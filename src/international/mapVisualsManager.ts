@@ -1,5 +1,5 @@
 import { unpackPosList } from 'other/packrat'
-import { ClaimRequestNeeds, minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteNeeds } from './constants'
+import { ClaimRequestData, minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteData } from './constants'
 import { customLog, unpackAsRoomPos } from './utils'
 import { InternationalManager } from './internationalManager'
 
@@ -99,9 +99,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
                     const income =
                         (possibleReservation ? 10 : 5) -
-                        Math.floor(
-                            roomMemory.needs[RemoteNeeds[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio,
-                        )
+                        Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
 
                     Game.map.visual.text(
                         `⛏️${income},🚶‍♀️${roomMemory.SE[sourceIndex]}`,
@@ -114,17 +112,21 @@ InternationalManager.prototype.mapVisualsManager = function () {
                 }
             }
 
-            if (roomMemory.abandon) {
-                Game.map.visual.text(`❌${roomMemory.abandon.toString()}`, new RoomPosition(2, 16, roomName), {
-                    align: 'left',
-                    fontSize: 8,
-                })
+            if (roomMemory.data[RemoteData.abandon]) {
+                Game.map.visual.text(
+                    `❌${roomMemory.data[RemoteData.abandon].toString()}`,
+                    new RoomPosition(2, 16, roomName),
+                    {
+                        align: 'left',
+                        fontSize: 8,
+                    },
+                )
             }
 
             continue
         }
 
-        if (roomMemory.notClaimable) {
+        if (roomMemory.NC) {
             Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
                 stroke: myColors.red,
                 strokeWidth: 2,
@@ -136,13 +138,24 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
     for (const roomName in Memory.claimRequests) {
         Game.map.visual.text(
-            `💵${(Memory.claimRequests[roomName].needs[ClaimRequestNeeds.abandon] || 0).toFixed(2)}`,
+            `💵${(Memory.claimRequests[roomName].data[ClaimRequestData.score] || 0).toFixed(2)}`,
             new RoomPosition(2, 24, roomName),
             {
                 align: 'left',
                 fontSize: 8,
             },
         )
+
+        if (Memory.claimRequests[roomName].data[ClaimRequestData.abandon]) {
+            Game.map.visual.text(
+                `❌${Memory.claimRequests[roomName].data[ClaimRequestData.abandon].toString()}`,
+                new RoomPosition(2, 16, roomName),
+                {
+                    align: 'left',
+                    fontSize: 8,
+                },
+            )
+        }
     }
 
     // If CPU logging is enabled, log the CPU used by this manager

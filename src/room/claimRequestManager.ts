@@ -1,4 +1,4 @@
-import { ClaimRequestNeeds, myColors } from 'international/constants'
+import { ClaimRequestData, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
@@ -10,7 +10,6 @@ export class ClaimRequestManager {
         this.communeManager = communeManager
     }
     public run() {
-
         const { room } = this.communeManager
 
         if (!room.memory.claimRequest) return
@@ -30,7 +29,7 @@ export class ClaimRequestManager {
 
         // If the request has been abandoned, have the commune abandon it too
 
-        if (request.needs[ClaimRequestNeeds.abandon] > 0) {
+        if (request.data[ClaimRequestData.abandon] > 0) {
             delete request.responder
             delete room.memory.claimRequest
             return
@@ -44,7 +43,7 @@ export class ClaimRequestManager {
 
         const requestRoom = Game.rooms[room.memory.claimRequest]
         if (!requestRoom || !requestRoom.controller.my) {
-            request.needs[ClaimRequestNeeds.claimer] = 1
+            request.data[ClaimRequestData.claimer] = 1
             return
         }
 
@@ -62,25 +61,26 @@ export class ClaimRequestManager {
         if (invaderCores.length) {
             // Abandon for its remaining existance plus the estimated reservation time
 
-            request.needs[ClaimRequestNeeds.abandon] = invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
+            request.data[ClaimRequestData.abandon] =
+                invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
 
             delete request.responder
             delete room.memory.claimRequest
             return
         }
 
-        request.needs[ClaimRequestNeeds.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
+        request.data[ClaimRequestData.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
 
-        request.needs[ClaimRequestNeeds.minDamage] = 0
-        request.needs[ClaimRequestNeeds.minHeal] = 0
+        request.data[ClaimRequestData.minDamage] = 0
+        request.data[ClaimRequestData.minHeal] = 0
 
         // Increase the defenderNeed according to the enemy attackers' combined strength
 
         for (const enemyAttacker of requestRoom.enemyAttackers) {
             if (enemyAttacker.owner.username === 'Invader') continue
 
-            request.needs[ClaimRequestNeeds.minDamage] += 10 + enemyAttacker.healStrength
-            request.needs[ClaimRequestNeeds.minHeal] += enemyAttacker.attackStrength
+            request.data[ClaimRequestData.minDamage] += 10 + enemyAttacker.healStrength
+            request.data[ClaimRequestData.minHeal] += enemyAttacker.attackStrength
         }
 
         // If CPU logging is enabled, log the CPU used by this manager

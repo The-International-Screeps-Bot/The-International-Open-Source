@@ -1,4 +1,4 @@
-import { allStructureTypes, ClaimRequestNeeds } from './constants'
+import { allStructureTypes, ClaimRequestData } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
@@ -145,14 +145,13 @@ global.destroyCommuneStructures = function (types?) {
 }
 
 global.claim = function (requestName, communeName) {
-
     if (!Memory.claimRequests[requestName]) {
-        const request = Memory.claimRequests[requestName] = {
+        const request = (Memory.claimRequests[requestName] = {
             responder: communeName,
-            needs: [0],
-        }
+            data: [0],
+        })
 
-        request.needs[ClaimRequestNeeds.score] = 0
+        request.data[ClaimRequestData.score] = 0
     }
 
     if (communeName) {
@@ -216,7 +215,7 @@ global.allyCreepRequest = function (requestName, communeName?) {
     if (!Memory.allyCreepRequests[requestName]) {
         Memory.allyCreepRequests[requestName] = {
             responder: communeName,
-            needs: [0],
+            data: [0],
         }
     }
 

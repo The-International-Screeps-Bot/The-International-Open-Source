@@ -1,4 +1,4 @@
-import { ClaimRequestNeeds } from 'international/constants'
+import { ClaimRequestData } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -12,7 +12,7 @@ export class Claimer extends Creep {
         const claimRequestName = Memory.rooms[this.commune.name].claimRequest
         if (!claimRequestName) return
 
-        Memory.claimRequests[claimRequestName].needs[ClaimRequestNeeds.claimer] -= 1
+        Memory.claimRequests[claimRequestName].data[ClaimRequestData.claimer] -= 1
     }
 
     /**
@@ -64,6 +64,7 @@ export class Claimer extends Creep {
             const creep: Claimer = Game.creeps[creepName]
 
             if (!creep.commune) return
+
             const claimRequestName = Memory.rooms[creep.commune.name].claimRequest
             if (!claimRequestName) return
 
@@ -90,7 +91,9 @@ export class Claimer extends Creep {
                     },
                 })
             ) {
-                Memory.claimRequests[claimRequestName].needs[ClaimRequestNeeds.score] = 20000
+                const request = Memory.claimRequests[claimRequestName]
+                request.data[ClaimRequestData.abandon] = 20000
+                delete request.responder
                 delete Memory.rooms[creep.commune.name].claimRequest
             }
         }

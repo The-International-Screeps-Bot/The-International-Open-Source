@@ -1,4 +1,4 @@
-import { AllyCreepRequestNeeds } from 'international/constants'
+import { AllyCreepRequestData } from 'international/constants'
 import { findObjectWithID, getRange, unpackAsPos } from 'international/utils'
 
 export class AllyVanguard extends Creep {
@@ -69,7 +69,7 @@ export class AllyVanguard extends Creep {
         const { room } = this
 
         if (room.controller && (room.controller.owner || room.controller.reservation)) {
-            if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+            if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
 
             if (!this.fulfillReservation()) {
                 this.say(this.message)
@@ -198,8 +198,8 @@ export class AllyVanguard extends Creep {
 
             if (!request) return
 
-            Memory.allyCreepRequests[Memory.rooms[creep.commune.name].allyCreepRequest].needs[
-                AllyCreepRequestNeeds.allyVanguard
+            Memory.allyCreepRequests[Memory.rooms[creep.commune.name].allyCreepRequest].data[
+                AllyCreepRequestData.allyVanguard
             ] -= creep.parts.work
 
             creep.say(request)

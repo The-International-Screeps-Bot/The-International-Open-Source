@@ -99,7 +99,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     remotes: true,
     deposits: true,
     powerBanks: true,
-    notClaimable: true,
+    NC: true,
     PC: true,
     MHC: true,
     HU: true,
@@ -142,7 +142,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         SE: true,
         RE: true,
         abandon: true,
-        notClaimable: true,
+        NC: true,
         PC: true,
     },
     ally: {
@@ -159,16 +159,16 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         towers: true,
         hasTerminal: true,
         energy: true,
-        notClaimable: true,
+        NC: true,
         OT: true,
         DT: true,
     },
     enemyRemote: {
         owner: true,
-        notClaimable: true,
+        NC: true,
     },
     neutral: {
-        notClaimable: true,
+        NC: true,
         PC: true,
     },
     keeper: {
@@ -649,12 +649,11 @@ export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 export const terminalResourceTargets: ResourceTarget[] = [
     {
         resource: RESOURCE_BATTERY,
-        conditions: function(communeManager) {
-
+        conditions: function (communeManager) {
             return communeManager.room.structures.factory.length
         },
         min: 0.005,
-        max: 0.015
+        max: 0.015,
     },
     {
         resource: RESOURCE_ENERGY,
@@ -698,16 +697,15 @@ export const terminalResourceTargets: ResourceTarget[] = [
     },
     {
         resource: RESOURCE_POWER,
-        conditions: function(communeManager) {
-
+        conditions: function (communeManager) {
             return communeManager.room.structures.powerSpawn.length
         },
         min: 0.005,
-        max: 0.015
+        max: 0.015,
     },
 ]
 
-export enum RemoteNeeds {
+export enum RemoteData {
     source1RemoteHarvester,
     source2RemoteHarvester,
     remoteHauler0,
@@ -720,16 +718,17 @@ export enum RemoteNeeds {
     minHeal,
     enemyReserved,
     invaderCore,
+    abandon,
 }
 
-export const RemoteNeeds_HaulerByIndex: RemoteNeeds[] = [RemoteNeeds.remoteHauler0, RemoteNeeds.remoteHauler1]
+export const RemoteData_HaulerByIndex: RemoteData[] = [RemoteData.remoteHauler0, RemoteData.remoteHauler1]
 
-export const RemoteNeeds_HarvesterByIndex: RemoteNeeds[] = [
-    RemoteNeeds.source1RemoteHarvester,
-    RemoteNeeds.source2RemoteHarvester,
+export const RemoteData_HarvesterByIndex: RemoteData[] = [
+    RemoteData.source1RemoteHarvester,
+    RemoteData.source2RemoteHarvester,
 ]
 
-export enum ClaimRequestNeeds {
+export enum ClaimRequestData {
     claimer,
     vanguard,
     minDamage,
@@ -750,7 +749,7 @@ export enum CombatRequestData {
     priority,
 }
 
-export enum AllyCreepRequestNeeds {
+export enum AllyCreepRequestData {
     allyVanguard,
     abandon,
 }

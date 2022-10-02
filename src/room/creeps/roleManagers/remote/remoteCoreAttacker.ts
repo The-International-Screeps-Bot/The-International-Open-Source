@@ -1,4 +1,4 @@
-import { RemoteNeeds } from 'international/constants'
+import { RemoteData } from 'international/constants'
 import { getRange } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
@@ -42,7 +42,7 @@ export class RemoteCoreAttacker extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
+        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
 
         const commune = this.commune
 
@@ -78,12 +78,12 @@ export class RemoteCoreAttacker extends Creep {
 
             // If the needs of this remote are met, iterate
 
-            if (roomMemory.needs[RemoteNeeds[role]] <= 0) continue
+            if (roomMemory.data[RemoteData[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true
 
             creep.memory.RN = roomName
-            roomMemory.needs[RemoteNeeds[role]] -= 1
+            roomMemory.data[RemoteData[role]] -= 1
 
             return true
         }

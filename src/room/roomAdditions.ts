@@ -117,14 +117,14 @@ Object.defineProperties(Room.prototype, {
             // If commune, only avoid ally creeps
 
             if (this.memory.T === 'commune') {
-                return this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
+                return (this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
                     return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work + creep.parts.heal > 0
-                })
+                }))
             }
 
-            return this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
+            return (this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
                 return creep.parts.attack + creep.parts.ranged_attack + creep.parts.heal > 0
-            })
+            }))
         },
     },
     allyCreeps: {
@@ -971,6 +971,48 @@ Object.defineProperties(Room.prototype, {
             return (this._actionableWalls = this.structures.constructedWall.filter(function (structure) {
                 return structure.hits
             }))
+        },
+    },
+    quadCostMatrix: {
+        get() {
+            /* if (this._quadCostMatrix) return this._quadCostMatrix */
+
+            const terrainCoords = internationalManager.getTerrainCoords(this.name)
+            this._quadCostMatrix = new PathFinder.CostMatrix()
+
+            // Assign impassible to tiles we can't aren't 2x2 passible
+
+            for (let x = 0; x < roomDimensions; x += 1) {
+                for (let y = 0; y < roomDimensions; y += 1) {
+                    if (terrainCoords[packXY(x, y)] === 255) {
+                        this._quadCostMatrix.set(x, y, 255)
+                        continue
+                    }
+
+                    if (terrainCoords[packXY(x + 1, y)] === 255) {
+                        this._quadCostMatrix.set(x, y, 255)
+                        continue
+                    }
+
+                    if (terrainCoords[packXY(x + 1, y + 1)] === 255) {
+                        this._quadCostMatrix.set(x, y, 255)
+                        continue
+                    }
+
+                    if (terrainCoords[packXY(x, y + 1)] === 255) {
+                        this._quadCostMatrix.set(x, y, 255)
+                        continue
+                    }
+
+                    this._quadCostMatrix.set(x + 1, y, 0)
+                    this._quadCostMatrix.set(x + 1, y + 1, 0)
+                    this._quadCostMatrix.set(x, y + 1, 0)
+                }
+            }
+
+            this.visualizeCostMatrix(this._quadCostMatrix, true)
+
+            return this._quadCostMatrix
         },
     },
     MEWT: {

@@ -3,9 +3,9 @@ import {
     myColors,
     NORMAL,
     PROTECTED,
-    RemoteNeeds,
-    RemoteNeeds_HarvesterByIndex,
-    RemoteNeeds_HaulerByIndex,
+    RemoteData,
+    RemoteData_HarvesterByIndex,
+    RemoteData_HaulerByIndex,
     roomDimensions,
     stamps,
 } from 'international/constants'
@@ -188,12 +188,12 @@ export class RoomVisualsManager {
     private sourceVisuals() {
         for (const source of this.roomManager.room.sources) {
             if (this.roomManager.room.memory.T == 'remote') {
-                if (this.roomManager.room.memory.needs && this.roomManager.room.memory.needs.length > 10) {
+                if (this.roomManager.room.memory.data && this.roomManager.room.memory.data.length > 10) {
                 }
 
                 this.roomManager.room.visual.text(
-                    `${this.roomManager.room.memory.needs[RemoteNeeds_HarvesterByIndex[source.index]]} / ${
-                        this.roomManager.room.memory.needs[RemoteNeeds_HaulerByIndex[source.index]]
+                    `${this.roomManager.room.memory.data[RemoteData_HarvesterByIndex[source.index]]} / ${
+                        this.roomManager.room.memory.data[RemoteData_HaulerByIndex[source.index]]
                     }`,
                     source.pos,
                     {

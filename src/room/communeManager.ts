@@ -83,6 +83,7 @@ export class CommuneManager {
         this.test()
     }
     private test() {
+
         return
 
         let CPUUsed = Game.cpu.getUsed()

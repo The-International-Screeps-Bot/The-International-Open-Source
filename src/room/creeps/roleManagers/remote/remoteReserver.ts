@@ -1,4 +1,4 @@
-import { RemoteNeeds } from 'international/constants'
+import { RemoteData } from 'international/constants'
 
 export class RemoteReserver extends Creep {
     public get dying(): boolean {
@@ -31,10 +31,10 @@ export class RemoteReserver extends Creep {
         for (const roomName of remoteNamesByEfficacy) {
             roomMemory = Memory.rooms[roomName]
 
-            if (roomMemory.needs[RemoteNeeds.remoteReserver] <= 0) continue
+            if (roomMemory.data[RemoteData.remoteReserver] <= 0) continue
 
             this.memory.RN = roomName
-            roomMemory.needs[RemoteNeeds.remoteReserver] -= 1
+            roomMemory.data[RemoteData.remoteReserver] -= 1
 
             return true
         }
@@ -60,7 +60,7 @@ export class RemoteReserver extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
+        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
 
         const commune = this.commune
 

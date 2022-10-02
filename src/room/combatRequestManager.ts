@@ -1,4 +1,4 @@
-import { CombatRequestData, ClaimRequestNeeds, myColors } from 'international/constants'
+import { CombatRequestData, ClaimRequestData, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
@@ -10,7 +10,6 @@ export class CombatRequestManager {
         this.communeManager = communeManager
     }
     public run() {
-
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
         for (let index = 0; index < this.communeManager.room.memory.combatRequests.length; index++) {
@@ -30,12 +29,8 @@ export class CombatRequestManager {
                 myColors.lightGrey,
             )
     }
-    private attackRequest(request: CombatRequest, requestName: string, index: number) {
-
-
-    }
+    private attackRequest(request: CombatRequest, requestName: string, index: number) {}
     private harassRequest(request: CombatRequest, requestName: string, index: number) {
-
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
 
@@ -71,8 +66,5 @@ export class CombatRequestManager {
             return
         }
     }
-    private defendRequest(request: CombatRequest, requestName: string, index: number) {
-
-
-    }
+    private defendRequest(request: CombatRequest, requestName: string, index: number) {}
 }

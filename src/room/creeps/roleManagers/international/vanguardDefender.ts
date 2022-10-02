@@ -1,4 +1,4 @@
-import { allyPlayers, ClaimRequestNeeds } from 'international/constants'
+import { allyPlayers, ClaimRequestData } from 'international/constants'
 import { findClosestObject, getRange, pack } from 'international/utils'
 
 export class VanguardDefender extends Creep {
@@ -171,8 +171,8 @@ export class VanguardDefender extends Creep {
 
             if (!claimTarget) return
 
-            Memory.rooms[creep.commune.name].needs[ClaimRequestNeeds.minDamage] -= creep.attackStrength
-            Memory.rooms[creep.commune.name].needs[ClaimRequestNeeds.minHeal] -= creep.healStrength
+            Memory.rooms[creep.commune.name].data[ClaimRequestData.minDamage] -= creep.attackStrength
+            Memory.rooms[creep.commune.name].data[ClaimRequestData.minHeal] -= creep.healStrength
 
             creep.say(claimTarget)
 

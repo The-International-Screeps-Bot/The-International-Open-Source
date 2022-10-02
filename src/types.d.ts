@@ -305,7 +305,15 @@ declare global {
          * The name of the room responding to the request
          */
         responder?: string
-        needs: number[]
+        data: number[]
+    }
+
+    interface AllyCreepRequest {
+        /**
+         * The name of the room responding to the request
+         */
+        responder?: string
+        data: number[]
     }
 
     interface CombatRequest {
@@ -318,14 +326,6 @@ declare global {
          */
         responder?: string
         data: number[]
-    }
-
-    interface AllyCreepRequest {
-        /**
-         * The name of the room responding to the request
-         */
-        responder?: string
-        needs: number[]
     }
 
     interface ControllerLevel {
@@ -912,9 +912,9 @@ declare global {
          */
         createWithdrawTasks(creator: Structure | Creep | Resource): void
 
-        visualizeCoordMap(coordMap: CoordMap): void
+        visualizeCoordMap(coordMap: CoordMap, color?: boolean): void
 
-        visualizeCostMatrix(cm: CostMatrix): void
+        visualizeCostMatrix(cm: CostMatrix, color?: boolean): void
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
@@ -1201,6 +1201,10 @@ declare global {
 
         readonly actionableWalls: StructureWall[]
 
+        _quadCostMatrix: CostMatrix
+
+        readonly quadCostMatrix: CostMatrix
+
         // Target finding
 
         _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
@@ -1296,9 +1300,9 @@ declare global {
         remotes: string[]
 
         /**
-         * If the room can be constructed by the base planner
+         * Not Claimable, if the room can be constructed by the base planner
          */
-        notClaimable: boolean
+        NC: boolean
 
         /**
          * Source IDs of the sources in the room
@@ -1320,7 +1324,7 @@ declare global {
         /**
          * A list of needs the remote wants met
          */
-        needs: number[]
+        data: number[]
 
         /**
          * The room owner
@@ -1377,8 +1381,6 @@ declare global {
         cSiteTargetID: Id<ConstructionSite>
 
         stampAnchors: Partial<Record<StampTypes, number[]>>
-
-        abandon: number | undefined
 
         powerBanks: { [roomName: string]: number[] }
 
@@ -1725,11 +1727,6 @@ declare global {
         D: boolean
 
         /**
-         * A name of the creep's designated source
-         */
-        sourceName: 'source1' | 'source2'
-
-        /**
          * The Source Index of recorded sources in the room
          */
         SI: 0 | 1
@@ -1740,19 +1737,19 @@ declare global {
         packedPos: number
 
         /**
-         * The last time a path was cached in memory
+         * Last Cache, the last time a path was cached in memory
          */
-        lastCache: number
+        LC: number
 
         /**
          * An array of positions desciring where the creep neeeds to move to get to its goal
          */
-        path: string
+        P: string
 
         /**
-         * The position the creep is or has tried to path to
+         * Goal Pos, the position the creep is or has tried to path to
          */
-        goalPos: string
+        GP: string
 
         /**
          * Whether the creep is intended to move on its own or not
@@ -1765,14 +1762,14 @@ declare global {
         repairTarget: Id<Structure>
 
         /**
-         * The name of the room the scout is trying to scout
+         * Scout Target, the name of the room the scout is trying to scout
          */
-        scoutTarget: string
+        scT: string
 
         /**
-         * The name of the room the scout is trying to sign
+         * Sign Target, the name of the room the scout is trying to sign
          */
-        signTarget: string
+        siT: string
 
         /**
          * Remote Name of the room the creep is remoting for
@@ -1785,9 +1782,9 @@ declare global {
         taskTarget: Id<Creep | AnyStoreStructure>
 
         /**
-         * An array of targets with information to manage the resources of
+         * Reservations, An array of targets with information to manage the resources of
          */
-        reservations: Reservation[]
+        Rs: Reservation[]
 
         /**
          * The target for which the creep should dismantle

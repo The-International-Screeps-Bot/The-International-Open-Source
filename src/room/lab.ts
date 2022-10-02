@@ -146,7 +146,7 @@ export class LabManager {
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return false
 
-        if (lab.mineralAmount < LAB_BOOST_MINERAL || lab.energy < LAB_BOOST_ENERGY) return false
+        if (lab.mineralAmount < LAB_BOOST_MINERAL || lab.store.getUsedCapacity(RESOURCE_ENERGY) < LAB_BOOST_ENERGY) return false
 
         //This needs to see if the lab is fully ready to boost the creep.  This will work
         //  even if it partially boosts the creep.
@@ -384,10 +384,9 @@ export class LabManager {
     }
 
     react() {
-        if (!this.isValid()) return false
         if (!this.reactionPossible()) return false
 
-        for (let output of this.outputs) {
+        for (const output of this.outputs) {
             if (this.isReverse) {
                 if (output.mineralType == this.outputRsc && output.store[this.outputRsc] >= LAB_REACTION_AMOUNT)
                     output.reverseReaction(this.input1, this.input2) //Reverse is here so the outputs line up with the expected locations
@@ -581,7 +580,7 @@ export class LabManager {
             }
         }
 
-        if (creep.memory.reservations?.length > 0) return true
+        if (creep.memory.Rs?.length > 0) return true
         return false
     }
 
@@ -633,7 +632,7 @@ export class LabManager {
             }
         }
 
-        if (creep.memory.reservations?.length > 0) return true
+        if (creep.memory.Rs?.length > 0) return true
         return false
     }
 
@@ -690,7 +689,7 @@ export class LabManager {
             )
         }
 
-        if (creep.memory.reservations?.length > 0) return true
+        if (creep.memory.Rs?.length > 0) return true
         return false
     }
 

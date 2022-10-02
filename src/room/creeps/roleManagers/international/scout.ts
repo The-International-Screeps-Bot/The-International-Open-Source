@@ -2,25 +2,24 @@ import { communeSigns, nonCommuneSigns } from 'international/constants'
 import { findClosestCommuneName, getRange } from 'international/utils'
 
 export class Scout extends Creep {
-
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
 
     preTickManager() {
-        if (!this.memory.scoutTarget) return
+        if (!this.memory.scT) return
 
         const commune = this.commune
         if (!commune) return
 
-        commune.scoutTargets.add(this.memory.scoutTarget)
+        commune.scoutTargets.add(this.memory.scT)
     }
 
     /**
      * Finds a room name for the scout to target
      */
     findScoutTarget?(): boolean {
-        if (this.memory.scoutTarget) return true
+        if (this.memory.scT) return true
 
         const commune = this.commune
 
@@ -72,7 +71,7 @@ export class Scout extends Creep {
 
         if (!scoutTarget) return false
 
-        this.memory.scoutTarget = scoutTarget
+        this.memory.scT = scoutTarget
         commune.scoutTargets.add(scoutTarget)
 
         return true
@@ -120,7 +119,7 @@ export class Scout extends Creep {
 
         if (!controller) return true
 
-        if (room.name !== this.memory.signTarget) return true
+        if (room.name !== this.memory.siT) return true
 
         // Construct the signMessage
 
@@ -197,7 +196,7 @@ export class Scout extends Creep {
 
             // If the creep is in the scoutTarget
 
-            if (creep.memory.scoutTarget === room.name) {
+            if (creep.memory.scT === room.name) {
                 creep.say('👁️')
 
                 // Get information about the room
@@ -210,7 +209,7 @@ export class Scout extends Creep {
 
                 // And delete the creep's scoutTarget
 
-                delete creep.memory.scoutTarget
+                delete creep.memory.scT
             }
 
             // If there is no scoutTarget, find one
@@ -219,11 +218,11 @@ export class Scout extends Creep {
 
             // Say the scoutTarget
 
-            creep.say(`🔭${creep.memory.scoutTarget.toString()}`)
+            creep.say(`🔭${creep.memory.scT.toString()}`)
 
             if (!creep.advancedSignController()) continue
 
-            creep.memory.signTarget = creep.memory.scoutTarget
+            creep.memory.siT = creep.memory.scT
 
             // Try to go to the scoutTarget
 
@@ -231,7 +230,7 @@ export class Scout extends Creep {
                 origin: creep.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, creep.memory.scoutTarget),
+                        pos: new RoomPosition(25, 25, creep.memory.scT),
                         range: 25,
                     },
                 ],

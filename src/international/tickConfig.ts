@@ -1,13 +1,13 @@
 import { allyManager } from 'international/simpleAllies'
 import {
-    AllyCreepRequestNeeds,
+    AllyCreepRequestData,
     antifaRoles,
-    ClaimRequestNeeds,
+    ClaimRequestData,
     CombatRequestData,
     creepRoles,
     haulerUpdateDefault,
     myColors,
-    RemoteNeeds,
+    RemoteData,
     remoteRoles,
     stamps,
 } from './constants'
@@ -175,12 +175,12 @@ class TickConfig {
 
             if (!request) continue
 
-            if (request.needs[ClaimRequestNeeds.score] > 0) {
-                request.needs[ClaimRequestNeeds.score] -= 1
+            if (request.data[ClaimRequestData.score] > 0) {
+                request.data[ClaimRequestData.score] -= 1
                 continue
             }
 
-            delete request.needs[ClaimRequestNeeds.score]
+            delete request.data[ClaimRequestData.score]
 
             if (request.responder && global.communes.has(request.responder)) continue
 
@@ -214,7 +214,7 @@ class TickConfig {
                     ally: Infinity,
                 }) > maxRange
             ) {
-                Memory.claimRequests[roomName].needs[ClaimRequestNeeds.score] = 20000
+                Memory.claimRequests[roomName].data[ClaimRequestData.score] = 20000
                 continue
             }
 
@@ -234,12 +234,12 @@ class TickConfig {
         for (const roomName in Memory.allyCreepRequests) {
             const request = Memory.allyCreepRequests[roomName]
 
-            if (request.needs[AllyCreepRequestNeeds.abandon] > 0) {
-                request.needs[AllyCreepRequestNeeds.abandon] -= 1
+            if (request.data[AllyCreepRequestData.abandon] > 0) {
+                request.data[AllyCreepRequestData.abandon] -= 1
                 continue
             }
 
-            request.needs[AllyCreepRequestNeeds.abandon] = undefined
+            request.data[AllyCreepRequestData.abandon] = undefined
 
             if (request.responder) continue
 
@@ -266,7 +266,7 @@ class TickConfig {
                     ally: Infinity,
                 }) > maxRange
             ) {
-                request.needs[AllyCreepRequestNeeds.abandon] = 20000
+                request.data[AllyCreepRequestData.abandon] = 20000
                 continue
             }
 

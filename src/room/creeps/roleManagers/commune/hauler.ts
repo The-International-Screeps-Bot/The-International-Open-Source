@@ -1,7 +1,6 @@
 import { customLog, findClosestObject, getRange } from 'international/utils'
 
 export class Hauler extends Creep {
-
     haul?() {
         this.reserve()
 
@@ -21,7 +20,7 @@ export class Hauler extends Creep {
     }
 
     reserve?() {
-        if (this.memory.reservations?.length) return
+        if (this.memory.Rs?.length) return
 
         const { room } = this
 
@@ -31,7 +30,10 @@ export class Hauler extends Creep {
                     target.reserveAmount >= this.store.getCapacity() * 0.2 || target.reserveAmount >= this.freeStore()
                 )
 
-            return target.store.getUsedCapacity(RESOURCE_ENERGY) >= target.store.getCapacity(RESOURCE_ENERGY) || target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
+            return (
+                target.store.getUsedCapacity(RESOURCE_ENERGY) >= target.store.getCapacity(RESOURCE_ENERGY) ||
+                target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
+            )
         })
 
         let transferTargets
@@ -77,7 +79,10 @@ export class Hauler extends Creep {
                             target.reserveAmount >= this.freeStore()
                         )
 
-                    return target.store.getUsedCapacity(RESOURCE_ENERGY) >= target.store.getCapacity(RESOURCE_ENERGY) || target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
+                    return (
+                        target.store.getUsedCapacity(RESOURCE_ENERGY) >= target.store.getCapacity(RESOURCE_ENERGY) ||
+                        target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
+                    )
                 })
 
                 if (!withdrawTargets.length) return
@@ -136,7 +141,7 @@ export class Hauler extends Creep {
             this.createReservation('transfer', target.id, amount)
         }
 
-        if (this.memory.reservations?.length == 0) {
+        if (this.memory.Rs?.length == 0) {
             //Empty out the creep if it has anything left by this point.
             if (this.store.getUsedCapacity() > 0) {
                 let target = room.OATT[0]
@@ -152,7 +157,7 @@ export class Hauler extends Creep {
             }
         }
 
-        if (this.memory.reservations?.length == 0 && room.communeManager.labManager)
+        if (this.memory.Rs?.length == 0 && room.communeManager.labManager)
             room.communeManager.labManager.generateHaulingReservation(this)
     }
 

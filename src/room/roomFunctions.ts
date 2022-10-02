@@ -1,7 +1,7 @@
 import {
     allStructureTypes,
     allyPlayers,
-    ClaimRequestNeeds,
+    ClaimRequestData,
     CombatRequestData,
     defaultPlainCost,
     defaultSwampCost,
@@ -11,7 +11,7 @@ import {
     myColors,
     numbersByStructureTypes,
     prefferedCommuneRange,
-    RemoteNeeds,
+    RemoteData,
     roomDimensions,
     roomTypeProperties,
     roomTypes,
@@ -683,7 +683,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (!room) return cm
 
                 if (opts.creep) {
-
                     let roadCost = 1
                     if (!opts.creep.memory.R) roadCost = opts.plainCost
 
@@ -902,7 +901,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             let lastPos = opts.origin
 
             for (const goal of opts.goals) {
-
                 // Ensure no visuals are generated outside of the origin room
 
                 if (lastPos.roomName !== goal.pos.roomName) continue
@@ -1293,8 +1291,8 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             room.memory.SE = newSourceEfficacies
             room.memory.RE = newReservationEfficacy
 
-            room.memory.needs = []
-            for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
+            room.memory.data = []
+            for (const key in RemoteData) room.memory.data[parseInt(key)] = 0
 
             return true
         }
@@ -1330,8 +1328,8 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         room.memory.SE = newSourceEfficacies
         room.memory.RE = newReservationEfficacy
 
-        room.memory.needs = []
-        for (const key in RemoteNeeds) room.memory.needs[parseInt(key)] = 0
+        room.memory.data = []
+        for (const key in RemoteData) room.memory.data[parseInt(key)] = 0
 
         return true
     }
@@ -1363,7 +1361,8 @@ Room.prototype.createHarassCombatRequest = function () {
     let totalHits = 0
     for (const structure of structures) totalHits += structure.hits
 
-    if (structures.length > 0) request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+    if (structures.length > 0)
+        request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
 }
 
 Room.prototype.cleanMemory = function () {
@@ -2157,7 +2156,6 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 }
 
 Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisuals) {
-
     if (!visualize) return
 
     if (!path.length) return
@@ -2490,15 +2488,15 @@ Room.prototype.getPartsOfRoleAmount = function (role, type) {
 Room.prototype.createClaimRequest = function () {
     if (this.sources.length !== 2) return false
 
-    if (this.memory.notClaimable) return false
+    if (this.memory.NC) return false
 
     if (Memory.claimRequests[this.name]) return false
 
     if (basePlanner(this) === 'failed') return false
 
-    const request = Memory.claimRequests[this.name] = {
-        needs: [0],
-    }
+    const request = (Memory.claimRequests[this.name] = {
+        data: [0],
+    })
 
     let score = 0
 
@@ -2513,7 +2511,7 @@ Room.prototype.createClaimRequest = function () {
     score += this.upgradePathLength / 10
     score += this.findSwampPlainsRatio() * 10
 
-    request.needs[ClaimRequestNeeds.score] = score
+    request.data[ClaimRequestData.score] = score
 
     return true
 }
@@ -2532,7 +2530,20 @@ Room.prototype.findSwampPlainsRatio = function () {
     return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
 }
 
-Room.prototype.visualizeCoordMap = function (coordMap) {
+Room.prototype.visualizeCoordMap = function (coordMap, color) {
+    if (color) {
+        for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                    fill: `hsl(${200}${coordMap[packXY(x, y)] * 10}, 100%, 60%)`,
+                    opacity: 0.4,
+                })
+            }
+        }
+
+        return
+    }
+
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             this.visual.text(coordMap[packXY(x, y)].toString(), x, y, {
@@ -2542,7 +2553,20 @@ Room.prototype.visualizeCoordMap = function (coordMap) {
     }
 }
 
-Room.prototype.visualizeCostMatrix = function (cm) {
+Room.prototype.visualizeCostMatrix = function (cm, color) {
+    if (color) {
+        for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+                    fill: `hsl(${200}${cm.get(x, y) * 10}, 100%, 60%)`,
+                    opacity: 0.4,
+                })
+            }
+        }
+
+        return
+    }
+
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
             this.visual.text(cm.get(x, y).toString(), x, y, {

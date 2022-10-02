@@ -58,12 +58,8 @@ export class CommunePlanner {
     public run() {}
     private flipStampVertical() {}
     private flipStampHorizontal() {}
-    private planStamps(opts: PlanStampOpts) {
-
-    }
-    private planStamp(startPos: Coord) {
-
-    }
+    private planStamps(opts: PlanStampOpts) {}
+    private planStamp(startPos: Coord) {}
     private planSourceStructures() {}
 }
 
@@ -324,7 +320,7 @@ export function basePlanner(room: Room) {
     if (!room.memory.stampAnchors.fastFiller.length) {
         // Record that the room is not claimable and stop
 
-        room.memory.notClaimable = true
+        room.memory.NC = true
         return 'failed'
     }
 

@@ -296,7 +296,7 @@ Creep.prototype.advancedUpgradeController = function () {
     // If the creep needs resources
 
     if (this.needsResources()) {
-        if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+        if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
 
         if (!this.fulfillReservation()) {
             this.say(this.message)
@@ -767,21 +767,21 @@ Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
 
     // Inform true if there is no lastCache value in the creep's memory
 
-    if (!this.memory.lastCache) return true
+    if (!this.memory.LC) return true
 
     // Inform true if the path is out of caching time
 
-    if (this.memory.lastCache + cacheAmount <= Game.time) return true
+    if (this.memory.LC + cacheAmount <= Game.time) return true
 
     // Inform true if the path isn't in the same room as the creep
 
     if (path[0].roomName !== this.room.name) return true
 
-    if (!this.memory.goalPos) return true
+    if (!this.memory.GP) return true
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!areCoordsEqual(unpackPos(this.memory.goalPos), goalPos)) return true
+    if (!areCoordsEqual(unpackPos(this.memory.GP), goalPos)) return true
 
     // If next pos in the path is not in range, inform true
 
@@ -810,8 +810,8 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // If there is a path in the creep's memory
 
-    if (this.memory.path) {
-        path = unpackPosList(this.memory.path)
+    if (this.memory.P) {
+        path = unpackPosList(this.memory.P)
 
         // So long as the creep isn't standing on the first position in the path
 
@@ -849,7 +849,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
         // Set the lastCache to the current tick
 
-        this.memory.lastCache = Game.time
+        this.memory.LC = Game.time
 
         // Show that a new path has been created
 
@@ -892,11 +892,11 @@ Creep.prototype.createMoveRequest = function (opts) {
 
     // Assign the goal's pos to the creep's goalPos
 
-    this.memory.goalPos = packPos(opts.goals[0].pos)
+    this.memory.GP = packPos(opts.goals[0].pos)
 
     // Set the path in the creep's memory
 
-    this.memory.path = packPosList(path)
+    this.memory.P = packPosList(path)
 
     // Inform success
 
@@ -1001,8 +1001,8 @@ Creep.prototype.shove = function (shoverPos) {
 
     let goalPos: RoomPosition
 
-    if (this.memory.goalPos) {
-        goalPos = unpackPos(this.memory.goalPos)
+    if (this.memory.GP) {
+        goalPos = unpackPos(this.memory.GP)
 
         goalPos = shovePositions.sort((a, b) => {
             return getRange(goalPos.x, a.x, goalPos.y, a.y) - getRange(goalPos.x, b.x, goalPos.y, b.y)
@@ -1705,23 +1705,23 @@ Creep.prototype.passiveRangedAttack = function () {
 }
 
 Creep.prototype.deleteReservation = function (index) {
-    this.memory.reservations.splice(index, 1)
+    this.memory.Rs.splice(index, 1)
 
     this.message += '❌'
 }
 
 Creep.prototype.createReservation = function (type, targetID, amount, resourceType = RESOURCE_ENERGY) {
-    if (!this.memory.reservations) this.memory.reservations = []
+    if (!this.memory.Rs) this.memory.Rs = []
     if (amount <= 0) return
 
-    this.memory.reservations.push({
+    this.memory.Rs.push({
         type,
         targetID,
         amount,
         resourceType,
     })
 
-    const reservation = this.memory.reservations[0]
+    const reservation = this.memory.Rs[0]
 
     const target = findObjectWithID(reservation.targetID)
 
@@ -1738,10 +1738,10 @@ Creep.prototype.createReservation = function (type, targetID, amount, resourceTy
 }
 
 Creep.prototype.reservationManager = function () {
-    if (!this.memory.reservations) return
+    if (!this.memory.Rs) return
 
-    for (let index = 0; index < this.memory.reservations.length; index++) {
-        const reservation = this.memory.reservations[index]
+    for (let index = 0; index < this.memory.Rs.length; index++) {
+        const reservation = this.memory.Rs[index]
         const target = findObjectWithID(reservation.targetID)
 
         if (!target || target.room.name !== this.room.name) {
@@ -1800,9 +1800,9 @@ Creep.prototype.reservationManager = function () {
 }
 
 Creep.prototype.fulfillReservation = function () {
-    if (!this.memory.reservations) return true
+    if (!this.memory.Rs) return true
 
-    const reservation = this.memory.reservations[0]
+    const reservation = this.memory.Rs[0]
     if (!reservation) return true
 
     const target = findObjectWithID(reservation.targetID)
@@ -1929,7 +1929,7 @@ Creep.prototype.fulfillReservation = function () {
 }
 
 Creep.prototype.reserveWithdrawEnergy = function () {
-    if (this.memory.reservations && this.memory.reservations?.length) return
+    if (this.memory.Rs && this.memory.Rs?.length) return
 
     const { room } = this
 
@@ -1988,7 +1988,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
 }
 
 Creep.prototype.reserveTransferEnergy = function () {
-    if (this.memory.reservations?.length) return
+    if (this.memory.Rs?.length) return
 
     const { room } = this
 

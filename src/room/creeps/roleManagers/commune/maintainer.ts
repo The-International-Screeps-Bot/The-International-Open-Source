@@ -2,7 +2,6 @@ import { roomDimensions } from 'international/constants'
 import { findObjectWithID } from 'international/utils'
 
 export class Maintainer extends Creep {
-
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
@@ -13,7 +12,7 @@ export class Maintainer extends Creep {
         // If the this needs resources
 
         if (this.needsResources()) {
-            if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+            if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
 
             if (!this.fulfillReservation()) {
                 this.say(this.message)
@@ -37,12 +36,9 @@ export class Maintainer extends Creep {
         // Find a repair target based on the creeps work parts. If none are found, inform false
 
         const repairTarget: Structure | false =
-            findObjectWithID(this.memory.repairTarget) ||
-            this.findRepairTarget() ||
-            this.findRampartRepairTarget()
+            findObjectWithID(this.memory.repairTarget) || this.findRepairTarget() || this.findRampartRepairTarget()
 
         if (!repairTarget) {
-
             this.say('❌🔧')
             return false
         }

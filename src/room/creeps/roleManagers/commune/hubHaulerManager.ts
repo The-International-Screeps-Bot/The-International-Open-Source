@@ -32,7 +32,7 @@ export class HubHauler extends Creep {
      * @returns If a reservation was made or not
      */
     reserve?(): void {
-        if (this.memory.reservations?.length) return
+        if (this.memory.Rs?.length) return
 
         const { room } = this
         const { storage } = room
@@ -238,7 +238,9 @@ export class HubHauler extends Creep {
 
         if (
             controllerLink &&
-            controllerLink.store.getCapacity(RESOURCE_ENERGY) * (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) > controllerLink.store.energy
+            controllerLink.store.getCapacity(RESOURCE_ENERGY) *
+                (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) >
+                controllerLink.store.energy
         ) {
         } else if (
             fastFillerLink &&
@@ -443,7 +445,7 @@ export class HubHauler extends Creep {
     /**
      * @returns If a reservation was made or not
      */
-     reservePowerSpawnTransferEnergy?(): boolean {
+    reservePowerSpawnTransferEnergy?(): boolean {
         const { room } = this
         const powerSpawn = room.structures.powerSpawn[0]
         const resource = RESOURCE_ENERGY
@@ -494,7 +496,7 @@ export class HubHauler extends Creep {
 
             // If the creep has no reservations but is full
 
-            if ((!creep.memory.reservations || !creep.memory.reservations.length) && creep.freeStore() === 0) {
+            if ((!creep.memory.Rs || !creep.memory.Rs.length) && creep.freeStore() === 0) {
                 for (const key in creep.store) {
                     const resourceType = key as ResourceConstant
 

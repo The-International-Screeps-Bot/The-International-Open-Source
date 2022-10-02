@@ -1,4 +1,4 @@
-import { minHarvestWorkRatio, RemoteNeeds } from 'international/constants'
+import { minHarvestWorkRatio, RemoteData } from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,
@@ -61,7 +61,7 @@ export class RemoteHarvester extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= this.parts.work
+        Memory.rooms[this.memory.RN].needs[RemoteData[role]] -= this.parts.work
 
         const commune = this.commune
 
@@ -91,7 +91,7 @@ export class RemoteHarvester extends Creep {
 
             // If there is no need
 
-            if (remoteMemory.needs[RemoteNeeds[role]] <= 0) continue
+            if (remoteMemory.needs[RemoteData[role]] <= 0) continue
 
             this.assignRemote(remoteName)
             return true
@@ -109,7 +109,7 @@ export class RemoteHarvester extends Creep {
 
         const needs = Memory.rooms[remoteName].needs
 
-        needs[RemoteNeeds[role]] -= this.parts.work
+        needs[RemoteData[role]] -= this.parts.work
     }
 
     removeRemote?() {
@@ -118,7 +118,7 @@ export class RemoteHarvester extends Creep {
 
             const needs = Memory.rooms[this.memory.RN].needs
 
-            needs[RemoteNeeds[role]] += this.parts.work
+            needs[RemoteData[role]] += this.parts.work
         }
 
         delete this.memory.RN

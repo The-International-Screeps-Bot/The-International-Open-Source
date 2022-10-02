@@ -1,7 +1,7 @@
 import {
-    AllyCreepRequestNeeds,
+    AllyCreepRequestData,
     allyPlayers,
-    ClaimRequestNeeds,
+    ClaimRequestData,
     CombatRequestData,
     containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
@@ -11,7 +11,7 @@ import {
     remoteHarvesterRoles,
     RemoteHarvesterRolesBySourceIndex,
     remoteHaulerRoles,
-    RemoteNeeds,
+    RemoteData,
     roadUpkeepCost,
 } from 'international/constants'
 import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from 'international/utils'
@@ -889,7 +889,7 @@ Room.prototype.spawnRequester = function () {
         const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
         const remoteMemory = Memory.rooms[remoteName]
-        const remoteNeeds = Memory.rooms[remoteName].needs
+        const remoteNeeds = Memory.rooms[remoteName].data
         const remote = Game.rooms[remoteName]
         const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100
 
@@ -897,9 +897,9 @@ Room.prototype.spawnRequester = function () {
             | 'source1RemoteHarvester'
             | 'source2RemoteHarvester'
 
-        // If there are no needs for this this, inform false
+        // If there are no data for this this, inform false
 
-        if (remoteNeeds[RemoteNeeds[role]] <= 0) continue
+        if (remoteNeeds[RemoteData[role]] <= 0) continue
 
         const sourcePositionsAmount = remote
             ? remote.sourcePositions.length
@@ -914,7 +914,7 @@ Room.prototype.spawnRequester = function () {
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
-                        partsMultiplier: remoteNeeds[RemoteNeeds[role]],
+                        partsMultiplier: remoteNeeds[RemoteData[role]],
                         spawnGroup: this.creepsOfRemote[remoteName][role],
                         threshold: 0.1,
                         minCreeps: 1,
@@ -934,7 +934,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
-                    partsMultiplier: remoteNeeds[RemoteNeeds[role]],
+                    partsMultiplier: remoteNeeds[RemoteData[role]],
                     spawnGroup: this.creepsOfRemote[remoteName][role],
                     threshold: 0.1,
                     minCreeps: undefined,
@@ -958,22 +958,22 @@ Room.prototype.spawnRequester = function () {
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
         const remoteName = remoteNamesByEfficacy[index]
-        const remoteNeeds = Memory.rooms[remoteName].needs
+        const remoteNeeds = Memory.rooms[remoteName].data
 
-        // Add up econ needs for this this
+        // Add up econ data for this this
 
         const totalRemoteNeed =
-            Math.max(remoteNeeds[RemoteNeeds.remoteHauler0], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteHauler1], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteReserver], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteCoreAttacker], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.remoteDismantler], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.minDamage], 0) +
-            Math.max(remoteNeeds[RemoteNeeds.minHeal], 0)
+            Math.max(remoteNeeds[RemoteData.remoteHauler0], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteHauler1], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteReserver], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteCoreAttacker], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteDismantler], 0) +
+            Math.max(remoteNeeds[RemoteData.minDamage], 0) +
+            Math.max(remoteNeeds[RemoteData.minHeal], 0)
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        if (!remoteMemory.needs[RemoteNeeds.enemyReserved] && !remoteMemory.abandon) {
+        if (!remoteMemory.data[RemoteData.enemyReserved] && !remoteMemory.data[RemoteData.abandon]) {
             const remote = Game.rooms[remoteName]
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
@@ -987,7 +987,7 @@ Room.prototype.spawnRequester = function () {
                 const income = Math.max(
                     (isReserved ? 10 : 5) -
                         Math.floor(
-                            Math.max(remoteMemory.needs[RemoteNeeds[remoteHarvesterRoles[index]]], 0) *
+                            Math.max(remoteMemory.data[RemoteData[remoteHarvesterRoles[index]]], 0) *
                                 minHarvestWorkRatio,
                         ),
                     0,
@@ -1010,8 +1010,8 @@ Room.prototype.spawnRequester = function () {
                 // If there are insufficient harvesters for the remote's sources
 
                 if (
-                    Math.max(remoteNeeds[RemoteNeeds.source1RemoteHarvester], 0) +
-                        Math.max(remoteNeeds[RemoteNeeds.source2RemoteHarvester], 0) >
+                    Math.max(remoteNeeds[RemoteData.source1RemoteHarvester], 0) +
+                        Math.max(remoteNeeds[RemoteData.source2RemoteHarvester], 0) >
                     0
                 )
                     return false
@@ -1022,9 +1022,9 @@ Room.prototype.spawnRequester = function () {
 
                 if (spawnEnergyCapacity < cost) return false
 
-                // If there are no needs for this this, inform false
+                // If there are no data for this this, inform false
 
-                if (remoteNeeds[RemoteNeeds.remoteReserver] <= 0) return false
+                if (remoteNeeds[RemoteData.remoteReserver] <= 0) return false
 
                 const role = 'remoteReserver'
 
@@ -1049,9 +1049,9 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                // If there are no related needs
+                // If there are no related data
 
-                if (remoteNeeds[RemoteNeeds.minDamage] + remoteNeeds[RemoteNeeds.minHeal] <= 0) return false
+                if (remoteNeeds[RemoteData.minDamage] + remoteNeeds[RemoteData.minHeal] <= 0) return false
 
                 const minCost = 400
                 const cost = 900
@@ -1066,18 +1066,18 @@ Room.prototype.spawnRequester = function () {
                 // If max spawnable strength is less that needed
 
                 if (
-                    rangedAttackStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteNeeds.minDamage] ||
-                    healStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteNeeds.minHeal]
+                    rangedAttackStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteData.minDamage] ||
+                    healStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteData.minHeal]
                 ) {
                     // Abandon the this for some time
 
-                    Memory.rooms[remoteName].abandon = 1500
+                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
 
                 const partsMultiplier = Math.max(
-                    remoteNeeds[RemoteNeeds.minDamage] / rangedAttackStrength +
-                        remoteNeeds[RemoteNeeds.minHeal] / healStrength,
+                    remoteNeeds[RemoteData.minDamage] / rangedAttackStrength +
+                        remoteNeeds[RemoteData.minHeal] / healStrength,
                     1,
                 )
 
@@ -1101,9 +1101,9 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                // If there are no related needs
+                // If there are no related data
 
-                if (remoteNeeds[RemoteNeeds.remoteCoreAttacker] <= 0) return false
+                if (remoteNeeds[RemoteData.remoteCoreAttacker] <= 0) return false
 
                 // Define the minCost and strength
 
@@ -1133,9 +1133,9 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                // If there are no related needs
+                // If there are no related data
 
-                if (remoteNeeds[RemoteNeeds.remoteDismantler] <= 0) return false
+                if (remoteNeeds[RemoteData.remoteDismantler] <= 0) return false
 
                 // Define the minCost and strength
 
@@ -1233,8 +1233,8 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                if (!request.needs[ClaimRequestNeeds.claimer]) return false
-                if (request.needs[ClaimRequestNeeds.claimer] <= 0) return false
+                if (!request.data[ClaimRequestData.claimer]) return false
+                if (request.data[ClaimRequestData.claimer] <= 0) return false
 
                 const role = 'claimer'
 
@@ -1255,8 +1255,8 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                if (!request.needs[ClaimRequestNeeds.vanguard]) return false
-                if (request.needs[ClaimRequestNeeds.vanguard] <= 0) return false
+                if (!request.data[ClaimRequestData.vanguard]) return false
+                if (request.data[ClaimRequestData.vanguard] <= 0) return false
 
                 const role = 'vanguard'
 
@@ -1264,7 +1264,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
-                    partsMultiplier: request.needs[ClaimRequestNeeds.vanguard],
+                    partsMultiplier: request.data[ClaimRequestData.vanguard],
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,
@@ -1278,25 +1278,25 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                if (!request.needs[ClaimRequestNeeds.minDamage]) return false
-                if (request.needs[ClaimRequestNeeds.minDamage] <= 0) return false
+                if (!request.data[ClaimRequestData.minDamage]) return false
+                if (request.data[ClaimRequestData.minDamage] <= 0) return false
 
                 const role = 'vanguardDefender'
 
                 const minRangedAttackCost =
-                    ((request.needs[ClaimRequestNeeds.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-                        (request.needs[ClaimRequestNeeds.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
+                    ((request.data[ClaimRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+                        (request.data[ClaimRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
                     1.2
                 const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
                 const minHealCost =
-                    ((request.needs[ClaimRequestNeeds.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
-                        (request.needs[ClaimRequestNeeds.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
+                    ((request.data[ClaimRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
+                        (request.data[ClaimRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
                     1.2
                 const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
                 if (minRangedAttackCost + minHealCost > spawnEnergyCapacity) {
-                    request.needs[ClaimRequestNeeds.abandon] = 20000
+                    request.data[ClaimRequestData.abandon] = 20000
                     delete request.responder
                     delete this.memory.claimRequest
                 }
@@ -1327,7 +1327,7 @@ Room.prototype.spawnRequester = function () {
     }
 
     if (this.memory.allyCreepRequest) {
-        const allyCreepRequestNeeds = Memory.allyCreepRequests[this.memory.allyCreepRequest].needs
+        const allyCreepRequestNeeds = Memory.allyCreepRequests[this.memory.allyCreepRequest].data
 
         // Requests for vanguard
 
@@ -1335,7 +1335,7 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there is no vanguard need
 
-                if (allyCreepRequestNeeds[AllyCreepRequestNeeds.allyVanguard] <= 0) return false
+                if (allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard] <= 0) return false
 
                 const role = 'allyVanguard'
 
@@ -1343,7 +1343,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
-                    partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestNeeds.allyVanguard],
+                    partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 250,

@@ -44,9 +44,9 @@ Object.defineProperties(Creep.prototype, {
     },
     reservation: {
         get() {
-            if (!this.memory.reservations[0]) return false
+            if (!this.memory.Rs[0]) return false
 
-            return (this._reservation = this.memory.reservations[0])
+            return (this._reservation = this.memory.Rs[0])
         },
     },
     strength: {
@@ -194,7 +194,6 @@ Object.defineProperties(Creep.prototype, {
             // Loop through each adjacentCreep
 
             for (const posData of adjacentCreeps) {
-
                 if (this.owner.username !== posData.creep.owner.username) continue
 
                 const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)

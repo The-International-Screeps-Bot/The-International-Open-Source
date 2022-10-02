@@ -37,7 +37,7 @@ export class Builder extends Creep {
 
         // If there are fastFiller containers
 
-        if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+        if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
 
         if (!this.fulfillReservation()) {
             this.say(this.message)
