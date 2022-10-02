@@ -1,4 +1,4 @@
-import { areCoordsEqual, arePositionsEqual, customLog, getRange, isExit } from 'international/utils'
+import { areCoordsEqual, arePositionsEqual, customLog, getRange, isExit, unpackAsPos } from 'international/utils'
 import { packCoord } from 'other/packrat'
 import { Antifa } from './antifa'
 
@@ -111,7 +111,7 @@ export class Quad {
         if (this.leader.isOnExit()) return true
 
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) === 255) {
-
+/*
             this.leader.createMoveRequest({
                 goals: [{
                     pos: this.leader.pos,
@@ -120,6 +120,8 @@ export class Quad {
                 flee: true,
             })
             return false
+ */
+            return true
         }
 
         let inFormation = true
@@ -158,11 +160,8 @@ export class Quad {
 
             const goalPos = memberGoalPositions[i - 1]
 
-            if (!isExit(goalPos.x, goalPos.y)) continue
-            if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) !== 255) continue
-
-            this.type = 'transport'
-            return this.getInFormation()
+            if (isExit(goalPos.x, goalPos.y)) return true
+            /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
         }
 
         for (let i = 1; i < this.members.length; i++) {
@@ -206,17 +205,19 @@ export class Quad {
         opts.weightCostMatrixes = ['quadCostMatrix']
         if (!moveLeader.createMoveRequest(opts)) return
 
+        const moveRequestCoord = unpackAsPos(moveLeader.moveRequest)
+
         const offset = {
-            x: moveLeader.pos.x - opts.goals[0].pos.x,
-            y: moveLeader.pos.y - opts.goals[0].pos.y,
+            x: moveLeader.pos.x - moveRequestCoord.x,
+            y: moveLeader.pos.y - moveRequestCoord.y,
         }
 
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            customLog('move attempt', new RoomPosition(member.pos.x - moveLeader.pos.x + offset.x, member.pos.y - moveLeader.pos.y + offset.y, member.pos.roomName))
+
             member.assignMoveRequest({
-                x: member.pos.x - moveLeader.pos.x + offset.x,
-                y: member.pos.y - moveLeader.pos.y + offset.y,
+                x: member.pos.x - offset.x,
+                y: member.pos.y - offset.y,
             })
         }
     }
