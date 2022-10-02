@@ -53,9 +53,13 @@ export class Quad {
         }
     }
     run() {
+
         this.leader.say(this.type)
+
+        this.advancedHeal()
+
         if (!this.getInFormation()) return
-/*
+        /*
         if (this.leader.room.name === this.leader.memory.CRN) {
 
             if (this.runCombat()) return
@@ -78,40 +82,11 @@ export class Quad {
             },
         })
     }
-    /*
-     isInFormation() {
-        if (this.type === 'transport') {
-            let lastMember: Antifa = this.leader
-
-            for (let i = 1; i < this.members.length; i++) {
-                const member = this.members[i]
-
-                if (getRange(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) > 1) return false
-
-                lastMember = member
-            }
-
-            return true
-        }
-
-        // Attack mode
-
-        return (
-            this.members.filter(
-                member =>
-                    (this.leader.pos.x === member.pos.x && this.leader.pos.y === member.pos.y) ||
-                    (this.leader.pos.x + 1 === member.pos.x && this.leader.pos.y === member.pos.y) ||
-                    (this.leader.pos.x === member.pos.x && this.leader.pos.y + 1 === member.pos.y) ||
-                    (this.leader.pos.x + 1 === member.pos.x && this.leader.pos.y + 1 === member.pos.y),
-            ).length === 4
-        )
-    } */
     getInFormation(): boolean {
-
         if (this.leader.isOnExit()) return true
 
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) === 255) {
-/*
+            /*
             this.leader.createMoveRequest({
                 goals: [{
                     pos: this.leader.pos,
@@ -132,17 +107,25 @@ export class Quad {
             for (let i = 1; i < this.members.length; i++) {
                 const member = this.members[i]
 
-                if (getRange(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) <= 1) continue
+                if (
+                    getRange(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) <= 1 &&
+                    member.room.name === lastMember.room.name
+                ) {
+                    lastMember = member
+                    continue
+                }
 
                 member.createMoveRequest({
-                    goals: [{
-                        pos: lastMember.pos,
-                        range: 1,
-                    }]
+                    goals: [
+                        {
+                            pos: lastMember.pos,
+                            range: 1,
+                        },
+                    ],
                 })
 
-                inFormation = false
                 lastMember = member
+                inFormation = false
             }
 
             return inFormation
@@ -153,11 +136,10 @@ export class Quad {
         const memberGoalPositions = [
             new RoomPosition(this.leader.pos.x + 1, this.leader.pos.y, this.leader.room.name),
             new RoomPosition(this.leader.pos.x, this.leader.pos.y + 1, this.leader.room.name),
-            new RoomPosition(this.leader.pos.x + 1, this.leader.pos.y + 1, this.leader.room.name)
+            new RoomPosition(this.leader.pos.x + 1, this.leader.pos.y + 1, this.leader.room.name),
         ]
 
         for (let i = 1; i < this.members.length; i++) {
-
             const goalPos = memberGoalPositions[i - 1]
 
             if (isExit(goalPos.x, goalPos.y)) return true
@@ -171,10 +153,12 @@ export class Quad {
             if (arePositionsEqual(member.pos, goalPos)) continue
 
             member.createMoveRequest({
-                goals: [{
-                    pos: goalPos,
-                    range: 0,
-                }]
+                goals: [
+                    {
+                        pos: goalPos,
+                        range: 0,
+                    },
+                ],
             })
             inFormation = false
         }
@@ -185,7 +169,6 @@ export class Quad {
         if (!this.canMove) return
 
         if (this.type === 'transport') {
-
             if (!moveLeader.createMoveRequest(opts)) return
 
             let lastMember = moveLeader
@@ -225,5 +208,18 @@ export class Quad {
     advancedRangedAttack() {}
     advancedAttack() {}
     advancedDismantle() {}
-    advancedHeal() {}
+    advancedHeal() {
+
+        for (const member of this.members) {
+
+            if (member.hits < member.hitsMax) member.heal(member)
+        }
+
+        for (const member of this.members) {
+
+            if (!member.room.enemyAttackers.length) continue
+
+            member.heal(member)
+        }
+    }
 }

@@ -1,6 +1,7 @@
 import {
     allStructureTypes,
     allyPlayers,
+    defaultSwampCost,
     impassibleStructureTypes,
     myColors,
     roomDimensions,
@@ -981,6 +982,8 @@ Object.defineProperties(Room.prototype, {
             const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
             this._quadCostMatrix = new PathFinder.CostMatrix()
 
+            for (const road of this.structures.road) this._quadCostMatrix.set(road.pos.x, road.pos.y, 1)
+
             // Avoid not my creeps
 
             for (const creep of this.enemyCreeps) terrainCoords[pack(creep.pos)] = 255
@@ -1028,6 +1031,8 @@ Object.defineProperties(Room.prototype, {
 
             for (const cSite of this.allyCSites) terrainCoords[pack(cSite.pos)] = 255
 
+            const terrainCM = this.getTerrain()
+
             // Assign impassible to tiles we can't aren't 2x2 passible
 
             for (let x = 0; x < roomDimensions; x += 1) {
@@ -1052,9 +1057,37 @@ Object.defineProperties(Room.prototype, {
                         continue
                     }
 
-                    this._quadCostMatrix.set(x + 1, y, 0)
-                    this._quadCostMatrix.set(x + 1, y + 1, 0)
-                    this._quadCostMatrix.set(x, y + 1, 0)
+                    const offsetCoord = [
+                        {
+                            x,
+                            y,
+                        },
+                        {
+                            x: x + 1,
+                            y,
+                        },
+                        {
+                            x,
+                            y: y + 1,
+                        },
+                        {
+                            x: x + 1,
+                            y: y + 1,
+                        },
+                    ]
+
+                    let largestValue = 0
+
+                    for (const coord of offsetCoord) {
+
+                        const value = terrainCM.get(coord.x, coord.y)
+                        if (value === TERRAIN_MASK_SWAMP) largestValue = defaultSwampCost * 2
+                    }
+
+                    for (const coord of offsetCoord) {
+
+                        this._quadCostMatrix.set(coord.x, coord.y, largestValue)
+                    }
                 }
             }
 
