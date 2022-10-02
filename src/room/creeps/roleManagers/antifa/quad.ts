@@ -53,7 +53,7 @@ export class Quad {
         }
     }
     run() {
-
+        this.leader.say(this.type)
         if (!this.getInFormation()) return
 /*
         if (this.leader.room.name === this.leader.memory.CRN) {
@@ -78,7 +78,6 @@ export class Quad {
             },
         })
     }
-    move(opts: MoveRequestOpts) {}
     /*
      isInFormation() {
         if (this.type === 'transport') {
@@ -126,7 +125,7 @@ export class Quad {
         let inFormation = true
 
         if (this.type === 'transport') {
-            let lastMember: Antifa = this.leader
+            let lastMember = this.leader
 
             for (let i = 1; i < this.members.length; i++) {
                 const member = this.members[i]
@@ -159,6 +158,7 @@ export class Quad {
 
             const goalPos = memberGoalPositions[i - 1]
 
+            if (!isExit(goalPos.x, goalPos.y)) continue
             if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) !== 255) continue
 
             this.type = 'transport'
@@ -189,7 +189,7 @@ export class Quad {
 
             if (!moveLeader.createMoveRequest(opts)) return
 
-            let lastMember: Antifa = this.leader
+            let lastMember = moveLeader
 
             for (let i = 1; i < this.members.length; i++) {
                 const member = this.members[i]
@@ -203,7 +203,7 @@ export class Quad {
 
         // Attack mode
 
-        opts.weightCostMatrixes = [moveLeader.room.quadCostMatrix]
+        opts.weightCostMatrixes = ['quadCostMatrix']
         if (!moveLeader.createMoveRequest(opts)) return
 
         const offset = {

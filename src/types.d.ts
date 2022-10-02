@@ -163,7 +163,7 @@ declare global {
         /**
          *
          */
-        weightCostMatrixes?: CostMatrix[]
+        weightCostMatrixes?: string[]
 
         weightCoordMaps?: CoordMap[]
 

@@ -781,11 +781,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoiding structures that can't be walked on is enabled
 
                 if (opts.avoidImpassibleStructures) {
-                    // Get and loop through ramparts
 
-                    const ramparts = room.structures.rampart
-
-                    for (const rampart of ramparts) {
+                    for (const rampart of room.structures.rampart) {
                         // If the rampart is mine
 
                         if (rampart.my) {

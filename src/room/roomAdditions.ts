@@ -1,6 +1,7 @@
 import {
     allStructureTypes,
     allyPlayers,
+    impassibleStructureTypes,
     myColors,
     roomDimensions,
     structureTypesByBuildPriority,
@@ -975,10 +976,57 @@ Object.defineProperties(Room.prototype, {
     },
     quadCostMatrix: {
         get() {
-            /* if (this._quadCostMatrix) return this._quadCostMatrix */
+            if (this._quadCostMatrix) return this._quadCostMatrix
 
-            const terrainCoords = internationalManager.getTerrainCoords(this.name)
+            const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
             this._quadCostMatrix = new PathFinder.CostMatrix()
+
+            // Avoid not my creeps
+
+            for (const creep of this.enemyCreeps) terrainCoords[pack(creep.pos)] = 255
+            for (const creep of this.allyCreeps) terrainCoords[pack(creep.pos)] = 255
+
+            for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) terrainCoords[pack(creep.pos)] = 255
+
+            // Avoid impassible structures
+
+            for (const rampart of this.structures.rampart) {
+                // If the rampart is mine
+
+                if (rampart.my) continue
+
+                // Otherwise if the rampart is owned by an ally, iterate
+
+                if (rampart.isPublic) continue
+
+                // Otherwise set the rampart's pos as impassible
+
+                terrainCoords[pack(rampart.pos)] = 255
+            }
+
+            // Loop through structureTypes of impassibleStructureTypes
+
+            for (const structureType of impassibleStructureTypes) {
+                for (const structure of this.structures[structureType]) {
+                    // Set pos as impassible
+
+                    terrainCoords[pack(structure.pos)] = 255
+                }
+
+                for (const cSite of this.cSites[structureType]) {
+                    // Set pos as impassible
+
+                    terrainCoords[pack(cSite.pos)] = 255
+                }
+            }
+
+            //
+
+            for (const portal of this.structures.portal) terrainCoords[pack(portal.pos)] = 255
+
+            // Loop trough each construction site belonging to an ally
+
+            for (const cSite of this.allyCSites) terrainCoords[pack(cSite.pos)] = 255
 
             // Assign impassible to tiles we can't aren't 2x2 passible
 
@@ -1009,6 +1057,8 @@ Object.defineProperties(Room.prototype, {
                     this._quadCostMatrix.set(x, y + 1, 0)
                 }
             }
+
+            this.visualizeCostMatrix(this._quadCostMatrix, true)
 
             return this._quadCostMatrix
         },
