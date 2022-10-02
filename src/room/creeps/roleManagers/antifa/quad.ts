@@ -1,4 +1,5 @@
-import { areCoordsEqual, arePositionsEqual, customLog, getRange, isExit, unpackAsPos } from 'international/utils'
+import { myColors } from 'international/constants'
+import { areCoordsEqual, arePositionsEqual, customLog, findClosestObject, getRange, isExit, unpackAsPos } from 'international/utils'
 import { packCoord } from 'other/packrat'
 import { Antifa } from './antifa'
 
@@ -188,6 +189,10 @@ export class Quad {
         opts.weightCostMatrixes = ['quadCostMatrix']
         if (!moveLeader.createMoveRequest(opts)) return
 
+        this.membersAttackMove()
+    }
+    membersAttackMove(moveLeader = this.leader) {
+
         const moveRequestCoord = unpackAsPos(moveLeader.moveRequest)
 
         const offset = {
@@ -205,7 +210,175 @@ export class Quad {
         }
     }
     rotate() {}
-    advancedRangedAttack() {}
+    advancedRangedAttack() {
+        const { room } = this.leader
+
+        let enemyAttackers = room.enemyAttackers.filter(function (creep) {
+            return !creep.isOnExit()
+        })
+
+        if (!room.enemyAttackers.length) enemyAttackers = room.enemyAttackers
+
+        // If there are none
+
+        if (!enemyAttackers.length) {
+            let enemyCreeps = room.enemyCreeps.filter(function (creep) {
+                return !creep.isOnExit()
+            })
+
+            if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
+
+            if (!enemyCreeps.length) {
+                if (this.leader.aggressiveHeal()) return true
+                return this.rangedAttackStructures()
+            }
+
+            this.leader.say('EC')
+
+            const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
+            if (Memory.roomVisuals)
+                this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+
+            // Get the range between the creeps
+
+            const range = getRange(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
+
+            // If the range is more than 1
+
+            if (range > 1) {
+                this.leader.rangedAttack(enemyCreep)
+
+                // Have the create a moveRequest to the enemyAttacker and inform true
+
+                this.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [{ pos: enemyCreep.pos, range: 1 }],
+                })
+
+                return true
+            }
+
+            this.leader.rangedMassAttack()
+
+            if (enemyCreep.canMove && this.canMove) {
+                this.leader.assignMoveRequest(enemyCreep.pos)
+                this.membersAttackMove()
+            }
+            return true
+        }
+
+        // Otherwise, get the closest enemyAttacker
+
+        const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
+        if (Memory.roomVisuals)
+            this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
+
+        // Get the range between the creeps
+
+        const range = getRange(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
+
+        // If it's more than range 3
+
+        if (range > 3) {
+            // Heal nearby creeps
+
+            this.leader.passiveHeal()
+
+            // Make a moveRequest to it and inform true
+
+            this.createMoveRequest({
+                origin: this.leader.pos,
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        this.leader.say('AEA')
+
+        if (range === 1) this.leader.rangedMassAttack()
+        else this.leader.rangedAttack(enemyAttacker)
+
+        // If the creep has less heal power than the enemyAttacker's attack power
+
+        if (this.leader.healStrength < enemyAttacker.attackStrength) {
+            if (range === 3) return true
+
+            // If too close
+
+            if (range <= 2) {
+                // Have the squad flee
+
+                this.createMoveRequest(
+                    {
+                        origin: this.leader.pos,
+                        goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                        flee: true,
+                    },
+                    this.members[1],
+                )
+            }
+
+            return true
+        }
+
+        if (range > 1) {
+            this.createMoveRequest({
+                origin: this.leader.pos,
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        if (enemyAttacker.canMove && this.canMove) {
+            this.leader.assignMoveRequest(enemyAttacker.pos)
+            this.membersAttackMove()
+        }
+        return true
+    }
+
+    rangedAttackStructures() {
+        const structures = this.leader.room.dismantleableStructures
+
+        if (!structures.length) return false
+
+        let structure = findClosestObject(this.leader.pos, structures)
+        if (Memory.roomVisuals)
+            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+
+        if (getRange(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3) {
+            this.createMoveRequest({
+                origin: this.leader.pos,
+                goals: [{ pos: structure.pos, range: 3 }],
+            })
+
+            return false
+        }
+
+        if (this.leader.rangedAttack(structure) !== OK) return false
+
+        // See if the structure is destroyed next tick
+
+        structure.realHits = structure.hits - this.leader.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.realHits > 0) return true
+
+        // Try to find a new structure to preemptively move to
+
+        structures.splice(structures.indexOf(structure), 1)
+        if (!structures.length) return true
+
+        structure = findClosestObject(this.leader.pos, structures)
+
+        if (getRange(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 3) {
+            this.createMoveRequest({
+                origin: this.leader.pos,
+                goals: [{ pos: structure.pos, range: 3 }],
+            })
+        }
+
+        return true
+    }
     advancedAttack() {}
     advancedDismantle() {}
     advancedHeal() {
