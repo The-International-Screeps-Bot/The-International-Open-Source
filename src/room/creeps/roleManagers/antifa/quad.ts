@@ -417,8 +417,9 @@ export class Quad {
 
             for (const member2 of this.members) {
                 member2.heal(member1)
-                break
             }
+
+            return
         }
 
         for (const member of this.members) {

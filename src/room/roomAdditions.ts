@@ -1036,22 +1036,26 @@ Object.defineProperties(Room.prototype, {
             // Configure y and loop through top exits
 
             let y = 0
-            for (x = 0; x < roomDimensions; x += 1) terrainCoords[packXY(x, y)] = 254
+            for (x = 0; x < roomDimensions; x += 1)
+                terrainCoords[packXY(x, y)] = Math.max(terrainCoords[packXY(x, y)], 254)
 
             // Configure x and loop through left exits
 
             x = 0
-            for (y = 0; y < roomDimensions; y += 1) terrainCoords[packXY(x, y)] = 254
+            for (y = 0; y < roomDimensions; y += 1)
+                terrainCoords[packXY(x, y)] = Math.max(terrainCoords[packXY(x, y)], 254)
 
             // Configure y and loop through bottom exits
 
             y = roomDimensions - 1
-            for (x = 0; x < roomDimensions; x += 1) terrainCoords[packXY(x, y)] = 254
+            for (x = 0; x < roomDimensions; x += 1)
+                terrainCoords[packXY(x, y)] = Math.max(terrainCoords[packXY(x, y)], 254)
 
             // Configure x and loop through right exits
 
             x = roomDimensions - 1
-            for (y = 0; y < roomDimensions; y += 1) terrainCoords[packXY(x, y)] = 254
+            for (y = 0; y < roomDimensions; y += 1)
+                terrainCoords[packXY(x, y)] = Math.max(terrainCoords[packXY(x, y)], 254)
 
             const terrainCM = this.getTerrain()
 
@@ -1104,7 +1108,7 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-            this.visualizeCostMatrix(this._quadCostMatrix)
+            this.visualizeCostMatrix(this._quadCostMatrix, true)
 
             return this._quadCostMatrix
         },
