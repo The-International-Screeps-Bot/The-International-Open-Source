@@ -1031,33 +1031,35 @@ Object.defineProperties(Room.prototype, {
 
             for (const cSite of this.allyCSites) terrainCoords[pack(cSite.pos)] = 255
 
+            let x
+
+            // Configure y and loop through top exits
+
+            let y = 0
+            for (x = 0; x < roomDimensions; x += 1) terrainCoords[packXY(x, y)] = 254
+
+            // Configure x and loop through left exits
+
+            x = 0
+            for (y = 0; y < roomDimensions; y += 1) terrainCoords[packXY(x, y)] = 254
+
+            // Configure y and loop through bottom exits
+
+            y = roomDimensions - 1
+            for (x = 0; x < roomDimensions; x += 1) terrainCoords[packXY(x, y)] = 254
+
+            // Configure x and loop through right exits
+
+            x = roomDimensions - 1
+            for (y = 0; y < roomDimensions; y += 1) terrainCoords[packXY(x, y)] = 254
+
             const terrainCM = this.getTerrain()
 
             // Assign impassible to tiles we can't aren't 2x2 passible
 
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {
-                    if (terrainCoords[packXY(x, y)] === 255) {
-                        this._quadCostMatrix.set(x, y, 255)
-                        continue
-                    }
-
-                    if (terrainCoords[packXY(x + 1, y)] === 255) {
-                        this._quadCostMatrix.set(x, y, 255)
-                        continue
-                    }
-
-                    if (terrainCoords[packXY(x + 1, y + 1)] === 255) {
-                        this._quadCostMatrix.set(x, y, 255)
-                        continue
-                    }
-
-                    if (terrainCoords[packXY(x, y + 1)] === 255) {
-                        this._quadCostMatrix.set(x, y, 255)
-                        continue
-                    }
-
-                    const offsetCoord = [
+                    const offsetCoords = [
                         {
                             x,
                             y,
@@ -1076,22 +1078,33 @@ Object.defineProperties(Room.prototype, {
                         },
                     ]
 
+                    let valueChange = false
+
+                    for (const coord of offsetCoords) {
+                        const coordValue = terrainCoords[pack(coord)]
+                        if (coordValue < 254) continue
+
+                        this._quadCostMatrix.set(x, y, coordValue)
+                        valueChange = true
+                        break
+                    }
+
+                    if (valueChange) continue
+
                     let largestValue = 0
 
-                    for (const coord of offsetCoord) {
-
+                    for (const coord of offsetCoords) {
                         const value = terrainCM.get(coord.x, coord.y)
                         if (value === TERRAIN_MASK_SWAMP) largestValue = defaultSwampCost * 2
                     }
 
-                    for (const coord of offsetCoord) {
-
+                    for (const coord of offsetCoords) {
                         this._quadCostMatrix.set(coord.x, coord.y, largestValue)
                     }
                 }
             }
 
-            this.visualizeCostMatrix(this._quadCostMatrix, true)
+            this.visualizeCostMatrix(this._quadCostMatrix)
 
             return this._quadCostMatrix
         },

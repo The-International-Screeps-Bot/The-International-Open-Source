@@ -99,7 +99,7 @@ export class Quad {
     getInFormation(): boolean {
         if (this.leader.isOnExit()) return true
 
-        if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) === 255) {
+        if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
             /*
             this.leader.createMoveRequest({
                 goals: [{
@@ -246,7 +246,6 @@ export class Quad {
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) {
-                
                 return this.rangedAttackStructures()
             }
 
@@ -413,8 +412,13 @@ export class Quad {
     advancedAttack() {}
     advancedDismantle() {}
     advancedHeal() {
-        for (const member of this.members) {
-            if (member.hits < member.hitsMax) member.heal(member)
+        for (const member1 of this.members) {
+            if (member1.hits === member1.hitsMax) continue
+
+            for (const member2 of this.members) {
+                member2.heal(member1)
+                break
+            }
         }
 
         for (const member of this.members) {
