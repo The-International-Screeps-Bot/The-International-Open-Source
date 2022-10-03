@@ -1153,7 +1153,8 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                     room.memory.T = 'enemyRemote'
                     room.memory.owner = creep.owner.username
 
-                    room.createHarassCombatRequest()
+                    room.createAttackCombatRequest()
+                    /* room.createHarassCombatRequest() */
 
                     return true
                 }
@@ -1344,11 +1345,28 @@ Room.prototype.makeRemote = function (scoutingRoom) {
     return true
 }
 
+Room.prototype.createAttackCombatRequest = function() {
+
+    if (Memory.combatRequests[this.name]) return
+    if (!this.enemyCreeps.length) return
+    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
+    if (this.enemyAttackers.length > 0) return
+
+    const request = (Memory.combatRequests[this.name] = {
+        T: 'attack',
+        data: [0],
+    })
+
+    request.data[CombatRequestData.minDamage] = 10
+    request.data[CombatRequestData.minHeal] = 10
+    request.data[CombatRequestData.quadCount] = 2
+}
+
 Room.prototype.createHarassCombatRequest = function () {
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
-    if (this.enemyAttackers.find(creep => creep.attackStrength > 0)) return
+    if (this.enemyAttackers.length > 0) return
 
     const request = (Memory.combatRequests[this.name] = {
         T: 'harass',
@@ -1356,8 +1374,8 @@ Room.prototype.createHarassCombatRequest = function () {
     })
 
     request.data[CombatRequestData.attack] = 3
-    request.data[CombatRequestData.minDamage] = 50
-    request.data[CombatRequestData.minHeal] = 20
+    request.data[CombatRequestData.minDamage] = 40
+    request.data[CombatRequestData.minHeal] = 10
 
     const structures = this.dismantleableStructures
 
@@ -1366,6 +1384,11 @@ Room.prototype.createHarassCombatRequest = function () {
 
     if (structures.length > 0)
         request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+}
+
+Room.prototype.createAttackCombatRequest = function() {
+
+
 }
 
 Room.prototype.cleanMemory = function () {

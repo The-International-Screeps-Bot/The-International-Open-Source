@@ -1,5 +1,13 @@
 import { myColors } from 'international/constants'
-import { areCoordsEqual, arePositionsEqual, customLog, findClosestObject, getRange, isExit, unpackAsPos } from 'international/utils'
+import {
+    areCoordsEqual,
+    arePositionsEqual,
+    customLog,
+    findClosestObject,
+    getRange,
+    isExit,
+    unpackAsPos,
+} from 'international/utils'
 import { packCoord } from 'other/packrat'
 import { Antifa } from './antifa'
 
@@ -54,12 +62,17 @@ export class Quad {
         }
     }
     run() {
-
         this.leader.say(this.type)
 
         this.advancedHeal()
 
         if (!this.getInFormation()) return
+
+        if (this.leader.room.name === this.leader.memory.CRN) {
+            this.runCombat()
+            return
+        }
+
         /*
         if (this.leader.room.name === this.leader.memory.CRN) {
 
@@ -192,7 +205,6 @@ export class Quad {
         this.membersAttackMove()
     }
     membersAttackMove(moveLeader = this.leader) {
-
         const moveRequestCoord = unpackAsPos(moveLeader.moveRequest)
 
         const offset = {
@@ -210,6 +222,11 @@ export class Quad {
         }
     }
     rotate() {}
+    runCombat() {
+        if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
+        if (this.leader.memory.ST === 'attack') return this.advancedAttack()
+        return this.advancedDismantle()
+    }
     advancedRangedAttack() {
         const { room } = this.leader
 
@@ -229,7 +246,7 @@ export class Quad {
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) {
-                if (this.leader.aggressiveHeal()) return true
+                
                 return this.rangedAttackStructures()
             }
 
@@ -246,7 +263,7 @@ export class Quad {
             // If the range is more than 1
 
             if (range > 1) {
-                this.leader.rangedAttack(enemyCreep)
+                for (const member of this.members) member.rangedAttack(enemyCreep)
 
                 // Have the create a moveRequest to the enemyAttacker and inform true
 
@@ -259,6 +276,10 @@ export class Quad {
             }
 
             this.leader.rangedMassAttack()
+            for (let i = 1; i < this.members.length; i++) {
+                const member = this.members[i]
+                member.rangedAttack(enemyCreep)
+            }
 
             if (enemyCreep.canMove && this.canMove) {
                 this.leader.assignMoveRequest(enemyCreep.pos)
@@ -298,6 +319,11 @@ export class Quad {
 
         if (range === 1) this.leader.rangedMassAttack()
         else this.leader.rangedAttack(enemyAttacker)
+
+        for (let i = 1; i < this.members.length; i++) {
+            const member = this.members[i]
+            member.rangedAttack(enemyAttacker)
+        }
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
@@ -356,6 +382,11 @@ export class Quad {
             return false
         }
 
+        for (let i = 1; i < this.members.length; i++) {
+            const member = this.members[i]
+            member.rangedAttack(structure)
+        }
+
         if (this.leader.rangedAttack(structure) !== OK) return false
 
         // See if the structure is destroyed next tick
@@ -382,14 +413,11 @@ export class Quad {
     advancedAttack() {}
     advancedDismantle() {}
     advancedHeal() {
-
         for (const member of this.members) {
-
             if (member.hits < member.hitsMax) member.heal(member)
         }
 
         for (const member of this.members) {
-
             if (!member.room.enemyAttackers.length) continue
 
             member.heal(member)

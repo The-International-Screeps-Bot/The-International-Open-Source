@@ -814,7 +814,11 @@ declare global {
 
         makeRemote(scoutingRoom: Room): boolean
 
+        createAttackCombatRequest(): void
+
         createHarassCombatRequest(): void
+
+        createDefendCombatRequest(): void
 
         /**
          * Finds the score of rooms for potential communes

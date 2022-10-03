@@ -29,21 +29,42 @@ export class CombatRequestManager {
                 myColors.lightGrey,
             )
     }
-    private attackRequest(request: CombatRequest, requestName: string, index: number) {}
+    private attackRequest(request: CombatRequest, requestName: string, index: number) {
+        const requestRoom = Game.rooms[requestName]
+        if (!requestRoom) return
+
+        // If there are threats to our hegemony, temporarily abandon the request
+
+        if (requestRoom.enemyAttackers.length > 0) {
+            request.data[CombatRequestData.abandon] = 1500
+
+            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            delete request.responder
+            return
+        }
+
+        // If there are no enemyCreeps, delete the combatRequest
+
+        if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
+            delete Memory.combatRequests[requestName]
+            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            delete request.responder
+            return
+        }
+    }
     private harassRequest(request: CombatRequest, requestName: string, index: number) {
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
 
-        /* if (Game.time % Math.floor(Math.random() * 100) === 0) { */
+        if (Game.time % Math.floor(Math.random() * 100) === 0) {
+            const structures = requestRoom.dismantleableStructures
 
-        const structures = requestRoom.dismantleableStructures
+            let totalHits = 0
+            for (const structure of structures) totalHits += structure.hits
 
-        let totalHits = 0
-        for (const structure of structures) totalHits += structure.hits
-
-        if (structures.length > 0)
-            request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
-        /* } */
+            if (structures.length > 0)
+                request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+        }
 
         // If there are threats to our hegemony, temporarily abandon the request
 

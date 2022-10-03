@@ -46,6 +46,8 @@ export class Duo {
 
     run() {
 
+        this.advancedHeal()
+
         if (!this.getInFormation()) return
 
         if (this.leader.room.name === this.leader.memory.CRN) {
@@ -123,7 +125,6 @@ export class Duo {
     }
 
     runCombat() {
-        this.advancedHeal()
         if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
         if (this.leader.memory.ST === 'attack') return this.advancedAttack()
         return this.advancedDismantle()
@@ -148,7 +149,7 @@ export class Duo {
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) {
-                if (this.leader.aggressiveHeal()) return true
+                
                 return this.rangedAttackStructures()
             }
 
