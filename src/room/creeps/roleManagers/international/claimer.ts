@@ -91,10 +91,10 @@ export class Claimer extends Creep {
                     },
                 })
             ) {
-                const request = Memory.claimRequests[claimRequestName]
+                /* const request = Memory.claimRequests[claimRequestName]
                 request.data[ClaimRequestData.abandon] = 20000
                 delete request.responder
-                delete Memory.rooms[creep.commune.name].claimRequest
+                delete Memory.rooms[creep.commune.name].claimRequest */
             }
         }
     }
