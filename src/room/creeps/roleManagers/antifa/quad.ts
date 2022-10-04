@@ -280,10 +280,6 @@ export class Quad {
                 member.rangedAttack(enemyCreep)
             }
 
-            if (enemyCreep.canMove && this.canMove) {
-                this.leader.assignMoveRequest(enemyCreep.pos)
-                this.membersAttackMove()
-            }
             return true
         }
 
@@ -356,10 +352,6 @@ export class Quad {
             return true
         }
 
-        if (enemyAttacker.canMove && this.canMove) {
-            this.leader.assignMoveRequest(enemyAttacker.pos)
-            this.membersAttackMove()
-        }
         return true
     }
 

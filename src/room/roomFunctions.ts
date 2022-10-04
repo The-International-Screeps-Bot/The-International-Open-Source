@@ -1386,7 +1386,7 @@ Room.prototype.createHarassCombatRequest = function () {
         request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
 }
 
-Room.prototype.createAttackCombatRequest = function() {
+Room.prototype.createDefendCombatRequest = function() {
 
 
 }
