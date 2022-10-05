@@ -364,6 +364,7 @@ declare global {
     }
 
     interface RoomCommuneStats extends RoomStats {
+        [name: string]: number
         /**
          * Controller Level
          */
@@ -1853,9 +1854,9 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep {}
+    interface PowerCreep { }
 
-    interface PowerCreepMemory {}
+    interface PowerCreepMemory { }
 
     // Structures
 
@@ -2012,7 +2013,13 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            combat(type: CombatRequestTypes, requestName: string, communeName?: string, minDamage?: number, minHeal?: number): string
+            combat(
+                type: CombatRequestTypes,
+                requestName: string,
+                communeName?: string,
+                minDamage?: number,
+                minHeal?: number,
+            ): string
 
             /**
              * Deletes combatRequests for a specified room, if there are any

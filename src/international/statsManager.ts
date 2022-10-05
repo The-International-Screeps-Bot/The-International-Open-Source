@@ -49,10 +49,10 @@ export class StatsManager {
     roomEndTick(roomName: string, roomType: RoomTypes) {
         if (roomType === 'commune') {
             const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
-            globalStats.cu = globalStats.cu >= 0 ? Game.cpu.getUsed() - globalStats.cu : 0
+            globalStats.cu = Game.cpu.getUsed() - globalStats.cu
         } else if (roomType === 'remote') {
             const globalStats = global.roomStats.remote[roomName] as RoomStats
-            globalStats.rcu = globalStats.rcu >= 0 ? Game.cpu.getUsed() - globalStats.rcu : 0
+            globalStats.rcu = Game.cpu.getUsed() - globalStats.rcu
         }
     }
 
@@ -60,49 +60,9 @@ export class StatsManager {
         const roomMemory = Memory.rooms[roomName]
         const roomStats = Memory.stats.rooms[roomName]
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
-        const allGlobalRemoteStats = Object.entries(global.roomStats.remote).filter(([roomName]) =>
-            roomMemory.remotes.includes(roomName),
-        )
-        let spawnUsage = 0
-
-        roomStats.cu = this.average(roomStats.cu, globalCommuneStats.cu >= 0 ? globalCommuneStats.cu : 0)
-        if (room) {
-            roomStats.cc = room.myCreepsAmount
-            roomStats.tcc = room.creepsFromRoomAmount
-
-            const spawns = room.structures.spawn
-            if (spawns.length > 0)
-                spawnUsage = spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
-
-            if (Game.time % 250 === 0 || forceUpdate) {
-                if (room.controller && room.controller.my) {
-                    const progressPercentage = room.controller.progress / room.controller.progressTotal
-                    roomStats.cl =
-                        progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
-                } else roomStats.cl = null
-                roomStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
-            }
-        } else {
-            roomStats.cc = 0
-            roomStats.tcc = 0
-            roomStats.cl = null
-            roomStats.es = 0
-        }
-        roomStats.su = this.average(roomStats.su, spawnUsage)
-
-        roomStats.eih = this.average(roomStats.eih, globalCommuneStats.eih)
-        if ((Memory.roomStats && Memory.roomStats >= 2) || forceUpdate) {
-            roomStats.mh = this.average(roomStats.mh, !forceUpdate ? globalCommuneStats.mh : 0)
-            roomStats.eib = this.average(roomStats.eib, !forceUpdate ? globalCommuneStats.eib : 0)
-            roomStats.eos = this.average(roomStats.eos, !forceUpdate ? globalCommuneStats.eos : 0)
-
-            roomStats.eou = this.average(roomStats.eou, !forceUpdate ? globalCommuneStats.eou : 0)
-            roomStats.eob = this.average(roomStats.eob, !forceUpdate ? globalCommuneStats.eob : 0)
-            roomStats.eoro = this.average(roomStats.eoro, !forceUpdate ? globalCommuneStats.eoro : 0)
-            roomStats.eorwr = this.average(roomStats.eorwr, !forceUpdate ? globalCommuneStats.eorwr : 0)
-            roomStats.eosp = this.average(roomStats.eosp, !forceUpdate ? globalCommuneStats.eosp : 0)
-
-            allGlobalRemoteStats.forEach(([remoteRoomName, remoteRoomStats]) => {
+        Object.entries(global.roomStats.remote)
+            .filter(([roomName]) => roomMemory.remotes.includes(roomName))
+            .forEach(([remoteRoomName, remoteRoomStats]) => {
                 globalCommuneStats.rc += 1
                 globalCommuneStats.rcu += remoteRoomStats.rcu
                 globalCommuneStats.res += remoteRoomStats.res
@@ -110,13 +70,68 @@ export class StatsManager {
                 globalCommuneStats.reoro += remoteRoomStats.reoro
                 globalCommuneStats.reob += remoteRoomStats.reob
             })
-            roomStats.rc = this.average(globalCommuneStats.rc, !forceUpdate ? roomStats.rc : 0)
-            roomStats.rcu = this.average(globalCommuneStats.rcu, !forceUpdate ? roomStats.rcu : 0)
-            roomStats.res = this.average(globalCommuneStats.res, !forceUpdate ? roomStats.res : 0)
-            roomStats.reih = this.average(globalCommuneStats.reih, !forceUpdate ? roomStats.reih : 0)
-            roomStats.reoro = this.average(globalCommuneStats.reoro, !forceUpdate ? roomStats.reoro : 0)
-            roomStats.reob = this.average(globalCommuneStats.reob, !forceUpdate ? roomStats.reob : 0)
+        if (room) {
+            globalCommuneStats.cc = room.myCreepsAmount
+            globalCommuneStats.tcc = room.creepsFromRoomAmount
+
+            const spawns = room.structures.spawn
+            if (spawns.length > 0)
+                globalCommuneStats.su =
+                    spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
+
+            if (Game.time % 250 === 0 || forceUpdate) {
+                if (room.controller && room.controller.my) {
+                    const progressPercentage = room.controller.progress / room.controller.progressTotal
+                    globalCommuneStats.cl =
+                        progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
+                } else globalCommuneStats.cl = null
+                globalCommuneStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
+            }
         }
+
+        _.forOwn(roomStats, (value, name) => {
+            if (value === undefined) value = 0
+            let globalValue = globalCommuneStats[name]
+            if (globalValue === undefined) globalValue = 0
+
+            switch (name) {
+                // level 1 wo average
+                case 'cc':
+                case 'tcc':
+                case 'cl':
+                case 'es':
+                    value = globalValue ?? 0
+                    break
+                // level 1 w average
+                case 'su':
+                case 'cu':
+                case 'eh':
+                    value = this.average(value, globalValue ?? 0)
+                    break
+                // level 2
+                case 'mh':
+                case 'eib':
+                case 'eos':
+                case 'eou':
+                case 'eob':
+                case 'eoro':
+                case 'eorwr':
+                case 'eosp':
+                case 'rc':
+                case 'rcu':
+                case 'res':
+                case 'reih':
+                case 'reoro':
+                case 'reob':
+                    if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
+                        value = this.average(value, globalValue ?? 0)
+                    else value = 0
+                    break
+                default:
+                    value = this.average(value, globalValue ?? 0)
+                    break
+            }
+        })
     }
     internationalConfig() {
         Memory.stats = {
@@ -210,14 +225,10 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    average(originalNumber: number, newNumber: number, averagedOverTickCount: number = 500, digits: number = 5) {
-        const newWeight = 1 / averagedOverTickCount
-        const originalWeight = 1 - newWeight
-
-        const originalNumberResult = originalNumber * originalWeight
-        const newNumberResult = newNumber * newWeight
-        const result = (originalNumberResult || 0) + (newNumberResult || 0)
-        return parseFloat(result.toFixed(digits))
+    average(avg: number, number: number, averagedOverTickCount: number = 1000, digits: number = 5) {
+        avg -= avg / averagedOverTickCount
+        avg += number / averagedOverTickCount
+        return _.round(avg, digits)
     }
 }
 
