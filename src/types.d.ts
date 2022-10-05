@@ -338,6 +338,10 @@ declare global {
     }
     interface RoomStats {
         /**
+         * Game Time
+         */
+        gt: number
+        /**
          * Remote Count
          */
         rc: number

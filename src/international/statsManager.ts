@@ -23,6 +23,7 @@ export class StatsManager {
                 reih: 0,
                 reoro: 0,
                 reob: 0,
+                gt: 0,
             }
 
             global.roomStats.commune[roomName] = communeStats
@@ -37,6 +38,7 @@ export class StatsManager {
             reih: 0,
             reoro: 0,
             reob: 0,
+            gt: 0,
         }
 
         global.roomStats.remote[roomName] = remoteStats
@@ -50,9 +52,11 @@ export class StatsManager {
         if (roomType === 'commune') {
             const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
             globalStats.cu = Game.cpu.getUsed() - globalStats.cu
+            globalStats.gt = Game.time;
         } else if (roomType === 'remote') {
             const globalStats = global.roomStats.remote[roomName] as RoomStats
             globalStats.rcu = Game.cpu.getUsed() - globalStats.rcu
+            globalStats.gt = Game.time;
         }
     }
 
@@ -60,15 +64,20 @@ export class StatsManager {
         const roomMemory = Memory.rooms[roomName]
         const roomStats = Memory.stats.rooms[roomName]
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
+
+        if (globalCommuneStats.gt !== Game.time && !forceUpdate) return;
+
         Object.entries(global.roomStats.remote)
             .filter(([roomName]) => roomMemory.remotes.includes(roomName))
             .forEach(([remoteRoomName, remoteRoomStats]) => {
-                globalCommuneStats.rc += 1
-                globalCommuneStats.rcu += remoteRoomStats.rcu
-                globalCommuneStats.res += remoteRoomStats.res
-                globalCommuneStats.reih += remoteRoomStats.reih
-                globalCommuneStats.reoro += remoteRoomStats.reoro
-                globalCommuneStats.reob += remoteRoomStats.reob
+                if (globalCommuneStats.gt === Game.time) {
+                    globalCommuneStats.rc += 1
+                    globalCommuneStats.rcu += remoteRoomStats.rcu
+                    globalCommuneStats.res += remoteRoomStats.res
+                    globalCommuneStats.reih += remoteRoomStats.reih
+                    globalCommuneStats.reoro += remoteRoomStats.reoro
+                    globalCommuneStats.reob += remoteRoomStats.reob
+                }
             })
         if (room) {
             globalCommuneStats.cc = room.myCreepsAmount
