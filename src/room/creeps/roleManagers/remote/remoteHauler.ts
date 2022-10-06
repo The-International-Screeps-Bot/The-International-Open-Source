@@ -282,8 +282,9 @@ export class RemoteHauler extends Creep {
 
             this.advancedRenew()
 
-            let store: AnyStoreStructure = this.commune.storage
-            if (!store) store = this.commune.terminal
+            //let store: AnyStoreStructure = this.commune.storage
+            //if (!store) store = this.commune.terminal
+            let store = undefined
 
             //We don't want remote haulers fulfilling reservations all over the place in the commune.
             if (store) {
