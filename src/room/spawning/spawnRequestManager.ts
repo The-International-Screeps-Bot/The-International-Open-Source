@@ -225,7 +225,7 @@ Room.prototype.spawnRequester = function () {
             let requiredCarryParts = 10
 
             //If the FF isn't setup, add more carrying.
-            requiredCarryParts += 10
+            //requiredCarryParts += 10
 
             // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
@@ -1359,29 +1359,28 @@ Room.prototype.spawnRequester = function () {
         if (!request) continue
 
         const minRangedAttackCost =
-            (((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+            ((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
                 (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
-            1.2) || 0
+                1.2 || 0
         const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
         const minAttackCost =
-            (((request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+            ((request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
                 (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[MOVE]) *
-            1.2) || 0
+                1.2 || 0
         const attackAmount = minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE])
 
         const minHealCost =
-            (((request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
+            ((request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
                 (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
-            1.2) || 0
+                1.2 || 0
         const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
         const minDismantleCost =
-            (request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
-            request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE]) || 0
+            request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
+                request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
         if (request.T === 'attack') {
-
             // Spawn quad
 
             this.constructSpawnRequests(
