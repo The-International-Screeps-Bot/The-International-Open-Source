@@ -1790,6 +1790,15 @@ Creep.prototype.reservationManager = function () {
             continue
         }
 
+        if (reservation.type === 'withdraw') {
+            if (
+                this.store.getFreeCapacity() === 0 ||
+                target.store.getUsedCapacity(reservation.resourceType) < reservation.amount
+            ) {
+                this.deleteReservation(0)
+            }
+        }
+
         let amount = reservation.amount
 
         /*

@@ -240,6 +240,7 @@ Room.prototype.spawnRequester = function () {
             // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
             if (this.controllerContainer) {
+                requiredCarryParts += 8
                 if (storage && this.controller.level >= 4) {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
@@ -671,6 +672,18 @@ Room.prototype.spawnRequester = function () {
             )
                 return false
 
+            // If the controllerContainer have not enough energy in it, don't spawn a new upgrader
+
+            const controllerContainer = this.controllerContainer
+            if (controllerContainer) {
+                if (
+                    controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                    this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed
+                ) {
+                    return false
+                }
+            }
+
             // If there is a storage
 
             if (storage && this.controller.level >= 4) {
@@ -860,7 +873,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
                     threshold,
-                    maxCreeps: Infinity,
+                    maxCreeps,
                     minCost: 200,
                     priority,
                     memoryAdditions: {
@@ -875,7 +888,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
                 threshold,
-                maxCreeps: Infinity,
+                maxCreeps,
                 minCost: 250,
                 priority,
                 memoryAdditions: {},
