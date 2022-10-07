@@ -283,7 +283,8 @@ export class RemoteHauler extends Creep {
             this.advancedRenew()
 
             let store: AnyStoreStructure = this.commune.storage
-            if (!store) store = this.commune.terminal
+            //if (!store) store = this.commune.terminal
+            store = undefined
 
             //We don't want remote haulers fulfilling reservations all over the place in the commune.
             if (store) {
@@ -414,6 +415,7 @@ export class RemoteHauler extends Creep {
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
         if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
+        if (creepAtPos.memory.SI !== this.memory.SI) return false
 
         this.transfer(creepAtPos, RESOURCE_ENERGY)
 
