@@ -661,37 +661,77 @@ export const terminalResourceTargets: ResourceTarget[] = [
     {
         resource: RESOURCE_HYDROGEN,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_OXYGEN,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_UTRIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_KEANIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_LEMERGIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_ZYNTHIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_CATALYST,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
+    },
+    {
+        resource: RESOURCE_OXIDANT,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_REDUCTANT,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_ZYNTHIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_LEMERGIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_UTRIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_KEANIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_PURIFIER,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_GHODIUM_MELT,
+        min: 0,
+        max: 0.01,
     },
     {
         resource: RESOURCE_POWER,
