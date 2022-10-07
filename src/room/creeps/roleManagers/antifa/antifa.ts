@@ -10,14 +10,16 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
+
+        if (!this.memory.SS) return
+        if (this.memory.SF) return
+
         if (!internationalManager.creepsByCombatRequest[this.memory.CRN]) {
             internationalManager.creepsByCombatRequest[this.memory.CRN] = {}
             for (const role of antifaRoles) internationalManager.creepsByCombatRequest[this.memory.CRN][role] = []
         }
 
         internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
-
-        if (!this.memory.SS) return
 
         const squadMembers: Antifa[] = [this]
 
@@ -54,10 +56,11 @@ export class Antifa extends Creep {
         // The creep should be single
 
         if (!this.memory.SS) return false
+        if (this.memory.SS === 1) return false
 
         // The creep is in a squad but no the leader
 
-        if (!this.squad && this.memory.SMNs.length === this.memory.SS) return true
+        if (this.memory.SMNs[0] !== this.name) return true
 
         if (!this.createSquad()) return true
 
@@ -69,6 +72,9 @@ export class Antifa extends Creep {
      * Tries to find a squad, creating one if none could be found
      */
     createSquad?() {
+
+        if (this.squad) return true
+
         for (const requestingCreepName of this.room.squadRequests) {
             if (requestingCreepName === this.name) continue
 

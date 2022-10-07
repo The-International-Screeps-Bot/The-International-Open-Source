@@ -58,6 +58,7 @@ export class Quad {
         this.leader = members[0]
 
         for (const member of members) {
+            member.memory.SF = true
             this.membersByPosition.set(packCoord(member.pos), member)
         }
     }

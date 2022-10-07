@@ -1360,6 +1360,7 @@ Room.prototype.createAttackCombatRequest = function () {
 }
 
 Room.prototype.createHarassCombatRequest = function () {
+    if (!Memory.autoAttack) return
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
@@ -2202,7 +2203,9 @@ Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisual
     })
 }
 
-Room.prototype.errorVisual = function (coord) {
+Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {
+    if (!visualize) return
+
     this.visual.circle(coord.x, coord.y, {
         fill: '',
         stroke: myColors.red,

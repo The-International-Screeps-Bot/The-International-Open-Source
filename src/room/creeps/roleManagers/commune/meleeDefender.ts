@@ -9,20 +9,66 @@ import {
 } from 'international/utils'
 
 export class MeleeDefender extends Creep {
-    advancedDefend?(): boolean {
+    advancedDefend?() {
         const { room } = this
 
         // Get enemyAttackers in the room, informing false if there are none
 
-        const enemyAttackers = room.enemyAttackers.filter(function (enemyAttacker) {
+        let enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
             return !enemyAttacker.isOnExit()
         })
 
-        if (!enemyAttackers.length) return false
+        if (!enemyCreeps.length) {
+            enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
+                return !enemyAttacker.isOnExit()
+            })
+
+            if (!enemyCreeps.length) return
+        }
+
+        if (!room.enemyDamageThreat) {
+            this.defendWithoutRamparts(enemyCreeps)
+            return
+        }
+
+        this.defendWithRampart(enemyCreeps)
+    }
+
+    defendWithoutRamparts?(enemyCreeps: Creep[]) {
+        // Get the closest enemyAttacker
+
+        const enemyCreep = findClosestObject(this.pos, enemyCreeps)
+
+        if (Memory.roomVisuals)
+            this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+
+        // If the range is more than 1
+
+        if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
+            // Have the create a moveRequest to the enemyAttacker and inform true
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: enemyCreep.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        // Otherwise attack
+
+        this.attack(enemyCreep)
+
+        if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
+        return true
+    }
+
+    defendWithRampart?(enemyCreeps: Creep[]) {
+        const { room } = this
 
         // Get the closest enemyAttacker
 
-        const enemyAttacker = this.pos.findClosestByPath(enemyAttackers, {
+        const enemyCreep = this.pos.findClosestByPath(enemyCreeps, {
             ignoreCreeps: true,
             ignoreRoads: true,
         })
@@ -30,6 +76,11 @@ export class MeleeDefender extends Creep {
         // Get the room's ramparts, filtering for those and informing false if there are none
 
         const ramparts = room.structures.rampart.filter(rampart => {
+
+            // Avoid ramparts that are low
+
+            if (rampart.hits < 3000) return false
+
             // Allow the rampart the creep is currently standing on
 
             if (areCoordsEqual(this.pos, rampart.pos)) return true
@@ -50,18 +101,18 @@ export class MeleeDefender extends Creep {
         if (!ramparts.length) {
             delete this.memory.ROS
 
-            if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
+            if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
                 this.createMoveRequest({
                     origin: this.pos,
-                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    goals: [{ pos: enemyCreep.pos, range: 1 }],
                 })
 
                 return true
             }
 
-            this.attack(enemyAttacker)
+            this.attack(enemyCreep)
 
-            if (enemyAttacker.getActiveBodyparts(MOVE) > 0) this.moveRequest = pack(enemyAttacker.pos)
+            if (enemyCreep.getActiveBodyparts(MOVE) > 0) this.moveRequest = pack(enemyCreep.pos)
             return true
         }
 
@@ -69,20 +120,20 @@ export class MeleeDefender extends Creep {
 
         // Attack the enemyAttacker
 
-        this.attack(enemyAttacker)
+        this.attack(enemyCreep)
 
         // Find the closest rampart to the enemyAttacker
 
         for (const rampart of ramparts)
             room.visual.text(
-                getRangeEuc(enemyAttacker.pos.x, rampart.pos.x, enemyAttacker.pos.y, rampart.pos.y).toString(),
+                getRangeEuc(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
                 rampart.pos,
                 { font: 0.5 },
             )
 
-        const closestRampart = findClosestObjectEuc(enemyAttacker.pos, ramparts)
+        const closestRampart = findClosestObjectEuc(enemyCreep.pos, ramparts)
 
-        room.visual.circle(enemyAttacker.pos, { fill: myColors.yellow })
+        room.visual.circle(enemyCreep.pos, { fill: myColors.yellow })
         room.visual.circle(closestRampart.pos, { fill: myColors.red })
         // Visualize the targeting, if roomVisuals are enabled
 
