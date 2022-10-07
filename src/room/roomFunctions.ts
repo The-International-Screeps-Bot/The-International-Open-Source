@@ -1347,6 +1347,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
 Room.prototype.createAttackCombatRequest = function() {
 
+    if (!Memory.autoAttack) return
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
@@ -1363,6 +1364,8 @@ Room.prototype.createAttackCombatRequest = function() {
 }
 
 Room.prototype.createHarassCombatRequest = function () {
+
+    if (!Memory.autoAttack) return
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
@@ -1388,7 +1391,7 @@ Room.prototype.createHarassCombatRequest = function () {
 
 Room.prototype.createDefendCombatRequest = function() {
 
-
+    if (!Memory.autoAttack) return
 }
 
 Room.prototype.cleanMemory = function () {
