@@ -63,7 +63,7 @@ export const autoClaim = true
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const autoAttack = false
+export const autoAttack = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
