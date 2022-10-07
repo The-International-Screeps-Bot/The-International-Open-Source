@@ -76,6 +76,11 @@ export class MeleeDefender extends Creep {
         // Get the room's ramparts, filtering for those and informing false if there are none
 
         const ramparts = room.structures.rampart.filter(rampart => {
+
+            // Avoid ramparts that are low
+
+            if (rampart.hits < 3000) return false
+
             // Allow the rampart the creep is currently standing on
 
             if (areCoordsEqual(this.pos, rampart.pos)) return true
