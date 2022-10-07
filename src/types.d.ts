@@ -882,7 +882,7 @@ declare global {
          */
         pathVisual(path: RoomPosition[], color: keyof Colors, visualize?: boolean): void
 
-        errorVisual(coord: Coord): void
+        errorVisual(coord: Coord, visualize?: boolean): void
 
         /**
          * Finds and records a construction site for builders to target
@@ -1218,6 +1218,10 @@ declare global {
         _quadCostMatrix: CostMatrix
 
         readonly quadCostMatrix: CostMatrix
+
+        _enemyDamageThreat: boolean
+
+        readonly enemyDamageThreat: boolean
 
         // Target finding
 
@@ -1823,12 +1827,17 @@ declare global {
         /**
          * Squad Size of the squad the creep is attempting to form
          */
-        SS: 4 | 2 | undefined
+        SS: number | undefined
 
         /**
          * Squad Type the combat method the creep's squad is attempting
          */
         ST: 'rangedAttack' | 'attack' | 'dismantle'
+
+        /**
+         * Squad Formed, wether the creep has joined a squad or not
+         */
+        SF: boolean
 
         /**
          * Squad Member Names

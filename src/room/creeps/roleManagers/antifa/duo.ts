@@ -42,6 +42,8 @@ export class Duo {
     constructor(members: Antifa[]) {
         this.members = members
         this.leader = members[0]
+
+        for (const member of this.members) member.memory.SF = true
     }
 
     run() {
@@ -149,7 +151,7 @@ export class Duo {
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) {
-                
+
                 return this.rangedAttackStructures()
             }
 

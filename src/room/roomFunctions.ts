@@ -2208,7 +2208,10 @@ Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisual
     })
 }
 
-Room.prototype.errorVisual = function (coord) {
+Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {
+
+    if (!visualize) return
+
     this.visual.circle(coord.x, coord.y, {
         fill: '',
         stroke: myColors.red,

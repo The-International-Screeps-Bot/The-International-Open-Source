@@ -214,7 +214,7 @@ class TickConfig {
                     ally: Infinity,
                 }) > maxRange
             ) {
-                Memory.claimRequests[roomName].data[ClaimRequestData.score] = 20000
+                Memory.claimRequests[roomName].data[ClaimRequestData.abandon] = 20000
                 continue
             }
 

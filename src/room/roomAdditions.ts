@@ -1082,20 +1082,21 @@ Object.defineProperties(Room.prototype, {
                         },
                     ]
 
-                    let valueChange = false
+                    let largestValue = terrainCoords[packXY(x, y)]
 
                     for (const coord of offsetCoords) {
                         const coordValue = terrainCoords[pack(coord)]
-                        if (coordValue < 254) continue
+                        if (!coordValue || coordValue < 254) continue
 
-                        this._quadCostMatrix.set(x, y, coordValue)
-                        valueChange = true
-                        break
+                        largestValue = Math.max(largestValue, coordValue)
                     }
 
-                    if (valueChange) continue
+                    if (largestValue >= 254) {
+                        this._quadCostMatrix.set(x, y, largestValue)
+                        continue
+                    }
 
-                    let largestValue = 0
+                    largestValue = 0
 
                     for (const coord of offsetCoords) {
                         const value = terrainCM.get(coord.x, coord.y)
@@ -1111,6 +1112,19 @@ Object.defineProperties(Room.prototype, {
             this.visualizeCostMatrix(this._quadCostMatrix, true)
 
             return this._quadCostMatrix
+        },
+    },
+    enemyDamageThreat: {
+        get() {
+            if (this._enemyDamageThreat !== undefined) return this._enemyDamageThreat
+
+            for (const enemyAttacker of this.enemyAttackers) {
+                if (!enemyAttacker.attackStrength) continue
+
+                return (this._enemyDamageThreat = true)
+            }
+
+            return (this._enemyDamageThreat = false)
         },
     },
     MEWT: {
