@@ -62,7 +62,7 @@ export class Antifa extends Creep {
 
         if (this.memory.SMNs[0] !== this.name) return true
 
-        if (!this.createSquad()) return true
+        if (!this.findSquad()) return true
 
         this.squad.run()
         return true
@@ -71,9 +71,20 @@ export class Antifa extends Creep {
     /**
      * Tries to find a squad, creating one if none could be found
      */
-    createSquad?() {
+    findSquad?() {
 
         if (this.squad) return true
+        if (this.memory.SF) {
+
+            const members: Antifa[] = []
+
+            for (const memberName of this.memory.SMNs) {
+
+                members.push(Game.creeps[memberName])
+            }
+
+            this.createSquad(members)
+        }
 
         for (const requestingCreepName of this.room.squadRequests) {
             if (requestingCreepName === this.name) continue
@@ -93,23 +104,29 @@ export class Antifa extends Creep {
 
         if (this.memory.SMNs.length !== this.memory.SS) return false
 
-        const squadMembers: Antifa[] = []
+        const members: Antifa[] = []
 
-        for (const squadCreepName of this.memory.SMNs) {
-            this.room.squadRequests.delete(squadCreepName)
+        for (const memberName of this.memory.SMNs) {
+            this.room.squadRequests.delete(memberName)
 
-            const squadCreep = Game.creeps[squadCreepName]
+            const member = Game.creeps[memberName]
 
-            squadCreep.memory.SMNs = this.memory.SMNs
-            squadMembers.push(squadCreep)
+            member.memory.SMNs = this.memory.SMNs
+            members.push(member)
         }
 
+        this.createSquad(members)
+        return true
+    }
+
+    createSquad?(members: Antifa[]) {
+
         if (this.memory.SS === 2) {
-            this.squad = new Duo(squadMembers)
+            this.squad = new Duo(members)
             return true
         }
 
-        this.squad = new Quad(squadMembers)
+        this.squad = new Quad(members)
         return true
     }
 
