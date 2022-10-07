@@ -741,6 +741,46 @@ export const terminalResourceTargets: ResourceTarget[] = [
         min: 0.005,
         max: 0.015,
     },
+    {
+        resource: RESOURCE_METAL,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_BIOMASS,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_SILICON,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_MIST,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_ALLOY,
+        min: 0,
+        max: 0,
+    },
+    {
+        resource: RESOURCE_CELL,
+        min: 0,
+        max: 0,
+    },
+    {
+        resource: RESOURCE_WIRE,
+        min: 0,
+        max: 0,
+    },
+    {
+        resource: RESOURCE_CONDENSATE,
+        min: 0,
+        max: 0,
+    },
 ]
 
 export enum RemoteData {
