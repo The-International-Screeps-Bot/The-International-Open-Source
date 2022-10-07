@@ -12,6 +12,8 @@ export class Maintainer extends Creep {
         // If the this needs resources
 
         if (this.needsResources()) {
+            delete this.memory.repairTarget
+
             if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
 
             if (!this.fulfillReservation()) {
@@ -101,7 +103,8 @@ export class Maintainer extends Creep {
         if (repairTarget.structureType === STRUCTURE_RAMPART) {
             // If the repairTarget will be below or equal to expectations next tick
 
-            if (repairTarget.realHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25) return true
+            /* if (repairTarget.realHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25)  */
+            return true
         }
 
         // Otherwise if it isn't a rampart and it will be viable to repair next tick

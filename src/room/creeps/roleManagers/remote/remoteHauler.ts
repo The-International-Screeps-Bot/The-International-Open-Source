@@ -430,6 +430,19 @@ export class RemoteHauler extends Creep {
         delete this.moveRequest
         delete creepAtPos.moveRequest
 
+        // Trade memory
+
+        const newCreepAtPosMemory = JSON.parse(JSON.stringify(this.memory))
+
+        this.memory = creepAtPos.memory
+        creepAtPos.memory = newCreepAtPosMemory
+
+        // Delete old values
+
+        delete this.memory.P
+        delete creepAtPos.memory.P
+        
+/*
         // Trade remotes and sourceIndexes
 
         const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
@@ -439,7 +452,7 @@ export class RemoteHauler extends Creep {
         this.memory.SI = creepAtPos.memory.SI !== undefined ? creepAtPos.memory.SI : this.memory.SI
         creepAtPos.memory.RN = newCreepAtPosRemote
         creepAtPos.memory.SI = newCreepAtPosSourceIndex
-
+ */
         this.getResources()
 
         const remoteHauler = creepAtPos as RemoteHauler

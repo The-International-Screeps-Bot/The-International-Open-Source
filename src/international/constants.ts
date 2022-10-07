@@ -656,37 +656,77 @@ export const terminalResourceTargets: ResourceTarget[] = [
     {
         resource: RESOURCE_HYDROGEN,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_OXYGEN,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_UTRIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_KEANIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_LEMERGIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_ZYNTHIUM,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
     },
     {
         resource: RESOURCE_CATALYST,
         min: 0.01,
-        max: 0.27,
+        max: 0.027,
+    },
+    {
+        resource: RESOURCE_OXIDANT,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_REDUCTANT,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_ZYNTHIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_LEMERGIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_UTRIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_KEANIUM_BAR,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_PURIFIER,
+        min: 0,
+        max: 0.01,
+    },
+    {
+        resource: RESOURCE_GHODIUM_MELT,
+        min: 0,
+        max: 0.01,
     },
     {
         resource: RESOURCE_POWER,
@@ -695,6 +735,46 @@ export const terminalResourceTargets: ResourceTarget[] = [
         },
         min: 0.005,
         max: 0.015,
+    },
+    {
+        resource: RESOURCE_METAL,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_BIOMASS,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_SILICON,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_MIST,
+        min: 0,
+        max: 0.00001,
+    },
+    {
+        resource: RESOURCE_ALLOY,
+        min: 0,
+        max: 0,
+    },
+    {
+        resource: RESOURCE_CELL,
+        min: 0,
+        max: 0,
+    },
+    {
+        resource: RESOURCE_WIRE,
+        min: 0,
+        max: 0,
+    },
+    {
+        resource: RESOURCE_CONDENSATE,
+        min: 0,
+        max: 0,
     },
 ]
 

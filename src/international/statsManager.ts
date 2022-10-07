@@ -51,12 +51,16 @@ export class StatsManager {
     roomEndTick(roomName: string, roomType: RoomTypes) {
         if (roomType === 'commune') {
             const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
-            globalStats.cu = Game.cpu.getUsed() - globalStats.cu
-            globalStats.gt = Game.time;
+            if (globalStats) {
+                globalStats.cu = Game.cpu.getUsed() - globalStats.cu
+                globalStats.gt = Game.time
+            }
         } else if (roomType === 'remote') {
             const globalStats = global.roomStats.remote[roomName] as RoomStats
-            globalStats.rcu = Game.cpu.getUsed() - globalStats.rcu
-            globalStats.gt = Game.time;
+            if (globalStats) {
+                globalStats.rcu = Game.cpu.getUsed() - globalStats.rcu
+                globalStats.gt = Game.time
+            }
         }
     }
 
@@ -65,7 +69,7 @@ export class StatsManager {
         const roomStats = Memory.stats.rooms[roomName]
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
 
-        if (globalCommuneStats.gt !== Game.time && !forceUpdate) return;
+        if (globalCommuneStats.gt !== Game.time && !forceUpdate) return
 
         Object.entries(global.roomStats.remote)
             .filter(([roomName]) => roomMemory.remotes.includes(roomName))
@@ -98,10 +102,11 @@ export class StatsManager {
             }
         }
 
-        _.forOwn(roomStats, (value, name) => {
-            if (value === undefined) value = 0
+        Object.keys(roomStats).forEach(name => {
             let globalValue = globalCommuneStats[name]
             if (globalValue === undefined) globalValue = 0
+            const value = roomStats[name]
+            if (value === undefined) roomStats[name] = 0
 
             switch (name) {
                 // level 1 wo average
@@ -109,13 +114,13 @@ export class StatsManager {
                 case 'tcc':
                 case 'cl':
                 case 'es':
-                    value = globalValue ?? 0
+                    roomStats[name] = globalValue
                     break
                 // level 1 w average
                 case 'su':
                 case 'cu':
                 case 'eh':
-                    value = this.average(value, globalValue ?? 0)
+                    roomStats[name] = this.average(value, globalValue)
                     break
                 // level 2
                 case 'mh':
@@ -133,11 +138,10 @@ export class StatsManager {
                 case 'reoro':
                 case 'reob':
                     if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
-                        value = this.average(value, globalValue ?? 0)
-                    else value = 0
+                        roomStats[name] = this.average(value, globalValue)
+                    else roomStats[name] = 0
                     break
                 default:
-                    value = this.average(value, globalValue ?? 0)
                     break
             }
         })
@@ -237,7 +241,7 @@ export class StatsManager {
     average(avg: number, number: number, averagedOverTickCount: number = 1000, digits: number = 5) {
         avg -= avg / averagedOverTickCount
         avg += number / averagedOverTickCount
-        return _.round(avg, digits)
+        return Math.round(avg * Math.pow(10, digits)) / Math.pow(10, digits)
     }
 }
 
