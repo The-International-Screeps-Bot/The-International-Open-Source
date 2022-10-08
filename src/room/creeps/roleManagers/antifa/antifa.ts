@@ -84,6 +84,7 @@ export class Antifa extends Creep {
             }
 
             this.createSquad(members)
+            return true
         }
 
         for (const requestingCreepName of this.room.squadRequests) {
@@ -123,11 +124,11 @@ export class Antifa extends Creep {
 
         if (this.memory.SS === 2) {
             this.squad = new Duo(members)
-            return true
+            return
         }
 
         this.squad = new Quad(members)
-        return true
+        return
     }
 
     runSingle?() {

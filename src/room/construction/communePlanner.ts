@@ -489,7 +489,25 @@ export function basePlanner(room: Room) {
         for (const index2 in room.sources) {
             if (index === index2) continue
 
-            for (const pos of room.sourcePositions[index2]) room.roadCoords[pack(pos)] = 10
+            for (const pos of room.sourcePositions[index2]) room.roadCoords[pack(pos)] = 50
+
+            const closestSourcePos = room.sourcePositions[index2][0]
+
+            const adjacentCoords = findCoordsInsideRect(
+                closestSourcePos.x - 1,
+                closestSourcePos.y - 1,
+                closestSourcePos.x + 1,
+                closestSourcePos.y + 1,
+            )
+
+            for (const coord of adjacentCoords) {
+
+                if (room.roadCoords[pack(coord)] > 0) continue
+
+                room.roadCoords[pack(coord)] = 50
+            }
+
+            room.roadCoords[pack(closestSourcePos)] = 150
         }
 
         // Path from the fastFillerAnchor to the closestHarvestPos
@@ -717,6 +735,9 @@ export function basePlanner(room: Room) {
             for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
         }
     }
+
+    room.visualizeCoordMap(room.roadCoords)
+
     /*
     if (!room.memory.stampAnchors.rampart.length) {
         for (let x = 0; x < roomDimensions; x += 1) {
