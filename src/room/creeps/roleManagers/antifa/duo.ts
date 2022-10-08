@@ -1,5 +1,5 @@
 import { myColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRange, isExit, pack } from 'international/utils'
+import { findClosestObject, getRange, isCoordExit, isXYExit, pack } from 'international/utils'
 import { Antifa } from './antifa'
 
 export class Duo {
@@ -47,13 +47,11 @@ export class Duo {
     }
 
     run() {
-
         this.advancedHeal()
 
         if (!this.getInFormation()) return
 
         if (this.leader.room.name === this.leader.memory.CRN) {
-
             if (this.runCombat()) return
 
             this.stompEnemyCSites()
@@ -80,7 +78,6 @@ export class Duo {
         if (this.leader.spawning) return false
 
         if (this.leader.room.name === this.members[1].room.name) {
-
             const range = getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y)
             if (range <= 1) return true
 
@@ -151,7 +148,6 @@ export class Duo {
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) {
-
                 return this.rangedAttackStructures()
             }
 
@@ -474,7 +470,7 @@ export class Duo {
         // Filter only enemy construction sites worth stomping
 
         const enemyCSites = this.leader.room.enemyCSites.filter(
-            cSite => cSite.progress > 0 && !isExit(cSite.pos.x, cSite.pos.y),
+            cSite => cSite.progress > 0 && !isCoordExit(cSite.pos),
         )
 
         if (!enemyCSites.length) return false

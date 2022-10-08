@@ -1053,3 +1053,18 @@ export { allowedSquadCombinations }
 
 export const defaultPlainCost = 2
 export const defaultSwampCost = 8
+
+export const quadAttackMemberOffsets = [
+    {
+        x: 1,
+        y: 0,
+    },
+    {
+        x: 0,
+        y: 1,
+    },
+    {
+        x: 1,
+        y: 1,
+    },
+]

@@ -11,7 +11,7 @@ export function constructionManager(room: Room) {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-    /*
+/*
     // Testing
 
     delete room.memory.PC

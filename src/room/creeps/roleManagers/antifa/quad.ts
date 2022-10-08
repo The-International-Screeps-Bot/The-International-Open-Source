@@ -1,11 +1,12 @@
-import { myColors } from 'international/constants'
+import { myColors, quadAttackMemberOffsets } from 'international/constants'
 import {
     areCoordsEqual,
     arePositionsEqual,
     customLog,
+    doesXYExist,
     findClosestObject,
     getRange,
-    isExit,
+    isXYExit,
     unpackAsPos,
 } from 'international/utils'
 import { packCoord } from 'other/packrat'
@@ -148,22 +149,24 @@ export class Quad {
 
         // Attack mode
 
-        const memberGoalPositions = [
-            new RoomPosition(this.leader.pos.x + 1, this.leader.pos.y, this.leader.room.name),
-            new RoomPosition(this.leader.pos.x, this.leader.pos.y + 1, this.leader.room.name),
-            new RoomPosition(this.leader.pos.x + 1, this.leader.pos.y + 1, this.leader.room.name),
-        ]
-
         for (let i = 1; i < this.members.length; i++) {
-            const goalPos = memberGoalPositions[i - 1]
+            const offset = quadAttackMemberOffsets[i - 1]
 
-            if (isExit(goalPos.x, goalPos.y)) return true
+            if (isXYExit(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return true
+
+            if (!doesXYExist(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return true
+
             /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
         }
 
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            const goalPos = memberGoalPositions[i - 1]
+            const offset = quadAttackMemberOffsets[i - 1]
+            const goalPos = new RoomPosition(
+                this.leader.pos.x + offset.x,
+                this.leader.pos.y + offset.y,
+                this.leader.room.name,
+            )
 
             if (arePositionsEqual(member.pos, goalPos)) continue
 

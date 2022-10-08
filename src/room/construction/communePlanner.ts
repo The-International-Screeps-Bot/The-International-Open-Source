@@ -355,8 +355,6 @@ export function basePlanner(room: Room) {
         ignoreCreeps: true,
     })
 
-    // Construct path
-
     let path = room.advancedFindPath({
         origin: closestSource.pos,
         goals: [{ pos: room.anchor, range: 3 }],
@@ -385,6 +383,65 @@ export function basePlanner(room: Room) {
 
     const closestUpgradePos = upgradePositions[0]
     if (!closestUpgradePos) return 'failed'
+
+    for (const index in sources) {
+        // get the closestHarvestPos using the sourceName, iterating if undefined
+
+        const closestSourcePos = room.sourcePositions[index][0]
+
+        if (!room.memory.stampAnchors.container.includes(pack(closestSourcePos))) {
+            room.memory.stampAnchors.container.push(pack(closestSourcePos))
+        }
+
+        for (const index2 in room.sources) {
+            if (index === index2) continue
+
+            for (const pos of room.sourcePositions[index2]) room.roadCoords[pack(pos)] = 50
+
+            const closestSourcePos = room.sourcePositions[index2][0]
+
+            const adjacentCoords = findCoordsInsideRect(
+                closestSourcePos.x - 1,
+                closestSourcePos.y - 1,
+                closestSourcePos.x + 1,
+                closestSourcePos.y + 1,
+            )
+
+            for (const coord of adjacentCoords) {
+                if (room.roadCoords[pack(coord)] > 0) continue
+
+                room.roadCoords[pack(coord)] = 50
+            }
+
+            room.roadCoords[pack(closestSourcePos)] = 150
+        }
+
+        // Path from the fastFillerAnchor to the closestHarvestPos
+
+        path = room.advancedFindPath({
+            origin: closestSourcePos,
+            goals: [{ pos: room.anchor, range: 3 }],
+            weightCoordMaps: [room.roadCoords],
+        })
+
+        // Record the path positions in roadCM
+
+        for (const pos of path) room.roadCoords[pack(pos)] = 1
+
+        // Path from the centerUpgradePos to the closestHarvestPos
+
+        path = room.advancedFindPath({
+            origin: closestSourcePos,
+            goals: [{ pos: closestUpgradePos, range: 1 }],
+            weightCoordMaps: [room.roadCoords],
+        })
+
+        // Loop through positions of the path
+
+        // Record the pos in roadCM
+
+        for (const pos of path) room.roadCoords[pack(pos)] = 1
+    }
 
     room.roadCoords[pack(closestUpgradePos)] = 1
 
@@ -473,68 +530,6 @@ export function basePlanner(room: Room) {
         // Record the pos in roadCM
 
         room.roadCoords[pack(closestSourcePos)] = 255
-    }
-
-    // loop through sourceNames
-
-    for (const index in sources) {
-        // get the closestHarvestPos using the sourceName, iterating if undefined
-
-        const closestSourcePos = room.sourcePositions[index][0]
-
-        if (!room.memory.stampAnchors.container.includes(pack(closestSourcePos))) {
-            room.memory.stampAnchors.container.push(pack(closestSourcePos))
-        }
-
-        for (const index2 in room.sources) {
-            if (index === index2) continue
-
-            for (const pos of room.sourcePositions[index2]) room.roadCoords[pack(pos)] = 50
-
-            const closestSourcePos = room.sourcePositions[index2][0]
-
-            const adjacentCoords = findCoordsInsideRect(
-                closestSourcePos.x - 1,
-                closestSourcePos.y - 1,
-                closestSourcePos.x + 1,
-                closestSourcePos.y + 1,
-            )
-
-            for (const coord of adjacentCoords) {
-
-                if (room.roadCoords[pack(coord)] > 0) continue
-
-                room.roadCoords[pack(coord)] = 50
-            }
-
-            room.roadCoords[pack(closestSourcePos)] = 150
-        }
-
-        // Path from the fastFillerAnchor to the closestHarvestPos
-
-        path = room.advancedFindPath({
-            origin: closestSourcePos,
-            goals: [{ pos: room.anchor, range: 3 }],
-            weightCoordMaps: [room.roadCoords],
-        })
-
-        // Record the path positions in roadCM
-
-        for (const pos of path) room.roadCoords[pack(pos)] = 1
-
-        // Path from the centerUpgradePos to the closestHarvestPos
-
-        path = room.advancedFindPath({
-            origin: closestSourcePos,
-            goals: [{ pos: closestUpgradePos, range: 1 }],
-            weightCoordMaps: [room.roadCoords],
-        })
-
-        // Loop through positions of the path
-
-        // Record the pos in roadCM
-
-        for (const pos of path) room.roadCoords[pack(pos)] = 1
     }
 
     // Path from the hubAnchor to the labsAnchor
@@ -685,9 +680,12 @@ export function basePlanner(room: Room) {
             for (const coord1 of adjacentCoords) {
                 const packedCoord1 = pack(coord1)
 
+                const roadCoordsValue = room.roadCoords[packedCoord1]
+
                 // Iterate if plan for pos is in use
 
-                if (room.roadCoords[packedCoord1] > 0) continue
+                if (roadCoordsValue === 1) continue
+                if (roadCoordsValue === 255) continue
 
                 if (room.rampartCoords[packedCoord1] > 0) continue
 
@@ -735,8 +733,6 @@ export function basePlanner(room: Room) {
             for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
         }
     }
-
-    room.visualizeCoordMap(room.roadCoords)
 
     /*
     if (!room.memory.stampAnchors.rampart.length) {

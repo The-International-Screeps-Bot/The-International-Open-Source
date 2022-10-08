@@ -1,5 +1,5 @@
 import { allowedSquadCombinations, antifaRoles, myColors } from 'international/constants'
-import { customLog, findClosestObject, getRange, isExit, pack } from 'international/utils'
+import { customLog, findClosestObject, getRange, isCoordExit, isXYExit, pack } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { Duo } from './duo'
 import { Quad } from './quad'
@@ -10,7 +10,6 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
-
         if (!this.memory.SS) return
         if (this.memory.SF) return
 
@@ -72,14 +71,11 @@ export class Antifa extends Creep {
      * Tries to find a squad, creating one if none could be found
      */
     findSquad?() {
-
         if (this.squad) return true
         if (this.memory.SF) {
-
             const members: Antifa[] = []
 
             for (const memberName of this.memory.SMNs) {
-
                 members.push(Game.creeps[memberName])
             }
 
@@ -121,7 +117,6 @@ export class Antifa extends Creep {
     }
 
     createSquad?(members: Antifa[]) {
-
         if (this.memory.SS === 2) {
             this.squad = new Duo(members)
             return
@@ -523,7 +518,7 @@ export class Antifa extends Creep {
         // Filter only enemy construction sites worth stomping
 
         const enemyCSites = this.room.enemyCSites.filter(
-            cSite => cSite.progress > 0 && !isExit(cSite.pos.x, cSite.pos.y),
+            cSite => cSite.progress > 0 && !isCoordExit(cSite.pos),
         )
 
         if (!enemyCSites.length) return false
