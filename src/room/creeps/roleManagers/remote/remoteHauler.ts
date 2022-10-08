@@ -7,6 +7,7 @@ import {
     findObjectWithID,
     getRange,
     pack,
+    randomTick,
     unpackAsPos,
 } from 'international/utils'
 import { indexOf } from 'lodash'
@@ -34,6 +35,9 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
+
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
+
         if (!this.memory.RN) return
 
         // If the creep's remote no longer is managed by its commune
@@ -439,7 +443,7 @@ export class RemoteHauler extends Creep {
 
         delete this.memory.P
         delete creepAtPos.memory.P
-        
+
 /*
         // Trade remotes and sourceIndexes
 

@@ -470,3 +470,8 @@ export function isXYExit(x: number, y: number) {
 export function isCoordExit(coord: Coord) {
     return coord.x <= 0 || coord.x >= roomDimensions - 1 || coord.y <= 0 || coord.y >= roomDimensions - 1
 }
+
+export function randomTick(max: number = 20) {
+
+    return Game.time % Math.floor(Math.random() * max) === 0
+}

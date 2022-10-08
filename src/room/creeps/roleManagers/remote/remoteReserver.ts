@@ -1,4 +1,5 @@
 import { RemoteData } from 'international/constants'
+import { randomTick } from 'international/utils'
 
 export class RemoteReserver extends Creep {
     public get dying(): boolean {
@@ -43,6 +44,8 @@ export class RemoteReserver extends Creep {
     }
 
     preTickManager() {
+
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
         if (!this.memory.RN) return
 
         const role = this.role as 'remoteReserver'
