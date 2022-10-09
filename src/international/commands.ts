@@ -232,3 +232,20 @@ global.allyCreepRequest = function (requestName, communeName?) {
     return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${requestName}`
 }
 global.ACR = global.allyCreepRequest
+
+global.deleteBasePlans = function(roomName) {
+
+    if (!roomName) {
+
+        if (global.communes.size > 1) return 'Provide a roomName'
+
+        roomName = Array.from(global.communes)[0]
+    }
+
+    const room = Game.rooms[roomName]
+    if (!room) return 'No vision in ' + roomName
+
+    delete room.memory.PC
+
+    return 'Deleted base plans for ' + roomName
+}
