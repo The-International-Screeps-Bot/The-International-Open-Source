@@ -240,12 +240,18 @@ Room.prototype.spawnRequester = function () {
             // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
 
             if (this.controllerContainer) {
-                requiredCarryParts += 8
                 if (storage && this.controller.level >= 4) {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
                         this.getPartsOfRoleAmount('controllerUpgrader', WORK),
                     )
+
+                    if (
+                        this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                        this.storage?.store.getUsedCapacity(RESOURCE_ENERGY) > 50000
+                    ) {
+                        requiredCarryParts * 1.5
+                    }
                 } else {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
@@ -674,18 +680,24 @@ Room.prototype.spawnRequester = function () {
 
             // If the controllerContainer have not enough energy in it, don't spawn a new upgrader
 
-            const controllerContainer = this.controllerContainer
-            if (controllerContainer) {
+            if (this.controllerContainer) {
                 if (
-                    controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
                     this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed
                 ) {
                     return false
                 }
+
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) > 1500 &&
+                    this.fastFillerContainerLeft?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000 &&
+                    this.fastFillerContainerRight?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000
+                )
+                    partsMultiplier += estimatedIncome * 1.25
+                else partsMultiplier += estimatedIncome * 0.75
             }
 
             // If there is a storage
-
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
