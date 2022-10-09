@@ -248,9 +248,9 @@ Room.prototype.spawnRequester = function () {
 
                     if (
                         this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
-                        this.storage?.store.getUsedCapacity(RESOURCE_ENERGY) > 50000
+                        storage.store.getUsedCapacity(RESOURCE_ENERGY) > this.controller.level * 10000
                     ) {
-                        requiredCarryParts * 1.5
+                        requiredCarryParts = requiredCarryParts * 1.5
                     }
                 } else {
                     requiredCarryParts += findCarryPartsRequired(
