@@ -4,6 +4,7 @@ import {
     findCarryPartsRequired,
     findObjectWithID,
     getRange,
+    randomTick,
     unpackAsPos,
     unpackAsRoomPos,
 } from 'international/utils'
@@ -44,7 +45,9 @@ export class RemoteHarvester extends Creep {
     }
 
     preTickManager(): void {
+
         if (!this.findRemote()) return
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 

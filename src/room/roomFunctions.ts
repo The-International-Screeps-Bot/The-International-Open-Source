@@ -2430,26 +2430,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
     return groupedPositions
 }
 
-Room.prototype.createPullTask = function (creator) {
-    const room = this
-}
-
-Room.prototype.createPickupTasks = function (creator) {
-    const room = this
-}
-
-Room.prototype.createOfferTasks = function (creator) {
-    const room = this
-}
-
-Room.prototype.createTransferTasks = function (creator) {
-    const room = this
-}
-
-Room.prototype.createWithdrawTasks = function (creator) {
-    const room = this
-}
-
 Room.prototype.estimateIncome = function () {
     const harvesterNames = this.creepsFromRoom.source1Harvester
         .concat(this.creepsFromRoom.source2Harvester)

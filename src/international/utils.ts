@@ -29,6 +29,20 @@ export function findObjectWithID<T extends Id<any>>(ID: T): fromId<T> | undefine
 }
 
 /**
+ * Check if an x and y are valid when mapped onto a room
+ */
+export function doesXYExist(x: number, y: number) {
+    return x >= 0 && x < roomDimensions && y >= 0 && y < roomDimensions
+}
+
+/**
+ * Check if a coord is valid when mapped onto a room
+ */
+export function doesCoordExist(coord: Coord) {
+    return coord.x >= 0 && coord.x < roomDimensions && coord.y >= 0 && coord.y < roomDimensions
+}
+
+/**
  * Takes a rectange and returns the positions inside of it in an array
  */
 export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: number) {
@@ -59,7 +73,7 @@ export function areCoordsEqual(coord1: Coord, coord2: Coord) {
 /**
  * Checks if two positions are equal
  */
- export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
+export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
     return pos1.roomName === pos2.roomName && pos1.x === pos2.x && pos1.y === pos2.y
 }
 
@@ -413,7 +427,6 @@ export function findClosestCommuneName(roomName: string) {
 }
 
 export function findClosestClaimType(roomName: string) {
-
     return Array.from(global.communes).sort(
         (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]
@@ -450,6 +463,15 @@ export function findFunctionCPU(func: Function) {
     customLog('CPU for ' + func, Game.cpu.getUsed() - CPU)
 }
 
-export function isExit(x: number, y: number) {
-    return x <= 0 || x >= 49 || y <= 0 || y >= 49
+export function isXYExit(x: number, y: number) {
+    return x <= 0 || x >= roomDimensions - 1 || y <= 0 || y >= roomDimensions - 1
+}
+
+export function isCoordExit(coord: Coord) {
+    return coord.x <= 0 || coord.x >= roomDimensions - 1 || coord.y <= 0 || coord.y >= roomDimensions - 1
+}
+
+export function randomTick(max: number = 20) {
+
+    return Game.time % Math.floor(Math.random() * max) === 0
 }

@@ -1109,7 +1109,7 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-            this.visualizeCostMatrix(this._quadCostMatrix, true)
+            /* this.visualizeCostMatrix(this._quadCostMatrix, true) */
 
             return this._quadCostMatrix
         },

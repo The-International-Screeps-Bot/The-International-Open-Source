@@ -1,5 +1,5 @@
 import { RemoteData } from 'international/constants'
-import { findObjectWithID, getRange } from 'international/utils'
+import { findObjectWithID, getRange, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -25,6 +25,8 @@ export class RemoteDismantler extends Creep {
     }
 
     preTickManager() {
+
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
         if (!this.memory.RN) return
 
         const role = this.role as 'remoteDismantler'

@@ -25,7 +25,7 @@ import {
     unpackAsPos,
     unpackAsRoomPos,
     findClosestObjectInRange,
-    isExit,
+    isXYExit,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'

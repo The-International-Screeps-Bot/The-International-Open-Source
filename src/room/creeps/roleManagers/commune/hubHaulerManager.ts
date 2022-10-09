@@ -62,6 +62,9 @@ export class HubHauler extends Creep {
 
         if (this.reserveFactoryWithdraw()) return
         if (this.reserveFactoryTransfer()) return
+
+        if (this.reservePowerSpawnTransferPower()) return
+        if (this.reservePowerSpawnTransferEnergy()) return
     }
 
     factoryEnergyOverfillTransfer?(): boolean {
@@ -415,29 +418,30 @@ export class HubHauler extends Creep {
         const { storage } = room
         const { terminal } = room
 
-        if (!storage && !powerSpawn) return false
+        if (!storage && !terminal) return false
 
         // If there is unsufficient space to justify a fill
 
-        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.energy) return false
+        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.getUsedCapacity(resource)) return false
 
         const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
 
         // Find a provider
 
         let provider
-        if (storage && storage.store.energy >= amount) provider = storage
-        else if (terminal && terminal.store.energy >= amount) provider = terminal
+        if (storage && storage.store[resource] >= amount) provider = storage
+        else if (terminal && terminal.store[resource] >= amount) provider = terminal
 
         if (!provider) return false
 
-        this.message += 'RHLT'
+        this.message += 'RPSTP'
 
-        this.createReservation('withdraw', provider.id, amount)
+        this.createReservation('withdraw', provider.id, amount, resource)
         this.createReservation(
             'transfer',
             powerSpawn.id,
-            Math.min(this.freeStore() + this.store.energy, powerSpawn.freeSpecificStore(resource)),
+            Math.min(this.freeStore() + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+            resource
         )
         return true
     }
@@ -451,33 +455,35 @@ export class HubHauler extends Creep {
         const resource = RESOURCE_ENERGY
 
         if (!powerSpawn) return false
+        if (!powerSpawn.store.getCapacity(RESOURCE_POWER)) return false
 
         const { storage } = room
         const { terminal } = room
 
-        if (!storage && !powerSpawn) return false
+        if (!storage && !terminal) return false
 
         // If there is unsufficient space to justify a fill
 
-        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.energy) return false
+        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.getUsedCapacity(resource)) return false
 
         const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
 
         // Find a provider
 
         let provider
-        if (storage && storage.store.energy >= amount) provider = storage
-        else if (terminal && terminal.store.energy >= amount) provider = terminal
+        if (storage && storage.store[resource] >= 75000 && storage.store[resource] >= amount) provider = storage
+        else if (terminal && storage.store[resource] >= 25000 && terminal.store[resource] >= amount) provider = terminal
 
         if (!provider) return false
 
-        this.message += 'RHLT'
+        this.message += 'RPSTE'
 
-        this.createReservation('withdraw', provider.id, amount)
+        this.createReservation('withdraw', provider.id, amount, resource)
         this.createReservation(
             'transfer',
             powerSpawn.id,
-            Math.min(this.freeStore() + this.store.energy, powerSpawn.freeSpecificStore(resource)),
+            Math.min(this.freeStore() + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+            resource
         )
         return true
     }

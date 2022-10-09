@@ -733,7 +733,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
         conditions: function (communeManager) {
             return communeManager.room.structures.powerSpawn.length
         },
-        min: 0.005,
+        min: 0.002,
         max: 0.015,
     },
     {
@@ -1048,3 +1048,18 @@ export { allowedSquadCombinations }
 
 export const defaultPlainCost = 2
 export const defaultSwampCost = 8
+
+export const quadAttackMemberOffsets = [
+    {
+        x: 1,
+        y: 0,
+    },
+    {
+        x: 0,
+        y: 1,
+    },
+    {
+        x: 1,
+        y: 1,
+    },
+]

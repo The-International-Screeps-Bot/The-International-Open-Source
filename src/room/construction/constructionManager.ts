@@ -1,4 +1,4 @@
-import { myColors } from 'international/constants'
+import { myColors, stamps } from 'international/constants'
 import { customLog } from 'international/utils'
 import { basePlanner } from './communePlanner'
 import { rampartPlanner } from './rampartPlanner'
@@ -11,6 +11,15 @@ export function constructionManager(room: Room) {
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+/*
+    // Testing
+
+    delete room.memory.PC
+
+    room.memory.stampAnchors = {}
+
+    for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+ */
 
     if (!room.memory.PC) basePlanner(room)
 
