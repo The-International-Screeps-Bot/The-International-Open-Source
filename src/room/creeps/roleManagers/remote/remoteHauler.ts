@@ -17,6 +17,10 @@ import { Hauler } from '../commune/hauler'
 
 export class RemoteHauler extends Creep {
     public get dying() {
+        // If creep has no active body parts anymore, kill itself
+
+        if (this.getActiveBodyparts(MOVE) === 0 || this.getActiveBodyparts(CARRY) === 0) this.suicide()
+
         // Inform as dying if creep is already recorded as dying
 
         if (this._dying) return true
@@ -418,6 +422,7 @@ export class RemoteHauler extends Creep {
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
         if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
+        if (creepAtPos.memory.SI !== this.memory.SI) return false
 
         this.transfer(creepAtPos, RESOURCE_ENERGY)
 

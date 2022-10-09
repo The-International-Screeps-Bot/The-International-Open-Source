@@ -1198,14 +1198,24 @@ Object.defineProperties(Room.prototype, {
     MAWT: {
         get() {
             if (this._MAWT) return this._MAWT
-
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
                 //Priortize ruins that have short-ish life remaining over source containers
                 //  So that we get all the resources out of the ruins
-                ...this.find(FIND_RUINS).filter(ruin => ruin.ticksToDecay < 10000 && ruin.store.getUsedCapacity() > 0),
-                ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity() > 0),
+                ...this.sourceContainers.filter(
+                    sc =>
+                        sc.store.getUsedCapacity() >
+                        _.sum(
+                            _.filter(
+                                Game.creeps,
+                                c => c.memory.Rs && c.memory.Rs?.length > 0 && c.memory.Rs[0].targetID === sc.id,
+                            ),
+                            c => c.memory.Rs[0].amount,
+                        ) +
+                            50,
+                ),
                 //But we still want to pull from ruins if the source containers are empty.
                 ...this.find(FIND_RUINS).filter(ruin => ruin.ticksToDecay >= 10000 && ruin.store.getUsedCapacity()),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {

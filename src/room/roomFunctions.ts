@@ -198,7 +198,7 @@ Room.prototype.get = function (roomObjectName) {
         for (const coord of adjacentPositions) {
             // Iterate if terrain for pos is a wall
 
-            if (terrain[pack(coord)] === TERRAIN_MASK_WALL) continue
+            if (terrain[pack(coord)] === 255) continue
 
             // Add pos to harvestPositions
 
@@ -677,7 +677,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             // Loop through each costMatrix
 
                             for (const weightCMName of opts.weightCostMatrixes) {
-
                                 const weightCM = room[weightCMName as unknown as keyof Room]
                                 if (!weightCM) continue
 
@@ -781,7 +780,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoiding structures that can't be walked on is enabled
 
                 if (opts.avoidImpassibleStructures) {
-
                     for (const rampart of room.structures.rampart) {
                         // If the rampart is mine
 
@@ -1345,9 +1343,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
     return true
 }
 
-Room.prototype.createAttackCombatRequest = function() {
-
-    if (!Memory.autoAttack) return
+Room.prototype.createAttackCombatRequest = function () {
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
@@ -1364,7 +1360,6 @@ Room.prototype.createAttackCombatRequest = function() {
 }
 
 Room.prototype.createHarassCombatRequest = function () {
-
     if (!Memory.autoAttack) return
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
@@ -1389,10 +1384,7 @@ Room.prototype.createHarassCombatRequest = function () {
         request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
 }
 
-Room.prototype.createDefendCombatRequest = function() {
-
-    if (!Memory.autoAttack) return
-}
+Room.prototype.createDefendCombatRequest = function () {}
 
 Room.prototype.cleanMemory = function () {
     const room = this
@@ -2212,7 +2204,6 @@ Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisual
 }
 
 Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {
-
     if (!visualize) return
 
     this.visual.circle(coord.x, coord.y, {

@@ -225,7 +225,7 @@ Room.prototype.spawnRequester = function () {
             let requiredCarryParts = 10
 
             //If the FF isn't setup, add more carrying.
-            requiredCarryParts += 10
+            //requiredCarryParts += 10
 
             // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
@@ -245,6 +245,13 @@ Room.prototype.spawnRequester = function () {
                         this.upgradePathLength,
                         this.getPartsOfRoleAmount('controllerUpgrader', WORK),
                     )
+
+                    if (
+                        this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                        this.storage?.store.getUsedCapacity(RESOURCE_ENERGY) > 50000
+                    ) {
+                        requiredCarryParts * 1.5
+                    }
                 } else {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
@@ -671,8 +678,26 @@ Room.prototype.spawnRequester = function () {
             )
                 return false
 
-            // If there is a storage
+            // If the controllerContainer have not enough energy in it, don't spawn a new upgrader
 
+            if (this.controllerContainer) {
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                    this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed
+                ) {
+                    return false
+                }
+
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) > 1500 &&
+                    this.fastFillerContainerLeft?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000 &&
+                    this.fastFillerContainerRight?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000
+                )
+                    partsMultiplier += estimatedIncome * 1.25
+                else partsMultiplier += estimatedIncome * 0.75
+            }
+
+            // If there is a storage
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
@@ -735,7 +760,7 @@ Room.prototype.spawnRequester = function () {
 
             // If there are construction sites of my ownership in the this, set multiplier to 1
 
-            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
+            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = partsMultiplier * 0.25
 
             const threshold = 0.15
             const role = 'controllerUpgrader'
@@ -860,7 +885,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
                     threshold,
-                    maxCreeps: Infinity,
+                    maxCreeps,
                     minCost: 200,
                     priority,
                     memoryAdditions: {
@@ -875,7 +900,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
                 threshold,
-                maxCreeps: Infinity,
+                maxCreeps,
                 minCost: 250,
                 priority,
                 memoryAdditions: {},
@@ -1359,29 +1384,28 @@ Room.prototype.spawnRequester = function () {
         if (!request) continue
 
         const minRangedAttackCost =
-            (((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+            ((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
                 (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
-            1.2) || 0
+                1.2 || 0
         const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
         const minAttackCost =
-            (((request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+            ((request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
                 (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[MOVE]) *
-            1.2) || 0
+                1.2 || 0
         const attackAmount = minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE])
 
         const minHealCost =
-            (((request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
+            ((request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
                 (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
-            1.2) || 0
+                1.2 || 0
         const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
         const minDismantleCost =
-            (request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
-            request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE]) || 0
+            request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
+                request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
         if (request.T === 'attack') {
-
             // Spawn quad
 
             this.constructSpawnRequests(

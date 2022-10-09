@@ -18,7 +18,7 @@ export const baseVisuals = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const mapVisuals = false
+export const mapVisuals = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -48,7 +48,7 @@ export const pixelSelling = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const pixelGeneration = false
+export const pixelGeneration = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -63,7 +63,7 @@ export const autoClaim = true
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const autoAttack = false
+export const autoAttack = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -94,8 +94,6 @@ interface RoomTypeProperties {
 }
 
 export const roomTypeProperties: RoomTypeProperties = {
-
-
     remotes: true,
     deposits: true,
     powerBanks: true,
@@ -124,8 +122,6 @@ export const roomTypeProperties: RoomTypeProperties = {
 
 export const roomTypes: Record<RoomTypes, RoomType> = {
     commune: {
-
-
         remotes: true,
         deposits: true,
         powerBanks: true,
@@ -135,7 +131,6 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
     },
     remote: {
         commune: true,
-
 
         SE: true,
         RE: true,
