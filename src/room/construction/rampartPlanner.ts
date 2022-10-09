@@ -1398,7 +1398,8 @@ export function rampartPlanner(room: Room) {
     // Loop through each group
 
     for (const group of groupedRampartPositions) {
-        // Get the closest pos of the group by range to the anchor
+
+        // Get the closest pos of the sort by range to the anchor
 
         const closestPosToAnchor = group.sort((a, b) => {
             return (

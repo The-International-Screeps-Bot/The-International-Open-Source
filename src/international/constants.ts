@@ -738,7 +738,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
         conditions: function (communeManager) {
             return communeManager.room.structures.powerSpawn.length
         },
-        min: 0.005,
+        min: 0.002,
         max: 0.015,
     },
     {
