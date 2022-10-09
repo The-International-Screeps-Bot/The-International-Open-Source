@@ -760,7 +760,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there are construction sites of my ownership in the this, set multiplier to 1
 
-            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = partsMultiplier * 0.25
+            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) {
+                if (!this.controllerContainer && !this.controllerLink) {
+                    partsMultiplier = 0
+                } else partsMultiplier = partsMultiplier * 0.25
+            }
 
             const threshold = 0.15
             const role = 'controllerUpgrader'
