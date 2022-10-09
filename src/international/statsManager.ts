@@ -2,7 +2,7 @@ export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
         if (roomType === 'commune') {
             const communeStats: RoomCommuneStats = {
-                cl: 0,
+                cl: null,
                 eib: 0,
                 eih: 0,
                 eou: 0,
@@ -12,7 +12,7 @@ export class StatsManager {
                 eos: 0,
                 eosp: 0,
                 mh: 0,
-                es: 0,
+                es: null,
                 cc: 0,
                 cu: Game.cpu.getUsed(),
                 su: 0,
@@ -69,7 +69,11 @@ export class StatsManager {
         const roomStats = Memory.stats.rooms[roomName]
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
 
-        if (globalCommuneStats.gt !== Game.time && !forceUpdate) return
+        if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
+            console.log(`StatsManager: roomCommuneFinalEndTick: ${roomName} stats not updated`)
+            return
+        }
+        const each250Ticks = Game.time % 250 === 0
 
         Object.entries(global.roomStats.remote)
             .filter(([roomName]) => roomMemory.remotes.includes(roomName))
@@ -77,10 +81,12 @@ export class StatsManager {
                 if (globalCommuneStats.gt === Game.time) {
                     globalCommuneStats.rc += 1
                     globalCommuneStats.rcu += remoteRoomStats.rcu
-                    globalCommuneStats.res += remoteRoomStats.res
                     globalCommuneStats.reih += remoteRoomStats.reih
                     globalCommuneStats.reoro += remoteRoomStats.reoro
                     globalCommuneStats.reob += remoteRoomStats.reob
+                    if (each250Ticks)
+                        globalCommuneStats.res +=
+                            Game.rooms[remoteRoomName]?.findStoredResourceAmount(RESOURCE_ENERGY, true) || 0
                 }
             })
         if (room) {
@@ -92,57 +98,61 @@ export class StatsManager {
                 globalCommuneStats.su =
                     spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
 
-            if (Game.time % 250 === 0 || forceUpdate) {
+            if (each250Ticks || forceUpdate) {
                 if (room.controller && room.controller.my) {
                     const progressPercentage = room.controller.progress / room.controller.progressTotal
                     globalCommuneStats.cl =
                         progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
-                } else globalCommuneStats.cl = null
+                }
                 globalCommuneStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
+            } else {
+                globalCommuneStats.cl = roomStats.cl
+                globalCommuneStats.es = roomStats.es
             }
         }
 
         Object.keys(roomStats).forEach(name => {
             let globalValue = globalCommuneStats[name]
-            if (globalValue === undefined) globalValue = 0
             const value = roomStats[name]
             if (value === undefined) roomStats[name] = 0
 
-            switch (name) {
-                // level 1 wo average
-                case 'cc':
-                case 'tcc':
-                case 'cl':
-                case 'es':
-                    roomStats[name] = globalValue
-                    break
-                // level 1 w average
-                case 'su':
-                case 'cu':
-                case 'eh':
-                    roomStats[name] = this.average(value, globalValue)
-                    break
-                // level 2
-                case 'mh':
-                case 'eib':
-                case 'eos':
-                case 'eou':
-                case 'eob':
-                case 'eoro':
-                case 'eorwr':
-                case 'eosp':
-                case 'rc':
-                case 'rcu':
-                case 'res':
-                case 'reih':
-                case 'reoro':
-                case 'reob':
-                    if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
+            if (globalValue) {
+                switch (name) {
+                    // level 1 wo average
+                    case 'cc':
+                    case 'tcc':
+                    case 'cl':
+                    case 'es':
+                        roomStats[name] = this.round(globalValue)
+                        break
+                    // level 1 w average
+                    case 'su':
+                    case 'cu':
+                    case 'eh':
                         roomStats[name] = this.average(value, globalValue)
-                    else roomStats[name] = 0
-                    break
-                default:
-                    break
+                        break
+                    // level 2
+                    case 'mh':
+                    case 'eib':
+                    case 'eos':
+                    case 'eou':
+                    case 'eob':
+                    case 'eoro':
+                    case 'eorwr':
+                    case 'eosp':
+                    case 'rc':
+                    case 'rcu':
+                    case 'res':
+                    case 'reih':
+                    case 'reoro':
+                    case 'reob':
+                        if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
+                            roomStats[name] = this.average(value, globalValue)
+                        else roomStats[name] = null
+                        break
+                    default:
+                        break
+                }
             }
         })
     }
@@ -238,10 +248,15 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    average(avg: number, number: number, averagedOverTickCount: number = 1000, digits: number = 5) {
+    round(value: number, decimals: number = 5) {
+        const multiplier = Math.pow(10, decimals || 0)
+        return Math.round(value * multiplier) / multiplier
+    }
+
+    average(avg: number, number: number, averagedOverTickCount: number = 1000, precision?: number) {
         avg -= avg / averagedOverTickCount
         avg += number / averagedOverTickCount
-        return Math.round(avg * Math.pow(10, digits)) / Math.pow(10, digits)
+        return this.round(avg, precision)
     }
 }
 
