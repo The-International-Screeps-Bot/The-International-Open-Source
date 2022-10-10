@@ -1,5 +1,6 @@
 import { ClaimRequestData } from 'international/constants'
-import { findObjectWithID, getRange, unpackAsPos } from 'international/utils'
+import { findObjectWithID, getRange } from 'international/utils'
+import { unpackCoord } from 'other/packrat'
 
 export class Vanguard extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -33,7 +34,7 @@ export class Vanguard extends Creep {
 
         // Unpack the harvestPos
 
-        const harvestPos = unpackAsPos(this.memory.packedPos)
+        const harvestPos = unpackCoord(this.memory.PC)
 
         // If the creep is at the creep's packedHarvestPos, inform false
 

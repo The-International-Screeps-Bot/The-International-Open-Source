@@ -25,7 +25,6 @@ export class RemoteDismantler extends Creep {
     }
 
     preTickManager() {
-
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
         if (!this.memory.RN) return
 
@@ -132,11 +131,7 @@ export class RemoteDismantler extends Creep {
 
         let targets: Structure[] = room.actionableWalls
 
-        targets = targets.concat(
-            room.find(FIND_HOSTILE_STRUCTURES).filter(function (structure) {
-                return structure.structureType != STRUCTURE_INVADER_CORE
-            }),
-        )
+        targets = targets.concat(room.dismantleableStructures)
 
         if (targets.length) {
             target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })

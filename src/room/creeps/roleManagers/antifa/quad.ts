@@ -7,9 +7,8 @@ import {
     findClosestObject,
     getRange,
     isXYExit,
-    unpackAsPos,
 } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord, unpackCoord } from 'other/packrat'
 import { Antifa } from './antifa'
 
 export class Quad {
@@ -209,7 +208,7 @@ export class Quad {
         this.membersAttackMove()
     }
     membersAttackMove(moveLeader = this.leader) {
-        const moveRequestCoord = unpackAsPos(moveLeader.moveRequest)
+        const moveRequestCoord = unpackCoord(moveLeader.moveRequest)
 
         const offset = {
             x: moveLeader.pos.x - moveRequestCoord.x,

@@ -1,5 +1,5 @@
 import { linkReceiveTreshold, linkSendThreshold, powerSpawnRefillThreshold } from 'international/constants'
-import { findObjectWithID, unpackAsRoomPos } from 'international/utils'
+import { findObjectWithID, unpackNumAsPos } from 'international/utils'
 
 //import { HubHauler } from '../../creepClasses'
 
@@ -9,7 +9,7 @@ export class HubHauler extends Creep {
 
         // Get the hub, informing false if it's undefined
 
-        const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+        const hubAnchor = unpackNumAsPos(room.memory.stampAnchors.hub[0], room.name)
         if (!hubAnchor) return true
 
         // Otherwise if the creep is on the hub, inform false
@@ -422,7 +422,11 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.getUsedCapacity(resource)) return false
+        if (
+            powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold <
+            powerSpawn.store.getUsedCapacity(resource)
+        )
+            return false
 
         const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
 
@@ -441,7 +445,7 @@ export class HubHauler extends Creep {
             'transfer',
             powerSpawn.id,
             Math.min(this.freeStore() + this.store[resource], powerSpawn.freeSpecificStore(resource)),
-            resource
+            resource,
         )
         return true
     }
@@ -464,7 +468,11 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold < powerSpawn.store.getUsedCapacity(resource)) return false
+        if (
+            powerSpawn.store.getCapacity(resource) * powerSpawnRefillThreshold <
+            powerSpawn.store.getUsedCapacity(resource)
+        )
+            return false
 
         const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
 
@@ -483,7 +491,7 @@ export class HubHauler extends Creep {
             'transfer',
             powerSpawn.id,
             Math.min(this.freeStore() + this.store[resource], powerSpawn.freeSpecificStore(resource)),
-            resource
+            resource,
         )
         return true
     }

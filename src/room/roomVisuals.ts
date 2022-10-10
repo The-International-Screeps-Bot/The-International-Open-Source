@@ -9,7 +9,7 @@ import {
     roomDimensions,
     stamps,
 } from 'international/constants'
-import { customLog, findObjectWithID, unpackAsPos } from 'international/utils'
+import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from './roomManager'
 
 export class RoomVisualsManager {
@@ -218,7 +218,7 @@ export class RoomVisualsManager {
             const stamp = stamps[stampType as StampTypes]
 
             for (const packedStampAnchor of this.roomManager.room.memory.stampAnchors[stampType as StampTypes]) {
-                const stampAnchor = unpackAsPos(packedStampAnchor)
+                const stampAnchor = unpackNumAsCoord(packedStampAnchor)
 
                 for (const structureType in stamp.structures) {
                     if (structureType === 'empty') continue

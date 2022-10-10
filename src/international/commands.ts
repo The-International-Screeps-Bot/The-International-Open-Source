@@ -246,6 +246,7 @@ global.deleteBasePlans = function(roomName) {
     if (!room) return 'No vision in ' + roomName
 
     delete room.memory.PC
+    delete room.memory.stampAnchors
 
     return 'Deleted base plans for ' + roomName
 }

@@ -374,8 +374,8 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             // Get the fastFiller positions, if there are none, inform false
 
-            const fastFillerPositions: Coord[] = this.get('fastFillerPositions')
-            if (!fastFillerPositions.length) return false
+            const fastFillerPositionsCount = this.fastFillerPositions.length
+            if (!fastFillerPositionsCount) return false
 
             let defaultParts = [CARRY, MOVE, CARRY]
 
@@ -389,7 +389,7 @@ Room.prototype.spawnRequester = function () {
                 defaultParts,
                 extraParts: [],
                 partsMultiplier: 1,
-                minCreeps: fastFillerPositions.length,
+                minCreeps: fastFillerPositionsCount,
                 minCost: 250,
                 priority: 0.75,
                 memoryAdditions: {},
@@ -659,7 +659,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             let partsMultiplier = 1
-            let maxCreeps = this.get('upgradePositions').length - 1
+            let maxCreeps = this.upgradePositions.length - 1
             const priority = 9
 
             // If there are enemyAttackers and the controller isn't soon to downgrade

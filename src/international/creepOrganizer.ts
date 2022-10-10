@@ -1,7 +1,8 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { myColors, remoteRoles } from './constants'
-import { customLog, pack } from './utils'
+import { customLog } from './utils'
 import { InternationalManager } from './internationalManager'
+import { packCoord } from 'other/packrat'
 
 InternationalManager.prototype.creepOrganizer = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -54,7 +55,7 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         // Add the creep's name to the position in its room
 
-        if (!creep.spawning) room.creepPositions.set(pack(creep.pos), creep.name)
+        if (!creep.spawning) room.creepPositions.set(packCoord(creep.pos), creep.name)
 
         // Get the commune the creep is from
 

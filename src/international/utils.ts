@@ -179,6 +179,11 @@ export function getRange(x1: number, x2: number, y1: number, y2: number) {
     return Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1))
 }
 
+export function getRangeOfCoords(coord1: Coord, coord2: Coord) {
+
+    return getRange(coord1.x, coord2.x, coord1.y, coord2.y)
+}
+
 /**
  * Finds the closest object with a position to a given target, by range (Half Manhattan)
  */
@@ -227,7 +232,26 @@ export function findClosestObjectInRange<T extends _HasRoomPosition>(
 /**
  * Finds the closest position to a given target (Half Manhattan)
  */
-export function findClosestPos<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
+ export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]) {
+    let minRange = Infinity
+    let closest = undefined
+
+    for (const pos of positions) {
+        const range = getRange(target.x, pos.x, target.y, pos.y)
+
+        if (range > minRange) continue
+
+        minRange = range
+        closest = pos
+    }
+
+    return closest
+}
+
+/**
+ * Finds the closest position to a given target (Half Manhattan)
+ */
+export function findClosestPos(target: RoomPosition | Coord, positions: RoomPosition[]) {
     let minRange = Infinity
     let closest = undefined
 
@@ -324,7 +348,19 @@ export function createPosMap(innerArray?: boolean, initialValue?: string | numbe
     return packedPosMap
 }
 
-export function unpackAsPos(packedPos: number) {
+export function packAsNum(pos: Coord) {
+    // Inform a packed pos
+
+    return pos.x * roomDimensions + pos.y
+}
+
+export function packXYAsNum(x: number, y: number) {
+    // Inform a packed pos
+
+    return x * roomDimensions + y
+}
+
+export function unpackNumAsCoord(packedPos: number) {
     // Inform an unpacked pos
 
     return {
@@ -333,22 +369,10 @@ export function unpackAsPos(packedPos: number) {
     }
 }
 
-export function unpackAsRoomPos(packedPos: number, roomName: string) {
+export function unpackNumAsPos(packedPos: number, roomName: string) {
     // Inform an unpacked RoomPosition
 
     return new RoomPosition(Math.floor(packedPos / roomDimensions), Math.floor(packedPos % roomDimensions), roomName)
-}
-
-export function pack(pos: Coord) {
-    // Inform a packed pos
-
-    return pos.x * roomDimensions + pos.y
-}
-
-export function packXY(x: number, y: number) {
-    // Inform a packed pos
-
-    return x * roomDimensions + y
 }
 
 export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {
@@ -361,7 +385,7 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
 
         // If the queuedCreep's pos is equal to the moveRequest, inform the creep
 
-        if (pack(queuedCreep.pos) === requestPackedPos) return queuedCreep
+        if (packAsNum(queuedCreep.pos) === requestPackedPos) return queuedCreep
     }
 
     return undefined
@@ -472,6 +496,5 @@ export function isCoordExit(coord: Coord) {
 }
 
 export function randomTick(max: number = 20) {
-
     return Game.time % Math.floor(Math.random() * max) === 0
 }

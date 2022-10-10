@@ -1,5 +1,6 @@
 import { allyPlayers, ClaimRequestData } from 'international/constants'
-import { findClosestObject, getRange, pack } from 'international/utils'
+import { findClosestObject, getRange } from 'international/utils'
+import { packCoord } from 'other/packrat'
 
 export class VanguardDefender extends Creep {
     /**
@@ -48,7 +49,7 @@ export class VanguardDefender extends Creep {
             }
 
             this.rangedMassAttack()
-            this.moveRequest = pack(enemyCreep.pos)
+            this.moveRequest = packCoord(enemyCreep.pos)
 
             return true
         }
@@ -88,7 +89,7 @@ export class VanguardDefender extends Creep {
 
         if (range === 1) {
             this.rangedMassAttack()
-            this.moveRequest = pack(enemyAttacker.pos)
+            this.moveRequest = packCoord(enemyAttacker.pos)
         }
 
         // Otherwise, rangedAttack the enemyAttacker

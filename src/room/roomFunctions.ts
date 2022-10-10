@@ -27,16 +27,16 @@ import {
     findClosestCommuneName,
     findCoordsInsideRect,
     getRange,
-    pack,
-    packXY,
-    unpackAsPos,
-    unpackAsRoomPos,
+    packAsNum,
+    packXYAsNum,
+    unpackNumAsCoord,
+    unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { packCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
+import { packCoord, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
 import { basePlanner } from './construction/communePlanner'
 import { RoomCacheObject } from './roomObject'
-
+/*
 Room.prototype.get = function (roomObjectName) {
     const room = this
 
@@ -44,11 +44,7 @@ Room.prototype.get = function (roomObjectName) {
 
     // Harvest positions
 
-    /**
-     * Finds positions adjacent to a source that a creep can harvest
-     * @param source source of which to find harvestPositions for
-     * @returns source's harvestPositions, a list of positions
-     */
+
     function findHarvestPositions(source: Source | Mineral) {
         // Stop and inform empty array if there is no source
 
@@ -88,10 +84,7 @@ Room.prototype.get = function (roomObjectName) {
         return harvestPositions
     }
 
-    /**
-     * @param harvestPositions array of RoomPositions to filter
-     * @returns the closest harvestPosition to the room's anchor
-     */
+
     function findClosestHarvestPos(harvestPositions: RoomPosition[]): void | RoomPosition {
         // Get the room anchor, stopping if it's undefined
 
@@ -198,7 +191,7 @@ Room.prototype.get = function (roomObjectName) {
         for (const coord of adjacentPositions) {
             // Iterate if terrain for pos is a wall
 
-            if (terrain[pack(coord)] === TERRAIN_MASK_WALL) continue
+            if (terrain[packAsNum(coord)] === TERRAIN_MASK_WALL) continue
 
             // Add pos to harvestPositions
 
@@ -335,7 +328,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-            if (creep.memory.packedPos) usedHarvestPositions.add(creep.memory.packedPos)
+            if (creep.memory.PC) usedHarvestPositions.add(creep.memory.PC)
         }
 
         // Inform usedHarvestPositions
@@ -369,12 +362,12 @@ Room.prototype.get = function (roomObjectName) {
             // Get the centerUpgradePos and set it as avoid in usedUpgradePositions
 
             const centerUpgadePos = room.roomObjects.centerUpgradePos.getValue()
-            usedUpgradePositions.add(pack(centerUpgadePos))
+            usedUpgradePositions.add(packAsNum(centerUpgadePos))
         }
 
         // Get the hubAnchor, informing false if it's not defined
 
-        const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+        const hubAnchor = unpackNumAsPos(room.memory.stampAnchors.hub[0], room.name)
         if (!hubAnchor) return false
 
         // Get the upgradePositions, informing false if they're undefined
@@ -385,7 +378,7 @@ Room.prototype.get = function (roomObjectName) {
         // Assign closestUpgradePos in usedUpgradePositions
 
         usedUpgradePositions.add(
-            pack(
+            packAsNum(
                 hubAnchor.findClosestByPath(upgradePositions, {
                     ignoreCreeps: true,
                     ignoreDestructibleStructures: true,
@@ -407,7 +400,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep has a packedUpgradePos, record it in usedUpgradePositions
 
-            if (creep.memory.packedPos) usedUpgradePositions.add(creep.memory.packedPos)
+            if (creep.memory.PC) usedUpgradePositions.add(creep.memory.PC)
         }
 
         // Inform usedUpgradePositions
@@ -442,7 +435,7 @@ Room.prototype.get = function (roomObjectName) {
 
             // If the creep has a packedFastFillerPos, record it in usedFastFillerPositions
 
-            if (creep.memory.packedPos) usedFastFillerPositions.add(creep.memory.packedPos)
+            if (creep.memory.PC) usedFastFillerPositions.add(creep.memory.PC)
         }
 
         // Inform usedFastFillerPositions
@@ -476,7 +469,7 @@ Room.prototype.get = function (roomObjectName) {
 
     return roomObject.getValue()
 }
-
+ */
 /**
     @param pos1 pos of the object performing the action
     @param pos2 pos of the object getting acted on
@@ -650,7 +643,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             const packedCoord = parseInt(index)
                             if (coordMap[packedCoord] === 0) continue
 
-                            const coord = unpackAsPos(packedCoord)
+                            const coord = unpackNumAsCoord(packedCoord)
 
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
                         }
@@ -677,7 +670,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             // Loop through each costMatrix
 
                             for (const weightCMName of opts.weightCostMatrixes) {
-
                                 const weightCM = room[weightCMName as unknown as keyof Room]
                                 if (!weightCM) continue
 
@@ -722,52 +714,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                     if (!opts.avoidEnemyRanges) return
 
-                    // Stop if the is a controller, it's mine, and it's in safemode
+                    for (const packedCoord of room.enemyThreatCoords) {
 
-                    if (room.controller && room.controller.my && room.controller.safeMode) return
-
-                    // Get enemies and loop through them
-
-                    const enemyAttackers: Creep[] = []
-                    const enemyRangedAttackers: Creep[] = []
-
-                    for (const enemyCreep of room.enemyAttackers) {
-                        if (enemyCreep.parts.ranged_attack > 0) {
-                            enemyRangedAttackers.push(enemyCreep)
-                            continue
-                        }
-
-                        if (enemyCreep.parts.attack > 0) enemyAttackers.push(enemyCreep)
-                    }
-
-                    for (const enemyAttacker of enemyAttackers) {
-                        // Construct rect and get positions inside
-
-                        const positions = findCoordsInsideRect(
-                            enemyAttacker.pos.x - 2,
-                            enemyAttacker.pos.y - 2,
-                            enemyAttacker.pos.x + 2,
-                            enemyAttacker.pos.y + 2,
-                        )
-
-                        // Loop through positions and set them as impassible
-
-                        for (const pos of positions) cm.set(pos.x, pos.y, 255)
-                    }
-
-                    for (const enemyAttacker of enemyRangedAttackers) {
-                        // Construct rect and get positions inside
-
-                        const positions = findCoordsInsideRect(
-                            enemyAttacker.pos.x - 3,
-                            enemyAttacker.pos.y - 3,
-                            enemyAttacker.pos.x + 3,
-                            enemyAttacker.pos.y + 3,
-                        )
-
-                        // Loop through positions and set them as impassible
-
-                        for (const pos of positions) cm.set(pos.x, pos.y, 255)
+                        const coord = unpackCoord(packedCoord)
+                        cm.set(coord.x, coord.y, 255)
                     }
                 }
 
@@ -781,7 +731,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoiding structures that can't be walked on is enabled
 
                 if (opts.avoidImpassibleStructures) {
-
                     for (const rampart of room.structures.rampart) {
                         // If the rampart is mine
 
@@ -838,7 +787,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (room.anchor) {
                         // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
 
-                        const upgradePositions: RoomPosition[] = room.get('upgradePositions')
+                        const upgradePositions = room.upgradePositions
                         const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
                             ignoreCreeps: true,
                             ignoreDestructibleStructures: true,
@@ -862,24 +811,16 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                     const hubAnchor =
                         room.memory.stampAnchors && room.memory.stampAnchors.hub[0]
-                            ? unpackAsRoomPos(room.memory.stampAnchors.hub[0], roomName)
+                            ? unpackNumAsPos(room.memory.stampAnchors.hub[0], roomName)
                             : undefined
 
                     // If the hubAnchor is defined
 
                     if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
 
-                    // Get fastFillerPositions
+                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
-                    const fastFillerPositions: Coord[] = room.get('fastFillerPositions')
-
-                    // If there are fastFillerPositions
-
-                    if (fastFillerPositions.length) {
-                        // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-                        for (const pos of fastFillerPositions) cm.set(pos.x, pos.y, 10)
-                    }
+                    for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
                 }
 
                 // Inform the CostMatrix
@@ -1201,7 +1142,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         let newSourceEfficaciesTotal = 0
 
         // Get base planning data
-
+  
         // loop through sourceNames
 
         for (const source of room.sources) {
@@ -1221,40 +1162,15 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
             if (path.length >= 300) return true
 
-            const uniqueRoomNames = [...new Set(path.map(rp => rp.roomName))]
-
-            //Pull the terrain into a dictionary, because creating the object is expensive-ish
-            let terrianDictionary: { [roomName: string]: RoomTerrain } = {}
-            for (let roomName of uniqueRoomNames) {
-                terrianDictionary[roomName] = new Room.Terrain(roomName)
-            }
-
-            let sourceEfficancy = path
-                //Map the Room position to the travel costs
-                .map(roomPos =>
-                    //Swamps
-                    terrianDictionary[roomPos.roomName].get(roomPos.x, roomPos.y) == TERRAIN_MASK_SWAMP ? 5 : 1,
-                )
-                //And sum it
-                .reduce((partialSum, a) => partialSum + a, 0)
-
-            newSourceEfficacies.push(sourceEfficancy)
-            newSourceEfficaciesTotal += sourceEfficancy
-
-            /*
-            // Loop through positions of the path
+            let newSourceEfficacy = 0
 
             for (const pos of path) {
 
-                // Record the pos in roadCM
-
-                roadCM.set(pos.x, pos.y, 1)
-
-                // Plan for a road at this position
-
-                structurePlans.set(pos.x, pos.y, structureTypesByNumber[STRUCTURE_ROAD])
+                newSourceEfficacy += internationalManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] === TERRAIN_MASK_SWAMP ? defaultSwampCost : 1
             }
-            */
+
+            newSourceEfficacies.push(newSourceEfficacy)
+            newSourceEfficaciesTotal += newSourceEfficacy
         }
 
         const newReservationEfficacy = room.advancedFindPath({
@@ -1345,8 +1261,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
     return true
 }
 
-Room.prototype.createAttackCombatRequest = function() {
-
+Room.prototype.createAttackCombatRequest = function () {
     if (!Memory.autoAttack) return
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
@@ -1364,7 +1279,6 @@ Room.prototype.createAttackCombatRequest = function() {
 }
 
 Room.prototype.createHarassCombatRequest = function () {
-
     if (!Memory.autoAttack) return
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
@@ -1389,8 +1303,7 @@ Room.prototype.createHarassCombatRequest = function () {
         request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
 }
 
-Room.prototype.createDefendCombatRequest = function() {
-
+Room.prototype.createDefendCombatRequest = function () {
     if (!Memory.autoAttack) return
 }
 
@@ -1483,7 +1396,7 @@ Room.prototype.distanceTransform = function (
 
     for (x = minX; x <= maxX; x += 1) {
         for (y = minY; y <= maxY; y += 1) {
-            packedCoord = packXY(x, y)
+            packedCoord = packXYAsNum(x, y)
             distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
         }
     }
@@ -1498,13 +1411,13 @@ Room.prototype.distanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            top = distanceCoords[packXY(x, y - 1)] || 0
-            left = distanceCoords[packXY(x - 1, y)] || 0
-            topLeft = distanceCoords[packXY(x - 1, y - 1)] || 0
-            topRight = distanceCoords[packXY(x + 1, y - 1)] || 0
-            bottomLeft = distanceCoords[packXY(x - 1, y + 1)] || 0
+            top = distanceCoords[packXYAsNum(x, y - 1)] || 0
+            left = distanceCoords[packXYAsNum(x - 1, y)] || 0
+            topLeft = distanceCoords[packXYAsNum(x - 1, y - 1)] || 0
+            topRight = distanceCoords[packXYAsNum(x + 1, y - 1)] || 0
+            bottomLeft = distanceCoords[packXYAsNum(x - 1, y + 1)] || 0
 
-            packedCoord = packXY(x, y)
+            packedCoord = packXYAsNum(x, y)
 
             distanceCoords[packedCoord] = Math.min(
                 Math.min(top, left, topLeft, topRight, bottomLeft) + 1,
@@ -1521,13 +1434,13 @@ Room.prototype.distanceTransform = function (
 
     for (x = x2; x >= x1; x -= 1) {
         for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCoords[packXY(x, y + 1)] || 0
-            right = distanceCoords[packXY(x + 1, y)] || 0
-            bottomRight = distanceCoords[packXY(x + 1, y + 1)] || 0
-            topRight = distanceCoords[packXY(x + 1, y - 1)] || 0
-            bottomLeft = distanceCoords[packXY(x - 1, y + 1)] || 0
+            bottom = distanceCoords[packXYAsNum(x, y + 1)] || 0
+            right = distanceCoords[packXYAsNum(x + 1, y)] || 0
+            bottomRight = distanceCoords[packXYAsNum(x + 1, y + 1)] || 0
+            topRight = distanceCoords[packXYAsNum(x + 1, y - 1)] || 0
+            bottomLeft = distanceCoords[packXYAsNum(x - 1, y + 1)] || 0
 
-            packedCoord = packXY(x, y)
+            packedCoord = packXYAsNum(x, y)
 
             distanceCoords[packedCoord] = Math.min(
                 Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1,
@@ -1542,10 +1455,10 @@ Room.prototype.distanceTransform = function (
         for (x = x1; x <= x2; x += 1) {
             for (y = y1; y <= y2; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${distanceCoords[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
-                this.visual.text(distanceCoords[packXY(x, y)].toString(), x, y)
+                this.visual.text(distanceCoords[packXYAsNum(x, y)].toString(), x, y)
             }
         }
     }
@@ -1574,7 +1487,7 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            packedCoord = packXY(x, y)
+            packedCoord = packXYAsNum(x, y)
             distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
         }
     }
@@ -1586,10 +1499,10 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x1; x <= x2; x += 1) {
         for (y = y1; y <= y2; y += 1) {
-            top = distanceCoords[packXY(x, y - 1)] || 0
-            left = distanceCoords[packXY(x - 1, y)] || 0
+            top = distanceCoords[packXYAsNum(x, y - 1)] || 0
+            left = distanceCoords[packXYAsNum(x - 1, y)] || 0
 
-            packedCoord = packXY(x, y)
+            packedCoord = packXYAsNum(x, y)
 
             distanceCoords[packedCoord] = Math.min(Math.min(top, left) + 1, distanceCoords[packedCoord])
         }
@@ -1602,10 +1515,10 @@ Room.prototype.diagonalDistanceTransform = function (
 
     for (x = x2; x >= x1; x -= 1) {
         for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCoords[packXY(x, y + 1)] || 0
-            right = distanceCoords[packXY(x + 1, y)] || 0
+            bottom = distanceCoords[packXYAsNum(x, y + 1)] || 0
+            right = distanceCoords[packXYAsNum(x + 1, y)] || 0
 
-            packedCoord = packXY(x, y)
+            packedCoord = packXYAsNum(x, y)
 
             distanceCoords[packedCoord] = Math.min(Math.min(bottom, right) + 1, distanceCoords[packedCoord])
         }
@@ -1617,10 +1530,10 @@ Room.prototype.diagonalDistanceTransform = function (
         for (x = x1; x <= x2; x += 1) {
             for (y = y1; y <= y2; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${distanceCoords[packXY(x, y)] * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${distanceCoords[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
-                this.visual.text(distanceCoords[packXY(x, y)].toString(), x, y)
+                this.visual.text(distanceCoords[packXYAsNum(x, y)].toString(), x, y)
             }
         }
     }
@@ -1643,7 +1556,7 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
     // Loop through positions of seeds
 
-    for (const coord of seeds) visitedCoords[pack(coord)] = 1
+    for (const coord of seeds) visitedCoords[packAsNum(coord)] = 1
 
     // So long as there are positions in this gen
 
@@ -1658,13 +1571,13 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
             // If the depth isn't 0
 
             if (depth > 0) {
-                const packedCoord1 = pack(coord1)
+                const packedCoord1 = packAsNum(coord1)
 
                 // Iterate if the terrain is a wall
 
                 if (terrainCoords[packedCoord1] === 255) continue
 
-                if (coordMap && coordMap[pack(coord1)] > 0) continue
+                if (coordMap && coordMap[packAsNum(coord1)] > 0) continue
 
                 // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
@@ -1683,7 +1596,7 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
             // Loop through adjacent positions
 
             for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
-                const packedCoord2 = pack(coord2)
+                const packedCoord2 = packAsNum(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
@@ -1727,7 +1640,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     function isViableAnchor(coord1: Coord): boolean {
         // Get the value of the pos4271
 
-        const posValue = opts.coordMap[pack(coord1)]
+        const posValue = opts.coordMap[packAsNum(coord1)]
         if (posValue === 255) return false
         if (posValue === 0) return false
 
@@ -1739,14 +1652,14 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         if (!opts.adjacentToRoads) return true
 
-        if (opts.roadCoords[pack(coord1)] > 0) return false
+        if (opts.roadCoords[packAsNum(coord1)] > 0) return false
 
         // Loop through adjacent positions
 
         for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
             // If the adjacentPos isn't a roadPosition, iterate
 
-            if (opts.roadCoords[pack(coord2)] !== 1) continue
+            if (opts.roadCoords[packAsNum(coord2)] !== 1) continue
 
             // Otherwise set nearbyRoad to true and stop the loop
 
@@ -1763,7 +1676,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         // Record startPos as visited
 
-        for (const coord of opts.startCoords) visitedCoords[pack(coord)] = 1
+        for (const coord of opts.startCoords) visitedCoords[packAsNum(coord)] = 1
 
         // Construct values for the check
 
@@ -1822,13 +1735,13 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (opts.coordMap[pack(coord2)] === 0) continue
+                        if (opts.coordMap[packAsNum(coord2)] === 0) continue
 
                         // Add it tofastFillerSide the next gen
 
@@ -1863,13 +1776,13 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (opts.coordMap[pack(coord2)] === 0) continue
+                        if (opts.coordMap[packAsNum(coord2)] === 0) continue
 
                         // Add it tofastFillerSide the next gen
 
@@ -1903,11 +1816,11 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[packAsNum(coord2)] = 1
 
                         // Add it tofastFillerSide the next gen
 
@@ -1918,7 +1831,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
             if (opts.visuals) {
                 for (const coord of nextGeneration)
-                    this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
+                    this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
                         font: 0.5,
                         color: myColors.yellow,
                     })
@@ -1955,7 +1868,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
     function isViableAnchor(coord1: Coord): boolean {
         // Get the value of the pos4271
 
-        const posValue = opts.coordMap[pack(coord1)]
+        const posValue = opts.coordMap[packAsNum(coord1)]
         if (posValue === 255) return false
         if (posValue === 0) return false
 
@@ -1973,26 +1886,26 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
         )) {
             // If the adjacentPos isn't walkable, iterate
 
-            if (opts.coordMap[pack(coord2)] === 0) return false
+            if (opts.coordMap[packAsNum(coord2)] === 0) return false
         }
         /*
         for (const coord2 of findCoordsInsideRect(coord1.x - opts.offset, coord1.y - opts.offset, coord1.x + opts.offset + opts.asymOffset, coord1.y + opts.offset + opts.asymOffset)) {
             // If the adjacentPos isn't walkable, iterate
-            room.visual.text(opts.coordMap[pack(coord2)].toString(), coord2.x, coord2.y)
+            room.visual.text(opts.coordMap[packAsNum(coord2)].toString(), coord2.x, coord2.y)
         }
  */
         // If adjacentToRoads is a requirement
 
         if (!opts.adjacentToRoads) return true
 
-        if (opts.roadCoords[pack(coord1)] > 0) return false
+        if (opts.roadCoords[packAsNum(coord1)] > 0) return false
 
         // Loop through adjacent positions
 
         for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
             // If the adjacentPos isn't a roadPosition, iterate
 
-            if (opts.roadCoords[pack(coord2)] !== 1) continue
+            if (opts.roadCoords[packAsNum(coord2)] !== 1) continue
 
             // Otherwise set nearbyRoad to true and stop the loop
 
@@ -2009,7 +1922,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
         // Record startPos as visited
 
-        for (const coord of opts.startCoords) visitedCoords[pack(coord)] = 1
+        for (const coord of opts.startCoords) visitedCoords[packAsNum(coord)] = 1
 
         // Construct values for the check
 
@@ -2067,13 +1980,13 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (opts.coordMap[pack(coord2)] === 0) continue
+                        if (opts.coordMap[packAsNum(coord2)] === 0) continue
 
                         // Add it tofastFillerSide the next gen
 
@@ -2108,13 +2021,13 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (opts.coordMap[pack(coord2)] === 0) continue
+                        if (opts.coordMap[packAsNum(coord2)] === 0) continue
 
                         // Add it tofastFillerSide the next gen
 
@@ -2148,11 +2061,11 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
-                        if (localVisitedCoords[pack(coord2)] === 1) continue
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
                         // Otherwise record that it has been visited
 
-                        localVisitedCoords[pack(coord2)] = 1
+                        localVisitedCoords[packAsNum(coord2)] = 1
 
                         // Add it tofastFillerSide the next gen
 
@@ -2163,7 +2076,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
             if (opts.visuals) {
                 for (const coord of nextGeneration)
-                    this.visual.text(opts.coordMap[pack(coord)].toString(), coord.x, coord.y, {
+                    this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
                         font: 0.5,
                         color: myColors.yellow,
                     })
@@ -2212,7 +2125,6 @@ Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisual
 }
 
 Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {
-
     if (!visualize) return
 
     this.visual.circle(coord.x, coord.y, {
@@ -2274,7 +2186,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
     // Loop through positions of seeds
 
-    for (const coord of thisGeneration) visitedCoords[pack(coord)] = 1
+    for (const coord of thisGeneration) visitedCoords[packAsNum(coord)] = 1
 
     // So long as there are positions in this gen
 
@@ -2289,7 +2201,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
             // If the depth isn't 0
 
             if (depth > 0) {
-                const packedCoord1 = pack(coord1)
+                const packedCoord1 = packAsNum(coord1)
 
                 // Iterate if the terrain is a wall
 
@@ -2313,7 +2225,7 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
             // Loop through adjacent positions
 
             for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
-                const packedCoord2 = pack(coord2)
+                const packedCoord2 = packAsNum(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
 
@@ -2352,15 +2264,15 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
     // Loop through each pos of positions
 
     for (const packedPos of rampartPositions) {
-        const pos = unpackAsPos(packedPos)
+        const pos = unpackNumAsCoord(packedPos)
 
         // If the pos has already been visited, iterate
 
-        if (visitedCoords[pack(pos)] === 1) continue
+        if (visitedCoords[packAsNum(pos)] === 1) continue
 
         // Record that this pos has been visited
 
-        visitedCoords[pack(pos)] = 1
+        visitedCoords[packAsNum(pos)] = 1
 
         // Construct the group for this index with the pos in it the group
 
@@ -2399,7 +2311,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
                     )
                         continue
 
-                    const packedAdjacentCoord = pack(adjacentPos)
+                    const packedAdjacentCoord = packAsNum(adjacentPos)
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
 
@@ -2411,7 +2323,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
                     // If a rampart is not planned for this position, iterate
 
-                    if (this.rampartCoords[pack(adjacentPos)] !== 1) continue
+                    if (this.rampartCoords[packAsNum(adjacentPos)] !== 1) continue
 
                     // Add it to the next gen and this group
 
@@ -2464,7 +2376,7 @@ Room.prototype.estimateIncome = function () {
     return income
 }
 
-Room.prototype.findRoomPositionsInsideRect = function (x1, y1, x2, y2) {
+Room.prototype.findPositionsInsideRect = function (x1, y1, x2, y2) {
     // Construct positions
 
     const positions = []
@@ -2557,7 +2469,7 @@ Room.prototype.visualizeCoordMap = function (coordMap, color) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${coordMap[packXY(x, y)] * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }
@@ -2568,7 +2480,7 @@ Room.prototype.visualizeCoordMap = function (coordMap, color) {
 
     for (let x = 0; x < roomDimensions; x += 1) {
         for (let y = 0; y < roomDimensions; y += 1) {
-            this.visual.text(coordMap[packXY(x, y)].toString(), x, y, {
+            this.visual.text(coordMap[packXYAsNum(x, y)].toString(), x, y, {
                 font: 0.5,
             })
         }

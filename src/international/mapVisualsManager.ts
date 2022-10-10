@@ -1,6 +1,6 @@
 import { unpackPosList } from 'other/packrat'
 import { ClaimRequestData, minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteData } from './constants'
-import { customLog, unpackAsRoomPos } from './utils'
+import { customLog } from './utils'
 import { InternationalManager } from './internationalManager'
 
 InternationalManager.prototype.mapVisualsManager = function () {

@@ -1,13 +1,6 @@
 import { minHarvestWorkRatio, RemoteData } from 'international/constants'
-import {
-    customLog,
-    findCarryPartsRequired,
-    findObjectWithID,
-    getRange,
-    unpackAsPos,
-    unpackAsRoomPos,
-} from 'international/utils'
-import { unpackPosList } from 'other/packrat'
+import { customLog, findCarryPartsRequired, findObjectWithID, getRange, getRangeOfCoords, randomTick } from 'international/utils'
+import { unpackPos, unpackPosList } from 'other/packrat'
 import { RemoteHauler } from './remoteHauler'
 
 export class RemoteHarvester extends Creep {
@@ -45,6 +38,7 @@ export class RemoteHarvester extends Creep {
 
     preTickManager(): void {
         if (!this.findRemote()) return
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
@@ -241,21 +235,17 @@ export class RemoteHarvester extends Creep {
      *
      */
     travelToSource?(sourceIndex: number): boolean {
-        const { room } = this
-
-        // Try to find a harvestPosition, inform false if it failed
-
-        if (!this.findSourcePos(sourceIndex)) return false
 
         this.say('🚬')
 
         // Unpack the harvestPos
 
-        const harvestPos = unpackAsRoomPos(this.memory.packedPos, room.name)
+        const harvestPos = this.findSourcePos(this.memory.SI)
+        if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRange(this.pos.x, harvestPos.x, this.pos.y, harvestPos.y) === 0) return false
+        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -265,7 +255,7 @@ export class RemoteHarvester extends Creep {
             origin: this.pos,
             goals: [
                 {
-                    pos: harvestPos,
+                    pos: new RoomPosition(harvestPos.x, harvestPos.y, this.memory.RN),
                     range: 0,
                 },
             ],

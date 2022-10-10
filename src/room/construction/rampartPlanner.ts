@@ -1,4 +1,5 @@
 import {
+    defaultRoadPlanningPlainCost,
     EXIT,
     maxRampartGroupSize,
     minOnboardingRamparts,
@@ -14,10 +15,10 @@ import {
     createPosMap,
     customLog,
     findCoordsInsideRect,
-    pack,
-    packXY,
-    unpackAsPos,
-    unpackAsRoomPos,
+    packAsNum,
+    packXYAsNum,
+    unpackNumAsCoord,
+    unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from 'room/communeManager'
@@ -51,11 +52,11 @@ export class RampartPlanner {
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                const packedCoord = packXY(x, y)
+                const packedCoord = packXYAsNum(x, y)
 
                 this.room.tileCoords[packedCoord] = UNWALKABLE
 
-                if (terrainCoords[packXY(x, y)] === 255) continue
+                if (terrainCoords[packXYAsNum(x, y)] === 255) continue
 
                 this.room.tileCoords[packedCoord] = NORMAL
 
@@ -69,31 +70,31 @@ export class RampartPlanner {
         let y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (this.room.tileCoords[packXY(0, y - 1)] === EXIT) this.room.tileCoords[packXY(1, y)] = TO_EXIT
-            if (this.room.tileCoords[packXY(0, y)] === EXIT) this.room.tileCoords[packXY(1, y)] = TO_EXIT
-            if (this.room.tileCoords[packXY(0, y + 1)] === EXIT) this.room.tileCoords[packXY(1, y)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(0, y - 1)] === EXIT) this.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(0, y)] === EXIT) this.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(0, y + 1)] === EXIT) this.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
 
-            if (this.room.tileCoords[packXY(roomDimensions - 1, y - 1)] === EXIT)
-                this.room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
-            if (this.room.tileCoords[packXY(roomDimensions - 1, y)] === EXIT)
-                this.room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
-            if (this.room.tileCoords[packXY(roomDimensions - 1, y + 1)] === EXIT)
-                this.room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(roomDimensions - 1, y - 1)] === EXIT)
+                this.room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(roomDimensions - 1, y)] === EXIT)
+                this.room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(roomDimensions - 1, y + 1)] === EXIT)
+                this.room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
         }
 
         let x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (this.room.tileCoords[packXY(x - 1, 0)] === EXIT) this.room.tileCoords[packXY(x, 1)] = TO_EXIT
-            if (this.room.tileCoords[packXY(x, 0)] === EXIT) this.room.tileCoords[packXY(x, 1)] = TO_EXIT
-            if (this.room.tileCoords[packXY(x + 1, 0)] === EXIT) this.room.tileCoords[packXY(x, 1)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(x - 1, 0)] === EXIT) this.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(x, 0)] === EXIT) this.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(x + 1, 0)] === EXIT) this.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
 
-            if (this.room.tileCoords[packXY(x - 1, roomDimensions - 1)] === EXIT)
-                this.room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
-            if (this.room.tileCoords[packXY(x, roomDimensions - 1)] === EXIT)
-                this.room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
-            if (this.room.tileCoords[packXY(x + 1, roomDimensions - 1)] === EXIT)
-                this.room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(x - 1, roomDimensions - 1)] === EXIT)
+                this.room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(x, roomDimensions - 1)] === EXIT)
+                this.room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
+            if (this.room.tileCoords[packXYAsNum(x + 1, roomDimensions - 1)] === EXIT)
+                this.room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
         }
 
         // mark Border Tiles as not usable
@@ -101,15 +102,15 @@ export class RampartPlanner {
         y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            this.room.tileCoords[packXY(0, y)] === UNWALKABLE
-            this.room.tileCoords[packXY(roomDimensions - 1, y)] === UNWALKABLE
+            this.room.tileCoords[packXYAsNum(0, y)] === UNWALKABLE
+            this.room.tileCoords[packXYAsNum(roomDimensions - 1, y)] === UNWALKABLE
         }
 
         x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            this.room.tileCoords[packXY(x, 0)] === UNWALKABLE
-            this.room.tileCoords[packXY(x, roomDimensions - 1)] === UNWALKABLE
+            this.room.tileCoords[packXYAsNum(x, 0)] === UNWALKABLE
+            this.room.tileCoords[packXYAsNum(x, roomDimensions - 1)] === UNWALKABLE
         }
     }
 
@@ -128,14 +129,14 @@ export class RampartPlanner {
                     if (x === rect.x1 || x === rect.x2 || y === rect.y1 || y === rect.y2) {
                         // Set the pos to protected, and iterate
 
-                        if (this.room.tileCoords[packXY(x, y)] === NORMAL)
-                            this.room.tileCoords[packXY(x, y)] = PROTECTED
+                        if (this.room.tileCoords[packXYAsNum(x, y)] === NORMAL)
+                            this.room.tileCoords[packXYAsNum(x, y)] = PROTECTED
                         continue
                     }
 
                     // Otherwise set the pos as unwalkable
 
-                    this.room.tileCoords[packXY(x, y)] = UNWALKABLE
+                    this.room.tileCoords[packXYAsNum(x, y)] = UNWALKABLE
                 }
             }
         }
@@ -146,7 +147,7 @@ export class RampartPlanner {
 
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {
-                    const tileType = room.tileCoords[packXY(x, y)]
+                    const tileType = room.tileCoords[packXYAsNum(x, y)]
 
                     if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
@@ -219,7 +220,7 @@ export class RampartPlanner {
                 const top = y * 50 + x
                 const bot = top + 2500
 
-                if (this.room.tileCoords[packXY(x, y)] === NORMAL) {
+                if (this.room.tileCoords[packXYAsNum(x, y)] === NORMAL) {
                     // normal Tile
                     this.newEdge(top, bot, 1)
 
@@ -228,8 +229,8 @@ export class RampartPlanner {
                         dy = y + surr[i][1]
 
                         if (
-                            this.room.tileCoords[packXY(dx, dy)] === NORMAL ||
-                            this.room.tileCoords[packXY(dx, dy)] === TO_EXIT
+                            this.room.tileCoords[packXYAsNum(dx, dy)] === NORMAL ||
+                            this.room.tileCoords[packXYAsNum(dx, dy)] === TO_EXIT
                         )
                             this.newEdge(bot, dy * 50 + dx, infini)
                     }
@@ -237,7 +238,7 @@ export class RampartPlanner {
                     continue
                 }
 
-                if (this.room.tileCoords[packXY(x, y)] === PROTECTED) {
+                if (this.room.tileCoords[packXYAsNum(x, y)] === PROTECTED) {
                     // protected Tile
                     this.newEdge(source, top, infini)
                     this.newEdge(top, bot, 1)
@@ -247,8 +248,8 @@ export class RampartPlanner {
                         dy = y + surr[i][1]
 
                         if (
-                            this.room.tileCoords[packXY(dx, dy)] === NORMAL ||
-                            this.room.tileCoords[packXY(dx, dy)] === TO_EXIT
+                            this.room.tileCoords[packXYAsNum(dx, dy)] === NORMAL ||
+                            this.room.tileCoords[packXYAsNum(dx, dy)] === TO_EXIT
                         )
                             this.newEdge(bot, dy * 50 + dx, infini)
                     }
@@ -256,7 +257,7 @@ export class RampartPlanner {
                     continue
                 }
 
-                if (this.room.tileCoords[packXY(x, y)] === TO_EXIT) {
+                if (this.room.tileCoords[packXYAsNum(x, y)] === TO_EXIT) {
                     // near Exit
                     this.newEdge(top, sink, infini)
                     continue
@@ -407,7 +408,7 @@ export class RampartPlanner {
 
     private deleteTilesToDeadEnds(cutCoords: Coord[]) {
         for (let i = cutCoords.length - 1; i >= 0; i -= 1)
-            this.room.tileCoords[packXY(cutCoords[i].x, cutCoords[i].y)] = UNWALKABLE
+            this.room.tileCoords[packXYAsNum(cutCoords[i].x, cutCoords[i].y)] = UNWALKABLE
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
 
@@ -415,15 +416,15 @@ export class RampartPlanner {
         let y = 0
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (this.room.tileCoords[packXY(1, y)] === TO_EXIT) unvisited_pos.push(50 * y + 1)
-            if (this.room.tileCoords[packXY(48, y)] === TO_EXIT) unvisited_pos.push(50 * y + 48)
+            if (this.room.tileCoords[packXYAsNum(1, y)] === TO_EXIT) unvisited_pos.push(50 * y + 1)
+            if (this.room.tileCoords[packXYAsNum(48, y)] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
 
         let x = 0
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (this.room.tileCoords[packXY(x, 1)] === TO_EXIT) unvisited_pos.push(50 + x)
-            if (this.room.tileCoords[packXY(x, 48)] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
+            if (this.room.tileCoords[packXYAsNum(x, 1)] === TO_EXIT) unvisited_pos.push(50 + x)
+            if (this.room.tileCoords[packXYAsNum(x, 48)] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
 
         // Iterate over all unvisited TO_EXIT- Tiles and mark neigbours as TO_EXIT tiles, if walkable (NORMAL), and add to unvisited
@@ -451,9 +452,9 @@ export class RampartPlanner {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
 
-                if (this.room.tileCoords[packXY(dx, dy)] === NORMAL) {
+                if (this.room.tileCoords[packXYAsNum(dx, dy)] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx)
-                    this.room.tileCoords[packXY(dx, dy)] = TO_EXIT
+                    this.room.tileCoords[packXYAsNum(dx, dy)] = TO_EXIT
                 }
             }
         }
@@ -470,7 +471,7 @@ export class RampartPlanner {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
 
-                if (this.room.tileCoords[packXY(dx, dy)] === TO_EXIT) {
+                if (this.room.tileCoords[packXYAsNum(dx, dy)] === TO_EXIT) {
                     leads_to_exit = true
                 }
             }
@@ -499,7 +500,7 @@ export class RampartPlanner {
             for (let i = 0; i < cutEdges.length; i += 1) {
                 const packedCoord = cutEdges[i]
 
-                positions.push(unpackAsPos(packedCoord))
+                positions.push(unpackNumAsCoord(packedCoord))
                 packedPositions.push(packedCoord)
             }
         }
@@ -528,7 +529,8 @@ export class RampartPlanner {
 
         // Get the centerUpgradePos
 
-        const centerUpgradePos: RoomPosition = this.room.get('centerUpgradePos')
+        const centerUpgradePos = this.room.centerUpgradePos
+        if (!centerUpgradePos) return false
 
         // Protect it
 
@@ -581,7 +583,7 @@ export class RampartPlanner {
             // Loop through stampAnchor of this stampType's stampAnchors
 
             for (const packedStampAnchor of stampAnchors[stampType as StampTypes]) {
-                const stampAnchor = unpackAsPos(packedStampAnchor)
+                const stampAnchor = unpackNumAsCoord(packedStampAnchor)
 
                 // Protect the stamp
 
@@ -614,15 +616,15 @@ export class RampartPlanner {
         // Loop through each pos of positions
 
         for (const packedPos of rampartPositions) {
-            const pos = unpackAsPos(packedPos)
+            const pos = unpackNumAsCoord(packedPos)
 
             // If the pos has already been visited, iterate
 
-            if (visitedCoords[pack(pos)] === 1) continue
+            if (visitedCoords[packAsNum(pos)] === 1) continue
 
             // Record that this pos has been visited
 
-            visitedCoords[pack(pos)] = 1
+            visitedCoords[packAsNum(pos)] = 1
 
             // Construct the group for this index with the pos in it the group
 
@@ -661,7 +663,7 @@ export class RampartPlanner {
                         )
                             continue
 
-                        const packedAdjacentCoord = pack(adjacentPos)
+                        const packedAdjacentCoord = packAsNum(adjacentPos)
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
@@ -673,7 +675,7 @@ export class RampartPlanner {
 
                         // If a rampart is not planned for this position, iterate
 
-                        if (this.room.rampartCoords[pack(adjacentPos)] !== 1) continue
+                        if (this.room.rampartCoords[packAsNum(adjacentPos)] !== 1) continue
 
                         // Add it to the next gen and this group
 
@@ -708,7 +710,7 @@ export class RampartPlanner {
 
         // Get the hubAnchor
 
-        const hubAnchor = unpackAsRoomPos(this.room.memory.stampAnchors.hub[0], this.room.name)
+        const hubAnchor = unpackNumAsPos(this.room.memory.stampAnchors.hub[0], this.room.name)
 
         const onboardingRampartCoords = new Uint8Array(2500)
 
@@ -738,11 +740,12 @@ export class RampartPlanner {
                 origin: closestPosToAnchor,
                 goals: [{ pos: hubAnchor, range: 2 }],
                 weightCoordMaps: [this.room.unprotectedCoords, this.room.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost,
             })
 
             // Loop through positions of the path
 
-            for (const pos of path) this.room.roadCoords[pack(pos)] = 1
+            for (const pos of path) this.room.roadCoords[packAsNum(pos)] = 1
 
             // Construct the onboardingIndex
 
@@ -754,7 +757,7 @@ export class RampartPlanner {
             while (path[onboardingIndex]) {
                 // Get the pos in path with an index of onboardingIndex
 
-                const packedPos = pack(path[onboardingIndex])
+                const packedPos = packAsNum(path[onboardingIndex])
 
                 onboardingIndex += 1
 
@@ -799,11 +802,11 @@ export function rampartPlanner(room: Room) {
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                const packedCoord = packXY(x, y)
+                const packedCoord = packXYAsNum(x, y)
 
                 room.tileCoords[packedCoord] = UNWALKABLE
 
-                if (terrainCoords[packXY(x, y)] === 255) continue
+                if (terrainCoords[packXYAsNum(x, y)] === 255) continue
 
                 room.tileCoords[packedCoord] = NORMAL
 
@@ -817,31 +820,31 @@ export function rampartPlanner(room: Room) {
         let y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (room.tileCoords[packXY(0, y - 1)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
-            if (room.tileCoords[packXY(0, y)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
-            if (room.tileCoords[packXY(0, y + 1)] === EXIT) room.tileCoords[packXY(1, y)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(0, y - 1)] === EXIT) room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(0, y)] === EXIT) room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(0, y + 1)] === EXIT) room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
 
-            if (room.tileCoords[packXY(roomDimensions - 1, y - 1)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
-            if (room.tileCoords[packXY(roomDimensions - 1, y)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
-            if (room.tileCoords[packXY(roomDimensions - 1, y + 1)] === EXIT)
-                room.tileCoords[packXY(roomDimensions - 2, y)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(roomDimensions - 1, y - 1)] === EXIT)
+                room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(roomDimensions - 1, y)] === EXIT)
+                room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(roomDimensions - 1, y + 1)] === EXIT)
+                room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
         }
 
         let x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (room.tileCoords[packXY(x - 1, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
-            if (room.tileCoords[packXY(x, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
-            if (room.tileCoords[packXY(x + 1, 0)] === EXIT) room.tileCoords[packXY(x, 1)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(x - 1, 0)] === EXIT) room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(x, 0)] === EXIT) room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(x + 1, 0)] === EXIT) room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
 
-            if (room.tileCoords[packXY(x - 1, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
-            if (room.tileCoords[packXY(x, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
-            if (room.tileCoords[packXY(x + 1, roomDimensions - 1)] === EXIT)
-                room.tileCoords[packXY(x, roomDimensions - 2)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(x - 1, roomDimensions - 1)] === EXIT)
+                room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(x, roomDimensions - 1)] === EXIT)
+                room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
+            if (room.tileCoords[packXYAsNum(x + 1, roomDimensions - 1)] === EXIT)
+                room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
         }
 
         // mark Border Tiles as not usable
@@ -849,15 +852,15 @@ export function rampartPlanner(room: Room) {
         y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            room.tileCoords[packXY(0, y)] === UNWALKABLE
-            room.tileCoords[packXY(roomDimensions - 1, y)] === UNWALKABLE
+            room.tileCoords[packXYAsNum(0, y)] === UNWALKABLE
+            room.tileCoords[packXYAsNum(roomDimensions - 1, y)] === UNWALKABLE
         }
 
         x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            room.tileCoords[packXY(x, 0)] === UNWALKABLE
-            room.tileCoords[packXY(x, roomDimensions - 1)] === UNWALKABLE
+            room.tileCoords[packXYAsNum(x, 0)] === UNWALKABLE
+            room.tileCoords[packXYAsNum(x, roomDimensions - 1)] === UNWALKABLE
         }
     }
 
@@ -1050,13 +1053,14 @@ export function rampartPlanner(room: Room) {
                     if (x === rect.x1 || x === rect.x2 || y === rect.y1 || y === rect.y2) {
                         // Set the pos to protected, and iterate
 
-                        if (room.tileCoords[packXY(x, y)] === NORMAL) room.tileCoords[packXY(x, y)] = PROTECTED
+                        if (room.tileCoords[packXYAsNum(x, y)] === NORMAL)
+                            room.tileCoords[packXYAsNum(x, y)] = PROTECTED
                         continue
                     }
 
                     // Otherwise set the pos as unwalkable
 
-                    room.tileCoords[packXY(x, y)] = UNWALKABLE
+                    room.tileCoords[packXYAsNum(x, y)] = UNWALKABLE
                 }
             }
         }
@@ -1065,7 +1069,7 @@ export function rampartPlanner(room: Room) {
             // Visualize position values
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {
-                    const tileType = room.tileCoords[packXY(x, y)]
+                    const tileType = room.tileCoords[packXYAsNum(x, y)]
                     if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
                             fill: myColors.yellow,
@@ -1125,7 +1129,7 @@ export function rampartPlanner(room: Room) {
                 const top = y * 50 + x
                 const bot = top + 2500
 
-                if (room.tileCoords[packXY(x, y)] === NORMAL) {
+                if (room.tileCoords[packXYAsNum(x, y)] === NORMAL) {
                     // normal Tile
                     g.New_edge(top, bot, 1)
 
@@ -1133,14 +1137,17 @@ export function rampartPlanner(room: Room) {
                         dx = x + surr[i][0]
                         dy = y + surr[i][1]
 
-                        if (room.tileCoords[packXY(dx, dy)] === NORMAL || room.tileCoords[packXY(dx, dy)] === TO_EXIT)
+                        if (
+                            room.tileCoords[packXYAsNum(dx, dy)] === NORMAL ||
+                            room.tileCoords[packXYAsNum(dx, dy)] === TO_EXIT
+                        )
                             g.New_edge(bot, dy * 50 + dx, infini)
                     }
 
                     continue
                 }
 
-                if (room.tileCoords[packXY(x, y)] === PROTECTED) {
+                if (room.tileCoords[packXYAsNum(x, y)] === PROTECTED) {
                     // protected Tile
                     g.New_edge(source, top, infini)
                     g.New_edge(top, bot, 1)
@@ -1149,14 +1156,17 @@ export function rampartPlanner(room: Room) {
                         dx = x + surr[i][0]
                         dy = y + surr[i][1]
 
-                        if (room.tileCoords[packXY(dx, dy)] === NORMAL || room.tileCoords[packXY(dx, dy)] === TO_EXIT)
+                        if (
+                            room.tileCoords[packXYAsNum(dx, dy)] === NORMAL ||
+                            room.tileCoords[packXYAsNum(dx, dy)] === TO_EXIT
+                        )
                             g.New_edge(bot, dy * 50 + dx, infini)
                     }
 
                     continue
                 }
 
-                if (room.tileCoords[packXY(x, y)] === TO_EXIT) {
+                if (room.tileCoords[packXYAsNum(x, y)] === TO_EXIT) {
                     // near Exit
                     g.New_edge(top, sink, infini)
                     continue
@@ -1172,7 +1182,7 @@ export function rampartPlanner(room: Room) {
 
     function deleteTilesToDeadEnds(cutCoords: Coord[]) {
         for (let i = cutCoords.length - 1; i >= 0; i -= 1)
-            room.tileCoords[packXY(cutCoords[i].x, cutCoords[i].y)] = UNWALKABLE
+            room.tileCoords[packXYAsNum(cutCoords[i].x, cutCoords[i].y)] = UNWALKABLE
 
         // Floodfill from exits: save exit tiles in array and do a bfs-like search
 
@@ -1180,15 +1190,15 @@ export function rampartPlanner(room: Room) {
         let y = 0
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (room.tileCoords[packXY(1, y)] === TO_EXIT) unvisited_pos.push(50 * y + 1)
-            if (room.tileCoords[packXY(48, y)] === TO_EXIT) unvisited_pos.push(50 * y + 48)
+            if (room.tileCoords[packXYAsNum(1, y)] === TO_EXIT) unvisited_pos.push(50 * y + 1)
+            if (room.tileCoords[packXYAsNum(48, y)] === TO_EXIT) unvisited_pos.push(50 * y + 48)
         }
 
         let x = 0
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (room.tileCoords[packXY(x, 1)] === TO_EXIT) unvisited_pos.push(50 + x)
-            if (room.tileCoords[packXY(x, 48)] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
+            if (room.tileCoords[packXYAsNum(x, 1)] === TO_EXIT) unvisited_pos.push(50 + x)
+            if (room.tileCoords[packXYAsNum(x, 48)] === TO_EXIT) unvisited_pos.push(2400 + x) // 50*48=2400
         }
 
         // Iterate over all unvisited TO_EXIT- Tiles and mark neigbours as TO_EXIT tiles, if walkable (NORMAL), and add to unvisited
@@ -1216,9 +1226,9 @@ export function rampartPlanner(room: Room) {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
 
-                if (room.tileCoords[packXY(dx, dy)] === NORMAL) {
+                if (room.tileCoords[packXYAsNum(dx, dy)] === NORMAL) {
                     unvisited_pos.push(50 * dy + dx)
-                    room.tileCoords[packXY(dx, dy)] = TO_EXIT
+                    room.tileCoords[packXYAsNum(dx, dy)] = TO_EXIT
                 }
             }
         }
@@ -1235,7 +1245,7 @@ export function rampartPlanner(room: Room) {
                 dx = x + surr[i][0]
                 dy = y + surr[i][1]
 
-                if (room.tileCoords[packXY(dx, dy)] === TO_EXIT) {
+                if (room.tileCoords[packXYAsNum(dx, dy)] === TO_EXIT) {
                     leads_to_exit = true
                 }
             }
@@ -1270,7 +1280,7 @@ export function rampartPlanner(room: Room) {
                 const y = Math.floor(packedCoord / 50)
 
                 positions.push({ x, y })
-                packedPositions.push(pack({ x, y }))
+                packedPositions.push(packAsNum({ x, y }))
             }
         }
 
@@ -1301,7 +1311,8 @@ export function rampartPlanner(room: Room) {
 
     // Get the centerUpgradePos
 
-    const centerUpgradePos: RoomPosition = room.get('centerUpgradePos')
+    const centerUpgradePos = room.centerUpgradePos
+    if (!centerUpgradePos) return false
 
     // Protect it
 
@@ -1348,7 +1359,7 @@ export function rampartPlanner(room: Room) {
         // Loop through stampAnchor of this stampType's stampAnchors
 
         for (const packedStampAnchor of stampAnchors[stampType as StampTypes]) {
-            const stampAnchor = unpackAsPos(packedStampAnchor)
+            const stampAnchor = unpackNumAsCoord(packedStampAnchor)
 
             // Protect the stamp
 
@@ -1375,19 +1386,19 @@ export function rampartPlanner(room: Room) {
     // Plan the positions
 
     for (const packedPos of rampartPositions) {
-        const pos = unpackAsPos(packedPos)
+        const pos = unpackNumAsCoord(packedPos)
 
         // Record the pos
 
-        room.roadCoords[pack(pos)] = 1
-        room.rampartCoords[pack(pos)] = 1
+        room.roadCoords[packAsNum(pos)] = 1
+        room.rampartCoords[packAsNum(pos)] = 1
     }
 
     room.findUnprotectedCoords()
 
     // Get the hubAnchor
 
-    const hubAnchor = unpackAsRoomPos(room.memory.stampAnchors.hub[0], room.name)
+    const hubAnchor = unpackNumAsPos(room.memory.stampAnchors.hub[0], room.name)
 
     const onboardingRampartCoords = new Uint8Array(2500)
 
@@ -1398,7 +1409,6 @@ export function rampartPlanner(room: Room) {
     // Loop through each group
 
     for (const group of groupedRampartPositions) {
-
         // Get the closest pos of the sort by range to the anchor
 
         const closestPosToAnchor = group.sort((a, b) => {
@@ -1422,11 +1432,12 @@ export function rampartPlanner(room: Room) {
             origin: closestPosToAnchor,
             goals: [{ pos: hubAnchor, range: 2 }],
             weightCoordMaps: [room.unprotectedCoords, room.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost,
         })
 
         // Loop through positions of the path
 
-        for (const pos of path) room.roadCoords[pack(pos)] = 1
+        for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
 
         // Construct the onboardingIndex
 
@@ -1438,7 +1449,7 @@ export function rampartPlanner(room: Room) {
         while (path[onboardingIndex]) {
             // Get the pos in path with an index of onboardingIndex
 
-            const packedPos = pack(path[onboardingIndex])
+            const packedPos = packAsNum(path[onboardingIndex])
 
             onboardingIndex += 1
 

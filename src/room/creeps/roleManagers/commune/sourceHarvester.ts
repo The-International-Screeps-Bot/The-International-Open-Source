@@ -1,4 +1,5 @@
-import { getRange, unpackAsPos } from 'international/utils'
+import { getRange, getRangeOfCoords } from 'international/utils'
+import { unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {
@@ -32,17 +33,17 @@ export class SourceHarvester extends Creep {
     }
 
     travelToSource?(): boolean {
-        const { room } = this
 
         this.say('🚬')
 
         // Unpack the harvestPos
 
-        const harvestPos = unpackAsPos(this.memory.packedPos)
+        const harvestPos = this.findSourcePos(this.memory.SI)
+        if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRange(this.pos.x, harvestPos.x, this.pos.y, harvestPos.y) === 0) return false
+        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
 
         // If the creep's movement type is pull
 
@@ -56,7 +57,7 @@ export class SourceHarvester extends Creep {
             origin: this.pos,
             goals: [
                 {
-                    pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+                    pos: new RoomPosition(harvestPos.x, harvestPos.y, this.room.name),
                     range: 0,
                 },
             ],
@@ -220,10 +221,6 @@ export class SourceHarvester extends Creep {
             // Define the creep's designated source
 
             const sourceIndex = creep.memory.SI
-
-            // Try to find a harvestPosition, inform false if it failed
-
-            if (!creep.findSourcePos(sourceIndex)) continue
 
             // Try to move to source. If creep moved then iterate
 

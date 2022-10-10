@@ -5,8 +5,8 @@ import {
     findClosestObjectEuc,
     getRange,
     getRangeEuc,
-    pack,
 } from 'international/utils'
+import { packCoord } from 'other/packrat'
 
 export class MeleeDefender extends Creep {
     advancedDefend?() {
@@ -39,8 +39,7 @@ export class MeleeDefender extends Creep {
 
         const enemyCreep = findClosestObject(this.pos, enemyCreeps)
 
-        if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+        if (Memory.roomVisuals) this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
 
         // If the range is more than 1
 
@@ -76,7 +75,6 @@ export class MeleeDefender extends Creep {
         // Get the room's ramparts, filtering for those and informing false if there are none
 
         const ramparts = room.structures.rampart.filter(rampart => {
-
             // Avoid ramparts that are low
 
             if (rampart.hits < 3000) return false
@@ -95,25 +93,11 @@ export class MeleeDefender extends Creep {
 
             // Inform wether there is a creep at the pos
 
-            return !room.creepPositions.get(pack(rampart.pos))
+            return !room.creepPositions.get(packCoord(rampart.pos))
         })
 
         if (!ramparts.length) {
-            delete this.memory.ROS
-
-            if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
-                this.createMoveRequest({
-                    origin: this.pos,
-                    goals: [{ pos: enemyCreep.pos, range: 1 }],
-                })
-
-                return true
-            }
-
-            this.attack(enemyCreep)
-
-            if (enemyCreep.getActiveBodyparts(MOVE) > 0) this.moveRequest = pack(enemyCreep.pos)
-            return true
+            return this.defendWithoutRamparts(enemyCreeps)
         }
 
         this.memory.ROS = true

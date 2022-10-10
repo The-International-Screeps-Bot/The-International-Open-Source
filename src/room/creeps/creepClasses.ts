@@ -16,7 +16,7 @@ import { VanguardDefender } from './roleManagers/international/vanguardDefender'
 import { RemoteCoreAttacker } from './roleManagers/remote/remoteCoreAttacker'
 import { RemoteDefender } from './roleManagers/remote/remoteDefender'
 import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
-import { RemoteHarvester } from './roleManagers/remote/remoteHarvesterFunctions'
+import { RemoteHarvester } from './roleManagers/remote/remoteSourceHarvester'
 import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
 

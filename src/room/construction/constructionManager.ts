@@ -26,7 +26,7 @@ export function constructionManager(room: Room) {
     manageControllerStructures()
 
     function manageControllerStructures() {
-        const centerUpgradePos: RoomPosition | undefined = room.get('centerUpgradePos')
+        const centerUpgradePos = room.centerUpgradePos
         if (!centerUpgradePos) return
 
         if (room.controller.level >= 5) {

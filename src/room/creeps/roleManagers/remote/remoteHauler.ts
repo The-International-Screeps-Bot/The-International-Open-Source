@@ -6,12 +6,10 @@ import {
     findFunctionCPU,
     findObjectWithID,
     getRange,
-    pack,
     randomTick,
-    unpackAsPos,
 } from 'international/utils'
 import { indexOf } from 'lodash'
-import { unpackPosList } from 'other/packrat'
+import { packCoord, unpackCoord, unpackPosList } from 'other/packrat'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
@@ -35,7 +33,6 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
-
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.memory.RN) return
@@ -160,7 +157,7 @@ export class RemoteHauler extends Creep {
                 return true
             }
 
-            this.moved = -2
+            this.moved = 'yeild'
 
             this.reserveWithdrawEnergy()
 
@@ -410,7 +407,7 @@ export class RemoteHauler extends Creep {
     relayCoord?(coord: Coord) {
         if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: myColors.lightBlue })
 
-        const creepAtPosName = this.room.creepPositions.get(pack(coord))
+        const creepAtPosName = this.room.creepPositions.get(packCoord(coord))
         if (!creepAtPosName) return false
 
         const creepAtPos = Game.creeps[creepAtPosName]
@@ -432,6 +429,9 @@ export class RemoteHauler extends Creep {
         delete this.moveRequest
         delete creepAtPos.moveRequest
 
+        delete this.moved
+        delete creepAtPos.moved
+
         // Trade memory
 
         const newCreepAtPosMemory = JSON.parse(JSON.stringify(this.memory))
@@ -444,17 +444,6 @@ export class RemoteHauler extends Creep {
         delete this.memory.P
         delete creepAtPos.memory.P
 
-/*
-        // Trade remotes and sourceIndexes
-
-        const newCreepAtPosRemote = this.memory.RN || creepAtPos.memory.RN
-        const newCreepAtPosSourceIndex = this.memory.SI !== undefined ? this.memory.SI : creepAtPos.memory.SI
-
-        this.memory.RN = creepAtPos.memory.RN || this.memory.RN
-        this.memory.SI = creepAtPos.memory.SI !== undefined ? creepAtPos.memory.SI : this.memory.SI
-        creepAtPos.memory.RN = newCreepAtPosRemote
-        creepAtPos.memory.SI = newCreepAtPosSourceIndex
- */
         this.getResources()
 
         const remoteHauler = creepAtPos as RemoteHauler
@@ -513,7 +502,7 @@ export class RemoteHauler extends Creep {
         if (this.movedResource) return
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return
 
-        const moveCoord = this.moveRequest ? unpackAsPos(this.moveRequest) : unpackPosList(this.memory.P)[0]
+        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[0]
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)

@@ -140,6 +140,17 @@ export function packCoord(coord: Coord) {
 }
 
 /**
+ * Packs a coord as a single utf-16 character. The seemingly strange choice of encoding value ((x << 6) | y) + 65 was
+ * chosen to be fast to compute (x << 6 | y is significantly faster than 50 * x + y) and to avoid control characters,
+ * as "A" starts at character code 65.
+ *
+ * Benchmarking: average of 150ns to execute on shard2 public server, reduce stringified size by 80%
+ */
+ export function packXYAsCoord(x: number, y: number) {
+     return String.fromCharCode(((x << 6) | y) + 65)
+}
+
+/**
  * Unpacks a coord stored as a single utf-16 character
  *
  * Benchmarking: average of 60ns-100ns to execute on shard2 public server
@@ -294,6 +305,17 @@ function unpackRoomName(char: string) {
  */
 export function packPos(pos: RoomPosition) {
      return packCoord(pos) + packRoomName(pos.roomName)
+}
+
+/**
+ * Packs a RoomPosition as a pair utf-16 characters. The seemingly strange choice of encoding value ((x << 6) | y) + 65
+ * was chosen to be fast to compute (x << 6 | y is significantly faster than 50 * x + y) and to avoid control
+ * characters, as "A" starts at character code 65.
+ *
+ * Benchmarking: average of 150ns to execute on shard2 public server, reduce stringified size by 90%
+ */
+ export function packXYAsPos(x: number, y: number, roomName: string) {
+     return packXYAsCoord(x, y) + packRoomName(roomName)
 }
 
 /**

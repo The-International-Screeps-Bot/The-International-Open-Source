@@ -1,20 +1,15 @@
-import { getRange, unpackAsRoomPos } from 'international/utils'
+import { findClosestPos, getRange, getRangeOfCoords } from 'international/utils'
+import { packCoord, packPos, unpackCoordAsPos, unpackPos } from 'other/packrat'
 
 export class FastFiller extends Creep {
     travelToFastFiller?(): boolean {
-        const { room } = this
 
-        // Try to find a fastFillerPos, inform true if it failed
-
-        if (!this.findFastFillerPos()) return true
-
-        // Unpack the this's packedFastFillerPos
-
-        const fastFillerPos = unpackAsRoomPos(this.memory.packedPos, room.name)
+        const fastFillerPos = this.findFastFillerPos()
+        if (!fastFillerPos) return true
 
         // If the this is standing on the fastFillerPos, inform false
 
-        if (getRange(this.pos.x, fastFillerPos.x, this.pos.y, fastFillerPos.y) === 0) return false
+        if (getRangeOfCoords(this.pos, fastFillerPos) === 0) return false
 
         // Otherwise, make a move request to it
 
@@ -28,6 +23,31 @@ export class FastFiller extends Creep {
         // And inform true
 
         return true
+    }
+
+    findFastFillerPos?() {
+        const { room } = this
+
+        this.say('FFP')
+
+        // Stop if the creep already has a packedFastFillerPos
+
+        if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
+
+        // Get usedFastFillerPositions
+
+        const usedFastFillerPositions = room.usedFastFillerCoords
+
+        const openFastFillerPositions = room.fastFillerPositions.filter(pos => !usedFastFillerPositions.has(packCoord(pos)))
+        if (!openFastFillerPositions.length) return false
+
+        const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
+        const packedCoord = packCoord(fastFillerPos)
+
+        this.memory.PC = packedCoord
+        room._usedFastFillerCoords.add(packedCoord)
+
+        return fastFillerPos
     }
 
     fillFastFiller?(): boolean {

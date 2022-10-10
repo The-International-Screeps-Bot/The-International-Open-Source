@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange, pack, packXY, unpackAsPos } from 'international/utils'
+import { createPosMap, customLog, findClosestObject, getRange, } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -83,6 +83,8 @@ export class CommuneManager {
         this.test()
     }
     private test() {
+
+        customLog('SOURCE INDEXES BY EFFICACY', this.room.remoteSourceIndexesByEfficacy)
 
         return
 
