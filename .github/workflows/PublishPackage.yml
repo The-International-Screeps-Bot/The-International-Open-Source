@@ -15,7 +15,7 @@ jobs:
         node-version: 12
         cache: 'npm'
     - run: npm install
-    - run: npm run build-publish
+    - run: npm run build
     - name: Publish Package
       continue-on-error: true
       id: publish

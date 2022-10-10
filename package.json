@@ -1,13 +1,13 @@
 {
     "name": "@the-international-screeps-bot/the-international-open-source",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "",
     "files": [
         "main.js"
     ],
+    "main": "dist/main.js",
     "scripts": {
         "build": "rollup -c",
-        "build-publish": "rollup -c --environment OUTPUT:main.js",
         "lint": "eslint **/*",
         "lint-ci": "eslint '**/*'",
         "lint-fix": "eslint **/* --fix",
@@ -70,5 +70,6 @@
     },
     "dependencies": {
         "source-map": "~0.6.1"
-    }
+    },
+    "screeps_bot": true
 }
