@@ -1142,7 +1142,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
         let newSourceEfficaciesTotal = 0
 
         // Get base planning data
-  
+
         // loop through sourceNames
 
         for (const source of room.sources) {
@@ -1294,7 +1294,7 @@ Room.prototype.createHarassCombatRequest = function () {
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
 
-    const structures = this.dismantleableStructures
+    const structures = this.dismantleableTargets
 
     let totalHits = 0
     for (const structure of structures) totalHits += structure.hits

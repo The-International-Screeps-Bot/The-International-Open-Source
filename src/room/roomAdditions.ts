@@ -340,11 +340,11 @@ Object.defineProperties(Room.prototype, {
             return this._spawningStructuresByNeed
         },
     },
-    dismantleableStructures: {
+    dismantleableTargets: {
         get() {
-            if (this._dismantleableStructures) return this._dismantleableStructures
+            if (this._dismantleableTargets) return this._dismantleableTargets
 
-            return (this._dismantleableStructures = this.find(FIND_STRUCTURES, {
+            return (this._dismantleableTargets = this.find(FIND_STRUCTURES, {
                 filter: structure =>
                     structure.structureType !== STRUCTURE_CONTROLLER &&
                     structure.structureType !== STRUCTURE_INVADER_CORE,
@@ -1410,7 +1410,6 @@ Object.defineProperties(Room.prototype, {
     },
     enemyThreatCoords: {
         get() {
-
             if (this._enemyThreatCoords) return this._enemyThreatCoords
 
             this._enemyThreatCoords = new Set()
@@ -1458,7 +1457,6 @@ Object.defineProperties(Room.prototype, {
             }
 
             for (const rampart of this.structures.rampart) {
-
                 if (!rampart.my) continue
                 if (rampart.hits < 3000) continue
 
@@ -1466,7 +1464,7 @@ Object.defineProperties(Room.prototype, {
             }
 
             return this._enemyThreatCoords
-        }
+        },
     },
     MEWT: {
         get() {
@@ -1474,16 +1472,23 @@ Object.defineProperties(Room.prototype, {
 
             this._MEWT = [
                 ...this.droppedEnergy,
-                ...this.find(FIND_TOMBSTONES),
+                ...this.find(FIND_TOMBSTONES, {
+                    filter: tombstone => tombstone.store.getUsedCapacity(RESOURCE_ENERGY) > 0,
+                }),
                 //Priortize ruins that have short-ish life remaining over source containers
                 //  So that we get all the resources out of the ruins
-                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000),
+                ...this.find(FIND_RUINS).filter(
+                    ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity(RESOURCE_ENERGY) > 0,
+                ),
                 ...this.sourceContainers,
                 //But we still want to pull from ruins if the source containers are empty.
-                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay >= 10000),
+                ...this.find(FIND_RUINS).filter(
+                    ru => ru.ticksToDecay >= 10000 && ru.store.getUsedCapacity(RESOURCE_ENERGY) > 0,
+                ),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (
                         (structure as any).store &&
+                        (structure as any).store.getUsedCapacity(RESOURCE_ENERGY) > 0 &&
                         //And there's not a rampart on top of it...
                         !structure.pos
                             .lookFor(LOOK_STRUCTURES)
@@ -1543,15 +1548,11 @@ Object.defineProperties(Room.prototype, {
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
-                //Priortize ruins that have short-ish life remaining over source containers
-                //  So that we get all the resources out of the ruins
-                ...this.find(FIND_RUINS).filter(ruin => ruin.ticksToDecay < 10000 && ruin.store.getUsedCapacity() > 0),
                 ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
-                //But we still want to pull from ruins if the source containers are empty.
-                ...this.find(FIND_RUINS).filter(ruin => ruin.ticksToDecay >= 10000 && ruin.store.getUsedCapacity() > 0),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (
                         (structure as any).store &&
+                        (structure as any).store.getUsedCapacity(RESOURCE_ENERGY) > 0 &&
                         //And there's not a rampart on top of it...
                         !structure.pos
                             .lookFor(LOOK_STRUCTURES)

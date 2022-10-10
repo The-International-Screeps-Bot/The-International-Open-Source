@@ -261,7 +261,7 @@ export class Duo {
     }
 
     rangedAttackStructures() {
-        const structures = this.leader.room.dismantleableStructures
+        const structures = this.leader.room.dismantleableTargets
 
         if (!structures.length) return false
 
@@ -379,7 +379,7 @@ export class Duo {
     }
 
     attackStructures() {
-        const structures = this.leader.room.dismantleableStructures
+        const structures = this.leader.room.dismantleableTargets
 
         if (!structures.length) return false
 
@@ -423,7 +423,7 @@ export class Duo {
     advancedDismantle() {
         // Avoid targets we can't dismantle
 
-        const structures = this.leader.room.dismantleableStructures
+        const structures = this.leader.room.dismantleableTargets
 
         if (!structures.length) return false
 
@@ -469,9 +469,7 @@ export class Duo {
 
         // Filter only enemy construction sites worth stomping
 
-        const enemyCSites = this.leader.room.enemyCSites.filter(
-            cSite => cSite.progress > 0 && !isCoordExit(cSite.pos),
-        )
+        const enemyCSites = this.leader.room.enemyCSites.filter(cSite => cSite.progress > 0 && !isCoordExit(cSite.pos))
 
         if (!enemyCSites.length) return false
 

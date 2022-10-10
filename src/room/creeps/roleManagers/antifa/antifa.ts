@@ -318,7 +318,7 @@ export class Antifa extends Creep {
     rangedAttackStructures?() {
         this.say('RAS')
 
-        const structures = this.room.dismantleableStructures
+        const structures = this.room.dismantleableTargets
 
         if (!structures.length) return false
 
@@ -429,7 +429,7 @@ export class Antifa extends Creep {
     attackStructures?() {
         this.say('AS')
 
-        const structures = this.room.dismantleableStructures
+        const structures = this.room.dismantleableTargets
 
         if (!structures.length) return false
 
@@ -472,7 +472,7 @@ export class Antifa extends Creep {
     advancedDismantle?() {
         // Avoid targets we can't dismantle
 
-        const structures = this.room.dismantleableStructures
+        const structures = this.room.dismantleableTargets
 
         if (!structures.length) return false
 
@@ -517,9 +517,7 @@ export class Antifa extends Creep {
 
         // Filter only enemy construction sites worth stomping
 
-        const enemyCSites = this.room.enemyCSites.filter(
-            cSite => cSite.progress > 0 && !isCoordExit(cSite.pos),
-        )
+        const enemyCSites = this.room.enemyCSites.filter(cSite => cSite.progress > 0 && !isCoordExit(cSite.pos))
 
         if (!enemyCSites.length) return false
 

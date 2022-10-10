@@ -1140,9 +1140,9 @@ declare global {
 
         readonly taskNeedingSpawningStructures: SpawningStructures
 
-        _dismantleableStructures: Structure[]
+        _dismantleableTargets: Structure[]
 
-        readonly dismantleableStructures: Structure[]
+        readonly dismantleableTargets: Structure[]
 
         // Resource info
 

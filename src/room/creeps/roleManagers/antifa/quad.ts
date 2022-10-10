@@ -359,7 +359,7 @@ export class Quad {
     }
 
     rangedAttackStructures() {
-        const structures = this.leader.room.dismantleableStructures
+        const structures = this.leader.room.dismantleableTargets
 
         if (!structures.length) return false
 
