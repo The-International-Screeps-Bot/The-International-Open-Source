@@ -34,14 +34,8 @@ class ConfigManager {
 
         Memory.breakingVersion = breakingVersion
 
-        Memory.me =
-            (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
-            Object.values(Game.creeps)[0]?.owner?.username ||
-            'username'
-        Memory.isMainShard =
-            Game.shard.name !== 'performanceServer'
-                ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
-                : false
+        Memory.me = 'W7N7'
+        Memory.isMainShard = false
 
         // Settings
 
@@ -49,7 +43,7 @@ class ConfigManager {
         Memory.baseVisuals = baseVisuals
         Memory.mapVisuals = mapVisuals
         Memory.CPULogging = CPULogging
-        Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
+        Memory.roomStats = 2
         Memory.allyPlayers = allyPlayers
         Memory.nonAggressionPlayers = nonAggressionPlayers
         Memory.pixelSelling = pixelSelling
