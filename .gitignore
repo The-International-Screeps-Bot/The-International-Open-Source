@@ -1,5 +1,6 @@
 # Build
 dist
+main.js
 
 # User's Push Information
 screeps.json

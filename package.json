@@ -1,12 +1,13 @@
 {
     "name": "@the-international-screeps-bot/the-international-open-source",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "",
     "files": [
-        "dist"
+        "main.js"
     ],
     "scripts": {
         "build": "rollup -c",
+        "build-publish": "rollup -c --environment OUTPUT:main.js",
         "lint": "eslint **/*",
         "lint-ci": "eslint '**/*'",
         "lint-fix": "eslint **/* --fix",
