@@ -50,7 +50,7 @@ class ConfigManager {
         Memory.baseVisuals = baseVisuals
         Memory.mapVisuals = mapVisuals
         Memory.CPULogging = CPULogging
-        Memory.roomStats = Memory.roomStats
+        Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
         Memory.allyPlayers = allyPlayers
         Memory.nonAggressionPlayers = nonAggressionPlayers
         Memory.pixelSelling = pixelSelling
