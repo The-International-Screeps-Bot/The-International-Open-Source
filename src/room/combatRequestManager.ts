@@ -57,7 +57,7 @@ export class CombatRequestManager {
         if (!requestRoom) return
 
         if (Game.time % Math.floor(Math.random() * 100) === 0) {
-            const structures = requestRoom.dismantleableStructures
+            const structures = requestRoom.dismantleableTargets
 
             let totalHits = 0
             for (const structure of structures) totalHits += structure.hits

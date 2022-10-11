@@ -1,5 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import { createPosMap, customLog, getAvgPrice, packXY } from './utils'
+import { createPosMap, customLog, getAvgPrice, packXYAsNum } from './utils'
 
 import {
     cacheAmountModifier,
@@ -183,7 +183,7 @@ export class InternationalManager {
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                global.terrainCoords[roomName][packXY(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
+                global.terrainCoords[roomName][packXYAsNum(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
             }
         }
 

@@ -1,5 +1,6 @@
 import { RemoteData } from 'international/constants'
-import { findClosestObject, getRange, pack, randomIntRange } from 'international/utils'
+import { findClosestObject, getRange, randomIntRange } from 'international/utils'
+import { packCoord } from 'other/packrat'
 
 export class RemoteDefender extends Creep {
     public get dying() {
@@ -133,7 +134,7 @@ export class RemoteDefender extends Creep {
             }
 
             this.rangedMassAttack()
-            this.moveRequest = pack(enemyCreep.pos)
+            this.moveRequest = packCoord(enemyCreep.pos)
 
             return true
         }
@@ -173,7 +174,7 @@ export class RemoteDefender extends Creep {
 
         if (range === 1) {
             this.rangedMassAttack()
-            this.moveRequest = pack(enemyAttacker.pos)
+            this.moveRequest = packCoord(enemyAttacker.pos)
         }
 
         // Otherwise, rangedAttack the enemyAttacker

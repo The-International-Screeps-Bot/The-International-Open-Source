@@ -1,5 +1,5 @@
 import { impassibleStructureTypes, stamps } from 'international/constants'
-import { unpackAsPos } from 'international/utils'
+import { unpackNumAsCoord } from 'international/utils'
 
 Room.prototype.remotePlanner = function (commune) {
     return true
@@ -36,7 +36,7 @@ Room.prototype.communeConstructionPlacement = function () {
         const stamp = stamps[stampType as StampTypes]
 
         for (const packedStampAnchor of this.memory.stampAnchors[stampType as StampTypes]) {
-            const stampAnchor = unpackAsPos(packedStampAnchor)
+            const stampAnchor = unpackNumAsCoord(packedStampAnchor)
 
             for (const structureType in stamp.structures) {
                 if (structureType === 'empty') continue

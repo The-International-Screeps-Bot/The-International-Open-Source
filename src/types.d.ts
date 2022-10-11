@@ -758,12 +758,12 @@ declare global {
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        creepPositions: Map<number, string>
+        creepPositions: Map<string, string>
 
         /**
          * A matrix with indexes of packed positions and values of creep names
          */
-        moveRequests: Map<number, string[]>
+        moveRequests: Map<string, string[]>
 
         roomManager: RoomManager
 
@@ -775,13 +775,6 @@ declare global {
         squadRequests: Set<string>
 
         // Functions
-
-        /**
-         * Uses caching and only operating on request to construct and get a specific roomObject based on its name
-         * @param roomObjectName The name of the requested roomObject
-         * @returns Either the roomObject's value, or, if the request failed, undefined
-         */
-        get(roomObjectName: RoomObjectName): any | undefined
 
         /**
          * Removes roomType-based values in the room's memory that don't match its type
@@ -899,7 +892,7 @@ declare global {
         /**
          *
          */
-        findRoomPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
+        findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
 
         /**
          *
@@ -1147,9 +1140,9 @@ declare global {
 
         readonly taskNeedingSpawningStructures: SpawningStructures
 
-        _dismantleableStructures: Structure[]
+        _dismantleableTargets: Structure[]
 
-        readonly dismantleableStructures: Structure[]
+        readonly dismantleableTargets: Structure[]
 
         // Resource info
 
@@ -1157,19 +1150,47 @@ declare global {
 
         readonly sourcePositions: RoomPosition[][]
 
-        _usedSourceCoords: Set<number>[]
+        _usedSourceCoords: Set<string>[]
 
-        readonly usedSourceCoords: Set<number>[]
+        readonly usedSourceCoords: Set<string>[]
 
         _sourcePaths: RoomPosition[][]
 
         readonly sourcePaths: RoomPosition[][]
+
+        _centerUpgradePos: RoomPosition | false
+
+        readonly centerUpgradePos: RoomPosition | false
+
+        _upgradePositions: RoomPosition[]
+
+        readonly upgradePositions: RoomPosition[]
+
+        _usedUpgradeCoords: Set<string>
+
+        readonly usedUpgradeCoords: Set<string>
 
         _controllerPositions: RoomPosition[]
 
         readonly controllerPositions: RoomPosition[]
 
         readonly upgradePathLength: number
+
+        _mineralPositions: RoomPosition[]
+
+        readonly mineralPositions: RoomPosition[]
+
+        _usedMineralCoords: Set<string>
+
+        readonly usedMineralCoords: Set<string>
+
+        _fastFillerPositions: RoomPosition[]
+
+        readonly fastFillerPositions: RoomPosition[]
+
+        _usedFastFillerCoords: Set<string>
+
+        readonly usedFastFillerCoords: Set<string>
 
         _remoteNamesBySourceEfficacy: string[]
 
@@ -1222,6 +1243,10 @@ declare global {
         _enemyDamageThreat: boolean
 
         readonly enemyDamageThreat: boolean
+
+        _enemyThreatCoords: Set<string>
+
+        readonly enemyThreatCoords: Set<string>
 
         // Target finding
 
@@ -1425,6 +1450,11 @@ declare global {
         SP: string[]
 
         /**
+         * Mineral Positions, packed positions around the mineral where harvesters can sit
+         */
+        MP: string
+
+        /**
          * Controller Positions, packed positions around the controller where reservers and downgraders can sit
          */
         CP: string
@@ -1466,7 +1496,7 @@ declare global {
         /**
          * The packed position of the moveRequest, if one has been made
          */
-        moveRequest: number
+        moveRequest: string
 
         /**
          * Wether the creep moved a resource this tick
@@ -1476,7 +1506,7 @@ declare global {
         /**
          * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
          */
-        moved?: number
+        moved?: string | 'moved' | 'yield'
 
         /**
          * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
@@ -1558,11 +1588,9 @@ declare global {
 
         findOptimalSourceIndex(): boolean
 
-        findSourcePos(sourceName: number): boolean
+        findSourcePos(sourceIndex: number): false | Coord
 
-        findMineralHarvestPos(): boolean
-
-        findFastFillerPos(): boolean
+        findMineralHarvestPos(): false | Coord
 
         /**
          *
@@ -1576,7 +1604,7 @@ declare global {
 
         assignMoveRequest(coord: Coord): void
 
-        findShovePositions(avoidPackedPositions: Set<number>): RoomPosition[]
+        findShovePositions(avoidPackedPositions: Set<string>): RoomPosition[]
 
         shove(shoverPos: RoomPosition): boolean
 
@@ -1586,7 +1614,7 @@ declare global {
         runMoveRequest(): boolean
 
         /**
-         *
+         *unpackCoordAsPos
          */
         recurseMoveRequest(queue?: string[]): void
 
@@ -1752,7 +1780,7 @@ declare global {
         /**
          * The creep's packedPos for a designated target
          */
-        packedPos: number
+        PC: string
 
         /**
          * Last Cache, the last time a path was cached in memory
@@ -1867,9 +1895,9 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep { }
+    interface PowerCreep {}
 
-    interface PowerCreepMemory { }
+    interface PowerCreepMemory {}
 
     // Structures
 

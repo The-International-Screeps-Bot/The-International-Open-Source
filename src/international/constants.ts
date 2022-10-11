@@ -28,12 +28,12 @@ export const CPULogging = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const roomStats: 0 | 1 | 2 = 1
+export const roomStats: 0 | 1 | 2 = 2
 
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian', 'Aerics']
+export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian', 'Aerics', 'PlaidRabbit']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -1046,8 +1046,10 @@ const allowedSquadCombinations: { [squadSize: string]: Partial<Record<CreepRoles
 
 export { allowedSquadCombinations }
 
-export const defaultPlainCost = 2
-export const defaultSwampCost = 8
+export const defaultPlainCost = 1
+export const defaultRoadPlanningPlainCost = 2
+export const defaultSwampCost = 3
+export const defaultCreepSwampCost = 8
 
 export const quadAttackMemberOffsets = [
     {

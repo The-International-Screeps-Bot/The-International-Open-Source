@@ -5,6 +5,8 @@ import {
     communeSigns,
     CPUBucketCapacity,
     CPUBucketRenewThreshold,
+    defaultCreepSwampCost,
+    defaultPlainCost,
     impassibleStructureTypes,
     myColors,
     nonCommuneSigns,
@@ -20,16 +22,25 @@ import {
     findObjectWithID,
     findCoordsInsideRect,
     getRange,
-    pack,
-    packXY,
-    unpackAsPos,
-    unpackAsRoomPos,
     findClosestObjectInRange,
     isXYExit,
+    packAsNum,
+    unpackNumAsPos,
+    packXYAsNum,
+    unpackNumAsCoord,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'
-import { packCoord, packPos, packPosList, unpackPos, unpackPosList } from 'other/packrat'
+import {
+    packCoord,
+    packPos,
+    packPosList,
+    packXYAsCoord,
+    unpackCoord,
+    unpackCoordAsPos,
+    unpackPos,
+    unpackPosList,
+} from 'other/packrat'
 import { creepClasses } from './creepClasses'
 
 Creep.prototype.preTickManager = function () {}
@@ -174,24 +185,17 @@ Creep.prototype.advancedUpgradeController = function () {
     if (controllerStructure) {
         // if the creep doesn't have an upgrade pos
 
-        if (!this.memory.packedPos) {
-            // Get upgrade positions
-
-            const upgradePositions: RoomPosition[] = room.get('upgradePositions')
-
+        if (!this.memory.PC) {
             // Get usedUpgradePositions, informing false if they're undefined
 
-            const usedUpgradePositions: Set<number> = room.get('usedUpgradePositions')
-            if (!usedUpgradePositions) return false
-
-            let packedPos
+            const usedUpgradePositions = room.usedUpgradeCoords
 
             // Loop through each upgradePositions
 
-            for (const pos of upgradePositions) {
+            for (const pos of room.upgradePositions) {
                 // Construct the packedPos using pos
 
-                packedPos = pack(pos)
+                const packedPos = packPos(pos)
 
                 // Iterate if the pos is used
 
@@ -199,15 +203,15 @@ Creep.prototype.advancedUpgradeController = function () {
 
                 // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
 
-                this.memory.packedPos = packedPos
+                this.memory.PC = packedPos
                 usedUpgradePositions.add(packedPos)
                 break
             }
         }
 
-        if (!this.memory.packedPos) return false
+        if (!this.memory.PC) return false
 
-        const upgradePos = unpackAsRoomPos(this.memory.packedPos, room.name)
+        const upgradePos = unpackPos(this.memory.PC)
         const upgradePosRange = getRange(this.pos.x, upgradePos.x, this.pos.y, upgradePos.y)
 
         if (upgradePosRange > 0) {
@@ -657,21 +661,21 @@ Creep.prototype.findSourcePos = function (index) {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (this.memory.packedPos) return true
+    if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
 
     // Get usedSourceHarvestPositions
 
     const usedSourceCoords = room.usedSourceCoords[index]
 
-    const openSourcePositions = room.sourcePositions[index].filter(pos => !usedSourceCoords.has(pack(pos)))
+    const openSourcePositions = room.sourcePositions[index].filter(pos => !usedSourceCoords.has(packCoord(pos)))
     if (!openSourcePositions.length) return false
 
-    const packedPos = pack(openSourcePositions[0])
+    const packedCoord = packCoord(openSourcePositions[0])
 
-    this.memory.packedPos = packedPos
-    room._usedSourceCoords[index].add(packedPos)
+    this.memory.PC = packedCoord
+    room._usedSourceCoords[index].add(packedCoord)
 
-    return true
+    return openSourcePositions[0]
 }
 
 Creep.prototype.findMineralHarvestPos = function () {
@@ -681,79 +685,21 @@ Creep.prototype.findMineralHarvestPos = function () {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (this.memory.packedPos) return true
+    if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
 
-    // Define an anchor
+    // Get usedSourceHarvestPositions
 
-    const anchor: RoomPosition = room.anchor || this.pos
+    const usedMineralCoords = room.usedMineralCoords
 
-    // Get usedMineralHarvestPositions
+    const openMineralPositions = room.mineralPositions.filter(pos => !usedMineralCoords.has(packCoord(pos)))
+    if (!openMineralPositions.length) return false
 
-    const usedHarvestPositions: Set<number> = room.get('usedMineralHarvestPositions')
+    const packedCoord = packCoord(openMineralPositions[0])
 
-    const closestHarvestPos: RoomPosition = room.get('closestMineralHarvestPos')
-    let packedPos = pack(closestHarvestPos)
+    this.memory.PC = packedCoord
+    room._usedMineralCoords.add(packedCoord)
 
-    // If the closestHarvestPos exists and isn't being used
-
-    if (closestHarvestPos) {
-        packedPos = pack(closestHarvestPos)
-
-        // If the position is unused
-
-        if (!usedHarvestPositions.has(packedPos)) {
-            // Assign it as the creep's harvest pos and inform true
-
-            this.memory.packedPos = packedPos
-            usedHarvestPositions.add(packedPos)
-
-            return true
-        }
-    }
-
-    // Otherwise get the harvest positions for the source
-
-    const harvestPositions: Coord[] = room.get('mineralHarvestPositions')
-
-    const openHarvestPositions = harvestPositions.filter(pos => !usedHarvestPositions.has(pack(pos)))
-    if (!openHarvestPositions.length) return false
-
-    openHarvestPositions.sort((a, b) => getRange(anchor.x, anchor.y, a.x, a.y) - getRange(anchor.x, anchor.y, b.x, b.y))
-
-    packedPos = pack(openHarvestPositions[0])
-
-    this.memory.packedPos = packedPos
-    usedHarvestPositions.add(packedPos)
-
-    return true
-}
-
-Creep.prototype.findFastFillerPos = function () {
-    const { room } = this
-
-    this.say('FFP')
-
-    // Stop if the creep already has a packedFastFillerPos
-
-    if (this.memory.packedPos) return true
-
-    // Get usedFastFillerPositions
-
-    const usedFastFillerPositions: Set<number> = room.get('usedFastFillerPositions')
-
-    // Otherwise get the harvest positions for the source
-
-    const fastFillerPositions: Coord[] = room.get('fastFillerPositions')
-
-    const openFastFillerPositions = fastFillerPositions.filter(pos => !usedFastFillerPositions.has(pack(pos)))
-    if (!openFastFillerPositions.length) return false
-
-    const packedPos = pack(findClosestPos(this.pos, openFastFillerPositions))
-
-    this.memory.packedPos = packedPos
-    usedFastFillerPositions.add(packedPos)
-
-    return true
+    return openMineralPositions[0]
 }
 
 Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
@@ -840,7 +786,10 @@ Creep.prototype.createMoveRequest = function (opts) {
         opts.avoidStationaryPositions = true
         opts.avoidNotMyCreeps = true
 
-        if (!opts.plainCost && !this.memory.R) opts.plainCost = 1
+        if (this.memory.R) {
+            if (!opts.plainCost) opts.plainCost = defaultPlainCost * 2
+            if (!opts.swampCost) opts.swampCost = defaultCreepSwampCost * 2
+        }
 
         // Generate a new path
 
@@ -887,6 +836,16 @@ Creep.prototype.createMoveRequest = function (opts) {
                   opacity: 0.3,
               })
 
+    if (path.length > 1) {
+        if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
+    } else {
+        room.visual.line(this.pos, path[0], {
+            color: myColors.lightBlue,
+            opacity: 0.3,
+        })
+        delete this.memory.LC
+    }
+
     this.assignMoveRequest(path[0])
 
     // Set the creep's pathOpts to reflect this moveRequest's opts
@@ -908,7 +867,7 @@ Creep.prototype.createMoveRequest = function (opts) {
 
 Creep.prototype.assignMoveRequest = function (coord) {
     const { room } = this
-    const packedCoord = pack(coord)
+    const packedCoord = packCoord(coord)
 
     this.moveRequest = packedCoord
 
@@ -920,18 +879,18 @@ Creep.prototype.assignMoveRequest = function (coord) {
 Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     const { room } = this
 
-    const x = this.pos.x
-    const y = this.pos.y
+    const { x } = this.pos
+    const { y } = this.pos
 
     const adjacentPackedPositions = [
-        packXY(x - 1, y - 1),
-        packXY(x - 1, y),
-        packXY(x - 1, y + 1),
-        packXY(x, y - 1),
-        packXY(x, y + 1),
-        packXY(x + 1, y - 1),
-        packXY(x + 1, y + 1),
-        packXY(x + 1, y - 1),
+        packXYAsCoord(x - 1, y - 1),
+        packXYAsCoord(x - 1, y),
+        packXYAsCoord(x - 1, y + 1),
+        packXYAsCoord(x, y - 1),
+        packXYAsCoord(x, y + 1),
+        packXYAsCoord(x + 1, y - 1),
+        packXYAsCoord(x + 1, y + 1),
+        packXYAsCoord(x + 1, y - 1),
     ]
 
     const shovePositions = []
@@ -939,19 +898,23 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     const terrain = room.getTerrain()
 
     for (let index = 0; index < adjacentPackedPositions.length; index++) {
-        const packedPos = adjacentPackedPositions[index]
+        const packedCoord = adjacentPackedPositions[index]
 
-        if (room.creepPositions.get(packedPos)) continue
+        if (room.creepPositions.get(packedCoord)) continue
 
-        if (avoidPackedPositions.has(packedPos)) continue
+        if (avoidPackedPositions.has(packedCoord)) continue
 
-        let coord = unpackAsPos(packedPos)
+        const coord = unpackCoord(packedCoord)
 
         if (coord.x < 1 || coord.x >= roomDimensions - 1 || coord.y < 1 || coord.y >= roomDimensions - 1) continue
 
-        let pos = new RoomPosition(coord.x, coord.y, room.name)
+        const pos = new RoomPosition(coord.x, coord.y, room.name)
 
         if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+
+        // If the coord isn't safe to stand on
+
+        if (room.enemyThreatCoords.has(packedCoord)) continue
 
         let hasImpassibleStructure
 
@@ -999,7 +962,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
 Creep.prototype.shove = function (shoverPos) {
     const { room } = this
 
-    const shovePositions = this.findShovePositions(new Set([pack(shoverPos), pack(this.pos)]))
+    const shovePositions = this.findShovePositions(new Set([packCoord(shoverPos), packCoord(this.pos)]))
     if (!shovePositions.length) return false
 
     let goalPos: RoomPosition
@@ -1012,7 +975,7 @@ Creep.prototype.shove = function (shoverPos) {
         })[0]
     } else goalPos = shovePositions[0]
 
-    const packedCoord = pack(goalPos)
+    const packedCoord = packCoord(goalPos)
 
     room.moveRequests.get(packedCoord)
         ? room.moveRequests.get(packedCoord).push(this.name)
@@ -1038,7 +1001,7 @@ Creep.prototype.shove = function (shoverPos) {
             opacity: 0.3,
         })
 
-        room.visual.line(this.pos, unpackAsRoomPos(this.moveRequest, this.room.name), {
+        room.visual.line(this.pos, unpackCoordAsPos(this.moveRequest, this.room.name), {
             color: myColors.yellow,
         })
     }
@@ -1056,7 +1019,7 @@ Creep.prototype.runMoveRequest = function () {
 
     if (!room.moveRequests.get(this.moveRequest)) return false
 
-    if (this.move(this.pos.getDirectionTo(unpackAsRoomPos(this.moveRequest, room.name))) !== OK) return false
+    if (this.move(this.pos.getDirectionTo(unpackCoordAsPos(this.moveRequest, room.name))) !== OK) return false
 
     if (Memory.roomVisuals)
         room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
@@ -1075,7 +1038,7 @@ Creep.prototype.runMoveRequest = function () {
 
     // Remove record of the creep being on its current position
 
-    /* room.creepPositions[pack(this.pos)] = undefined */
+    /* room.creepPositions[packAsNum(this.pos)] = undefined */
 
     // Record the creep at its new position
 
@@ -1089,7 +1052,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
     if (!this.moveRequest) return
     if (!room.moveRequests.get(this.moveRequest)) {
-        this.moved = -1
+        this.moved = 'moved'
         return
     }
 
@@ -1105,7 +1068,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         // loop through each index of the queue, drawing visuals
 
         if (Memory.roomVisuals) {
-            const moveRequestPos = unpackAsRoomPos(this.moveRequest, room.name)
+            const moveRequestPos = unpackCoordAsPos(this.moveRequest, room.name)
 
             room.visual.rect(moveRequestPos.x - 0.5, moveRequestPos.y - 0.5, 1, 1, {
                 fill: myColors.green,
@@ -1129,20 +1092,20 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         return
     }
 
-    const packedCoord = pack(this.pos)
+    const packedCoord = packCoord(this.pos)
 
     // Get the creepAtPos with the name
 
     const creepAtPos = Game.creeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
-        if (creepAtPos.moved === -1) {
+        if (creepAtPos.moved === 'moved') {
             delete this.moveRequest
-            this.moved = -1
+            this.moved = 'moved'
             return
         }
 
-        if (creepAtPos.moved === -2) {
+        if (creepAtPos.moved === 'yeild') {
             if (
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
                 TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
@@ -1160,7 +1123,7 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             }
 
             delete this.moveRequest
-            this.moved = -2
+            this.moved = 'yeild'
             return
         }
 
@@ -1261,13 +1224,13 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
                 this.runMoveRequest()
 
                 delete creepAtPos.moveRequest
-                creepAtPos.moved = -1
+                creepAtPos.moved = 'moved'
 
                 return
             }
 
             delete this.moveRequest
-            this.moved = -1
+            this.moved = 'moved'
 
             creepAtPos.runMoveRequest()
             return

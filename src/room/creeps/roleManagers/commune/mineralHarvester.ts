@@ -1,41 +1,38 @@
-import { getRange, unpackAsRoomPos } from 'international/utils'
+import { getRange, getRangeOfCoords } from 'international/utils'
+import { unpackPos } from 'other/packrat'
 
 export class MineralHarvester extends Creep {
     advancedHarvestMineral?(mineral: Mineral): boolean {
-        const creep = this
-        const { room } = creep
+        if (!this.needsResources()) return false
 
-        // Try to find a harvestPosition, inform false if it failed
-
-        if (!creep.findMineralHarvestPos()) return false
-
-        creep.say('🚬')
+        this.say('🚬')
 
         // Unpack the creep's packedHarvestPos
 
-        const harvestPos = unpackAsRoomPos(creep.memory.packedPos, room.name)
+        const harvestPos = this.findMineralHarvestPos()
+        if (!harvestPos) return true
 
         // If the creep is not standing on the harvestPos
 
-        if (getRange(creep.pos.x, harvestPos.x, creep.pos.y, harvestPos.y) > 0) {
-            creep.say('⏩M')
+        if (getRangeOfCoords(this.pos, harvestPos) > 0) {
+            this.say('⏩M')
 
             // Make a move request to it
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: harvestPos, range: 0 }],
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: new RoomPosition(harvestPos.x, harvestPos.y, this.room.name), range: 0 }],
                 avoidEnemyRanges: true,
             })
 
             // And inform false
 
-            return false
+            return true
         }
 
         // Harvest the mineral, informing the result if it didn't succeed
 
-        if (creep.harvest(mineral) !== OK) return false
+        if (this.harvest(mineral) !== OK) return true
 
         // Find amount of minerals harvested and record it in data
 
@@ -43,11 +40,11 @@ export class MineralHarvester extends Creep {
         if (global.roomStats.commune[this.room.name])
             (global.roomStats.commune[this.room.name] as RoomCommuneStats).mh += mineralsHarvested
 
-        creep.say(`⛏️${mineralsHarvested}`)
+        this.say(`⛏️${mineralsHarvested}`)
 
         // Inform true
 
-        return true
+        return false
     }
 
     constructor(creepID: Id<Creep>) {
@@ -67,14 +64,7 @@ export class MineralHarvester extends Creep {
                 continue
             }
 
-            // If the creep needs resources
-
-            if (creep.needsResources()) {
-                // Harvest the mineral and iterate
-
-                creep.advancedHarvestMineral(mineral)
-                continue
-            }
+            if (creep.advancedHarvestMineral(mineral)) continue
 
             // If there is a terminal
 
