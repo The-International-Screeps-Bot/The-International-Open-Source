@@ -346,6 +346,8 @@ Object.defineProperties(Room.prototype, {
 
             return (this._dismantleableTargets = this.find(FIND_STRUCTURES, {
                 filter: structure =>
+                    (structure as OwnedStructure).owner &&
+                    !(structure as OwnedStructure).my &&
                     structure.structureType !== STRUCTURE_CONTROLLER &&
                     structure.structureType !== STRUCTURE_INVADER_CORE,
             }))
@@ -1340,7 +1342,7 @@ Object.defineProperties(Room.prototype, {
 
             const terrainCM = this.getTerrain()
 
-            // Assign impassible to tiles we can't aren't 2x2 passible
+            // Assign impassible to tiles that aren't 2x2 passible
 
             for (let x = 0; x < roomDimensions; x += 1) {
                 for (let y = 0; y < roomDimensions; y += 1) {

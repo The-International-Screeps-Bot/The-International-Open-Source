@@ -84,8 +84,6 @@ export class CommuneManager {
     }
     private test() {
 
-        customLog('SOURCE INDEXES BY EFFICACY', this.room.remoteSourceIndexesByEfficacy)
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
