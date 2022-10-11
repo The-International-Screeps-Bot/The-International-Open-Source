@@ -29,7 +29,9 @@ export class RemotesManager {
             if (remoteMemory.data[RemoteData.abandon] > 0) {
                 remoteMemory.data[RemoteData.abandon] -= 1
 
-                for (const need in remoteMemory.data) remoteMemory.data[need] = 0
+                for (const need in remoteMemory.data) {
+                    if (Number(need) !== RemoteData.abandon) remoteMemory.data[need] = 0
+                }
 
                 continue
             }
@@ -91,16 +93,12 @@ export class RemotesManager {
 
             // If the remote is assumed to be reserved by an enemy
 
-            if (remoteMemory.data[RemoteData.enemyReserved]) {
-                remoteMemory.data[RemoteData.source1RemoteHarvester] = 0
-                remoteMemory.data[RemoteData.source2RemoteHarvester] = 0
-                remoteMemory.data[RemoteData.remoteHauler0] = 0
-                remoteMemory.data[RemoteData.remoteHauler1] = 0
-            }
-
-            // If there is assumed to be an invader core
-
-            if (remoteMemory.data[RemoteData.invaderCore]) {
+            if (
+                remoteMemory.data[RemoteData.enemyReserved] ||
+                remoteMemory.data[RemoteData.invaderCore] ||
+                remoteMemory.data[RemoteData.minDamage] > 0 ||
+                remoteMemory.data[RemoteData.minHeal] > 0
+            ) {
                 remoteMemory.data[RemoteData.source1RemoteHarvester] = 0
                 remoteMemory.data[RemoteData.source2RemoteHarvester] = 0
                 remoteMemory.data[RemoteData.remoteHauler0] = 0

@@ -191,7 +191,7 @@ Room.prototype.get = function (roomObjectName) {
         for (const coord of adjacentPositions) {
             // Iterate if terrain for pos is a wall
 
-            if (terrain[packAsNum(coord)] === TERRAIN_MASK_WALL) continue
+            if (terrain[pack(coord)] === 255) continue
 
             // Add pos to harvestPositions
 
@@ -1263,6 +1263,7 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
 Room.prototype.createAttackCombatRequest = function () {
     if (!Memory.autoAttack) return
+
     if (Memory.combatRequests[this.name]) return
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
