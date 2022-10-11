@@ -267,9 +267,10 @@ Creep.prototype.advancedUpgradeController = function () {
                     const energySpentOnRepairs = Math.min(
                         workPartCount,
                         (controllerStructure.hitsMax - controllerStructure.hits) / REPAIR_POWER,
+                        this.store.energy,
                     )
 
-                    this.store.energy -= workPartCount
+                    this.store.energy -= energySpentOnRepairs
 
                     // Add control points to total controlPoints counter and say the success
 
@@ -347,9 +348,11 @@ Creep.prototype.advancedUpgradeController = function () {
     if (this.upgradeController(room.controller) === OK) {
         // Add control points to total controlPoints counter and say the success
 
+        const energySpentOnUpgrades = Math.min(this.store.energy, this.parts.work * UPGRADE_CONTROLLER_POWER)
+
         if (global.roomStats.commune[this.room.name])
-            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += this.parts.work
-        this.say(`🔋${this.parts.work}`)
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += energySpentOnUpgrades
+        this.say(`🔋${energySpentOnUpgrades}`)
 
         // Inform true
 
@@ -396,6 +399,7 @@ Creep.prototype.advancedBuildCSite = function () {
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+            this.store.energy,
         )
 
         if (this.store.energy - energySpentOnConstruction <= 0) this.memory.NR = true
@@ -480,6 +484,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+            this.store.energy,
         )
 
         this.store.energy -= energySpentOnConstruction

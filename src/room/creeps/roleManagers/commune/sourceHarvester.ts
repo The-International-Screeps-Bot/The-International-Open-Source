@@ -33,7 +33,6 @@ export class SourceHarvester extends Creep {
     }
 
     travelToSource?(): boolean {
-
         this.say('🚬')
 
         // Unpack the harvestPos
@@ -174,6 +173,7 @@ export class SourceHarvester extends Creep {
             const energySpentOnRepairs = Math.min(
                 workPartCount,
                 (sourceContainer.hitsMax - sourceContainer.hits) / REPAIR_POWER,
+                this.store.energy,
             )
 
             // Add repair points to total repairPoints counter and say the success
