@@ -136,6 +136,8 @@ declare global {
         range: number
     }
 
+    type QuadTransformTypes = 'rotateLeft' | 'rotateRight'
+
     interface PathOpts {
         /**
          * Not required when pathing for creeps
@@ -1509,7 +1511,7 @@ declare global {
         moved?: string | 'moved' | 'yield'
 
         /**
-         * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
+         * Wether the creep did a heal, attack, dismantle, harvest, build, upgrade, dismantle, or repair this tick
          */
         worked: boolean
 
@@ -1517,11 +1519,6 @@ declare global {
          * Wether the creep rangedHealed or rangedAttacked this tick
          */
         ranged: boolean
-
-        /**
-         * Wether the creep healed or attacked this tick
-         */
-        meleed: boolean
 
         /**
          * Whether the creep is actively pulling another creep or not

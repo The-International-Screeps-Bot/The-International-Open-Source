@@ -12,17 +12,25 @@ export class ClaimRequestManager {
     public run() {
         const { room } = this.communeManager
 
-        if (!room.memory.claimRequest) return
+        const requestName = room.memory.claimRequest
+        if (!requestName) return
 
         // If CPU logging is enabled, get the CPU used at the start
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const request = Memory.claimRequests[room.memory.claimRequest]
+        const request = Memory.claimRequests[requestName]
 
         // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
 
         if (!request) {
+            delete room.memory.claimRequest
+            return
+        }
+
+        const type = Memory.rooms[requestName].T
+        if (type !== 'neutral' && type != 'commune') {
+            delete request.responder
             delete room.memory.claimRequest
             return
         }
@@ -41,7 +49,7 @@ export class ClaimRequestManager {
             return
         }
 
-        const requestRoom = Game.rooms[room.memory.claimRequest]
+        const requestRoom = Game.rooms[requestName]
         if (!requestRoom || !requestRoom.controller.my) {
             request.data[ClaimRequestData.claimer] = 1
             return

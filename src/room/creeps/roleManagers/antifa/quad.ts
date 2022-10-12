@@ -1,4 +1,9 @@
-import { myColors, quadAttackMemberOffsets } from 'international/constants'
+import {
+    myColors,
+    quadAttackMemberOffsets,
+    quadTransformIndexChange,
+    quadTransformOffsets,
+} from 'international/constants'
 import {
     areCoordsEqual,
     arePositionsEqual,
@@ -6,9 +11,10 @@ import {
     doesXYExist,
     findClosestObject,
     getRange,
+    getRangeOfCoords,
     isXYExit,
 } from 'international/utils'
-import { packCoord, unpackCoord } from 'other/packrat'
+import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
 import { Antifa } from './antifa'
 
 export class Quad {
@@ -22,7 +28,12 @@ export class Quad {
     members: Antifa[]
     leader: Antifa
     expectedSize: 4
-    membersByPosition: Map<string, Antifa> = new Map()
+    membersByCoord: { [packedCoord: string]: Antifa } = {
+        [packXYAsCoord(0, 0)]: undefined,
+        [packXYAsCoord(0, 1)]: undefined,
+        [packXYAsCoord(1, 1)]: undefined,
+        [packXYAsCoord(1, 0)]: undefined,
+    }
 
     _healStrength: number
 
@@ -59,30 +70,23 @@ export class Quad {
 
         for (const member of members) {
             member.memory.SF = true
-            this.membersByPosition.set(packCoord(member.pos), member)
+            this.membersByCoord[packCoord(member.pos)] = member
         }
     }
     run() {
         this.leader.say(this.type)
 
-        this.advancedHeal()
-
         if (!this.getInFormation()) return
 
         if (this.leader.room.name === this.leader.memory.CRN) {
+            this.advancedHeal()
             this.runCombat()
             return
         }
 
-        /*
-        if (this.leader.room.name === this.leader.memory.CRN) {
+        this.passiveHeal()
+        this.passiveRangedAttack()
 
-            if (this.runCombat()) return
-
-            this.stompEnemyCSites()
-            return
-        }
- */
         this.createMoveRequest({
             goals: [
                 {
@@ -97,6 +101,7 @@ export class Quad {
             },
         })
     }
+
     getInFormation(): boolean {
         if (this.leader.isOnExit()) return true
 
@@ -180,13 +185,17 @@ export class Quad {
             inFormation = false
         }
 
+        if (inFormation) return this.transform('rotateLeft')
         return inFormation
     }
+
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
-        if (!this.canMove) return
+        if (!this.canMove) return false
+
+        this.leader.say('R')
 
         if (this.type === 'transport') {
-            if (!moveLeader.createMoveRequest(opts)) return
+            if (!moveLeader.createMoveRequest(opts)) return false
 
             let lastMember = moveLeader
 
@@ -197,39 +206,123 @@ export class Quad {
                 lastMember = member
             }
 
-            return
+            return true
         }
 
         // Attack mode
 
         opts.weightCostMatrixes = ['quadCostMatrix']
-        if (!moveLeader.createMoveRequest(opts)) return
+        if (!moveLeader.createMoveRequest(opts)) return false
 
-        this.membersAttackMove()
+        if (this.membersAttackMove()) return true
+        return false
     }
+
     membersAttackMove(moveLeader = this.leader) {
         const moveRequestCoord = unpackCoord(moveLeader.moveRequest)
 
-        const offset = {
+        const moveLeaderOffset = {
             x: moveLeader.pos.x - moveRequestCoord.x,
             y: moveLeader.pos.y - moveRequestCoord.y,
         }
 
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
+            const offset = {
+                x: member.pos.x - moveLeaderOffset.x,
+                y: member.pos.y - moveLeaderOffset.y,
+            }
+
+            if (!doesXYExist(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return false
+
+            /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
+        }
+
+        for (let i = 1; i < this.members.length; i++) {
+            const member = this.members[i]
 
             member.assignMoveRequest({
-                x: member.pos.x - offset.x,
-                y: member.pos.y - offset.y,
+                x: member.pos.x - moveLeaderOffset.x,
+                y: member.pos.y - moveLeaderOffset.y,
             })
         }
+
+        return true
     }
-    rotate() {}
+
+    transform(transformType: QuadTransformTypes) {
+        if (!this.canMove) return false
+
+        const transformOffsets = quadTransformOffsets[transformType]
+        const indexChange = quadTransformIndexChange[transformType]
+        const newMembers = []
+
+        for (let i = 0; i < this.members.length; i++) {
+            const member = this.members[i]
+            const offset = transformOffsets[i]
+
+            member.assignMoveRequest({ x: member.pos.x + offset.x, y: member.pos.y + offset.y })
+
+            const newIndex = i > 4 ? i + (indexChange % 4) : i
+            member.room.visual.text(newIndex.toString(), member.pos)
+            newMembers[newIndex] = member
+        }
+
+        this.members = newMembers
+        this.leader = newMembers[0]
+        this.leader.room.visual.text('G', this.leader.pos)
+        return true
+    }
+
     runCombat() {
         if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
         if (this.leader.memory.ST === 'attack') return this.advancedAttack()
         return this.advancedDismantle()
     }
+
+    passiveHeal() {
+        for (const member1 of this.members) {
+            if (member1.hits === member1.hitsMax) continue
+
+            for (const member2 of this.members) {
+                member2.heal(member1)
+                member2.ranged = true
+            }
+
+            return
+        }
+
+        for (const member of this.members) {
+            member.passiveHeal()
+        }
+    }
+
+    passiveRangedAttack() {
+        for (const member of this.members) {
+            if (member.ranged) continue
+
+            let enemyCreeps = member.room.enemyAttackers
+            if (!enemyCreeps.length) {
+                enemyCreeps = member.room.enemyCreeps
+                if (!enemyCreeps.length) continue
+            }
+
+            const enemyCreep = findClosestObject(member.pos, enemyCreeps)
+
+            const range = getRangeOfCoords(member.pos, enemyCreep.pos)
+            if (range > 3) continue
+
+            member.ranged = true
+
+            if (range > 1) {
+                member.rangedAttack(enemyCreep)
+                continue
+            }
+
+            member.rangedMassAttack()
+        }
+    }
+
     advancedRangedAttack() {
         const { room } = this.leader
 

@@ -2,7 +2,7 @@ export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
         if (roomType === 'commune') {
             const communeStats: RoomCommuneStats = {
-                cl: null,
+                cl: 0,
                 eib: 0,
                 eih: 0,
                 eou: 0,
@@ -12,7 +12,7 @@ export class StatsManager {
                 eos: 0,
                 eosp: 0,
                 mh: 0,
-                es: null,
+                es: 0,
                 cc: 0,
                 cu: Game.cpu.getUsed(),
                 su: 0,

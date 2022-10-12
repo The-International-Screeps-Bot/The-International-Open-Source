@@ -1548,13 +1548,14 @@ Creep.prototype.passiveHeal = function () {
 
     this.say('PH')
 
-    if (!this.meleed) {
+    if (!this.worked) {
         // If the creep is below max hits
 
         if (this.hitsMax > this.hits) {
             // Have it heal itself and stop
 
             this.heal(this)
+            this.worked = true
             return false
         }
 
@@ -1572,7 +1573,7 @@ Creep.prototype.passiveHeal = function () {
         for (const posData of adjacentCreeps) {
             // If the creep is the posData creep, iterate
 
-            if (this.id === posData.creep.id) continue
+            if (this.name === posData.creep.name) continue
 
             // If the creep is not owned and isn't an ally
 
@@ -1585,6 +1586,7 @@ Creep.prototype.passiveHeal = function () {
             // have the creep heal the adjacentCreep and stop
 
             this.heal(posData.creep)
+            this.worked = true
             return false
         }
     }
@@ -1605,7 +1607,7 @@ Creep.prototype.passiveHeal = function () {
     for (const posData of nearbyCreeps) {
         // If the creep is the posData creep, iterate
 
-        if (this.id === posData.creep.id) continue
+        if (this.name === posData.creep.name) continue
 
         // If the creep is not owned and isn't an ally
 
@@ -1618,6 +1620,7 @@ Creep.prototype.passiveHeal = function () {
         // have the creep rangedHeal the nearbyCreep and stop
 
         this.rangedHeal(posData.creep)
+        this.ranged = true
         return true
     }
 
@@ -1629,13 +1632,14 @@ Creep.prototype.aggressiveHeal = function () {
 
     this.say('AH')
 
-    if (this.meleed) {
+    if (!this.worked) {
         // If the creep is below max hits
 
         if (this.hitsMax > this.hits) {
             // Have it heal itself and stop
 
             this.heal(this)
+            this.worked = true
             return true
         }
     }
@@ -1666,7 +1670,7 @@ Creep.prototype.aggressiveHeal = function () {
         }
     }
 
-    if (this.meleed) return false
+    if (this.worked) return false
 
     this.heal(healTarget)
     return true
