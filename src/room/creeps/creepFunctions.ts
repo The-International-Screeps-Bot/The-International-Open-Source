@@ -1763,19 +1763,6 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (reservation.type === 'withdraw') {
-            customLog(
-                'sum: ' + reservation.targetID,
-                _.sum(
-                    _.filter(
-                        Game.creeps,
-                        c => c.memory.Rs && c.memory.Rs?.length > 0 && c.memory.Rs[0].targetID === reservation.targetID,
-                    ),
-                    c => c.memory.Rs[0].amount,
-                ) +
-                    ' / ' +
-                    target.store.getUsedCapacity(reservation.resourceType),
-            )
-
             if (
                 this.store.getFreeCapacity() === 0 ||
                 target.store.getUsedCapacity(reservation.resourceType) < reservation.amount ||
@@ -1792,15 +1779,6 @@ Creep.prototype.reservationManager = function () {
                             c => c.memory.Rs[0].amount,
                         ))
             ) {
-                customLog(
-                    'delete reservation ' + this.memory.Rs[0].targetID,
-                    'creepStore: ' +
-                        this.store.getFreeCapacity() +
-                        ', targetStore: ' +
-                        (target.store.getUsedCapacity(reservation.resourceType) + reservation.amount) +
-                        ' / ' +
-                        target.store.getUsedCapacity(reservation.resourceType),
-                )
                 this.deleteReservation(0)
             }
         }
