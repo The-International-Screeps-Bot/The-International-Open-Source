@@ -618,7 +618,7 @@ Room.prototype.spawnRequester = function () {
             // For every x energy in storage, add 1 multiplier
 
             if (storage && this.controller.level >= 4)
-                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 18000, 2)
+                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000, 2)
 
             const role = 'maintainer'
 
