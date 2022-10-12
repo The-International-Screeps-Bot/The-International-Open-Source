@@ -1065,3 +1065,47 @@ export const quadAttackMemberOffsets = [
         y: 1,
     },
 ]
+
+export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number; }[]> = {
+    rotateLeft: [
+        {
+            x: 0,
+            y: 1
+        },
+        {
+            x: 1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: - 1
+        },
+        {
+            x: - 1,
+            y: 0
+        },
+    ],
+    rotateRight: [
+        {
+            x: 0,
+            y: 1
+        },
+        {
+            x: 1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: - 1
+        },
+        {
+            x: - 1,
+            y: 0
+        },
+    ]
+}
+
+export const quadTransformIndexChange: Record<QuadTransformTypes, number> = {
+    rotateLeft: 1,
+    rotateRight: -1,
+}

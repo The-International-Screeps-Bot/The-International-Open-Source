@@ -2,7 +2,7 @@ export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
         if (roomType === 'commune') {
             const communeStats: RoomCommuneStats = {
-                cl: null,
+                cl: 0,
                 eib: 0,
                 eih: 0,
                 eou: 0,
@@ -12,7 +12,7 @@ export class StatsManager {
                 eos: 0,
                 eosp: 0,
                 mh: 0,
-                es: null,
+                es: 0,
                 cc: 0,
                 cu: Game.cpu.getUsed(),
                 su: 0,
@@ -115,8 +115,9 @@ export class StatsManager {
             let globalValue = globalCommuneStats[name]
             const value = roomStats[name]
             if (value === undefined) roomStats[name] = 0
+            if (globalValue === undefined) globalValue = 0
 
-            if (globalValue) {
+            if (globalValue !== null) {
                 switch (name) {
                     // level 1 wo average
                     case 'cc':
@@ -128,7 +129,7 @@ export class StatsManager {
                     // level 1 w average
                     case 'su':
                     case 'cu':
-                    case 'eh':
+                    case 'eih':
                         roomStats[name] = this.average(value, globalValue)
                         break
                     // level 2
@@ -248,7 +249,7 @@ export class StatsManager {
         delete global.roomStats
     }
 
-    round(value: number, decimals: number = 5) {
+    round(value: number, decimals: number = 8) {
         const multiplier = Math.pow(10, decimals || 0)
         return Math.round(value * multiplier) / multiplier
     }

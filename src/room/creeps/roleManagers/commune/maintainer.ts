@@ -80,7 +80,11 @@ export class Maintainer extends Creep {
 
         // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
 
-        const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
+        const energySpentOnRepairs = Math.min(
+            workPartCount,
+            (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER,
+            this.store.energy,
+        )
 
         if (repairTarget.structureType === STRUCTURE_RAMPART) {
             if (global.roomStats.commune[this.room.name])

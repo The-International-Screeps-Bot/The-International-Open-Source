@@ -267,9 +267,10 @@ Creep.prototype.advancedUpgradeController = function () {
                     const energySpentOnRepairs = Math.min(
                         workPartCount,
                         (controllerStructure.hitsMax - controllerStructure.hits) / REPAIR_POWER,
+                        this.store.energy,
                     )
 
-                    this.store.energy -= workPartCount
+                    this.store.energy -= energySpentOnRepairs
 
                     // Add control points to total controlPoints counter and say the success
 
@@ -347,9 +348,11 @@ Creep.prototype.advancedUpgradeController = function () {
     if (this.upgradeController(room.controller) === OK) {
         // Add control points to total controlPoints counter and say the success
 
+        const energySpentOnUpgrades = Math.min(this.store.energy, this.parts.work * UPGRADE_CONTROLLER_POWER)
+
         if (global.roomStats.commune[this.room.name])
-            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += this.parts.work
-        this.say(`🔋${this.parts.work}`)
+            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += energySpentOnUpgrades
+        this.say(`🔋${energySpentOnUpgrades}`)
 
         // Inform true
 
@@ -396,6 +399,7 @@ Creep.prototype.advancedBuildCSite = function () {
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+            this.store.energy,
         )
 
         if (this.store.energy - energySpentOnConstruction <= 0) this.memory.NR = true
@@ -480,6 +484,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
             (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+            this.store.energy,
         )
 
         this.store.energy -= energySpentOnConstruction
@@ -1543,13 +1548,14 @@ Creep.prototype.passiveHeal = function () {
 
     this.say('PH')
 
-    if (!this.meleed) {
+    if (!this.worked) {
         // If the creep is below max hits
 
         if (this.hitsMax > this.hits) {
             // Have it heal itself and stop
 
             this.heal(this)
+            this.worked = true
             return false
         }
 
@@ -1567,7 +1573,7 @@ Creep.prototype.passiveHeal = function () {
         for (const posData of adjacentCreeps) {
             // If the creep is the posData creep, iterate
 
-            if (this.id === posData.creep.id) continue
+            if (this.name === posData.creep.name) continue
 
             // If the creep is not owned and isn't an ally
 
@@ -1580,6 +1586,7 @@ Creep.prototype.passiveHeal = function () {
             // have the creep heal the adjacentCreep and stop
 
             this.heal(posData.creep)
+            this.worked = true
             return false
         }
     }
@@ -1600,7 +1607,7 @@ Creep.prototype.passiveHeal = function () {
     for (const posData of nearbyCreeps) {
         // If the creep is the posData creep, iterate
 
-        if (this.id === posData.creep.id) continue
+        if (this.name === posData.creep.name) continue
 
         // If the creep is not owned and isn't an ally
 
@@ -1613,6 +1620,7 @@ Creep.prototype.passiveHeal = function () {
         // have the creep rangedHeal the nearbyCreep and stop
 
         this.rangedHeal(posData.creep)
+        this.ranged = true
         return true
     }
 
@@ -1624,13 +1632,14 @@ Creep.prototype.aggressiveHeal = function () {
 
     this.say('AH')
 
-    if (this.meleed) {
+    if (!this.worked) {
         // If the creep is below max hits
 
         if (this.hitsMax > this.hits) {
             // Have it heal itself and stop
 
             this.heal(this)
+            this.worked = true
             return true
         }
     }
@@ -1661,7 +1670,7 @@ Creep.prototype.aggressiveHeal = function () {
         }
     }
 
-    if (this.meleed) return false
+    if (this.worked) return false
 
     this.heal(healTarget)
     return true
