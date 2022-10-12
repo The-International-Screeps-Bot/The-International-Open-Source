@@ -618,7 +618,7 @@ Room.prototype.spawnRequester = function () {
             // For every x energy in storage, add 1 multiplier
 
             if (storage && this.controller.level >= 4)
-                partsMultiplier += storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000
+                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 18000, 2)
 
             const role = 'maintainer'
 
@@ -674,10 +674,10 @@ Room.prototype.spawnRequester = function () {
             // If there is a storage
 
             if (storage && this.controller.level >= 4) {
-                // If the storage is sufficiently full, provide x amount per y enemy in storage
+                // If the storage is sufficiently full, provide x amount per y energy in storage
 
                 if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= this.communeManager.storedEnergyUpgradeThreshold)
-                    partsMultiplier = Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 10000, 2)
+                    partsMultiplier = Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 15000, 2)
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
             }
