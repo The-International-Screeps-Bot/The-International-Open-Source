@@ -192,7 +192,9 @@ class TickConfig {
 
             // If the requested room is no longer neutral
 
-            if (Memory.rooms[roomName].T !== 'neutral') {
+            const type = Memory.rooms[roomName].T
+
+            if (type !== 'neutral' && type !== 'commune') {
                 // Delete the request
 
                 delete Memory.claimRequests[roomName]

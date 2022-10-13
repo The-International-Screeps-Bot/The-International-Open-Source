@@ -1,5 +1,5 @@
 import { allyPlayers, myColors, safemodeTargets } from 'international/constants'
-import { customLog, findObjectWithID } from 'international/utils'
+import { customLog, findObjectWithID, randomTick } from 'international/utils'
 
 Room.prototype.defenceManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -27,7 +27,7 @@ Room.prototype.manageRampartPublicity = function () {
 
         // Stop if the tick is not divisible by a random range
 
-        if (Game.time % Math.floor(Math.random() * 50) !== 0) return
+        if (randomTick(50)) return
 
         // Publicize at most 10 ramparts per tick, to avoid too many intents
 
