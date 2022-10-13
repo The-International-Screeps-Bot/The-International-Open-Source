@@ -1,5 +1,5 @@
 import { ClaimRequestData } from 'international/constants'
-import { findObjectWithID, getRange } from 'international/utils'
+import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
 import { unpackCoord } from 'other/packrat'
 
 export class Vanguard extends Creep {
@@ -24,21 +24,14 @@ export class Vanguard extends Creep {
     travelToSource?(sourceIndex: number): boolean {
         const { room } = this
 
-        this.say('FHP')
-
-        // Try to find a harvestPosition, inform false if it failed
-
-        if (!this.findSourcePos(sourceIndex)) return false
-
         this.say('🚬')
 
-        // Unpack the harvestPos
-
-        const harvestPos = unpackCoord(this.memory.PC)
+        const harvestPos = this.findSourcePos(this.memory.SI)
+        if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRange(this.pos.x, harvestPos.x, this.pos.y, harvestPos.y) === 0) return false
+        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 

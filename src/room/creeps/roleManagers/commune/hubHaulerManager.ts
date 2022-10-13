@@ -1,5 +1,5 @@
 import { linkReceiveTreshold, linkSendThreshold, powerSpawnRefillThreshold } from 'international/constants'
-import { findObjectWithID, unpackNumAsPos } from 'international/utils'
+import { findObjectWithID, getRangeOfCoords, unpackNumAsPos } from 'international/utils'
 
 //import { HubHauler } from '../../creepClasses'
 
@@ -14,7 +14,7 @@ export class HubHauler extends Creep {
 
         // Otherwise if the creep is on the hub, inform false
 
-        if (this.pos.getRangeTo(hubAnchor) === 0) return false
+        if (getRangeOfCoords(this.pos, hubAnchor) === 0) return false
 
         // Otherwise move to the hub and inform true
 
