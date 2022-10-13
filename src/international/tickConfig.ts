@@ -197,7 +197,7 @@ class TickConfig {
             if (type !== 'neutral' && type !== 'commune') {
                 // Delete the request
 
-                delete Memory.claimRequests[roomName]
+                Memory.claimRequests[roomName].data[ClaimRequestData.abandon] = 20000
                 continue
             }
 
