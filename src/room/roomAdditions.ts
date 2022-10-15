@@ -1422,6 +1422,10 @@ Object.defineProperties(Room.prototype, {
 
             if (this.controller && this.controller.my && this.controller.safeMode) return this._enemyThreatCoords
 
+            // If there is no enemy threat
+
+            if (!this.enemyAttackers.length) return this._enemyThreatCoords
+
             const enemyAttackers: Creep[] = []
             const enemyRangedAttackers: Creep[] = []
 

@@ -1725,6 +1725,11 @@ Creep.prototype.reservationManager = function () {
             continue
         }
 
+        if (this.room.enemyThreatCoords.has(packCoord(target.pos))) {
+            this.deleteReservation(index)
+            continue
+        }
+
         if (target instanceof Resource) {
             let { amount } = reservation
 
