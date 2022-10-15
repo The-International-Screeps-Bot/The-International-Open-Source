@@ -1726,6 +1726,7 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (this.room.enemyThreatCoords.has(packCoord(target.pos))) {
+
             this.deleteReservation(index)
             continue
         }

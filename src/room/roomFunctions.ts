@@ -245,7 +245,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                if (opts.creep && !opts.weightStructures.road) {
+                if (opts.creep && (!opts.weightStructures || !opts.weightStructures.road)) {
                     let roadCost = 1
                     if (!opts.creep.memory.R) roadCost = opts.plainCost
 

@@ -28,7 +28,7 @@ export class Quad {
     members: Antifa[]
     leader: Antifa
     expectedSize: 4
-    membersByCoord: { [packedCoord: string]: Antifa } = {}
+    membersByCoord: { [packedCoord: string]: Antifa }
 
     _healStrength: number
 
@@ -70,7 +70,23 @@ export class Quad {
             unsortedMembersByCoord[packCoord(member.pos)] = member
         }
 
+        this.membersByCoord = {
+            [packCoord(this.leader.pos)]: this.leader
+        }
 
+        const packedMemberCoords = [
+            packXYAsCoord(this.leader.pos.x, this.leader.pos.y + 1),
+            packXYAsCoord(this.leader.pos.x + 1, this.leader.pos.y + 1),
+            packXYAsCoord(this.leader.pos.x + 1, this.leader.pos.y),
+        ]
+
+        for (const packedCoord of packedMemberCoords) {
+
+            const member = unsortedMembersByCoord[packedCoord]
+            if (!member) continue
+
+            this.membersByCoord[packedCoord] = member
+        }
     }
     run() {
         this.leader.say(this.type)
