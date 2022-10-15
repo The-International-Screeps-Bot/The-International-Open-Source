@@ -1238,7 +1238,9 @@ Object.defineProperties(Room.prototype, {
             if (this._droppedEnergy) return this._droppedEnergy
 
             return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES, {
-                filter: resource => resource.resourceType === RESOURCE_ENERGY,
+                filter: resource =>
+                    resource.resourceType === RESOURCE_ENERGY &&
+                    resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
             }))
         },
     },
