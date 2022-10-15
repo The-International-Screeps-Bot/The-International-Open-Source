@@ -65,8 +65,6 @@ class TickConfig {
 
             room.myCreepsAmount = 0
 
-            room.roomObjects = {}
-
             room.creepsOfSourceAmount = []
 
             for (const index in room.sources) room.creepsOfSourceAmount.push(0)

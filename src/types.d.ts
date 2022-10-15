@@ -1,6 +1,5 @@
 import { CommuneManager } from './room/communeManager'
 import { RoomManager } from './room/roomManager'
-import { RoomCacheObject } from './room/roomObject'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 
@@ -120,23 +119,12 @@ declare global {
         | 'antifaDismantler'
         | 'antifaDowngrader'
 
-    type RoomObjectName =
-        | 'mineralHarvestPositions'
-        | 'closestMineralHarvestPos'
-        | 'centerUpgradePos'
-        | 'upgradePositions'
-        | 'fastFillerPositions'
-        | 'labContainer'
-        | 'usedMineralHarvestPositions'
-        | 'usedUpgradePositions'
-        | 'usedFastFillerPositions'
+    type QuadTransformTypes = 'rotateLeft' | 'rotateRight'
 
     interface PathGoal {
         pos: RoomPosition
         range: number
     }
-
-    type QuadTransformTypes = 'rotateLeft' | 'rotateRight'
 
     interface PathOpts {
         /**
@@ -154,7 +142,7 @@ declare global {
         flee?: boolean
         creep?: Creep
 
-        weightStructures?: { [weight: string]: StructureConstant[] }
+        weightStructures?: Partial<{ [key in StructureConstant]: number }>
 
         /**
          * An object with keys of weights and values of positions
@@ -707,8 +695,6 @@ declare global {
          * The number of my creeps in the room
          */
         myCreepsAmount: number
-
-        roomObjects: Partial<Record<RoomObjectName, RoomCacheObject>>
 
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
@@ -1511,7 +1497,7 @@ declare global {
         moved?: string | 'moved' | 'yield'
 
         /**
-         * Wether the creep did a heal, attack, dismantle, harvest, build, upgrade, dismantle, or repair this tick
+         * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
          */
         worked: boolean
 
@@ -1519,6 +1505,11 @@ declare global {
          * Wether the creep rangedHealed or rangedAttacked this tick
          */
         ranged: boolean
+
+        /**
+         * Wether the creep healed or attacked this tick
+         */
+        meleed: boolean
 
         /**
          * Whether the creep is actively pulling another creep or not
