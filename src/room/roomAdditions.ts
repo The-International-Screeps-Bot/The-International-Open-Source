@@ -1377,7 +1377,7 @@ Object.defineProperties(Room.prototype, {
                     }
 
                     if (largestValue >= 254) {
-                        this._quadCostMatrix.set(x, y, largestValue)
+                        this._quadCostMatrix.set(x, y, 254)
                         continue
                     }
 
@@ -1394,7 +1394,7 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-            /* this.visualizeCostMatrix(this._quadCostMatrix, true) */
+            this.visualizeCostMatrix(this._quadCostMatrix, true)
 
             return this._quadCostMatrix
         },

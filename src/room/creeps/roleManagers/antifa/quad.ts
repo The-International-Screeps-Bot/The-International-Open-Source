@@ -1,9 +1,4 @@
-import {
-    myColors,
-    quadAttackMemberOffsets,
-    quadTransformIndexes,
-    quadTransformOffsets,
-} from 'international/constants'
+import { myColors, quadAttackMemberOffsets, quadTransformIndexes, quadTransformOffsets, roomDimensions } from 'international/constants'
 import {
     areCoordsEqual,
     arePositionsEqual,
@@ -92,6 +87,8 @@ export class Quad {
 
         if (!this.getInFormation()) return
 
+        this.leader.say('IF')
+
         if (this.leader.room.name === this.leader.memory.CRN) {
             this.advancedHeal()
             this.runCombat()
@@ -120,6 +117,7 @@ export class Quad {
         if (this.leader.isOnExit()) return true
 
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
+            /*
             this.leader.createMoveRequest({
                 goals: [
                     {
@@ -130,8 +128,8 @@ export class Quad {
                 flee: true,
             })
             return false
-
-            /* return true */
+ */
+            return true
         }
 
         let inFormation = true
@@ -197,10 +195,10 @@ export class Quad {
                     },
                 ],
             })
+
             inFormation = false
         }
 
-        if (inFormation) return this.transform('tradeVertical')
         return inFormation
     }
 
@@ -282,15 +280,12 @@ export class Quad {
 
             const newIndex = newIndexes[i]
             newMemberNames[newIndex] = member.name
-
-            member.room.visual.text(newIndex.toString(), member.pos)
         }
 
         for (const member of this.members) {
             member.memory.SMNs = newMemberNames
         }
 
-        /* this.leader.room.visual.text('G', this.leader.pos) */
         return true
     }
 
