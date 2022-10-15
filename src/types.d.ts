@@ -119,7 +119,7 @@ declare global {
         | 'antifaDismantler'
         | 'antifaDowngrader'
 
-    type QuadTransformTypes = 'rotateLeft' | 'rotateRight'
+    type QuadTransformTypes = 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
 
     interface PathGoal {
         pos: RoomPosition

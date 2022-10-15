@@ -1,7 +1,7 @@
 import {
     myColors,
     quadAttackMemberOffsets,
-    quadTransformIndexChange,
+    quadTransformIndexes,
     quadTransformOffsets,
 } from 'international/constants'
 import {
@@ -71,7 +71,7 @@ export class Quad {
         }
 
         this.membersByCoord = {
-            [packCoord(this.leader.pos)]: this.leader
+            [packCoord(this.leader.pos)]: this.leader,
         }
 
         const packedMemberCoords = [
@@ -81,7 +81,6 @@ export class Quad {
         ]
 
         for (const packedCoord of packedMemberCoords) {
-
             const member = unsortedMembersByCoord[packedCoord]
             if (!member) continue
 
@@ -121,17 +120,18 @@ export class Quad {
         if (this.leader.isOnExit()) return true
 
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
-            /*
             this.leader.createMoveRequest({
-                goals: [{
-                    pos: this.leader.pos,
-                    range: 1,
-                }],
+                goals: [
+                    {
+                        pos: this.leader.pos,
+                        range: 1,
+                    },
+                ],
                 flee: true,
             })
             return false
- */
-            return true
+
+            /* return true */
         }
 
         let inFormation = true
@@ -200,7 +200,7 @@ export class Quad {
             inFormation = false
         }
 
-        if (inFormation) return this.transform('rotateLeft')
+        if (inFormation) return this.transform('tradeVertical')
         return inFormation
     }
 
@@ -269,23 +269,28 @@ export class Quad {
         if (!this.canMove) return false
 
         const transformOffsets = quadTransformOffsets[transformType]
-        const indexChange = quadTransformIndexChange[transformType]
-        const newMembers = []
+        const newIndexes = quadTransformIndexes[transformType]
+        const membersByCoordArray = Object.values(this.membersByCoord)
+        const newMemberNames: string[] = []
 
-        for (let i = 0; i < this.members.length; i++) {
-            const member = this.members[i]
+        for (let i = 0; i < membersByCoordArray.length; i++) {
+            const member = membersByCoordArray[i]
+            if (!member) continue
+
             const offset = transformOffsets[i]
-
             member.assignMoveRequest({ x: member.pos.x + offset.x, y: member.pos.y + offset.y })
 
-            const newIndex = i > 4 ? i + (indexChange % 4) : i
+            const newIndex = newIndexes[i]
+            newMemberNames[newIndex] = member.name
+
             member.room.visual.text(newIndex.toString(), member.pos)
-            newMembers[newIndex] = member
         }
 
-        this.members = newMembers
-        this.leader = newMembers[0]
-        this.leader.room.visual.text('G', this.leader.pos)
+        for (const member of this.members) {
+            member.memory.SMNs = newMemberNames
+        }
+
+        /* this.leader.room.visual.text('G', this.leader.pos) */
         return true
     }
 

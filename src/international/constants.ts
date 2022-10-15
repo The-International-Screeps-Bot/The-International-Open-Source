@@ -33,7 +33,16 @@ export const roomStats: 0 | 1 | 2 = 2
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian', 'Aerics', 'PlaidRabbit']
+export const allyPlayers = [
+    'MarvinTMB',
+    'PandaMaster',
+    'lokenwow',
+    'LittleBitBlue',
+    'DefaultO',
+    'Allorrian',
+    'Aerics',
+    'PlaidRabbit',
+]
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -94,8 +103,6 @@ interface RoomTypeProperties {
 }
 
 export const roomTypeProperties: RoomTypeProperties = {
-
-
     remotes: true,
     deposits: true,
     powerBanks: true,
@@ -124,8 +131,6 @@ export const roomTypeProperties: RoomTypeProperties = {
 
 export const roomTypes: Record<RoomTypes, RoomType> = {
     commune: {
-
-
         remotes: true,
         deposits: true,
         powerBanks: true,
@@ -135,7 +140,6 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
     },
     remote: {
         commune: true,
-
 
         SE: true,
         RE: true,
@@ -1058,10 +1062,6 @@ export const defaultCreepSwampCost = 8
 
 export const quadAttackMemberOffsets = [
     {
-        x: 1,
-        y: 0,
-    },
-    {
         x: 0,
         y: 1,
     },
@@ -1069,13 +1069,17 @@ export const quadAttackMemberOffsets = [
         x: 1,
         y: 1,
     },
+    {
+        x: 1,
+        y: 0,
+    },
 ]
 
-export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number; }[]> = {
+export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number }[]> = {
     rotateLeft: [
         {
             x: 0,
-            y: 1
+            y: 1,
         },
         {
             x: 1,
@@ -1083,34 +1087,72 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
         },
         {
             x: 0,
-            y: - 1
+            y: -1,
         },
         {
-            x: - 1,
-            y: 0
+            x: -1,
+            y: 0,
         },
     ],
     rotateRight: [
         {
+            x: 1,
+            y: 0,
+        },
+        {
             x: 0,
-            y: 1
+            y: -1,
+        },
+        {
+            x: -1,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: 1,
+        },
+    ],
+    tradeHorizontal: [
+        {
+            x: 1,
+            y: 0,
         },
         {
             x: 1,
             y: 0,
         },
         {
-            x: 0,
-            y: - 1
+            x: -1,
+            y: 0,
         },
         {
-            x: - 1,
-            y: 0
+            x: -1,
+            y: 0,
         },
-    ]
+    ],
+    tradeVertical: [
+        {
+            x: 0,
+            y: 1,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+        {
+            x: 0,
+            y: 1,
+        },
+    ],
 }
 
-export const quadTransformIndexChange: Record<QuadTransformTypes, number> = {
-    rotateLeft: 1,
-    rotateRight: -1,
+export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
+    rotateLeft: [1, 2, 3, 0],
+    rotateRight: [3, 2, 1, 0],
+    tradeHorizontal: [3, 2, 1, 0],
+    tradeVertical: [1, 0, 3, 2],
 }
