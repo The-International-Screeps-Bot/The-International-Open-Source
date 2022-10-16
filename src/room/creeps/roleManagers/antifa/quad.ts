@@ -102,17 +102,15 @@ export class Quad {
     run() {
         this.leader.say(this.type)
 
+        if (this.runCombatRoom()) return
+
         if (!this.getInFormation()) return
 
         this.leader.say('IF')
 
-        this.passiveHeal()
+        if (this.leader.room.enemyAttackers.length) this.advancedRangedAttack()
 
-        if (this.leader.room.name === this.leader.memory.CRN) {
-            this.advancedHeal()
-            this.runCombat()
-            return
-        }
+        this.passiveHeal()
 
         this.passiveRangedAttack()
 
@@ -129,6 +127,21 @@ export class Quad {
                 keeper: Infinity,
             },
         })
+    }
+
+    runCombatRoom() {
+        if (this.leader.room.name !== this.leader.memory.CRN) return false
+
+        if (!this.leader.room.enemyAttackers.length && !this.leader.room.structures.tower.length) {
+            for (const member of this.members) member.runSingle()
+            return true
+        }
+
+        if (!this.getInFormation()) return true
+
+        this.advancedHeal()
+        this.runCombat()
+        return true
     }
 
     getInFormation(): boolean {
@@ -224,8 +237,17 @@ export class Quad {
         return inFormation
     }
 
+    holdFormation() {
+
+        for (const member of this.members) member.moved = 'moved'
+    }
+
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
-        if (!this.canMove) return false
+        if (!this.canMove) {
+
+            this.holdFormation()
+            return false
+        }
 
         this.leader.say('R')
 
@@ -283,7 +305,11 @@ export class Quad {
     }
 
     transform(transformType: QuadTransformTypes) {
-        if (!this.canMove) return false
+        if (!this.canMove) {
+
+            this.holdFormation()
+            return false
+        }
 
         const transformOffsets = quadTransformOffsets[transformType]
         const newIndexes = quadTransformIndexes[transformType]
@@ -309,8 +335,13 @@ export class Quad {
     }
 
     runCombat() {
-        if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.leader.memory.ST === 'attack') return this.advancedAttack()
+        if (this.leader.memory.ST === 'rangedAttack') {
+            if (this.advancedRangedAttack()) return true
+            if (this.rangedAttackStructures()) return true
+        }
+        if (this.leader.memory.ST === 'attack') {
+            if (this.advancedAttack()) return true
+        }
         return this.advancedDismantle()
     }
 
@@ -357,7 +388,17 @@ export class Quad {
         }
     }
 
-    rangedAttackWithOwner(target: Creep | AnyOwnedStructure) {
+    rangedAttack(target: Creep | Structure) {
+        if (!(target as AnyOwnedStructure).owner) {
+            for (const member of this.members) {
+                if (getRangeOfCoords(member.pos, target.pos) > 3) continue
+
+                member.rangedAttack(target)
+            }
+
+            return
+        }
+
         for (const member of this.members) {
             const range = getRangeOfCoords(member.pos, target.pos)
             if (range > 3) continue
@@ -419,7 +460,7 @@ export class Quad {
             }
 
             if (range < 3) {
-                this.rangedAttackWithOwner(enemyCreep)
+                this.rangedAttack(enemyCreep)
             }
 
             return true
@@ -452,7 +493,7 @@ export class Quad {
 
         this.leader.say('AEA')
 
-        this.rangedAttackWithOwner(enemyAttacker)
+        this.rangedAttack(enemyAttacker)
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
@@ -487,7 +528,7 @@ export class Quad {
     }
 
     rangedAttackStructures() {
-        const structures = this.leader.room.dismantleableTargets
+        const structures = this.leader.room.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -495,7 +536,9 @@ export class Quad {
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
 
-        if (getRange(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3) {
+        const range = this.findMinRange(structure.pos)
+
+        if (range > 1) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -504,36 +547,17 @@ export class Quad {
             return false
         }
 
-        for (let i = 1; i < this.members.length; i++) {
-            const member = this.members[i]
-            member.rangedAttack(structure)
-        }
+        if (range > 3) return false
 
-        if (this.leader.rangedAttack(structure) !== OK) return false
-
-        // See if the structure is destroyed next tick
-
-        structure.realHits = structure.hits - this.leader.parts.ranged_attack * RANGED_ATTACK_POWER
-        if (structure.realHits > 0) return true
-
-        // Try to find a new structure to preemptively move to
-
-        structures.splice(structures.indexOf(structure), 1)
-        if (!structures.length) return true
-
-        structure = findClosestObject(this.leader.pos, structures)
-
-        if (getRange(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 3) {
-            this.createMoveRequest({
-                origin: this.leader.pos,
-                goals: [{ pos: structure.pos, range: 3 }],
-            })
-        }
-
+        this.rangedAttack(structure)
         return true
     }
-    advancedAttack() {}
-    advancedDismantle() {}
+    advancedAttack() {
+        return true
+    }
+    advancedDismantle() {
+        return true
+    }
     advancedHeal() {
         for (const member1 of this.members) {
             if (member1.hits === member1.hitsMax) continue

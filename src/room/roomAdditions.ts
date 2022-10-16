@@ -340,11 +340,11 @@ Object.defineProperties(Room.prototype, {
             return this._spawningStructuresByNeed
         },
     },
-    dismantleableTargets: {
+    dismantleTargets: {
         get() {
-            if (this._dismantleableTargets) return this._dismantleableTargets
+            if (this._dismantleTargets) return this._dismantleTargets
 
-            return (this._dismantleableTargets = this.find(FIND_STRUCTURES, {
+            return (this._dismantleTargets = this.find(FIND_STRUCTURES, {
                 filter: structure =>
                     (structure as OwnedStructure).owner &&
                     !(structure as OwnedStructure).my &&
@@ -352,6 +352,36 @@ Object.defineProperties(Room.prototype, {
                     structure.structureType !== STRUCTURE_INVADER_CORE,
             }))
         },
+    },
+    destructableStructures: {
+        get() {
+            if (this._destructableStructures) return this._destructableStructures
+
+            return (this._dismantleTargets = this.find(FIND_STRUCTURES, {
+                filter: structure =>
+                    structure.structureType !== STRUCTURE_CONTROLLER &&
+                    structure.structureType !== STRUCTURE_INVADER_CORE,
+            }))
+        }
+    },
+    combatStructureTargets: {
+        get() {
+            if (!this._combatStructureTargets) return this._combatStructureTargets
+
+            this._combatStructureTargets = []
+
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.tower)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.extension)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.storage)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.terminal)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.powerSpawn)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.factory)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.nuker)
+            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.observer)
+
+            return this._combatStructureTargets
+        }
     },
     sourcePositions: {
         get() {
@@ -1379,7 +1409,11 @@ Object.defineProperties(Room.prototype, {
                     if (largestValue >= 254) {
                         this._quadCostMatrix.set(x, y, 254)
 
-                        this._quadCostMatrix.set(x, y, Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 254)))
+                        this._quadCostMatrix.set(
+                            x,
+                            y,
+                            Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 254)),
+                        )
                         continue
                     }
 

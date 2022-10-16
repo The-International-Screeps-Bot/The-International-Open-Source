@@ -859,7 +859,7 @@ Room.prototype.createHarassCombatRequest = function () {
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
 
-    const structures = this.dismantleableTargets
+    const structures = this.dismantleTargets
 
     let totalHits = 0
     for (const structure of structures) totalHits += structure.hits

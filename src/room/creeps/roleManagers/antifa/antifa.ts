@@ -35,9 +35,7 @@ export class Antifa extends Creep {
             }
 
             if (this.memory.SMNs.length === this.memory.SS) {
-
                 for (const member of members) {
-
                     member.memory.SF = true
                 }
 
@@ -61,7 +59,7 @@ export class Antifa extends Creep {
         // The creep should be single
 
         if (!this.memory.SS) return false
-        if (this.memory.SMNs.length === 1) return false
+        if (this.memory.SF && this.memory.SMNs.length === 1) return false
 
         // The squad has already been run
 
@@ -82,7 +80,6 @@ export class Antifa extends Creep {
             const members: Antifa[] = []
 
             for (const memberName of this.memory.SMNs) {
-
                 const creep = Game.creeps[memberName]
                 if (!creep) continue
 
@@ -130,7 +127,6 @@ export class Antifa extends Creep {
     }
 
     createSquad?(members: Antifa[]) {
-
         if (this.memory.SMNs.length === 2) {
             this.squad = new Duo(members)
             return
@@ -332,7 +328,7 @@ export class Antifa extends Creep {
     rangedAttackStructures?() {
         this.say('RAS')
 
-        const structures = this.room.dismantleableTargets
+        const structures = this.room.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -443,7 +439,7 @@ export class Antifa extends Creep {
     attackStructures?() {
         this.say('AS')
 
-        const structures = this.room.dismantleableTargets
+        const structures = this.room.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -486,7 +482,7 @@ export class Antifa extends Creep {
     advancedDismantle?() {
         // Avoid targets we can't dismantle
 
-        const structures = this.room.dismantleableTargets
+        const structures = this.room.combatStructureTargets
 
         if (!structures.length) return false
 

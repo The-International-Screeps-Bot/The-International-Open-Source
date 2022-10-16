@@ -43,7 +43,6 @@ export class Duo {
         this.leader = members[0]
 
         for (const member of members) {
-
             member.squad = this
             member.squadRan = true
         }
@@ -264,7 +263,7 @@ export class Duo {
     }
 
     rangedAttackStructures() {
-        const structures = this.leader.room.dismantleableTargets
+        const structures = this.leader.room.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -382,7 +381,7 @@ export class Duo {
     }
 
     attackStructures() {
-        const structures = this.leader.room.dismantleableTargets
+        const structures = this.leader.room.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -426,7 +425,7 @@ export class Duo {
     advancedDismantle() {
         // Avoid targets we can't dismantle
 
-        const structures = this.leader.room.dismantleableTargets
+        const structures = this.leader.room.combatStructureTargets
 
         if (!structures.length) return false
 

@@ -762,7 +762,7 @@ declare global {
         /**
          * The number of my creeps in the room
          */
-         myCreepsAmount: number
+        myCreepsAmount: number
 
         /**
          * An object with keys of roles with properties of arrays of power creep names belonging to the role
@@ -1206,9 +1206,17 @@ declare global {
 
         readonly taskNeedingSpawningStructures: SpawningStructures
 
-        _dismantleableTargets: Structure[]
+        _dismantleTargets: Structure[]
 
-        readonly dismantleableTargets: Structure[]
+        readonly dismantleTargets: Structure[]
+
+        _destructableStructures: Structure[]
+
+        readonly destructableStructures: Structure[]
+
+        _combatStructureTargets: Structure[]
+
+        readonly combatStructureTargets: Structure[]
 
         // Resource info
 
@@ -1689,17 +1697,17 @@ declare global {
         /**
          * The packed position of the moveRequest, if one has been made
          */
-         moveRequest: string
+        moveRequest: string
 
-         /**
-          * Wether the creep moved a resource this tick
-          */
-         movedResource: boolean
+        /**
+         * Wether the creep moved a resource this tick
+         */
+        movedResource: boolean
 
-         /**
-          * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
-          */
-         moved?: string | 'moved' | 'yield'
+        /**
+         * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
+         */
+        moved?: string | 'moved' | 'yield'
 
         /**
          * The creep's opts when trying to make a moveRequest intra tick
@@ -1710,7 +1718,6 @@ declare global {
     // Creeps
 
     interface Creep extends CreepFunctions, CreepProperties {
-
         /**
          * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
          */
@@ -1979,12 +1986,9 @@ declare global {
          * Wether the creep has used a power this tick
          */
         powered: boolean
-
     }
 
-    interface PowerCreepMemory {
-
-    }
+    interface PowerCreepMemory {}
 
     // Structures
 
