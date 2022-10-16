@@ -1082,33 +1082,53 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteNeeds[RemoteData.minDamage] + remoteNeeds[RemoteData.minHeal] <= 0) return false
 
-                const minCost = 400
-                const cost = 900
-                const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
-                const rangedAttackStrength = RANGED_ATTACK_POWER * 2
-                const healStrength = HEAL_POWER
+                let totalCost = 999999
+                let extraParts = []
+                let partsMultiplier = 0
+                let minCost = 0
 
-                // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
+                // BODY for a defender against other players
+                if (remoteNeeds[RemoteData.attackByInvader] == 0) {
+                    const rangedAttackStrength = RANGED_ATTACK_POWER * 2
+                    const healStrength = HEAL_POWER
 
-                if (spawnEnergyCapacity < minCost) return false
+                    extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
+                    partsMultiplier = Math.max(
+                        remoteNeeds[RemoteData.minDamage] / rangedAttackStrength +
+                            remoteNeeds[RemoteData.minHeal] / healStrength,
+                        1,
+                    )
+                    minCost = 700
+                    totalCost = minCost * partsMultiplier
+                }
+
+                // BODY for a defender against an invader
+                else {
+                    if (remoteNeeds[RemoteData.attackByInvader] == 1) {
+                        extraParts = Array(remoteNeeds[RemoteData.minDamage] + 2).fill(ATTACK)
+                        totalCost = (remoteNeeds[RemoteData.minDamage] + 2) * BODYPART_COST[ATTACK]
+                    } else {
+                        extraParts = Array(remoteNeeds[RemoteData.minDamage] + 2).fill(RANGED_ATTACK)
+                        totalCost = (remoteNeeds[RemoteData.minDamage] + 2) * BODYPART_COST[RANGED_ATTACK]
+                    }
+
+                    const bodyMove = Array(extraParts.length * 2 + 2).fill(MOVE)
+                    Array.prototype.push.apply(extraParts, bodyMove)
+                    extraParts = extraParts.reverse()
+
+                    partsMultiplier = 1
+                    totalCost += bodyMove.length * BODYPART_COST[MOVE]
+                    minCost = totalCost
+                }
 
                 // If max spawnable strength is less that needed
 
-                if (
-                    rangedAttackStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteData.minDamage] ||
-                    healStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteData.minHeal]
-                ) {
+                if (spawnEnergyCapacity < totalCost) {
                     // Abandon the this for some time
 
                     Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
-
-                const partsMultiplier = Math.max(
-                    remoteNeeds[RemoteData.minDamage] / rangedAttackStrength +
-                        remoteNeeds[RemoteData.minHeal] / healStrength,
-                    1,
-                )
 
                 const role = 'remoteDefender'
 

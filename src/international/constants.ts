@@ -33,7 +33,16 @@ export const roomStats: 0 | 1 | 2 = 2
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const allyPlayers = ['MarvinTMB', 'PandaMaster', 'lokenwow', 'LittleBitBlue', 'DefaultO', 'Allorrian', 'Aerics', 'PlaidRabbit']
+export const allyPlayers = [
+    'MarvinTMB',
+    'PandaMaster',
+    'lokenwow',
+    'LittleBitBlue',
+    'DefaultO',
+    'Allorrian',
+    'Aerics',
+    'PlaidRabbit',
+]
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -792,6 +801,7 @@ export enum RemoteData {
     enemyReserved,
     invaderCore,
     abandon,
+    attackByInvader,
 }
 
 export const RemoteData_HaulerByIndex: RemoteData[] = [RemoteData.remoteHauler0, RemoteData.remoteHauler1]
@@ -1066,11 +1076,11 @@ export const quadAttackMemberOffsets = [
     },
 ]
 
-export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number; }[]> = {
+export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number }[]> = {
     rotateLeft: [
         {
             x: 0,
-            y: 1
+            y: 1,
         },
         {
             x: 1,
@@ -1078,17 +1088,17 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
         },
         {
             x: 0,
-            y: - 1
+            y: -1,
         },
         {
-            x: - 1,
-            y: 0
+            x: -1,
+            y: 0,
         },
     ],
     rotateRight: [
         {
             x: 0,
-            y: 1
+            y: 1,
         },
         {
             x: 1,
@@ -1096,13 +1106,13 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
         },
         {
             x: 0,
-            y: - 1
+            y: -1,
         },
         {
-            x: - 1,
-            y: 0
+            x: -1,
+            y: 0,
         },
-    ]
+    ],
 }
 
 export const quadTransformIndexChange: Record<QuadTransformTypes, number> = {

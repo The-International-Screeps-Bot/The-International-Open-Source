@@ -1,6 +1,7 @@
 import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles } from 'international/constants'
 import { customLog, findCarryPartsRequired } from 'international/utils'
 import { CommuneManager } from './communeManager'
+import { creepClasses } from './creeps/creepClasses'
 
 export class RemotesManager {
     communeManager: CommuneManager
@@ -67,10 +68,23 @@ export class RemotesManager {
             if (remote) {
                 remoteMemory.data[RemoteData.minDamage] = 0
                 remoteMemory.data[RemoteData.minHeal] = 0
+                remoteMemory.data[RemoteData.attackByInvader] = 0
 
                 // Increase the defenderNeed according to the enemy attackers' combined strength
 
                 for (const enemyCreep of remote.enemyCreeps) {
+                    if (enemyCreep.owner.username === 'Invader' && remote.enemyCreeps.length == 1) {
+                        if (enemyCreep.getActiveBodyparts(RANGED_ATTACK)) {
+                            remoteMemory.data[RemoteData.attackByInvader] = 2
+                            remoteMemory.data[RemoteData.minDamage] = enemyCreep.getActiveBodyparts(RANGED_ATTACK)
+                        } else {
+                            remoteMemory.data[RemoteData.attackByInvader] = 1
+                            remoteMemory.data[RemoteData.minDamage] = enemyCreep.getActiveBodyparts(ATTACK)
+                        }
+
+                        continue
+                    }
+
                     remoteMemory.data[RemoteData.minDamage] += 10 + enemyCreep.healStrength
                     remoteMemory.data[RemoteData.minHeal] += enemyCreep.attackStrength
                 }
@@ -93,12 +107,7 @@ export class RemotesManager {
 
             // If the remote is assumed to be reserved by an enemy
 
-            if (
-                remoteMemory.data[RemoteData.enemyReserved] ||
-                remoteMemory.data[RemoteData.invaderCore] ||
-                remoteMemory.data[RemoteData.minDamage] > 0 ||
-                remoteMemory.data[RemoteData.minHeal] > 0
-            ) {
+            if (remoteMemory.data[RemoteData.enemyReserved] || remoteMemory.data[RemoteData.invaderCore]) {
                 remoteMemory.data[RemoteData.source1RemoteHarvester] = 0
                 remoteMemory.data[RemoteData.source2RemoteHarvester] = 0
                 remoteMemory.data[RemoteData.remoteHauler0] = 0
