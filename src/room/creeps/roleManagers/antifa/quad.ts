@@ -61,7 +61,6 @@ export class Quad {
         const unsortedMembersByCoord: { [packedCoord: string]: Antifa } = {}
 
         for (const member of members) {
-            member.memory.SF = true
             unsortedMembersByCoord[packCoord(member.pos)] = member
         }
 

@@ -282,6 +282,74 @@ declare global {
         extraOpts: ExtraOpts
     }
 
+    type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
+
+    interface LogisticTask {
+        ID: number
+        Type: LogisticTaskTypes
+        TargetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
+        ResourceType: ResourceConstant
+    }
+
+    interface CreepLogisticTask {
+        /**
+         * The Type of logistic task
+         */
+        T: LogisticTaskTypes
+        /**
+         * The Amount of resources involved
+         */
+        A: number
+        /**
+         * The Resource Type involved
+         */
+        RT: ResourceConstant
+    }
+
+    interface CreepLogisticTansferTask extends CreepLogisticTask {
+        /**
+         * The Type of logistic task
+         */
+        T: 'transfer'
+        /**
+         * Target ID
+         */
+        TID: Id<AnyStoreStructure>
+    }
+
+    interface CreepLogisticWithdrawTask extends CreepLogisticTask {
+        /**
+         * The Type of logistic task
+         */
+        T: 'withdraw'
+        /**
+         * Target ID
+         */
+        TID: Id<AnyStoreStructure | Tombstone | Ruin | Creep>
+    }
+
+    interface CreepLogisticPickupTask extends CreepLogisticTask {
+        /**
+         * The Type of logistic task
+         */
+        T: 'pickup'
+        /**
+         * Target ID
+         */
+        TID: Id<AnyStoreStructure>
+    }
+
+    interface CreepLogisticOfferTask extends CreepLogisticTask {
+        /**
+         * The Type of logistic task
+         */
+        T: 'offer'
+        /**
+         * Target ID
+         */
+        TID: Id<AnyStoreStructure>
+    }
+
     type Reservations = 'transfer' | 'withdraw' | 'pickup'
 
     interface Reservation {
@@ -694,7 +762,17 @@ declare global {
         /**
          * The number of my creeps in the room
          */
-        myCreepsAmount: number
+         myCreepsAmount: number
+
+        /**
+         * An object with keys of roles with properties of arrays of power creep names belonging to the role
+         */
+        myPowerCreeps: { [key in PowerClassConstant]?: string[] }
+
+        /**
+         * The number of my power creeps in the room
+         */
+        myPowerCreepsAmount: number
 
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
@@ -1478,58 +1556,7 @@ declare global {
         }
     }
 
-    // Creeps
-
-    interface Creep {
-        /**
-         * The packed position of the moveRequest, if one has been made
-         */
-        moveRequest: string
-
-        /**
-         * Wether the creep moved a resource this tick
-         */
-        movedResource: boolean
-
-        /**
-         * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
-         */
-        moved?: string | 'moved' | 'yield'
-
-        /**
-         * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
-         */
-        worked: boolean
-
-        /**
-         * Wether the creep rangedHealed or rangedAttacked this tick
-         */
-        ranged: boolean
-
-        /**
-         * Wether the creep healed or attacked this tick
-         */
-        meleed: boolean
-
-        /**
-         * Whether the creep is actively pulling another creep or not
-         */
-        pulling: boolean
-
-        /**
-         * Whether the creep is actively getting pulled by another creep or not
-         */
-        gettingPulled: boolean
-
-        /**
-         * The creep's opts when trying to make a moveRequest intra tick
-         */
-        pathOpts: PathOpts
-
-        squad: Duo | Quad | undefined
-
-        // Functions
-
+    interface CreepFunctions {
         preTickManager(): void
 
         endTickManager(): void
@@ -1619,8 +1646,6 @@ declare global {
 
         advancedRecycle(): boolean
 
-        advancedRenew(): void
-
         advancedReserveController(): boolean
 
         findCost(): number
@@ -1658,6 +1683,64 @@ declare global {
         reservationManager(): void
 
         fulfillReservation(): boolean
+    }
+
+    interface CreepProperties {
+        /**
+         * The packed position of the moveRequest, if one has been made
+         */
+         moveRequest: string
+
+         /**
+          * Wether the creep moved a resource this tick
+          */
+         movedResource: boolean
+
+         /**
+          * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
+          */
+         moved?: string | 'moved' | 'yield'
+
+        /**
+         * The creep's opts when trying to make a moveRequest intra tick
+         */
+        pathOpts: PathOpts
+    }
+
+    // Creeps
+
+    interface Creep extends CreepFunctions, CreepProperties {
+
+        /**
+         * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
+         */
+        worked: boolean
+
+        /**
+         * Wether the creep rangedHealed or rangedAttacked this tick
+         */
+        ranged: boolean
+
+        /**
+         * Wether the creep healed or attacked this tick
+         */
+        meleed: boolean
+
+        /**
+         * Whether the creep is actively pulling another creep or not
+         */
+        pulling: boolean
+
+        /**
+         * Whether the creep is actively getting pulled by another creep or not
+         */
+        gettingPulled: boolean
+
+        squad: Duo | Quad | undefined
+
+        // Creep Functions
+
+        advancedRenew(): void
 
         // Creep Getters
 
@@ -1883,9 +1966,17 @@ declare global {
 
     // PowerCreeps
 
-    interface PowerCreep {}
+    interface PowerCreep extends CreepFunctions, CreepProperties {
+        /**
+         * Wether the creep has used a power this tick
+         */
+        powered: boolean
 
-    interface PowerCreepMemory {}
+    }
+
+    interface PowerCreepMemory {
+
+    }
 
     // Structures
 

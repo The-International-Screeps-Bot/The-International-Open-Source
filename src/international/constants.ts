@@ -218,6 +218,8 @@ export const creepRoles: CreepRoles[] = [
     'antifaDowngrader',
 ]
 
+export const powerCreepClassNames: PowerClassConstant[] = ['operator']
+
 export enum TrafficPriorities {
     remoteHauler,
     hauler,

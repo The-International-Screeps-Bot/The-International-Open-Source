@@ -42,8 +42,6 @@ export class Duo {
     constructor(members: Antifa[]) {
         this.members = members
         this.leader = members[0]
-
-        for (const member of this.members) member.memory.SF = true
     }
 
     run() {

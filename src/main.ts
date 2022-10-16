@@ -38,6 +38,8 @@ import { respawnManager } from './international/respawnManager'
 import { tickConfig } from './international/tickConfig'
 import { allyManager } from 'international/simpleAllies'
 import ExecutePandaMasterCode from './other/PandaMaster/Execute'
+import { creepOrganizer } from './international/creepOrganizer'
+import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 
 global.profiler = initProfiler()
 
@@ -60,7 +62,8 @@ export const loop = function () {
     respawnManager.run()
     configManager.run()
     tickConfig.run()
-    internationalManager.creepOrganizer()
+    creepOrganizer.run()
+    powerCreepOrganizer.run()
     internationalManager.constructionSiteManager()
     internationalManager.orderManager()
 

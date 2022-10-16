@@ -20,7 +20,7 @@ export class Antifa extends Creep {
 
         internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
 
-        const squadMembers: Antifa[] = [this]
+        const members: Antifa[] = [this]
 
         if (this.memory.SMNs) {
             for (let i = 0; i < this.memory.SMNs.length; i++) {
@@ -31,16 +31,22 @@ export class Antifa extends Creep {
                     break
                 }
 
-                squadMembers.push(creep)
+                members.push(creep)
             }
 
             if (this.memory.SMNs.length === this.memory.SS) {
+
+                for (const member of members) {
+
+                    member.memory.SF = true
+                }
+
                 if (this.memory.SS === 2) {
-                    this.squad = new Duo(squadMembers)
+                    this.squad = new Duo(members)
                     return
                 }
 
-                this.squad = new Quad(squadMembers)
+                this.squad = new Quad(members)
                 return
             }
         }
@@ -109,6 +115,7 @@ export class Antifa extends Creep {
             const member = Game.creeps[memberName]
 
             member.memory.SMNs = this.memory.SMNs
+            member.memory.SF = true
             members.push(member)
         }
 

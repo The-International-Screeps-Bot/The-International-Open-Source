@@ -1,4 +1,5 @@
-import './creepFunctions'
+import './creepPrototypes/creepFunctions'
+import './creepPrototypes/creepMoveFunctions'
 
 import { creepRoles, myColors } from 'international/constants'
 import { customLog } from 'international/utils'
@@ -28,7 +29,7 @@ import { RoomManager } from 'room/roomManager'
 
 // Construct managers
 
-const managers: Record<CreepRoles, Function> = {
+const managers:  { [key in CreepRoles]: Function } = {
     meleeDefender: MeleeDefender.meleeDefenderManager,
     allyVanguard: AllyVanguard.allyVanguardManager,
     antifaRangedAttacker: Antifa.antifaManager,

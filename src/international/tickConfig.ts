@@ -7,6 +7,7 @@ import {
     creepRoles,
     haulerUpdateDefault,
     myColors,
+    powerCreepClassNames,
     RemoteData,
     remoteRoles,
     stamps,
@@ -17,6 +18,7 @@ import { statsManager } from './statsManager'
 import '../room/haulerSize'
 import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/communeManager'
+import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 
 class TickConfig {
     public run() {
@@ -63,7 +65,12 @@ class TickConfig {
 
             for (const role of creepRoles) room.myCreeps[role] = []
 
+            room.myPowerCreeps = {}
+
+            for (const className of powerCreepClassNames) room.myPowerCreeps[className] = []
+
             room.myCreepsAmount = 0
+            room.myPowerCreepsAmount = 0
 
             room.creepsOfSourceAmount = []
 
