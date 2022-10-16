@@ -1392,11 +1392,16 @@ Room.prototype.spawnRequester = function () {
                     const extraParts: BodyPartConstant[] = []
 
                     for (let i = 0; i < rangedAttackAmount; i++) {
-                        extraParts.push(RANGED_ATTACK, MOVE)
+                        extraParts.push(RANGED_ATTACK)
+                    }
+
+                    for (let i = 0; i < rangedAttackAmount + healAmount; i++) {
+
+                        extraParts.push(MOVE)
                     }
 
                     for (let i = 0; i < healAmount; i++) {
-                        extraParts.push(HEAL, MOVE)
+                        extraParts.push(HEAL)
                     }
 
                     return {

@@ -282,6 +282,8 @@ declare global {
         extraOpts: ExtraOpts
     }
 
+    type FlagNames = 'disableTowers'
+
     type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
     interface LogisticTask {
@@ -1322,6 +1324,10 @@ declare global {
 
         readonly enemyThreatCoords: Set<string>
 
+        _flags: Partial<{ [key in FlagNames]: Flag }>
+
+        readonly flags: { [key in FlagNames]: Flag }
+
         // Target finding
 
         _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
@@ -2151,6 +2157,7 @@ declare global {
                 communeName?: string,
                 minDamage?: number,
                 minHeal?: number,
+                quadCount?: number,
             ): string
 
             /**

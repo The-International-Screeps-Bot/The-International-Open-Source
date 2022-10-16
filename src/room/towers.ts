@@ -6,6 +6,7 @@ Room.prototype.towerManager = function () {
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
+    if (this.flags.disableTowers) return
     if (!this.structures.tower.length) return
 
     this.towersAttackCreeps()

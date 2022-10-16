@@ -362,7 +362,7 @@ Object.defineProperties(Room.prototype, {
                     structure.structureType !== STRUCTURE_CONTROLLER &&
                     structure.structureType !== STRUCTURE_INVADER_CORE,
             }))
-        }
+        },
     },
     combatStructureTargets: {
         get() {
@@ -381,7 +381,7 @@ Object.defineProperties(Room.prototype, {
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.observer)
 
             return this._combatStructureTargets
-        }
+        },
     },
     sourcePositions: {
         get() {
@@ -1508,6 +1508,19 @@ Object.defineProperties(Room.prototype, {
             }
 
             return this._enemyThreatCoords
+        },
+    },
+    flags: {
+        get() {
+            if (this._flags) return this._flags
+
+            this._flags = {}
+
+            for (const flag of this.find(FIND_FLAGS)) {
+                this._flags[flag.name as FlagNames] = flag
+            }
+
+            return this._flags
         },
     },
     MEWT: {
