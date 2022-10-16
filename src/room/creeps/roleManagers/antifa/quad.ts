@@ -1,4 +1,10 @@
-import { myColors, quadAttackMemberOffsets, quadTransformIndexes, quadTransformOffsets, roomDimensions } from 'international/constants'
+import {
+    myColors,
+    quadAttackMemberOffsets,
+    quadTransformIndexes,
+    quadTransformOffsets,
+    roomDimensions,
+} from 'international/constants'
 import {
     areCoordsEqual,
     arePositionsEqual,
@@ -12,6 +18,7 @@ import {
     isXYExit,
 } from 'international/utils'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
+import { AllyCreepRequestManager } from 'room/allyCreepRequestManager'
 import { Antifa } from './antifa'
 
 export class Quad {
@@ -60,7 +67,6 @@ export class Quad {
         this.leader = members[0]
 
         for (const member of members) {
-
             member.squad = this
             member.squadRan = true
         }
@@ -69,7 +75,6 @@ export class Quad {
     }
 
     sortMembersByCoord() {
-
         const unsortedMembersByCoord: { [packedCoord: string]: Antifa } = {}
 
         for (const member of this.members) {
@@ -101,13 +106,14 @@ export class Quad {
 
         this.leader.say('IF')
 
+        this.passiveHeal()
+
         if (this.leader.room.name === this.leader.memory.CRN) {
             this.advancedHeal()
             this.runCombat()
             return
         }
 
-        this.passiveHeal()
         this.passiveRangedAttack()
 
         this.createMoveRequest({
@@ -254,7 +260,7 @@ export class Quad {
             x: moveLeader.pos.x - moveRequestCoord.x,
             y: moveLeader.pos.y - moveRequestCoord.y,
         }
-/*
+        /*
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
 
@@ -351,6 +357,22 @@ export class Quad {
         }
     }
 
+    rangedAttackWithOwner(target: Creep | AnyOwnedStructure) {
+        for (const member of this.members) {
+            const range = getRangeOfCoords(member.pos, target.pos)
+            if (range > 3) continue
+
+            member.ranged = true
+
+            if (range > 1) {
+                member.rangedAttack(target)
+                continue
+            }
+
+            member.rangedMassAttack()
+        }
+    }
+
     advancedRangedAttack() {
         const { room } = this.leader
 
@@ -381,13 +403,11 @@ export class Quad {
 
             // Get the range between the creeps
 
-            const range = getRange(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
+            const range = this.findMinRange(enemyCreep.pos)
 
             // If the range is more than 1
 
             if (range > 1) {
-                for (const member of this.members) member.rangedAttack(enemyCreep)
-
                 // Have the create a moveRequest to the enemyAttacker and inform true
 
                 this.createMoveRequest({
@@ -398,10 +418,8 @@ export class Quad {
                 return true
             }
 
-            this.leader.rangedMassAttack()
-            for (let i = 1; i < this.members.length; i++) {
-                const member = this.members[i]
-                member.rangedAttack(enemyCreep)
+            if (range < 3) {
+                this.rangedAttackWithOwner(enemyCreep)
             }
 
             return true
@@ -413,9 +431,7 @@ export class Quad {
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
 
-        // Get the range between the creeps
-
-        const range = getRange(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
+        const range = this.findMinRange(enemyAttacker.pos)
 
         // If it's more than range 3
 
@@ -436,13 +452,7 @@ export class Quad {
 
         this.leader.say('AEA')
 
-        if (range === 1) this.leader.rangedMassAttack()
-        else this.leader.rangedAttack(enemyAttacker)
-
-        for (let i = 1; i < this.members.length; i++) {
-            const member = this.members[i]
-            member.rangedAttack(enemyAttacker)
-        }
+        this.rangedAttackWithOwner(enemyAttacker)
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
@@ -454,14 +464,11 @@ export class Quad {
             if (range <= 2) {
                 // Have the squad flee
 
-                this.createMoveRequest(
-                    {
-                        origin: this.leader.pos,
-                        goals: [{ pos: enemyAttacker.pos, range: 1 }],
-                        flee: true,
-                    },
-                    this.members[1],
-                )
+                this.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    flee: true,
+                })
             }
 
             return true
@@ -543,5 +550,16 @@ export class Quad {
 
             member.heal(member)
         }
+    }
+
+    findMinRange(coord: Coord) {
+        let minRange = Infinity
+
+        for (const member of this.members) {
+            const range = getRangeOfCoords(member.pos, coord)
+            if (range < minRange) minRange = range
+        }
+
+        return minRange
     }
 }

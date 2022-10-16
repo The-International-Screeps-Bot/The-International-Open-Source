@@ -61,7 +61,7 @@ export class Antifa extends Creep {
         // The creep should be single
 
         if (!this.memory.SS) return false
-        if (this.memory.SS === 1) return false
+        if (this.memory.SMNs.length === 1) return false
 
         // The squad has already been run
 
@@ -131,7 +131,7 @@ export class Antifa extends Creep {
 
     createSquad?(members: Antifa[]) {
 
-        if (this.memory.SS === 2) {
+        if (this.memory.SMNs.length === 2) {
             this.squad = new Duo(members)
             return
         }
