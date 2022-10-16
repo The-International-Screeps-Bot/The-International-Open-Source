@@ -63,9 +63,9 @@ export class Antifa extends Creep {
         if (!this.memory.SS) return false
         if (this.memory.SS === 1) return false
 
-        // The creep is in a squad but no the leader
+        // The squad has already been run
 
-        if (this.memory.SMNs[0] !== this.name) return true
+        if (this.squadRan) return true
 
         if (!this.findSquad()) return true
 
@@ -551,11 +551,5 @@ export class Antifa extends Creep {
 
             if (!creep.runSquad()) creep.runSingle()
         }
-
-        /* for (const creepName of creepsOfRole) {
-
-            const creep: Antifa = Game.creeps[creepName]
-            creep.say(creep.meleed.toString())
-        } */
     }
 }

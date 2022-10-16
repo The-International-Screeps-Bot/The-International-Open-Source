@@ -41,6 +41,12 @@ export class Duo {
     constructor(members: Antifa[]) {
         this.members = members
         this.leader = members[0]
+
+        for (const member of members) {
+
+            member.squad = this
+            member.squadRan = true
+        }
     }
 
     run() {

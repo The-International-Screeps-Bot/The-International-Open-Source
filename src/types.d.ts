@@ -1736,7 +1736,15 @@ declare global {
          */
         gettingPulled: boolean
 
+        /**
+         * The squad the creep belongs to
+         */
         squad: Duo | Quad | undefined
+
+        /**
+         * Wether the squad has ran yet
+         */
+        squadRan: boolean
 
         // Creep Functions
 
