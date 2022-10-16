@@ -37,7 +37,10 @@ export class Antifa extends Creep {
 
             if (this.memory.SMNs.length === this.memory.SS) {
                 for (const memberName of memberNames) {
-                    Memory.creeps[memberName].SF = true
+
+                    const memberMemory = Memory.creeps[memberName]
+                    memberMemory.SF = true
+                    memberMemory.SMNs = memberNames
                 }
 
                 if (this.memory.SS === 2) {
@@ -84,6 +87,11 @@ export class Antifa extends Creep {
                 if (!Game.creeps[memberName]) continue
 
                 memberNames.push(memberName)
+            }
+
+            for (const memberName of memberNames) {
+
+                Memory.creeps[memberName].SMNs = memberNames
             }
 
             if (memberNames.length === 1) return false

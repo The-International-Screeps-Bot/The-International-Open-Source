@@ -45,7 +45,6 @@ export class Duo {
             const member = Game.creeps[memberName]
             this.members.push(member)
 
-            member.memory.SMNs = memberNames
             member.squad = this
             member.squadRan = true
         }
