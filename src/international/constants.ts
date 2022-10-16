@@ -218,6 +218,8 @@ export const creepRoles: CreepRoles[] = [
     'antifaDowngrader',
 ]
 
+export const powerCreepClassNames: PowerClassConstant[] = ['operator']
+
 export enum TrafficPriorities {
     remoteHauler,
     hauler,
@@ -1063,7 +1065,7 @@ export const defaultCreepSwampCost = 8
 
 export const quadAttackMemberOffsets = [
     {
-        x: 1,
+        x: 0,
         y: 0,
     },
     {
@@ -1073,6 +1075,10 @@ export const quadAttackMemberOffsets = [
     {
         x: 1,
         y: 1,
+    },
+    {
+        x: 1,
+        y: 0,
     },
 ]
 
@@ -1097,10 +1103,6 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
     ],
     rotateRight: [
         {
-            x: 0,
-            y: 1,
-        },
-        {
             x: 1,
             y: 0,
         },
@@ -1112,10 +1114,52 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
             x: -1,
             y: 0,
         },
+        {
+            x: 0,
+            y: 1,
+        },
+    ],
+    tradeHorizontal: [
+        {
+            x: 1,
+            y: 0,
+        },
+        {
+            x: 1,
+            y: 0,
+        },
+        {
+            x: -1,
+            y: 0,
+        },
+        {
+            x: -1,
+            y: 0,
+        },
+    ],
+    tradeVertical: [
+        {
+            x: 0,
+            y: 1,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+        {
+            x: 0,
+            y: -1,
+        },
+        {
+            x: 0,
+            y: 1,
+        },
     ],
 }
 
-export const quadTransformIndexChange: Record<QuadTransformTypes, number> = {
-    rotateLeft: 1,
-    rotateRight: -1,
+export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
+    rotateLeft: [1, 2, 3, 0],
+    rotateRight: [3, 2, 1, 0],
+    tradeHorizontal: [3, 2, 1, 0],
+    tradeVertical: [1, 0, 3, 2],
 }

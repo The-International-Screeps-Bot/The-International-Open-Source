@@ -8,7 +8,6 @@ export class Duo {
      */
     members: Antifa[]
     leader: Antifa
-    expectedSize: 2
 
     _healStrength: number
 
@@ -43,7 +42,11 @@ export class Duo {
         this.members = members
         this.leader = members[0]
 
-        for (const member of this.members) member.memory.SF = true
+        for (const member of members) {
+
+            member.squad = this
+            member.squadRan = true
+        }
     }
 
     run() {

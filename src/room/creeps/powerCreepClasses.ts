@@ -19,33 +19,8 @@ import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
 import { RemoteHarvester } from './roleManagers/remote/remoteSourceHarvester'
 import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
+import { Operator } from './powerCreeps/operator'
 
-export const creepClasses: { [key in CreepRoles]: any } = {
-    source1Harvester: SourceHarvester,
-    source2Harvester: SourceHarvester,
-    hauler: Hauler,
-    controllerUpgrader: ControllerUpgrader,
-    builder: Builder,
-    maintainer: Maintainer,
-    mineralHarvester: MineralHarvester,
-    hubHauler: HubHauler,
-    fastFiller: FastFiller,
-    meleeDefender: MeleeDefender,
-    source1RemoteHarvester: RemoteHarvester,
-    source2RemoteHarvester: RemoteHarvester,
-    remoteHauler: RemoteHauler,
-    remoteReserver: RemoteReserver,
-    remoteDefender: RemoteDefender,
-    remoteCoreAttacker: RemoteCoreAttacker,
-    remoteDismantler: RemoteDismantler,
-    scout: Scout,
-    claimer: Claimer,
-    vanguard: Vanguard,
-    allyVanguard: AllyVanguard,
-    vanguardDefender: VanguardDefender,
-    antifaRangedAttacker: Antifa,
-    antifaAttacker: Antifa,
-    antifaHealer: Antifa,
-    antifaDismantler: Antifa,
-    antifaDowngrader: Antifa,
+export const powerCreepClasses: { [key in PowerClassConstant]: any } = {
+    operator: Operator
 }

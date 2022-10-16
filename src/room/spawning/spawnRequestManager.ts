@@ -596,7 +596,7 @@ Room.prototype.spawnRequester = function () {
             )
             // Get ramparts below their max hits
 
-            const ramparts = this.structures.rampart.filter(rampart => rampart.hits < rampart.hitsMax)
+            const ramparts = this.structures.rampart.filter(rampart => rampart.hits < 8000000)
 
             // If there are no ramparts or repair targets
 

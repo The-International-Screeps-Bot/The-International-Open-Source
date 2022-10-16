@@ -6,7 +6,7 @@ import './communeManager'
 
 import { CreepRoleManager } from './creeps/creepRoleManager'
 
-import { powerCreepManager } from './powerCreeps/powerCreepManager'
+import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import './roomVisuals'
 import { createPosMap, customLog } from 'international/utils'
 import { statsManager } from 'international/statsManager'
