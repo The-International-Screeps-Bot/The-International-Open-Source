@@ -650,6 +650,11 @@ declare global {
         marketUsage: boolean
 
         /**
+         * Wether or not the bot should be using customLog
+         */
+        logging: boolean
+
+        /**
          * An ongoing record of the latest ID assigned by the bot
          */
         ID: number

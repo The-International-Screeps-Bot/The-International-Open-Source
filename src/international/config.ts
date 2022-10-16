@@ -15,6 +15,7 @@ import {
     nonAggressionPlayers,
     autoAttack,
     marketUsage,
+    logging,
 } from './constants'
 import { statsManager } from './statsManager'
 
@@ -61,6 +62,7 @@ class ConfigManager {
         Memory.publicRamparts = publicRamparts
         Memory.allyTrading = allyTrading
         Memory.marketUsage = marketUsage
+        Memory.logging = logging
 
         // Construct foundation
 

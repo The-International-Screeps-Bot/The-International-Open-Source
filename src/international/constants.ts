@@ -89,6 +89,11 @@ export const allyTrading = true
  */
 export const marketUsage = true
 
+/**
+ * Default value, do not change. Modify this property in Memory instead
+ */
+export const logging = true
+
 // General
 
 /**

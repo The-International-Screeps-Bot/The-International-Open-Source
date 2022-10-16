@@ -10,7 +10,6 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
-        if (this.spawning) return
         if (!this.memory.SS) return
         if (this.memory.SF) return
 
@@ -552,6 +551,7 @@ export class Antifa extends Creep {
     static antifaManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: Antifa = Game.creeps[creepName]
+            if (creep.spawning) continue
 
             if (!creep.runSquad()) creep.runSingle()
         }
