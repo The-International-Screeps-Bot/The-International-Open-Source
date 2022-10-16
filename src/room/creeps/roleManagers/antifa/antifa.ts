@@ -10,6 +10,7 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
+        if (this.spawning) return
         if (!this.memory.SS) return
         if (this.memory.SF) return
 
@@ -20,31 +21,31 @@ export class Antifa extends Creep {
 
         internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
 
-        const members: Antifa[] = [this]
+        const memberNames = [this.name]
 
         if (this.memory.SMNs) {
             for (let i = 0; i < this.memory.SMNs.length; i++) {
-                const creep = Game.creeps[this.memory.SMNs[i]]
+                const memberName = this.memory.SMNs[i]
 
-                if (!creep) {
+                if (!Game.creeps[memberName]) {
                     this.memory.SMNs.splice(i, 1)
                     break
                 }
 
-                members.push(creep)
+                memberNames.push(memberName)
             }
 
             if (this.memory.SMNs.length === this.memory.SS) {
-                for (const member of members) {
-                    member.memory.SF = true
+                for (const memberName of memberNames) {
+                    Memory.creeps[memberName].SF = true
                 }
 
                 if (this.memory.SS === 2) {
-                    this.squad = new Duo(members)
+                    this.squad = new Duo(memberNames)
                     return
                 }
 
-                this.squad = new Quad(members)
+                this.squad = new Quad(memberNames)
                 return
             }
         }
@@ -77,18 +78,17 @@ export class Antifa extends Creep {
     findSquad?() {
         if (this.squad) return true
         if (this.memory.SF) {
-            const members: Antifa[] = []
+            const memberNames: string[] = []
 
             for (const memberName of this.memory.SMNs) {
-                const creep = Game.creeps[memberName]
-                if (!creep) continue
+                if (!Game.creeps[memberName]) continue
 
-                members.push(creep)
+                memberNames.push(memberName)
             }
 
-            if (members.length === 1) return false
+            if (memberNames.length === 1) return false
 
-            this.createSquad(members)
+            this.createSquad(memberNames)
             return true
         }
 
@@ -110,29 +110,29 @@ export class Antifa extends Creep {
 
         if (this.memory.SMNs.length !== this.memory.SS) return false
 
-        const members: Antifa[] = []
+        const memberNames: string[] = []
 
         for (const memberName of this.memory.SMNs) {
             this.room.squadRequests.delete(memberName)
 
-            const member = Game.creeps[memberName]
+            const memberMemory = Memory.creeps[memberName]
+            memberMemory.SMNs = this.memory.SMNs
+            memberMemory.SF = true
 
-            member.memory.SMNs = this.memory.SMNs
-            member.memory.SF = true
-            members.push(member)
+            memberNames.push(memberName)
         }
 
-        this.createSquad(members)
+        this.createSquad(memberNames)
         return true
     }
 
-    createSquad?(members: Antifa[]) {
+    createSquad?(memberNames: string[]) {
         if (this.memory.SMNs.length === 2) {
-            this.squad = new Duo(members)
+            this.squad = new Duo(memberNames)
             return
         }
 
-        this.squad = new Quad(members)
+        this.squad = new Quad(memberNames)
         return
     }
 

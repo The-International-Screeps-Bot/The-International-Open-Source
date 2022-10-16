@@ -6,7 +6,7 @@ export class Duo {
     /**
      * All squad members, where index 0 is the leader
      */
-    members: Antifa[]
+    members: Antifa[] = []
     leader: Antifa
 
     _healStrength: number
@@ -38,14 +38,19 @@ export class Duo {
         return true
     }
 
-    constructor(members: Antifa[]) {
-        this.members = members
-        this.leader = members[0]
+    constructor(memberNames: string[]) {
 
-        for (const member of members) {
+        for (const memberName of memberNames) {
+
+            const member = Game.creeps[memberName]
+            this.members.push(member)
+
+            member.memory.SMNs = memberNames
             member.squad = this
             member.squadRan = true
         }
+
+        this.leader = this.members[0]
     }
 
     run() {
@@ -113,8 +118,15 @@ export class Duo {
         return false
     }
 
+    holdFormation() {
+        for (const member of this.members) member.moved = 'moved'
+    }
+
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
-        if (!this.canMove) return
+        if (!this.canMove) {
+            this.holdFormation()
+            return
+        }
 
         if (!moveLeader.createMoveRequest(opts)) return
 

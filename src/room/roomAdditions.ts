@@ -1297,7 +1297,8 @@ Object.defineProperties(Room.prototype, {
             const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
             this._quadCostMatrix = new PathFinder.CostMatrix()
 
-            for (const road of this.structures.road) this._quadCostMatrix.set(road.pos.x, road.pos.y, 1)
+            const roadCoods = new Set()
+            for (const road of this.structures.road) roadCoods.add(packCoord(road.pos))
 
             // Avoid not my creeps
 
@@ -1400,8 +1401,10 @@ Object.defineProperties(Room.prototype, {
                     let largestValue = terrainCoords[packXYAsNum(x, y)]
 
                     for (const coord of offsetCoords) {
-                        const coordValue = terrainCoords[packAsNum(coord)]
+                        let coordValue = terrainCoords[packAsNum(coord)]
                         if (!coordValue || coordValue < 254) continue
+
+                        if (roadCoods.has(packCoord(coord))) coordValue = 0
 
                         largestValue = Math.max(largestValue, coordValue)
                     }
@@ -1421,8 +1424,14 @@ Object.defineProperties(Room.prototype, {
 
                     for (const coord of offsetCoords) {
                         const value = terrainCM.get(coord.x, coord.y)
-                        if (value === TERRAIN_MASK_SWAMP) largestValue = defaultSwampCost * 2
+
+                        if (roadCoods.has(packCoord(coord))) continue
+                        if (value !== TERRAIN_MASK_SWAMP) continue
+
+                        largestValue = defaultSwampCost * 2
                     }
+
+                    if (!largestValue) continue
 
                     for (const coord of offsetCoords) {
                         this._quadCostMatrix.set(coord.x, coord.y, largestValue)
@@ -1433,6 +1442,158 @@ Object.defineProperties(Room.prototype, {
             /* this.visualizeCostMatrix(this._quadCostMatrix, true) */
 
             return this._quadCostMatrix
+        },
+    },
+    quadBulldozeCostMatrix: {
+        get() {
+            if (this._quadBulldozeCostMatrix) return this._quadBulldozeCostMatrix
+
+            const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+            this._quadBulldozeCostMatrix = new PathFinder.CostMatrix()
+
+            const roadCoods = new Set()
+            for (const road of this.structures.road) roadCoods.add(packCoord(road.pos))
+
+            // Avoid not my creeps
+            /*
+            for (const creep of this.enemyCreeps) terrainCoords[packAsNum(creep.pos)] = 255
+            for (const creep of this.allyCreeps) terrainCoords[packAsNum(creep.pos)] = 255
+
+            for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) terrainCoords[packAsNum(creep.pos)] = 255
+ */
+            // Avoid impassible structures
+
+            for (const rampart of this.structures.rampart) {
+                // If the rampart is mine
+
+                if (rampart.my) continue
+
+                // Otherwise if the rampart is owned by an ally, iterate
+
+                if (rampart.isPublic) continue
+
+                // Otherwise set the rampart's pos as impassible
+
+                terrainCoords[packAsNum(rampart.pos)] = rampart.hits / (rampart.hitsMax / 200)
+            }
+
+            // Loop through structureTypes of impassibleStructureTypes
+
+            for (const structureType of impassibleStructureTypes) {
+                for (const structure of this.structures[structureType]) {
+                    terrainCoords[packAsNum(structure.pos)] = structure.hits / (structure.hitsMax / 10)
+                }
+
+                for (const cSite of this.cSites[structureType]) {
+                    // Set pos as impassible
+
+                    terrainCoords[packAsNum(cSite.pos)] = 255
+                }
+            }
+
+            //
+
+            for (const portal of this.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
+
+            // Loop trough each construction site belonging to an ally
+
+            for (const cSite of this.allyCSites) terrainCoords[packAsNum(cSite.pos)] = 255
+
+            let x
+
+            // Configure y and loop through top exits
+
+            let y = 0
+            for (x = 0; x < roomDimensions; x += 1)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+
+            // Configure x and loop through left exits
+
+            x = 0
+            for (y = 0; y < roomDimensions; y += 1)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+
+            // Configure y and loop through bottom exits
+
+            y = roomDimensions - 1
+            for (x = 0; x < roomDimensions; x += 1)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+
+            // Configure x and loop through right exits
+
+            x = roomDimensions - 1
+            for (y = 0; y < roomDimensions; y += 1)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+
+            const terrainCM = this.getTerrain()
+
+            // Assign impassible to tiles that aren't 2x2 passible
+
+            for (let x = 0; x < roomDimensions; x += 1) {
+                for (let y = 0; y < roomDimensions; y += 1) {
+                    const offsetCoords = [
+                        {
+                            x,
+                            y,
+                        },
+                        {
+                            x: x + 1,
+                            y,
+                        },
+                        {
+                            x,
+                            y: y + 1,
+                        },
+                        {
+                            x: x + 1,
+                            y: y + 1,
+                        },
+                    ]
+
+                    let largestValue = terrainCoords[packXYAsNum(x, y)]
+
+                    for (const coord of offsetCoords) {
+                        let coordValue = terrainCoords[packAsNum(coord)]
+                        if (!coordValue || coordValue < 254) continue
+
+                        if (roadCoods.has(packCoord(coord))) coordValue = 0
+
+                        largestValue = Math.max(largestValue, coordValue)
+                    }
+
+                    if (largestValue >= 254) {
+                        this._quadBulldozeCostMatrix.set(x, y, 254)
+
+                        this._quadBulldozeCostMatrix.set(
+                            x,
+                            y,
+                            Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 254)),
+                        )
+                        continue
+                    }
+
+                    largestValue = 0
+
+                    for (const coord of offsetCoords) {
+                        const value = terrainCM.get(coord.x, coord.y)
+
+                        if (roadCoods.has(packCoord(coord))) continue
+                        if (value !== TERRAIN_MASK_SWAMP) continue
+
+                        largestValue = defaultSwampCost * 2
+                    }
+
+                    if (!largestValue) continue
+
+                    for (const coord of offsetCoords) {
+                        this._quadBulldozeCostMatrix.set(coord.x, coord.y, largestValue)
+                    }
+                }
+            }
+
+            this.visualizeCostMatrix(this._quadBulldozeCostMatrix, true)
+
+            return this._quadBulldozeCostMatrix
         },
     },
     enemyDamageThreat: {

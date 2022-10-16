@@ -857,6 +857,8 @@ declare global {
          */
         actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
 
+        targetVisual(coord1: Coord, coord2: Coord, visualize?: boolean): void
+
         /**
          * Generates a path between two positions
          */
@@ -1316,6 +1318,10 @@ declare global {
 
         readonly quadCostMatrix: CostMatrix
 
+        _quadBulldozeCostMatrix: CostMatrix
+
+        readonly quadBulldozeCostMatrix: CostMatrix
+
         _enemyDamageThreat: boolean
 
         readonly enemyDamageThreat: boolean
@@ -1763,6 +1769,10 @@ declare global {
 
         advancedRenew(): void
 
+        findBulzodeTargets(goalCoord: RoomPosition): Id<Structure>[]
+
+        findQuadBulldozeTargets(goalCoord: RoomPosition): Id<Structure>[]
+
         // Creep Getters
 
         _role: CreepRoles
@@ -1963,6 +1973,11 @@ declare global {
          * Squad Member Names
          */
         SMNs: string[]
+
+        /**
+         * Quad Bulldoze Targets
+         */
+        QBTIDs: Id<Structure>[]
 
         /**
          * Combat Request Name, the name of the room the creep should do combat in
