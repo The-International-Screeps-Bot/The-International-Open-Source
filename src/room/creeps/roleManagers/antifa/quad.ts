@@ -58,10 +58,15 @@ export class Quad {
     constructor(members: Antifa[]) {
         this.members = members
         this.leader = members[0]
+        /* for (const member of members) member.meleed = true */
+        this.sortMembersByCoord()
+    }
+
+    sortMembersByCoord() {
 
         const unsortedMembersByCoord: { [packedCoord: string]: Antifa } = {}
 
-        for (const member of members) {
+        for (const member of this.members) {
             unsortedMembersByCoord[packCoord(member.pos)] = member
         }
 
@@ -81,7 +86,6 @@ export class Quad {
 
             this.membersByCoord[packedCoord] = member
         }
-
     }
 
     run() {

@@ -16,7 +16,7 @@ class PowerCreepOrganizer {
 
         // Loop through all of my creeps
 
-        for (const creepName in Memory.creeps) {
+        for (const creepName in Memory.powerCreeps) {
             try {
                 this.processCreep(creepName)
             } catch (err) {

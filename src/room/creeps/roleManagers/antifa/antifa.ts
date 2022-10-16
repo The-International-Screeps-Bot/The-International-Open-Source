@@ -552,10 +552,10 @@ export class Antifa extends Creep {
             if (!creep.runSquad()) creep.runSingle()
         }
 
-        for (const creepName of creepsOfRole) {
+        /* for (const creepName of creepsOfRole) {
 
             const creep: Antifa = Game.creeps[creepName]
-            creep.say(creep.moveRequest)
-        }
+            creep.say(creep.meleed.toString())
+        } */
     }
 }
