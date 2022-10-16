@@ -350,7 +350,7 @@ Creep.prototype.runMoveRequest = function () {
 
 Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
-
+    
     if (!this.moveRequest) return
     if (!room.moveRequests.get(this.moveRequest)) {
         this.moved = 'moved'

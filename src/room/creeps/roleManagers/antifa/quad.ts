@@ -3,10 +3,12 @@ import {
     areCoordsEqual,
     arePositionsEqual,
     customLog,
+    doesCoordExist,
     doesXYExist,
     findClosestObject,
     getRange,
     getRangeOfCoords,
+    isCoordExit,
     isXYExit,
 } from 'international/utils'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
@@ -22,7 +24,6 @@ export class Quad {
      */
     members: Antifa[]
     leader: Antifa
-    expectedSize: 4
     membersByCoord: { [packedCoord: string]: Antifa }
 
     _healStrength: number
@@ -80,7 +81,9 @@ export class Quad {
 
             this.membersByCoord[packedCoord] = member
         }
+
     }
+
     run() {
         this.leader.say(this.type)
 
@@ -166,18 +169,22 @@ export class Quad {
         // Attack mode
 
         for (let i = 1; i < this.members.length; i++) {
-            const offset = quadAttackMemberOffsets[i - 1]
+            const offset = quadAttackMemberOffsets[i]
+            const goalCoord = {
+                x: this.leader.pos.x + offset.x,
+                y: this.leader.pos.y + offset.y,
+            }
 
-            if (isXYExit(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return true
+            if (isCoordExit(goalCoord)) return true
 
-            if (!doesXYExist(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return true
+            if (!doesCoordExist(goalCoord)) return true
 
             /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
         }
 
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            const offset = quadAttackMemberOffsets[i - 1]
+            const offset = quadAttackMemberOffsets[i]
             const goalPos = new RoomPosition(
                 this.leader.pos.x + offset.x,
                 this.leader.pos.y + offset.y,
@@ -226,8 +233,8 @@ export class Quad {
         opts.weightCostMatrixes = ['quadCostMatrix']
         if (!moveLeader.createMoveRequest(opts)) return false
 
-        if (this.membersAttackMove()) return true
-        return false
+        if (!this.membersAttackMove()) return false
+        return true
     }
 
     membersAttackMove(moveLeader = this.leader) {
@@ -237,26 +244,23 @@ export class Quad {
             x: moveLeader.pos.x - moveRequestCoord.x,
             y: moveLeader.pos.y - moveRequestCoord.y,
         }
-
+/*
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            const offset = {
+
+            if (!doesXYExist(member.pos.x - moveLeaderOffset.x, member.pos.y - moveLeaderOffset.y)) return false
+        }
+ */
+        for (let i = 1; i < this.members.length; i++) {
+            const member = this.members[i]
+            const goalCoord = {
                 x: member.pos.x - moveLeaderOffset.x,
                 y: member.pos.y - moveLeaderOffset.y,
             }
 
-            if (!doesXYExist(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return false
+            if (!doesCoordExist(goalCoord)) continue
 
-            /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
-        }
-
-        for (let i = 1; i < this.members.length; i++) {
-            const member = this.members[i]
-
-            member.assignMoveRequest({
-                x: member.pos.x - moveLeaderOffset.x,
-                y: member.pos.y - moveLeaderOffset.y,
-            })
+            member.assignMoveRequest(goalCoord)
         }
 
         return true

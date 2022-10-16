@@ -49,7 +49,6 @@ export class VanguardDefender extends Creep {
             }
 
             this.rangedMassAttack()
-            this.moveRequest = packCoord(enemyCreep.pos)
 
             return true
         }
@@ -89,7 +88,6 @@ export class VanguardDefender extends Creep {
 
         if (range === 1) {
             this.rangedMassAttack()
-            this.moveRequest = packCoord(enemyAttacker.pos)
         }
 
         // Otherwise, rangedAttack the enemyAttacker

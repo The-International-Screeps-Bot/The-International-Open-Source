@@ -134,7 +134,6 @@ export class RemoteDefender extends Creep {
             }
 
             this.rangedMassAttack()
-            this.moveRequest = packCoord(enemyCreep.pos)
 
             return true
         }
@@ -174,7 +173,6 @@ export class RemoteDefender extends Creep {
 
         if (range === 1) {
             this.rangedMassAttack()
-            this.moveRequest = packCoord(enemyAttacker.pos)
         }
 
         // Otherwise, rangedAttack the enemyAttacker

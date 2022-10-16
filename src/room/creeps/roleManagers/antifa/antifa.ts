@@ -82,8 +82,14 @@ export class Antifa extends Creep {
             const members: Antifa[] = []
 
             for (const memberName of this.memory.SMNs) {
-                members.push(Game.creeps[memberName])
+
+                const creep = Game.creeps[memberName]
+                if (!creep) continue
+
+                members.push(creep)
             }
+
+            if (members.length === 1) return false
 
             this.createSquad(members)
             return true
@@ -124,6 +130,7 @@ export class Antifa extends Creep {
     }
 
     createSquad?(members: Antifa[]) {
+
         if (this.memory.SS === 2) {
             this.squad = new Duo(members)
             return
@@ -135,7 +142,7 @@ export class Antifa extends Creep {
 
     runSingle?() {
         const { room } = this
-
+        this.say('S')
         // In attackTarget
 
         if (this.memory.CRN === room.name) {
@@ -543,6 +550,12 @@ export class Antifa extends Creep {
             const creep: Antifa = Game.creeps[creepName]
 
             if (!creep.runSquad()) creep.runSingle()
+        }
+
+        for (const creepName of creepsOfRole) {
+
+            const creep: Antifa = Game.creeps[creepName]
+            creep.say(creep.moveRequest)
         }
     }
 }

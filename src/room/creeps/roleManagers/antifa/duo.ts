@@ -8,7 +8,6 @@ export class Duo {
      */
     members: Antifa[]
     leader: Antifa
-    expectedSize: 2
 
     _healStrength: number
 
