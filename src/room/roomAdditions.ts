@@ -20,7 +20,7 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { packCoord, packCoordList, packPosList, unpackPosList } from 'other/packrat'
+import { packCoord, packCoordList, packPosList, packXYAsCoord, unpackPosList } from 'other/packrat'
 
 Object.defineProperties(Room.prototype, {
     global: {
@@ -1238,7 +1238,9 @@ Object.defineProperties(Room.prototype, {
             if (this._droppedEnergy) return this._droppedEnergy
 
             return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES, {
-                filter: resource => resource.resourceType === RESOURCE_ENERGY,
+                filter: resource =>
+                    resource.resourceType === RESOURCE_ENERGY &&
+                    resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
             }))
         },
     },
@@ -1375,7 +1377,9 @@ Object.defineProperties(Room.prototype, {
                     }
 
                     if (largestValue >= 254) {
-                        this._quadCostMatrix.set(x, y, largestValue)
+                        this._quadCostMatrix.set(x, y, 254)
+
+                        this._quadCostMatrix.set(x, y, Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 254)))
                         continue
                     }
 
@@ -1419,6 +1423,10 @@ Object.defineProperties(Room.prototype, {
             // If there is a controller, it's mine, and it's in safemode
 
             if (this.controller && this.controller.my && this.controller.safeMode) return this._enemyThreatCoords
+
+            // If there is no enemy threat
+
+            if (!this.enemyAttackers.length) return this._enemyThreatCoords
 
             const enemyAttackers: Creep[] = []
             const enemyRangedAttackers: Creep[] = []

@@ -1,20 +1,24 @@
 import {
     myColors,
     quadAttackMemberOffsets,
-    quadTransformIndexChange,
+    quadTransformIndexes,
     quadTransformOffsets,
+    roomDimensions,
 } from 'international/constants'
 import {
     areCoordsEqual,
     arePositionsEqual,
     customLog,
+    doesCoordExist,
     doesXYExist,
     findClosestObject,
     getRange,
     getRangeOfCoords,
+    isCoordExit,
     isXYExit,
 } from 'international/utils'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
+import { AllyCreepRequestManager } from 'room/allyCreepRequestManager'
 import { Antifa } from './antifa'
 
 export class Quad {
@@ -27,13 +31,7 @@ export class Quad {
      */
     members: Antifa[]
     leader: Antifa
-    expectedSize: 4
-    membersByCoord: { [packedCoord: string]: Antifa } = {
-        [packXYAsCoord(0, 0)]: undefined,
-        [packXYAsCoord(0, 1)]: undefined,
-        [packXYAsCoord(1, 1)]: undefined,
-        [packXYAsCoord(1, 0)]: undefined,
-    }
+    membersByCoord: { [packedCoord: string]: Antifa }
 
     _healStrength: number
 
@@ -69,14 +67,46 @@ export class Quad {
         this.leader = members[0]
 
         for (const member of members) {
-            member.memory.SF = true
-            this.membersByCoord[packCoord(member.pos)] = member
+            member.squad = this
+            member.squadRan = true
+        }
+
+        this.sortMembersByCoord()
+    }
+
+    sortMembersByCoord() {
+        const unsortedMembersByCoord: { [packedCoord: string]: Antifa } = {}
+
+        for (const member of this.members) {
+            unsortedMembersByCoord[packCoord(member.pos)] = member
+        }
+
+        this.membersByCoord = {
+            [packCoord(this.leader.pos)]: this.leader,
+        }
+
+        const packedMemberCoords = [
+            packXYAsCoord(this.leader.pos.x, this.leader.pos.y + 1),
+            packXYAsCoord(this.leader.pos.x + 1, this.leader.pos.y + 1),
+            packXYAsCoord(this.leader.pos.x + 1, this.leader.pos.y),
+        ]
+
+        for (const packedCoord of packedMemberCoords) {
+            const member = unsortedMembersByCoord[packedCoord]
+            if (!member) continue
+
+            this.membersByCoord[packedCoord] = member
         }
     }
+
     run() {
         this.leader.say(this.type)
 
         if (!this.getInFormation()) return
+
+        this.leader.say('IF')
+
+        this.passiveHeal()
 
         if (this.leader.room.name === this.leader.memory.CRN) {
             this.advancedHeal()
@@ -84,7 +114,6 @@ export class Quad {
             return
         }
 
-        this.passiveHeal()
         this.passiveRangedAttack()
 
         this.createMoveRequest({
@@ -108,10 +137,12 @@ export class Quad {
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
             /*
             this.leader.createMoveRequest({
-                goals: [{
-                    pos: this.leader.pos,
-                    range: 1,
-                }],
+                goals: [
+                    {
+                        pos: this.leader.pos,
+                        range: 1,
+                    },
+                ],
                 flee: true,
             })
             return false
@@ -154,18 +185,22 @@ export class Quad {
         // Attack mode
 
         for (let i = 1; i < this.members.length; i++) {
-            const offset = quadAttackMemberOffsets[i - 1]
+            const offset = quadAttackMemberOffsets[i]
+            const goalCoord = {
+                x: this.leader.pos.x + offset.x,
+                y: this.leader.pos.y + offset.y,
+            }
 
-            if (isXYExit(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return true
+            if (isCoordExit(goalCoord)) return true
 
-            if (!doesXYExist(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return true
+            if (!doesCoordExist(goalCoord)) return true
 
             /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
         }
 
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            const offset = quadAttackMemberOffsets[i - 1]
+            const offset = quadAttackMemberOffsets[i]
             const goalPos = new RoomPosition(
                 this.leader.pos.x + offset.x,
                 this.leader.pos.y + offset.y,
@@ -182,10 +217,10 @@ export class Quad {
                     },
                 ],
             })
+
             inFormation = false
         }
 
-        if (inFormation) return this.transform('rotateLeft')
         return inFormation
     }
 
@@ -214,8 +249,8 @@ export class Quad {
         opts.weightCostMatrixes = ['quadCostMatrix']
         if (!moveLeader.createMoveRequest(opts)) return false
 
-        if (this.membersAttackMove()) return true
-        return false
+        if (!this.membersAttackMove()) return false
+        return true
     }
 
     membersAttackMove(moveLeader = this.leader) {
@@ -225,26 +260,23 @@ export class Quad {
             x: moveLeader.pos.x - moveRequestCoord.x,
             y: moveLeader.pos.y - moveRequestCoord.y,
         }
-
+        /*
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            const offset = {
+
+            if (!doesXYExist(member.pos.x - moveLeaderOffset.x, member.pos.y - moveLeaderOffset.y)) return false
+        }
+ */
+        for (let i = 1; i < this.members.length; i++) {
+            const member = this.members[i]
+            const goalCoord = {
                 x: member.pos.x - moveLeaderOffset.x,
                 y: member.pos.y - moveLeaderOffset.y,
             }
 
-            if (!doesXYExist(this.leader.pos.x + offset.x, this.leader.pos.y + offset.y)) return false
+            if (!doesCoordExist(goalCoord)) continue
 
-            /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
-        }
-
-        for (let i = 1; i < this.members.length; i++) {
-            const member = this.members[i]
-
-            member.assignMoveRequest({
-                x: member.pos.x - moveLeaderOffset.x,
-                y: member.pos.y - moveLeaderOffset.y,
-            })
+            member.assignMoveRequest(goalCoord)
         }
 
         return true
@@ -254,23 +286,25 @@ export class Quad {
         if (!this.canMove) return false
 
         const transformOffsets = quadTransformOffsets[transformType]
-        const indexChange = quadTransformIndexChange[transformType]
-        const newMembers = []
+        const newIndexes = quadTransformIndexes[transformType]
+        const membersByCoordArray = Object.values(this.membersByCoord)
+        const newMemberNames: string[] = []
 
-        for (let i = 0; i < this.members.length; i++) {
-            const member = this.members[i]
+        for (let i = 0; i < membersByCoordArray.length; i++) {
+            const member = membersByCoordArray[i]
+            if (!member) continue
+
             const offset = transformOffsets[i]
-
             member.assignMoveRequest({ x: member.pos.x + offset.x, y: member.pos.y + offset.y })
 
-            const newIndex = i > 4 ? i + (indexChange % 4) : i
-            member.room.visual.text(newIndex.toString(), member.pos)
-            newMembers[newIndex] = member
+            const newIndex = newIndexes[i]
+            newMemberNames[newIndex] = member.name
         }
 
-        this.members = newMembers
-        this.leader = newMembers[0]
-        this.leader.room.visual.text('G', this.leader.pos)
+        for (const member of this.members) {
+            member.memory.SMNs = newMemberNames
+        }
+
         return true
     }
 
@@ -323,6 +357,22 @@ export class Quad {
         }
     }
 
+    rangedAttackWithOwner(target: Creep | AnyOwnedStructure) {
+        for (const member of this.members) {
+            const range = getRangeOfCoords(member.pos, target.pos)
+            if (range > 3) continue
+
+            member.ranged = true
+
+            if (range > 1) {
+                member.rangedAttack(target)
+                continue
+            }
+
+            member.rangedMassAttack()
+        }
+    }
+
     advancedRangedAttack() {
         const { room } = this.leader
 
@@ -353,13 +403,11 @@ export class Quad {
 
             // Get the range between the creeps
 
-            const range = getRange(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
+            const range = this.findMinRange(enemyCreep.pos)
 
             // If the range is more than 1
 
             if (range > 1) {
-                for (const member of this.members) member.rangedAttack(enemyCreep)
-
                 // Have the create a moveRequest to the enemyAttacker and inform true
 
                 this.createMoveRequest({
@@ -370,10 +418,8 @@ export class Quad {
                 return true
             }
 
-            this.leader.rangedMassAttack()
-            for (let i = 1; i < this.members.length; i++) {
-                const member = this.members[i]
-                member.rangedAttack(enemyCreep)
+            if (range < 3) {
+                this.rangedAttackWithOwner(enemyCreep)
             }
 
             return true
@@ -385,9 +431,7 @@ export class Quad {
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
 
-        // Get the range between the creeps
-
-        const range = getRange(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
+        const range = this.findMinRange(enemyAttacker.pos)
 
         // If it's more than range 3
 
@@ -408,13 +452,7 @@ export class Quad {
 
         this.leader.say('AEA')
 
-        if (range === 1) this.leader.rangedMassAttack()
-        else this.leader.rangedAttack(enemyAttacker)
-
-        for (let i = 1; i < this.members.length; i++) {
-            const member = this.members[i]
-            member.rangedAttack(enemyAttacker)
-        }
+        this.rangedAttackWithOwner(enemyAttacker)
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
@@ -426,14 +464,11 @@ export class Quad {
             if (range <= 2) {
                 // Have the squad flee
 
-                this.createMoveRequest(
-                    {
-                        origin: this.leader.pos,
-                        goals: [{ pos: enemyAttacker.pos, range: 1 }],
-                        flee: true,
-                    },
-                    this.members[1],
-                )
+                this.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    flee: true,
+                })
             }
 
             return true
@@ -515,5 +550,16 @@ export class Quad {
 
             member.heal(member)
         }
+    }
+
+    findMinRange(coord: Coord) {
+        let minRange = Infinity
+
+        for (const member of this.members) {
+            const range = getRangeOfCoords(member.pos, coord)
+            if (range < minRange) minRange = range
+        }
+
+        return minRange
     }
 }

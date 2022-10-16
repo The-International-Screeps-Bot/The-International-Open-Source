@@ -551,16 +551,8 @@ export class RemoteHauler extends Creep {
 
     static remoteHaulerManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-            try {
+
                 RemoteHauler.processSingleCreep(creepName)
-            } catch (err) {
-                customLog(
-                    'Exception remoteHaulerManager creep: ' + creepName + err,
-                    (err as any).stack,
-                    myColors.white,
-                    myColors.red,
-                )
-            }
         }
     }
 }

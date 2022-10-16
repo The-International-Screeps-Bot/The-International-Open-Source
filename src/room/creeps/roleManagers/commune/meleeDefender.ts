@@ -136,6 +136,9 @@ export class MeleeDefender extends Creep {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: closestRampart.pos, range: 0 }],
+            weightStructures: {
+                road: 20,
+            },
             plainCost: 20,
             swampCost: 80,
         })

@@ -14,10 +14,6 @@ import {
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
-    /**
-     * Organizes creeps into properties for their communeName, and tracks total creep count
-     */
-    creepOrganizer?(): void
 
     /**
      * Tracks and records constructionSites and thier age, deleting old sites

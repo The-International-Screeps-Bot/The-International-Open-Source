@@ -331,7 +331,7 @@ export function basePlanner(room: Room) {
         room.baseCoords[packAsNum(coord)] = 0
     }
 
-    const centerUpgadePos = room._centerUpgradePos
+    const centerUpgadePos = room.centerUpgradePos
     if (!centerUpgadePos) return 'failed'
 
     const upgradePositions = room.upgradePositions
