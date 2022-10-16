@@ -104,7 +104,9 @@ export class StatsManager {
                     globalCommuneStats.cl =
                         progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
                 }
-                globalCommuneStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
+                globalCommuneStats.es =
+                    room.findStoredResourceAmount(RESOURCE_ENERGY, true) +
+                    room.findStoredResourceAmount(RESOURCE_BATTERY, true) * 10
             } else {
                 globalCommuneStats.cl = roomStats.cl
                 globalCommuneStats.es = roomStats.es
