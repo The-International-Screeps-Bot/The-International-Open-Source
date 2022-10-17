@@ -102,7 +102,7 @@ export class RemotesManager {
                 // Create need if there are any walls or enemy owner structures (not including invader cores)
 
                 remoteMemory.data[RemoteData.remoteDismantler] =
-                    Math.min(remote.actionableWalls.length, 1) || Math.min(remote.dismantleableTargets.length, 1)
+                    Math.min(remote.actionableWalls.length, 1) || Math.min(remote.dismantleTargets.length, 1)
             }
 
             // If the remote is assumed to be reserved by an enemy

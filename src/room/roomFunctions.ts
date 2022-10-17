@@ -66,12 +66,12 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
     room.visual.line(pos1, pos2, { color })
 }
 
-interface RoutePart {
-    exit: ExitConstant
-    room: string
-}
+Room.prototype.targetVisual = function(coord1, coord2, visualize = Memory.roomVisuals) {
 
-type Route = RoutePart[]
+    if (!visualize) return
+
+    this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, { color: myColors.green, opacity: 0.3 })
+}
 
 /**
  * @param opts options
@@ -245,7 +245,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                if (opts.creep && (!opts.weightStructures || !opts.weightStructures.road)) {
+                // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
+
+                if (opts.creep && (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) && (!opts.weightStructures || !opts.weightStructures.road)) {
                     let roadCost = 1
                     if (!opts.creep.memory.R) roadCost = opts.plainCost
 
@@ -860,7 +862,7 @@ Room.prototype.createHarassCombatRequest = function () {
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
 
-    const structures = this.dismantleableTargets
+    const structures = this.dismantleTargets
 
     let totalHits = 0
     for (const structure of structures) totalHits += structure.hits
@@ -2035,7 +2037,7 @@ Room.prototype.visualizeCoordMap = function (coordMap, color) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * 2}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }
@@ -2058,7 +2060,7 @@ Room.prototype.visualizeCostMatrix = function (cm, color) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${cm.get(x, y) * 10}, 100%, 60%)`,
+                    fill: `hsl(${200}${cm.get(x, y) * 2}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }

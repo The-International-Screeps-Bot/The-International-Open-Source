@@ -1407,6 +1407,8 @@ Room.prototype.spawnRequester = function () {
         const request = Memory.combatRequests[requestName]
         if (!request) continue
 
+        if (request.data[CombatRequestData.abandon] > 0) continue
+
         const minRangedAttackCost =
             ((request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
                 (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
@@ -1440,11 +1442,16 @@ Room.prototype.spawnRequester = function () {
                     const extraParts: BodyPartConstant[] = []
 
                     for (let i = 0; i < rangedAttackAmount; i++) {
-                        extraParts.push(RANGED_ATTACK, MOVE)
+                        extraParts.push(RANGED_ATTACK)
+                    }
+
+                    for (let i = 0; i < rangedAttackAmount + healAmount; i++) {
+
+                        extraParts.push(MOVE)
                     }
 
                     for (let i = 0; i < healAmount; i++) {
-                        extraParts.push(HEAL, MOVE)
+                        extraParts.push(HEAL)
                     }
 
                     return {

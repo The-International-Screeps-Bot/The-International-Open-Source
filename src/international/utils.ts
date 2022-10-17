@@ -85,6 +85,9 @@ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
  * @param bgColor Colour of the background. Default is white
  */
 export function customLog(title: any, message: any, color: string = myColors.black, bgColor: string = myColors.white) {
+
+    if (!Memory.logging) return
+
     // Create the title
 
     global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${color};'>${title}:</div>`

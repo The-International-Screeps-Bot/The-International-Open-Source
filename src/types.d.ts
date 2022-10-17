@@ -282,6 +282,8 @@ declare global {
         extraOpts: ExtraOpts
     }
 
+    type FlagNames = 'disableTowers'
+
     type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
     interface LogisticTask {
@@ -648,6 +650,11 @@ declare global {
         marketUsage: boolean
 
         /**
+         * Wether or not the bot should be using customLog
+         */
+        logging: boolean
+
+        /**
          * An ongoing record of the latest ID assigned by the bot
          */
         ID: number
@@ -762,7 +769,7 @@ declare global {
         /**
          * The number of my creeps in the room
          */
-         myCreepsAmount: number
+        myCreepsAmount: number
 
         /**
          * An object with keys of roles with properties of arrays of power creep names belonging to the role
@@ -854,6 +861,8 @@ declare global {
          * @param type The type of interaction, success if not provided
          */
         actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
+
+        targetVisual(coord1: Coord, coord2: Coord, visualize?: boolean): void
 
         /**
          * Generates a path between two positions
@@ -1206,9 +1215,17 @@ declare global {
 
         readonly taskNeedingSpawningStructures: SpawningStructures
 
-        _dismantleableTargets: Structure[]
+        _dismantleTargets: Structure[]
 
-        readonly dismantleableTargets: Structure[]
+        readonly dismantleTargets: Structure[]
+
+        _destructableStructures: Structure[]
+
+        readonly destructableStructures: Structure[]
+
+        _combatStructureTargets: Structure[]
+
+        readonly combatStructureTargets: Structure[]
 
         // Resource info
 
@@ -1306,6 +1323,10 @@ declare global {
 
         readonly quadCostMatrix: CostMatrix
 
+        _quadBulldozeCostMatrix: CostMatrix
+
+        readonly quadBulldozeCostMatrix: CostMatrix
+
         _enemyDamageThreat: boolean
 
         readonly enemyDamageThreat: boolean
@@ -1313,6 +1334,10 @@ declare global {
         _enemyThreatCoords: Set<string>
 
         readonly enemyThreatCoords: Set<string>
+
+        _flags: Partial<{ [key in FlagNames]: Flag }>
+
+        readonly flags: { [key in FlagNames]: Flag }
 
         // Target finding
 
@@ -1689,17 +1714,17 @@ declare global {
         /**
          * The packed position of the moveRequest, if one has been made
          */
-         moveRequest: string
+        moveRequest: string
 
-         /**
-          * Wether the creep moved a resource this tick
-          */
-         movedResource: boolean
+        /**
+         * Wether the creep moved a resource this tick
+         */
+        movedResource: boolean
 
-         /**
-          * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
-          */
-         moved?: string | 'moved' | 'yield'
+        /**
+         * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
+         */
+        moved?: string | 'moved' | 'yield'
 
         /**
          * The creep's opts when trying to make a moveRequest intra tick
@@ -1710,7 +1735,6 @@ declare global {
     // Creeps
 
     interface Creep extends CreepFunctions, CreepProperties {
-
         /**
          * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
          */
@@ -1749,6 +1773,10 @@ declare global {
         // Creep Functions
 
         advancedRenew(): void
+
+        findBulzodeTargets(goalCoord: RoomPosition): Id<Structure>[]
+
+        findQuadBulldozeTargets(goalCoord: RoomPosition): Id<Structure>[]
 
         // Creep Getters
 
@@ -1952,6 +1980,11 @@ declare global {
         SMNs: string[]
 
         /**
+         * Quad Bulldoze Targets
+         */
+        QBTIDs: Id<Structure>[]
+
+        /**
          * Combat Request Name, the name of the room the creep should do combat in
          */
         CRN: string | undefined
@@ -1979,12 +2012,9 @@ declare global {
          * Wether the creep has used a power this tick
          */
         powered: boolean
-
     }
 
-    interface PowerCreepMemory {
-
-    }
+    interface PowerCreepMemory {}
 
     // Structures
 
@@ -2147,6 +2177,7 @@ declare global {
                 communeName?: string,
                 minDamage?: number,
                 minHeal?: number,
+                quadCount?: number,
             ): string
 
             /**
