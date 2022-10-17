@@ -366,7 +366,7 @@ Object.defineProperties(Room.prototype, {
     },
     combatStructureTargets: {
         get() {
-            if (!this._combatStructureTargets) return this._combatStructureTargets
+            if (this._combatStructureTargets) return this._combatStructureTargets
 
             this._combatStructureTargets = []
 
@@ -1468,20 +1468,16 @@ Object.defineProperties(Room.prototype, {
 
                 if (rampart.my) continue
 
-                // Otherwise if the rampart is owned by an ally, iterate
-
-                if (rampart.isPublic) continue
-
                 // Otherwise set the rampart's pos as impassible
 
-                terrainCoords[packAsNum(rampart.pos)] = rampart.hits / (rampart.hitsMax / 200)
+                terrainCoords[packAsNum(rampart.pos)] = 254/* rampart.hits / (rampart.hitsMax / 200) */
             }
 
             // Loop through structureTypes of impassibleStructureTypes
 
             for (const structureType of impassibleStructureTypes) {
                 for (const structure of this.structures[structureType]) {
-                    terrainCoords[packAsNum(structure.pos)] = structure.hits / (structure.hitsMax / 10)
+                    terrainCoords[packAsNum(structure.pos)] = 10 /* structure.hits / (structure.hitsMax / 10) */
                 }
 
                 for (const cSite of this.cSites[structureType]) {
@@ -1591,7 +1587,7 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-            this.visualizeCostMatrix(this._quadBulldozeCostMatrix, true)
+            this.visualizeCostMatrix(this._quadBulldozeCostMatrix)
 
             return this._quadBulldozeCostMatrix
         },

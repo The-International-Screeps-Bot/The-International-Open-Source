@@ -1,5 +1,6 @@
 import {
     myColors,
+    numbersByStructureTypes,
     quadAttackMemberOffsets,
     quadTransformIndexes,
     quadTransformOffsets,
@@ -64,9 +65,7 @@ export class Quad {
     }
 
     constructor(memberNames: string[]) {
-
         for (const memberName of memberNames) {
-
             const member = Game.creeps[memberName]
             this.members.push(member)
 
@@ -193,12 +192,18 @@ export class Quad {
                     ],
                 })
 
+                if (member.moveRequest === packCoord(this.leader.pos)) {
+                }
+
                 lastMember = member
                 inFormation = false
             }
 
             return inFormation
         }
+
+        let newLeader: Antifa
+        let newLeaderIndex: number
 
         // Attack mode
 
@@ -210,21 +215,11 @@ export class Quad {
             }
 
             if (isCoordExit(goalCoord)) return true
-
             if (!doesCoordExist(goalCoord)) return true
 
-            /* if (this.leader.room.quadCostMatrix.get(goalPos.x, goalPos.y) === 255) return true */
-        }
+            const goalPos = new RoomPosition(goalCoord.x, goalCoord.y, this.leader.room.name)
 
-        for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
-            const offset = quadAttackMemberOffsets[i]
-            const goalPos = new RoomPosition(
-                this.leader.pos.x + offset.x,
-                this.leader.pos.y + offset.y,
-                this.leader.room.name,
-            )
-
             if (arePositionsEqual(member.pos, goalPos)) continue
 
             member.createMoveRequest({
@@ -236,7 +231,27 @@ export class Quad {
                 ],
             })
 
+            if (member.moveRequest === packCoord(this.leader.pos)) {
+                newLeader = member
+                newLeaderIndex = i
+            }
+
             inFormation = false
+        }
+
+        if (newLeader) {
+            this.members[newLeaderIndex] = this.leader
+            this.members[0] = newLeader
+            this.leader = newLeader
+
+            const memberNames: string[] = []
+            for (const member of this.members) {
+                memberNames.push(member.name)
+            }
+
+            for (const member of this.members) {
+                member.memory.SMNs = memberNames
+            }
         }
 
         return inFormation
@@ -337,6 +352,7 @@ export class Quad {
 
     runCombat() {
         if (this.leader.memory.ST === 'rangedAttack') {
+            if (this.bulldoze()) return
             if (this.advancedRangedAttack()) return
             if (this.rangedAttackStructures()) return
         }
@@ -587,8 +603,6 @@ export class Quad {
     }
 
     rangedAttackStructures() {
-        if (this.bulldoze()) return true
-
         const structures = this.leader.room.combatStructureTargets
 
         if (!structures.length) return false
@@ -613,8 +627,6 @@ export class Quad {
         this.rangedAttack(structure)
         return true
     }
-
-
 
     advancedAttack() {
         return true
