@@ -10,6 +10,7 @@ import {
     impassibleStructureTypes,
     myColors,
     nonCommuneSigns,
+    quadAttackMemberOffsets,
     roomDimensions,
     TrafficPriorities,
 } from 'international/constants'
@@ -1118,7 +1119,6 @@ Creep.prototype.reservationManager = function () {
         }
 
         if (this.room.enemyThreatCoords.has(packCoord(target.pos))) {
-
             this.deleteReservation(index)
             continue
         }
@@ -1425,4 +1425,40 @@ Creep.prototype.reserveTransferEnergy = function () {
     amount = Math.min(Math.max(this.usedStore(), 0), target.freeStore())
 
     this.createReservation('transfer', target.id, amount, RESOURCE_ENERGY)
+}
+
+Creep.prototype.findBulzodeTargets = function (goalPos) {
+    return []
+}
+
+Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
+    if (this.memory.QBTIDs) return this.memory.QBTIDs
+
+    const path = this.room.advancedFindPath({
+        origin: this.pos,
+        goals: [
+            {
+                pos: goalPos,
+                range: 0,
+            },
+        ],
+        weightCostMatrixes: ['quadBulldozeCostMatrix'],
+    })
+
+    const targetStructureIDs: Set<Id<Structure>> = new Set()
+
+    for (const pos of path) {
+        for (let i = quadAttackMemberOffsets.length - 1; i > 0; i--) {
+            const offset = quadAttackMemberOffsets[i]
+
+            for (const structure of this.room.lookForAt(LOOK_STRUCTURES, pos.x + offset.x, pos.y + offset.y)) {
+                if (!impassibleStructureTypes.includes(structure.structureType)) continue
+                if (structure.structureType === STRUCTURE_RAMPART) continue
+
+                targetStructureIDs.add(structure.id)
+            }
+        }
+    }
+
+    return []
 }

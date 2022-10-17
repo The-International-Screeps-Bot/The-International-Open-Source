@@ -177,7 +177,7 @@ global.deleteClaimRequests = function () {
     return `Deleted ${deleteCount} claim requests`
 }
 
-global.combat = function (type, requestName, communeName, minDamage, minHeal) {
+global.combat = function (type, requestName, communeName, minDamage, minHeal, quadCount) {
     if (!Memory.combatRequests[requestName]) {
         const request = Memory.combatRequests[requestName] = {
             T: type || 'attack',
@@ -185,8 +185,9 @@ global.combat = function (type, requestName, communeName, minDamage, minHeal) {
             data: [0],
         }
 
-        request.data[CombatRequestData.minDamage] = minDamage
-        request.data[CombatRequestData.minHeal] = minHeal
+        if (minDamage) request.data[CombatRequestData.minDamage] = minDamage
+        if (minHeal) request.data[CombatRequestData.minHeal] = minHeal
+        if (quadCount) request.data[CombatRequestData.quadCount] = quadCount
     }
 
     if (communeName) {
