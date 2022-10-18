@@ -144,7 +144,7 @@ export class Quad {
     runCombatRoom() {
         if (this.leader.room.name !== this.leader.memory.CRN) return false
 
-        if (!this.leader.room.enemyAttackers.length && !this.leader.room.structures.tower.length) {
+        if (this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runSingle()
             return true
         }
@@ -379,12 +379,29 @@ export class Quad {
     }
 
     passiveHeal() {
+
         for (const member1 of this.members) {
             if (member1.hits === member1.hitsMax) continue
 
             for (const member2 of this.members) {
+
+                if (member2.worked) continue
+
                 member2.heal(member1)
-                member2.ranged = true
+                member2.worked = true
+            }
+
+            return
+        }
+
+        if (this.leader.room.enemyDamageThreat) {
+
+            for (const member of this.members) {
+
+                if (member.worked) continue
+
+                member.heal(member)
+                member.worked = true
             }
 
             return
