@@ -129,6 +129,10 @@ export class Quad {
                 enemy: Infinity,
                 ally: Infinity,
                 keeper: Infinity,
+                enemyRemote: 5,
+                allyRemote: 5,
+                highway: 1,
+                neutral: 2,
             },
         })
     }
@@ -573,16 +577,14 @@ export class Quad {
 
             bulldozeTarget = findClosestObject(this.leader.pos, bulldozeTargets)
 
-            this.leader.findQuadBulldozeTargets(bulldozeTarget.pos)
-
-            quadBulldozeTargetIDs = this.leader.memory.QBTIDs
+            quadBulldozeTargetIDs = this.leader.findQuadBulldozeTargets(bulldozeTarget.pos)
             if (!quadBulldozeTargetIDs.length) return false
 
             bulldozeTarget = findObjectWithID(quadBulldozeTargetIDs[0])
         }
 
-        this.leader.room.targetVisual(this.leader.pos, bulldozeTarget.pos)
-
+        this.leader.room.targetVisual(this.leader.pos, bulldozeTarget.pos, true)
+        return false
         const range = this.findMinRange(bulldozeTarget.pos)
 
         if (range > 1) {

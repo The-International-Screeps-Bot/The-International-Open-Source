@@ -76,6 +76,10 @@ export class Duo {
                 enemy: Infinity,
                 ally: Infinity,
                 keeper: Infinity,
+                enemyRemote: 4,
+                allyRemote: 4,
+                highway: 1,
+                neutral: 2,
             },
         })
     }

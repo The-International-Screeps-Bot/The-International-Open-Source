@@ -1431,13 +1431,12 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
             const offset = quadAttackMemberOffsets[i]
 
             for (const structure of this.room.lookForAt(LOOK_STRUCTURES, pos.x + offset.x, pos.y + offset.y)) {
-                if (!impassibleStructureTypes.includes(structure.structureType)) continue
-                if (structure.structureType === STRUCTURE_RAMPART) continue
-
+                if (!impassibleStructureTypes.includes(structure.structureType) && structure.structureType !== STRUCTURE_RAMPART) continue
+                this.room.visual.circle(structure.pos)
                 targetStructureIDs.add(structure.id)
             }
         }
     }
 
-    return []
+    return this.memory.QBTIDs = Array.from(targetStructureIDs)
 }

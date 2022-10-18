@@ -10,8 +10,6 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
-        if (!this.memory.SS) return
-        if (this.memory.SF) return
 
         if (!internationalManager.creepsByCombatRequest[this.memory.CRN]) {
             internationalManager.creepsByCombatRequest[this.memory.CRN] = {}
@@ -19,6 +17,9 @@ export class Antifa extends Creep {
         }
 
         internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
+
+        if (!this.memory.SS) return
+        if (this.memory.SF) return
 
         const memberNames = [this.name]
 

@@ -31,6 +31,11 @@ export class Maintainer extends Creep {
             if (this.needsResources()) return false
         }
 
+        if (room.cSiteTarget.structureType === STRUCTURE_SPAWN) {
+
+            return this.advancedBuildCSite()
+        }
+
         // Otherwise if the this doesn't need resources
 
         const workPartCount = this.parts.work
