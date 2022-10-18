@@ -1,3 +1,4 @@
+import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
 import { unpackPos } from 'other/packrat'
 
@@ -37,8 +38,7 @@ export class MineralHarvester extends Creep {
         // Find amount of minerals harvested and record it in data
 
         const mineralsHarvested = Math.min(this.parts.work * HARVEST_POWER, mineral.mineralAmount)
-        if (global.roomStats.commune[this.room.name])
-            (global.roomStats.commune[this.room.name] as RoomCommuneStats).mh += mineralsHarvested
+            globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
 
         this.say(`⛏️${mineralsHarvested}`)
 

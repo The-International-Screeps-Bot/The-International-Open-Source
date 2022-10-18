@@ -232,4 +232,13 @@ Object.defineProperties(Creep.prototype, {
             return (this._canMove = !this.fatigue && !this.spawning && this.parts.move > 0)
         },
     },
+    isOnExit: {
+        get() {
+            if (this._isOnExit !== undefined) return this._isOnExit
+
+            const { x } = this.pos
+            const { y } = this.pos
+            return x <= 0 || x >= 49 || y <= 0 || y >= 49
+        }
+    },
 } as PropertyDescriptorMap & ThisType<Creep>)

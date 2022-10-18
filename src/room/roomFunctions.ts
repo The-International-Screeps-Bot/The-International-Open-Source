@@ -2077,3 +2077,14 @@ Room.prototype.visualizeCostMatrix = function (cm, color) {
         }
     }
 }
+
+Room.prototype.coordHasStructureTypes = function(coord, types) {
+
+    for (const structure of this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
+        if (!types.has(structure.structureType)) continue
+
+        return true
+    }
+
+    return false
+}

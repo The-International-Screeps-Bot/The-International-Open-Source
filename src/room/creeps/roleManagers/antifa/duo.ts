@@ -39,9 +39,7 @@ export class Duo {
     }
 
     constructor(memberNames: string[]) {
-
         for (const memberName of memberNames) {
-
             const member = Game.creeps[memberName]
             this.members.push(member)
 
@@ -76,6 +74,10 @@ export class Duo {
                 enemy: Infinity,
                 ally: Infinity,
                 keeper: Infinity,
+                enemyRemote: 4,
+                allyRemote: 4,
+                highway: 1,
+                neutral: 2,
             },
         })
     }
@@ -102,7 +104,7 @@ export class Duo {
 
         this.leader.say('GIF')
 
-        if (this.leader.isOnExit()) return true
+        if (this.leader.isOnExit) return true
 
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,
@@ -146,7 +148,7 @@ export class Duo {
         const { room } = this.leader
 
         let enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         if (!room.enemyAttackers.length) enemyAttackers = room.enemyAttackers
@@ -155,7 +157,7 @@ export class Duo {
 
         if (!enemyAttackers.length) {
             let enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
@@ -319,7 +321,7 @@ export class Duo {
         const { room } = this.leader
 
         let enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         if (!enemyAttackers.length) enemyAttackers = room.enemyAttackers
@@ -328,7 +330,7 @@ export class Duo {
 
         if (!enemyAttackers.length) {
             let enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps

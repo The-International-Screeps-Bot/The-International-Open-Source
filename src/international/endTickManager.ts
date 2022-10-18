@@ -8,7 +8,7 @@ InternationalManager.prototype.endTickManager = function () {
     allyManager.endTickManager()
     statsManager.internationalEndTick()
 
-    if (!Memory.isMainShard) return
+    if (!Memory.logging) return
 
     // Fill up the console with empty logs
     for (let i = 0; i < 99; i += 1) console.log()

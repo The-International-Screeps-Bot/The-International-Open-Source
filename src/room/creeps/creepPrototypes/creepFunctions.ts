@@ -43,6 +43,7 @@ import {
     unpackPosList,
 } from 'other/packrat'
 import { creepClasses } from '../creepClasses'
+import { globalStatsUpdater } from 'international/statsManager'
 
 Creep.prototype.preTickManager = function () {}
 
@@ -165,9 +166,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
 
-    if (global.roomStats.commune[this.room.name])
-        (global.roomStats.commune[this.room.name] as RoomCommuneStats).eih += energyHarvested
-    else if (global.roomStats.remote[this.room.name]) global.roomStats.remote[this.room.name].reih += energyHarvested
+    globalStatsUpdater(this.room.name, 'eih', energyHarvested)
 
     this.say(`⛏️${energyHarvested}`)
     return true
@@ -239,8 +238,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
-                if (global.roomStats.commune[this.room.name])
-                    (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += controlPoints
+                globalStatsUpdater(this.room.name, 'eou', controlPoints)
                 this.message += `🔋${controlPoints}`
             }
         }
@@ -275,10 +273,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                     // Add control points to total controlPoints counter and say the success
 
-                    if (global.roomStats.commune[this.room.name])
-                        (global.roomStats.commune[this.room.name] as RoomCommuneStats).eoro += energySpentOnRepairs
-                    else if (global.roomStats.remote[this.room.name])
-                        global.roomStats.remote[this.room.name].reoro += energySpentOnRepairs
+                    globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
                     this.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
                 }
             }
@@ -351,8 +346,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
         const energySpentOnUpgrades = Math.min(this.store.energy, this.parts.work * UPGRADE_CONTROLLER_POWER)
 
-        if (global.roomStats.commune[this.room.name])
-            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eou += energySpentOnUpgrades
+        globalStatsUpdater(this.room.name, 'eou', energySpentOnUpgrades)
         this.say(`🔋${energySpentOnUpgrades}`)
 
         // Inform true
@@ -407,11 +401,7 @@ Creep.prototype.advancedBuildCSite = function () {
 
         // Add control points to total controlPoints counter and say the success
 
-        if (global.roomStats.commune[this.room.name])
-            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eob += energySpentOnConstruction
-        else if (global.roomStats.remote[this.room.name])
-            global.roomStats.remote[this.room.name].reob += energySpentOnConstruction
-
+        globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
         this.say(`🚧${energySpentOnConstruction}`)
 
         return true
@@ -492,11 +482,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
         // Add control points to total controlPoints counter and say the success
 
-        if (global.roomStats.commune[this.room.name])
-            (global.roomStats.commune[this.room.name] as RoomCommuneStats).eob += energySpentOnConstruction
-        else if (global.roomStats.remote[this.room.name])
-            global.roomStats.remote[this.room.name].reob += energySpentOnConstruction
-
+        globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
         this.say(`🚧${energySpentOnConstruction}`)
 
         // Inform true
@@ -729,17 +715,6 @@ Creep.prototype.needsResources = function () {
     return this.memory.NR
 }
 
-Creep.prototype.isOnExit = function () {
-    // Define an x and y aligned with the creep's pos
-
-    const { x } = this.pos
-    const { y } = this.pos
-
-    // If the creep is on an exit, inform true. Otherwise inform false
-
-    return x <= 0 || x >= 49 || y <= 0 || y >= 49
-}
-
 Creep.prototype.findTotalHealPower = function (range = 1) {
     // Initialize the healValue
 
@@ -882,7 +857,7 @@ Creep.prototype.advancedRenew = function () {
 
     const result = spawn.renewCreep(this)
     if (result === OK) {
-        ;(global.roomStats.commune[this.room.name] as RoomCommuneStats).eosp += energyCost
+        globalStatsUpdater(this.room.name, 'eosp', energyCost)
         spawn.hasRenewed = true
     }
 }
@@ -1432,7 +1407,7 @@ Creep.prototype.findBulzodeTargets = function (goalPos) {
 }
 
 Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
-    if (this.memory.QBTIDs) return this.memory.QBTIDs
+    if (this.memory.QBTIDs && this.memory.QBTIDs.length) return this.memory.QBTIDs
 
     const path = this.room.advancedFindPath({
         origin: this.pos,
@@ -1445,20 +1420,34 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
         weightCostMatrixes: ['quadBulldozeCostMatrix'],
     })
 
+    path.push(goalPos)
+
     const targetStructureIDs: Set<Id<Structure>> = new Set()
+    const visitedCoords: Set<string> = new Set()
 
     for (const pos of path) {
-        for (let i = quadAttackMemberOffsets.length - 1; i > 0; i--) {
+        for (let i = quadAttackMemberOffsets.length - 1; i > -1; i--) {
             const offset = quadAttackMemberOffsets[i]
+            const coord = {
+                x: pos.x + offset.x,
+                y: pos.y + offset.y,
+            }
+            const packedCoord = packCoord(coord)
+            if (visitedCoords.has(packedCoord)) continue
 
-            for (const structure of this.room.lookForAt(LOOK_STRUCTURES, pos.x + offset.x, pos.y + offset.y)) {
-                if (!impassibleStructureTypes.includes(structure.structureType)) continue
-                if (structure.structureType === STRUCTURE_RAMPART) continue
+            visitedCoords.add(packedCoord)
+
+            for (const structure of this.room.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
+                if (
+                    !impassibleStructureTypes.includes(structure.structureType) &&
+                    structure.structureType !== STRUCTURE_RAMPART
+                )
+                    continue
 
                 targetStructureIDs.add(structure.id)
             }
         }
     }
 
-    return []
+    return (this.memory.QBTIDs = Array.from(targetStructureIDs))
 }

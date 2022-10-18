@@ -17,7 +17,7 @@ Room.prototype.defenceManager = function () {
 
 Room.prototype.manageRampartPublicity = function () {
     const enemyAttackers = this.enemyAttackers.filter(function (creep) {
-        return !creep.isOnExit()
+        return !creep.isOnExit
     })
 
     // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
@@ -72,7 +72,7 @@ Room.prototype.advancedActivateSafeMode = function () {
     // Filter attackers that are not invaders. If there are none, stop
 
     const nonInvaderAttackers = this.enemyAttackers.filter(
-        enemyCreep => !enemyCreep.isOnExit() && enemyCreep.owner.username /* !== 'Invader' */,
+        enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username /* !== 'Invader' */,
     )
 
     if (!nonInvaderAttackers.length) return

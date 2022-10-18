@@ -1,3 +1,4 @@
+import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
 import { unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
@@ -177,11 +178,7 @@ export class SourceHarvester extends Creep {
             )
 
             // Add repair points to total repairPoints counter and say the success
-
-            if (global.roomStats.commune[this.room.name])
-                (global.roomStats.commune[this.room.name] as RoomCommuneStats).eoro += energySpentOnRepairs
-            else if (global.roomStats.remote[this.room.name])
-                global.roomStats.remote[this.room.name].reoro += energySpentOnRepairs
+            globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
             this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
 
             // Inform success

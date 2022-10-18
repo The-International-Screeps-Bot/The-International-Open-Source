@@ -30,14 +30,11 @@ class AllyManager {
      */
     getAllyRequests() {
         if (!Memory.allyTrading) return
-
-        // Stop if there are no allies
-
         if (!allyArray.length) return
 
-        // Run only once every 10 ticks
+        // Run every so often, increasing based on ally count
 
-        if (Game.time % (10 * allyArray.length) >= allyArray.length) return
+        if (Game.time % (10 + allyArray.length) >= allyArray.length) return
 
         const currentAllyName = allyArray[Game.time % allyArray.length]
 

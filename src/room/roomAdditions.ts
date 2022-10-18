@@ -1587,7 +1587,7 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-            this.visualizeCostMatrix(this._quadBulldozeCostMatrix)
+            /* this.visualizeCostMatrix(this._quadBulldozeCostMatrix) */
 
             return this._quadBulldozeCostMatrix
         },
@@ -1595,6 +1595,8 @@ Object.defineProperties(Room.prototype, {
     enemyDamageThreat: {
         get() {
             if (this._enemyDamageThreat !== undefined) return this._enemyDamageThreat
+
+            if (this.controller && !this.controller.my && this.structures.tower.length) return (this._enemyDamageThreat = true)
 
             for (const enemyAttacker of this.enemyAttackers) {
                 if (!enemyAttacker.attackStrength) continue

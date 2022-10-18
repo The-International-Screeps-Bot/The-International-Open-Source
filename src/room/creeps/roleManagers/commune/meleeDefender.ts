@@ -1,11 +1,5 @@
 import { impassibleStructureTypes, myColors } from 'international/constants'
-import {
-    areCoordsEqual,
-    findClosestObject,
-    findClosestObjectEuc,
-    getRange,
-    getRangeEuc,
-} from 'international/utils'
+import { areCoordsEqual, findClosestObject, findClosestObjectEuc, getRange, getRangeEuc } from 'international/utils'
 import { packCoord } from 'other/packrat'
 
 export class MeleeDefender extends Creep {
@@ -15,12 +9,12 @@ export class MeleeDefender extends Creep {
         // Get enemyAttackers in the room, informing false if there are none
 
         let enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
-            return !enemyAttacker.isOnExit()
+            return !enemyAttacker.isOnExit
         })
 
         if (!enemyCreeps.length) {
             enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
-                return !enemyAttacker.isOnExit()
+                return !enemyAttacker.isOnExit
             })
 
             if (!enemyCreeps.length) return

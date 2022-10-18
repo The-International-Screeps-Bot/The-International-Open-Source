@@ -397,6 +397,7 @@ declare global {
         progressTotal: number
     }
     interface RoomStats {
+        [name: string]: number
         /**
          * Game Time
          */
@@ -563,11 +564,6 @@ declare global {
          * The name of the user
          */
         me: string
-
-        /**
-         * IsMainShard
-         */
-        isMainShard: boolean
 
         /**
          * The current breaking version of the bot
@@ -997,6 +993,8 @@ declare global {
         visualizeCoordMap(coordMap: CoordMap, color?: boolean): void
 
         visualizeCostMatrix(cm: CostMatrix, color?: boolean): void
+
+        coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
@@ -1663,8 +1661,6 @@ declare global {
          */
         needsResources(): boolean
 
-        isOnExit(): boolean
-
         findTotalHealPower(range?: number): number
 
         findRecycleTarget(): StructureSpawn | StructureContainer | false
@@ -1871,6 +1867,10 @@ declare global {
         _canMove: boolean
 
         readonly canMove: boolean
+
+        _isOnExit: boolean
+
+        readonly isOnExit: boolean
     }
 
     interface CreepMemory {

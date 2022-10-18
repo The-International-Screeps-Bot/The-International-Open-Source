@@ -1,5 +1,6 @@
 import { customLog, findLargestTransactionAmount, getAvgPrice } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
+import { globalStatsUpdater } from 'international/statsManager'
 
 Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
     // Get orders specific to this situation
@@ -27,7 +28,7 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
         )
         const result = Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name)
         if (result === OK && resourceType === 'energy') {
-            ; (global.roomStats.commune[this.name] as RoomCommuneStats).eos += amount
+            globalStatsUpdater(this.name, 'eos', amount)
         }
 
         return result == OK
@@ -62,7 +63,7 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
         totalAmount: amount,
     })
     if (result === OK && resourceType === 'energy') {
-        ; (global.roomStats.commune[this.name] as RoomCommuneStats).eos += amount
+        globalStatsUpdater(this.name, 'eos', amount)
     }
     return result == OK
 }
@@ -94,7 +95,7 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
 
         const result = Game.market.deal(order.id, Math.min(dealAmount, order.remainingAmount), this.name)
         if (result === OK && resourceType === 'energy') {
-            ; (global.roomStats.commune[this.name] as RoomCommuneStats).eib += amount
+            globalStatsUpdater(this.name, 'eib', amount)
         }
         return result == OK
     }
@@ -128,7 +129,7 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
         totalAmount: amount,
     })
     if (result === OK && resourceType === 'energy') {
-        ; (global.roomStats.commune[this.name] as RoomCommuneStats).eib += amount
+        globalStatsUpdater(this.name, 'eib', amount)
     }
     return result == OK
 }

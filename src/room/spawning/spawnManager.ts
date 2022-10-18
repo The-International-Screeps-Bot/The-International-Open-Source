@@ -1,4 +1,5 @@
 import { myColors } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import './spawnFunctions'
 import './spawnRequestManager'
@@ -95,8 +96,7 @@ Room.prototype.spawnManager = function () {
 
         this.energyAvailable -= spawnRequest.cost
 
-        if (global.roomStats.commune[this.name])
-            (global.roomStats.commune[this.name] as RoomCommuneStats).eosp += spawnRequest.cost
+        globalStatsUpdater(this.name, 'eosp', spawnRequest.cost)
 
         // Decrease the spawnIndex
 

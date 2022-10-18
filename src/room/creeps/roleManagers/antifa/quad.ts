@@ -108,7 +108,11 @@ export class Quad {
 
         if (this.runCombatRoom()) return
 
-        if (!this.getInFormation()) return
+        if (!this.getInFormation()) {
+            this.passiveHeal()
+            this.passiveRangedAttack()
+            return
+        }
 
         this.leader.say('IF')
 
@@ -129,6 +133,10 @@ export class Quad {
                 enemy: Infinity,
                 ally: Infinity,
                 keeper: Infinity,
+                enemyRemote: 5,
+                allyRemote: 5,
+                highway: 1,
+                neutral: 2,
             },
         })
     }
@@ -136,20 +144,39 @@ export class Quad {
     runCombatRoom() {
         if (this.leader.room.name !== this.leader.memory.CRN) return false
 
-        if (!this.leader.room.enemyAttackers.length && !this.leader.room.structures.tower.length) {
+        if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runSingle()
             return true
         }
 
-        if (!this.getInFormation()) return true
+        if (!this.getInFormation()) {
+            this.passiveHeal()
+            this.passiveRangedAttack()
+            return true
+        }
 
-        this.advancedHeal()
         this.runCombat()
         return true
     }
 
+    runCombat() {
+        if (this.leader.memory.ST === 'rangedAttack') {
+            this.passiveRangedAttack()
+            this.passiveHeal()
+            if (this.bulldoze()) return
+            if (this.advancedRangedAttack()) return
+            /* if (this.rangedAttackStructures()) return */
+        }
+        if (this.leader.memory.ST === 'attack') {
+            if (this.advancedAttack()) return
+        }
+
+        this.advancedDismantle()
+        return
+    }
+
     getInFormation(): boolean {
-        if (this.leader.isOnExit()) return true
+        if (this.leader.isOnExit) return true
 
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
             /*
@@ -288,7 +315,7 @@ export class Quad {
         if (!moveLeader.createMoveRequest(opts)) return false
 
         if (!this.membersAttackMove()) return false
-        this.leader.room.visual.circle(unpackCoord(this.leader.moveRequest).x, unpackCoord(this.leader.moveRequest).y)
+
         return true
     }
 
@@ -350,35 +377,48 @@ export class Quad {
         return true
     }
 
-    runCombat() {
-        if (this.leader.memory.ST === 'rangedAttack') {
-            if (this.bulldoze()) return
-            if (this.advancedRangedAttack()) return
-            if (this.rangedAttackStructures()) return
-        }
-        if (this.leader.memory.ST === 'attack') {
-            if (this.advancedAttack()) return
-        }
-
-        this.advancedDismantle()
-        return
-    }
-
     passiveHeal() {
         for (const member1 of this.members) {
             if (member1.hits === member1.hitsMax) continue
 
             for (const member2 of this.members) {
+                if (member2.worked) continue
+
                 member2.heal(member1)
-                member2.ranged = true
+                member2.worked = true
             }
 
             return
         }
 
+        if (this.preHeal()) return
+
         for (const member of this.members) {
             member.passiveHeal()
         }
+    }
+
+    /**
+     * The precogs are delighted to assist
+     */
+    preHeal() {
+        if (!this.leader.room.enemyDamageThreat) return false
+
+        // Have members semi-randomly heal each other
+
+        const notHealedMembers = Array.from(this.members)
+
+        for (const member of this.members) {
+            const memberIndex = Math.floor(Math.random() * notHealedMembers.length)
+            const memberHealer = notHealedMembers[memberIndex]
+
+            memberHealer.heal(member)
+            memberHealer.worked = true
+
+            notHealedMembers.splice(memberIndex, 1)
+        }
+
+        return true
     }
 
     passiveRangedAttack() {
@@ -387,7 +427,9 @@ export class Quad {
 
             let enemyCreeps = member.room.enemyAttackers
             if (!enemyCreeps.length) {
-                enemyCreeps = member.room.enemyCreeps
+                enemyCreeps = member.room.enemyCreeps.filter(
+                    enemyCreep => !member.room.coordHasStructureTypes(enemyCreep.pos, new Set([STRUCTURE_RAMPART])),
+                )
                 if (!enemyCreeps.length) continue
             }
 
@@ -410,6 +452,8 @@ export class Quad {
     rangedAttack(target: Creep | Structure) {
         if (!(target as AnyOwnedStructure).owner) {
             for (const member of this.members) {
+                if (member.ranged) continue
+
                 if (getRangeOfCoords(member.pos, target.pos) > 3) continue
 
                 member.rangedAttack(target)
@@ -419,6 +463,7 @@ export class Quad {
         }
 
         for (const member of this.members) {
+            if (member.ranged) continue
             const range = getRangeOfCoords(member.pos, target.pos)
             if (range > 3) continue
 
@@ -437,7 +482,7 @@ export class Quad {
         const { room } = this.leader
 
         let enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         if (!room.enemyAttackers.length) enemyAttackers = room.enemyAttackers
@@ -446,7 +491,7 @@ export class Quad {
 
         if (!enemyAttackers.length) {
             let enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
@@ -549,39 +594,36 @@ export class Quad {
 
     bulldoze() {
         let bulldozeTarget: Structure
-        let quadBulldozeTargetIDs = this.leader.memory.QBTIDs
+        this.leader.memory.QBTIDs = []
+        let quadBulldozeTargetIDs = this.leader.memory.QBTIDs || []
 
-        if (quadBulldozeTargetIDs) {
-            for (let i = 0; i < quadBulldozeTargetIDs.length; i++) {
-                const ID = quadBulldozeTargetIDs[i]
-                const structure = findObjectWithID(ID)
-                if (!structure) {
-                    quadBulldozeTargetIDs.splice(i, 1)
-                    continue
-                }
-
-                bulldozeTarget = structure
+        for (let i = 0; i < quadBulldozeTargetIDs.length; i++) {
+            const ID = quadBulldozeTargetIDs[i]
+            const structure = findObjectWithID(ID)
+            if (!structure) {
+                quadBulldozeTargetIDs.splice(i, 1)
+                continue
             }
+
+            bulldozeTarget = structure
         }
 
         if (!bulldozeTarget) {
             let bulldozeTargets: Structure[] = []
-            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn)
+            /* bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn) */
             bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.tower)
 
             if (!bulldozeTargets.length) return false
 
             bulldozeTarget = findClosestObject(this.leader.pos, bulldozeTargets)
 
-            this.leader.findQuadBulldozeTargets(bulldozeTarget.pos)
-
-            quadBulldozeTargetIDs = this.leader.memory.QBTIDs
+            quadBulldozeTargetIDs = this.leader.findQuadBulldozeTargets(bulldozeTarget.pos)
             if (!quadBulldozeTargetIDs.length) return false
 
             bulldozeTarget = findObjectWithID(quadBulldozeTargetIDs[0])
         }
 
-        this.leader.room.targetVisual(this.leader.pos, bulldozeTarget.pos)
+        this.leader.room.targetVisual(this.leader.pos, bulldozeTarget.pos, true)
 
         const range = this.findMinRange(bulldozeTarget.pos)
 
@@ -590,11 +632,9 @@ export class Quad {
                 origin: this.leader.pos,
                 goals: [{ pos: bulldozeTarget.pos, range: 1 }],
             })
-
-            return true
         }
 
-        if (range > 3) return false
+        if (range > 3) return true
 
         this.rangedAttack(bulldozeTarget)
         return true
@@ -618,11 +658,9 @@ export class Quad {
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
             })
-
-            return false
         }
 
-        if (range > 3) return false
+        if (range > 3) return true
 
         this.rangedAttack(structure)
         return true
@@ -633,23 +671,6 @@ export class Quad {
     }
     advancedDismantle() {
         return true
-    }
-    advancedHeal() {
-        for (const member1 of this.members) {
-            if (member1.hits === member1.hitsMax) continue
-
-            for (const member2 of this.members) {
-                member2.heal(member1)
-            }
-
-            return
-        }
-
-        for (const member of this.members) {
-            if (!member.room.enemyAttackers.length) continue
-
-            member.heal(member)
-        }
     }
 
     findMinRange(coord: Coord) {

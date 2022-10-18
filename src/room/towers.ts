@@ -1,4 +1,5 @@
 import { myColors } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 
 Room.prototype.towerManager = function () {
@@ -25,7 +26,7 @@ Room.prototype.towersHealCreeps = function () {
     // Construct heal targets from my and allied damaged creeps in the this
 
     const healTargets = this.myDamagedCreeps.concat(this.allyDamagedCreeps).filter(creep => {
-        return creep.body.length > 1 && creep.hits < creep.hitsMax && !creep.isOnExit()
+        return creep.body.length > 1 && creep.hits < creep.hitsMax && !creep.isOnExit
     })
 
     if (!healTargets.length) return
@@ -58,7 +59,7 @@ Room.prototype.towersAttackCreeps = function () {
     // Construct attack targets from my and allied damaged creeps in the this
 
     const attackTargets = this.enemyCreeps.filter(function (creep) {
-        return !creep.isOnExit()
+        return !creep.isOnExit
     })
 
     if (!attackTargets.length) return
@@ -122,9 +123,7 @@ Room.prototype.towersRepairRamparts = function () {
         // Otherwise the repair worked
 
         // Record the tower energy spent in stats
-
-        if (global.roomStats.commune[this.name])
-            (global.roomStats.commune[this.name] as RoomCommuneStats).eorwr += TOWER_ENERGY_COST
+        globalStatsUpdater(this.name, 'eorwr', TOWER_ENERGY_COST)
 
         tower.intended = true
         ramparts.pop()
