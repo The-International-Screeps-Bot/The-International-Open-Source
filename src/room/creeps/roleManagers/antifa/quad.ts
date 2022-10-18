@@ -300,7 +300,7 @@ export class Quad {
         if (!moveLeader.createMoveRequest(opts)) return false
 
         if (!this.membersAttackMove()) return false
-        this.leader.room.visual.circle(unpackCoord(this.leader.moveRequest).x, unpackCoord(this.leader.moveRequest).y)
+
         return true
     }
 
@@ -619,7 +619,7 @@ export class Quad {
 
         if (!bulldozeTarget) {
             let bulldozeTargets: Structure[] = []
-            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn)
+            /* bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn) */
             bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.tower)
 
             if (!bulldozeTargets.length) return false
