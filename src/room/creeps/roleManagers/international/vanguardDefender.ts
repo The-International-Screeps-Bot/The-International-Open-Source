@@ -10,14 +10,14 @@ export class VanguardDefender extends Creep {
         const { room } = this
 
         const enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         // If there are none
 
         if (!enemyAttackers.length) {
             const enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!enemyCreeps.length) return this.aggressiveHeal()

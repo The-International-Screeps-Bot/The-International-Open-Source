@@ -10,7 +10,6 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
-
         if (!internationalManager.creepsByCombatRequest[this.memory.CRN]) {
             internationalManager.creepsByCombatRequest[this.memory.CRN] = {}
             for (const role of antifaRoles) internationalManager.creepsByCombatRequest[this.memory.CRN][role] = []
@@ -37,7 +36,6 @@ export class Antifa extends Creep {
 
             if (this.memory.SMNs.length === this.memory.SS) {
                 for (const memberName of memberNames) {
-
                     const memberMemory = Memory.creeps[memberName]
                     memberMemory.SF = true
                     memberMemory.SMNs = memberNames
@@ -90,7 +88,6 @@ export class Antifa extends Creep {
             }
 
             for (const memberName of memberNames) {
-
                 Memory.creeps[memberName].SMNs = memberNames
             }
 
@@ -211,7 +208,7 @@ export class Antifa extends Creep {
         const { room } = this
 
         let enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         if (!enemyAttackers.length) enemyAttackers = room.enemyAttackers
@@ -220,7 +217,7 @@ export class Antifa extends Creep {
 
         if (!enemyAttackers.length) {
             let enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps
@@ -260,7 +257,7 @@ export class Antifa extends Creep {
             }
 
             this.rangedMassAttack()
-            if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
+            if (enemyCreep.canMove && !enemyCreep.isOnExit) this.assignMoveRequest(enemyCreep.pos)
             return true
         }
 
@@ -380,7 +377,7 @@ export class Antifa extends Creep {
         const { room } = this
 
         let enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         if (!enemyAttackers.length) enemyAttackers = room.enemyAttackers
@@ -389,7 +386,7 @@ export class Antifa extends Creep {
 
         if (!enemyAttackers.length) {
             let enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!enemyCreeps) enemyCreeps = room.enemyCreeps

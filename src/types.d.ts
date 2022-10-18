@@ -1665,8 +1665,6 @@ declare global {
          */
         needsResources(): boolean
 
-        isOnExit(): boolean
-
         findTotalHealPower(range?: number): number
 
         findRecycleTarget(): StructureSpawn | StructureContainer | false
@@ -1873,6 +1871,10 @@ declare global {
         _canMove: boolean
 
         readonly canMove: boolean
+
+        _isOnExit: boolean
+
+        readonly isOnExit: boolean
     }
 
     interface CreepMemory {

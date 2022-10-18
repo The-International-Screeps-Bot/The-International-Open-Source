@@ -729,17 +729,6 @@ Creep.prototype.needsResources = function () {
     return this.memory.NR
 }
 
-Creep.prototype.isOnExit = function () {
-    // Define an x and y aligned with the creep's pos
-
-    const { x } = this.pos
-    const { y } = this.pos
-
-    // If the creep is on an exit, inform true. Otherwise inform false
-
-    return x <= 0 || x >= 49 || y <= 0 || y >= 49
-}
-
 Creep.prototype.findTotalHealPower = function (range = 1) {
     // Initialize the healValue
 
@@ -1439,7 +1428,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
             }
             const packedCoord = packCoord(coord)
             if (visitedCoords.has(packedCoord)) continue
-            
+
             visitedCoords.add(packedCoord)
 
             for (const structure of this.room.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {

@@ -155,13 +155,28 @@ export class Quad {
             return true
         }
 
-        this.advancedHeal()
         this.runCombat()
         return true
     }
 
+    runCombat() {
+        if (this.leader.memory.ST === 'rangedAttack') {
+            this.passiveRangedAttack()
+            this.passiveHeal()
+            if (this.bulldoze()) return
+            if (this.advancedRangedAttack()) return
+            /* if (this.rangedAttackStructures()) return */
+        }
+        if (this.leader.memory.ST === 'attack') {
+            if (this.advancedAttack()) return
+        }
+
+        this.advancedDismantle()
+        return
+    }
+
     getInFormation(): boolean {
-        if (this.leader.isOnExit()) return true
+        if (this.leader.isOnExit) return true
 
         if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
             /*
@@ -362,22 +377,6 @@ export class Quad {
         return true
     }
 
-    runCombat() {
-        if (this.leader.memory.ST === 'rangedAttack') {
-            this.passiveRangedAttack()
-            this.passiveHeal()
-            if (this.bulldoze()) return
-            if (this.advancedRangedAttack()) return
-            if (this.rangedAttackStructures()) return
-        }
-        if (this.leader.memory.ST === 'attack') {
-            if (this.advancedAttack()) return
-        }
-
-        this.advancedDismantle()
-        return
-    }
-
     passiveHeal() {
         for (const member1 of this.members) {
             if (member1.hits === member1.hitsMax) continue
@@ -483,7 +482,7 @@ export class Quad {
         const { room } = this.leader
 
         let enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit()
+            return !creep.isOnExit
         })
 
         if (!room.enemyAttackers.length) enemyAttackers = room.enemyAttackers
@@ -492,7 +491,7 @@ export class Quad {
 
         if (!enemyAttackers.length) {
             let enemyCreeps = room.enemyCreeps.filter(function (creep) {
-                return !creep.isOnExit()
+                return !creep.isOnExit
             })
 
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
@@ -672,23 +671,6 @@ export class Quad {
     }
     advancedDismantle() {
         return true
-    }
-    advancedHeal() {
-        for (const member1 of this.members) {
-            if (member1.hits === member1.hitsMax) continue
-
-            for (const member2 of this.members) {
-                member2.heal(member1)
-            }
-
-            return
-        }
-
-        for (const member of this.members) {
-            if (!member.room.enemyAttackers.length) continue
-
-            member.heal(member)
-        }
     }
 
     findMinRange(coord: Coord) {
