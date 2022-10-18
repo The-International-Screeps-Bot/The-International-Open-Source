@@ -172,15 +172,22 @@ export class RemoteDefender extends Creep {
         // If the range is 1, rangedMassAttack
 
         if (range === 1) {
-            this.rangedMassAttack()
+            if (this.getActiveBodyparts(RANGED_ATTACK) > 0) {
+                this.rangedMassAttack()
+                this.moveRequest = packCoord(enemyAttacker.pos)
+            } else {
+                this.attack(enemyAttacker)
+            }
         }
 
         // Otherwise, rangedAttack the enemyAttacker
-        else this.rangedAttack(enemyAttacker)
+        else if (this.getActiveBodyparts(RANGED_ATTACK) > 0) {
+            this.rangedAttack(enemyAttacker)
+        }
 
         // If the creep is out matched, try to always stay in range 3
 
-        if (this.healStrength < enemyAttacker.attackStrength) {
+        if (this.healStrength < enemyAttacker.attackStrength && this.getActiveBodyparts(RANGED_ATTACK) > 0) {
             if (range === 3) return true
 
             if (range >= 3) {
@@ -203,7 +210,7 @@ export class RemoteDefender extends Creep {
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
-        if (this.healStrength < enemyAttacker.attackStrength) {
+        if (this.healStrength < enemyAttacker.attackStrength && this.getActiveBodyparts(RANGED_ATTACK) > 0) {
             // If the range is less or equal to 2
 
             if (range <= 2) {
@@ -221,7 +228,7 @@ export class RemoteDefender extends Creep {
 
         // If the range is more than 1
 
-        if (range > 1) {
+        if (range > 1 && this.getActiveBodyparts(RANGED_ATTACK) > 0) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
