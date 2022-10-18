@@ -1411,7 +1411,7 @@ Creep.prototype.findBulzodeTargets = function (goalPos) {
 }
 
 Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
-    if (this.memory.QBTIDs) return this.memory.QBTIDs
+    if (this.memory.QBTIDs && this.memory.QBTIDs.length) return this.memory.QBTIDs
 
     const path = this.room.advancedFindPath({
         origin: this.pos,
@@ -1424,15 +1424,27 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
         weightCostMatrixes: ['quadBulldozeCostMatrix'],
     })
 
+    path.push(goalPos)
+
     const targetStructureIDs: Set<Id<Structure>> = new Set()
+    const visitedCoords: Set<string> = new Set()
 
     for (const pos of path) {
-        for (let i = quadAttackMemberOffsets.length - 1; i > 0; i--) {
-            const offset = quadAttackMemberOffsets[i]
 
-            for (const structure of this.room.lookForAt(LOOK_STRUCTURES, pos.x + offset.x, pos.y + offset.y)) {
+        for (let i = quadAttackMemberOffsets.length - 1; i > -1; i--) {
+            const offset = quadAttackMemberOffsets[i]
+            const coord = {
+                x: pos.x + offset.x,
+                y: pos.y + offset.y
+            }
+            const packedCoord = packCoord(coord)
+            if (visitedCoords.has(packedCoord)) continue
+            
+            visitedCoords.add(packedCoord)
+
+            for (const structure of this.room.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
                 if (!impassibleStructureTypes.includes(structure.structureType) && structure.structureType !== STRUCTURE_RAMPART) continue
-                this.room.visual.circle(structure.pos)
+
                 targetStructureIDs.add(structure.id)
             }
         }

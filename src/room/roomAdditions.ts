@@ -1587,7 +1587,7 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-            this.visualizeCostMatrix(this._quadBulldozeCostMatrix)
+            /* this.visualizeCostMatrix(this._quadBulldozeCostMatrix) */
 
             return this._quadBulldozeCostMatrix
         },
