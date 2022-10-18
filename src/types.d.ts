@@ -565,11 +565,6 @@ declare global {
         me: string
 
         /**
-         * IsMainShard
-         */
-        isMainShard: boolean
-
-        /**
          * The current breaking version of the bot
          */
         breakingVersion: number | undefined

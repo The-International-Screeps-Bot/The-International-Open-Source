@@ -40,11 +40,6 @@ class ConfigManager {
             Object.values(Game.creeps)[0]?.owner?.username ||
             'username'
 
-        Memory.isMainShard =
-            Game.shard.name !== 'performanceServer'
-                ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
-                : false
-
         // Settings
 
         Memory.roomVisuals = roomVisuals
@@ -62,7 +57,10 @@ class ConfigManager {
         Memory.publicRamparts = publicRamparts
         Memory.allyTrading = allyTrading
         Memory.marketUsage = marketUsage
-        Memory.logging = logging
+        Memory.logging =
+            Game.shard.name !== 'performanceServer'
+                ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
+                : false
 
         // Construct foundation
 
