@@ -144,7 +144,7 @@ export class Quad {
     runCombatRoom() {
         if (this.leader.room.name !== this.leader.memory.CRN) return false
 
-        if (this.leader.room.enemyDamageThreat) {
+        if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runSingle()
             return true
         }
@@ -392,16 +392,7 @@ export class Quad {
             return
         }
 
-        if (this.leader.room.enemyDamageThreat) {
-            for (const member of this.members) {
-                if (member.worked) continue
-
-                member.heal(member)
-                member.worked = true
-            }
-
-            return
-        }
+        if (this.preHeal()) return
 
         for (const member of this.members) {
             member.passiveHeal()
@@ -419,12 +410,13 @@ export class Quad {
         const notHealedMembers = Array.from(this.members)
 
         for (const member of this.members) {
-            const memberHealer = notHealedMembers[notHealedMembers.length - 1]
+            const memberIndex = Math.floor(Math.random() * notHealedMembers.length)
+            const memberHealer = notHealedMembers[memberIndex]
 
             memberHealer.heal(member)
             memberHealer.worked = true
 
-            notHealedMembers.pop()
+            notHealedMembers.splice(memberIndex, 1)
         }
 
         return true
