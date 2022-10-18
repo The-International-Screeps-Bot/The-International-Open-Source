@@ -379,12 +379,10 @@ export class Quad {
     }
 
     passiveHeal() {
-
         for (const member1 of this.members) {
             if (member1.hits === member1.hitsMax) continue
 
             for (const member2 of this.members) {
-
                 if (member2.worked) continue
 
                 member2.heal(member1)
@@ -395,9 +393,7 @@ export class Quad {
         }
 
         if (this.leader.room.enemyDamageThreat) {
-
             for (const member of this.members) {
-
                 if (member.worked) continue
 
                 member.heal(member)
@@ -410,6 +406,28 @@ export class Quad {
         for (const member of this.members) {
             member.passiveHeal()
         }
+    }
+
+    /**
+     * The precogs are delighted to assist
+     */
+    preHeal() {
+        if (!this.leader.room.enemyDamageThreat) return false
+
+        // Have members semi-randomly heal each other
+
+        const notHealedMembers = Array.from(this.members)
+
+        for (const member of this.members) {
+            const memberHealer = notHealedMembers[notHealedMembers.length - 1]
+
+            memberHealer.heal(member)
+            memberHealer.worked = true
+
+            notHealedMembers.pop()
+        }
+
+        return true
     }
 
     passiveRangedAttack() {
