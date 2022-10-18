@@ -1,3 +1,49 @@
+function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
+    const roomStatsLevel = Memory.roomStats
+    switch (statName) {
+        case 'su':
+        case 'cu':
+        case 'eih':
+            if (roomStatsLevel >= 1 || forceUpdate) return 1
+        case 'cc':
+        case 'tcc':
+        case 'cl':
+        case 'es':
+            if (roomStatsLevel >= 1 || forceUpdate) return 1.5
+        case 'mh':
+        case 'eib':
+        case 'eos':
+        case 'eou':
+        case 'eob':
+        case 'eoro':
+        case 'eorwr':
+        case 'eosp':
+        case 'rc':
+        case 'rcu':
+        case 'res':
+        case 'reih':
+        case 'reoro':
+        case 'reob':
+            if (roomStatsLevel >= 2 || forceUpdate) return 2
+            else return 0
+        default:
+            return 0
+    }
+}
+
+function GetRemoteStatsName(name: string): string {
+    switch (name) {
+        case 'cu':
+        case 'es':
+        case 'eih':
+        case 'eoro':
+        case 'eob':
+            return 'r' + name
+        default:
+            return name
+    }
+}
+
 export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
         if (roomType === 'commune') {
@@ -119,43 +165,24 @@ export class StatsManager {
             if (value === undefined) roomStats[name] = 0
             if (globalValue === undefined) globalValue = 0
 
-            if (globalValue !== null) {
-                switch (name) {
-                    // level 1 wo average
-                    case 'cc':
-                    case 'tcc':
-                    case 'cl':
-                    case 'es':
-                        roomStats[name] = this.round(globalValue)
-                        break
-                    // level 1 w average
-                    case 'su':
-                    case 'cu':
-                    case 'eih':
+            const statLevel = GetLevelOfStatName(name, forceUpdate)
+            switch (statLevel) {
+                // level 1 w average
+                case 1:
+                    roomStats[name] = this.average(value, globalValue)
+                    break
+                // level 1 wo average
+                case 1.5:
+                    roomStats[name] = this.round(globalValue)
+                    break
+                // level 2 w average
+                case 2:
+                    if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
                         roomStats[name] = this.average(value, globalValue)
-                        break
-                    // level 2
-                    case 'mh':
-                    case 'eib':
-                    case 'eos':
-                    case 'eou':
-                    case 'eob':
-                    case 'eoro':
-                    case 'eorwr':
-                    case 'eosp':
-                    case 'rc':
-                    case 'rcu':
-                    case 'res':
-                    case 'reih':
-                    case 'reoro':
-                    case 'reob':
-                        if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
-                            roomStats[name] = this.average(value, globalValue)
-                        else roomStats[name] = null
-                        break
-                    default:
-                        break
-                }
+                    else roomStats[name] = 0
+                    break
+                default:
+                    break
             }
         })
     }
@@ -236,11 +263,13 @@ export class StatsManager {
         const globalRoomKeys = Object.keys(global.roomStats.commune)
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
         globalRoomKeys.forEach(roomName => {
+            console.log(`StatsManager: internationalEndTick: ${roomName} stats updated`)
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
         })
 
         notCheckedCommuneRooms.forEach(roomName => {
             const roomType = Memory.rooms[roomName].T
+            console.log(`StatsManager: NOT UPDATED internationalEndTick: ${roomName}`)
             if (roomType === 'commune') {
                 this.roomConfig(roomName, roomType)
                 this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName], true)
@@ -264,3 +293,10 @@ export class StatsManager {
 }
 
 export const statsManager = new StatsManager()
+export const globalStatsUpdater = function (roomName: string, name: string, value: number) {
+    const updateStats = GetLevelOfStatName(name, true) > 0
+    if (updateStats && global.roomStats) {
+        if (global.roomStats.commune[roomName]) global.roomStats.commune[roomName][name] += value
+        else if (global.roomStats.remote[roomName]) global.roomStats.remote[roomName][GetRemoteStatsName(name)] += value
+    }
+}

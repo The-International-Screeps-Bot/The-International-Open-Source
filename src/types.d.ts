@@ -397,6 +397,7 @@ declare global {
         progressTotal: number
     }
     interface RoomStats {
+        [name: string]: number
         /**
          * Game Time
          */

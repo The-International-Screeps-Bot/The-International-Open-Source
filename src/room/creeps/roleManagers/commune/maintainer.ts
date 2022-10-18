@@ -1,4 +1,5 @@
 import { roomDimensions } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { findObjectWithID } from 'international/utils'
 
 export class Maintainer extends Creep {
@@ -32,7 +33,6 @@ export class Maintainer extends Creep {
         }
 
         if (room.cSiteTarget.structureType === STRUCTURE_SPAWN) {
-
             return this.advancedBuildCSite()
         }
 
@@ -91,15 +91,11 @@ export class Maintainer extends Creep {
             this.store.energy,
         )
 
-        if (repairTarget.structureType === STRUCTURE_RAMPART) {
-            if (global.roomStats.commune[this.room.name])
-                (global.roomStats.commune[this.room.name] as RoomCommuneStats).eorwr += energySpentOnRepairs
+        if (repairTarget.structureType === STRUCTURE_RAMPART || repairTarget.structureType === STRUCTURE_WALL) {
+            globalStatsUpdater(this.room.name, 'eorwr', energySpentOnRepairs)
             this.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
         } else {
-            if (global.roomStats.commune[this.room.name])
-                (global.roomStats.commune[this.room.name] as RoomCommuneStats).eoro += energySpentOnRepairs
-            else if (global.roomStats.remote[this.room.name])
-                global.roomStats.remote[this.room.name].reoro += energySpentOnRepairs
+            globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
             this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
         }
 

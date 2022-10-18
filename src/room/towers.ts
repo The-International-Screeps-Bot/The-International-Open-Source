@@ -1,4 +1,5 @@
 import { myColors } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 
 Room.prototype.towerManager = function () {
@@ -122,9 +123,7 @@ Room.prototype.towersRepairRamparts = function () {
         // Otherwise the repair worked
 
         // Record the tower energy spent in stats
-
-        if (global.roomStats.commune[this.name])
-            (global.roomStats.commune[this.name] as RoomCommuneStats).eorwr += TOWER_ENERGY_COST
+        globalStatsUpdater(this.name, 'eorwr', TOWER_ENERGY_COST)
 
         tower.intended = true
         ramparts.pop()
