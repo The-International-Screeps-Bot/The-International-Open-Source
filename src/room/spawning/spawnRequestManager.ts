@@ -486,7 +486,7 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             // If there are enemy attackers in the room
 
-            if (!this.towerSuperiority) return false
+            if (attackStrength > 0) return false
 
             // Stop if there are no construction sites
 
@@ -514,6 +514,8 @@ Room.prototype.spawnRequester = function () {
             }
 
             const role = 'builder'
+
+            customLog('builder:', partsMultiplier)
 
             // If there is a storage or terminal
 
