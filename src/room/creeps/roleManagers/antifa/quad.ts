@@ -165,7 +165,7 @@ export class Quad {
             this.passiveHeal()
             if (this.bulldoze()) return
             if (this.advancedRangedAttack()) return
-            /* if (this.rangedAttackStructures()) return */
+            if (this.rangedAttackStructures()) return
         }
         if (this.leader.memory.ST === 'attack') {
             if (this.advancedAttack()) return
@@ -326,13 +326,7 @@ export class Quad {
             x: moveLeader.pos.x - moveRequestCoord.x,
             y: moveLeader.pos.y - moveRequestCoord.y,
         }
-        /*
-        for (let i = 1; i < this.members.length; i++) {
-            const member = this.members[i]
 
-            if (!doesXYExist(member.pos.x - moveLeaderOffset.x, member.pos.y - moveLeaderOffset.y)) return false
-        }
- */
         for (let i = 1; i < this.members.length; i++) {
             const member = this.members[i]
             const goalCoord = {
@@ -610,7 +604,7 @@ export class Quad {
 
         if (!bulldozeTarget) {
             let bulldozeTargets: Structure[] = []
-            /* bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn) */
+            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn)
             bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.tower)
 
             if (!bulldozeTargets.length) return false

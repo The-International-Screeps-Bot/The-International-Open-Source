@@ -95,6 +95,7 @@ Creep.prototype.createMoveRequest = function (opts) {
         // Generate a new path
 
         path = room.advancedFindPath(opts)
+        if (!path.length) return 'unpathable'
 
         // Limit the path's length to the cacheAmount
 
@@ -350,7 +351,7 @@ Creep.prototype.runMoveRequest = function () {
 
 Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
-    
+
     if (!this.moveRequest) return
     if (!room.moveRequests.get(this.moveRequest)) {
         this.moved = 'moved'

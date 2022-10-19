@@ -42,8 +42,7 @@ export class Maintainer extends Creep {
 
         // Find a repair target based on the creeps work parts. If none are found, inform false
 
-        const repairTarget: Structure | false =
-            findObjectWithID(this.memory.repairTarget) || this.findRepairTarget() || this.findRampartRepairTarget()
+        const repairTarget = this.findRepairTarget() || this.findRampartRepairTarget()
 
         if (!repairTarget) {
             this.say('❌🔧')
@@ -52,10 +51,7 @@ export class Maintainer extends Creep {
 
         this.say('⏩🔧')
 
-        // If roomVisuals are enabled
-
-        if (Memory.roomVisuals)
-            room.visual.text(repairTarget.structureType === STRUCTURE_RAMPART ? '🧱' : '🔧', repairTarget.pos)
+        room.targetVisual(this.pos, repairTarget.pos)
 
         // If the repairTarget is out of repair range
 
@@ -73,14 +69,9 @@ export class Maintainer extends Creep {
             return false
         }
 
-        // Otherwise
-
-        // Try to repair the target
+        // Try to repair, stopping if failed
 
         const repairResult = this.repair(repairTarget)
-
-        // If the repair failed, inform false
-
         if (repairResult !== OK) return false
 
         // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
@@ -146,11 +137,7 @@ export class Maintainer extends Creep {
 
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
-        // Get the this's work parts
-
         const workPartCount = this.parts.work
-
-        // Loop through structuresAtPos
 
         for (const structure of this.pos.lookFor(LOOK_STRUCTURES)) {
             // If the structure is not a road, iterate

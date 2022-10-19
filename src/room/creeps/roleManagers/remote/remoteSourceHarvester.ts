@@ -269,9 +269,32 @@ export class RemoteHarvester extends Creep {
         for (const creepName of creepsOfRole) {
             const creep: RemoteHarvester = Game.creeps[creepName] as RemoteHarvester
 
-            // Try to find a remote. If one couldn't be found, iterate
+            // Try to find a remote
 
-            if (!creep.findRemote()) continue
+            if (!creep.findRemote()) {
+                // If the room is the creep's commune
+
+                if (room.name === creep.commune.name) {
+                    // Advanced recycle and iterate
+
+                    creep.advancedRecycle()
+                    continue
+                }
+
+                // Otherwise, have the creep make a moveRequest to its commune and iterate
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.commune.name),
+                            range: 25,
+                        },
+                    ],
+                })
+
+                continue
+            }
 
             // If the creep needs resources
 
@@ -284,7 +307,7 @@ export class RemoteHarvester extends Creep {
 
             const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].SP[creep.memory.SI])[0]
 
-            creep.createMoveRequest({
+            const createMoveRequestResult = creep.createMoveRequest({
                 origin: creep.pos,
                 goals: [
                     {
@@ -301,6 +324,12 @@ export class RemoteHarvester extends Creep {
                     allyRemote: Infinity,
                 },
             })
+            
+            if (createMoveRequestResult === 'unpathable') {
+
+                Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
+                creep.removeRemote()
+            }
         }
     }
 }

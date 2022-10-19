@@ -8,7 +8,7 @@
         "branch": "default",
         "uglify": false
     },
-    "pserver": {
+    "pServer": {
         "email": "your username (case sensitive!)",
         "password": "your password",
         "protocol": "http",

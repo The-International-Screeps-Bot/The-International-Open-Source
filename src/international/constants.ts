@@ -808,7 +808,7 @@ export enum RemoteData {
     enemyReserved,
     invaderCore,
     abandon,
-    attackByInvader,
+    onlyInvader,
 }
 
 export const RemoteData_HaulerByIndex: RemoteData[] = [RemoteData.remoteHauler0, RemoteData.remoteHauler1]

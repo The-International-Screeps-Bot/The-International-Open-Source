@@ -307,6 +307,9 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
+
+            if (!this.towerSuperiority) return false
+
             // If there is no extractor, inform false
 
             if (!this.structures.extractor.length) return false
@@ -486,7 +489,7 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             // If there are enemy attackers in the room
 
-            if (attackStrength > 0) return false
+            if (!this.towerSuperiority) return false
 
             // Stop if there are no construction sites
 

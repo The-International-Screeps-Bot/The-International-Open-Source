@@ -843,7 +843,7 @@ Room.prototype.createAttackCombatRequest = function () {
 
     request.data[CombatRequestData.minDamage] = 10
     request.data[CombatRequestData.minHeal] = 10
-    request.data[CombatRequestData.quadCount] = 2
+    request.data[CombatRequestData.quadCount] = 1
 }
 
 Room.prototype.createHarassCombatRequest = function () {

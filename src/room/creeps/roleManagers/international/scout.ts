@@ -159,15 +159,13 @@ export class Scout extends Creep {
         if (getRange(this.pos.x, controller.pos.x, this.pos.y, controller.pos.y) > 1) {
             // Request to move to the controller and inform false
 
-            this.createMoveRequest({
+            if (this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: room.controller.pos, range: 1 }],
                 avoidEnemyRanges: true,
                 plainCost: 1,
                 swampCost: 1,
-            })
-
-            if (!this.moveRequest) return true
+            }) !== 'unpathable') return true
 
             this.say(this.moveRequest.toString())
 
