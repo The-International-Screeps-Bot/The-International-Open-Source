@@ -172,22 +172,15 @@ export class RemoteDefender extends Creep {
         // If the range is 1, rangedMassAttack
 
         if (range === 1) {
-            if (this.getActiveBodyparts(RANGED_ATTACK) > 0) {
-                this.rangedMassAttack()
-                this.moveRequest = packCoord(enemyAttacker.pos)
-            } else {
-                this.attack(enemyAttacker)
-            }
+            this.rangedMassAttack()
         }
 
         // Otherwise, rangedAttack the enemyAttacker
-        else if (this.getActiveBodyparts(RANGED_ATTACK) > 0) {
-            this.rangedAttack(enemyAttacker)
-        }
+        else this.rangedAttack(enemyAttacker)
 
         // If the creep is out matched, try to always stay in range 3
 
-        if (this.healStrength < enemyAttacker.attackStrength && this.getActiveBodyparts(RANGED_ATTACK) > 0) {
+        if (this.healStrength < enemyAttacker.attackStrength) {
             if (range === 3) return true
 
             if (range >= 3) {
@@ -210,7 +203,7 @@ export class RemoteDefender extends Creep {
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
-        if (this.healStrength < enemyAttacker.attackStrength && this.getActiveBodyparts(RANGED_ATTACK) > 0) {
+        if (this.healStrength < enemyAttacker.attackStrength) {
             // If the range is less or equal to 2
 
             if (range <= 2) {
@@ -228,7 +221,7 @@ export class RemoteDefender extends Creep {
 
         // If the range is more than 1
 
-        if (range > 1 && this.getActiveBodyparts(RANGED_ATTACK) > 0) {
+        if (range > 1) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
@@ -316,23 +309,24 @@ export class RemoteDefender extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-            if (creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
-                        range: 25,
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory.RN),
+                            range: 25,
+                        },
+                    ],
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity,
                     },
-                ],
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-            }) === 'unpathable') {
-
+                }) === 'unpathable'
+            ) {
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
                 delete creep.memory.RN
             }
