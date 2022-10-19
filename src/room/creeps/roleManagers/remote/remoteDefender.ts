@@ -327,6 +327,7 @@ export class RemoteDefender extends Creep {
             }) === 'unpathable') {
 
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
+                delete creep.memory.RN
             }
         }
     }

@@ -2,6 +2,12 @@ import { myColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 
+class TowerManager {
+    constructor() {}
+
+    run() {}
+}
+
 Room.prototype.towerManager = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
@@ -23,11 +29,19 @@ Room.prototype.towerManager = function () {
 }
 
 Room.prototype.towersHealCreeps = function () {
-    // Construct heal targets from my and allied damaged creeps in the this
+    let healTargets: Creep[]
 
-    const healTargets = this.myDamagedCreeps.concat(this.allyDamagedCreeps).filter(creep => {
-        return creep.body.length > 1 && creep.hits < creep.hitsMax && !creep.isOnExit
-    })
+    if (this.enemyAttackers.length) {
+        healTargets = this.myDamagedCreeps.filter(creep => {
+            return creep.role === 'meleeDefender'
+        })
+    } else {
+        // Construct heal targets from my and allied damaged creeps in the this
+
+        healTargets = this.myDamagedCreeps.concat(this.allyDamagedCreeps).filter(creep => {
+            return creep.body.length > 1 && creep.hits < creep.hitsMax && !creep.isOnExit
+        })
+    }
 
     if (!healTargets.length) return
 

@@ -80,7 +80,32 @@ export class RemoteReserver extends Creep {
         for (const creepName of creepsOfRole) {
             const creep: RemoteReserver = Game.creeps[creepName]
 
-            if (!creep.findRemote()) continue
+            // Try to find a remote
+
+            if (!creep.findRemote()) {
+                // If the room is the creep's commune
+
+                if (room.name === creep.commune.name) {
+                    // Advanced recycle and iterate
+
+                    creep.advancedRecycle()
+                    continue
+                }
+
+                // Otherwise, have the creep make a moveRequest to its commune and iterate
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.commune.name),
+                            range: 25,
+                        },
+                    ],
+                })
+
+                continue
+            }
 
             creep.say(creep.memory.RN)
 
@@ -104,7 +129,6 @@ export class RemoteReserver extends Creep {
                     },
                 ],
                 avoidEnemyRanges: true,
-                plainCost: 1,
                 typeWeights: {
                     enemy: Infinity,
                     ally: Infinity,
@@ -115,6 +139,7 @@ export class RemoteReserver extends Creep {
             }) === 'unpathable') {
 
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
+                delete creep.memory.RN
             }
         }
     }

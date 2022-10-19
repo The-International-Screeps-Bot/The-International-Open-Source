@@ -133,7 +133,32 @@ export class RemoteHauler extends Creep {
     }
 
     getResources?() {
-        if (!this.findRemote()) return false
+        // Try to find a remote
+
+        if (!this.findRemote()) {
+            // If the room is the creep's commune
+
+            if (this.room.name === this.commune.name) {
+                // Advanced recycle and iterate
+
+                this.advancedRecycle()
+                return false
+            }
+
+            // Otherwise, have the creep make a moveRequest to its commune and iterate
+
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.commune.name),
+                        range: 25,
+                    },
+                ],
+            })
+
+            return false
+        }
 
         const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
@@ -208,23 +233,28 @@ export class RemoteHauler extends Creep {
 
         this.getDroppedEnergy()
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: sourcePos,
-                    range: 1,
+        if (
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: sourcePos,
+                        range: 1,
+                    },
+                ],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
                 },
-            ],
-            avoidEnemyRanges: true,
-            typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                enemyRemote: Infinity,
-                allyRemote: Infinity,
-            },
-        })
+            }) === 'unpathable'
+        ) {
+            Memory.rooms[this.memory.RN].data[RemoteData.abandon] = 1500
+            this.removeRemote()
+        }
 
         return true
     }
@@ -326,7 +356,12 @@ export class RemoteHauler extends Creep {
                 }
 
                 if (!this.memory.Rs || this.memory.Rs.length == 0)
-                    this.createReservation('transfer', storingStructure.id, this.store[RESOURCE_ENERGY], RESOURCE_ENERGY)
+                    this.createReservation(
+                        'transfer',
+                        storingStructure.id,
+                        this.store[RESOURCE_ENERGY],
+                        RESOURCE_ENERGY,
+                    )
                 if (!this.fulfillReservation()) {
                     this.say(this.message)
                     return true
@@ -356,7 +391,7 @@ export class RemoteHauler extends Creep {
 
             const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
-            if (this.createMoveRequest({
+            this.createMoveRequest({
                 origin: this.pos,
                 goals: [
                     {
@@ -372,10 +407,7 @@ export class RemoteHauler extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-            }) === 'unpathable') {
-
-                Memory.rooms[this.memory.RN].data[RemoteData.abandon] = 1500
-            }
+            })
 
             return false
         }
@@ -548,8 +580,7 @@ export class RemoteHauler extends Creep {
 
     static remoteHaulerManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-
-                RemoteHauler.runCreep(creepName)
+            RemoteHauler.runCreep(creepName)
         }
     }
 }

@@ -51,10 +51,7 @@ export class Maintainer extends Creep {
 
         this.say('⏩🔧')
 
-        // If roomVisuals are enabled
-
-        if (Memory.roomVisuals)
-            room.visual.text(repairTarget.structureType === STRUCTURE_RAMPART ? '🧱' : '🔧', repairTarget.pos)
+        room.targetVisual(this.pos, repairTarget.pos)
 
         // If the repairTarget is out of repair range
 
@@ -72,14 +69,9 @@ export class Maintainer extends Creep {
             return false
         }
 
-        // Otherwise
-
-        // Try to repair the target
+        // Try to repair, stopping if failed
 
         const repairResult = this.repair(repairTarget)
-
-        // If the repair failed, inform false
-
         if (repairResult !== OK) return false
 
         // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power

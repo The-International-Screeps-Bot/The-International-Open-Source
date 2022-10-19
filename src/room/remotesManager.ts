@@ -29,7 +29,11 @@ export class RemotesManager {
             if (remoteMemory.data[RemoteData.abandon] > 0) {
                 remoteMemory.data[RemoteData.abandon] -= 1
 
-                for (const need in remoteMemory.data) remoteMemory.data[need] = 0
+                for (const dataType in remoteMemory.data) {
+
+                    if (dataType === 'abandon') continue
+                    remoteMemory.data[dataType] = 0
+                }
 
                 continue
             }
