@@ -42,8 +42,7 @@ export class Maintainer extends Creep {
 
         // Find a repair target based on the creeps work parts. If none are found, inform false
 
-        const repairTarget: Structure | false =
-            findObjectWithID(this.memory.repairTarget) || this.findRepairTarget() || this.findRampartRepairTarget()
+        const repairTarget = this.findRepairTarget() || this.findRampartRepairTarget()
 
         if (!repairTarget) {
             this.say('❌🔧')
