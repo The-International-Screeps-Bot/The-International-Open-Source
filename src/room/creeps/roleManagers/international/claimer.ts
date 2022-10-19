@@ -78,7 +78,7 @@ export class Claimer extends Creep {
             // Otherwise if the creep is not in the claimTarget
 
             if (
-                !creep.createMoveRequest({
+                creep.createMoveRequest({
                     origin: creep.pos,
                     goals: [{ pos: new RoomPosition(25, 25, claimRequestName), range: 25 }],
                     avoidEnemyRanges: true,
@@ -89,12 +89,12 @@ export class Claimer extends Creep {
                         ally: Infinity,
                         keeper: Infinity,
                     },
-                })
+                }) === 'unpathable'
             ) {
-                /* const request = Memory.claimRequests[claimRequestName]
+                const request = Memory.claimRequests[claimRequestName]
                 request.data[ClaimRequestData.abandon] = 20000
                 delete request.responder
-                delete Memory.rooms[creep.commune.name].claimRequest */
+                delete Memory.rooms[creep.commune.name].claimRequest
             }
         }
     }

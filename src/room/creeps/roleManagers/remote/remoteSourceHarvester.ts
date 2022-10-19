@@ -284,7 +284,7 @@ export class RemoteHarvester extends Creep {
 
             const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].SP[creep.memory.SI])[0]
 
-            creep.createMoveRequest({
+            if (creep.createMoveRequest({
                 origin: creep.pos,
                 goals: [
                     {
@@ -300,7 +300,10 @@ export class RemoteHarvester extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-            })
+            }) === 'unpathable') {
+
+                Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
+            }
         }
     }
 }

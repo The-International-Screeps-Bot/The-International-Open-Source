@@ -1642,7 +1642,7 @@ declare global {
         /**
          *
          */
-        createMoveRequest(opts: MoveRequestOpts): boolean
+        createMoveRequest(opts: MoveRequestOpts): boolean | 'unpathable'
 
         assignMoveRequest(coord: Coord): void
 

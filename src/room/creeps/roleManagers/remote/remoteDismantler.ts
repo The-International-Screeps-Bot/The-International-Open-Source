@@ -204,7 +204,7 @@ export class RemoteDismantler extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-            creep.createMoveRequest({
+            if (creep.createMoveRequest({
                 origin: creep.pos,
                 goals: [
                     {
@@ -219,7 +219,10 @@ export class RemoteDismantler extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-            })
+            }) === 'unpathable') {
+
+                Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
+            }
         }
     }
 }
