@@ -146,11 +146,7 @@ export class Maintainer extends Creep {
 
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
-        // Get the this's work parts
-
         const workPartCount = this.parts.work
-
-        // Loop through structuresAtPos
 
         for (const structure of this.pos.lookFor(LOOK_STRUCTURES)) {
             // If the structure is not a road, iterate

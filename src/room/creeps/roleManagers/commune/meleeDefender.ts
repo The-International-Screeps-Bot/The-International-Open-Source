@@ -68,7 +68,7 @@ export class MeleeDefender extends Creep {
 
         // Get the room's ramparts, filtering for those and informing false if there are none
 
-        const ramparts = room.structures.rampart.filter(rampart => {
+        const ramparts = room.defensiveRamparts.filter(rampart => {
             // Avoid ramparts that are low
 
             if (rampart.hits < 3000) return false
@@ -77,13 +77,7 @@ export class MeleeDefender extends Creep {
 
             if (areCoordsEqual(this.pos, rampart.pos)) return true
 
-            const structuresAtPos = room.lookForAt(LOOK_STRUCTURES, rampart.pos)
-
-            // Loop through each structure
-            // If the structure is impassible, inform false
-
-            for (const structure of structuresAtPos)
-                if (impassibleStructureTypes.includes(structure.structureType)) return false
+            if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) return false
 
             // Inform wether there is a creep at the pos
 

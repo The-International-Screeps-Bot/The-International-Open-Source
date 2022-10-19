@@ -1337,6 +1337,10 @@ declare global {
 
         readonly flags: { [key in FlagNames]: Flag }
 
+        _defensiveRamparts: StructureRampart[]
+
+        readonly defensiveRamparts: StructureRampart[]
+
         // Target finding
 
         _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]

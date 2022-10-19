@@ -499,7 +499,9 @@ Creep.prototype.findRampartRepairTarget = function () {
     let minScore = Infinity
     let bestTarget
 
-    for (const structure of this.room.structures.rampart) {
+    let ramparts = this.room.enemyAttackers ? this.room.defensiveRamparts : this.room.structures.rampart
+
+    for (const structure of ramparts) {
         // If above 90% of max hits
 
         if (structure.hits / structure.hitsMax > 0.9) continue
@@ -518,35 +520,6 @@ Creep.prototype.findRampartRepairTarget = function () {
 
     this.memory.repairTarget = bestTarget.id
     return bestTarget
-    /*
-    // Assign the quota to the value of the creep's quota, or its workPartCount times 1000, increasing it each iteration based on the creep's workPartCount
-
-    for (
-        let quota = this.memory.quota || rampartRepairExpectation;
-        quota < ramparts[0].hitsMax;
-        quota += rampartRepairExpectation
-    ) {
-        // Filter ramparts thats hits are below the quota, iterating if there are none
-
-        const rampartsUnderQuota = ramparts.filter(r => r.hits < quota)
-        if (!rampartsUnderQuota.length) continue
-
-        // Assign the quota to the creep's memory
-
-        this.memory.quota = quota
-
-        // Find the closest rampart under the quota and inform it
-
-        return this.pos.findClosestByPath(rampartsUnderQuota, {
-            ignoreCreeps: true,
-            range: 3,
-        })
-    }
-
-    // If no rampart was found, inform false
-
-    return false
-     */
 }
 
 Creep.prototype.findRepairTarget = function () {

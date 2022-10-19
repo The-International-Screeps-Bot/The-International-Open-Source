@@ -1470,7 +1470,7 @@ Object.defineProperties(Room.prototype, {
 
                 // Otherwise set the rampart's pos as impassible
 
-                terrainCoords[packAsNum(rampart.pos)] = 254/* rampart.hits / (rampart.hitsMax / 200) */
+                terrainCoords[packAsNum(rampart.pos)] = 254 /* rampart.hits / (rampart.hitsMax / 200) */
             }
 
             // Loop through structureTypes of impassibleStructureTypes
@@ -1596,7 +1596,8 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._enemyDamageThreat !== undefined) return this._enemyDamageThreat
 
-            if (this.controller && !this.controller.my && this.structures.tower.length) return (this._enemyDamageThreat = true)
+            if (this.controller && !this.controller.my && this.structures.tower.length)
+                return (this._enemyDamageThreat = true)
 
             for (const enemyAttacker of this.enemyAttackers) {
                 if (!enemyAttacker.attackStrength) continue
@@ -1680,6 +1681,118 @@ Object.defineProperties(Room.prototype, {
             }
 
             return this._flags
+        },
+    },
+    defensiveRamparts: {
+        get() {
+            if (this._defensiveRamparts) return this._defensiveRamparts
+
+            this._defensiveRamparts = []
+
+            if (!this.anchor) return this._defensiveRamparts
+
+            const ramparts = this.structures.rampart
+            if (!ramparts.length) return this._defensiveRamparts
+
+            // Construct a cost matrix for the flood
+
+            const coordMap = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+
+            for (const road of this.structures.road) {
+                coordMap[packAsNum(road.pos)] = 0
+            }
+
+            const rampartsByCoord: Map<number, Id<StructureRampart>> = new Map()
+
+            for (const rampart of ramparts) {
+
+                const packedCoord = packAsNum(rampart.pos)
+                coordMap[packedCoord] = 254
+                rampartsByCoord.set(packedCoord, rampart.id)
+            }
+
+            const visitedCoords = new Uint8Array(2500)
+
+            // Construct values for the flood
+
+            let depth = 0
+            let thisGeneration: Coord[] = [this.anchor]
+            let nextGeneration: Coord[] = []
+
+            // Loop through positions of seeds
+
+            for (const coord of thisGeneration) visitedCoords[packAsNum(coord)] = 1
+
+            // So long as there are positions in this gen
+
+            while (thisGeneration.length) {
+                // Reset next gen
+
+                nextGeneration = []
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+
+                    let isRampart: boolean
+
+                    // For anything after the first generation
+
+                    if (depth > 0) {
+                        const packedCoord1 = packAsNum(coord1)
+
+                        // Iterate if the terrain is a wall
+
+                        if (coordMap[packedCoord1] === 255) continue
+
+                        if (coordMap[packedCoord1] === 254) {
+                            this._defensiveRamparts.push(findObjectWithID(rampartsByCoord.get(packedCoord1)))
+                            isRampart = true
+                        }
+                    }
+
+                    const generationAdditions = []
+                    let foundRampart: boolean
+
+                    // Loop through adjacent positions
+
+                    for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+                        const packedCoord2 = packAsNum(coord2)
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (visitedCoords[packedCoord2] === 1) continue
+
+                        if (isRampart) {
+
+                            if (coordMap[packedCoord2] !== 254) continue
+                            foundRampart = true
+                        }
+
+                        // Otherwise record that it has been visited
+
+                        visitedCoords[packedCoord2] = 1
+
+                        // Add it to the next gen
+
+                        generationAdditions.push(coord2)
+                    }
+
+                    if (isRampart && !foundRampart) continue
+
+                    nextGeneration = nextGeneration.concat(generationAdditions)
+                }
+
+                // Set this gen to next gen
+
+                thisGeneration = nextGeneration
+
+                // Increment depth
+
+                depth += 1
+            }
+
+            return this._defensiveRamparts
         },
     },
     MEWT: {
