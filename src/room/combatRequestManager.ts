@@ -34,13 +34,24 @@ export class CombatRequestManager {
         if (!requestRoom) return
 
         // If there are threats to our hegemony, temporarily abandon the request
-
+/*
         if (requestRoom.enemyAttackers.length > 0) {
             request.data[CombatRequestData.abandon] = 1500
 
             this.communeManager.room.memory.combatRequests.splice(index, 1)
             delete request.responder
             return
+        }
+ */
+
+        // If there is a controller and it's in safemode, abandon until it ends
+
+        if (requestRoom.controller && requestRoom.controller.safeMode) {
+
+            request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
+
+            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            delete request.responder
         }
 
         // If there are no enemyCreeps, delete the combatRequest
