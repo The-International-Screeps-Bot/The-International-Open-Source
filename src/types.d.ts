@@ -2,6 +2,7 @@ import { CommuneManager } from './room/communeManager'
 import { RoomManager } from './room/roomManager'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
+import { CombatRequestData } from 'international/constants'
 
 declare global {
     interface ProfilerMemory {
@@ -2175,13 +2176,11 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            combat(
-                type: CombatRequestTypes,
+            createCombatRequest(
                 requestName: string,
+                type: CombatRequestTypes,
+                opts?: { [key: string]: number },
                 communeName?: string,
-                minDamage?: number,
-                minHeal?: number,
-                quadCount?: number,
             ): string
 
             /**
