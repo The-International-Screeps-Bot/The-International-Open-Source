@@ -64,9 +64,11 @@ Room.prototype.towersAttackCreeps = function () {
 
     if (!attackTargets.length) return
 
+    const towers = this.structures.tower
+
     // Find the target the creep can deal the most damage to
 
-    const attackTarget = attackTargets.find(creep => creep.towerDamage > 0)
+    const attackTarget = attackTargets.find(creep => creep.towerDamage > 50 * towers.length)
 
     if (!attackTarget) return
 
@@ -76,7 +78,7 @@ Room.prototype.towersAttackCreeps = function () {
 
     // Loop through the this's towers
 
-    for (const tower of this.structures.tower) {
+    for (const tower of towers) {
         // Iterate if the tower is intended
 
         if (tower.intended) continue
