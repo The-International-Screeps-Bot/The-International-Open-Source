@@ -818,11 +818,9 @@ declare global {
         unprotectedCoords: CoordMap
 
         /**
-         * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
-         *
-         * Should influence if maintainers and defenders are needed to fend off the attack
+         * Wether the towers can sufficiently deal with the enemy threat in the room
          */
-        towerSuperiority: boolean
+        towerInferiority: boolean
 
         baseCoords: CoordMap
 

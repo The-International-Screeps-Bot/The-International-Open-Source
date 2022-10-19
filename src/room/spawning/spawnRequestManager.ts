@@ -300,7 +300,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-
             // If there is no extractor, inform false
 
             if (!this.structures.extractor.length) return false
@@ -426,7 +425,7 @@ Room.prototype.spawnRequester = function () {
 
             /* if (this.controller.safeMode) return false */
 
-            if (this.towerSuperiority) return false
+            if (!this.towerInferiority) return false
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
@@ -480,7 +479,7 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             // If there are enemy attackers in the room
 
-            if (!this.towerSuperiority) return false
+            if (this.towerInferiority) return false
 
             // Stop if there are no construction sites
 
@@ -668,7 +667,7 @@ Room.prototype.spawnRequester = function () {
             if (
                 enemyAttackers.length &&
                 this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
-                !this.towerSuperiority
+                this.towerInferiority
             )
                 return false
 
