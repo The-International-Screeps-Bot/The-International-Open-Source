@@ -155,8 +155,9 @@ export class StatsManager {
                 globalCommuneStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
                 globalCommuneStats.bes = room.findStoredResourceAmount(RESOURCE_BATTERY, true) * 10
             } else {
-                globalCommuneStats.cl = roomStats.cl
                 globalCommuneStats.es = roomStats.es
+                globalCommuneStats.bes = roomStats.bes
+                globalCommuneStats.cl = roomStats.cl
             }
         }
 
