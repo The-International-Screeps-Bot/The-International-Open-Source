@@ -1705,7 +1705,6 @@ Object.defineProperties(Room.prototype, {
             const rampartsByCoord: Map<number, Id<StructureRampart>> = new Map()
 
             for (const rampart of ramparts) {
-
                 const packedCoord = packAsNum(rampart.pos)
                 coordMap[packedCoord] = 254
                 rampartsByCoord.set(packedCoord, rampart.id)
@@ -1733,7 +1732,6 @@ Object.defineProperties(Room.prototype, {
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-
                     let isRampart: boolean
 
                     // For anything after the first generation
@@ -1764,7 +1762,6 @@ Object.defineProperties(Room.prototype, {
                         if (visitedCoords[packedCoord2] === 1) continue
 
                         if (isRampart) {
-
                             if (coordMap[packedCoord2] !== 254) continue
                             foundRampart = true
                         }
@@ -1876,9 +1873,6 @@ Object.defineProperties(Room.prototype, {
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
-                //Priortize ruins that have short-ish life remaining over source containers
-                //  So that we get all the resources out of the ruins
-                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity() > 0),
                 ...this.sourceContainers.filter(
                     sc =>
                         sc.store.getUsedCapacity() >
@@ -1891,8 +1885,6 @@ Object.defineProperties(Room.prototype, {
                         ) +
                             50,
                 ),
-                //But we still want to pull from ruins if the source containers are empty.
-                ...this.find(FIND_RUINS).filter(ruin => ruin.ticksToDecay >= 10000 && ruin.store.getUsedCapacity()),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (
                         (structure as any).store &&
