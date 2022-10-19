@@ -1115,6 +1115,27 @@ Creep.prototype.reservationManager = function () {
             continue
         }
 
+        if (reservation.type === 'withdraw') {
+            if (
+                this.store.getFreeCapacity() === 0 ||
+                target.store.getUsedCapacity(reservation.resourceType) < reservation.amount ||
+                (Game.time % Math.floor(Math.random() * 10) === 0 &&
+                    target.store.getUsedCapacity(reservation.resourceType) <
+                        _.sum(
+                            _.filter(
+                                Game.creeps,
+                                c =>
+                                    c.memory.Rs &&
+                                    c.memory.Rs?.length > 0 &&
+                                    c.memory.Rs[0].targetID === reservation.targetID,
+                            ),
+                            c => c.memory.Rs[0].amount,
+                        ))
+            ) {
+                this.deleteReservation(0)
+            }
+        }
+
         let amount = reservation.amount
 
         /*
@@ -1275,7 +1296,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         return target.store.energy >= this.freeCapacityNextTick
     })
 
-    if (!room.storage && !room.terminal) {
+    if (!room.storage || !room.terminal) {
         withdrawTargets = withdrawTargets.concat(
             [room.fastFillerContainerLeft, room.fastFillerContainerRight, room.controllerContainer].filter(target => {
                 return target && target.store.energy >= target.store.getCapacity(RESOURCE_ENERGY) * 0.5
