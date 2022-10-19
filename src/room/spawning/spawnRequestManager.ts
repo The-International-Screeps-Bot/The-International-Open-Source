@@ -1055,10 +1055,6 @@ Room.prototype.spawnRequester = function () {
                 const rangedAttackStrength = RANGED_ATTACK_POWER * 2
                 const healStrength = HEAL_POWER
 
-                // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
-
-                if (spawnEnergyCapacity < minCost) return false
-
                 // If max spawnable strength is less that needed
 
                 if (
@@ -1070,6 +1066,10 @@ Room.prototype.spawnRequester = function () {
                     Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
+
+                // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
+
+                if (spawnEnergyCapacity < minCost) return false
 
                 const partsMultiplier = Math.max(
                     remoteNeeds[RemoteData.minDamage] / rangedAttackStrength +

@@ -143,6 +143,8 @@ declare global {
         flee?: boolean
         creep?: Creep
 
+        avoidAbandonedRemotes?: boolean
+
         weightStructures?: Partial<{ [key in StructureConstant]: number }>
 
         /**

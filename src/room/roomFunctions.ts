@@ -112,6 +112,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                     if (!roomMemory) return Infinity
 
+                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon]) return false
+
                     // If the type is in typeWeights, inform the weight for the type
 
                     if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
