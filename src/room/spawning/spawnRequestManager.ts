@@ -419,9 +419,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            // Inform false if there are no enemyAttackers
-
-            if (!enemyAttackers.length) return false
 
             /* if (this.controller.safeMode) return false */
 
@@ -477,7 +474,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            // If there are enemy attackers in the room
 
             if (this.towerInferiority) return false
 
@@ -493,8 +489,9 @@ Room.prototype.spawnRequester = function () {
             if (storage && this.controller.level < 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= this.communeManager.storedEnergyBuildThreshold)
-                    partsMultiplier += storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
+                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < this.communeManager.storedEnergyBuildThreshold) return false
+
+                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000, 2)
             }
 
             // Otherwise if there is no storage
@@ -665,7 +662,6 @@ Room.prototype.spawnRequester = function () {
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
             if (
-                enemyAttackers.length &&
                 this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
                 this.towerInferiority
             )
