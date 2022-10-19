@@ -8,6 +8,7 @@ function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
         case 'cc':
         case 'tcc':
         case 'cl':
+        case 'bes':
         case 'es':
             if (roomStatsLevel >= 1 || forceUpdate) return 1.5
         case 'mh':
@@ -58,6 +59,7 @@ export class StatsManager {
                 eos: 0,
                 eosp: 0,
                 mh: 0,
+                bes: 0,
                 es: 0,
                 cc: 0,
                 cu: Game.cpu.getUsed(),
@@ -150,12 +152,12 @@ export class StatsManager {
                     globalCommuneStats.cl =
                         progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
                 }
-                globalCommuneStats.es =
-                    room.findStoredResourceAmount(RESOURCE_ENERGY, true) +
-                    room.findStoredResourceAmount(RESOURCE_BATTERY, true) * 10
+                globalCommuneStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
+                globalCommuneStats.bes = room.findStoredResourceAmount(RESOURCE_BATTERY, true) * 10
             } else {
-                globalCommuneStats.cl = roomStats.cl
                 globalCommuneStats.es = roomStats.es
+                globalCommuneStats.bes = roomStats.bes
+                globalCommuneStats.cl = roomStats.cl
             }
         }
 

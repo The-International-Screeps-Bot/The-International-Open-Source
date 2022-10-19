@@ -475,6 +475,11 @@ declare global {
          * Energy Stored
          */
         es: number
+
+        /**
+         * Batteries Stored *10
+         */
+        bes: number
         /**
          * Creep Count
          */
@@ -2019,7 +2024,7 @@ declare global {
         powered: boolean
     }
 
-    interface PowerCreepMemory {}
+    interface PowerCreepMemory { }
 
     // Structures
 
