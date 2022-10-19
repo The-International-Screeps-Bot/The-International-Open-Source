@@ -301,8 +301,6 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
 
-            if (!this.towerSuperiority) return false
-
             // If there is no extractor, inform false
 
             if (!this.structures.extractor.length) return false

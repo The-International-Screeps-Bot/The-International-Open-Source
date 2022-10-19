@@ -42,6 +42,10 @@ export class MineralHarvester extends Creep {
 
         this.say(`⛏️${mineralsHarvested}`)
 
+        // If the creep will likely be full next tick
+
+        if (this.store.getUsedCapacity() + mineralsHarvested >= this.store.getCapacity()) return true
+
         // Inform true
 
         return false
