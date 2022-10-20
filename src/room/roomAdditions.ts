@@ -1792,6 +1792,63 @@ Object.defineProperties(Room.prototype, {
             return this._defensiveRamparts
         },
     },
+    factory: {
+        get() {
+            if (this._factory !== undefined) return this._factory
+
+            return (this._factory = this.structures.factory[0])
+        },
+    },
+    powerSpawn: {
+        get() {
+            if (this._powerSpawn !== undefined) return this._powerSpawn
+
+            return (this._powerSpawn = this.structures.powerSpawn[0])
+        },
+    },
+    nuker: {
+        get() {
+            if (this._nuker !== undefined) return this._nuker
+
+            return (this._nuker = this.structures.nuker[0])
+        },
+    },
+    observer: {
+        get() {
+            if (this._observer !== undefined) return this._observer
+
+            return (this._observer = this.structures.observer[0])
+        },
+    },
+    resourcesInStoringStructures: {
+        get() {
+            if (this._resourcesInStoringStructures) return this._resourcesInStoringStructures
+
+            this._resourcesInStoringStructures = {}
+
+            const storingStructures: AnyStoreStructure[] = [this.storage, this.terminal, this.factory]
+
+            for (const structure of storingStructures) {
+
+                if (!structure) continue
+
+                for (const key in structure.store) {
+
+                    const resourceType = key as ResourceConstant
+
+                    if (!this._resourcesInStoringStructures[resourceType]) {
+
+                        this._resourcesInStoringStructures[resourceType] = structure.store[resourceType]
+                        continue
+                    }
+
+                    this._resourcesInStoringStructures[resourceType] += structure.store[resourceType]
+                }
+            }
+
+            return this._resourcesInStoringStructures
+        },
+    },
     MEWT: {
         get() {
             if (this._MEWT) return this._MEWT

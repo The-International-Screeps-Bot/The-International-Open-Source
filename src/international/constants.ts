@@ -47,7 +47,7 @@ export const allyPlayers = [
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'o4kapuk']
+export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'somygame']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -1168,3 +1168,5 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
     tradeHorizontal: [3, 2, 1, 0],
     tradeVertical: [1, 0, 3, 2],
 }
+
+export const ERROR_FAILED = 0

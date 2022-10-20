@@ -31,7 +31,7 @@ export class Hauler extends Creep {
                 )
 
             return (
-                target.store.getUsedCapacity(RESOURCE_ENERGY) >= target.store.getCapacity(RESOURCE_ENERGY) ||
+                target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.store.getCapacity(RESOURCE_ENERGY) ||
                 target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
             )
         })
@@ -80,7 +80,7 @@ export class Hauler extends Creep {
                         )
 
                     return (
-                        target.store.getUsedCapacity(RESOURCE_ENERGY) >= target.store.getCapacity(RESOURCE_ENERGY) ||
+                        target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.store.getCapacity(RESOURCE_ENERGY) ||
                         target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
                     )
                 })

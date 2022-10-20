@@ -190,6 +190,7 @@ export class RemoteCoreAttacker extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
+                avoidAbandonedRemotes: true,
             }) === 'unpathable') {
 
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
