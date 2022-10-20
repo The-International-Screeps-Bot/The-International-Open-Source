@@ -470,6 +470,10 @@ declare global {
          */
         eosp: number
         /**
+         * Energy Output Power
+         */
+        eop: number
+        /**
          * Minerals Harvested
          */
         mh: number
