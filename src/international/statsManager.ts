@@ -1,3 +1,6 @@
+import { myColors } from './constants'
+import { customLog } from './utils'
+
 function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
     const roomStatsLevel = Memory.roomStats
     switch (statName) {
@@ -120,7 +123,12 @@ export class StatsManager {
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
-            console.log(`StatsManager: roomCommuneFinalEndTick: ${roomName} stats not updated`)
+            customLog(
+                'StatsManager',
+                `RoomCommuneFinalEndTick: ${roomName} stats not updated`,
+                myColors.white,
+                myColors.red,
+            )
             return
         }
         const each250Ticks = Game.time % 250 === 0
@@ -267,13 +275,11 @@ export class StatsManager {
         const globalRoomKeys = Object.keys(global.roomStats.commune)
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
         globalRoomKeys.forEach(roomName => {
-            console.log(`StatsManager: internationalEndTick: ${roomName} stats updated`)
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
         })
 
         notCheckedCommuneRooms.forEach(roomName => {
             const roomType = Memory.rooms[roomName].T
-            console.log(`StatsManager: NOT UPDATED internationalEndTick: ${roomName}`)
             if (roomType === 'commune') {
                 this.roomConfig(roomName, roomType)
                 this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName], true)
