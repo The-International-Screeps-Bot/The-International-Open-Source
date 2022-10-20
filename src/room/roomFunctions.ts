@@ -100,19 +100,17 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
                 routeCallback(roomName: string) {
+
+                    const roomMemory = Memory.rooms[roomName]
+                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon]) return Infinity
+
                     // If the goal is in the room, inform 1
 
                     if (roomName === goal.pos.roomName) return 1
 
-                    // Get the room's memory
-
-                    const roomMemory = Memory.rooms[roomName]
-
                     // If there is no memory for the room, inform impassible
 
                     if (!roomMemory) return Infinity
-
-                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon]) return Infinity
 
                     // If the type is in typeWeights, inform the weight for the type
 
