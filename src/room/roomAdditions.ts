@@ -1830,6 +1830,8 @@ Object.defineProperties(Room.prototype, {
 
             for (const structure of storingStructures) {
 
+                if (!structure) continue
+
                 for (const key in structure.store) {
 
                     const resourceType = key as ResourceConstant
