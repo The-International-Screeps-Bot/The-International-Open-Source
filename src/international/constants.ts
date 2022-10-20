@@ -47,7 +47,7 @@ export const allyPlayers = [
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy']
+export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'somygame']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
