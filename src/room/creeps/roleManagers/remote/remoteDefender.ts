@@ -309,12 +309,21 @@ export class RemoteDefender extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-            if (creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
-                        range: 25,
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory.RN),
+                            range: 25,
+                        },
+                    ],
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity,
                     },
                 ],
                 typeWeights: {
@@ -326,7 +335,6 @@ export class RemoteDefender extends Creep {
                 },
                 avoidAbandonedRemotes: true,
             }) === 'unpathable') {
-
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
                 delete creep.memory.RN
             }
