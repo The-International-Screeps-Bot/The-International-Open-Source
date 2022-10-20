@@ -254,7 +254,6 @@ export class RemoteHauler extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-                avoidAbandonedRemotes: true,
             }) === 'unpathable'
         ) {
             Memory.rooms[this.memory.RN].data[RemoteData.abandon] = 1500

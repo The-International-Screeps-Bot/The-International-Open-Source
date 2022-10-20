@@ -148,7 +148,7 @@ class TickConfig {
             for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
         }
 
-        if (room.creepsFromRoom.scout) room.scoutTargets = new Set()
+        room.scoutTargets = new Set()
 
         if (!room.memory.deposits) room.memory.deposits = {}
     }

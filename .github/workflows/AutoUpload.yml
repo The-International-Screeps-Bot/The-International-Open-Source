@@ -9,7 +9,7 @@ on:
           - Main
 jobs:
      VerifyUpload:
-          timeout-minutes: 129600
+          timeout-minutes: 10000
           runs-on: self-hosted
           steps:
                - name: 'Cleanup build folder'

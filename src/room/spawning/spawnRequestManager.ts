@@ -426,9 +426,13 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
+            // Inform false if there are no enemyAttackers
+
+            if (!enemyAttackers.length) return false
+
             /* if (this.controller.safeMode) return false */
 
-            if (!this.towerInferiority) return false
+            if (this.towerSuperiority) return false
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
@@ -480,8 +484,9 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
+            // If there are enemy attackers in the room
 
-            if (this.towerInferiority) return false
+            if (attackStrength > 0) return false
 
             // Stop if there are no construction sites
 
@@ -495,10 +500,8 @@ Room.prototype.spawnRequester = function () {
             if (storage && this.controller.level < 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < this.communeManager.storedEnergyBuildThreshold)
-                    return false
-
-                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000, 2)
+                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= this.communeManager.storedEnergyBuildThreshold)
+                    partsMultiplier += storage.store.getUsedCapacity(RESOURCE_ENERGY) / 8000
             }
 
             // Otherwise if there is no storage
@@ -670,7 +673,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
-            if (this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed && this.towerInferiority)
+            if (
+                enemyAttackers.length &&
+                this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
+                !this.towerSuperiority
+            )
                 return false
 
             // If the controllerContainer have not enough energy in it, don't spawn a new upgrader
@@ -913,7 +920,7 @@ Room.prototype.spawnRequester = function () {
         const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
         const remoteMemory = Memory.rooms[remoteName]
-        const remoteData = Memory.rooms[remoteName].data
+        const remoteNeeds = Memory.rooms[remoteName].data
         const remote = Game.rooms[remoteName]
         const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100
 
@@ -923,7 +930,7 @@ Room.prototype.spawnRequester = function () {
 
         // If there are no data for this this, inform false
 
-        if (remoteData[RemoteData[role]] <= 0) continue
+        if (remoteNeeds[RemoteData[role]] <= 0) continue
 
         const sourcePositionsAmount = remote
             ? remote.sourcePositions.length
@@ -938,7 +945,7 @@ Room.prototype.spawnRequester = function () {
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE],
-                        partsMultiplier: remoteData[RemoteData[role]],
+                        partsMultiplier: remoteNeeds[RemoteData[role]],
                         spawnGroup: this.creepsOfRemote[remoteName][role],
                         threshold: 0.1,
                         minCreeps: 1,
@@ -958,7 +965,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [CARRY],
                     extraParts: [WORK, WORK, MOVE],
-                    partsMultiplier: remoteData[RemoteData[role]],
+                    partsMultiplier: remoteNeeds[RemoteData[role]],
                     spawnGroup: this.creepsOfRemote[remoteName][role],
                     threshold: 0.1,
                     minCreeps: undefined,
@@ -982,18 +989,18 @@ Room.prototype.spawnRequester = function () {
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
         const remoteName = remoteNamesByEfficacy[index]
-        const remoteData = Memory.rooms[remoteName].data
+        const remoteNeeds = Memory.rooms[remoteName].data
 
         // Add up econ data for this this
 
         const totalRemoteNeed =
-            Math.max(remoteData[RemoteData.remoteHauler0], 0) +
-            Math.max(remoteData[RemoteData.remoteHauler1], 0) +
-            Math.max(remoteData[RemoteData.remoteReserver], 0) +
-            Math.max(remoteData[RemoteData.remoteCoreAttacker], 0) +
-            Math.max(remoteData[RemoteData.remoteDismantler], 0) +
-            Math.max(remoteData[RemoteData.minDamage], 0) +
-            Math.max(remoteData[RemoteData.minHeal], 0)
+            Math.max(remoteNeeds[RemoteData.remoteHauler0], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteHauler1], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteReserver], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteCoreAttacker], 0) +
+            Math.max(remoteNeeds[RemoteData.remoteDismantler], 0) +
+            Math.max(remoteNeeds[RemoteData.minDamage], 0) +
+            Math.max(remoteNeeds[RemoteData.minHeal], 0)
 
         const remoteMemory = Memory.rooms[remoteName]
 
@@ -1034,8 +1041,8 @@ Room.prototype.spawnRequester = function () {
                 // If there are insufficient harvesters for the remote's sources
 
                 if (
-                    Math.max(remoteData[RemoteData.source1RemoteHarvester], 0) +
-                        Math.max(remoteData[RemoteData.source2RemoteHarvester], 0) >
+                    Math.max(remoteNeeds[RemoteData.source1RemoteHarvester], 0) +
+                        Math.max(remoteNeeds[RemoteData.source2RemoteHarvester], 0) >
                     0
                 )
                     return false
@@ -1048,7 +1055,7 @@ Room.prototype.spawnRequester = function () {
 
                 // If there are no data for this this, inform false
 
-                if (remoteData[RemoteData.remoteReserver] <= 0) return false
+                if (remoteNeeds[RemoteData.remoteReserver] <= 0) return false
 
                 const role = 'remoteReserver'
 
@@ -1075,51 +1082,43 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there are no related data
 
-                if (remoteData[RemoteData.minDamage] + remoteData[RemoteData.minHeal] <= 0) return false
+                if (remoteNeeds[RemoteData.minDamage] + remoteNeeds[RemoteData.minHeal] <= 0) return false
 
-                const minRangedAttackCost =
-                    (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-                        (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE] || 0
-                const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
+                const minCost = 400
+                const cost = 900
+                const extraParts = [RANGED_ATTACK, MOVE, RANGED_ATTACK, MOVE, HEAL, MOVE]
+                const rangedAttackStrength = RANGED_ATTACK_POWER * 2
+                const healStrength = HEAL_POWER
 
-                const minHealCost =
-                    (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
-                        (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE] || 0
-                const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
+                // If there isn't enough spawnEnergyCapacity to spawn a remoteDefender, inform false
 
-                if ((rangedAttackAmount + healAmount) * 2 > 50) {
+                if (spawnEnergyCapacity < minCost) return false
+
+                // If max spawnable strength is less that needed
+
+                if (
+                    rangedAttackStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteData.minDamage] ||
+                    healStrength * (spawnEnergyCapacity / cost) < remoteNeeds[RemoteData.minHeal]
+                ) {
+                    // Abandon the this for some time
 
                     Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
 
-                const minCost = minRangedAttackCost + minHealCost
-                if (minCost > spawnEnergyCapacity) {
-
-                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
-                    return false
-                }
+                const partsMultiplier = Math.max(
+                    remoteNeeds[RemoteData.minDamage] / rangedAttackStrength +
+                        remoteNeeds[RemoteData.minHeal] / healStrength,
+                    1,
+                )
 
                 const role = 'remoteDefender'
-                const extraParts: BodyPartConstant[] = []
-
-                for (let i = 0; i < rangedAttackAmount + healAmount; i++) {
-                    extraParts.push(MOVE)
-                }
-
-                for (let i = 0; i < rangedAttackAmount; i++) {
-                    extraParts.push(RANGED_ATTACK)
-                }
-
-                for (let i = 0; i < healAmount; i++) {
-                    extraParts.push(HEAL)
-                }
 
                 return {
                     role,
                     defaultParts: [],
                     extraParts,
-                    partsMultiplier: 1,
+                    partsMultiplier,
                     spawnGroup: this.creepsOfRemote[remoteName].remoteDefender,
                     minCreeps: 1,
                     minCost,
@@ -1135,7 +1134,7 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there are no related data
 
-                if (remoteData[RemoteData.remoteCoreAttacker] <= 0) return false
+                if (remoteNeeds[RemoteData.remoteCoreAttacker] <= 0) return false
 
                 // Define the minCost and strength
 
@@ -1167,7 +1166,7 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 // If there are no related data
 
-                if (remoteData[RemoteData.remoteDismantler] <= 0) return false
+                if (remoteNeeds[RemoteData.remoteDismantler] <= 0) return false
 
                 // Define the minCost and strength
 
