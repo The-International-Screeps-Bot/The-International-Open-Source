@@ -480,7 +480,7 @@ export class HubHauler extends Creep {
 
         let provider
         if (storage && storage.store[resource] >= 75000 && storage.store[resource] >= amount) provider = storage
-        else if (terminal && terminal.store[resource] >= 25000 && terminal.store[resource] >= amount) provider = terminal
+        else if (terminal && storage.store[resource] >= 25000 && terminal.store[resource] >= amount) provider = terminal
 
         if (!provider) return false
 

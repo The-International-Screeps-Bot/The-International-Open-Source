@@ -523,7 +523,9 @@ Creep.prototype.findRampartRepairTarget = function () {
 }
 
 Creep.prototype.findRepairTarget = function () {
+
     if (this.memory.repairTarget) {
+
         const repairTarget = findObjectWithID(this.memory.repairTarget)
         if (repairTarget) return repairTarget
     }

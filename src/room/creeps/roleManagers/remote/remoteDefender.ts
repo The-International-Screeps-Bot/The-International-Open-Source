@@ -325,16 +325,8 @@ export class RemoteDefender extends Creep {
                         enemyRemote: Infinity,
                         allyRemote: Infinity,
                     },
-                ],
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-                avoidAbandonedRemotes: true,
-            }) === 'unpathable') {
+                }) === 'unpathable'
+            ) {
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
                 delete creep.memory.RN
             }
