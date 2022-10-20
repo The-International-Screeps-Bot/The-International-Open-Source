@@ -9,7 +9,7 @@ export class PowerSpawnManager {
     }
     public run() {
 
-        this.powerSpawn = this.communeManager.room.structures.powerSpawn[0]
+        this.powerSpawn = this.communeManager.room.powerSpawn
         if (!this.powerSpawn) return
 
         this.process()

@@ -84,12 +84,9 @@ export class CommuneManager {
     }
     private test() {
 
-        return
-
         let CPUUsed = Game.cpu.getUsed()
 
-        const cm = new PathFinder.CostMatrix()
-        customLog('SERIALIZED CM', cm.serialize())
+        customLog('STORED ENERGY', this.room.resourcesInStoringStructures.energy)
 
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed)
     }

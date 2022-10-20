@@ -1347,6 +1347,28 @@ declare global {
 
         readonly defensiveRamparts: StructureRampart[]
 
+        _factory: StructureFactory
+
+        readonly factory: StructureFactory
+
+        _powerSpawn: StructurePowerSpawn
+
+        readonly powerSpawn: StructurePowerSpawn
+
+        _nuker: StructureNuker
+
+        readonly nuker: StructureNuker
+
+        _observer: StructureObserver
+
+        readonly observer: StructureObserver
+
+        _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+
+        readonly resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+
+
+
         // Target finding
 
         _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
