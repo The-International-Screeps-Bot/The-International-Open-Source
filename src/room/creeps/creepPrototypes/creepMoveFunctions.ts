@@ -39,7 +39,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
     return false
 }
 
-Creep.prototype.createMoveRequest = function (opts) {
+PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (opts) {
     const { room } = this
 
     // Stop if the we know the creep won't move
@@ -167,7 +167,7 @@ Creep.prototype.createMoveRequest = function (opts) {
     return true
 }
 
-Creep.prototype.assignMoveRequest = function (coord) {
+PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = function (coord) {
     const { room } = this
     const packedCoord = packCoord(coord)
 
@@ -178,7 +178,7 @@ Creep.prototype.assignMoveRequest = function (coord) {
         : room.moveRequests.set(packedCoord, [this.name])
 }
 
-Creep.prototype.findShovePositions = function (avoidPackedPositions) {
+PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     const { room } = this
 
     const { x } = this.pos
@@ -261,7 +261,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     return shovePositions
 }
 
-Creep.prototype.shove = function (shoverPos) {
+PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
     const { room } = this
 
     const shovePositions = this.findShovePositions(new Set([packCoord(shoverPos), packCoord(this.pos)]))
@@ -314,7 +314,7 @@ Creep.prototype.shove = function (shoverPos) {
     return false
 }
 
-Creep.prototype.runMoveRequest = function () {
+PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function () {
     const { room } = this
 
     // If requests are not allowed for this pos, inform false
@@ -349,7 +349,7 @@ Creep.prototype.runMoveRequest = function () {
     return true
 }
 
-Creep.prototype.recurseMoveRequest = function (queue = []) {
+PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return

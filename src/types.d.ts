@@ -1367,8 +1367,6 @@ declare global {
 
         readonly resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
 
-
-
         // Target finding
 
         _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
@@ -2046,7 +2044,12 @@ declare global {
         powered: boolean
     }
 
-    interface PowerCreepMemory { }
+    interface PowerCreepMemory {
+        /**
+         * Task name, the method for which the creep is trying to run inter tick
+         */
+        TN: string
+    }
 
     // Structures
 

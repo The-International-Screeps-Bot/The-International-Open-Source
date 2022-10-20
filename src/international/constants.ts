@@ -1168,3 +1168,5 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
     tradeHorizontal: [3, 2, 1, 0],
     tradeVertical: [1, 0, 3, 2],
 }
+
+export const ERROR_FAILED = 0
