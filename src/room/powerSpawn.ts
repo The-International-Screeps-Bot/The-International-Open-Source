@@ -14,11 +14,14 @@ export class PowerSpawnManager {
         this.powerSpawn = this.communeManager.room.powerSpawn
         if (!this.powerSpawn) return
 
-        this.process()
+        this.advancedProcessPower()
         this.advancedSpawn()
     }
 
-    private process() {
+    /**
+     * So long as there are sufficient resources, try to process power
+     */
+    private advancedProcessPower() {
         if (this.powerSpawn.store.getCapacity(RESOURCE_ENERGY) < POWER_SPAWN_ENERGY_RATIO) return
         if (!this.powerSpawn.store.getCapacity(RESOURCE_POWER)) return
 
@@ -27,12 +30,15 @@ export class PowerSpawnManager {
         if (result === OK) globalStatsUpdater(this.powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
     }
 
+    /**
+     * Find unspawned power creeps and spawn them
+     */
     private advancedSpawn() {
-        customLog('CREEPS TRYINGA SPAWN', internationalManager.unspawnedPowerCreepNames)
+
         for (let i = internationalManager.unspawnedPowerCreepNames.length - 1; i >= 0; i--) {
 
             const creep = Game.powerCreeps[internationalManager.unspawnedPowerCreepNames[i]]
-            customLog('POWER TRYINA SPAWN', creep)
+
             creep.spawn(this.powerSpawn)
             internationalManager.unspawnedPowerCreepNames.pop()
             return

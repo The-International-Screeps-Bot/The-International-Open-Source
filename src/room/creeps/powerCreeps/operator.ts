@@ -145,7 +145,7 @@ export class Operator extends PowerCreep {
         for (const source of sources) {
 
             if (!this.isViablePowerTarget(source)) continue
-            this.room.visual.circle(source.pos, { stroke: myColors.red, strokeWidth: 2 })
+
             this.memory.TN = 'advancedRegenSource'
             this.memory.TTID = source.id
             return true
@@ -160,6 +160,8 @@ export class Operator extends PowerCreep {
 
         const source = findObjectWithID(this.memory.TTID)
         if (!source) return true
+
+        this.room.targetVisual(this.pos, source.pos)
 
         const minRange = 3
         if (getRangeOfCoords(this.pos, source.pos) > minRange) {

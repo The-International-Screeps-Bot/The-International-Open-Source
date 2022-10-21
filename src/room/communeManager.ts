@@ -88,8 +88,6 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        customLog('STORED ENERGY', this.room.resourcesInStoringStructures.energy)
-
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed)
     }
 

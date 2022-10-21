@@ -128,7 +128,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         }
     }
 
-    generateRoute()
+    generateRoute() 
 
     // Construct path
 
