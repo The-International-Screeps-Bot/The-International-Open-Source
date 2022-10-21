@@ -2056,6 +2056,11 @@ declare global {
 
     interface PowerCreepMemory {
         /**
+         * Commune Name
+         */
+        CN: string
+
+        /**
          * Task name, the method for which the creep is trying to run inter tick
          */
         TN: keyof Operator

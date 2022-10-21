@@ -14,9 +14,18 @@ class PowerCreepOrganizer {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        // Loop through all of my creeps
+        // Clear non-existent creeps from memory
 
         for (const creepName in Memory.powerCreeps) {
+
+            // The creep has been deleted, delete it from memory
+
+            if (!Game.creeps[creepName]) delete Memory.powerCreeps[creepName]
+        }
+
+        // Process and organize existing creeps
+
+        for (const creepName in Game.powerCreeps) {
             try {
                 this.processCreep(creepName)
             } catch (err) {
@@ -35,15 +44,6 @@ class PowerCreepOrganizer {
 
     private processCreep(creepName: string) {
         let creep = Game.powerCreeps[creepName]
-
-        // If creep doesn't exist
-
-        if (!creep) {
-            // Delete creep from memory and iterate
-
-            delete Memory.powerCreeps[creepName]
-            return
-        }
 
         // If the creep isn't spawned
 

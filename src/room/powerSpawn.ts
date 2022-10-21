@@ -28,10 +28,11 @@ export class PowerSpawnManager {
     }
 
     private advancedSpawn() {
-
-        for (let i = internationalManager.unspawnedPowerCreepNames.length; i > -1; i++) {
+        customLog('CREEPS TRYINGA SPAWN', internationalManager.unspawnedPowerCreepNames)
+        for (let i = internationalManager.unspawnedPowerCreepNames.length - 1; i >= 0; i--) {
 
             const creep = Game.powerCreeps[internationalManager.unspawnedPowerCreepNames[i]]
+            customLog('POWER TRYINA SPAWN', creep)
             creep.spawn(this.powerSpawn)
             internationalManager.unspawnedPowerCreepNames.pop()
             return
