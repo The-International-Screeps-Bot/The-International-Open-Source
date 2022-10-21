@@ -64,6 +64,8 @@ class PowerCreepOrganizer {
 
         const { room } = creep
 
+        room.powerCreepPositions.set(packCoord(creep.pos), creep.name)
+
         // Organize creep in its room by its role
 
         room.myPowerCreeps[className].push(creepName)
@@ -71,6 +73,8 @@ class PowerCreepOrganizer {
         // Record the creep's presence in the room
 
         room.myCreepsAmount += 1
+
+        creep.preTickManager()
     }
 }
 

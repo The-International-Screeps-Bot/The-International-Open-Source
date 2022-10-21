@@ -836,12 +836,17 @@ declare global {
         roadCoords: CoordMap
 
         /**
-         * A matrix with indexes of packed positions and values of creep names
+         * A matrix with indexes of packed coords and values of creep names
          */
         creepPositions: Map<string, string>
 
         /**
-         * A matrix with indexes of packed positions and values of creep names
+         * A matrix with indexes of packed coords and values of creep names
+         */
+        powerCreepPositions: Map<string, string>
+
+        /**
+         * A matrix with indexes of packed coords and values of creep names
          */
         moveRequests: Map<string, string[]>
 

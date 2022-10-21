@@ -81,7 +81,8 @@ export class MeleeDefender extends Creep {
 
             // Inform wether there is a creep at the pos
 
-            return !room.creepPositions.get(packCoord(rampart.pos))
+            const packedCoord = packCoord(rampart.pos)
+            return (!room.creepPositions.get(packedCoord) || !room.powerCreepPositions.get(packedCoord))
         })
 
         if (!ramparts.length) {

@@ -56,6 +56,7 @@ class TickConfig {
 
             room.moveRequests = new Map()
             room.creepPositions = new Map()
+            room.powerCreepPositions = new Map()
 
             // Single tick properties
 

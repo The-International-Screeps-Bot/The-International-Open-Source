@@ -203,6 +203,7 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
         const packedCoord = adjacentPackedPositions[index]
 
         if (room.creepPositions.get(packedCoord)) continue
+        if (room.powerCreepPositions.get(packedCoord)) continue
 
         if (avoidPackedPositions.has(packedCoord)) continue
 
@@ -362,7 +363,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     // Try to find the name of the creep at pos
 
-    const creepNameAtPos = room.creepPositions.get(this.moveRequest)
+    const creepNameAtPos = room.creepPositions.get(this.moveRequest) || room.powerCreepPositions.get(this.moveRequest)
 
     // If there is no creep at the pos
 
