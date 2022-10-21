@@ -1,7 +1,7 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { myColors, remoteRoles } from './constants'
 import { customLog } from './utils'
-import { InternationalManager } from './internationalManager'
+import { internationalManager, InternationalManager } from './internationalManager'
 import { packCoord } from 'other/packrat'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 
@@ -14,9 +14,18 @@ class PowerCreepOrganizer {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        // Loop through all of my creeps
+        // Clear non-existent creeps from memory
 
         for (const creepName in Memory.powerCreeps) {
+
+            // The creep has been deleted, delete it from memory
+
+            if (!Game.creeps[creepName]) delete Memory.powerCreeps[creepName]
+        }
+
+        // Process and organize existing creeps
+
+        for (const creepName in Game.powerCreeps) {
             try {
                 this.processCreep(creepName)
             } catch (err) {
@@ -36,18 +45,13 @@ class PowerCreepOrganizer {
     private processCreep(creepName: string) {
         let creep = Game.powerCreeps[creepName]
 
-        // If creep doesn't exist
-
-        if (!creep) {
-            // Delete creep from memory and iterate
-
-            delete Memory.powerCreeps[creepName]
-            return
-        }
-
         // If the creep isn't spawned
 
-        if (!creep.ticksToLive) return
+        if (!creep.ticksToLive) {
+
+            internationalManager.unspawnedPowerCreepNames.push(creep.name)
+            return
+        }
 
         // Get the creep's role
 
@@ -56,13 +60,13 @@ class PowerCreepOrganizer {
         // Assign creep a class based on role
 
         const creepClass = powerCreepClasses[className]
-        if (!creepClass) return
-
-        creep = Game.creeps[creepName] = new creepClass(creep.id)
+        creep = Game.powerCreeps[creepName] = new creepClass(creep.id)
 
         // Get the creep's current room and the room it's from
 
         const { room } = creep
+
+        room.powerCreepPositions.set(packCoord(creep.pos), creep.name)
 
         // Organize creep in its room by its role
 
@@ -71,6 +75,8 @@ class PowerCreepOrganizer {
         // Record the creep's presence in the room
 
         room.myCreepsAmount += 1
+
+        creep.preTickManager()
     }
 }
 

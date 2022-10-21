@@ -18,6 +18,7 @@ import './room/roomAdditions'
 
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
+import './room/roomObjectAdditions'
 
 // Creep
 

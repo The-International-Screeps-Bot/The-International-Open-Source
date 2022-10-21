@@ -1,4 +1,4 @@
-import { communeSigns, nonCommuneSigns } from 'international/constants'
+import { communeSign, nonCommuneSigns } from 'international/constants'
 import { findClosestCommuneName, getRange } from 'international/utils'
 
 export class Scout extends Creep {
@@ -136,11 +136,11 @@ export class Scout extends Creep {
         if (room.memory.T === 'commune') {
             // If the room already has a correct sign
 
-            if (controller.sign && communeSigns.includes(controller.sign.text)) return true
+            if (controller.sign && communeSign.startsWith(controller.sign.text)) return true
 
             // Otherwise assign the signMessage the commune sign
 
-            signMessage = communeSigns[0]
+            signMessage = communeSign[0]
         }
 
         // Otherwise if the room is not a commune
@@ -159,13 +159,16 @@ export class Scout extends Creep {
         if (getRange(this.pos.x, controller.pos.x, this.pos.y, controller.pos.y) > 1) {
             // Request to move to the controller and inform false
 
-            if (this.createMoveRequest({
-                origin: this.pos,
-                goals: [{ pos: room.controller.pos, range: 1 }],
-                avoidEnemyRanges: true,
-                plainCost: 1,
-                swampCost: 1,
-            }) !== 'unpathable') return true
+            if (
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [{ pos: room.controller.pos, range: 1 }],
+                    avoidEnemyRanges: true,
+                    plainCost: 1,
+                    swampCost: 1,
+                }) !== 'unpathable'
+            )
+                return true
 
             this.say(this.moveRequest.toString())
 

@@ -35,10 +35,14 @@ export class InternationalManager {
      */
     creepsByCombatRequest: { [key: string]: { [key: string]: string[] } }
 
+    unspawnedPowerCreepNames: string[]
+
     /**
      * Updates values to be present for this tick
      */
     update() {
+        internationalManager.creepsByCombatRequest = {}
+        this.unspawnedPowerCreepNames = []
         delete this._myOrders
         delete this._orders
         delete this._myOrdersCount

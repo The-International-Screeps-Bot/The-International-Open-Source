@@ -3,6 +3,7 @@ import { RoomManager } from './room/roomManager'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
+import { Operator } from 'room/creeps/powerCreeps/operator'
 
 declare global {
     interface ProfilerMemory {
@@ -831,12 +832,17 @@ declare global {
         roadCoords: CoordMap
 
         /**
-         * A matrix with indexes of packed positions and values of creep names
+         * A matrix with indexes of packed coords and values of creep names
          */
         creepPositions: Map<string, string>
 
         /**
-         * A matrix with indexes of packed positions and values of creep names
+         * A matrix with indexes of packed coords and values of creep names
+         */
+        powerCreepPositions: Map<string, string>
+
+        /**
+         * A matrix with indexes of packed coords and values of creep names
          */
         moveRequests: Map<string, string[]>
 
@@ -2024,7 +2030,27 @@ declare global {
         powered: boolean
     }
 
-    interface PowerCreepMemory { }
+    interface PowerCreepMemory {
+        /**
+         * Commune Name
+         */
+        CN: string
+
+        /**
+         * Task name, the method for which the creep is trying to run inter tick
+         */
+        TN: keyof Operator
+
+        /**
+         * Task target, the ID of the target the creep is targeting for its task
+         */
+        TTID: Id<Structure | Source>
+
+        /**
+         * Task Room Name, the name of the room the creep is trying to go to for its task
+         */
+        TRN: string
+    }
 
     // Structures
 
@@ -2082,6 +2108,12 @@ declare global {
          * Finds the total free store capacity of a specific resource for this RoomObject
          */
         freeSpecificStore(resourceType?: ResourceConstant): number
+
+        // RoomObject getters
+
+        _effectsData: Map<PowerConstant | EffectConstant, PowerEffect | NaturalEffect>
+
+        readonly effectsData: Map<PowerConstant | EffectConstant, PowerEffect | NaturalEffect>
     }
 
     interface Resource {

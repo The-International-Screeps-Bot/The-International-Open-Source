@@ -2,7 +2,7 @@ import { spawn } from 'child_process'
 import {
     allyPlayers,
     cacheAmountModifier,
-    communeSigns,
+    communeSign,
     CPUBucketCapacity,
     CPUBucketRenewThreshold,
     defaultCreepSwampCost,

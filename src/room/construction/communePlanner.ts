@@ -475,7 +475,7 @@ export function basePlanner(room: Room) {
     if (
         !planStamp({
             stampType: 'extensions',
-            count: 3,
+            count: 6,
             startCoords: [hubAnchor],
         })
     )

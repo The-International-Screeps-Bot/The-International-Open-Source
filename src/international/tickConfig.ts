@@ -45,8 +45,6 @@ class TickConfig {
 
         global.constructionSitesCount = Object.keys(Game.constructionSites).length
         global.logs = ``
-
-        internationalManager.creepsByCombatRequest = {}
     }
     private configRooms() {
         // Configure rooms
@@ -56,6 +54,7 @@ class TickConfig {
 
             room.moveRequests = new Map()
             room.creepPositions = new Map()
+            room.powerCreepPositions = new Map()
 
             // Single tick properties
 
