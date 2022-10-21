@@ -25,7 +25,6 @@ export class RemoteCoreAttacker extends Creep {
     }
 
     preTickManager(): void {
-
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
         if (!this.memory.RN) return
 
@@ -175,23 +174,25 @@ export class RemoteCoreAttacker extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-            if (creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
-                        range: 25,
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory.RN),
+                            range: 25,
+                        },
+                    ],
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity,
                     },
-                ],
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-            }) === 'unpathable') {
-
+                    avoidAbandonedRemotes: true,
+                }) === 'unpathable'
+            ) {
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
                 delete creep.memory.RN
             }

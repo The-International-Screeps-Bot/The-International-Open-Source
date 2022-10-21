@@ -1,7 +1,23 @@
-import { defaultCreepSwampCost, defaultPlainCost, impassibleStructureTypes, myColors, roomDimensions, TrafficPriorities } from "international/constants"
-import { internationalManager } from "international/internationalManager"
-import { areCoordsEqual, getRange } from "international/utils"
-import { packCoord, packPos, packPosList, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from "other/packrat"
+import {
+    defaultCreepSwampCost,
+    defaultPlainCost,
+    impassibleStructureTypes,
+    myColors,
+    roomDimensions,
+    TrafficPriorities,
+} from 'international/constants'
+import { internationalManager } from 'international/internationalManager'
+import { areCoordsEqual, getRange } from 'international/utils'
+import {
+    packCoord,
+    packPos,
+    packPosList,
+    packXYAsCoord,
+    unpackCoord,
+    unpackCoordAsPos,
+    unpackPos,
+    unpackPosList,
+} from 'other/packrat'
 
 PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
     // Inform true if there is no path
@@ -39,7 +55,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
     return false
 }
 
-Creep.prototype.createMoveRequest = function (opts) {
+PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (opts) {
     const { room } = this
 
     // Stop if the we know the creep won't move
@@ -167,7 +183,7 @@ Creep.prototype.createMoveRequest = function (opts) {
     return true
 }
 
-Creep.prototype.assignMoveRequest = function (coord) {
+PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = function (coord) {
     const { room } = this
     const packedCoord = packCoord(coord)
 
@@ -178,7 +194,7 @@ Creep.prototype.assignMoveRequest = function (coord) {
         : room.moveRequests.set(packedCoord, [this.name])
 }
 
-Creep.prototype.findShovePositions = function (avoidPackedPositions) {
+PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     const { room } = this
 
     const { x } = this.pos
@@ -262,7 +278,7 @@ Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     return shovePositions
 }
 
-Creep.prototype.shove = function (shoverPos) {
+PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
     const { room } = this
 
     const shovePositions = this.findShovePositions(new Set([packCoord(shoverPos), packCoord(this.pos)]))
@@ -315,7 +331,7 @@ Creep.prototype.shove = function (shoverPos) {
     return false
 }
 
-Creep.prototype.runMoveRequest = function () {
+PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function () {
     const { room } = this
 
     // If requests are not allowed for this pos, inform false
@@ -350,7 +366,7 @@ Creep.prototype.runMoveRequest = function () {
     return true
 }
 
-Creep.prototype.recurseMoveRequest = function (queue = []) {
+PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
@@ -379,7 +395,6 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             })
 
             for (let index = queue.length - 1; index >= 0; index--) {
-
                 const creep = Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]
 
                 room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, {
@@ -413,9 +428,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
         }
 
         if (creepAtPos.moved === 'yeild') {
-            if (creepAtPos instanceof PowerCreep ||
+            if (
+                creepAtPos instanceof PowerCreep ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[(creepAtPos as Creep).role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                    TrafficPriorities[(creepAtPos as Creep).role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
                 // Have the creep move to its moveRequest
 
@@ -524,9 +540,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
 
             // Prefer the creep with the higher priority
 
-            if (creepAtPos instanceof PowerCreep ||
+            if (
+                creepAtPos instanceof PowerCreep ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
                 this.runMoveRequest()
 
@@ -543,9 +560,10 @@ Creep.prototype.recurseMoveRequest = function (queue = []) {
             return
         }
 
-        if (creepAtPos instanceof PowerCreep ||
+        if (
+            creepAtPos instanceof PowerCreep ||
             TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-            TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {

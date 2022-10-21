@@ -1,4 +1,4 @@
-import { myColors } from 'international/constants'
+import { myColors, powerCreepClassNames } from 'international/constants'
 import { customLog } from 'international/utils'
 import { RoomManager } from '../roomManager'
 
@@ -15,6 +15,19 @@ export class EndTickCreepManager {
         // If CPU logging is enabled, get the CPU used at the start
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+
+        // Power creeps go first
+
+        for (const className of powerCreepClassNames) {
+            for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
+                const creep = Game.powerCreeps[creepName]
+
+                creep.endTickManager()
+                creep.recurseMoveRequest()
+            }
+        }
+
+        // Normal creeps go second
 
         for (const role in this.roomManager.room.myCreeps)
             for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {

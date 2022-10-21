@@ -1,5 +1,12 @@
 import { minHarvestWorkRatio, RemoteData } from 'international/constants'
-import { customLog, findCarryPartsRequired, findObjectWithID, getRange, getRangeOfCoords, randomTick } from 'international/utils'
+import {
+    customLog,
+    findCarryPartsRequired,
+    findObjectWithID,
+    getRange,
+    getRangeOfCoords,
+    randomTick,
+} from 'international/utils'
 import { unpackPos, unpackPosList } from 'other/packrat'
 import { RemoteHauler } from './remoteHauler'
 
@@ -235,7 +242,6 @@ export class RemoteHarvester extends Creep {
      *
      */
     travelToSource?(sourceIndex: number): boolean {
-
         this.say('🚬')
 
         // Unpack the harvestPos
@@ -323,10 +329,10 @@ export class RemoteHarvester extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
+                avoidAbandonedRemotes: true,
             })
-            
-            if (createMoveRequestResult === 'unpathable') {
 
+            if (createMoveRequestResult === 'unpathable') {
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
                 creep.removeRemote()
             }

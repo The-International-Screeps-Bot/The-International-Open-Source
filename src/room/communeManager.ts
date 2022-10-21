@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange, } from 'international/utils'
+import { createPosMap, customLog, findClosestObject, getRange } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -83,13 +83,11 @@ export class CommuneManager {
         this.test()
     }
     private test() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
 
-        const cm = new PathFinder.CostMatrix()
-        customLog('SERIALIZED CM', cm.serialize())
+        customLog('STORED ENERGY', this.room.resourcesInStoringStructures.energy)
 
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed)
     }
