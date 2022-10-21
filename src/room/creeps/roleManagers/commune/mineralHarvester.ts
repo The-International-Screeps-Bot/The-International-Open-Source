@@ -37,18 +37,15 @@ export class MineralHarvester extends Creep {
 
         // Find amount of minerals harvested and record it in data
 
-        const mineralsHarvested = Math.min(this.parts.work * HARVEST_POWER, mineral.mineralAmount)
+        const mineralsHarvested = Math.min(this.parts.work * HARVEST_MINERAL_POWER, mineral.mineralAmount)
             globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
 
         this.say(`⛏️${mineralsHarvested}`)
 
         // If the creep will likely be full next tick
 
-        if (this.store.getUsedCapacity() + mineralsHarvested >= this.store.getCapacity()) return true
-
-        // Inform true
-
-        return false
+        if (this.store.getUsedCapacity() + mineralsHarvested >= this.store.getCapacity()) return false
+        return true
     }
 
     constructor(creepID: Id<Creep>) {

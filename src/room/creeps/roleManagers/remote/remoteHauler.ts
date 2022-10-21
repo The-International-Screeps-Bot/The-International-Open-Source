@@ -136,6 +136,7 @@ export class RemoteHauler extends Creep {
         // Try to find a remote
 
         if (!this.findRemote()) {
+            this.say('NO NEW')
             // If the room is the creep's commune
 
             if (this.room.name === this.commune.name) {
@@ -253,6 +254,7 @@ export class RemoteHauler extends Creep {
                 avoidAbandonedRemotes: true,
             }) === 'unpathable'
         ) {
+            this.say('ABANDON')
             Memory.rooms[this.memory.RN].data[RemoteData.abandon] = 1500
             this.removeRemote()
         }
