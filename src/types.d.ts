@@ -3,6 +3,7 @@ import { RoomManager } from './room/roomManager'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
+import { Operator } from 'room/creeps/powerCreeps/operator'
 
 declare global {
     interface ProfilerMemory {
@@ -2052,7 +2053,7 @@ declare global {
         /**
          * Task name, the method for which the creep is trying to run inter tick
          */
-        TN: string
+        TN: keyof Operator
     }
 
     // Structures

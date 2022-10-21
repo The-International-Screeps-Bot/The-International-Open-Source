@@ -23,6 +23,7 @@ export class Operator extends PowerCreep {
     findTask?() {
         if (this.findRenewTask()) return true
         if (this.findEnablePowerTask()) return true
+        if (this.findGenerateOpsTask()) return true
         return false
     }
 
@@ -88,6 +89,24 @@ export class Operator extends PowerCreep {
         }
 
         this.enableRoom(controller)
+        return true
+    }
+
+    findGenerateOpsTask?() {
+
+        if (this.powered) return false
+
+        const power = this.powers[PWR_GENERATE_OPS]
+        if (!power) return false
+        if (power.cooldown) return false
+
+        this.memory.TN = 'advancedGenerateOps'
+        return true
+    }
+
+    advancedGenerateOps?() {
+
+        this.usePower(PWR_GENERATE_OPS)
         return true
     }
 
