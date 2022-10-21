@@ -13,8 +13,11 @@ Room.prototype.towerManager = function () {
 
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-    if (this.flags.disableTowers) return
-    if (!this.structures.tower.length) return
+    if (this.flags.disableTowers || !this.structures.tower.length) {
+
+        this.towerInferiority = true
+        return
+    }
 
     this.towersAttackCreeps()
 

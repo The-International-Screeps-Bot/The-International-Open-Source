@@ -378,11 +378,15 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 opacity: 0.2,
             })
 
-            for (let index = queue.length - 1; index >= 0; index--)
-                room.visual.rect(Game.creeps[queue[index]].pos.x - 0.5, Game.creeps[queue[index]].pos.y - 0.5, 1, 1, {
+            for (let index = queue.length - 1; index >= 0; index--) {
+
+                const creep = Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]
+
+                room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, {
                     fill: myColors.yellow,
                     opacity: 0.2,
                 })
+            }
         }
 
         // Otherwise, loop through each index of the queue
@@ -390,7 +394,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         for (let index = queue.length - 1; index >= 0; index--)
             // Have the creep run its moveRequesat
 
-            Game.creeps[queue[index]].runMoveRequest()
+            (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
 
         return
     }
@@ -399,7 +403,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     // Get the creepAtPos with the name
 
-    const creepAtPos = Game.creeps[creepNameAtPos]
+    const creepAtPos = Game.creeps[creepNameAtPos] || Game.powerCreeps[creepNameAtPos]
 
     if (creepAtPos.moved) {
         if (creepAtPos.moved === 'moved') {
@@ -409,9 +413,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         }
 
         if (creepAtPos.moved === 'yeild') {
-            if (
+            if (creepAtPos instanceof PowerCreep ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                TrafficPriorities[(creepAtPos as Creep).role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
                 // Have the creep move to its moveRequest
 
@@ -454,7 +458,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         for (let index = queue.length - 1; index >= 0; index--)
             // Have the creep run its moveRequest
 
-            Game.creeps[queue[index]].runMoveRequest()
+            (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
 
         // loop through each index of the queue, drawing visuals
 
@@ -520,7 +524,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             // Prefer the creep with the higher priority
 
-            if (
+            if (creepAtPos instanceof PowerCreep ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
                 TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
@@ -539,7 +543,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
 
-        if (
+        if (creepAtPos instanceof PowerCreep ||
             TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
             TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
         ) {
@@ -567,7 +571,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             for (let index = queue.length - 1; index >= 0; index--)
                 // Have the creep run its moveRequest
 
-                Game.creeps[queue[index]].runMoveRequest()
+                (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
 
             // loop through each index of the queue, drawing visuals
 
@@ -587,7 +591,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     // Otherwise if creepAtPos is fatigued, stop
 
-    if (creepAtPos.fatigue > 0) return
+    if (!(creepAtPos instanceof PowerCreep) && creepAtPos.fatigue > 0) return
 
     // Otherwise the creepAtPos has no moveRequest
 

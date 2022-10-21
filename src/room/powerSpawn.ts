@@ -16,11 +16,11 @@ export class PowerSpawnManager {
         this.process()
     }
     private process() {
-        if (!this.powerSpawn.store.getCapacity(RESOURCE_ENERGY)) return
+        if (this.powerSpawn.store.getCapacity(RESOURCE_ENERGY) < POWER_SPAWN_ENERGY_RATIO) return
         if (!this.powerSpawn.store.getCapacity(RESOURCE_POWER)) return
 
         const result = this.powerSpawn.processPower()
-        customLog('powerSpawn', `${result}-${POWER_SPAWN_ENERGY_RATIO}`)
+
         if (result === OK) globalStatsUpdater(this.powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
     }
 }

@@ -2059,6 +2059,16 @@ declare global {
          * Task name, the method for which the creep is trying to run inter tick
          */
         TN: keyof Operator
+
+        /**
+         * Task target, the ID of the target the creep is targeting for its task
+         */
+        TTID: Id<Structure | Source>
+
+        /**
+         * Task Room Name, the name of the room the creep is trying to go to for its task
+         */
+        TRN: string
     }
 
     // Structures
@@ -2117,6 +2127,12 @@ declare global {
          * Finds the total free store capacity of a specific resource for this RoomObject
          */
         freeSpecificStore(resourceType?: ResourceConstant): number
+
+        // RoomObject getters
+
+        _effectsData: Map<PowerConstant | EffectConstant, PowerEffect | NaturalEffect>
+
+        readonly effectsData: Map<PowerConstant | EffectConstant, PowerEffect | NaturalEffect>
     }
 
     interface Resource {

@@ -1,5 +1,5 @@
-import { ERROR_FAILED } from 'international/constants'
-import { getRangeOfCoords } from 'international/utils'
+import { ERROR_FAILED, myColors } from 'international/constants'
+import { customLog, findObjectWithID, getRangeOfCoords } from 'international/utils'
 
 export class Operator extends PowerCreep {
     constructor(creepID: Id<PowerCreep>) {
@@ -17,13 +17,16 @@ export class Operator extends PowerCreep {
         if (!taskResult) return taskResult === ERROR_FAILED
 
         delete this.memory.TN
+        delete this.memory.TTID
         return true
     }
 
     findTask?() {
+
         if (this.findRenewTask()) return true
         if (this.findEnablePowerTask()) return true
         if (this.findGenerateOpsTask()) return true
+        if (this.findSourceRegenTask()) return true
         return false
     }
 
@@ -40,13 +43,14 @@ export class Operator extends PowerCreep {
         const powerSpawn = this.room.powerSpawn
         if (!powerSpawn) return ERROR_FAILED
 
-        if (getRangeOfCoords(this.pos, powerSpawn.pos) > 1) {
+        const minRange = 1
+        if (getRangeOfCoords(this.pos, powerSpawn.pos) > minRange) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
                     {
                         pos: powerSpawn.pos,
-                        range: 1,
+                        range: minRange,
                     },
                 ],
                 avoidEnemyRanges: true,
@@ -73,13 +77,14 @@ export class Operator extends PowerCreep {
         const { controller } = this.room
         if (!controller) return ERROR_FAILED
 
-        if (getRangeOfCoords(this.pos, controller.pos) > 1) {
+        const minRange = 1
+        if (getRangeOfCoords(this.pos, controller.pos) > minRange) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
                     {
                         pos: controller.pos,
-                        range: 1,
+                        range: minRange,
                     },
                 ],
                 avoidEnemyRanges: true,
@@ -98,6 +103,7 @@ export class Operator extends PowerCreep {
 
         const power = this.powers[PWR_GENERATE_OPS]
         if (!power) return false
+
         if (power.cooldown) return false
 
         this.memory.TN = 'advancedGenerateOps'
@@ -106,7 +112,76 @@ export class Operator extends PowerCreep {
 
     advancedGenerateOps?() {
 
+        this.say('AGO')
+
+        if (this.powered) return false
+
         this.usePower(PWR_GENERATE_OPS)
+        return true
+    }
+
+    isViablePowerTarget?(target: Structure | Source) {
+
+        const maxRange = getRangeOfCoords(this.pos, target.pos) * 1.2
+
+        if (this.powers[PWR_REGEN_SOURCE].cooldown > maxRange) return false
+
+        if (!target.effectsData.get(PWR_REGEN_SOURCE)) return true
+
+        if (target.effectsData.get(PWR_REGEN_SOURCE).ticksRemaining > maxRange) return false
+
+        return true
+    }
+
+    findSourceRegenTask?() {
+
+        const power = this.powers[PWR_REGEN_SOURCE]
+        if (!power) return false
+
+        const sources = this.room.sources.sort((a, b) => {
+            return getRangeOfCoords(this.pos, a.pos) - getRangeOfCoords(this.pos, b.pos)
+        })
+
+        for (const source of sources) {
+
+            if (!this.isViablePowerTarget(source)) continue
+            this.room.visual.circle(source.pos, { stroke: myColors.red, strokeWidth: 2 })
+            this.memory.TN = 'advancedRegenSource'
+            this.memory.TTID = source.id
+            return true
+        }
+
+        return false
+    }
+
+    advancedRegenSource?() {
+
+        this.say('ARS')
+
+        const source = findObjectWithID(this.memory.TTID)
+        if (!source) return true
+
+        const minRange = 3
+        if (getRangeOfCoords(this.pos, source.pos) > minRange) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: source.pos,
+                        range: minRange,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            })
+
+            return false
+        }
+
+        if (this.powered) return false
+        if (this.powers[PWR_REGEN_SOURCE].cooldown) return false
+        if (source.effectsData.get(PWR_REGEN_SOURCE) && source.effectsData.get(PWR_REGEN_SOURCE).ticksRemaining) return false
+
+        this.usePower(PWR_REGEN_SOURCE, source)
         return true
     }
 

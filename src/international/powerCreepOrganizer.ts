@@ -56,9 +56,7 @@ class PowerCreepOrganizer {
         // Assign creep a class based on role
 
         const creepClass = powerCreepClasses[className]
-        if (!creepClass) return
-
-        creep = Game.creeps[creepName] = new creepClass(creep.id)
+        creep = Game.powerCreeps[creepName] = new creepClass(creep.id)
 
         // Get the creep's current room and the room it's from
 
