@@ -144,8 +144,6 @@ declare global {
         flee?: boolean
         creep?: Creep
 
-        avoidAbandonedRemotes?: boolean
-
         weightStructures?: Partial<{ [key in StructureConstant]: number }>
 
         /**
@@ -470,10 +468,6 @@ declare global {
          * Energy Output Spawn
          */
         eosp: number
-        /**
-         * Energy Output Power
-         */
-        eop: number
         /**
          * Minerals Harvested
          */
@@ -825,9 +819,11 @@ declare global {
         unprotectedCoords: CoordMap
 
         /**
-         * Wether the towers can sufficiently deal with the enemy threat in the room
+         * Wether the towers can deal sufficient damage to out-damage enemy creeps in the room
+         *
+         * Should influence if maintainers and defenders are needed to fend off the attack
          */
-        towerInferiority: boolean
+        towerSuperiority: boolean
 
         baseCoords: CoordMap
 
@@ -1356,26 +1352,6 @@ declare global {
         _defensiveRamparts: StructureRampart[]
 
         readonly defensiveRamparts: StructureRampart[]
-
-        _factory: StructureFactory
-
-        readonly factory: StructureFactory
-
-        _powerSpawn: StructurePowerSpawn
-
-        readonly powerSpawn: StructurePowerSpawn
-
-        _nuker: StructureNuker
-
-        readonly nuker: StructureNuker
-
-        _observer: StructureObserver
-
-        readonly observer: StructureObserver
-
-        _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
-
-        readonly resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
 
         // Target finding
 

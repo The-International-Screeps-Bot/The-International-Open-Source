@@ -18,7 +18,7 @@ export const baseVisuals = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const mapVisuals = false
+export const mapVisuals = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -47,7 +47,7 @@ export const allyPlayers = [
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'somygame']
+export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'o4kapuk']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -57,7 +57,7 @@ export const pixelSelling = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const pixelGeneration = false
+export const pixelGeneration = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -72,7 +72,7 @@ export const autoClaim = true
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const autoAttack = false
+export const autoAttack = true
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -1168,5 +1168,3 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
     tradeHorizontal: [3, 2, 1, 0],
     tradeVertical: [1, 0, 3, 2],
 }
-
-export const ERROR_FAILED = 0

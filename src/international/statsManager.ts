@@ -1,6 +1,3 @@
-import { myColors } from './constants'
-import { customLog } from './utils'
-
 function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
     const roomStatsLevel = Memory.roomStats
     switch (statName) {
@@ -22,7 +19,6 @@ function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
         case 'eoro':
         case 'eorwr':
         case 'eosp':
-        case 'eop':
         case 'rc':
         case 'rcu':
         case 'res':
@@ -62,7 +58,6 @@ export class StatsManager {
                 eob: 0,
                 eos: 0,
                 eosp: 0,
-                eop: 0,
                 mh: 0,
                 bes: 0,
                 es: 0,
@@ -123,12 +118,7 @@ export class StatsManager {
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
-            customLog(
-                'StatsManager',
-                `RoomCommuneFinalEndTick: ${roomName} stats not updated`,
-                myColors.white,
-                myColors.red,
-            )
+            console.log(`StatsManager: roomCommuneFinalEndTick: ${roomName} stats not updated`)
             return
         }
         const each250Ticks = Game.time % 250 === 0
@@ -171,11 +161,11 @@ export class StatsManager {
             }
         }
 
-        Object.keys(globalCommuneStats).forEach(name => {
+        Object.keys(roomStats).forEach(name => {
             let globalValue = globalCommuneStats[name]
             const value = roomStats[name]
-            if (!value) roomStats[name] = 0
-            if (!globalValue) globalValue = 0
+            if (value === undefined) roomStats[name] = 0
+            if (globalValue === undefined) globalValue = 0
 
             const statLevel = GetLevelOfStatName(name, forceUpdate)
             switch (statLevel) {
@@ -275,11 +265,13 @@ export class StatsManager {
         const globalRoomKeys = Object.keys(global.roomStats.commune)
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
         globalRoomKeys.forEach(roomName => {
+            console.log(`StatsManager: internationalEndTick: ${roomName} stats updated`)
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
         })
 
         notCheckedCommuneRooms.forEach(roomName => {
             const roomType = Memory.rooms[roomName].T
+            console.log(`StatsManager: NOT UPDATED internationalEndTick: ${roomName}`)
             if (roomType === 'commune') {
                 this.roomConfig(roomName, roomType)
                 this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName], true)
@@ -310,10 +302,3 @@ export const globalStatsUpdater = function (roomName: string, name: string, valu
         else if (global.roomStats.remote[roomName]) global.roomStats.remote[roomName][GetRemoteStatsName(name)] += value
     }
 }
-
-Game.market.createOrder({
-    type: ORDER_BUY,
-    resourceType: PIXEL,
-    price: 325000,
-    totalAmount: 50000,
-})

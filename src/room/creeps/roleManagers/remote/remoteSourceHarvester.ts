@@ -323,9 +323,8 @@ export class RemoteHarvester extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-                avoidAbandonedRemotes: true,
             })
-
+            
             if (createMoveRequestResult === 'unpathable') {
 
                 Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500

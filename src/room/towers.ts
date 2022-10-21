@@ -87,15 +87,11 @@ Room.prototype.towersAttackCreeps = function () {
 
     const attackTarget = attackTargets.find(creep => creep.towerDamage > 50 * towers.length)
 
-    if (!attackTarget) {
-
-        this.towerInferiority = true
-        return
-    }
+    if (!attackTarget) return
 
     // If we seem to be under attack from a swarm, record that the tower needs help
 
-    if (attackTargets.length >= 15) this.towerInferiority = true
+    if (attackTargets.length >= 15) this.towerSuperiority = false
 
     // Loop through the this's towers
 

@@ -39,7 +39,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
     return false
 }
 
-PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (opts) {
+Creep.prototype.createMoveRequest = function (opts) {
     const { room } = this
 
     // Stop if the we know the creep won't move
@@ -167,7 +167,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     return true
 }
 
-PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = function (coord) {
+Creep.prototype.assignMoveRequest = function (coord) {
     const { room } = this
     const packedCoord = packCoord(coord)
 
@@ -178,7 +178,7 @@ PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = fun
         : room.moveRequests.set(packedCoord, [this.name])
 }
 
-PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = function (avoidPackedPositions) {
+Creep.prototype.findShovePositions = function (avoidPackedPositions) {
     const { room } = this
 
     const { x } = this.pos
@@ -262,7 +262,7 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
     return shovePositions
 }
 
-PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
+Creep.prototype.shove = function (shoverPos) {
     const { room } = this
 
     const shovePositions = this.findShovePositions(new Set([packCoord(shoverPos), packCoord(this.pos)]))
@@ -315,7 +315,7 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
     return false
 }
 
-PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function () {
+Creep.prototype.runMoveRequest = function () {
     const { room } = this
 
     // If requests are not allowed for this pos, inform false
@@ -350,7 +350,7 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
     return true
 }
 
-PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = function (queue = []) {
+Creep.prototype.recurseMoveRequest = function (queue = []) {
     const { room } = this
 
     if (!this.moveRequest) return
