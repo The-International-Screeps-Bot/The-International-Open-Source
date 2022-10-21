@@ -1,7 +1,7 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { myColors, remoteRoles } from './constants'
 import { customLog } from './utils'
-import { InternationalManager } from './internationalManager'
+import { internationalManager, InternationalManager } from './internationalManager'
 import { packCoord } from 'other/packrat'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 
@@ -47,7 +47,11 @@ class PowerCreepOrganizer {
 
         // If the creep isn't spawned
 
-        if (!creep.ticksToLive) return
+        if (!creep.ticksToLive) {
+
+            internationalManager.unspawnedPowerCreepNames.push(creep.name)
+            return
+        }
 
         // Get the creep's role
 
