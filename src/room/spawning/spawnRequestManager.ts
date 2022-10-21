@@ -377,10 +377,10 @@ Room.prototype.spawnRequester = function () {
             const fastFillerPositionsCount = this.fastFillerPositions.length
             if (!fastFillerPositionsCount) return false
 
-            let defaultParts = [CARRY, MOVE, CARRY]
-
-            if (spawnEnergyCapacity >= 650) defaultParts = [CARRY, CARRY, MOVE, CARRY]
-            else if (this.controller.level >= 7) defaultParts = [CARRY, CARRY, CARRY, MOVE, CARRY]
+            let defaultParts: BodyPartConstant[]
+            if (this.controller.level >= 8) defaultParts = [CARRY, MOVE, CARRY, CARRY, CARRY, CARRY]
+            else if (spawnEnergyCapacity >= 650) defaultParts = [CARRY, MOVE, CARRY, CARRY]
+            else  defaultParts = [CARRY, MOVE, CARRY]
 
             const role = 'fastFiller'
 
@@ -390,7 +390,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [],
                 partsMultiplier: 1,
                 minCreeps: fastFillerPositionsCount,
-                minCost: 250,
+                minCost: 150,
                 priority: 0.75,
                 memoryAdditions: {},
             }
@@ -427,6 +427,8 @@ Room.prototype.spawnRequester = function () {
 
             let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.5
 
+            const priority = Math.min(6 + this.myCreeps.meleeDefender.length * 0.5, 8)
+
             const role = 'meleeDefender'
 
             // If all RCL 3 extensions are build
@@ -441,7 +443,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts,
                     partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                     minCost: 210,
-                    priority: 6 + this.creepsFromRoom.meleeDefender.length,
+                    priority,
                     memoryAdditions: {
                         R: true,
                     },
@@ -458,7 +460,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts,
                 partsMultiplier: Math.max(requiredStrength / strength, 1),
                 minCost: 260,
-                priority: 6 + this.creepsFromRoom.meleeDefender.length,
+                priority,
                 memoryAdditions: {},
                 threshold: 0,
             }
@@ -576,7 +578,8 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const priority = 8 + this.creepsFromRoom.maintainer.length
+            let priority = 7
+            if (!this.towerInferiority) priority += this.creepsFromRoom.maintainer.length
 
             // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
