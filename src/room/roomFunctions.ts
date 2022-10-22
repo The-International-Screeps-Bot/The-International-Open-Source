@@ -105,7 +105,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
                         return Infinity
 
-                    // If the goal is in the room, inform 1
+                    // If the goal is in the room
 
                     if (roomName === goal.pos.roomName) return 1
 
@@ -113,9 +113,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                     if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
 
-                    // Inform to consider this room
-
-                    return 2
+                    return 1
                 },
             })
 

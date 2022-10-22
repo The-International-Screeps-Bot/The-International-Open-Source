@@ -1890,7 +1890,7 @@ Object.defineProperties(Room.prototype, {
 
             this._OEWT = []
 
-            if (this.storage) {
+            if (this.storage && this.controller.level >= 4) {
                 if (this.controller.my) this._OEWT.push(this.storage)
                 // If it's not my controller but there are no enemy ramparts on the structure
                 else if (
@@ -1904,7 +1904,7 @@ Object.defineProperties(Room.prototype, {
                     this._OEWT.push(this.storage)
             }
 
-            if (this.terminal) {
+            if (this.terminal && this.controller.level >= 6) {
                 if (this.controller.my) this._OEWT.push(this.terminal)
                 // If it's not my controller but there are no enemy ramparts on the structure
                 else if (
@@ -2001,8 +2001,8 @@ Object.defineProperties(Room.prototype, {
 
             this._OETT = []
 
-            if (this.storage) this._OETT.push(this.storage)
-            if (this.terminal) this._OETT.push(this.terminal)
+            if (this.storage && this.controller.level >= 4) this._OETT.push(this.storage)
+            if (this.terminal && this.controller.level >= 6) this._OETT.push(this.terminal)
 
             return this._OETT
         },

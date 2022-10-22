@@ -43,14 +43,34 @@ Room.prototype.spawnRequester = function () {
             const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
+
+                let extraParts: BodyPartConstant[] = [CARRY]
+                let workAmount = 6
+
+                // Account for power regenerating sources
+
+                const source = this.sources[sourceIndex]
+                const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
+                if (effect) {
+
+                    workAmount += Math.round(POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] / POWER_INFO[PWR_REGEN_SOURCE].period / HARVEST_POWER)
+                }
+
+                for (let i = 1; i <= workAmount; i++) {
+
+                    if (i % 2 === 0) extraParts.push(MOVE)
+                    extraParts.push(WORK)
+                    if (i % 6 === 0) extraParts.push(CARRY)
+                }
+
                 return {
                     role,
-                    defaultParts: [CARRY],
-                    extraParts: [WORK, MOVE, WORK],
-                    partsMultiplier: 3,
+                    defaultParts: [],
+                    extraParts,
+                    partsMultiplier: 1,
                     minCreeps: 1,
                     minCost: 200,
-                    priority,
+                    priority: 1,
                     memoryAdditions: {
                         SI: sourceIndex,
                         R: true,
@@ -134,14 +154,34 @@ Room.prototype.spawnRequester = function () {
                 const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
                 if (spawnEnergyCapacity >= 800) {
+
+                    let extraParts: BodyPartConstant[] = [CARRY]
+                    let workAmount = 6
+
+                    // Account for power regenerating sources
+
+                    const source = this.sources[sourceIndex]
+                    const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
+                    if (effect) {
+
+                        workAmount += Math.round(POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] / POWER_INFO[PWR_REGEN_SOURCE].period / HARVEST_POWER)
+                    }
+
+                    for (let i = 1; i <= workAmount; i++) {
+
+                        if (i % 2 === 0) extraParts.push(MOVE)
+                        extraParts.push(WORK)
+                        if (i % 6 === 0) extraParts.push(CARRY)
+                    }
+
                     return {
                         role,
-                        defaultParts: [CARRY],
-                        extraParts: [WORK, MOVE, WORK],
-                        partsMultiplier: 3,
+                        defaultParts: [],
+                        extraParts,
+                        partsMultiplier: 1,
                         minCreeps: 1,
                         minCost: 200,
-                        priority,
+                        priority: 1,
                         memoryAdditions: {
                             SI: sourceIndex,
                             R: true,
@@ -482,18 +522,18 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            if (this.towerInferiority) return false
+            if (this.towerInferiority && this.structures.tower.length) return false
 
             // Stop if there are no construction sites
 
-            if (this.find(FIND_MY_CONSTRUCTION_SITES).length === 0) return false
+            if (!this.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
             let priority = 9
             let partsMultiplier = 0
 
-            // If there is a storage
+            // If there is an active storage
 
-            if (storage && this.controller.level < 4) {
+            if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
                 if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < this.communeManager.storedEnergyBuildThreshold)
@@ -1197,6 +1237,8 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             if (remoteHaulerNeed === 0) return false
 
+            partsMultiplier = remoteHaulerNeed
+
             /*
                // If all RCL 3 extensions are built
                if (spawnEnergyCapacity >= 800) {
@@ -1217,7 +1259,6 @@ Room.prototype.spawnRequester = function () {
                     }
                }
  */
-            partsMultiplier = remoteHaulerNeed
 
             const role = 'remoteHauler'
 
@@ -1227,7 +1268,6 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [CARRY, MOVE],
                 threshold: 0.1,
                 partsMultiplier,
-                maxCreeps: Infinity,
                 minCost: 100,
                 maxCostPerCreep: this.memory.MHC,
                 priority: minRemotePriority,

@@ -2135,9 +2135,9 @@ declare global {
 
         // RoomObject getters
 
-        _effectsData: Map<PowerConstant | EffectConstant, PowerEffect | NaturalEffect>
+        _effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
 
-        readonly effectsData: Map<PowerConstant | EffectConstant, PowerEffect | NaturalEffect>
+        readonly effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
     }
 
     interface Resource {
