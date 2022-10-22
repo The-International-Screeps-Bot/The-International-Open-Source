@@ -18,7 +18,7 @@ export const baseVisuals = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const mapVisuals = true
+export const mapVisuals = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -47,7 +47,7 @@ export const allyPlayers = [
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'o4kapuk']
+export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'somygame']
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -57,7 +57,7 @@ export const pixelSelling = false
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const pixelGeneration = true
+export const pixelGeneration = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -72,7 +72,7 @@ export const autoClaim = true
 /**
  * Default value, do not change. Modify this property in Memory instead
  */
-export const autoAttack = true
+export const autoAttack = false
 
 /**
  * Default value, do not change. Modify this property in Memory instead
@@ -542,17 +542,17 @@ export const stamps: Record<StampTypes, Stamp> = {
                 { x: 0, y: 0 },
             ],
             /* empty: [
-                { x: 0, y: 1 },
-                { x: 0, y: 2 },
-                { x: 1, y: 2 },
-                { x: 1, y: 3 },
-                { x: 2, y: 3 },
-                { x: 1, y: 0 },
-                { x: 2, y: 0 },
-                { x: 2, y: 1 },
-                { x: 3, y: 1 },
-                { x: 3, y: 2 },
-            ], */
+                 { x: 0, y: 1 },
+                 { x: 0, y: 2 },
+                 { x: 1, y: 2 },
+                 { x: 1, y: 3 },
+                 { x: 2, y: 3 },
+                 { x: 1, y: 0 },
+                 { x: 2, y: 0 },
+                 { x: 2, y: 1 },
+                 { x: 3, y: 1 },
+                 { x: 3, y: 2 },
+             ], */
             lab: [
                 { x: 0, y: 1 },
                 { x: 0, y: 2 },
@@ -1168,3 +1168,5 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
     tradeHorizontal: [3, 2, 1, 0],
     tradeVertical: [1, 0, 3, 2],
 }
+
+export const ERROR_FAILED = 0
