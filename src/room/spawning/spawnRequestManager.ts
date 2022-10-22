@@ -524,9 +524,9 @@ Room.prototype.spawnRequester = function () {
             let priority = 9
             let partsMultiplier = 0
 
-            // If there is a storage
+            // If there is an active storage
 
-            if (storage && this.controller.level < 4) {
+            if (storage && this.controller.level > 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
                 if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < this.communeManager.storedEnergyBuildThreshold)
