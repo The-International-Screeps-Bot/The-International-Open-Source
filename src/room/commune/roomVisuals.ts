@@ -10,7 +10,7 @@ import {
     stamps,
 } from 'international/constants'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
-import { RoomManager } from './roomManager'
+import { RoomManager } from '../roomManager'
 
 export class RoomVisualsManager {
     roomManager: RoomManager

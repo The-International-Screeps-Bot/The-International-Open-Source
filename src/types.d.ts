@@ -1,4 +1,4 @@
-import { CommuneManager } from './room/communeManager'
+import { CommuneManager } from './room/commune/communeManager'
 import { RoomManager } from './room/roomManager'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
@@ -354,6 +354,30 @@ declare global {
          * Target ID
          */
         TID: Id<AnyStoreStructure>
+    }
+
+    interface PowerTask {
+        taskID: number
+        targetID: Id<Structure | Source>
+        powerType: PowerConstant
+        packedCoord: string
+        cooldown: number
+        priority: number
+    }
+
+    interface PackedPowerTask {
+        /**
+         * Target ID
+         */
+        TID: Id<Structure | Source>
+        /**
+         * Power Type
+         */
+        PT: PowerConstant
+        /**
+         * Cooldown
+         */
+        C: number
     }
 
     type Reservations = 'transfer' | 'withdraw' | 'pickup'
@@ -859,6 +883,8 @@ declare global {
          */
         squadRequests: Set<string>
 
+        powerTasks: { [ID: number]: PowerTask }
+
         // Functions
 
         /**
@@ -1011,6 +1037,8 @@ declare global {
         visualizeCostMatrix(cm: CostMatrix, color?: boolean): void
 
         coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
+
+        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters

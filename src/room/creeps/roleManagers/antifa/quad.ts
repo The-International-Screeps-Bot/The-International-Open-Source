@@ -20,7 +20,6 @@ import {
     isXYExit,
 } from 'international/utils'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
-import { AllyCreepRequestManager } from 'room/allyCreepRequestManager'
 import { Antifa } from './antifa'
 
 export class Quad {

@@ -1,6 +1,6 @@
 import { globalStatsUpdater } from 'international/statsManager'
 import { CommuneManager } from './communeManager'
-import { customLog } from '../international/utils'
+import { customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 
 export class PowerSpawnManager {

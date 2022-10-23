@@ -21,7 +21,7 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { CommuneManager } from 'room/communeManager'
+import { CommuneManager } from 'room/commune/communeManager'
 
 /*
 - Posted 10 may 2018 by @saruss

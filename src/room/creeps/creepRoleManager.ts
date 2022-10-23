@@ -24,12 +24,12 @@ import { Scout } from './roleManagers/international/scout'
 import { Vanguard } from './roleManagers/international/vanguard'
 import { Antifa } from './roleManagers/antifa/antifa'
 import { VanguardDefender } from './roleManagers/international/vanguardDefender'
-import { CommuneManager } from 'room/communeManager'
+import { CommuneManager } from 'room/commune/communeManager'
 import { RoomManager } from 'room/roomManager'
 
 // Construct managers
 
-const managers:  { [key in CreepRoles]: Function } = {
+const managers: { [key in CreepRoles]: Function } = {
     meleeDefender: MeleeDefender.meleeDefenderManager,
     allyVanguard: AllyVanguard.allyVanguardManager,
     antifaRangedAttacker: Antifa.antifaManager,
