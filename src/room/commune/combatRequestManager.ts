@@ -12,6 +12,8 @@ export class CombatRequestManager {
     public run() {
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
+        if (!this.communeManager.room.structures.spawn.length) return
+
         for (let index = 0; index < this.communeManager.room.memory.combatRequests.length; index++) {
             const requestName = this.communeManager.room.memory.combatRequests[index]
             const request = Memory.combatRequests[requestName]
