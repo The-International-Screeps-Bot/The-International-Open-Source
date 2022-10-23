@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange, } from 'international/utils'
+import { createPosMap, customLog, findClosestObject, getRange } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -87,7 +87,6 @@ export class CommuneManager {
         this.test()
     }
     private test() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()

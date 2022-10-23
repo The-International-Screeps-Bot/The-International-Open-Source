@@ -178,7 +178,11 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy + room.getPartsOfRoleAmount('controllerUpgrader', WORK)) return false
+        if (
+            hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold >
+            hubLink.store.energy + room.getPartsOfRoleAmount('controllerUpgrader', WORK)
+        )
+            return false
 
         // If the controllerLink is less than x% full
 
@@ -480,7 +484,8 @@ export class HubHauler extends Creep {
 
         let provider
         if (storage && storage.store[resource] >= 75000 && storage.store[resource] >= amount) provider = storage
-        else if (terminal && terminal.store[resource] >= 25000 && terminal.store[resource] >= amount) provider = terminal
+        else if (terminal && terminal.store[resource] >= 25000 && terminal.store[resource] >= amount)
+            provider = terminal
 
         if (!provider) return false
 

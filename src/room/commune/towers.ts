@@ -14,7 +14,6 @@ Room.prototype.towerManager = function () {
     if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
     if (this.flags.disableTowers || !this.structures.tower.length) {
-
         this.towerInferiority = true
         return
     }
@@ -88,7 +87,6 @@ Room.prototype.towersAttackCreeps = function () {
     const attackTarget = attackTargets.find(creep => creep.towerDamage > 50 * towers.length)
 
     if (!attackTarget) {
-
         this.towerInferiority = true
         return
     }
