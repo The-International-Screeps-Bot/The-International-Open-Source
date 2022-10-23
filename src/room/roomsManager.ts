@@ -2,16 +2,16 @@ import { myColors, roomTypesUsedForStats } from '../international/constants'
 
 import './roomFunctions'
 
-import './communeManager'
+import './commune/communeManager'
 
 import { CreepRoleManager } from './creeps/creepRoleManager'
 
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
-import './roomVisuals'
+import './commune/roomVisuals'
 import { createPosMap, customLog } from 'international/utils'
 import { statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
-import { CommuneManager } from './communeManager'
+import { CommuneManager } from './commune/communeManager'
 import { RoomManager } from './roomManager'
 
 export function roomsManager() {

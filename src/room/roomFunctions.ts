@@ -27,6 +27,7 @@ import {
     findClosestCommuneName,
     findCoordsInsideRect,
     getRange,
+    newID,
     packAsNum,
     packXYAsNum,
     unpackNumAsCoord,
@@ -2084,4 +2085,24 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
     }
 
     return false
+}
+
+Room.prototype.createPowerTask = function(target, powerType, priority) {
+
+    const ID = newID()
+
+
+    let cooldown
+    const effectsData = target.effectsData
+    if (!effectsData.get(powerType)) cooldown = 0
+    else cooldown = effectsData.get(powerType).ticksRemaining
+
+    return this.powerTasks[ID] = {
+        taskID: ID,
+        targetID: target.id,
+        powerType,
+        packedCoord: packCoord(target.pos),
+        cooldown,
+        priority,
+    }
 }

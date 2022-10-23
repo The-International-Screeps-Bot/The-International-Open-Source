@@ -81,6 +81,9 @@ Room.prototype.spawnManager = function () {
                 myColors.red,
             )
 
+            //We don't want one bad spawn request to block all of spawning.
+            if (testSpawnResult == ERR_INVALID_ARGS) continue
+
             break
         }
 

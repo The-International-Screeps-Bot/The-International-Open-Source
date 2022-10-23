@@ -2,28 +2,31 @@ import { createPosMap, customLog, findClosestObject, getRange } from 'internatio
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
-import { constructionManager } from './construction/constructionManager'
+import { constructionManager } from '../construction/constructionManager'
 import './defence'
 import './allyCreepRequestManager'
 import './claimRequestManager'
 import './combatRequestManager'
 import { myColors, roomDimensions } from 'international/constants'
 import './factory'
-import { LabManager } from './lab'
+import { LabManager } from './labs'
 import './towers'
 import './links'
 import { RoomVisualsManager } from './roomVisuals'
-import { EndTickCreepManager } from './creeps/endTickCreepManager'
-import { CreepRoleManager } from './creeps/creepRoleManager'
+import { EndTickCreepManager } from '../creeps/endTickCreepManager'
+import { CreepRoleManager } from '../creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
 import { ClaimRequestManager } from './claimRequestManager'
 import { CombatRequestManager } from './combatRequestManager'
 import { AllyCreepRequestManager } from './allyCreepRequestManager'
 import { PowerSpawnManager } from './powerSpawn'
+import './haulerSize'
+import { SourceManager } from './sourceManager'
 
 export class CommuneManager {
     labManager: LabManager
     powerSpawnManager: PowerSpawnManager
+    sourceManager: SourceManager
 
     tradeManager: TradeManager
     remotesManager: RemotesManager
@@ -35,6 +38,7 @@ export class CommuneManager {
     constructor() {
         this.labManager = new LabManager(this)
         this.powerSpawnManager = new PowerSpawnManager(this)
+        this.sourceManager = new SourceManager(this)
 
         this.tradeManager = new TradeManager(this)
         this.remotesManager = new RemotesManager(this)

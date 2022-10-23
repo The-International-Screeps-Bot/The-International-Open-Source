@@ -12,6 +12,8 @@ export class ClaimRequestManager {
     public run() {
         const { room } = this.communeManager
 
+        if (!room.structures.spawn.length) return
+
         const requestName = room.memory.claimRequest
         if (!requestName) return
 

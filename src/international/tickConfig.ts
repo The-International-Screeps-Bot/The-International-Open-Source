@@ -15,9 +15,8 @@ import {
 import { advancedFindDistance, createPosMap, customLog, findCarryPartsRequired, findClosestRoomName } from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
-import '../room/haulerSize'
 import { indexOf } from 'lodash'
-import { CommuneManager } from 'room/communeManager'
+import { CommuneManager } from 'room/commune/communeManager'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 
 class TickConfig {
@@ -59,19 +58,17 @@ class TickConfig {
             // Single tick properties
 
             room.myCreeps = {}
-
-            // For each role, construct an array for myCreeps
-
             for (const role of creepRoles) room.myCreeps[role] = []
 
             room.myPowerCreeps = {}
-
             for (const className of powerCreepClassNames) room.myPowerCreeps[className] = []
 
             room.myCreepsAmount = 0
             room.myPowerCreepsAmount = 0
 
             room.creepsOfSourceAmount = []
+
+            room.powerTasks = {}
 
             for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 

@@ -30,7 +30,7 @@ import { internationalManager } from 'international/internationalManager'
 import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
-import { CommuneManager } from 'room/communeManager'
+import { CommuneManager } from 'room/commune/communeManager'
 import { rampartPlanner } from './rampartPlanner'
 
 interface PlanStampOpts {

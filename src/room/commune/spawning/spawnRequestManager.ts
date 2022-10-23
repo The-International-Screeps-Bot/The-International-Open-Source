@@ -710,7 +710,7 @@ Room.prototype.spawnRequester = function () {
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
-            if (this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed && this.towerInferiority)
+            if (this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed && this.towerInferiority && this.structures.tower.length)
                 return false
 
             // If the controllerContainer have not enough energy in it, don't spawn a new upgrader

@@ -12,6 +12,8 @@ export class AllyCreepRequestManager {
     public run() {
         const { room } = this.communeManager
 
+        if (!room.structures.spawn.length) return
+
         if (!room.memory.allyCreepRequest) return
 
         // If CPU logging is enabled, get the CPU used at the start

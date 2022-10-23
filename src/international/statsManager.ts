@@ -310,10 +310,3 @@ export const globalStatsUpdater = function (roomName: string, name: string, valu
         else if (global.roomStats.remote[roomName]) global.roomStats.remote[roomName][GetRemoteStatsName(name)] += value
     }
 }
-
-Game.market.createOrder({
-    type: ORDER_BUY,
-    resourceType: PIXEL,
-    price: 325000,
-    totalAmount: 50000,
-})

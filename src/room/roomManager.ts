@@ -1,7 +1,7 @@
 import { CreepRoleManager } from "./creeps/creepRoleManager"
 import { EndTickCreepManager } from "./creeps/endTickCreepManager"
 import { PowerCreepRoleManager } from "./creeps/powerCreepRoleManager"
-import { RoomVisualsManager } from "./roomVisuals"
+import { RoomVisualsManager } from './commune/roomVisuals'
 
 export class RoomManager {
 

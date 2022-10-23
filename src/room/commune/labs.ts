@@ -1,6 +1,7 @@
 import { minerals } from 'international/constants'
 import { CommuneManager } from './communeManager'
-import { Hauler } from './creeps/roleManagers/commune/hauler'
+import { Hauler } from '../creeps/roleManagers/commune/hauler'
+import { findObjectWithID, getRangeOfCoords } from 'international/utils'
 
 const reactionCycleAmount = 5000
 
@@ -56,52 +57,62 @@ function decompose(compound: MineralConstant | MineralCompoundConstant): (Minera
 }
 
 const boostsInOrder: MineralBoostConstant[] = [
-    //fatigue decrease speed
+    // fatigue decrease speed
+
     RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE,
     RESOURCE_ZYNTHIUM_ALKALIDE,
     RESOURCE_ZYNTHIUM_OXIDE,
 
-    //damage taken
+    // damage taken
+
     RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
     RESOURCE_GHODIUM_ALKALIDE,
     RESOURCE_GHODIUM_OXIDE,
 
-    //heal and rangedHeal effectiveness
+    // heal and rangedHeal effectiveness
+
     RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
     RESOURCE_LEMERGIUM_ALKALIDE,
     RESOURCE_LEMERGIUM_OXIDE,
 
-    //attack effectiveness
+    // attack effectiveness
+
     RESOURCE_CATALYZED_UTRIUM_ACID,
     RESOURCE_UTRIUM_ACID,
     RESOURCE_UTRIUM_HYDRIDE,
 
-    //rangedAttack and rangedMassAttack effectiveness
+    // rangedAttack and rangedMassAttack effectiveness
+
     RESOURCE_CATALYZED_KEANIUM_ALKALIDE,
     RESOURCE_KEANIUM_ALKALIDE,
     RESOURCE_KEANIUM_OXIDE,
 
-    //dismantle effectiveness
+    // dismantle effectiveness
+
     RESOURCE_CATALYZED_ZYNTHIUM_ACID,
     RESOURCE_ZYNTHIUM_ACID,
     RESOURCE_ZYNTHIUM_HYDRIDE,
 
-    //upgradeController effectiveness
+    // upgradeController effectiveness
+
     RESOURCE_CATALYZED_GHODIUM_ACID,
     RESOURCE_GHODIUM_ACID,
     RESOURCE_GHODIUM_HYDRIDE,
 
-    //capacity
+    // capacity
+
     RESOURCE_CATALYZED_KEANIUM_ACID,
     RESOURCE_KEANIUM_ACID,
     RESOURCE_KEANIUM_HYDRIDE,
 
-    //repair and build effectiveness
+    // repair and build effectiveness
+
     RESOURCE_CATALYZED_LEMERGIUM_ACID,
     RESOURCE_LEMERGIUM_ACID,
     RESOURCE_LEMERGIUM_HYDRIDE,
 
-    //harvest effectiveness
+    // harvest effectiveness
+
     RESOURCE_CATALYZED_UTRIUM_ALKALIDE,
     RESOURCE_UTRIUM_ALKALIDE,
     RESOURCE_UTRIUM_OXIDE,
@@ -112,6 +123,14 @@ export class LabManager {
         KH: 15000,
         G: 10000,
         OH: 5000,
+        [RESOURCE_CATALYZED_UTRIUM_ACID]: 5000,
+        [RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE]: 5000,
+        [RESOURCE_CATALYZED_KEANIUM_ALKALIDE]: 5000,
+        [RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE]: 5000,
+        [RESOURCE_CATALYZED_LEMERGIUM_ACID]: 5000,
+        [RESOURCE_CATALYZED_GHODIUM_ALKALIDE]: 5000,
+        [RESOURCE_CATALYZED_ZYNTHIUM_ACID]: 5000,
+        [RESOURCE_CATALYZED_GHODIUM_ACID]: 5000,
     }
 
     deficits: { [key in MineralConstant | MineralCompoundConstant]?: number } = {}
@@ -146,7 +165,8 @@ export class LabManager {
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return false
 
-        if (lab.mineralAmount < LAB_BOOST_MINERAL || lab.store.getUsedCapacity(RESOURCE_ENERGY) < LAB_BOOST_ENERGY) return false
+        if (lab.mineralAmount < LAB_BOOST_MINERAL || lab.store.getUsedCapacity(RESOURCE_ENERGY) < LAB_BOOST_ENERGY)
+            return false
 
         //This needs to see if the lab is fully ready to boost the creep.  This will work
         //  even if it partially boosts the creep.
@@ -220,49 +240,54 @@ export class LabManager {
     private doLayoutCheck(): void {
         if (this.lastLayoutCheck + 1000 > Game.time) return
 
-        if (!this.lab1Id || !this.lab2Id || !this.input1 || !this.input2) {
+        this.lastLayoutCheck = Game.time
+
+        if (!this.lab1Id && !this.lab2Id && !this.input1 && !this.input2) return
+
+        this.lab1Id = null
+        this.lab2Id = null
+
+        const terminal = this.communeManager.room.terminal
+        if (!terminal) return
+        if (this.communeManager.structures.lab.length < 3) return
+
+        //Sort the labs by the distance to the terminal, so that labs on the side of the hub are favored.
+
+        const labs = this.communeManager.structures.lab.sort((a, b) => {
+            return getRangeOfCoords(a.pos, terminal.pos) - getRangeOfCoords(b.pos, terminal.pos)
+        })
+
+        let bestLab = labs[0]
+
+        //Starting at 2 intentally, to skip the first two records, which will be the default best labs...
+        //  then we see if there's a lab that's better.
+        //I'm not 100% sure this logic is perfect, but it's decent, but I think there may be an error in here.
+        for (let i = 2; i < labs.length; i++) {
+            let thisLab = labs[i]
+            if (this.labsInRange(thisLab) > this.labsInRange(bestLab)) bestLab = thisLab
+        }
+        this.lab1Id = bestLab.id
+        let lab1 = bestLab
+
+        bestLab = labs[1]
+        for (let i = 2; i < labs.length; i++) {
+            let thisLab = labs[i]
+            if (this.labsInRange(thisLab, lab1) > this.labsInRange(bestLab, lab1)) bestLab = thisLab
+        }
+        this.lab2Id = bestLab.id
+        //Make sure that both the sending labs are valid.... technically this should check to see how many labs overlap both labs.
+        if (this.labsInRange(bestLab) == 0 || this.labsInRange(lab1) == 0) {
             this.lab1Id = null
             this.lab2Id = null
-
-            if (this.communeManager.structures.lab.length >= 3) {
-                //Sort the labs by the distance to the terminal, so that labs on the side of the hub are favored.
-                let sorted = _.sortBy(this.communeManager.structures.lab, lab =>
-                    lab.pos.getRangeTo(this.communeManager.room.terminal?.pos),
-                )
-                let bestLab = sorted[0]
-                //Starting at 2 intentally, to skip the first two records, which will be the default best labs...
-                //  then we see if there's a lab that's better.
-                //I'm not 100% sure this logic is perfect, but it's decent, but I think there may be an error in here.
-                for (let i = 2; i < sorted.length; i++) {
-                    let thisLab = sorted[i]
-                    if (this.labsInRange(thisLab) > this.labsInRange(bestLab)) bestLab = thisLab
-                }
-                this.lab1Id = bestLab.id
-                let lab1 = bestLab
-
-                bestLab = sorted[1]
-                for (let i = 2; i < sorted.length; i++) {
-                    let thisLab = sorted[i]
-                    if (this.labsInRange(thisLab, lab1) > this.labsInRange(bestLab, lab1)) bestLab = thisLab
-                }
-                this.lab2Id = bestLab.id
-                //Make sure that both the sending labs are valid.... technically this should check to see how many labs overlap both labs.
-                if (this.labsInRange(bestLab) == 0 || this.labsInRange(lab1) == 0) {
-                    this.lab1Id = null
-                    this.lab2Id = null
-                }
-            }
         }
-
-        this.lastLayoutCheck = Game.time
     }
 
     public get input1(): StructureLab {
-        return _.find(this.communeManager.structures.lab, lab => lab.id == this.lab1Id)
+        return findObjectWithID(this.lab1Id)
     }
 
     public get input2(): StructureLab {
-        return _.find(this.communeManager.structures.lab, lab => lab.id == this.lab2Id)
+        return findObjectWithID(this.lab2Id)
     }
 
     public get outputs(): StructureLab[] {
