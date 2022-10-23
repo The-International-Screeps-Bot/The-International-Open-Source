@@ -531,7 +531,34 @@ export class Quad {
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
 
         const range = this.findMinRange(enemyAttacker.pos)
-        this.leader.say(range.toString())
+
+        // If the squad is outmatched
+
+        if (this.healStrength + this.attackStrength < enemyAttacker.healStrength + enemyAttacker.attackStrength) {
+            if (range === 4) {
+
+                this.passiveHeal()
+                return true
+            }
+
+            // If too close
+
+            if (range <= 3) {
+
+                this.rangedAttack(enemyAttacker)
+
+                // Have the squad flee
+
+                this.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    flee: true,
+                })
+            }
+
+            return true
+        }
+
         // If it's more than range 3
 
         if (range > 3) {
@@ -552,26 +579,6 @@ export class Quad {
         this.leader.say('AEA')
 
         this.rangedAttack(enemyAttacker)
-
-        // If the creep has less heal power than the enemyAttacker's attack power
-
-        if (this.leader.healStrength < enemyAttacker.attackStrength) {
-            if (range === 3) return true
-
-            // If too close
-
-            if (range <= 2) {
-                // Have the squad flee
-
-                this.createMoveRequest({
-                    origin: this.leader.pos,
-                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
-                    flee: true,
-                })
-            }
-
-            return true
-        }
 
         if (range > 1) {
             this.createMoveRequest({
