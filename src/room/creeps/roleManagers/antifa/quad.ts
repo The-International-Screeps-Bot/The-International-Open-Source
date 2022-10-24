@@ -414,60 +414,77 @@ export class Quad {
         return true
     }
 
-    passiveRangedAttack() {
-        for (const member of this.members) {
-            if (member.ranged) continue
+    /**
+     * Attack viable targets without moving
+     */
+    passiveRangedAttack(target?: Structure | Creep) {
+        // Find members that can attack
 
-            let enemyCreeps = member.room.enemyAttackers
-            if (!enemyCreeps.length) {
-                enemyCreeps = member.room.enemyCreeps.filter(
-                    enemyCreep => !member.room.coordHasStructureTypes(enemyCreep.pos, new Set([STRUCTURE_RAMPART])),
-                )
-                if (!enemyCreeps.length) continue
-            }
-
-            const enemyCreep = findClosestObject(member.pos, enemyCreeps)
-
-            const range = getRangeOfCoords(member.pos, enemyCreep.pos)
-            if (range > 3) continue
-
-            member.ranged = true
-
-            if (range > 1) {
-                member.rangedAttack(enemyCreep)
-                continue
-            }
-
-            member.rangedMassAttack()
-        }
-    }
-
-    rangedAttack(target: Creep | Structure) {
-        if (!(target as AnyOwnedStructure).owner) {
-            for (const member of this.members) {
-                if (member.ranged) continue
-
-                if (getRangeOfCoords(member.pos, target.pos) > 3) continue
-
-                member.rangedAttack(target)
-            }
-
-            return
-        }
+        const attackingMemberIDs: Set<Id<Antifa>> = new Set()
 
         for (const member of this.members) {
             if (member.ranged) continue
+
+            attackingMemberIDs.add(member.id)
+        }
+
+        // Sort enemies by number of members that can attack them
+
+        const attackingMemberIdsArray = Array.from(attackingMemberIDs)
+        const enemyTargets: Map<Id<Creep>, Id<Antifa>[]> = new Map()
+
+        for (const enemyCreep of this.leader.room.enemyCreeps) {
+
+            // the enemy creep is standing on a rampart, don't try to attack it
+
+            if (enemyCreep.room.coordHasStructureTypes(enemyCreep.pos, new Set([STRUCTURE_RAMPART]))) continue
+
+            const memberIDsInRange: Id<Antifa>[] = []
+
+            for (const memberID of attackingMemberIdsArray) {
+                const member = findObjectWithID(memberID)
+
+                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 3) continue
+
+                memberIDsInRange.push(member.id)
+            }
+
+            if (!memberIDsInRange.length) continue
+
+            enemyTargets.set(enemyCreep.id, memberIDsInRange)
+            if (memberIDsInRange.length === this.members.length) break
+        }
+
+        // Attack enemies in order of most members that can attack them
+
+        for (const [enemyID, memberIDs] of enemyTargets) {
+            const enemyCreep = findObjectWithID(enemyID)
+
+            for (const memberID of memberIDs) {
+                const member = findObjectWithID(memberID)
+
+                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
+                else member.rangedMassAttack()
+                member.ranged = true
+
+                attackingMemberIDs.delete(memberID)
+            }
+
+            if (!attackingMemberIDs.size) return
+        }
+
+        // If there is a target and there are members left that can attack, attack the target
+
+        if (!target) return
+
+        for (const memberID of Array.from(attackingMemberIDs)) {
+            const member = findObjectWithID(memberID)
+
             const range = getRangeOfCoords(member.pos, target.pos)
             if (range > 3) continue
 
-            member.ranged = true
-
-            if (range > 1) {
-                member.rangedAttack(target)
-                continue
-            }
-
-            member.rangedMassAttack()
+            if (range === 1) member.rangedMassAttack()
+            else member.rangedAttack(target)
         }
     }
 
@@ -505,7 +522,7 @@ export class Quad {
             this.leader.say(range.toString())
 
             if (range <= 3) {
-                this.rangedAttack(enemyCreep)
+                this.passiveRangedAttack(enemyCreep)
             }
 
             // If the range is more than 1
@@ -531,7 +548,32 @@ export class Quad {
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
 
         const range = this.findMinRange(enemyAttacker.pos)
-        this.leader.say(range.toString())
+
+        // If the squad is outmatched
+
+        if (this.healStrength + this.attackStrength < enemyAttacker.healStrength + enemyAttacker.attackStrength) {
+            if (range === 4) {
+                this.passiveHeal()
+                return true
+            }
+
+            // If too close
+
+            if (range <= 3) {
+                this.passiveRangedAttack(enemyAttacker)
+
+                // Have the squad flee
+
+                this.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    flee: true,
+                })
+            }
+
+            return true
+        }
+
         // If it's more than range 3
 
         if (range > 3) {
@@ -551,27 +593,7 @@ export class Quad {
 
         this.leader.say('AEA')
 
-        this.rangedAttack(enemyAttacker)
-
-        // If the creep has less heal power than the enemyAttacker's attack power
-
-        if (this.leader.healStrength < enemyAttacker.attackStrength) {
-            if (range === 3) return true
-
-            // If too close
-
-            if (range <= 2) {
-                // Have the squad flee
-
-                this.createMoveRequest({
-                    origin: this.leader.pos,
-                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
-                    flee: true,
-                })
-            }
-
-            return true
-        }
+        this.passiveRangedAttack(enemyAttacker)
 
         if (range > 1) {
             this.createMoveRequest({
@@ -629,7 +651,7 @@ export class Quad {
 
         if (range > 3) return true
 
-        this.rangedAttack(bulldozeTarget)
+        this.passiveRangedAttack(bulldozeTarget)
         return true
 
         return true
@@ -655,7 +677,7 @@ export class Quad {
 
         if (range > 3) return true
 
-        this.rangedAttack(structure)
+        this.passiveRangedAttack(structure)
         return true
     }
 

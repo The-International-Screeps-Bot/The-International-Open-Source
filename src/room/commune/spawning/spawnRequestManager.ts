@@ -469,6 +469,7 @@ Room.prototype.spawnRequester = function () {
             /* if (this.controller.safeMode) return false */
 
             if (!this.towerInferiority) return false
+            if (!this.enemyAttackers.length) return false
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
@@ -1284,13 +1285,12 @@ Room.prototype.spawnRequester = function () {
 
             return {
                 role,
-                defaultParts: [MOVE],
-                extraParts: [],
+                defaultParts: [],
+                extraParts: [MOVE],
                 partsMultiplier: 1,
                 minCreeps: this.controller.level === 8 ? 1 : 2,
-                maxCreeps: Infinity,
-                minCost: 100,
-                priority: 6,
+                minCost: 50,
+                priority: 5,
                 memoryAdditions: {},
             }
         })(),

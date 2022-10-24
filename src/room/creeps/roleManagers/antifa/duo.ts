@@ -214,6 +214,32 @@ export class Duo {
 
         const range = getRange(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
 
+        // If the squad is outmatched
+
+        if (this.healStrength + this.attackStrength < enemyAttacker.healStrength + enemyAttacker.attackStrength) {
+            if (range === 4) {
+
+                return true
+            }
+
+            // If too close
+
+            if (range <= 3) {
+
+                this.leader.rangedAttack(enemyAttacker)
+
+                // Have the squad flee
+
+                this.createMoveRequest({
+                    origin: this.leader.pos,
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    flee: true,
+                })
+            }
+
+            return true
+        }
+
         // If it's more than range 3
 
         if (range > 3) {
@@ -235,29 +261,6 @@ export class Duo {
 
         if (range === 1) this.leader.rangedMassAttack()
         else this.leader.rangedAttack(enemyAttacker)
-
-        // If the creep has less heal power than the enemyAttacker's attack power
-
-        if (this.leader.healStrength < enemyAttacker.attackStrength) {
-            if (range === 3) return true
-
-            // If too close
-
-            if (range <= 2) {
-                // Have the squad flee
-
-                this.createMoveRequest(
-                    {
-                        origin: this.leader.pos,
-                        goals: [{ pos: enemyAttacker.pos, range: 1 }],
-                        flee: true,
-                    },
-                    this.members[1],
-                )
-            }
-
-            return true
-        }
 
         if (range > 1) {
             this.createMoveRequest({
