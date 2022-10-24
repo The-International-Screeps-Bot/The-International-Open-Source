@@ -4,6 +4,7 @@ import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
+import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
 
 declare global {
     interface ProfilerMemory {
@@ -884,6 +885,9 @@ declare global {
         squadRequests: Set<string>
 
         powerTasks: { [ID: number]: PowerTask }
+
+        attackingMeleeDefenderIDs: Set<Id<MeleeDefender>>
+        enemyTargets: Map<Id<Creep>, Id<MeleeDefender>[]>
 
         // Functions
 

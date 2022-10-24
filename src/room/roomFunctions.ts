@@ -103,7 +103,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 routeCallback(roomName: string) {
 
                     const roomMemory = Memory.rooms[roomName]
-                    if (!roomMemory) return Infinity
+                    if (!roomMemory && roomName !== goal.pos.roomName) return Infinity
 
                     if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon]) return Infinity
 

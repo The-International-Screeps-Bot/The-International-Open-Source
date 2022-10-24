@@ -141,7 +141,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (path.length > 1) {
         if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
     } else {
-        room.visual.line(this.pos, path[0], {
+        if (Memory.roomVisuals) room.visual.line(this.pos, path[0], {
             color: myColors.lightBlue,
             opacity: 0.3,
         })
