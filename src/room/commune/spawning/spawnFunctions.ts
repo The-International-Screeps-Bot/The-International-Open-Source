@@ -94,6 +94,10 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
                 partCost = BODYPART_COST[part]
 
+                // If adding the part will put the body above minCost, stop adding parts
+
+                if (cost + partCost > this.energyCapacityAvailable) break
+
                 // And add the partCost to the cost
 
                 cost += partCost
@@ -241,7 +245,6 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     }
 
     while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
-
         // Construct important imformation for the spawnRequest
 
         const body: BodyPartConstant[] = []
@@ -267,6 +270,10 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 // Get the cost of the part
 
                 partCost = BODYPART_COST[part]
+
+                // If adding the part will put the body above minCost, stop adding parts
+
+                if (cost + partCost > this.energyCapacityAvailable) break
 
                 // And add the partCost to the cost
 
