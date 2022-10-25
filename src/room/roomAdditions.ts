@@ -142,9 +142,18 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._myDamagedCreeps) return this._myDamagedCreeps
 
-            return (this._myDamagedCreeps = this.find(FIND_MY_CREEPS, {
+            return this._myDamagedCreeps = this._myDamagedCreeps = this.find(FIND_MY_CREEPS, {
                 filter: creep => creep.hits < creep.hitsMax,
-            }))
+            })
+        },
+    },
+    myDamagedPowerCreeps: {
+        get() {
+            if (this._myDamagedPowerCreeps) return this._myDamagedPowerCreeps
+
+            return this._myDamagedPowerCreeps = this._myDamagedPowerCreeps = this.find(FIND_MY_POWER_CREEPS, {
+                filter: creep => creep.hits < creep.hitsMax,
+            })
         },
     },
     allyDamagedCreeps: {
@@ -1826,7 +1835,8 @@ Object.defineProperties(Room.prototype, {
 
             this._resourcesInStoringStructures = {}
 
-            const storingStructures: AnyStoreStructure[] = [this.storage, this.terminal, this.factory]
+            const storingStructures: AnyStoreStructure[] = [this.storage, this.factory]
+            if (this.terminal && !this.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(this.terminal)
 
             for (const structure of storingStructures) {
                 if (!structure) continue
@@ -1845,6 +1855,18 @@ Object.defineProperties(Room.prototype, {
 
             return this._resourcesInStoringStructures
         },
+    },
+    unprotectedEnemyCreeps: {
+        get() {
+
+            if (this._unprotectedEnemyCreeps) return this._unprotectedEnemyCreeps
+
+            const avoidStructureTypes = new Set([STRUCTURE_RAMPART])
+
+            return this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
+                return !this.coordHasStructureTypes(enemyCreep.pos, avoidStructureTypes)
+            })
+        }
     },
     MEWT: {
         get() {

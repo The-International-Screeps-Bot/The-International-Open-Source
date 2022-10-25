@@ -22,8 +22,13 @@ import { AllyCreepRequestManager } from './allyCreepRequestManager'
 import { PowerSpawnManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
+import { TowerManager } from './towers'
+import { DefenceManager } from './defence'
 
 export class CommuneManager {
+    defenceManager: DefenceManager
+
+    towerManager: TowerManager
     labManager: LabManager
     powerSpawnManager: PowerSpawnManager
     sourceManager: SourceManager
@@ -36,6 +41,9 @@ export class CommuneManager {
     allyCreepRequestManager: AllyCreepRequestManager
 
     constructor() {
+        this.defenceManager = new DefenceManager(this)
+
+        this.towerManager = new TowerManager(this)
         this.labManager = new LabManager(this)
         this.powerSpawnManager = new PowerSpawnManager(this)
         this.sourceManager = new SourceManager(this)
@@ -59,8 +67,9 @@ export class CommuneManager {
     public run() {
         constructionManager(this.room)
 
-        this.room.defenceManager()
-        this.room.towerManager()
+        this.defenceManager.run()
+
+        this.towerManager.run()
 
         try {
             this.tradeManager.run()

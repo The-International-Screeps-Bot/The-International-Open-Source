@@ -353,8 +353,8 @@ export class Antifa extends Creep {
 
         // See if the structure is destroyed next tick
 
-        structure.realHits = structure.hits - this.parts.ranged_attack * RANGED_ATTACK_POWER
-        if (structure.realHits > 0) return true
+        structure.estimatedHits -= this.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.estimatedHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -464,8 +464,8 @@ export class Antifa extends Creep {
 
         // See if the structure is destroyed next tick
 
-        structure.realHits = structure.hits - this.parts.attack * ATTACK_POWER
-        if (structure.realHits > 0) return true
+        structure.estimatedHits -= this.parts.attack * ATTACK_POWER
+        if (structure.estimatedHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -507,8 +507,8 @@ export class Antifa extends Creep {
 
         // See if the structure is destroyed next tick
 
-        structure.realHits = structure.hits - this.parts.work * DISMANTLE_POWER
-        if (structure.realHits > 0) return true
+        structure.estimatedHits -= this.parts.work * DISMANTLE_POWER
+        if (structure.estimatedHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 

@@ -29,7 +29,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
             if (!room) continue
 
             Game.map.visual.text(
-                `⚡${room.findStoredResourceAmount(RESOURCE_ENERGY)}`,
+                `⚡${room.resourcesInStoringStructures.energy}`,
                 new RoomPosition(2, 8, roomName),
                 {
                     align: 'left',

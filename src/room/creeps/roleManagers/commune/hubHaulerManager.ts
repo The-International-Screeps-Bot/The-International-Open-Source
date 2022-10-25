@@ -389,7 +389,7 @@ export class HubHauler extends Creep {
 
         // If the ratio of stored batteries to energy is sufficiently high
         // 100 : 1
-        if (room.findStoredResourceAmount(RESOURCE_BATTERY) * 100 > room.findStoredResourceAmount(RESOURCE_ENERGY))
+        if (room.resourcesInStoringStructures.battery * 100 > room.resourcesInStoringStructures.energy)
             return false
 
         // Find a provider

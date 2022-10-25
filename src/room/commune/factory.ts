@@ -85,9 +85,15 @@ Room.prototype.factoryManager = function () {
                         | RESOURCE_ENERGY
                         | RESOURCE_GHODIUM
                 ]
-            var comonentOnHand = room.findStoredResourceAmount(
-                component as DepositConstant | CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM,
-            )
+            var comonentOnHand =
+                room.resourcesInStoringStructures[
+                    component as
+                        | DepositConstant
+                        | CommodityConstant
+                        | MineralConstant
+                        | RESOURCE_ENERGY
+                        | RESOURCE_GHODIUM
+                ]
             //If it's a basic material, see if we have it.  Otherwise, see if we have the stuff to make it
             //this line doesn't include DepositConstant intentally.  that way !COMMODITIES will be false.
             if (
@@ -150,10 +156,11 @@ Room.prototype.factoryManager = function () {
         setProduct(null)
 
         if (
-            room.findStoredResourceAmount(RESOURCE_ENERGY) > 150000 &&
+            room.resourcesInStoringStructures[RESOURCE_ENERGY] > 150000 &&
             //If We're either low in space, or we don't have any in storage.  We put some in storage so we can trade,
             // but don't make it till we're low-ish on space.
-            (room.storage.store.getFreeCapacity() < 100000 || room.findStoredResourceAmount(RESOURCE_BATTERY) < 5000)
+            (room.storage.store.getFreeCapacity() < 100000 ||
+                room.resourcesInStoringStructures[RESOURCE_BATTERY] < 5000)
         ) {
             // Convert energy into batteries
             setProduct(RESOURCE_BATTERY)
@@ -161,8 +168,8 @@ Room.prototype.factoryManager = function () {
         }
 
         if (
-            room.findStoredResourceAmount(RESOURCE_ENERGY) < 20000 &&
-            room.findStoredResourceAmount(RESOURCE_BATTERY) >= 600
+            room.resourcesInStoringStructures[RESOURCE_ENERGY] < 20000 &&
+            room.resourcesInStoringStructures[RESOURCE_BATTERY] >= 600
         ) {
             setProduct(RESOURCE_ENERGY)
             return
@@ -202,10 +209,10 @@ Room.prototype.factoryManager = function () {
             let productionTarget = 10000
             if (resource == RESOURCE_COMPOSITE) productionTarget = 200
 
-            var totalOnHand = room.findStoredResourceAmount(resource)
+            var totalOnHand = room.resourcesInStoringStructures[resource]
 
             //don't run the room out of energy making batteries.
-            if (resource == RESOURCE_BATTERY && room.findStoredResourceAmount(RESOURCE_ENERGY) < 200000) continue
+            if (resource == RESOURCE_BATTERY && room.resourcesInStoringStructures[RESOURCE_ENERGY] < 200000) continue
 
             if (
                 (totalOnHand < productionTarget &&
@@ -224,28 +231,29 @@ Room.prototype.factoryManager = function () {
                 resource == RESOURCE_CONDENSATE ||
                 resource == RESOURCE_CELL ||
                 resource == RESOURCE_ALLOY ||
-                (resource == RESOURCE_PURIFIER && room.findStoredResourceAmount(RESOURCE_CATALYST) > 10000) ||
-                (resource == RESOURCE_UTRIUM_BAR && room.findStoredResourceAmount(RESOURCE_UTRIUM) > 10000) ||
-                (resource == RESOURCE_LEMERGIUM_BAR && room.findStoredResourceAmount(RESOURCE_LEMERGIUM) > 10000) ||
+                (resource == RESOURCE_PURIFIER && room.resourcesInStoringStructures[RESOURCE_CATALYST] > 10000) ||
+                (resource == RESOURCE_UTRIUM_BAR && room.resourcesInStoringStructures[RESOURCE_UTRIUM] > 10000) ||
+                (resource == RESOURCE_LEMERGIUM_BAR && room.resourcesInStoringStructures[RESOURCE_LEMERGIUM] > 10000) ||
                 (resource == RESOURCE_ZYNTHIUM_BAR &&
-                    room.findStoredResourceAmount(RESOURCE_ZYNTHIUM) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_ZYNTHIUM) >
-                        room.findStoredResourceAmount(RESOURCE_ZYNTHIUM_BAR)) ||
+                    room.resourcesInStoringStructures[RESOURCE_ZYNTHIUM] > 10000 &&
+                    room.resourcesInStoringStructures[RESOURCE_ZYNTHIUM] >
+                        room.resourcesInStoringStructures[RESOURCE_ZYNTHIUM_BAR]) ||
                 (resource == RESOURCE_KEANIUM_BAR &&
-                    room.findStoredResourceAmount(RESOURCE_KEANIUM) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_KEANIUM) >
-                        room.findStoredResourceAmount(RESOURCE_KEANIUM_BAR)) ||
+                    room.resourcesInStoringStructures[RESOURCE_KEANIUM] > 10000 &&
+                    room.resourcesInStoringStructures[RESOURCE_KEANIUM] >
+                        room.resourcesInStoringStructures[RESOURCE_KEANIUM_BAR]) ||
                 (resource == RESOURCE_GHODIUM_MELT &&
-                    room.findStoredResourceAmount(RESOURCE_GHODIUM) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_GHODIUM) >
-                        room.findStoredResourceAmount(RESOURCE_GHODIUM_MELT)) ||
+                    room.resourcesInStoringStructures[RESOURCE_GHODIUM] > 10000 &&
+                    room.resourcesInStoringStructures[RESOURCE_GHODIUM] >
+                        room.resourcesInStoringStructures[RESOURCE_GHODIUM_MELT]) ||
                 (resource == RESOURCE_OXIDANT &&
-                    room.findStoredResourceAmount(RESOURCE_OXYGEN) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_OXYGEN) > room.findStoredResourceAmount(RESOURCE_OXIDANT)) ||
+                    room.resourcesInStoringStructures[RESOURCE_OXYGEN] > 10000 &&
+                    room.resourcesInStoringStructures[RESOURCE_OXYGEN] >
+                        room.resourcesInStoringStructures[RESOURCE_OXIDANT]) ||
                 (resource == RESOURCE_REDUCTANT &&
-                    room.findStoredResourceAmount(RESOURCE_HYDROGEN) > 10000 &&
-                    room.findStoredResourceAmount(RESOURCE_HYDROGEN) >
-                        room.findStoredResourceAmount(RESOURCE_REDUCTANT))
+                    room.resourcesInStoringStructures[RESOURCE_HYDROGEN] > 10000 &&
+                    room.resourcesInStoringStructures[RESOURCE_HYDROGEN] >
+                        room.resourcesInStoringStructures[RESOURCE_REDUCTANT])
             ) {
                 let currentlyHaveAllMaterials: boolean = haveAllMaterials(resource)
                 if (!currentlyHaveAllMaterials) continue

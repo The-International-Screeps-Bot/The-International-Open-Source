@@ -1,5 +1,5 @@
 import { myColors, powerCreepClassNames } from 'international/constants'
-import { customLog } from 'international/utils'
+import { customLog, randomTick } from 'international/utils'
 import { RoomManager } from '../roomManager'
 
 export class EndTickCreepManager {
@@ -35,6 +35,15 @@ export class EndTickCreepManager {
 
                 creep.endTickManager()
                 creep.recurseMoveRequest()
+
+                if (Game.time % 2 === 0) {
+
+                    creep.say('MORE', true)
+                }
+                else {
+
+                    creep.say('MALARKEY', true)
+                }
             }
 
         // If CPU logging is enabled, log the CPU used by this manager

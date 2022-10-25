@@ -1,106 +1,161 @@
-import { allyPlayers, myColors, safemodeTargets } from 'international/constants'
-import { customLog, findObjectWithID, randomTick } from 'international/utils'
+import { allyPlayers, myColors, roomDimensions, safemodeTargets } from 'international/constants'
+import { customLog, findObjectWithID, getRangeOfCoords, randomTick } from 'international/utils'
+import { CommuneManager } from './communeManager'
 
-Room.prototype.defenceManager = function () {
-    // If CPU logging is enabled, get the CPU used at the start
+export class DefenceManager {
+    communeManager: CommuneManager
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-
-    this.advancedActivateSafeMode()
-    this.manageRampartPublicity()
-
-    // If CPU logging is enabled, log the CPU used by this manager
-
-    if (Memory.CPULogging)
-        customLog('Defence Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
-}
-
-Room.prototype.manageRampartPublicity = function () {
-    const enemyAttackers = this.enemyAttackers.filter(function (creep) {
-        return !creep.isOnExit
-    })
-
-    // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
-
-    if (!enemyAttackers.length) {
-        if (!Memory.publicRamparts) return
-
-        // Stop if the tick is not divisible by a random range
-
-        if (randomTick(50)) return
-
-        // Publicize at most 10 ramparts per tick, to avoid too many intents
-
-        let intents = 0
-
-        for (const rampart of this.structures.rampart) {
-            if (intents >= 10) return
-
-            // If the rampart is public
-
-            if (rampart.isPublic) continue
-
-            // Otherwise set the rampart to public, increase increment
-
-            rampart.setPublic(true)
-            intents += 1
-        }
-
-        // Stop
-
-        return
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
     }
 
-    // If there are enemyAttackers, privitize all ramparts that are public
+    run() {
+        // If CPU logging is enabled, get the CPU used at the start
 
-    for (const rampart of this.structures.rampart) if (rampart.isPublic) rampart.setPublic(false)
-}
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-Room.prototype.advancedActivateSafeMode = function () {
-    // If safeMode is on cooldown, stop
+        this.advancedActivateSafeMode()
+        this.manageRampartPublicity()
+        this.assignDefenceTargets()
 
-    if (this.controller.safeModeCooldown) return
+        // If CPU logging is enabled, log the CPU used by this manager
 
-    // Otherwise if there are no safeModes left, stop
+        if (Memory.CPULogging)
+            customLog(
+                'Defence Manager',
+                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
+                undefined,
+                myColors.lightGrey,
+            )
+    }
 
-    if (this.controller.safeModeAvailable === 0) return
+    advancedActivateSafeMode() {
+        const { room } = this.communeManager
+        const { controller } = room
 
-    // Otherwise if the controller is upgradeBlocked, stop
+        // If safeMode is on cooldown, stop
 
-    if (this.controller.upgradeBlocked > 0) return
+        if (controller.safeModeCooldown) return
 
-    // Filter attackers that are not invaders. If there are none, stop
+        // Otherwise if there are no safeModes left, stop
 
-    const nonInvaderAttackers = this.enemyAttackers.filter(
-        enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username /* !== 'Invader' */,
-    )
+        if (controller.safeModeAvailable === 0) return
 
-    if (!nonInvaderAttackers.length) return
+        // Otherwise if the controller is upgradeBlocked, stop
 
-    // Otherwise if safeMode can be activated
+        if (controller.upgradeBlocked > 0) return
 
-    // Get the previous tick's events
+        // Filter attackers that are not invaders. If there are none, stop
 
-    const eventLog = this.getEventLog()
+        const nonInvaderAttackers = room.enemyAttackers.filter(
+            enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username /* !== 'Invader' */,
+        )
 
-    // Loop through each eventItem
+        if (!nonInvaderAttackers.length) return
 
-    for (const eventItem of eventLog) {
-        // If the event wasn't an attack, iterate
+        // Otherwise if safeMode can be activated
 
-        if (eventItem.event !== EVENT_ATTACK) continue
+        // Get the previous tick's events
 
-        // Otherwise get the target of the attack
+        const eventLog = room.getEventLog()
 
-        const attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | any>)
+        // Loop through each eventItem
 
-        // If the attackTarget isn't a structure, iterate
+        for (const eventItem of eventLog) {
+            // If the event wasn't an attack, iterate
 
-        if (!(attackTarget instanceof Structure)) continue
+            if (eventItem.event !== EVENT_ATTACK) continue
 
-        if (!safemodeTargets.includes(attackTarget.structureType)) continue
+            // Otherwise get the target of the attack
 
-        this.controller.activateSafeMode()
-        return
+            const attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | any>)
+
+            // If the attackTarget isn't a structure, iterate
+
+            if (!(attackTarget instanceof Structure)) continue
+
+            if (!safemodeTargets.includes(attackTarget.structureType)) continue
+
+            controller.activateSafeMode()
+            return
+        }
+    }
+
+    manageRampartPublicity() {
+        const { room } = this.communeManager
+
+        const enemyAttackers = room.enemyAttackers.filter(function (creep) {
+            return !creep.isOnExit
+        })
+
+        // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
+
+        if (!enemyAttackers.length) {
+            if (!Memory.publicRamparts) return
+
+            // Stop if the tick is not divisible by a random range
+
+            if (randomTick(50)) return
+
+            // Publicize at most 10 ramparts per tick, to avoid too many intents
+
+            let intents = 0
+
+            for (const rampart of room.structures.rampart) {
+                if (intents >= 10) return
+
+                // If the rampart is public
+
+                if (rampart.isPublic) continue
+
+                // Otherwise set the rampart to public, increase increment
+
+                rampart.setPublic(true)
+                intents += 1
+            }
+
+            // Stop
+
+            return
+        }
+
+        // If there are enemyAttackers, privitize all ramparts that are public
+
+        for (const rampart of room.structures.rampart) if (rampart.isPublic) rampart.setPublic(false)
+    }
+
+    assignDefenceTargets() {
+        const { room } = this.communeManager
+
+        const defenderEnemyTargetsByDamage = Array.from(room.defenderEnemyTargetsWithDefender.keys()).sort((a, b) => {
+            return room.defenderEnemyTargetsWithDamage.get(a) - room.defenderEnemyTargetsWithDamage.get(b)
+        })
+
+        // Attack enemies in order of most members that can attack them
+
+        for (const enemyCreepID of defenderEnemyTargetsByDamage) {
+            const enemyCreep = findObjectWithID(enemyCreepID)
+
+            for (const memberID of room.defenderEnemyTargetsWithDefender.get(enemyCreepID)) {
+
+                if (!room.attackingDefenderIDs.has(memberID)) continue
+
+                const member = Game.getObjectById(memberID)
+
+                Game.creeps[member.name].combatTarget = enemyCreep
+
+                room.attackingDefenderIDs.delete(memberID)
+            }
+
+            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
+
+            if (netDamage > 0) {
+
+                if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
+                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id)) room.towerAttackTarget = enemyCreep
+            }
+
+            if (!room.attackingDefenderIDs.size) break
+        }
     }
 }
