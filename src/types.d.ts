@@ -1077,7 +1077,7 @@ declare global {
 
         constructSpawnRequests(opts: SpawnRequestOpts | false): void
 
-        decideMaxCostPerCreep(maxCostPerCreep: number): number
+        findMaxCostPerCreep(maxCostPerCreep: number): number
 
         createSpawnRequest(
             priority: number,

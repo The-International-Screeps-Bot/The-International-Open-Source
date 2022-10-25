@@ -30,7 +30,7 @@ Room.prototype.constructSpawnRequests = function (opts) {
     this.spawnRequestByGroup(opts)
 }
 
-Room.prototype.decideMaxCostPerCreep = function (maxCostPerCreep) {
+Room.prototype.findMaxCostPerCreep = function (maxCostPerCreep) {
     if (!maxCostPerCreep) maxCostPerCreep = this.energyCapacityAvailable
 
     // If there are no sourceHarvesters or haulers
@@ -67,7 +67,7 @@ Room.prototype.createSpawnRequest = function (priority, role, body, tier, cost, 
 Room.prototype.spawnRequestIndividually = function (opts) {
     // Get the maxCostPerCreep
 
-    const maxCostPerCreep = Math.max(this.decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
+    const maxCostPerCreep = Math.max(this.findMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
 
     // So long as minCreeps is more than the current number of creeps
 
@@ -96,7 +96,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
                 // If adding the part will put the body above minCost, stop adding parts
 
-                if (cost + partCost > this.energyCapacityAvailable) break
+                if (cost + partCost > maxCostPerCreep) break
 
                 // And add the partCost to the cost
 
@@ -204,7 +204,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 Room.prototype.spawnRequestByGroup = function (opts) {
     // Get the maxCostPerCreep
 
-    const maxCostPerCreep = Math.max(this.decideMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
+    const maxCostPerCreep = Math.max(this.findMaxCostPerCreep(opts.maxCostPerCreep), opts.minCost)
 
     // Find the totalExtraParts using the partsMultiplier
 
@@ -273,7 +273,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
                 // If adding the part will put the body above minCost, stop adding parts
 
-                if (cost + partCost > this.energyCapacityAvailable) break
+                if (cost + partCost > maxCostPerCreep) break
 
                 // And add the partCost to the cost
 

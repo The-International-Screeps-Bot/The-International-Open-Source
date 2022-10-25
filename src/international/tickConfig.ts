@@ -104,6 +104,14 @@ class TickConfig {
         // The room is a commune
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
+        else {
+            for (const combatRequestName of room.memory.combatRequests) {
+                if (internationalManager.creepsByCombatRequest[combatRequestName]) continue
+
+                internationalManager.creepsByCombatRequest[combatRequestName] = {}
+                for (const role of antifaRoles) internationalManager.creepsByCombatRequest[combatRequestName][role] = []
+            }
+        }
 
         room.spawnRequests = {}
 
@@ -319,11 +327,8 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-
                     if (room.resourcesInStoringStructures.energy / 15000 < room.memory.combatRequests.length) continue
-                }
-                else {
-
+                } else {
                     if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
                 }
 
