@@ -43,7 +43,6 @@ Room.prototype.spawnRequester = function () {
             const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
-
                 let extraParts: BodyPartConstant[] = [CARRY]
                 let workAmount = 6
 
@@ -52,12 +51,14 @@ Room.prototype.spawnRequester = function () {
                 const source = this.sources[sourceIndex]
                 const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
                 if (effect) {
-
-                    workAmount += Math.round(POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] / POWER_INFO[PWR_REGEN_SOURCE].period / HARVEST_POWER)
+                    workAmount += Math.round(
+                        POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] /
+                            POWER_INFO[PWR_REGEN_SOURCE].period /
+                            HARVEST_POWER,
+                    )
                 }
 
                 for (let i = 1; i <= workAmount; i++) {
-
                     if (i % 2 === 0) extraParts.push(MOVE)
                     extraParts.push(WORK)
                     if (i % 6 === 0) extraParts.push(CARRY)
@@ -154,7 +155,6 @@ Room.prototype.spawnRequester = function () {
                 const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
                 if (spawnEnergyCapacity >= 800) {
-
                     let extraParts: BodyPartConstant[] = [CARRY]
                     let workAmount = 6
 
@@ -163,12 +163,14 @@ Room.prototype.spawnRequester = function () {
                     const source = this.sources[sourceIndex]
                     const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
                     if (effect) {
-
-                        workAmount += Math.round(POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] / POWER_INFO[PWR_REGEN_SOURCE].period / HARVEST_POWER)
+                        workAmount += Math.round(
+                            POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] /
+                                POWER_INFO[PWR_REGEN_SOURCE].period /
+                                HARVEST_POWER,
+                        )
                     }
 
                     for (let i = 1; i <= workAmount; i++) {
-
                         if (i % 2 === 0) extraParts.push(MOVE)
                         extraParts.push(WORK)
                         if (i % 6 === 0) extraParts.push(CARRY)
@@ -348,7 +350,7 @@ Room.prototype.spawnRequester = function () {
 
             if (!storage) return false
 
-            if (storage.store.energy < 40000) return false
+            if (this.resourcesInStoringStructures.energy < 40000) return false
 
             // If there is no terminal, inform false
 
@@ -420,7 +422,7 @@ Room.prototype.spawnRequester = function () {
             let defaultParts: BodyPartConstant[]
             if (this.controller.level >= 8) defaultParts = [CARRY, MOVE, CARRY, CARRY, CARRY, CARRY]
             else if (spawnEnergyCapacity >= 650) defaultParts = [CARRY, MOVE, CARRY, CARRY]
-            else  defaultParts = [CARRY, MOVE, CARRY]
+            else defaultParts = [CARRY, MOVE, CARRY]
 
             const role = 'fastFiller'
 
@@ -459,10 +461,9 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            /* if (this.controller.safeMode) return false */
 
             if (!this.towerInferiority) return false
-            if (!this.enemyAttackers.length) return false
+            /* if (!this.enemyAttackers.length) return false */
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
@@ -485,9 +486,7 @@ Room.prototype.spawnRequester = function () {
                     partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                     minCost: 210,
                     priority,
-                    memoryAdditions: {
-                        R: true,
-                    },
+                    memoryAdditions: {},
                     threshold: 0.1,
                 }
             }
@@ -516,7 +515,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            if (this.towerInferiority && this.structures.tower.length) return false
+            if (this.towerInferiority) return false
 
             // Stop if there are no construction sites
 
@@ -530,10 +529,10 @@ Room.prototype.spawnRequester = function () {
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y enemy in storage
 
-                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < this.communeManager.storedEnergyBuildThreshold)
+                if (this.resourcesInStoringStructures.energy < this.communeManager.storedEnergyBuildThreshold)
                     return false
 
-                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000, 2)
+                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / 20000, 2)
             }
 
             // Otherwise if there is no storage
@@ -658,7 +657,7 @@ Room.prototype.spawnRequester = function () {
             // For every x energy in storage, add 1 multiplier
 
             if (storage && this.controller.level >= 4)
-                partsMultiplier += Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 20000, 2)
+                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / 20000, 2)
 
             const role = 'maintainer'
 
@@ -704,7 +703,10 @@ Room.prototype.spawnRequester = function () {
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
-            if (this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed && this.towerInferiority && this.structures.tower.length)
+            if (
+                this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
+                this.towerInferiority
+            )
                 return false
 
             // If there is a storage
@@ -712,8 +714,8 @@ Room.prototype.spawnRequester = function () {
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y energy in storage
 
-                if (storage.store.getUsedCapacity(RESOURCE_ENERGY) >= this.communeManager.storedEnergyUpgradeThreshold)
-                    partsMultiplier = Math.pow(storage.store.getUsedCapacity(RESOURCE_ENERGY) / 15000, 2)
+                if (this.resourcesInStoringStructures.energy >= this.communeManager.storedEnergyUpgradeThreshold)
+                    partsMultiplier = Math.pow(this.resourcesInStoringStructures.energy / 15000, 2)
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
             }
@@ -1090,24 +1092,24 @@ Room.prototype.spawnRequester = function () {
                 if (remoteData[RemoteData.minDamage] + remoteData[RemoteData.minHeal] <= 0) return false
 
                 const minRangedAttackCost =
-                    (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-                        (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE] || 0
+                    ((remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+                        (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
+                    1.2
                 const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
                 const minHealCost =
-                    (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
-                        (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE] || 0
+                    ((remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
+                        (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
+                    1.2
                 const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
                 if ((rangedAttackAmount + healAmount) * 2 > 50) {
-
                     Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
 
                 const minCost = minRangedAttackCost + minHealCost
                 if (minCost > spawnEnergyCapacity) {
-
                     Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }

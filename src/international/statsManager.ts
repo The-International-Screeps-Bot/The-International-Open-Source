@@ -144,7 +144,7 @@ export class StatsManager {
                     globalCommuneStats.reob += remoteRoomStats.reob
                     if (each250Ticks)
                         globalCommuneStats.res +=
-                            Game.rooms[remoteRoomName]?.findStoredResourceAmount(RESOURCE_ENERGY, true) || 0
+                            Game.rooms[remoteRoomName]?.resourcesInStoringStructures.energy || 0
                 }
             })
         if (room) {
@@ -162,8 +162,8 @@ export class StatsManager {
                     globalCommuneStats.cl =
                         progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
                 }
-                globalCommuneStats.es = room.findStoredResourceAmount(RESOURCE_ENERGY, true)
-                globalCommuneStats.bes = room.findStoredResourceAmount(RESOURCE_BATTERY, true) * 10
+                globalCommuneStats.es = room.resourcesInStoringStructures.energy
+                globalCommuneStats.bes = room.resourcesInStoringStructures.battery * 10
             } else {
                 globalCommuneStats.es = roomStats.es
                 globalCommuneStats.bes = roomStats.bes

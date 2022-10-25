@@ -526,7 +526,7 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
             threat = 0
 
-            const energy = room.findStoredResourceAmount(RESOURCE_ENERGY)
+            const energy = room.resourcesInStoringStructures.energy
 
             room.memory.energy = energy
             threat += Math.pow(energy, 0.5)
@@ -656,8 +656,8 @@ Room.prototype.findType = function (scoutingRoom: Room) {
                     room.memory.T = 'enemyRemote'
                     room.memory.owner = creep.owner.username
 
-                    room.createAttackCombatRequest()
-                    /* room.createHarassCombatRequest() */
+                    /* room.createAttackCombatRequest() */
+                    room.createHarassCombatRequest()
 
                     return true
                 }
@@ -893,46 +893,6 @@ Room.prototype.cleanMemory = function () {
 
         delete room.memory[key as keyof RoomMemory]
     }
-}
-
-Room.prototype.findStoredResourceAmount = function (resourceType, includeContainers = false) {
-    const room = this
-
-    // If room.storedResources doesn't exist, construct it
-
-    if (!room.storedResources) room.storedResources = {}
-    // Otherwise if there is already data about the storedResources, inform it
-    else if (room.storedResources[resourceType]) return room.storedResources[resourceType]
-
-    // Otherwise construct the number for this stored resource
-
-    room.storedResources[resourceType] = 0
-
-    // Create array of room and terminal
-
-    const storageStructures: AnyStoreStructure[] = [
-        room.storage,
-        room.terminal,
-        ...room.structures.factory,
-        ...room.structures.powerSpawn,
-    ]
-    if (includeContainers) storageStructures.push(...room.structures.container)
-
-    // Iterate through storageStructures
-
-    for (const storageStructure of storageStructures) {
-        // Iterate if storageStructure isn't defined
-
-        if (!storageStructure) continue
-
-        // Add the amount of resources in the storageStructure to the rooms storedResources of resourceType
-
-        room.storedResources[resourceType] += storageStructure.store.getUsedCapacity(resourceType)
-    }
-
-    // Inform room's storedResources of resourceType
-
-    return room.storedResources[resourceType]
 }
 
 Room.prototype.distanceTransform = function (

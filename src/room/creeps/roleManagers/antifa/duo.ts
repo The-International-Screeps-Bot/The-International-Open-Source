@@ -218,14 +218,12 @@ export class Duo {
 
         if (this.healStrength + this.attackStrength < enemyAttacker.healStrength + enemyAttacker.attackStrength) {
             if (range === 4) {
-
                 return true
             }
 
             // If too close
 
             if (range <= 3) {
-
                 this.leader.rangedAttack(enemyAttacker)
 
                 // Have the squad flee
@@ -300,8 +298,8 @@ export class Duo {
 
         // See if the structure is destroyed next tick
 
-        structure.realHits = structure.hits - this.leader.parts.ranged_attack * RANGED_ATTACK_POWER
-        if (structure.realHits > 0) return true
+        structure.estimatedHits -= this.leader.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.estimatedHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -418,8 +416,8 @@ export class Duo {
 
         // See if the structure is destroyed next tick
 
-        structure.realHits = structure.hits - this.leader.parts.attack * ATTACK_POWER
-        if (structure.realHits > 0) return true
+        structure.estimatedHits -= this.leader.parts.attack * ATTACK_POWER
+        if (structure.estimatedHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -462,8 +460,8 @@ export class Duo {
 
         // See if the structure is destroyed next tick
 
-        structure.realHits = structure.hits - this.leader.parts.work * DISMANTLE_POWER
-        if (structure.realHits > 0) return true
+        structure.estimatedHits -= this.leader.parts.work * DISMANTLE_POWER
+        if (structure.estimatedHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 

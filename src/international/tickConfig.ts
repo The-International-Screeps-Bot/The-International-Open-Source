@@ -147,6 +147,10 @@ class TickConfig {
         if (room.creepsFromRoom.scout) room.scoutTargets = new Set()
 
         if (!room.memory.deposits) room.memory.deposits = {}
+
+        room.attackingDefenderIDs = new Set()
+        room.defenderEnemyTargetsWithDamage = new Map()
+        room.defenderEnemyTargetsWithDefender = new Map()
     }
     private configClaimRequests() {
         let reservedGCL = Game.gcl.level - global.communes.size
@@ -165,6 +169,9 @@ class TickConfig {
             if (Memory.rooms[roomName].claimRequest) continue
 
             if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
+
+            const room = Game.rooms[roomName]
+            if (!room.structures.spawn.length) continue
 
             communesForResponding.push(roomName)
         }
@@ -251,6 +258,9 @@ class TickConfig {
             for (const roomName of global.communes) {
                 if (Memory.rooms[roomName].allyCreepRequest) continue
 
+                const room = Game.rooms[roomName]
+                if (!room.structures.spawn.length) continue
+
                 communes.push(roomName)
             }
 
@@ -302,6 +312,20 @@ class TickConfig {
 
             for (const roomName of global.communes) {
                 if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue
+
+                const room = Game.rooms[roomName]
+                if (!room.structures.spawn.length) continue
+
+                // Ensure we aren't responding to too many requests for our energy level
+
+                if (room.storage && room.controller.level >= 4) {
+
+                    if (room.resourcesInStoringStructures.energy / 15000 >= room.memory.combatRequests.length) continue
+                }
+                else {
+
+                    if (room.estimateIncome() / 10 >= room.memory.combatRequests.length) continue
+                }
 
                 communes.push(roomName)
             }

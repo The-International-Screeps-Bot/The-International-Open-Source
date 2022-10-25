@@ -831,11 +831,6 @@ declare global {
         creepsOfRemote: { [key: string]: { [key: string]: string[] } }
 
         /**
-         * An object, if constructed, containing keys of resource types and values of the number of those resources in the room's terminal and storage
-         */
-        storedResources: { [key: string]: number }
-
-        /**
          * A set of roomNames representing the targets of scouts from this commune
          */
         scoutTargets: Set<string>
@@ -886,8 +881,10 @@ declare global {
 
         powerTasks: { [ID: number]: PowerTask }
 
-        attackingMeleeDefenderIDs: Set<Id<MeleeDefender>>
-        enemyTargets: Map<Id<Creep>, Id<MeleeDefender>[]>
+        attackingDefenderIDs: Set<Id<Creep>>
+        defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
+        defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
+        towerAttackTarget: Creep
 
         // Functions
 
@@ -910,11 +907,6 @@ declare global {
          * Generates a path between two positions
          */
         advancedFindPath(opts: PathOpts): RoomPosition[]
-
-        /**
-         * Finds the amount of a specified resourceType in the room's storage and teminal
-         */
-        findStoredResourceAmount(resourceType: ResourceConstant, includeContainers?: boolean): number
 
         /**
          * Tries to delete a task with the provided ID and response state
@@ -1118,45 +1110,6 @@ declare global {
 
         communeConstructionPlacement(): void
 
-        // Defence
-
-        /**
-         * Handles defence related situations for a commune
-         */
-        defenceManager(): void
-
-        /**
-         * Publicizes or privitizes ramparts based on enemyAttacker presence
-         */
-        manageRampartPublicity(): void
-
-        /**
-         * Activates safemode based on concerning conditions
-         */
-        advancedActivateSafeMode(): void
-
-        // Tower functions
-
-        /**
-         * Dictates and operates tasks for towers
-         */
-        towerManager(): void
-
-        /**
-         * has towers heal my or allied damaged creeps
-         */
-        towersHealCreeps(): void
-
-        /**
-         * Has towers attack enemyCreeps, if they think they can deal damage
-         */
-        towersAttackCreeps(): void
-
-        /**
-         * Has towers repair ramparts that are soon to decay
-         */
-        towersRepairRamparts(): void
-
         // Link functions
 
         /**
@@ -1216,6 +1169,10 @@ declare global {
         _myDamagedCreeps: Creep[]
 
         readonly myDamagedCreeps: Creep[]
+
+        _myDamagedPowerCreeps: PowerCreep[]
+
+        readonly myDamagedPowerCreeps: PowerCreep[]
 
         _allyDamagedCreeps: Creep[]
 
@@ -1408,6 +1365,10 @@ declare global {
         _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
 
         readonly resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+
+        _unprotectedEnemyCreeps: Creep[]
+
+        readonly unprotectedEnemyCreeps: Creep[]
 
         // Target finding
 
@@ -1803,6 +1764,9 @@ declare global {
     // Creeps
 
     interface Creep extends CreepFunctions, CreepProperties {
+
+        combatTarget: Creep
+
         /**
          * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
          */
@@ -2111,7 +2075,7 @@ declare global {
     // Structures
 
     interface Structure {
-        realHits: number
+        estimatedHits: number
     }
 
     interface StructureSpawn {
@@ -2170,6 +2134,14 @@ declare global {
         _effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
 
         readonly effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
+
+        _estimatedHits: number
+
+        estimatedHits: number
+
+        _estimatedStore: Partial<StoreDefinition>
+
+        readonly estimatedStore: Partial<StoreDefinition>
     }
 
     interface Resource {

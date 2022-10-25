@@ -85,13 +85,13 @@ export class Scout extends Creep {
         // Find the closest room to the creep's commune
 
         if (this.unscoutedRooms.length) {
-            let highestRange = Infinity
+            let lowestRange = Infinity
 
             for (const roomName of this.unscoutedRooms) {
                 const range = Game.map.getRoomLinearDistance(this.commune.name, roomName)
-                if (range > highestRange) continue
+                if (range > lowestRange) continue
 
-                highestRange = range
+                lowestRange = range
                 this.memory.scT = roomName
             }
 
@@ -100,13 +100,13 @@ export class Scout extends Creep {
 
         // Find the room scouted longest ago
 
-        let highestLastScoutTick = Infinity
+        let lowestLastScoutTick = Infinity
 
         for (const roomName of this.scoutedRooms) {
             const lastScoutTick = Memory.rooms[roomName].LST
-            if (lastScoutTick > highestLastScoutTick) continue
+            if (lastScoutTick > lowestLastScoutTick) continue
 
-            highestLastScoutTick = lastScoutTick
+            lowestLastScoutTick = lastScoutTick
             this.memory.scT = roomName
         }
     }
@@ -156,6 +156,8 @@ export class Scout extends Creep {
         if (!controller) return true
 
         if (room.name !== this.memory.siT) return true
+
+        this.say('🔤')
 
         // Construct the signMessage
 

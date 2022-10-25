@@ -180,6 +180,10 @@ Object.defineProperties(Creep.prototype, {
             else if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
             else if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
 
+            // The enemy can't heal when we're in safemode, so don't calculate it
+
+            if (room.controller.safeMode) return this._towerDamage
+
             // Find adjacent creeps
 
             let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)

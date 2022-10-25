@@ -418,67 +418,66 @@ export class Quad {
      * Attack viable targets without moving
      */
     passiveRangedAttack(target?: Structure | Creep) {
-        // Find members that can attack
 
-        const attackingMemberIDs: Set<Id<Antifa>> = new Set()
-
-        for (const member of this.members) {
-            if (member.ranged) continue
-
-            attackingMemberIDs.add(member.id)
-        }
+        const attackingMemberNames = new Set(this.leader.memory.SMNs)
 
         // Sort enemies by number of members that can attack them
 
-        const attackingMemberIdsArray = Array.from(attackingMemberIDs)
-        const enemyTargets: Map<Id<Creep>, Id<Antifa>[]> = new Map()
+        const enemyTargetsWithDamage: Map<Id<Creep>, number> = new Map()
+        const enemyTargetsWithAntifa: Map<Id<Creep>, Id<Antifa>[]> = new Map()
 
-        for (const enemyCreep of this.leader.room.enemyCreeps) {
-
-            // the enemy creep is standing on a rampart, don't try to attack it
-
-            if (enemyCreep.room.coordHasStructureTypes(enemyCreep.pos, new Set([STRUCTURE_RAMPART]))) continue
+        for (const enemyCreep of this.leader.room.unprotectedEnemyCreeps) {
 
             const memberIDsInRange: Id<Antifa>[] = []
 
-            for (const memberID of attackingMemberIdsArray) {
-                const member = findObjectWithID(memberID)
+            let netDamage = -1 * enemyCreep.healStrength
+
+            for (const memberName of attackingMemberNames) {
+                const member = Game.creeps[memberName]
 
                 if (getRangeOfCoords(member.pos, enemyCreep.pos) > 3) continue
+
+                netDamage += member.attackStrength
 
                 memberIDsInRange.push(member.id)
             }
 
             if (!memberIDsInRange.length) continue
 
-            enemyTargets.set(enemyCreep.id, memberIDsInRange)
+            enemyTargetsWithDamage.set(enemyCreep.id, netDamage)
+            enemyTargetsWithAntifa.set(enemyCreep.id, memberIDsInRange)
             if (memberIDsInRange.length === this.members.length) break
         }
 
+        const enemyTargetsByDamage = Array.from(enemyTargetsWithAntifa.keys()).sort((a, b) => {
+            return enemyTargetsWithDamage.get(a) - enemyTargetsWithDamage.get(b)
+        })
+
         // Attack enemies in order of most members that can attack them
 
-        for (const [enemyID, memberIDs] of enemyTargets) {
-            const enemyCreep = findObjectWithID(enemyID)
+        for (const enemyCreepID of enemyTargetsByDamage) {
+            const enemyCreep = findObjectWithID(enemyCreepID)
 
-            for (const memberID of memberIDs) {
+            for (const memberID of enemyTargetsWithAntifa.get(enemyCreepID)) {
                 const member = findObjectWithID(memberID)
+                if (!attackingMemberNames.has(member.name)) continue
 
                 if (getRangeOfCoords(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
                 else member.rangedMassAttack()
                 member.ranged = true
 
-                attackingMemberIDs.delete(memberID)
+                attackingMemberNames.delete(memberID)
             }
 
-            if (!attackingMemberIDs.size) return
+            if (!attackingMemberNames.size) return
         }
 
         // If there is a target and there are members left that can attack, attack the target
 
         if (!target) return
 
-        for (const memberID of Array.from(attackingMemberIDs)) {
-            const member = findObjectWithID(memberID)
+        for (const memberName of attackingMemberNames) {
+            const member = Game.creeps[memberName]
 
             const range = getRangeOfCoords(member.pos, target.pos)
             if (range > 3) continue

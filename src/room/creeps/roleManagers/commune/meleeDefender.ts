@@ -1,11 +1,51 @@
 import { impassibleStructureTypes, myColors } from 'international/constants'
-import { areCoordsEqual, findClosestObject, findClosestObjectEuc, findObjectWithID, getRange, getRangeEuc, getRangeOfCoords } from 'international/utils'
+import {
+    areCoordsEqual,
+    findClosestObject,
+    findClosestObjectEuc,
+    findObjectWithID,
+    getRange,
+    getRangeEuc,
+    getRangeOfCoords,
+} from 'international/utils'
 import { packCoord } from 'other/packrat'
 
 export class MeleeDefender extends Creep {
+    preTickManager() {
+        const { room } = this
+
+        room.attackingDefenderIDs.add(this.id)
+
+        for (const enemyCreep of this.room.unprotectedEnemyCreeps) {
+            const range = getRangeOfCoords(this.pos, enemyCreep.pos)
+            if (range > 1) continue
+
+            //
+
+            const targetDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
+            if (!targetDamage) {
+                room.defenderEnemyTargetsWithDamage.set(
+                    enemyCreep.id,
+                    enemyCreep.healStrength * -1 + this.attackStrength,
+                )
+            } else room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, targetDamage + this.attackStrength)
+
+            //
+
+            if (!room.defenderEnemyTargetsWithDefender.get(enemyCreep.id)) {
+                room.defenderEnemyTargetsWithDefender.set(enemyCreep.id, [this.id])
+                continue
+            } else room.defenderEnemyTargetsWithDefender.get(enemyCreep.id).push(this.id)
+        }
+    }
 
     advancedDefend?() {
         const { room } = this
+
+        if (this.combatTarget) {
+            this.room.targetVisual(this.pos, this.combatTarget.pos)
+            this.attack(this.combatTarget)
+        }
 
         // Get enemyAttackers in the room, informing false if there are none
 
@@ -51,7 +91,7 @@ export class MeleeDefender extends Creep {
 
         // Otherwise attack
 
-        this.attack(enemyCreep)
+        /* this.attack(enemyCreep) */
 
         if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
         return true
@@ -83,7 +123,7 @@ export class MeleeDefender extends Creep {
             // Inform wether there is a creep at the pos
 
             const packedCoord = packCoord(rampart.pos)
-            return (!room.creepPositions.get(packedCoord) || !room.powerCreepPositions.get(packedCoord))
+            return !room.creepPositions.get(packedCoord) || !room.powerCreepPositions.get(packedCoord)
         })
 
         if (!ramparts.length) {
@@ -91,58 +131,29 @@ export class MeleeDefender extends Creep {
         }
 
         this.memory.ROS = true
-/*
-        if (!this.meleed) {
 
-            this.attackingMeleeDefenderIDs.add(this.id)
-
-            for (const enemyCreep of this.room.enemyCreeps) {
-
-                // the enemy creep is standing on a rampart, don't try to attack it
-
-                if (enemyCreep.room.coordHasStructureTypes(enemyCreep.pos, new Set([STRUCTURE_RAMPART]))) continue
-
-                const memberIDsInRange: Id<Creep>[] = []
-
-                for (const creepID of this.attackingMeleeDefenderIDs) {
-                    const member = findObjectWithID(creepID)
-
-                    if (getRangeOfCoords(member.pos, enemyCreep.pos) > 3) continue
-
-                    memberIDsInRange.push(member.id)
-                }
-
-                if (!memberIDsInRange.length) continue
-
-                enemyTargets.set(enemyCreep.id, memberIDsInRange)
-                if (memberIDsInRange.length === this.members.length) break
-            }
-        }
- */
         // Attack the enemyAttacker
 
-        this.attack(enemyCreep)
+        /* this.attack(enemyCreep) */
 
         // Find the closest rampart to the enemyAttacker
 
-        for (const rampart of ramparts)
-            room.visual.text(
-                getRangeEuc(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
-                rampart.pos,
-                { font: 0.5 },
-            )
-
         const closestRampart = findClosestObjectEuc(enemyCreep.pos, ramparts)
 
-        room.visual.circle(enemyCreep.pos, { fill: myColors.yellow })
-        room.visual.circle(closestRampart.pos, { fill: myColors.red })
         // Visualize the targeting, if roomVisuals are enabled
 
-        if (Memory.roomVisuals)
-            room.visual.line(this.pos, closestRampart.pos, {
-                color: myColors.lightBlue,
-                opacity: 0.2,
-            })
+        if (Memory.roomVisuals) {
+            for (const rampart of ramparts)
+                room.visual.text(
+                    getRangeEuc(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
+                    rampart.pos,
+                    { font: 0.5 },
+                )
+
+            this.room.targetVisual(this.pos, enemyCreep.pos)
+
+            room.visual.circle(enemyCreep.pos, { fill: myColors.green })
+        }
 
         // If the creep is range 0 to the closestRampart, inform false
 
@@ -167,46 +178,7 @@ export class MeleeDefender extends Creep {
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
-    /**
-     * Attack viable targets without moving
-     *//*
-     passiveRangedAttack(target?: Structure | Creep) {
-        // Find members that can attack
 
-        const attackingMeleeDefenderIDs: Set<Id<Antifa>> = new Set()
-
-        for (const member of this.members) {
-            if (member.ranged) continue
-
-            attackingMeleeDefenderIDs.add(member.id)
-        }
-
-        // Sort enemies by number of members that can attack them
-
-        const attackingMemberIdsArray = Array.from(attackingMeleeDefenderIDs)
-        const enemyTargets: Map<Id<Creep>, Id<Antifa>[]> = new Map()
-
-
-
-        // Attack enemies in order of most members that can attack them
-
-        for (const [enemyID, memberIDs] of enemyTargets) {
-            const enemyCreep = findObjectWithID(enemyID)
-
-            for (const memberID of memberIDs) {
-                const member = findObjectWithID(memberID)
-
-                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
-                else member.rangedMassAttack()
-                member.ranged = true
-
-                attackingMeleeDefenderIDs.delete(memberID)
-            }
-
-            if (!attackingMeleeDefenderIDs.size) return
-        }
-    }
- */
     static meleeDefenderManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: MeleeDefender = Game.creeps[creepName]
