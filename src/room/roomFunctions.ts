@@ -67,8 +67,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
     room.visual.line(pos1, pos2, { color })
 }
 
-Room.prototype.targetVisual = function(coord1, coord2, visualize = Memory.roomVisuals) {
-
+Room.prototype.targetVisual = function (coord1, coord2, visualize = Memory.roomVisuals) {
     if (!visualize) return
 
     this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, { color: myColors.green, opacity: 0.3 })
@@ -101,11 +100,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
                 routeCallback(roomName: string) {
-
                     const roomMemory = Memory.rooms[roomName]
                     if (!roomMemory && roomName !== goal.pos.roomName) return Infinity
 
-                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon]) return Infinity
+                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
+                        return Infinity
 
                     // If the goal is in the room
 
@@ -275,28 +274,13 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
                 }
 
-                // Stop if there are no cost matrixes to weight
-
-                if (opts.weightCostMatrixes) {
-                    // Otherwise iterate through each x and y in the room
-
-                    for (let x = 0; x < roomDimensions; x += 1) {
-                        for (let y = 0; y < roomDimensions; y += 1) {
-                            // Loop through each costMatrix
-
-                            for (const weightCMName of opts.weightCostMatrixes) {
-                                const weightCM = room[weightCMName as unknown as keyof Room]
-                                if (!weightCM) continue
-
-                                cm.set(x, y, (weightCM as CostMatrix).get(x, y))
-                            }
-                        }
-                    }
-                }
-
                 // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
-                if (opts.creep && (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) && (!opts.weightStructures || !opts.weightStructures.road)) {
+                if (
+                    opts.creep &&
+                    (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) &&
+                    (!opts.weightStructures || !opts.weightStructures.road)
+                ) {
                     let roadCost = 1
                     if (!opts.creep.memory.R) roadCost = opts.plainCost
 
@@ -385,8 +369,27 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                // Stop if there are no cost matrixes to weight
+
+                if (opts.weightCostMatrixes) {
+                    // Otherwise iterate through each x and y in the room
+
+                    for (let x = 0; x < roomDimensions; x += 1) {
+                        for (let y = 0; y < roomDimensions; y += 1) {
+                            // Loop through each costMatrix
+
+                            for (const weightCMName of opts.weightCostMatrixes) {
+                                const weightCM = room[weightCMName as unknown as keyof Room]
+                                if (!weightCM) continue
+
+                                cm.set(x, y, (weightCM as CostMatrix).get(x, y))
+                            }
+                        }
+                    }
+                }
+
                 // Inform the CostMatrix
-                if (opts.creep && opts.creep.role === 'meleeDefender') room.visualizeCostMatrix(cm)
+
                 return cm
             },
         })
@@ -868,7 +871,8 @@ Room.prototype.createHarassCombatRequest = function () {
 }
 
 Room.prototype.createDefendCombatRequest = function () {
-    if (!Memory.autoAttack) return
+
+    
 }
 
 Room.prototype.cleanMemory = function () {
@@ -2034,8 +2038,7 @@ Room.prototype.visualizeCostMatrix = function (cm, color) {
     }
 }
 
-Room.prototype.coordHasStructureTypes = function(coord, types) {
-
+Room.prototype.coordHasStructureTypes = function (coord, types) {
     for (const structure of this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
         if (!types.has(structure.structureType)) continue
 
@@ -2045,22 +2048,20 @@ Room.prototype.coordHasStructureTypes = function(coord, types) {
     return false
 }
 
-Room.prototype.createPowerTask = function(target, powerType, priority) {
-
+Room.prototype.createPowerTask = function (target, powerType, priority) {
     const ID = newID()
-
 
     let cooldown
     const effectsData = target.effectsData
     if (!effectsData.get(powerType)) cooldown = 0
     else cooldown = effectsData.get(powerType).ticksRemaining
 
-    return this.powerTasks[ID] = {
+    return (this.powerTasks[ID] = {
         taskID: ID,
         targetID: target.id,
         powerType,
         packedCoord: packCoord(target.pos),
         cooldown,
         priority,
-    }
+    })
 }

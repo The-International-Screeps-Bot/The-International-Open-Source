@@ -16,7 +16,7 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        if (!this.communeManager.room.enemyAttackers) return
+        if (!this.communeManager.room.enemyAttackers.length) return
 
         this.communeManager.room.towerInferiority = true
 
