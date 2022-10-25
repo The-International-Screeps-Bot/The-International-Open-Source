@@ -136,7 +136,6 @@ export class RemoteHauler extends Creep {
         // Try to find a remote
 
         if (!this.findRemote()) {
-
             // If the room is the creep's commune
 
             if (this.room.name === this.commune.name) {
@@ -555,7 +554,6 @@ export class RemoteHauler extends Creep {
     }
 
     run?() {
-        
         let returnTripTime = 0
         if (this.memory.RN && this.memory.SI !== undefined && Memory.rooms[this.memory.RN]) {
             // The 1.1 is to add some margin for the return trip
@@ -576,13 +574,11 @@ export class RemoteHauler extends Creep {
 
         // If the creep has a remoteName, delete it and delete it's fulfilled needs
 
-
         if (this.deliverResources()) this.relayAsFull()
     }
 
     static remoteHaulerManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-
             const creep = Game.creeps[creepName] as RemoteHauler
             creep.run()
         }

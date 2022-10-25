@@ -67,8 +67,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
     room.visual.line(pos1, pos2, { color })
 }
 
-Room.prototype.targetVisual = function(coord1, coord2, visualize = Memory.roomVisuals) {
-
+Room.prototype.targetVisual = function (coord1, coord2, visualize = Memory.roomVisuals) {
     if (!visualize) return
 
     this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, { color: myColors.green, opacity: 0.3 })
@@ -101,11 +100,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
                 routeCallback(roomName: string) {
-
                     const roomMemory = Memory.rooms[roomName]
                     if (!roomMemory && roomName !== goal.pos.roomName) return Infinity
 
-                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon]) return Infinity
+                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
+                        return Infinity
 
                     // If the goal is in the room
 
@@ -296,7 +295,11 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
-                if (opts.creep && (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) && (!opts.weightStructures || !opts.weightStructures.road)) {
+                if (
+                    opts.creep &&
+                    (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) &&
+                    (!opts.weightStructures || !opts.weightStructures.road)
+                ) {
                     let roadCost = 1
                     if (!opts.creep.memory.R) roadCost = opts.plainCost
 
@@ -2034,8 +2037,7 @@ Room.prototype.visualizeCostMatrix = function (cm, color) {
     }
 }
 
-Room.prototype.coordHasStructureTypes = function(coord, types) {
-
+Room.prototype.coordHasStructureTypes = function (coord, types) {
     for (const structure of this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
         if (!types.has(structure.structureType)) continue
 

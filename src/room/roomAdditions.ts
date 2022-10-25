@@ -1839,15 +1839,12 @@ Object.defineProperties(Room.prototype, {
             if (this.terminal && !this.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(this.terminal)
 
             for (const structure of storingStructures) {
-
                 if (!structure) continue
 
                 for (const key in structure.store) {
-
                     const resourceType = key as ResourceConstant
 
                     if (!this._resourcesInStoringStructures[resourceType]) {
-
                         this._resourcesInStoringStructures[resourceType] = structure.store[resourceType]
                         continue
                     }
@@ -1949,11 +1946,21 @@ Object.defineProperties(Room.prototype, {
     MAWT: {
         get() {
             if (this._MAWT) return this._MAWT
-
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
-                ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
+                ...this.sourceContainers.filter(
+                    sc =>
+                        sc.store.getUsedCapacity() >
+                        _.sum(
+                            _.filter(
+                                Game.creeps,
+                                c => c.memory.Rs && c.memory.Rs?.length > 0 && c.memory.Rs[0].targetID === sc.id,
+                            ),
+                            c => c.memory.Rs[0].amount,
+                        ) +
+                            50,
+                ),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (
                         (structure as any).store &&
