@@ -1,4 +1,3 @@
-import { Structures } from 'discord.js'
 import { myColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, randomTick } from 'international/utils'
