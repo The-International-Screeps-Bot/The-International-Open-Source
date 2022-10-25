@@ -274,25 +274,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
                 }
 
-                // Stop if there are no cost matrixes to weight
-
-                if (opts.weightCostMatrixes) {
-                    // Otherwise iterate through each x and y in the room
-
-                    for (let x = 0; x < roomDimensions; x += 1) {
-                        for (let y = 0; y < roomDimensions; y += 1) {
-                            // Loop through each costMatrix
-
-                            for (const weightCMName of opts.weightCostMatrixes) {
-                                const weightCM = room[weightCMName as unknown as keyof Room]
-                                if (!weightCM) continue
-
-                                cm.set(x, y, (weightCM as CostMatrix).get(x, y))
-                            }
-                        }
-                    }
-                }
-
                 // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
                 if (
@@ -388,8 +369,27 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                // Stop if there are no cost matrixes to weight
+
+                if (opts.weightCostMatrixes) {
+                    // Otherwise iterate through each x and y in the room
+
+                    for (let x = 0; x < roomDimensions; x += 1) {
+                        for (let y = 0; y < roomDimensions; y += 1) {
+                            // Loop through each costMatrix
+
+                            for (const weightCMName of opts.weightCostMatrixes) {
+                                const weightCM = room[weightCMName as unknown as keyof Room]
+                                if (!weightCM) continue
+
+                                cm.set(x, y, (weightCM as CostMatrix).get(x, y))
+                            }
+                        }
+                    }
+                }
+
                 // Inform the CostMatrix
-                if (opts.creep && opts.creep.role === 'meleeDefender') room.visualizeCostMatrix(cm)
+
                 return cm
             },
         })
@@ -871,7 +871,8 @@ Room.prototype.createHarassCombatRequest = function () {
 }
 
 Room.prototype.createDefendCombatRequest = function () {
-    if (!Memory.autoAttack) return
+
+    
 }
 
 Room.prototype.cleanMemory = function () {
@@ -2047,22 +2048,20 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
     return false
 }
 
-Room.prototype.createPowerTask = function(target, powerType, priority) {
-
+Room.prototype.createPowerTask = function (target, powerType, priority) {
     const ID = newID()
-
 
     let cooldown
     const effectsData = target.effectsData
     if (!effectsData.get(powerType)) cooldown = 0
     else cooldown = effectsData.get(powerType).ticksRemaining
 
-    return this.powerTasks[ID] = {
+    return (this.powerTasks[ID] = {
         taskID: ID,
         targetID: target.id,
         powerType,
         packedCoord: packCoord(target.pos),
         cooldown,
         priority,
-    }
+    })
 }

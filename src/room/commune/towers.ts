@@ -1,4 +1,3 @@
-import { Structures } from 'discord.js'
 import { myColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, randomTick } from 'international/utils'
@@ -17,7 +16,7 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        if (!this.communeManager.room.enemyAttackers) return
+        if (!this.communeManager.room.enemyAttackers.length) return
 
         this.communeManager.room.towerInferiority = true
 
