@@ -165,11 +165,11 @@ export class MeleeDefender extends Creep {
             origin: this.pos,
             goals: [{ pos: closestRampart.pos, range: 0 }],
             weightStructures: {
-                road: 10,
+                road: 20,
                 rampart: 1,
             },
-            plainCost: 20,
-            swampCost: 80,
+            plainCost: 40,
+            swampCost: 100,
         })
 
         return true

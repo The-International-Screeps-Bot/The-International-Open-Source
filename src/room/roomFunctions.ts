@@ -223,6 +223,58 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (!room) return cm
 
+                // If avoidStationaryPositions is requested
+
+                if (opts.avoidStationaryPositions) {
+                    // Loop through them
+
+                    for (const index in room.sources) {
+                        // Loop through each position of harvestPositions, have creeps prefer to avoid
+
+                        for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
+                    }
+
+                    // If the anchor is defined
+
+                    if (room.anchor) {
+                        // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
+
+                        const upgradePositions = room.upgradePositions
+                        const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
+                            ignoreCreeps: true,
+                            ignoreDestructibleStructures: true,
+                            ignoreRoads: true,
+                        })
+
+                        // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
+
+                        for (const pos of upgradePositions) {
+                            // If the pos and deliverUpgradePos are the same, iterate
+
+                            if (areCoordsEqual(pos, deliverUpgradePos)) continue
+
+                            // Otherwise have the creep prefer to avoid the pos
+
+                            cm.set(pos.x, pos.y, 10)
+                        }
+                    }
+
+                    // Get the hubAnchor
+
+                    const hubAnchor =
+                        room.memory.stampAnchors && room.memory.stampAnchors.hub[0]
+                            ? unpackNumAsPos(room.memory.stampAnchors.hub[0], roomName)
+                            : undefined
+
+                    // If the hubAnchor is defined
+
+                    if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
+
+                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+                    for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
+                }
+
                 // Stop if there are no cost matrixes to weight
 
                 if (opts.weightCostMatrixes) {
@@ -333,60 +385,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                // If avoidStationaryPositions is requested
-
-                if (opts.avoidStationaryPositions) {
-                    // Loop through them
-
-                    for (const index in room.sources) {
-                        // Loop through each position of harvestPositions, have creeps prefer to avoid
-
-                        for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
-                    }
-
-                    // If the anchor is defined
-
-                    if (room.anchor) {
-                        // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
-
-                        const upgradePositions = room.upgradePositions
-                        const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
-                            ignoreCreeps: true,
-                            ignoreDestructibleStructures: true,
-                            ignoreRoads: true,
-                        })
-
-                        // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
-
-                        for (const pos of upgradePositions) {
-                            // If the pos and deliverUpgradePos are the same, iterate
-
-                            if (areCoordsEqual(pos, deliverUpgradePos)) continue
-
-                            // Otherwise have the creep prefer to avoid the pos
-
-                            cm.set(pos.x, pos.y, 10)
-                        }
-                    }
-
-                    // Get the hubAnchor
-
-                    const hubAnchor =
-                        room.memory.stampAnchors && room.memory.stampAnchors.hub[0]
-                            ? unpackNumAsPos(room.memory.stampAnchors.hub[0], roomName)
-                            : undefined
-
-                    // If the hubAnchor is defined
-
-                    if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
-
-                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-                    for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
-                }
-
                 // Inform the CostMatrix
-
+                if (opts.creep && opts.creep.role === 'meleeDefender') room.visualizeCostMatrix(cm)
                 return cm
             },
         })
