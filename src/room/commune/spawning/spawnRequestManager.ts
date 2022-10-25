@@ -1104,13 +1104,13 @@ Room.prototype.spawnRequester = function () {
                 const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
                 if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
+                    /* Memory.rooms[remoteName].data[RemoteData.abandon] = 1500 */
                     return false
                 }
 
                 const minCost = minRangedAttackCost + minHealCost
                 if (minCost > spawnEnergyCapacity) {
-                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
+                    /* Memory.rooms[remoteName].data[RemoteData.abandon] = 1500 */
                     return false
                 }
 

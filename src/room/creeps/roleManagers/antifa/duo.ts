@@ -1,5 +1,5 @@
 import { myColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRange, isCoordExit, isXYExit } from 'international/utils'
+import { findClosestObject, getRange, getRangeOfCoords, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
 export class Duo {
@@ -39,8 +39,9 @@ export class Duo {
     }
 
     constructor(memberNames: string[]) {
-        for (const memberName of memberNames) {
-            const member = Game.creeps[memberName]
+
+        for (let i = 0; i < memberNames.length; i++) {
+            const member = Game.creeps[memberNames[i]]
             this.members.push(member)
 
             member.squad = this
@@ -48,6 +49,14 @@ export class Duo {
         }
 
         this.leader = this.members[0]
+
+        // Ensure the leader is the one with melee parts, if the quad is melee
+
+        if (!(this.leader.parts.attack + this.leader.parts.work) && (this.members[1].parts.attack + this.members[1].parts.work)) {
+
+            this.members.reverse()
+            this.leader = this.members[0]
+        }
     }
 
     run() {
@@ -86,8 +95,8 @@ export class Duo {
         if (this.leader.spawning) return false
 
         if (this.leader.room.name === this.members[1].room.name) {
-            const range = getRange(this.leader.pos.x, this.members[1].pos.x, this.leader.pos.y, this.members[1].pos.y)
-            if (range <= 1) return true
+            const range = getRangeOfCoords(this.leader.pos, this.members[1].pos)
+            if (range === 1) return true
 
             if (range > 2) {
                 this.leader.createMoveRequest({
@@ -128,14 +137,10 @@ export class Duo {
             this.holdFormation()
             return
         }
-
+        this.leader.say('x')
         if (!moveLeader.createMoveRequest(opts)) return
 
-        for (const member of this.members) {
-            if (member.name === moveLeader.name) continue
-
-            member.assignMoveRequest(moveLeader.pos)
-        }
+        this.members[1].assignMoveRequest(moveLeader.pos)
     }
 
     runCombat() {

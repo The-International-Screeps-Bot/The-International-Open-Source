@@ -320,11 +320,11 @@ class TickConfig {
 
                 if (room.storage && room.controller.level >= 4) {
 
-                    if (room.resourcesInStoringStructures.energy / 15000 >= room.memory.combatRequests.length) continue
+                    if (room.resourcesInStoringStructures.energy / 15000 < room.memory.combatRequests.length) continue
                 }
                 else {
 
-                    if (room.estimateIncome() / 10 >= room.memory.combatRequests.length) continue
+                    if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
                 }
 
                 communes.push(roomName)
