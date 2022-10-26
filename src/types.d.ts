@@ -1764,7 +1764,6 @@ declare global {
     // Creeps
 
     interface Creep extends CreepFunctions, CreepProperties {
-
         combatTarget: Creep
 
         /**
@@ -2082,7 +2081,7 @@ declare global {
         /**
          * Wether the spawn has renewed a creep this tick
          */
-        hasRenewed: boolean
+        renewed: boolean
 
         /**
          * Wether the structure has been transfered or withdrawn from

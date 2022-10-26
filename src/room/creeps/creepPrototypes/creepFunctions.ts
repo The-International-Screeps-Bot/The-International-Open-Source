@@ -827,7 +827,7 @@ Creep.prototype.advancedRenew = function () {
 
     // If the spawn has already renewed this tick, inform false
 
-    if (spawn.hasRenewed) return
+    if (spawn.renewed) return
 
     // If the spawn is spawning, inform false
 
@@ -836,7 +836,7 @@ Creep.prototype.advancedRenew = function () {
     const result = spawn.renewCreep(this)
     if (result === OK) {
         globalStatsUpdater(this.room.name, 'eosp', energyCost)
-        spawn.hasRenewed = true
+        spawn.renewed = true
     }
 }
 

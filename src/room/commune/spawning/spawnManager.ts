@@ -11,7 +11,7 @@ Room.prototype.spawnManager = function () {
 
     // Find spawns that aren't spawning
 
-    const inactiveSpawns = this.structures.spawn.filter(spawn => !spawn.spawning)
+    const inactiveSpawns = this.structures.spawn.filter(spawn => !spawn.spawning && !spawn.renewed)
     if (!inactiveSpawns.length) return
 
     // Construct spawnRequests
