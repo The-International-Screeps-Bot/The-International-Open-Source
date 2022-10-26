@@ -165,9 +165,11 @@ export class Quad {
             if (this.bulldoze()) return
             if (this.advancedRangedAttack()) return
             if (this.rangedAttackStructures()) return
+            return
         }
         if (this.leader.memory.ST === 'attack') {
             if (this.advancedAttack()) return
+            return
         }
 
         this.advancedDismantle()
@@ -418,7 +420,6 @@ export class Quad {
      * Attack viable targets without moving
      */
     passiveRangedAttack(target?: Structure | Creep) {
-
         const attackingMemberNames = new Set(this.leader.memory.SMNs)
 
         // Sort enemies by number of members that can attack them
@@ -427,7 +428,6 @@ export class Quad {
         const enemyTargetsWithAntifa: Map<Id<Creep>, Id<Antifa>[]> = new Map()
 
         for (const enemyCreep of this.leader.room.unprotectedEnemyCreeps) {
-
             const memberIDsInRange: Id<Antifa>[] = []
 
             let netDamage = -1 * enemyCreep.healStrength
@@ -504,10 +504,6 @@ export class Quad {
             })
 
             if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
-
-            if (!enemyCreeps.length) {
-                return this.rangedAttackStructures()
-            }
 
             this.leader.say('EC')
 

@@ -925,7 +925,7 @@ declare global {
 
         createHarassCombatRequest(): void
 
-        createDefendCombatRequest(): void
+        createDefendCombatRequest(opts?: { [key: string]: number }): void
 
         /**
          * Finds the score of rooms for potential communes
