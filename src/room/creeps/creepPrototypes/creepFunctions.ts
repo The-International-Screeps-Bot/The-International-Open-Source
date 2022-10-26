@@ -1289,7 +1289,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
     if (!this.needsResources()) return
     if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
-    let withdrawTargets = room.MAWT.filter(target => {
+    let withdrawTargets = room.MEWT.filter(target => {
         if (target instanceof Resource)
             return (
                 target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
@@ -1320,7 +1320,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         return
     }
 
-    withdrawTargets = room.OAWT.filter(target => {
+    withdrawTargets = room.OEWT.filter(target => {
         if (target instanceof Resource)
             return (
                 target.reserveAmount >= this.store.getCapacity(RESOURCE_ENERGY) * 0.2 ||
@@ -1347,7 +1347,7 @@ Creep.prototype.reserveTransferEnergy = function () {
 
     if (this.usedStore() === 0) return
 
-    let transferTargets = room.MATT.filter(function (target) {
+    let transferTargets = room.METT.filter(function (target) {
         return target.freeSpecificStore(RESOURCE_ENERGY) > 0
     })
 
@@ -1372,7 +1372,7 @@ Creep.prototype.reserveTransferEnergy = function () {
         return
     }
 
-    transferTargets = room.OATT.filter(target => {
+    transferTargets = room.OETT.filter(target => {
         return target.freeStore() >= this.usedStore()
     })
 
