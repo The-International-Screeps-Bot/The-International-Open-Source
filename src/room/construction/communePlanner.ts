@@ -514,7 +514,7 @@ export function basePlanner(room: Room) {
 
     path = room.advancedFindPath({
         origin: centerUpgadePos,
-        goals: [{ pos: hubAnchor, range: 1 }],
+        goals: [{ pos: hubAnchor, range: 2 }],
         weightCoordMaps: [room.roadCoords],
         plainCost: defaultRoadPlanningPlainCost,
     })

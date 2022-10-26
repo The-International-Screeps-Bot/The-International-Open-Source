@@ -499,7 +499,7 @@ Creep.prototype.findRampartRepairTarget = function () {
     let minScore = Infinity
     let bestTarget
 
-    let ramparts = this.room.enemyAttackers ? this.room.defensiveRamparts : this.room.structures.rampart
+    let ramparts = this.room.enemyAttackers.length ? this.room.defensiveRamparts : this.room.structures.rampart
 
     for (const structure of ramparts) {
         // If above 90% of max hits
