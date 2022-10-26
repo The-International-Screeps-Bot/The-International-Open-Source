@@ -16,16 +16,18 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        if (!this.communeManager.room.enemyAttackers.length) return
+        const { room } = this.communeManager
 
-        this.communeManager.room.towerInferiority = true
+        if (room.flags.disableTowerAttacks) {
+            room.towerInferiority = room.enemyAttackers.length > 0
+            return
+        }
 
-        if (this.communeManager.room.flags.disableTowers) return
-
-        const towers = this.communeManager.room.structures.tower
-        if (!towers.length) return
-
-        this.communeManager.room.towerInferiority = false
+        const towers = room.structures.tower
+        if (!towers.length) {
+            room.towerInferiority = room.enemyAttackers.length > 0
+            return
+        }
 
         this.actionableTowerIDs = []
 
@@ -35,10 +37,10 @@ export class TowerManager {
             this.actionableTowerIDs.push(tower.id)
         }
 
-        this.attackEnemyCreeps()
-        this.healCreeps()
-        this.repairRamparts()
-        this.repairGeneral()
+        if (!this.attackEnemyCreeps()) return
+        if (!this.healCreeps()) return
+        if (!this.repairRamparts()) return
+        if (!this.repairGeneral()) return
 
         // If CPU logging is enabled, log the CPU used by this manager
 
@@ -166,11 +168,10 @@ export class TowerManager {
     }
 
     findGeneralRepairTargets() {
-        return this.communeManager.room.find(FIND_STRUCTURES, {
-            filter: structure => {
-                return structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_TOWER
-            },
-        })
+        let structures: Structure[] = this.communeManager.room.structures.spawn
+        structures = structures.concat(this.communeManager.room.structures.tower)
+
+        return structures
     }
 
     repairGeneral() {

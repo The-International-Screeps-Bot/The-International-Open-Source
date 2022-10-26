@@ -10,8 +10,8 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
-
-        internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
+        if (internationalManager.creepsByCombatRequest[this.memory.CRN])
+            internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
 
         if (!this.memory.SS) return
         if (this.memory.SF) return

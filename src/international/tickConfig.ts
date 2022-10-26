@@ -104,13 +104,12 @@ class TickConfig {
         // The room is a commune
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
-        else {
-            for (const combatRequestName of room.memory.combatRequests) {
-                if (internationalManager.creepsByCombatRequest[combatRequestName]) continue
 
-                internationalManager.creepsByCombatRequest[combatRequestName] = {}
-                for (const role of antifaRoles) internationalManager.creepsByCombatRequest[combatRequestName][role] = []
-            }
+        for (const combatRequestName of room.memory.combatRequests) {
+            if (internationalManager.creepsByCombatRequest[combatRequestName]) continue
+
+            internationalManager.creepsByCombatRequest[combatRequestName] = {}
+            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[combatRequestName][role] = []
         }
 
         room.spawnRequests = {}
