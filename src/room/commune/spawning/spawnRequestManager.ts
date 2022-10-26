@@ -651,11 +651,11 @@ Room.prototype.spawnRequester = function () {
 
             // For each road, add a multiplier
 
-            partsMultiplier += this.structures.road.length * roadUpkeepCost * 1.2
+            partsMultiplier += this.structures.road.length * roadUpkeepCost * 2
 
             // For each container, add a multiplier
 
-            partsMultiplier += this.structures.container.length * containerUpkeepCost * 1.2
+            partsMultiplier += this.structures.container.length * containerUpkeepCost * 2
 
             // For each rampart, add a multiplier
 
