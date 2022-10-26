@@ -380,9 +380,10 @@ export function basePlanner(room: Room) {
     const hubAnchor = unpackNumAsPos(room.memory.stampAnchors.hub[0], room.name)
 
     const fastFillerHubAnchor = findAvgBetweenCoords(room.anchor, hubAnchor)
-    // Get the closest upgrade pos and mark it as fair use in roadCM
 
-    const closestUpgradePos = upgradePositions[0]
+    // Get the closest upgrade pos
+
+    const closestUpgradePos = upgradePositions[upgradePositions.length - 1]
     if (!closestUpgradePos) return 'failed'
 
     let path: RoomPosition[]
