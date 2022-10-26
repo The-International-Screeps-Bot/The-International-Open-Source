@@ -499,7 +499,7 @@ Creep.prototype.findRampartRepairTarget = function () {
     let minScore = Infinity
     let bestTarget
 
-    let ramparts = this.room.enemyAttackers ? this.room.defensiveRamparts : this.room.structures.rampart
+    let ramparts = this.room.enemyAttackers.length ? this.room.defensiveRamparts : this.room.structures.rampart
 
     for (const structure of ramparts) {
         // If above 90% of max hits
@@ -827,7 +827,7 @@ Creep.prototype.advancedRenew = function () {
 
     // If the spawn has already renewed this tick, inform false
 
-    if (spawn.hasRenewed) return
+    if (spawn.renewed) return
 
     // If the spawn is spawning, inform false
 
@@ -836,7 +836,7 @@ Creep.prototype.advancedRenew = function () {
     const result = spawn.renewCreep(this)
     if (result === OK) {
         globalStatsUpdater(this.room.name, 'eosp', energyCost)
-        spawn.hasRenewed = true
+        spawn.renewed = true
     }
 }
 

@@ -838,6 +838,8 @@ export enum CombatRequestData {
     swarm,
     priority,
     quadCount,
+    timer,
+    inactionTimer,
 }
 
 export enum AllyCreepRequestData {

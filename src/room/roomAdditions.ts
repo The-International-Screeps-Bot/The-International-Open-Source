@@ -379,6 +379,8 @@ Object.defineProperties(Room.prototype, {
 
             this._combatStructureTargets = []
 
+            if (this.controller.my || this.controller.reservation) return this._combatStructureTargets
+
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.tower)
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.extension)

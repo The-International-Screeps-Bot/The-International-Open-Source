@@ -287,7 +287,7 @@ declare global {
         extraOpts: ExtraOpts
     }
 
-    type FlagNames = 'disableTowers'
+    type FlagNames = 'disableTowerAttacks'
 
     type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
@@ -925,7 +925,7 @@ declare global {
 
         createHarassCombatRequest(): void
 
-        createDefendCombatRequest(): void
+        createDefendCombatRequest(opts?: { [key: string]: number }): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -1077,7 +1077,7 @@ declare global {
 
         constructSpawnRequests(opts: SpawnRequestOpts | false): void
 
-        decideMaxCostPerCreep(maxCostPerCreep: number): number
+        findMaxCostPerCreep(maxCostPerCreep: number): number
 
         createSpawnRequest(
             priority: number,
@@ -1764,7 +1764,6 @@ declare global {
     // Creeps
 
     interface Creep extends CreepFunctions, CreepProperties {
-
         combatTarget: Creep
 
         /**
@@ -2082,7 +2081,7 @@ declare global {
         /**
          * Wether the spawn has renewed a creep this tick
          */
-        hasRenewed: boolean
+        renewed: boolean
 
         /**
          * Wether the structure has been transfered or withdrawn from

@@ -870,9 +870,24 @@ Room.prototype.createHarassCombatRequest = function () {
         request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
 }
 
-Room.prototype.createDefendCombatRequest = function () {
+Room.prototype.createDefendCombatRequest = function (opts) {
 
-    
+    if (Memory.combatRequests[this.name]) return
+    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
+
+    const request = (Memory.combatRequests[this.name] = {
+        T: 'defend',
+        data: [0],
+    })
+
+    request.data[CombatRequestData.minDamage] = 40
+    request.data[CombatRequestData.minHeal] = 10
+    request.data[CombatRequestData.inactionTimer] = Math.floor(Math.random() * 200)
+
+    for (const key in opts) {
+
+        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
+    }
 }
 
 Room.prototype.cleanMemory = function () {

@@ -43,7 +43,7 @@ Room.prototype.spawnRequester = function () {
             const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
             if (spawnEnergyCapacity >= 800) {
-                let extraParts: BodyPartConstant[] = [CARRY]
+                let defaultParts: BodyPartConstant[] = [CARRY]
                 let workAmount = 6
 
                 // Account for power regenerating sources
@@ -59,18 +59,18 @@ Room.prototype.spawnRequester = function () {
                 }
 
                 for (let i = 1; i <= workAmount; i++) {
-                    if (i % 2 === 0) extraParts.push(MOVE)
-                    extraParts.push(WORK)
-                    if (i % 6 === 0) extraParts.push(CARRY)
+                    if (i % 2 === 0) defaultParts.push(MOVE)
+                    defaultParts.push(WORK)
+                    if (i % 6 === 0) defaultParts.push(CARRY)
                 }
 
                 return {
                     role,
-                    defaultParts: [],
-                    extraParts,
+                    defaultParts,
+                    extraParts: [],
                     partsMultiplier: 1,
                     minCreeps: 1,
-                    minCost: 200,
+                    minCost: 300,
                     priority: 1,
                     memoryAdditions: {
                         SI: sourceIndex,
@@ -155,7 +155,7 @@ Room.prototype.spawnRequester = function () {
                 const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
                 if (spawnEnergyCapacity >= 800) {
-                    let extraParts: BodyPartConstant[] = [CARRY]
+                    let defaultParts: BodyPartConstant[] = [CARRY]
                     let workAmount = 6
 
                     // Account for power regenerating sources
@@ -171,18 +171,18 @@ Room.prototype.spawnRequester = function () {
                     }
 
                     for (let i = 1; i <= workAmount; i++) {
-                        if (i % 2 === 0) extraParts.push(MOVE)
-                        extraParts.push(WORK)
-                        if (i % 6 === 0) extraParts.push(CARRY)
+                        if (i % 2 === 0) defaultParts.push(MOVE)
+                        defaultParts.push(WORK)
+                        if (i % 6 === 0) defaultParts.push(CARRY)
                     }
 
                     return {
                         role,
-                        defaultParts: [],
-                        extraParts,
+                        defaultParts,
+                        extraParts: [],
                         partsMultiplier: 1,
                         minCreeps: 1,
-                        minCost: 200,
+                        minCost: 300,
                         priority: 1,
                         memoryAdditions: {
                             SI: sourceIndex,
@@ -426,9 +426,17 @@ Room.prototype.spawnRequester = function () {
             const fastFillerPositionsCount = this.fastFillerPositions.length
             if (!fastFillerPositionsCount) return false
 
+            let priority = 0.75
+
+            let totalFastFillerEnergy = 0
+            if (this.fastFillerContainerLeft) totalFastFillerEnergy += this.fastFillerContainerLeft.store.energy
+            if (this.fastFillerContainerRight) totalFastFillerEnergy += this.fastFillerContainerRight.store.energy
+
+            if (totalFastFillerEnergy < 300) priority = 1.25
+
             let defaultParts: BodyPartConstant[]
             if (this.controller.level >= 8) defaultParts = [CARRY, MOVE, CARRY, CARRY, CARRY, CARRY]
-            else if (spawnEnergyCapacity >= 650) defaultParts = [CARRY, MOVE, CARRY, CARRY]
+            else if (this.controller.level >= 7) defaultParts = [CARRY, MOVE, CARRY, CARRY]
             else defaultParts = [CARRY, MOVE, CARRY]
 
             const role = 'fastFiller'
@@ -440,7 +448,7 @@ Room.prototype.spawnRequester = function () {
                 partsMultiplier: 1,
                 minCreeps: fastFillerPositionsCount,
                 minCost: 150,
-                priority: 0.75,
+                priority,
                 memoryAdditions: {},
             }
         })(),
@@ -539,7 +547,7 @@ Room.prototype.spawnRequester = function () {
                 if (this.resourcesInStoringStructures.energy < this.communeManager.storedEnergyBuildThreshold)
                     return false
 
-                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / 20000, 2)
+                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / (15000 + this.controller.level * 1000), 2)
             }
 
             // Otherwise if there is no storage
@@ -630,12 +638,15 @@ Room.prototype.spawnRequester = function () {
 
             // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-            const repairTargets = [...this.structures.road, ...this.structures.container].filter(
+            let repairTargets: Structure<BuildableStructureConstant>[] = this.structures.road
+            repairTargets = repairTargets.concat(this.structures.container)
+
+            repairTargets = repairTargets.filter(
                 structure => structure.hitsMax * 0.2 >= structure.hits,
             )
             // Get ramparts below their max hits
 
-            const ramparts = this.structures.rampart.filter(rampart => rampart.hits < 8000000)
+            const ramparts = this.structures.rampart.filter(rampart => rampart.hits < Math.floor(Math.pow((this.controller.level - 3) * 10, 4.15)))
 
             // If there are no ramparts or repair targets
 
@@ -663,8 +674,8 @@ Room.prototype.spawnRequester = function () {
 
             // For every x energy in storage, add 1 multiplier
 
-            if (storage && this.controller.level >= 4)
-                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / 20000, 2)
+            if (storage && this.controller.level >= 4 && ramparts.length)
+                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / (16000 + this.controller.level * 1000), 2)
 
             const role = 'maintainer'
 
@@ -740,7 +751,7 @@ Room.prototype.spawnRequester = function () {
                 // If the storage is sufficiently full, provide x amount per y energy in storage
 
                 if (this.resourcesInStoringStructures.energy >= this.communeManager.storedEnergyUpgradeThreshold)
-                    partsMultiplier = Math.pow(this.resourcesInStoringStructures.energy / 15000, 2)
+                    partsMultiplier = Math.pow(this.resourcesInStoringStructures.energy / (8000 + this.controller.level * 1000), 2)
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
             }
@@ -789,7 +800,7 @@ Room.prototype.spawnRequester = function () {
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) / range
+                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
                     }
 
                     partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
@@ -1471,13 +1482,17 @@ Room.prototype.spawnRequester = function () {
                         extraParts.push(RANGED_ATTACK)
                     }
 
-                    for (let i = 0; i < rangedAttackAmount + healAmount; i++) {
+                    for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
                         extraParts.push(MOVE)
                     }
 
                     for (let i = 0; i < healAmount; i++) {
                         extraParts.push(HEAL)
                     }
+
+                    extraParts.push(MOVE)
+
+                    if (!extraParts.length) return false
 
                     return {
                         role,
@@ -1510,12 +1525,20 @@ Room.prototype.spawnRequester = function () {
                 const extraParts: BodyPartConstant[] = []
 
                 for (let i = 0; i < rangedAttackAmount; i++) {
-                    extraParts.push(RANGED_ATTACK, MOVE)
+                    extraParts.push(RANGED_ATTACK)
+                }
+
+                for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
+                    extraParts.push(MOVE)
                 }
 
                 for (let i = 0; i < healAmount; i++) {
-                    extraParts.push(HEAL, MOVE)
+                    extraParts.push(HEAL)
                 }
+
+                extraParts.push(MOVE)
+
+                if (!extraParts.length) return false
 
                 return {
                     role,
@@ -1541,9 +1564,17 @@ Room.prototype.spawnRequester = function () {
                 const minCost = minDismantleCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < request.data[CombatRequestData.dismantle]; i++) {
-                    extraParts.push(WORK, MOVE)
+                const workAmount = request.data[CombatRequestData.dismantle]
+
+                for (let i = 0; i < workAmount; i++) {
+                    extraParts.push(WORK)
                 }
+
+                for (let i = 0; i < workAmount; i++) {
+                    extraParts.push(MOVE)
+                }
+
+                if (!extraParts.length) return false
 
                 return {
                     role,
@@ -1569,9 +1600,21 @@ Room.prototype.spawnRequester = function () {
                 const minCost = minAttackCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < attackAmount; i++) {
-                    extraParts.push(ATTACK, MOVE)
+                for (let i = 0; i < Math.floor(attackAmount / 2); i++) {
+                    extraParts.push(ATTACK)
                 }
+
+                for (let i = 0; i < attackAmount - 1; i++) {
+                    extraParts.push(MOVE)
+                }
+
+                for (let i = 0; i < Math.ceil(attackAmount / 2); i++) {
+                    extraParts.push(ATTACK)
+                }
+
+                extraParts.push(MOVE)
+
+                if (!extraParts.length) return false
 
                 return {
                     role,
@@ -1597,9 +1640,17 @@ Room.prototype.spawnRequester = function () {
                 const minCost = minHealCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < healAmount; i++) {
-                    extraParts.push(HEAL, MOVE)
+                for (let i = 0; i < healAmount - 1; i++) {
+                    extraParts.push(MOVE)
                 }
+
+                for (let i = 0; i < healAmount; i++) {
+                    extraParts.push(HEAL)
+                }
+
+                extraParts.push(MOVE)
+
+                if (!extraParts.length) return false
 
                 return {
                     role,
