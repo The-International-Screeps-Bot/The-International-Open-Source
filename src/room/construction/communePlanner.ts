@@ -140,7 +140,7 @@ export function basePlanner(room: Room) {
             goals: [{ pos: room.controller.pos, range: 2 }],
             plainCost: defaultRoadPlanningPlainCost,
         }).length
-        if (range < closestSourceToControllerRange) continue
+        if (range > closestSourceToControllerRange) continue
 
         closestSourceToControllerRange = range
         closestSourceToController = source
