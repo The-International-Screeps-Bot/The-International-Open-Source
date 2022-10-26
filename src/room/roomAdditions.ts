@@ -799,6 +799,8 @@ Object.defineProperties(Room.prototype, {
                 this._usedUpgradeCoords.add(creep.memory.PC)
             }
 
+            if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
+
             return this._usedUpgradeCoords
         },
     },

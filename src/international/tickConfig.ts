@@ -326,7 +326,7 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-                    if (room.resourcesInStoringStructures.energy / 15000 < room.memory.combatRequests.length) continue
+                    if (room.resourcesInStoringStructures.energy / (10000 + room.controller.level * 1000) < room.memory.combatRequests.length) continue
                 } else {
                     if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
                 }
@@ -337,7 +337,7 @@ class TickConfig {
             const communeName = findClosestRoomName(requestName, communes)
             if (!communeName) break
 
-            const maxRange = 15
+            const maxRange = 18
 
             // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
