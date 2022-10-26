@@ -631,7 +631,10 @@ Room.prototype.spawnRequester = function () {
 
             // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-            const repairTargets = [...this.structures.road, ...this.structures.container].filter(
+            let repairTargets: Structure<BuildableStructureConstant>[] = this.structures.road
+            repairTargets = repairTargets.concat(this.structures.container)
+
+            repairTargets = repairTargets.filter(
                 structure => structure.hitsMax * 0.2 >= structure.hits,
             )
             // Get ramparts below their max hits
@@ -664,7 +667,7 @@ Room.prototype.spawnRequester = function () {
 
             // For every x energy in storage, add 1 multiplier
 
-            if (storage && this.controller.level >= 4)
+            if (storage && this.controller.level >= 4 && ramparts.length)
                 partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / (16000 + this.controller.level * 1000), 2)
 
             const role = 'maintainer'
