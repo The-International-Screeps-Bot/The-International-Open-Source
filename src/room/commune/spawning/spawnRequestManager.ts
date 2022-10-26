@@ -709,7 +709,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             let partsMultiplier = 1
-            let maxCreeps = this.upgradePositions.length - 1
+            let maxCreeps = this.upgradePositions.length
             const priority = 9
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
@@ -743,6 +743,9 @@ Room.prototype.spawnRequester = function () {
             // If the controllerLink is defined
 
             if (controllerLink) {
+
+                maxCreeps -= 1
+
                 const hubLink = this.hubLink
                 const sourceLinks = this.sourceLinks
 
@@ -759,7 +762,7 @@ Room.prototype.spawnRequester = function () {
                         // Limit partsMultiplier at the range with a multiplier
 
                         maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
-                    } else maxCreeps -= 1
+                    }
 
                     for (const sourceLink of sourceLinks) {
                         if (!sourceLink) continue
