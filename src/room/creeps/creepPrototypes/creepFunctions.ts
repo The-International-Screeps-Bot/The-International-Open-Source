@@ -172,6 +172,38 @@ Creep.prototype.advancedHarvestSource = function (source) {
     return true
 }
 
+Creep.prototype.findUpgradePos = function() {
+
+    const { room } = this
+
+    if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
+
+    // Get usedUpgradePositions, informing false if they're undefined
+
+    const usedUpgradePositions = room.usedUpgradeCoords
+
+    // Loop through each upgradePositions
+
+    for (const pos of room.upgradePositions) {
+        // Construct the packedPos using pos
+
+        const packedPos = packPos(pos)
+
+        // Iterate if the pos is used
+
+        if (usedUpgradePositions.has(packedPos)) continue
+
+        // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
+
+        this.memory.PC = packedPos
+        usedUpgradePositions.add(packedPos)
+
+        return pos
+    }
+
+    return false
+}
+
 Creep.prototype.advancedUpgradeController = function () {
     const { room } = this
 
@@ -183,38 +215,11 @@ Creep.prototype.advancedUpgradeController = function () {
     // If there is a controllerContainer
 
     if (controllerStructure) {
-        // if the creep doesn't have an upgrade pos
 
-        if (!this.memory.PC) {
-            // Get usedUpgradePositions, informing false if they're undefined
+        const upgradePos = this.findUpgradePos()
+        if (!upgradePos) return false
 
-            const usedUpgradePositions = room.usedUpgradeCoords
-
-            // Loop through each upgradePositions
-
-            for (const pos of room.upgradePositions) {
-                // Construct the packedPos using pos
-
-                const packedPos = packPos(pos)
-
-                // Iterate if the pos is used
-
-                if (usedUpgradePositions.has(packedPos)) continue
-
-                // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
-
-                this.memory.PC = packedPos
-                usedUpgradePositions.add(packedPos)
-                break
-            }
-        }
-
-        if (!this.memory.PC) return false
-
-        const upgradePos = unpackPos(this.memory.PC)
-        const upgradePosRange = getRange(this.pos.x, upgradePos.x, this.pos.y, upgradePos.y)
-
-        if (upgradePosRange > 0) {
+        if (getRange(this.pos.x, upgradePos.x, this.pos.y, upgradePos.y) > 0) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [

@@ -1632,6 +1632,8 @@ declare global {
          */
         advancedHarvestSource(source: Source): boolean
 
+        findUpgradePos(): RoomPosition | false
+
         /**
          * Attempts multiple methods to upgrade the controller
          */
