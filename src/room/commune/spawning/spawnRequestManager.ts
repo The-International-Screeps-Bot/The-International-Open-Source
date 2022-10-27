@@ -622,7 +622,7 @@ Room.prototype.spawnRequester = function () {
         })(),
     )
 
-    // Construct requests for mainainers
+    // Construct requests for maintainer
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
