@@ -124,14 +124,18 @@ export function advancedFindDistance(
     const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
         routeCallback(roomName) {
             const roomMemory = Memory.rooms[roomName]
-            if (!roomMemory && roomName !== roomName) return Infinity
+            if (!roomMemory) {
+
+                if (roomName === goalRoomName) return 1
+                return Infinity
+            }
 
             if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
                 return Infinity
 
             // If the goal is in the room
 
-            if (roomName === roomName) return 1
+            if (roomName === goalRoomName) return 1
 
             // If the type is in typeWeights, inform the weight for the type
 

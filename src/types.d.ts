@@ -1691,6 +1691,8 @@ declare global {
          */
         recurseMoveRequest(queue?: string[]): void
 
+        avoidEnemyThreatCoords(): boolean
+
         /**
          * Decides if the creep needs to get more resources or not
          */
