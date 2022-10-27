@@ -59,6 +59,7 @@ export const loop = function () {
 
     // Run prototypes
 
+    if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
     migrationManager.run()
     respawnManager.run()
     configManager.run()
@@ -72,7 +73,6 @@ export const loop = function () {
 
     allyManager.tickConfig()
     allyManager.getAllyRequests()
-    ExecutePandaMasterCode()
 
     if (Memory.CPULogging)
         customLog(
