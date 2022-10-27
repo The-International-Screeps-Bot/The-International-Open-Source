@@ -1172,3 +1172,5 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
 }
 
 export const ERROR_FAILED = 0
+
+export const maxRemoteRoomDistance = 5

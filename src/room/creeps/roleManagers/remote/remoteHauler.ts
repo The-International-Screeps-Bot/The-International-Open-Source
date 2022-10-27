@@ -555,7 +555,7 @@ export class RemoteHauler extends Creep {
     }
 
     run?() {
-        
+
         let returnTripTime = 0
         if (this.memory.RN && this.memory.SI !== undefined && Memory.rooms[this.memory.RN]) {
             // The 1.1 is to add some margin for the return trip

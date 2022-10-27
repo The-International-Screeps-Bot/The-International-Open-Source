@@ -7,6 +7,7 @@ import {
     defaultSwampCost,
     impassibleStructureTypes,
     maxRampartGroupSize,
+    maxRemoteRoomDistance,
     minHarvestWorkRatio,
     myColors,
     numbersByStructureTypes,
@@ -134,7 +135,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
             plainCost: opts.plainCost,
             swampCost: opts.swampCost,
-            maxRooms: allowedRoomNames.size,
+            maxRooms: opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size,
             maxOps: 100000,
             flee: opts.flee,
 
@@ -684,17 +685,18 @@ Room.prototype.makeRemote = function (scoutingRoom) {
 
     // Find distance from scoutingRoom
 
-    if (distance <= 5)
+    if (distance <= maxRemoteRoomDistance)
         distance = advancedFindDistance(scoutingRoom.name, room.name, {
-            keeper: Infinity,
-            enemy: Infinity,
-            enemyRemote: Infinity,
-            ally: Infinity,
-            allyRemote: Infinity,
-            /* highway: Infinity, */
+            typeWeights: {
+                keeper: Infinity,
+                enemy: Infinity,
+                enemyRemote: Infinity,
+                ally: Infinity,
+                allyRemote: Infinity,
+            },
         })
 
-    if (distance <= 5) {
+    if (distance <= maxRemoteRoomDistance) {
         // If the room is already a remote of the scoutingRoom
 
         if (room.memory.T === 'remote' && scoutingRoom.name === room.memory.commune) return true

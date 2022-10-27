@@ -1,4 +1,4 @@
-import { mmoShardNames, myColors, roomDimensions } from './constants'
+import { mmoShardNames, myColors, RemoteData, roomDimensions } from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -105,37 +105,39 @@ export function newID() {
     return (Memory.ID += 1)
 }
 
+interface AdvancedFindDistanceOpts {
+    typeWeights?: { [key: string]: number }
+    avoidAbandonedRemotes?: boolean
+
+}
+
 /**
  * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
  */
 export function advancedFindDistance(
     originRoomName: string,
     goalRoomName: string,
-    typeWeights?: { [key: string]: number },
+    opts: AdvancedFindDistanceOpts = {}
 ) {
     // Try to find a route from the origin room to the goal room
 
     const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
         routeCallback(roomName) {
-            // If the goal is in the room, inform 1
-
-            if (roomName === goalRoomName) return 1
-
-            // Get the room's memory
-
             const roomMemory = Memory.rooms[roomName]
+            if (!roomMemory && roomName !== roomName) return Infinity
 
-            // If there is no memory for the room inform impassible
+            if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
+                return Infinity
 
-            if (!roomMemory) return Infinity
+            // If the goal is in the room
+
+            if (roomName === roomName) return 1
 
             // If the type is in typeWeights, inform the weight for the type
 
-            if (typeWeights[roomMemory.T]) return typeWeights[roomMemory.T]
+            if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
 
-            // Inform to consider this room
-
-            return 2
+            return 1
         },
     })
 

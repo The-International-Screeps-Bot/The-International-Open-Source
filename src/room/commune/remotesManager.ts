@@ -1,5 +1,5 @@
-import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles } from 'international/constants'
-import { customLog, findCarryPartsRequired } from 'international/utils'
+import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles, maxRemoteRoomDistance } from 'international/constants'
+import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
 export class RemotesManager {
@@ -27,15 +27,45 @@ export class RemotesManager {
             }
 
             if (remoteMemory.data[RemoteData.abandon] > 0) {
-                remoteMemory.data[RemoteData.abandon] -= 1
+                this.manageAbandonment(remoteMemory)
+                return
+            }
 
-                for (const key in remoteMemory.data) {
+            // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
-                    if (parseInt(key) === RemoteData.abandon) continue
-                    remoteMemory.data[key] = 0
+            if (randomTick(10)) {
+
+                const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
+                    avoidAbandonedRemotes: true,
+                })
+
+                if (safeDistance > maxRemoteRoomDistance) {
+
+                    remoteMemory.data[RemoteData.abandon] = 1500
+                    this.manageAbandonment(remoteMemory)
+                    return
                 }
 
-                continue
+                const distance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
+                    avoidAbandonedRemotes: true,
+                })
+
+                if (Math.round(safeDistance * 0.75) > distance) {
+
+                    remoteMemory.data[RemoteData.abandon] = 1500
+                    this.manageAbandonment(remoteMemory)
+                    return
+                }
             }
 
             remoteMemory.data[RemoteData.source1RemoteHarvester] = 3
@@ -150,6 +180,17 @@ export class RemotesManager {
                     income,
                 )
             }
+        }
+    }
+
+    private manageAbandonment(remoteMemory: RoomMemory) {
+
+        remoteMemory.data[RemoteData.abandon] -= 1
+
+        for (const key in remoteMemory.data) {
+
+            if (parseInt(key) === RemoteData.abandon) continue
+            remoteMemory.data[key] = 0
         }
     }
 }
