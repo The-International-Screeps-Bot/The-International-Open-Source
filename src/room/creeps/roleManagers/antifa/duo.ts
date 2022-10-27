@@ -64,12 +64,16 @@ export class Duo {
 
         if (!this.getInFormation()) return
 
+        this.leader.say('IF')
+
         if (this.leader.room.name === this.leader.memory.CRN) {
             if (this.runCombat()) return
 
             this.stompEnemyCSites()
             return
         }
+
+        if (this.leader.room.enemyAttackers.length) this.advancedRangedAttack()
 
         this.createMoveRequest({
             origin: this.leader.pos,
@@ -92,7 +96,7 @@ export class Duo {
     }
 
     getInFormation() {
-        if (this.leader.spawning) return false
+        if (this.leader.isOnExit) return true
 
         if (this.leader.room.name === this.members[1].room.name) {
             const range = getRangeOfCoords(this.leader.pos, this.members[1].pos)
@@ -112,8 +116,6 @@ export class Duo {
         }
 
         this.leader.say('GIF')
-
-        if (this.leader.isOnExit) return true
 
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,

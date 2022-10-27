@@ -100,6 +100,8 @@ export class RemoteDismantler extends Creep {
     advancedDismantle?(): boolean {
         const { room } = this
 
+        if (this.room.controller.owner && Memory.allyPlayers.includes(this.room.controller.owner.username)) return true
+
         let target
         let range
 
