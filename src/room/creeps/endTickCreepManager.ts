@@ -19,7 +19,6 @@ export class EndTickCreepManager {
         // Power creeps go first
 
         for (const className of powerCreepClassNames) {
-
             for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
                 const creep = Game.powerCreeps[creepName]
 
