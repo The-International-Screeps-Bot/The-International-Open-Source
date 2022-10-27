@@ -170,8 +170,8 @@ export class VanguardDefender extends Creep {
 
             if (!claimTarget) return
 
-            Memory.rooms[creep.commune.name].data[ClaimRequestData.minDamage] -= creep.attackStrength
-            Memory.rooms[creep.commune.name].data[ClaimRequestData.minHeal] -= creep.healStrength
+            Memory.rooms[Memory.rooms[creep.commune.name].claimRequest].data[ClaimRequestData.minDamage] -= creep.attackStrength
+            Memory.rooms[Memory.rooms[creep.commune.name].claimRequest].data[ClaimRequestData.minHeal] -= creep.healStrength
 
             creep.say(claimTarget)
 

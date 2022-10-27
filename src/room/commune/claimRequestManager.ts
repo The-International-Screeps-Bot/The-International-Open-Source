@@ -84,13 +84,15 @@ export class ClaimRequestManager {
         request.data[ClaimRequestData.minDamage] = 0
         request.data[ClaimRequestData.minHeal] = 0
 
-        // Increase the defenderNeed according to the enemy attackers' combined strength
+        if (!requestRoom.controller.safeMode) {
+            // Increase the defenderNeed according to the enemy attackers' combined strength
 
-        for (const enemyAttacker of requestRoom.enemyAttackers) {
-            if (enemyAttacker.owner.username === 'Invader') continue
+            for (const enemyAttacker of requestRoom.enemyAttackers) {
+                if (enemyAttacker.owner.username === 'Invader') continue
 
-            request.data[ClaimRequestData.minDamage] += 10 + enemyAttacker.healStrength
-            request.data[ClaimRequestData.minHeal] += enemyAttacker.attackStrength
+                request.data[ClaimRequestData.minDamage] += 10 + enemyAttacker.healStrength
+                request.data[ClaimRequestData.minHeal] += enemyAttacker.attackStrength
+            }
         }
 
         // If CPU logging is enabled, log the CPU used by this manager

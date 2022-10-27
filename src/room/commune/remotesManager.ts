@@ -1,5 +1,5 @@
-import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles } from 'international/constants'
-import { customLog, findCarryPartsRequired } from 'international/utils'
+import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles, maxRemoteRoomDistance } from 'international/constants'
+import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
 export class RemotesManager {
@@ -22,20 +22,51 @@ export class RemotesManager {
             // If the room isn't a remote, remove it from the remotes array
 
             if (remoteMemory.T !== 'remote' || remoteMemory.commune !== this.communeManager.room.name) {
+
                 this.communeManager.room.memory.remotes.splice(index, 1)
                 continue
             }
 
             if (remoteMemory.data[RemoteData.abandon] > 0) {
-                remoteMemory.data[RemoteData.abandon] -= 1
+                this.manageAbandonment(remoteName)
+                continue
+            }
 
-                for (const key in remoteMemory.data) {
+            // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
-                    if (parseInt(key) === RemoteData.abandon) continue
-                    remoteMemory.data[key] = 0
+            if (randomTick(10)) {
+
+                const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
+                    avoidAbandonedRemotes: true,
+                })
+
+                if (safeDistance > maxRemoteRoomDistance) {
+
+                    remoteMemory.data[RemoteData.abandon] = 1500
+                    this.manageAbandonment(remoteName)
+                    continue
                 }
 
-                continue
+                const distance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
+                    avoidAbandonedRemotes: true,
+                })
+
+                if (Math.round(safeDistance * 0.75) > distance) {
+
+                    remoteMemory.data[RemoteData.abandon] = 1500
+                    this.manageAbandonment(remoteName)
+                    continue
+                }
             }
 
             remoteMemory.data[RemoteData.source1RemoteHarvester] = 3
@@ -116,10 +147,8 @@ export class RemotesManager {
     public stage2() {
         // Loop through the commune's remote names
 
-        for (let index = this.communeManager.room.memory.remotes.length - 1; index >= 0; index -= 1) {
-            // Get the name of the remote using the index
+        for (const remoteName of this.communeManager.room.memory.remotes) {
 
-            const remoteName = this.communeManager.room.memory.remotes[index]
             const remoteMemory = Memory.rooms[remoteName]
 
             if (remoteMemory.data[RemoteData.abandon]) continue
@@ -150,6 +179,19 @@ export class RemotesManager {
                     income,
                 )
             }
+        }
+    }
+
+    private manageAbandonment(remoteName: string) {
+
+        const remoteMemory = Memory.rooms[remoteName]
+
+        remoteMemory.data[RemoteData.abandon] -= 1
+
+        for (const key in remoteMemory.data) {
+
+            if (parseInt(key) === RemoteData.abandon) continue
+            remoteMemory.data[key] = 0
         }
     }
 }

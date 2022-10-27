@@ -634,3 +634,16 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     room.moveRequests.set(packedCoord, [creepAtPos.name])
     creepAtPos.runMoveRequest()
 }
+
+Creep.prototype.avoidEnemyThreatCoords = function() {
+
+    if (!this.room.enemyThreatCoords.has(packCoord(this.pos))) return false
+
+    this.createMoveRequest({
+        origin: this.pos,
+        goals: [{ pos: this.pos, range: 3 }],
+        flee: true
+    })
+
+    return true
+}

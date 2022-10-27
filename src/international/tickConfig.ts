@@ -226,9 +226,11 @@ class TickConfig {
             if (
                 Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
                 advancedFindDistance(communeName, roomName, {
-                    keeper: Infinity,
-                    enemy: Infinity,
-                    ally: Infinity,
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
                 }) > maxRange
             ) {
                 Memory.claimRequests[roomName].data[ClaimRequestData.abandon] = 20000
@@ -281,9 +283,11 @@ class TickConfig {
             if (
                 Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
                 advancedFindDistance(communeName, roomName, {
-                    keeper: Infinity,
-                    enemy: Infinity,
-                    ally: Infinity,
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
                 }) > maxRange
             ) {
                 request.data[AllyCreepRequestData.abandon] = 20000
@@ -344,9 +348,11 @@ class TickConfig {
             if (
                 Game.map.getRoomLinearDistance(communeName, requestName) > maxRange ||
                 advancedFindDistance(communeName, requestName, {
-                    keeper: Infinity,
-                    enemy: Infinity,
-                    ally: Infinity,
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    }
                 }) > maxRange
             ) {
                 request.data[CombatRequestData.abandon] = 20000

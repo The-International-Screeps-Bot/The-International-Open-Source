@@ -7,6 +7,11 @@ export class Maintainer extends Creep {
         super(creepID)
     }
 
+    preTickManager() {
+
+        this.avoidEnemyThreatCoords()
+    }
+
     advancedMaintain?(): boolean {
         const { room } = this
 
