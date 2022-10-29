@@ -1179,9 +1179,9 @@ declare global {
 
         readonly upgradePositions: RoomPosition[]
 
-        _usedUpgradeCoords: Set<string>
+        _usedUpgradePositions: Set<string>
 
-        readonly usedUpgradeCoords: Set<string>
+        readonly usedUpgradePositions: Set<string>
 
         _controllerPositions: RoomPosition[]
 
@@ -1867,7 +1867,7 @@ declare global {
         SI: 0 | 1
 
         /**
-         * The creep's packedPos for a designated target
+         * The creep's packed coord for a designated target
          */
         PC: string
 

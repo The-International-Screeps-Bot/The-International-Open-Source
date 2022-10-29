@@ -1,6 +1,5 @@
 import { spawn } from 'child_process'
 import {
-
     cacheAmountModifier,
     communeSign,
     CPUBucketCapacity,
@@ -172,15 +171,14 @@ Creep.prototype.advancedHarvestSource = function (source) {
     return true
 }
 
-Creep.prototype.findUpgradePos = function() {
-
+Creep.prototype.findUpgradePos = function () {
     const { room } = this
 
     if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
 
     // Get usedUpgradePositions, informing false if they're undefined
 
-    const usedUpgradePositions = room.usedUpgradeCoords
+    const usedUpgradePositions = room.usedUpgradePositions
 
     // Loop through each upgradePositions
 
@@ -215,7 +213,6 @@ Creep.prototype.advancedUpgradeController = function () {
     // If there is a controllerContainer
 
     if (controllerStructure) {
-
         const upgradePos = this.findUpgradePos()
         if (!upgradePos) return false
 
