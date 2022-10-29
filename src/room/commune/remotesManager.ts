@@ -62,7 +62,6 @@ export class RemotesManager {
                         ally: Infinity,
                         allyRemote: Infinity,
                     },
-                    avoidAbandonedRemotes: true,
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {

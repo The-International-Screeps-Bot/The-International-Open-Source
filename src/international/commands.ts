@@ -146,14 +146,16 @@ global.destroyCommuneStructures = function (types?) {
 
 global.claim = function (requestName, communeName) {
     if (!Memory.claimRequests[requestName]) {
-        const request = (Memory.claimRequests[requestName] = {
+        Memory.claimRequests[requestName] = {
             responder: communeName,
             data: [0],
-        })
-
-        request.data[ClaimRequestData.score] = 0
-        request.data[ClaimRequestData.abandon] = 0
+        }
     }
+
+    const request = Memory.claimRequests[requestName]
+
+    request.data[ClaimRequestData.score] = 0
+    request.data[ClaimRequestData.abandon] = 0
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]
@@ -178,20 +180,22 @@ global.deleteClaimRequests = function () {
     return `Deleted ${deleteCount} claim requests`
 }
 
-global.createCombatRequest = function (requestName, type, opts, communeName) {
+global.combat = function (requestName, type, opts, communeName) {
     if (!Memory.combatRequests[requestName]) {
-        const request = Memory.combatRequests[requestName] = {
+        Memory.combatRequests[requestName] = {
             T: type || 'attack',
             responder: communeName,
             data: [0],
         }
+    }
 
-        request.data[CombatRequestData.abandon] = 0
+    const request = Memory.combatRequests[requestName]
 
-        for (const key in opts) {
+    request.data[CombatRequestData.abandon] = 0
 
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
-        }
+    for (const key in opts) {
+
+        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
     }
 
     if (communeName) {
@@ -221,13 +225,15 @@ global.DCR = global.deleteCombatRequest
 
 global.allyCreepRequest = function (requestName, communeName?) {
     if (!Memory.allyCreepRequests[requestName]) {
-        const request = Memory.allyCreepRequests[requestName] = {
+        Memory.allyCreepRequests[requestName] = {
             responder: communeName,
             data: [0],
         }
-
-        request.data[AllyCreepRequestData.abandon] = 0
     }
+
+    const request = Memory.allyCreepRequests[requestName]
+
+    request.data[AllyCreepRequestData.abandon] = 0
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]

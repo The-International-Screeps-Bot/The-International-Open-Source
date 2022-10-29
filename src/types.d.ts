@@ -2182,7 +2182,7 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            createCombatRequest(
+            combat(
                 requestName: string,
                 type: CombatRequestTypes,
                 opts?: { [key: string]: number },
