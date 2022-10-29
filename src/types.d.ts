@@ -1265,6 +1265,10 @@ declare global {
 
         readonly enemyThreatCoords: Set<string>
 
+        _enemyThreatGoals: PathGoal[]
+
+        readonly enemyThreatGoals: PathGoal[]
+
         _flags: Partial<{ [key in FlagNames]: Flag }>
 
         readonly flags: { [key in FlagNames]: Flag }

@@ -8,9 +8,10 @@ export class Vanguard extends Creep {
     }
 
     preTickManager() {
-        if (this.memory.SI && !this.dying) this.room.creepsOfSourceAmount[this.memory.SI] += 1
 
         if (this.dying) return
+
+        if (this.memory.SI) this.room.creepsOfSourceAmount[this.memory.SI] += 1
 
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return
@@ -70,6 +71,41 @@ export class Vanguard extends Creep {
         return true
     }
 
+    repairRampart?() {
+
+        if (this.room.cSites.rampart.length) {
+
+            const cSite = this.room.cSites.rampart[0]
+
+            if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [{ pos: cSite.pos, range: 3 }],
+                })
+
+                return true
+            }
+
+            this.build(cSite)
+            return true
+        }
+
+        const rampartTarget = this.room.structures.rampart.find(rampart => rampart.hits < 20000)
+        if (!rampartTarget) return false
+
+        if (getRangeOfCoords(this.pos, rampartTarget.pos) > 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: rampartTarget.pos, range: 3 }],
+            })
+
+            return true
+        }
+
+        this.repair(rampartTarget)
+        return true
+    }
+
     static vanguardManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
@@ -99,6 +135,7 @@ export class Vanguard extends Creep {
                 }
 
                 if (creep.upgradeRoom()) continue
+                if (creep.repairRampart()) continue
                 if (creep.advancedBuildCSite()) continue
                 continue
             }

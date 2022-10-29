@@ -1696,6 +1696,17 @@ Object.defineProperties(Room.prototype, {
             return this._enemyThreatCoords
         },
     },
+    enemyThreatGoals: {
+
+        get() {
+
+            if (this._enemyThreatGoals) return this._enemyThreatGoals
+
+            this._enemyThreatGoals = []
+
+            return this._enemyThreatGoals
+        }
+    },
     flags: {
         get() {
             if (this._flags) return this._flags
