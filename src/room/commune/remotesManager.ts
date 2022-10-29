@@ -40,7 +40,9 @@ export class RemotesManager {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
+                        enemyRemote: Infinity,
                         ally: Infinity,
+                        allyRemote: Infinity,
                     },
                     avoidAbandonedRemotes: true,
                 })
@@ -56,7 +58,9 @@ export class RemotesManager {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
+                        enemyRemote: Infinity,
                         ally: Infinity,
+                        allyRemote: Infinity,
                     },
                     avoidAbandonedRemotes: true,
                 })

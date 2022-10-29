@@ -50,6 +50,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         console.log('SKIPPING TICK due to low bucket:' + Game.cpu.bucket)
         return
     }
+
     memHack.run()
 
     internationalManager.update()

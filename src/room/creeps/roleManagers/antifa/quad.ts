@@ -115,7 +115,7 @@ export class Quad {
 
         this.leader.say('IF')
 
-        if (this.leader.room.enemyAttackers.length) this.advancedRangedAttack()
+        if (this.leader.room.enemyAttackers.length && this.runCombat()) return
 
         this.passiveHeal()
 
@@ -162,18 +162,18 @@ export class Quad {
         if (this.leader.memory.ST === 'rangedAttack') {
             this.passiveRangedAttack()
             this.passiveHeal()
-            if (this.bulldoze()) return
-            if (this.advancedRangedAttack()) return
-            if (this.rangedAttackStructures()) return
-            return
+            if (this.bulldoze()) return true
+            if (this.advancedRangedAttack()) return true
+            if (this.rangedAttackStructures()) return true
+            return false
         }
         if (this.leader.memory.ST === 'attack') {
-            if (this.advancedAttack()) return
-            return
+            if (this.advancedAttack())
+            return false
         }
 
         this.advancedDismantle()
-        return
+        return false
     }
 
     getInFormation(): boolean {

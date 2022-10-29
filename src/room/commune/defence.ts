@@ -1,4 +1,4 @@
-import { allyPlayers, myColors, roomDimensions, safemodeTargets } from 'international/constants'
+import { myColors, roomDimensions, safemodeTargets } from 'international/constants'
 import { customLog, findObjectWithID, getRangeOfCoords, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 

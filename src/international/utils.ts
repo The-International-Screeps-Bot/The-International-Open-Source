@@ -1,4 +1,4 @@
-import { mmoShardNames, myColors, RemoteData, roomDimensions } from './constants'
+import { mmoShardNames, myColors, offsetsByDirection, RemoteData, roomDimensions } from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -53,6 +53,26 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
             // Iterate if the pos doesn't map onto a room
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+
+            // Otherwise ass the x and y to positions
+
+            positions.push({ x, y })
+        }
+    }
+
+    return positions
+}
+
+export function findAdjacentCoordsToCoord(coord: Coord) {
+    const positions: Coord[] = []
+
+    for (let x = coord.x - 1; x < coord.x + 1; x += 1) {
+        for (let y = coord.y - 1; y < coord.y + 1; y += 1) {
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+
+            if (coord.x === x && coord.y === y) continue
 
             // Otherwise ass the x and y to positions
 
@@ -506,4 +526,50 @@ export function isCoordExit(coord: Coord) {
 
 export function randomTick(max: number = 20) {
     return Game.time % Math.floor(Math.random() * max) === 0
+}
+
+export function getDirectionCoord(coord1: Coord, coord2: Coord) {
+
+    return getDirection(coord1.x, coord2.x, coord1.x, coord2.x)
+}
+
+export function getDirection(x1: number, x2: number, y1: number, y2: number) {
+
+    let dx = x2 - x1
+    let dy = y2 - y1
+    let adx = Math.abs(dx)
+    let ady = Math.abs(dy);
+
+    if(adx > ady*2) {
+        if(dx > 0) {
+            return RIGHT;
+        }
+        else {
+            return LEFT;
+        }
+    }
+    else if(ady > adx*2) {
+        if(dy > 0) {
+            return BOTTOM;
+        }
+        else {
+            return TOP;
+        }
+    }
+    else {
+        if(dx > 0 && dy > 0) {
+            return BOTTOM_RIGHT;
+        }
+        if(dx > 0 && dy < 0) {
+            return TOP_RIGHT;
+        }
+        if(dx < 0 && dy > 0) {
+            return BOTTOM_LEFT;
+        }
+        if(dx < 0 && dy < 0) {
+            return TOP_LEFT;
+        }
+    }
+
+    return undefined
 }

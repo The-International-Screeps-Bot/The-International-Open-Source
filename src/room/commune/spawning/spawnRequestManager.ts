@@ -1,6 +1,5 @@
 import {
     AllyCreepRequestData,
-    allyPlayers,
     ClaimRequestData,
     CombatRequestData,
     containerUpkeepCost,

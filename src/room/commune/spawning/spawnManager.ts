@@ -11,7 +11,22 @@ Room.prototype.spawnManager = function () {
 
     // Find spawns that aren't spawning
 
-    const inactiveSpawns = this.structures.spawn.filter(spawn => !spawn.spawning && !spawn.renewed)
+    const inactiveSpawns: StructureSpawn[] = []
+
+    for (const spawn of this.structures.spawn) {
+
+        if (spawn.spawning) {
+
+            const creep = Game.creeps[spawn.spawning.name]
+            creep.spawnID = spawn.id
+            continue
+        }
+
+        if (spawn.renewed) continue
+
+        inactiveSpawns.push(spawn)
+    }
+
     if (!inactiveSpawns.length) return
 
     // Construct spawnRequests

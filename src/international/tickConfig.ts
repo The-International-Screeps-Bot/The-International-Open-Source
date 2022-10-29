@@ -12,7 +12,14 @@ import {
     remoteRoles,
     stamps,
 } from './constants'
-import { advancedFindDistance, createPosMap, customLog, findCarryPartsRequired, findClosestRoomName } from './utils'
+import {
+    advancedFindDistance,
+    createPosMap,
+    customLog,
+    findCarryPartsRequired,
+    findClosestRoomName,
+    randomTick,
+} from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { statsManager } from './statsManager'
 import { indexOf } from 'lodash'
@@ -50,6 +57,15 @@ class TickConfig {
 
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
+            const roomMemory = Memory.rooms[roomName]
+
+            // Every 100~ ticks
+
+            if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
+
+                room.basicScout()
+                room.cleanMemory()
+            }
 
             room.moveRequests = new Map()
             room.creepPositions = new Map()
@@ -330,7 +346,11 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-                    if (room.resourcesInStoringStructures.energy / (10000 + room.controller.level * 1000) < room.memory.combatRequests.length) continue
+                    if (
+                        room.resourcesInStoringStructures.energy / (10000 + room.controller.level * 1000) <
+                        room.memory.combatRequests.length
+                    )
+                        continue
                 } else {
                     if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
                 }
@@ -352,7 +372,7 @@ class TickConfig {
                         keeper: Infinity,
                         enemy: Infinity,
                         ally: Infinity,
-                    }
+                    },
                 }) > maxRange
             ) {
                 request.data[CombatRequestData.abandon] = 20000

@@ -1,4 +1,4 @@
-import { allyPlayers, roomDimensions } from 'international/constants'
+import { roomDimensions } from 'international/constants'
 import { getRange } from 'international/utils'
 
 Object.defineProperties(Creep.prototype, {
@@ -243,6 +243,6 @@ Object.defineProperties(Creep.prototype, {
             const { x } = this.pos
             const { y } = this.pos
             return x <= 0 || x >= 49 || y <= 0 || y >= 49
-        }
+        },
     },
 } as PropertyDescriptorMap & ThisType<Creep>)
