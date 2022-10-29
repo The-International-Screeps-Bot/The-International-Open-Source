@@ -1723,7 +1723,7 @@ Object.defineProperties(Room.prototype, {
 
                     this._enemyThreatGoals.push({
                         pos: enemyCreep.pos,
-                        range: 3,
+                        range: 4,
                     })
                     continue
                 }
@@ -1732,7 +1732,7 @@ Object.defineProperties(Room.prototype, {
 
                 this._enemyThreatGoals.push({
                     pos: enemyCreep.pos,
-                    range: 1,
+                    range: 2,
                 })
             }
 
