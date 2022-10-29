@@ -201,28 +201,17 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         if (spawn.spawning.directions) return true
 
-        const avoidStructureTypes = new Set(impassibleStructureTypes)
-
-        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos).filter(coord => {
-            return (
-                !room.usedFastFillerCoords.has(packCoord(coord)) &&
-                !room.coordHasStructureTypes(coord, avoidStructureTypes)
-            )
-        })
-
-        const targetPos = path[0]
+        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos)
 
         // Sort by distance from the first pos in the path
 
         adjacentCoords.sort((a, b) => {
-            return getRangeOfCoords(a, targetPos) - getRangeOfCoords(b, targetPos)
+            return getRangeOfCoords(a, path[0]) - getRangeOfCoords(b, path[0])
         })
 
         const directions: DirectionConstant[] = []
 
-        for (const coord of adjacentCoords) {
-            directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
-        }
+        for (const coord of adjacentCoords) directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
 
         spawn.spawning.setDirections(directions)
 
