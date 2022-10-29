@@ -1,5 +1,4 @@
 import {
-    allyPlayers,
     myColors,
     NORMAL,
     PROTECTED,

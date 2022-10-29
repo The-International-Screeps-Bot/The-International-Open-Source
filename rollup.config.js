@@ -7,16 +7,10 @@ import { terser } from 'rollup-plugin-terser'
 
 let cfg
 const dest = process.env.DEST
-let output = process.env.OUTPUT
 if (!dest) {
     console.log('No destination specified - code will be compiled but not uploaded')
 } else if ((cfg = require('./screeps.json')[dest]) == null) {
     throw new Error('Invalid upload destination')
-}
-
-if (!output) {
-    console.log('No output directory specified - code will be compiled but not saved')
-    output = 'dist/main.js'
 }
 
 const shouldUglify = cfg && cfg.uglify
@@ -25,15 +19,15 @@ if (cfg) delete cfg.uglify
 export default {
     input: 'src/main.ts',
     output: {
-        file: output,
+        file: 'dist/main.js',
         format: 'cjs',
-        sourcemap: false,
+        sourcemap: true,
     },
 
     plugins: [
-        clear({ targets: [output] }),
-        resolve({ rootDir: 'src' }),
+        clear({ targets: ["dist"] }),
         commonjs(),
+        resolve({ rootDir: 'src' }),
         shouldUglify && terser(),
         typescript({ tsconfig: './tsconfig.json' }),
         screeps({ config: cfg, dryRun: cfg == null }),

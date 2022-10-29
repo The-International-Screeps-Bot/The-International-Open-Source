@@ -73,7 +73,7 @@ export class Duo {
             return
         }
 
-        if (this.leader.room.enemyAttackers.length) this.advancedRangedAttack()
+        if (this.leader.room.enemyAttackers.length && this.runCombat()) return
 
         this.createMoveRequest({
             origin: this.leader.pos,

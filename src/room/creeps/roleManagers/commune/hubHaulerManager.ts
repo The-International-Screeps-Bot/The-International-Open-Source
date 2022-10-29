@@ -205,8 +205,8 @@ export class HubHauler extends Creep {
         // FInd a target
 
         let target
-        if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
-        else if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
+        if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
+        else if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
 
         if (!target) return false
 
@@ -263,8 +263,8 @@ export class HubHauler extends Creep {
         // Find a provider
 
         let provider
-        if (storage && storage.store.energy >= amount) provider = storage
-        else if (terminal && terminal.store.energy >= amount) provider = terminal
+        if (terminal && terminal.store.energy >= amount) provider = terminal
+        else if (storage && storage.store.energy >= amount) provider = storage
 
         if (!provider) return false
 
@@ -338,8 +338,8 @@ export class HubHauler extends Creep {
         // Find a target
 
         let target
-        if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
-        else if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
+        if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
+        else if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
 
         if (!target) return false
 
@@ -360,6 +360,8 @@ export class HubHauler extends Creep {
         const { storage } = room
         const { terminal } = room
 
+        if (!storage && !terminal) return false
+
         const factory = room.structures.factory[0]
         if (!factory) return false
 
@@ -373,8 +375,8 @@ export class HubHauler extends Creep {
                 if (factory.store[component] >= 1000) continue
 
                 let provider
-                if (storage && storage.store[component] > 0) provider = storage
-                else if (terminal && terminal.store[component] > 0) provider = terminal
+                if (terminal && terminal.store[component] > 0) provider = terminal
+                else if (storage && storage.store[component] > 0) provider = storage
                 if (!provider) continue
 
                 let amount = Math.min(this.freeStore(), provider.store[component], 2000 - factory.store[component])
@@ -395,8 +397,8 @@ export class HubHauler extends Creep {
         // Find a provider
 
         let provider
-        if (storage && storage.store.energy > this.store.getCapacity()) provider = storage
-        else if (terminal && terminal.store.energy > this.store.getCapacity()) provider = terminal
+        if (terminal && terminal.store.energy > this.store.getCapacity()) provider = terminal
+        else if (storage && storage.store.energy > this.store.getCapacity()) provider = storage
 
         if (!provider) return false
 
@@ -437,8 +439,8 @@ export class HubHauler extends Creep {
         // Find a provider
 
         let provider
-        if (storage && storage.store[resource] >= amount) provider = storage
-        else if (terminal && terminal.store[resource] >= amount) provider = terminal
+        if (terminal && terminal.store[resource] >= amount) provider = terminal
+        else if (storage && storage.store[resource] >= amount) provider = storage
 
         if (!provider) return false
 
@@ -483,9 +485,8 @@ export class HubHauler extends Creep {
         // Find a provider
 
         let provider
-        if (storage && storage.store[resource] >= 75000 && storage.store[resource] >= amount) provider = storage
-        else if (terminal && terminal.store[resource] >= 25000 && terminal.store[resource] >= amount)
-            provider = terminal
+        if (terminal && terminal.store[resource] >= 25000 && terminal.store[resource] >= amount) provider = terminal
+        else if (storage && storage.store[resource] >= 75000 && storage.store[resource] >= amount) provider = storage
 
         if (!provider) return false
 

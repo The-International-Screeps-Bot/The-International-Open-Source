@@ -87,11 +87,19 @@ export class ClaimRequestManager {
         if (!requestRoom.controller.safeMode) {
             // Increase the defenderNeed according to the enemy attackers' combined strength
 
-            for (const enemyAttacker of requestRoom.enemyAttackers) {
-                if (enemyAttacker.owner.username === 'Invader') continue
+            for (const enemyCreep of requestRoom.enemyAttackers) {
+                if (enemyCreep.owner.username === 'Invader') continue
 
-                request.data[ClaimRequestData.minDamage] += 10 + enemyAttacker.healStrength
-                request.data[ClaimRequestData.minHeal] += enemyAttacker.attackStrength
+                request.data[ClaimRequestData.minDamage] += enemyCreep.healStrength
+                request.data[ClaimRequestData.minHeal] += enemyCreep.attackStrength
+            }
+
+            // Decrease the defenderNeed according to ally combined strength
+
+            for (const allyCreep of requestRoom.allyCreeps) {
+
+                request.data[ClaimRequestData.minDamage] -= allyCreep.healStrength
+                request.data[ClaimRequestData.minHeal] -= allyCreep.attackStrength
             }
         }
 

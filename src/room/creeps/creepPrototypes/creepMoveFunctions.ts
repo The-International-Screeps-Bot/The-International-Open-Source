@@ -3,11 +3,20 @@ import {
     defaultPlainCost,
     impassibleStructureTypes,
     myColors,
+    offsetsByDirection,
     roomDimensions,
     TrafficPriorities,
 } from 'international/constants'
 import { internationalManager } from 'international/internationalManager'
-import { areCoordsEqual, getRange } from 'international/utils'
+import {
+    areCoordsEqual,
+    arePositionsEqual,
+    customLog,
+    findAdjacentCoordsToCoord,
+    findObjectWithID,
+    getRange,
+    getRangeOfCoords,
+} from 'international/utils'
 import {
     packCoord,
     packPos,
@@ -23,6 +32,8 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
     // Inform true if there is no path
 
     if (!path) return true
+
+    if (this.spawning) return false
 
     // Inform true if the path is at its end
 
@@ -63,8 +74,9 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
+    /*
     if (this.spawning) return false
-
+ */
     // Assign default opts
 
     if (!opts.origin) opts.origin = this.pos
@@ -72,14 +84,17 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     let path: RoomPosition[]
 
-    // If there is a path in the creep's memory
+    // If there is a path in the creep's memory and it isn't spawning
 
-    if (this.memory.P) {
+    if (this.memory.P && !this.spawning) {
         path = unpackPosList(this.memory.P)
 
-        // So long as the creep isn't standing on the first position in the path
+        // So long as the creep isn't standing on the first position in the path, and the pos is worth going on
+        /*
+        while (path[0] && getRangeOfCoords(path[0], this.pos) <= 1 && path.length > 1) {
+ */
 
-        while (path[0] && areCoordsEqual(this.pos, path[0])) {
+        while (path[0] && arePositionsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
 
             path.shift()
@@ -157,14 +172,13 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (path.length > 1) {
         if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
     } else {
-        if (Memory.roomVisuals) room.visual.line(this.pos, path[0], {
-            color: myColors.lightBlue,
-            opacity: 0.3,
-        })
+        if (Memory.roomVisuals)
+            room.visual.line(this.pos, path[0], {
+                color: myColors.lightBlue,
+                opacity: 0.3,
+            })
         delete this.memory.LC
     }
-
-    this.assignMoveRequest(path[0])
 
     // Set the creep's pathOpts to reflect this moveRequest's opts
 
@@ -177,6 +191,34 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     // Set the path in the creep's memory
 
     this.memory.P = packPosList(path)
+
+    if (this.spawning) {
+        const spawn = findObjectWithID(this.spawnID)
+
+        if (spawn.spawning.remainingTime <= 1) this.assignMoveRequest(path[0])
+
+        // Ensure we aren't using the default direction
+
+        if (spawn.spawning.directions) return true
+
+        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos)
+
+        // Sort by distance from the first pos in the path
+
+        adjacentCoords.sort((a, b) => {
+            return getRangeOfCoords(a, path[0]) - getRangeOfCoords(b, path[0])
+        })
+
+        const directions: DirectionConstant[] = []
+
+        for (const coord of adjacentCoords) directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
+
+        spawn.spawning.setDirections(directions)
+
+        return true
+    }
+
+    this.assignMoveRequest(path[0])
 
     // Inform success
 
@@ -635,14 +677,13 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     creepAtPos.runMoveRequest()
 }
 
-Creep.prototype.avoidEnemyThreatCoords = function() {
-
+PowerCreep.prototype.avoidEnemyThreatCoords = Creep.prototype.avoidEnemyThreatCoords = function () {
     if (!this.room.enemyThreatCoords.has(packCoord(this.pos))) return false
 
     this.createMoveRequest({
         origin: this.pos,
-        goals: [{ pos: this.pos, range: 3 }],
-        flee: true
+        goals: [{ pos: this.pos, range: 5 }],
+        flee: true,
     })
 
     return true

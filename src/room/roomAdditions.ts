@@ -1,6 +1,5 @@
 import {
     allStructureTypes,
-    allyPlayers,
     defaultSwampCost,
     impassibleStructureTypes,
     myColors,
@@ -20,7 +19,7 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { packCoord, packCoordList, packPosList, packXYAsCoord, unpackPosList } from 'other/packrat'
+import { packCoord, packCoordList, packPosList, packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
 
 Object.defineProperties(Room.prototype, {
     global: {
@@ -142,18 +141,20 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._myDamagedCreeps) return this._myDamagedCreeps
 
-            return this._myDamagedCreeps = this._myDamagedCreeps = this.find(FIND_MY_CREEPS, {
-                filter: creep => creep.hits < creep.hitsMax,
-            })
+            return (this._myDamagedCreeps = this._myDamagedCreeps =
+                this.find(FIND_MY_CREEPS, {
+                    filter: creep => creep.hits < creep.hitsMax,
+                }))
         },
     },
     myDamagedPowerCreeps: {
         get() {
             if (this._myDamagedPowerCreeps) return this._myDamagedPowerCreeps
 
-            return this._myDamagedPowerCreeps = this._myDamagedPowerCreeps = this.find(FIND_MY_POWER_CREEPS, {
-                filter: creep => creep.hits < creep.hitsMax,
-            })
+            return (this._myDamagedPowerCreeps = this._myDamagedPowerCreeps =
+                this.find(FIND_MY_POWER_CREEPS, {
+                    filter: creep => creep.hits < creep.hitsMax,
+                }))
         },
     },
     allyDamagedCreeps: {
@@ -380,6 +381,11 @@ Object.defineProperties(Room.prototype, {
             this._combatStructureTargets = []
 
             if (this.controller.my || this.controller.reservation) return this._combatStructureTargets
+
+            if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
+                return this._combatStructureTargets
+            if (this.controller.reservation && Memory.allyPlayers.includes(this.controller.reservation.username))
+                return this._combatStructureTargets
 
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.tower)
@@ -1679,9 +1685,27 @@ Object.defineProperties(Room.prototype, {
 
                 this._enemyThreatCoords.delete(packCoord(rampart.pos))
             }
+/*
+            for (const packedCoord of this._enemyThreatCoords) {
 
+                const coord = unpackCoord(packedCoord)
+
+                this.visual.circle(coord.x, coord.y, { fill: myColors.red })
+            }
+ */
             return this._enemyThreatCoords
         },
+    },
+    enemyThreatGoals: {
+
+        get() {
+
+            if (this._enemyThreatGoals) return this._enemyThreatGoals
+
+            this._enemyThreatGoals = []
+
+            return this._enemyThreatGoals
+        }
     },
     flags: {
         get() {
@@ -1840,7 +1864,8 @@ Object.defineProperties(Room.prototype, {
             this._resourcesInStoringStructures = {}
 
             const storingStructures: AnyStoreStructure[] = [this.storage, this.factory]
-            if (this.terminal && !this.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(this.terminal)
+            if (this.terminal && !this.terminal.effectsData.get(PWR_DISRUPT_TERMINAL))
+                storingStructures.push(this.terminal)
 
             for (const structure of storingStructures) {
                 if (!structure) continue
@@ -1862,15 +1887,14 @@ Object.defineProperties(Room.prototype, {
     },
     unprotectedEnemyCreeps: {
         get() {
-
             if (this._unprotectedEnemyCreeps) return this._unprotectedEnemyCreeps
 
             const avoidStructureTypes = new Set([STRUCTURE_RAMPART])
 
-            return this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
+            return (this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
                 return !this.coordHasStructureTypes(enemyCreep.pos, avoidStructureTypes)
-            })
-        }
+            }))
+        },
     },
     MEWT: {
         get() {

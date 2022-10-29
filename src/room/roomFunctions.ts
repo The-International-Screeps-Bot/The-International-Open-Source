@@ -1,6 +1,5 @@
 import {
     allStructureTypes,
-    allyPlayers,
     ClaimRequestData,
     CombatRequestData,
     defaultPlainCost,
@@ -103,7 +102,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 routeCallback(roomName: string) {
                     const roomMemory = Memory.rooms[roomName]
                     if (!roomMemory) {
-
                         if (roomName === goal.pos.roomName) return 1
                         return Infinity
                     }
@@ -442,17 +440,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     return generatePath()
 }
 
-Room.prototype.findType = function (scoutingRoom: Room) {
-    const room = this
-    const { controller } = room
-
-    // Record that the room was scouted this tick
-
-    room.memory.LST = Game.time
-
+Room.prototype.scoutByRoomName = function () {
     // Find the numbers in the room's name
 
-    const [EWstring, NSstring] = room.name.match(/\d+/g)
+    const [EWstring, NSstring] = this.name.match(/\d+/g)
 
     // Convert he numbers from strings into actual numbers
 
@@ -461,236 +452,191 @@ Room.prototype.findType = function (scoutingRoom: Room) {
 
     // Use the numbers to deduce some room types - quickly!
 
-    if (EW % 10 === 0 && NS % 10 === 0) {
-        room.memory.T = 'intersection'
-        return
-    }
-
-    if (EW % 10 === 0 || NS % 10 === 0) {
-        room.memory.T = 'highway'
-        return
-    }
-
-    if (EW % 5 === 0 && NS % 5 === 0) {
-        room.memory.T = 'keeperCenter'
-        return
-    }
-
-    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
-        room.memory.T = 'keeper'
-        return
-    }
-
-    // If there is a controller
-
-    if (controller) {
-        // If the contoller is owned
-
-        if (controller.owner) {
-            // Stop if the controller is owned by me
-
-            if (controller.my) return
-
-            const owner = controller.owner.username
-
-            room.memory.owner = owner
-
-            // If the controller is owned by an ally
-
-            if (Memory.allyPlayers.includes(owner)) {
-                room.memory.T = 'ally'
-                return
-            }
-
-            room.memory.T = 'enemy'
-
-            // If the controller is not owned by an ally
-
-            const playerInfo = Memory.players[owner]
-
-            if (!playerInfo) Memory.players[owner] = {}
-
-            const level = controller.level
-
-            if (level) Memory.players[owner].GRCL = Math.max(level, playerInfo.GRCL)
-            room.memory.level = level
-
-            // Offensive threat
-
-            let threat = 0
-
-            threat += Math.pow(level, 2)
-
-            threat += room.structures.spawn.length * 50
-
-            threat += room.structures.nuker.length * 300
-
-            threat += Math.pow(room.structures.lab.length * 10000, 0.4)
-
-            room.memory.OT = threat
-            Memory.players[owner].OT = Math.max(threat, playerInfo.OT)
-
-            // Defensive threat
-
-            threat = 0
-
-            const energy = room.resourcesInStoringStructures.energy
-
-            room.memory.energy = energy
-            threat += Math.pow(energy, 0.5)
-
-            const ramparts = room.structures.rampart
-            const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
-
-            threat += Math.pow(avgRampartHits, 0.5)
-
-            threat += room.structures.spawn.length * 100
-
-            threat += room.structures.tower.length * 300
-
-            threat += Math.pow(room.structures.extension.length * 400, 0.8)
-
-            const hasTerminal = room.terminal !== undefined
-
-            if (hasTerminal) {
-                threat += 800
-
-                room.memory.terminal = true
-            }
-
-            room.memory.powerEnabled = controller.isPowerEnabled
-
-            room.memory.DT = threat
-            Memory.players[owner].DT = Math.max(threat, playerInfo.DT)
-
-            return
-        }
-
-        // Filter sources that have been harvested
-
-        const harvestedSources = room.find(FIND_SOURCES).filter(source => source.ticksToRegeneration > 0)
-
-        if (isReservedRemote()) return
-
-        function isReservedRemote(): boolean {
-            // If there is no reservation inform false
-
-            if (!controller.reservation) return false
-
-            // If I am the reserver, inform false
-
-            if (controller.reservation.username === Memory.me) return false
-
-            // If the reserver is an Invader, inform false
-
-            if (controller.reservation.username === 'Invader') return false
-
-            // Get roads
-
-            const roads = room.structures.road
-
-            // Get containers
-
-            const containers = room.structures.container
-
-            // If there are roads or containers or sources harvested, inform false
-
-            if (roads.length === 0 && containers.length === 0 && !harvestedSources) return false
-
-            // If the controller is not reserved by an ally
-
-            if (!Memory.allyPlayers.includes(controller.reservation.username)) {
-                // Set type to enemyRemote and inform true
-
-                room.memory.T = 'enemyRemote'
-                room.memory.owner = controller.reservation.username
-                return true
-            }
-
-            // Otherwise if the room is reserved by an ally
-
-            // Set type to allyRemote and inform true
-
-            room.memory.T = 'allyRemote'
-            room.memory.owner = controller.reservation.username
-            return true
-        }
-
-        if (isUnReservedRemote()) return
-
-        function isUnReservedRemote() {
-            if (controller.reservation) {
-                // If I am the reserver, inform false
-
-                if (controller.reservation.username === Memory.me) return false
-
-                // If the reserver is an Invader, inform false
-
-                if (controller.reservation.username === 'Invader') return false
-            }
-
-            // If there are no sources harvested
-
-            if (harvestedSources.length === 0) return false
-
-            // Find creeps that I don't own that aren't invaders
-
-            const creepsNotMine = room.enemyCreeps.concat(room.allyCreeps)
-
-            // Iterate through them
-
-            for (const creep of creepsNotMine) {
-                // If the creep is an invdader, iterate
-
-                if (creep.owner.username === 'Invader') continue
-
-                // If the creep has work parts
-
-                if (creep.parts.work > 0) {
-                    // If the creep is owned by an ally
-
-                    if (Memory.allyPlayers.includes(creep.owner.username)) {
-                        // Set type to allyRemote and stop
-
-                        room.memory.T = 'allyRemote'
-                        room.memory.owner = creep.owner.username
-                        return true
-                    }
-
-                    // If the creep is not owned by an ally
-
-                    // Set type to enemyRemote and stop
-
-                    room.memory.T = 'enemyRemote'
-                    room.memory.owner = creep.owner.username
-
-                    /* room.createAttackCombatRequest() */
-                    room.createHarassCombatRequest()
-
-                    return true
-                }
-            }
-
-            return false
-        }
-
-        if (room.makeRemote(scoutingRoom)) return
-
-        room.memory.T = 'neutral'
-
-        room.createClaimRequest()
-    }
+    if (EW % 10 === 0 && NS % 10 === 0) return (this.memory.T = 'intersection')
+    if (EW % 10 === 0 || NS % 10 === 0) return (this.memory.T = 'highway')
+    if (EW % 5 === 0 && NS % 5 === 0) return (this.memory.T = 'keeperCenter')
+    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) return (this.memory.T = 'keeper')
+
+    return false
 }
 
-Room.prototype.makeRemote = function (scoutingRoom) {
-    const room = this
+Room.prototype.scoutReservedRemote = function () {
+    const { controller } = this
 
-    let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, room.name)
+    // If there is no reservation inform false
+
+    if (!controller.reservation) return false
+
+    // If I am the reserver, inform false
+
+    if (controller.reservation.username === Memory.me) return false
+
+    // If the reserver is an Invader, inform false
+
+    if (controller.reservation.username === 'Invader') return false
+
+    const harvestedSources = this.find(FIND_SOURCES, {
+        filter: source => source.ticksToRegeneration > 0,
+    })
+
+    // If there are roads or containers or sources harvested, inform false
+
+    if (!this.structures.road && !this.structures.container && !harvestedSources) return false
+
+    // If the controller is not reserved by an ally
+
+    if (!Memory.allyPlayers.includes(controller.reservation.username)) {
+        // Set type to enemyRemote and inform true
+
+        this.memory.owner = controller.reservation.username
+        return (this.memory.T = 'enemyRemote')
+    }
+
+    // Otherwise if the room is reserved by an ally
+
+    // Set type to allyRemote and inform true
+
+    this.memory.owner = controller.reservation.username
+    return (this.memory.T = 'allyRemote')
+}
+
+Room.prototype.scoutUnreservedRemote = function () {
+    const { controller } = this
+
+    if (controller.reservation) {
+        // If I am the reserver, inform false
+
+        if (controller.reservation.username === Memory.me) return false
+
+        // If the reserver is an Invader, inform false
+
+        if (controller.reservation.username === 'Invader') return false
+    }
+
+    const harvestedSources = this.find(FIND_SOURCES, {
+        filter: source => source.ticksToRegeneration > 0,
+    })
+
+    // If there are no sources harvested
+
+    if (!harvestedSources.length) return false
+
+    // Find creeps that I don't own that aren't invaders
+
+    const creepsNotMine = this.enemyCreeps.concat(this.allyCreeps)
+
+    // Iterate through them
+
+    for (const creep of creepsNotMine) {
+        // If the creep is an invdader, iterate
+
+        if (creep.owner.username === 'Invader') continue
+
+        // If the creep has work parts
+
+        if (creep.parts.work > 0) {
+            // If the creep is owned by an ally
+
+            if (Memory.allyPlayers.includes(creep.owner.username)) {
+                // Set type to allyRemote and stop
+
+                this.memory.owner = creep.owner.username
+                return (this.memory.T = 'allyRemote')
+            }
+
+            // If the creep is not owned by an ally
+
+            // Set type to enemyRemote and stop
+
+            this.memory.owner = creep.owner.username
+
+            /* room.createAttackCombatRequest() */
+            this.createHarassCombatRequest()
+
+            return (this.memory.T = 'enemyRemote')
+        }
+    }
+
+    return false
+}
+
+Room.prototype.scoutEnemyRoom = function () {
+    const { controller } = this
+    const playerName = controller.owner.username
+
+    this.memory.T = 'enemy'
+
+    // If the controller is not owned by an ally
+
+    const playerInfo = Memory.players[playerName]
+
+    if (!playerInfo) Memory.players[playerName] = {}
+
+    const level = controller.level
+
+    if (level) Memory.players[playerName].GRCL = Math.max(level, playerInfo.GRCL)
+    this.memory.level = level
+
+    // Offensive threat
+
+    let threat = 0
+
+    threat += Math.pow(level, 2)
+
+    threat += this.structures.spawn.length * 50
+    threat += this.structures.nuker.length * 300
+    threat += Math.pow(this.structures.lab.length * 10000, 0.4)
+
+    this.memory.OT = threat
+    Memory.players[playerName].OT = Math.max(threat, playerInfo.OT)
+
+    // Defensive threat
+
+    threat = 0
+
+    const energy = this.resourcesInStoringStructures.energy
+
+    this.memory.energy = energy
+    threat += Math.pow(energy, 0.5)
+
+    const ramparts = this.structures.rampart
+    const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
+
+    threat += Math.pow(avgRampartHits, 0.5)
+
+    threat += this.structures.spawn.length * 100
+
+    threat += this.structures.tower.length * 300
+
+    threat += Math.pow(this.structures.extension.length * 400, 0.8)
+
+    const hasTerminal = this.terminal !== undefined
+
+    if (hasTerminal) {
+        threat += 800
+
+        this.memory.terminal = true
+    }
+
+    this.memory.powerEnabled = controller.isPowerEnabled
+
+    this.memory.DT = threat
+    Memory.players[playerName].DT = Math.max(threat, playerInfo.DT)
+
+    return this.memory.T
+}
+
+Room.prototype.scoutMyRemote = function (scoutingRoom) {
+    if (this.memory.T === 'remote' && !global.communes.has(this.memory.commune)) this.memory.T = 'neutral'
+
+    let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
+
+    if (distance > maxRemoteRoomDistance) return this.memory.T
 
     // Find distance from scoutingRoom
 
     if (distance <= maxRemoteRoomDistance)
-        distance = advancedFindDistance(scoutingRoom.name, room.name, {
+        distance = advancedFindDistance(scoutingRoom.name, this.name, {
             typeWeights: {
                 keeper: Infinity,
                 enemy: Infinity,
@@ -700,55 +646,27 @@ Room.prototype.makeRemote = function (scoutingRoom) {
             },
         })
 
-    if (distance <= maxRemoteRoomDistance) {
-        // If the room is already a remote of the scoutingRoom
+    if (distance > maxRemoteRoomDistance) return this.memory.T
 
-        if (room.memory.T === 'remote' && scoutingRoom.name === room.memory.commune) return true
+    // If the room is already a remote of the scoutingRoom
 
-        // Get the anchor from the scoutingRoom, stopping if it's undefined
+    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.commune) return this.memory.T
 
-        if (!scoutingRoom.anchor) return true
+    // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-        const newSourceEfficacies = []
-        let newSourceEfficaciesTotal = 0
+    if (!scoutingRoom.anchor) return this.memory.T
 
-        // Get base planning data
+    const newSourceEfficacies = []
+    let newSourceEfficaciesTotal = 0
 
-        // loop through sourceNames
+    // Get base planning data
 
-        for (const source of room.sources) {
-            const path = room.advancedFindPath({
-                origin: source.pos,
-                goals: [{ pos: scoutingRoom.anchor, range: 1 }],
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-            })
+    // loop through sourceNames
 
-            // Stop if there is a source inefficient enough
-
-            if (path.length >= 300) return true
-
-            let newSourceEfficacy = 0
-
-            for (const pos of path) {
-                newSourceEfficacy +=
-                    internationalManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] === TERRAIN_MASK_SWAMP
-                        ? defaultSwampCost
-                        : 1
-            }
-
-            newSourceEfficacies.push(newSourceEfficacy)
-            newSourceEfficaciesTotal += newSourceEfficacy
-        }
-
-        const newReservationEfficacy = room.advancedFindPath({
-            origin: room.controller.pos,
-            goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+    for (const source of this.sources) {
+        const path = this.advancedFindPath({
+            origin: source.pos,
+            goals: [{ pos: scoutingRoom.anchor, range: 1 }],
             typeWeights: {
                 enemy: Infinity,
                 ally: Infinity,
@@ -756,82 +674,189 @@ Room.prototype.makeRemote = function (scoutingRoom) {
                 enemyRemote: Infinity,
                 allyRemote: Infinity,
             },
-        }).length
+        })
 
-        // If the room isn't already a remote
+        // Stop if there is a source inefficient enough
 
-        if (room.memory.T !== 'remote' || !global.communes.has(room.memory.commune)) {
-            room.memory.T = 'remote'
+        if (path.length >= 300) return this.memory.T
 
-            // Assign the room's commune as the scoutingRoom
+        let newSourceEfficacy = 0
 
-            room.memory.commune = scoutingRoom.name
-
-            // Generate new important positions
-
-            delete room.memory.SP
-            delete room._sourcePositions
-            room.sourcePositions
-
-            delete room.memory.CP
-            delete room._controllerPositions
-            room.controllerPositions
-
-            // Add the room's name to the scoutingRoom's remotes list
-
-            scoutingRoom.memory.remotes.push(room.name)
-
-            room.memory.SE = newSourceEfficacies
-            room.memory.RE = newReservationEfficacy
-
-            room.memory.data = []
-            for (const key in RemoteData) room.memory.data[parseInt(key)] = 0
-
-            return true
+        for (const pos of path) {
+            newSourceEfficacy +=
+                internationalManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] === TERRAIN_MASK_SWAMP
+                    ? defaultSwampCost
+                    : 1
         }
 
-        const currentRemoteEfficacy =
-            room.memory.SE.reduce((sum, el) => sum + el) / room.memory.SE.length + room.memory.RE
-        const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
+        newSourceEfficacies.push(newSourceEfficacy)
+        newSourceEfficaciesTotal += newSourceEfficacy
+    }
 
-        // If the new average source efficacy is above the current, stop
+    const newReservationEfficacy = this.advancedFindPath({
+        origin: this.controller.pos,
+        goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+        typeWeights: {
+            enemy: Infinity,
+            ally: Infinity,
+            keeper: Infinity,
+            enemyRemote: Infinity,
+            allyRemote: Infinity,
+        },
+    }).length
 
-        if (newRemoteEfficacy >= currentRemoteEfficacy) return true
+    // If the room isn't already a remote
 
-        room.memory.T = 'remote'
-
+    if (this.memory.T !== 'remote') {
         // Assign the room's commune as the scoutingRoom
 
-        room.memory.commune = scoutingRoom.name
+        this.memory.commune = scoutingRoom.name
 
         // Generate new important positions
 
-        delete room.memory.SP
-        delete room._sourcePositions
-        room.sourcePositions
+        delete this.memory.SP
+        delete this._sourcePositions
+        this.sourcePositions
 
-        delete room.memory.CP
-        delete room._controllerPositions
-        room.controllerPositions
+        delete this.memory.CP
+        delete this._controllerPositions
+        this.controllerPositions
 
         // Add the room's name to the scoutingRoom's remotes list
 
-        scoutingRoom.memory.remotes.push(room.name)
+        scoutingRoom.memory.remotes.push(this.name)
 
-        room.memory.SE = newSourceEfficacies
-        room.memory.RE = newReservationEfficacy
+        this.memory.SE = newSourceEfficacies
+        this.memory.RE = newReservationEfficacy
 
-        room.memory.data = []
-        for (const key in RemoteData) room.memory.data[parseInt(key)] = 0
+        this.memory.data = []
+        for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
 
-        return true
+        return (this.memory.T = 'remote')
     }
 
-    if (room.memory.T !== 'remote') return false
+    const currentRemoteEfficacy = this.memory.SE.reduce((sum, el) => sum + el) / this.memory.SE.length + this.memory.RE
+    const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
-    if (!global.communes.has(room.memory.commune)) return false
+    // If the new average source efficacy is above the current, stop
 
-    return true
+    if (newRemoteEfficacy >= currentRemoteEfficacy) return this.memory.T
+
+    // Assign the room's commune as the scoutingRoom
+
+    this.memory.commune = scoutingRoom.name
+
+    // Generate new important positions
+
+    delete this.memory.SP
+    delete this._sourcePositions
+    this.sourcePositions
+
+    delete this.memory.CP
+    delete this._controllerPositions
+    this.controllerPositions
+
+    // Add the room's name to the scoutingRoom's remotes list
+
+    scoutingRoom.memory.remotes.push(this.name)
+
+    this.memory.SE = newSourceEfficacies
+    this.memory.RE = newReservationEfficacy
+
+    this.memory.data = []
+    for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
+
+    return (this.memory.T = 'remote')
+}
+
+Room.prototype.basicScout = function () {
+    const { controller } = this
+
+    // Record that the room was scouted this tick
+
+    this.memory.LST = Game.time
+
+    if (this.scoutByRoomName()) return this.memory.T
+
+    // If there is a controller
+
+    if (controller) {
+        // If the contoller is owned
+
+        if (controller.owner) {
+            // Stop if the controller is owned by me
+
+            if (controller.my) return this.memory.T
+
+            const owner = controller.owner.username
+
+            this.memory.owner = owner
+
+            // If the controller is owned by an ally
+
+            if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
+
+            if (this.scoutEnemyRoom()) return this.memory.T
+
+            return this.memory.T
+        }
+
+        if (this.scoutReservedRemote()) return this.memory.T
+
+        if (this.scoutUnreservedRemote()) return this.memory.T
+
+        if (this.memory.T === 'remote') return this.memory.T
+
+        this.createClaimRequest()
+        return (this.memory.T = 'neutral')
+    }
+
+    return this.memory.T
+}
+
+Room.prototype.advancedScout = function (scoutingRoom: Room) {
+    const { controller } = this
+
+    // Record that the room was scouted this tick
+
+    this.memory.LST = Game.time
+
+    if (this.scoutByRoomName()) return this.memory.T
+
+    // If there is a controller
+
+    if (controller) {
+        // If the contoller is owned
+
+        if (controller.owner) {
+            // Stop if the controller is owned by me
+
+            if (controller.my) return this.memory.T
+
+            const owner = controller.owner.username
+
+            this.memory.owner = owner
+
+            // If the controller is owned by an ally
+
+            if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
+
+            if (this.scoutEnemyRoom()) return this.memory.T
+
+            return this.memory.T
+        }
+
+        if (this.scoutReservedRemote()) return this.memory.T
+
+        if (this.scoutUnreservedRemote()) return this.memory.T
+
+        if (this.scoutMyRemote(scoutingRoom)) return this.memory.T
+
+        this.createClaimRequest()
+        return (this.memory.T = 'neutral')
+    }
+
+    return this.memory.T
 }
 
 Room.prototype.createAttackCombatRequest = function () {
@@ -877,7 +902,6 @@ Room.prototype.createHarassCombatRequest = function () {
 }
 
 Room.prototype.createDefendCombatRequest = function (opts) {
-
     if (Memory.combatRequests[this.name]) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
 
@@ -891,8 +915,8 @@ Room.prototype.createDefendCombatRequest = function (opts) {
     request.data[CombatRequestData.inactionTimer] = Math.floor(Math.random() * 200)
 
     for (const key in opts) {
-
-        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
+        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+            opts[key as keyof typeof CombatRequestData]
     }
 }
 

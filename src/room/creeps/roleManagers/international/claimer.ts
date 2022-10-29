@@ -9,10 +9,10 @@ export class Claimer extends Creep {
         if (this.dying) return
         if (!this.commune) return
 
-        const claimRequestName = Memory.rooms[this.commune.name].claimRequest
-        if (!claimRequestName) return
+        const request = Memory.claimRequests[this.memory.TRN]
+        if (!request) return
 
-        Memory.claimRequests[claimRequestName].data[ClaimRequestData.claimer] -= 1
+        request.data[ClaimRequestData.claimer] -= 1
     }
 
     /**
@@ -63,14 +63,9 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            if (!creep.commune) return
+            creep.say(creep.memory.TRN)
 
-            const claimRequestName = Memory.rooms[creep.commune.name].claimRequest
-            if (!claimRequestName) return
-
-            creep.say(claimRequestName)
-
-            if (room.name === claimRequestName) {
+            if (room.name === creep.memory.TRN) {
                 creep.claimRoom()
                 continue
             }
@@ -80,7 +75,7 @@ export class Claimer extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, claimRequestName), range: 25 }],
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: creep.parts.move >= 5 ? 1 : undefined,
@@ -91,10 +86,8 @@ export class Claimer extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[claimRequestName]
-                request.data[ClaimRequestData.abandon] = 20000
-                delete request.responder
-                delete Memory.rooms[creep.commune.name].claimRequest
+                const request = Memory.claimRequests[creep.memory.TRN]
+                if (request) request.data[ClaimRequestData.abandon] = 20000
             }
         }
     }

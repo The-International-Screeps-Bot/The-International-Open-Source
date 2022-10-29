@@ -1,4 +1,4 @@
-import { allStructureTypes, ClaimRequestData, CombatRequestData } from './constants'
+import { allStructureTypes, AllyCreepRequestData, ClaimRequestData, CombatRequestData } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
@@ -152,6 +152,7 @@ global.claim = function (requestName, communeName) {
         })
 
         request.data[ClaimRequestData.score] = 0
+        request.data[ClaimRequestData.abandon] = 0
     }
 
     if (communeName) {
@@ -184,6 +185,8 @@ global.createCombatRequest = function (requestName, type, opts, communeName) {
             responder: communeName,
             data: [0],
         }
+
+        request.data[CombatRequestData.abandon] = 0
 
         for (const key in opts) {
 
@@ -218,10 +221,12 @@ global.DCR = global.deleteCombatRequest
 
 global.allyCreepRequest = function (requestName, communeName?) {
     if (!Memory.allyCreepRequests[requestName]) {
-        Memory.allyCreepRequests[requestName] = {
+        const request = Memory.allyCreepRequests[requestName] = {
             responder: communeName,
             data: [0],
         }
+
+        request.data[AllyCreepRequestData.abandon] = 0
     }
 
     if (communeName) {

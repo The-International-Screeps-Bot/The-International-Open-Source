@@ -5,6 +5,7 @@ import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
+import { Settings } from 'international/settings'
 
 declare global {
     interface ProfilerMemory {
@@ -115,7 +116,6 @@ declare global {
         | 'claimer'
         | 'vanguard'
         | 'allyVanguard'
-        | 'vanguardDefender'
         | 'antifaRangedAttacker'
         | 'antifaAttacker'
         | 'antifaHealer'
@@ -597,96 +597,11 @@ declare global {
         GRCL: number
     }
 
-    interface Memory {
+    interface Memory extends Settings {
         /**
          * The name of the user
          */
         me: string
-
-        /**
-         * The current breaking version of the bot
-         */
-        breakingVersion: number | undefined
-
-        /**
-         * Wether the bot should generate any room visuals
-         */
-        roomVisuals: boolean
-
-        /**
-         * Wether the bot should generate base room visuals
-         */
-        baseVisuals: boolean
-
-        /**
-         * Wether the bot should generate map visuals
-         */
-        mapVisuals: boolean
-
-        /**
-         * Wether the bot should log CPU data
-         */
-        CPULogging: boolean
-
-        /**
-         * Wether the bot save RoomStats data
-         */
-        roomStats: 0 | 1 | 2
-
-        /**
-         * A list of usernames to treat as allies
-         */
-        allyPlayers: string[]
-
-        /**
-         * A list of usernames to treat as neutral
-         */
-        nonAggressionPlayers: string[]
-
-        /**
-         * Wether the bot should sell pixels
-         */
-        pixelSelling: boolean
-
-        /**
-         * Wether the bot should generate pixels
-         */
-        pixelGeneration: boolean
-
-        /**
-         * An list of usernames to not trade with
-         */
-        tradeBlacklist: string[]
-
-        /**
-         * Wether the bot should automatically respond to claimRequests
-         */
-        autoClaim: boolean
-
-        /**
-         * Wether or not to automatically create attack requests for viable targets
-         */
-        autoAttack: boolean
-
-        /**
-         * Wether the bot should enable ramparts when there is no enemy present
-         */
-        publicRamparts: boolean
-
-        /**
-         * Wether the bot should try trading with its allies
-         */
-        allyTrading: boolean
-
-        /**
-         * Wether or not the bot should be using the market
-         */
-        marketUsage: boolean
-
-        /**
-         * Wether or not the bot should be using customLog
-         */
-        logging: boolean
 
         /**
          * An ongoing record of the latest ID assigned by the bot
@@ -913,11 +828,23 @@ declare global {
          */
         deleteTask(taskID: any, responder: boolean): void
 
+        scoutByRoomName(): RoomTypes | false
+
+        scoutReservedRemote(): RoomTypes | false
+
+        scoutUnreservedRemote(): RoomTypes | false
+
+        scoutMyRemote(scoutingRoom: Room): RoomTypes | false
+
+        scoutEnemyRoom(): RoomTypes | false
+
+        basicScout(): RoomTypes
+
         /**
          * Finds the type of a room and initializes its custom properties
          * @param scoutingRoom The room that is performing the scout operation
          */
-        findType(scoutingRoom: Room): void
+        advancedScout(scoutingRoom: Room): RoomTypes
 
         makeRemote(scoutingRoom: Room): boolean
 
@@ -1337,6 +1264,10 @@ declare global {
         _enemyThreatCoords: Set<string>
 
         readonly enemyThreatCoords: Set<string>
+
+        _enemyThreatGoals: PathGoal[]
+
+        readonly enemyThreatGoals: PathGoal[]
 
         _flags: Partial<{ [key in FlagNames]: Flag }>
 
@@ -1805,6 +1736,11 @@ declare global {
          */
         squadRan: boolean
 
+        /**
+         * The ID of the spawn the creep is spawning in, if it is spawning
+         */
+        spawnID: Id<StructureSpawn>
+
         // Creep Functions
 
         advancedRenew(): void
@@ -1912,7 +1848,14 @@ declare global {
         readonly isOnExit: boolean
     }
 
-    interface CreepMemory {
+    interface CreepMemoryTemplate {
+        /**
+         * Task Room Name, the name of the room the creep is trying to perform a task in
+         */
+        TRN: string
+    }
+
+    interface CreepMemory extends CreepMemoryTemplate {
         /**
          * Wether the creep is old enough to need a replacement
          */
@@ -2053,7 +1996,7 @@ declare global {
         powered: boolean
     }
 
-    interface PowerCreepMemory {
+    interface PowerCreepMemory extends CreepMemoryTemplate {
         /**
          * Commune Name
          */
@@ -2068,11 +2011,6 @@ declare global {
          * Task target, the ID of the target the creep is targeting for its task
          */
         TTID: Id<Structure | Source>
-
-        /**
-         * Task Room Name, the name of the room the creep is trying to go to for its task
-         */
-        TRN: string
     }
 
     // Structures

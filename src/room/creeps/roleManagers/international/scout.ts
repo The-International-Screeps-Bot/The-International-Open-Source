@@ -111,8 +111,8 @@ export class Scout extends Creep {
         }
     }
 
-    // THIS SHOULD BE A ROOM FUNCTION BASED OFF Room.findType
-/*
+    // THIS SHOULD BE A ROOM FUNCTION BASED OFF Room.advancedScout
+    /*
     recordDeposits?(): void {
         const { room } = this
 
@@ -240,7 +240,7 @@ export class Scout extends Creep {
 
                 // Get information about the room
 
-                room.findType(commune)
+                room.advancedScout(commune)
 
                 // Clean the room's memory
 

@@ -41,14 +41,16 @@ import { allyManager } from 'international/simpleAllies'
 import ExecutePandaMasterCode from './other/PandaMaster/Execute'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
+import { ErrorMapper } from 'other/ErrorMapper'
 
 global.profiler = initProfiler()
 
-export const loop = function () {
+export const loop = ErrorMapper.wrapLoop((): void => {
     if (Game.cpu.bucket < 100) {
         console.log('SKIPPING TICK due to low bucket:' + Game.cpu.bucket)
         return
     }
+
     memHack.run()
 
     internationalManager.update()
@@ -96,4 +98,4 @@ export const loop = function () {
     internationalManager.advancedGeneratePixel()
     internationalManager.advancedSellPixels()
     internationalManager.endTickManager()
-}
+})

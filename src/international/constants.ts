@@ -1,99 +1,3 @@
-/**
- * Increment by 1 when a change has been made that will break previous versions of the bot
- */
-export const breakingVersion = 85
-
-// Settings
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const roomVisuals = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const baseVisuals = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const mapVisuals = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const CPULogging = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const roomStats: 0 | 1 | 2 = 2
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const allyPlayers = [
-    'MarvinTMB',
-    'PandaMaster',
-    'lokenwow',
-    'LittleBitBlue',
-    'DefaultO',
-    'Allorrian',
-    'Aerics',
-    'PlaidRabbit',
-]
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const nonAggressionPlayers = ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'somygame']
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const pixelSelling = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const pixelGeneration = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const tradeBlacklist = ['']
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const autoClaim = true
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const autoAttack = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const publicRamparts = false
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const allyTrading = true
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const marketUsage = true
-
-/**
- * Default value, do not change. Modify this property in Memory instead
- */
-export const logging = true
-
 // General
 
 /**
@@ -215,7 +119,6 @@ export const creepRoles: CreepRoles[] = [
     'claimer',
     'vanguard',
     'allyVanguard',
-    'vanguardDefender',
     'antifaRangedAttacker',
     'antifaAttacker',
     'antifaHealer',
@@ -245,7 +148,6 @@ export enum TrafficPriorities {
     builder,
     maintainer,
     claimer,
-    vanguardDefender,
     remoteDefender,
     meleeDefender,
     antifaDismantler,
@@ -1174,3 +1076,4 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
 export const ERROR_FAILED = 0
 
 export const maxRemoteRoomDistance = 5
+export const offsetsByDirection = [, [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1]]
