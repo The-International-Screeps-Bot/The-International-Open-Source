@@ -178,7 +178,11 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy + room.getPartsOfRoleAmount('controllerUpgrader', WORK)) return false
+        if (
+            hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold >
+            hubLink.store.energy + room.getPartsOfRoleAmount('controllerUpgrader', WORK)
+        )
+            return false
 
         // If the controllerLink is less than x% full
 

@@ -266,7 +266,7 @@ Room.prototype.spawnRequester = function () {
             let requiredCarryParts = 10
 
             //If the FF isn't setup, add more carrying.
-            requiredCarryParts += 10
+            //requiredCarryParts += 10
 
             // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
 
@@ -286,6 +286,13 @@ Room.prototype.spawnRequester = function () {
                         this.upgradePathLength,
                         this.getPartsOfRoleAmount('controllerUpgrader', WORK),
                     )
+
+                    if (
+                        this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                        storage.store.getUsedCapacity(RESOURCE_ENERGY) > this.controller.level * 10000
+                    ) {
+                        requiredCarryParts = requiredCarryParts * 1.5
+                    }
                 } else {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
@@ -468,7 +475,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-
             if (!this.towerInferiority) return false
             /* if (!this.enemyAttackers.length) return false */
 
@@ -539,7 +545,10 @@ Room.prototype.spawnRequester = function () {
                 if (this.resourcesInStoringStructures.energy < this.communeManager.storedEnergyBuildThreshold)
                     return false
 
-                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / (15000 + this.controller.level * 1000), 2)
+                partsMultiplier += Math.pow(
+                    this.resourcesInStoringStructures.energy / (15000 + this.controller.level * 1000),
+                    2,
+                )
             }
 
             // Otherwise if there is no storage
@@ -633,12 +642,12 @@ Room.prototype.spawnRequester = function () {
             let repairTargets: Structure<BuildableStructureConstant>[] = this.structures.road
             repairTargets = repairTargets.concat(this.structures.container)
 
-            repairTargets = repairTargets.filter(
-                structure => structure.hitsMax * 0.2 >= structure.hits,
-            )
+            repairTargets = repairTargets.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
             // Get ramparts below their max hits
 
-            const ramparts = this.structures.rampart.filter(rampart => rampart.hits < Math.floor(Math.pow((this.controller.level - 3) * 10, 4.15)))
+            const ramparts = this.structures.rampart.filter(
+                rampart => rampart.hits < Math.floor(Math.pow((this.controller.level - 3) * 10, 4.5)),
+            )
 
             // If there are no ramparts or repair targets
 
@@ -667,7 +676,10 @@ Room.prototype.spawnRequester = function () {
             // For every x energy in storage, add 1 multiplier
 
             if (storage && this.controller.level >= 4 && ramparts.length)
-                partsMultiplier += Math.pow(this.resourcesInStoringStructures.energy / (16000 + this.controller.level * 1000), 2)
+                partsMultiplier += Math.pow(
+                    this.resourcesInStoringStructures.energy / (16000 + this.controller.level * 1000),
+                    2,
+                )
 
             const role = 'maintainer'
 
@@ -713,19 +725,37 @@ Room.prototype.spawnRequester = function () {
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
-            if (
-                this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
-                this.towerInferiority
-            )
+            if (this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed && this.towerInferiority)
                 return false
 
-            // If there is a storage
+            // If the controllerContainer have not enough energy in it, don't spawn a new upgrader
 
+            if (this.controllerContainer) {
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                    this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed
+                ) {
+                    return false
+                }
+
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) > 1500 &&
+                    this.fastFillerContainerLeft?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000 &&
+                    this.fastFillerContainerRight?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000
+                )
+                    partsMultiplier += estimatedIncome * 1.25
+                else partsMultiplier += estimatedIncome * 0.75
+            }
+
+            // If there is a storage
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y energy in storage
 
                 if (this.resourcesInStoringStructures.energy >= this.communeManager.storedEnergyUpgradeThreshold)
-                    partsMultiplier = Math.pow(this.resourcesInStoringStructures.energy / (8000 + this.controller.level * 1000), 2)
+                    partsMultiplier = Math.pow(
+                        this.resourcesInStoringStructures.energy / (8000 + this.controller.level * 1000),
+                        2,
+                    )
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
             }
@@ -742,7 +772,6 @@ Room.prototype.spawnRequester = function () {
             // If the controllerLink is defined
 
             if (controllerLink) {
-
                 maxCreeps -= 1
 
                 const hubLink = this.hubLink
@@ -786,7 +815,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there are construction sites of my ownership in the this, set multiplier to 1
 
-            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
+            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) {
+                if (!this.controllerContainer && !this.controllerLink) {
+                    partsMultiplier = 0
+                } else partsMultiplier = partsMultiplier * 0.25
+            }
 
             const threshold = 0.15
             const role = 'controllerUpgrader'
@@ -911,7 +944,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
                     threshold,
-                    maxCreeps: Infinity,
+                    maxCreeps,
                     minCost: 200,
                     priority,
                     memoryAdditions: {
@@ -926,7 +959,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
                 threshold,
-                maxCreeps: Infinity,
+                maxCreeps,
                 minCost: 250,
                 priority,
                 memoryAdditions: {},
@@ -1118,12 +1151,14 @@ Room.prototype.spawnRequester = function () {
 
                 if ((rangedAttackAmount + healAmount) * 2 > 50) {
                     /* Memory.rooms[remoteName].data[RemoteData.abandon] = 1500 */
+
                     return false
                 }
 
                 const minCost = minRangedAttackCost + minHealCost
                 if (minCost > spawnEnergyCapacity) {
                     /* Memory.rooms[remoteName].data[RemoteData.abandon] = 1500 */
+
                     return false
                 }
 
