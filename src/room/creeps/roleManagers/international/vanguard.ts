@@ -12,9 +12,10 @@ export class Vanguard extends Creep {
 
         if (this.dying) return
 
-        if (!Memory.rooms[this.commune.name].claimRequest) return
+        const request = Memory.claimRequests[this.memory.TRN]
+        if (!request) return
 
-        Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].data[ClaimRequestData.vanguard] -=
+        request.data[ClaimRequestData.vanguard] -=
             this.parts.work
     }
 
@@ -77,15 +78,9 @@ export class Vanguard extends Creep {
 
             const creep: Vanguard = Game.creeps[creepName]
 
-            const claimRequestName = Memory.rooms[creep.commune.name].claimRequest
+            creep.say(creep.memory.TRN)
 
-            // If the creep has no claim target, stop
-
-            if (!claimRequestName) return
-
-            creep.say(claimRequestName)
-
-            if (room.name === claimRequestName) {
+            if (room.name === creep.memory.TRN || !creep.memory.TRN) {
                 if (creep.needsResources()) {
                     // Define the creep's sourceName
 
@@ -113,7 +108,7 @@ export class Vanguard extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, claimRequestName), range: 25 }],
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
                     avoidEnemyRanges: true,
                     typeWeights: {
                         enemy: Infinity,
@@ -122,10 +117,8 @@ export class Vanguard extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[claimRequestName]
-                request.data[ClaimRequestData.abandon] = 20000
-                delete request.responder
-                delete Memory.rooms[creep.commune.name].claimRequest
+                const request = Memory.claimRequests[creep.memory.TRN]
+                if (request) request.data[ClaimRequestData.abandon] = 20000
             }
         }
     }

@@ -35,7 +35,7 @@ export class RemoteCoreAttacker extends Creep {
             delete this.memory.RN
             if (!this.findRemote()) return
         }
-
+        
         // If the creep's remote no longer is managed by its commune
 
         else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {

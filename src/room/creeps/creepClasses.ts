@@ -12,7 +12,6 @@ import { AllyVanguard } from './roleManagers/international/allyVanguard'
 import { Claimer } from './roleManagers/international/claimer'
 import { Scout } from './roleManagers/international/scout'
 import { Vanguard } from './roleManagers/international/vanguard'
-import { VanguardDefender } from './roleManagers/international/vanguardDefender'
 import { RemoteCoreAttacker } from './roleManagers/remote/remoteCoreAttacker'
 import { RemoteDefender } from './roleManagers/remote/remoteDefender'
 import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
@@ -42,7 +41,6 @@ export const creepClasses: { [key in CreepRoles]: any } = {
     claimer: Claimer,
     vanguard: Vanguard,
     allyVanguard: AllyVanguard,
-    vanguardDefender: VanguardDefender,
     antifaRangedAttacker: Antifa,
     antifaAttacker: Antifa,
     antifaHealer: Antifa,

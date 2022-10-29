@@ -116,7 +116,6 @@ declare global {
         | 'claimer'
         | 'vanguard'
         | 'allyVanguard'
-        | 'vanguardDefender'
         | 'antifaRangedAttacker'
         | 'antifaAttacker'
         | 'antifaHealer'
@@ -1845,7 +1844,14 @@ declare global {
         readonly isOnExit: boolean
     }
 
-    interface CreepMemory {
+    interface CreepMemoryTemplate {
+        /**
+         * Task Room Name, the name of the room the creep is trying to perform a task in
+         */
+        TRN: string
+    }
+
+    interface CreepMemory extends CreepMemoryTemplate {
         /**
          * Wether the creep is old enough to need a replacement
          */
@@ -1986,7 +1992,7 @@ declare global {
         powered: boolean
     }
 
-    interface PowerCreepMemory {
+    interface PowerCreepMemory extends CreepMemoryTemplate {
         /**
          * Commune Name
          */
@@ -2001,11 +2007,6 @@ declare global {
          * Task target, the ID of the target the creep is targeting for its task
          */
         TTID: Id<Structure | Source>
-
-        /**
-         * Task Room Name, the name of the room the creep is trying to go to for its task
-         */
-        TRN: string
     }
 
     // Structures
