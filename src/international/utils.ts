@@ -7,6 +7,7 @@ export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
     // Get the market history for the specified resourceType
 
     const history = Game.market.getHistory(resourceType)
+    if (!history) return 1
 
     // Init the totalPrice
 
