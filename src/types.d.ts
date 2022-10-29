@@ -2158,7 +2158,7 @@ declare global {
             /**
              * Removes all specified construction sites owned by the bot
              */
-            removeCSites(types?: BuildableStructureConstant[]): string
+            removeCSites(removeInProgress?: boolean, types?: BuildableStructureConstant[]): string
 
             /**
              * Destroys all specified structures owned by the bot

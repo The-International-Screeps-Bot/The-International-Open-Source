@@ -54,11 +54,13 @@ global.killCreeps = function (roles?) {
 global.marxistLeninism = global.killCreeps
 global.genocide = global.killCreeps
 
-global.removeCSites = function (types?) {
+global.removeCSites = function (removeInProgress, types?) {
     let removedCSCount = 0
 
     for (const cSiteID in Game.constructionSites) {
         const cSite = Game.constructionSites[cSiteID]
+
+        if (cSite.progress && removeInProgress) continue
 
         if (types && !types.includes(cSite.structureType)) continue
 
