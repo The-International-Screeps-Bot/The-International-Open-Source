@@ -11,7 +11,7 @@ export class Vanguard extends Creep {
 
         if (this.dying) return
 
-        if (this.memory.SI) this.room.creepsOfSourceAmount[this.memory.SI] += 1
+        if (this.memory.SI !== undefined) this.room.creepsOfSourceAmount[this.memory.SI] += 1
 
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return
@@ -133,6 +133,9 @@ export class Vanguard extends Creep {
                     if (creep.advancedHarvestSource(room.sources[sourceIndex])) continue
                     continue
                 }
+
+                delete creep.memory.SI
+                delete creep.memory.PC
 
                 if (creep.upgradeRoom()) continue
                 if (creep.repairRampart()) continue

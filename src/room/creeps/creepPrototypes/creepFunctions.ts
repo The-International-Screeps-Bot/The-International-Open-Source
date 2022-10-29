@@ -590,7 +590,7 @@ Creep.prototype.findOptimalSourceIndex = function () {
 
     this.say('FOSN')
 
-    if (this.memory.SI) return true
+    if (this.memory.SI !== undefined) return true
 
     // Get the rooms anchor, if it's undefined inform false
 

@@ -18,11 +18,6 @@ export class TowerManager {
 
         const { room } = this.communeManager
 
-        if (room.flags.disableTowerAttacks) {
-            room.towerInferiority = room.enemyAttackers.length > 0
-            return
-        }
-
         const towers = room.structures.tower
         if (!towers.length) {
             room.towerInferiority = room.enemyAttackers.length > 0
@@ -86,6 +81,12 @@ export class TowerManager {
     }
 
     attackEnemyCreeps() {
+
+        if (this.communeManager.room.flags.disableTowerAttacks) {
+            this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
+            return true
+        }
+
         if (!this.actionableTowerIDs.length) return false
 
         const attackTarget = this.findAttackTarget()
