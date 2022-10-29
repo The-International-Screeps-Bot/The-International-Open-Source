@@ -528,6 +528,11 @@ export function isCoordExit(coord: Coord) {
 export function randomTick(max: number = 20) {
     return Game.time % Math.floor(Math.random() * max) === 0
 }
+
+export function randomRange(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min) + min);
+}
+
 /*
 export function getDirectionCoord(coord1: Coord, coord2: Coord) {
 

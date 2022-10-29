@@ -1685,14 +1685,14 @@ Object.defineProperties(Room.prototype, {
 
                 this._enemyThreatCoords.delete(packCoord(rampart.pos))
             }
-
+/*
             for (const packedCoord of this._enemyThreatCoords) {
 
                 const coord = unpackCoord(packedCoord)
 
                 this.visual.circle(coord.x, coord.y, { fill: myColors.red })
             }
-
+ */
             return this._enemyThreatCoords
         },
     },
