@@ -3,7 +3,6 @@ import { packCoord, packPos, unpackCoordAsPos, unpackPos } from 'other/packrat'
 
 export class FastFiller extends Creep {
     travelToFastFiller?(): boolean {
-
         const fastFillerPos = this.findFastFillerPos()
         if (!fastFillerPos) return true
 
@@ -38,7 +37,9 @@ export class FastFiller extends Creep {
 
         const usedFastFillerPositions = room.usedFastFillerCoords
 
-        const openFastFillerPositions = room.fastFillerPositions.filter(pos => !usedFastFillerPositions.has(packCoord(pos)))
+        const openFastFillerPositions = room.fastFillerPositions.filter(
+            pos => !usedFastFillerPositions.has(packCoord(pos)),
+        )
         if (!openFastFillerPositions.length) return false
 
         const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
@@ -100,27 +101,30 @@ export class FastFiller extends Creep {
 
                 // If there is a non-energy resource in the structure
 
-                if (structure.structureType != STRUCTURE_LINK && structure.usedStore() > structure.store.energy) {
-                    for (const key in structure.store) {
-                        const resourceType = key as ResourceConstant
+                if (structure.structureType != STRUCTURE_LINK) {
+                    // If there is a non-energy resource in a container
 
-                        if (resourceType === RESOURCE_ENERGY) continue
+                    if (structure.usedStore() > structure.store.energy) {
+                        for (const key in structure.store) {
+                            const resourceType = key as ResourceConstant
 
-                        this.say('WCR')
+                            if (resourceType === RESOURCE_ENERGY) continue
 
-                        this.withdraw(structure, resourceType as ResourceConstant)
+                            this.say('WCR')
 
-                        return true
+                            this.withdraw(structure, resourceType as ResourceConstant)
+
+                            return true
+                        }
                     }
+                    // Otherwise, if there is insufficient energy in the structure, iterate
+
+                    if (
+                        structure.store.energy < this.freeSpecificStore(RESOURCE_ENERGY) ||
+                        structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.freeSpecificStore(RESOURCE_ENERGY)
+                    )
+                        continue
                 }
-
-                // Otherwise, if there is insufficient energy in the structure, iterate
-
-                if (
-                    structure.store.energy < this.freeSpecificStore(RESOURCE_ENERGY) ||
-                    structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.freeSpecificStore(RESOURCE_ENERGY)
-                )
-                    continue
 
                 // Otherwise, withdraw from the structure and inform true
 

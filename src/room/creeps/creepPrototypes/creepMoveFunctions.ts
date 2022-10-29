@@ -8,7 +8,7 @@ import {
     TrafficPriorities,
 } from 'international/constants'
 import { internationalManager } from 'international/internationalManager'
-import { areCoordsEqual, findAdjacentCoordsToCoord, findObjectWithID, getDirectionCoord, getRange, getRangeOfCoords } from 'international/utils'
+import { areCoordsEqual, customLog, findAdjacentCoordsToCoord, findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
 import {
     packCoord,
     packPos,
@@ -25,6 +25,8 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
 
     if (!path) return true
 
+    if (this.spawning) return false
+
     // Inform true if the path is at its end
 
     if (path.length === 0) return true
@@ -35,7 +37,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
 
     // Inform true if the path is out of caching time
 
-    if (!this.spawning && this.memory.LC + cacheAmount <= Game.time) return true
+    if (this.memory.LC + cacheAmount <= Game.time) return true
 
     // Inform true if the path isn't in the same room as the creep
 
@@ -74,14 +76,14 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     let path: RoomPosition[]
 
-    // If there is a path in the creep's memory
+    // If there is a path in the creep's memory and it isn't spawning
 
-    if (this.memory.P) {
+    if (this.memory.P && !this.spawning) {
         path = unpackPosList(this.memory.P)
 
-        // So long as the creep isn't standing on the first position in the path
+        // So long as the creep isn't standing on the first position in the path, and the pos is worth going on
 
-        while (path[0] && areCoordsEqual(this.pos, path[0])) {
+        while (path[0] && getRangeOfCoords(path[0], this.pos) <= 1) {
             // Remove the first pos of the path
 
             path.shift()
@@ -183,19 +185,31 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         const spawn = findObjectWithID(this.spawnID)
 
-        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos)
+        if (spawn.spawning.remainingTime <= 1) this.assignMoveRequest(path[0])
+
+        // Ensure we aren't using the default direction
+
+        if (spawn.spawning.directions) return true
+
+        const avoidStructureTypes = new Set(impassibleStructureTypes)
+
+        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos).filter(coord => {
+            return !room.usedFastFillerCoords.has(packCoord(coord)) && !room.coordHasStructureTypes(coord, avoidStructureTypes)
+        })
+
+        const targetPos = path[1] || path[0]
 
         // Sort by distance from the first pos in the path
 
         adjacentCoords.sort((a, b) => {
-            return getRangeOfCoords(a, path[0]) - getRangeOfCoords(b, path[0])
+            return getRangeOfCoords(a, targetPos) - getRangeOfCoords(b, targetPos)
         })
 
         const directions: DirectionConstant[] = []
 
         for (const coord of adjacentCoords) {
 
-            directions.push(getDirectionCoord(spawn.pos, coord))
+            directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
         }
 
         spawn.spawning.setDirections(directions)

@@ -66,8 +66,8 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 export function findAdjacentCoordsToCoord(coord: Coord) {
     const positions: Coord[] = []
 
-    for (let x = coord.x - 1; x < coord.x + 1; x += 1) {
-        for (let y = coord.y - 1; y < coord.y + 1; y += 1) {
+    for (let x = coord.x - 1; x <= coord.x + 1; x += 1) {
+        for (let y = coord.y - 1; y <= coord.y + 1; y += 1) {
             // Iterate if the pos doesn't map onto a room
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
@@ -527,7 +527,7 @@ export function isCoordExit(coord: Coord) {
 export function randomTick(max: number = 20) {
     return Game.time % Math.floor(Math.random() * max) === 0
 }
-
+/*
 export function getDirectionCoord(coord1: Coord, coord2: Coord) {
 
     return getDirection(coord1.x, coord2.x, coord1.x, coord2.x)
@@ -538,7 +538,7 @@ export function getDirection(x1: number, x2: number, y1: number, y2: number) {
     let dx = x2 - x1
     let dy = y2 - y1
     let adx = Math.abs(dx)
-    let ady = Math.abs(dy);
+    let ady = Math.abs(dy)
 
     if(adx > ady*2) {
         if(dx > 0) {
@@ -573,3 +573,4 @@ export function getDirection(x1: number, x2: number, y1: number, y2: number) {
 
     return undefined
 }
+ */
