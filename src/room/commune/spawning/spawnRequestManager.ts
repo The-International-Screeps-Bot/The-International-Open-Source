@@ -1285,7 +1285,8 @@ Room.prototype.spawnRequester = function () {
     )
 
     if (this.memory.claimRequest) {
-        const request = Memory.claimRequests[this.memory.claimRequest]
+        const requestName = this.memory.claimRequest
+        const request = Memory.claimRequests[requestName]
 
         // Construct requests for claimers
 
@@ -1304,7 +1305,9 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     minCost: 650,
                     priority: 8.1,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        TRN: requestName
+                    },
                 }
             })(),
         )
@@ -1327,7 +1330,9 @@ Room.prototype.spawnRequester = function () {
                     maxCreeps: Infinity,
                     minCost: 250,
                     priority: 8.2 + this.creepsFromRoom.vanguard.length,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        TRN: requestName
+                    },
                 }
             })(),
         )
