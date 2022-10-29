@@ -51,30 +51,22 @@ export class Vanguard extends Creep {
         return true
     }
 
-    /**
-     * Builds a spawn in the creep's commune claimRequest
-     */
-    buildRoom?(): void {
-        const { room } = this
+    upgradeRoom?() {
+        const { controller } = this.room
 
-        if (this.needsResources()) {
-            // Define the creep's sourceName
+        if (controller.level >= 2 && controller.ticksToDowngrade > 5000) return false
 
-            if (!this.findOptimalSourceIndex()) return
+        if (getRangeOfCoords(this.pos, controller.pos) > 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: controller.pos, range: 3 }],
+            })
 
-            const sourceIndex = this.memory.SI
-
-            // Try to move to source. If creep moved then iterate
-
-            if (this.travelToSource(sourceIndex)) return
-
-            // Try to normally harvest. Iterate if creep harvested
-
-            if (this.advancedHarvestSource(room.sources[sourceIndex])) return
-            return
+            return true
         }
 
-        this.advancedBuildCSite()
+        this.upgradeController(controller)
+        return true
     }
 
     static vanguardManager(room: Room, creepsOfRole: string[]) {
@@ -94,7 +86,25 @@ export class Vanguard extends Creep {
             creep.say(claimRequestName)
 
             if (room.name === claimRequestName) {
-                creep.buildRoom()
+                if (creep.needsResources()) {
+                    // Define the creep's sourceName
+
+                    if (!creep.findOptimalSourceIndex()) continue
+
+                    const sourceIndex = creep.memory.SI
+
+                    // Try to move to source. If creep moved then iterate
+
+                    if (creep.travelToSource(sourceIndex)) continue
+
+                    // Try to normally harvest. Iterate if creep harvested
+
+                    if (creep.advancedHarvestSource(room.sources[sourceIndex])) continue
+                    continue
+                }
+
+                if (creep.upgradeRoom()) continue
+                if (creep.advancedBuildCSite()) continue
                 continue
             }
 

@@ -98,8 +98,8 @@ export class ClaimRequestManager {
 
             for (const allyCreep of requestRoom.allyCreeps) {
 
-                request.data[ClaimRequestData.minDamage] += allyCreep.healStrength
-                request.data[ClaimRequestData.minHeal] += allyCreep.attackStrength
+                request.data[ClaimRequestData.minDamage] -= allyCreep.healStrength
+                request.data[ClaimRequestData.minHeal] -= allyCreep.attackStrength
             }
         }
 
