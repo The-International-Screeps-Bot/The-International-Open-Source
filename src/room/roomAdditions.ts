@@ -1660,7 +1660,7 @@ Object.defineProperties(Room.prototype, {
             const enemyRangedAttackers: Creep[] = []
 
             for (const enemyCreep of this.enemyAttackers) {
-                if (enemyCreep.parts.ranged_attack > 0) {
+                if (enemyCreep.parts.ranged_attack) {
                     enemyRangedAttackers.push(enemyCreep)
                     continue
                 }
@@ -1716,6 +1716,25 @@ Object.defineProperties(Room.prototype, {
             if (this._enemyThreatGoals) return this._enemyThreatGoals
 
             this._enemyThreatGoals = []
+
+            for (const enemyCreep of this.enemyAttackers) {
+
+                if (enemyCreep.parts.ranged_attack) {
+
+                    this._enemyThreatGoals.push({
+                        pos: enemyCreep.pos,
+                        range: 3,
+                    })
+                    continue
+                }
+
+                if (!enemyCreep.parts.attack) continue
+
+                this._enemyThreatGoals.push({
+                    pos: enemyCreep.pos,
+                    range: 1,
+                })
+            }
 
             return this._enemyThreatGoals
         },

@@ -682,7 +682,7 @@ PowerCreep.prototype.avoidEnemyThreatCoords = Creep.prototype.avoidEnemyThreatCo
 
     this.createMoveRequest({
         origin: this.pos,
-        goals: [{ pos: this.pos, range: 5 }],
+        goals: this.room.enemyThreatGoals,
         flee: true,
     })
 

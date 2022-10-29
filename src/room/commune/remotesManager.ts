@@ -34,7 +34,7 @@ export class RemotesManager {
 
             // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
-            if (randomTick(10)) {
+            if (randomTick(100)) {
 
                 const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
                     typeWeights: {
