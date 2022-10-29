@@ -8,7 +8,15 @@ import {
     TrafficPriorities,
 } from 'international/constants'
 import { internationalManager } from 'international/internationalManager'
-import { areCoordsEqual, customLog, findAdjacentCoordsToCoord, findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import {
+    areCoordsEqual,
+    arePositionsEqual,
+    customLog,
+    findAdjacentCoordsToCoord,
+    findObjectWithID,
+    getRange,
+    getRangeOfCoords,
+} from 'international/utils'
 import {
     packCoord,
     packPos,
@@ -66,7 +74,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
-/*
+    /*
     if (this.spawning) return false
  */
     // Assign default opts
@@ -82,8 +90,11 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         path = unpackPosList(this.memory.P)
 
         // So long as the creep isn't standing on the first position in the path, and the pos is worth going on
+        /*
+        while (path[0] && getRangeOfCoords(path[0], this.pos) <= 1 && path.length > 1) {
+ */
 
-        while (path[0] && getRangeOfCoords(path[0], this.pos) <= 1) {
+        while (path[0] && arePositionsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
 
             path.shift()
@@ -182,7 +193,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     this.memory.P = packPosList(path)
 
     if (this.spawning) {
-
         const spawn = findObjectWithID(this.spawnID)
 
         if (spawn.spawning.remainingTime <= 1) this.assignMoveRequest(path[0])
@@ -194,10 +204,13 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         const avoidStructureTypes = new Set(impassibleStructureTypes)
 
         const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos).filter(coord => {
-            return !room.usedFastFillerCoords.has(packCoord(coord)) && !room.coordHasStructureTypes(coord, avoidStructureTypes)
+            return (
+                !room.usedFastFillerCoords.has(packCoord(coord)) &&
+                !room.coordHasStructureTypes(coord, avoidStructureTypes)
+            )
         })
 
-        const targetPos = path[1] || path[0]
+        const targetPos = path[0]
 
         // Sort by distance from the first pos in the path
 
@@ -208,7 +221,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         const directions: DirectionConstant[] = []
 
         for (const coord of adjacentCoords) {
-
             directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
         }
 
