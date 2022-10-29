@@ -568,9 +568,8 @@ Room.prototype.scoutEnemyRoom = function () {
 
     // If the controller is not owned by an ally
 
-    const playerInfo = Memory.players[playerName]
-
-    if (!playerInfo) Memory.players[playerName] = {}
+    let playerInfo = Memory.players[playerName]
+    if (!playerInfo) playerInfo = Memory.players[playerName] = {}
 
     const level = controller.level
 
