@@ -39,7 +39,7 @@ class PowerCreepOrganizer {
         }
 
         if (Memory.CPULogging)
-            customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
+            customLog('Power Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.teal)
     }
 
     private processCreep(creepName: string) {

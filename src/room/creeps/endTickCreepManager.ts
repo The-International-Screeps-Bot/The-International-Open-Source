@@ -1,5 +1,5 @@
 import { myColors, powerCreepClassNames } from 'international/constants'
-import { customLog, randomTick } from 'international/utils'
+import { customLog } from 'international/utils'
 import { RoomManager } from '../roomManager'
 
 export class EndTickCreepManager {

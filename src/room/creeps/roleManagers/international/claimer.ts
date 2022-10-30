@@ -7,7 +7,6 @@ export class Claimer extends Creep {
 
     preTickManager() {
         if (this.dying) return
-        if (!this.commune) return
 
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return

@@ -708,7 +708,7 @@ Object.defineProperties(Room.prototype, {
     },
     centerUpgradePos: {
         get() {
-            if (this._centerUpgradePos !== undefined) return this._centerUpgradePos
+            if (this.global.centerUpgradePos !== undefined) return this.global.centerUpgradePos
 
             if (!this.anchor) return false
 
@@ -726,7 +726,7 @@ Object.defineProperties(Room.prototype, {
 
             // Find the closest value greater than two to the centerUpgradePos and inform it
 
-            return (this._centerUpgradePos = this.findClosestPosOfValue({
+            return (this.global.centerUpgradePos = this.findClosestPosOfValue({
                 coordMap: distanceCoords,
                 startCoords: [this.anchor],
                 requiredValue: 2,
