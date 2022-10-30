@@ -120,7 +120,7 @@ class TickConfig {
 
         // The room is a commune
 
-        if (!roomMemory.GRCL) roomMemory.GRCL = controller.level
+        if (!roomMemory.GRCL || controller.level > roomMemory.GRCL) roomMemory.GRCL = controller.level
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
 
