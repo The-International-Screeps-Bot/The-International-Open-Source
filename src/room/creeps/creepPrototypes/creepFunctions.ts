@@ -698,7 +698,7 @@ Creep.prototype.needsResources = function () {
 Creep.prototype.findRecycleTarget = function () {
     const { room } = this
 
-    const spawns = room.structures.spawn
+    const spawns = room.structures.spawn.filter(spawn => spawn.RCLActionable)
 
     if (!spawns.length) return false
 
@@ -801,7 +801,7 @@ Creep.prototype.advancedRenew = function () {
 
     // Get a spawn in range of 1, informing false if there are none
 
-    const spawn = spawns.find(spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1)
+    const spawn = spawns.find(spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable)
     if (!spawn) return
 
     // If the spawn has already renewed this tick, inform false

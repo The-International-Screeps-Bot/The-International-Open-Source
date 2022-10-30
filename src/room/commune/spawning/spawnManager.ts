@@ -99,7 +99,6 @@ export class SpawnManager {
                 continue
             }
 
-            // See if creep can be spawned
             const testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
             // If creep can't be spawned
