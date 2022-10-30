@@ -591,10 +591,6 @@ declare global {
          * Offensive Threat, the enemy's perceived offensive threat towards the bot
          */
         OT: number
-        /**
-         * The enemy's Greatest Room Controller Level known by the bot
-         */
-        GRCL: number
     }
 
     interface Memory extends Settings {

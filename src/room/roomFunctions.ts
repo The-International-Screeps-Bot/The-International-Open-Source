@@ -573,8 +573,6 @@ Room.prototype.scoutEnemyRoom = function () {
     if (!playerInfo) playerInfo = Memory.players[playerName] = {}
 
     const level = controller.level
-
-    if (level) Memory.players[playerName].GRCL = Math.max(level, playerInfo.GRCL)
     this.memory.level = level
 
     // Offensive threat
