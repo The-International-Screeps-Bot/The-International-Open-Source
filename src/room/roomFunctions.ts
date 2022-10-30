@@ -2094,6 +2094,12 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
 
+    // There is already has a power creep responding to this target with the power
+
+    if (target.reservePowers.has(powerType)) return false
+
+    // Create a power task with info on the cooldown
+
     let cooldown
     const effectsData = target.effectsData
     if (!effectsData.get(powerType)) cooldown = 0

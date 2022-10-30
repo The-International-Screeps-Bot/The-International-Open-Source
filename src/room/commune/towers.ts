@@ -26,7 +26,6 @@ export class TowerManager {
 
         for (const tower of towers) {
             if (tower.store.energy < TOWER_ENERGY_COST) continue
-            if (!tower.RCLActionable) continue
 
             this.actionableTowerIDs.push(tower.id)
         }

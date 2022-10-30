@@ -55,7 +55,7 @@ export function roomsManager() {
 
         if (Memory.CPULogging) logMessage += `, CPU: ${(Game.cpu.getUsed() - roomCPUStart).toFixed(2)}`
 
-        customLog(room.name + ' ' + roomType, logMessage, undefined, myColors.midGrey)
+        customLog(room.name + ' ' + roomType, logMessage, undefined, myColors.teal)
         if (statsActive) statsManager.roomEndTick(room.name, roomType)
     }
 

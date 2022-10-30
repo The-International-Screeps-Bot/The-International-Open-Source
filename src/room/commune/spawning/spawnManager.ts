@@ -57,7 +57,7 @@ export class SpawnManager {
         const requestsByPriority = Object.keys(this.communeManager.room.spawnRequests).sort((a, b) => {
             return parseInt(a) - parseInt(b)
         })
-
+/*
         // Spawn request debug logging
 
         for (const priority of requestsByPriority) {
@@ -65,7 +65,7 @@ export class SpawnManager {
 
             customLog('SPAWN REQUESTS', priority + ', ' + request.role)
         }
-
+ */
         // Track the inactive spawn index
 
         let spawnIndex = inactiveSpawns.length - 1

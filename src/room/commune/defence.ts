@@ -95,7 +95,7 @@ export class DefenceManager {
 
             // Stop if the tick is not divisible by a random range
 
-            if (randomTick(50)) return
+            if (!randomTick(50)) return
 
             // Publicize at most 10 ramparts per tick, to avoid too many intents
 
