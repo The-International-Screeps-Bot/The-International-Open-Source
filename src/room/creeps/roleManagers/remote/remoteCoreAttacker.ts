@@ -1,4 +1,4 @@
-import { RemoteData } from 'international/constants'
+import { myColors, RemoteData } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
@@ -31,11 +31,11 @@ export class RemoteCoreAttacker extends Creep {
         const role = this.role as 'remoteCoreAttacker'
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-
+            
             delete this.memory.RN
             if (!this.findRemote()) return
         }
-        
+
         // If the creep's remote no longer is managed by its commune
 
         else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {

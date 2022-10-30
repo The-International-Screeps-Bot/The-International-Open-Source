@@ -5,7 +5,6 @@ import { InternationalManager } from './internationalManager'
 import { packCoord } from 'other/packrat'
 
 class CreepOrganizer {
-
     constructor() {}
 
     public run() {
@@ -29,7 +28,7 @@ class CreepOrganizer {
         }
 
         if (Memory.CPULogging)
-            customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
+            customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.teal)
     }
 
     private processCreep(creepName: string) {

@@ -691,6 +691,8 @@ declare global {
 
         mineralContainer: Id<StructureContainer> | undefined
 
+        centerUpgradePos: RoomPosition | false
+
         // Links
 
         controllerLink: Id<StructureLink> | undefined
@@ -957,7 +959,7 @@ declare global {
 
         coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
-        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask
+        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask | false
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
@@ -1161,8 +1163,6 @@ declare global {
         _sourcePaths: RoomPosition[][]
 
         readonly sourcePaths: RoomPosition[][]
-
-        _centerUpgradePos: RoomPosition | false
 
         readonly centerUpgradePos: RoomPosition | false
 
@@ -2019,8 +2019,6 @@ declare global {
     interface Structure {
         estimatedHits: number
 
-        advancedIsActive(): boolean
-
         // Getters
 
         _RCLActionable: boolean
@@ -2092,9 +2090,13 @@ declare global {
 
         estimatedHits: number
 
-        _estimatedStore: Partial<StoreDefinition>
+        _reserveStore: Partial<StoreDefinition>
 
-        readonly estimatedStore: Partial<StoreDefinition>
+        readonly reserveStore: Partial<StoreDefinition>
+
+        _reservePowers: Set<PowerConstant>
+
+        readonly reservePowers: Set<PowerConstant>
     }
 
     interface Resource {

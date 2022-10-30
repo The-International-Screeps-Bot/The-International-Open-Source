@@ -1,12 +1,12 @@
 import { impassibleStructureTypes, stamps } from 'international/constants'
-import { unpackNumAsCoord } from 'international/utils'
+import { customLog, randomTick, unpackNumAsCoord } from 'international/utils'
 
 Room.prototype.remotePlanner = function (commune) {
     return true
 }
 
 Room.prototype.clearOtherStructures = function () {
-    if (Game.time % 100 !== 0) return
+    if (!randomTick(100)) return
 
     for (const wall of this.structures.constructedWall) wall.destroy()
 
@@ -20,8 +20,8 @@ Room.prototype.communeConstructionPlacement = function () {
 
     // Only run every x ticks or if there are builders (temporary fix)
 
-    if (!this.myCreeps.builder.length && Game.time % Math.floor(Math.random() * 100) !== 0) return
-
+    if (!this.myCreeps.builder.length && !randomTick(200)) return
+    customLog('WTF', 'HOW')
     // If the construction site count is at its limit, stop
 
     if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return

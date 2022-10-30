@@ -37,7 +37,7 @@ export class RemoteHauler extends Creep {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-
+            this.room.visual.circle(this.pos, { fill: myColors.green })
             delete this.memory.RN
             if (!this.findRemote()) return
         }
@@ -203,8 +203,6 @@ export class RemoteHauler extends Creep {
             }
 
             if (this.needsResources()) return false
-
-            if (!this.commune) return false
 
             delete this.moved
 
@@ -418,8 +416,6 @@ export class RemoteHauler extends Creep {
 
             return false
         }
-
-        if (!this.commune) return false
 
         this.message += this.commune.name
         this.say(this.message)

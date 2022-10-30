@@ -40,7 +40,7 @@ class TickConfig {
         this.configCombatRequests()
 
         if (Memory.CPULogging)
-            customLog('Tick Config', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
+            customLog('Tick Config', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.teal)
     }
     private configGeneral() {
         // General
@@ -62,7 +62,6 @@ class TickConfig {
             // Every 100~ ticks
 
             if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
-
                 room.basicScout()
                 room.cleanMemory()
             }
