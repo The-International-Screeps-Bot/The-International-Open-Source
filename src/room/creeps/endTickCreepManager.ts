@@ -1,4 +1,5 @@
 import { myColors, powerCreepClassNames } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, randomTick } from 'international/utils'
 import { RoomManager } from '../roomManager'
 
@@ -10,16 +11,16 @@ export class EndTickCreepManager {
     }
 
     public run() {
+        const { room } = this.roomManager
         if (!this.roomManager.room.myCreepsAmount) return
 
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         // Power creeps go first
 
         for (const className of powerCreepClassNames) {
-
             for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
                 const creep = Game.powerCreeps[creepName]
 
@@ -38,23 +39,19 @@ export class EndTickCreepManager {
                 creep.recurseMoveRequest()
 
                 if (Game.time % 2 === 0) {
-
                     creep.say('MORE', true)
-                }
-                else {
-
+                } else {
                     creep.say('MALARKEY', true)
                 }
             }
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
-            customLog(
-                'End Tick Creep Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                undefined,
-                myColors.lightGrey,
-            )
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('End Tick Creep Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'etcmcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 }

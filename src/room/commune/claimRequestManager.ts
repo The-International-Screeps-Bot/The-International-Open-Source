@@ -2,6 +2,7 @@ import { ClaimRequestData, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
+import { globalStatsUpdater } from 'international/statsManager'
 
 export class ClaimRequestManager {
     communeManager: CommuneManager
@@ -19,7 +20,7 @@ export class ClaimRequestManager {
 
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         const request = Memory.claimRequests[requestName]
 
@@ -97,12 +98,11 @@ export class ClaimRequestManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
-            customLog(
-                'Claim Request Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                undefined,
-                myColors.lightGrey,
-            )
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Claim Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'clrmcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 }

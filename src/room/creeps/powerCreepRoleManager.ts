@@ -1,4 +1,5 @@
 import { myColors, powerCreepClassNames } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import { RoomManager } from 'room/roomManager'
 import { Operator } from './powerCreeps/operator'
@@ -15,25 +16,31 @@ export class PowerCreepRoleManager {
     }
 
     public run() {
+        const { room } = this.roomManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         for (const className of powerCreepClassNames) this.runManager(className)
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            const cpuUsed2 = this.roomManager.room.myCreepsAmount
+                ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
+                : 0
             customLog(
                 'Power Role Manager',
-                `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}, CPU Per Creep: ${(this.roomManager.room
-                    .myCreepsAmount
-                    ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
-                    : 0
-                ).toFixed(2)}`,
-                undefined,
-                myColors.lightGrey,
+                `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`,
+                myColors.white,
+                myColors.lightBlue,
             )
+            const statName: RoomCommuneStatNames = 'prmcu'
+            const statName2: RoomCommuneStatNames = 'prmpccu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+            globalStatsUpdater(room.name, statName2, cpuUsed2)
+        }
     }
 
     private runManager(className: PowerClassConstant) {

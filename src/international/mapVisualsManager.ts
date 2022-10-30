@@ -2,6 +2,7 @@ import { unpackPosList } from 'other/packrat'
 import { ClaimRequestData, minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteData } from './constants'
 import { customLog } from './utils'
 import { InternationalManager } from './internationalManager'
+import { globalStatsUpdater } from './statsManager'
 
 InternationalManager.prototype.mapVisualsManager = function () {
     // Stop if mapVisuals are disabled
@@ -10,7 +11,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
     // Loop through each roomName in Memory
 
@@ -28,14 +29,10 @@ InternationalManager.prototype.mapVisualsManager = function () {
             const room = Game.rooms[roomName]
             if (!room) continue
 
-            Game.map.visual.text(
-                `⚡${room.resourcesInStoringStructures.energy}`,
-                new RoomPosition(2, 8, roomName),
-                {
-                    align: 'left',
-                    fontSize: 8,
-                },
-            )
+            Game.map.visual.text(`⚡${room.resourcesInStoringStructures.energy}`, new RoomPosition(2, 8, roomName), {
+                align: 'left',
+                fontSize: 8,
+            })
 
             if (roomMemory.claimRequest) {
                 Game.map.visual.line(
@@ -160,11 +157,10 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.CPULogging)
-        customLog(
-            'Map Visuals Manager',
-            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-            undefined,
-            myColors.lightGrey,
-        )
+    if (Memory.CPULogging === true) {
+        const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+        customLog('Map Visuals Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        const statName: InternationalStatNames = 'mvmcu'
+        globalStatsUpdater('', statName, cpuUsed, true)
+    }
 }

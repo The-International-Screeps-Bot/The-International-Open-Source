@@ -14,7 +14,7 @@ import {
 } from './constants'
 import { advancedFindDistance, createPosMap, customLog, findCarryPartsRequired, findClosestRoomName } from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
-import { statsManager } from './statsManager'
+import { globalStatsUpdater, statsManager } from './statsManager'
 import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/communeManager'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
@@ -23,7 +23,7 @@ class TickConfig {
     public run() {
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.configGeneral()
         statsManager.internationalPreTick()
@@ -32,8 +32,12 @@ class TickConfig {
         this.configAllyCreepRequests()
         this.configCombatRequests()
 
-        if (Memory.CPULogging)
-            customLog('Tick Config', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Tick Config', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: InternationalStatNames = 'tccu'
+            globalStatsUpdater('', statName, cpuUsed, true)
+        }
     }
     private configGeneral() {
         // General
@@ -330,7 +334,11 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-                    if (room.resourcesInStoringStructures.energy / (10000 + room.controller.level * 1000) < room.memory.combatRequests.length) continue
+                    if (
+                        room.resourcesInStoringStructures.energy / (10000 + room.controller.level * 1000) <
+                        room.memory.combatRequests.length
+                    )
+                        continue
                 } else {
                     if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
                 }
@@ -352,7 +360,7 @@ class TickConfig {
                         keeper: Infinity,
                         enemy: Infinity,
                         ally: Infinity,
-                    }
+                    },
                 }) > maxRange
             ) {
                 request.data[CombatRequestData.abandon] = 20000

@@ -2,6 +2,7 @@ import { CombatRequestData, ClaimRequestData, myColors } from 'international/con
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
+import { globalStatsUpdater } from 'international/statsManager'
 
 export class CombatRequestManager {
     communeManager: CommuneManager
@@ -10,12 +11,14 @@ export class CombatRequestManager {
         this.communeManager = communeManager
     }
     public run() {
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        const { room } = this.communeManager
 
-        if (!this.communeManager.room.structures.spawn.length) return
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-        for (let index = 0; index < this.communeManager.room.memory.combatRequests.length; index++) {
-            const requestName = this.communeManager.room.memory.combatRequests[index]
+        if (!room.structures.spawn.length) return
+
+        for (let index = 0; index < room.memory.combatRequests.length; index++) {
+            const requestName = room.memory.combatRequests[index]
             const request = Memory.combatRequests[requestName]
 
             this[`${request.T}Request`](request, requestName, index)
@@ -23,24 +26,24 @@ export class CombatRequestManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
-            customLog(
-                'Attack Request Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                undefined,
-                myColors.lightGrey,
-            )
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Attack Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'cormcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
     private attackRequest(request: CombatRequest, requestName: string, index: number) {
+        const { room } = this.communeManager
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
 
         // If there are threats to our hegemony, temporarily abandon the request
-/*
+        /*
         if (requestRoom.enemyAttackers.length > 0) {
             request.data[CombatRequestData.abandon] = 1500
 
-            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            room.memory.combatRequests.splice(index, 1)
             delete request.responder
             return
         }
@@ -49,10 +52,9 @@ export class CombatRequestManager {
         // If there is a controller and it's in safemode, abandon until it ends
 
         if (requestRoom.controller && requestRoom.controller.safeMode) {
-
             request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
 
-            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            room.memory.combatRequests.splice(index, 1)
             delete request.responder
         }
 
@@ -60,12 +62,13 @@ export class CombatRequestManager {
 
         if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
             delete Memory.combatRequests[requestName]
-            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            room.memory.combatRequests.splice(index, 1)
             delete request.responder
             return
         }
     }
     private harassRequest(request: CombatRequest, requestName: string, index: number) {
+        const { room } = this.communeManager
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
 
@@ -86,7 +89,7 @@ export class CombatRequestManager {
         if (threateningAttacker) {
             request.data[CombatRequestData.abandon] = 1500
 
-            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            room.memory.combatRequests.splice(index, 1)
             delete request.responder
             return
         }
@@ -95,7 +98,7 @@ export class CombatRequestManager {
 
         if (!requestRoom.enemyCreeps.length) {
             delete Memory.combatRequests[requestName]
-            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            room.memory.combatRequests.splice(index, 1)
             delete request.responder
             return
         }

@@ -1,4 +1,5 @@
 import { allyPlayers, myColors, roomDimensions, safemodeTargets } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, getRangeOfCoords, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
@@ -10,9 +11,10 @@ export class DefenceManager {
     }
 
     run() {
+        const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.advancedActivateSafeMode()
         this.manageRampartPublicity()
@@ -20,13 +22,12 @@ export class DefenceManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
-            customLog(
-                'Defence Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                undefined,
-                myColors.lightGrey,
-            )
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Defense Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'dmcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 
     advancedActivateSafeMode() {
@@ -137,7 +138,6 @@ export class DefenceManager {
             const enemyCreep = findObjectWithID(enemyCreepID)
 
             for (const memberID of room.defenderEnemyTargetsWithDefender.get(enemyCreepID)) {
-
                 if (!room.attackingDefenderIDs.has(memberID)) continue
 
                 const member = Game.getObjectById(memberID)
@@ -150,9 +150,9 @@ export class DefenceManager {
             const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
 
             if (netDamage > 0) {
-
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
-                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id)) room.towerAttackTarget = enemyCreep
+                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
+                    room.towerAttackTarget = enemyCreep
             }
 
             if (!room.attackingDefenderIDs.size) break

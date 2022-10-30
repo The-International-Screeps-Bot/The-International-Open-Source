@@ -45,7 +45,7 @@ class ConfigManager {
         Memory.roomVisuals = roomVisuals
         Memory.baseVisuals = baseVisuals
         Memory.mapVisuals = mapVisuals
-        Memory.CPULogging = CPULogging
+        Memory.CPULogging = Game.shard.name !== 'performanceServer' ? CPULogging : true
         Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
         Memory.allyPlayers = allyPlayers
         Memory.nonAggressionPlayers = nonAggressionPlayers
