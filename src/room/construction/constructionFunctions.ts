@@ -62,7 +62,7 @@ Room.prototype.communeConstructionPlacement = function () {
 
                 if (
                     structureType === STRUCTURE_RAMPART &&
-                    (!this.storage || this.controller.level < 4 || this.storage.store.energy < 30000)
+                    (!this.storage || (this.controller.level < 4 && this.storage.store.energy < 30000))
                 ) {
                     continue
                 }
