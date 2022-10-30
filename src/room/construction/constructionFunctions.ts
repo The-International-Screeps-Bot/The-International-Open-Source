@@ -21,7 +21,7 @@ Room.prototype.communeConstructionPlacement = function () {
     // Only run every x ticks or if there are builders (temporary fix)
 
     if (!this.myCreeps.builder.length && !randomTick(200)) return
-    customLog('WTF', 'HOW')
+
     // If the construction site count is at its limit, stop
 
     if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return

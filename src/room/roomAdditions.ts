@@ -188,12 +188,8 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES)) {
+            for (const structure of this.find(FIND_STRUCTURES)) this._structures[structure.structureType].push(structure as any)
 
-                if (!structure.RCLActionable) continue
-
-                this._structures[structure.structureType].push(structure as any)
-            }
 
             return this._structures
         },

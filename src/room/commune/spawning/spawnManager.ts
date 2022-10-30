@@ -31,6 +31,7 @@ export class SpawnManager {
             }
 
             if (spawn.renewed) continue
+            if (!spawn.RCLActionable) continue
 
             inactiveSpawns.push(spawn)
         }
