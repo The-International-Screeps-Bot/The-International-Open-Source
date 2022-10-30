@@ -134,7 +134,6 @@ export class Quad {
                 keeper: Infinity,
                 enemyRemote: 5,
                 allyRemote: 5,
-                highway: 1,
                 neutral: 2,
             },
         })

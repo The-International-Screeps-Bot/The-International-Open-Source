@@ -989,11 +989,6 @@ declare global {
         // Spawn functions
 
         /**
-         * Takes spawnRequests and tries to spawn them in order of priority (lowest to highest)
-         */
-        spawnManager(): void
-
-        /**
          * Creates spawn requests for the commune
          */
         spawnRequester(): void
