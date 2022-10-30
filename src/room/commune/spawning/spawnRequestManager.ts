@@ -968,6 +968,7 @@ Room.prototype.spawnRequester = function () {
     )
 
     for (const remoteInfo of this.remoteSourceIndexesByEfficacy) {
+        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.9) break
         const splitRemoteInfo = remoteInfo.split(' ')
         const remoteName = splitRemoteInfo[0]
         const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
@@ -1041,6 +1042,7 @@ Room.prototype.spawnRequester = function () {
     const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
+        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.9) break
         const remoteName = remoteNamesByEfficacy[index]
         const remoteData = Memory.rooms[remoteName].data
 
@@ -1341,7 +1343,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 650,
                     priority: 8.1,
                     memoryAdditions: {
-                        TRN: requestName
+                        TRN: requestName,
                     },
                 }
             })(),
@@ -1366,7 +1368,7 @@ Room.prototype.spawnRequester = function () {
                     minCost: 250,
                     priority: 8.2 + this.creepsFromRoom.vanguard.length,
                     memoryAdditions: {
-                        TRN: requestName
+                        TRN: requestName,
                     },
                 }
             })(),
