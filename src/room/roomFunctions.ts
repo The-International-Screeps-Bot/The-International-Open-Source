@@ -15,6 +15,7 @@ import {
     roomDimensions,
     roomTypeProperties,
     roomTypes,
+    stagnantRoomTypes,
     stamps,
     structureTypesByBuildPriority,
 } from 'international/constants'
@@ -775,7 +776,7 @@ Room.prototype.basicScout = function () {
 
     this.memory.LST = Game.time
 
-    if (this.scoutByRoomName()) return this.memory.T
+    if (stagnantRoomTypes.has(this.memory.T)) return this.memory.T
 
     // If there is a controller
 
@@ -820,6 +821,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
     this.memory.LST = Game.time
 
+    if (stagnantRoomTypes.has(this.memory.T)) return this.memory.T
     if (this.scoutByRoomName()) return this.memory.T
 
     // If there is a controller
@@ -2093,12 +2095,13 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 }
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
-    const ID = newID()
 
     let cooldown
     const effectsData = target.effectsData
     if (!effectsData.get(powerType)) cooldown = 0
     else cooldown = effectsData.get(powerType).ticksRemaining
+
+    const ID = newID()
 
     return (this.powerTasks[ID] = {
         taskID: ID,

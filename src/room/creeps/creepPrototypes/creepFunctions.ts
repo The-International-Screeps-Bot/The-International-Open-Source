@@ -695,29 +695,6 @@ Creep.prototype.needsResources = function () {
     return this.memory.NR
 }
 
-Creep.prototype.findTotalHealPower = function (range = 1) {
-    // Initialize the healValue
-
-    let heal = 0
-
-    // Loop through the creep's body
-
-    for (const part of this.body) {
-        // If the part isn't heal, iterate
-
-        if (part.type !== HEAL) continue
-
-        // Otherwise increase healValue by heal power * the part's boost
-
-        heal +=
-            (part.boost ? BOOSTS[part.type][part.boost][part.type] : 1) * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
-    }
-
-    // Inform healValue
-
-    return heal
-}
-
 Creep.prototype.findRecycleTarget = function () {
     const { room } = this
 

@@ -1532,6 +1532,11 @@ declare global {
          */
         HU: number
 
+        /**
+         * Greatest Room Controller Level
+         */
+        GRCL: number
+
         factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
         factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
 
@@ -1628,8 +1633,6 @@ declare global {
          * Decides if the creep needs to get more resources or not
          */
         needsResources(): boolean
-
-        findTotalHealPower(range?: number): number
 
         findRecycleTarget(): StructureSpawn | StructureContainer | false
 
@@ -1803,6 +1806,13 @@ declare global {
          * The potential heal the creep can intent
          */
         readonly healStrength: number
+
+        _defenceStrength: number
+
+        /**
+         * The multiplier to incoming damage the creep has
+         */
+        readonly defenceStrength: number
 
         _parts: Partial<Record<BodyPartConstant, number>>
 
@@ -2017,6 +2027,17 @@ declare global {
 
     interface Structure {
         estimatedHits: number
+
+        advancedIsActive(): boolean
+
+        // Getters
+
+        _RCLActionable: boolean
+
+        /**
+         * Wether the structure is disable or not by the room's controller level
+         */
+        readonly RCLActionable: boolean
     }
 
     interface StructureSpawn {

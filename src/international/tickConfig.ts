@@ -106,6 +106,8 @@ class TickConfig {
 
         room.communeManager.update(room)
 
+        const roomMemory = Memory.rooms[room.name]
+
         if (controller.my) room.memory.T = 'commune'
 
         if (room.memory.T != 'commune') return
@@ -118,6 +120,8 @@ class TickConfig {
         }
 
         // The room is a commune
+
+        if (!roomMemory.GRCL) roomMemory.GRCL = controller.level
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
 

@@ -127,8 +127,18 @@ export class DefenceManager {
     assignDefenceTargets() {
         const { room } = this.communeManager
 
+        // Sort by estimated percent health change
+
         const defenderEnemyTargetsByDamage = Array.from(room.defenderEnemyTargetsWithDefender.keys()).sort((a, b) => {
-            return room.defenderEnemyTargetsWithDamage.get(a) - room.defenderEnemyTargetsWithDamage.get(b)
+            const creepA = findObjectWithID(a)
+            const creepB = findObjectWithID(b)
+
+            return (
+                creepA.hits / creepA.hitsMax -
+                (creepA.hits + creepA.healStrength - room.defenderEnemyTargetsWithDamage.get(a)) / creepA.hitsMax -
+                (creepB.hits / creepB.hitsMax -
+                    (creepB.hits + creepB.healStrength - room.defenderEnemyTargetsWithDamage.get(b)) / creepB.hitsMax)
+            )
         })
 
         // Attack enemies in order of most members that can attack them
@@ -137,7 +147,6 @@ export class DefenceManager {
             const enemyCreep = findObjectWithID(enemyCreepID)
 
             for (const memberID of room.defenderEnemyTargetsWithDefender.get(enemyCreepID)) {
-
                 if (!room.attackingDefenderIDs.has(memberID)) continue
 
                 const member = Game.getObjectById(memberID)
@@ -147,12 +156,12 @@ export class DefenceManager {
                 room.attackingDefenderIDs.delete(memberID)
             }
 
-            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
+            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id) - enemyCreep.healStrength
 
             if (netDamage > 0) {
-
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
-                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id)) room.towerAttackTarget = enemyCreep
+                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
+                    room.towerAttackTarget = enemyCreep
             }
 
             if (!room.attackingDefenderIDs.size) break
