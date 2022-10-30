@@ -591,10 +591,6 @@ declare global {
          * Offensive Threat, the enemy's perceived offensive threat towards the bot
          */
         OT: number
-        /**
-         * The enemy's Greatest Room Controller Level known by the bot
-         */
-        GRCL: number
     }
 
     interface Memory extends Settings {
@@ -993,11 +989,6 @@ declare global {
         // Spawn functions
 
         /**
-         * Takes spawnRequests and tries to spawn them in order of priority (lowest to highest)
-         */
-        spawnManager(): void
-
-        /**
          * Creates spawn requests for the commune
          */
         spawnRequester(): void
@@ -1179,9 +1170,9 @@ declare global {
 
         readonly upgradePositions: RoomPosition[]
 
-        _usedUpgradeCoords: Set<string>
+        _usedUpgradePositions: Set<string>
 
-        readonly usedUpgradeCoords: Set<string>
+        readonly usedUpgradePositions: Set<string>
 
         _controllerPositions: RoomPosition[]
 
@@ -1532,6 +1523,11 @@ declare global {
          */
         HU: number
 
+        /**
+         * Greatest Room Controller Level
+         */
+        GRCL: number
+
         factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
         factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
 
@@ -1628,8 +1624,6 @@ declare global {
          * Decides if the creep needs to get more resources or not
          */
         needsResources(): boolean
-
-        findTotalHealPower(range?: number): number
 
         findRecycleTarget(): StructureSpawn | StructureContainer | false
 
@@ -1804,6 +1798,13 @@ declare global {
          */
         readonly healStrength: number
 
+        _defenceStrength: number
+
+        /**
+         * The multiplier to incoming damage the creep has
+         */
+        readonly defenceStrength: number
+
         _parts: Partial<Record<BodyPartConstant, number>>
 
         /**
@@ -1867,7 +1868,7 @@ declare global {
         SI: 0 | 1
 
         /**
-         * The creep's packedPos for a designated target
+         * The creep's packed coord for a designated target
          */
         PC: string
 
@@ -2017,6 +2018,17 @@ declare global {
 
     interface Structure {
         estimatedHits: number
+
+        advancedIsActive(): boolean
+
+        // Getters
+
+        _RCLActionable: boolean
+
+        /**
+         * Wether the structure is disable or not by the room's controller level
+         */
+        readonly RCLActionable: boolean
     }
 
     interface StructureSpawn {
@@ -2158,7 +2170,7 @@ declare global {
             /**
              * Removes all specified construction sites owned by the bot
              */
-            removeCSites(types?: BuildableStructureConstant[]): string
+            removeCSites(removeInProgress?: boolean, types?: BuildableStructureConstant[]): string
 
             /**
              * Destroys all specified structures owned by the bot
@@ -2182,7 +2194,7 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            createCombatRequest(
+            combat(
                 requestName: string,
                 type: CombatRequestTypes,
                 opts?: { [key: string]: number },

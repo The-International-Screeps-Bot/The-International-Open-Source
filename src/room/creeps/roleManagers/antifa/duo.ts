@@ -89,14 +89,12 @@ export class Duo {
                 keeper: Infinity,
                 enemyRemote: 4,
                 allyRemote: 4,
-                highway: 1,
                 neutral: 2,
             },
         })
     }
 
     getInFormation() {
-        if (this.leader.isOnExit) return true
 
         if (this.leader.room.name === this.members[1].room.name) {
             const range = getRangeOfCoords(this.leader.pos, this.members[1].pos)
@@ -127,7 +125,7 @@ export class Duo {
             ],
         })
 
-        return false
+        return this.leader.isOnExit
     }
 
     holdFormation() {
@@ -141,6 +139,21 @@ export class Duo {
         }
         this.leader.say('x')
         if (!moveLeader.createMoveRequest(opts)) return
+
+        if (getRangeOfCoords(this.leader.pos, this.members[1].pos) > 1) {
+
+            this.members[1].createMoveRequest({
+                origin: this.members[1].pos,
+                goals: [
+                    {
+                        pos: this.leader.pos,
+                        range: 1,
+                    },
+                ],
+            })
+
+            return
+        }
 
         this.members[1].assignMoveRequest(moveLeader.pos)
     }

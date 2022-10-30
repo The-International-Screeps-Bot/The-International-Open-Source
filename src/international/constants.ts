@@ -95,6 +95,14 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         portalsTo: true,
     },
 }
+
+export const stagnantRoomTypes: Set<Partial<RoomTypes>> = new Set([
+    'keeper',
+    'keeperCenter',
+    'highway',
+    'intersection'
+])
+
 export const roomTypesUsedForStats = ['commune', 'remote']
 
 export const creepRoles: CreepRoles[] = [
@@ -1077,3 +1085,5 @@ export const ERROR_FAILED = 0
 
 export const maxRemoteRoomDistance = 5
 export const offsetsByDirection = [, [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1]]
+
+export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]

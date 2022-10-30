@@ -720,7 +720,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             let partsMultiplier = 1
-            let maxCreeps = this.upgradePositions.length
+            let maxCreeps = this.upgradePositions.length - 1
             const priority = 9
 
             // If there are enemyAttackers and the controller isn't soon to downgrade

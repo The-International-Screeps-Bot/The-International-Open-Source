@@ -19,7 +19,15 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { packCoord, packCoordList, packPosList, packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
+import {
+    packCoord,
+    packCoordList,
+    packPos,
+    packPosList,
+    packXYAsCoord,
+    unpackCoord,
+    unpackPosList,
+} from 'other/packrat'
 
 Object.defineProperties(Room.prototype, {
     global: {
@@ -180,8 +188,12 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES))
+            for (const structure of this.find(FIND_STRUCTURES)) {
+
+                if (!structure.RCLActionable) continue
+
                 this._structures[structure.structureType].push(structure as any)
+            }
 
             return this._structures
         },
@@ -783,11 +795,11 @@ Object.defineProperties(Room.prototype, {
             return this._upgradePositions
         },
     },
-    usedUpgradeCoords: {
+    usedUpgradePositions: {
         get() {
-            if (this._usedUpgradeCoords) return this._usedUpgradeCoords
+            if (this._usedUpgradePositions) return this._usedUpgradePositions
 
-            this._usedUpgradeCoords = new Set()
+            this._usedUpgradePositions = new Set()
 
             for (const creepName of this.myCreeps.controllerUpgrader) {
                 // Get the creep using its name
@@ -802,12 +814,19 @@ Object.defineProperties(Room.prototype, {
 
                 // The creep has a packedPos
 
-                this._usedUpgradeCoords.add(creep.memory.PC)
+                this._usedUpgradePositions.add(creep.memory.PC)
             }
 
-            if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
+            if (this.controllerLink) this._usedUpgradePositions.add(packPos(this.controllerLink.pos))
+            /*
+            for (const packedCoord of this._usedUpgradePositions) {
 
-            return this._usedUpgradeCoords
+                const coord = unpackCoord(packedCoord)
+
+                this.visual.circle(coord.x, coord.y, { fill: myColors.red })
+            }
+ */
+            return this._usedUpgradePositions
         },
     },
     upgradePathLength: {
@@ -1645,7 +1664,7 @@ Object.defineProperties(Room.prototype, {
             const enemyRangedAttackers: Creep[] = []
 
             for (const enemyCreep of this.enemyAttackers) {
-                if (enemyCreep.parts.ranged_attack > 0) {
+                if (enemyCreep.parts.ranged_attack) {
                     enemyRangedAttackers.push(enemyCreep)
                     continue
                 }
@@ -1685,7 +1704,7 @@ Object.defineProperties(Room.prototype, {
 
                 this._enemyThreatCoords.delete(packCoord(rampart.pos))
             }
-/*
+            /*
             for (const packedCoord of this._enemyThreatCoords) {
 
                 const coord = unpackCoord(packedCoord)
@@ -1697,15 +1716,32 @@ Object.defineProperties(Room.prototype, {
         },
     },
     enemyThreatGoals: {
-
         get() {
-
             if (this._enemyThreatGoals) return this._enemyThreatGoals
 
             this._enemyThreatGoals = []
 
+            for (const enemyCreep of this.enemyAttackers) {
+
+                if (enemyCreep.parts.ranged_attack) {
+
+                    this._enemyThreatGoals.push({
+                        pos: enemyCreep.pos,
+                        range: 4,
+                    })
+                    continue
+                }
+
+                if (!enemyCreep.parts.attack) continue
+
+                this._enemyThreatGoals.push({
+                    pos: enemyCreep.pos,
+                    range: 2,
+                })
+            }
+
             return this._enemyThreatGoals
-        }
+        },
     },
     flags: {
         get() {

@@ -1,6 +1,5 @@
 import { spawn } from 'child_process'
 import {
-
     cacheAmountModifier,
     communeSign,
     CPUBucketCapacity,
@@ -172,15 +171,14 @@ Creep.prototype.advancedHarvestSource = function (source) {
     return true
 }
 
-Creep.prototype.findUpgradePos = function() {
-
+Creep.prototype.findUpgradePos = function () {
     const { room } = this
 
     if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
 
     // Get usedUpgradePositions, informing false if they're undefined
 
-    const usedUpgradePositions = room.usedUpgradeCoords
+    const usedUpgradePositions = room.usedUpgradePositions
 
     // Loop through each upgradePositions
 
@@ -215,7 +213,6 @@ Creep.prototype.advancedUpgradeController = function () {
     // If there is a controllerContainer
 
     if (controllerStructure) {
-
         const upgradePos = this.findUpgradePos()
         if (!upgradePos) return false
 
@@ -593,7 +590,7 @@ Creep.prototype.findOptimalSourceIndex = function () {
 
     this.say('FOSN')
 
-    if (this.memory.SI) return true
+    if (this.memory.SI !== undefined) return true
 
     // Get the rooms anchor, if it's undefined inform false
 
@@ -696,29 +693,6 @@ Creep.prototype.needsResources = function () {
     }
 
     return this.memory.NR
-}
-
-Creep.prototype.findTotalHealPower = function (range = 1) {
-    // Initialize the healValue
-
-    let heal = 0
-
-    // Loop through the creep's body
-
-    for (const part of this.body) {
-        // If the part isn't heal, iterate
-
-        if (part.type !== HEAL) continue
-
-        // Otherwise increase healValue by heal power * the part's boost
-
-        heal +=
-            (part.boost ? BOOSTS[part.type][part.boost][part.type] : 1) * (range <= 1 ? HEAL_POWER : RANGED_HEAL_POWER)
-    }
-
-    // Inform healValue
-
-    return heal
 }
 
 Creep.prototype.findRecycleTarget = function () {

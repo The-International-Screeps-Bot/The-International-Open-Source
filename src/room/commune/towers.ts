@@ -16,16 +16,9 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const { room } = this.communeManager
-
-        if (room.flags.disableTowerAttacks) {
-            room.towerInferiority = room.enemyAttackers.length > 0
-            return
-        }
-
-        const towers = room.structures.tower
+        const towers = this.communeManager.structures.tower
         if (!towers.length) {
-            room.towerInferiority = room.enemyAttackers.length > 0
+            this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
             return
         }
 
@@ -33,6 +26,7 @@ export class TowerManager {
 
         for (const tower of towers) {
             if (tower.store.energy < TOWER_ENERGY_COST) continue
+            if (!tower.RCLActionable) continue
 
             this.actionableTowerIDs.push(tower.id)
         }
@@ -74,18 +68,30 @@ export class TowerManager {
         }
 
         if (!room.towerAttackTarget) {
+
+            this.createPowerTasks()
             room.towerInferiority = true
             return false
         }
 
         // If we seem to be under attack from a swarm, record that the tower needs help
 
-        if (attackTargets.length >= 15) room.towerInferiority = true
+        if (attackTargets.length >= 15) {
+
+            this.createPowerTasks()
+            room.towerInferiority = true
+        }
 
         return room.towerAttackTarget
     }
 
     attackEnemyCreeps() {
+
+        if (this.communeManager.room.flags.disableTowerAttacks) {
+            this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
+            return true
+        }
+
         if (!this.actionableTowerIDs.length) return false
 
         const attackTarget = this.findAttackTarget()
@@ -109,7 +115,7 @@ export class TowerManager {
 
         if (room.enemyAttackers.length) {
             healTargets = room.myDamagedCreeps.filter(creep => {
-                return creep.role === 'meleeDefender'
+                return creep.role === 'meleeDefender' || creep.role === 'maintainer'
             })
 
             return healTargets[0]
@@ -140,7 +146,7 @@ export class TowerManager {
     }
 
     findRampartRepairTargets() {
-        return this.communeManager.room.structures.rampart.filter(function (rampart) {
+        return this.communeManager.structures.rampart.filter(function (rampart) {
             return rampart.hits <= RAMPART_DECAY_AMOUNT
         })
     }
@@ -168,8 +174,8 @@ export class TowerManager {
     }
 
     findGeneralRepairTargets() {
-        let structures: Structure[] = this.communeManager.room.structures.spawn
-        structures = structures.concat(this.communeManager.room.structures.tower)
+        let structures: Structure[] = this.communeManager.structures.spawn
+        structures = structures.concat(this.communeManager.structures.tower)
 
         return structures
     }
@@ -194,5 +200,15 @@ export class TowerManager {
         }
 
         return true
+    }
+
+    createPowerTasks() {
+
+        if (!this.communeManager.room.myPowerCreepsAmount) return
+
+        for (const tower of this.communeManager.structures.tower) {
+
+            this.communeManager.room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
+        }
     }
 }
