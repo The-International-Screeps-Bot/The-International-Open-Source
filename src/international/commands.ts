@@ -1,4 +1,4 @@
-import { allStructureTypes, ClaimRequestData, CombatRequestData } from './constants'
+import { allStructureTypes, AllyCreepRequestData, ClaimRequestData, CombatRequestData } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
 
@@ -54,11 +54,13 @@ global.killCreeps = function (roles?) {
 global.marxistLeninism = global.killCreeps
 global.genocide = global.killCreeps
 
-global.removeCSites = function (types?) {
+global.removeCSites = function (removeInProgress, types?) {
     let removedCSCount = 0
 
     for (const cSiteID in Game.constructionSites) {
         const cSite = Game.constructionSites[cSiteID]
+
+        if (cSite.progress && removeInProgress) continue
 
         if (types && !types.includes(cSite.structureType)) continue
 
@@ -146,13 +148,16 @@ global.destroyCommuneStructures = function (types?) {
 
 global.claim = function (requestName, communeName) {
     if (!Memory.claimRequests[requestName]) {
-        const request = (Memory.claimRequests[requestName] = {
+        Memory.claimRequests[requestName] = {
             responder: communeName,
             data: [0],
-        })
-
-        request.data[ClaimRequestData.score] = 0
+        }
     }
+
+    const request = Memory.claimRequests[requestName]
+
+    request.data[ClaimRequestData.score] = 0
+    request.data[ClaimRequestData.abandon] = 0
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]
@@ -177,18 +182,22 @@ global.deleteClaimRequests = function () {
     return `Deleted ${deleteCount} claim requests`
 }
 
-global.createCombatRequest = function (requestName, type, opts, communeName) {
+global.combat = function (requestName, type, opts, communeName) {
     if (!Memory.combatRequests[requestName]) {
-        const request = Memory.combatRequests[requestName] = {
+        Memory.combatRequests[requestName] = {
             T: type || 'attack',
             responder: communeName,
             data: [0],
         }
+    }
 
-        for (const key in opts) {
+    const request = Memory.combatRequests[requestName]
 
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
-        }
+    request.data[CombatRequestData.abandon] = 0
+
+    for (const key in opts) {
+
+        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
     }
 
     if (communeName) {
@@ -223,6 +232,10 @@ global.allyCreepRequest = function (requestName, communeName?) {
             data: [0],
         }
     }
+
+    const request = Memory.allyCreepRequests[requestName]
+
+    request.data[AllyCreepRequestData.abandon] = 0
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]

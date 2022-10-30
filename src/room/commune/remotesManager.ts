@@ -34,13 +34,15 @@ export class RemotesManager {
 
             // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
-            if (randomTick(10)) {
+            if (randomTick(100)) {
 
                 const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
+                        enemyRemote: Infinity,
                         ally: Infinity,
+                        allyRemote: Infinity,
                     },
                     avoidAbandonedRemotes: true,
                 })
@@ -56,9 +58,10 @@ export class RemotesManager {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
+                        enemyRemote: Infinity,
                         ally: Infinity,
+                        allyRemote: Infinity,
                     },
-                    avoidAbandonedRemotes: true,
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {
@@ -124,18 +127,9 @@ export class RemotesManager {
                     Math.min(remote.actionableWalls.length, 1) || Math.min(remote.dismantleTargets.length, 1)
             }
 
-            // If the remote is assumed to be reserved by an enemy
+            // If the remote is assumed to be reserved by an enemy or to be an invader core
 
-            if (remoteMemory.data[RemoteData.enemyReserved]) {
-                remoteMemory.data[RemoteData.source1RemoteHarvester] = 0
-                remoteMemory.data[RemoteData.source2RemoteHarvester] = 0
-                remoteMemory.data[RemoteData.remoteHauler0] = 0
-                remoteMemory.data[RemoteData.remoteHauler1] = 0
-            }
-
-            // If there is assumed to be an invader core
-
-            if (remoteMemory.data[RemoteData.invaderCore]) {
+            if (remoteMemory.data[RemoteData.enemyReserved] || remoteMemory.data[RemoteData.invaderCore]) {
                 remoteMemory.data[RemoteData.source1RemoteHarvester] = 0
                 remoteMemory.data[RemoteData.source2RemoteHarvester] = 0
                 remoteMemory.data[RemoteData.remoteHauler0] = 0

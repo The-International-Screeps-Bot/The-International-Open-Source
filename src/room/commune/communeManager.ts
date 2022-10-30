@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange, } from 'international/utils'
+import { createPosMap, customLog, findClosestObject, getRange } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -24,6 +24,7 @@ import './haulerSize'
 import { SourceManager } from './sourceManager'
 import { TowerManager } from './towers'
 import { DefenceManager } from './defence'
+import { SpawnManager } from './spawning/spawnManager'
 
 export class CommuneManager {
     defenceManager: DefenceManager
@@ -31,6 +32,7 @@ export class CommuneManager {
     towerManager: TowerManager
     labManager: LabManager
     powerSpawnManager: PowerSpawnManager
+    spawnManager: SpawnManager
     sourceManager: SourceManager
 
     tradeManager: TradeManager
@@ -46,6 +48,7 @@ export class CommuneManager {
         this.towerManager = new TowerManager(this)
         this.labManager = new LabManager(this)
         this.powerSpawnManager = new PowerSpawnManager(this)
+        this.spawnManager = new SpawnManager(this)
         this.sourceManager = new SourceManager(this)
 
         this.tradeManager = new TradeManager(this)
@@ -91,12 +94,12 @@ export class CommuneManager {
         this.room.factoryManager()
         this.labManager.run()
         this.powerSpawnManager.run()
-        this.room.spawnManager()
+        this.spawnManager.run()
+        this.sourceManager.run()
 
         this.test()
     }
     private test() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()

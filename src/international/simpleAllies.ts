@@ -1,6 +1,6 @@
-import { allyPlayers, simpleAlliesSegment } from 'international/constants'
+import { simpleAlliesSegment } from 'international/constants'
 
-const allyArray = Array.from(allyPlayers)
+const allyArray = Array.from(Memory.allyPlayers)
 
 export enum RequestTypes {
     RESOURCE,

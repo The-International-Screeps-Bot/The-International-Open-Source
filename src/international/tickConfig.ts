@@ -12,7 +12,14 @@ import {
     remoteRoles,
     stamps,
 } from './constants'
-import { advancedFindDistance, createPosMap, customLog, findCarryPartsRequired, findClosestRoomName } from './utils'
+import {
+    advancedFindDistance,
+    createPosMap,
+    customLog,
+    findCarryPartsRequired,
+    findClosestRoomName,
+    randomTick,
+} from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { globalStatsUpdater, statsManager } from './statsManager'
 import { indexOf } from 'lodash'
@@ -54,6 +61,14 @@ class TickConfig {
 
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
+            const roomMemory = room.memory
+
+            // Every 100~ ticks
+
+            if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
+                room.basicScout()
+                room.cleanMemory()
+            }
 
             room.moveRequests = new Map()
             room.creepPositions = new Map()
@@ -94,6 +109,8 @@ class TickConfig {
 
         room.communeManager.update(room)
 
+        const roomMemory = Memory.rooms[room.name]
+
         if (controller.my) room.memory.T = 'commune'
 
         if (room.memory.T != 'commune') return
@@ -106,6 +123,8 @@ class TickConfig {
         }
 
         // The room is a commune
+
+        if (!roomMemory.GRCL || controller.level > roomMemory.GRCL) roomMemory.GRCL = controller.level
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
 

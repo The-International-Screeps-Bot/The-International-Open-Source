@@ -21,6 +21,11 @@ export class CombatRequestManager {
             const requestName = room.memory.combatRequests[index]
             const request = Memory.combatRequests[requestName]
 
+            if (!request) {
+                this.communeManager.room.memory.combatRequests.splice(index, 1)
+                continue
+            }
+
             this[`${request.T}Request`](request, requestName, index)
         }
 

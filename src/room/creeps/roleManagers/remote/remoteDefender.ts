@@ -22,13 +22,19 @@ export class RemoteDefender extends Creep {
     }
 
     preTickManager(): void {
-        if (!this.memory.RN) return
+        if (!this.findRemote()) return
 
         const role = this.role as 'remoteDefender'
 
+        if (Memory.rooms[this.memory.RN].T !== 'remote') {
+
+            delete this.memory.RN
+            if (!this.findRemote()) return
+        }
+
         // If the creep's remote no longer is managed by its commune
 
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+        else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
             // Delete it from memory and try to find a new one
 
             delete this.memory.RN

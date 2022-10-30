@@ -33,15 +33,18 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
+        if (!this.findRemote()) return
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
-        if (!this.memory.RN) return
+        if (Memory.rooms[this.memory.RN].T !== 'remote') {
+            this.room.visual.circle(this.pos, { fill: myColors.green })
+            delete this.memory.RN
+            if (!this.findRemote()) return
+        }
 
         // If the creep's remote no longer is managed by its commune
 
-        // If the creep's remote no longer is managed by its commune
-
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+        else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
             // Delete it from memory and try to find a new one
 
             this.removeRemote()
@@ -200,8 +203,6 @@ export class RemoteHauler extends Creep {
             }
 
             if (this.needsResources()) return false
-
-            if (!this.commune) return false
 
             delete this.moved
 
@@ -415,8 +416,6 @@ export class RemoteHauler extends Creep {
 
             return false
         }
-
-        if (!this.commune) return false
 
         this.message += this.commune.name
         this.say(this.message)

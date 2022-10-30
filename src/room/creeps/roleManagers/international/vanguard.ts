@@ -8,13 +8,15 @@ export class Vanguard extends Creep {
     }
 
     preTickManager() {
-        if (this.memory.SI && !this.dying) this.room.creepsOfSourceAmount[this.memory.SI] += 1
 
         if (this.dying) return
 
-        if (!Memory.rooms[this.commune.name].claimRequest) return
+        if (this.memory.SI !== undefined) this.room.creepsOfSourceAmount[this.memory.SI] += 1
 
-        Memory.claimRequests[Memory.rooms[this.commune.name].claimRequest].data[ClaimRequestData.vanguard] -=
+        const request = Memory.claimRequests[this.memory.TRN]
+        if (!request) return
+
+        request.data[ClaimRequestData.vanguard] -=
             this.parts.work
     }
 
@@ -51,30 +53,57 @@ export class Vanguard extends Creep {
         return true
     }
 
-    /**
-     * Builds a spawn in the creep's commune claimRequest
-     */
-    buildRoom?(): void {
-        const { room } = this
+    upgradeRoom?() {
+        const { controller } = this.room
 
-        if (this.needsResources()) {
-            // Define the creep's sourceName
+        if (controller.level >= 2 && controller.ticksToDowngrade > 5000) return false
 
-            if (!this.findOptimalSourceIndex()) return
+        if (getRangeOfCoords(this.pos, controller.pos) > 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: controller.pos, range: 3 }],
+            })
 
-            const sourceIndex = this.memory.SI
-
-            // Try to move to source. If creep moved then iterate
-
-            if (this.travelToSource(sourceIndex)) return
-
-            // Try to normally harvest. Iterate if creep harvested
-
-            if (this.advancedHarvestSource(room.sources[sourceIndex])) return
-            return
+            return true
         }
 
-        this.advancedBuildCSite()
+        this.upgradeController(controller)
+        return true
+    }
+
+    repairRampart?() {
+
+        if (this.room.cSites.rampart.length) {
+
+            const cSite = this.room.cSites.rampart[0]
+
+            if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [{ pos: cSite.pos, range: 3 }],
+                })
+
+                return true
+            }
+
+            this.build(cSite)
+            return true
+        }
+
+        const rampartTarget = this.room.structures.rampart.find(rampart => rampart.hits < 20000)
+        if (!rampartTarget) return false
+
+        if (getRangeOfCoords(this.pos, rampartTarget.pos) > 3) {
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: rampartTarget.pos, range: 3 }],
+            })
+
+            return true
+        }
+
+        this.repair(rampartTarget)
+        return true
     }
 
     static vanguardManager(room: Room, creepsOfRole: string[]) {
@@ -85,16 +114,32 @@ export class Vanguard extends Creep {
 
             const creep: Vanguard = Game.creeps[creepName]
 
-            const claimRequestName = Memory.rooms[creep.commune.name].claimRequest
+            creep.say(creep.memory.TRN)
 
-            // If the creep has no claim target, stop
+            if (room.name === creep.memory.TRN || !creep.memory.TRN) {
+                if (creep.needsResources()) {
+                    // Define the creep's sourceName
 
-            if (!claimRequestName) return
+                    if (!creep.findOptimalSourceIndex()) continue
 
-            creep.say(claimRequestName)
+                    const sourceIndex = creep.memory.SI
 
-            if (room.name === claimRequestName) {
-                creep.buildRoom()
+                    // Try to move to source. If creep moved then iterate
+
+                    if (creep.travelToSource(sourceIndex)) continue
+
+                    // Try to normally harvest. Iterate if creep harvested
+
+                    if (creep.advancedHarvestSource(room.sources[sourceIndex])) continue
+                    continue
+                }
+
+                delete creep.memory.SI
+                delete creep.memory.PC
+
+                if (creep.upgradeRoom()) continue
+                if (creep.repairRampart()) continue
+                if (creep.advancedBuildCSite()) continue
                 continue
             }
 
@@ -103,7 +148,7 @@ export class Vanguard extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, claimRequestName), range: 25 }],
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
                     avoidEnemyRanges: true,
                     typeWeights: {
                         enemy: Infinity,
@@ -112,10 +157,8 @@ export class Vanguard extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[claimRequestName]
-                request.data[ClaimRequestData.abandon] = 20000
-                delete request.responder
-                delete Memory.rooms[creep.commune.name].claimRequest
+                const request = Memory.claimRequests[creep.memory.TRN]
+                if (request) request.data[ClaimRequestData.abandon] = 20000
             }
         }
     }

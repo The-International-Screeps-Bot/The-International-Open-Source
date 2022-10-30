@@ -5,6 +5,7 @@ import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
+import { Settings } from 'international/settings'
 
 declare global {
     interface ProfilerMemory {
@@ -115,7 +116,6 @@ declare global {
         | 'claimer'
         | 'vanguard'
         | 'allyVanguard'
-        | 'vanguardDefender'
         | 'antifaRangedAttacker'
         | 'antifaAttacker'
         | 'antifaHealer'
@@ -715,102 +715,13 @@ declare global {
          * Offensive Threat, the enemy's perceived offensive threat towards the bot
          */
         OT: number
-        /**
-         * The enemy's Greatest Room Controller Level known by the bot
-         */
-        GRCL: number
     }
 
-    interface Memory {
+    interface Memory extends Settings {
         /**
          * The name of the user
          */
         me: string
-
-        /**
-         * The current breaking version of the bot
-         */
-        breakingVersion: number | undefined
-
-        /**
-         * Wether the bot should generate any room visuals
-         */
-        roomVisuals: boolean
-
-        /**
-         * Wether the bot should generate base room visuals
-         */
-        baseVisuals: boolean
-
-        /**
-         * Wether the bot should generate map visuals
-         */
-        mapVisuals: boolean
-
-        /**
-         * Wether the bot should log CPU data
-         */
-        CPULogging: boolean
-
-        /**
-         * Wether the bot save RoomStats data
-         */
-        roomStats: 0 | 1 | 2
-
-        /**
-         * A list of usernames to treat as allies
-         */
-        allyPlayers: string[]
-
-        /**
-         * A list of usernames to treat as neutral
-         */
-        nonAggressionPlayers: string[]
-
-        /**
-         * Wether the bot should sell pixels
-         */
-        pixelSelling: boolean
-
-        /**
-         * Wether the bot should generate pixels
-         */
-        pixelGeneration: boolean
-
-        /**
-         * An list of usernames to not trade with
-         */
-        tradeBlacklist: string[]
-
-        /**
-         * Wether the bot should automatically respond to claimRequests
-         */
-        autoClaim: boolean
-
-        /**
-         * Wether or not to automatically create attack requests for viable targets
-         */
-        autoAttack: boolean
-
-        /**
-         * Wether the bot should enable ramparts when there is no enemy present
-         */
-        publicRamparts: boolean
-
-        /**
-         * Wether the bot should try trading with its allies
-         */
-        allyTrading: boolean
-
-        /**
-         * Wether or not the bot should be using the market
-         */
-        marketUsage: boolean
-
-        /**
-         * Wether or not the bot should be using customLog
-         */
-        logging: boolean
 
         /**
          * An ongoing record of the latest ID assigned by the bot
@@ -903,6 +814,8 @@ declare global {
         controllerContainer: Id<StructureContainer> | undefined
 
         mineralContainer: Id<StructureContainer> | undefined
+
+        centerUpgradePos: RoomPosition | false
 
         // Links
 
@@ -1037,11 +950,23 @@ declare global {
          */
         deleteTask(taskID: any, responder: boolean): void
 
+        scoutByRoomName(): RoomTypes | false
+
+        scoutReservedRemote(): RoomTypes | false
+
+        scoutUnreservedRemote(): RoomTypes | false
+
+        scoutMyRemote(scoutingRoom: Room): RoomTypes | false
+
+        scoutEnemyRoom(): RoomTypes | false
+
+        basicScout(): RoomTypes
+
         /**
          * Finds the type of a room and initializes its custom properties
          * @param scoutingRoom The room that is performing the scout operation
          */
-        findType(scoutingRoom: Room): void
+        advancedScout(scoutingRoom: Room): RoomTypes
 
         makeRemote(scoutingRoom: Room): boolean
 
@@ -1158,7 +1083,7 @@ declare global {
 
         coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
-        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask
+        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask | false
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
@@ -1188,11 +1113,6 @@ declare global {
         factoryManager(): void
 
         // Spawn functions
-
-        /**
-         * Takes spawnRequests and tries to spawn them in order of priority (lowest to highest)
-         */
-        spawnManager(): void
 
         /**
          * Creates spawn requests for the commune
@@ -1368,17 +1288,15 @@ declare global {
 
         readonly sourcePaths: RoomPosition[][]
 
-        _centerUpgradePos: RoomPosition | false
-
         readonly centerUpgradePos: RoomPosition | false
 
         _upgradePositions: RoomPosition[]
 
         readonly upgradePositions: RoomPosition[]
 
-        _usedUpgradeCoords: Set<string>
+        _usedUpgradePositions: Set<string>
 
-        readonly usedUpgradeCoords: Set<string>
+        readonly usedUpgradePositions: Set<string>
 
         _controllerPositions: RoomPosition[]
 
@@ -1461,6 +1379,10 @@ declare global {
         _enemyThreatCoords: Set<string>
 
         readonly enemyThreatCoords: Set<string>
+
+        _enemyThreatGoals: PathGoal[]
+
+        readonly enemyThreatGoals: PathGoal[]
 
         _flags: Partial<{ [key in FlagNames]: Flag }>
 
@@ -1725,6 +1647,11 @@ declare global {
          */
         HU: number
 
+        /**
+         * Greatest Room Controller Level
+         */
+        GRCL: number
+
         factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
         factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
 
@@ -1821,8 +1748,6 @@ declare global {
          * Decides if the creep needs to get more resources or not
          */
         needsResources(): boolean
-
-        findTotalHealPower(range?: number): number
 
         findRecycleTarget(): StructureSpawn | StructureContainer | false
 
@@ -1929,6 +1854,11 @@ declare global {
          */
         squadRan: boolean
 
+        /**
+         * The ID of the spawn the creep is spawning in, if it is spawning
+         */
+        spawnID: Id<StructureSpawn>
+
         // Creep Functions
 
         advancedRenew(): void
@@ -1992,6 +1922,13 @@ declare global {
          */
         readonly healStrength: number
 
+        _defenceStrength: number
+
+        /**
+         * The multiplier to incoming damage the creep has
+         */
+        readonly defenceStrength: number
+
         _parts: Partial<Record<BodyPartConstant, number>>
 
         /**
@@ -2036,7 +1973,14 @@ declare global {
         readonly isOnExit: boolean
     }
 
-    interface CreepMemory {
+    interface CreepMemoryTemplate {
+        /**
+         * Task Room Name, the name of the room the creep is trying to perform a task in
+         */
+        TRN: string
+    }
+
+    interface CreepMemory extends CreepMemoryTemplate {
         /**
          * Wether the creep is old enough to need a replacement
          */
@@ -2048,7 +1992,7 @@ declare global {
         SI: 0 | 1
 
         /**
-         * The creep's packedPos for a designated target
+         * The creep's packed coord for a designated target
          */
         PC: string
 
@@ -2177,7 +2121,7 @@ declare global {
         powered: boolean
     }
 
-    interface PowerCreepMemory {
+    interface PowerCreepMemory extends CreepMemoryTemplate {
         /**
          * Commune Name
          */
@@ -2192,17 +2136,21 @@ declare global {
          * Task target, the ID of the target the creep is targeting for its task
          */
         TTID: Id<Structure | Source>
-
-        /**
-         * Task Room Name, the name of the room the creep is trying to go to for its task
-         */
-        TRN: string
     }
 
     // Structures
 
     interface Structure {
         estimatedHits: number
+
+        // Getters
+
+        _RCLActionable: boolean
+
+        /**
+         * Wether the structure is disable or not by the room's controller level
+         */
+        readonly RCLActionable: boolean
     }
 
     interface StructureSpawn {
@@ -2266,9 +2214,13 @@ declare global {
 
         estimatedHits: number
 
-        _estimatedStore: Partial<StoreDefinition>
+        _reserveStore: Partial<StoreDefinition>
 
-        readonly estimatedStore: Partial<StoreDefinition>
+        readonly reserveStore: Partial<StoreDefinition>
+
+        _reservePowers: Set<PowerConstant>
+
+        readonly reservePowers: Set<PowerConstant>
     }
 
     interface Resource {
@@ -2345,7 +2297,7 @@ declare global {
             /**
              * Removes all specified construction sites owned by the bot
              */
-            removeCSites(types?: BuildableStructureConstant[]): string
+            removeCSites(removeInProgress?: boolean, types?: BuildableStructureConstant[]): string
 
             /**
              * Destroys all specified structures owned by the bot
@@ -2369,7 +2321,7 @@ declare global {
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
              */
-            createCombatRequest(
+            combat(
                 requestName: string,
                 type: CombatRequestTypes,
                 opts?: { [key: string]: number },

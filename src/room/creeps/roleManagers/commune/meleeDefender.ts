@@ -20,15 +20,17 @@ export class MeleeDefender extends Creep {
             const range = getRangeOfCoords(this.pos, enemyCreep.pos)
             if (range > 1) continue
 
+            const estimatedDamage = this.attackStrength * enemyCreep.defenceStrength
+
             //
 
             const targetDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
             if (!targetDamage) {
                 room.defenderEnemyTargetsWithDamage.set(
                     enemyCreep.id,
-                    enemyCreep.healStrength * -1 + this.attackStrength,
+                    estimatedDamage,
                 )
-            } else room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, targetDamage + this.attackStrength)
+            } else room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, targetDamage + estimatedDamage)
 
             //
 

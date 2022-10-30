@@ -1,11 +1,11 @@
-import { allyPlayers, breakingVersion, nonAggressionPlayers } from './constants'
+import { settings } from './settings'
 
 /**
  * Migrate version by performing actions, if required
  */
 class MigrationManager {
     public run() {
-        if (Memory.breakingVersion === breakingVersion) return
+        if (Memory.breakingVersion === settings.breakingVersion) return
 
         if (Memory.breakingVersion === 81) {
             global.killCreeps()
@@ -57,14 +57,14 @@ class MigrationManager {
             Memory.combatRequests = {}
 
             delete (Memory as any).allyList
-            Memory.allyPlayers = allyPlayers
+            Memory.allyPlayers = settings.allyPlayers
 
-            Memory.nonAggressionPlayers = nonAggressionPlayers
+            Memory.nonAggressionPlayers = settings.nonAggressionPlayers
 
             Memory.breakingVersion = 85
         }
 
-        if (Memory.breakingVersion < breakingVersion) {
+        if (Memory.breakingVersion < settings.breakingVersion) {
             global.killCreeps()
             global.clearMemory()
             global.removeCSites()

@@ -3,6 +3,18 @@ import { findObjectWithID, getRange, getRangeOfCoords } from 'international/util
 import { unpackCoord } from 'other/packrat'
 
 export class AllyVanguard extends Creep {
+
+    preTickManager() {
+
+        const request = Memory.claimRequests[this.memory.TRN]
+
+        if (!request) return
+
+        request.data[
+            AllyCreepRequestData.allyVanguard
+        ] -= this.parts.work
+    }
+
     findRemote?(): boolean {
         if (this.memory.RN) return true
 
@@ -159,12 +171,10 @@ export class AllyVanguard extends Creep {
             return
         }
 
-        const request = Memory.rooms[this.commune.name].allyCreepRequest
-
-        if (room.name !== request) {
+        if (room.name !== this.memory.TRN) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, request), range: 25 }],
+                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
                 avoidEnemyRanges: true,
             })
 
@@ -186,15 +196,7 @@ export class AllyVanguard extends Creep {
 
             const creep: AllyVanguard = Game.creeps[creepName]
 
-            const request = Memory.rooms[creep.commune.name].allyCreepRequest
-
-            // If the creep has no claim target, stop
-
-            if (!request) return
-
-            Memory.allyCreepRequests[Memory.rooms[creep.commune.name].allyCreepRequest].data[
-                AllyCreepRequestData.allyVanguard
-            ] -= creep.parts.work
+            const request = creep.memory.TRN
 
             creep.say(request)
 
@@ -207,19 +209,21 @@ export class AllyVanguard extends Creep {
 
             // Move to it
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: new RoomPosition(25, 25, request), range: 25 }],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    commune: 1,
-                    neutral: 1,
-                    highway: 1,
-                },
-            })
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                    },
+                }) === 'unpathable'
+            ) {
+                const request = Memory.claimRequests[creep.memory.TRN]
+                if (request) request.data[AllyCreepRequestData.abandon] = 20000
+            }
         }
     }
 }

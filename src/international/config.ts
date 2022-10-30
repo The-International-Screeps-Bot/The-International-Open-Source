@@ -1,22 +1,4 @@
-import {
-    allyPlayers,
-    allyTrading,
-    autoClaim,
-    baseVisuals,
-    breakingVersion,
-    CPULogging,
-    mapVisuals,
-    pixelGeneration,
-    pixelSelling,
-    publicRamparts,
-    roomVisuals,
-    tradeBlacklist,
-    roomStats,
-    nonAggressionPlayers,
-    autoAttack,
-    marketUsage,
-    logging,
-} from './constants'
+import { settings } from './settings'
 import { statsManager } from './statsManager'
 
 /**
@@ -33,7 +15,7 @@ class ConfigManager {
     private configMemory() {
         if (Memory.breakingVersion) return
 
-        Memory.breakingVersion = breakingVersion
+        Memory.breakingVersion = settings.breakingVersion
 
         Memory.me =
             (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
@@ -42,21 +24,21 @@ class ConfigManager {
 
         // Settings
 
-        Memory.roomVisuals = roomVisuals
-        Memory.baseVisuals = baseVisuals
-        Memory.mapVisuals = mapVisuals
-        Memory.CPULogging = Game.shard.name !== 'performanceServer' ? CPULogging : true
-        Memory.roomStats = Game.shard.name !== 'performanceServer' ? roomStats : 2
-        Memory.allyPlayers = allyPlayers
-        Memory.nonAggressionPlayers = nonAggressionPlayers
-        Memory.pixelSelling = pixelSelling
-        Memory.pixelGeneration = pixelGeneration
-        Memory.tradeBlacklist = tradeBlacklist
-        Memory.autoClaim = autoClaim
-        Memory.autoAttack = autoAttack
-        Memory.publicRamparts = publicRamparts
-        Memory.allyTrading = allyTrading
-        Memory.marketUsage = marketUsage
+        Memory.roomVisuals = settings.roomVisuals
+        Memory.baseVisuals = settings.baseVisuals
+        Memory.mapVisuals = settings.mapVisuals
+        Memory.CPULogging = Game.shard.name === 'performanceServer' ? true : settings.CPULogging
+        Memory.roomStats = Game.shard.name === 'performanceServer' ? 2 : settings.roomStats
+        Memory.allyPlayers = settings.allyPlayers
+        Memory.nonAggressionPlayers = settings.nonAggressionPlayers
+        Memory.pixelSelling = settings.pixelSelling
+        Memory.pixelGeneration = settings.pixelGeneration
+        Memory.tradeBlacklist = settings.tradeBlacklist
+        Memory.autoClaim = settings.autoClaim
+        Memory.autoAttack = settings.autoAttack
+        Memory.publicRamparts = settings.publicRamparts
+        Memory.allyTrading = settings.allyTrading
+        Memory.marketUsage = settings.marketUsage
         Memory.logging =
             Game.shard.name !== 'performanceServer'
                 ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1

@@ -23,7 +23,6 @@ import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
 import { Scout } from './roleManagers/international/scout'
 import { Vanguard } from './roleManagers/international/vanguard'
 import { Antifa } from './roleManagers/antifa/antifa'
-import { VanguardDefender } from './roleManagers/international/vanguardDefender'
 import { CommuneManager } from 'room/commune/communeManager'
 import { RoomManager } from 'room/roomManager'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -39,7 +38,6 @@ const managers: { [key in CreepRoles]: Function } = {
     antifaDismantler: Antifa.antifaManager,
     antifaDowngrader: Antifa.antifaManager,
     claimer: Claimer.claimerManager,
-    vanguardDefender: VanguardDefender.vanguardDefenderManager,
     remoteDefender: RemoteDefender.remoteDefenderManager,
     source1Harvester: SourceHarvester.sourceHarvesterManager,
     source2Harvester: SourceHarvester.sourceHarvesterManager,

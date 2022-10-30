@@ -1,6 +1,5 @@
 import {
     AllyCreepRequestData,
-    allyPlayers,
     ClaimRequestData,
     CombatRequestData,
     containerUpkeepCost,
@@ -715,7 +714,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             let partsMultiplier = 1
-            let maxCreeps = this.upgradePositions.length
+            let maxCreeps = this.upgradePositions.length - 1
             const priority = 9
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
@@ -1291,7 +1290,8 @@ Room.prototype.spawnRequester = function () {
     )
 
     if (this.memory.claimRequest) {
-        const request = Memory.claimRequests[this.memory.claimRequest]
+        const requestName = this.memory.claimRequest
+        const request = Memory.claimRequests[requestName]
 
         // Construct requests for claimers
 
@@ -1310,7 +1310,9 @@ Room.prototype.spawnRequester = function () {
                     minCreeps: 1,
                     minCost: 650,
                     priority: 8.1,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        TRN: requestName
+                    },
                 }
             })(),
         )
@@ -1333,58 +1335,9 @@ Room.prototype.spawnRequester = function () {
                     maxCreeps: Infinity,
                     minCost: 250,
                     priority: 8.2 + this.creepsFromRoom.vanguard.length,
-                    memoryAdditions: {},
-                }
-            })(),
-        )
-
-        // Requests for vanguardDefender
-
-        this.constructSpawnRequests(
-            ((): SpawnRequestOpts | false => {
-                if (!request.data[ClaimRequestData.minDamage]) return false
-                if (request.data[ClaimRequestData.minDamage] <= 0) return false
-
-                const role = 'vanguardDefender'
-
-                const minRangedAttackCost =
-                    ((request.data[ClaimRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-                        (request.data[ClaimRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
-                    1.2
-                const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
-
-                const minHealCost =
-                    ((request.data[ClaimRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
-                        (request.data[ClaimRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
-                    1.2
-                const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
-
-                if (minRangedAttackCost + minHealCost > spawnEnergyCapacity) {
-                    request.data[ClaimRequestData.abandon] = 20000
-                    delete request.responder
-                    delete this.memory.claimRequest
-                }
-
-                const minCost = Math.min(minRangedAttackCost + minHealCost, spawnEnergyCapacity)
-                const extraParts: BodyPartConstant[] = []
-
-                for (let i = 0; i < rangedAttackAmount; i++) {
-                    extraParts.push(RANGED_ATTACK, MOVE)
-                }
-
-                for (let i = 0; i < healAmount; i++) {
-                    extraParts.push(HEAL, MOVE)
-                }
-
-                return {
-                    role,
-                    defaultParts: [],
-                    extraParts,
-                    partsMultiplier: 1,
-                    minCreeps: 1,
-                    minCost,
-                    priority: 8 + this.creepsFromRoom.vanguardDefender.length,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        TRN: requestName
+                    },
                 }
             })(),
         )
@@ -1653,5 +1606,4 @@ Room.prototype.spawnRequester = function () {
         const statName: RoomCommuneStatNames = 'srmcu'
         globalStatsUpdater(this.name, statName, cpuUsed)
     }
-    customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2))
 }

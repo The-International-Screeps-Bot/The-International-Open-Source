@@ -1,6 +1,5 @@
 import {
     allStructureTypes,
-    allyPlayers,
     defaultSwampCost,
     impassibleStructureTypes,
     myColors,
@@ -20,7 +19,15 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { packCoord, packCoordList, packPosList, packXYAsCoord, unpackPosList } from 'other/packrat'
+import {
+    packCoord,
+    packCoordList,
+    packPos,
+    packPosList,
+    packXYAsCoord,
+    unpackCoord,
+    unpackPosList,
+} from 'other/packrat'
 
 Object.defineProperties(Room.prototype, {
     global: {
@@ -142,18 +149,20 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._myDamagedCreeps) return this._myDamagedCreeps
 
-            return this._myDamagedCreeps = this._myDamagedCreeps = this.find(FIND_MY_CREEPS, {
-                filter: creep => creep.hits < creep.hitsMax,
-            })
+            return (this._myDamagedCreeps = this._myDamagedCreeps =
+                this.find(FIND_MY_CREEPS, {
+                    filter: creep => creep.hits < creep.hitsMax,
+                }))
         },
     },
     myDamagedPowerCreeps: {
         get() {
             if (this._myDamagedPowerCreeps) return this._myDamagedPowerCreeps
 
-            return this._myDamagedPowerCreeps = this._myDamagedPowerCreeps = this.find(FIND_MY_POWER_CREEPS, {
-                filter: creep => creep.hits < creep.hitsMax,
-            })
+            return (this._myDamagedPowerCreeps = this._myDamagedPowerCreeps =
+                this.find(FIND_MY_POWER_CREEPS, {
+                    filter: creep => creep.hits < creep.hitsMax,
+                }))
         },
     },
     allyDamagedCreeps: {
@@ -179,8 +188,8 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES))
-                this._structures[structure.structureType].push(structure as any)
+            for (const structure of this.find(FIND_STRUCTURES)) this._structures[structure.structureType].push(structure as any)
+
 
             return this._structures
         },
@@ -380,6 +389,11 @@ Object.defineProperties(Room.prototype, {
             this._combatStructureTargets = []
 
             if (this.controller.my || this.controller.reservation) return this._combatStructureTargets
+
+            if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
+                return this._combatStructureTargets
+            if (this.controller.reservation && Memory.allyPlayers.includes(this.controller.reservation.username))
+                return this._combatStructureTargets
 
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.tower)
@@ -690,7 +704,7 @@ Object.defineProperties(Room.prototype, {
     },
     centerUpgradePos: {
         get() {
-            if (this._centerUpgradePos !== undefined) return this._centerUpgradePos
+            if (this.global.centerUpgradePos !== undefined) return this.global.centerUpgradePos
 
             if (!this.anchor) return false
 
@@ -708,7 +722,7 @@ Object.defineProperties(Room.prototype, {
 
             // Find the closest value greater than two to the centerUpgradePos and inform it
 
-            return (this._centerUpgradePos = this.findClosestPosOfValue({
+            return (this.global.centerUpgradePos = this.findClosestPosOfValue({
                 coordMap: distanceCoords,
                 startCoords: [this.anchor],
                 requiredValue: 2,
@@ -777,11 +791,11 @@ Object.defineProperties(Room.prototype, {
             return this._upgradePositions
         },
     },
-    usedUpgradeCoords: {
+    usedUpgradePositions: {
         get() {
-            if (this._usedUpgradeCoords) return this._usedUpgradeCoords
+            if (this._usedUpgradePositions) return this._usedUpgradePositions
 
-            this._usedUpgradeCoords = new Set()
+            this._usedUpgradePositions = new Set()
 
             for (const creepName of this.myCreeps.controllerUpgrader) {
                 // Get the creep using its name
@@ -796,12 +810,19 @@ Object.defineProperties(Room.prototype, {
 
                 // The creep has a packedPos
 
-                this._usedUpgradeCoords.add(creep.memory.PC)
+                this._usedUpgradePositions.add(creep.memory.PC)
             }
 
-            if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
+            if (this.controllerLink) this._usedUpgradePositions.add(packPos(this.controllerLink.pos))
+            /*
+            for (const packedCoord of this._usedUpgradePositions) {
 
-            return this._usedUpgradeCoords
+                const coord = unpackCoord(packedCoord)
+
+                this.visual.circle(coord.x, coord.y, { fill: myColors.red })
+            }
+ */
+            return this._usedUpgradePositions
         },
     },
     upgradePathLength: {
@@ -1639,7 +1660,7 @@ Object.defineProperties(Room.prototype, {
             const enemyRangedAttackers: Creep[] = []
 
             for (const enemyCreep of this.enemyAttackers) {
-                if (enemyCreep.parts.ranged_attack > 0) {
+                if (enemyCreep.parts.ranged_attack) {
                     enemyRangedAttackers.push(enemyCreep)
                     continue
                 }
@@ -1679,8 +1700,43 @@ Object.defineProperties(Room.prototype, {
 
                 this._enemyThreatCoords.delete(packCoord(rampart.pos))
             }
+            /*
+            for (const packedCoord of this._enemyThreatCoords) {
 
+                const coord = unpackCoord(packedCoord)
+
+                this.visual.circle(coord.x, coord.y, { fill: myColors.red })
+            }
+ */
             return this._enemyThreatCoords
+        },
+    },
+    enemyThreatGoals: {
+        get() {
+            if (this._enemyThreatGoals) return this._enemyThreatGoals
+
+            this._enemyThreatGoals = []
+
+            for (const enemyCreep of this.enemyAttackers) {
+
+                if (enemyCreep.parts.ranged_attack) {
+
+                    this._enemyThreatGoals.push({
+                        pos: enemyCreep.pos,
+                        range: 4,
+                    })
+                    continue
+                }
+
+                if (!enemyCreep.parts.attack) continue
+
+                this._enemyThreatGoals.push({
+                    pos: enemyCreep.pos,
+                    range: 2,
+                })
+            }
+
+            return this._enemyThreatGoals
         },
     },
     flags: {
@@ -1840,18 +1896,16 @@ Object.defineProperties(Room.prototype, {
             this._resourcesInStoringStructures = {}
 
             const storingStructures: AnyStoreStructure[] = [this.storage, this.factory]
-            if (this.terminal && !this.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(this.terminal)
+            if (this.terminal && !this.terminal.effectsData.get(PWR_DISRUPT_TERMINAL))
+                storingStructures.push(this.terminal)
 
             for (const structure of storingStructures) {
-
                 if (!structure) continue
 
                 for (const key in structure.store) {
-
                     const resourceType = key as ResourceConstant
 
                     if (!this._resourcesInStoringStructures[resourceType]) {
-
                         this._resourcesInStoringStructures[resourceType] = structure.store[resourceType]
                         continue
                     }
@@ -1865,15 +1919,14 @@ Object.defineProperties(Room.prototype, {
     },
     unprotectedEnemyCreeps: {
         get() {
-
             if (this._unprotectedEnemyCreeps) return this._unprotectedEnemyCreeps
 
             const avoidStructureTypes = new Set([STRUCTURE_RAMPART])
 
-            return this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
+            return (this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
                 return !this.coordHasStructureTypes(enemyCreep.pos, avoidStructureTypes)
-            })
-        }
+            }))
+        },
     },
     MEWT: {
         get() {

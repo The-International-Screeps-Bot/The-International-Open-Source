@@ -19,6 +19,7 @@ import './room/roomAdditions'
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 import './room/roomObjectAdditions'
+import './room/structureAdditions'
 
 // Creep
 
@@ -51,6 +52,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         console.log('SKIPPING TICK due to low bucket:' + Game.cpu.bucket)
         return
     }
+
     memHack.run()
 
     internationalManager.update()
