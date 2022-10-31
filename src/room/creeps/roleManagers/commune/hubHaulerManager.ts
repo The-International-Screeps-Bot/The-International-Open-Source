@@ -256,10 +256,7 @@ export class HubHauler extends Creep {
 
         // Find a provider
 
-        let provider
-        if (terminal && terminal.store.energy >= amount) provider = terminal
-        else if (storage && storage.store.energy >= amount) provider = storage
-
+        const provider = room.highestWeightedStoringStructures(RESOURCE_ENERGY)
         if (!provider) return false
 
         this.message += 'RHLT'
@@ -431,10 +428,7 @@ export class HubHauler extends Creep {
 
         // Find a provider
 
-        let provider
-        if (terminal && terminal.store[resource] >= amount) provider = terminal
-        else if (storage && storage.store[resource] >= amount) provider = storage
-
+        const provider = room.highestWeightedStoringStructures(RESOURCE_ENERGY)
         if (!provider) return false
 
         this.message += 'RPSTP'
@@ -477,10 +471,7 @@ export class HubHauler extends Creep {
 
         // Find a provider
 
-        let provider
-        if (terminal && terminal.store[resource] >= 25000 && terminal.store[resource] >= amount) provider = terminal
-        else if (storage && storage.store[resource] >= 75000 && storage.store[resource] >= amount) provider = storage
-
+        const provider = room.highestWeightedStoringStructures(RESOURCE_ENERGY)
         if (!provider) return false
 
         this.message += 'RPSTE'
