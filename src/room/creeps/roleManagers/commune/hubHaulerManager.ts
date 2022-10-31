@@ -54,8 +54,8 @@ export class HubHauler extends Creep {
 
         //Fill the Link before the storage/terminal because the storage transfers can take a long time,
         // the link transfers are just 2 or 4 ticks long.
-        if (this.reserveHubLinkWithdraw()) return
         if (this.reserveHubLinkTransfer()) return
+        if (this.reserveHubLinkWithdraw()) return
 
         if (this.reserveStorageTransfer()) return
         if (this.reserveTerminalTransfer()) return
@@ -178,14 +178,16 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy + room.getPartsOfRoleAmount('controllerUpgrader', WORK)) return false
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy) return false
 
         // If the controllerLink is less than x% full
 
         const { controllerLink } = room
         if (
             controllerLink &&
-            controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > controllerLink.store.energy
+            controllerLink.store.getCapacity(RESOURCE_ENERGY) *
+                (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) >
+                controllerLink.store.energy
         )
             return false
 
@@ -240,19 +242,15 @@ export class HubHauler extends Creep {
         // If a link is less than x% full
 
         if (
-            controllerLink &&
-            controllerLink.store.getCapacity(RESOURCE_ENERGY) *
-                (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) >
-                controllerLink.store.energy
-        ) {
-        } else if (
-            fastFillerLink &&
-            fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy
-        ) {
-        }
-
-        // There are no needy links
-        else return false
+            (!fastFillerLink ||
+                fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold <
+                    fastFillerLink.store.energy) &&
+            (!controllerLink ||
+                controllerLink.store.getCapacity(RESOURCE_ENERGY) *
+                    (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) <
+                    controllerLink.store.energy)
+        )
+            return false
 
         const amount = Math.min(this.freeStore(), hubLink.freeSpecificStore())
 
@@ -387,8 +385,7 @@ export class HubHauler extends Creep {
 
         // If the ratio of stored batteries to energy is sufficiently high
         // 100 : 1
-        if (room.resourcesInStoringStructures.battery * 100 > room.resourcesInStoringStructures.energy)
-            return false
+        if (room.resourcesInStoringStructures.battery * 100 > room.resourcesInStoringStructures.energy) return false
 
         // Find a provider
 

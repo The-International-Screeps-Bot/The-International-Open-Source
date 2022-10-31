@@ -760,7 +760,7 @@ Room.prototype.spawnRequester = function () {
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
+                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.8) / range
                     }
 
                     for (const sourceLink of sourceLinks) {
@@ -788,7 +788,7 @@ Room.prototype.spawnRequester = function () {
 
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
-            const threshold = 0.15
+            const threshold = 0.05
             const role = 'controllerUpgrader'
 
             // If the controllerContainer or controllerLink exists
@@ -797,46 +797,47 @@ Room.prototype.spawnRequester = function () {
                 // If the controller is level 8
 
                 if (this.controller.level === 8) {
+
+                    let extraParts: BodyPartConstant[]
+
                     // If the controller is near to downgrading
 
-                    if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                        partsMultiplier = Math.max(partsMultiplier, 3)
-
-                    partsMultiplier = Math.min(Math.round(partsMultiplier / 3), 5)
-                    if (partsMultiplier === 0) return false
+                    if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed) extraParts = [CARRY, WORK, MOVE]
+                    else if (partsMultiplier = 0) return false
+                    else extraParts = [
+                        WORK,
+                        WORK,
+                        MOVE,
+                        CARRY,
+                        WORK,
+                        WORK,
+                        MOVE,
+                        WORK,
+                        WORK,
+                        WORK,
+                        MOVE,
+                        WORK,
+                        WORK,
+                        MOVE,
+                        CARRY,
+                        WORK,
+                        MOVE,
+                        WORK,
+                        WORK,
+                        MOVE,
+                        WORK,
+                        WORK,
+                        MOVE,
+                        CARRY,
+                        WORK,
+                        MOVE,
+                    ]
 
                     return {
                         role,
                         defaultParts: [],
-                        extraParts: [
-                            WORK,
-                            WORK,
-                            MOVE,
-                            CARRY,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            CARRY,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            CARRY,
-                            WORK,
-                            MOVE,
-                        ],
-                        partsMultiplier,
+                        extraParts,
+                        partsMultiplier: 1,
                         threshold,
                         minCreeps: 1,
                         minCost: 300,
@@ -853,20 +854,20 @@ Room.prototype.spawnRequester = function () {
                     // If the controller is near to downgrading, set partsMultiplier to x
 
                     if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                        partsMultiplier = Math.max(partsMultiplier, 6)
+                        partsMultiplier = Math.max(partsMultiplier, 4)
 
-                    partsMultiplier = Math.round(partsMultiplier / 6)
+                    partsMultiplier = Math.round(partsMultiplier / 4)
                     if (partsMultiplier === 0) return false
 
                     return {
                         role,
-                        defaultParts: [CARRY],
+                        defaultParts: [CARRY, CARRY],
                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
                         partsMultiplier,
                         threshold,
                         minCreeps: undefined,
                         maxCreeps,
-                        minCost: 750,
+                        minCost: 250,
                         priority,
                         memoryAdditions: {
                             R: true,
