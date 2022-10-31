@@ -55,6 +55,7 @@ export class TradeManager {
         // Stop if there is no terminal
 
         if (!terminal) return
+        if (!terminal.RCLActionable) return
 
         this.createAllyRequests()
 

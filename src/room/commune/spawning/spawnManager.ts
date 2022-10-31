@@ -31,6 +31,7 @@ export class SpawnManager {
             }
 
             if (spawn.renewed) continue
+            if (!spawn.RCLActionable) continue
 
             inactiveSpawns.push(spawn)
         }
@@ -98,7 +99,6 @@ export class SpawnManager {
                 continue
             }
 
-            // See if creep can be spawned
             const testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
             // If creep can't be spawned

@@ -961,6 +961,8 @@ declare global {
 
         createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask | false
 
+        highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
+
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
          */

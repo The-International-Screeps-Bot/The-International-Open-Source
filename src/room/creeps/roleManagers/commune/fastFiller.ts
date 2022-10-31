@@ -117,6 +117,7 @@ export class FastFiller extends Creep {
                             return true
                         }
                     }
+
                     // Otherwise, if there is insufficient energy in the structure, iterate
 
                     if (
@@ -125,6 +126,7 @@ export class FastFiller extends Creep {
                     )
                         continue
                 }
+                else if (structure.store.energy <= 0) continue
 
                 // Otherwise, withdraw from the structure and inform true
 
