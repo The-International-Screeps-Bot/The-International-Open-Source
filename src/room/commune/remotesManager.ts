@@ -127,7 +127,7 @@ export class RemotesManager {
 
                 remoteMemory.data[RemoteData.remoteDismantler] =
                     Math.min(remote.actionableWalls.filter(w => w.hits < 50000).length, 1) ||
-                    Math.min(remote.dismantleTargets.length, 1)
+                    Math.min(remote.dismantleTargets.filter(w => w.hits < 50000).length, 1)
             }
 
             // If the remote is assumed to be reserved by an enemy or to be an invader core
