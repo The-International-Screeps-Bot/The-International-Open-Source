@@ -1481,6 +1481,11 @@ declare global {
         PC: boolean
 
         /**
+         * Placing completed for controler level. Set the rcl if all cs has been placed for the room
+         */
+        PCL: number
+
+        /**
          * Remote Planned, wether or not remote planning has been completed for the room
          */
         RP: boolean
