@@ -1310,7 +1310,7 @@ Object.defineProperties(Room.prototype, {
     },
     droppedResources: {
         get() {
-            if (this._droppedResources) return this.droppedResources
+            if (this._droppedResources) return this._droppedResources
 
             return (this._droppedResources = this.find(FIND_DROPPED_RESOURCES))
         },
