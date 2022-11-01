@@ -1,19 +1,30 @@
 import { myColors } from './constants'
 import { customLog } from './utils'
 
-function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
+const cpuUsers: CpuUsers = {
+    imcu: 0,
+    cocu: 0,
+    mvmcu: 0,
+    pccu: 0,
+    tccu: 0,
+    roomcu: 0,
+    smcu: 0,
+}
+
+function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
     const roomStatsLevel = Memory.roomStats
     switch (statName) {
         case 'su':
-        case 'cu':
         case 'eih':
-            if (roomStatsLevel >= 1 || forceUpdate) return 1
+            if (roomStatsLevel >= 1) return 1
+            else return 0
         case 'cc':
         case 'tcc':
         case 'cl':
         case 'bes':
         case 'es':
-            if (roomStatsLevel >= 1 || forceUpdate) return 1.5
+            if (roomStatsLevel >= 1) return 1.5
+            else return 0
         case 'mh':
         case 'eib':
         case 'eos':
@@ -24,77 +35,186 @@ function GetLevelOfStatName(statName: string, forceUpdate: boolean): number {
         case 'eosp':
         case 'eop':
         case 'rc':
-        case 'rcu':
         case 'res':
         case 'reih':
         case 'reoro':
         case 'reob':
-            if (roomStatsLevel >= 2 || forceUpdate) return 2
+            if (roomStatsLevel >= 2) return 2
+            else return 0
+        case 'rrvmcu':
+        case 'rcmcu':
+        case 'rrolmcu':
+        case 'retcmcu':
+        case 'rprmcu':
+        case 'acrmcu':
+        case 'clrmcu':
+        case 'tmcu':
+        case 'smcu':
+        case 'cormcu':
+        case 'dmcu':
+        case 'srmcu':
+        case 'rocu':
+        case 'rvmcu':
+        case 'cmcu':
+        case 'rolmcu':
+        case 'rolmpccu':
+        case 'rrolmpccu':
+        case 'etcmcu':
+        case 'prmcu':
+        case 'prmpccu':
+        case 'rprmpccu':
+        case 'rrocu':
+            if (Memory.CPULogging === true) return 3
             else return 0
         default:
             return 0
     }
 }
 
-function GetRemoteStatsName(name: string): string {
+function GetRemoteStatsName(name: RoomCommuneStatNames): RoomStatNames {
     switch (name) {
-        case 'cu':
         case 'es':
         case 'eih':
         case 'eoro':
         case 'eob':
-            return 'r' + name
+        case 'rocu':
+        case 'rvmcu':
+        case 'cmcu':
+        case 'rolmcu':
+        case 'rolmpccu':
+        case 'etcmcu':
+        case 'prmcu':
+        case 'prmpccu':
+            return ('r' + name) as RoomStatNames
         default:
-            return name
+            return name as RoomStatNames
     }
 }
 
 export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
-        if (roomType === 'commune') {
-            const communeStats: RoomCommuneStats = {
-                cl: 0,
-                eib: 0,
-                eih: 0,
-                eou: 0,
-                eoro: 0,
-                eorwr: 0,
-                eob: 0,
-                eos: 0,
-                eosp: 0,
-                eop: 0,
-                mh: 0,
-                bes: 0,
-                es: 0,
-                cc: 0,
-                cu: Game.cpu.getUsed(),
-                su: 0,
-                tcc: 0,
-                rc: 0,
-                rcu: 0,
-                res: 0,
-                reih: 0,
-                reoro: 0,
-                reob: 0,
-                gt: 0,
-            }
-
-            global.roomStats.commune[roomName] = communeStats
-            if (!Memory.stats.rooms[roomName]) Memory.stats.rooms[roomName] = communeStats
-            return
+        const remoteLevel1: Partial<RoomStats> = {
+            res: 0,
+            gt: 0,
+            reih: 0,
+        }
+        const remoteLevel2: Partial<RoomStats> = {
+            ...remoteLevel1,
+            reoro: 0,
+            reob: 0,
+            res: 0,
+        }
+        const remoteLevel3: Partial<RoomStats> = {
+            rrocu: 0,
+            rrvmcu: 0,
+            rcmcu: 0,
+            rrolmcu: 0,
+            rrolmpccu: 0,
+            retcmcu: 0,
+            rprmcu: 0,
+            rprmpccu: 0,
         }
 
-        const remoteStats: RoomStats = {
+        const communeLevel1: Partial<RoomCommuneStats> = {
+            su: 0,
+            eih: 0,
+            cc: 0,
+            tcc: 0,
+            cl: 0,
+            bes: 0,
+            es: 0,
+            gt: 0,
+        }
+        const communeLevel2: Partial<RoomCommuneStats> = {
+            ...communeLevel1,
+            mh: 0,
+            eib: 0,
+            eos: 0,
+            eou: 0,
+            eob: 0,
+            eoro: 0,
+            eorwr: 0,
+            eosp: 0,
+            eop: 0,
             rc: 0,
-            rcu: Game.cpu.getUsed(),
             res: 0,
             reih: 0,
             reoro: 0,
             reob: 0,
-            gt: 0,
+        }
+        const communeLevel3: Partial<RoomCommuneStats> = {
+            rrvmcu: 0,
+            rcmcu: 0,
+            rrolmcu: 0,
+            rolmcu: 0,
+            rolmpccu: 0,
+            rrolmpccu: 0,
+            retcmcu: 0,
+            prmcu: 0,
+            rprmcu: 0,
+            prmpccu: 0,
+            rprmpccu: 0,
+            acrmcu: 0,
+            clrmcu: 0,
+            tmcu: 0,
+            smcu: 0,
+            cormcu: 0,
+            dmcu: 0,
+            srmcu: 0,
+            rocu: 0,
+            rvmcu: 0,
+            cmcu: 0,
+            etcmcu: 0,
+        }
+        const roomStats = Memory.roomStats
+        let stats = undefined
+        if (roomType === 'commune') {
+            switch (roomStats) {
+                case 1:
+                    stats = communeLevel1
+                    break
+                case 2:
+                    stats = communeLevel2
+                    break
+                default:
+                    stats = communeLevel1
+                    break
+            }
+
+            if (Memory.CPULogging === true) {
+                stats = {
+                    ...stats,
+                    ...communeLevel3,
+                }
+            }
+
+            if (stats) {
+                global.roomStats.commune[roomName] = stats
+                if (!Memory.stats.rooms[roomName]) Memory.stats.rooms[roomName] = stats
+            }
+            return
         }
 
-        global.roomStats.remote[roomName] = remoteStats
+        switch (roomStats) {
+            case 1:
+                stats = remoteLevel1
+                break
+            case 2:
+                stats = remoteLevel2
+                break
+            default:
+                stats = remoteLevel1
+                break
+        }
+
+        if (Memory.CPULogging === true) {
+            stats = {
+                ...stats,
+                ...remoteLevel3,
+            }
+        }
+
+        if (stats) global.roomStats.remote[roomName] = stats
     }
 
     roomPreTick(roomName: string, roomType: RoomTypes) {
@@ -105,13 +225,11 @@ export class StatsManager {
         if (roomType === 'commune') {
             const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
             if (globalStats) {
-                globalStats.cu = Game.cpu.getUsed() - globalStats.cu
                 globalStats.gt = Game.time
             }
         } else if (roomType === 'remote') {
             const globalStats = global.roomStats.remote[roomName] as RoomStats
             if (globalStats) {
-                globalStats.rcu = Game.cpu.getUsed() - globalStats.rcu
                 globalStats.gt = Game.time
             }
         }
@@ -138,13 +256,24 @@ export class StatsManager {
             .forEach(([remoteRoomName, remoteRoomStats]) => {
                 if (globalCommuneStats.gt === Game.time) {
                     globalCommuneStats.rc += 1
-                    globalCommuneStats.rcu += remoteRoomStats.rcu
                     globalCommuneStats.reih += remoteRoomStats.reih
                     globalCommuneStats.reoro += remoteRoomStats.reoro
                     globalCommuneStats.reob += remoteRoomStats.reob
+
+                    // CPU
+                    if (Memory.CPULogging === true) {
+                        globalCommuneStats.rrocu += remoteRoomStats.rrocu
+                        globalCommuneStats.rrvmcu += remoteRoomStats.rrvmcu
+                        globalCommuneStats.rcmcu += remoteRoomStats.rcmcu
+                        globalCommuneStats.rrolmcu += remoteRoomStats.rrolmcu
+                        globalCommuneStats.rrolmpccu += remoteRoomStats.rrolmpccu
+                        globalCommuneStats.retcmcu += remoteRoomStats.retcmcu
+                        globalCommuneStats.rprmcu += remoteRoomStats.rprmcu
+                        globalCommuneStats.rprmpccu += remoteRoomStats.rprmpccu
+                    }
+
                     if (each250Ticks)
-                        globalCommuneStats.res +=
-                            Game.rooms[remoteRoomName]?.resourcesInStoringStructures.energy || 0
+                        globalCommuneStats.res += Game.rooms[remoteRoomName]?.resourcesInStoringStructures.energy || 0
                 }
             })
         if (room) {
@@ -171,30 +300,48 @@ export class StatsManager {
             }
         }
 
-        Object.keys(globalCommuneStats).forEach(name => {
-            let globalValue = globalCommuneStats[name]
-            const value = roomStats[name]
-            if (!value) roomStats[name] = 0
-            if (!globalValue) globalValue = 0
+        const activeGlobalStatNames = Object.keys(globalCommuneStats) as (keyof RoomCommuneStats)[]
+        const activeStatNames = Object.keys(roomStats) as (keyof RoomCommuneStats)[]
+        const nonActiveStats = activeStatNames.filter(
+            stat => !activeGlobalStatNames.includes(stat),
+        ) as (keyof RoomCommuneStats)[]
 
-            const statLevel = GetLevelOfStatName(name, forceUpdate)
-            switch (statLevel) {
-                // level 1 w average
-                case 1:
-                    roomStats[name] = this.average(value, globalValue)
-                    break
-                // level 1 wo average
-                case 1.5:
-                    roomStats[name] = this.round(globalValue)
-                    break
-                // level 2 w average
-                case 2:
-                    if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
+        nonActiveStats.forEach(name => {
+            delete globalCommuneStats[name]
+            delete roomStats[name]
+        })
+
+        activeGlobalStatNames.forEach(name => {
+            const statLevel = GetLevelOfStatName(name)
+            if (statLevel > 0) {
+                let globalValue = globalCommuneStats[name]
+                const value = roomStats[name]
+                if (!value) roomStats[name] = 0
+                if (!globalValue) globalValue = 0
+
+                switch (statLevel) {
+                    // level 1 w average
+                    case 1:
                         roomStats[name] = this.average(value, globalValue)
-                    else roomStats[name] = 0
-                    break
-                default:
-                    break
+                        break
+                    // level 1 wo average
+                    case 1.5:
+                        roomStats[name] = this.round(globalValue)
+                        break
+                    // level 2 w average
+                    case 2:
+                        if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
+                            roomStats[name] = this.average(value, globalValue)
+                        else roomStats[name] = 0
+                        break
+                    case 3:
+                        if (forceUpdate || Memory.CPULogging === true) {
+                            roomStats[name] = this.average(value, globalValue)
+                        } else roomStats[name] = 0
+                        break
+                    default:
+                        break
+                }
             }
         })
     }
@@ -230,17 +377,21 @@ export class StatsManager {
             },
             rooms: {},
             constructionSiteCount: 0,
+            cpuUsers,
         }
 
         global.roomStats = { commune: {}, remote: {} }
+        global.cpuUsers = cpuUsers
         this.internationalEndTick()
     }
 
     internationalPreTick() {
+        global.cpuUsers = cpuUsers
         global.roomStats = { commune: {}, remote: {} }
     }
 
     internationalEndTick() {
+        const managerCPUStart = Game.cpu.getUsed()
         const timestamp = Date.now()
 
         global.lastReset = (global.lastReset || 0) + 1
@@ -288,6 +439,31 @@ export class StatsManager {
             }
         })
         delete global.roomStats
+
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            const cpuUsers = Memory.stats.cpuUsers
+            Memory.stats.cpuUsers = {
+                cocu: this.average(cpuUsers.cocu, global.cpuUsers.cocu),
+                imcu: this.average(cpuUsers.imcu, global.cpuUsers.imcu),
+                mvmcu: this.average(cpuUsers.mvmcu, global.cpuUsers.mvmcu),
+                pccu: this.average(cpuUsers.pccu, global.cpuUsers.pccu),
+                tccu: this.average(cpuUsers.tccu, global.cpuUsers.tccu),
+                roomcu: this.average(cpuUsers.roomcu, global.cpuUsers.roomcu),
+                smcu: this.average(cpuUsers.smcu, cpuUsed),
+            }
+            customLog('Stats Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        } else {
+            Memory.stats.cpuUsers = {
+                cocu: null,
+                imcu: null,
+                mvmcu: null,
+                pccu: null,
+                tccu: null,
+                roomcu: null,
+                smcu: null,
+            }
+        }
     }
 
     round(value: number, decimals: number = 8) {
@@ -296,6 +472,8 @@ export class StatsManager {
     }
 
     average(avg: number, number: number, averagedOverTickCount: number = 1000, precision?: number) {
+        if (!avg) avg = 0
+        if (!number) number = 0
         avg -= avg / averagedOverTickCount
         avg += number / averagedOverTickCount
         return this.round(avg, precision)
@@ -303,10 +481,22 @@ export class StatsManager {
 }
 
 export const statsManager = new StatsManager()
-export const globalStatsUpdater = function (roomName: string, name: string, value: number) {
-    const updateStats = GetLevelOfStatName(name, true) > 0
+export const globalStatsUpdater = function (
+    roomName: string,
+    name: string,
+    value: number,
+    nonRoomStat: boolean = false,
+) {
+    if (nonRoomStat) {
+        global.cpuUsers[name as InternationalStatNames] = value
+        return
+    }
+    const roomStatName = name as RoomStatNames
+    const updateStats = GetLevelOfStatName(roomStatName) > 0
     if (updateStats && global.roomStats) {
-        if (global.roomStats.commune[roomName]) global.roomStats.commune[roomName][name] += value
-        else if (global.roomStats.remote[roomName]) global.roomStats.remote[roomName][GetRemoteStatsName(name)] += value
+        if (global.roomStats.commune[roomName])
+            (global.roomStats.commune[roomName] as RoomCommuneStats)[roomStatName] += value
+        else if (global.roomStats.remote[roomName])
+            (global.roomStats.remote[roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
     }
 }

@@ -426,7 +426,6 @@ declare global {
         progressTotal: number
     }
     interface RoomStats {
-        [name: string]: number
         /**
          * Game Time
          */
@@ -435,10 +434,6 @@ declare global {
          * Remote Count
          */
         rc: number
-        /**
-         * Remote CPU Usage
-         */
-        rcu: number
         /**
          * Remote Energy Stored
          */
@@ -455,10 +450,41 @@ declare global {
          * Remote Energy Output Build
          */
         reob: number
+        /**
+         * Remote Room CPU Usage
+         */
+        rrocu: number
+        /**
+         * Remote Room Visuals Manager CPU Usage
+         */
+        rrvmcu: number
+        /**
+         * Remote Construction Manager CPU Usage
+         */
+        rcmcu: number
+        /**
+         * Remote Role Manager CPU Usage
+         */
+        rrolmcu: number
+        /**
+         * Remote Role Manager Per Creep CPU Usage
+         */
+        rrolmpccu: number
+        /**
+         * Remote End Tick Creep Manager CPU Usage
+         */
+        retcmcu: number
+        /**
+         * Remote Power Role Manager CPU Usage
+         */
+        rprmcu: number
+        /**
+         * Remote Power Role Manager Per Creep CPU Usage
+         */
+        rprmpccu: number
     }
 
     interface RoomCommuneStats extends RoomStats {
-        [name: string]: number
         /**
          * Controller Level
          */
@@ -521,14 +547,111 @@ declare global {
          */
         tcc: number
         /**
-         * CPU Usage
-         */
-        cu: number
-        /**
          * Spawn Usage
          */
         su: number
+        /**
+         * Ally Creep Request Manager CPU Usage
+         */
+        acrmcu: number
+        /**
+         * Claim Request Manager CPU Usage
+         */
+        clrmcu: number
+        /**
+         * Tower Manager CPU Usage
+         */
+        tmcu: number
+        /**
+         * Spawn Manager CPU Usage
+         */
+        smcu: number
+        /**
+         * Combat Request Manager CPU Usage
+         */
+        cormcu: number
+        /**
+         * Defence Manager CPU Usage
+         */
+        dmcu: number
+        /**
+         * Spawn Request Manager CPU Usage
+         */
+        srmcu: number
+        /**
+         * Room CPU Usage
+         */
+        rocu: number
+        /**
+         * Room Visuals Manager CPU Usage
+         */
+        rvmcu: number
+        /**
+         * Construction Manager CPU Usage
+         */
+        cmcu: number
+        /**
+         * Role Manager CPU Usage
+         */
+        rolmcu: number
+        /**
+         * Role Manager Per Creep CPU Usage
+         */
+        rolmpccu: number
+        /**
+         * End Tick Creep Manager CPU Usage
+         */
+        etcmcu: number
+        /**
+         * Power Role Manager CPU Usage
+         */
+        prmcu: number
+        /**
+         * Role Manager Per Creep CPU Usage
+         */
+        prmpccu: number
     }
+
+    interface CpuUsers {
+        /**
+         * International Manager CPU Usage
+         */
+        imcu: number
+
+        /**
+         * Creep Organizer CPU Usage
+         */
+        cocu: number
+
+        /**
+         * Map Visuals Manager CPU Usage
+         */
+        mvmcu: number
+
+        /**
+         * Power Creep Organizer CPU Usage
+         */
+        pccu: number
+
+        /**
+         * Tick Config CPU Usage
+         */
+        tccu: number
+
+        /**
+         * Room Manager CPU Usage
+         */
+        roomcu: number
+
+        /**
+         * Stats Manager CPU Usage
+         */
+        smcu: number
+    }
+
+    type InternationalStatNames = keyof CpuUsers
+    type RoomStatNames = keyof RoomStats
+    type RoomCommuneStatNames = keyof RoomCommuneStats
 
     interface Stats {
         lastReset: number
@@ -559,8 +682,9 @@ declare global {
         gcl: ControllerLevel
 
         gpl: ControllerLevel
-        rooms: { [key: string]: RoomCommuneStats }
+        rooms: { [key: string]: Partial<RoomCommuneStats> }
         constructionSiteCount: number
+        cpuUsers: CpuUsers
     }
 
     type StatsRoomTypes = 'commune' | 'remote'
@@ -2139,7 +2263,8 @@ declare global {
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: RoomStats | RoomCommuneStats } }
+            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: Partial<RoomStats | RoomCommuneStats> } }
+            cpuUsers: CpuUsers
 
             terrainCoords: { [roomName: string]: CoordMap }
 

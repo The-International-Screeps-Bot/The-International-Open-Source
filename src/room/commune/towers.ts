@@ -12,9 +12,10 @@ export class TowerManager {
     }
 
     public run() {
+        const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         const towers = this.communeManager.structures.tower
         if (!towers.length) {
@@ -38,8 +39,12 @@ export class TowerManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
-            customLog('Tower Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Tower Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'tmcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 
     findAttackTarget() {
@@ -68,7 +73,6 @@ export class TowerManager {
         }
 
         if (!room.towerAttackTarget) {
-
             this.createPowerTasks()
             room.towerInferiority = true
             return false
@@ -77,6 +81,9 @@ export class TowerManager {
         // If we seem to be under attack from a swarm, record that the tower needs help
 
         if (attackTargets.length >= 15) {
+            this.createPowerTasks()
+            room.towerInferiority = true
+        }
 
             this.createPowerTasks()
             room.towerInferiority = true
@@ -86,7 +93,6 @@ export class TowerManager {
     }
 
     attackEnemyCreeps() {
-
         if (this.communeManager.room.flags.disableTowerAttacks) {
             this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
             return true
@@ -203,11 +209,9 @@ export class TowerManager {
     }
 
     createPowerTasks() {
-
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
         for (const tower of this.communeManager.structures.tower) {
-
             this.communeManager.room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
         }
     }
