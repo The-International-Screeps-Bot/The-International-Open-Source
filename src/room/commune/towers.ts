@@ -15,7 +15,7 @@ export class TowerManager {
         const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
         const towers = this.communeManager.structures.tower
         if (!towers.length) {
@@ -39,7 +39,7 @@ export class TowerManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging === true) {
+        if (Memory.CPULogging) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Tower Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
             const statName: RoomCommuneStatNames = 'tmcu'
@@ -208,7 +208,7 @@ export class TowerManager {
         return true
     }
 
-    createPowerTasks() {
+    private createPowerTasks() {
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
         for (const tower of this.communeManager.structures.tower) {

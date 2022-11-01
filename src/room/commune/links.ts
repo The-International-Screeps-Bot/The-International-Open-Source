@@ -3,7 +3,7 @@ import { customLog } from 'international/utils'
 
 Room.prototype.linkManager = function() {
 
-     if (!this.storage) return
+     if (!this.storage && !this.terminal) return
 
      // Get the sourceLinks
 
@@ -81,7 +81,7 @@ Room.prototype.hubToController = function (hubLink, controllerLink) {
 
      if (
           this.controller.ticksToDowngrade > 10000 &&
-          this.storage.store.energy < this.communeManager.storedEnergyUpgradeThreshold * 0.5
+          this.resourcesInStoringStructures.energy < this.communeManager.storedEnergyUpgradeThreshold * 0.5
      )
           return
 

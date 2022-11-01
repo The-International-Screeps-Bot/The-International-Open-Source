@@ -40,6 +40,7 @@ export class TradeManager {
     communeManager: CommuneManager
     room: Room
     terminal: StructureTerminal
+
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
     }
@@ -133,14 +134,27 @@ export class TradeManager {
         const { room } = this.communeManager
         const { terminal } = room
 
+        let targetAmount = this.communeManager.storedEnergyUpgradeThreshold
+        let resource: MarketResourceConstant = RESOURCE_ENERGY
+
         // If the terminal has less than x energy in the terminal, request y
 
-        if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) < 50000) {
+        if (terminal.store.getUsedCapacity(resource) < targetAmount) {
+
+            let priority: number
+
+            const { controller } = this.communeManager.room
+            if (controller.level < 8) {
+
+                priority = Math.max(Math.min(controller.progress / controller.progressTotal, 0.9), 0.2)
+            }
+            else priority = 0.5
+
             allyManager.requestResource(
                 room.name,
-                RESOURCE_ENERGY,
-                60000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY),
-                0.75,
+                resource,
+                targetAmount * 1.2 - terminal.store.getUsedCapacity(resource),
+                priority,
             )
         }
 
@@ -201,7 +215,15 @@ export class TradeManager {
             if (request.resourceType === RESOURCE_ENERGY) {
                 // If the terminal doesn't have enough, iterate
 
-                if (terminal.store.getUsedCapacity(request.resourceType) < 60000) continue
+                if (
+                    terminal.store.getUsedCapacity(request.resourceType) / terminal.store.getCapacity() <
+                    1 -
+                        Math.pow(
+                            terminal.store.getUsedCapacity(request.resourceType) / terminal.store.getCapacity(),
+                            1.2,
+                        )
+                )
+                    continue
 
                 amount = Math.min(request.maxAmount, terminal.store.getUsedCapacity(request.resourceType) / 2)
 

@@ -354,7 +354,7 @@ class TickConfig {
 
                 if (room.storage && room.controller.level >= 4) {
                     if (
-                        room.resourcesInStoringStructures.energy / (10000 + room.controller.level * 1000) <
+                        room.resourcesInStoringStructures.energy / (20000 + room.controller.level * 1000) <
                         room.memory.combatRequests.length
                     )
                         continue
