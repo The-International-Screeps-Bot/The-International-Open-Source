@@ -830,41 +830,42 @@ Room.prototype.spawnRequester = function () {
                 // If the controller is level 8
 
                 if (this.controller.level === 8) {
-
                     let extraParts: BodyPartConstant[]
 
                     // If the controller is near to downgrading
 
-                    if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed) extraParts = [CARRY, WORK, MOVE]
-                    else if (partsMultiplier = 0) return false
-                    else extraParts = [
-                        WORK,
-                        WORK,
-                        MOVE,
-                        CARRY,
-                        WORK,
-                        WORK,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        WORK,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        MOVE,
-                        CARRY,
-                        WORK,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        MOVE,
-                        CARRY,
-                        WORK,
-                        MOVE,
-                    ]
+                    if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        extraParts = [CARRY, WORK, MOVE]
+                    else if ((partsMultiplier = 0)) return false
+                    else
+                        extraParts = [
+                            WORK,
+                            WORK,
+                            MOVE,
+                            CARRY,
+                            WORK,
+                            WORK,
+                            MOVE,
+                            WORK,
+                            WORK,
+                            WORK,
+                            MOVE,
+                            WORK,
+                            WORK,
+                            MOVE,
+                            CARRY,
+                            WORK,
+                            MOVE,
+                            WORK,
+                            WORK,
+                            MOVE,
+                            WORK,
+                            WORK,
+                            MOVE,
+                            CARRY,
+                            WORK,
+                            MOVE,
+                        ]
 
                     return {
                         role,
@@ -969,7 +970,7 @@ Room.prototype.spawnRequester = function () {
     )
 
     for (const remoteInfo of this.remoteSourceIndexesByEfficacy) {
-        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.9) break
+        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.95) break
         const splitRemoteInfo = remoteInfo.split(' ')
         const remoteName = splitRemoteInfo[0]
         const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
@@ -1043,7 +1044,7 @@ Room.prototype.spawnRequester = function () {
     const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
-        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.9) break
+        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.95) break
         const remoteName = remoteNamesByEfficacy[index]
         const remoteData = Memory.rooms[remoteName].data
 
