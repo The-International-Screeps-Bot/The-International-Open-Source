@@ -801,7 +801,9 @@ Creep.prototype.advancedRenew = function () {
 
     // Get a spawn in range of 1, informing false if there are none
 
-    const spawn = spawns.find(spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable)
+    const spawn = spawns.find(
+        spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable,
+    )
     if (!spawn) return
 
     // If the spawn has already renewed this tick, inform false
@@ -1273,7 +1275,7 @@ Creep.prototype.reserveWithdrawEnergy = function () {
         return target.store.energy >= this.freeCapacityNextTick
     })
 
-    if (!room.storage || !room.terminal) {
+    if (!room.storage && !room.terminal) {
         withdrawTargets = withdrawTargets.concat(
             [room.fastFillerContainerLeft, room.fastFillerContainerRight, room.controllerContainer].filter(target => {
                 return target && target.store.energy >= target.store.getCapacity(RESOURCE_ENERGY) * 0.5
