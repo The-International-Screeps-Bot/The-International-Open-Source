@@ -188,8 +188,8 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES)) this._structures[structure.structureType].push(structure as any)
-
+            for (const structure of this.find(FIND_STRUCTURES))
+                this._structures[structure.structureType].push(structure as any)
 
             return this._structures
         },
@@ -1310,9 +1310,9 @@ Object.defineProperties(Room.prototype, {
     },
     droppedResources: {
         get() {
-            if (this._droppedEnergy) return this._droppedEnergy
+            if (this._droppedResources) return this.droppedResources
 
-            return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES))
+            return (this._droppedResources = this.find(FIND_DROPPED_RESOURCES))
         },
     },
     actionableWalls: {
@@ -1718,9 +1718,7 @@ Object.defineProperties(Room.prototype, {
             this._enemyThreatGoals = []
 
             for (const enemyCreep of this.enemyAttackers) {
-
                 if (enemyCreep.parts.ranged_attack) {
-
                     this._enemyThreatGoals.push({
                         pos: enemyCreep.pos,
                         range: 4,
