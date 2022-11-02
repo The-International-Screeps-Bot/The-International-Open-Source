@@ -85,10 +85,6 @@ export class TowerManager {
             room.towerInferiority = true
         }
 
-            this.createPowerTasks()
-            room.towerInferiority = true
-        }
-
         return room.towerAttackTarget
     }
 
