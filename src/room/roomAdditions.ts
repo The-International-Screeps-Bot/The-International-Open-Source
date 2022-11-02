@@ -1304,7 +1304,7 @@ Object.defineProperties(Room.prototype, {
             return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES, {
                 filter: resource =>
                     resource.resourceType === RESOURCE_ENERGY &&
-                    resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
+                    !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
             }))
         },
     },
@@ -1312,7 +1312,9 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._droppedResources) return this._droppedResources
 
-            return (this._droppedResources = this.find(FIND_DROPPED_RESOURCES))
+            return (this._droppedResources = this.find(FIND_DROPPED_RESOURCES, {
+                filter: resource=> !resource.room.enemyThreatCoords.has(packCoord(resource.pos))
+            }))
         },
     },
     actionableWalls: {

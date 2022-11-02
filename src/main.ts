@@ -43,6 +43,7 @@ import ExecutePandaMasterCode from './other/PandaMaster/Execute'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
+import { globalStatsUpdater } from 'international/statsManager'
 
 global.profiler = initProfiler()
 
@@ -58,7 +59,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
     // Run prototypes
 
@@ -77,13 +78,12 @@ export const loop = ErrorMapper.wrapLoop((): void => {
     allyManager.tickConfig()
     allyManager.getAllyRequests()
 
-    if (Memory.CPULogging)
-        customLog(
-            'International Manager',
-            (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-            myColors.white,
-            myColors.lightBlue,
-        )
+    if (Memory.CPULogging === true) {
+        const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+        customLog('International Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        const statName: InternationalStatNames = 'imcu'
+        globalStatsUpdater('', statName, cpuUsed, true)
+    }
 
     /*
     let cpu = Game.cpu.getUsed()

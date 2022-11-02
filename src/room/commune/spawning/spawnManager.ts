@@ -13,6 +13,7 @@ export class SpawnManager {
     }
 
     run() {
+        const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
@@ -39,14 +40,15 @@ export class SpawnManager {
         this.runSpawning(inactiveSpawns)
         this.createPowerTasks(activeSpawns)
 
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (Memory.CPULogging)
-            customLog('Spawn Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.lightGrey)
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Spawn Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'smcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 
     runSpawning(inactiveSpawns: StructureSpawn[]) {
-
         if (!inactiveSpawns.length) return
 
         // Construct spawnRequests
@@ -58,12 +60,10 @@ export class SpawnManager {
         const requestsByPriority = Object.keys(this.communeManager.room.spawnRequests).sort((a, b) => {
             return parseInt(a) - parseInt(b)
         })
-/*
+        /*
         // Spawn request debug logging
-
         for (const priority of requestsByPriority) {
             const request = this.communeManager.room.spawnRequests[priority]
-
             customLog('SPAWN REQUESTS', priority + ', ' + request.role)
         }
  */
@@ -99,6 +99,7 @@ export class SpawnManager {
                 continue
             }
 
+            // See if creep can be spawned
             const testSpawnResult = spawn.advancedSpawn(spawnRequest)
 
             // If creep can't be spawned
@@ -140,11 +141,9 @@ export class SpawnManager {
     }
 
     createPowerTasks(activeSpawns: StructureSpawn[]) {
-
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
         for (const spawn of activeSpawns) {
-
             this.communeManager.room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)
         }
     }

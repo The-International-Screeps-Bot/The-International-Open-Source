@@ -4,20 +4,19 @@ import { customLog } from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { packCoord } from 'other/packrat'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
+import { globalStatsUpdater } from './statsManager'
 
 class PowerCreepOrganizer {
-
     constructor() {}
 
     public run() {
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         // Clear non-existent creeps from memory
 
         for (const creepName in Memory.powerCreeps) {
-
             // The creep has been deleted, delete it from memory
 
             if (!Game.creeps[creepName]) delete Memory.powerCreeps[creepName]
@@ -38,8 +37,12 @@ class PowerCreepOrganizer {
             }
         }
 
-        if (Memory.CPULogging)
-            customLog('Power Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.teal)
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Power Creep Organizer', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: InternationalStatNames = 'pccu'
+            globalStatsUpdater('', statName, cpuUsed, true)
+        }
     }
 
     private processCreep(creepName: string) {
@@ -48,7 +51,6 @@ class PowerCreepOrganizer {
         // If the creep isn't spawned
 
         if (!creep.ticksToLive) {
-
             internationalManager.unspawnedPowerCreepNames.push(creep.name)
             return
         }

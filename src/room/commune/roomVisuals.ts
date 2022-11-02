@@ -8,6 +8,7 @@ import {
     roomDimensions,
     stamps,
 } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from '../roomManager'
 
@@ -19,22 +20,22 @@ export class RoomVisualsManager {
     }
 
     public run() {
+        const { room } = this.roomManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.roomVisuals()
         this.baseVisuals()
 
         // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
 
-        if (Memory.CPULogging)
-            customLog(
-                'Room Visuals Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                undefined,
-                myColors.lightGrey,
-            )
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Room Visuals Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'rvmcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 
     private roomVisuals() {

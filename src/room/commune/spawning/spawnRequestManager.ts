@@ -16,12 +16,13 @@ import {
 import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
+import { globalStatsUpdater } from 'international/statsManager'
 const minRemotePriority = 10
 
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
     // Structure info about the this's spawn energy
 
@@ -836,7 +837,9 @@ Room.prototype.spawnRequester = function () {
 
                     if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
                         extraParts = [CARRY, WORK, MOVE]
-                    else if ((partsMultiplier = 0)) return false
+
+                    else if (partsMultiplier === 0) return false
+
                     else
                         extraParts = [
                             WORK,
@@ -1141,35 +1144,41 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteData[RemoteData.minDamage] + remoteData[RemoteData.minHeal] <= 0) return false
 
-                const minRangedAttackCost =
-                    ((remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-                        (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]) *
-                    1.2
+                let minRangedAttackCost = 0
+
+                if (remoteData[RemoteData.minDamage] > 0) {
+                    minRangedAttackCost =
+                        (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+                        (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+                }
+
                 const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
-                const minHealCost =
-                    ((remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
-                        (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]) *
-                    1.2
+                let minHealCost = 0
+
+                if (remoteData[RemoteData.minHeal] > 0) {
+                    minHealCost =
+                        (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
+                        (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]
+                }
+
                 const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
                 if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                    /* Memory.rooms[remoteName].data[RemoteData.abandon] = 1500 */
-
+                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
 
                 const minCost = minRangedAttackCost + minHealCost
                 if (minCost > spawnEnergyCapacity) {
-                    /* Memory.rooms[remoteName].data[RemoteData.abandon] = 1500 */
-
+                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
                     return false
                 }
 
                 const role = 'remoteDefender'
                 const extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < rangedAttackAmount + healAmount; i++) {
+                for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
                     extraParts.push(MOVE)
                 }
 
@@ -1180,6 +1189,8 @@ Room.prototype.spawnRequester = function () {
                 for (let i = 0; i < healAmount; i++) {
                     extraParts.push(HEAL)
                 }
+
+                extraParts.push(MOVE)
 
                 return {
                     role,
@@ -1634,5 +1645,10 @@ Room.prototype.spawnRequester = function () {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.CPULogging) customLog('Spawn Request Manager', (Game.cpu.getUsed() - managerCPUStart).toFixed(2))
+    if (Memory.CPULogging === true) {
+        const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+        customLog('Spawn Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        const statName: RoomCommuneStatNames = 'srmcu'
+        globalStatsUpdater(this.name, statName, cpuUsed)
+    }
 }

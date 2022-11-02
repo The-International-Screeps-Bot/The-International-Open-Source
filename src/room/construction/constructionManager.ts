@@ -3,6 +3,7 @@ import { customLog } from 'international/utils'
 import { basePlanner } from './communePlanner'
 import { rampartPlanner } from './rampartPlanner'
 import './constructionFunctions'
+import { globalStatsUpdater } from 'international/statsManager'
 
 /**
  * Creates construction sites and deletes structures in a room
@@ -10,14 +11,11 @@ import './constructionFunctions'
 export function constructionManager(room: Room) {
     // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
     /*
     // Testing
-
     delete room.memory.PC
-
     room.memory.stampAnchors = {}
-
     for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
  */
 
@@ -50,11 +48,10 @@ export function constructionManager(room: Room) {
 
     // If CPU logging is enabled, log the CPU used by this manager
 
-    if (Memory.CPULogging)
-        customLog(
-            'Construction Manager',
-            `CPU: ${(Game.cpu.getUsed() - managerCPUStart).toFixed(2)}`,
-            undefined,
-            myColors.lightGrey,
-        )
+    if (Memory.CPULogging === true) {
+        const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+        customLog('Construction Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        const statName: RoomCommuneStatNames = 'cmcu'
+        globalStatsUpdater(room.name, statName, cpuUsed)
+    }
 }

@@ -2,6 +2,7 @@ import { AllyCreepRequestData, ClaimRequestData, myColors } from 'international/
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
+import { globalStatsUpdater } from 'international/statsManager'
 
 export class AllyCreepRequestManager {
     communeManager: CommuneManager
@@ -18,7 +19,7 @@ export class AllyCreepRequestManager {
 
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         /*
         if (Memory.allyCreepRequests[this.memory.allyCreepRequest].abandon > 0) {
@@ -62,13 +63,12 @@ export class AllyCreepRequestManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging)
-            customLog(
-                'Ally Creep Request Manager',
-                (Game.cpu.getUsed() - managerCPUStart).toFixed(2),
-                undefined,
-                myColors.lightGrey,
-            )
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Ally Creep Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            const statName: RoomCommuneStatNames = 'acrmcu'
+            globalStatsUpdater(room.name, statName, cpuUsed)
+        }
     }
 }
 
