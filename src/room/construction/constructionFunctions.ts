@@ -21,12 +21,11 @@ Room.prototype.communeConstructionPlacement = function () {
     // Only run if not all cs got placed for this rcl or the room is under attack
 
     if (
-        this.memory.PCL &&
-        this.memory.PCL === this.controller.level &&
-        this.enemyCreeps.filter(function (creep) {
+        (this.memory.PCL && this.memory.PCL === this.controller.level) ||
+        (this.enemyCreeps.filter(function (creep) {
             return !creep.isOnExit
         }).length === 0 &&
-        !randomTick(200)
+            !randomTick(200))
     )
         return
 
