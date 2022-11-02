@@ -188,8 +188,8 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES)) this._structures[structure.structureType].push(structure as any)
-
+            for (const structure of this.find(FIND_STRUCTURES))
+                this._structures[structure.structureType].push(structure as any)
 
             return this._structures
         },
@@ -1720,9 +1720,7 @@ Object.defineProperties(Room.prototype, {
             this._enemyThreatGoals = []
 
             for (const enemyCreep of this.enemyAttackers) {
-
                 if (enemyCreep.parts.ranged_attack) {
-
                     this._enemyThreatGoals.push({
                         pos: enemyCreep.pos,
                         range: 4,
@@ -2008,11 +2006,21 @@ Object.defineProperties(Room.prototype, {
     MAWT: {
         get() {
             if (this._MAWT) return this._MAWT
-
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
-                ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
+                ...this.sourceContainers.filter(
+                    sc =>
+                        sc.store.getUsedCapacity() >
+                        _.sum(
+                            _.filter(
+                                Game.creeps,
+                                c => c.memory.Rs && c.memory.Rs?.length > 0 && c.memory.Rs[0].targetID === sc.id,
+                            ),
+                            c => c.memory.Rs[0].amount,
+                        ) +
+                            50,
+                ),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (
                         (structure as any).store &&

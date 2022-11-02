@@ -25,7 +25,6 @@ export class Operator extends PowerCreep {
     }
 
     findTask?() {
-
         if (this.findRenewTask()) return true
         if (this.findEnablePowerTask()) return true
         if (this.findGenerateOpsTask()) return true
@@ -101,7 +100,6 @@ export class Operator extends PowerCreep {
     }
 
     findGenerateOpsTask?() {
-
         if (this.powered) return false
 
         const power = this.powers[PWR_GENERATE_OPS]
@@ -114,7 +112,6 @@ export class Operator extends PowerCreep {
     }
 
     advancedGenerateOps?() {
-
         this.say('AGO')
 
         if (this.powered) return false
@@ -124,7 +121,6 @@ export class Operator extends PowerCreep {
     }
 
     isViablePowerTarget?(target: Structure | Source) {
-
         const maxRange = getRangeOfCoords(this.pos, target.pos) * 1.2
 
         if (this.powers[PWR_REGEN_SOURCE].cooldown > maxRange) return false
@@ -137,7 +133,6 @@ export class Operator extends PowerCreep {
     }
 
     findSourceRegenTask?() {
-
         const power = this.powers[PWR_REGEN_SOURCE]
         if (!power) return false
 
@@ -146,7 +141,6 @@ export class Operator extends PowerCreep {
         })
 
         for (const source of sources) {
-
             if (!this.isViablePowerTarget(source)) continue
 
             this.memory.TN = 'advancedRegenSource'
@@ -158,7 +152,6 @@ export class Operator extends PowerCreep {
     }
 
     advancedRegenSource?() {
-
         this.say('ARS')
 
         const source = findObjectWithID(this.memory.TTID)
@@ -184,7 +177,8 @@ export class Operator extends PowerCreep {
 
         if (this.powered) return false
         if (this.powers[PWR_REGEN_SOURCE].cooldown) return false
-        if (source.effectsData.get(PWR_REGEN_SOURCE) && source.effectsData.get(PWR_REGEN_SOURCE).ticksRemaining) return false
+        if (source.effectsData.get(PWR_REGEN_SOURCE) && source.effectsData.get(PWR_REGEN_SOURCE).ticksRemaining)
+            return false
 
         this.usePower(PWR_REGEN_SOURCE, source)
         return true

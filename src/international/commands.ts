@@ -168,15 +168,22 @@ global.claim = function (requestName, communeName) {
 
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`
 }
-global.deleteClaimRequests = function () {
+global.deleteClaimRequests = function (requestName) {
     let deleteCount = 0
 
-    for (const requestName in Memory.claimRequests) {
-        const request = Memory.claimRequests[requestName]
+    if (requestName) {
+        if (Memory.claimRequests[requestName]) {
+            deleteCount += 1
+            delete Memory.claimRequests[requestName]
+        }
+    } else {
+        for (const requestName in Memory.claimRequests) {
+            const request = Memory.claimRequests[requestName]
 
-        deleteCount += 1
-        if (request.responder) delete Memory.rooms[request.responder].claimRequest
-        delete Memory.claimRequests[requestName]
+            deleteCount += 1
+            if (request.responder) delete Memory.rooms[request.responder].claimRequest
+            delete Memory.claimRequests[requestName]
+        }
     }
 
     return `Deleted ${deleteCount} claim requests`
@@ -196,8 +203,8 @@ global.combat = function (requestName, type, opts, communeName) {
     request.data[CombatRequestData.abandon] = 0
 
     for (const key in opts) {
-
-        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
+        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+            opts[key as keyof typeof CombatRequestData]
     }
 
     if (communeName) {
@@ -248,10 +255,8 @@ global.allyCreepRequest = function (requestName, communeName?) {
 }
 global.ACR = global.allyCreepRequest
 
-global.deleteBasePlans = function(roomName) {
-
+global.deleteBasePlans = function (roomName) {
     if (!roomName) {
-
         if (global.communes.size > 1) return 'Provide a roomName'
 
         roomName = Array.from(global.communes)[0]

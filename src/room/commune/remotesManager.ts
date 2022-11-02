@@ -1,4 +1,10 @@
-import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles, maxRemoteRoomDistance } from 'international/constants'
+import {
+    minHarvestWorkRatio,
+    remoteHarvesterRoles,
+    RemoteData,
+    remoteRoles,
+    maxRemoteRoomDistance,
+} from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
@@ -22,7 +28,6 @@ export class RemotesManager {
             // If the room isn't a remote, remove it from the remotes array
 
             if (remoteMemory.T !== 'remote' || remoteMemory.commune !== this.communeManager.room.name) {
-
                 this.communeManager.room.memory.remotes.splice(index, 1)
                 continue
             }
@@ -35,7 +40,6 @@ export class RemotesManager {
             // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
             if (randomTick(100)) {
-
                 const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
                     typeWeights: {
                         keeper: Infinity,
@@ -48,7 +52,6 @@ export class RemotesManager {
                 })
 
                 if (safeDistance > maxRemoteRoomDistance) {
-
                     remoteMemory.data[RemoteData.abandon] = 1500
                     this.manageAbandonment(remoteName)
                     continue
@@ -65,7 +68,6 @@ export class RemotesManager {
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {
-
                     remoteMemory.data[RemoteData.abandon] = 1500
                     this.manageAbandonment(remoteName)
                     continue
@@ -124,7 +126,8 @@ export class RemotesManager {
                 // Create need if there are any walls or enemy owner structures (not including invader cores)
 
                 remoteMemory.data[RemoteData.remoteDismantler] =
-                    Math.min(remote.actionableWalls.length, 1) || Math.min(remote.dismantleTargets.length, 1)
+                    Math.min(remote.actionableWalls.filter(w => w.hits < 50000).length, 1) ||
+                    Math.min(remote.dismantleTargets.filter(w => w.hits < 50000).length, 1)
             }
 
             // If the remote is assumed to be reserved by an enemy or to be an invader core
@@ -142,7 +145,6 @@ export class RemotesManager {
         // Loop through the commune's remote names
 
         for (const remoteName of this.communeManager.room.memory.remotes) {
-
             const remoteMemory = Memory.rooms[remoteName]
 
             if (remoteMemory.data[RemoteData.abandon]) continue
@@ -177,13 +179,11 @@ export class RemotesManager {
     }
 
     private manageAbandonment(remoteName: string) {
-
         const remoteMemory = Memory.rooms[remoteName]
 
         remoteMemory.data[RemoteData.abandon] -= 1
 
         for (const key in remoteMemory.data) {
-
             if (parseInt(key) === RemoteData.abandon) continue
             remoteMemory.data[key] = 0
         }
