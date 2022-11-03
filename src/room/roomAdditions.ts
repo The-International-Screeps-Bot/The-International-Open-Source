@@ -813,6 +813,15 @@ Object.defineProperties(Room.prototype, {
                 this._usedUpgradePositions.add(creep.memory.PC)
             }
 
+            // If a source container / link is nearby block the pos
+
+            for (const container of this.sourceContainers) {
+                this._usedUpgradePositions.add(packPos(container.pos))
+            }
+            for (const links of this.sourceLinks) {
+                this._usedUpgradePositions.add(packPos(links.pos))
+            }
+
             if (this.controllerLink) this._usedUpgradePositions.add(packPos(this.controllerLink.pos))
             /*
             for (const packedCoord of this._usedUpgradePositions) {
@@ -1313,7 +1322,7 @@ Object.defineProperties(Room.prototype, {
             if (this._droppedResources) return this._droppedResources
 
             return (this._droppedResources = this.find(FIND_DROPPED_RESOURCES, {
-                filter: resource=> !resource.room.enemyThreatCoords.has(packCoord(resource.pos))
+                filter: resource => !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
             }))
         },
     },
