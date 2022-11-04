@@ -60,20 +60,16 @@ export class Duo {
     }
 
     run() {
+
+        if (this.runCombatRoom()) return
+
         this.advancedHeal()
 
         if (!this.getInFormation()) return
 
         this.leader.say('IF')
 
-        if (this.leader.room.name === this.leader.memory.CRN) {
-            if (this.runCombat()) return
-
-            this.stompEnemyCSites()
-            return
-        }
-
-        if (this.leader.room.enemyAttackers.length && this.runCombat()) return
+        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
 
         this.createMoveRequest({
             origin: this.leader.pos,
@@ -92,6 +88,28 @@ export class Duo {
                 neutral: 2,
             },
         })
+    }
+
+    runCombatRoom() {
+
+        if (this.leader.room.name !== this.leader.memory.CRN) return false
+
+        if (!this.leader.room.enemyDamageThreat) {
+
+            for (const member of this.members) member.runCombat()
+            return true
+        }
+
+        if (this.runCombat()) return true
+
+        this.stompEnemyCSites()
+        return true
+    }
+
+    runCombat() {
+        if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
+        if (this.leader.memory.ST === 'attack') return this.advancedAttack()
+        return this.advancedDismantle()
     }
 
     getInFormation() {
@@ -156,12 +174,6 @@ export class Duo {
         }
 
         this.members[1].assignMoveRequest(moveLeader.pos)
-    }
-
-    runCombat() {
-        if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.leader.memory.ST === 'attack') return this.advancedAttack()
-        return this.advancedDismantle()
     }
 
     advancedRangedAttack() {

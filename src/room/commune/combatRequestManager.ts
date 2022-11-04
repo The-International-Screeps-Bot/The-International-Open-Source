@@ -26,6 +26,15 @@ export class CombatRequestManager {
                 continue
             }
 
+            // The room is closed or is now a respawn or novice zone
+
+            if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
+                delete Memory.combatRequests[requestName]
+                room.memory.combatRequests.splice(index, 1)
+                delete request.responder
+                return
+            }
+
             this[`${request.T}Request`](request, requestName, index)
         }
 
@@ -38,6 +47,7 @@ export class CombatRequestManager {
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
     }
+
     private attackRequest(request: CombatRequest, requestName: string, index: number) {
         const { room } = this.communeManager
         const requestRoom = Game.rooms[requestName]

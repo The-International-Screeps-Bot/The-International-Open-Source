@@ -76,7 +76,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
         }
 
         if (roomMemory.T === 'remote') {
-            const commune = Game.rooms[roomMemory.commune]
+            const commune = Game.rooms[roomMemory.CN]
 
             if (commune) {
                 const possibleReservation = commune.energyCapacityAvailable >= 650

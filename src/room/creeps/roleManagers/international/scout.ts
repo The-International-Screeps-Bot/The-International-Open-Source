@@ -120,15 +120,15 @@ export class Scout extends Creep {
 
         // Make sure the room has a commune
 
-        if (room.memory.commune) {
-            if (!global.communes.has(room.memory.commune)) {
-                room.memory.commune = findClosestCommuneName(room.name)
+        if (room.memory.CN) {
+            if (!global.communes.has(room.memory.CN)) {
+                room.memory.CN = findClosestCommuneName(room.name)
             }
         } else {
-            room.memory.commune = findClosestCommuneName(room.name)
+            room.memory.CN = findClosestCommuneName(room.name)
         }
 
-        const communeMemory = Memory.rooms[room.memory.commune]
+        const communeMemory = Memory.rooms[room.memory.CN]
 
         const deposits = room.find(FIND_DEPOSITS)
 

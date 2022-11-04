@@ -194,6 +194,50 @@ Object.defineProperties(Room.prototype, {
             return this._structures
         },
     },
+    structureCoords: {
+        get() {
+            if (this._structureCoords) return this._structureCoords
+
+            // Construct storage of structures based on structureType
+
+            this._structureCoords = new Map()
+
+            // Group structures by structureType
+
+            for (const structure of this.find(FIND_STRUCTURES)) {
+                const packedCoord = packCoord(structure.pos)
+
+                const coordStructureIDs = this._structureCoords.get(packedCoord)
+                if (!coordStructureIDs) {
+                    this._structureCoords.set(packedCoord, [structure.id])
+                    continue
+                }
+                coordStructureIDs.push(structure.id)
+            }
+
+            return this._structureCoords
+        },
+    },
+    structureCoordsByType: {
+        get() {
+            if (this._structureCoordsByType) return this._structureCoordsByType
+
+            // Construct storage of structures based on structureType
+
+            this._structureCoordsByType = {}
+
+            // Make array keys for each structureType
+
+            for (const structureType of allStructureTypes) this._structureCoordsByType[structureType] = new Map()
+
+            // Group structures by structureType
+
+            for (const structure of this.find(FIND_STRUCTURES))
+                this._structureCoordsByType[structure.structureType].set(packCoord(structure.pos), structure.id)
+
+            return this._structureCoordsByType
+        },
+    },
     cSites: {
         get() {
             if (this._cSites) return this._cSites
@@ -424,7 +468,7 @@ Object.defineProperties(Room.prototype, {
             this._sourcePositions = []
 
             if (this.memory.T === 'remote') {
-                const commune = Game.rooms[this.memory.commune]
+                const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
 
                 const anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
@@ -578,7 +622,7 @@ Object.defineProperties(Room.prototype, {
             this.global.sourcePaths = []
 
             if (this.memory.T === 'remote') {
-                const commune = Game.rooms[this.memory.commune]
+                const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
 
                 for (const source of this.sources) {
@@ -619,7 +663,7 @@ Object.defineProperties(Room.prototype, {
             const { controller } = this
 
             if (this.memory.T === 'remote') {
-                const commune = Game.rooms[this.memory.commune]
+                const commune = Game.rooms[this.memory.CN]
                 if (!commune) return undefined
 
                 const terrainCoords = internationalManager.getTerrainCoords(this.name)

@@ -115,7 +115,7 @@ export class Quad {
 
         this.leader.say('IF')
 
-        if (this.leader.room.enemyAttackers.length && this.runCombat()) return
+        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
 
         this.passiveHeal()
 
@@ -143,7 +143,7 @@ export class Quad {
         if (this.leader.room.name !== this.leader.memory.CRN) return false
 
         if (!this.leader.room.enemyDamageThreat) {
-            for (const member of this.members) member.runSingle()
+            for (const member of this.members) member.runCombat()
             return true
         }
 

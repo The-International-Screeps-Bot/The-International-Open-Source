@@ -2,6 +2,7 @@ import {
     defaultCreepSwampCost,
     defaultPlainCost,
     impassibleStructureTypes,
+    impassibleStructureTypesSet,
     myColors,
     offsetsByDirection,
     roomDimensions,
@@ -201,7 +202,22 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         if (spawn.spawning.directions) return true
 
-        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos)
+        const adjacentCoords: Coord[] = []
+
+        for (let x = spawn.pos.x - 1; x <= spawn.pos.x + 1; x += 1) {
+            for (let y = spawn.pos.y - 1; y <= spawn.pos.y + 1; y += 1) {
+
+                if (spawn.pos.x === x && spawn.pos.y === y) continue
+
+                const coord = { x, y }
+
+                /* if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue */
+
+                // Otherwise ass the x and y to positions
+
+                adjacentCoords.push(coord)
+            }
+        }
 
         // Sort by distance from the first pos in the path
 
@@ -211,7 +227,12 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         const directions: DirectionConstant[] = []
 
-        for (const coord of adjacentCoords) directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
+        for (const coord of adjacentCoords) {
+
+
+
+            directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
+        }
 
         spawn.spawning.setDirections(directions)
 
@@ -299,7 +320,7 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
 
         if (hasImpassibleStructure) continue
 
-        // If the shove positions must have viable ramparts
+        // If rampart shoving only, the shove position must have viable ramparts
 
         if (this.memory.ROS) {
             let hasRampart
@@ -334,15 +355,9 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
         goalPos = shovePositions.sort((a, b) => {
             return getRange(goalPos.x, a.x, goalPos.y, a.y) - getRange(goalPos.x, b.x, goalPos.y, b.y)
         })[0]
-    } else goalPos = shovePositions[0]
+    } else goalPos = shovePositions[Math.floor(Math.random() * shovePositions.length)]
 
-    const packedCoord = packCoord(goalPos)
-
-    room.moveRequests.get(packedCoord)
-        ? room.moveRequests.get(packedCoord).push(this.name)
-        : room.moveRequests.set(packedCoord, [this.name])
-    this.moveRequest = packedCoord
-
+    this.assignMoveRequest(goalPos)
     if (Memory.roomVisuals)
         room.visual.circle(this.pos, {
             fill: '',
