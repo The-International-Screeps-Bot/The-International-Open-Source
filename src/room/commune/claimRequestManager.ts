@@ -62,7 +62,7 @@ export class ClaimRequestManager {
         }
 
         const requestRoom = Game.rooms[requestName]
-        if (!requestRoom || !requestRoom.controller.my) {
+        if (!requestRoom || (!requestRoom.controller.my && !requestRoom.controller.reservation)) {
             request.data[ClaimRequestData.claimer] = 1
             return
         }
@@ -107,7 +107,6 @@ export class ClaimRequestManager {
             // Decrease the defenderNeed according to ally combined strength
 
             for (const allyCreep of requestRoom.allyCreeps) {
-
                 request.data[ClaimRequestData.minDamage] -= allyCreep.healStrength
                 request.data[ClaimRequestData.minHeal] -= allyCreep.attackStrength
             }
