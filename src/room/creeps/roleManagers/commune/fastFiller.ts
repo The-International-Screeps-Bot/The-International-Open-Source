@@ -78,62 +78,64 @@ export class FastFiller extends Creep {
         // If the this needs resources
 
         if (this.needsResources()) {
-            // Get the sourceLinks
-
-            let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [room.fastFillerLink]
-            fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
-
-            let structures = fastFillerStoringStructures.length
-
-            // Loop through each fastFillerStoringStructure
-
-            for (const structure of fastFillerStoringStructures) {
-                // If the structure is undefined, iterate
+            for (let i = fastFillerContainers.length - 1; i >= 0; i--) {
+                const structure = fastFillerContainers[i]
 
                 if (!structure) {
-                    structures -= 1
+                    fastFillerContainers.splice(i, 1)
                     continue
                 }
 
                 // Otherwise, if the structure is not in range 1 to the this
 
-                if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) continue
+                if (getRangeOfCoords(this.pos, structure.pos) > 1) {
+                    fastFillerContainers.splice(i, 1)
+                    continue
+                }
+
+                // If there is a non-energy resource in a container
+
+                if (structure.usedStore() > structure.store.energy) {
+                    for (const key in structure.store) {
+                        const resourceType = key as ResourceConstant
+
+                        if (resourceType === RESOURCE_ENERGY) continue
+
+                        this.say('WCR')
+
+                        this.withdraw(structure, resourceType as ResourceConstant)
+
+                        return true
+                    }
+                }
+
+                // Otherwise, if there is insufficient energy in the structure, iterate
+
+                if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < structure.store.getCapacity() * 0.5) continue
+
+                this.withdraw(structure, RESOURCE_ENERGY)
+                return true
+            }
+
+            let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = [room.fastFillerLink]
+            fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
+
+            // Loop through each fastFillerStoringStructure
+
+            for (const structure of fastFillerStoringStructures) {
+                // Otherwise, if the structure is not in range 1 to the this
+
+                if (getRangeOfCoords(this.pos, structure.pos) > 1) continue
 
                 // If there is a non-energy resource in the structure
 
-                if (structure.structureType != STRUCTURE_LINK) {
-                    // If there is a non-energy resource in a container
-
-                    if (structure.usedStore() > structure.store.energy) {
-                        for (const key in structure.store) {
-                            const resourceType = key as ResourceConstant
-
-                            if (resourceType === RESOURCE_ENERGY) continue
-
-                            this.say('WCR')
-
-                            this.withdraw(structure, resourceType as ResourceConstant)
-
-                            return true
-                        }
-                    }
-
-                    // Otherwise, if there is insufficient energy in the structure, iterate
-
-                    if (
-                        structure.store.energy < this.freeSpecificStore(RESOURCE_ENERGY) ||
-                        structure.store.getUsedCapacity(RESOURCE_ENERGY) < this.freeSpecificStore(RESOURCE_ENERGY)
-                    )
-                        continue
-                }
-                else if (structure.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
+                if (structure.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
 
                 // Otherwise, withdraw from the structure and inform true
 
                 this.say('W')
 
                 this.withdraw(structure, RESOURCE_ENERGY)
-                structure.store.energy -= this.store.getCapacity() - this.store.energy
                 return true
             }
 

@@ -209,11 +209,13 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
                 if (spawn.pos.x === x && spawn.pos.y === y) continue
 
-                if (room.coordHasStructureTypes(spawn.pos, impassibleStructureTypesSet)) continue
+                const coord = { x, y }
+
+                /* if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue */
 
                 // Otherwise ass the x and y to positions
 
-                adjacentCoords.push({ x, y })
+                adjacentCoords.push(coord)
             }
         }
 

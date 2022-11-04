@@ -13,7 +13,7 @@ import {
     RemoteData,
     roadUpkeepCost,
 } from 'international/constants'
-import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange } from 'international/utils'
+import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange, getRangeOfCoords } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -747,7 +747,7 @@ Room.prototype.spawnRequester = function () {
 
             // If the controllerLink is defined
 
-            if (controllerLink) {
+            if (controllerLink && controllerLink.RCLActionable) {
                 maxCreeps -= 1
 
                 const hubLink = this.hubLink
@@ -755,13 +755,13 @@ Room.prototype.spawnRequester = function () {
 
                 // If there are transfer links, max out partMultiplier to their ability
 
-                if (hubLink || sourceLinks.length) {
+                if (hubLink && hubLink.RCLActionable || sourceLinks.find(link => link && link.RCLActionable)) {
                     let maxPartsMultiplier = 0
 
-                    if (hubLink) {
+                    if (hubLink && hubLink.RCLActionable) {
                         // Get the range between the controllerLink and hubLink
 
-                        const range = getRange(controllerLink.pos.x, hubLink.pos.x, controllerLink.pos.y, hubLink.pos.y)
+                        const range = getRangeOfCoords(controllerLink.pos, hubLink.pos)
 
                         // Limit partsMultiplier at the range with a multiplier
 
@@ -770,19 +770,15 @@ Room.prototype.spawnRequester = function () {
 
                     for (const sourceLink of sourceLinks) {
                         if (!sourceLink) continue
+                        if (!sourceLink.RCLActionable) continue
 
                         // Get the range between the controllerLink and hubLink
 
-                        const range = getRange(
-                            controllerLink.pos.x,
-                            sourceLink.pos.x,
-                            controllerLink.pos.y,
-                            sourceLink.pos.y,
-                        )
+                        const range = getRangeOfCoords(sourceLink.pos, controllerLink.pos)
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.7) / range
+                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.3) / range
                     }
 
                     partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
