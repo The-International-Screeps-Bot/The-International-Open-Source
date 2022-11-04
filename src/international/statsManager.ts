@@ -1,7 +1,7 @@
 import { myColors } from './constants'
 import { customLog } from './utils'
 
-const cpuUsers: CpuUsers = {
+const CPUUsers: CpuUsers = {
     imcu: 0,
     cocu: 0,
     mvmcu: 0,
@@ -377,16 +377,16 @@ export class StatsManager {
             },
             rooms: {},
             constructionSiteCount: 0,
-            cpuUsers,
+            CPUUsers,
         }
 
         global.roomStats = { commune: {}, remote: {} }
-        global.cpuUsers = cpuUsers
+        global.CPUUsers = CPUUsers
         this.internationalEndTick()
     }
 
     internationalPreTick() {
-        global.cpuUsers = cpuUsers
+        global.CPUUsers = CPUUsers
         global.roomStats = { commune: {}, remote: {} }
     }
 
@@ -442,19 +442,19 @@ export class StatsManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            const cpuUsers = Memory.stats.cpuUsers
-            Memory.stats.cpuUsers = {
-                cocu: this.average(cpuUsers.cocu, global.cpuUsers.cocu),
-                imcu: this.average(cpuUsers.imcu, global.cpuUsers.imcu),
-                mvmcu: this.average(cpuUsers.mvmcu, global.cpuUsers.mvmcu),
-                pccu: this.average(cpuUsers.pccu, global.cpuUsers.pccu),
-                tccu: this.average(cpuUsers.tccu, global.cpuUsers.tccu),
-                roomcu: this.average(cpuUsers.roomcu, global.cpuUsers.roomcu),
-                smcu: this.average(cpuUsers.smcu, cpuUsed),
+            const CPUUsers = Memory.stats.CPUUsers
+            Memory.stats.CPUUsers = {
+                cocu: this.average(CPUUsers.cocu, global.CPUUsers.cocu),
+                imcu: this.average(CPUUsers.imcu, global.CPUUsers.imcu),
+                mvmcu: this.average(CPUUsers.mvmcu, global.CPUUsers.mvmcu),
+                pccu: this.average(CPUUsers.pccu, global.CPUUsers.pccu),
+                tccu: this.average(CPUUsers.tccu, global.CPUUsers.tccu),
+                roomcu: this.average(CPUUsers.roomcu, global.CPUUsers.roomcu),
+                smcu: this.average(CPUUsers.smcu, cpuUsed),
             }
             customLog('Stats Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
         } else {
-            Memory.stats.cpuUsers = {
+            Memory.stats.CPUUsers = {
                 cocu: null,
                 imcu: null,
                 mvmcu: null,
@@ -488,7 +488,7 @@ export const globalStatsUpdater = function (
     nonRoomStat: boolean = false,
 ) {
     if (nonRoomStat) {
-        global.cpuUsers[name as InternationalStatNames] = value
+        global.CPUUsers[name as InternationalStatNames] = value
         return
     }
     const roomStatName = name as RoomStatNames

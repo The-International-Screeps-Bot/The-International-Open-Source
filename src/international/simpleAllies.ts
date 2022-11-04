@@ -1,4 +1,4 @@
-import { simpleAlliesSegment } from 'international/constants'
+
 
 const allyArray = Array.from(Memory.allyPlayers)
 
@@ -48,7 +48,7 @@ class AllyManager {
         }
 
         const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]
-        RawMemory.setActiveForeignSegment(nextAllyName, simpleAlliesSegment)
+        RawMemory.setActiveForeignSegment(nextAllyName, Memory.simpleAlliesSegment)
     }
     /**
      * To call before any requests are made. Configures some required values
@@ -67,8 +67,8 @@ class AllyManager {
 
         if (Object.keys(RawMemory.segments).length < 10) {
             // Assign myRequests to the public segment
-            RawMemory.segments[simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
-            RawMemory.setPublicSegments([simpleAlliesSegment])
+            RawMemory.segments[Memory.simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
+            RawMemory.setPublicSegments([Memory.simpleAlliesSegment])
         }
     }
     /**

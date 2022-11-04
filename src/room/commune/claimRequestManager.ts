@@ -38,6 +38,15 @@ export class ClaimRequestManager {
             return
         }
 
+        // The room is closed or is now a respawn or novice zone
+
+        if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
+
+            delete request.responder
+            delete room.memory.claimRequest
+            return
+        }
+
         // If the request has been abandoned, have the commune abandon it too
 
         if (request.data[ClaimRequestData.abandon] > 0) {

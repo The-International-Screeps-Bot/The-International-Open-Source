@@ -22,18 +22,13 @@ export class RemoteHarvester extends Creep {
 
         // Stop if creep is spawning
 
-        if (!this.spawning) return false
+        if (this.spawning) return false
 
         if (this.memory.RN) {
             if (
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
-                    Memory.rooms[this.memory.RN].SE[this.memory.SI] -
-                    1 +
-                    //  I'm adding 20 to the theoritical value.  I'm frequently seeing the replacement harvesters
-                    // not re-spawn in time because other creeps are spawning, and we end up losing out on a lot of
-                    // energy because we miss a chance to farm.  -PR
-                    20
+                    Memory.rooms[this.memory.RN].SE[this.memory.SI]
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -50,14 +45,12 @@ export class RemoteHarvester extends Creep {
         const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-
             delete this.memory.RN
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-
-        else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
             // Delete it from memory and try to find a new one
 
             this.removeRemote()
@@ -86,7 +79,7 @@ export class RemoteHarvester extends Creep {
 
         const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
-        for (const remoteInfo of this.commune?.remoteSourceIndexesByEfficacy) {
+        for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1])
@@ -299,8 +292,8 @@ export class RemoteHarvester extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.commune.name),
-                            range: 25,
+                            pos: creep.commune.anchor,
+                            range: 5,
                         },
                     ],
                 })

@@ -43,6 +43,7 @@ class ConfigManager {
             Game.shard.name !== 'performanceServer'
                 ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
                 : false
+        Memory.simpleAlliesSegment = settings.simpleAlliesSegment
 
         // Construct foundation
 

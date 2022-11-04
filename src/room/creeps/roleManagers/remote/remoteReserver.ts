@@ -9,10 +9,10 @@ export class RemoteReserver extends Creep {
 
         // Stop if creep is spawning
 
-        if (!this.ticksToLive) return false
+        if (this.spawning) return false
 
         if (this.memory.RN) {
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE - 1)
+            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE)
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
@@ -25,7 +25,7 @@ export class RemoteReserver extends Creep {
     findRemote?(): boolean {
         if (this.memory.RN) return true
 
-        const remoteNamesByEfficacy = this.commune?.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
         let roomMemory
 
@@ -50,14 +50,12 @@ export class RemoteReserver extends Creep {
         const role = this.role as 'remoteReserver'
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-
             delete this.memory.RN
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-
-        else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
             // Delete it from memory and try to find a new one
 
             delete this.memory.RN
@@ -103,8 +101,8 @@ export class RemoteReserver extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.commune.name),
-                            range: 25,
+                            pos: creep.commune.anchor,
+                            range: 5,
                         },
                     ],
                 })

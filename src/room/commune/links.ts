@@ -73,7 +73,7 @@ Room.prototype.hubToFastFiller = function (hubLink, fastFillerLink) {
      hubLink.transferEnergy(fastFillerLink)
 
      fastFillerLink.store.energy += hubLink.store.energy
-     hubLink.store.energy -= fastFillerLink.store.getCapacity(RESOURCE_ENERGY) - fastFillerLink.store.energy
+     hubLink.store.energy -= fastFillerLink.store.getFreeCapacity(RESOURCE_ENERGY)
 }
 
 Room.prototype.hubToController = function (hubLink, controllerLink) {
@@ -102,5 +102,5 @@ Room.prototype.hubToController = function (hubLink, controllerLink) {
      hubLink.transferEnergy(controllerLink)
 
      controllerLink.store.energy += hubLink.store.energy
-     hubLink.store.energy -= controllerLink.store.getCapacity(RESOURCE_ENERGY) - controllerLink.store.energy
+     hubLink.store.energy -= controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)
 }

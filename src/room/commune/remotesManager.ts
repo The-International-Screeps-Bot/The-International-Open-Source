@@ -1,4 +1,10 @@
-import { minHarvestWorkRatio, remoteHarvesterRoles, RemoteData, remoteRoles, maxRemoteRoomDistance } from 'international/constants'
+import {
+    minHarvestWorkRatio,
+    remoteHarvesterRoles,
+    RemoteData,
+    remoteRoles,
+    maxRemoteRoomDistance,
+} from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
@@ -10,6 +16,9 @@ export class RemotesManager {
     }
 
     public stage1() {
+
+        const { room } = this.communeManager
+
         // Loop through the commune's remote names
 
         for (let index = this.communeManager.room.memory.remotes.length - 1; index >= 0; index -= 1) {
@@ -21,9 +30,19 @@ export class RemotesManager {
 
             // If the room isn't a remote, remove it from the remotes array
 
-            if (remoteMemory.T !== 'remote' || remoteMemory.commune !== this.communeManager.room.name) {
-
+            if (remoteMemory.T !== 'remote' || remoteMemory.CN !== this.communeManager.room.name) {
                 this.communeManager.room.memory.remotes.splice(index, 1)
+                continue
+            }
+
+            // The room is closed or is now a respawn or novice zone
+
+            if (Game.map.getRoomStatus(remoteName).status !== Game.map.getRoomStatus(room.name).status) {
+
+                delete room.memory.claimRequest
+                this.communeManager.room.memory.remotes.splice(index, 1)
+                delete remoteMemory.CN
+                remoteMemory.T = 'neutral'
                 continue
             }
 
@@ -35,7 +54,6 @@ export class RemotesManager {
             // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
             if (randomTick(100)) {
-
                 const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
                     typeWeights: {
                         keeper: Infinity,
@@ -48,7 +66,6 @@ export class RemotesManager {
                 })
 
                 if (safeDistance > maxRemoteRoomDistance) {
-
                     remoteMemory.data[RemoteData.abandon] = 1500
                     this.manageAbandonment(remoteName)
                     continue
@@ -65,7 +82,6 @@ export class RemotesManager {
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {
-
                     remoteMemory.data[RemoteData.abandon] = 1500
                     this.manageAbandonment(remoteName)
                     continue
@@ -107,7 +123,7 @@ export class RemotesManager {
                 // Increase the defenderNeed according to the enemy attackers' combined strength
 
                 for (const enemyCreep of remote.enemyCreeps) {
-                    remoteMemory.data[RemoteData.minDamage] += enemyCreep.healStrength
+                    remoteMemory.data[RemoteData.minDamage] += (enemyCreep.healStrength + enemyCreep.healStrength * enemyCreep.defenceStrength) || enemyCreep.attackStrength / 2
                     remoteMemory.data[RemoteData.minHeal] += 1 + enemyCreep.attackStrength
                 }
 
@@ -142,7 +158,6 @@ export class RemotesManager {
         // Loop through the commune's remote names
 
         for (const remoteName of this.communeManager.room.memory.remotes) {
-
             const remoteMemory = Memory.rooms[remoteName]
 
             if (remoteMemory.data[RemoteData.abandon]) continue
@@ -177,13 +192,11 @@ export class RemotesManager {
     }
 
     private manageAbandonment(remoteName: string) {
-
         const remoteMemory = Memory.rooms[remoteName]
 
         remoteMemory.data[RemoteData.abandon] -= 1
 
         for (const key in remoteMemory.data) {
-
             if (parseInt(key) === RemoteData.abandon) continue
             remoteMemory.data[key] = 0
         }

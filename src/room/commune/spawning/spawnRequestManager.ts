@@ -1540,7 +1540,7 @@ Room.prototype.spawnRequester = function () {
                 const minCost = minAttackCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < Math.floor(attackAmount / 2); i++) {
+                for (let i = 0; i < Math.ceil(attackAmount / 2); i++) {
                     extraParts.push(ATTACK)
                 }
 

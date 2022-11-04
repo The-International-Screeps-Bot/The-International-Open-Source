@@ -63,6 +63,25 @@ class MigrationManager {
 
             Memory.breakingVersion = 85
         }
+        if (Memory.breakingVersion === 85) {
+            Memory.simpleAlliesSegment = settings.simpleAlliesSegment
+
+            for (const roomName in Game.rooms) {
+
+                const room = Game.rooms[roomName]
+
+                if (!room.controller) continue
+
+                if (!room.controller.my) continue
+
+                for (const remoteName of room.memory.remotes) {
+
+                    Memory.rooms[remoteName].CN = room.name
+                }
+            }
+
+            Memory.breakingVersion = 86
+        }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
             global.killCreeps()

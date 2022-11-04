@@ -625,7 +625,7 @@ Room.prototype.scoutEnemyRoom = function () {
 }
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
-    if (this.memory.T === 'remote' && !global.communes.has(this.memory.commune)) this.memory.T = 'neutral'
+    if (this.memory.T === 'remote' && !global.communes.has(this.memory.CN)) this.memory.T = 'neutral'
 
     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
 
@@ -648,7 +648,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // If the room is already a remote of the scoutingRoom
 
-    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.commune) return this.memory.T
+    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.CN) return this.memory.T
 
     // Get the anchor from the scoutingRoom, stopping if it's undefined
 
@@ -708,7 +708,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     if (this.memory.T !== 'remote') {
         // Assign the room's commune as the scoutingRoom
 
-        this.memory.commune = scoutingRoom.name
+        this.memory.CN = scoutingRoom.name
 
         // Generate new important positions
 
@@ -742,7 +742,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // Assign the room's commune as the scoutingRoom
 
-    this.memory.commune = scoutingRoom.name
+    this.memory.CN = scoutingRoom.name
 
     // Generate new important positions
 
@@ -2093,7 +2093,6 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 }
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
-
     // There is already has a power creep responding to this target with the power
 
     if (target.reservePowers.has(powerType)) return false
@@ -2117,13 +2116,13 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
     })
 }
 
-Room.prototype.highestWeightedStoringStructures = function(resourceType) {
-
+Room.prototype.highestWeightedStoringStructures = function (resourceType) {
     if (!this.storage && this.terminal) return false
 
     if (!this.storage) return this.terminal
     if (!this.terminal) return this.storage
 
-    if (this.storage.store.getUsedCapacity(resourceType) * 3 > this.terminal.store.getUsedCapacity(resourceType)) return this.storage
+    if (this.storage.store.getUsedCapacity(resourceType) * 3 > this.terminal.store.getUsedCapacity(resourceType))
+        return this.storage
     return this.terminal
 }

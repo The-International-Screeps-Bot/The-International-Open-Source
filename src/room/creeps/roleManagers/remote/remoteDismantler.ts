@@ -13,7 +13,7 @@ export class RemoteDismantler extends Creep {
 
         // Stop if creep is spawning
 
-        if (!this.ticksToLive) return false
+        if (this.spawning) return false
 
         // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
@@ -31,14 +31,12 @@ export class RemoteDismantler extends Creep {
         const role = this.role as 'remoteDismantler'
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-
             delete this.memory.RN
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-
-        else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
             // Delete it from memory and try to find a new one
 
             delete this.memory.RN
@@ -74,7 +72,7 @@ export class RemoteDismantler extends Creep {
 
         // Get remotes by their efficacy
 
-        const remoteNamesByEfficacy = creep.commune?.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = creep.commune.remoteNamesBySourceEfficacy
 
         // Loop through each remote name
 
@@ -192,8 +190,8 @@ export class RemoteDismantler extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.commune.name),
-                            range: 25,
+                            pos: creep.commune.anchor,
+                            range: 5,
                         },
                     ],
                 })

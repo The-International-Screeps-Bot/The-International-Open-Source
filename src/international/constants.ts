@@ -1,10 +1,5 @@
 // General
 
-/**
- * Please avoid changing this. If you do change it, don't push it to the main repository
- */
-export const simpleAlliesSegment = 90
-
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 interface RoomTypeProperties {
@@ -20,7 +15,7 @@ export const roomTypeProperties: RoomTypeProperties = {
     MHC: true,
     HU: true,
 
-    commune: true,
+    CN: true,
     SE: true,
     RE: true,
     data: true,
@@ -48,7 +43,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         HU: true,
     },
     remote: {
-        commune: true,
+        CN: true,
 
         SE: true,
         RE: true,
@@ -89,7 +84,7 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
         owner: true,
     },
     highway: {
-        commune: true,
+
     },
     intersection: {
         portalsTo: true,
