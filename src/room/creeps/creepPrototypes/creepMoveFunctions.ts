@@ -299,7 +299,7 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
 
         if (hasImpassibleStructure) continue
 
-        // If the shove positions must have viable ramparts
+        // If rampart shoving only, the shove position must have viable ramparts
 
         if (this.memory.ROS) {
             let hasRampart
@@ -334,15 +334,9 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
         goalPos = shovePositions.sort((a, b) => {
             return getRange(goalPos.x, a.x, goalPos.y, a.y) - getRange(goalPos.x, b.x, goalPos.y, b.y)
         })[0]
-    } else goalPos = shovePositions[0]
+    } else goalPos = shovePositions[Math.floor(Math.random() * shovePositions.length)]
 
-    const packedCoord = packCoord(goalPos)
-
-    room.moveRequests.get(packedCoord)
-        ? room.moveRequests.get(packedCoord).push(this.name)
-        : room.moveRequests.set(packedCoord, [this.name])
-    this.moveRequest = packedCoord
-
+    this.assignMoveRequest(goalPos)
     if (Memory.roomVisuals)
         room.visual.circle(this.pos, {
             fill: '',

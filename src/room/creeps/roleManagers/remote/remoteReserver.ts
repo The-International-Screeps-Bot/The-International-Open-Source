@@ -123,7 +123,6 @@ export class RemoteReserver extends Creep {
 
             // Otherwise, make a moveRequest to it
 
-            if (
                 creep.createMoveRequest({
                     origin: creep.pos,
                     goals: [
@@ -141,11 +140,7 @@ export class RemoteReserver extends Creep {
                         allyRemote: Infinity,
                     },
                     avoidAbandonedRemotes: true,
-                }) === 'unpathable'
-            ) {
-                Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
-                delete creep.memory.RN
-            }
+                })
         }
     }
 }

@@ -233,30 +233,24 @@ export class RemoteHauler extends Creep {
 
         this.getDroppedEnergy()
 
-        if (
-            this.createMoveRequest({
-                origin: this.pos,
-                goals: [
-                    {
-                        pos: sourcePos,
-                        range: 1,
-                    },
-                ],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: sourcePos,
+                    range: 1,
                 },
-                avoidAbandonedRemotes: true,
-            }) === 'unpathable'
-        ) {
-            this.say('ABANDON')
-            Memory.rooms[this.memory.RN].data[RemoteData.abandon] = 1500
-            this.removeRemote()
-        }
+            ],
+            avoidEnemyRanges: true,
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity,
+            },
+            avoidAbandonedRemotes: true,
+        })
 
         return true
     }
