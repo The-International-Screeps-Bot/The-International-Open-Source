@@ -1948,15 +1948,18 @@ Room.prototype.estimateIncome = function () {
     return income
 }
 
-Room.prototype.findPositionsInsideRect = function (x1, y1, x2, y2) {
+Room.prototype.findPositionsInsideRect = function (rx, ry) {
     // Construct positions
 
     const positions = []
 
     // Loop through coordinates inside the rect
 
-    for (let x = x1; x <= x2; x += 1) {
-        for (let y = y1; y <= y2; y += 1) {
+    for (let x = rx - 1; x <= rx + 1; x += 1) {
+        for (let y = ry - 1; y <= ry + 1; y += 1) {
+
+            if(x === rx && y === ry) continue
+
             // Iterate if the pos doesn't map onto a room
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue

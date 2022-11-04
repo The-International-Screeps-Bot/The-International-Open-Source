@@ -1055,6 +1055,11 @@ declare global {
         /**
          *
          */
+        findAdjacentPositions(rx: number, ry: number): RoomPosition[]
+
+        /**
+         *
+         */
         createPullTask(creator: Structure | Creep | Resource): void
 
         /**

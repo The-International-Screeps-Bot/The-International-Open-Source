@@ -798,12 +798,7 @@ Object.defineProperties(Room.prototype, {
 
             // Find positions adjacent to source
 
-            const adjacentPositions = this.findPositionsInsideRect(
-                centerUpgradePos.x - 1,
-                centerUpgradePos.y - 1,
-                centerUpgradePos.x + 1,
-                centerUpgradePos.y + 1,
-            )
+            const adjacentPositions = this.findAdjacentPositions(centerUpgradePos.x, centerUpgradePos.y)
 
             // Loop through each pos
 
@@ -833,6 +828,8 @@ Object.defineProperties(Room.prototype, {
             // Make the closest pos the last to be chosen
 
             this._upgradePositions.push(this._upgradePositions.shift())
+
+            this._upgradePositions.splice(0, 0, centerUpgradePos)
 
             return this._upgradePositions
         },

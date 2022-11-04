@@ -117,7 +117,10 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         opts.avoidImpassibleStructures = true
         opts.avoidStationaryPositions = true
-        opts.avoidNotMyCreeps = true
+
+        // If there is no safemode
+
+        if (!room.controller || !room.controller.safeMode) opts.avoidNotMyCreeps = true
 
         if (this.memory.R) {
             if (!opts.plainCost) opts.plainCost = defaultPlainCost * 2
