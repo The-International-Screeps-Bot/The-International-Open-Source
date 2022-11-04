@@ -440,7 +440,7 @@ export class StatsManager {
         })
         delete global.roomStats
 
-        if (Memory.CPULogging === true) {
+        if (Memory.CPULogging === true && Memory.stats.CPUUsers !== undefined) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             const CPUUsers = Memory.stats.CPUUsers
             Memory.stats.CPUUsers = {
