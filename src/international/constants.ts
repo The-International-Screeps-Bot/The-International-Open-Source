@@ -225,6 +225,8 @@ export const impassibleStructureTypes: StructureConstant[] = [
     STRUCTURE_INVADER_CORE,
 ]
 
+export const impassibleStructureTypesSet = new Set(impassibleStructureTypes)
+
 export const structureTypesByBuildPriority: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,

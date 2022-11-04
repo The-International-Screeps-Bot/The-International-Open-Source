@@ -126,7 +126,7 @@ export class FastFiller extends Creep {
                     )
                         continue
                 }
-                else if (structure.store.energy <= 0) continue
+                else if (structure.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
 
                 // Otherwise, withdraw from the structure and inform true
 

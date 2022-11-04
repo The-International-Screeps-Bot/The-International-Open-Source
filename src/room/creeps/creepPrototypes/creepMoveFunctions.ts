@@ -2,6 +2,7 @@ import {
     defaultCreepSwampCost,
     defaultPlainCost,
     impassibleStructureTypes,
+    impassibleStructureTypesSet,
     myColors,
     offsetsByDirection,
     roomDimensions,
@@ -201,7 +202,20 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         if (spawn.spawning.directions) return true
 
-        const adjacentCoords = findAdjacentCoordsToCoord(spawn.pos)
+        const adjacentCoords: Coord[] = []
+
+        for (let x = spawn.pos.x - 1; x <= spawn.pos.x + 1; x += 1) {
+            for (let y = spawn.pos.y - 1; y <= spawn.pos.y + 1; y += 1) {
+
+                if (spawn.pos.x === x && spawn.pos.y === y) continue
+
+                if (room.coordHasStructureTypes(spawn.pos, impassibleStructureTypesSet)) continue
+
+                // Otherwise ass the x and y to positions
+
+                adjacentCoords.push({ x, y })
+            }
+        }
 
         // Sort by distance from the first pos in the path
 
@@ -211,7 +225,12 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         const directions: DirectionConstant[] = []
 
-        for (const coord of adjacentCoords) directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
+        for (const coord of adjacentCoords) {
+
+
+
+            directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
+        }
 
         spawn.spawning.setDirections(directions)
 
