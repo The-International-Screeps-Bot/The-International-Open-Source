@@ -206,7 +206,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         for (let x = spawn.pos.x - 1; x <= spawn.pos.x + 1; x += 1) {
             for (let y = spawn.pos.y - 1; y <= spawn.pos.y + 1; y += 1) {
-
                 if (spawn.pos.x === x && spawn.pos.y === y) continue
 
                 const coord = { x, y }
@@ -228,14 +227,10 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         const directions: DirectionConstant[] = []
 
         for (const coord of adjacentCoords) {
-
-
-
             directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
         }
 
         spawn.spawning.setDirections(directions)
-
         return true
     }
 
