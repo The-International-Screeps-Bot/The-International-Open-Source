@@ -100,11 +100,19 @@ export class CommuneManager {
         this.test()
     }
     private test() {
-        return
+        /* return */
 
         let CPUUsed = Game.cpu.getUsed()
 
-        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed)
+        this.room.structureCoords
+
+        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, undefined, myColors.red)
+
+        CPUUsed = Game.cpu.getUsed()
+
+        this.room.structureCoordsByType.spawn
+
+        customLog('CPU TEST 2', Game.cpu.getUsed() - CPUUsed, undefined, myColors.red)
     }
 
     get storedEnergyUpgradeThreshold() {

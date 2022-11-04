@@ -31,7 +31,7 @@ Object.defineProperties(Creep.prototype, {
 
             // Stop if creep is spawning
 
-            if (!this.ticksToLive) return false
+            if (this.spawning) return false
 
             // If the creep's remaining ticks are more than the estimated spawn time, inform false
 

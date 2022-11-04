@@ -684,7 +684,7 @@ declare global {
         gpl: ControllerLevel
         rooms: { [key: string]: Partial<RoomCommuneStats> }
         constructionSiteCount: number
-        cpuUsers: CpuUsers
+        CPUUsers: CpuUsers
     }
 
     type StatsRoomTypes = 'commune' | 'remote'
@@ -1230,6 +1230,14 @@ declare global {
 
         readonly structures: OrganizedStructures
 
+        _structureCoords: Map<string, Id<Structure>[]>
+
+        readonly structureCoords: Map<string, Id<Structure>[]>
+
+        _structureCoordsByType: Partial<{ [key in StructureConstant]: Map<string, Id<Structure>> }>
+
+        readonly structureCoordsByType: { [key in StructureConstant]: Map<string, Id<Structure>> }
+
         _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
 
         readonly cSites: Record<StructureConstant, ConstructionSite[]>
@@ -1524,7 +1532,10 @@ declare global {
          */
         SIDs: Id<Source>[]
 
-        commune: string
+        /**
+         * Commune Name
+         */
+        CN: string
 
         /**
          * Source Efficacies, An array of path distances from the remote's sources to its commune
@@ -2271,7 +2282,7 @@ declare global {
 
             unpackedRoomNames: { [roomName: string]: string }
             roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: Partial<RoomStats | RoomCommuneStats> } }
-            cpuUsers: CpuUsers
+            CPUUsers: CpuUsers
 
             terrainCoords: { [roomName: string]: CoordMap }
 

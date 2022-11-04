@@ -84,10 +84,15 @@ export interface Settings {
      * Wether or not the bot should be using customLog
      */
     logging: boolean
+
+    /**
+     * The public segment number (0-100) that you and your allies are using
+     */
+    simpleAlliesSegment: number
 }
 
 export const settings: Settings = {
-    breakingVersion: 85,
+    breakingVersion: 86,
 
     // Default values, do not change. Instead modify clones in memory
 
@@ -116,4 +121,5 @@ export const settings: Settings = {
     allyTrading: true,
     marketUsage: true,
     logging: true,
+    simpleAlliesSegment: 90,
 }

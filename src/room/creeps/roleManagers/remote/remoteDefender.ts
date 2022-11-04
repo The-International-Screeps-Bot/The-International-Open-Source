@@ -10,7 +10,7 @@ export class RemoteDefender extends Creep {
 
         // Stop if creep is spawning
 
-        if (!this.ticksToLive) return false
+        if (this.spawning) return false
 
         // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
@@ -27,14 +27,12 @@ export class RemoteDefender extends Creep {
         const role = this.role as 'remoteDefender'
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-
             delete this.memory.RN
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-
-        else if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
+        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
             // Delete it from memory and try to find a new one
 
             delete this.memory.RN
@@ -67,7 +65,7 @@ export class RemoteDefender extends Creep {
 
         // Get remotes by their efficacy
 
-        const remoteNamesByEfficacy = creep.commune?.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = creep.commune.remoteNamesBySourceEfficacy
 
         let roomMemory
 
@@ -269,8 +267,8 @@ export class RemoteDefender extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.commune.name),
-                            range: 25,
+                            pos: creep.commune.anchor,
+                            range: 5,
                         },
                     ],
                     typeWeights: {
@@ -315,7 +313,6 @@ export class RemoteDefender extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-            if (
                 creep.createMoveRequest({
                     origin: creep.pos,
                     goals: [
@@ -332,11 +329,7 @@ export class RemoteDefender extends Creep {
                         allyRemote: Infinity,
                     },
                     avoidAbandonedRemotes: true,
-                }) === 'unpathable'
-            ) {
-                Memory.rooms[creep.memory.RN].data[RemoteData.abandon] = 1500
-                delete creep.memory.RN
-            }
+                })
         }
     }
 }

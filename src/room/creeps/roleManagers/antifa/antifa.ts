@@ -154,7 +154,7 @@ export class Antifa extends Creep {
 
         // In the commune
 
-        if (this.commune?.name === this.name) {
+        if (this.commune.name === this.name) {
             // Go to the attackTarget
 
             this.createMoveRequest({
@@ -408,6 +408,8 @@ export class Antifa extends Creep {
                 return true
             }
 
+            this.attack(enemyCreep)
+
             if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
             return true
         }
@@ -433,7 +435,7 @@ export class Antifa extends Creep {
 
         this.attack(enemyAttacker)
 
-        if (enemyAttacker.canMove) this.assignMoveRequest(enemyAttacker.pos)
+        if (this.canMove && enemyAttacker.canMove) this.assignMoveRequest(enemyAttacker.pos)
         return true
     }
 

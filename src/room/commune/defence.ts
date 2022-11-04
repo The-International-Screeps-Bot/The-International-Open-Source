@@ -1,6 +1,7 @@
 import { myColors, roomDimensions, safemodeTargets } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, getRangeOfCoords, randomTick } from 'international/utils'
+import { packCoord } from 'other/packrat'
 import { CommuneManager } from './communeManager'
 
 export class DefenceManager {
@@ -30,21 +31,21 @@ export class DefenceManager {
         }
     }
 
-    advancedActivateSafeMode() {
+    shouldActivatesSafeMode() {
         const { room } = this.communeManager
         const { controller } = room
 
         // If safeMode is on cooldown, stop
 
-        if (controller.safeModeCooldown) return
+        if (controller.safeModeCooldown) return false
 
         // Otherwise if there are no safeModes left, stop
 
-        if (controller.safeModeAvailable === 0) return
+        if (!controller.safeModeAvailable) return false
 
         // Otherwise if the controller is upgradeBlocked, stop
 
-        if (controller.upgradeBlocked > 0) return
+        if (controller.upgradeBlocked) return false
 
         // Filter attackers that are not invaders. If there are none, stop
 
@@ -52,7 +53,7 @@ export class DefenceManager {
             enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username /* !== 'Invader' */,
         )
 
-        if (!nonInvaderAttackers.length) return
+        if (!nonInvaderAttackers.length) return false
 
         // Otherwise if safeMode can be activated
 
@@ -75,11 +76,20 @@ export class DefenceManager {
 
             if (!(attackTarget instanceof Structure)) continue
 
-            if (!safemodeTargets.includes(attackTarget.structureType)) continue
+            // If a rampart was destroyed above a spawn
 
-            controller.activateSafeMode()
-            return
+            if (room.structureCoordsByType.spawn.has(packCoord(attackTarget.pos))) return true
+
+            if (safemodeTargets.includes(attackTarget.structureType)) return true
         }
+
+        return false
+    }
+
+    advancedActivateSafeMode() {
+        if (!this.shouldActivatesSafeMode()) return
+
+        this.communeManager.room.controller.activateSafeMode()
     }
 
     manageRampartPublicity() {
@@ -96,7 +106,7 @@ export class DefenceManager {
 
             // Stop if the tick is not divisible by a random range
 
-            if (!randomTick(50)) return
+            if (!randomTick(100)) return
 
             // Publicize at most 10 ramparts per tick, to avoid too many intents
 
@@ -136,9 +146,9 @@ export class DefenceManager {
 
             return (
                 creepA.hits / creepA.hitsMax -
-                (creepA.hits + creepA.healStrength - room.defenderEnemyTargetsWithDamage.get(a)) / creepA.hitsMax -
+                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a) - creepA.healStrength) / creepA.hitsMax -
                 (creepB.hits / creepB.hitsMax -
-                    (creepB.hits + creepB.healStrength - room.defenderEnemyTargetsWithDamage.get(b)) / creepB.hitsMax)
+                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b) - creepB.healStrength) / creepB.hitsMax)
             )
         })
 
