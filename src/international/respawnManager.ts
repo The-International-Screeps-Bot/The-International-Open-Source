@@ -1,10 +1,13 @@
-// Credit to @SemperRabbit for this nice piece of code!
+/**
+ * Credit to SemperRabbit for this nice piece of code!
+ */
 class RespawnManager {
-    public run(): void {
+    public run() {
         if (!this.hasRespawned()) return
 
         global.clearMemory()
     }
+
     private hasRespawned(): boolean {
         if (Game.time === 0) return true
 

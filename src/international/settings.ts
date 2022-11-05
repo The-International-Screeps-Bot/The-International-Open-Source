@@ -122,7 +122,7 @@ export const settings: Settings = {
     pixelSelling: false,
     pixelGeneration: false,
     autoClaim: true,
-    autoAttack: true,
+    autoAttack: false,
     publicRamparts: false,
     allyTrading: true,
     marketUsage: true,
