@@ -1926,8 +1926,8 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 Room.prototype.estimateIncome = function () {
     const harvesterNames = this.creepsFromRoom.source1Harvester
         .concat(this.creepsFromRoom.source2Harvester)
-        .concat(this.creepsFromRoom.source1RemoteHarvester)
-        .concat(this.creepsFromRoom.source2RemoteHarvester)
+        .concat(this.creepsFromRoom.remoteSourceHarvester0)
+        .concat(this.creepsFromRoom.remoteSourceHarvester1)
 
     // Construct income starting at 0
 
@@ -1981,8 +1981,7 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
 
     for (let x = rx - 1; x <= rx + 1; x += 1) {
         for (let y = ry - 1; y <= ry + 1; y += 1) {
-
-            if(x === rx && y === ry) continue
+            if (x === rx && y === ry) continue
 
             // Iterate if the pos doesn't map onto a room
 

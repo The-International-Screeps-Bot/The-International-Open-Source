@@ -205,12 +205,10 @@ Object.defineProperties(Room.prototype, {
             // Group structures by structureType
 
             for (const structure of this.find(FIND_STRUCTURES)) {
-
                 const packedCoord = packCoord(structure.pos)
 
                 const coordStructureIDs = this._structureCoords.get(packedCoord)
                 if (!coordStructureIDs) {
-
                     this._structureCoords.set(packedCoord, [structure.id])
                     continue
                 }
@@ -583,9 +581,9 @@ Object.defineProperties(Room.prototype, {
                 if (this.sources.length >= 2) harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
                 harvesterNames = harvesterNames.concat(this.myCreeps.vanguard)
             } else {
-                harvesterNames = this.myCreeps.source1RemoteHarvester
+                harvesterNames = this.myCreeps.remoteSourceHarvester0
                 if (this.sources.length >= 2)
-                    harvesterNames = harvesterNames.concat(this.myCreeps.source2RemoteHarvester)
+                    harvesterNames = harvesterNames.concat(this.myCreeps.remoteSourceHarvester1)
             }
 
             for (const creepName of harvesterNames) {
@@ -2053,9 +2051,7 @@ Object.defineProperties(Room.prototype, {
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
-                ...this.find(FIND_RUINS).filter(
-                    ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity() > 0,
-                ),
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity() > 0),
                 ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (

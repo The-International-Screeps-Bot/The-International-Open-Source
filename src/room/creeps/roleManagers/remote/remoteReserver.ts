@@ -5,15 +5,14 @@ export class RemoteReserver extends Creep {
     public get dying(): boolean {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 
         if (this.spawning) return false
 
         if (this.memory.RN) {
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE)
-                return false
+            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE) return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
         return (this._dying = true)
@@ -123,24 +122,24 @@ export class RemoteReserver extends Creep {
 
             // Otherwise, make a moveRequest to it
 
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: new RoomPosition(25, 25, creep.memory.RN),
-                            range: 25,
-                        },
-                    ],
-                    avoidEnemyRanges: true,
-                    typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
-                        enemyRemote: Infinity,
-                        allyRemote: Infinity,
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        range: 25,
                     },
-                    avoidAbandonedRemotes: true,
-                })
+                ],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
+                },
+                avoidAbandonedRemotes: true,
+            })
         }
     }
 }

@@ -181,7 +181,7 @@ export function advancedFindDistance(
  * @param income The number of resources added to the pile each tick
  */
 export function findCarryPartsRequired(distance: number, income: number) {
-    return (distance * 2 * income) / CARRY_CAPACITY
+    return Math.ceil((distance * 2 * income) / CARRY_CAPACITY)
 }
 
 /**

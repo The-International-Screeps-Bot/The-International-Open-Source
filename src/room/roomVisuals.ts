@@ -3,8 +3,6 @@ import {
     NORMAL,
     PROTECTED,
     RemoteData,
-    RemoteData_HarvesterByIndex,
-    RemoteData_HaulerByIndex,
     roomDimensions,
     stamps,
 } from 'international/constants'
@@ -48,7 +46,6 @@ export class RoomVisualsManager {
         this.controllerVisuals()
         this.spawnVisuals()
         this.cSiteTargetVisuals()
-        this.sourceVisuals()
     }
 
     private controllerVisuals() {
@@ -187,30 +184,6 @@ export class RoomVisualsManager {
         if (constructionTarget) this.roomManager.room.visual.text('🚧', constructionTarget.pos)
     }
 
-    private sourceVisuals() {
-        for (const source of this.roomManager.room.sources) {
-            if (this.roomManager.room.memory.T == 'remote') {
-                if (this.roomManager.room.memory.data && this.roomManager.room.memory.data.length > 10) {
-                }
-
-                this.roomManager.room.visual.text(
-                    `${this.roomManager.room.memory.data[RemoteData_HarvesterByIndex[source.index]]} / ${
-                        this.roomManager.room.memory.data[RemoteData_HaulerByIndex[source.index]]
-                    }`,
-                    source.pos,
-                    {
-                        backgroundColor: 'rgb(255, 0, 0, 0)',
-                        font: 0.5,
-                        opacity: 0.8,
-                        stroke: myColors.darkBlue,
-                        strokeWidth: 0.04,
-                        color: myColors.lightBlue,
-                    },
-                )
-            }
-        }
-    }
-
     private baseVisuals() {
         if (!Memory.baseVisuals) return
 
@@ -307,7 +280,7 @@ export class RoomVisualsManager {
             row.push(remoteName)
             row.push(sourceIndex)
             row.push(remoteMemory.SE[sourceIndex])
-            row.push(remoteData[RemoteData[`source${(sourceIndex + 1) as 1 | 2}RemoteHarvester`]])
+            row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
             row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
             row.push(remoteData[RemoteData.remoteReserver])
             row.push(remoteData[RemoteData.abandon])
