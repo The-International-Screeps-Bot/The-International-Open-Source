@@ -26,7 +26,6 @@ import { globalStatsUpdater } from 'international/statsManager'
 const minRemotePriority = 10
 
 Room.prototype.spawnRequester = function () {
-
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
@@ -481,7 +480,13 @@ Room.prototype.spawnRequester = function () {
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
-            let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.5
+            let requiredStrength = 1
+            if (!this.controller.safeMode) {
+                requiredStrength += healStrength
+                if (!this.structures.tower.length) requiredStrength += attackStrength
+            }
+
+            requiredStrength *= 1.5
 
             const priority = Math.min(6 + this.myCreeps.meleeDefender.length * 0.5, 8)
 
