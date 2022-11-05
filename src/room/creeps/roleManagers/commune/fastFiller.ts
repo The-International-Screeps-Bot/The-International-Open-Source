@@ -81,11 +81,6 @@ export class FastFiller extends Creep {
             for (let i = fastFillerContainers.length - 1; i >= 0; i--) {
                 const structure = fastFillerContainers[i]
 
-                if (!structure) {
-                    fastFillerContainers.splice(i, 1)
-                    continue
-                }
-
                 // Otherwise, if the structure is not in range 1 to the this
 
                 if (getRangeOfCoords(this.pos, structure.pos) > 1) {

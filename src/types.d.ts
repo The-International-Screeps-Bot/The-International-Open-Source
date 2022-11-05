@@ -105,8 +105,8 @@ declare global {
         | 'hubHauler'
         | 'fastFiller'
         | 'meleeDefender'
-        | 'source1RemoteHarvester'
-        | 'source2RemoteHarvester'
+        | 'remoteSourceHarvester0'
+        | 'remoteSourceHarvester1'
         | 'remoteHauler'
         | 'remoteReserver'
         | 'remoteDefender'
@@ -287,7 +287,7 @@ declare global {
         extraOpts: ExtraOpts
     }
 
-    type FlagNames = 'disableTowerAttacks'
+    type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
 
     type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
@@ -682,7 +682,7 @@ declare global {
         gcl: ControllerLevel
 
         gpl: ControllerLevel
-        rooms: { [key: string]: Partial<RoomCommuneStats> }
+        rooms: { [roomName: string]: Partial<RoomCommuneStats> }
         constructionSiteCount: number
         CPUUsers: CpuUsers
     }
@@ -817,6 +817,8 @@ declare global {
 
         centerUpgradePos: RoomPosition | false
 
+        upgradePositions: RoomPosition[]
+
         // Links
 
         controllerLink: Id<StructureLink> | undefined
@@ -865,7 +867,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsOfRemote: { [key: string]: { [key: string]: string[] } }
+        creepsOfRemote: { [remoteName: string]: Partial<{ [key in CreepRoles]: string[] }> }
 
         /**
          * A set of roomNames representing the targets of scouts from this commune
@@ -1051,6 +1053,11 @@ declare global {
          *
          */
         findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
+
+        /**
+         *
+         */
+        findAdjacentPositions(rx: number, ry: number): RoomPosition[]
 
         /**
          *
@@ -1299,8 +1306,6 @@ declare global {
         readonly sourcePaths: RoomPosition[][]
 
         readonly centerUpgradePos: RoomPosition | false
-
-        _upgradePositions: RoomPosition[]
 
         readonly upgradePositions: RoomPosition[]
 

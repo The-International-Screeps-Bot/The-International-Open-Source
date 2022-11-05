@@ -18,7 +18,7 @@ export class RemoteHarvester extends Creep {
     public get dying(): boolean {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 
@@ -27,8 +27,7 @@ export class RemoteHarvester extends Creep {
         if (this.memory.RN) {
             if (
                 this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME +
-                    Memory.rooms[this.memory.RN].SE[this.memory.SI]
+                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].SE[this.memory.SI]
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -41,8 +40,6 @@ export class RemoteHarvester extends Creep {
     preTickManager(): void {
         if (!this.findRemote()) return
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
-
-        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
             delete this.memory.RN
@@ -61,14 +58,14 @@ export class RemoteHarvester extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= this.parts.work
+        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI}`]] -= this.parts.work
 
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
 
         if (commune && commune.creepsOfRemote[this.memory.RN])
-            commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+            commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
     }
 
     /**
@@ -77,21 +74,15 @@ export class RemoteHarvester extends Creep {
     findRemote?(): boolean {
         if (this.memory.RN) return true
 
-        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
-
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1])
             const remoteMemory = Memory.rooms[remoteName]
 
-            // If the sourceIndexes aren't aligned
-
-            if (sourceIndex !== this.memory.SI) continue
-
             // If there is no need
 
-            if (remoteMemory.data[RemoteData[role]] <= 0) continue
+            if (remoteMemory.data[RemoteData[`remoteSourceHarvester${this.memory.SI}`]] <= 0) continue
 
             this.assignRemote(remoteName)
             return true
@@ -105,20 +96,16 @@ export class RemoteHarvester extends Creep {
 
         if (this.dying) return
 
-        const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
-
         const needs = Memory.rooms[remoteName].data
 
-        needs[RemoteData[role]] -= this.parts.work
+        needs[RemoteData[`remoteSourceHarvester${this.memory.SI}`]] -= this.parts.work
     }
 
     removeRemote?() {
         if (!this.dying) {
-            const role = this.role as 'source1RemoteHarvester' | 'source2RemoteHarvester'
-
             const needs = Memory.rooms[this.memory.RN].data
 
-            needs[RemoteData[role]] += this.parts.work
+            needs[RemoteData[`remoteSourceHarvester${this.memory.SI}`]] += this.parts.work
         }
 
         delete this.memory.RN

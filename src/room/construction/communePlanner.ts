@@ -137,7 +137,7 @@ export function basePlanner(room: Room) {
 
         const range = room.advancedFindPath({
             origin: source.pos,
-            goals: [{ pos: room.controller.pos, range: 2 }],
+            goals: [{ pos: room.controller.pos, range: 1 }],
             plainCost: defaultRoadPlanningPlainCost,
         }).length
         if (range > closestSourceToControllerRange) continue
@@ -152,7 +152,14 @@ export function basePlanner(room: Room) {
  */
     // Find the average pos between some sources and the controller
 
-    const avgControllerSourcePos = findAvgBetweenCoords(room.controller.pos, closestSourceToController.pos)
+    let path = room.advancedFindPath({
+        origin: closestSourceToController.pos,
+        goals: [{ pos: room.controller.pos, range: 1 }],
+        weightCoordMaps: [room.roadCoords],
+        plainCost: defaultRoadPlanningPlainCost,
+    })
+
+    const avgControllerSourcePos = path[Math.floor(path.length / 2)]
 
     const controllerAdjacentCoords = findCoordsInsideRect(
         room.controller.pos.x - 3,
@@ -366,11 +373,18 @@ export function basePlanner(room: Room) {
 
     // Try to plan the stamp
 
+    path = room.advancedFindPath({
+        origin: closestSourceToController.pos,
+        goals: [{ pos: room.anchor, range: 3 }],
+        weightCoordMaps: [room.roadCoords],
+        plainCost: defaultRoadPlanningPlainCost,
+    })
+
     if (
         !planStamp({
             stampType: 'hub',
             count: 1,
-            startCoords: [closestSourceToController.pos],
+            startCoords: [path[path.length - 1]],
             normalDT: true,
             cardinalFlood: true,
         })
@@ -385,8 +399,6 @@ export function basePlanner(room: Room) {
 
     const closestUpgradePos = upgradePositions[upgradePositions.length - 1]
     if (!closestUpgradePos) return 'failed'
-
-    let path: RoomPosition[]
 
     for (const index in sources) {
         // get the closestHarvestPos using the sourceName, iterating if undefined

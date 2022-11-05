@@ -581,9 +581,9 @@ Object.defineProperties(Room.prototype, {
                 if (this.sources.length >= 2) harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
                 harvesterNames = harvesterNames.concat(this.myCreeps.vanguard)
             } else {
-                harvesterNames = this.myCreeps.source1RemoteHarvester
+                harvesterNames = this.myCreeps.remoteSourceHarvester0
                 if (this.sources.length >= 2)
-                    harvesterNames = harvesterNames.concat(this.myCreeps.source2RemoteHarvester)
+                    harvesterNames = harvesterNames.concat(this.myCreeps.remoteSourceHarvester1)
             }
 
             for (const creepName of harvesterNames) {
@@ -778,7 +778,7 @@ Object.defineProperties(Room.prototype, {
     },
     upgradePositions: {
         get() {
-            if (this._upgradePositions) return this._upgradePositions
+            if (this.global.upgradePositions) return this.global.upgradePositions
 
             // Get the center upgrade pos, stopping if it's undefined
 
@@ -788,7 +788,7 @@ Object.defineProperties(Room.prototype, {
             const anchor = this.anchor
             if (!anchor) return []
 
-            this._upgradePositions = []
+            this.global.upgradePositions = []
 
             // Find terrain in room
 
@@ -796,12 +796,7 @@ Object.defineProperties(Room.prototype, {
 
             // Find positions adjacent to source
 
-            const adjacentPositions = this.findPositionsInsideRect(
-                centerUpgradePos.x - 1,
-                centerUpgradePos.y - 1,
-                centerUpgradePos.x + 1,
-                centerUpgradePos.y + 1,
-            )
+            const adjacentPositions = this.findAdjacentPositions(centerUpgradePos.x, centerUpgradePos.y)
 
             // Loop through each pos
 
@@ -812,10 +807,10 @@ Object.defineProperties(Room.prototype, {
 
                 // Add pos to harvestPositions
 
-                this._upgradePositions.push(pos)
+                this.global.upgradePositions.push(pos)
             }
 
-            this._upgradePositions.sort((a, b) => {
+            this.global.upgradePositions.sort((a, b) => {
                 return (
                     this.advancedFindPath({
                         origin: a,
@@ -830,9 +825,11 @@ Object.defineProperties(Room.prototype, {
 
             // Make the closest pos the last to be chosen
 
-            this._upgradePositions.push(this._upgradePositions.shift())
+            this.global.upgradePositions.push(this.global.upgradePositions.shift())
 
-            return this._upgradePositions
+            this.global.upgradePositions.splice(0, 0, centerUpgradePos)
+
+            return this.global.upgradePositions
         },
     },
     usedUpgradePositions: {
@@ -2062,6 +2059,7 @@ Object.defineProperties(Room.prototype, {
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
+                ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity() > 0),
                 ...this.sourceContainers.filter(
                     sc =>
                         sc.store.getUsedCapacity() >

@@ -13,13 +13,20 @@ import {
     RemoteData,
     roadUpkeepCost,
 } from 'international/constants'
-import { customLog, findCarryPartsRequired, findRemoteSourcesByEfficacy, getRange, getRangeOfCoords } from 'international/utils'
+import {
+    customLog,
+    findCarryPartsRequired,
+    findRemoteSourcesByEfficacy,
+    getRange,
+    getRangeOfCoords,
+} from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
 const minRemotePriority = 10
 
 Room.prototype.spawnRequester = function () {
+
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
@@ -780,7 +787,7 @@ Room.prototype.spawnRequester = function () {
 
                 // If there are transfer links, max out partMultiplier to their ability
 
-                if (hubLink && hubLink.RCLActionable || sourceLinks.find(link => link && link.RCLActionable)) {
+                if ((hubLink && hubLink.RCLActionable) || sourceLinks.find(link => link && link.RCLActionable)) {
                     let maxPartsMultiplier = 0
 
                     if (hubLink && hubLink.RCLActionable) {
@@ -980,8 +987,8 @@ Room.prototype.spawnRequester = function () {
         const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100
 
         const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
-            | 'source1RemoteHarvester'
-            | 'source2RemoteHarvester'
+            | 'remoteSourceHarvester0'
+            | 'remoteSourceHarvester1'
 
         // If there are no data for this this, inform false
 
@@ -991,7 +998,7 @@ Room.prototype.spawnRequester = function () {
             ? remote.sourcePositions.length
             : unpackPosList(remoteMemory.SP[sourceIndex]).length
 
-        // Construct requests for source1RemoteHarvesters
+        // Construct requests for remoteSourceHarvester0s
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
@@ -1097,8 +1104,8 @@ Room.prototype.spawnRequester = function () {
                 // If there are insufficient harvesters for the remote's sources
 
                 if (
-                    Math.max(remoteData[RemoteData.source1RemoteHarvester], 0) +
-                        Math.max(remoteData[RemoteData.source2RemoteHarvester], 0) >
+                    Math.max(remoteData[RemoteData.remoteSourceHarvester0], 0) +
+                        Math.max(remoteData[RemoteData.remoteSourceHarvester1], 0) >
                     0
                 )
                     return false

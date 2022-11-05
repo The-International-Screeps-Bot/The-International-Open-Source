@@ -283,7 +283,7 @@ export class StatsManager {
             const spawns = room.structures.spawn
             if (spawns.length > 0)
                 globalCommuneStats.su =
-                    spawns.reduce((sum, spawn) => sum + (spawn.spawning !== null ? 1 : 0), 0) / spawns.length
+                    spawns.reduce((sum, spawn) => sum + (((spawn.spawning && spawn.spawning.remainingTime) || spawn.renewed || !spawn.RCLActionable) ? 1 : 0), 0) / spawns.length
 
             if (each250Ticks || forceUpdate) {
                 if (room.controller && room.controller.my) {
@@ -440,7 +440,7 @@ export class StatsManager {
         })
         delete global.roomStats
 
-        if (Memory.CPULogging === true) {
+        if (Memory.CPULogging === true && Memory.stats.CPUUsers !== undefined) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             const CPUUsers = Memory.stats.CPUUsers
             Memory.stats.CPUUsers = {
@@ -455,13 +455,13 @@ export class StatsManager {
             customLog('Stats Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
         } else {
             Memory.stats.CPUUsers = {
-                cocu: null,
-                imcu: null,
-                mvmcu: null,
-                pccu: null,
-                tccu: null,
-                roomcu: null,
-                smcu: null,
+                cocu: undefined,
+                imcu: undefined,
+                mvmcu: undefined,
+                pccu: undefined,
+                tccu: undefined,
+                roomcu: undefined,
+                smcu: undefined,
             }
         }
     }

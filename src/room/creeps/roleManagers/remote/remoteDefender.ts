@@ -6,7 +6,7 @@ export class RemoteDefender extends Creep {
     public get dying() {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 
@@ -313,23 +313,23 @@ export class RemoteDefender extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: new RoomPosition(25, 25, creep.memory.RN),
-                            range: 25,
-                        },
-                    ],
-                    typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
-                        enemyRemote: Infinity,
-                        allyRemote: Infinity,
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        range: 25,
                     },
-                    avoidAbandonedRemotes: true,
-                })
+                ],
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                    enemyRemote: Infinity,
+                    allyRemote: Infinity,
+                },
+                avoidAbandonedRemotes: true,
+            })
         }
     }
 }

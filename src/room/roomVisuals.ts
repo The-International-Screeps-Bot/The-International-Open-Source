@@ -1,16 +1,8 @@
-import {
-    myColors,
-    NORMAL,
-    PROTECTED,
-    RemoteData,
-    RemoteData_HarvesterByIndex,
-    RemoteData_HaulerByIndex,
-    roomDimensions,
-    stamps,
-} from 'international/constants'
+import { myColors, NORMAL, PROTECTED, RemoteData, roomDimensions, stamps } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
-import { RoomManager } from '../roomManager'
+import { RoomManager } from './roomManager'
+import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -27,6 +19,7 @@ export class RoomVisualsManager {
 
         this.roomVisuals()
         this.baseVisuals()
+        this.dataVisuals()
 
         // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
 
@@ -46,7 +39,6 @@ export class RoomVisualsManager {
         this.controllerVisuals()
         this.spawnVisuals()
         this.cSiteTargetVisuals()
-        this.sourceVisuals()
     }
 
     private controllerVisuals() {
@@ -185,30 +177,6 @@ export class RoomVisualsManager {
         if (constructionTarget) this.roomManager.room.visual.text('🚧', constructionTarget.pos)
     }
 
-    private sourceVisuals() {
-        for (const source of this.roomManager.room.sources) {
-            if (this.roomManager.room.memory.T == 'remote') {
-                if (this.roomManager.room.memory.data && this.roomManager.room.memory.data.length > 10) {
-                }
-
-                this.roomManager.room.visual.text(
-                    `${this.roomManager.room.memory.data[RemoteData_HarvesterByIndex[source.index]]} / ${
-                        this.roomManager.room.memory.data[RemoteData_HaulerByIndex[source.index]]
-                    }`,
-                    source.pos,
-                    {
-                        backgroundColor: 'rgb(255, 0, 0, 0)',
-                        font: 0.5,
-                        opacity: 0.8,
-                        stroke: myColors.darkBlue,
-                        strokeWidth: 0.04,
-                        color: myColors.lightBlue,
-                    },
-                )
-            }
-        }
-    }
-
     private baseVisuals() {
         if (!Memory.baseVisuals) return
 
@@ -240,5 +208,205 @@ export class RoomVisualsManager {
         this.roomManager.room.visual.connectRoads({
             opacity: 0.3,
         })
+    }
+
+    private dataVisuals() {
+
+        this.internationalDataVisuals()
+
+        if (!Memory.dataVisuals) return
+
+        if (!global.communes.has(this.roomManager.room.name)) return
+
+        this.remoteDataVisuals(this.generalDataVisuals(1))
+    }
+
+    private internationalDataVisuals() {
+        if (!this.roomManager.room.flags.internationalDataVisuals) return
+
+        const headers: any[] = [
+            'estimatedIncome',
+            'commune harvest',
+            'remote harvest',
+            'upgrade',
+            'build',
+            'repair other',
+            'barricade repair',
+            'spawn',
+        ]
+
+        const data: any[][] = [[]]
+
+        let totalEstimatedIncome = 0
+        let totalEnergyHarvested = 0
+        let totalUpgrade = 0
+        let totalBuild = 0
+        let totalRepairOther = 0
+        let totalBarricadeRepair = 0
+        let totalSpawn = 0
+
+        for (const roomName in Memory.stats.rooms) {
+            const room = Game.rooms[roomName]
+            const roomStats = Memory.stats.rooms[roomName]
+
+            totalEstimatedIncome += room.estimateIncome()
+            totalEnergyHarvested += roomStats.eih
+            totalUpgrade += roomStats.eou
+            totalBuild += roomStats.eob
+            totalRepairOther = roomStats.eoro
+            totalBarricadeRepair = roomStats.eorwr
+            totalSpawn = roomStats.su
+        }
+
+        totalSpawn = totalSpawn / Object.keys(Memory.stats.rooms).length
+
+        data[0].push(
+            totalEstimatedIncome,
+            totalEnergyHarvested.toFixed(2),
+            totalEnergyHarvested.toFixed(2),
+            totalUpgrade.toFixed(2),
+            totalBuild.toFixed(2),
+            totalRepairOther.toFixed(2),
+            totalBarricadeRepair.toFixed(2),
+            totalSpawn.toFixed(2),
+        )
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'International',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+    }
+
+    private generalDataVisuals(y: number) {
+        const headers: any[] = [
+            'estimatedIncome',
+            'commune harvest',
+            'remote harvest',
+            'upgrade',
+            'build',
+            'repair other',
+            'barricade repair',
+            'spawn',
+        ]
+
+        const roomStats = Memory.stats.rooms[this.roomManager.room.name]
+
+        const data: any[][] = [
+            [
+                this.roomManager.room.estimateIncome(),
+                roomStats.eih.toFixed(2),
+                roomStats.reih.toFixed(2),
+                roomStats.eou.toFixed(2),
+                roomStats.eob.toFixed(2),
+                roomStats.eoro.toFixed(2),
+                roomStats.eorwr.toFixed(2),
+                roomStats.su.toFixed(2) + '%',
+            ],
+        ]
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'General',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private remoteDataVisuals(y: number) {
+        const headers: any[] = ['remote', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']
+        const data: any[][] = []
+
+        for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {
+            const splitRemoteInfo = remoteInfo.split(' ')
+            const remoteName = splitRemoteInfo[0]
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+            const remoteMemory = Memory.rooms[remoteName]
+            const remoteData = remoteMemory.data
+
+            const row: any[] = []
+
+            row.push(remoteName)
+            row.push(sourceIndex)
+            row.push(remoteMemory.SE[sourceIndex])
+            row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
+            row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
+            row.push(remoteData[RemoteData.remoteReserver])
+            row.push(remoteData[RemoteData.abandon])
+
+            data.push(row)
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Remotes',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
     }
 }

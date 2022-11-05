@@ -1926,8 +1926,8 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 Room.prototype.estimateIncome = function () {
     const harvesterNames = this.creepsFromRoom.source1Harvester
         .concat(this.creepsFromRoom.source2Harvester)
-        .concat(this.creepsFromRoom.source1RemoteHarvester)
-        .concat(this.creepsFromRoom.source2RemoteHarvester)
+        .concat(this.creepsFromRoom.remoteSourceHarvester0)
+        .concat(this.creepsFromRoom.remoteSourceHarvester1)
 
     // Construct income starting at 0
 
@@ -1945,7 +1945,7 @@ Room.prototype.estimateIncome = function () {
 
     // Inform income
 
-    return income
+    return Math.floor(income)
 }
 
 Room.prototype.findPositionsInsideRect = function (x1, y1, x2, y2) {
@@ -1957,6 +1957,32 @@ Room.prototype.findPositionsInsideRect = function (x1, y1, x2, y2) {
 
     for (let x = x1; x <= x2; x += 1) {
         for (let y = y1; y <= y2; y += 1) {
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+
+            // Otherwise ass the x and y to positions
+
+            positions.push(new RoomPosition(x, y, this.name))
+        }
+    }
+
+    // Inform positions
+
+    return positions
+}
+
+Room.prototype.findAdjacentPositions = function (rx, ry) {
+    // Construct positions
+
+    const positions = []
+
+    // Loop through coordinates inside the rect
+
+    for (let x = rx - 1; x <= rx + 1; x += 1) {
+        for (let y = ry - 1; y <= ry + 1; y += 1) {
+            if (x === rx && y === ry) continue
+
             // Iterate if the pos doesn't map onto a room
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue

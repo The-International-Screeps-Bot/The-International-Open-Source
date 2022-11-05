@@ -43,7 +43,7 @@ export class InternationalManager {
     update() {
         this.creepsByCombatRequest = {}
         this.unspawnedPowerCreepNames = []
-        
+
         delete this._myOrders
         delete this._orders
         delete this._myOrdersCount
@@ -113,9 +113,10 @@ export class InternationalManager {
         const avgPrice = getAvgPrice(PIXEL, 7)
 
         const minPrice = avgPrice * 0.8
+/*
         customLog('minPixelPrice', minPrice)
         customLog('avgPixelPrice', avgPrice)
-
+ */
         const buyOrder = this.getBuyOrder(PIXEL, minPrice)
 
         if (buyOrder) {

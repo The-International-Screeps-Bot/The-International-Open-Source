@@ -32,7 +32,7 @@ export class ClaimRequestManager {
         }
 
         const type = Memory.rooms[requestName].T
-        if (type !== 'neutral' && type != 'commune') {
+        if (type !== 'neutral' && type != 'commune' && type !== 'remote') {
             delete request.responder
             delete room.memory.claimRequest
             return

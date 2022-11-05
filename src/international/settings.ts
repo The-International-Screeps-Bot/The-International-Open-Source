@@ -16,6 +16,11 @@ export interface Settings {
     baseVisuals: boolean
 
     /**
+     * Wether or not to generate data visuals
+     */
+    dataVisuals: boolean
+
+    /**
      * Wether the bot should generate map visuals
      */
     mapVisuals: boolean
@@ -98,6 +103,7 @@ export const settings: Settings = {
 
     roomVisuals: false,
     baseVisuals: false,
+    dataVisuals: false,
     mapVisuals: false,
     CPULogging: false,
     roomStats: 2,
@@ -120,6 +126,6 @@ export const settings: Settings = {
     publicRamparts: false,
     allyTrading: true,
     marketUsage: true,
-    logging: true,
+    logging: false,
     simpleAlliesSegment: 90,
 }

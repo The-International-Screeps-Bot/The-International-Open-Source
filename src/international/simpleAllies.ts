@@ -1,7 +1,4 @@
 
-
-const allyArray = Array.from(Memory.allyPlayers)
-
 export enum RequestTypes {
     RESOURCE,
     DEFENSE,
@@ -30,6 +27,8 @@ class AllyManager {
      */
     getAllyRequests() {
         if (!Memory.allyTrading) return
+
+        const allyArray = Array.from(Memory.allyPlayers)
         if (!allyArray.length) return
 
         // Run every so often, increasing based on ally count

@@ -206,7 +206,7 @@ function outputProfilerData() {
     //// Footer line
     output += `${totalTicks} total ticks measured`
     output += `\t\t\t${totalCpu.toFixed(2)} average CPU profiled per tick`
-    console.log(output)
+
 }
 
 // debugging

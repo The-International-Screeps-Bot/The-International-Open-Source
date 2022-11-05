@@ -12,7 +12,7 @@ export class SpawnManager {
         this.communeManager = communeManager
     }
 
-    run() {
+    public run() {
         const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -39,6 +39,7 @@ export class SpawnManager {
 
         this.runSpawning(inactiveSpawns)
         this.createPowerTasks(activeSpawns)
+        this.test()
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
@@ -48,7 +49,7 @@ export class SpawnManager {
         }
     }
 
-    runSpawning(inactiveSpawns: StructureSpawn[]) {
+    private runSpawning(inactiveSpawns: StructureSpawn[]) {
         if (!inactiveSpawns.length) return
 
         // Construct spawnRequests
@@ -60,13 +61,7 @@ export class SpawnManager {
         const requestsByPriority = Object.keys(this.communeManager.room.spawnRequests).sort((a, b) => {
             return parseInt(a) - parseInt(b)
         })
-        /*
-        // Spawn request debug logging
-        for (const priority of requestsByPriority) {
-            const request = this.communeManager.room.spawnRequests[priority]
-            customLog('SPAWN REQUESTS', priority + ', ' + request.role)
-        }
- */
+
         // Track the inactive spawn index
 
         let spawnIndex = inactiveSpawns.length - 1
@@ -140,11 +135,36 @@ export class SpawnManager {
         }
     }
 
-    createPowerTasks(activeSpawns: StructureSpawn[]) {
+    private createPowerTasks(activeSpawns: StructureSpawn[]) {
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
         for (const spawn of activeSpawns) {
             this.communeManager.room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)
         }
+    }
+
+    /**
+     * Spawn request debugging
+     */
+    private test() {
+
+        return
+
+        if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
+
+        const requestsByPriority = Object.keys(this.communeManager.room.spawnRequests).sort((a, b) => {
+            return parseInt(a) - parseInt(b)
+        })
+
+        for (const priority of requestsByPriority) {
+            const request = this.communeManager.room.spawnRequests[priority]
+
+            /* customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ') */
+
+            if (request.role !== 'remoteSourceHarvester0' && request.role !== 'remoteSourceHarvester1') continue
+
+            customLog('SPAWN REQUEST REMOTE HARVESTER', priority + ', ' + request.extraOpts.memory.RN + ', ' + request.extraOpts.memory.SI)
+        }
+
     }
 }

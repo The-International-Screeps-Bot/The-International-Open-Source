@@ -6,7 +6,7 @@ export class ControllerUpgrader extends Creep {
     public get dying() {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 

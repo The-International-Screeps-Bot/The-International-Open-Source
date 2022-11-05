@@ -85,13 +85,6 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         globalStatsUpdater('', statName, cpuUsed, true)
     }
 
-    /*
-    let cpu = Game.cpu.getUsed()
-
-    console.log(new InternationalManager())
-
-    customLog('CPU USED FOR TEST 1', Game.cpu.getUsed() - cpu, myColors.white, myColors.green)
- */
     roomsManager()
 
     internationalManager.mapVisualsManager()

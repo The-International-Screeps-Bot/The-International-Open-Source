@@ -26,6 +26,7 @@ class ConfigManager {
 
         Memory.roomVisuals = settings.roomVisuals
         Memory.baseVisuals = settings.baseVisuals
+        Memory.dataVisuals = settings.dataVisuals
         Memory.mapVisuals = settings.mapVisuals
         Memory.CPULogging = Game.shard.name === 'performanceServer' ? true : settings.CPULogging
         Memory.roomStats = Game.shard.name === 'performanceServer' ? 2 : settings.roomStats

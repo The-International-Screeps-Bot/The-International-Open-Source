@@ -83,20 +83,13 @@ export const roomTypes: Record<RoomTypes, RoomType> = {
     keeperCenter: {
         owner: true,
     },
-    highway: {
-
-    },
+    highway: {},
     intersection: {
         portalsTo: true,
     },
 }
 
-export const stagnantRoomTypes: Set<Partial<RoomTypes>> = new Set([
-    'keeper',
-    'keeperCenter',
-    'highway',
-    'intersection'
-])
+export const stagnantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
 
 export const roomTypesUsedForStats = ['commune', 'remote']
 
@@ -111,8 +104,8 @@ export const creepRoles: CreepRoles[] = [
     'hubHauler',
     'fastFiller',
     'meleeDefender',
-    'source1RemoteHarvester',
-    'source2RemoteHarvester',
+    'remoteSourceHarvester0',
+    'remoteSourceHarvester1',
     'remoteHauler',
     'remoteReserver',
     'remoteDefender',
@@ -140,8 +133,8 @@ export enum TrafficPriorities {
     source1Harvester,
     source2Harvester,
     mineralHarvester,
-    source1RemoteHarvester,
-    source2RemoteHarvester,
+    remoteSourceHarvester0,
+    remoteSourceHarvester1,
     remoteReserver,
     remoteDismantler,
     remoteCoreAttacker,
@@ -702,8 +695,8 @@ export const terminalResourceTargets: ResourceTarget[] = [
 ]
 
 export enum RemoteData {
-    source1RemoteHarvester,
-    source2RemoteHarvester,
+    remoteSourceHarvester0,
+    remoteSourceHarvester1,
     remoteHauler0,
     remoteHauler1,
     remoteReserver,
@@ -717,13 +710,6 @@ export enum RemoteData {
     abandon,
     onlyInvader,
 }
-
-export const RemoteData_HaulerByIndex: RemoteData[] = [RemoteData.remoteHauler0, RemoteData.remoteHauler1]
-
-export const RemoteData_HarvesterByIndex: RemoteData[] = [
-    RemoteData.source1RemoteHarvester,
-    RemoteData.source2RemoteHarvester,
-]
 
 export enum ClaimRequestData {
     claimer,
@@ -759,9 +745,9 @@ export enum DepositNeeds {
     depositHauler,
 }
 
-export const remoteHarvesterRoles: ('source1RemoteHarvester' | 'source2RemoteHarvester')[] = [
-    'source1RemoteHarvester',
-    'source2RemoteHarvester',
+export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [
+    'remoteSourceHarvester0',
+    'remoteSourceHarvester1',
 ]
 
 export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = ['remoteHauler0', 'remoteHauler1']
@@ -778,15 +764,15 @@ export const antifaRoles: (
  * Roles for which to provide spawnGroups for based on their shared remoteName
  */
 export const remoteRoles: (
-    | 'source1RemoteHarvester'
-    | 'source2RemoteHarvester'
+    | 'remoteSourceHarvester0'
+    | 'remoteSourceHarvester1'
     | 'remoteReserver'
     | 'remoteDefender'
     | 'remoteCoreAttacker'
     | 'remoteDismantler'
 )[] = [
-    'source1RemoteHarvester',
-    'source2RemoteHarvester',
+    'remoteSourceHarvester0',
+    'remoteSourceHarvester1',
     'remoteReserver',
     'remoteDefender',
     'remoteCoreAttacker',
@@ -794,8 +780,8 @@ export const remoteRoles: (
 ]
 
 export enum RemoteHarvesterRolesBySourceIndex {
-    source1RemoteHarvester,
-    source2RemoteHarvester,
+    remoteSourceHarvester0,
+    remoteSourceHarvester1,
 }
 
 export enum RemoteHaulerRolesBySourceIndex {
@@ -1081,6 +1067,6 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
 export const ERROR_FAILED = 0
 
 export const maxRemoteRoomDistance = 5
-export const offsetsByDirection = [, [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1]]
+export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
 
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
