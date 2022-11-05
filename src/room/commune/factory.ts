@@ -274,9 +274,9 @@ Room.prototype.factoryManager = function () {
         var result = factory.produce(product)
 
         if (result == ERR_BUSY) {
-            console.log('runfactory: ' + room.name + ' needs activating.')
+
         } else if (result != OK) {
-            console.log('runFactory produce error: ' + result)
+
         } else {
             // if(Memory.masterPlan.targetProduction && Memory.masterPlan.targetProduction[product]) {
             //     Memory.masterPlan.targetProduction[product]--;

@@ -80,10 +80,10 @@ export class ErrorMapper {
                     if ('sim' in Game.rooms) {
                         const message = `Source maps don't work in the simulator - displaying original error`
                         // @ts-ignore
-                        console.log(`<span style='color:red'>${message}<br>${_.escape(e.stack)}</span>`)
+                        console.log(`<span style='color:#bb3d3d'>${message}<br>${_.escape(e.stack)}</span>`)
                     } else {
                         // @ts-ignore
-                        console.log(`<span style='color:red'>${_.escape(this.sourceMappedStackTrace(e))}</span>`)
+                        console.log(`<span style='color:#bb3d3d'>${_.escape(this.sourceMappedStackTrace(e))}</span>`)
                     }
                 } else {
                     // can't handle it
