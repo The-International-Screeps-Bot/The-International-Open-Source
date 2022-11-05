@@ -1,11 +1,4 @@
-import {
-    myColors,
-    NORMAL,
-    PROTECTED,
-    RemoteData,
-    roomDimensions,
-    stamps,
-} from 'international/constants'
+import { myColors, NORMAL, PROTECTED, RemoteData, roomDimensions, stamps } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from './roomManager'
@@ -218,6 +211,9 @@ export class RoomVisualsManager {
     }
 
     private dataVisuals() {
+
+        this.internationalDataVisuals()
+
         if (!Memory.dataVisuals) return
 
         if (!global.communes.has(this.roomManager.room.name)) return
@@ -225,13 +221,109 @@ export class RoomVisualsManager {
         this.remoteDataVisuals(this.generalDataVisuals(1))
     }
 
+    private internationalDataVisuals() {
+        if (!this.roomManager.room.flags.internationalDataVisuals) return
+
+        const headers: any[] = [
+            'estimatedIncome',
+            'commune harvest',
+            'remote harvest',
+            'upgrade',
+            'build',
+            'repair other',
+            'barricade repair',
+            'spawn',
+        ]
+
+        const data: any[][] = [[]]
+
+        let totalEstimatedIncome = 0
+        let totalEnergyHarvested = 0
+        let totalUpgrade = 0
+        let totalBuild = 0
+        let totalRepairOther = 0
+        let totalBarricadeRepair = 0
+        let totalSpawn = 0
+
+        for (const roomName in Memory.stats.rooms) {
+            const room = Game.rooms[roomName]
+            const roomStats = Memory.stats.rooms[roomName]
+
+            totalEstimatedIncome += room.estimateIncome()
+            totalEnergyHarvested += roomStats.eih
+            totalUpgrade += roomStats.eou
+            totalBuild += roomStats.eob
+            totalRepairOther = roomStats.eoro
+            totalBarricadeRepair = roomStats.eorwr
+            totalSpawn = roomStats.su
+        }
+
+        totalSpawn = totalSpawn / Object.keys(Memory.stats.rooms).length
+
+        data[0].push(
+            totalEstimatedIncome,
+            totalEnergyHarvested.toFixed(2),
+            totalEnergyHarvested.toFixed(2),
+            totalUpgrade.toFixed(2),
+            totalBuild.toFixed(2),
+            totalRepairOther.toFixed(2),
+            totalBarricadeRepair.toFixed(2),
+            totalSpawn.toFixed(2),
+        )
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'International',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+    }
+
     private generalDataVisuals(y: number) {
-        const headers: any[] = ['estimatedIncome', 'commune harvest', 'remote harvest', 'upgrade', 'build', 'spawn']
+        const headers: any[] = [
+            'estimatedIncome',
+            'commune harvest',
+            'remote harvest',
+            'upgrade',
+            'build',
+            'repair other',
+            'barricade repair',
+            'spawn',
+        ]
 
         const roomStats = Memory.stats.rooms[this.roomManager.room.name]
 
         const data: any[][] = [
-            [this.roomManager.room.estimateIncome(), roomStats.eih.toFixed(2), roomStats.reih.toFixed(2), roomStats.eou.toFixed(2), roomStats.eob.toFixed(2), roomStats.su.toFixed(2) + '%'],
+            [
+                this.roomManager.room.estimateIncome(),
+                roomStats.eih.toFixed(2),
+                roomStats.reih.toFixed(2),
+                roomStats.eou.toFixed(2),
+                roomStats.eob.toFixed(2),
+                roomStats.eoro.toFixed(2),
+                roomStats.eorwr.toFixed(2),
+                roomStats.su.toFixed(2) + '%',
+            ],
         ]
 
         const height = 3 + data.length

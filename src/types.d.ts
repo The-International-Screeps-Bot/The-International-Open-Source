@@ -287,7 +287,7 @@ declare global {
         extraOpts: ExtraOpts
     }
 
-    type FlagNames = 'disableTowerAttacks'
+    type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
 
     type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
