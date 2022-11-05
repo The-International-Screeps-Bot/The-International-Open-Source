@@ -857,9 +857,7 @@ Room.prototype.spawnRequester = function () {
                     }
                 }
 
-                // Otherwise if the spawnEnergyCapacity is more than 800
-
-                if (spawnEnergyCapacity >= 800) {
+                if (spawnEnergyCapacity >= 1000) {
                     // If the controller is near to downgrading, set partsMultiplier to x
 
                     if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
@@ -872,6 +870,33 @@ Room.prototype.spawnRequester = function () {
                         role,
                         defaultParts: [CARRY, CARRY],
                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
+                        partsMultiplier,
+                        threshold,
+                        minCreeps: undefined,
+                        maxCreeps,
+                        minCost: 250,
+                        priority,
+                        memoryAdditions: {
+                            R: true,
+                        },
+                    }
+                }
+
+                // Otherwise if the spawnEnergyCapacity is more than 800
+
+                if (spawnEnergyCapacity >= 800) {
+                    // If the controller is near to downgrading, set partsMultiplier to x
+
+                    if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        partsMultiplier = Math.max(partsMultiplier, 6)
+
+                    partsMultiplier = Math.round(partsMultiplier / 6)
+                    if (partsMultiplier === 0) return false
+
+                    return {
+                        role,
+                        defaultParts: [CARRY, CARRY],
+                        extraParts: [WORK, MOVE, WORK, WORK, WORK, WORK, MOVE, WORK],
                         partsMultiplier,
                         threshold,
                         minCreeps: undefined,

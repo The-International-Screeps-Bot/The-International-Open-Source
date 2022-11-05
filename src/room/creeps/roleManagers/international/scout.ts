@@ -21,21 +21,10 @@ export class Scout extends Creep {
     findScoutTarget?(): boolean {
         if (this.memory.scT) return true
 
-        this.findScoutTargets()
         this.findBestScoutTarget()
-
-        /*
-        const scoutTarget = unscoutedRooms.length
-            ? unscoutedRooms.sort(
-                  (a, b) =>
-                      Game.map.getRoomLinearDistance(this.commune.name, a) -
-                      Game.map.getRoomLinearDistance(this.commune.name, b),
-              )[0]
-            : scoutedRooms.sort((a, b) => Memory.rooms[a].LST - Memory.rooms[b].LST)[0]
- */
         if (!this.memory.scT) return false
 
-        this.memory.scT = this.memory.scT
+        this.memory.siT = this.memory.scT
         this.commune.scoutTargets.add(this.memory.scT)
 
         return true
@@ -82,6 +71,9 @@ export class Scout extends Creep {
     }
 
     findBestScoutTarget?() {
+
+        this.findScoutTargets()
+
         // Find the closest room to the creep's commune
 
         if (this.unscoutedRooms.length) {
@@ -230,9 +222,6 @@ export class Scout extends Creep {
 
             if (creep.ticksToLive === CREEP_LIFE_TIME - 1) creep.notifyWhenAttacked(false)
 
-            const commune = creep.commune
-            if (!commune) continue
-
             // If the creep is in the scoutTarget
 
             if (creep.memory.scT === room.name) {
@@ -240,7 +229,7 @@ export class Scout extends Creep {
 
                 // Get information about the room
 
-                room.advancedScout(commune)
+                room.advancedScout(creep.commune)
 
                 // Clean the room's memory
 
