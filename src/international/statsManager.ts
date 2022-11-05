@@ -283,7 +283,7 @@ export class StatsManager {
             const spawns = room.structures.spawn
             if (spawns.length > 0)
                 globalCommuneStats.su =
-                    spawns.reduce((sum, spawn) => sum + (spawn.spawning !== undefined ? 1 : 0), 0) / spawns.length
+                    spawns.reduce((sum, spawn) => sum + (((spawn.spawning && spawn.spawning.remainingTime) || spawn.renewed || !spawn.RCLActionable) ? 1 : 0), 0) / spawns.length
 
             if (each250Ticks || forceUpdate) {
                 if (room.controller && room.controller.my) {

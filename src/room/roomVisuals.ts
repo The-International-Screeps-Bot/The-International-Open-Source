@@ -10,7 +10,8 @@ import {
 } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
-import { RoomManager } from '../roomManager'
+import { RoomManager } from './roomManager'
+import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -27,6 +28,7 @@ export class RoomVisualsManager {
 
         this.roomVisuals()
         this.baseVisuals()
+        this.dataVisuals()
 
         // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
 
@@ -240,5 +242,106 @@ export class RoomVisualsManager {
         this.roomManager.room.visual.connectRoads({
             opacity: 0.3,
         })
+    }
+
+    private dataVisuals() {
+        if (!Memory.dataVisuals) return
+
+        if (!global.communes.has(this.roomManager.room.name)) return
+
+        this.remoteDataVisuals(this.generalDataVisuals(1))
+    }
+
+    private generalDataVisuals(y: number) {
+        const headers: any[] = ['estimatedIncome', 'commune harvest', 'remote harvest', 'upgrade', 'build', 'spawn']
+
+        const roomStats = Memory.stats.rooms[this.roomManager.room.name]
+
+        const data: any[][] = [
+            [this.roomManager.room.estimateIncome(), roomStats.eih.toFixed(2), roomStats.reih.toFixed(2), roomStats.eou.toFixed(2), roomStats.eob.toFixed(2), roomStats.su.toFixed(2) + '%'],
+        ]
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'General',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private remoteDataVisuals(y: number) {
+        const headers: any[] = ['remote', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']
+        const data: any[][] = []
+
+        for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {
+            const splitRemoteInfo = remoteInfo.split(' ')
+            const remoteName = splitRemoteInfo[0]
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+            const remoteMemory = Memory.rooms[remoteName]
+            const remoteData = remoteMemory.data
+
+            const row: any[] = []
+
+            row.push(remoteName)
+            row.push(sourceIndex)
+            row.push(remoteMemory.SE[sourceIndex])
+            row.push(remoteData[RemoteData[`source${(sourceIndex + 1) as 1 | 2}RemoteHarvester`]])
+            row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
+            row.push(remoteData[RemoteData.remoteReserver])
+            row.push(remoteData[RemoteData.abandon])
+
+            data.push(row)
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Remotes',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
     }
 }

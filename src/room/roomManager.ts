@@ -1,10 +1,9 @@
-import { CreepRoleManager } from "./creeps/creepRoleManager"
-import { EndTickCreepManager } from "./creeps/endTickCreepManager"
-import { PowerCreepRoleManager } from "./creeps/powerCreepRoleManager"
-import { RoomVisualsManager } from './commune/roomVisuals'
+import { CreepRoleManager } from './creeps/creepRoleManager'
+import { EndTickCreepManager } from './creeps/endTickCreepManager'
+import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
+import { RoomVisualsManager } from './roomVisuals'
 
 export class RoomManager {
-
     creepRoleManager: CreepRoleManager
     powerCreepRoleManager: PowerCreepRoleManager
     endTickCreepManager: EndTickCreepManager

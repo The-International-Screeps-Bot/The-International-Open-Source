@@ -780,7 +780,7 @@ Object.defineProperties(Room.prototype, {
     },
     upgradePositions: {
         get() {
-            if (this._upgradePositions) return this._upgradePositions
+            if (this.global.upgradePositions) return this.global.upgradePositions
 
             // Get the center upgrade pos, stopping if it's undefined
 
@@ -790,7 +790,7 @@ Object.defineProperties(Room.prototype, {
             const anchor = this.anchor
             if (!anchor) return []
 
-            this._upgradePositions = []
+            this.global.upgradePositions = []
 
             // Find terrain in room
 
@@ -809,10 +809,10 @@ Object.defineProperties(Room.prototype, {
 
                 // Add pos to harvestPositions
 
-                this._upgradePositions.push(pos)
+                this.global.upgradePositions.push(pos)
             }
 
-            this._upgradePositions.sort((a, b) => {
+            this.global.upgradePositions.sort((a, b) => {
                 return (
                     this.advancedFindPath({
                         origin: a,
@@ -827,11 +827,11 @@ Object.defineProperties(Room.prototype, {
 
             // Make the closest pos the last to be chosen
 
-            this._upgradePositions.push(this._upgradePositions.shift())
+            this.global.upgradePositions.push(this.global.upgradePositions.shift())
 
-            this._upgradePositions.splice(0, 0, centerUpgradePos)
+            this.global.upgradePositions.splice(0, 0, centerUpgradePos)
 
-            return this._upgradePositions
+            return this.global.upgradePositions
         },
     },
     usedUpgradePositions: {
