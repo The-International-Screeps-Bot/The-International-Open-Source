@@ -242,7 +242,7 @@ export class LabManager {
 
         this.lastLayoutCheck = Game.time
 
-        if (!this.lab1Id && !this.lab2Id && !this.input1 && !this.input2) return
+        if (this.lab1Id && this.lab2Id && this.input1 && this.input2) return
 
         this.lab1Id = null
         this.lab2Id = null
@@ -574,7 +574,7 @@ export class LabManager {
             if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
                 let source =
                     this.communeManager.room?.storage.store[inputRsc] >
-                    this.communeManager.room?.terminal.store[inputRsc]
+                        this.communeManager.room?.terminal.store[inputRsc]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -614,7 +614,7 @@ export class LabManager {
             if (outputLab.mineralType == this.outputRsc || outputLab.mineralType == null) {
                 let source =
                     this.communeManager.room?.storage.store[this.outputRsc] >
-                    this.communeManager.room?.terminal.store[this.outputRsc]
+                        this.communeManager.room?.terminal.store[this.outputRsc]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -671,7 +671,7 @@ export class LabManager {
             ) {
                 let source =
                     this.communeManager.room?.storage.store[RESOURCE_ENERGY] >
-                    this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
+                        this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -680,7 +680,7 @@ export class LabManager {
             } else {
                 let source: AnyStoreStructure =
                     this.communeManager.room?.storage.store[compound] >
-                    this.communeManager.room?.terminal.store[compound]
+                        this.communeManager.room?.terminal.store[compound]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
