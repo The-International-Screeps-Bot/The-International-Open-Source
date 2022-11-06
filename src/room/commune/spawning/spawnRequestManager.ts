@@ -16,6 +16,7 @@ import {
 import {
     customLog,
     findCarryPartsRequired,
+    findLinkThroughput,
     findRemoteSourcesByEfficacy,
     getRange,
     getRangeOfCoords,
@@ -777,11 +778,13 @@ Room.prototype.spawnRequester = function () {
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.8) / range
+                        maxPartsMultiplier += findLinkThroughput(range) * 0.7
                     }
 
-                    for (const sourceLink of sourceLinks) {
-                        if (!sourceLink) continue
+                    for (let i = 0; i < sourceLinks.length; i++) {
+
+                        const sourceLink = sourceLinks[i]
+
                         if (!sourceLink.RCLActionable) continue
 
                         // Get the range between the controllerLink and hubLink
@@ -790,7 +793,7 @@ Room.prototype.spawnRequester = function () {
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.3) / range
+                        maxPartsMultiplier += findLinkThroughput(range, this.estimatedSourceIncome[i]) * 0.7
                     }
 
                     partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)

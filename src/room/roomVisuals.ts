@@ -1,4 +1,14 @@
-import { myColors, NORMAL, PROTECTED, RemoteData, roomDimensions, stamps } from 'international/constants'
+import {
+    ClaimRequestData,
+    CombatRequestData,
+    HaulRequestData,
+    myColors,
+    NORMAL,
+    PROTECTED,
+    RemoteData,
+    roomDimensions,
+    stamps,
+} from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from './roomManager'
@@ -211,7 +221,6 @@ export class RoomVisualsManager {
     }
 
     private dataVisuals() {
-
         this.internationalDataVisuals()
 
         if (!Memory.dataVisuals) return
@@ -224,6 +233,10 @@ export class RoomVisualsManager {
     private internationalDataVisuals() {
         if (!this.roomManager.room.flags.internationalDataVisuals) return
 
+        this.internationalRequestDataVisuals(this.internationalGeneralDataVisuals(1))
+    }
+
+    private internationalGeneralDataVisuals(y: number) {
         const headers: any[] = [
             'estimatedIncome',
             'commune harvest',
@@ -281,7 +294,7 @@ export class RoomVisualsManager {
                 {
                     pos: {
                         x: 1,
-                        y: 1,
+                        y,
                     },
                     width: 47,
                     height,
@@ -297,6 +310,70 @@ export class RoomVisualsManager {
                 },
             ],
         })
+
+        return y + height
+    }
+
+    private internationalRequestDataVisuals(y: number) {
+        const headers: any[] = ['requestName', 'responderName', 'abandon']
+
+        const data: any[][] = []
+
+        for (const requestName in Memory.claimRequests) {
+            const request = Memory.claimRequests[requestName]
+
+            if (!request.responder) continue
+
+            const row: any[] = [requestName, request.responder, request.data[ClaimRequestData.abandon]]
+            data.push(row)
+        }
+
+        for (const requestName in Memory.combatRequests) {
+            const request = Memory.combatRequests[requestName]
+
+            if (!request.responder) continue
+
+            const row: any[] = [requestName, request.responder, request.data[CombatRequestData.abandon]]
+            data.push(row)
+        }
+
+        for (const requestName in Memory.haulRequests) {
+            const request = Memory.haulRequests[requestName]
+
+            if (!request.responder) continue
+
+            const row: any[] = [requestName, request.responder, request.data[HaulRequestData.abandon]]
+            data.push(row)
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
     }
 
     private generalDataVisuals(y: number) {
