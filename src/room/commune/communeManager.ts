@@ -90,12 +90,12 @@ export class CommuneManager {
         this.allyCreepRequestManager.run()
         this.remotesManager.stage2()
 
+        this.sourceManager.run()
         this.room.linkManager()
         this.room.factoryManager()
         this.labManager.run()
         this.powerSpawnManager.run()
         this.spawnManager.run()
-        this.sourceManager.run()
 
         this.test()
     }
@@ -112,6 +112,14 @@ export class CommuneManager {
     }
 
     get storedEnergyBuildThreshold() {
+        return this.room.controller.level * 8000
+    }
+
+    /**
+     * The minimum amount of stored energy the room should only use in emergencies
+     */
+    get storedEnergyMin() {
+
         return this.room.controller.level * 8000
     }
 }

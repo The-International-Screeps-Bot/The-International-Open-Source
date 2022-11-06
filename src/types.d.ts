@@ -420,6 +420,11 @@ declare global {
         data: number[]
     }
 
+    interface HaulRequest {
+        data: number[]
+        responder?: string,
+    }
+
     interface ControllerLevel {
         level: number
         progress: number
@@ -740,6 +745,8 @@ declare global {
 
         combatRequests: { [roomName: string]: CombatRequest }
 
+        haulRequests: { [roomName: string]: HaulRequest }
+
         allyCreepRequests: { [roomName: string]: AllyCreepRequest }
 
         stats: Partial<Stats>
@@ -833,6 +840,8 @@ declare global {
          * The amount of creeps with a task of harvesting sources in the room
          */
         creepsOfSourceAmount: number[]
+
+        estimatedSourceIncome: number[]
 
         /**
          * An object with keys of roles with properties of arrays of creep names belonging to the role
@@ -1600,9 +1609,14 @@ declare global {
         claimRequest: string
 
         /**
-         *
+         * The room names of the requests this room is responding to
          */
         combatRequests: string[]
+
+        /**
+         * The room names of the requests this room is responding to
+         */
+        haulRequests: string[]
 
         /**
          * The room name of the room's ally creep target

@@ -97,6 +97,9 @@ class TickConfig {
         }
     }
     private configCommune(room: Room) {
+
+        // Check if the room is a commune
+
         const { controller } = room
         if (!controller) return
 
@@ -127,14 +130,20 @@ class TickConfig {
         if (!roomMemory.GRCL || controller.level > roomMemory.GRCL) roomMemory.GRCL = controller.level
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
+/*
+        for (const requestName of room.memory.combatRequests) {
+            if (internationalManager.creepsByCombatRequest[requestName]) continue
 
-        for (const combatRequestName of room.memory.combatRequests) {
-            if (internationalManager.creepsByCombatRequest[combatRequestName]) continue
-
-            internationalManager.creepsByCombatRequest[combatRequestName] = {}
-            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[combatRequestName][role] = []
+            internationalManager.creepsByCombatRequest[requestName] = {}
+            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
         }
 
+        for (const requestName of room.memory.haulRequests) {
+            if (internationalManager.creepsByHaulRequest[requestName]) continue
+
+            internationalManager.creepsByHaulRequest[requestName] = []
+        }
+ */
         room.spawnRequests = {}
 
         if (!room.memory.remotes) room.memory.remotes = []
@@ -327,6 +336,79 @@ class TickConfig {
         // Assign and decrease abandon for combatRequests
 
         for (const requestName in Memory.combatRequests) {
+            const request = Memory.combatRequests[requestName]
+
+            if (request.data[CombatRequestData.abandon] > 0) {
+                request.data[CombatRequestData.abandon] -= 1
+                continue
+            }
+
+            if (request.responder) {
+                internationalManager.creepsByCombatRequest[requestName] = {}
+                for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+                continue
+            }
+
+            // Filter communes that don't have the combatRequest target already
+
+            const communes = []
+
+            for (const roomName of global.communes) {
+                if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue
+
+                const room = Game.rooms[roomName]
+                if (!room.structures.spawn.length) continue
+
+                // Ensure we aren't responding to too many requests for our energy level
+
+                if (room.storage && room.controller.level >= 4) {
+                    if (
+                        room.resourcesInStoringStructures.energy / (20000 + room.controller.level * 1000) <
+                        room.memory.combatRequests.length
+                    )
+                        continue
+                } else {
+                    if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
+                }
+
+                communes.push(roomName)
+            }
+
+            const communeName = findClosestRoomName(requestName, communes)
+            if (!communeName) break
+
+            const maxRange = 18
+
+            // Run a more simple and less expensive check, then a more complex and expensive to confirm
+
+            if (
+                Game.map.getRoomLinearDistance(communeName, requestName) > maxRange ||
+                advancedFindDistance(communeName, requestName, {
+                    typeWeights: {
+                        keeper: Infinity,
+                        enemy: Infinity,
+                        ally: Infinity,
+                    },
+                }) > maxRange
+            ) {
+                request.data[CombatRequestData.abandon] = 20000
+                continue
+            }
+
+            // Otherwise assign the request to the room, and record as such in Memory
+
+            Memory.rooms[communeName].combatRequests.push(requestName)
+            request.responder = communeName
+
+            internationalManager.creepsByCombatRequest[requestName] = {}
+            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+        }
+    }
+
+    private configHaulRequests() {
+        // Assign and decrease abandon for combatRequests
+
+        for (const requestName in Memory.haulRequests) {
             const request = Memory.combatRequests[requestName]
 
             if (request.data[CombatRequestData.abandon] > 0) {

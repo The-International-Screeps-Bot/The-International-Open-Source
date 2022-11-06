@@ -1,10 +1,10 @@
-import { CombatRequestData, ClaimRequestData, myColors } from 'international/constants'
+import { CombatRequestData, ClaimRequestData, myColors, HaulRequestData } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
 import { globalStatsUpdater } from 'international/statsManager'
 
-export class CombatRequestManager {
+export class HaulRequestManager {
     communeManager: CommuneManager
 
     constructor(communeManager: CommuneManager) {
@@ -35,20 +35,21 @@ export class CombatRequestManager {
                 return
             }
 
-            this[`${request.T}Request`](request, requestName, index)
+            if (request.data[HaulRequestData.transfer]) this.transferRequest(request, requestName, index)
+            this.withdrawRequest(request, requestName, index)
         }
 
         // If CPU logging is enabled, log the CPU used by this manager
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Combat Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Haul Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
             const statName: RoomCommuneStatNames = 'cormcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
     }
 
-    private attackRequest(request: CombatRequest, requestName: string, index: number) {
+    private transferRequest(request: CombatRequest, requestName: string, index: number) {
         const { room } = this.communeManager
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
@@ -82,7 +83,7 @@ export class CombatRequestManager {
             return
         }
     }
-    private harassRequest(request: CombatRequest, requestName: string, index: number) {
+    private withdrawRequest(request: CombatRequest, requestName: string, index: number) {
         const { room } = this.communeManager
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
@@ -118,5 +119,4 @@ export class CombatRequestManager {
             return
         }
     }
-    private defendRequest(request: CombatRequest, requestName: string, index: number) {}
 }

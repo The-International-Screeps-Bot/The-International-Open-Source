@@ -16,6 +16,7 @@ import {
 import {
     customLog,
     findCarryPartsRequired,
+    findLinkThroughput,
     findRemoteSourcesByEfficacy,
     getRange,
     getRangeOfCoords,
@@ -26,7 +27,6 @@ import { globalStatsUpdater } from 'international/statsManager'
 const minRemotePriority = 10
 
 Room.prototype.spawnRequester = function () {
-
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
@@ -488,7 +488,13 @@ Room.prototype.spawnRequester = function () {
 
             // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
-            let requiredStrength = (healStrength + (this.structures.tower.length ? 0 : attackStrength)) * 1.5
+            let requiredStrength = 1
+            if (!this.controller.safeMode) {
+                requiredStrength += healStrength
+                if (!this.structures.tower.length) requiredStrength += attackStrength
+            }
+
+            requiredStrength *= 1.5
 
             const priority = Math.min(6 + this.myCreeps.meleeDefender.length * 0.5, 8)
 
@@ -797,11 +803,13 @@ Room.prototype.spawnRequester = function () {
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.8) / range
+                        maxPartsMultiplier += findLinkThroughput(range) * 0.7
                     }
 
-                    for (const sourceLink of sourceLinks) {
-                        if (!sourceLink) continue
+                    for (let i = 0; i < sourceLinks.length; i++) {
+
+                        const sourceLink = sourceLinks[i]
+
                         if (!sourceLink.RCLActionable) continue
 
                         // Get the range between the controllerLink and hubLink
@@ -810,7 +818,7 @@ Room.prototype.spawnRequester = function () {
 
                         // Limit partsMultiplier at the range with a multiplier
 
-                        maxPartsMultiplier += (controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.3) / range
+                        maxPartsMultiplier += findLinkThroughput(range, this.estimatedSourceIncome[i]) * 0.7
                     }
 
                     partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
@@ -888,9 +896,7 @@ Room.prototype.spawnRequester = function () {
                     }
                 }
 
-                // Otherwise if the spawnEnergyCapacity is more than 800
-
-                if (spawnEnergyCapacity >= 800) {
+                if (spawnEnergyCapacity >= 1000) {
                     // If the controller is near to downgrading, set partsMultiplier to x
 
                     if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
@@ -903,6 +909,33 @@ Room.prototype.spawnRequester = function () {
                         role,
                         defaultParts: [CARRY, CARRY],
                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
+                        partsMultiplier,
+                        threshold,
+                        minCreeps: undefined,
+                        maxCreeps,
+                        minCost: 250,
+                        priority,
+                        memoryAdditions: {
+                            R: true,
+                        },
+                    }
+                }
+
+                // Otherwise if the spawnEnergyCapacity is more than 800
+
+                if (spawnEnergyCapacity >= 800) {
+                    // If the controller is near to downgrading, set partsMultiplier to x
+
+                    if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        partsMultiplier = Math.max(partsMultiplier, 6)
+
+                    partsMultiplier = Math.round(partsMultiplier / 6)
+                    if (partsMultiplier === 0) return false
+
+                    return {
+                        role,
+                        defaultParts: [CARRY, CARRY],
+                        extraParts: [WORK, MOVE, WORK, WORK, WORK, WORK, MOVE, WORK],
                         partsMultiplier,
                         threshold,
                         minCreeps: undefined,

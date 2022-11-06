@@ -443,7 +443,7 @@ export class RemoteHauler extends Creep {
 
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
-        if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
+        if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY) && creepAtPos.store.getCapacity() !== this.store.getCapacity()) return false
 
         this.transfer(creepAtPos, RESOURCE_ENERGY)
 

@@ -63,7 +63,7 @@ export class MeleeDefender extends Creep {
             if (!enemyCreeps.length) return
         }
 
-        if (!room.enemyDamageThreat) {
+        if (!room.enemyDamageThreat || room.controller.safeMode) {
             this.defendWithoutRamparts(enemyCreeps)
             return
         }

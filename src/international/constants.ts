@@ -735,6 +735,14 @@ export enum CombatRequestData {
     inactionTimer,
 }
 
+export enum HaulRequestData {
+    transfer,
+    distance,
+    timer,
+    priority,
+    abandon,
+}
+
 export enum AllyCreepRequestData {
     allyVanguard,
     abandon,

@@ -33,7 +33,9 @@ export class InternationalManager {
     /**
      * Antifa creeps by combat request name, then by role with an array of creep names
      */
-    creepsByCombatRequest: { [key: string]: { [key: string]: string[] } }
+    creepsByCombatRequest: { [requestName: string]: Partial<{ [key in CreepRoles]: string[] }> }
+
+    creepsByHaulRequest: { [requestName: string]: string[] }
 
     unspawnedPowerCreepNames: string[]
 
@@ -42,6 +44,7 @@ export class InternationalManager {
      */
     update() {
         this.creepsByCombatRequest = {}
+        this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
 
         delete this._myOrders

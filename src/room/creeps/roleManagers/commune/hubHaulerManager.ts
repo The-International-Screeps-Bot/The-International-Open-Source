@@ -210,7 +210,7 @@ export class HubHauler extends Creep {
 
         this.message += 'RHLW'
 
-        let amount = Math.min(this.freeStore(), hubLink.store.energy)
+        let amount = Math.min(this.freeStore(), hubLink.store.getUsedCapacity(RESOURCE_ENERGY))
 
         this.createReservation('withdraw', hubLink.id, amount)
         this.createReservation('transfer', target.id, amount + this.store.energy)
@@ -222,15 +222,14 @@ export class HubHauler extends Creep {
      */
     reserveHubLinkTransfer?(): boolean {
         const { room } = this
-        const { storage } = room
-        const { terminal } = room
+
         const { hubLink } = room
 
         if (!hubLink) return false
 
         // If there is a sufficient cooldown (there is no point filling a link that can do nothing)
 
-        if (hubLink.cooldown > 5) return false
+        if (hubLink.cooldown > 6) return false
 
         // If there is unsufficient space to justify a fill
 
@@ -252,7 +251,7 @@ export class HubHauler extends Creep {
         )
             return false
 
-        const amount = Math.min(this.freeStore(), hubLink.freeSpecificStore())
+        const amount = Math.min(this.freeStore(), hubLink.store.getFreeCapacity(RESOURCE_ENERGY))
 
         // Find a provider
 
@@ -265,7 +264,7 @@ export class HubHauler extends Creep {
         this.createReservation(
             'transfer',
             hubLink.id,
-            Math.min(this.freeStore() + this.store.energy, hubLink.freeSpecificStore()),
+            Math.min(this.freeStore() + this.store.energy, hubLink.store.getFreeCapacity(RESOURCE_ENERGY)),
         )
         return true
     }
