@@ -140,15 +140,12 @@ export class TradeManager {
         // If the terminal has less than x energy in the terminal, request y
 
         if (terminal.store.getUsedCapacity(resource) < targetAmount) {
-
             let priority: number
 
             const { controller } = this.communeManager.room
             if (controller.level < 8) {
-
                 priority = Math.max(Math.min(controller.progress / controller.progressTotal, 0.9), 0.2)
-            }
-            else priority = 0.5
+            } else priority = 0.5
 
             allyManager.requestResource(
                 room.name,
@@ -246,6 +243,7 @@ export class TradeManager {
 
         for (const resourceTarget of terminalResourceTargets) {
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
+            if (resourceTarget.resource === RESOURCE_ENERGY) continue
 
             let min = terminal.store.getCapacity() * resourceTarget.min
 
