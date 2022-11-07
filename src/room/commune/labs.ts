@@ -445,7 +445,7 @@ export class LabManager {
             )
         }
         for (let compound in this.targetCompounds) {
-            console.log('updateDeficits ' + this.communeManager.room.name + ': ' + compound)
+            //console.log('updateDeficits ' + this.communeManager.room.name + ': ' + compound)
             var amount = Math.max(0, this.targetCompounds[compound as MineralConstant | MineralCompoundConstant]) // this.communeManager.roomai.trading.maxStorageAmount(compound))
 
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
@@ -518,7 +518,7 @@ export class LabManager {
     ): { type: MineralCompoundConstant; amount: number } {
         let nextReaction = target
         let missing = _.filter(decompose(nextReaction), r => this.amount(r) < LAB_REACTION_AMOUNT)
-        console.log(targetAmount + ':' + target + ' missing: ' + JSON.stringify(missing))
+        //console.log(targetAmount + ':' + target + ' missing: ' + JSON.stringify(missing))
         if (missing.length === 0) return { type: target as MineralCompoundConstant, amount: targetAmount }
 
         // filter uncookable resources (e.g. H). Can't get those using reactions.
@@ -574,7 +574,7 @@ export class LabManager {
             if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
                 let source =
                     this.communeManager.room?.storage.store[inputRsc] >
-                        this.communeManager.room?.terminal.store[inputRsc]
+                    this.communeManager.room?.terminal.store[inputRsc]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -614,7 +614,7 @@ export class LabManager {
             if (outputLab.mineralType == this.outputRsc || outputLab.mineralType == null) {
                 let source =
                     this.communeManager.room?.storage.store[this.outputRsc] >
-                        this.communeManager.room?.terminal.store[this.outputRsc]
+                    this.communeManager.room?.terminal.store[this.outputRsc]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -671,7 +671,7 @@ export class LabManager {
             ) {
                 let source =
                     this.communeManager.room?.storage.store[RESOURCE_ENERGY] >
-                        this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
+                    this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -680,7 +680,7 @@ export class LabManager {
             } else {
                 let source: AnyStoreStructure =
                     this.communeManager.room?.storage.store[compound] >
-                        this.communeManager.room?.terminal.store[compound]
+                    this.communeManager.room?.terminal.store[compound]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
