@@ -1,10 +1,4 @@
-import {
-    minHarvestWorkRatio,
-    remoteHarvesterRoles,
-    RemoteData,
-    remoteRoles,
-    maxRemoteRoomDistance,
-} from 'international/constants'
+import { minHarvestWorkRatio, remoteHarvesterRoles, remoteRoles, maxRemoteRoomDistance, RemoteData } from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
@@ -15,30 +9,32 @@ export class RemotesManager {
         this.communeManager = communeManager
     }
 
-    public stage1() {
+    public preTickRun() {
         const { room } = this.communeManager
 
         // Loop through the commune's remote names
 
-        for (let index = this.communeManager.room.memory.remotes.length - 1; index >= 0; index -= 1) {
+        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
             // Get the name of the remote using the index
 
-            const remoteName = this.communeManager.room.memory.remotes[index]
+            const remoteName = room.memory.remotes[index]
 
             const remoteMemory = Memory.rooms[remoteName]
 
             // If the room isn't a remote, remove it from the remotes array
 
-            if (remoteMemory.T !== 'remote' || remoteMemory.CN !== this.communeManager.room.name) {
-                this.communeManager.room.memory.remotes.splice(index, 1)
+            if (remoteMemory.T !== 'remote' || remoteMemory.CN !== room.name) {
+                room.memory.remotes.splice(index, 1)
+                delete remoteMemory.CN
+                remoteMemory.T = 'neutral'
                 continue
             }
 
             // The room is closed or is now a respawn or novice zone
 
             if (Game.map.getRoomStatus(remoteName).status !== Game.map.getRoomStatus(room.name).status) {
-                delete room.memory.claimRequest
-                this.communeManager.room.memory.remotes.splice(index, 1)
+
+                room.memory.remotes.splice(index, 1)
                 delete remoteMemory.CN
                 remoteMemory.T = 'neutral'
                 continue
@@ -52,7 +48,7 @@ export class RemotesManager {
             // Every 5~ ticks ensure enemies haven't blocked off too much of the path
 
             if (randomTick(100)) {
-                const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+                const safeDistance = advancedFindDistance(room.name, remoteName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
@@ -69,7 +65,7 @@ export class RemotesManager {
                     continue
                 }
 
-                const distance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+                const distance = advancedFindDistance(room.name, remoteName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
@@ -96,7 +92,7 @@ export class RemotesManager {
 
             const remote = Game.rooms[remoteName]
 
-            const possibleReservation = this.communeManager.room.energyCapacityAvailable >= 650
+            const possibleReservation = room.energyCapacityAvailable >= 650
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
 
@@ -154,7 +150,7 @@ export class RemotesManager {
         }
     }
 
-    public stage2() {
+    public run() {
         // Loop through the commune's remote names
 
         for (const remoteName of this.communeManager.room.memory.remotes) {
@@ -196,9 +192,13 @@ export class RemotesManager {
 
         remoteMemory.data[RemoteData.abandon] -= 1
 
+        const abandonment = remoteMemory.data[RemoteData.abandon]
+
         for (const key in remoteMemory.data) {
-            if (parseInt(key) === RemoteData.abandon) continue
+
             remoteMemory.data[key] = 0
         }
+
+        remoteMemory.data[RemoteData.abandon] = abandonment
     }
 }

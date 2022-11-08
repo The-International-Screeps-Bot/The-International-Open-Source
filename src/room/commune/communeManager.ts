@@ -7,7 +7,7 @@ import './defence'
 import './allyCreepRequestManager'
 import './claimRequestManager'
 import './combatRequestManager'
-import { myColors, roomDimensions } from 'international/constants'
+import { creepRoles, myColors, remoteRoles, roomDimensions, stamps } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
 import './towers'
@@ -25,6 +25,9 @@ import { SourceManager } from './sourceManager'
 import { TowerManager } from './towers'
 import { DefenceManager } from './defence'
 import { SpawnManager } from './spawning/spawnManager'
+import { HaulRequestManager } from './haulRequestManager'
+import { HaulerSizeManager } from './haulerSize'
+import { HaulerNeedManager } from './haulerNeedManager'
 
 export class CommuneManager {
     defenceManager: DefenceManager
@@ -37,10 +40,15 @@ export class CommuneManager {
 
     tradeManager: TradeManager
     remotesManager: RemotesManager
+    haulerSizeManager: HaulerSizeManager
 
     claimRequestManager: ClaimRequestManager
     combatRequestManager: CombatRequestManager
     allyCreepRequestManager: AllyCreepRequestManager
+    haulRequestManager: HaulRequestManager
+    haulerNeedManager: HaulerNeedManager
+
+    //
 
     constructor() {
         this.defenceManager = new DefenceManager(this)
@@ -53,10 +61,13 @@ export class CommuneManager {
 
         this.tradeManager = new TradeManager(this)
         this.remotesManager = new RemotesManager(this)
+        this.haulerSizeManager = new HaulerSizeManager(this)
 
         this.claimRequestManager = new ClaimRequestManager(this)
         this.combatRequestManager = new CombatRequestManager(this)
         this.allyCreepRequestManager = new AllyCreepRequestManager(this)
+        this.haulRequestManager = new HaulRequestManager(this)
+        this.haulerNeedManager = new HaulerNeedManager(this)
     }
 
     room: Room
@@ -65,6 +76,71 @@ export class CommuneManager {
     public update(room: Room) {
         this.room = room
         this.structures = room.structures
+    }
+
+    preTickRun() {
+
+        const { room } = this
+
+        const roomMemory = Memory.rooms[room.name]
+
+        room.memory.T = 'commune'
+
+        if (!roomMemory.GRCL || room.controller.level > roomMemory.GRCL) roomMemory.GRCL = room.controller.level
+
+        if (!room.memory.combatRequests) room.memory.combatRequests = []
+        if (!room.memory.haulRequests) room.memory.haulRequests = []
+
+        room.spawnRequests = {}
+        room.upgradeStrength = 0
+        room.haulerNeed = 0
+
+        if (!room.memory.remotes) room.memory.remotes = []
+
+        // If there is no Hauler Size
+
+        if (!room.memory.MHC) {
+            room.memory.MHC = 0
+            room.memory.HU = 0
+        }
+
+        this.haulerSizeManager.preTickRun()
+        this.remotesManager.preTickRun()
+        this.haulRequestManager.preTickRun()
+        this.sourceManager.preTickRun()
+
+        // Add roomName to commune list
+
+        global.communes.add(room.name)
+
+        room.creepsOfRemote = {}
+
+        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+            const remoteName = room.memory.remotes[index]
+            room.creepsOfRemote[remoteName] = {}
+            for (const role of remoteRoles) room.creepsOfRemote[remoteName][role] = []
+        }
+
+        // For each role, construct an array for creepsFromRoom
+
+        room.creepsFromRoom = {}
+        for (const role of creepRoles) room.creepsFromRoom[role] = []
+
+        room.creepsFromRoomAmount = 0
+
+        if (!room.memory.stampAnchors) {
+            room.memory.stampAnchors = {}
+
+            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
+        }
+
+        if (room.creepsFromRoom.scout) room.scoutTargets = new Set()
+
+        if (!room.memory.deposits) room.memory.deposits = {}
+
+        room.attackingDefenderIDs = new Set()
+        room.defenderEnemyTargetsWithDamage = new Map()
+        room.defenderEnemyTargetsWithDefender = new Map()
     }
 
     public run() {
@@ -88,7 +164,9 @@ export class CommuneManager {
         this.claimRequestManager.run()
         this.combatRequestManager.run()
         this.allyCreepRequestManager.run()
-        this.remotesManager.stage2()
+        this.haulRequestManager.run()
+        this.remotesManager.run()
+        this.haulerNeedManager.run()
 
         this.sourceManager.run()
         this.room.linkManager()
@@ -99,12 +177,22 @@ export class CommuneManager {
 
         this.test()
     }
+
     private test() {
+
+        customLog('HAULER NEED', this.room.haulerNeed)
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
 
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, undefined, myColors.red)
+    }
+
+    public deleteCombatRequest(requestName: string, index: number) {
+
+        delete Memory.combatRequests[requestName]
+        this.room.memory.combatRequests.splice(index, 1)
     }
 
     get storedEnergyUpgradeThreshold() {
@@ -119,7 +207,6 @@ export class CommuneManager {
      * The minimum amount of stored energy the room should only use in emergencies
      */
     get storedEnergyMin() {
-
-        return this.room.controller.level * 8000
+        return Math.pow(this.room.controller.level * 8000, 1.05)
     }
-}
+ }

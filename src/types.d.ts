@@ -422,7 +422,7 @@ declare global {
 
     interface HaulRequest {
         data: number[]
-        responder?: string,
+        responder?: string
     }
 
     interface ControllerLevel {
@@ -733,6 +733,8 @@ declare global {
          */
         ID: number
 
+        chantIndex: number
+
         /**
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
@@ -761,7 +763,7 @@ declare global {
     }
 
     interface RawMemory {
-        [key: string]: any
+        _parsed: Memory
     }
 
     type SpawningStructures = (StructureSpawn | StructureExtension)[]
@@ -933,6 +935,13 @@ declare global {
         defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
         defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
         towerAttackTarget: Creep
+
+        upgradeStrength: number
+
+        /**
+         * The carry parts needed to effectively run the commune
+         */
+        haulerNeed: number
 
         // Functions
 
@@ -1108,7 +1117,9 @@ declare global {
          */
         estimateIncome(): number
 
-        getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
+        partsOfRoles: Partial<{ [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }> }>
+
+        getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>
 
         createClaimRequest(): boolean
 
@@ -1120,8 +1131,6 @@ declare global {
         combatRequestManager(): void
 
         allyCreepRequestManager(): void
-
-        haulerSizeManager(): void
 
         trafficManager(): void
 
@@ -1436,7 +1445,7 @@ declare global {
 
         _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
 
-        readonly resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+        readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
 
         _unprotectedEnemyCreeps: Creep[]
 
@@ -1685,6 +1694,8 @@ declare global {
          * Greatest Room Controller Level
          */
         GRCL: number
+
+        hasTerminal: boolean
 
         factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
         factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
@@ -1983,6 +1994,10 @@ declare global {
          * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
          */
         readonly towerDamage: number
+
+        _upgradeStrength: number
+
+        readonly upgradeStrength: number
 
         _message: string
 

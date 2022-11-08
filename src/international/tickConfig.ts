@@ -2,13 +2,14 @@ import { allyManager } from 'international/simpleAllies'
 import {
     AllyCreepRequestData,
     antifaRoles,
+    chant,
     ClaimRequestData,
     CombatRequestData,
     creepRoles,
     haulerUpdateDefault,
+    HaulRequestData,
     myColors,
     powerCreepClassNames,
-    RemoteData,
     remoteRoles,
     stamps,
 } from './constants'
@@ -38,6 +39,7 @@ class TickConfig {
         this.configClaimRequests()
         this.configAllyCreepRequests()
         this.configCombatRequests()
+        this.configHaulRequests()
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
@@ -50,6 +52,14 @@ class TickConfig {
         // General
 
         global.communes = new Set()
+
+        // Chant logic
+
+        if (Memory.doChant) {
+
+            if (Memory.chantIndex === chant.length - 1) Memory.chantIndex = 0
+            else Memory.chantIndex += 1
+        }
 
         // global
 
@@ -87,110 +97,37 @@ class TickConfig {
 
             room.creepsOfSourceAmount = []
 
+            room.partsOfRoles = {}
             room.powerTasks = {}
 
             for (const index in room.sources) room.creepsOfSourceAmount.push(0)
 
             room.squadRequests = new Set()
 
-            this.configCommune(room)
+            // Check if the room is a commune
+
+            if (!room.controller) continue
+
+            if (!room.controller.my) {
+                if (room.memory.T === 'commune') {
+                    room.basicScout()
+                    room.cleanMemory()
+                }
+                continue
+            }
+
+            room.communeManager = global.communeManagers[room.name]
+
+            if (!room.communeManager) {
+                room.communeManager = new CommuneManager()
+                global.communeManagers[room.name] = room.communeManager
+            }
+
+            room.communeManager.update(room)
+            room.communeManager.preTickRun()
         }
     }
-    private configCommune(room: Room) {
 
-        // Check if the room is a commune
-
-        const { controller } = room
-        if (!controller) return
-
-        room.communeManager = global.communeManagers[room.name]
-
-        if (!room.communeManager) {
-            room.communeManager = new CommuneManager()
-            global.communeManagers[room.name] = room.communeManager
-        }
-
-        room.communeManager.update(room)
-
-        const roomMemory = Memory.rooms[room.name]
-
-        if (controller.my) room.memory.T = 'commune'
-
-        if (room.memory.T != 'commune') return
-
-        // Iterate if the controller is not mine
-
-        if (!controller.my) {
-            room.memory.T = 'neutral'
-            return
-        }
-
-        // The room is a commune
-
-        if (!roomMemory.GRCL || controller.level > roomMemory.GRCL) roomMemory.GRCL = controller.level
-
-        if (!room.memory.combatRequests) room.memory.combatRequests = []
-/*
-        for (const requestName of room.memory.combatRequests) {
-            if (internationalManager.creepsByCombatRequest[requestName]) continue
-
-            internationalManager.creepsByCombatRequest[requestName] = {}
-            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
-        }
-
-        for (const requestName of room.memory.haulRequests) {
-            if (internationalManager.creepsByHaulRequest[requestName]) continue
-
-            internationalManager.creepsByHaulRequest[requestName] = []
-        }
- */
-        room.spawnRequests = {}
-
-        if (!room.memory.remotes) room.memory.remotes = []
-
-        // If there is no Hauler Size
-
-        if (!room.memory.MHC) {
-            room.memory.MHC = 0
-            room.memory.HU = 0
-        }
-
-        room.haulerSizeManager()
-        room.communeManager.remotesManager.stage1()
-
-        // Add roomName to commune list
-
-        global.communes.add(room.name)
-
-        room.creepsOfRemote = {}
-
-        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
-            const remoteName = room.memory.remotes[index]
-            room.creepsOfRemote[remoteName] = {}
-            for (const role of remoteRoles) room.creepsOfRemote[remoteName][role] = []
-        }
-
-        // For each role, construct an array for creepsFromRoom
-
-        room.creepsFromRoom = {}
-        for (const role of creepRoles) room.creepsFromRoom[role] = []
-
-        room.creepsFromRoomAmount = 0
-
-        if (!room.memory.stampAnchors) {
-            room.memory.stampAnchors = {}
-
-            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
-        }
-
-        if (room.creepsFromRoom.scout) room.scoutTargets = new Set()
-
-        if (!room.memory.deposits) room.memory.deposits = {}
-
-        room.attackingDefenderIDs = new Set()
-        room.defenderEnemyTargetsWithDamage = new Map()
-        room.defenderEnemyTargetsWithDefender = new Map()
-    }
     private configClaimRequests() {
         let reservedGCL = Game.gcl.level - global.communes.size
 
@@ -338,16 +275,15 @@ class TickConfig {
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
 
-            if (request.data[CombatRequestData.abandon] > 0) {
-                request.data[CombatRequestData.abandon] -= 1
-                continue
-            }
+            if (request.data[CombatRequestData.abandon]) request.data[CombatRequestData.abandon] -= 1
 
             if (request.responder) {
                 internationalManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
                 continue
             }
+
+            if (request.data[CombatRequestData.abandon]) continue
 
             // Filter communes that don't have the combatRequest target already
 
@@ -409,16 +345,12 @@ class TickConfig {
         // Assign and decrease abandon for combatRequests
 
         for (const requestName in Memory.haulRequests) {
-            const request = Memory.combatRequests[requestName]
+            const request = Memory.haulRequests[requestName]
 
-            if (request.data[CombatRequestData.abandon] > 0) {
-                request.data[CombatRequestData.abandon] -= 1
-                continue
-            }
+            if (request.data[HaulRequestData.abandon]) request.data[HaulRequestData.abandon] -= 1
 
             if (request.responder) {
-                internationalManager.creepsByCombatRequest[requestName] = {}
-                for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+                internationalManager.creepsByHaulRequest[requestName] = []
                 continue
             }
 
@@ -427,22 +359,21 @@ class TickConfig {
             const communes = []
 
             for (const roomName of global.communes) {
-                if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue
+                if (Memory.rooms[roomName].haulRequests.includes(requestName)) continue
 
                 const room = Game.rooms[roomName]
                 if (!room.structures.spawn.length) continue
 
                 // Ensure we aren't responding to too many requests for our energy level
 
-                if (room.storage && room.controller.level >= 4) {
-                    if (
-                        room.resourcesInStoringStructures.energy / (20000 + room.controller.level * 1000) <
-                        room.memory.combatRequests.length
-                    )
-                        continue
-                } else {
-                    if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
-                }
+                if (room.controller.level < 4) continue
+                if (!room.storage) continue
+
+                if (
+                    room.resourcesInStoringStructures.energy / (20000 + room.controller.level * 1000) <
+                    room.memory.haulRequests.length
+                )
+                    continue
 
                 communes.push(roomName)
             }
@@ -464,17 +395,16 @@ class TickConfig {
                     },
                 }) > maxRange
             ) {
-                request.data[CombatRequestData.abandon] = 20000
+                request.data[HaulRequestData.abandon] = 20000
                 continue
             }
 
             // Otherwise assign the request to the room, and record as such in Memory
 
-            Memory.rooms[communeName].combatRequests.push(requestName)
+            Memory.rooms[communeName].haulRequests.push(requestName)
             request.responder = communeName
 
-            internationalManager.creepsByCombatRequest[requestName] = {}
-            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+            internationalManager.creepsByHaulRequest[requestName] = []
         }
     }
 }

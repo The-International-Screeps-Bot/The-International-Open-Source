@@ -7,10 +7,10 @@ import {
     minHarvestWorkRatio,
     myColors,
     rampartUpkeepCost,
+    RemoteData,
     remoteHarvesterRoles,
     RemoteHarvesterRolesBySourceIndex,
     remoteHaulerRoles,
-    RemoteData,
     roadUpkeepCost,
 } from 'international/constants'
 import {
@@ -292,15 +292,12 @@ Room.prototype.spawnRequester = function () {
                 if (storage && this.controller.level >= 4) {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
-                        this.getPartsOfRoleAmount('controllerUpgrader', WORK),
+                        this.getPartsOfRole('controllerUpgrader').work,
                     )
                 } else {
                     requiredCarryParts += findCarryPartsRequired(
                         this.upgradePathLength,
-                        Math.min(
-                            this.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75,
-                            this.sources.length * 0.75,
-                        ),
+                        Math.min(this.getPartsOfRole('controllerUpgrader').work * 0.75, this.sources.length * 0.75),
                     )
                 }
             }
@@ -642,7 +639,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             let priority = 7
-            if (!this.towerInferiority) priority += this.creepsFromRoom.maintainer.length
+            if (!this.towerInferiority) priority += this.creepsFromRoom.maintainer.length * 0.5
 
             // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
@@ -782,7 +779,6 @@ Room.prototype.spawnRequester = function () {
                     }
 
                     for (let i = 0; i < sourceLinks.length; i++) {
-
                         const sourceLink = sourceLinks[i]
 
                         if (!sourceLink.RCLActionable) continue
@@ -1444,7 +1440,7 @@ Room.prototype.spawnRequester = function () {
             request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
-        if (request.T === 'attack') {
+        if (request.T === 'attack' || request.T === 'defend') {
             // Spawn quad
 
             this.constructSpawnRequests(

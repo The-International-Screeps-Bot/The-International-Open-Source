@@ -6,7 +6,7 @@ interface RoomTypeProperties {
     [key: string]: boolean
 }
 
-export const roomTypeProperties: RoomTypeProperties = {
+export const roomTypeProperties: Partial<{ [key in keyof RoomMemory]: boolean }> = {
     remotes: true,
     deposits: true,
     powerBanks: true,
@@ -170,6 +170,22 @@ export const nonCommuneSigns = [
     'Trans rights.',
     'Advancing the LGBTQ+ agenda <3',
     'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it',
+]
+
+export const chant = [
+    'creeps',
+    'of',
+    Game.shard.name,
+    'unite',
+    'you',
+    'have',
+    'nothing',
+    'to',
+    'loose',
+    'but',
+    'your',
+    'chains!',
+    undefined,
 ]
 
 export const roomDimensions = 50
@@ -731,8 +747,10 @@ export enum CombatRequestData {
     swarm,
     priority,
     quadCount,
-    timer,
+    inactionTimerMax,
     inactionTimer,
+    maxThreat,
+    abandonments,
 }
 
 export enum HaulRequestData {

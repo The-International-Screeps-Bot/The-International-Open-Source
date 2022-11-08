@@ -1,4 +1,4 @@
-import { myColors, powerCreepClassNames } from 'international/constants'
+import { chant, myColors, powerCreepClassNames } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, randomTick } from 'international/utils'
 import { RoomManager } from '../roomManager'
@@ -31,19 +31,17 @@ export class EndTickCreepManager {
 
         // Normal creeps go second
 
-        for (const role in this.roomManager.room.myCreeps)
+        for (const role in this.roomManager.room.myCreeps) {
+
             for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
                 const creep = Game.creeps[creepName]
 
                 creep.endTickManager()
                 creep.recurseMoveRequest()
-
-                if (Game.time % 2 === 0) {
-                    creep.say('MORE', true)
-                } else {
-                    creep.say('MALARKEY', true)
-                }
             }
+        }
+
+        this.runChant()
 
         // If CPU logging is enabled, log the CPU used by this manager
 
@@ -53,5 +51,32 @@ export class EndTickCreepManager {
             const statName: RoomCommuneStatNames = 'etcmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
+    }
+
+    private runChant() {
+
+        if (!Memory.doChant) return
+
+        const currentChant = chant[Memory.chantIndex]
+        if (!currentChant) return
+
+        // Power creeps go first
+
+        for (const className of powerCreepClassNames) {
+            for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
+                const creep = Game.powerCreeps[creepName]
+
+                creep.say(currentChant, true)
+            }
+        }
+
+        // Normal creeps go second
+
+        for (const role in this.roomManager.room.myCreeps)
+            for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
+                const creep = Game.creeps[creepName]
+
+                creep.say(currentChant, true)
+            }
     }
 }

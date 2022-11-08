@@ -1,4 +1,4 @@
-import { AllyCreepRequestData, ClaimRequestData, myColors } from 'international/constants'
+import { AllyCreepRequestData, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'

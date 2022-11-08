@@ -31,6 +31,7 @@ import {
     newID,
     packAsNum,
     packXYAsNum,
+    randomRange,
     unpackNumAsCoord,
     unpackNumAsPos,
 } from 'international/utils'
@@ -140,6 +141,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             swampCost: opts.swampCost,
             maxRooms: opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size,
             maxOps: 100000,
+            heuristicWeight: 1,
             flee: opts.flee,
 
             // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
@@ -890,7 +892,7 @@ Room.prototype.createHarassCombatRequest = function () {
     request.data[CombatRequestData.attack] = 3
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
-
+    /*
     const structures = this.dismantleTargets
 
     let totalHits = 0
@@ -898,11 +900,11 @@ Room.prototype.createHarassCombatRequest = function () {
 
     if (structures.length > 0)
         request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+ */
 }
 
 Room.prototype.createDefendCombatRequest = function (opts) {
     if (Memory.combatRequests[this.name]) return
-    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
 
     const request = (Memory.combatRequests[this.name] = {
         T: 'defend',
@@ -911,7 +913,7 @@ Room.prototype.createDefendCombatRequest = function (opts) {
 
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
-    request.data[CombatRequestData.inactionTimer] = Math.floor(Math.random() * 200)
+    request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
 
     for (const key in opts) {
         request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
@@ -931,7 +933,7 @@ Room.prototype.cleanMemory = function () {
     for (const key in room.memory) {
         // Iterate if key is not part of roomTypeProperties
 
-        if (!roomTypeProperties[key]) continue
+        if (!roomTypeProperties[key as keyof RoomMemory]) continue
 
         // Iterate if key part of this roomType's properties
 
@@ -1998,23 +2000,32 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
     return positions
 }
 
-Room.prototype.getPartsOfRoleAmount = function (role, type) {
-    let partsAmount = 0
+Room.prototype.getPartsOfRole = function (role) {
+
+    if (this.partsOfRoles[role]) return this.partsOfRoles[role]
+
+    this.partsOfRoles[role] = {}
 
     // Loop through every creepName in the creepsFromRoom of the specified role
 
     for (const creepName of this.creepsFromRoom[role]) {
         const creep = Game.creeps[creepName]
 
-        if (!type) {
-            partsAmount += creep.body.length
-            continue
-        }
+        for (const key in creep.parts) {
 
-        partsAmount += creep.parts[type]
+            const partType = key as BodyPartConstant
+
+            if (!this.partsOfRoles[role][partType]) {
+
+                this.partsOfRoles[role][partType] = 1
+                continue
+            }
+
+            this.partsOfRoles[role][partType] += 1
+        }
     }
 
-    return partsAmount
+    return this.partsOfRoles[role]
 }
 
 Room.prototype.createClaimRequest = function () {

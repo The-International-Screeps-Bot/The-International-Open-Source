@@ -1,29 +1,30 @@
 import { CPUBucketCapacity, haulerUpdateDefault } from 'international/constants'
+import { CommuneManager } from './communeManager'
 
-Room.prototype.haulerSizeManager = function () {
-    const { memory } = this
+export class HaulerSizeManager {
+    communeManager: CommuneManager
 
-    memory.HU -= 1
-    if (memory.HU > 0) return
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
+    }
 
-    memory.HU = haulerUpdateDefault
+    preTickRun() {
 
-    const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
+        const roomMemory = Memory.rooms[this.communeManager.room.name]
 
-    // Use to average energy usage percent and the energy capacity availible in the room to determine the max hauler size
+        roomMemory.HU -= 1
+        if (roomMemory.HU > 0) return
 
-    memory.MHC =
-        (Math.floor(
-            Math.max(Math.pow(avgCPUUsagePercent, 1.3) - 0.4, 0) *
-                Math.min(this.energyCapacityAvailable / BODYPART_COST.move, MAX_CREEP_SIZE),
-        ) + this.structures.spawn.length * 2) * BODYPART_COST[CARRY]
+        roomMemory.HU = haulerUpdateDefault
 
-    /* memory.MHC = Number.MAX_SAFE_INTEGER */
-    /* memory.MHC = Math.min(
-        Math.max(
-            Math.floor(((CPUBucketCapacity - CPUBucketCapacity * 0.3 - Game.cpu.bucket) / CPUBucketCapacity) * 50),
-            1,
-        ),
-        MAX_CREEP_SIZE,
-    ) * BODYPART_COST[MOVE] || Number.MAX_SAFE_INTEGER */
+        const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
+
+        // Use to average energy usage percent and the energy capacity availible in the room to determine the max hauler size
+
+        roomMemory.MHC =
+            (Math.floor(
+                Math.max(Math.pow(avgCPUUsagePercent, 1.3) - 0.4, 0) *
+                    Math.min(this.communeManager.room.energyCapacityAvailable / BODYPART_COST.move, MAX_CREEP_SIZE),
+            ) + this.communeManager.room.structures.spawn.length * 2) * BODYPART_COST[CARRY]
+    }
 }

@@ -259,9 +259,10 @@ export class LabManager {
 
         let bestLab = labs[0]
 
-        //Starting at 2 intentally, to skip the first two records, which will be the default best labs...
+        // Starting at 2 intentally, to skip the first two records, which will be the default best labs...
         //  then we see if there's a lab that's better.
-        //I'm not 100% sure this logic is perfect, but it's decent, but I think there may be an error in here.
+        // I'm not 100% sure this logic is perfect, but it's decent, but I think there may be an error in here
+
         for (let i = 2; i < labs.length; i++) {
             let thisLab = labs[i]
             if (this.labsInRange(thisLab) > this.labsInRange(bestLab)) bestLab = thisLab

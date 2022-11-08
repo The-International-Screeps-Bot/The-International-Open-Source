@@ -21,6 +21,11 @@ export class ControllerUpgrader extends Creep {
         return (this._dying = true)
     }
 
+    preTickManager() {
+
+        this.room.upgradeStrength += this.upgradeStrength
+    }
+
     public static controllerUpgraderManager(room: Room, creepsOfRole: string[]) {
         // Loop through creepNames
 

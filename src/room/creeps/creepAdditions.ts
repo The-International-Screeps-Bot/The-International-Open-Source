@@ -225,9 +225,25 @@ Object.defineProperties(Creep.prototype, {
             return this._towerDamage
         },
     },
+    upgradeStrength: {
+        get() {
+
+            if (this._upgradeStrength !== undefined) return this._upgradeStrength
+
+            this._upgradeStrength = this.parts.work
+
+            if (this.boosts.XGH2O > 0) return this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController
+            else if (this.boosts.GH2O > 0) return this._defenceStrength *= BOOSTS.upgrade.GH2O.upgradeController
+            else if (this.boosts.GH > 0) return this._defenceStrength *= BOOSTS.upgrade.GH.upgradeController
+
+            return this._upgradeStrength
+        }
+    },
     message: {
         get() {
             if (this._message) return this._message
+
+            this.say(this._message)
 
             return (this._message = '')
         },

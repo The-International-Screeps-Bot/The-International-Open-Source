@@ -196,8 +196,8 @@ global.combat = function (requestName, type, opts, communeName) {
     request.data[CombatRequestData.abandon] = 0
 
     for (const key in opts) {
-
-        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] = opts[key as keyof typeof CombatRequestData]
+        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+            opts[key as keyof typeof CombatRequestData]
     }
 
     if (communeName) {
@@ -248,10 +248,8 @@ global.allyCreepRequest = function (requestName, communeName?) {
 }
 global.ACR = global.allyCreepRequest
 
-global.deleteBasePlans = function(roomName) {
-
+global.deleteBasePlans = function (roomName) {
     if (!roomName) {
-
         if (global.communes.size > 1) return 'Provide a roomName'
 
         roomName = Array.from(global.communes)[0]

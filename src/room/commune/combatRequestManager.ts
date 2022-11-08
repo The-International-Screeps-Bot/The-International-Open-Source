@@ -1,4 +1,4 @@
-import { CombatRequestData, ClaimRequestData, myColors } from 'international/constants'
+import { CombatRequestData, myColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from './communeManager'
@@ -10,32 +10,37 @@ export class CombatRequestManager {
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
     }
+
     public run() {
         const { room } = this.communeManager
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-        if (!room.structures.spawn.length) return
-
-        for (let index = 0; index < room.memory.combatRequests.length; index++) {
+        for (let index = room.memory.combatRequests.length - 1; index >= 0; index -= 1) {
             const requestName = room.memory.combatRequests[index]
             const request = Memory.combatRequests[requestName]
 
             if (!request) {
-                this.communeManager.room.memory.combatRequests.splice(index, 1)
+
+                room.memory.combatRequests.splice(index, 1)
+                continue
+            }
+
+            if (!room.structures.spawn.length) {
+
+                delete request.responder
+                room.memory.combatRequests.splice(index, 1)
                 continue
             }
 
             // The room is closed or is now a respawn or novice zone
 
             if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
-                delete Memory.combatRequests[requestName]
-                room.memory.combatRequests.splice(index, 1)
-                delete request.responder
-                return
+                this.communeManager.deleteCombatRequest(requestName, index)
+                continue
             }
 
-            this[`${request.T}Request`](request, requestName, index)
+            this[`${request.T}Request`](requestName, index)
         }
 
         // If CPU logging is enabled, log the CPU used by this manager
@@ -48,8 +53,9 @@ export class CombatRequestManager {
         }
     }
 
-    private attackRequest(request: CombatRequest, requestName: string, index: number) {
+    private attackRequest(requestName: string, index: number) {
         const { room } = this.communeManager
+        const request = Memory.combatRequests[requestName]
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
 
@@ -69,24 +75,24 @@ export class CombatRequestManager {
         if (requestRoom.controller && requestRoom.controller.safeMode) {
             request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
 
-            room.memory.combatRequests.splice(index, 1)
-            delete request.responder
+            this.manageAbandonment(requestName, index)
+            return
         }
 
         // If there are no enemyCreeps, delete the combatRequest
 
         if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
-            delete Memory.combatRequests[requestName]
-            room.memory.combatRequests.splice(index, 1)
-            delete request.responder
+            this.communeManager.deleteCombatRequest(requestName, index)
             return
         }
     }
-    private harassRequest(request: CombatRequest, requestName: string, index: number) {
+
+    private harassRequest(requestName: string, index: number) {
         const { room } = this.communeManager
+        const request = Memory.combatRequests[requestName]
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom) return
-
+        /*
         if (Game.time % Math.floor(Math.random() * 100) === 0) {
             const structures = requestRoom.dismantleTargets
 
@@ -96,7 +102,7 @@ export class CombatRequestManager {
             if (structures.length > 0)
                 request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
         }
-
+ */
         // If there are threats to our hegemony, temporarily abandon the request
 
         const threateningAttacker = requestRoom.enemyAttackers.find(creep => creep.attackStrength > 0)
@@ -112,11 +118,65 @@ export class CombatRequestManager {
         // If there are no enemyCreeps, delete the combatRequest
 
         if (!requestRoom.enemyCreeps.length) {
-            delete Memory.combatRequests[requestName]
-            room.memory.combatRequests.splice(index, 1)
+            request.data[CombatRequestData.abandon] = 1500
+            request.data[CombatRequestData.abandonments] += 1
+            this.manageAbandonment(requestName, index)
+            return
+        }
+    }
+
+    private defendRequest(requestName: string, index: number) {
+        const { room } = this.communeManager
+        const request = Memory.combatRequests[requestName]
+        const requestRoom = Game.rooms[requestName]
+        if (!requestRoom) return
+
+        if (requestRoom.controller && requestRoom.controller.safeMode) {
+            request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
+
+            this.manageAbandonment(requestName, index)
+            return
+        }
+
+        for (const enemyCreep of requestRoom.enemyAttackers) {
+            if (enemyCreep.attackStrength > request.data[CombatRequestData.minHeal] * 4)
+                request.data[CombatRequestData.minHeal] = enemyCreep.attackStrength + 1
+
+            if (enemyCreep.healStrength > request.data[CombatRequestData.minDamage] * enemyCreep.defenceStrength * 4)
+                request.data[CombatRequestData.minDamage] = enemyCreep.healStrength + 1
+        }
+
+        if (!requestRoom.enemyDamageThreat) {
+            request.data[CombatRequestData.inactionTimer] -= 1
+            this.manageInaction(requestName, index)
+        } else request.data[CombatRequestData.inactionTimer] = request.data[CombatRequestData.inactionTimerMax]
+    }
+
+    private manageInaction(requestName: string, index: number) {
+        const request = Memory.combatRequests[requestName]
+
+        if (request.data[CombatRequestData.inactionTimer] >= request.data[CombatRequestData.inactionTimerMax]) {
+            this.communeManager.deleteCombatRequest(requestName, index)
+            return
+        }
+    }
+
+    private manageAbandonment(requestName: string, index: number) {
+        const request = Memory.combatRequests[requestName]
+
+        if (request.data[CombatRequestData.abandonments] >= 3) {
+            // Delete the request
+
+            this.communeManager.deleteCombatRequest(requestName, index)
+            return
+        }
+
+        if (request.data[CombatRequestData.abandon] > 0) {
+            // Stop responding to the request
+
+            this.communeManager.room.memory.combatRequests.splice(index, 1)
             delete request.responder
             return
         }
     }
-    private defendRequest(request: CombatRequest, requestName: string, index: number) {}
 }

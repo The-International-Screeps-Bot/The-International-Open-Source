@@ -107,8 +107,10 @@ export class Quad {
 
         if (this.runCombatRoom()) return
 
+        this.passiveHealQuad()
+
         if (!this.getInFormation()) {
-            this.passiveHeal()
+
             this.passiveRangedAttack()
             return
         }
@@ -116,8 +118,6 @@ export class Quad {
         this.leader.say('IF')
 
         if (this.leader.room.enemyDamageThreat && this.runCombat()) return
-
-        this.passiveHeal()
 
         this.passiveRangedAttack()
 
@@ -148,7 +148,6 @@ export class Quad {
         }
 
         if (!this.getInFormation()) {
-            this.passiveHeal()
             this.passiveRangedAttack()
             return true
         }
@@ -160,7 +159,6 @@ export class Quad {
     runCombat() {
         if (this.leader.memory.ST === 'rangedAttack') {
             this.passiveRangedAttack()
-            this.passiveHeal()
             if (this.bulldoze()) return true
             if (this.advancedRangedAttack()) return true
             if (this.rangedAttackStructures()) return true
@@ -336,6 +334,8 @@ export class Quad {
 
             if (!doesCoordExist(goalCoord)) continue
 
+            if (member.room.quadCostMatrix.get(goalCoord.x, goalCoord.y) >= 255) continue
+
             member.assignMoveRequest(goalCoord)
         }
 
@@ -371,7 +371,7 @@ export class Quad {
         return true
     }
 
-    passiveHeal() {
+    passiveHealQuad() {
         for (const member1 of this.members) {
             if (member1.hits === member1.hitsMax) continue
 
@@ -385,11 +385,9 @@ export class Quad {
             return
         }
 
-        if (this.preHeal()) return
+        if (!this.leader.room.enemyDamageThreat) return
 
-        for (const member of this.members) {
-            member.passiveHeal()
-        }
+        if (this.preHeal()) return
     }
 
     /**
@@ -465,7 +463,7 @@ export class Quad {
                 else member.rangedMassAttack()
                 member.ranged = true
 
-                attackingMemberNames.delete(memberID)
+                attackingMemberNames.delete(member.name)
             }
 
             if (!attackingMemberNames.size) return
@@ -546,10 +544,6 @@ export class Quad {
         // If the squad is outmatched
 
         if (this.healStrength + this.attackStrength < enemyAttacker.healStrength + enemyAttacker.attackStrength) {
-            if (range === 4) {
-                this.passiveHeal()
-                return true
-            }
 
             // If too close
 
@@ -571,9 +565,6 @@ export class Quad {
         // If it's more than range 3
 
         if (range > 3) {
-            // Heal nearby creeps
-
-            this.leader.passiveHeal()
 
             // Make a moveRequest to it and inform true
 
@@ -602,6 +593,11 @@ export class Quad {
     }
 
     bulldoze() {
+
+        const request = Memory.combatRequests[this.leader.memory.CRN]
+        if (!request) return false
+        if (request.T === 'defend') return false
+
         let bulldozeTarget: Structure
         this.leader.memory.QBTIDs = []
         let quadBulldozeTargetIDs = this.leader.memory.QBTIDs || []
@@ -652,6 +648,11 @@ export class Quad {
     }
 
     rangedAttackStructures() {
+
+        const request = Memory.combatRequests[this.leader.memory.CRN]
+        if (!request) return false
+        if (request.T === 'defend') return false
+
         const structures = this.leader.room.combatStructureTargets
 
         if (!structures.length) return false

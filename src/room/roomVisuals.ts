@@ -13,6 +13,7 @@ import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from './roomManager'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
+import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -233,7 +234,13 @@ export class RoomVisualsManager {
     private internationalDataVisuals() {
         if (!this.roomManager.room.flags.internationalDataVisuals) return
 
-        this.internationalRequestDataVisuals(this.internationalGeneralDataVisuals(1))
+        this.internationalAllyBuildRequestsDataVisuals(
+            this.internationalAllyCombatRequestsDataVisuals(
+                this.internationalAllyResourceRequestsDataVisuals(
+                    this.internationalRequestsDataVisuals(this.internationalGeneralDataVisuals(1)),
+                ),
+            ),
+        )
     }
 
     private internationalGeneralDataVisuals(y: number) {
@@ -314,7 +321,7 @@ export class RoomVisualsManager {
         return y + height
     }
 
-    private internationalRequestDataVisuals(y: number) {
+    private internationalRequestsDataVisuals(y: number) {
         const headers: any[] = ['requestName', 'responderName', 'abandon']
 
         const data: any[][] = []
@@ -364,7 +371,143 @@ export class RoomVisualsManager {
                         data: Table(() => ({
                             data,
                             config: {
-                                label: 'Requests',
+                                label: 'My Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalAllyResourceRequestsDataVisuals(y: number) {
+        const headers: any[] = ['room', 'resource', 'amount', 'priority']
+
+        const data: any[][] = []
+
+        for (const request of allyManager.allyRequests) {
+            if (request.requestType !== AllyRequestTypes.resource) continue
+
+            const row: any[] = [request.roomName, request.resourceType, request.maxAmount, request.priority.toFixed(2)]
+            data.push(row)
+            continue
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Ally Resource Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalAllyCombatRequestsDataVisuals(y: number) {
+        const headers: any[] = ['room', 'type', 'minDamage', 'minHeal', 'priority']
+
+        const data: any[][] = []
+
+        for (const request of allyManager.allyRequests) {
+            if (request.requestType !== AllyRequestTypes.attack && request.requestType !== AllyRequestTypes.defense)
+                continue
+
+            const row: any[] = [
+                request.roomName,
+                AllyRequestTypes[request.requestType],
+                request.minDamage,
+                request.minHeal,
+                request.priority.toFixed(2),
+            ]
+            data.push(row)
+            continue
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Ally Combat Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalAllyBuildRequestsDataVisuals(y: number) {
+        const headers: any[] = ['room', 'priority']
+
+        const data: any[][] = []
+
+        for (const request of allyManager.allyRequests) {
+            if (request.requestType !== AllyRequestTypes.build) continue
+
+            const row: any[] = [request.roomName, request.priority.toFixed(2)]
+            data.push(row)
+            continue
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Ally Build Requests',
                                 headers,
                             },
                         })),

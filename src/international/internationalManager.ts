@@ -1,20 +1,12 @@
 import { allyManager } from 'international/simpleAllies'
 import { createPosMap, customLog, getAvgPrice, packXYAsNum } from './utils'
 
-import {
-    cacheAmountModifier,
-    ClaimRequestData,
-    CPUBucketCapacity,
-    mmoShardNames,
-    myColors,
-    roomDimensions,
-} from './constants'
+import { cacheAmountModifier, ClaimRequestData, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
-
     /**
      * Tracks and records constructionSites and thier age, deleting old sites
      */
@@ -116,7 +108,7 @@ export class InternationalManager {
         const avgPrice = getAvgPrice(PIXEL, 7)
 
         const minPrice = avgPrice * 0.8
-/*
+        /*
         customLog('minPixelPrice', minPrice)
         customLog('avgPixelPrice', avgPrice)
  */

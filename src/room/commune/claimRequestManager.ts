@@ -13,8 +13,6 @@ export class ClaimRequestManager {
     public run() {
         const { room } = this.communeManager
 
-        if (!room.structures.spawn.length) return
-
         const requestName = room.memory.claimRequest
         if (!requestName) return
 
@@ -26,7 +24,7 @@ export class ClaimRequestManager {
 
         // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
 
-        if (!request) {
+        if (!request || !room.structures.spawn.length) {
             delete room.memory.claimRequest
             return
         }
@@ -41,7 +39,6 @@ export class ClaimRequestManager {
         // The room is closed or is now a respawn or novice zone
 
         if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
-
             delete request.responder
             delete room.memory.claimRequest
             return
@@ -107,10 +104,11 @@ export class ClaimRequestManager {
             // Decrease the defenderNeed according to ally combined strength
 
             for (const allyCreep of requestRoom.allyCreeps) {
-
                 request.data[ClaimRequestData.minDamage] -= allyCreep.healStrength
                 request.data[ClaimRequestData.minHeal] -= allyCreep.attackStrength
             }
+
+            if (request.data[ClaimRequestData.minDamage] > 0 || request.data[ClaimRequestData.minHeal] > 0) request.data[ClaimRequestData.abandon] = 20000
         }
 
         // If CPU logging is enabled, log the CPU used by this manager
