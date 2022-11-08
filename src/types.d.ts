@@ -690,6 +690,7 @@ declare global {
         rooms: { [roomName: string]: Partial<RoomCommuneStats> }
         constructionSiteCount: number
         CPUUsers: CpuUsers
+        heap: HeapStatistics
     }
 
     type StatsRoomTypes = 'commune' | 'remote'
