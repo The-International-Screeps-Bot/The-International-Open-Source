@@ -83,7 +83,6 @@ export class FastFiller extends Creep {
         if (this.needsResources()) {
             for (let i = fastFillerContainers.length - 1; i >= 0; i--) {
                 const structure = fastFillerContainers[i]
-                if (!structure) continue
 
                 // Otherwise, if the structure is not in range 1 to the this
 
@@ -123,7 +122,6 @@ export class FastFiller extends Creep {
             // Loop through each fastFillerStoringStructure
 
             for (const structure of fastFillerStoringStructures) {
-                if (!structure) continue
 
                 // Otherwise, if the structure is not in range 1 to the this
 

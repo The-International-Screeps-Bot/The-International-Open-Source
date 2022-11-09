@@ -322,7 +322,7 @@ export class RoomVisualsManager {
     }
 
     private internationalRequestsDataVisuals(y: number) {
-        const headers: any[] = ['requestName', 'responderName', 'abandon']
+        const headers: any[] = ['requestName', 'type', 'responderName', 'abandon']
 
         const data: any[][] = []
 
@@ -331,16 +331,16 @@ export class RoomVisualsManager {
 
             if (!request.responder) continue
 
-            const row: any[] = [requestName, request.responder, request.data[ClaimRequestData.abandon]]
+            const row: any[] = [requestName, 'default', request.responder, request.data[ClaimRequestData.abandon]]
             data.push(row)
         }
 
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
 
-            if (!request.responder) continue
+            if (request.T !== 'defend' && !request.responder) continue
 
-            const row: any[] = [requestName, request.responder, request.data[CombatRequestData.abandon]]
+            const row: any[] = [requestName, request.T, request.responder || 'none', request.data[CombatRequestData.abandon]]
             data.push(row)
         }
 
@@ -349,7 +349,7 @@ export class RoomVisualsManager {
 
             if (!request.responder) continue
 
-            const row: any[] = [requestName, request.responder, request.data[HaulRequestData.abandon]]
+            const row: any[] = [requestName, request.data[HaulRequestData.transfer] ? 'transfer' : 'withdraw', request.responder, request.data[HaulRequestData.abandon]]
             data.push(row)
         }
 

@@ -64,9 +64,9 @@ export class ClaimRequestManager {
             return
         }
 
-        // If there is a spawn
+        // If there is a spawn and we own it
 
-        if (requestRoom.structures.spawn.length) {
+        if (requestRoom.structures.spawn.length && requestRoom.structures.spawn.find(spawn => spawn.my)) {
             delete Memory.claimRequests[room.memory.claimRequest]
             delete room.memory.claimRequest
             return

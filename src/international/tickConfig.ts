@@ -290,7 +290,11 @@ class TickConfig {
             const communes = []
 
             for (const roomName of global.communes) {
-                if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue
+                /* if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue */
+
+                // Ensure the combatRequest isn't responded to by the room the request is for
+
+                if (requestName === roomName) continue
 
                 const room = Game.rooms[roomName]
                 if (!room.structures.spawn.length) continue

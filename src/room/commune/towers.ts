@@ -122,9 +122,10 @@ export class TowerManager {
 
             return healTargets[0]
         }
+
         // Construct heal targets from my and allied damaged creeps in the this
 
-        healTargets = room.myDamagedCreeps.concat(room.allyDamagedCreeps)
+        healTargets = room.myDamagedCreeps.concat(room.allyDamagedCreeps.filter(creep => creep.isOnExit))
         healTargets = healTargets.concat(room.myDamagedPowerCreeps)
 
         return healTargets[0]

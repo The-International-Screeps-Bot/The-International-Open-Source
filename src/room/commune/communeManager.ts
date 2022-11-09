@@ -147,8 +147,8 @@ export class CommuneManager {
         constructionManager(this.room)
 
         this.defenceManager.run()
-
         this.towerManager.run()
+        this.defenceManager.createDefenceRequest()
 
         try {
             this.tradeManager.run()
@@ -165,15 +165,22 @@ export class CommuneManager {
         this.combatRequestManager.run()
         this.allyCreepRequestManager.run()
         this.haulRequestManager.run()
+        this.sourceManager.run()
         this.remotesManager.run()
         this.haulerNeedManager.run()
 
-        this.sourceManager.run()
         this.room.linkManager()
         this.room.factoryManager()
         this.labManager.run()
         this.powerSpawnManager.run()
+
+        this.room.roomManager.creepRoleManager.run()
+        this.room.roomManager.powerCreepRoleManager.run()
+
         this.spawnManager.run()
+
+        this.room.roomManager.endTickCreepManager.run()
+        this.room.roomManager.roomVisualsManager.run()
 
         this.test()
     }

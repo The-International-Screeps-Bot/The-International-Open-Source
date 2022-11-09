@@ -31,7 +31,7 @@ export class DefenceManager {
         }
     }
 
-    shouldActivatesSafeMode() {
+    private shouldActivatesSafeMode() {
         const { room } = this.communeManager
         const { controller } = room
 
@@ -86,13 +86,13 @@ export class DefenceManager {
         return false
     }
 
-    advancedActivateSafeMode() {
+    private advancedActivateSafeMode() {
         if (!this.shouldActivatesSafeMode()) return
 
         this.communeManager.room.controller.activateSafeMode()
     }
 
-    manageRampartPublicity() {
+    private manageRampartPublicity() {
         const { room } = this.communeManager
 
         const enemyAttackers = room.enemyAttackers.filter(function (creep) {
@@ -135,7 +135,7 @@ export class DefenceManager {
         for (const rampart of room.structures.rampart) if (rampart.isPublic) rampart.setPublic(false)
     }
 
-    assignDefenceTargets() {
+    private assignDefenceTargets() {
         const { room } = this.communeManager
 
         // Sort by estimated percent health change
@@ -177,5 +177,29 @@ export class DefenceManager {
 
             if (!room.attackingDefenderIDs.size) break
         }
+    }
+
+    createDefenceRequest() {
+
+        const { room } = this.communeManager
+
+        if (!room.towerInferiority) return
+
+        let minDamage = 0
+        let minHeal = 0
+
+        for (const enemyCreep of room.enemyAttackers) {
+
+            minDamage += enemyCreep.healStrength
+            minHeal += enemyCreep.attackStrength
+        }
+
+        // There is tower inferiority, make a defend request
+
+        room.createDefendCombatRequest({
+            minDamage,
+            minHeal,
+            quadCount: 1,
+        })
     }
 }

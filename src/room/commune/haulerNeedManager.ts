@@ -14,13 +14,17 @@ export class HaulerNeedManager {
 
         for (let index in room.sources) {
 
+            if (room.sourceLinks[index]) continue
+
             room.haulerNeed += findCarryPartsRequired(room.sourcePaths[index].length, room.estimatedSourceIncome[index])
         }
 
-        room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
+        if (room.controllerLink) room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
 
         room.haulerNeed += room.structures.lab.length / 2
 
         room.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
+
+        room.haulerNeed = Math.floor(room.haulerNeed)
     }
 }

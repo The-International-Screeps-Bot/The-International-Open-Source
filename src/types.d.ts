@@ -98,6 +98,7 @@ declare global {
         | 'source1Harvester'
         | 'source2Harvester'
         | 'hauler'
+        | 'requestHauler'
         | 'controllerUpgrader'
         | 'builder'
         | 'maintainer'
@@ -991,11 +992,11 @@ declare global {
 
         makeRemote(scoutingRoom: Room): boolean
 
-        createAttackCombatRequest(): void
+        createAttackCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
 
-        createHarassCombatRequest(): void
+        createHarassCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
 
-        createDefendCombatRequest(opts?: { [key: string]: number }): void
+        createDefendCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -2144,7 +2145,12 @@ declare global {
         /**
          * Combat Request Name, the name of the room the creep should do combat in
          */
-        CRN: string | undefined
+        CRN?: string
+
+        /**
+         * Haul Request Name, the name of the room the creep should do hauling for
+         */
+        HRN?: string
 
         /**
          * Recycle Target, the spawn ID the creep is going to recycle

@@ -911,14 +911,20 @@ Room.prototype.createDefendCombatRequest = function (opts) {
         data: [0],
     })
 
-    request.data[CombatRequestData.minDamage] = 40
-    request.data[CombatRequestData.minHeal] = 10
+    request.data[CombatRequestData.inactionTimer] = 0
     request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
 
-    for (const key in opts) {
-        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-            opts[key as keyof typeof CombatRequestData]
+    if (opts) {
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+        return
     }
+
+    request.data[CombatRequestData.minDamage] = 40
+    request.data[CombatRequestData.minHeal] = 10
 }
 
 Room.prototype.cleanMemory = function () {

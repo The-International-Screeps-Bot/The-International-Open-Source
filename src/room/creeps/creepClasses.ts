@@ -18,11 +18,13 @@ import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
 import { RemoteHarvester } from './roleManagers/remote/remoteSourceHarvester'
 import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
+import { RequestHauler } from './roleManagers/international/requestHauler'
 
 export const creepClasses: { [key in CreepRoles]: any } = {
     source1Harvester: SourceHarvester,
     source2Harvester: SourceHarvester,
     hauler: Hauler,
+    requestHauler: RequestHauler,
     controllerUpgrader: ControllerUpgrader,
     builder: Builder,
     maintainer: Maintainer,
