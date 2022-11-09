@@ -14,11 +14,8 @@ export function constructionManager(room: Room) {
     if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
     /*
     // Testing
-
     delete room.memory.PC
-
     room.memory.stampAnchors = {}
-
     for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
  */
 
@@ -30,15 +27,17 @@ export function constructionManager(room: Room) {
         const centerUpgradePos = room.centerUpgradePos
         if (!centerUpgradePos) return
 
+        const controllerContainer = room.controllerContainer
         if (room.controller.level >= 5) {
-            const controllerContainer = room.controllerContainer
             if (controllerContainer) controllerContainer.destroy()
 
-            room.createConstructionSite(centerUpgradePos, STRUCTURE_LINK)
+            const controllerLink = room.controllerLink
+            if (!controllerLink) room.createConstructionSite(centerUpgradePos, STRUCTURE_LINK)
+
             return
         }
 
-        room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
+        if (!controllerContainer) room.createConstructionSite(centerUpgradePos, STRUCTURE_CONTAINER)
     }
 
     room.clearOtherStructures()

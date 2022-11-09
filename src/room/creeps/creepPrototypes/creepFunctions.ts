@@ -801,7 +801,9 @@ Creep.prototype.advancedRenew = function () {
 
     // Get a spawn in range of 1, informing false if there are none
 
-    const spawn = spawns.find(spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable)
+    const spawn = spawns.find(
+        spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable,
+    )
     if (!spawn) return
 
     // If the spawn has already renewed this tick, inform false
@@ -1090,6 +1092,27 @@ Creep.prototype.reservationManager = function () {
             reservation.amount = amount
 
             continue
+        }
+
+        if (reservation.type === 'withdraw') {
+            if (
+                this.store.getFreeCapacity() === 0 ||
+                target.store.getUsedCapacity(reservation.resourceType) < reservation.amount ||
+                (Game.time % Math.floor(Math.random() * 10) === 0 &&
+                    target.store.getUsedCapacity(reservation.resourceType) <
+                        _.sum(
+                            _.filter(
+                                Game.creeps,
+                                c =>
+                                    c.memory.Rs &&
+                                    c.memory.Rs?.length > 0 &&
+                                    c.memory.Rs[0].targetID === reservation.targetID,
+                            ),
+                            c => c.memory.Rs[0].amount,
+                        ))
+            ) {
+                this.deleteReservation(0)
+            }
         }
 
         let amount = reservation.amount

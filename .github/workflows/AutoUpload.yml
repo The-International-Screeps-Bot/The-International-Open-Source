@@ -1,35 +1,34 @@
-
 # To run self hosted on ubuntu 20.04: apt install build-essential
 
 name: Auto upload
 
 on:
-     push:
+    push:
         branches:
-          - Main
+            - Main
 jobs:
-     VerifyUpload:
-          timeout-minutes: 129600
-          runs-on: self-hosted
-          steps:
-               - name: 'Cleanup build folder'
-                 run: |
-                    ls -la ./
-                    rm -rf ./* || true
-                    rm -rf ./.??* || true
-                    ls -la ./
-               - uses: actions/checkout@v3
-               - name: Use Node.js 16.x
-                 uses: actions/setup-node@v3
-                 with:
-                    node-version: 16.x
-                    cache: 'npm'
-               - name: Get IP
-                 run: hostname -I
-               - name: Install dependencies
-                 run: npm install
-               - name: Start instances
-                 run: node server 250000
-                 env:
-                    STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                    EXPORT_API_BASE_URL: ${{ secrets.EXPORT_API_BASE_URL }}
+    VerifyUpload:
+        timeout-minutes: 129600
+        runs-on: self-hosted
+        steps:
+            - name: 'Cleanup build folder'
+              run: |
+                  ls -la ./
+                  rm -rf ./* || true
+                  rm -rf ./.??* || true
+                  ls -la ./
+            - uses: actions/checkout@v3
+            - name: Use Node.js 16.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16.x
+                  cache: 'npm'
+            - name: Get IP
+              run: hostname -I
+            - name: Install dependencies
+              run: npm install
+            - name: Start instances
+              run: node server 250000
+              env:
+                  STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                  EXPORT_API_BASE_URL: ${{ secrets.EXPORT_API_BASE_URL }}
