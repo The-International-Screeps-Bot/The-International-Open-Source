@@ -1859,6 +1859,38 @@ declare global {
          * The creep's opts when trying to make a moveRequest intra tick
          */
         pathOpts: PathOpts
+
+        _dying: boolean
+
+        /**
+         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
+         */
+        readonly dying: boolean
+
+        _towerDamage: number
+
+        /**
+         * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
+         */
+        readonly towerDamage: number
+
+        _message: string
+
+        /**
+         * The cumulative message to present in say()
+         */
+        message: string
+
+        _freeCapacityNextTick: number
+
+        /**
+         * The estimated total free capacity the creep will have next tick
+         */
+        freeCapacityNextTick: number
+
+        _isOnExit: boolean
+
+        readonly isOnExit: boolean
     }
 
     // Creeps
@@ -1937,23 +1969,20 @@ declare global {
          */
         readonly commune: Room | undefined
 
-        _dying: boolean
-
-        /**
-         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
-         */
-        readonly dying: boolean
-
-        _reservation: Reservation | false
-
-        readonly reservation: Reservation | false
-
         _strength: number
 
         /**
          * A numerical measurement of the combat abilites of the creep
          */
         readonly strength: number
+
+        _reservation: Reservation
+
+        readonly reservation: Reservation
+
+        _upgradeStrength: number
+
+        readonly upgradeStrength: number
 
         _attackStrength: number
 
@@ -1990,38 +2019,9 @@ declare global {
          */
         readonly boosts: Partial<Record<MineralBoostConstant, number>>
 
-        _towerDamage: number
-
-        /**
-         * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
-         */
-        readonly towerDamage: number
-
-        _upgradeStrength: number
-
-        readonly upgradeStrength: number
-
-        _message: string
-
-        /**
-         * The cumulative message to present in say()
-         */
-        message: string
-
-        _freeCapacityNextTick: number
-
-        /**
-         * The estimated total free capacity the creep will have next tick
-         */
-        freeCapacityNextTick: number
-
         _canMove: boolean
 
         readonly canMove: boolean
-
-        _isOnExit: boolean
-
-        readonly isOnExit: boolean
     }
 
     interface CreepMemoryTemplate {

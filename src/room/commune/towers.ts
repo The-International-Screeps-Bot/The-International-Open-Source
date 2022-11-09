@@ -113,22 +113,20 @@ export class TowerManager {
     findHealTarget() {
         const { room } = this.communeManager
 
-        let healTargets: (Creep | PowerCreep)[]
-
         if (room.enemyAttackers.length) {
-            healTargets = room.myDamagedCreeps.filter(creep => {
-                return creep.role === 'meleeDefender' || creep.role === 'maintainer'
+            return room.myDamagedCreeps.find(creep => {
+                return (creep.role === 'meleeDefender' || creep.role === 'maintainer') && !creep.isOnExit
             })
-
-            return healTargets[0]
         }
+
+        let healTargets: (Creep | PowerCreep)[] = []
 
         // Construct heal targets from my and allied damaged creeps in the this
 
-        healTargets = room.myDamagedCreeps.concat(room.allyDamagedCreeps.filter(creep => creep.isOnExit))
+        healTargets = room.myDamagedCreeps.concat(room.allyDamagedCreeps)
         healTargets = healTargets.concat(room.myDamagedPowerCreeps)
 
-        return healTargets[0]
+        return healTargets.find(creep => !creep.isOnExit)
     }
 
     healCreeps() {
