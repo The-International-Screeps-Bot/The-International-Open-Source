@@ -1,11 +1,27 @@
-
-export enum RequestTypes {
-    RESOURCE,
-    DEFENSE,
-    ATTACK,
-    EXECUTE,
-    HATE,
+export enum AllyRequestTypes {
+    resource,
+    defense,
+    attack,
+    execute,
+    hate,
+    build
 }
+
+interface AllyRequest {
+    requestType: AllyRequestTypes
+    roomName?: string
+    playerName?: string
+    resourceType?: ResourceConstant
+    maxAmount?: number
+    /**
+     * A number representing the need of the request, where 1 is highest and 0 is lowest
+     */
+    priority: number
+    minDamage?: number
+    minHeal?: number
+    hateAmount?: number
+}
+
 
 /**
  * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated simpleAlliesSegment before usage
@@ -14,12 +30,12 @@ class AllyManager {
     /**
      * An array of the requests you have made this tick
      */
-    myRequests: Request[]
+    myRequests: AllyRequest[]
 
     /**
      * An array of all the current requests made by other allies
      */
-    allyRequests: Request[]
+    allyRequests: AllyRequest[]
 
     constructor() {}
     /**
@@ -73,42 +89,64 @@ class AllyManager {
     /**
      * Request an attack of a specified room
      */
-    requestAttack(roomName: string, playerName: string, priority: number = 0) {
+    requestAttack(
+        roomName: string,
+        playerName: string,
+        minDamage: number = 0,
+        minHeal: number = 0,
+        priority: number = 0,
+    ) {
         this.myRequests.push({
-            requestType: RequestTypes.ATTACK,
+            requestType: AllyRequestTypes.attack,
             roomName,
             playerName,
+            minDamage,
+            minHeal,
             priority,
         })
     }
     /**
      * Request help for a specified room
      */
-    requestHelp(roomName: string, priority: number = 0) {
+    requestDefense(roomName: string, minDamage: number = 0, minHeal: number = 0, priority: number = 0) {
         this.myRequests.push({
-            requestType: RequestTypes.DEFENSE,
+            requestType: AllyRequestTypes.defense,
             roomName,
+            minDamage,
+            minHeal,
             priority,
         })
     }
     /**
      * Request hate for a specified room. It's up to you and your allies how to intepret hate
      */
-    requestHate(playerName: string, priority: number = 0) {
+    requestHate(playerName: string, hateAmount: number, priority: number = 0) {
         this.myRequests.push({
-            requestType: RequestTypes.HATE,
+            requestType: AllyRequestTypes.hate,
             playerName,
             priority,
         })
     }
+
     /**
      * Request resources for a specified room. Handled by the tradeManager
      */
     requestResource(roomName: string, resourceType: ResourceConstant, maxAmount: number, priority: number = 0) {
         this.myRequests.push({
-            requestType: RequestTypes.RESOURCE,
+            requestType: AllyRequestTypes.resource,
             resourceType,
             maxAmount,
+            roomName,
+            priority,
+        })
+    }
+
+    /**
+     * Request resources for a specified room. Handled by the tradeManager
+     */
+     requestBuild(roomName: string, priority: number = 0) {
+        this.myRequests.push({
+            requestType: AllyRequestTypes.build,
             roomName,
             priority,
         })

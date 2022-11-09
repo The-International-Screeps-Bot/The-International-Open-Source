@@ -69,9 +69,6 @@ export class SpawnManager {
         // Loop through priorities inside requestsByPriority
 
         for (const priority of requestsByPriority) {
-            // Stop if the spawnIndex is negative
-
-            if (spawnIndex < 0) break
 
             // Try to find inactive spawn, if can't, stop the loop
 
@@ -108,11 +105,11 @@ export class SpawnManager {
                     myColors.white,
                     myColors.red,
                 )
-
+/*
                 //We don't want one bad spawn request to block all of spawning.
                 if (testSpawnResult == ERR_INVALID_ARGS) continue
-
-                break
+ */
+                return
             }
 
             // Disable dry run
@@ -122,16 +119,17 @@ export class SpawnManager {
             // Spawn the creep
 
             spawn.advancedSpawn(spawnRequest)
-
+/*
             // Record in stats the costs
 
             this.communeManager.room.energyAvailable -= spawnRequest.cost
-
+ */
             globalStatsUpdater(this.communeManager.room.name, 'eosp', spawnRequest.cost)
 
             // Decrease the spawnIndex
 
             spawnIndex -= 1
+            if (spawnIndex < 0) return
         }
     }
 

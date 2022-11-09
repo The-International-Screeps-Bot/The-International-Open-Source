@@ -98,6 +98,7 @@ declare global {
         | 'source1Harvester'
         | 'source2Harvester'
         | 'hauler'
+        | 'requestHauler'
         | 'controllerUpgrader'
         | 'builder'
         | 'maintainer'
@@ -422,7 +423,7 @@ declare global {
 
     interface HaulRequest {
         data: number[]
-        responder?: string,
+        responder?: string
     }
 
     interface ControllerLevel {
@@ -690,6 +691,7 @@ declare global {
         rooms: { [roomName: string]: Partial<RoomCommuneStats> }
         constructionSiteCount: number
         CPUUsers: CpuUsers
+        heap: HeapStatistics
     }
 
     type StatsRoomTypes = 'commune' | 'remote'
@@ -733,6 +735,8 @@ declare global {
          */
         ID: number
 
+        chantIndex: number
+
         /**
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
@@ -761,7 +765,7 @@ declare global {
     }
 
     interface RawMemory {
-        [key: string]: any
+        _parsed: Memory
     }
 
     type SpawningStructures = (StructureSpawn | StructureExtension)[]
@@ -934,6 +938,13 @@ declare global {
         defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
         towerAttackTarget: Creep
 
+        upgradeStrength: number
+
+        /**
+         * The carry parts needed to effectively run the commune
+         */
+        haulerNeed: number
+
         // Functions
 
         /**
@@ -981,11 +992,11 @@ declare global {
 
         makeRemote(scoutingRoom: Room): boolean
 
-        createAttackCombatRequest(): void
+        createAttackCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
 
-        createHarassCombatRequest(): void
+        createHarassCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
 
-        createDefendCombatRequest(opts?: { [key: string]: number }): void
+        createDefendCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -1108,7 +1119,9 @@ declare global {
          */
         estimateIncome(): number
 
-        getPartsOfRoleAmount(role: CreepRoles, type?: BodyPartConstant): number
+        partsOfRoles: Partial<{ [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }> }>
+
+        getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>
 
         createClaimRequest(): boolean
 
@@ -1120,8 +1133,6 @@ declare global {
         combatRequestManager(): void
 
         allyCreepRequestManager(): void
-
-        haulerSizeManager(): void
 
         trafficManager(): void
 
@@ -1436,7 +1447,7 @@ declare global {
 
         _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
 
-        readonly resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+        readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
 
         _unprotectedEnemyCreeps: Creep[]
 
@@ -1691,6 +1702,8 @@ declare global {
          */
         GRCL: number
 
+        hasTerminal: boolean
+
         factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
         factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
 
@@ -1851,6 +1864,38 @@ declare global {
          * The creep's opts when trying to make a moveRequest intra tick
          */
         pathOpts: PathOpts
+
+        _dying: boolean
+
+        /**
+         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
+         */
+        readonly dying: boolean
+
+        _towerDamage: number
+
+        /**
+         * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
+         */
+        readonly towerDamage: number
+
+        _message: string
+
+        /**
+         * The cumulative message to present in say()
+         */
+        message: string
+
+        _freeCapacityNextTick: number
+
+        /**
+         * The estimated total free capacity the creep will have next tick
+         */
+        freeCapacityNextTick: number
+
+        _isOnExit: boolean
+
+        readonly isOnExit: boolean
     }
 
     // Creeps
@@ -1929,23 +1974,20 @@ declare global {
          */
         readonly commune: Room | undefined
 
-        _dying: boolean
-
-        /**
-         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
-         */
-        readonly dying: boolean
-
-        _reservation: Reservation | false
-
-        readonly reservation: Reservation | false
-
         _strength: number
 
         /**
          * A numerical measurement of the combat abilites of the creep
          */
         readonly strength: number
+
+        _reservation: Reservation
+
+        readonly reservation: Reservation
+
+        _upgradeStrength: number
+
+        readonly upgradeStrength: number
 
         _attackStrength: number
 
@@ -1982,34 +2024,9 @@ declare global {
          */
         readonly boosts: Partial<Record<MineralBoostConstant, number>>
 
-        _towerDamage: number
-
-        /**
-         * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
-         */
-        readonly towerDamage: number
-
-        _message: string
-
-        /**
-         * The cumulative message to present in say()
-         */
-        message: string
-
-        _freeCapacityNextTick: number
-
-        /**
-         * The estimated total free capacity the creep will have next tick
-         */
-        freeCapacityNextTick: number
-
         _canMove: boolean
 
         readonly canMove: boolean
-
-        _isOnExit: boolean
-
-        readonly isOnExit: boolean
     }
 
     interface CreepMemoryTemplate {
@@ -2133,7 +2150,12 @@ declare global {
         /**
          * Combat Request Name, the name of the room the creep should do combat in
          */
-        CRN: string | undefined
+        CRN?: string
+
+        /**
+         * Haul Request Name, the name of the room the creep should do hauling for
+         */
+        HRN?: string
 
         /**
          * Recycle Target, the spawn ID the creep is going to recycle

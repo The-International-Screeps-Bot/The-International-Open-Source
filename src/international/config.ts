@@ -44,11 +44,13 @@ class ConfigManager {
             Game.shard.name !== 'performanceServer'
                 ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
                 : false
+        Memory.doChant = settings.doChant
         Memory.simpleAlliesSegment = settings.simpleAlliesSegment
 
         // Construct foundation
 
         Memory.ID = 0
+        Memory.chantIndex = 0
         Memory.constructionSites = {}
         Memory.players = {}
         Memory.claimRequests = {}

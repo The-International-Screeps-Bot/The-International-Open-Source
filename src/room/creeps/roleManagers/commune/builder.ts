@@ -33,7 +33,13 @@ export class Builder extends Creep {
             return true
         }
 
-        if (!room.fastFillerContainerLeft && !room.fastFillerContainerRight) return false
+        if (
+            !room.fastFillerContainerLeft &&
+            !room.fastFillerContainerRight &&
+            (!room.storage || !room.storage.RCLActionable) &&
+            (!room.terminal || !room.terminal.RCLActionable)
+        )
+            return false
 
         // If there are fastFiller containers
 

@@ -69,7 +69,10 @@ export class FastFiller extends Creep {
             }
         }
 
-        const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight]
+        const fastFillerContainers: StructureContainer[] = []
+
+        if (room.fastFillerContainerLeft) fastFillerContainers.push(room.fastFillerContainerLeft)
+        if (room.fastFillerContainerRight) fastFillerContainers.push(room.fastFillerContainerRight)
 
         // If all spawningStructures are filled, inform false
 
@@ -119,6 +122,7 @@ export class FastFiller extends Creep {
             // Loop through each fastFillerStoringStructure
 
             for (const structure of fastFillerStoringStructures) {
+
                 // Otherwise, if the structure is not in range 1 to the this
 
                 if (getRangeOfCoords(this.pos, structure.pos) > 1) continue

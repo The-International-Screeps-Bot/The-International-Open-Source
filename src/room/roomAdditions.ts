@@ -432,7 +432,7 @@ Object.defineProperties(Room.prototype, {
 
             this._combatStructureTargets = []
 
-            if (this.controller.my || this.controller.reservation) return this._combatStructureTargets
+            if (this.controller && (this.controller.my || this.controller.reservation)) return this._combatStructureTargets
 
             if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
                 return this._combatStructureTargets

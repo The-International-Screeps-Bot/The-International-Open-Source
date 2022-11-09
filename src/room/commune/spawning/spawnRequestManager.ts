@@ -7,10 +7,10 @@ import {
     minHarvestWorkRatio,
     myColors,
     rampartUpkeepCost,
+    RemoteData,
     remoteHarvesterRoles,
     RemoteHarvesterRolesBySourceIndex,
     remoteHaulerRoles,
-    RemoteData,
     roadUpkeepCost,
 } from 'international/constants'
 import {
@@ -270,51 +270,8 @@ Room.prototype.spawnRequester = function () {
             const priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
 
             // Construct the required carry parts
-
-            let requiredCarryParts = 10
-
-            //If the FF isn't setup, add more carrying.
-            //requiredCarryParts += 10
-
-            // If there is no sourceLink 0, increase requiredCarryParts using the source's path length
-
-            if (this.sourcePaths[0] && !this.sourceLinks[0])
-                requiredCarryParts += findCarryPartsRequired(this.sourcePaths[0].length, 10)
-
-            // If there is no sourceLink 1, increase requiredCarryParts using the source's path length
-
-            if (this.sourcePaths[1] && !this.sourceLinks[1])
-                requiredCarryParts += findCarryPartsRequired(this.sourcePaths[1].length, 10)
-
-            // If there is a controllerContainer, increase requiredCarryParts using the hub-structure path length
-
-            if (this.controllerContainer) {
-                if (storage && this.controller.level >= 4) {
-                    requiredCarryParts += findCarryPartsRequired(
-                        this.upgradePathLength,
-                        this.getPartsOfRoleAmount('controllerUpgrader', WORK),
-                    )
-
-                    if (
-                        this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
-                        storage.store.getUsedCapacity(RESOURCE_ENERGY) > this.controller.level * 10000
-                    ) {
-                        requiredCarryParts = requiredCarryParts * 1.5
-                    }
-                } else {
-                    requiredCarryParts += findCarryPartsRequired(
-                        this.upgradePathLength,
-                        Math.min(
-                            this.getPartsOfRoleAmount('controllerUpgrader', WORK) * 0.75,
-                            this.sources.length * 0.75,
-                        ),
-                    )
-                }
-            }
-
-            if (this.controller.level >= 4 && storage && storage.store.energy >= 1000) {
-            } else if (this.controller.level >= 6 && terminal && terminal.store.energy >= 1000) {
-            }
+            
+            partsMultiplier = this.haulerNeed
 
             const role = 'hauler'
 
@@ -325,7 +282,7 @@ Room.prototype.spawnRequester = function () {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, CARRY, MOVE],
-                    partsMultiplier: requiredCarryParts / 2,
+                    partsMultiplier: partsMultiplier / 2,
                     minCreeps: undefined,
                     maxCreeps: Infinity,
                     minCost: 150,
@@ -341,7 +298,7 @@ Room.prototype.spawnRequester = function () {
                 role,
                 defaultParts: [],
                 extraParts: [CARRY, MOVE],
-                partsMultiplier: requiredCarryParts,
+                partsMultiplier,
                 minCreeps: undefined,
                 maxCreeps: Infinity,
                 minCost: 100,
@@ -649,7 +606,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             let priority = 7
-            if (!this.towerInferiority) priority += this.creepsFromRoom.maintainer.length
+            if (!this.towerInferiority) priority += this.creepsFromRoom.maintainer.length * 0.5
 
             // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
@@ -807,7 +764,6 @@ Room.prototype.spawnRequester = function () {
                     }
 
                     for (let i = 0; i < sourceLinks.length; i++) {
-
                         const sourceLink = sourceLinks[i]
 
                         if (!sourceLink.RCLActionable) continue
@@ -1477,7 +1433,7 @@ Room.prototype.spawnRequester = function () {
             request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
-        if (request.T === 'attack') {
+        if (request.T === 'attack' || request.T === 'defend') {
             // Spawn quad
 
             this.constructSpawnRequests(

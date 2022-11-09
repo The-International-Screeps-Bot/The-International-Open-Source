@@ -201,6 +201,7 @@ global.combat = function (requestName, type, opts, communeName) {
     const request = Memory.combatRequests[requestName]
 
     request.data[CombatRequestData.abandon] = 0
+    request.data[CombatRequestData.inactionTimer] = 0
 
     for (const key in opts) {
         request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =

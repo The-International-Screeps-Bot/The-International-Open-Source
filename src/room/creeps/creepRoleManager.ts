@@ -26,6 +26,7 @@ import { Antifa } from './roleManagers/antifa/antifa'
 import { CommuneManager } from 'room/commune/communeManager'
 import { RoomManager } from 'room/roomManager'
 import { globalStatsUpdater } from 'international/statsManager'
+import { RequestHauler } from './roleManagers/international/requestHauler'
 
 // Construct managers
 
@@ -42,6 +43,7 @@ const managers: { [key in CreepRoles]: Function } = {
     source1Harvester: SourceHarvester.sourceHarvesterManager,
     source2Harvester: SourceHarvester.sourceHarvesterManager,
     hauler: Hauler.haulerManager,
+    requestHauler: RequestHauler.requestHaulerManager,
     maintainer: Maintainer.maintainerManager,
     fastFiller: FastFiller.fastFillerManager,
     hubHauler: HubHauler.hubHaulerManager,

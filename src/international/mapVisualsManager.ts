@@ -1,5 +1,5 @@
 import { unpackPosList } from 'other/packrat'
-import { ClaimRequestData, minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteData } from './constants'
+import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
 import { customLog } from './utils'
 import { InternationalManager } from './internationalManager'
 import { globalStatsUpdater } from './statsManager'

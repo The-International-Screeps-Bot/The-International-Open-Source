@@ -106,7 +106,6 @@ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
  * @param bgColor Colour of the background. Default is white
  */
 export function customLog(title: any, message: any, color: string = myColors.black, bgColor: string = myColors.white) {
-
     if (!Memory.logging) return
 
     // Create the title
@@ -129,7 +128,6 @@ export function newID() {
 interface AdvancedFindDistanceOpts {
     typeWeights?: { [key: string]: number }
     avoidAbandonedRemotes?: boolean
-
 }
 
 /**
@@ -138,7 +136,7 @@ interface AdvancedFindDistanceOpts {
 export function advancedFindDistance(
     originRoomName: string,
     goalRoomName: string,
-    opts: AdvancedFindDistanceOpts = {}
+    opts: AdvancedFindDistanceOpts = {},
 ) {
     // Try to find a route from the origin room to the goal room
 
@@ -146,7 +144,6 @@ export function advancedFindDistance(
         routeCallback(roomName) {
             const roomMemory = Memory.rooms[roomName]
             if (!roomMemory) {
-
                 if (roomName === goalRoomName) return 1
                 return Infinity
             }
@@ -185,7 +182,6 @@ export function findCarryPartsRequired(distance: number, income: number) {
 }
 
 export function findLinkThroughput(range: number, income: number = 1) {
-
     return Math.min(LINK_CAPACITY / range, LINK_CAPACITY / income)
 }
 
@@ -215,7 +211,6 @@ export function getRange(x1: number, x2: number, y1: number, y2: number) {
 }
 
 export function getRangeOfCoords(coord1: Coord, coord2: Coord) {
-
     return getRange(coord1.x, coord2.x, coord1.y, coord2.y)
 }
 
@@ -267,7 +262,7 @@ export function findClosestObjectInRange<T extends _HasRoomPosition>(
 /**
  * Finds the closest position to a given target (Half Manhattan)
  */
- export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]) {
+export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]) {
     let minRange = Infinity
     let closest = undefined
 
@@ -535,7 +530,7 @@ export function randomTick(max: number = 20) {
 }
 
 export function randomRange(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min) + min);
+    return Math.floor(Math.random() * (max - min) + min)
 }
 
 /*

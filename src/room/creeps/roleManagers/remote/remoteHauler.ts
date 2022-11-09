@@ -33,13 +33,12 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
-        if (!this.findRemote()) return
+        if (!this.memory.RN) return
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (Memory.rooms[this.memory.RN].T !== 'remote') {
-            this.room.visual.circle(this.pos, { fill: myColors.green })
             delete this.memory.RN
-            if (!this.findRemote()) return
+            return
         }
 
         // If the creep's remote no longer is managed by its commune
@@ -47,13 +46,12 @@ export class RemoteHauler extends Creep {
             // Delete it from memory and try to find a new one
 
             this.removeRemote()
-            if (!this.findRemote()) return
+            return
         }
 
         if (this.dying) return
 
-        if (Memory.rooms[this.memory.RN])
-            Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+        Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
     }
 
     /**
@@ -443,7 +441,11 @@ export class RemoteHauler extends Creep {
 
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
-        if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY) && creepAtPos.store.getCapacity() !== this.store.getCapacity()) return false
+        if (
+            creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY) &&
+            creepAtPos.store.getCapacity() !== this.store.getCapacity()
+        )
+            return false
 
         this.transfer(creepAtPos, RESOURCE_ENERGY)
 

@@ -1,7 +1,7 @@
 import { minerals, terminalResourceTargets } from 'international/constants'
 import { customLog } from 'international/utils'
 import './marketFunctions'
-import { allyManager, RequestTypes } from 'international/simpleAllies'
+import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
 import { internationalManager } from 'international/internationalManager'
 import { CommuneManager } from 'room/commune/communeManager'
 
@@ -134,7 +134,7 @@ export class TradeManager {
         const { room } = this.communeManager
         const { terminal } = room
 
-        let targetAmount = this.communeManager.storedEnergyUpgradeThreshold
+        let targetAmount = this.communeManager.storedEnergyMin * 1.5
         let resource: MarketResourceConstant = RESOURCE_ENERGY
 
         // If the terminal has less than x energy in the terminal, request y
@@ -150,19 +150,19 @@ export class TradeManager {
             allyManager.requestResource(
                 room.name,
                 resource,
-                targetAmount * 1.2 - terminal.store.getUsedCapacity(resource),
+                targetAmount * 1.2 - room.resourcesInStoringStructures[resource],
                 priority,
             )
         }
 
         // For each mineral
 
-        for (const mineral of minerals) {
-            const mineralAmount = terminal.store.getUsedCapacity(mineral)
+        for (resource of minerals) {
+            const mineralAmount = terminal.store.getUsedCapacity(resource)
 
             if (mineralAmount > 5000) continue
 
-            allyManager.requestResource(room.name, mineral, 7000 - mineralAmount, 0.25)
+            allyManager.requestResource(room.name, resource, 7000 - mineralAmount, 0.25)
         }
     }
 
@@ -173,7 +173,7 @@ export class TradeManager {
         // Filter out allyRequests that are requesting resources
 
         const resourceRequests = allyManager.allyRequests.filter(
-            request => request.requestType === RequestTypes.RESOURCE,
+            request => request.requestType === AllyRequestTypes.resource,
         )
 
         // Filter resourceRequests by priority, highest to lowest
@@ -210,13 +210,15 @@ export class TradeManager {
             // If the resourceType is energy
 
             if (request.resourceType === RESOURCE_ENERGY) {
+                if (room.resourcesInStoringStructures.energy < room.communeManager.storedEnergyMin * 2) continue
+
                 // If the terminal doesn't have enough, iterate
 
                 if (
-                    terminal.store.getUsedCapacity(request.resourceType) / terminal.store.getCapacity() <
+                    request.priority >
                     1 -
                         Math.pow(
-                            terminal.store.getUsedCapacity(request.resourceType) / terminal.store.getCapacity(),
+                            terminal.store.getUsedCapacity(request.resourceType) / (terminal.store.getCapacity() / 2),
                             1.2,
                         )
                 )

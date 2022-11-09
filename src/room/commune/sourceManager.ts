@@ -8,15 +8,22 @@ export class SourceManager {
         this.communeManager = communeManager
     }
 
-    run() {
+    preTickRun() {
         this.sources = this.communeManager.room.sources
 
         this.estimateIncome()
+    }
+
+    run() {
+
         this.createPowerTasks()
     }
 
     private estimateIncome() {
-        this.communeManager.room.estimatedSourceIncome = []
+
+        const { room } = this.communeManager
+
+        room.estimatedSourceIncome = []
 
         for (let i = 0; i < this.sources.length; i += 1) {
             const source = this.sources[i]
@@ -30,7 +37,7 @@ export class SourceManager {
             if (effect)
                 income += POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] / POWER_INFO[PWR_REGEN_SOURCE].period
 
-            this.communeManager.room.estimatedSourceIncome[i] = income
+            room.estimatedSourceIncome[i] = income
         }
     }
 
