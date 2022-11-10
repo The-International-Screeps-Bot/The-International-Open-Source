@@ -146,9 +146,9 @@ export class DefenceManager {
 
             return (
                 creepA.hits / creepA.hitsMax -
-                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a) - creepA.healStrength) / creepA.hitsMax -
+                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a) - creepA.combatStrength.heal) / creepA.hitsMax -
                 (creepB.hits / creepB.hitsMax -
-                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b) - creepB.healStrength) / creepB.hitsMax)
+                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b) - creepB.combatStrength.heal) / creepB.hitsMax)
             )
         })
 
@@ -167,7 +167,7 @@ export class DefenceManager {
                 room.attackingDefenderIDs.delete(memberID)
             }
 
-            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id) - enemyCreep.healStrength
+            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id) - enemyCreep.combatStrength.heal
 
             if (netDamage > 0) {
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
@@ -190,8 +190,8 @@ export class DefenceManager {
 
         for (const enemyCreep of room.enemyAttackers) {
 
-            minDamage += enemyCreep.healStrength
-            minHeal += enemyCreep.attackStrength
+            minDamage += enemyCreep.combatStrength.heal
+            minHeal += enemyCreep.combatStrength.ranged
         }
 
         // There is tower inferiority, make a defend request

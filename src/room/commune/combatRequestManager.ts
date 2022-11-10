@@ -105,7 +105,7 @@ export class CombatRequestManager {
  */
         // If there are threats to our hegemony, temporarily abandon the request
 
-        const threateningAttacker = requestRoom.enemyAttackers.find(creep => creep.attackStrength > 0)
+        const threateningAttacker = requestRoom.enemyAttackers.find(creep => creep.combatStrength.ranged + creep.combatStrength.ranged > 0)
 
         if (threateningAttacker) {
             request.data[CombatRequestData.abandon] = 1500
@@ -139,11 +139,11 @@ export class CombatRequestManager {
         }
 
         for (const enemyCreep of requestRoom.enemyAttackers) {
-            if (enemyCreep.attackStrength > request.data[CombatRequestData.minHeal] * 4)
-                request.data[CombatRequestData.minHeal] = enemyCreep.attackStrength + 1
+            if (enemyCreep.combatStrength.ranged > request.data[CombatRequestData.minHeal] * 4)
+                request.data[CombatRequestData.minHeal] = enemyCreep.combatStrength.ranged + 1
 
-            if (enemyCreep.healStrength > request.data[CombatRequestData.minDamage] * enemyCreep.defenceStrength * 4)
-                request.data[CombatRequestData.minDamage] = enemyCreep.healStrength + 1
+            if (enemyCreep.combatStrength.heal > request.data[CombatRequestData.minDamage] * enemyCreep.defenceStrength * 4)
+                request.data[CombatRequestData.minDamage] = enemyCreep.combatStrength.heal + 1
         }
 
         if (!requestRoom.enemyDamageThreat) {

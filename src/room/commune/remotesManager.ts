@@ -118,9 +118,9 @@ export class RemotesManager {
 
                 for (const enemyCreep of remote.enemyCreeps) {
                     remoteMemory.data[RemoteData.minDamage] +=
-                        enemyCreep.healStrength + enemyCreep.healStrength * enemyCreep.defenceStrength ||
+                        enemyCreep.combatStrength.heal + enemyCreep.combatStrength.heal * enemyCreep.defenceStrength ||
                         Math.max(Math.floor(enemyCreep.hits / 10), 1)
-                    remoteMemory.data[RemoteData.minHeal] += enemyCreep.attackStrength
+                    remoteMemory.data[RemoteData.minHeal] += enemyCreep.combatStrength.ranged
                 }
 
                 // If the controller is reserved and not by me

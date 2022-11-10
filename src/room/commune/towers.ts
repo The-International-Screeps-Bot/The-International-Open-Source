@@ -1,6 +1,7 @@
 import { myColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, randomTick } from 'international/utils'
+import { packCoord } from 'other/packrat'
 import { CommuneManager } from './communeManager'
 
 export class TowerManager {
@@ -115,7 +116,7 @@ export class TowerManager {
 
         if (room.enemyAttackers.length) {
             return room.myDamagedCreeps.find(creep => {
-                return (creep.role === 'meleeDefender' || creep.role === 'maintainer') && !creep.isOnExit
+                return !creep.isOnExit && !room.enemyThreatCoords.has(packCoord(creep.pos))
             })
         }
 

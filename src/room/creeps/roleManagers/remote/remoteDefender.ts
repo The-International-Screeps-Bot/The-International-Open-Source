@@ -43,8 +43,8 @@ export class RemoteDefender extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData.minDamage] -= this.attackStrength
-        Memory.rooms[this.memory.RN].data[RemoteData.minHeal] -= this.healStrength
+        Memory.rooms[this.memory.RN].data[RemoteData.minDamage] -= this.combatStrength.ranged
+        Memory.rooms[this.memory.RN].data[RemoteData.minHeal] -= this.combatStrength.heal
 
         const commune = this.commune
 
@@ -83,8 +83,8 @@ export class RemoteDefender extends Creep {
             // Otherwise assign the remote to the creep and inform true
 
             creep.memory.RN = roomName
-            roomMemory.data[RemoteData.minDamage] -= creep.attackStrength
-            roomMemory.data[RemoteData.minHeal] -= creep.healStrength
+            roomMemory.data[RemoteData.minDamage] -= creep.combatStrength.ranged
+            roomMemory.data[RemoteData.minHeal] -= creep.combatStrength.heal
 
             return true
         }
@@ -184,7 +184,7 @@ export class RemoteDefender extends Creep {
 
         // If the creep is out matched, try to always stay in range 3
 
-        if (this.healStrength < enemyAttacker.attackStrength) {
+        if (this.combatStrength.heal < enemyAttacker.combatStrength.ranged) {
             if (range === 3) return true
 
             if (range >= 3) {
@@ -207,7 +207,7 @@ export class RemoteDefender extends Creep {
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
-        if (this.healStrength < enemyAttacker.attackStrength) {
+        if (this.combatStrength.heal < enemyAttacker.combatStrength.ranged) {
             // If the range is less or equal to 2
 
             if (range <= 2) {
