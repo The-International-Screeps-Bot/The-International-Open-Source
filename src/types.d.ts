@@ -188,6 +188,12 @@ declare global {
         weightStampAnchors?: boolean
     }
 
+    interface CombatStrength {
+        melee: number
+        ranged: number
+        heal: number
+    }
+
     interface FindClosestPosOfValueOpts {
         coordMap: CoordMap
         startCoords: Coord[]
@@ -1984,19 +1990,9 @@ declare global {
 
         readonly upgradeStrength: number
 
-        _attackStrength: number
+        _combatStrength: CombatStrength
 
-        /**
-         * The protential damage the creep can intent
-         */
-        readonly attackStrength: number
-
-        _healStrength: number
-
-        /**
-         * The potential heal the creep can intent
-         */
-        readonly healStrength: number
+        readonly combatStrength: CombatStrength
 
         _defenceStrength: number
 

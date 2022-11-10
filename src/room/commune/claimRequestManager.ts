@@ -97,15 +97,15 @@ export class ClaimRequestManager {
             for (const enemyCreep of requestRoom.enemyAttackers) {
                 if (enemyCreep.owner.username === 'Invader') continue
 
-                request.data[ClaimRequestData.minDamage] += enemyCreep.healStrength
-                request.data[ClaimRequestData.minHeal] += enemyCreep.attackStrength
+                request.data[ClaimRequestData.minDamage] += enemyCreep.combatStrength.heal
+                request.data[ClaimRequestData.minHeal] += enemyCreep.combatStrength.ranged
             }
 
             // Decrease the defenderNeed according to ally combined strength
 
             for (const allyCreep of requestRoom.allyCreeps) {
-                request.data[ClaimRequestData.minDamage] -= allyCreep.healStrength
-                request.data[ClaimRequestData.minHeal] -= allyCreep.attackStrength
+                request.data[ClaimRequestData.minDamage] -= allyCreep.combatStrength.heal
+                request.data[ClaimRequestData.minHeal] -= allyCreep.combatStrength.ranged
             }
 
             if (request.data[ClaimRequestData.minDamage] > 0 || request.data[ClaimRequestData.minHeal] > 0) request.data[ClaimRequestData.abandon] = 20000

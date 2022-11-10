@@ -427,7 +427,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'type', 'minDamage', 'minHeal', 'priority']
+        const headers: any[] = ['room', 'type', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
 
         const data: any[][] = []
 
@@ -439,7 +439,8 @@ export class RoomVisualsManager {
                 request.roomName,
                 AllyRequestTypes[request.requestType],
                 request.minDamage,
-                request.minHeal,
+                request.minMeleeHeal,
+                request.minRangedHeal,
                 request.priority.toFixed(2),
             ]
             data.push(row)

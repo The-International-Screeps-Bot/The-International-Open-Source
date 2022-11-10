@@ -295,7 +295,7 @@ export class Antifa extends Creep {
 
         // If the creep has less heal power than the enemyAttacker's attack power
 
-        if (this.healStrength < enemyAttacker.attackStrength) {
+        if (this.combatStrength.heal < enemyAttacker.combatStrength.ranged) {
             if (range === 3) return true
 
             // If too close

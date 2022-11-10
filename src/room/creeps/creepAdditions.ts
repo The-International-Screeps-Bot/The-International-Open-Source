@@ -137,7 +137,7 @@ Object.defineProperties(Creep.prototype, {
                 const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
                 if (range > 3) continue
 
-                let healStrength = posData.creep.healStrength
+                let healStrength = posData.creep.combatStrength.heal
 
                 if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
 
@@ -160,39 +160,35 @@ Object.defineProperties(Creep.prototype, {
             return this._upgradeStrength
         },
     },
-    attackStrength: {
+    combatStrength: {
         get() {
-            if (this._attackStrength) return this._attackStrength
+            if (this._combatStrength) return this._combatStrength
 
-            this._attackStrength = 0
+            this._combatStrength = {
+                melee: 0,
+                ranged: 0,
+                heal: 0
+            }
 
             for (const part of this.body) {
-                switch (part.type) {
-                    case RANGED_ATTACK:
-                        this._attackStrength +=
-                            RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
-                        break
-                    case ATTACK:
-                        this._attackStrength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
-                        break
+
+                if (part.type === ATTACK) {
+                    this._combatStrength.melee += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
+                    continue
+                }
+
+                if (part.type === RANGED_ATTACK) {
+                    this._combatStrength.ranged +=
+                        RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
+                    continue
+                }
+
+                if (part.type === HEAL) {
+                    this._combatStrength.heal += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
                 }
             }
 
-            return this._attackStrength
-        },
-    },
-    healStrength: {
-        get() {
-            if (this._healStrength) return this._healStrength
-
-            this._healStrength = 0
-
-            for (const part of this.body) {
-                if (part.type === HEAL)
-                    this._healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
-            }
-
-            return this._healStrength
+            return this._combatStrength
         },
     },
     defenceStrength: {
@@ -311,7 +307,7 @@ Object.defineProperties(PowerCreep.prototype, {
                 const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
                 if (range > 3) continue
 
-                let healStrength = posData.creep.healStrength
+                let healStrength = posData.creep.combatStrength.heal
 
                 if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
 

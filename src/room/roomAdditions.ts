@@ -432,7 +432,8 @@ Object.defineProperties(Room.prototype, {
 
             this._combatStructureTargets = []
 
-            if (this.controller && (this.controller.my || this.controller.reservation)) return this._combatStructureTargets
+            if (this.controller && (this.controller.my || this.controller.reservation))
+                return this._combatStructureTargets
 
             if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
                 return this._combatStructureTargets
@@ -637,6 +638,8 @@ Object.defineProperties(Room.prototype, {
 
                 return this._sourcePaths
             }
+
+            if (!this.anchor) return this._sourcePaths
 
             for (const source of this.sources) {
                 const path = this.advancedFindPath({
@@ -1677,7 +1680,7 @@ Object.defineProperties(Room.prototype, {
                 return (this._enemyDamageThreat = true)
 
             for (const enemyAttacker of this.enemyAttackers) {
-                if (!enemyAttacker.attackStrength) continue
+                if (!enemyAttacker.combatStrength.melee && !enemyAttacker.combatStrength.ranged) continue
 
                 return (this._enemyDamageThreat = true)
             }

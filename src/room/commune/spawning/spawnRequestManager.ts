@@ -432,8 +432,8 @@ Room.prototype.spawnRequester = function () {
     // Increase attackValue by the creep's heal power
 
     for (const enemyCreep of this.enemyCreeps) {
-        attackStrength += enemyCreep.attackStrength
-        healStrength += enemyCreep.healStrength
+        attackStrength += enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged
+        healStrength += enemyCreep.combatStrength.heal
     }
 
     // Construct requests for meleeDefenders

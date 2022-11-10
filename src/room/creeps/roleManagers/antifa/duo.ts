@@ -9,28 +9,26 @@ export class Duo {
     members: Antifa[] = []
     leader: Antifa
 
-    _healStrength: number
+    _combatStrength: CombatStrength
 
-    get healStrength() {
-        if (this._healStrength !== undefined) return this._healStrength
+    get combatStrength() {
+        if (this._combatStrength) return this._combatStrength
 
-        this._healStrength = 0
+        this._combatStrength = {
+            melee: 0,
+            ranged: 0,
+            heal: 0,
+        }
 
-        for (const member of this.members) this._healStrength += member.healStrength
+        for (const member of this.members) {
+            for (const key in this._combatStrength) {
+                const combatType = key as keyof CombatStrength
 
-        return this._healStrength
-    }
+                this._combatStrength[combatType] = member.combatStrength[combatType]
+            }
+        }
 
-    _attackStrength: number
-
-    get attackStrength() {
-        if (this._attackStrength !== undefined) return this._attackStrength
-
-        this._attackStrength = 0
-
-        for (const member of this.members) this._attackStrength += member.attackStrength
-
-        return this._attackStrength
+        return this._combatStrength
     }
 
     get canMove() {
@@ -248,7 +246,7 @@ export class Duo {
 
         // If the squad is outmatched
 
-        if (this.healStrength + this.attackStrength < enemyAttacker.healStrength + enemyAttacker.attackStrength) {
+        if (this.combatStrength.heal + this.combatStrength.ranged < enemyAttacker.combatStrength.heal + enemyAttacker.combatStrength.ranged) {
             if (range === 4) {
                 return true
             }
