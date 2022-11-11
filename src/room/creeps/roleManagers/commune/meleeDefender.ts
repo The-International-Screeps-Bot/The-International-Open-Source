@@ -20,7 +20,7 @@ export class MeleeDefender extends Creep {
             const range = getRangeOfCoords(this.pos, enemyCreep.pos)
             if (range > 1) continue
 
-            const estimatedDamage = this.attackStrength * enemyCreep.defenceStrength
+            const estimatedDamage = this.combatStrength.heal * enemyCreep.defenceStrength
 
             //
 

@@ -876,7 +876,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsFromRoom: { [key: string]: string[] }
+        creepsFromRoom: Partial<{ [key in CreepRoles]: string[] }>
 
         /**
          * The cumulative amount of creeps with a communeName value of this room's name

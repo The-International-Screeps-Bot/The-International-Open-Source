@@ -1372,11 +1372,39 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
                     partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
-                    minCreeps: undefined,
-                    maxCreeps: Infinity,
                     minCost: 250,
                     priority: 10 + this.creepsFromRoom.allyVanguard.length,
                     memoryAdditions: {},
+                }
+            })(),
+        )
+    }
+
+    for (const requestName of this.memory.haulRequests) {
+        const request = Memory.haulRequests[requestName]
+        if (!request) continue
+
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+                const priority = Math.min(0.5 + this.creepsFromRoom.requestHauler.length / 2, minRemotePriority - 3)
+
+                // Construct the required carry parts
+
+                partsMultiplier = 100
+
+                const role = 'requestHauler'
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts: [CARRY, MOVE],
+                    partsMultiplier,
+                    minCost: 100,
+                    maxCostPerCreep: this.memory.MHC,
+                    priority,
+                    memoryAdditions: {
+                        HRN: requestName,
+                    },
                 }
             })(),
         )
