@@ -212,7 +212,6 @@ export class DefenceManager {
         let threatByPlayers: Map<string, number> = new Map()
 
         for (const enemyCreep of room.enemyAttackers) {
-
             let threat = 0
 
             threat += enemyCreep.combatStrength.dismantle
@@ -229,7 +228,6 @@ export class DefenceManager {
 
             const threatByPlayer = threatByPlayers.get(enemyCreep.owner.username)
             if (threatByPlayer) {
-
                 threatByPlayers.set(playerName, threatByPlayer + threat)
                 continue
             }
@@ -238,8 +236,13 @@ export class DefenceManager {
         }
 
         for (const [playerName, threat] of threatByPlayers) {
+            let player = Memory.players[playerName]
 
-            const player = Memory.players[playerName]
+            if (!player) {
+                player = Memory.players[playerName] = {
+                    data: [0],
+                }
+            }
 
             player.data[PlayerData.offensiveStrength] = Math.max(threat, player.data[PlayerData.offensiveStrength])
             player.data[PlayerData.hate] = Math.max(threat, player.data[PlayerData.hate])
