@@ -243,6 +243,8 @@ export class DefenceManager {
 
             player.data[PlayerData.offensiveStrength] = Math.max(threat, player.data[PlayerData.offensiveStrength])
             player.data[PlayerData.hate] = Math.max(threat, player.data[PlayerData.hate])
+
+            player.data[PlayerData.lastAttack] = 0
         }
 
         const roomMemory = Memory.rooms[room.name]
@@ -252,7 +254,10 @@ export class DefenceManager {
             roomMemory.LAT = 0
         }
 
-        roomMemory.AT -= 1 + roomMemory.LAT * 0.002
+        // Reduce attack threat over time
+
+        if (roomMemory.AT > 0) roomMemory.AT -= 1 + roomMemory.LAT * 0.002
+
         roomMemory.LAT += 1
     }
 }
