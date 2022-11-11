@@ -437,14 +437,14 @@ Room.prototype.spawnRequester = function () {
 
     // Increase attackValue by the creep's heal power
 
-    for (const enemyCreep of this.enemyCreeps) {
+    for (const enemyCreep of this.enemyAttackers) {
         attackStrength += enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged
         healStrength += enemyCreep.combatStrength.heal
     }
 
     // Construct requests for meleeDefenders
 
-    if (!this.towerInferiority) {
+    if (this.towerInferiority) {
 
         // Defenders
 
@@ -484,7 +484,6 @@ Room.prototype.spawnRequester = function () {
                         minCost: 210,
                         priority,
                         memoryAdditions: {},
-                        threshold: 0.1,
                     }
                 }
 
@@ -499,7 +498,6 @@ Room.prototype.spawnRequester = function () {
                     minCost: 260,
                     priority,
                     memoryAdditions: {},
-                    threshold: 0,
                 }
             })(),
         )
@@ -521,7 +519,7 @@ Room.prototype.spawnRequester = function () {
 
                 requiredStrength *= 1
 
-                const priority = Math.min(minPriority + .1 + this.myCreeps[role].length * 1, maxPriority)
+                const priority = Math.min(minPriority + .1 + this.myCreeps[role].length * 0.5, maxPriority)
 
                 // If all RCL 3 extensions are build
 
@@ -537,7 +535,6 @@ Room.prototype.spawnRequester = function () {
                         minCost: 210,
                         priority,
                         memoryAdditions: {},
-                        threshold: 0.1,
                     }
                 }
 
@@ -552,7 +549,6 @@ Room.prototype.spawnRequester = function () {
                     minCost: 260,
                     priority,
                     memoryAdditions: {},
-                    threshold: 0,
                 }
             })(),
         )

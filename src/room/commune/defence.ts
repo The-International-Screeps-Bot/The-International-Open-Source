@@ -172,7 +172,7 @@ export class DefenceManager {
             }
 
             const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
-
+            room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, { font: 0.3 })
             if (damage > 0) {
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
                 else if (damage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))

@@ -104,6 +104,8 @@ export class CommuneManager {
             room.memory.HU = 0
         }
 
+        room.usedRampartIDs = new Set()
+
         this.haulerSizeManager.preTickRun()
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()

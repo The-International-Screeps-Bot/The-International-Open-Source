@@ -110,7 +110,7 @@ Object.defineProperties(Creep.prototype, {
                 let healStrength = creep.combatStrength.heal
                 if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
 
-                this._macroHealStrength -= Math.floor(healStrength)
+                this._macroHealStrength += Math.floor(healStrength)
             }
 
             return this._macroHealStrength
@@ -118,7 +118,7 @@ Object.defineProperties(Creep.prototype, {
     },
     netTowerDamage: {
         get() {
-            if (this._netTowerDamage) return this._netTowerDamage
+            if (this._netTowerDamage !== undefined) return this._netTowerDamage
 
             this._netTowerDamage = this.grossTowerDamage
             this._netTowerDamage *= this.defenceStrength
@@ -127,7 +127,9 @@ Object.defineProperties(Creep.prototype, {
 
             if (this.room.controller.safeMode) return this._netTowerDamage
 
-            return (this._netTowerDamage -= this.macroHealStrength)
+            this._netTowerDamage -= this.macroHealStrength
+            
+            return this._netTowerDamage
         },
     },
     upgradeStrength: {
@@ -275,7 +277,7 @@ Object.defineProperties(PowerCreep.prototype, {
                 let healStrength = creep.combatStrength.heal
                 if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
 
-                this._macroHealStrength -= Math.floor(healStrength)
+                this._macroHealStrength += Math.floor(healStrength)
             }
 
             return this._macroHealStrength
@@ -283,7 +285,7 @@ Object.defineProperties(PowerCreep.prototype, {
     },
     netTowerDamage: {
         get() {
-            if (this._netTowerDamage) return this._netTowerDamage
+            if (this._netTowerDamage !== undefined) return this._netTowerDamage
 
             this._netTowerDamage = this.grossTowerDamage
 
@@ -299,7 +301,7 @@ Object.defineProperties(PowerCreep.prototype, {
 const additions = {
     grossTowerDamage: {
         get() {
-            if (this._grossTowerDamage) return this._grossTowerDamage
+            if (this._grossTowerDamage !== undefined) return this._grossTowerDamage
 
             this._grossTowerDamage = 0
 
@@ -329,7 +331,7 @@ const additions = {
                 this._grossTowerDamage += Math.floor(damage)
             }
 
-            return this._netTowerDamage
+            return this._grossTowerDamage
         },
     },
     message: {

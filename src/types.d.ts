@@ -942,6 +942,8 @@ declare global {
          */
         haulerNeed: number
 
+        usedRampartIDs: Set<Id<StructureRampart>>
+
         // Functions
 
         /**
@@ -2177,6 +2179,11 @@ declare global {
          * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
          */
         ROS: boolean
+
+        /**
+         * Rampart ID, the ID of the rampart the creep is trying to sit under
+         */
+        RID: Id<StructureRampart>
     }
 
     // PowerCreeps
