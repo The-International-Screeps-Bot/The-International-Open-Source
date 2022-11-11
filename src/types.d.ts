@@ -190,6 +190,7 @@ declare global {
     }
 
     interface CombatStrength {
+        dismantle: number
         melee: number
         ranged: number
         heal: number
@@ -716,19 +717,8 @@ declare global {
         | 'highway'
         | 'intersection'
 
-    interface RoomType {
-        [property: string]: true
-    }
-
     interface PlayerInfo {
-        /**
-         * Defensive Threat, the enemy's perceived defensive ability
-         */
-        DT: number
-        /**
-         * Offensive Threat, the enemy's perceived offensive threat towards the bot
-         */
-        OT: number
+        data: number[]
     }
 
     interface Memory extends Settings {
@@ -1641,7 +1631,7 @@ declare global {
          */
         allyCreepRequest: string
 
-        cSiteTargetID: Id<ConstructionSite>
+        CSTID: Id<ConstructionSite>
 
         stampAnchors: Partial<Record<StampTypes, number[]>>
 
@@ -1680,14 +1670,24 @@ declare global {
         CP: string
 
         /**
-         * Defensive Threat
+         * Defensive Strength
          */
-        DT: number
+        DS: number
 
         /**
-         * Offensive Threat
+         * Offensive Strength
          */
-        OT: number
+        OS: number
+
+        /**
+         * Attack Threat, how much a commune is concerned about enemy attackers
+         */
+        AT: number
+
+        /**
+         * Last Attack Tick, how many ticks have passed since the last attack
+         */
+        LAT: number
 
         /**
          * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage

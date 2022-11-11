@@ -419,7 +419,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // If there is no construction target ID
 
-    if (!room.memory.cSiteTargetID) {
+    if (!room.memory.CSTID) {
         // Try to find a construction target. If none are found, stop
 
         room.findAllyCSiteTargetID(this)
@@ -427,7 +427,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Convert the construction target ID into a game object
 
-    let cSiteTarget = findObjectWithID(room.memory.cSiteTargetID)
+    let cSiteTarget = findObjectWithID(room.memory.CSTID)
 
     // If there is no construction target
 
@@ -439,7 +439,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Convert the construction target ID into a game object, stopping if it's undefined
 
-    cSiteTarget = findObjectWithID(room.memory.cSiteTargetID)
+    cSiteTarget = findObjectWithID(room.memory.CSTID)
 
     // Stop if the cSite is undefined
 
@@ -801,7 +801,9 @@ Creep.prototype.advancedRenew = function () {
 
     // Get a spawn in range of 1, informing false if there are none
 
-    const spawn = spawns.find(spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable)
+    const spawn = spawns.find(
+        spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable,
+    )
     if (!spawn) return
 
     // If the spawn has already renewed this tick, inform false

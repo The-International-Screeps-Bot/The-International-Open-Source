@@ -7,9 +7,41 @@ import './spawnRequestManager'
 
 export class SpawnManager {
     communeManager: CommuneManager
+    inactiveSpawns: StructureSpawn[]
+    activeSpawns: StructureSpawn[]
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
+    }
+
+    /**
+     * Find spawns that are inactive and active
+     * Assign spawnIDs to creeps
+     */
+    public preTickRun() {
+
+        const spawns = this.communeManager.structures.spawn
+        if (!spawns.length) return
+
+        // Find spawns that are and aren't spawning
+
+        this.inactiveSpawns = []
+        this.activeSpawns = []
+
+        for (const spawn of spawns) {
+            if (spawn.spawning) {
+                const creep = Game.creeps[spawn.spawning.name]
+                creep.spawnID = spawn.id
+                customLog('SPAWNID ASSIGNMENT', creep)
+                this.activeSpawns.push(spawn)
+                continue
+            }
+
+            if (spawn.renewed) continue
+            if (!spawn.RCLActionable) continue
+
+            this.inactiveSpawns.push(spawn)
+        }
     }
 
     public run() {
@@ -18,27 +50,8 @@ export class SpawnManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        // Find spawns that are and aren't spawning
-
-        const inactiveSpawns: StructureSpawn[] = []
-        const activeSpawns: StructureSpawn[] = []
-
-        for (const spawn of this.communeManager.structures.spawn) {
-            if (spawn.spawning) {
-                const creep = Game.creeps[spawn.spawning.name]
-                creep.spawnID = spawn.id
-                activeSpawns.push(spawn)
-                continue
-            }
-
-            if (spawn.renewed) continue
-            if (!spawn.RCLActionable) continue
-
-            inactiveSpawns.push(spawn)
-        }
-
-        this.runSpawning(inactiveSpawns)
-        this.createPowerTasks(activeSpawns)
+        this.runSpawning()
+        this.createPowerTasks()
         this.test()
 
         if (Memory.CPULogging === true) {
@@ -49,8 +62,8 @@ export class SpawnManager {
         }
     }
 
-    private runSpawning(inactiveSpawns: StructureSpawn[]) {
-        if (!inactiveSpawns.length) return
+    private runSpawning() {
+        if (!this.inactiveSpawns.length) return
 
         // Construct spawnRequests
 
@@ -64,7 +77,7 @@ export class SpawnManager {
 
         // Track the inactive spawn index
 
-        let spawnIndex = inactiveSpawns.length - 1
+        let spawnIndex = this.inactiveSpawns.length - 1
 
         // Loop through priorities inside requestsByPriority
 
@@ -72,7 +85,7 @@ export class SpawnManager {
 
             // Try to find inactive spawn, if can't, stop the loop
 
-            const spawn = inactiveSpawns[spawnIndex]
+            const spawn = this.inactiveSpawns[spawnIndex]
 
             // Otherwise get the spawnRequest using its priority
             const spawnRequest = this.communeManager.room.spawnRequests[priority]
@@ -133,10 +146,10 @@ export class SpawnManager {
         }
     }
 
-    private createPowerTasks(activeSpawns: StructureSpawn[]) {
+    private createPowerTasks() {
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
-        for (const spawn of activeSpawns) {
+        for (const spawn of this.activeSpawns) {
             this.communeManager.room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)
         }
     }

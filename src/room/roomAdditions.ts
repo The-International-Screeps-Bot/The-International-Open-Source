@@ -259,8 +259,8 @@ Object.defineProperties(Room.prototype, {
     },
     cSiteTarget: {
         get() {
-            if (this.memory.cSiteTargetID) {
-                const cSiteTarget = findObjectWithID(this.memory.cSiteTargetID)
+            if (this.memory.CSTID) {
+                const cSiteTarget = findObjectWithID(this.memory.CSTID)
                 if (cSiteTarget) return cSiteTarget
             }
 
@@ -302,7 +302,7 @@ Object.defineProperties(Room.prototype, {
 
                 if (!target) target = findClosestObject(searchAnchor, cSitesOfType)
 
-                this.memory.cSiteTargetID = target.id
+                this.memory.CSTID = target.id
                 return target
             }
 

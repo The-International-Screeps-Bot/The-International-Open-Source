@@ -175,13 +175,13 @@ export class RoomVisualsManager {
     }
 
     private cSiteTargetVisuals() {
-        // If there is not a cSiteTargetID, stop
+        // If there is not a CSTID, stop
 
-        if (!this.roomManager.room.memory.cSiteTargetID) return
+        if (!this.roomManager.room.memory.CSTID) return
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = findObjectWithID(this.roomManager.room.memory.cSiteTargetID)
+        const constructionTarget = findObjectWithID(this.roomManager.room.memory.CSTID)
 
         // If the constructionTarget exists, show visuals for it
 
@@ -340,7 +340,12 @@ export class RoomVisualsManager {
 
             if (request.T !== 'defend' && !request.responder) continue
 
-            const row: any[] = [requestName, request.T, request.responder || 'none', request.data[CombatRequestData.abandon]]
+            const row: any[] = [
+                requestName,
+                request.T,
+                request.responder || 'none',
+                request.data[CombatRequestData.abandon],
+            ]
             data.push(row)
         }
 
@@ -349,7 +354,12 @@ export class RoomVisualsManager {
 
             if (!request.responder) continue
 
-            const row: any[] = [requestName, request.data[HaulRequestData.transfer] ? 'transfer' : 'withdraw', request.responder, request.data[HaulRequestData.abandon]]
+            const row: any[] = [
+                requestName,
+                request.data[HaulRequestData.transfer] ? 'transfer' : 'withdraw',
+                request.responder,
+                request.data[HaulRequestData.abandon],
+            ]
             data.push(row)
         }
 

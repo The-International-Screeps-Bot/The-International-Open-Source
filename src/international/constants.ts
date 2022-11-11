@@ -2,91 +2,47 @@
 
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
-interface RoomTypeProperties {
-    [key: string]: boolean
-}
+export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
+    'remotes',
+    'deposits',
+    'powerBanks',
+    'NC',
+    'PC',
+    'MHC',
+    'HU',
+    'AT',
+    'LAT',
 
-export const roomTypeProperties: Partial<{ [key in keyof RoomMemory]: boolean }> = {
-    remotes: true,
-    deposits: true,
-    powerBanks: true,
-    NC: true,
-    PC: true,
-    MHC: true,
-    HU: true,
+    'CN',
+    'SE',
+    'RE',
+    'data',
 
-    CN: true,
-    SE: true,
-    RE: true,
-    data: true,
+    'owner',
+    'level',
 
-    owner: true,
-    level: true,
+    'powerEnabled',
+    'towers',
+    'hasTerminal',
+    'energy',
+    'OS',
+    'DS',
 
-    powerEnabled: true,
-    towers: true,
-    hasTerminal: true,
-    energy: true,
-    OT: true,
-    DT: true,
+    'portalsTo',
+])
 
-    portalsTo: true,
-}
-
-export const roomTypes: Record<RoomTypes, RoomType> = {
-    commune: {
-        remotes: true,
-        deposits: true,
-        powerBanks: true,
-        PC: true,
-        MHC: true,
-        HU: true,
-    },
-    remote: {
-        CN: true,
-
-        SE: true,
-        RE: true,
-        data: true,
-        NC: true,
-        PC: true,
-    },
-    ally: {
-        owner: true,
-        level: true,
-    },
-    allyRemote: {
-        owner: true,
-    },
-    enemy: {
-        owner: true,
-        level: true,
-        powerEnabled: true,
-        towers: true,
-        hasTerminal: true,
-        energy: true,
-        NC: true,
-        OT: true,
-        DT: true,
-    },
-    enemyRemote: {
-        owner: true,
-        NC: true,
-    },
-    neutral: {
-        NC: true,
-        PC: true,
-    },
-    keeper: {
-        owner: true,
-    },
-    keeperCenter: {
-        owner: true,
-    },
-    highway: {},
-    intersection: {
-        portalsTo: true,
-    },
+export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
+    commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT']),
+    remote: new Set(['CN', 'SE', 'RE', 'data', 'NC', 'PC']),
+    ally: new Set(['owner', 'level']),
+    allyRemote: new Set(['owner']),
+    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'NC', 'OS', 'DS']),
+    enemyRemote: new Set(['owner', 'NC']),
+    neutral: new Set(['NC', 'PC']),
+    keeper: new Set(['owner']),
+    keeperCenter: new Set(['owner']),
+    highway: new Set([]),
+    intersection: new Set(['portalsTo']),
 }
 
 export const stagnantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
@@ -571,6 +527,8 @@ export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_CATALYST,
 ]
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
+export const dismantleBoosts = [RESOURCE_ZYNTHIUM_HYDRIDE, RESOURCE_ZYNTHIUM_ACID, RESOURCE_CATALYZED_ZYNTHIUM_ACID]
+export const dismantleBoostsSet = new Set(dismantleBoosts)
 
 /**
  * The percent of the terminal to fill with each resource
@@ -713,6 +671,25 @@ export const terminalResourceTargets: ResourceTarget[] = [
         max: 0,
     },
 ]
+
+export enum PlayerData {
+    /**
+     * Generally how good their offense is
+     */
+    offensiveStrength,
+    /**
+     * Generally how good their defense is
+     */
+    defensiveStrength,
+    /**
+     * How much we want them dead
+     */
+    hate,
+    /**
+     * The last time we were attacked by them
+     */
+    lastAttack,
+}
 
 export enum RemoteData {
     remoteSourceHarvester0,

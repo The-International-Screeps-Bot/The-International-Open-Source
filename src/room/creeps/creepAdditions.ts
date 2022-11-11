@@ -1,4 +1,4 @@
-import { roomDimensions, towerPowers } from 'international/constants'
+import { dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
 import { getRange, getRangeOfCoords } from 'international/utils'
 
 Object.defineProperties(Creep.prototype, {
@@ -127,7 +127,7 @@ Object.defineProperties(Creep.prototype, {
 
             if (this.room.controller.safeMode) return this._netTowerDamage
 
-            return this._netTowerDamage -= this.macroHealStrength
+            return (this._netTowerDamage -= this.macroHealStrength)
         },
     },
     upgradeStrength: {
@@ -148,12 +148,23 @@ Object.defineProperties(Creep.prototype, {
             if (this._combatStrength) return this._combatStrength
 
             this._combatStrength = {
+                dismantle: 0,
                 melee: 0,
                 ranged: 0,
                 heal: 0,
             }
 
             for (const part of this.body) {
+                if (part.type === WORK) {
+
+                    const boost = part.boost as RESOURCE_CATALYZED_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_HYDRIDE
+
+                    this._combatStrength.dismantle +=
+                        DISMANTLE_POWER *
+                        (part.boost && dismantleBoosts.includes(boost) ? BOOSTS[part.type][boost].dismantle : 1)
+                    continue
+                }
+
                 if (part.type === ATTACK) {
                     this._combatStrength.melee += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
                     continue
@@ -280,7 +291,7 @@ Object.defineProperties(PowerCreep.prototype, {
 
             if (this.room.controller.safeMode) return this._netTowerDamage
 
-            return this._netTowerDamage -= this.macroHealStrength
+            return (this._netTowerDamage -= this.macroHealStrength)
         },
     },
 } as PropertyDescriptorMap & ThisType<PowerCreep>)

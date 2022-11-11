@@ -10,6 +10,7 @@ import {
     minHarvestWorkRatio,
     myColors,
     numbersByStructureTypes,
+    PlayerData,
     prefferedCommuneRange,
     RemoteData,
     roomDimensions,
@@ -326,7 +327,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                if (opts.avoidNotMyCreeps && !room.controller || !room.controller.safeMode) {
+                if ((opts.avoidNotMyCreeps && !room.controller) || !room.controller.safeMode) {
                     for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
                     for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
@@ -567,16 +568,22 @@ Room.prototype.scoutUnreservedRemote = function () {
 Room.prototype.scoutEnemyRoom = function () {
     const { controller } = this
     const playerName = controller.owner.username
+    const roomMemory = this.memory
 
-    this.memory.T = 'enemy'
+    roomMemory.T = 'enemy'
 
-    // If the controller is not owned by an ally
+    let player = Memory.players[playerName]
+    if (!player)
+        player = Memory.players[playerName] = {
+            data: [0],
+        }
 
-    let playerInfo = Memory.players[playerName]
-    if (!playerInfo) playerInfo = Memory.players[playerName] = {}
+    // General
 
     const level = controller.level
-    this.memory.level = level
+    roomMemory.level = level
+
+    roomMemory.powerEnabled = controller.isPowerEnabled
 
     // Offensive threat
 
@@ -588,8 +595,13 @@ Room.prototype.scoutEnemyRoom = function () {
     threat += this.structures.nuker.length * 300
     threat += Math.pow(this.structures.lab.length * 10000, 0.4)
 
-    this.memory.OT = threat
-    Memory.players[playerName].OT = Math.max(threat, playerInfo.OT)
+    threat = Math.floor(threat)
+
+    roomMemory.OS = threat
+    Memory.players[playerName].data[PlayerData.offensiveStrength] = Math.max(
+        threat,
+        player.data[PlayerData.offensiveStrength],
+    )
 
     // Defensive threat
 
@@ -597,18 +609,15 @@ Room.prototype.scoutEnemyRoom = function () {
 
     const energy = this.resourcesInStoringStructures.energy
 
-    this.memory.energy = energy
+    roomMemory.energy = energy
     threat += Math.pow(energy, 0.5)
 
     const ramparts = this.structures.rampart
     const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
 
     threat += Math.pow(avgRampartHits, 0.5)
-
     threat += this.structures.spawn.length * 100
-
     threat += this.structures.tower.length * 300
-
     threat += Math.pow(this.structures.extension.length * 400, 0.8)
 
     const hasTerminal = this.terminal !== undefined
@@ -616,15 +625,18 @@ Room.prototype.scoutEnemyRoom = function () {
     if (hasTerminal) {
         threat += 800
 
-        this.memory.terminal = true
+        roomMemory.terminal = true
     }
 
-    this.memory.powerEnabled = controller.isPowerEnabled
+    threat = Math.floor(threat)
 
-    this.memory.DT = threat
-    Memory.players[playerName].DT = Math.max(threat, playerInfo.DT)
+    roomMemory.DS = threat
+    Memory.players[playerName].data[PlayerData.defensiveStrength] = Math.max(
+        threat,
+        player.data[PlayerData.defensiveStrength],
+    )
 
-    return this.memory.T
+    return roomMemory.T
 }
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
@@ -916,7 +928,6 @@ Room.prototype.createDefendCombatRequest = function (opts) {
     request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
 
     if (opts) {
-
         for (const key in opts) {
             request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
                 opts[key as keyof typeof CombatRequestData]
@@ -931,20 +942,16 @@ Room.prototype.createDefendCombatRequest = function (opts) {
 Room.prototype.cleanMemory = function () {
     const room = this
 
-    // Stop if the room doesn't have a type
-
-    if (!room.memory.T) return
-
     // Loop through keys in the room's memory
 
     for (const key in room.memory) {
         // Iterate if key is not part of roomTypeProperties
 
-        if (!roomTypeProperties[key as keyof RoomMemory]) continue
+        if (!roomTypeProperties.has(key as keyof RoomMemory)) continue
 
         // Iterate if key part of this roomType's properties
 
-        if (roomTypes[room.memory.T][key]) continue
+        if (roomTypes[room.memory.T].has(key as keyof RoomMemory)) continue
 
         // Delete the property
 
@@ -1739,7 +1746,7 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        this.memory.cSiteTargetID = anchor.findClosestByPath(cSitesOfType, {
+        this.memory.CSTID = anchor.findClosestByPath(cSitesOfType, {
             ignoreCreeps: true,
             ignoreDestructibleStructures: true,
             ignoreRoads: true,
@@ -2008,7 +2015,6 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
 }
 
 Room.prototype.getPartsOfRole = function (role) {
-
     if (this.partsOfRoles[role]) return this.partsOfRoles[role]
 
     this.partsOfRoles[role] = {}
@@ -2019,11 +2025,9 @@ Room.prototype.getPartsOfRole = function (role) {
         const creep = Game.creeps[creepName]
 
         for (const key in creep.parts) {
-
             const partType = key as BodyPartConstant
 
             if (!this.partsOfRoles[role][partType]) {
-
                 this.partsOfRoles[role][partType] = 1
                 continue
             }
