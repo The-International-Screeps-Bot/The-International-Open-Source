@@ -102,7 +102,7 @@ export interface Settings {
 }
 
 export const settings: Settings = {
-    breakingVersion: 86,
+    breakingVersion: 87,
 
     // Default values, do not change. Instead modify clones in memory
 
@@ -122,7 +122,7 @@ export const settings: Settings = {
         'Aerics',
         'PlaidRabbit',
     ],
-    nonAggressionPlayers: ['Q13214', 'HerrKai', 'clarkok', 'Raggy', 'somygame'],
+    nonAggressionPlayers: ['Q13214', 'HerrKai', 'Raggy', 'somygame'],
     tradeBlacklist: [''],
     pixelSelling: false,
     pixelGeneration: false,

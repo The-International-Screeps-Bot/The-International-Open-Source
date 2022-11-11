@@ -82,6 +82,12 @@ class MigrationManager {
 
             Memory.breakingVersion = 86
         }
+        if (Memory.breakingVersion === 86) {
+
+            Memory.players = {}
+
+            Memory.breakingVersion += 1
+        }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
             global.killCreeps()

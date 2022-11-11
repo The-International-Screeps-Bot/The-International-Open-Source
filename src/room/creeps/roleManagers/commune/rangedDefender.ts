@@ -11,7 +11,7 @@ import {
 } from 'international/utils'
 import { packCoord } from 'other/packrat'
 
-export class MeleeDefender extends Creep {
+export class RangedDefender extends Creep {
     preTickManager() {
         const { room } = this
 
@@ -19,9 +19,9 @@ export class MeleeDefender extends Creep {
 
         for (const enemyCreep of this.room.unprotectedEnemyCreeps) {
             const range = getRangeOfCoords(this.pos, enemyCreep.pos)
-            if (range > 1) continue
+            if (range > 3) continue
 
-            const estimatedDamage = this.combatStrength.melee * enemyCreep.defenceStrength
+            const estimatedDamage = this.combatStrength.ranged * enemyCreep.defenceStrength
 
             //
 
@@ -54,7 +54,9 @@ export class MeleeDefender extends Creep {
 
         if (this.combatTarget) {
             this.room.targetVisual(this.pos, this.combatTarget.pos)
-            this.attack(this.combatTarget)
+
+            if (getRangeOfCoords(this.pos, this.combatTarget.pos) <= 1) this.rangedMassAttack()
+            else this.rangedAttack(this.combatTarget)
         }
 
         // Get enemyAttackers in the room, informing false if there are none
@@ -208,9 +210,9 @@ export class MeleeDefender extends Creep {
         super(creepID)
     }
 
-    static meleeDefenderManager(room: Room, creepsOfRole: string[]) {
+    static rangedDefenderManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
-            const creep: MeleeDefender = Game.creeps[creepName]
+            const creep: RangedDefender = Game.creeps[creepName]
 
             if (creep.spawning) continue
 

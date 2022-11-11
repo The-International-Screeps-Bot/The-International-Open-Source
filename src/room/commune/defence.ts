@@ -1,6 +1,6 @@
-import { myColors, roomDimensions, safemodeTargets } from 'international/constants'
+import { myColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, getRangeOfCoords, randomTick } from 'international/utils'
+import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick } from 'international/utils'
 import { packCoord } from 'other/packrat'
 import { CommuneManager } from './communeManager'
 
@@ -13,6 +13,9 @@ export class DefenceManager {
 
     run() {
         const { room } = this.communeManager
+
+        if (!room.enemyAttackers.length) return
+
         // If CPU logging is enabled, get the CPU used at the start
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
@@ -20,6 +23,7 @@ export class DefenceManager {
         this.advancedActivateSafeMode()
         this.manageRampartPublicity()
         this.assignDefenceTargets()
+        this.handleThreat()
 
         // If CPU logging is enabled, log the CPU used by this manager
 
@@ -146,9 +150,9 @@ export class DefenceManager {
 
             return (
                 creepA.hits / creepA.hitsMax -
-                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a) - creepA.combatStrength.heal) / creepA.hitsMax -
+                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a)) / creepA.hitsMax -
                 (creepB.hits / creepB.hitsMax -
-                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b) - creepB.combatStrength.heal) / creepB.hitsMax)
+                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b)) / creepB.hitsMax)
             )
         })
 
@@ -167,11 +171,11 @@ export class DefenceManager {
                 room.attackingDefenderIDs.delete(memberID)
             }
 
-            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id) - enemyCreep.combatStrength.heal
-
-            if (netDamage > 0) {
+            const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
+            room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, { font: 0.3 })
+            if (damage > 0) {
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
-                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
+                else if (damage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
                     room.towerAttackTarget = enemyCreep
             }
 
@@ -180,7 +184,6 @@ export class DefenceManager {
     }
 
     createDefenceRequest() {
-
         const { room } = this.communeManager
 
         if (!room.towerInferiority) return
@@ -189,7 +192,6 @@ export class DefenceManager {
         let minHeal = 0
 
         for (const enemyCreep of room.enemyAttackers) {
-
             minDamage += enemyCreep.combatStrength.heal
             minHeal += enemyCreep.combatStrength.ranged
         }
@@ -201,5 +203,61 @@ export class DefenceManager {
             minHeal,
             quadCount: 1,
         })
+    }
+
+    handleThreat() {
+        const { room } = this.communeManager
+
+        let totalThreat = 0
+        let threatByPlayers: Map<string, number> = new Map()
+
+        for (const enemyCreep of room.enemyAttackers) {
+
+            let threat = 0
+
+            threat += enemyCreep.combatStrength.dismantle
+            threat += enemyCreep.combatStrength.melee
+            threat += enemyCreep.combatStrength.ranged * 3
+
+            threat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
+
+            threat = Math.floor(threat)
+            totalThreat += threat
+
+            const playerName = enemyCreep.owner.username
+            if (playerName === 'Invader') continue
+
+            const threatByPlayer = threatByPlayers.get(enemyCreep.owner.username)
+            if (threatByPlayer) {
+
+                threatByPlayers.set(playerName, threatByPlayer + threat)
+                continue
+            }
+
+            threatByPlayers.set(playerName, threat)
+        }
+
+        for (const [playerName, threat] of threatByPlayers) {
+
+            const player = Memory.players[playerName]
+
+            player.data[PlayerData.offensiveStrength] = Math.max(threat, player.data[PlayerData.offensiveStrength])
+            player.data[PlayerData.hate] = Math.max(threat, player.data[PlayerData.hate])
+
+            player.data[PlayerData.lastAttack] = 0
+        }
+
+        const roomMemory = Memory.rooms[room.name]
+
+        if (totalThreat > 0) {
+            roomMemory.AT = Math.max(roomMemory.AT, totalThreat)
+            roomMemory.LAT = 0
+        }
+
+        // Reduce attack threat over time
+
+        if (roomMemory.AT > 0) roomMemory.AT -= 1 + roomMemory.LAT * 0.002
+
+        roomMemory.LAT += 1
     }
 }

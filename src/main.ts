@@ -44,6 +44,7 @@ import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { globalStatsUpdater } from 'international/statsManager'
+import { playerManager } from 'international/players'
 
 global.profiler = initProfiler()
 
@@ -68,6 +69,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
     respawnManager.run()
     configManager.run()
     tickConfig.run()
+    playerManager.run()
     creepOrganizer.run()
     powerCreepOrganizer.run()
     internationalManager.constructionSiteManager()

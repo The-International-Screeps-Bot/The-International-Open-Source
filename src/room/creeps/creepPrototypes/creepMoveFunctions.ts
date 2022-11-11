@@ -197,8 +197,9 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     this.memory.P = packPosList(path)
 
     if (this.spawning) {
-        const spawn = findObjectWithID(this.spawnID)
 
+        const spawn = findObjectWithID(this.spawnID)
+        customLog('SPAWN ISSUES', this.spawnID + ', ' + spawn)
         if (spawn.spawning.remainingTime <= 1) this.assignMoveRequest(path[0])
 
         // Ensure we aren't using the default direction
@@ -296,16 +297,11 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
 
         if (room.enemyThreatCoords.has(packedCoord)) continue
 
+        if (room.coordHasStructureTypes(pos, impassibleStructureTypesSet)) continue
+
+        if (this.memory.ROS && !room.coordHasStructureTypes(pos, new Set([STRUCTURE_RAMPART]))) continue
+
         let hasImpassibleStructure
-
-        for (const structure of pos.lookFor(LOOK_STRUCTURES)) {
-            if (!impassibleStructureTypes.includes(structure.structureType)) continue
-
-            hasImpassibleStructure = true
-            break
-        }
-
-        if (hasImpassibleStructure) continue
 
         for (const cSite of pos.lookFor(LOOK_CONSTRUCTION_SITES)) {
             if (!cSite.my && !Memory.allyPlayers.includes(cSite.owner.username)) continue
@@ -317,21 +313,6 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
         }
 
         if (hasImpassibleStructure) continue
-
-        // If rampart shoving only, the shove position must have viable ramparts
-
-        if (this.memory.ROS) {
-            let hasRampart
-
-            for (const structure of pos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_RAMPART) continue
-
-                hasRampart = true
-                break
-            }
-
-            if (!hasRampart) continue
-        }
 
         shovePositions.push(pos)
     }

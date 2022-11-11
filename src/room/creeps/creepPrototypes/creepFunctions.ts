@@ -419,7 +419,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // If there is no construction target ID
 
-    if (!room.memory.cSiteTargetID) {
+    if (!room.memory.CSTID) {
         // Try to find a construction target. If none are found, stop
 
         room.findAllyCSiteTargetID(this)
@@ -427,7 +427,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Convert the construction target ID into a game object
 
-    let cSiteTarget = findObjectWithID(room.memory.cSiteTargetID)
+    let cSiteTarget = findObjectWithID(room.memory.CSTID)
 
     // If there is no construction target
 
@@ -439,7 +439,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Convert the construction target ID into a game object, stopping if it's undefined
 
-    cSiteTarget = findObjectWithID(room.memory.cSiteTargetID)
+    cSiteTarget = findObjectWithID(room.memory.CSTID)
 
     // Stop if the cSite is undefined
 

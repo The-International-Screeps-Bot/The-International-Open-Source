@@ -19,6 +19,7 @@ import { RemoteHarvester } from './roleManagers/remote/remoteSourceHarvester'
 import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
 import { RequestHauler } from './roleManagers/international/requestHauler'
+import { RangedDefender } from './roleManagers/commune/rangedDefender'
 
 export const creepClasses: { [key in CreepRoles]: any } = {
     source1Harvester: SourceHarvester,
@@ -32,6 +33,7 @@ export const creepClasses: { [key in CreepRoles]: any } = {
     hubHauler: HubHauler,
     fastFiller: FastFiller,
     meleeDefender: MeleeDefender,
+    rangedDefender: RangedDefender,
     remoteSourceHarvester0: RemoteHarvester,
     remoteSourceHarvester1: RemoteHarvester,
     remoteHauler: RemoteHauler,

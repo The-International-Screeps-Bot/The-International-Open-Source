@@ -106,6 +106,7 @@ declare global {
         | 'hubHauler'
         | 'fastFiller'
         | 'meleeDefender'
+        | 'rangedDefender'
         | 'remoteSourceHarvester0'
         | 'remoteSourceHarvester1'
         | 'remoteHauler'
@@ -189,6 +190,7 @@ declare global {
     }
 
     interface CombatStrength {
+        dismantle: number
         melee: number
         ranged: number
         heal: number
@@ -715,19 +717,8 @@ declare global {
         | 'highway'
         | 'intersection'
 
-    interface RoomType {
-        [property: string]: true
-    }
-
     interface PlayerInfo {
-        /**
-         * Defensive Threat, the enemy's perceived defensive ability
-         */
-        DT: number
-        /**
-         * Offensive Threat, the enemy's perceived offensive threat towards the bot
-         */
-        OT: number
+        data: number[]
     }
 
     interface Memory extends Settings {
@@ -876,7 +867,7 @@ declare global {
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
          */
-        creepsFromRoom: { [key: string]: string[] }
+        creepsFromRoom: Partial<{ [key in CreepRoles]: string[] }>
 
         /**
          * The cumulative amount of creeps with a communeName value of this room's name
@@ -950,6 +941,8 @@ declare global {
          * The carry parts needed to effectively run the commune
          */
         haulerNeed: number
+
+        usedRampartIDs: Set<Id<StructureRampart>>
 
         // Functions
 
@@ -1640,7 +1633,7 @@ declare global {
          */
         allyCreepRequest: string
 
-        cSiteTargetID: Id<ConstructionSite>
+        CSTID: Id<ConstructionSite>
 
         stampAnchors: Partial<Record<StampTypes, number[]>>
 
@@ -1684,14 +1677,24 @@ declare global {
         CP: string
 
         /**
-         * Defensive Threat
+         * Defensive Strength
          */
-        DT: number
+        DS: number
 
         /**
-         * Offensive Threat
+         * Offensive Strength
          */
-        OT: number
+        OS: number
+
+        /**
+         * Attack Threat, how much a commune is concerned about enemy attackers
+         */
+        AT: number
+
+        /**
+         * Last Attack Tick, how many ticks have passed since the last attack
+         */
+        LAT: number
 
         /**
          * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage
@@ -1878,12 +1881,26 @@ declare global {
          */
         readonly dying: boolean
 
-        _towerDamage: number
+        _macroHealStrength: number
 
         /**
-         * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
+         * The heal strength of the creep alongside its neighbours that we dopn't own
          */
-        readonly towerDamage: number
+        readonly macroHealStrength: number
+
+        _grossTowerDamage: number
+
+        /**
+         * The highest possible tower damage
+         */
+        readonly grossTowerDamage: number
+
+        _netTowerDamage: number
+
+        /**
+         * The highest possible tower damage, accounting for maximum possible enemy heal
+         */
+        readonly netTowerDamage: number
 
         _message: string
 
@@ -2167,6 +2184,11 @@ declare global {
          * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
          */
         ROS: boolean
+
+        /**
+         * Rampart ID, the ID of the rampart the creep is trying to sit under
+         */
+        RID: Id<StructureRampart>
     }
 
     // PowerCreeps

@@ -40,6 +40,7 @@ export class Quad {
         if (this._combatStrength) return this._combatStrength
 
         this._combatStrength = {
+            dismantle: 0,
             melee: 0,
             ranged: 0,
             heal: 0,

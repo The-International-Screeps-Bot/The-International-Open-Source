@@ -1,4 +1,4 @@
-import { roomDimensions, towerPowers } from 'international/constants'
+import { dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
 import { getRange, getRangeOfCoords } from 'international/utils'
 
 Object.defineProperties(Creep.prototype, {
@@ -78,45 +78,11 @@ Object.defineProperties(Creep.prototype, {
             return (this._reservation = this.memory.Rs[0])
         },
     },
-    towerDamage: {
+    macroHealStrength: {
         get() {
-            if (this._towerDamage) return this._towerDamage
+            if (this._macroHealStrength !== undefined) return this._macroHealStrength
 
-            const { room } = this
-
-            this._towerDamage = 0
-
-            for (const tower of room.structures.tower) {
-                if (!tower.RCLActionable) continue
-                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
-
-                let damage = TOWER_POWER_ATTACK
-
-                let range = getRangeOfCoords(this.pos, tower.pos)
-
-                if (range > TOWER_OPTIMAL_RANGE) {
-                    if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
-
-                    damage -=
-                        (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
-                        (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
-                }
-
-                for (const powerType of towerPowers) {
-                    const effect = tower.effectsData.get(powerType) as PowerEffect
-                    if (!effect) continue
-
-                    damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
-                }
-
-                this._towerDamage += Math.floor(damage)
-            }
-
-            this._towerDamage *= this.defenceStrength
-
-            // The enemy can't heal when we're in safemode, so don't calculate it
-
-            if (room.controller.safeMode) return this._towerDamage
+            this._macroHealStrength = this.combatStrength.heal
 
             // Find adjacent creeps
 
@@ -127,24 +93,43 @@ Object.defineProperties(Creep.prototype, {
 
             // Find adjacent creeps
 
-            const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+            const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
             // Loop through each adjacentCreep this creep
 
             for (const posData of adjacentCreeps) {
-                if (this.owner.username !== posData.creep.owner.username) continue
+                const { creep } = posData
 
-                const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
+                if (this.owner.username === Memory.me) {
+                    if (creep.owner.username !== Memory.me) continue
+                } else if (this.owner.username !== creep.owner.username) continue
+
+                const range = getRangeOfCoords(this.pos, creep.pos)
                 if (range > 3) continue
 
-                let healStrength = posData.creep.combatStrength.heal
-
+                let healStrength = creep.combatStrength.heal
                 if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
 
-                this._towerDamage -= healStrength
+                this._macroHealStrength += Math.floor(healStrength)
             }
 
-            return this._towerDamage
+            return this._macroHealStrength
+        },
+    },
+    netTowerDamage: {
+        get() {
+            if (this._netTowerDamage !== undefined) return this._netTowerDamage
+
+            this._netTowerDamage = this.grossTowerDamage
+            this._netTowerDamage *= this.defenceStrength
+
+            // The enemy can't heal when we're in safemode, so don't calculate it
+
+            if (this.room.controller.safeMode) return this._netTowerDamage
+
+            this._netTowerDamage -= this.macroHealStrength
+            
+            return this._netTowerDamage
         },
     },
     upgradeStrength: {
@@ -165,12 +150,22 @@ Object.defineProperties(Creep.prototype, {
             if (this._combatStrength) return this._combatStrength
 
             this._combatStrength = {
+                dismantle: 0,
                 melee: 0,
                 ranged: 0,
-                heal: 0
+                heal: 0,
             }
 
             for (const part of this.body) {
+                if (part.type === WORK) {
+
+                    const boost = part.boost as RESOURCE_CATALYZED_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_HYDRIDE
+
+                    this._combatStrength.dismantle +=
+                        DISMANTLE_POWER *
+                        (part.boost && dismantleBoosts.includes(boost) ? BOOSTS[part.type][boost].dismantle : 1)
+                    continue
+                }
 
                 if (part.type === ATTACK) {
                     this._combatStrength.melee += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
@@ -250,15 +245,67 @@ Object.defineProperties(PowerCreep.prototype, {
             return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
         },
     },
-    towerDamage: {
+    macroHealStrength: {
         get() {
-            if (this._towerDamage) return this._towerDamage
+            if (this._macroHealStrength !== undefined) return this._macroHealStrength
 
-            const { room } = this
+            this._macroHealStrength = 0
 
-            this._towerDamage = 0
+            // Find adjacent creeps
 
-            for (const tower of room.structures.tower) {
+            let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
+            let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0)
+            let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
+            let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
+
+            // Find adjacent creeps
+
+            const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+
+            // Loop through each adjacentCreep this creep
+
+            for (const posData of adjacentCreeps) {
+                const { creep } = posData
+
+                if (this.owner.username === Memory.me) {
+                    if (creep.owner.username !== Memory.me) continue
+                } else if (this.owner.username !== creep.owner.username) continue
+
+                const range = getRangeOfCoords(this.pos, creep.pos)
+                if (range > 3) continue
+
+                let healStrength = creep.combatStrength.heal
+                if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
+
+                this._macroHealStrength += Math.floor(healStrength)
+            }
+
+            return this._macroHealStrength
+        },
+    },
+    netTowerDamage: {
+        get() {
+            if (this._netTowerDamage !== undefined) return this._netTowerDamage
+
+            this._netTowerDamage = this.grossTowerDamage
+
+            // The enemy can't heal when we're in safemode, so don't calculate it
+
+            if (this.room.controller.safeMode) return this._netTowerDamage
+
+            return (this._netTowerDamage -= this.macroHealStrength)
+        },
+    },
+} as PropertyDescriptorMap & ThisType<PowerCreep>)
+
+const additions = {
+    grossTowerDamage: {
+        get() {
+            if (this._grossTowerDamage !== undefined) return this._grossTowerDamage
+
+            this._grossTowerDamage = 0
+
+            for (const tower of this.room.structures.tower) {
                 if (!tower.RCLActionable) continue
                 if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
 
@@ -281,45 +328,12 @@ Object.defineProperties(PowerCreep.prototype, {
                     damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
                 }
 
-                this._towerDamage += Math.floor(damage)
+                this._grossTowerDamage += Math.floor(damage)
             }
 
-            // The enemy can't heal when we're in safemode, so don't calculate it
-
-            if (room.controller.safeMode) return this._towerDamage
-
-            // Find adjacent creeps
-
-            let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
-            let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0)
-            let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
-            let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
-
-            // Find adjacent creeps
-
-            const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
-
-            // Loop through each adjacentCreep this creep
-
-            for (const posData of adjacentCreeps) {
-                if (this.owner.username !== posData.creep.owner.username) continue
-
-                const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
-                if (range > 3) continue
-
-                let healStrength = posData.creep.combatStrength.heal
-
-                if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
-
-                this._towerDamage -= healStrength
-            }
-
-            return this._towerDamage
+            return this._grossTowerDamage
         },
     },
-} as PropertyDescriptorMap & ThisType<PowerCreep>)
-
-const additions = {
     message: {
         get() {
             if (this._message) return this._message
@@ -351,7 +365,7 @@ const additions = {
             return x <= 0 || x >= 49 || y <= 0 || y >= 49
         },
     },
-} as (PropertyDescriptorMap & ThisType<Creep>) | ThisType<PowerCreep>
+} as PropertyDescriptorMap & (ThisType<Creep> | ThisType<PowerCreep>)
 
-Object.defineProperties(Creep.prototype, additions as PropertyDescriptorMap & ThisType<Creep>)
-Object.defineProperties(PowerCreep.prototype, additions as PropertyDescriptorMap & ThisType<PowerCreep>)
+Object.defineProperties(Creep.prototype, additions)
+Object.defineProperties(PowerCreep.prototype, additions)
