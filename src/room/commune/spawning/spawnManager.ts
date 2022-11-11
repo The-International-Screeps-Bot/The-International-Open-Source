@@ -50,6 +50,8 @@ export class SpawnManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
+        if (!this.communeManager.structures.spawn.length) return
+
         this.runSpawning()
         this.createPowerTasks()
         this.test()
