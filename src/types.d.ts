@@ -106,6 +106,7 @@ declare global {
         | 'hubHauler'
         | 'fastFiller'
         | 'meleeDefender'
+        | 'rangedDefender'
         | 'remoteSourceHarvester0'
         | 'remoteSourceHarvester1'
         | 'remoteHauler'
@@ -1873,12 +1874,26 @@ declare global {
          */
         readonly dying: boolean
 
-        _towerDamage: number
+        _macroHealStrength: number
 
         /**
-         * The amount of tower damage, accounting for maximum possible enemy heal, that can be done in the room
+         * The heal strength of the creep alongside its neighbours that we dopn't own
          */
-        readonly towerDamage: number
+        readonly macroHealStrength: number
+
+        _grossTowerDamage: number
+
+        /**
+         * The highest possible tower damage
+         */
+        readonly grossTowerDamage: number
+
+        _netTowerDamage: number
+
+        /**
+         * The highest possible tower damage, accounting for maximum possible enemy heal
+         */
+        readonly netTowerDamage: number
 
         _message: string
 

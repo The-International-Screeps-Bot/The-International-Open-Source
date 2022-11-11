@@ -146,9 +146,9 @@ export class DefenceManager {
 
             return (
                 creepA.hits / creepA.hitsMax -
-                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a) - creepA.combatStrength.heal) / creepA.hitsMax -
+                (creepA.hits + room.defenderEnemyTargetsWithDamage.get(a)) / creepA.hitsMax -
                 (creepB.hits / creepB.hitsMax -
-                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b) - creepB.combatStrength.heal) / creepB.hitsMax)
+                    (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b)) / creepB.hitsMax)
             )
         })
 
@@ -167,11 +167,11 @@ export class DefenceManager {
                 room.attackingDefenderIDs.delete(memberID)
             }
 
-            const netDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id) - enemyCreep.combatStrength.heal
+            const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
 
-            if (netDamage > 0) {
+            if (damage > 0) {
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
-                else if (netDamage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
+                else if (damage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
                     room.towerAttackTarget = enemyCreep
             }
 

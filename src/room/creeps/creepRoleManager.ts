@@ -27,11 +27,13 @@ import { CommuneManager } from 'room/commune/communeManager'
 import { RoomManager } from 'room/roomManager'
 import { globalStatsUpdater } from 'international/statsManager'
 import { RequestHauler } from './roleManagers/international/requestHauler'
+import { RangedDefender } from './roleManagers/commune/rangedDefender'
 
 // Construct managers
 
 const managers: { [key in CreepRoles]: Function } = {
     meleeDefender: MeleeDefender.meleeDefenderManager,
+    rangedDefender: RangedDefender.rangedDefenderManager,
     allyVanguard: AllyVanguard.allyVanguardManager,
     antifaRangedAttacker: Antifa.antifaManager,
     antifaAttacker: Antifa.antifaManager,

@@ -318,6 +318,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // Stop if avoidEnemyRanges isn't specified
 
                     if (!opts.avoidEnemyRanges) return
+                    if (room.controller && room.controller.safeMode && room.controller.my) return
 
                     for (const packedCoord of room.enemyThreatCoords) {
                         const coord = unpackCoord(packedCoord)
@@ -325,7 +326,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                if (opts.avoidNotMyCreeps) {
+                if (opts.avoidNotMyCreeps && !room.controller || !room.controller.safeMode) {
                     for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
                     for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 

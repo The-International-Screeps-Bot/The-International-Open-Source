@@ -66,11 +66,11 @@ export class TowerManager {
         for (const enemyCreep of room.enemyCreeps) {
             if (enemyCreep.isOnExit) continue
 
-            const towerDamage = enemyCreep.towerDamage
-            if (towerDamage < highestDamage) continue
+            const netTowerDamage = enemyCreep.netTowerDamage
+            if (netTowerDamage < highestDamage) continue
 
             room.towerAttackTarget = enemyCreep
-            highestDamage = towerDamage
+            highestDamage = netTowerDamage
         }
 
         if (!room.towerAttackTarget) {

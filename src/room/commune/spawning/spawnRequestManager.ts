@@ -6,6 +6,7 @@ import {
     controllerDowngradeUpgraderNeed,
     minHarvestWorkRatio,
     myColors,
+    numbersByStructureTypes,
     rampartUpkeepCost,
     RemoteData,
     remoteHarvesterRoles,
@@ -39,13 +40,18 @@ Room.prototype.spawnRequester = function () {
     const { terminal } = this
 
     let partsMultiplier: number
+    let spawnGroup: string[]
+    let role: CreepRoles
+    let priority: number
+    let minPriority: number
+    let maxPriority: number
 
     // Construct requests for sourceHarvesters
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             const sourceIndex = 0
-            const role = 'source1Harvester'
+            role = 'source1Harvester'
 
             const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
@@ -157,7 +163,7 @@ Room.prototype.spawnRequester = function () {
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
                 const sourceIndex = 1
-                const role = 'source2Harvester'
+                role = 'source2Harvester'
 
                 const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
 
@@ -273,7 +279,7 @@ Room.prototype.spawnRequester = function () {
 
             partsMultiplier = this.haulerNeed
 
-            const role = 'hauler'
+            role = 'hauler'
 
             // If all RCL 3 extensions are built
 
@@ -337,7 +343,7 @@ Room.prototype.spawnRequester = function () {
 
             if (spawnEnergyCapacity < minCost) return false
 
-            const role = 'mineralHarvester'
+            role = 'mineralHarvester'
 
             return {
                 role,
@@ -366,7 +372,7 @@ Room.prototype.spawnRequester = function () {
 
             if (!this.hubLink && (!terminal || this.controller.level < 6)) return false
 
-            const role = 'hubHauler'
+            role = 'hubHauler'
 
             return {
                 role,
@@ -403,7 +409,7 @@ Room.prototype.spawnRequester = function () {
             else if (this.controller.level >= 7) defaultParts = [CARRY, MOVE, CARRY, CARRY]
             else defaultParts = [CARRY, MOVE, CARRY]
 
-            const role = 'fastFiller'
+            role = 'fastFiller'
 
             return {
                 role,
@@ -438,58 +444,119 @@ Room.prototype.spawnRequester = function () {
 
     // Construct requests for meleeDefenders
 
-    this.constructSpawnRequests(
-        ((): SpawnRequestOpts | false => {
-            if (!this.towerInferiority) return false
-            /* if (!this.enemyAttackers.length) return false */
+    if (!this.towerInferiority) {
 
-            // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
+        // Defenders
 
-            let requiredStrength = 1
-            if (!this.controller.safeMode) {
-                requiredStrength += healStrength
-                if (!this.structures.tower.length) requiredStrength += attackStrength
-            }
+        minPriority = 6
+        maxPriority = minRemotePriority - 1
 
-            requiredStrength *= 1.5
+        // Melee defender
 
-            const priority = Math.min(6 + this.myCreeps.meleeDefender.length * 0.5, 8)
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
 
-            const role = 'meleeDefender'
+                role = 'meleeDefender'
 
-            // If all RCL 3 extensions are build
+                // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
-            if (spawnEnergyCapacity >= 800) {
-                const extraParts = [ATTACK, ATTACK, MOVE]
-                const strength = ATTACK_POWER * 2
+                let requiredStrength = 1
+                if (!this.controller.safeMode) {
+                    requiredStrength += healStrength
+                    if (!this.structures.tower.length) requiredStrength += attackStrength
+                }
+
+                requiredStrength *= 1.5
+
+                const priority = Math.min(minPriority + this.myCreeps[role].length * 0.5, maxPriority)
+
+                // If all RCL 3 extensions are build
+
+                if (spawnEnergyCapacity >= 800) {
+                    const extraParts = [ATTACK, ATTACK, MOVE]
+                    const strength = ATTACK_POWER * 2
+
+                    return {
+                        role,
+                        defaultParts: [],
+                        extraParts,
+                        partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
+                        minCost: 210,
+                        priority,
+                        memoryAdditions: {},
+                        threshold: 0.1,
+                    }
+                }
+
+                const extraParts = [ATTACK, MOVE]
+                const strength = ATTACK_POWER
 
                 return {
                     role,
                     defaultParts: [],
                     extraParts,
-                    partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
-                    minCost: 210,
+                    partsMultiplier: Math.max(requiredStrength / strength, 1),
+                    minCost: 260,
                     priority,
                     memoryAdditions: {},
-                    threshold: 0.1,
+                    threshold: 0,
                 }
-            }
+            })(),
+        )
 
-            const extraParts = [ATTACK, MOVE]
-            const strength = ATTACK_POWER
+        // Ranged defender
 
-            return {
-                role,
-                defaultParts: [],
-                extraParts,
-                partsMultiplier: Math.max(requiredStrength / strength, 1),
-                minCost: 260,
-                priority,
-                memoryAdditions: {},
-                threshold: 0,
-            }
-        })(),
-    )
+        this.constructSpawnRequests(
+            ((): SpawnRequestOpts | false => {
+
+                role = 'rangedDefender'
+
+                // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
+
+                let requiredStrength = 1
+                if (!this.controller.safeMode) {
+                    requiredStrength += healStrength
+                    if (!this.structures.tower.length) requiredStrength += attackStrength
+                }
+
+                requiredStrength *= 1
+
+                const priority = Math.min(minPriority + .1 + this.myCreeps[role].length * 1, maxPriority)
+
+                // If all RCL 3 extensions are build
+
+                if (spawnEnergyCapacity >= 800) {
+                    const extraParts = [RANGED_ATTACK, RANGED_ATTACK, MOVE]
+                    const strength = RANGED_ATTACK_POWER * 2
+
+                    return {
+                        role,
+                        defaultParts: [],
+                        extraParts,
+                        partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
+                        minCost: 210,
+                        priority,
+                        memoryAdditions: {},
+                        threshold: 0.1,
+                    }
+                }
+
+                const extraParts = [RANGED_ATTACK, MOVE]
+                const strength = RANGED_ATTACK_POWER
+
+                return {
+                    role,
+                    defaultParts: [],
+                    extraParts,
+                    partsMultiplier: Math.max(requiredStrength / strength, 1),
+                    minCost: 260,
+                    priority,
+                    memoryAdditions: {},
+                    threshold: 0,
+                }
+            })(),
+        )
+    }
 
     // Get the estimates income
 
@@ -506,7 +573,7 @@ Room.prototype.spawnRequester = function () {
             if (!this.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
             let priority = 9
-            let partsMultiplier = 0
+            partsMultiplier = 0
 
             // If there is an active storage
 
@@ -531,7 +598,7 @@ Room.prototype.spawnRequester = function () {
                 if (spawnEnergyCapacity >= 800) partsMultiplier *= 1.2
             }
 
-            const role = 'builder'
+            role = 'builder'
 
             // If there is a storage or terminal
 
@@ -605,8 +672,11 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            let priority = 7
-            if (!this.towerInferiority) priority += this.creepsFromRoom.maintainer.length * 0.5
+
+            minPriority = 7
+            maxPriority = minRemotePriority - 0.5
+
+            priority = Math.min(minPriority + this.creepsFromRoom.maintainer.length * 0.5, maxPriority)
 
             // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
@@ -626,7 +696,7 @@ Room.prototype.spawnRequester = function () {
 
             // Construct the partsMultiplier
 
-            let partsMultiplier = 1
+            partsMultiplier = 1
 
             // For each road, add a multiplier
 
@@ -652,7 +722,7 @@ Room.prototype.spawnRequester = function () {
                     2,
                 )
 
-            const role = 'maintainer'
+            role = 'maintainer'
 
             // If all RCL 3 extensions are build
 
@@ -690,7 +760,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            let partsMultiplier = 1
+            partsMultiplier = 1
             let maxCreeps = this.upgradePositions.length - 1
             const priority = 9
 
@@ -768,7 +838,7 @@ Room.prototype.spawnRequester = function () {
             if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
             const threshold = 0.05
-            const role = 'controllerUpgrader'
+            role = 'controllerUpgrader'
 
             // If the controllerContainer or controllerLink exists
 
@@ -950,7 +1020,7 @@ Room.prototype.spawnRequester = function () {
         const remote = Game.rooms[remoteName]
         const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100
 
-        const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
+        role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
             | 'remoteSourceHarvester0'
             | 'remoteSourceHarvester1'
 
@@ -1083,7 +1153,7 @@ Room.prototype.spawnRequester = function () {
 
                 if (remoteData[RemoteData.remoteReserver] <= 0) return false
 
-                const role = 'remoteReserver'
+                role = 'remoteReserver'
 
                 return {
                     role,
@@ -1141,7 +1211,7 @@ Room.prototype.spawnRequester = function () {
                     return false
                 }
 
-                const role = 'remoteDefender'
+                role = 'remoteDefender'
                 const extraParts: BodyPartConstant[] = []
 
                 for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
@@ -1186,7 +1256,7 @@ Room.prototype.spawnRequester = function () {
                 const extraParts = [ATTACK, MOVE]
                 const minCost = cost * extraParts.length
 
-                const role = 'remoteCoreAttacker'
+                role = 'remoteCoreAttacker'
 
                 return {
                     role,
@@ -1217,7 +1287,7 @@ Room.prototype.spawnRequester = function () {
                 const cost = 150
                 const extraParts = [WORK, MOVE]
 
-                const role = 'remoteDismantler'
+                role = 'remoteDismantler'
 
                 return {
                     role,
@@ -1265,7 +1335,7 @@ Room.prototype.spawnRequester = function () {
                }
  */
 
-            const role = 'remoteHauler'
+            role = 'remoteHauler'
 
             return {
                 role,
@@ -1285,7 +1355,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const role = 'scout'
+            role = 'scout'
 
             return {
                 role,
@@ -1311,7 +1381,7 @@ Room.prototype.spawnRequester = function () {
                 if (!request.data[ClaimRequestData.claimer]) return false
                 if (request.data[ClaimRequestData.claimer] <= 0) return false
 
-                const role = 'claimer'
+                role = 'claimer'
 
                 return {
                     role,
@@ -1335,7 +1405,7 @@ Room.prototype.spawnRequester = function () {
                 if (!request.data[ClaimRequestData.vanguard]) return false
                 if (request.data[ClaimRequestData.vanguard] <= 0) return false
 
-                const role = 'vanguard'
+                role = 'vanguard'
 
                 return {
                     role,
@@ -1365,7 +1435,7 @@ Room.prototype.spawnRequester = function () {
 
                 if (allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard] <= 0) return false
 
-                const role = 'allyVanguard'
+                role = 'allyVanguard'
 
                 return {
                     role,
@@ -1392,7 +1462,7 @@ Room.prototype.spawnRequester = function () {
 
                 partsMultiplier = 100
 
-                const role = 'requestHauler'
+                role = 'requestHauler'
 
                 return {
                     role,
@@ -1440,8 +1510,8 @@ Room.prototype.spawnRequester = function () {
 
             this.constructSpawnRequests(
                 ((): SpawnRequestOpts | false => {
-                    const role = 'antifaRangedAttacker'
-                    const spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    role = 'antifaRangedAttacker'
+                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minHealCost
                     const extraParts: BodyPartConstant[] = []
 
@@ -1486,8 +1556,8 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                const role = 'antifaRangedAttacker'
-                const spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                role = 'antifaRangedAttacker'
+                spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                 const minCost = minRangedAttackCost + minHealCost
                 const extraParts: BodyPartConstant[] = []
 
@@ -1526,8 +1596,8 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                const role = 'antifaDismantler'
-                const spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                role = 'antifaDismantler'
+                spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                 const minCost = minDismantleCost
                 let extraParts: BodyPartConstant[] = []
 
@@ -1562,8 +1632,8 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                const role = 'antifaAttacker'
-                const spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                role = 'antifaAttacker'
+                spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                 const minCost = minAttackCost
                 let extraParts: BodyPartConstant[] = []
 
@@ -1602,8 +1672,8 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                const role = 'antifaHealer'
-                const spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                role = 'antifaHealer'
+                spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                 const minCost = minHealCost
                 let extraParts: BodyPartConstant[] = []
 
