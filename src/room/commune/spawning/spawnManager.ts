@@ -18,7 +18,7 @@ export class SpawnManager {
      * Find spawns that are inactive and active
      * Assign spawnIDs to creeps
      */
-    public preTickRun() {
+    public organizeSpawns() {
 
         const spawns = this.communeManager.structures.spawn
         if (!spawns.length) return
@@ -32,7 +32,7 @@ export class SpawnManager {
             if (spawn.spawning) {
                 const creep = Game.creeps[spawn.spawning.name]
                 creep.spawnID = spawn.id
-                customLog('SPAWNID ASSIGNMENT', creep)
+
                 this.activeSpawns.push(spawn)
                 continue
             }

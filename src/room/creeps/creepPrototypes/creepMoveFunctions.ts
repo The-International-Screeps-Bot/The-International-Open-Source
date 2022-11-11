@@ -199,7 +199,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.spawning) {
 
         const spawn = findObjectWithID(this.spawnID)
-        customLog('SPAWN ISSUES', this.spawnID + ', ' + spawn)
+
         if (spawn.spawning.remainingTime <= 1) this.assignMoveRequest(path[0])
 
         // Ensure we aren't using the default direction

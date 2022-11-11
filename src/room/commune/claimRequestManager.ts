@@ -10,6 +10,23 @@ export class ClaimRequestManager {
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
     }
+
+    preTickRun() {
+        const { room } = this.communeManager
+
+        // create a claimRequet if needed
+
+        if (room.structures.spawn.length) return
+
+        if (Memory.claimRequests[room.name]) return
+
+        const request = (Memory.claimRequests[room.name] = {
+            data: [0],
+        })
+
+        request.data[ClaimRequestData.score] = 0
+    }
+
     public run() {
         const { room } = this.communeManager
 
@@ -108,7 +125,8 @@ export class ClaimRequestManager {
                 request.data[ClaimRequestData.minHeal] -= allyCreep.combatStrength.ranged
             }
 
-            if (request.data[ClaimRequestData.minDamage] > 0 || request.data[ClaimRequestData.minHeal] > 0) request.data[ClaimRequestData.abandon] = 20000
+            if (request.data[ClaimRequestData.minDamage] > 0 || request.data[ClaimRequestData.minHeal] > 0)
+                request.data[ClaimRequestData.abandon] = 20000
         }
 
         // If CPU logging is enabled, log the CPU used by this manager

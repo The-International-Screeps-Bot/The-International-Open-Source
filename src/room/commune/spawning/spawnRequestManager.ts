@@ -517,8 +517,6 @@ Room.prototype.spawnRequester = function () {
                     if (!this.structures.tower.length) requiredStrength += attackStrength
                 }
 
-                requiredStrength *= 1
-
                 const priority = Math.min(minPriority + .1 + this.myCreeps[role].length * 0.75, maxPriority)
 
                 // If all RCL 3 extensions are build
@@ -669,7 +667,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
 
-            minPriority = 7
+            minPriority = 6
             maxPriority = minRemotePriority - 0.5
 
             priority = Math.min(minPriority + this.creepsFromRoom.maintainer.length * 0.5, maxPriority)

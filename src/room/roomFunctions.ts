@@ -636,6 +636,13 @@ Room.prototype.scoutEnemyRoom = function () {
         player.data[PlayerData.defensiveStrength],
     )
 
+    // Combat request creation
+
+    this.createAttackCombatRequest({
+        minHeal: 10 + ((this.structures.tower.length * TOWER_POWER_ATTACK) / 4) * 1.1,
+        minDamage: 10 + avgRampartHits / RANGED_ATTACK_POWER / 200,
+    })
+
     return roomMemory.T
 }
 
@@ -873,38 +880,86 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
     return this.memory.T
 }
 
-Room.prototype.createAttackCombatRequest = function () {
+Room.prototype.createAttackCombatRequest = function (opts) {
     if (!Memory.autoAttack) return
-    if (Memory.combatRequests[this.name]) return
-    if (!this.enemyCreeps.length) return
-    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
-    if (this.enemyAttackers.length > 0) return
 
-    const request = (Memory.combatRequests[this.name] = {
+    let request = Memory.combatRequests[this.name]
+    if (request) {
+        if (request.T !== 'attack') return
+
+        if (!opts) return
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+
+        return
+    }
+
+    if (
+        !this.enemyCreeps.length &&
+        !this.find(FIND_HOSTILE_STRUCTURES).find(structure => structure.structureType !== STRUCTURE_CONTROLLER)
+    )
+        return
+    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
+
+    request = Memory.combatRequests[this.name] = {
         T: 'attack',
         data: [0],
-    })
+    }
 
     request.data[CombatRequestData.minDamage] = 10
     request.data[CombatRequestData.minHeal] = 10
     request.data[CombatRequestData.quadCount] = 1
+
+    if (opts) {
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+        return
+    }
 }
 
-Room.prototype.createHarassCombatRequest = function () {
+Room.prototype.createHarassCombatRequest = function (opts) {
     if (!Memory.autoAttack) return
-    if (Memory.combatRequests[this.name]) return
+
+    let request = Memory.combatRequests[this.name]
+    if (request) {
+        if (request.T !== 'harass') return
+
+        if (!opts) return
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+
+        return
+    }
+
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
     if (this.enemyAttackers.length > 0) return
 
-    const request = (Memory.combatRequests[this.name] = {
+    request = Memory.combatRequests[this.name] = {
         T: 'harass',
         data: [0],
-    })
+    }
 
     request.data[CombatRequestData.attack] = 3
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
+
+    if (opts) {
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+        return
+    }
+
     /*
     const structures = this.dismantleTargets
 
@@ -917,12 +972,24 @@ Room.prototype.createHarassCombatRequest = function () {
 }
 
 Room.prototype.createDefendCombatRequest = function (opts) {
-    if (Memory.combatRequests[this.name]) return
+    let request = Memory.combatRequests[this.name]
+    if (request) {
+        if (request.T !== 'defend') return
 
-    const request = (Memory.combatRequests[this.name] = {
+        if (!opts) return
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+
+        return
+    }
+
+    request = Memory.combatRequests[this.name] = {
         T: 'defend',
         data: [0],
-    })
+    }
 
     request.data[CombatRequestData.inactionTimer] = 0
     request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
@@ -2063,6 +2130,7 @@ Room.prototype.createClaimRequest = function () {
     score += this.sourcePaths[0].length / 10
     score += this.sourcePaths[1].length / 10
     score += this.upgradePathLength / 10
+    score += this.memory.stampAnchors.rampart.length / 10
     score += this.findSwampPlainsRatio() * 10
 
     request.data[ClaimRequestData.score] = score

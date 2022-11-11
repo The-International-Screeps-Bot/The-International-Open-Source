@@ -199,8 +199,8 @@ export class DefenceManager {
         // There is tower inferiority, make a defend request
 
         room.createDefendCombatRequest({
-            minDamage,
-            minHeal,
+            minDamage: 10,
+            minHeal: 10,
             quadCount: 1,
         })
     }

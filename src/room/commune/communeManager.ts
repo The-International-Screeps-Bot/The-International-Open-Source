@@ -110,7 +110,6 @@ export class CommuneManager {
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
-        this.spawnManager.preTickRun()
 
         // Add roomName to commune list
 
@@ -176,6 +175,7 @@ export class CommuneManager {
         this.room.factoryManager()
         this.labManager.run()
         this.powerSpawnManager.run()
+        this.spawnManager.organizeSpawns()
 
         this.room.roomManager.creepRoleManager.run()
         this.room.roomManager.powerCreepRoleManager.run()
