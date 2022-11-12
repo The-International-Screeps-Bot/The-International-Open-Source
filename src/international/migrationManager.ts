@@ -98,13 +98,10 @@ class MigrationManager {
 
                 if (!room.controller.my) continue
 
-                for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+                for (const remoteName of room.memory.remotes) {
 
-                    const remoteName = room.memory.remotes[index]
                     const remoteMemory = Memory.rooms[remoteName]
 
-                    room.memory.remotes.splice(index, 1)
-                    delete remoteMemory.CN
                     remoteMemory.T = 'neutral'
                 }
 
