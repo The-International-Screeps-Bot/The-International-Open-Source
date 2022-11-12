@@ -76,7 +76,7 @@ export class ClaimRequestManager {
         }
 
         const requestRoom = Game.rooms[requestName]
-        if (!requestRoom || !requestRoom.controller.my) {
+        if (!requestRoom || (!requestRoom.controller.my && !requestRoom.controller.reservation)) {
             request.data[ClaimRequestData.claimer] = 1
             return
         }
