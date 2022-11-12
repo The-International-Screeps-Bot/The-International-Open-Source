@@ -696,7 +696,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     this.createAttackCombatRequest({
         minHeal: 10 + ((this.structures.tower.length * TOWER_POWER_ATTACK) / 4) * 1.1,
-        minDamage: 10 + avgRampartHits / RANGED_ATTACK_POWER / 200,
+        minDamage: 50,
     })
 
     return roomMemory.T
