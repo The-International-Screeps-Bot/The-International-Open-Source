@@ -102,6 +102,7 @@ class MigrationManager {
 
                     const remoteMemory = Memory.rooms[remoteName]
 
+                    delete remoteMemory.CN
                     remoteMemory.T = 'neutral'
                 }
 
