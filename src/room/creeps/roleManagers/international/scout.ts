@@ -171,7 +171,7 @@ export class Scout extends Creep {
 
             // Otherwise assign the signMessage the commune sign
 
-            signMessage = communeSign[0]
+            signMessage = communeSign
         }
 
         // Otherwise if the room is not a commune

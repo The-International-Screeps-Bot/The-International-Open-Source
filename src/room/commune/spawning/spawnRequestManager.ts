@@ -1350,12 +1350,16 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             role = 'scout'
 
+            let minCreeps: number
+            if (this.structures.observer.length) minCreeps = 1
+            else minCreeps = 2
+
             return {
                 role,
                 defaultParts: [],
                 extraParts: [MOVE],
                 partsMultiplier: 1,
-                minCreeps: this.controller.level === 8 ? 1 : 2,
+                minCreeps,
                 minCost: 50,
                 priority: 5,
                 memoryAdditions: {},
