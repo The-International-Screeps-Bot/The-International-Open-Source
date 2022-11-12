@@ -49,7 +49,7 @@ import { playerManager } from 'international/players'
 global.profiler = initProfiler()
 
 export const loop = ErrorMapper.wrapLoop((): void => {
-    if (Game.cpu.bucket < 100) {
+    if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
         console.log('SKIPPING TICK due to low bucket:' + Game.cpu.bucket)
         return
     }

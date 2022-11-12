@@ -99,9 +99,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             if (opts.origin.roomName === goal.pos.roomName) continue
 
             function weightRoom(roomName: string) {
-                if (Game.map.getRoomStatus(roomName).status !== Game.map.getRoomStatus(opts.origin.roomName).status)
-                    return Infinity
-
                 const roomMemory = Memory.rooms[roomName]
                 if (!roomMemory) {
                     if (roomName === goal.pos.roomName) return 1
@@ -140,8 +137,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 const exits = Game.map.describeExits(roomRoute.room)
                 for (const exit in exits) {
                     const roomName = exits[exit as ExitKey]
-
-                    if (Game.map.getRoomStatus(roomName).status !== Game.map.getRoomStatus(opts.origin.roomName).status) continue
 
                     if (weightRoom(roomName) > 1) continue
 
