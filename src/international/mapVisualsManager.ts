@@ -99,7 +99,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                         Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
 
                     Game.map.visual.text(
-                        `⛏️${income},🚶‍♀️${roomMemory.SE[sourceIndex]}`,
+                        `⛏️${income},🚶‍♀️${roomMemory.SPs[sourceIndex].length}`,
                         new RoomPosition(positions[0].x, positions[0].y, roomName),
                         {
                             align: 'center',

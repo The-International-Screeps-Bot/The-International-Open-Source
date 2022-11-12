@@ -88,6 +88,31 @@ class MigrationManager {
 
             Memory.breakingVersion += 1
         }
+        if (Memory.breakingVersion === 87) {
+
+            for (const roomName in Game.rooms) {
+
+                const room = Game.rooms[roomName]
+
+                if (!room.controller) continue
+
+                if (!room.controller.my) continue
+
+                for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+
+                    const remoteName = room.memory.remotes[index]
+                    const remoteMemory = Memory.rooms[remoteName]
+
+                    room.memory.remotes.splice(index, 1)
+                    delete remoteMemory.CN
+                    remoteMemory.T = 'neutral'
+                }
+
+                room.memory.remotes = []
+            }
+
+            Memory.breakingVersion += 1
+        }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
             global.killCreeps()

@@ -19,11 +19,11 @@ export class HaulerNeedManager {
             room.haulerNeed += findCarryPartsRequired(room.sourcePaths[index].length, room.estimatedSourceIncome[index])
         }
 
-        if (room.controllerLink) room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
+        if (!room.controllerLink) room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
 
-        room.haulerNeed += room.structures.lab.length / 2
+        room.haulerNeed += room.structures.lab.length / 3
 
-        room.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
+        room.haulerNeed += Memory.stats.rooms[room.name].eosp / 50
 
         room.haulerNeed = Math.floor(room.haulerNeed)
     }

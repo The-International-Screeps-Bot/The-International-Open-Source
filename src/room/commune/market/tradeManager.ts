@@ -134,7 +134,7 @@ export class TradeManager {
         const { room } = this.communeManager
         const { terminal } = room
 
-        let targetAmount = this.communeManager.storedEnergyMin * 1.5
+        let targetAmount = this.communeManager.minStoredEnergy * 1.5
         let resource: MarketResourceConstant = RESOURCE_ENERGY
 
         // If the terminal has less than x energy in the terminal, request y
@@ -210,7 +210,7 @@ export class TradeManager {
             // If the resourceType is energy
 
             if (request.resourceType === RESOURCE_ENERGY) {
-                if (room.resourcesInStoringStructures.energy < room.communeManager.storedEnergyMin * 2) continue
+                if (room.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy * 2) continue
 
                 // If the terminal doesn't have enough, iterate
 

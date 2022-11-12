@@ -21,7 +21,7 @@ export class HaulRequestManager {
             if (
                 !request ||
                 !room.structures.spawn.length ||
-                room.resourcesInStoringStructures.energy < this.communeManager.storedEnergyMin
+                room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy
             ) {
                 this.communeManager.room.memory.combatRequests.splice(index, 1)
                 continue

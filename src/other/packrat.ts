@@ -173,6 +173,11 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
      return new RoomPosition(coord.x, coord.y, roomName)
 }
 
+export function reverseCoordList(coordList: string) {
+
+     return coordList.match(/.{1,2}/g).reverse().join('')
+}
+
 /**
  * Packs a list of coords as a utf-16 string. This is better than having a list of packed coords, as it avoids
  * extra commas and "" when memory gets stringified.
