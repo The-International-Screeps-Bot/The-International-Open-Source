@@ -627,7 +627,7 @@ Object.defineProperties(Room.prototype, {
                 const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
 
-                const sources = this.sourcePositions.sort((a, b) => {
+                const sources = Array.from(this.sourcePositions).sort((a, b) => {
                     return (
                         this.advancedFindPath({
                             origin: a[0],
@@ -661,7 +661,7 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.anchor) return this._sourcePaths
 
-            const sources = this.sourcePositions.sort((a, b) => {
+            const sources = Array.from(this.sourcePositions).sort((a, b) => {
                 return (
                     this.advancedFindPath({
                         origin: a[0],
