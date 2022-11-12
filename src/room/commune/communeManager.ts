@@ -113,6 +113,7 @@ export class CommuneManager {
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
+        this.claimRequestManager.preTickRun()
 
         // Add roomName to commune list
 
