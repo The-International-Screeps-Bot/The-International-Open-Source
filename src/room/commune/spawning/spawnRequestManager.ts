@@ -18,7 +18,6 @@ import {
     customLog,
     findCarryPartsRequired,
     findLinkThroughput,
-    findRemoteSourcesByEfficacy,
     getRange,
     getRangeOfCoords,
 } from 'international/utils'
@@ -517,8 +516,6 @@ Room.prototype.spawnRequester = function () {
                     if (!this.structures.tower.length) requiredStrength += attackStrength
                 }
 
-                requiredStrength *= 1
-
                 const priority = Math.min(minPriority + .1 + this.myCreeps[role].length * 0.75, maxPriority)
 
                 // If all RCL 3 extensions are build
@@ -568,7 +565,7 @@ Room.prototype.spawnRequester = function () {
 
             if (!this.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
-            let priority = 9
+            let priority = 8
             partsMultiplier = 0
 
             // If there is an active storage
@@ -669,7 +666,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
 
-            minPriority = 7
+            minPriority = 6
             maxPriority = minRemotePriority - 0.5
 
             priority = Math.min(minPriority + this.creepsFromRoom.maintainer.length * 0.5, maxPriority)
@@ -683,7 +680,7 @@ Room.prototype.spawnRequester = function () {
             // Get ramparts below their max hits
 
             const ramparts = this.structures.rampart.filter(
-                rampart => rampart.hits < Math.floor(Math.pow((this.controller.level - 3) * 10, 4.5)),
+                rampart => rampart.hits < this.communeManager.minRampartHits,
             )
 
             // If there are no ramparts or repair targets
@@ -758,7 +755,7 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             partsMultiplier = 1
             let maxCreeps = this.upgradePositions.length - 1
-            const priority = 9
+            const priority = 8
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 
@@ -1039,7 +1036,7 @@ Room.prototype.spawnRequester = function () {
         const remoteMemory = Memory.rooms[remoteName]
         const remoteData = Memory.rooms[remoteName].data
         const remote = Game.rooms[remoteName]
-        const priority = minRemotePriority + 1 + remoteMemory.SE[sourceIndex] / 100
+        const priority = minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100
 
         role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
             | 'remoteSourceHarvester0'
@@ -1129,7 +1126,7 @@ Room.prototype.spawnRequester = function () {
 
             // Loop through each index of sourceEfficacies
 
-            for (let index = 0; index < remoteMemory.SE.length; index += 1) {
+            for (let index = 0; index < remoteMemory.SPs.length; index += 1) {
                 // Get the income based on the reservation of the this and remoteHarvester need
                 // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
@@ -1144,7 +1141,7 @@ Room.prototype.spawnRequester = function () {
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SE[index], income)
+                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SPs[index].length, income)
             }
         }
 

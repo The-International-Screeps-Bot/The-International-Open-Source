@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange } from 'international/utils'
+import { createPosMap, customLog, findClosestObject, getRange, unpackNumAsCoord } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -7,7 +7,7 @@ import './defence'
 import './allyCreepRequestManager'
 import './claimRequestManager'
 import './combatRequestManager'
-import { creepRoles, myColors, remoteRoles, roomDimensions, stamps } from 'international/constants'
+import { creepRoles, impassibleStructureTypesSet, myColors, remoteRoles, roomDimensions, stamps } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
 import './towers'
@@ -28,6 +28,7 @@ import { SpawnManager } from './spawning/spawnManager'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeedManager'
+import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
 
 export class CommuneManager {
     defenceManager: DefenceManager
@@ -104,13 +105,14 @@ export class CommuneManager {
             room.memory.HU = 0
         }
 
+        if (roomMemory.AT == undefined) roomMemory.AT = 0
+
         room.usedRampartIDs = new Set()
 
         this.haulerSizeManager.preTickRun()
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
-        this.spawnManager.preTickRun()
 
         // Add roomName to commune list
 
@@ -176,6 +178,7 @@ export class CommuneManager {
         this.room.factoryManager()
         this.labManager.run()
         this.powerSpawnManager.run()
+        this.spawnManager.organizeSpawns()
 
         this.room.roomManager.creepRoleManager.run()
         this.room.roomManager.powerCreepRoleManager.run()
@@ -189,8 +192,6 @@ export class CommuneManager {
     }
 
     private test() {
-
-        customLog('HAULER NEED', this.room.haulerNeed)
 
         return
 
@@ -216,7 +217,14 @@ export class CommuneManager {
     /**
      * The minimum amount of stored energy the room should only use in emergencies
      */
-    get storedEnergyMin() {
-        return Math.pow(this.room.controller.level * 8000, 1.05)
+    get minStoredEnergy() {
+        return Math.floor(Math.pow(this.room.controller.level * 8000, 1.05) + this.room.memory.AT * 20)
+    }
+
+    get minRampartHits() {
+
+        const level = this.room.controller.level
+
+        return Math.min(Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * level * 10), RAMPART_HITS_MAX[level])
     }
  }

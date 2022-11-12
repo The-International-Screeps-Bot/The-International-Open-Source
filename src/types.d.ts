@@ -155,7 +155,7 @@ declare global {
          * An object with keys of weights and values of positions
          */
 
-        weightPositions?: { [weight: string]: Coord[] | RoomPosition[] }
+        weightCoords?: { [roomName: string]: { [packedCoord: string]: number } }
 
         /**
          *
@@ -186,7 +186,7 @@ declare global {
          */
         myRampartWeight?: number
 
-        weightStampAnchors?: boolean
+        weightStructurePlans?: boolean
     }
 
     interface CombatStrength {
@@ -797,11 +797,6 @@ declare global {
         // RoomObjects
 
         stampAnchors: StampAnchors
-
-        /**
-         * packed
-         */
-        sourcePaths: string[]
 
         source1PathLength: number
 
@@ -1562,11 +1557,6 @@ declare global {
         CN: string
 
         /**
-         * Source Efficacies, An array of path distances from the remote's sources to its commune
-         */
-        SE: number[]
-
-        /**
          * Reservation Efficacy, the path distance from the remote's sources to its commune
          */
         RE: number
@@ -1665,6 +1655,11 @@ declare global {
          * Source Positions, packed positions around sources where harvesters can sit
          */
         SP: string[]
+
+        /**
+         * Source Paths
+         */
+        SPs: string[]
 
         /**
          * Mineral Positions, packed positions around the mineral where harvesters can sit
@@ -1781,6 +1776,11 @@ declare global {
          *
          */
         needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean
+
+        /**
+         *
+         */
+        createMoveRequestByPath(opts: MoveRequestOpts, packedPath: string, loose?: boolean): boolean | 'unpathable'
 
         /**
          *

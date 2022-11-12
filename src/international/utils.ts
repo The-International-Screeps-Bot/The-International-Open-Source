@@ -421,26 +421,6 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
     return undefined
 }
 
-export function findRemoteSourcesByEfficacy(roomName: string): ('source1' | 'source2')[] {
-    // Get the room's sourceNames
-
-    const sourceNames: ('source1' | 'source2')[] = ['source1', 'source2']
-
-    // Get the remote's sourceEfficacies
-
-    const sourceEfficacies = Memory.rooms[roomName].SE
-
-    // Limit sourceNames to the number of sourceEfficacies
-
-    if (sourceNames.length > sourceEfficacies.length) sourceNames.splice(sourceEfficacies.length - 1, 1)
-
-    // Sort sourceNames by efficacy, informing the result
-
-    return sourceNames.sort(function (a, b) {
-        return Memory.rooms[roomName].SE[sourceNames.indexOf(a)] - Memory.rooms[roomName].SE[sourceNames.indexOf(b)]
-    })
-}
-
 /**
  * Finds the largest possible transaction amount given a budget and starting amount
  * @param budget The number of energy willing to be invested in the trade

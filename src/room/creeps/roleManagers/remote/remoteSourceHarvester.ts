@@ -7,7 +7,7 @@ import {
     getRangeOfCoords,
     randomTick,
 } from 'international/utils'
-import { unpackPos, unpackPosList } from 'other/packrat'
+import { reverseCoordList, unpackPos, unpackPosList } from 'other/packrat'
 import { RemoteHauler } from './remoteHauler'
 
 export class RemoteHarvester extends Creep {
@@ -27,7 +27,7 @@ export class RemoteHarvester extends Creep {
         if (this.memory.RN) {
             if (
                 this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].SE[this.memory.SI]
+                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].SPs[this.memory.SI].length
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -243,16 +243,22 @@ export class RemoteHarvester extends Creep {
 
         this.say(`⏩ ${sourceIndex}`)
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: new RoomPosition(harvestPos.x, harvestPos.y, this.memory.RN),
-                    range: 0,
-                },
-            ],
-            avoidEnemyRanges: true,
-        })
+        const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
+
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: new RoomPosition(harvestPos.x, harvestPos.y, this.memory.RN),
+                        range: 0,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            },
+            packedPath,
+            true,
+        )
 
         return true
     }
@@ -275,15 +281,20 @@ export class RemoteHarvester extends Creep {
 
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: creep.commune.anchor,
-                            range: 5,
-                        },
-                    ],
-                })
+                const packedPath = Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]
+
+                creep.createMoveRequestByPath(
+                    {
+                        origin: creep.pos,
+                        goals: [
+                            {
+                                pos: creep.commune.anchor,
+                                range: 5,
+                            },
+                        ],
+                    },
+                    packedPath,
+                )
 
                 continue
             }
@@ -298,25 +309,29 @@ export class RemoteHarvester extends Creep {
             creep.say(creep.memory.RN)
 
             const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].SP[creep.memory.SI])[0]
+            const packedPath = reverseCoordList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI])
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: sourcePos,
-                        range: 1,
+            creep.createMoveRequestByPath(
+                {
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: sourcePos,
+                            range: 1,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity,
                     },
-                ],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
+                    avoidAbandonedRemotes: true,
                 },
-                avoidAbandonedRemotes: true,
-            })
+                packedPath,
+            )
         }
     }
 }

@@ -75,8 +75,8 @@ export class RoomVisualsManager {
                         font: 0.5,
                         opacity: 1,
                         color: myColors.lightBlue,
-                        stroke: myColors.darkBlue,
-                        strokeWidth: 0.04,
+                        stroke: myColors.white,
+                        strokeWidth: 0.03,
                     },
                 )
 
@@ -121,8 +121,8 @@ export class RoomVisualsManager {
                     font: 0.5,
                     opacity: 0.8,
                     color: color(),
-                    stroke: myColors.darkBlue,
-                    strokeWidth: 0.04,
+                    stroke: myColors.white,
+                    strokeWidth: 0.03,
                 },
             )
         }
@@ -147,13 +147,13 @@ export class RoomVisualsManager {
 
             // Otherwise display the role of the creep being spawn
 
-            this.roomManager.room.visual.text(creep.role, spawn.pos, {
+            this.roomManager.room.visual.text(creep.role, spawn.pos.x, spawn.pos.y + 0.25, {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,
                 color: myColors.lightBlue,
-                stroke: myColors.darkBlue,
-                strokeWidth: 0.04,
+                stroke: myColors.white,
+                strokeWidth: 0.03,
             })
 
             // And display how many ticks left until spawned
@@ -161,14 +161,14 @@ export class RoomVisualsManager {
             this.roomManager.room.visual.text(
                 (spawn.spawning.remainingTime - 1).toString(),
                 spawn.pos.x,
-                spawn.pos.y - 1,
+                spawn.pos.y - 0.25,
                 {
                     backgroundColor: 'rgb(255, 0, 0, 0)',
                     font: 0.5,
                     opacity: 1,
                     color: myColors.lightBlue,
-                    stroke: myColors.darkBlue,
-                    strokeWidth: 0.04,
+                    stroke: myColors.white,
+                    strokeWidth: 0.03,
                 },
             )
         }
@@ -532,9 +532,12 @@ export class RoomVisualsManager {
 
     private generalDataVisuals(y: number) {
         const headers: any[] = [
+            'energy',
+            'min energy',
+            'minRampartHits',
             'estimatedIncome',
-            'commune harvest',
-            'remote harvest',
+            'C harvest',
+            'R harvest',
             'upgrade',
             'build',
             'repair other',
@@ -546,6 +549,9 @@ export class RoomVisualsManager {
 
         const data: any[][] = [
             [
+                this.roomManager.room.resourcesInStoringStructures.energy,
+                this.roomManager.room.communeManager.minStoredEnergy,
+                this.roomManager.room.communeManager.minRampartHits,
                 this.roomManager.room.estimateIncome(),
                 roomStats.eih.toFixed(2),
                 roomStats.reih.toFixed(2),
@@ -602,7 +608,7 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            row.push(remoteMemory.SE[sourceIndex])
+            row.push(remoteMemory.SPs[sourceIndex].length)
             row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
             row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
             row.push(remoteData[RemoteData.remoteReserver])

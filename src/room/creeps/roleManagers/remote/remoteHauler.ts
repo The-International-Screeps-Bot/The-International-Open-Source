@@ -9,7 +9,7 @@ import {
     randomTick,
 } from 'international/utils'
 import { indexOf } from 'lodash'
-import { packCoord, unpackCoord, unpackPosList } from 'other/packrat'
+import { packCoord, reverseCoordList, unpackCoord, unpackPosList } from 'other/packrat'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
@@ -147,15 +147,20 @@ export class RemoteHauler extends Creep {
 
             // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-            this.createMoveRequest({
-                origin: this.pos,
-                goals: [
-                    {
-                        pos: this.commune.anchor,
-                        range: 25,
-                    },
-                ],
-            })
+            const packedPath = Memory.rooms[this.memory.RN].SPs[this.memory.SI]
+
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: this.commune.anchor,
+                            range: 25,
+                        },
+                    ],
+                },
+                packedPath,
+            )
 
             return false
         }
@@ -168,16 +173,21 @@ export class RemoteHauler extends Creep {
             if ((this.memory?.Rs?.length || 0 == 0) && getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
                 this.getDroppedEnergy()
 
-                this.createMoveRequest({
-                    origin: this.pos,
-                    goals: [
-                        {
-                            pos: sourcePos,
-                            range: 1,
-                        },
-                    ],
-                    avoidEnemyRanges: true,
-                })
+                const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
+
+                this.createMoveRequestByPath(
+                    {
+                        origin: this.pos,
+                        goals: [
+                            {
+                                pos: sourcePos,
+                                range: 1,
+                            },
+                        ],
+                        avoidEnemyRanges: true,
+                    },
+                    packedPath,
+                )
 
                 return true
             }
@@ -205,12 +215,47 @@ export class RemoteHauler extends Creep {
             this.message += this.commune.name
             this.say(this.message)
 
-            this.createMoveRequest({
+            const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
+
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: this.commune.anchor,
+                            range: 3,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity,
+                    },
+                },
+                packedPath,
+                true,
+            )
+
+            return true
+        }
+
+        this.message += this.memory.RN
+        this.say(this.message)
+
+        this.getDroppedEnergy()
+
+        const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
+
+        this.createMoveRequestByPath(
+            {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: this.commune.anchor,
-                        range: 3,
+                        pos: sourcePos,
+                        range: 1,
                     },
                 ],
                 avoidEnemyRanges: true,
@@ -221,34 +266,10 @@ export class RemoteHauler extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-            })
-
-            return true
-        }
-
-        this.message += this.memory.RN
-        this.say(this.message)
-
-        this.getDroppedEnergy()
-
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: sourcePos,
-                    range: 1,
-                },
-            ],
-            avoidEnemyRanges: true,
-            typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                enemyRemote: Infinity,
-                allyRemote: Infinity,
+                avoidAbandonedRemotes: true,
             },
-            avoidAbandonedRemotes: true,
-        })
+            packedPath,
+        )
 
         return true
     }
@@ -385,13 +406,45 @@ export class RemoteHauler extends Creep {
             this.say(this.message)
 
             const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+            const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
 
-            this.createMoveRequest({
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: sourcePos,
+                            range: 1,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                        enemyRemote: Infinity,
+                        allyRemote: Infinity,
+                    },
+                },
+                packedPath,
+                true,
+            )
+
+            return false
+        }
+
+        this.message += this.commune.name
+        this.say(this.message)
+
+        const packedPath = Memory.rooms[this.memory.RN].SPs[this.memory.SI]
+
+        this.createMoveRequestByPath(
+            {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: sourcePos,
-                        range: 1,
+                        pos: this.commune.anchor,
+                        range: 3,
                     },
                 ],
                 avoidEnemyRanges: true,
@@ -402,31 +455,9 @@ export class RemoteHauler extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-            })
-
-            return false
-        }
-
-        this.message += this.commune.name
-        this.say(this.message)
-
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: this.commune.anchor,
-                    range: 3,
-                },
-            ],
-            avoidEnemyRanges: true,
-            typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                enemyRemote: Infinity,
-                allyRemote: Infinity,
             },
-        })
+            packedPath,
+        )
 
         return true
     }
@@ -441,6 +472,7 @@ export class RemoteHauler extends Creep {
 
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
+        if (creepAtPos.store.getUsedCapacity() === creepAtPos.store.getCapacity()) return false
         if (
             creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY) &&
             creepAtPos.store.getCapacity() !== this.store.getCapacity()
@@ -553,10 +585,10 @@ export class RemoteHauler extends Creep {
             // The 1.1 is to add some margin for the return trip
             if (
                 Memory.rooms[this.memory.RN] &&
-                Memory.rooms[this.memory.RN].SE &&
-                Memory.rooms[this.memory.RN].SE.length > this.memory.SI + 1
+                Memory.rooms[this.memory.RN].SP &&
+                Memory.rooms[this.memory.RN].SPs.length > this.memory.SI + 1
             )
-                returnTripTime = Memory.rooms[this.memory.RN].SE[this.memory.SI] * 1.1
+                returnTripTime = Memory.rooms[this.memory.RN].SPs[this.memory.SI].length * 1.1
         }
 
         if (this.needsResources() && this.ticksToLive > returnTripTime) {

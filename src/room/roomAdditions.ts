@@ -1,5 +1,6 @@
 import {
     allStructureTypes,
+    defaultRoadPlanningPlainCost,
     defaultSwampCost,
     impassibleStructureTypes,
     myColors,
@@ -610,30 +611,49 @@ Object.defineProperties(Room.prototype, {
     },
     sourcePaths: {
         get() {
-            if (this._sourcePaths?.length) return this._sourcePaths
+            if (this._sourcePaths) return this._sourcePaths
 
             this._sourcePaths = []
 
-            if (this.global.sourcePaths?.length) {
-                for (const path of this.global.sourcePaths) this._sourcePaths.push(unpackPosList(path))
+            if (this.memory.SPs) {
+                for (const path of this.memory.SPs) this._sourcePaths.push(unpackPosList(path))
 
                 return this._sourcePaths
             }
 
-            this.global.sourcePaths = []
+            this.memory.SPs = []
 
             if (this.memory.T === 'remote') {
                 const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
 
-                for (const source of this.sources) {
+                const sources = this.sourcePositions.sort((a, b) => {
+                    return (
+                        this.advancedFindPath({
+                            origin: a[0],
+                            goals: [{ pos: commune.anchor, range: 3 }],
+                            plainCost: defaultRoadPlanningPlainCost,
+                            weightStructurePlans: true,
+                        }).length -
+                        this.advancedFindPath({
+                            origin: b[0],
+                            goals: [{ pos: commune.anchor, range: 3 }],
+                            plainCost: defaultRoadPlanningPlainCost,
+                            weightStructurePlans: true,
+                        }).length
+                    )
+                }).reverse()
+
+                for (let index in sources) {
                     const path = this.advancedFindPath({
-                        origin: source.pos,
+                        origin: this.sourcePositions[index][0],
                         goals: [{ pos: commune.anchor, range: 3 }],
+                        plainCost: defaultRoadPlanningPlainCost,
+                        weightStructurePlans: true,
                     })
 
-                    this._sourcePaths.push(path)
-                    this.global.sourcePaths.push(packPosList(path))
+                    this._sourcePaths[index] = path
+                    this.memory.SPs[index] = packPosList(path)
                 }
 
                 return this._sourcePaths
@@ -641,14 +661,33 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.anchor) return this._sourcePaths
 
-            for (const source of this.sources) {
+            const sources = this.sourcePositions.sort((a, b) => {
+                return (
+                    this.advancedFindPath({
+                        origin: a[0],
+                        goals: [{ pos: this.anchor, range: 3 }],
+                        plainCost: defaultRoadPlanningPlainCost,
+                        weightStructurePlans: true,
+                    }).length -
+                    this.advancedFindPath({
+                        origin: b[0],
+                        goals: [{ pos: this.anchor, range: 3 }],
+                        plainCost: defaultRoadPlanningPlainCost,
+                        weightStructurePlans: true,
+                    }).length
+                )
+            }).reverse()
+
+            for (let index in sources) {
                 const path = this.advancedFindPath({
-                    origin: source.pos,
+                    origin: this.sourcePositions[index][0],
                     goals: [{ pos: this.anchor, range: 3 }],
+                    plainCost: defaultRoadPlanningPlainCost,
+                    weightStructurePlans: true,
                 })
 
-                this._sourcePaths.push(path)
-                this.global.sourcePaths.push(packPosList(path))
+                this._sourcePaths[index] = path
+                this.memory.SPs[index] = packPosList(path)
             }
 
             return this._sourcePaths
@@ -1074,15 +1113,15 @@ Object.defineProperties(Room.prototype, {
             // Filter rooms that have some sourceEfficacies recorded
 
             this._remoteNamesBySourceEfficacy = this.memory.remotes.filter(function (roomName) {
-                return Memory.rooms[roomName].SE.length
+                return Memory.rooms[roomName].SPs.length
             })
 
             // Sort the remotes based on the average source efficacy
 
             return this._remoteNamesBySourceEfficacy.sort(function (a1, b1) {
                 return (
-                    Memory.rooms[a1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[a1].SE.length -
-                    Memory.rooms[b1].SE.reduce((a2, b2) => a2 + b2) / Memory.rooms[b1].SE.length
+                    Memory.rooms[a1].SPs.reduce((a2, b2) => a2 + b2.length, 0) / Memory.rooms[a1].SPs.length -
+                    Memory.rooms[b1].SPs.reduce((a2, b2) => a2 + b2.length, 0) / Memory.rooms[b1].SPs.length
                 )
             })
         },
@@ -1105,7 +1144,10 @@ Object.defineProperties(Room.prototype, {
                 const aSplit = a.split(' ')
                 const bSplit = b.split(' ')
 
-                return Memory.rooms[aSplit[0]].SE[parseInt(aSplit[1])] - Memory.rooms[bSplit[0]].SE[parseInt(bSplit[1])]
+                return (
+                    Memory.rooms[aSplit[0]].SPs[parseInt(aSplit[1])].length -
+                    Memory.rooms[bSplit[0]].SPs[parseInt(bSplit[1])].length
+                )
             })
         },
     },

@@ -5,6 +5,7 @@ import {
     defaultPlainCost,
     defaultSwampCost,
     impassibleStructureTypes,
+    impassibleStructureTypesSet,
     maxRampartGroupSize,
     maxRemoteRoomDistance,
     minHarvestWorkRatio,
@@ -37,8 +38,9 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
-import { packCoord, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/packrat'
+import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/packrat'
 import { basePlanner } from './construction/communePlanner'
+import { posix } from 'path'
 
 /**
     @param pos1 pos of the object performing the action
@@ -86,8 +88,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     opts.plainCost = opts.plainCost || defaultPlainCost
     opts.swampCost = opts.swampCost || defaultSwampCost
 
-    const allowedRoomNames = new Set()
-    allowedRoomNames.add(opts.origin.roomName)
+    const allowedRoomNames = new Set([opts.origin.roomName])
 
     // Construct route
 
@@ -97,42 +98,107 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
             if (opts.origin.roomName === goal.pos.roomName) continue
 
+            function weightRoom(roomName: string) {
+                const roomMemory = Memory.rooms[roomName]
+                if (!roomMemory) {
+                    if (roomName === goal.pos.roomName) return 1
+                    return Infinity
+                }
+
+                if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
+                    return Infinity
+
+                // If the goal is in the room
+
+                if (roomName === goal.pos.roomName) return 1
+
+                // If the type is in typeWeights, inform the weight for the type
+
+                if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
+
+                return 1
+            }
+
             // Construct route by searching through rooms
 
             const route = Game.map.findRoute(opts.origin.roomName, goal.pos.roomName, {
                 // Essentially a costMatrix for the rooms, priority is for the lower values. Infinity is impassible
 
-                routeCallback(roomName: string) {
-                    const roomMemory = Memory.rooms[roomName]
-                    if (!roomMemory) {
-                        if (roomName === goal.pos.roomName) return 1
-                        return Infinity
-                    }
-
-                    if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
-                        return Infinity
-
-                    // If the goal is in the room
-
-                    if (roomName === goal.pos.roomName) return 1
-
-                    // If the type is in typeWeights, inform the weight for the type
-
-                    if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
-
-                    return 1
-                },
+                routeCallback: weightRoom,
             })
 
             // If a route can't be found
 
             if (route === ERR_NO_PATH) continue
 
-            for (const roomRoute of route) allowedRoomNames.add(roomRoute.room)
+            for (const roomRoute of route) {
+                allowedRoomNames.add(roomRoute.room)
+
+                const exits = Game.map.describeExits(roomRoute.room)
+                for (const exit in exits) {
+                    const roomName = exits[exit as ExitKey]
+
+                    if (weightRoom(roomName) > 1) continue
+
+                    allowedRoomNames.add(roomName)
+                }
+            }
         }
     }
 
     generateRoute()
+
+    if (opts.weightStructurePlans) {
+        if (!opts.weightCoords) opts.weightCoords = {}
+
+        for (const roomName of allowedRoomNames) {
+            if (!opts.weightCoords[roomName]) opts.weightCoords[roomName] = {}
+        }
+
+        for (const roomName of allowedRoomNames) {
+            const roomMemory = Memory.rooms[roomName]
+
+            if (roomMemory.T === 'commune') {
+                for (const stampType in stamps) {
+                    const stamp = stamps[stampType as StampTypes]
+
+                    for (const packedStampAnchor of roomMemory.stampAnchors[stampType as StampTypes]) {
+                        const stampAnchor = unpackNumAsCoord(packedStampAnchor)
+
+                        for (const key in stamp.structures) {
+                            const structureType = key as BuildableStructureConstant | 'empty'
+                            if (structureType === 'empty') continue
+
+                            let weight = 0
+
+                            if (impassibleStructureTypesSet.has(structureType)) weight = 255
+                            else if (structureType === STRUCTURE_ROAD) weight = 1
+
+                            for (const pos of stamp.structures[structureType]) {
+                                const x = pos.x + stampAnchor.x - stamp.offset
+                                const y = pos.y + stampAnchor.y - stamp.offset
+
+                                const currentWeight = opts.weightCoords[roomName][packXYAsCoord(x, y)] || 0
+                                opts.weightCoords[roomName][packXYAsCoord(x, y)] = Math.max(weight, currentWeight)
+                            }
+                        }
+                    }
+                }
+
+                for (const packedPath of roomMemory.SPs) {
+                    const path = unpackPosList(packedPath)
+
+                    for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
+                }
+            } else if (roomMemory.T === 'remote') {
+                for (const packedPath of roomMemory.SPs) {
+                    const path = unpackPosList(packedPath)
+
+                    for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
+                }
+            }
+        }
+    }
 
     // Construct path
 
@@ -155,6 +221,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If the room is not allowed
 
                 if (!allowedRoomNames.has(roomName)) return false
+
+                /* const roomMemory = Memory.rooms[roomName] */
 
                 // Create a costMatrix for the room
 
@@ -190,18 +258,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 // Weight positions
 
-                for (const weight in opts.weightPositions) {
-                    // Use the weight to get the positions
+                if (opts.weightCoords && opts.weightCoords[roomName]) {
+                    for (const packedCoord in opts.weightCoords[roomName]) {
+                        const coord = unpackCoord(packedCoord)
 
-                    const positions = opts.weightPositions[weight]
-
-                    // Get the numeric value of the weight
-
-                    const weightNum = parseInt(weight)
-
-                    // Loop through each gameObject and set their pos to the weight in the cm
-
-                    for (const pos of positions) cm.set(pos.x, pos.y, weightNum)
+                        cm.set(coord.x, coord.y, opts.weightCoords[roomName][packedCoord])
+                    }
                 }
 
                 // Weight costMatrixes
@@ -216,12 +278,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
                         }
-                    }
-                }
-
-                if (opts.weightStampAnchors) {
-                    if (room.memory.T === 'commune') {
-                    } else if (room.memory.T === 'remote') {
                     }
                 }
 
@@ -327,7 +383,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                if ((opts.avoidNotMyCreeps && !room.controller) || !room.controller.safeMode) {
+                if (opts.avoidNotMyCreeps && (!room.controller || !room.controller.safeMode)) {
                     for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
                     for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
@@ -636,6 +692,13 @@ Room.prototype.scoutEnemyRoom = function () {
         player.data[PlayerData.defensiveStrength],
     )
 
+    // Combat request creation
+
+    this.createAttackCombatRequest({
+        minHeal: 10 + ((this.structures.tower.length * TOWER_POWER_ATTACK) / 4) * 1.1,
+        minDamage: 10 + avgRampartHits / RANGED_ATTACK_POWER / 200,
+    })
+
     return roomMemory.T
 }
 
@@ -721,6 +784,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // If the room isn't already a remote
 
     if (this.memory.T !== 'remote') {
+        this.memory.T = 'remote'
+
         // Assign the room's commune as the scoutingRoom
 
         this.memory.CN = scoutingRoom.name
@@ -731,6 +796,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         delete this._sourcePositions
         this.sourcePositions
 
+        delete this.memory.SPs
+        delete this._sourcePaths
+        this.sourcePaths
+
         delete this.memory.CP
         delete this._controllerPositions
         this.controllerPositions
@@ -739,16 +808,16 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         scoutingRoom.memory.remotes.push(this.name)
 
-        this.memory.SE = newSourceEfficacies
         this.memory.RE = newReservationEfficacy
 
         this.memory.data = []
         for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
 
-        return (this.memory.T = 'remote')
+        return this.memory.T
     }
 
-    const currentRemoteEfficacy = this.memory.SE.reduce((sum, el) => sum + el) / this.memory.SE.length + this.memory.RE
+    const currentRemoteEfficacy =
+        this.memory.SPs.reduce((sum, el) => sum + el.length, 0) / this.memory.SPs.length + this.memory.RE
     const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
     // If the new average source efficacy is above the current, stop
@@ -765,6 +834,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     delete this._sourcePositions
     this.sourcePositions
 
+    delete this.memory.SPs
+    delete this._sourcePaths
+    this.sourcePaths
+
     delete this.memory.CP
     delete this._controllerPositions
     this.controllerPositions
@@ -773,13 +846,12 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     scoutingRoom.memory.remotes.push(this.name)
 
-    this.memory.SE = newSourceEfficacies
     this.memory.RE = newReservationEfficacy
 
     this.memory.data = []
     for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
 
-    return (this.memory.T = 'remote')
+    return this.memory.T
 }
 
 Room.prototype.basicScout = function () {
@@ -873,38 +945,86 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
     return this.memory.T
 }
 
-Room.prototype.createAttackCombatRequest = function () {
+Room.prototype.createAttackCombatRequest = function (opts) {
     if (!Memory.autoAttack) return
-    if (Memory.combatRequests[this.name]) return
-    if (!this.enemyCreeps.length) return
-    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
-    if (this.enemyAttackers.length > 0) return
 
-    const request = (Memory.combatRequests[this.name] = {
+    let request = Memory.combatRequests[this.name]
+    if (request) {
+        if (request.T !== 'attack') return
+
+        if (!opts) return
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+
+        return
+    }
+
+    if (
+        !this.enemyCreeps.length &&
+        !this.find(FIND_HOSTILE_STRUCTURES).find(structure => structure.structureType !== STRUCTURE_CONTROLLER)
+    )
+        return
+    if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
+
+    request = Memory.combatRequests[this.name] = {
         T: 'attack',
         data: [0],
-    })
+    }
 
     request.data[CombatRequestData.minDamage] = 10
     request.data[CombatRequestData.minHeal] = 10
     request.data[CombatRequestData.quadCount] = 1
+
+    if (opts) {
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+        return
+    }
 }
 
-Room.prototype.createHarassCombatRequest = function () {
+Room.prototype.createHarassCombatRequest = function (opts) {
     if (!Memory.autoAttack) return
-    if (Memory.combatRequests[this.name]) return
+
+    let request = Memory.combatRequests[this.name]
+    if (request) {
+        if (request.T !== 'harass') return
+
+        if (!opts) return
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+
+        return
+    }
+
     if (!this.enemyCreeps.length) return
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
     if (this.enemyAttackers.length > 0) return
 
-    const request = (Memory.combatRequests[this.name] = {
+    request = Memory.combatRequests[this.name] = {
         T: 'harass',
         data: [0],
-    })
+    }
 
     request.data[CombatRequestData.attack] = 3
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
+
+    if (opts) {
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+        return
+    }
+
     /*
     const structures = this.dismantleTargets
 
@@ -917,12 +1037,24 @@ Room.prototype.createHarassCombatRequest = function () {
 }
 
 Room.prototype.createDefendCombatRequest = function (opts) {
-    if (Memory.combatRequests[this.name]) return
+    let request = Memory.combatRequests[this.name]
+    if (request) {
+        if (request.T !== 'defend') return
 
-    const request = (Memory.combatRequests[this.name] = {
+        if (!opts) return
+
+        for (const key in opts) {
+            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
+                opts[key as keyof typeof CombatRequestData]
+        }
+
+        return
+    }
+
+    request = Memory.combatRequests[this.name] = {
         T: 'defend',
         data: [0],
-    })
+    }
 
     request.data[CombatRequestData.inactionTimer] = 0
     request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
@@ -2063,6 +2195,7 @@ Room.prototype.createClaimRequest = function () {
     score += this.sourcePaths[0].length / 10
     score += this.sourcePaths[1].length / 10
     score += this.upgradePathLength / 10
+    score += this.memory.stampAnchors.rampart.length / 10
     score += this.findSwampPlainsRatio() * 10
 
     request.data[ClaimRequestData.score] = score
