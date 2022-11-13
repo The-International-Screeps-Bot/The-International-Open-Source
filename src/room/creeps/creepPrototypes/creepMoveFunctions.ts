@@ -5,6 +5,7 @@ import {
     impassibleStructureTypesSet,
     myColors,
     offsetsByDirection,
+    RemoteData,
     roomDimensions,
     TrafficPriorities,
 } from 'international/constants'
@@ -69,44 +70,39 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
 
 PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (
     opts,
-    packedPath,
-    loose,
+    pathOpts
 ) {
     // Stop if the we know the creep won't move
 
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
+    if (!this.parts.move) return false
 
     if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
 
-    const index = packedPath.indexOf(packPos(this.pos))
+    const index = pathOpts.packedPath.indexOf(packPos(this.pos))
 
     if (index >= 0) {
 
-        if (index + 2 >= packedPath.length) {
+        if (index + 2 >= pathOpts.packedPath.length) {
             // If loose is enabled, don't try to get back on the cached path
 
-            if (loose) return this.createMoveRequest(opts)
+            if (pathOpts.loose) return this.createMoveRequest(opts)
             return true
         }
-/*
-        customLog(
-            'CACHING MOVE ISSUES',
-            index + ', ' + (index / 2 + 1) + ', ' + packedPath.length + ', ' + unpackPosList(packedPath)[index / 2 + 1],
-        )
- */
-        this.assignMoveRequest(unpackPosList(packedPath)[index / 2 + 1])
+
+        this.assignMoveRequest(unpackPosList(pathOpts.packedPath)[index / 2 + 1])
         return true
     }
 
     // If loose is enabled, don't try to get back on the cached path
 
-    if (loose) return this.createMoveRequest(opts)
+    if (pathOpts.loose) return this.createMoveRequest(opts)
 
     opts.goals = []
 
-    for (const pos of unpackPosList(packedPath))
+    for (const pos of unpackPosList(pathOpts.packedPath))
         opts.goals.push({
             pos: pos,
             range: 0,
@@ -123,6 +119,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
+    if (!this.parts.move) return false
     /*
     if (this.spawning) return false
  */

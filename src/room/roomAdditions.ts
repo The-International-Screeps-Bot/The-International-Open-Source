@@ -4,6 +4,7 @@ import {
     defaultSwampCost,
     impassibleStructureTypes,
     myColors,
+    remoteTypeWeights,
     roomDimensions,
     structureTypesByBuildPriority,
 } from 'international/constants'
@@ -480,18 +481,9 @@ Object.defineProperties(Room.prototype, {
                 for (const source of this.sources) {
                     const positions = []
 
-                    // Find positions adjacent to source
-
-                    const adjacentPositions = this.findPositionsInsideRect(
-                        source.pos.x - 1,
-                        source.pos.y - 1,
-                        source.pos.x + 1,
-                        source.pos.y + 1,
-                    )
-
                     // Loop through each pos
 
-                    for (const pos of adjacentPositions) {
+                    for (const pos of this.findAdjacentPositions(source.pos.x, source.pos.y)) {
                         // Iterate if terrain for pos is a wall
 
                         if (terrainCoords[packAsNum(pos)] === 255) continue
@@ -528,18 +520,9 @@ Object.defineProperties(Room.prototype, {
             for (const source of this.sources) {
                 const positions = []
 
-                // Find positions adjacent to source
-
-                const adjacentPositions = this.findPositionsInsideRect(
-                    source.pos.x - 1,
-                    source.pos.y - 1,
-                    source.pos.x + 1,
-                    source.pos.y + 1,
-                )
-
                 // Loop through each pos
 
-                for (const pos of adjacentPositions) {
+                for (const pos of this.findAdjacentPositions(source.pos.x, source.pos.y)) {
                     // Iterate if terrain for pos is a wall
 
                     if (terrainCoords[packAsNum(pos)] === 255) continue
@@ -627,27 +610,33 @@ Object.defineProperties(Room.prototype, {
                 const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
 
-                const sources = Array.from(this.sourcePositions).sort((a, b) => {
-                    return (
-                        this.advancedFindPath({
-                            origin: a[0],
-                            goals: [{ pos: commune.anchor, range: 3 }],
-                            plainCost: defaultRoadPlanningPlainCost,
-                            weightStructurePlans: true,
-                        }).length -
-                        this.advancedFindPath({
-                            origin: b[0],
-                            goals: [{ pos: commune.anchor, range: 3 }],
-                            plainCost: defaultRoadPlanningPlainCost,
-                            weightStructurePlans: true,
-                        }).length
-                    )
-                }).reverse()
+                const sources = []
+                    .concat(this.sourcePositions)
+                    .sort((a, b) => {
+                        return (
+                            this.advancedFindPath({
+                                origin: a[0],
+                                goals: [{ pos: commune.anchor, range: 3 }],
+                                typeWeights: remoteTypeWeights,
+                                plainCost: defaultRoadPlanningPlainCost,
+                                weightStructurePlans: true,
+                            }).length -
+                            this.advancedFindPath({
+                                origin: b[0],
+                                goals: [{ pos: commune.anchor, range: 3 }],
+                                typeWeights: remoteTypeWeights,
+                                plainCost: defaultRoadPlanningPlainCost,
+                                weightStructurePlans: true,
+                            }).length
+                        )
+                    })
+                    .reverse()
 
                 for (let index in sources) {
                     const path = this.advancedFindPath({
                         origin: this.sourcePositions[index][0],
                         goals: [{ pos: commune.anchor, range: 3 }],
+                        typeWeights: remoteTypeWeights,
                         plainCost: defaultRoadPlanningPlainCost,
                         weightStructurePlans: true,
                     })
@@ -661,27 +650,33 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.anchor) return this._sourcePaths
 
-            const sources = Array.from(this.sourcePositions).sort((a, b) => {
-                return (
-                    this.advancedFindPath({
-                        origin: a[0],
-                        goals: [{ pos: this.anchor, range: 3 }],
-                        plainCost: defaultRoadPlanningPlainCost,
-                        weightStructurePlans: true,
-                    }).length -
-                    this.advancedFindPath({
-                        origin: b[0],
-                        goals: [{ pos: this.anchor, range: 3 }],
-                        plainCost: defaultRoadPlanningPlainCost,
-                        weightStructurePlans: true,
-                    }).length
-                )
-            }).reverse()
+            const sources = []
+                .concat(this.sourcePositions)
+                .sort((a, b) => {
+                    return (
+                        this.advancedFindPath({
+                            origin: a[0],
+                            goals: [{ pos: this.anchor, range: 3 }],
+                            typeWeights: remoteTypeWeights,
+                            plainCost: defaultRoadPlanningPlainCost,
+                            weightStructurePlans: true,
+                        }).length -
+                        this.advancedFindPath({
+                            origin: b[0],
+                            goals: [{ pos: this.anchor, range: 3 }],
+                            typeWeights: remoteTypeWeights,
+                            plainCost: defaultRoadPlanningPlainCost,
+                            weightStructurePlans: true,
+                        }).length
+                    )
+                })
+                .reverse()
 
             for (let index in sources) {
                 const path = this.advancedFindPath({
                     origin: this.sourcePositions[index][0],
                     goals: [{ pos: this.anchor, range: 3 }],
+                    typeWeights: remoteTypeWeights,
                     plainCost: defaultRoadPlanningPlainCost,
                     weightStructurePlans: true,
                 })

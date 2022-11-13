@@ -1,5 +1,6 @@
 import { communeSign, nonCommuneSigns } from 'international/constants'
-import { findClosestCommuneName, getRange, getRangeOfCoords } from 'international/utils'
+import { cleanRoomMemory, findClosestCommuneName, getRange, getRangeOfCoords } from 'international/utils'
+import { partial } from 'lodash'
 
 export class Scout extends Creep {
     scoutedRooms?: string[]
@@ -234,7 +235,7 @@ export class Scout extends Creep {
 
                 // Clean the room's memory
 
-                room.cleanMemory()
+                cleanRoomMemory(room.name)
 
                 // And delete the creep's scoutTarget
 
@@ -268,12 +269,11 @@ export class Scout extends Creep {
                 swampCost: 1,
             }) === 'unpathable') {
 
-                if (!Memory.rooms[creep.memory.scT]) Memory.rooms[creep.memory.scT] = {}
+                let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory.scT]
+                if (!roomMemory) roomMemory = (Memory.rooms[creep.memory.scT] as Partial<RoomMemory>) = {}
 
-                Memory.rooms[creep.memory.scT] = {
-                    LST: Game.time,
-                    T: 'neutral',
-                }
+                roomMemory.T = 'neutral'
+                roomMemory.LST = Game.time
 
                 delete creep.memory.scT
             }

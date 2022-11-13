@@ -1100,7 +1100,7 @@ Room.prototype.spawnRequester = function () {
 
             // Loop through each index of sourceEfficacies
 
-            for (let index = 0; index < remoteMemory.SPs.length; index += 1) {
+            for (let index = 0; index < remoteMemory.SIDs.length; index += 1) {
                 // Get the income based on the reservation of the this and remoteHarvester need
                 // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 

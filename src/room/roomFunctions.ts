@@ -185,16 +185,19 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                for (const packedPath of roomMemory.SPs) {
-                    const path = unpackPosList(packedPath)
-
+                for (const path of Game.rooms[roomName].sourcePaths) {
                     for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                 }
             } else if (roomMemory.T === 'remote') {
+                customLog('SOURCEPATH ISSUES', roomName + ', ' + roomMemory.SPs)
                 for (const packedPath of roomMemory.SPs) {
                     const path = unpackPosList(packedPath)
 
-                    for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
+                    for (const pos of path) {
+
+                        if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
+                        opts.weightCoords[pos.roomName][packCoord(pos)] = 1
+                    }
                 }
             }
         }
@@ -1071,24 +1074,6 @@ Room.prototype.createDefendCombatRequest = function (opts) {
 
     request.data[CombatRequestData.minDamage] = 40
     request.data[CombatRequestData.minHeal] = 10
-}
-
-Room.prototype.cleanMemory = function () {
-    const room = this
-
-    // Loop through keys in the room's memory
-
-    for (const key in room.memory) {
-        // Iterate if key is not part of roomTypeProperties
-
-        if (!roomTypeProperties.has(key as keyof RoomMemory)) continue
-
-        // Iterate if key is part of this roomType's properties
-
-        if (roomTypes[room.memory.T].has(key as keyof RoomMemory)) continue
-
-        delete room.memory[key as keyof RoomMemory]
-    }
 }
 
 Room.prototype.distanceTransform = function (

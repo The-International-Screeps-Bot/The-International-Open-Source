@@ -170,6 +170,8 @@ export class TradeManager {
         const { room } = this.communeManager
         const { terminal } = room
 
+        if (!allyManager.allyRequests) return
+
         // Filter out allyRequests that are requesting resources
 
         const resourceRequests = allyManager.allyRequests.filter(

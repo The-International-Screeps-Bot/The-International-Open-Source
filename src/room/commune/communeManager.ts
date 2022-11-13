@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange, unpackNumAsCoord } from 'international/utils'
+import { cleanRoomMemory, createPosMap, customLog, findClosestObject, getRange, unpackNumAsCoord } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -205,6 +205,17 @@ export class CommuneManager {
 
         delete Memory.combatRequests[requestName]
         this.room.memory.combatRequests.splice(index, 1)
+    }
+
+    public removeRemote(remoteName: string, index: number) {
+
+        this.room.memory.remotes.splice(index, 1)
+
+        const remoteMemory = Memory.rooms[remoteName]
+
+        delete remoteMemory.CN
+        remoteMemory.T = 'neutral'
+        cleanRoomMemory(remoteName)
     }
 
     get storedEnergyUpgradeThreshold() {
