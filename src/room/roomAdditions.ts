@@ -86,7 +86,7 @@ Object.defineProperties(Room.prototype, {
             if (this._sourcesByEfficacy) return this._sourcesByEfficacy
 
             this._sourcesByEfficacy = [].concat(this.sources)
-
+            console.log(this.name)
             return this._sourcesByEfficacy.sort((a, b) => {
                 return this.sourcePaths[a.index].length - this.sourcePaths[b.index].length
             })
@@ -611,11 +611,11 @@ Object.defineProperties(Room.prototype, {
     },
     sourcePaths: {
         get() {
-            if (this._sourcePaths) return this._sourcePaths
+            if (this._sourcePaths && this._sourcePaths.length) return this._sourcePaths
 
             this._sourcePaths = []
 
-            if (this.memory.SPs) {
+            if (this.memory.SPs && this.memory.SPs.length) {
                 for (const path of this.memory.SPs) this._sourcePaths.push(unpackPosList(path))
 
                 return this._sourcePaths
@@ -627,7 +627,7 @@ Object.defineProperties(Room.prototype, {
                 const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
 
-                const sources = this.sourcePositions.sort((a, b) => {
+                const sources = Array.from(this.sourcePositions).sort((a, b) => {
                     return (
                         this.advancedFindPath({
                             origin: a[0],
@@ -661,7 +661,7 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.anchor) return this._sourcePaths
 
-            const sources = this.sourcePositions.sort((a, b) => {
+            const sources = Array.from(this.sourcePositions).sort((a, b) => {
                 return (
                     this.advancedFindPath({
                         origin: a[0],

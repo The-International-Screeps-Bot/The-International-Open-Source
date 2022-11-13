@@ -33,10 +33,10 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT']),
     remote: new Set(['CN', 'RE', 'data', 'NC', 'PC']),
-    ally: new Set(['owner', 'level']),
-    allyRemote: new Set(['owner']),
-    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'NC', 'OS', 'DS']),
-    enemyRemote: new Set(['owner', 'NC']),
+    ally: new Set(['owner', 'level', 'NC', 'PC']),
+    allyRemote: new Set(['owner', 'NC', 'PC']),
+    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'NC', 'PC', 'OS', 'DS']),
+    enemyRemote: new Set(['owner', 'NC', 'PC']),
     neutral: new Set(['NC', 'PC']),
     keeper: new Set(['owner']),
     keeperCenter: new Set(['owner']),
@@ -406,7 +406,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     labs: {
         offset: 1,
-        protectionOffset: 3,
+        protectionOffset: 5,
         size: 2,
         asymmetry: 1,
         structures: {

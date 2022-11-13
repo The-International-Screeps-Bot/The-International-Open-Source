@@ -739,10 +739,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // loop through sourceNames
 
-    for (const source of this.sources) {
+    for (const index in this.sources) {
         const path = this.advancedFindPath({
-            origin: source.pos,
-            goals: [{ pos: scoutingRoom.anchor, range: 1 }],
+            origin: this.sourcePositions[index][0],
+            goals: [{ pos: scoutingRoom.anchor, range: 3 }],
             typeWeights: {
                 enemy: Infinity,
                 ally: Infinity,
@@ -750,6 +750,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
                 enemyRemote: Infinity,
                 allyRemote: Infinity,
             },
+            plainCost: defaultPlainCost,
+            weightStructurePlans: true,
         })
 
         // Stop if there is a source inefficient enough
@@ -1081,11 +1083,9 @@ Room.prototype.cleanMemory = function () {
 
         if (!roomTypeProperties.has(key as keyof RoomMemory)) continue
 
-        // Iterate if key part of this roomType's properties
+        // Iterate if key is part of this roomType's properties
 
         if (roomTypes[room.memory.T].has(key as keyof RoomMemory)) continue
-
-        // Delete the property
 
         delete room.memory[key as keyof RoomMemory]
     }

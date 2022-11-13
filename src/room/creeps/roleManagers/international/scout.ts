@@ -1,5 +1,5 @@
 import { communeSign, nonCommuneSigns } from 'international/constants'
-import { findClosestCommuneName, getRange } from 'international/utils'
+import { findClosestCommuneName, getRange, getRangeOfCoords } from 'international/utils'
 
 export class Scout extends Creep {
     scoutedRooms?: string[]
@@ -21,10 +21,9 @@ export class Scout extends Creep {
     findScoutTarget?(): boolean {
         if (this.memory.scT) return true
 
-        this.findBestScoutTarget()
-        if (!this.memory.scT) return false
+        const scoutTarget = this.findBestScoutTarget()
+        if (!scoutTarget) return false
 
-        this.memory.siT = this.memory.scT
         this.commune.scoutTargets.add(this.memory.scT)
 
         return true
@@ -87,7 +86,7 @@ export class Scout extends Creep {
                 this.memory.scT = roomName
             }
 
-            return
+            return this.memory.scT
         }
 
         // Find the room scouted longest ago
@@ -101,6 +100,8 @@ export class Scout extends Creep {
             lowestLastScoutTick = lastScoutTick
             this.memory.scT = roomName
         }
+
+        return this.memory.scT
     }
 
     // THIS SHOULD BE A ROOM FUNCTION BASED OFF Room.advancedScout
@@ -159,7 +160,7 @@ export class Scout extends Creep {
 
         if (room.memory.T === 'ally' || room.memory.T === 'enemy') return true
 
-        if (controller.reservation && controller.reservation.username != Memory.me) return true
+        if (controller.reservation && controller.reservation.username !== Memory.me) return true
 
         // If the room is a commune
 
@@ -170,7 +171,7 @@ export class Scout extends Creep {
 
             // Otherwise assign the signMessage the commune sign
 
-            signMessage = communeSign[0]
+            signMessage = communeSign
         }
 
         // Otherwise if the room is not a commune
@@ -186,7 +187,7 @@ export class Scout extends Creep {
 
         // If the controller is not in range
 
-        if (getRange(this.pos.x, controller.pos.x, this.pos.y, controller.pos.y) > 1) {
+        if (getRangeOfCoords(this.pos, controller.pos) > 1) {
             // Request to move to the controller and inform false
 
             if (
@@ -196,7 +197,7 @@ export class Scout extends Creep {
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) !== 'unpathable'
+                }) === 'unpathable'
             )
                 return true
 
@@ -254,7 +255,7 @@ export class Scout extends Creep {
 
             // Try to go to the scoutTarget
 
-            creep.createMoveRequest({
+            if (creep.createMoveRequest({
                 origin: creep.pos,
                 goals: [
                     {
@@ -265,7 +266,17 @@ export class Scout extends Creep {
                 avoidEnemyRanges: true,
                 plainCost: 1,
                 swampCost: 1,
-            })
+            }) === 'unpathable') {
+
+                if (!Memory.rooms[creep.memory.scT]) Memory.rooms[creep.memory.scT] = {}
+
+                Memory.rooms[creep.memory.scT] = {
+                    LST: Game.time,
+                    T: 'neutral',
+                }
+
+                delete creep.memory.scT
+            }
         }
     }
 }
