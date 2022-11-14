@@ -18,7 +18,7 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const towers = this.communeManager.structures.tower
+        const towers = this.communeManager.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
             this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
             return
@@ -28,7 +28,6 @@ export class TowerManager {
 
         for (const tower of towers) {
             if (tower.store.energy < TOWER_ENERGY_COST) continue
-            if (!tower.RCLActionable) continue
 
             this.actionableTowerIDs.push(tower.id)
         }

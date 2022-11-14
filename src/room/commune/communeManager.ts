@@ -1,4 +1,4 @@
-import { createPosMap, customLog, findClosestObject, getRange, unpackNumAsCoord } from 'international/utils'
+import { cleanRoomMemory, createPosMap, customLog, findClosestObject, getRange, unpackNumAsCoord } from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -92,7 +92,7 @@ export class CommuneManager {
         if (!room.memory.combatRequests) room.memory.combatRequests = []
         if (!room.memory.haulRequests) room.memory.haulRequests = []
 
-        room.spawnRequests = {}
+        room.spawnRequests = []
         room.upgradeStrength = 0
         room.haulerNeed = 0
 
@@ -154,7 +154,8 @@ export class CommuneManager {
 
         this.defenceManager.run()
         this.towerManager.run()
-        this.defenceManager.createDefenceRequest()
+        this.defenceManager.manageThreat()
+        this.defenceManager.manageDefenceRequests()
 
         try {
             this.tradeManager.run()
@@ -194,6 +195,8 @@ export class CommuneManager {
 
     private test() {
 
+        customLog('RAMPART HITS TARGET', this.room.name + ', ' + this.minRampartHits + ', ' + this.room.memory.AT + ', ' + (this.room.memory.AT * this.room.controller.level * 10))
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -205,6 +208,17 @@ export class CommuneManager {
 
         delete Memory.combatRequests[requestName]
         this.room.memory.combatRequests.splice(index, 1)
+    }
+
+    public removeRemote(remoteName: string, index: number) {
+
+        this.room.memory.remotes.splice(index, 1)
+
+        const remoteMemory = Memory.rooms[remoteName]
+
+        delete remoteMemory.CN
+        remoteMemory.T = 'neutral'
+        cleanRoomMemory(remoteName)
     }
 
     get storedEnergyUpgradeThreshold() {
@@ -226,6 +240,6 @@ export class CommuneManager {
 
         const level = this.room.controller.level
 
-        return Math.min(Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * level * 10), RAMPART_HITS_MAX[level])
+        return Math.min(Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10), RAMPART_HITS_MAX[level])
     }
  }

@@ -31,6 +31,8 @@ export class InternationalManager {
 
     unspawnedPowerCreepNames: string[]
 
+    tickID: number
+
     /**
      * Updates values to be present for this tick
      */
@@ -39,6 +41,7 @@ export class InternationalManager {
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
 
+        this.tickID = 0
         delete this._myOrders
         delete this._orders
         delete this._myOrdersCount
@@ -185,6 +188,11 @@ export class InternationalManager {
         }
 
         return global.terrainCoords[roomName]
+    }
+
+    newTickID() {
+
+        return this.tickID += 1
     }
 
     /**

@@ -15,6 +15,7 @@ import {
 } from './constants'
 import {
     advancedFindDistance,
+    cleanRoomMemory,
     createPosMap,
     customLog,
     findCarryPartsRequired,
@@ -77,7 +78,7 @@ class TickConfig {
 
             if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
                 room.basicScout()
-                room.cleanMemory()
+                cleanRoomMemory(room.name)
             }
 
             room.moveRequests = new Map()
@@ -111,7 +112,7 @@ class TickConfig {
             if (!room.controller.my) {
                 if (room.memory.T === 'commune') {
                     room.basicScout()
-                    room.cleanMemory()
+                    cleanRoomMemory(room.name)
                 }
                 continue
             }

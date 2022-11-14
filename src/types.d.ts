@@ -226,6 +226,12 @@ declare global {
         cacheAmount?: number
     }
 
+    interface MoveRequestByPathOpts {
+        packedPath: string,
+        loose?: boolean,
+        remoteName?: string
+    }
+
     type OrderedStructurePlans = BuildObj[]
 
     interface BuildObj {
@@ -290,6 +296,7 @@ declare global {
 
     interface SpawnRequest {
         role: CreepRoles
+        priority: number
         body: BodyPartConstant[]
         tier: number
         cost: number
@@ -879,7 +886,7 @@ declare global {
          */
         scoutTargets: Set<string>
 
-        spawnRequests: { [priority: string]: SpawnRequest }
+        spawnRequests: SpawnRequest[]
 
         /**
          * Tile types as defined by the rampartPlanner
@@ -940,11 +947,6 @@ declare global {
         usedRampartIDs: Set<Id<StructureRampart>>
 
         // Functions
-
-        /**
-         * Removes roomType-based values in the room's memory that don't match its type
-         */
-        cleanMemory(): void
 
         /**
          *
@@ -1780,7 +1782,7 @@ declare global {
         /**
          *
          */
-        createMoveRequestByPath(opts: MoveRequestOpts, packedPath: string, loose?: boolean): boolean | 'unpathable'
+        createMoveRequestByPath(opts: MoveRequestOpts, pathOpts: MoveRequestByPathOpts): boolean | 'unpathable'
 
         /**
          *

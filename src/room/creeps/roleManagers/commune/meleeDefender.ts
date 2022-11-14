@@ -40,7 +40,7 @@ export class MeleeDefender extends Creep {
 
         if (this.memory.RID) {
             const rampart = findObjectWithID(this.memory.RID)
-            if (!rampart || rampart.hits < 3000 || randomTick(10)) {
+            if (!rampart || rampart.hits < 3000) {
                 delete this.memory.RID
                 return
             }
@@ -76,7 +76,7 @@ export class MeleeDefender extends Creep {
             return
         }
 
-        this.defendWithRampart(enemyCreeps)
+        this.defendWithRampart()
     }
 
     defendWithoutRamparts?(enemyCreeps: Creep[]) {
@@ -110,7 +110,7 @@ export class MeleeDefender extends Creep {
     findRampart?(enemyCreep: Creep) {
         const { room } = this
 
-        if (this.memory.RID) return findObjectWithID(this.memory.RID)
+        if (this.memory.RID && !randomTick(10)) return findObjectWithID(this.memory.RID)
 
         // Get the room's ramparts, filtering for those and informing false if there are none
 
@@ -146,8 +146,10 @@ export class MeleeDefender extends Creep {
         return rampart
     }
 
-    defendWithRampart?(enemyCreeps: Creep[]) {
+    defendWithRampart?() {
         const { room } = this
+
+        const enemyCreeps = room.enemyAttackers
 
         // Get the closest enemyAttacker
 

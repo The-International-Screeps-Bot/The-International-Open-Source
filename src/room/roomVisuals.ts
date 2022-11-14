@@ -542,6 +542,7 @@ export class RoomVisualsManager {
             'build',
             'repair other',
             'barricade repair',
+            'tower inferiority',
             'spawn',
         ]
 
@@ -559,6 +560,7 @@ export class RoomVisualsManager {
                 roomStats.eob.toFixed(2),
                 roomStats.eoro.toFixed(2),
                 roomStats.eorwr.toFixed(2),
+                this.roomManager.room.towerInferiority || 'false',
                 roomStats.su.toFixed(2) + '%',
             ],
         ]

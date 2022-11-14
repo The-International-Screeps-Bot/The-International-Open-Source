@@ -7,14 +7,15 @@ import { CommuneManager } from './communeManager'
 export class DefenceManager {
     communeManager: CommuneManager
 
+    totalThreat: number
+    threatByPlayers: Map<string, number>
+
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
     }
 
     run() {
         const { room } = this.communeManager
-
-        if (!room.enemyAttackers.length) return
 
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -23,7 +24,6 @@ export class DefenceManager {
         this.advancedActivateSafeMode()
         this.manageRampartPublicity()
         this.assignDefenceTargets()
-        this.handleThreat()
 
         // If CPU logging is enabled, log the CPU used by this manager
 
@@ -99,9 +99,7 @@ export class DefenceManager {
     private manageRampartPublicity() {
         const { room } = this.communeManager
 
-        const enemyAttackers = room.enemyAttackers.filter(function (creep) {
-            return !creep.isOnExit
-        })
+        const enemyAttackers = room.enemyAttackers
 
         // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
 
@@ -129,8 +127,6 @@ export class DefenceManager {
                 intents += 1
             }
 
-            // Stop
-
             return
         }
 
@@ -141,6 +137,8 @@ export class DefenceManager {
 
     private assignDefenceTargets() {
         const { room } = this.communeManager
+
+        if (!room.enemyAttackers.length) return
 
         // Sort by estimated percent health change
 
@@ -183,7 +181,7 @@ export class DefenceManager {
         }
     }
 
-    createDefenceRequest() {
+    manageDefenceRequests() {
         const { room } = this.communeManager
 
         if (!room.towerInferiority) return
@@ -199,17 +197,19 @@ export class DefenceManager {
         // There is tower inferiority, make a defend request
 
         room.createDefendCombatRequest({
-            minDamage: 10,
-            minHeal: 10,
+            minDamage,
+            minHeal,
             quadCount: 1,
         })
     }
 
-    handleThreat() {
+    private calculateThreat() {
+        this.totalThreat = 0
+        this.threatByPlayers = new Map()
+
         const { room } = this.communeManager
 
-        let totalThreat = 0
-        let threatByPlayers: Map<string, number> = new Map()
+        if (!room.towerInferiority) return
 
         for (const enemyCreep of room.enemyAttackers) {
             let threat = 0
@@ -221,21 +221,27 @@ export class DefenceManager {
             threat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
 
             threat = Math.floor(threat)
-            totalThreat += threat
+            this.totalThreat += threat
 
             const playerName = enemyCreep.owner.username
             if (playerName === 'Invader') continue
 
-            const threatByPlayer = threatByPlayers.get(enemyCreep.owner.username)
+            const threatByPlayer = this.threatByPlayers.get(enemyCreep.owner.username)
             if (threatByPlayer) {
-                threatByPlayers.set(playerName, threatByPlayer + threat)
+                this.threatByPlayers.set(playerName, threatByPlayer + threat)
                 continue
             }
 
-            threatByPlayers.set(playerName, threat)
+            this.threatByPlayers.set(playerName, threat)
         }
+    }
 
-        for (const [playerName, threat] of threatByPlayers) {
+    manageThreat() {
+        const { room } = this.communeManager
+
+        this.calculateThreat()
+
+        for (const [playerName, threat] of this.threatByPlayers) {
             let player = Memory.players[playerName]
 
             if (!player) {
@@ -252,8 +258,8 @@ export class DefenceManager {
 
         const roomMemory = Memory.rooms[room.name]
 
-        if (totalThreat > 0) {
-            roomMemory.AT = Math.max(roomMemory.AT, totalThreat)
+        if (this.totalThreat > 0) {
+            roomMemory.AT = Math.max(roomMemory.AT, this.totalThreat)
             roomMemory.LAT = 0
         }
 

@@ -1,4 +1,8 @@
 Object.defineProperties(Structure.prototype, {
+    /**
+     * Credits to Tigga for the foundation
+     * Improved by MarvinTMB / Carson
+     */
     RCLActionable: {
          get() {
             if (this._RCLActionable !== undefined) return this._RCLActionable

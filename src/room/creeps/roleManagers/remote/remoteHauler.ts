@@ -147,8 +147,6 @@ export class RemoteHauler extends Creep {
 
             // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-            const packedPath = Memory.rooms[this.memory.RN].SPs[this.memory.SI]
-
             this.createMoveRequestByPath(
                 {
                     origin: this.pos,
@@ -159,7 +157,9 @@ export class RemoteHauler extends Creep {
                         },
                     ],
                 },
-                packedPath,
+                {
+                    packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+                },
             )
 
             return false
@@ -173,8 +173,6 @@ export class RemoteHauler extends Creep {
             if ((this.memory?.Rs?.length || 0 == 0) && getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
                 this.getDroppedEnergy()
 
-                const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
-
                 this.createMoveRequestByPath(
                     {
                         origin: this.pos,
@@ -186,7 +184,10 @@ export class RemoteHauler extends Creep {
                         ],
                         avoidEnemyRanges: true,
                     },
-                    packedPath,
+                    {
+                        packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                        remoteName: this.memory.RN
+                    },
                 )
 
                 return true
@@ -215,8 +216,6 @@ export class RemoteHauler extends Creep {
             this.message += this.commune.name
             this.say(this.message)
 
-            const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
-
             this.createMoveRequestByPath(
                 {
                     origin: this.pos,
@@ -235,8 +234,11 @@ export class RemoteHauler extends Creep {
                         allyRemote: Infinity,
                     },
                 },
-                packedPath,
-                true,
+                {
+                    packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    remoteName: this.memory.RN,
+                    loose: true,
+                },
             )
 
             return true
@@ -246,8 +248,6 @@ export class RemoteHauler extends Creep {
         this.say(this.message)
 
         this.getDroppedEnergy()
-
-        const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
 
         this.createMoveRequestByPath(
             {
@@ -268,7 +268,10 @@ export class RemoteHauler extends Creep {
                 },
                 avoidAbandonedRemotes: true,
             },
-            packedPath,
+            {
+                packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                remoteName: this.memory.RN
+            },
         )
 
         return true
@@ -406,7 +409,6 @@ export class RemoteHauler extends Creep {
             this.say(this.message)
 
             const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
-            const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
 
             this.createMoveRequestByPath(
                 {
@@ -426,8 +428,10 @@ export class RemoteHauler extends Creep {
                         allyRemote: Infinity,
                     },
                 },
-                packedPath,
-                true,
+                {
+                    packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    remoteName: this.memory.RN
+                },
             )
 
             return false
@@ -435,8 +439,6 @@ export class RemoteHauler extends Creep {
 
         this.message += this.commune.name
         this.say(this.message)
-
-        const packedPath = Memory.rooms[this.memory.RN].SPs[this.memory.SI]
 
         this.createMoveRequestByPath(
             {
@@ -456,7 +458,9 @@ export class RemoteHauler extends Creep {
                     allyRemote: Infinity,
                 },
             },
-            packedPath,
+            {
+                packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+            },
         )
 
         return true

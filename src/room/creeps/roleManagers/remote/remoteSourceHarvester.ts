@@ -243,8 +243,6 @@ export class RemoteHarvester extends Creep {
 
         this.say(`⏩ ${sourceIndex}`)
 
-        const packedPath = reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI])
-
         this.createMoveRequestByPath(
             {
                 origin: this.pos,
@@ -256,8 +254,11 @@ export class RemoteHarvester extends Creep {
                 ],
                 avoidEnemyRanges: true,
             },
-            packedPath,
-            true,
+            {
+                packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                remoteName: this.memory.RN,
+                loose: true,
+            },
         )
 
         return true
@@ -281,8 +282,6 @@ export class RemoteHarvester extends Creep {
 
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-                const packedPath = Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]
-
                 creep.createMoveRequestByPath(
                     {
                         origin: creep.pos,
@@ -293,7 +292,9 @@ export class RemoteHarvester extends Creep {
                             },
                         ],
                     },
-                    packedPath,
+                    {
+                        packedPath: Memory.rooms[creep.memory.RN].SPs[creep.memory.SI],
+                    },
                 )
 
                 continue
@@ -309,7 +310,6 @@ export class RemoteHarvester extends Creep {
             creep.say(creep.memory.RN)
 
             const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].SP[creep.memory.SI])[0]
-            const packedPath = reverseCoordList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI])
 
             creep.createMoveRequestByPath(
                 {
@@ -330,7 +330,10 @@ export class RemoteHarvester extends Creep {
                     },
                     avoidAbandonedRemotes: true,
                 },
-                packedPath,
+                {
+                    packedPath: reverseCoordList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
+                    remoteName: creep.memory.RN
+                },
             )
         }
     }

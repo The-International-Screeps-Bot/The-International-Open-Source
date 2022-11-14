@@ -122,7 +122,7 @@ export const settings: Settings = {
         'Aerics',
         'PlaidRabbit',
     ],
-    nonAggressionPlayers: ['Q13214', 'HerrKai', 'Raggy', 'somygame'],
+    nonAggressionPlayers: ['Q13214', 'HerrKai', 'Raggy', 'somygame', 'shley92822212'],
     tradeBlacklist: [''],
     pixelSelling: false,
     pixelGeneration: false,

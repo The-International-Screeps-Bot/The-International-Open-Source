@@ -4,9 +4,6 @@ import { getRange, getRangeOfCoords } from 'international/utils'
 Object.defineProperties(Creep.prototype, {
     dying: {
         get() {
-            // Inform as dying if creep is already recorded as dying
-
-            if (this._dying !== undefined) return this._dying
 
             // Stop if creep is spawning
 
@@ -18,7 +15,7 @@ Object.defineProperties(Creep.prototype, {
 
             // Record creep as dying
 
-            return (this._dying = true)
+            return true
         },
     },
     role: {
@@ -91,11 +88,9 @@ Object.defineProperties(Creep.prototype, {
             let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
             let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
 
-            // Find adjacent creeps
-
             const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
-            // Loop through each adjacentCreep this creep
+            // Calculate combined heal to this creep of adjacent creeps
 
             for (const posData of adjacentCreeps) {
                 const { creep } = posData
@@ -108,7 +103,7 @@ Object.defineProperties(Creep.prototype, {
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
+                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
 
                 this._macroHealStrength += Math.floor(healStrength)
             }
@@ -128,7 +123,7 @@ Object.defineProperties(Creep.prototype, {
             if (this.room.controller.safeMode) return this._netTowerDamage
 
             this._netTowerDamage -= this.macroHealStrength
-            
+
             return this._netTowerDamage
         },
     },
@@ -240,7 +235,6 @@ Object.defineProperties(Creep.prototype, {
 Object.defineProperties(PowerCreep.prototype, {
     dying: {
         get() {
-            if (this.dying !== undefined) return this.dying
 
             return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
         },
@@ -275,7 +269,7 @@ Object.defineProperties(PowerCreep.prototype, {
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
+                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
 
                 this._macroHealStrength += Math.floor(healStrength)
             }

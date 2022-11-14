@@ -1,4 +1,12 @@
-import { mmoShardNames, myColors, offsetsByDirection, RemoteData, roomDimensions } from './constants'
+import {
+    mmoShardNames,
+    myColors,
+    offsetsByDirection,
+    RemoteData,
+    roomDimensions,
+    roomTypeProperties,
+    roomTypes,
+} from './constants'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -511,6 +519,27 @@ export function randomTick(max: number = 20) {
 
 export function randomRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min)
+}
+
+/**
+ * Removes roomType-based values in the room's memory that don't match its type
+ */
+export function cleanRoomMemory(roomName: string) {
+    const roomMemory = Memory.rooms[roomName]
+
+    // Loop through keys in the room's memory
+
+    for (const key in roomMemory) {
+        // Iterate if key is not part of roomTypeProperties
+
+        if (!roomTypeProperties.has(key as keyof RoomMemory)) continue
+
+        // Iterate if key is part of this roomType's properties
+
+        if (roomTypes[roomMemory.T].has(key as keyof RoomMemory)) continue
+
+        delete roomMemory[key as keyof RoomMemory]
+    }
 }
 
 /*

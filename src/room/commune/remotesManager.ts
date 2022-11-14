@@ -1,5 +1,13 @@
-import { minHarvestWorkRatio, remoteHarvesterRoles, remoteRoles, maxRemoteRoomDistance, RemoteData } from 'international/constants'
+import {
+    minHarvestWorkRatio,
+    remoteHarvesterRoles,
+    remoteRoles,
+    maxRemoteRoomDistance,
+    RemoteData,
+    remoteTypeWeights,
+} from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
+import { unpackPosList } from 'other/packrat'
 import { CommuneManager } from './communeManager'
 
 export class RemotesManager {
@@ -24,19 +32,14 @@ export class RemotesManager {
             // If the room isn't a remote, remove it from the remotes array
 
             if (remoteMemory.T !== 'remote' || remoteMemory.CN !== room.name) {
-                room.memory.remotes.splice(index, 1)
-                delete remoteMemory.CN
-                remoteMemory.T = 'neutral'
+                this.communeManager.removeRemote(remoteName, index)
                 continue
             }
 
             // The room is closed or is now a respawn or novice zone
 
             if (Game.map.getRoomStatus(remoteName).status !== Game.map.getRoomStatus(room.name).status) {
-
-                room.memory.remotes.splice(index, 1)
-                delete remoteMemory.CN
-                remoteMemory.T = 'neutral'
+                this.communeManager.removeRemote(remoteName, index)
                 continue
             }
 
@@ -45,17 +48,13 @@ export class RemotesManager {
                 continue
             }
 
-            // Every 5~ ticks ensure enemies haven't blocked off too much of the path
+            this.managePathCacheAllowance(remoteName)
+
+            // Every x ticks ensure enemies haven't blocked off too much of the path
 
             if (randomTick(100)) {
                 const safeDistance = advancedFindDistance(room.name, remoteName, {
-                    typeWeights: {
-                        keeper: Infinity,
-                        enemy: Infinity,
-                        enemyRemote: Infinity,
-                        ally: Infinity,
-                        allyRemote: Infinity,
-                    },
+                    typeWeights: remoteTypeWeights,
                     avoidAbandonedRemotes: true,
                 })
 
@@ -66,13 +65,7 @@ export class RemotesManager {
                 }
 
                 const distance = advancedFindDistance(room.name, remoteName, {
-                    typeWeights: {
-                        keeper: Infinity,
-                        enemy: Infinity,
-                        enemyRemote: Infinity,
-                        ally: Infinity,
-                        allyRemote: Infinity,
-                    },
+                    typeWeights: remoteTypeWeights,
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {
@@ -188,6 +181,35 @@ export class RemotesManager {
         }
     }
 
+    /**
+     * Every x ticks see if sourcePath is safe to use
+     */
+    private managePathCacheAllowance(remoteName: string) {
+        if (!randomTick(20)) return
+
+        const remoteMemory = Memory.rooms[remoteName]
+
+        for (let index in remoteMemory.SIDs) {
+            const pathRoomNames: Set<string> = new Set()
+
+            for (const pos of unpackPosList(remoteMemory.SPs[index])) {
+                const roomName = pos.roomName
+
+                if (pathRoomNames.has(roomName)) continue
+                pathRoomNames.add(roomName)
+
+                // See if the room has a valid type and isn't abandoned
+
+                if (remoteTypeWeights[remoteMemory.T] !== Infinity && !remoteMemory.data[RemoteData.abandon]) continue
+
+                remoteMemory.data[RemoteData.disableCachedPaths] = 1
+                return
+            }
+        }
+
+        remoteMemory.data[RemoteData.disableCachedPaths] = 0
+    }
+
     private manageAbandonment(remoteName: string) {
         const remoteMemory = Memory.rooms[remoteName]
 
@@ -196,7 +218,6 @@ export class RemotesManager {
         const abandonment = remoteMemory.data[RemoteData.abandon]
 
         for (const key in remoteMemory.data) {
-
             remoteMemory.data[key] = 0
         }
 

@@ -50,7 +50,8 @@ global.profiler = initProfiler()
 
 export const loop = ErrorMapper.wrapLoop((): void => {
     if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
-        console.log('SKIPPING TICK due to low bucket:' + Game.cpu.bucket)
+        customLog('Skipping tick due to low bucket', Game.cpu.bucket, myColors.white, myColors.red)
+        console.log(global.logs)
         return
     }
 

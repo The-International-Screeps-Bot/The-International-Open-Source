@@ -132,7 +132,7 @@ export const nonCommuneSigns = [
 ]
 
 export const chant = [
-    'creeps',
+    'Creeps',
     'of',
     Game.shard.name,
     'unite',
@@ -144,6 +144,17 @@ export const chant = [
     'but',
     'your',
     'chains!',
+    undefined,
+    'Die',
+    'Tigga',
+    'die!',
+    undefined,
+    'Read',
+    'Das',
+    'Kapital',
+    'on',
+    'marxists',
+    '.org',
     undefined,
 ]
 
@@ -705,6 +716,7 @@ export enum RemoteData {
     invaderCore,
     abandon,
     onlyInvader,
+    disableCachedPaths,
 }
 
 export enum ClaimRequestData {
@@ -1076,3 +1088,11 @@ export const maxRemoteRoomDistance = 5
 export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
 
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
+
+export const remoteTypeWeights: Partial<{ [key in RoomTypes]: number }> = {
+    keeper: Infinity,
+    enemy: Infinity,
+    enemyRemote: Infinity,
+    ally: Infinity,
+    allyRemote: Infinity,
+}
