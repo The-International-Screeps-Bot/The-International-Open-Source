@@ -154,6 +154,7 @@ export class CommuneManager {
 
         this.defenceManager.run()
         this.towerManager.run()
+        this.defenceManager.manageThreat()
         this.defenceManager.manageDefenceRequests()
 
         try {
@@ -193,6 +194,8 @@ export class CommuneManager {
     }
 
     private test() {
+
+        customLog('RAMPART HITS TARGET', this.room.name + ', ' + this.minRampartHits + ', ' + this.room.memory.AT + ', ' + (this.room.memory.AT * this.room.controller.level * 10))
 
         return
 
@@ -237,6 +240,6 @@ export class CommuneManager {
 
         const level = this.room.controller.level
 
-        return Math.min(Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * level * 10), RAMPART_HITS_MAX[level])
+        return Math.min(Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10), RAMPART_HITS_MAX[level])
     }
  }

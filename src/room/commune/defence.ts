@@ -24,7 +24,6 @@ export class DefenceManager {
         this.advancedActivateSafeMode()
         this.manageRampartPublicity()
         this.assignDefenceTargets()
-        this.manageThreat()
 
         // If CPU logging is enabled, log the CPU used by this manager
 
@@ -185,7 +184,7 @@ export class DefenceManager {
     manageDefenceRequests() {
         const { room } = this.communeManager
 
-        if (!room.towerInferiority && room.structures.tower.length) return
+        if (!room.towerInferiority) return
 
         let minDamage = 0
         let minHeal = 0
@@ -210,7 +209,7 @@ export class DefenceManager {
 
         const { room } = this.communeManager
 
-        if (!room.towerInferiority && room.structures.tower.length) return
+        if (!room.towerInferiority) return
 
         for (const enemyCreep of room.enemyAttackers) {
             let threat = 0
@@ -237,7 +236,7 @@ export class DefenceManager {
         }
     }
 
-    private manageThreat() {
+    manageThreat() {
         const { room } = this.communeManager
 
         this.calculateThreat()

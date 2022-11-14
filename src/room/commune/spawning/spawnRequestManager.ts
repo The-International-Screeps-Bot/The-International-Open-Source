@@ -449,6 +449,8 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 role = 'meleeDefender'
 
+                if (this.myCreeps[role].length * 1.75 > enemyAttackers.length) return false
+
                 // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
                 let requiredStrength = 1
@@ -498,6 +500,8 @@ Room.prototype.spawnRequester = function () {
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
                 role = 'rangedDefender'
+
+                if (this.myCreeps[role].length * 1.75 > enemyAttackers.length) return false
 
                 // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 

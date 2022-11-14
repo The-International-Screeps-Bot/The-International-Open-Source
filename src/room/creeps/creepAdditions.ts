@@ -88,11 +88,9 @@ Object.defineProperties(Creep.prototype, {
             let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
             let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
 
-            // Find adjacent creeps
-
             const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
-            // Loop through each adjacentCreep this creep
+            // Calculate combined heal to this creep of adjacent creeps
 
             for (const posData of adjacentCreeps) {
                 const { creep } = posData
@@ -105,7 +103,7 @@ Object.defineProperties(Creep.prototype, {
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
+                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
 
                 this._macroHealStrength += Math.floor(healStrength)
             }
@@ -271,7 +269,7 @@ Object.defineProperties(PowerCreep.prototype, {
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength / (HEAL_POWER / RANGED_HEAL_POWER)
+                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
 
                 this._macroHealStrength += Math.floor(healStrength)
             }

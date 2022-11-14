@@ -77,7 +77,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
-    if (!this.parts.move) return false
+    if (this instanceof Creep && !this.parts.move) return false
 
     if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
 
@@ -119,7 +119,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
-    if (!this.parts.move) return false
+    if (this instanceof Creep && !this.parts.move) return false
     /*
     if (this.spawning) return false
  */
