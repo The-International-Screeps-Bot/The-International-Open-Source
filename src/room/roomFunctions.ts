@@ -185,11 +185,14 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                for (const path of Game.rooms[roomName].sourcePaths) {
-                    for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
+                if (roomMemory.SPs.length) {
+
+                    for (const path of Game.rooms[roomName].sourcePaths) {
+                        for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
+                    }
                 }
             } else if (roomMemory.T === 'remote') {
-                customLog('SOURCEPATH ISSUES', roomName + ', ' + roomMemory.SPs)
+
                 for (const packedPath of roomMemory.SPs) {
                     const path = unpackPosList(packedPath)
 
@@ -2270,7 +2273,7 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
     if (!effectsData.get(powerType)) cooldown = 0
     else cooldown = effectsData.get(powerType).ticksRemaining
 
-    const ID = newID()
+    const ID = internationalManager.newTickID()
 
     return (this.powerTasks[ID] = {
         taskID: ID,

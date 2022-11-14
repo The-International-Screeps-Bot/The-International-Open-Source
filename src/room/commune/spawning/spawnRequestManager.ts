@@ -14,13 +14,7 @@ import {
     remoteHaulerRoles,
     roadUpkeepCost,
 } from 'international/constants'
-import {
-    customLog,
-    findCarryPartsRequired,
-    findLinkThroughput,
-    getRange,
-    getRangeOfCoords,
-} from 'international/utils'
+import { customLog, findCarryPartsRequired, findLinkThroughput, getRange, getRangeOfCoords } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -444,7 +438,6 @@ Room.prototype.spawnRequester = function () {
     // Construct requests for meleeDefenders
 
     if (this.towerInferiority) {
-
         // Defenders
 
         minPriority = 6
@@ -454,7 +447,6 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-
                 role = 'meleeDefender'
 
                 // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
@@ -505,7 +497,6 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-
                 role = 'rangedDefender'
 
                 // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
@@ -516,7 +507,7 @@ Room.prototype.spawnRequester = function () {
                     if (!this.structures.tower.length) requiredStrength += attackStrength
                 }
 
-                const priority = Math.min(minPriority + .1 + this.myCreeps[role].length * 0.75, maxPriority)
+                const priority = Math.min(minPriority + 0.1 + this.myCreeps[role].length * 0.75, maxPriority)
 
                 // If all RCL 3 extensions are build
 
@@ -665,7 +656,6 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-
             minPriority = 6
             maxPriority = minRemotePriority - 0.5
 
@@ -1013,9 +1003,7 @@ Room.prototype.spawnRequester = function () {
         const remote = Game.rooms[remoteName]
         const priority = minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100
 
-        role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
-            | 'remoteSourceHarvester0'
-            | 'remoteSourceHarvester1'
+        role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as 'remoteSourceHarvester0' | 'remoteSourceHarvester1'
 
         // If there are no data for this this, inform false
 
@@ -1703,6 +1691,10 @@ Room.prototype.spawnRequester = function () {
             })(),
         )
     }
+
+    this.spawnRequests.sort((a, b) => {
+        return a.priority - b.priority
+    })
 
     // If CPU logging is enabled, log the CPU used by this manager
 

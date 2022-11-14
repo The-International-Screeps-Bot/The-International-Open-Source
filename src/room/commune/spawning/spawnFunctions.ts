@@ -1,4 +1,5 @@
 import { myColors } from 'international/constants'
+import { internationalManager } from 'international/internationalManager'
 import { customLog, newID } from 'international/utils'
 
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
@@ -49,10 +50,10 @@ Room.prototype.findMaxCostPerCreep = function (maxCostPerCreep) {
 }
 
 Room.prototype.createSpawnRequest = function (priority, role, body, tier, cost, memory) {
-    // Add the components to spawnRequests
 
-    this.spawnRequests[priority] = {
+    this.spawnRequests.push({
         role,
+        priority,
         body,
         tier,
         cost,
@@ -60,8 +61,8 @@ Room.prototype.createSpawnRequest = function (priority, role, body, tier, cost, 
             memory,
             energyStructures: this.spawningStructuresByPriority,
             dryRun: true,
-        },
-    }
+        }
+    })
 }
 
 Room.prototype.spawnRequestIndividually = function (opts) {

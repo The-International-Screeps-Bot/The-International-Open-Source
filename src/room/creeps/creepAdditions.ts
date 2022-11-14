@@ -4,9 +4,6 @@ import { getRange, getRangeOfCoords } from 'international/utils'
 Object.defineProperties(Creep.prototype, {
     dying: {
         get() {
-            // Inform as dying if creep is already recorded as dying
-
-            if (this._dying !== undefined) return this._dying
 
             // Stop if creep is spawning
 
@@ -18,7 +15,7 @@ Object.defineProperties(Creep.prototype, {
 
             // Record creep as dying
 
-            return (this._dying = true)
+            return true
         },
     },
     role: {
@@ -128,7 +125,7 @@ Object.defineProperties(Creep.prototype, {
             if (this.room.controller.safeMode) return this._netTowerDamage
 
             this._netTowerDamage -= this.macroHealStrength
-            
+
             return this._netTowerDamage
         },
     },
@@ -240,7 +237,6 @@ Object.defineProperties(Creep.prototype, {
 Object.defineProperties(PowerCreep.prototype, {
     dying: {
         get() {
-            if (this.dying !== undefined) return this.dying
 
             return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
         },

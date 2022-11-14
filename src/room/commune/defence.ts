@@ -182,10 +182,10 @@ export class DefenceManager {
         }
     }
 
-    createDefenceRequest() {
+    manageDefenceRequests() {
         const { room } = this.communeManager
 
-        if (!room.towerInferiority) return
+        if (!room.towerInferiority && room.structures.tower.length) return
 
         let minDamage = 0
         let minHeal = 0
@@ -198,8 +198,8 @@ export class DefenceManager {
         // There is tower inferiority, make a defend request
 
         room.createDefendCombatRequest({
-            minDamage: 10,
-            minHeal: 10,
+            minDamage,
+            minHeal,
             quadCount: 1,
         })
     }

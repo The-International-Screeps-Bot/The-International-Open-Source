@@ -649,7 +649,7 @@ Object.defineProperties(Room.prototype, {
             }
 
             if (!this.anchor) return this._sourcePaths
-
+            
             const sources = []
                 .concat(this.sourcePositions)
                 .sort((a, b) => {

@@ -92,7 +92,7 @@ export class CommuneManager {
         if (!room.memory.combatRequests) room.memory.combatRequests = []
         if (!room.memory.haulRequests) room.memory.haulRequests = []
 
-        room.spawnRequests = {}
+        room.spawnRequests = []
         room.upgradeStrength = 0
         room.haulerNeed = 0
 
@@ -154,7 +154,7 @@ export class CommuneManager {
 
         this.defenceManager.run()
         this.towerManager.run()
-        this.defenceManager.createDefenceRequest()
+        this.defenceManager.manageDefenceRequests()
 
         try {
             this.tradeManager.run()

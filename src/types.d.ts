@@ -296,6 +296,7 @@ declare global {
 
     interface SpawnRequest {
         role: CreepRoles
+        priority: number
         body: BodyPartConstant[]
         tier: number
         cost: number
@@ -885,7 +886,7 @@ declare global {
          */
         scoutTargets: Set<string>
 
-        spawnRequests: { [priority: string]: SpawnRequest }
+        spawnRequests: SpawnRequest[]
 
         /**
          * Tile types as defined by the rampartPlanner

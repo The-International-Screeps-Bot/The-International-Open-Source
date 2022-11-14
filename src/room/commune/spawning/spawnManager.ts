@@ -71,34 +71,25 @@ export class SpawnManager {
 
         this.communeManager.room.spawnRequester()
 
-        // Sort spawnRequests by their priority
-
-        const requestsByPriority = Object.keys(this.communeManager.room.spawnRequests).sort((a, b) => {
-            return parseInt(a) - parseInt(b)
-        })
-
         // Track the inactive spawn index
 
         let spawnIndex = this.inactiveSpawns.length - 1
 
         // Loop through priorities inside requestsByPriority
 
-        for (const priority of requestsByPriority) {
+        for (const request of this.communeManager.room.spawnRequests) {
 
             // Try to find inactive spawn, if can't, stop the loop
 
             const spawn = this.inactiveSpawns[spawnIndex]
 
-            // Otherwise get the spawnRequest using its priority
-            const spawnRequest = this.communeManager.room.spawnRequests[priority]
-
             //We want to continue instead of break in this sub-case.  If we're asked to build a creep larger
             // than what we can possibly build, if we break out, we'll get stuck in a loop where the rest of the
             // spawns never run.
-            if (spawnRequest.cost > this.communeManager.room.energyCapacityAvailable) {
+            if (request.cost > this.communeManager.room.energyCapacityAvailable) {
                 customLog(
                     'Failed to spawn',
-                    `cost greater then energyCapacityAvailable, role: ${spawnRequest.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
+                    `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                     myColors.white,
                     myColors.red,
                 )
@@ -107,7 +98,7 @@ export class SpawnManager {
             }
 
             // See if creep can be spawned
-            const testSpawnResult = spawn.advancedSpawn(spawnRequest)
+            const testSpawnResult = spawn.advancedSpawn(request)
 
             // If creep can't be spawned
 
@@ -116,7 +107,7 @@ export class SpawnManager {
 
                 customLog(
                     'Failed to spawn',
-                    `error: ${testSpawnResult}, role: ${spawnRequest.role}, cost: ${spawnRequest.cost}, body: (${spawnRequest.body.length}) ${spawnRequest.body}`,
+                    `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                     myColors.white,
                     myColors.red,
                 )
@@ -129,17 +120,17 @@ export class SpawnManager {
 
             // Disable dry run
 
-            spawnRequest.extraOpts.dryRun = false
+            request.extraOpts.dryRun = false
 
             // Spawn the creep
 
-            spawn.advancedSpawn(spawnRequest)
+            spawn.advancedSpawn(request)
 /*
             // Record in stats the costs
 
             this.communeManager.room.energyAvailable -= spawnRequest.cost
  */
-            globalStatsUpdater(this.communeManager.room.name, 'eosp', spawnRequest.cost)
+            globalStatsUpdater(this.communeManager.room.name, 'eosp', request.cost)
 
             // Decrease the spawnIndex
 
@@ -165,18 +156,13 @@ export class SpawnManager {
 
         if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
 
-        const requestsByPriority = Object.keys(this.communeManager.room.spawnRequests).sort((a, b) => {
-            return parseInt(a) - parseInt(b)
-        })
-
-        for (const priority of requestsByPriority) {
-            const request = this.communeManager.room.spawnRequests[priority]
+        for (const request of this.communeManager.room.spawnRequests) {
 
             /* customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ') */
 
             if (request.role !== 'remoteSourceHarvester0' && request.role !== 'remoteSourceHarvester1') continue
 
-            customLog('SPAWN REQUEST REMOTE HARVESTER', priority + ', ' + request.extraOpts.memory.RN + ', ' + request.extraOpts.memory.SI)
+            customLog('SPAWN REQUEST REMOTE HARVESTER', request.priority + ', ' + request.extraOpts.memory.RN + ', ' + request.extraOpts.memory.SI)
         }
 
     }
