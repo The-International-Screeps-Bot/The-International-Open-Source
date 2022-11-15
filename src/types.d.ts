@@ -297,6 +297,7 @@ declare global {
     interface SpawnRequest {
         role: CreepRoles
         priority: number
+        defaultParts: number
         body: BodyPartConstant[]
         tier: number
         cost: number
@@ -1151,6 +1152,7 @@ declare global {
         createSpawnRequest(
             priority: number,
             role: CreepRoles,
+            defaultParts: number,
             body: BodyPartConstant[],
             tier: number,
             cost: number,
@@ -1993,6 +1995,10 @@ declare global {
          * The name of the room the creep is from
          */
         readonly commune: Room | undefined
+
+        _defaultParts: number
+
+        readonly defaultParts: number
 
         _strength: number
 

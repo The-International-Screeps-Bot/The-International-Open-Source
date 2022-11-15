@@ -189,12 +189,15 @@ export class DefenceManager {
 
         if (!room.towerInferiority) return
 
+        let onlyInvader = true
         let minDamage = 0
         let minHeal = 0
 
         for (const enemyCreep of room.enemyAttackers) {
             minDamage += enemyCreep.combatStrength.heal
             minHeal += enemyCreep.combatStrength.ranged
+
+            if (onlyInvader && enemyCreep.owner.username !== 'Invader') onlyInvader = false
         }
 
         // There is tower inferiority, make a defend request
@@ -203,6 +206,7 @@ export class DefenceManager {
             minDamage,
             minHeal,
             quadCount: 1,
+            inactionTimerMax: onlyInvader ? 1 : undefined
         })
     }
 

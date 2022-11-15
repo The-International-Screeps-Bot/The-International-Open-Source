@@ -536,16 +536,16 @@ export class RoomVisualsManager {
     private generalDataVisuals(y: number) {
         const headers: any[] = [
             'energy',
-            'min energy',
+            'minEnergy',
             'minRampartHits',
             'estimatedIncome',
-            'C harvest',
-            'R harvest',
+            'CHarvest',
+            'RHarvest',
             'upgrade',
             'build',
-            'repair other',
-            'barricade repair',
-            'tower inferiority',
+            'repairOther',
+            'barricadeRepair',
+            'towerInferiority',
             'spawn',
         ]
 
@@ -596,6 +596,11 @@ export class RoomVisualsManager {
         })
 
         return y + height
+    }
+
+    requestDataVisuals(y: number) {
+
+        
     }
 
     private remoteDataVisuals(y: number) {
