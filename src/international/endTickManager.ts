@@ -20,8 +20,10 @@ InternationalManager.prototype.endTickManager = function () {
     customLog(
         'Total CPU',
         `${Game.cpu.getUsed().toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
-        myColors.white,
-        CPUColor,
+        {
+            textColor: myColors.white,
+            bgColor: CPUColor
+        },
     )
 
     // Log the accumilated global logs

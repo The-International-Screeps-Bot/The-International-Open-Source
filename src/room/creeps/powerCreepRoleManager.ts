@@ -33,8 +33,10 @@ export class PowerCreepRoleManager {
             customLog(
                 'Power Role Manager',
                 `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`,
-                myColors.white,
-                myColors.lightBlue,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.lightBlue
+                },
             )
             const statName: RoomCommuneStatNames = 'prmcu'
             const statName2: RoomCommuneStatNames = 'prmpccu'
@@ -62,8 +64,11 @@ export class PowerCreepRoleManager {
             customLog(
                 'Exception processing creep role: ' + className + ' in ' + this.roomManager.room.name + '. ',
                 err + '\n' + (err as any).stack,
-                myColors.white,
-                myColors.red,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.red,
+                    superPosition: 3,
+                },
             )
         }
 

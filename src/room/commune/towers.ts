@@ -41,7 +41,10 @@ export class TowerManager {
 
         if (Memory.CPULogging) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Tower Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Tower Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'tmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

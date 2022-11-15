@@ -470,8 +470,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             customLog(
                 'Incomplete Path',
                 `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`,
-                myColors.white,
-                myColors.red,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.red
+                }
             )
 
             room.pathVisual(pathFinderResult.path, 'red')
@@ -762,7 +764,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Stop if there is a source inefficient enough
 
-        if (path.length >= 300) return this.memory.T
+        if (path.length > 250) return this.memory.T
 
         let newSourceEfficacy = 0
 

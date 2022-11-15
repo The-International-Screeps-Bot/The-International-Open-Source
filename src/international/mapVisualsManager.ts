@@ -159,7 +159,10 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-        customLog('Map Visuals Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        customLog('Map Visuals Manager', cpuUsed.toFixed(2), {
+            textColor: myColors.white,
+            bgColor: myColors.lightBlue
+        })
         const statName: InternationalStatNames = 'mvmcu'
         globalStatsUpdater('', statName, cpuUsed, true)
     }

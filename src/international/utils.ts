@@ -106,6 +106,12 @@ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
     return pos1.roomName === pos2.roomName && pos1.x === pos2.x && pos1.y === pos2.y
 }
 
+interface CustomLogOpts {
+    superPosition?: number,
+    textColor?: string,
+    bgColor?: string,
+}
+
 /**
  * Outputs HTML and CSS styled console logs
  * @param title Title of the log
@@ -113,16 +119,20 @@ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
  * @param color Colour of the text. Default is black
  * @param bgColor Colour of the background. Default is white
  */
-export function customLog(title: any, message: any, color: string = myColors.black, bgColor: string = myColors.white) {
+export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
     if (!Memory.logging) return
+
+    if (!opts) opts = {}
+    if (!opts.textColor) opts.textColor = myColors.black
+    if (!opts.bgColor) opts.bgColor = myColors.white
 
     // Create the title
 
-    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${bgColor};'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${color};'>${title}:</div>`
+    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${opts.bgColor}; margin-left: ${(opts.superPosition || 0) * 8}px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
 
     // Create the content
 
-    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${color};'>${message}</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${opts.textColor};'>${message || ''}</div></div>`
 }
 
 /**

@@ -133,7 +133,10 @@ export class ClaimRequestManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Claim Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Claim Request Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'clrmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

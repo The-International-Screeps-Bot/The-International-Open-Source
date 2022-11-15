@@ -74,7 +74,10 @@ export class HaulRequestManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Haul Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Haul Request Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'cormcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

@@ -22,15 +22,20 @@ class CreepOrganizer {
                 customLog(
                     'Exception processing creep: ' + creepName + err,
                     (err as any).stack,
-                    myColors.white,
-                    myColors.red,
+                    {
+                        textColor: myColors.white,
+                        bgColor: myColors.red
+                    }
                 )
             }
         }
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Creep Organizer', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Creep Organizer', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: InternationalStatNames = 'cocu'
             globalStatsUpdater('', statName, cpuUsed, true)
         }

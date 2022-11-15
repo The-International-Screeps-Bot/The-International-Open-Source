@@ -58,7 +58,11 @@ export function roomsManager() {
             logMessage += `, CPU: ${cpuUsed.toFixed(2)}`
             globalStatsUpdater(roomName, statName, cpuUsed)
         }
-        customLog(room.name + ' ' + roomType, logMessage, undefined, myColors.midGrey)
+        customLog(room.name + ' ' + roomType, logMessage, {
+            textColor: myColors.white,
+            bgColor: myColors.lightBlue,
+            superPosition: 2,
+        })
         if (statsActive) statsManager.roomEndTick(room.name, roomType)
     }
 
@@ -66,7 +70,11 @@ export function roomsManager() {
 
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-        customLog('Room Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        customLog('Room Manager', cpuUsed.toFixed(2), {
+            textColor: myColors.white,
+            bgColor: myColors.lightBlue,
+            superPosition: 1,
+        })
         const statName: InternationalStatNames = 'roomcu'
         globalStatsUpdater('', statName, cpuUsed, true)
     }
