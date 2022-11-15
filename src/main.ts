@@ -50,7 +50,10 @@ global.profiler = initProfiler()
 
 export const loop = ErrorMapper.wrapLoop((): void => {
     if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
-        customLog('Skipping tick due to low bucket', Game.cpu.bucket, myColors.white, myColors.red)
+        customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+            textColor: myColors.white,
+            bgColor: myColors.red
+        })
         console.log(global.logs)
         return
     }
@@ -83,7 +86,10 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-        customLog('International Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        customLog('International Manager', cpuUsed.toFixed(2), {
+            textColor: myColors.white,
+            bgColor: myColors.lightBlue
+        })
         const statName: InternationalStatNames = 'imcu'
         globalStatsUpdater('', statName, cpuUsed, true)
     }

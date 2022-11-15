@@ -1704,7 +1704,10 @@ Room.prototype.spawnRequester = function () {
 
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-        customLog('Spawn Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+        customLog('Spawn Request Manager', cpuUsed.toFixed(2), {
+            textColor: myColors.white,
+            bgColor: myColors.lightBlue
+        })
         const statName: RoomCommuneStatNames = 'srmcu'
         globalStatsUpdater(this.name, statName, cpuUsed)
     }

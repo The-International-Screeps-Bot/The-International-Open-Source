@@ -47,7 +47,10 @@ export class CombatRequestManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Combat Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Combat Request Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'cormcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

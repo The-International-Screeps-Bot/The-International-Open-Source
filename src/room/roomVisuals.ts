@@ -36,7 +36,10 @@ export class RoomVisualsManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Room Visuals Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Room Visuals Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'rvmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

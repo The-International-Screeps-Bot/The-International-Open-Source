@@ -29,7 +29,10 @@ export class DefenceManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Defense Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Defense Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'dmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

@@ -44,7 +44,10 @@ class TickConfig {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Tick Config', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Tick Config', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: InternationalStatNames = 'tccu'
             globalStatsUpdater('', statName, cpuUsed, true)
         }

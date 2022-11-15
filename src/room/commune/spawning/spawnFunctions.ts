@@ -239,8 +239,10 @@ Room.prototype.spawnRequestByGroup = function (opts) {
         customLog(
             'spawnRequestByGroup error',
             '0 length extraParts?' + JSON.stringify(opts),
-            myColors.white,
-            myColors.red,
+            {
+                textColor: myColors.white,
+                bgColor: myColors.red
+            }
         )
         return
     }

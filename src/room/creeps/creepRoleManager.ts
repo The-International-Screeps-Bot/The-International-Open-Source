@@ -85,8 +85,10 @@ export class CreepRoleManager {
             customLog(
                 'Role Manager',
                 `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`,
-                myColors.white,
-                myColors.lightBlue,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.lightBlue
+                },
             )
             const statName: RoomCommuneStatNames = 'rolmcu'
             const statName2: RoomCommuneStatNames = 'rolmpccu'
@@ -114,8 +116,11 @@ export class CreepRoleManager {
             customLog(
                 'Exception processing creep role: ' + role + ' in ' + this.roomManager.room.name + '. ',
                 err + '\n' + (err as any).stack,
-                myColors.white,
-                myColors.red,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.red,
+                    superPosition: 2
+                },
             )
         }
 
@@ -127,7 +132,9 @@ export class CreepRoleManager {
                 (Game.cpu.getUsed() - roleCPUStart) /
                 creepsOfRoleAmount
             ).toFixed(2)}`,
-            undefined,
+            {
+                superPosition: 3,
+            }
         )
     }
 }

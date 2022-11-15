@@ -244,8 +244,10 @@ export class StatsManager {
             customLog(
                 'StatsManager',
                 `RoomCommuneFinalEndTick: ${roomName} stats not updated`,
-                myColors.white,
-                myColors.red,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.red
+                }
             )
             return
         }
@@ -461,7 +463,10 @@ export class StatsManager {
                 roomcu: this.average(CPUUsers.roomcu, global.CPUUsers.roomcu),
                 smcu: this.average(CPUUsers.smcu, cpuUsed),
             }
-            customLog('Stats Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Stats Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
         } else {
             Memory.stats.CPUUsers = {
                 cocu: undefined,
