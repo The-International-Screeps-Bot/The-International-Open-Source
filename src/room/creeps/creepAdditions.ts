@@ -39,6 +39,13 @@ Object.defineProperties(Creep.prototype, {
             return (this._commune = Game.rooms[this.name.split(' ')[2]])
         },
     },
+    defaultParts: {
+        get() {
+            if (this._defaultParts) return this._defaultParts
+
+            return (this._defaultParts = parseInt(this.name.split(' ')[3]))
+        },
+    },
     strength: {
         get() {
             if (this._strength) return this._strength

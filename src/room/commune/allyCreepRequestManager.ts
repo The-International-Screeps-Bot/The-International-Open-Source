@@ -65,7 +65,10 @@ export class AllyCreepRequestManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Ally Creep Request Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Ally Creep Request Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'acrmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

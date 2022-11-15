@@ -47,7 +47,10 @@ export class EndTickCreepManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('End Tick Creep Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('End Tick Creep Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'etcmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }

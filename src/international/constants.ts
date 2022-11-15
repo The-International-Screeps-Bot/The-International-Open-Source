@@ -126,7 +126,7 @@ export const nonCommuneSigns = [
     'Real democracy requires democracy in the workplace - Richard Wolff',
     'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
     'Socialism is about worker ownership over the workplace',
-    'Trans rights.',
+    'Are trans women women? Yes. Obviously.',
     'Advancing the LGBTQ+ agenda <3',
     'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it',
 ]

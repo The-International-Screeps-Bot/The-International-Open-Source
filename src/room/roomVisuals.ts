@@ -36,7 +36,10 @@ export class RoomVisualsManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Room Visuals Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Room Visuals Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'rvmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
@@ -533,16 +536,16 @@ export class RoomVisualsManager {
     private generalDataVisuals(y: number) {
         const headers: any[] = [
             'energy',
-            'min energy',
+            'minEnergy',
             'minRampartHits',
             'estimatedIncome',
-            'C harvest',
-            'R harvest',
+            'CHarvest',
+            'RHarvest',
             'upgrade',
             'build',
-            'repair other',
-            'barricade repair',
-            'tower inferiority',
+            'repairOther',
+            'barricadeRepair',
+            'towerInferiority',
             'spawn',
         ]
 
@@ -593,6 +596,11 @@ export class RoomVisualsManager {
         })
 
         return y + height
+    }
+
+    requestDataVisuals(y: number) {
+
+        
     }
 
     private remoteDataVisuals(y: number) {

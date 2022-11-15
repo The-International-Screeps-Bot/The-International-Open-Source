@@ -163,8 +163,10 @@ export class CommuneManager {
             customLog(
                 'Exception processing tradeManager in ' + this.room.name + '. ',
                 err + '\n' + (err as any).stack,
-                myColors.white,
-                myColors.red,
+                {
+                    textColor: myColors.white,
+                    bgColor: myColors.red
+                }
             )
         }
 
@@ -195,13 +197,13 @@ export class CommuneManager {
 
     private test() {
 
-        customLog('RAMPART HITS TARGET', this.room.name + ', ' + this.minRampartHits + ', ' + this.room.memory.AT + ', ' + (this.room.memory.AT * this.room.controller.level * 10))
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
 
-        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, undefined, myColors.red)
+        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, {
+            bgColor: myColors.red
+        })
     }
 
     public deleteCombatRequest(requestName: string, index: number) {

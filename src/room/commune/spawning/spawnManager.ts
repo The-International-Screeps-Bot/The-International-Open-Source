@@ -58,7 +58,10 @@ export class SpawnManager {
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Spawn Manager', cpuUsed.toFixed(2), myColors.white, myColors.lightBlue)
+            customLog('Spawn Manager', cpuUsed.toFixed(2), {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue
+            })
             const statName: RoomCommuneStatNames = 'smcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
@@ -90,8 +93,10 @@ export class SpawnManager {
                 customLog(
                     'Failed to spawn',
                     `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
-                    myColors.white,
-                    myColors.red,
+                    {
+                        textColor: myColors.white,
+                        bgColor: myColors.red
+                    }
                 )
 
                 continue
@@ -108,8 +113,10 @@ export class SpawnManager {
                 customLog(
                     'Failed to spawn',
                     `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
-                    myColors.white,
-                    myColors.red,
+                    {
+                        textColor: myColors.white,
+                        bgColor: myColors.red
+                    }
                 )
 /*
                 //We don't want one bad spawn request to block all of spawning.
