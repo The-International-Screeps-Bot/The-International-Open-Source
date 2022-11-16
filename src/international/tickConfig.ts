@@ -315,6 +315,18 @@ class TickConfig {
                     if (room.estimateIncome() / 10 < room.memory.combatRequests.length) continue
                 }
 
+                // Ensure we can afford the creeps required
+
+                const minRangedAttackCost = room.communeManager.findMinRangedAttackCost(
+                    request.data[CombatRequestData.minDamage],
+                )
+                const minHealCost = room.communeManager.findMinHealCost(request.data[CombatRequestData.minHeal])
+
+                if (minRangedAttackCost + minHealCost > room.energyCapacityAvailable) continue
+
+                const minAttackCost = room.communeManager.findMinMeleeAttackCost(request.data[CombatRequestData.minDamage])
+                if (minAttackCost > room.energyCapacityAvailable) continue
+
                 communes.push(roomName)
             }
 

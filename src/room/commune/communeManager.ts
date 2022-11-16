@@ -1,4 +1,11 @@
-import { cleanRoomMemory, createPosMap, customLog, findClosestObject, getRange, unpackNumAsCoord } from 'international/utils'
+import {
+    cleanRoomMemory,
+    createPosMap,
+    customLog,
+    findClosestObject,
+    getRange,
+    unpackNumAsCoord,
+} from 'international/utils'
 import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
@@ -7,7 +14,14 @@ import './defence'
 import './allyCreepRequestManager'
 import './claimRequestManager'
 import './combatRequestManager'
-import { creepRoles, impassibleStructureTypesSet, myColors, remoteRoles, roomDimensions, stamps } from 'international/constants'
+import {
+    creepRoles,
+    impassibleStructureTypesSet,
+    myColors,
+    remoteRoles,
+    roomDimensions,
+    stamps,
+} from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
 import './towers'
@@ -80,7 +94,6 @@ export class CommuneManager {
     }
 
     preTickRun() {
-
         const { room } = this
 
         const roomMemory = Memory.rooms[room.name]
@@ -165,8 +178,8 @@ export class CommuneManager {
                 err + '\n' + (err as any).stack,
                 {
                     textColor: myColors.white,
-                    bgColor: myColors.red
-                }
+                    bgColor: myColors.red,
+                },
             )
         }
 
@@ -196,24 +209,21 @@ export class CommuneManager {
     }
 
     private test() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
 
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, {
-            bgColor: myColors.red
+            bgColor: myColors.red,
         })
     }
 
     public deleteCombatRequest(requestName: string, index: number) {
-
         delete Memory.combatRequests[requestName]
         this.room.memory.combatRequests.splice(index, 1)
     }
 
     public removeRemote(remoteName: string, index: number) {
-
         this.room.memory.remotes.splice(index, 1)
 
         const remoteMemory = Memory.rooms[remoteName]
@@ -221,6 +231,27 @@ export class CommuneManager {
         delete remoteMemory.CN
         remoteMemory.T = 'neutral'
         cleanRoomMemory(remoteName)
+    }
+
+    public findMinRangedAttackCost(minDamage: number = 0) {
+        return (
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+        )
+    }
+
+    public findMinMeleeAttackCost(minDamage: number = 0) {
+        return (
+            (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+            (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+        )
+    }
+
+    public findMinHealCost(minHeal: number = 0) {
+        return (
+            (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] +
+            (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
+        )
     }
 
     get storedEnergyUpgradeThreshold() {
@@ -239,9 +270,11 @@ export class CommuneManager {
     }
 
     get minRampartHits() {
-
         const level = this.room.controller.level
 
-        return Math.min(Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10), RAMPART_HITS_MAX[level])
+        return Math.min(
+            Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10),
+            RAMPART_HITS_MAX[level],
+        )
     }
- }
+}
