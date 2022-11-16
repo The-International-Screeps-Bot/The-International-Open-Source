@@ -1469,25 +1469,23 @@ Room.prototype.spawnRequester = function () {
         )
     }
 
-    for (const requestName of this.memory.combatRequests) {
+    for (let i = this.memory.combatRequests.length - 1; i >= 0; i -= 1) {
+
+        const requestName = Memory.rooms[this.name].combatRequests[i]
         const request = Memory.combatRequests[requestName]
         if (!request) continue
 
         if (request.data[CombatRequestData.abandon] > 0) continue
 
-        const minRangedAttackCost =
-            (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-                (request.data[CombatRequestData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE] || 0
+        const minRangedAttackCost = this.communeManager.findMinRangedAttackCost(
+            request.data[CombatRequestData.minDamage],
+        )
         const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
-        const minAttackCost =
-            (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[ATTACK] +
-                (request.data[CombatRequestData.minDamage] / ATTACK_POWER) * BODYPART_COST[MOVE] || 0
+        const minAttackCost = this.communeManager.findMinMeleeAttackCost(request.data[CombatRequestData.minDamage])
         const attackAmount = minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE])
 
-        const minHealCost =
-            (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[HEAL] +
-                (request.data[CombatRequestData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE] || 0
+        const minHealCost = this.communeManager.findMinHealCost(request.data[CombatRequestData.minHeal])
         const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
         const minDismantleCost =
@@ -1495,6 +1493,15 @@ Room.prototype.spawnRequester = function () {
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
         if (request.T === 'attack' || request.T === 'defend') {
+            if (
+                minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
+                minAttackCost > this.energyCapacityAvailable
+            ) {
+
+                this.communeManager.deleteCombatRequest(requestName, i)
+                continue
+            }
+
             // Spawn quad
 
             this.constructSpawnRequests(
@@ -1706,7 +1713,7 @@ Room.prototype.spawnRequester = function () {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Spawn Request Manager', cpuUsed.toFixed(2), {
             textColor: myColors.white,
-            bgColor: myColors.lightBlue
+            bgColor: myColors.lightBlue,
         })
         const statName: RoomCommuneStatNames = 'srmcu'
         globalStatsUpdater(this.name, statName, cpuUsed)
