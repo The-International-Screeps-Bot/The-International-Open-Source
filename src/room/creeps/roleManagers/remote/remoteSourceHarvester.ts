@@ -293,7 +293,7 @@ export class RemoteHarvester extends Creep {
                         ],
                     },
                     {
-                        packedPath: Memory.rooms[creep.memory.RN].SPs[creep.memory.SI],
+                        packedPath: Memory.rooms[creep.commune.name].SPs[creep.memory.SI],
                     },
                 )
 
@@ -332,7 +332,7 @@ export class RemoteHarvester extends Creep {
                 },
                 {
                     packedPath: reverseCoordList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
-                    remoteName: creep.memory.RN
+                    remoteName: creep.memory.RN,
                 },
             )
         }
