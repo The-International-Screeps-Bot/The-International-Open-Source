@@ -437,9 +437,13 @@ Object.defineProperties(Room.prototype, {
             if (this.controller && (this.controller.my || this.controller.reservation))
                 return this._combatStructureTargets
 
-            if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
+            if (this.controller && this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
                 return this._combatStructureTargets
-            if (this.controller.reservation && Memory.allyPlayers.includes(this.controller.reservation.username))
+            if (
+                this.controller &&
+                this.controller.reservation &&
+                Memory.allyPlayers.includes(this.controller.reservation.username)
+            )
                 return this._combatStructureTargets
 
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
@@ -649,7 +653,7 @@ Object.defineProperties(Room.prototype, {
             }
 
             if (!this.anchor) return this._sourcePaths
-            
+
             const sources = []
                 .concat(this.sourcePositions)
                 .sort((a, b) => {
