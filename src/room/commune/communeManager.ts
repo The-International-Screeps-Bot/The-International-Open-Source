@@ -235,22 +235,29 @@ export class CommuneManager {
 
     public findMinRangedAttackCost(minDamage: number = 0) {
         return (
-            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+            minDamage / RANGED_ATTACK_POWER * BODYPART_COST[RANGED_ATTACK] +
+            minDamage / RANGED_ATTACK_POWER * BODYPART_COST[MOVE]
         )
     }
 
     public findMinMeleeAttackCost(minDamage: number = 0) {
         return (
-            (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] +
-            (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+            minDamage / ATTACK_POWER * BODYPART_COST[ATTACK] +
+            minDamage / ATTACK_POWER * BODYPART_COST[MOVE]
         )
     }
 
     public findMinHealCost(minHeal: number = 0) {
         return (
-            (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] +
-            (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
+            minHeal / HEAL_POWER * BODYPART_COST[HEAL] +
+            minHeal / HEAL_POWER * BODYPART_COST[MOVE]
+        )
+    }
+
+    public findMinDismantleCost(minDismantle: number = 0) {
+        return (
+            minDismantle * BODYPART_COST[WORK] +
+            minDismantle * BODYPART_COST[MOVE]
         )
     }
 

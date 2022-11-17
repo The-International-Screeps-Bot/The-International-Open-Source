@@ -1470,7 +1470,6 @@ Room.prototype.spawnRequester = function () {
     }
 
     for (let i = this.memory.combatRequests.length - 1; i >= 0; i -= 1) {
-
         const requestName = Memory.rooms[this.name].combatRequests[i]
         const request = Memory.combatRequests[requestName]
         if (!request) continue
@@ -1492,16 +1491,15 @@ Room.prototype.spawnRequester = function () {
             request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
+        if (
+            minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
+            minAttackCost > this.energyCapacityAvailable
+        ) {
+            this.communeManager.deleteCombatRequest(requestName, i)
+            continue
+        }
+
         if (request.T === 'attack' || request.T === 'defend') {
-            if (
-                minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
-                minAttackCost > this.energyCapacityAvailable
-            ) {
-
-                this.communeManager.deleteCombatRequest(requestName, i)
-                continue
-            }
-
             // Spawn quad
 
             this.constructSpawnRequests(

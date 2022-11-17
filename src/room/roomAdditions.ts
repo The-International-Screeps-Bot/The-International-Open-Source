@@ -620,6 +620,7 @@ Object.defineProperties(Room.prototype, {
                                 typeWeights: remoteTypeWeights,
                                 plainCost: defaultRoadPlanningPlainCost,
                                 weightStructurePlans: true,
+                                avoidStationaryPositions: true,
                             }).length -
                             this.advancedFindPath({
                                 origin: b[0],
@@ -627,6 +628,7 @@ Object.defineProperties(Room.prototype, {
                                 typeWeights: remoteTypeWeights,
                                 plainCost: defaultRoadPlanningPlainCost,
                                 weightStructurePlans: true,
+                                avoidStationaryPositions: true,
                             }).length
                         )
                     })
@@ -639,6 +641,7 @@ Object.defineProperties(Room.prototype, {
                         typeWeights: remoteTypeWeights,
                         plainCost: defaultRoadPlanningPlainCost,
                         weightStructurePlans: true,
+                        avoidStationaryPositions: true,
                     })
 
                     this._sourcePaths[index] = path
@@ -649,7 +652,7 @@ Object.defineProperties(Room.prototype, {
             }
 
             if (!this.anchor) return this._sourcePaths
-            
+
             const sources = []
                 .concat(this.sourcePositions)
                 .sort((a, b) => {
@@ -660,6 +663,7 @@ Object.defineProperties(Room.prototype, {
                             typeWeights: remoteTypeWeights,
                             plainCost: defaultRoadPlanningPlainCost,
                             weightStructurePlans: true,
+                            avoidStationaryPositions: true,
                         }).length -
                         this.advancedFindPath({
                             origin: b[0],
@@ -667,6 +671,7 @@ Object.defineProperties(Room.prototype, {
                             typeWeights: remoteTypeWeights,
                             plainCost: defaultRoadPlanningPlainCost,
                             weightStructurePlans: true,
+                            avoidStationaryPositions: true,
                         }).length
                     )
                 })
@@ -679,6 +684,7 @@ Object.defineProperties(Room.prototype, {
                     typeWeights: remoteTypeWeights,
                     plainCost: defaultRoadPlanningPlainCost,
                     weightStructurePlans: true,
+                    avoidStationaryPositions: true,
                 })
 
                 this._sourcePaths[index] = path

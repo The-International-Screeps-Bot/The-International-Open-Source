@@ -1382,6 +1382,8 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
                 )
                     continue
 
+                if (targetStructureIDs.has(structure.id)) continue
+
                 targetStructureIDs.add(structure.id)
             }
         }
