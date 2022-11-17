@@ -1096,3 +1096,7 @@ export const remoteTypeWeights: Partial<{ [key in RoomTypes]: number }> = {
     ally: Infinity,
     allyRemote: Infinity,
 }
+
+export const maxClaimRequestDistance = 10
+export const maxCombatDistance = 20
+export const maxHaulDistance = 15

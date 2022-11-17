@@ -1518,15 +1518,15 @@ Room.prototype.spawnRequester = function () {
             request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
-        if (request.T === 'attack' || request.T === 'defend') {
-            if (
-                minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
-                minAttackCost > this.energyCapacityAvailable
-            ) {
-                this.communeManager.deleteCombatRequest(requestName, i)
-                continue
-            }
+        if (
+            minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
+            minAttackCost > this.energyCapacityAvailable
+        ) {
+            this.communeManager.deleteCombatRequest(requestName, i)
+            continue
+        }
 
+        if (request.T === 'attack' || request.T === 'defend') {
             // Spawn quad
 
             this.constructSpawnRequests(
