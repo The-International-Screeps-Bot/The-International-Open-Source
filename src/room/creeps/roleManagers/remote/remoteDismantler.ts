@@ -135,9 +135,9 @@ export class RemoteDismantler extends Creep {
             }
         }
 
-        let targets: Structure[] = room.actionableWalls.filter(w => w.hits < 50000)
+        let targets: Structure[] = room.actionableWalls
 
-        targets = targets.concat(room.dismantleTargets.filter(w => w.hits < 50000))
+        targets = targets.concat(room.dismantleTargets)
 
         if (targets.length) {
             target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })
