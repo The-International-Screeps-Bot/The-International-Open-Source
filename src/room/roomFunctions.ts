@@ -185,6 +185,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                const room = Game.rooms[roomName]
+                if (room.centerUpgradePos) opts.weightCoords[roomName][packCoord(room.centerUpgradePos)] = 255
+
                 if (roomMemory.SPs.length) {
 
                     for (const path of Game.rooms[roomName].sourcePaths) {

@@ -640,8 +640,6 @@ export class Quad {
 
         this.passiveRangedAttack(bulldozeTarget)
         return true
-
-        return true
     }
 
     rangedAttackStructures() {

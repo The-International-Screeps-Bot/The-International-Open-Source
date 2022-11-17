@@ -8,6 +8,9 @@ import {
     creepRoles,
     haulerUpdateDefault,
     HaulRequestData,
+    maxClaimRequestDistance,
+    maxCombatDistance,
+    maxHaulDistance,
     myColors,
     powerCreepClassNames,
     remoteRoles,
@@ -192,19 +195,17 @@ class TickConfig {
             const communeName = findClosestRoomName(roomName, communesForResponding)
             if (!communeName) break
 
-            const maxRange = 10
-
             // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
 
             if (
-                Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
+                Game.map.getRoomLinearDistance(communeName, roomName) > maxClaimRequestDistance ||
                 advancedFindDistance(communeName, roomName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
                         ally: Infinity,
                     },
-                }) > maxRange
+                }) > maxClaimRequestDistance
             ) {
                 Memory.claimRequests[roomName].data[ClaimRequestData.abandon] = 20000
                 continue
@@ -249,7 +250,7 @@ class TickConfig {
             const communeName = findClosestRoomName(roomName, communes)
             if (!communeName) break
 
-            const maxRange = 25
+            const maxRange = 20
 
             // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
@@ -333,19 +334,17 @@ class TickConfig {
             const communeName = findClosestRoomName(requestName, communes)
             if (!communeName) break
 
-            const maxRange = 18
-
             // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
             if (
-                Game.map.getRoomLinearDistance(communeName, requestName) > maxRange ||
+                Game.map.getRoomLinearDistance(communeName, requestName) > maxCombatDistance ||
                 advancedFindDistance(communeName, requestName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
                         ally: Infinity,
                     },
-                }) > maxRange
+                }) > maxCombatDistance
             ) {
                 request.data[CombatRequestData.abandon] = 20000
                 continue
@@ -401,19 +400,17 @@ class TickConfig {
             const communeName = findClosestRoomName(requestName, communes)
             if (!communeName) break
 
-            const maxRange = 18
-
             // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
             if (
-                Game.map.getRoomLinearDistance(communeName, requestName) > maxRange ||
+                Game.map.getRoomLinearDistance(communeName, requestName) > maxHaulDistance ||
                 advancedFindDistance(communeName, requestName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
                         ally: Infinity,
                     },
-                }) > maxRange
+                }) > maxHaulDistance
             ) {
                 request.data[HaulRequestData.abandon] = 20000
                 continue
