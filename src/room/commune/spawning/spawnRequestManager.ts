@@ -269,7 +269,7 @@ Room.prototype.spawnRequester = function () {
             const priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
 
             // Construct the required carry parts
-            
+
             partsMultiplier = this.haulerNeed
 
             role = 'hauler'
@@ -807,7 +807,10 @@ Room.prototype.spawnRequester = function () {
 
                 // If there are transfer links, max out partMultiplier to their ability
 
-                if ((hubLink && hubLink.RCLActionable) || sourceLinks.find(link => link && link.RCLActionable)) {
+                if (
+                    (storage && hubLink && hubLink.RCLActionable) ||
+                    sourceLinks.find(link => link && link.RCLActionable)
+                ) {
                     let maxPartsMultiplier = 0
 
                     if (hubLink && hubLink.RCLActionable) {
@@ -861,9 +864,7 @@ Room.prototype.spawnRequester = function () {
 
                     if (this.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
                         extraParts = [CARRY, WORK, MOVE]
-
                     else if (partsMultiplier === 0) return false
-
                     else
                         extraParts = [
                             WORK,
@@ -1496,7 +1497,6 @@ Room.prototype.spawnRequester = function () {
     }
 
     for (let i = this.memory.combatRequests.length - 1; i >= 0; i -= 1) {
-
         const requestName = Memory.rooms[this.name].combatRequests[i]
         const request = Memory.combatRequests[requestName]
         if (!request) continue
@@ -1523,7 +1523,6 @@ Room.prototype.spawnRequester = function () {
                 minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
                 minAttackCost > this.energyCapacityAvailable
             ) {
-
                 this.communeManager.deleteCombatRequest(requestName, i)
                 continue
             }
