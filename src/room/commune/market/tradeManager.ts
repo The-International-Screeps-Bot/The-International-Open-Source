@@ -247,6 +247,7 @@ export class TradeManager {
 
         for (const resourceTarget of terminalResourceTargets) {
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
+            if (resourceTarget.resource === RESOURCE_ENERGY) continue
 
             let min = terminal.store.getCapacity() * resourceTarget.min
 

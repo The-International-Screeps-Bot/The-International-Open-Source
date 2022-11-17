@@ -158,7 +158,7 @@ export class RemoteHauler extends Creep {
                     ],
                 },
                 {
-                    packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+                    packedPath: Memory.rooms[this.commune.name].SPs[this.memory.SI],
                 },
             )
 
@@ -186,7 +186,7 @@ export class RemoteHauler extends Creep {
                     },
                     {
                         packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                        remoteName: this.memory.RN
+                        remoteName: this.memory.RN,
                     },
                 )
 
@@ -270,7 +270,7 @@ export class RemoteHauler extends Creep {
             },
             {
                 packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                remoteName: this.memory.RN
+                remoteName: this.memory.RN,
             },
         )
 
@@ -430,7 +430,7 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                    remoteName: this.memory.RN
+                    remoteName: this.memory.RN,
                 },
             )
 
@@ -459,7 +459,7 @@ export class RemoteHauler extends Creep {
                 },
             },
             {
-                packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+                packedPath: Memory.rooms[this.commune.name].SPs[this.memory.SI],
             },
         )
 

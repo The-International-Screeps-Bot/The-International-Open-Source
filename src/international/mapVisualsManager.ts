@@ -93,7 +93,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     })
 
                     // Get the income based on the reservation of the room and remoteHarvester need
-                    console.log(roomName)
+                    //console.log(roomName)
                     const income =
                         (possibleReservation ? 10 : 5) -
                         Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
@@ -161,7 +161,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Map Visuals Manager', cpuUsed.toFixed(2), {
             textColor: myColors.white,
-            bgColor: myColors.lightBlue
+            bgColor: myColors.lightBlue,
         })
         const statName: InternationalStatNames = 'mvmcu'
         globalStatsUpdater('', statName, cpuUsed, true)

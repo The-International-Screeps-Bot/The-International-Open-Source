@@ -26,6 +26,7 @@ export class RemoteCoreAttacker extends Creep {
 
     preTickManager(): void {
         if (!this.findRemote()) return
+
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'remoteCoreAttacker'

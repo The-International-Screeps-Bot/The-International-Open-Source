@@ -25,15 +25,18 @@ export class Hauler extends Creep {
         const { room } = this
 
         let withdrawTargets = room.MAWT.filter(target => {
-            if (target instanceof Resource)
+            if (target instanceof Resource) {
                 return (
-                    target.reserveAmount >= this.store.getCapacity() * 0.2 || target.reserveAmount >= this.freeStore()
+                    ((target.resourceType === RESOURCE_ENERGY || room.storage) &&
+                        target.reserveAmount >= this.store.getCapacity() * 0.2) ||
+                    ((target.resourceType === RESOURCE_ENERGY || room.storage) &&
+                        target.reserveAmount >= this.freeStore())
                 )
-
-            return (
-                target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.store.getCapacity(RESOURCE_ENERGY) ||
-                target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
-            )
+            } else
+                return (
+                    target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.store.getCapacity(RESOURCE_ENERGY) ||
+                    target.store.getUsedCapacity(RESOURCE_ENERGY) >= this.freeStore()
+                )
         })
 
         let transferTargets

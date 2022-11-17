@@ -756,8 +756,26 @@ Room.prototype.spawnRequester = function () {
             if (this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed && this.towerInferiority)
                 return false
 
-            // If there is a storage
+            // If the controllerContainer have not enough energy in it, don't spawn a new upgrader
 
+            if (this.controllerContainer) {
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) < 1000 &&
+                    this.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed
+                ) {
+                    return false
+                }
+
+                if (
+                    this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) > 1500 &&
+                    this.fastFillerContainerLeft?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000 &&
+                    this.fastFillerContainerRight?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000
+                )
+                    partsMultiplier += estimatedIncome * 1.25
+                else partsMultiplier += estimatedIncome * 0.75
+            }
+
+            // If there is a storage
             if (storage && this.controller.level >= 4) {
                 // If the storage is sufficiently full, provide x amount per y energy in storage
 
@@ -789,7 +807,10 @@ Room.prototype.spawnRequester = function () {
 
                 // If there are transfer links, max out partMultiplier to their ability
 
-                if ((hubLink && hubLink.RCLActionable) || sourceLinks.find(link => link && link.RCLActionable)) {
+                if (
+                    (storage && hubLink && hubLink.RCLActionable) ||
+                    sourceLinks.find(link => link && link.RCLActionable)
+                ) {
                     let maxPartsMultiplier = 0
 
                     if (hubLink && hubLink.RCLActionable) {
@@ -822,7 +843,11 @@ Room.prototype.spawnRequester = function () {
 
             // If there are construction sites of my ownership in the this, set multiplier to 1
 
-            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
+            if (this.find(FIND_MY_CONSTRUCTION_SITES).length) {
+                if (!this.controllerContainer && !this.controllerLink) {
+                    partsMultiplier = 0
+                } else partsMultiplier = partsMultiplier * 0.25
+            }
 
             const threshold = 0.05
             role = 'controllerUpgrader'
@@ -974,7 +999,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts: [CARRY, MOVE, WORK],
                     partsMultiplier,
                     threshold,
-                    maxCreeps: Infinity,
+                    maxCreeps,
                     minCost: 200,
                     priority,
                     memoryAdditions: {
@@ -989,7 +1014,7 @@ Room.prototype.spawnRequester = function () {
                 extraParts: [MOVE, CARRY, MOVE, WORK],
                 partsMultiplier,
                 threshold,
-                maxCreeps: Infinity,
+                maxCreeps,
                 minCost: 250,
                 priority,
                 memoryAdditions: {},
@@ -998,6 +1023,7 @@ Room.prototype.spawnRequester = function () {
     )
 
     for (const remoteInfo of this.remoteSourceIndexesByEfficacy) {
+        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.95) break
         const splitRemoteInfo = remoteInfo.split(' ')
         const remoteName = splitRemoteInfo[0]
         const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
@@ -1069,6 +1095,7 @@ Room.prototype.spawnRequester = function () {
     const remoteNamesByEfficacy = this.remoteNamesBySourceEfficacy
 
     for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
+        if (Memory.stats.cpu.usage / Game.cpu.limit > 0.95) break
         const remoteName = remoteNamesByEfficacy[index]
         const remoteData = Memory.rooms[remoteName].data
 
