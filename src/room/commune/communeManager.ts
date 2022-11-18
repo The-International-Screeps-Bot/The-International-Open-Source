@@ -233,14 +233,14 @@ export class CommuneManager {
         cleanRoomMemory(remoteName)
     }
 
-    public findMinRangedAttackCost(minDamage: number = 0) {
+    public findMinRangedAttackCost(minDamage: number = 10) {
         return (
             minDamage / RANGED_ATTACK_POWER * BODYPART_COST[RANGED_ATTACK] +
             minDamage / RANGED_ATTACK_POWER * BODYPART_COST[MOVE]
         )
     }
 
-    public findMinMeleeAttackCost(minDamage: number = 0) {
+    public findMinMeleeAttackCost(minDamage: number = 30) {
         return (
             minDamage / ATTACK_POWER * BODYPART_COST[ATTACK] +
             minDamage / ATTACK_POWER * BODYPART_COST[MOVE]
