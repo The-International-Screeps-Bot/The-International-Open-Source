@@ -768,8 +768,10 @@ Room.prototype.spawnRequester = function () {
 
                 if (
                     this.controllerContainer.store.getUsedCapacity(RESOURCE_ENERGY) > 1500 &&
-                    this.fastFillerContainerLeft?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000 &&
-                    this.fastFillerContainerRight?.store.getUsedCapacity(RESOURCE_ENERGY) > 1000
+                    this.fastFillerContainerLeft &&
+                    this.fastFillerContainerLeft.store.getUsedCapacity(RESOURCE_ENERGY) > 1000 &&
+                    this.fastFillerContainerRight &&
+                    this.fastFillerContainerRight.store.getUsedCapacity(RESOURCE_ENERGY) > 1000
                 )
                     partsMultiplier += estimatedIncome * 1.25
                 else partsMultiplier += estimatedIncome * 0.75
