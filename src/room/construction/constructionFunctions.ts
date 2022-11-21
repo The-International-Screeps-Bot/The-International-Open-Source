@@ -18,16 +18,9 @@ Room.prototype.remoteConstructionPlacement = function () {}
 Room.prototype.communeConstructionPlacement = function () {
     if (!this.memory.PC) return
 
-    // Only run if not all cs got placed for this rcl or the room is under attack
+    // Only run every x ticks or if there are builders (temporary fix)
 
-    if (
-        (this.memory.PCL && this.memory.PCL === this.controller.level) ||
-        (this.enemyCreeps.filter(function (creep) {
-            return !creep.isOnExit
-        }).length === 0 &&
-            !randomTick(200))
-    )
-        return
+    if (!this.myCreeps.builder.length && !randomTick(200)) return
 
     // If the construction site count is at its limit, stop
 
@@ -61,7 +54,7 @@ Room.prototype.communeConstructionPlacement = function () {
 
                 if (
                     structureType === STRUCTURE_RAMPART &&
-                    (!this.storage || (this.controller.level < 4 && this.storage.store.energy < 30000))
+                    (!this.storage || this.controller.level < 4 || this.storage.store.energy < 30000)
                 ) {
                     continue
                 }
@@ -119,10 +112,6 @@ Room.prototype.communeConstructionPlacement = function () {
             }
         }
     }
-
-    // If no more cs got placed set the placing cpmpleted for this rlc
-
-    if (placed === 0) this.memory.PCL = this.controller.level
 
     // If visuals are enabled, visually connect roads
 

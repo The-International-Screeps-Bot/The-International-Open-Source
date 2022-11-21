@@ -150,7 +150,7 @@ export class RemotesManager {
         for (const remoteName of this.communeManager.room.memory.remotes) {
             const remoteMemory = Memory.rooms[remoteName]
 
-            if (remoteMemory.data[RemoteData.abandon]) continue
+            if (remoteMemory.data && remoteMemory.data[RemoteData.abandon]) continue
 
             const remote = Game.rooms[remoteName]
             const isReserved =
