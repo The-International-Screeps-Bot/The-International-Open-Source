@@ -21,13 +21,11 @@ export class CombatRequestManager {
             const request = Memory.combatRequests[requestName]
 
             if (!request) {
-
                 room.memory.combatRequests.splice(index, 1)
                 continue
             }
 
             if (!room.structures.spawn.length) {
-
                 delete request.responder
                 room.memory.combatRequests.splice(index, 1)
                 continue
@@ -49,7 +47,7 @@ export class CombatRequestManager {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Combat Request Manager', cpuUsed.toFixed(2), {
                 textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                bgColor: myColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'cormcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -84,7 +82,11 @@ export class CombatRequestManager {
 
         // If there are no enemyCreeps, delete the combatRequest
 
-        if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
+        if (
+            !requestRoom.enemyCreeps.length &&
+            !requestRoom.combatStructureTargets.length &&
+            (!requestRoom.controller || !requestRoom.controller.owner)
+        ) {
             this.communeManager.deleteCombatRequest(requestName, index)
             return
         }
@@ -108,7 +110,9 @@ export class CombatRequestManager {
  */
         // If there are threats to our hegemony, temporarily abandon the request
 
-        const threateningAttacker = requestRoom.enemyAttackers.find(creep => creep.combatStrength.ranged + creep.combatStrength.ranged > 0)
+        const threateningAttacker = requestRoom.enemyAttackers.find(
+            creep => creep.combatStrength.ranged + creep.combatStrength.ranged > 0,
+        )
 
         if (threateningAttacker) {
             request.data[CombatRequestData.abandon] = 1500
@@ -145,7 +149,10 @@ export class CombatRequestManager {
             if (enemyCreep.combatStrength.ranged > request.data[CombatRequestData.minRangedHeal] * 4)
                 request.data[CombatRequestData.minRangedHeal] = enemyCreep.combatStrength.ranged + 1
 
-            if (enemyCreep.combatStrength.heal > request.data[CombatRequestData.minDamage] * enemyCreep.defenceStrength * 4)
+            if (
+                enemyCreep.combatStrength.heal >
+                request.data[CombatRequestData.minDamage] * enemyCreep.defenceStrength * 4
+            )
                 request.data[CombatRequestData.minDamage] = enemyCreep.combatStrength.heal + 1
         }
 

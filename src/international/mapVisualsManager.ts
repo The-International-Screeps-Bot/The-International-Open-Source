@@ -60,11 +60,13 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
             if (roomMemory.combatRequests.length) {
                 for (const requestName of roomMemory.combatRequests) {
+                    let color = Memory.combatRequests[requestName]?.T === 'defend' ? myColors.darkBlue : myColors.red
+
                     Game.map.visual.line(
                         room.anchor || new RoomPosition(25, 25, roomName),
                         new RoomPosition(25, 25, requestName),
                         {
-                            color: myColors.red,
+                            color,
                             width: 1.2,
                             opacity: 0.3,
                         },
@@ -93,7 +95,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     })
 
                     // Get the income based on the reservation of the room and remoteHarvester need
-                    console.log(roomName)
+                    //console.log(roomName)
                     const income =
                         (possibleReservation ? 10 : 5) -
                         Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
@@ -161,7 +163,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Map Visuals Manager', cpuUsed.toFixed(2), {
             textColor: myColors.white,
-            bgColor: myColors.lightBlue
+            bgColor: myColors.lightBlue,
         })
         const statName: InternationalStatNames = 'mvmcu'
         globalStatsUpdater('', statName, cpuUsed, true)

@@ -129,7 +129,8 @@ export class RemotesManager {
                 // Create need if there are any walls or enemy owner structures (not including invader cores)
 
                 remoteMemory.data[RemoteData.remoteDismantler] =
-                    Math.min(remote.actionableWalls.length, 1) || Math.min(remote.dismantleTargets.length, 1)
+                    Math.min(remote.actionableWalls.filter(w => w.hits < 500000).length, 1) ||
+                    Math.min(remote.dismantleTargets.filter(w => w.hits < 500000).length, 1)
             }
 
             // If the remote is assumed to be reserved by an enemy or to be an invader core
@@ -149,7 +150,7 @@ export class RemotesManager {
         for (const remoteName of this.communeManager.room.memory.remotes) {
             const remoteMemory = Memory.rooms[remoteName]
 
-            if (remoteMemory.data[RemoteData.abandon]) continue
+            if (remoteMemory.data && remoteMemory.data[RemoteData.abandon]) continue
 
             const remote = Game.rooms[remoteName]
             const isReserved =

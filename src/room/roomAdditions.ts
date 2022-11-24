@@ -87,7 +87,7 @@ Object.defineProperties(Room.prototype, {
             if (this._sourcesByEfficacy) return this._sourcesByEfficacy
 
             this._sourcesByEfficacy = [].concat(this.sources)
-            console.log(this.name)
+            //console.log(this.name)
             return this._sourcesByEfficacy.sort((a, b) => {
                 return this.sourcePaths[a.index].length - this.sourcePaths[b.index].length
             })
@@ -899,6 +899,15 @@ Object.defineProperties(Room.prototype, {
                 // The creep has a packedPos
 
                 this._usedUpgradePositions.add(creep.memory.PC)
+            }
+
+            // If a source container / link is nearby block the pos
+
+            for (const container of this.sourceContainers) {
+                this._usedUpgradePositions.add(packPos(container.pos))
+            }
+            for (const links of this.sourceLinks) {
+                this._usedUpgradePositions.add(packPos(links.pos))
             }
 
             if (this.controllerLink) this._usedUpgradePositions.add(packPos(this.controllerLink.pos))
@@ -2097,12 +2106,22 @@ Object.defineProperties(Room.prototype, {
     MAWT: {
         get() {
             if (this._MAWT) return this._MAWT
-
             this._MAWT = [
                 ...this.droppedResources,
                 ...this.find(FIND_TOMBSTONES).filter(cr => cr.store.getUsedCapacity() > 0),
                 ...this.find(FIND_RUINS).filter(ru => ru.ticksToDecay < 10000 && ru.store.getUsedCapacity() > 0),
-                ...this.sourceContainers.filter(cr => cr.store.getUsedCapacity() > 0),
+                ...this.sourceContainers.filter(
+                    sc =>
+                        sc.store.getUsedCapacity() >
+                        _.sum(
+                            _.filter(
+                                Game.creeps,
+                                c => c.memory.Rs && c.memory.Rs?.length > 0 && c.memory.Rs[0].targetID === sc.id,
+                            ),
+                            c => c.memory.Rs[0].amount,
+                        ) +
+                            50,
+                ),
                 ...(this.find(FIND_HOSTILE_STRUCTURES).filter(structure => {
                     return (
                         (structure as any).store &&

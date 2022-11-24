@@ -189,18 +189,15 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (room.centerUpgradePos) opts.weightCoords[roomName][packCoord(room.centerUpgradePos)] = 255
 
                 if (roomMemory.SPs.length) {
-
                     for (const path of Game.rooms[roomName].sourcePaths) {
                         for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
                 }
             } else if (roomMemory.T === 'remote') {
-
                 for (const packedPath of roomMemory.SPs) {
                     const path = unpackPosList(packedPath)
 
                     for (const pos of path) {
-
                         if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
                         opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
@@ -470,14 +467,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         // If the pathFindResult is incomplete, inform an empty array
 
         if (pathFinderResult.incomplete) {
-            customLog(
-                'Incomplete Path',
-                `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`,
-                {
-                    textColor: myColors.white,
-                    bgColor: myColors.red
-                }
-            )
+            customLog('Incomplete Path', `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`, {
+                textColor: myColors.white,
+                bgColor: myColors.red,
+            })
 
             room.pathVisual(pathFinderResult.path, 'red')
             room.errorVisual(opts.origin)
@@ -706,7 +699,7 @@ Room.prototype.scoutEnemyRoom = function () {
     // Combat request creation
 
     this.createAttackCombatRequest({
-        maxTowerDamage: Math.ceil((this.structures.tower.length * TOWER_POWER_ATTACK) * 1.1),
+        maxTowerDamage: Math.ceil((this.structures.tower.filter(tower => tower.RCLActionable).length * TOWER_POWER_ATTACK) * 1.1),
         minDamage: 50,
     })
 

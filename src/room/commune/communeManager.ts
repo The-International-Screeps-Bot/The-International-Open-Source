@@ -235,16 +235,13 @@ export class CommuneManager {
 
     public findMinRangedAttackCost(minDamage: number = 10) {
         return (
-            minDamage / RANGED_ATTACK_POWER * BODYPART_COST[RANGED_ATTACK] +
-            minDamage / RANGED_ATTACK_POWER * BODYPART_COST[MOVE]
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
         )
     }
 
     public findMinMeleeAttackCost(minDamage: number = 30) {
-        return (
-            minDamage / ATTACK_POWER * BODYPART_COST[ATTACK] +
-            minDamage / ATTACK_POWER * BODYPART_COST[MOVE]
-        )
+        return (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
     }
 
     /**
@@ -268,10 +265,7 @@ export class CommuneManager {
     }
 
     public findMinDismantleCost(minDismantle: number = 0) {
-        return (
-            minDismantle * BODYPART_COST[WORK] +
-            minDismantle * BODYPART_COST[MOVE]
-        )
+        return minDismantle * BODYPART_COST[WORK] + minDismantle * BODYPART_COST[MOVE]
     }
 
     get storedEnergyUpgradeThreshold() {
@@ -293,7 +287,7 @@ export class CommuneManager {
         const level = this.room.controller.level
 
         return Math.min(
-            Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10),
+            Math.floor(Math.pow((level - 3) * 10, 4.5) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10),
             RAMPART_HITS_MAX[level],
         )
     }

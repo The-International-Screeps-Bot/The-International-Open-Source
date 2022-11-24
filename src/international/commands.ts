@@ -168,15 +168,22 @@ global.claim = function (requestName, communeName) {
 
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`
 }
-global.deleteClaimRequests = function () {
+global.deleteClaimRequests = function (requestName) {
     let deleteCount = 0
 
-    for (const requestName in Memory.claimRequests) {
-        const request = Memory.claimRequests[requestName]
+    if (requestName) {
+        if (Memory.claimRequests[requestName]) {
+            deleteCount += 1
+            delete Memory.claimRequests[requestName]
+        }
+    } else {
+        for (const requestName in Memory.claimRequests) {
+            const request = Memory.claimRequests[requestName]
 
-        deleteCount += 1
-        if (request.responder) delete Memory.rooms[request.responder].claimRequest
-        delete Memory.claimRequests[requestName]
+            deleteCount += 1
+            if (request.responder) delete Memory.rooms[request.responder].claimRequest
+            delete Memory.claimRequests[requestName]
+        }
     }
 
     return `Deleted ${deleteCount} claim requests`
@@ -212,17 +219,38 @@ global.combat = function (requestName, type, opts, communeName) {
 }
 
 global.deleteCombatRequest = function (requestName) {
-    if (!Memory.combatRequests[requestName]) return 'No combatRequest for that room'
+    let deleteCount = 0
 
-    // If responder, remove from its memory
+    if (requestName) {
+        if (!Memory.combatRequests[requestName]) return 'No combatRequest for that room'
 
-    const responder = Memory.combatRequests[requestName].responder
-    if (responder)
-        Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(requestName), 1)
+        // If responder, remove from its memory
 
-    delete Memory.combatRequests[requestName]
+        const responder = Memory.combatRequests[requestName].responder
+        if (responder)
+            Memory.rooms[responder].combatRequests.splice(
+                Memory.rooms[responder].combatRequests.indexOf(requestName),
+                1,
+            )
 
-    return `deleted combatRequest for ${requestName}`
+        delete Memory.combatRequests[requestName]
+
+        return `deleted combatRequest for ${requestName}`
+    } else {
+        for (const requestName in Memory.combatRequests) {
+            const request = Memory.combatRequests[requestName]
+
+            deleteCount += 1
+            if (request.responder)
+                Memory.rooms[request.responder].combatRequests.splice(
+                    Memory.rooms[request.responder].combatRequests.indexOf(requestName),
+                    1,
+                )
+            delete Memory.combatRequests[requestName]
+        }
+
+        return `Deleted ${deleteCount} combat requests`
+    }
 }
 global.DCR = global.deleteCombatRequest
 
