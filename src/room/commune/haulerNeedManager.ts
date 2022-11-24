@@ -14,7 +14,7 @@ export class HaulerNeedManager {
             if (room.sourceLinks[index]) continue
 
             room.haulerNeed +=
-                findCarryPartsRequired(room.sourcePaths[index].length, room.estimatedSourceIncome[index]) * 1.3
+                findCarryPartsRequired(room.sourcePaths[index].length, room.estimatedSourceIncome[index]) * 1.4
         }
 
         if (!room.controllerLink)
