@@ -247,7 +247,20 @@ export class CommuneManager {
         )
     }
 
-    public findMinHealCost(minHeal: number = 0) {
+    /**
+     * Finds how expensive it will be to provide enough heal parts to withstand a melee attack
+     */
+    public findMinMeleeHealCost(minHeal: number = 0) {
+        return (
+            minHeal / HEAL_POWER * BODYPART_COST[HEAL] +
+            minHeal / HEAL_POWER * BODYPART_COST[MOVE]
+        )
+    }
+
+    /**
+     * Finds how expensive it will be to provide enough heal parts to withstand a ranged attack
+     */
+    public findMinRangedHealCost(minHeal: number = 0) {
         return (
             minHeal / HEAL_POWER * BODYPART_COST[HEAL] +
             minHeal / HEAL_POWER * BODYPART_COST[MOVE]

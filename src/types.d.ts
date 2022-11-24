@@ -2406,7 +2406,7 @@ declare global {
             combat(
                 requestName: string,
                 type: CombatRequestTypes,
-                opts?: { [key: string]: number },
+                opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>,
                 communeName?: string,
             ): string
 

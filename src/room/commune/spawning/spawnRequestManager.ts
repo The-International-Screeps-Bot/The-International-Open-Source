@@ -1481,43 +1481,49 @@ Room.prototype.spawnRequester = function () {
         )
         const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
-        const minAttackCost = this.communeManager.findMinMeleeAttackCost(request.data[CombatRequestData.minDamage])
+        const minAttackCost = this.communeManager.findMinMeleeAttackCost(request.data[CombatRequestData.minDamage] + (request.data[CombatRequestData.maxTowerDamage] || 0))
         const attackAmount = minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE])
 
-        const minHealCost = this.communeManager.findMinHealCost(request.data[CombatRequestData.minHeal])
-        const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
+        const minMeleeHealCost = this.communeManager.findMinMeleeHealCost(request.data[CombatRequestData.minMeleeHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0))
+        const meleeHealAmount = minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
+
+        const minRangedHealCost = this.communeManager.findMinRangedHealCost(
+            request.data[CombatRequestData.minRangedHeal],
+        )
+        const rangedHealAmount = minRangedHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
         const minDismantleCost =
             request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
-        if (
-            minRangedAttackCost + minHealCost > this.energyCapacityAvailable ||
-            minAttackCost > this.energyCapacityAvailable
-        ) {
-            this.communeManager.deleteCombatRequest(requestName, i)
-            continue
-        }
-
         if (request.T === 'attack' || request.T === 'defend') {
+
+            if (
+                minRangedAttackCost + minRangedHealCost > this.energyCapacityAvailable ||
+                minAttackCost > this.energyCapacityAvailable
+            ) {
+                this.communeManager.deleteCombatRequest(requestName, i)
+                continue
+            }
+
             // Spawn quad
 
             this.constructSpawnRequests(
                 ((): SpawnRequestOpts | false => {
                     role = 'antifaRangedAttacker'
                     spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
-                    const minCost = minRangedAttackCost + minHealCost
+                    const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
 
                     for (let i = 0; i < rangedAttackAmount; i++) {
                         extraParts.push(RANGED_ATTACK)
                     }
 
-                    for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
+                    for (let i = 0; i < rangedAttackAmount + rangedHealAmount - 1; i++) {
                         extraParts.push(MOVE)
                     }
 
-                    for (let i = 0; i < healAmount; i++) {
+                    for (let i = 0; i < rangedHealAmount; i++) {
                         extraParts.push(HEAL)
                     }
 
@@ -1545,6 +1551,15 @@ Room.prototype.spawnRequester = function () {
             continue
         }
 
+        if (
+            minRangedAttackCost + minRangedHealCost > this.energyCapacityAvailable ||
+            minAttackCost + minMeleeHealCost > this.energyCapacityAvailable ||
+            minAttackCost > this.energyCapacityAvailable
+        ) {
+            this.communeManager.deleteCombatRequest(requestName, i)
+            continue
+        }
+
         // If the request isn't an attack
         // Spawn RangedAttack Heal singletons
 
@@ -1552,18 +1567,18 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 role = 'antifaRangedAttacker'
                 spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
-                const minCost = minRangedAttackCost + minHealCost
+                const minCost = minRangedAttackCost + minRangedHealCost
                 const extraParts: BodyPartConstant[] = []
 
                 for (let i = 0; i < rangedAttackAmount; i++) {
                     extraParts.push(RANGED_ATTACK)
                 }
 
-                for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
+                for (let i = 0; i < rangedAttackAmount + rangedHealAmount - 1; i++) {
                     extraParts.push(MOVE)
                 }
 
-                for (let i = 0; i < healAmount; i++) {
+                for (let i = 0; i < rangedHealAmount; i++) {
                     extraParts.push(HEAL)
                 }
 
@@ -1668,14 +1683,14 @@ Room.prototype.spawnRequester = function () {
             ((): SpawnRequestOpts | false => {
                 role = 'antifaHealer'
                 spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
-                const minCost = minHealCost
+                const minCost = minMeleeHealCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < healAmount - 1; i++) {
+                for (let i = 0; i < meleeHealAmount - 1; i++) {
                     extraParts.push(MOVE)
                 }
 
-                for (let i = 0; i < healAmount; i++) {
+                for (let i = 0; i < meleeHealAmount; i++) {
                     extraParts.push(HEAL)
                 }
 
