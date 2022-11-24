@@ -191,20 +191,25 @@ export class DefenceManager {
 
         let onlyInvader = true
         let minDamage = 0
-        let minHeal = 0
+        let minMeleeHeal = 0
+        let minRangedHeal = 0
 
         for (const enemyCreep of room.enemyAttackers) {
-            minDamage += enemyCreep.combatStrength.heal
-            minHeal += enemyCreep.combatStrength.ranged
+            minDamage += Math.max(Math.max(enemyCreep.combatStrength.heal, Math.ceil(enemyCreep.hits / 25)), minDamage)
+            minMeleeHeal += Math.max(enemyCreep.combatStrength.melee, minMeleeHeal)
+            minRangedHeal += Math.max(enemyCreep.combatStrength.ranged, minRangedHeal)
 
             if (onlyInvader && enemyCreep.owner.username !== 'Invader') onlyInvader = false
         }
+
+        if (minRangedHeal > minMeleeHeal) minMeleeHeal = minRangedHeal
 
         // There is tower inferiority, make a defend request
 
         room.createDefendCombatRequest({
             minDamage,
-            minHeal,
+            minMeleeHeal,
+            minRangedHeal,
             quadCount: 1,
             inactionTimerMax: onlyInvader ? 1 : undefined
         })
