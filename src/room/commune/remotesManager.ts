@@ -173,7 +173,7 @@ export class RemotesManager {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory.data[RemoteData[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(
-                    remoteMemory.SPs[sourceIndex].length,
+                    remoteMemory.SPs[sourceIndex].length / 2,
                     income,
                 )
             }

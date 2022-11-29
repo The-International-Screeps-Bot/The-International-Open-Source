@@ -207,13 +207,10 @@ export class SpawnManager {
         if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
 
         for (const request of this.communeManager.room.spawnRequests) {
-            /* customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ') */
-
-            if (request.role !== 'remoteSourceHarvester0' && request.role !== 'remoteSourceHarvester1') continue
 
             customLog(
-                'SPAWN REQUEST REMOTE HARVESTER',
-                request.priority + ', ' + request.extraOpts.memory.RN + ', ' + request.extraOpts.memory.SI,
+                'SPAWN REQUEST',
+                request.role + ', ' + request.priority + ', ' + request.cost + ', ' + request.body
             )
         }
     }

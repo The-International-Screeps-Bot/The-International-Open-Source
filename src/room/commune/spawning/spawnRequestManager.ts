@@ -282,8 +282,6 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [CARRY, CARRY, MOVE],
                     partsMultiplier: partsMultiplier / 2,
-                    minCreeps: undefined,
-                    maxCreeps: Infinity,
                     minCost: 150,
                     maxCostPerCreep: this.memory.MHC,
                     priority,
@@ -298,8 +296,6 @@ Room.prototype.spawnRequester = function () {
                 defaultParts: [],
                 extraParts: [CARRY, MOVE],
                 partsMultiplier,
-                minCreeps: undefined,
-                maxCreeps: Infinity,
                 minCost: 100,
                 maxCostPerCreep: this.memory.MHC,
                 priority,
@@ -1107,7 +1103,7 @@ Room.prototype.spawnRequester = function () {
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SPs[index].length, income)
+                remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SPs[index].length / 2, income)
             }
         }
 
@@ -1395,8 +1391,6 @@ Room.prototype.spawnRequester = function () {
                     defaultParts: [],
                     extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                     partsMultiplier: request.data[ClaimRequestData.vanguard],
-                    minCreeps: undefined,
-                    maxCreeps: Infinity,
                     minCost: 250,
                     priority: 8.2 + this.creepsFromRoom.vanguard.length,
                     memoryAdditions: {

@@ -1109,7 +1109,6 @@ export const partsByPriority: PartsByPriority[] = [
     'attack',
     'ranged_attack',
     'secondaryTough',
-    'secondaryRangedAttack',
     'work',
     'carry',
     'move',

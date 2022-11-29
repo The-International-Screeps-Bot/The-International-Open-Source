@@ -1,5 +1,5 @@
 import { dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
-import { getRange, getRangeOfCoords } from 'international/utils'
+import { customLog, getRange, getRangeOfCoords } from 'international/utils'
 
 Object.defineProperties(Creep.prototype, {
     dying: {
@@ -34,7 +34,7 @@ Object.defineProperties(Creep.prototype, {
     },
     commune: {
         get() {
-            if (this._commune) return this._commune
+            if (this._commune !== undefined) return this._commune
 
             return (this._commune = Game.rooms[this.name.split(' ')[2]])
         },

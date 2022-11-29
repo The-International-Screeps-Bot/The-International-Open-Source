@@ -7,8 +7,8 @@ StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
 
     return this.spawnCreep(
         spawnRequest.body,
-        `${spawnRequest.role} ${spawnRequest.cost} ${this.room.name} T${spawnRequest.tier} ${
-            spawnRequest.defaultParts
+        `${spawnRequest.role} ${spawnRequest.cost} ${this.room.name} ${spawnRequest.defaultParts} T${
+            spawnRequest.tier
         } ${newID()}`,
         spawnRequest.extraOpts,
     )
@@ -248,10 +248,14 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
     if (totalExtraParts < maxPartsPerCreep * (opts.threshold || 0.25)) return
 
-    // Subtract maxCreeps by the existing number of creeps of this role
+    if (!opts.maxCreeps) {
+        opts.maxCreeps = Number.MAX_SAFE_INTEGER
+    }
 
-    if (!opts.maxCreeps) opts.maxCreeps = Infinity
-    else opts.maxCreeps -= opts.spawnGroup ? opts.spawnGroup.length : this.creepsFromRoom[opts.role].length
+    // Subtract maxCreeps by the existing number of creeps of this role
+    else {
+        opts.maxCreeps -= opts.spawnGroup ? opts.spawnGroup.length : this.creepsFromRoom[opts.role].length
+    }
 
     // So long as there are totalExtraParts left to assign
 
@@ -339,8 +343,6 @@ Room.prototype.spawnRequestByGroup = function (opts) {
             // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
             if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-                let part
-
                 // Assign partIndex as the length of extraParts
 
                 let partIndex = opts.extraParts.length - 1
@@ -350,7 +352,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 while (partIndex >= 0) {
                     // Get the part using the partIndex
 
-                    part = opts.extraParts[partIndex]
+                    const part = opts.extraParts[partIndex]
 
                     // Get the cost of the part
 
