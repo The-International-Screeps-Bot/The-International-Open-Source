@@ -58,7 +58,6 @@ declare global {
         | 'attack'
         | 'ranged_attack'
         | 'secondaryTough'
-        | 'secondaryRangedAttack'
         | 'work'
         | 'carry'
         | 'move'

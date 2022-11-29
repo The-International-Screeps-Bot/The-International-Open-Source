@@ -1123,7 +1123,6 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
     [ATTACK]: ATTACK,
     [RANGED_ATTACK]: RANGED_ATTACK,
     secondaryTough: TOUGH,
-    secondaryRangedAttack: RANGED_ATTACK,
     [WORK]: WORK,
     [CARRY]: CARRY,
     [MOVE]: MOVE,

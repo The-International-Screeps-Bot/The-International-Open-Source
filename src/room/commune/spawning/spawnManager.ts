@@ -164,7 +164,7 @@ export class SpawnManager {
             if (!request.bodyPartCounts[part]) continue
 
             let priorityPartsCount: number
-            if (part === ATTACK) priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
+            if (part === ATTACK || part === TOUGH) priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
             else priorityPartsCount = request.bodyPartCounts[part] - 1
 
             for (let i = 0; i < priorityPartsCount; i++) {
@@ -172,7 +172,7 @@ export class SpawnManager {
             }
 
             if (part === TOUGH) {
-                request.body.push(part)
+                request.bodyPartCounts.secondaryTough = Math.floor(request.bodyPartCounts[part] - priorityPartsCount)
                 continue
             }
 
