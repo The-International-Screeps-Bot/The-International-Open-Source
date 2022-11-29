@@ -157,14 +157,29 @@ export class SpawnManager {
         const request = this.communeManager.room.spawnRequests[index]
 
         request.body = []
+        const endParts: BodyPartConstant[] = []
 
         for (const part of partsByPriority) {
 
-            for (let i = 0; i < request.bodyPartCounts[part]; i++) {
+            if (!request.bodyPartCounts[part]) continue
+
+            for (let i = 0; i < request.bodyPartCounts[part] - 1; i++) {
 
                 request.body.push(part)
             }
+
+            // Ensure each part besides tough has a place at the end to reduce CPU when creeps perform actions
+
+            if (part === TOUGH) {
+
+                request.body.push(part)
+                continue
+            }
+
+            endParts.push(part)
         }
+
+        request.body = request.body.concat(endParts)
     }
 
     private createPowerTasks() {
