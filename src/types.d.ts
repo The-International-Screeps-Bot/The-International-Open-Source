@@ -52,6 +52,19 @@ declare global {
         brown: string
     }
 
+    type PartsByPriority =
+        | 'tough'
+        | 'claim'
+        | 'attack'
+        | 'ranged_attack'
+        | 'secondaryTough'
+        | 'secondaryRangedAttack'
+        | 'work'
+        | 'carry'
+        | 'move'
+        | 'secondaryAttack'
+        | 'heal'
+
     interface ResourceTarget {
         resource: ResourceConstant
         conditions?(communeManager: CommuneManager): any
@@ -227,8 +240,8 @@ declare global {
     }
 
     interface MoveRequestByPathOpts {
-        packedPath: string,
-        loose?: boolean,
+        packedPath: string
+        loose?: boolean
         remoteName?: string
     }
 
@@ -298,7 +311,7 @@ declare global {
         role: CreepRoles
         priority: number
         defaultParts: number
-        bodyPartCounts: { [key in BodyPartConstant]: number }
+        bodyPartCounts: { [key in PartsByPriority]: number }
         body?: BodyPartConstant[]
         tier: number
         cost: number
@@ -1154,7 +1167,7 @@ declare global {
             priority: number,
             role: CreepRoles,
             defaultParts: number,
-            bodyPartCounts: { [key in BodyPartConstant]: number },
+            bodyPartCounts: { [key in PartsByPriority]: number },
             tier: number,
             cost: number,
             memory: any,

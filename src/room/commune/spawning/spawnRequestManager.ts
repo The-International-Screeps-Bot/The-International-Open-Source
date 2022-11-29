@@ -1199,19 +1199,13 @@ Room.prototype.spawnRequester = function () {
                 role = 'remoteDefender'
                 const extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < rangedAttackAmount + healAmount - 1; i++) {
-                    extraParts.push(MOVE)
-                }
-
                 for (let i = 0; i < rangedAttackAmount; i++) {
-                    extraParts.push(RANGED_ATTACK)
+                    extraParts.push(RANGED_ATTACK, MOVE)
                 }
 
                 for (let i = 0; i < healAmount; i++) {
-                    extraParts.push(HEAL)
+                    extraParts.push(HEAL, MOVE)
                 }
-
-                extraParts.push(MOVE)
 
                 return {
                     role,
@@ -1399,7 +1393,7 @@ Room.prototype.spawnRequester = function () {
                 return {
                     role,
                     defaultParts: [],
-                    extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
+                    extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                     partsMultiplier: request.data[ClaimRequestData.vanguard],
                     minCreeps: undefined,
                     maxCreeps: Infinity,
@@ -1429,7 +1423,7 @@ Room.prototype.spawnRequester = function () {
                 return {
                     role,
                     defaultParts: [],
-                    extraParts: [CARRY, MOVE, WORK, MOVE, CARRY, MOVE],
+                    extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                     partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
                     minCost: 250,
                     priority: 10 + this.creepsFromRoom.allyVanguard.length,
@@ -1516,18 +1510,12 @@ Room.prototype.spawnRequester = function () {
                     const extraParts: BodyPartConstant[] = []
 
                     for (let i = 0; i < rangedAttackAmount; i++) {
-                        extraParts.push(RANGED_ATTACK)
-                    }
-
-                    for (let i = 0; i < rangedAttackAmount + rangedHealAmount - 1; i++) {
-                        extraParts.push(MOVE)
+                        extraParts.push(RANGED_ATTACK, MOVE)
                     }
 
                     for (let i = 0; i < rangedHealAmount; i++) {
-                        extraParts.push(HEAL)
+                        extraParts.push(HEAL, MOVE)
                     }
-
-                    extraParts.push(MOVE)
 
                     if (!extraParts.length) return false
 
@@ -1571,18 +1559,12 @@ Room.prototype.spawnRequester = function () {
                 const extraParts: BodyPartConstant[] = []
 
                 for (let i = 0; i < rangedAttackAmount; i++) {
-                    extraParts.push(RANGED_ATTACK)
-                }
-
-                for (let i = 0; i < rangedAttackAmount + rangedHealAmount - 1; i++) {
-                    extraParts.push(MOVE)
+                    extraParts.push(RANGED_ATTACK, MOVE)
                 }
 
                 for (let i = 0; i < rangedHealAmount; i++) {
-                    extraParts.push(HEAL)
+                    extraParts.push(HEAL, MOVE)
                 }
-
-                extraParts.push(MOVE)
 
                 if (!extraParts.length) return false
 
@@ -1613,11 +1595,7 @@ Room.prototype.spawnRequester = function () {
                 const workAmount = request.data[CombatRequestData.dismantle]
 
                 for (let i = 0; i < workAmount; i++) {
-                    extraParts.push(WORK)
-                }
-
-                for (let i = 0; i < workAmount; i++) {
-                    extraParts.push(MOVE)
+                    extraParts.push(WORK, MOVE)
                 }
 
                 if (!extraParts.length) return false
@@ -1646,19 +1624,9 @@ Room.prototype.spawnRequester = function () {
                 const minCost = minAttackCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < Math.ceil(attackAmount / 2); i++) {
-                    extraParts.push(ATTACK)
+                for (let i = 0; i < attackAmount; i++) {
+                    extraParts.push(ATTACK, MOVE)
                 }
-
-                for (let i = 0; i < attackAmount - 1; i++) {
-                    extraParts.push(MOVE)
-                }
-
-                for (let i = 0; i < Math.ceil(attackAmount / 2); i++) {
-                    extraParts.push(ATTACK)
-                }
-
-                extraParts.push(MOVE)
 
                 if (!extraParts.length) return false
 
@@ -1686,15 +1654,9 @@ Room.prototype.spawnRequester = function () {
                 const minCost = minMeleeHealCost
                 let extraParts: BodyPartConstant[] = []
 
-                for (let i = 0; i < meleeHealAmount - 1; i++) {
-                    extraParts.push(MOVE)
-                }
-
                 for (let i = 0; i < meleeHealAmount; i++) {
-                    extraParts.push(HEAL)
+                    extraParts.push(HEAL, MOVE)
                 }
-
-                extraParts.push(MOVE)
 
                 if (!extraParts.length) return false
 

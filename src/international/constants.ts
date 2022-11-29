@@ -1103,13 +1103,30 @@ export const maxClaimRequestDistance = 10
 export const maxCombatDistance = 20
 export const maxHaulDistance = 15
 
-export const partsByPriority = [
-    TOUGH,
-    CLAIM,
-    ATTACK,
-    RANGED_ATTACK,
-    WORK,
-    CARRY,
-    HEAL,
-    MOVE
+export const partsByPriority: PartsByPriority[] = [
+    'tough',
+    'claim',
+    'attack',
+    'ranged_attack',
+    'secondaryTough',
+    'secondaryRangedAttack',
+    'work',
+    'carry',
+    'move',
+    'secondaryAttack',
+    'heal',
 ]
+
+export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConstant } = {
+    [TOUGH]: TOUGH,
+    [CLAIM]: CLAIM,
+    [ATTACK]: ATTACK,
+    [RANGED_ATTACK]: RANGED_ATTACK,
+    secondaryTough: TOUGH,
+    secondaryRangedAttack: RANGED_ATTACK,
+    [WORK]: WORK,
+    [CARRY]: CARRY,
+    [MOVE]: MOVE,
+    secondaryAttack: ATTACK,
+    [HEAL]: HEAL,
+}

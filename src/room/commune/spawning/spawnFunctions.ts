@@ -77,15 +77,18 @@ Room.prototype.spawnRequestIndividually = function (opts) {
     while (opts.minCreeps > (opts.spawnGroup ? opts.spawnGroup.length : this.creepsFromRoom[opts.role].length)) {
         // Construct important imformation for the spawnRequest
 
-        let bodyPartCounts: { [key in BodyPartConstant]: number } = {
-            [TOUGH]: 0,
-            [CLAIM]: 0,
-            [ATTACK]: 0,
-            [RANGED_ATTACK]: 0,
-            [WORK]: 0,
-            [CARRY]: 0,
-            [HEAL]: 0,
-            [MOVE]: 0,
+        let bodyPartCounts: { [key in PartsByPriority]: number } = {
+            tough: 0,
+            claim: 0,
+            attack: 0,
+            ranged_attack: 0,
+            secondaryTough: 0,
+            secondaryRangedAttack: 0,
+            work: 0,
+            carry: 0,
+            move: 0,
+            secondaryAttack: 0,
+            heal: 0,
         }
 
         let tier = 0
@@ -263,16 +266,20 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     }
 
     while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
+        // Construct important imformation for the spawnRequest
 
-        let bodyPartCounts: { [key in BodyPartConstant]: number } = {
-            [TOUGH]: 0,
-            [CLAIM]: 0,
-            [ATTACK]: 0,
-            [RANGED_ATTACK]: 0,
-            [WORK]: 0,
-            [CARRY]: 0,
-            [HEAL]: 0,
-            [MOVE]: 0,
+        let bodyPartCounts: { [key in PartsByPriority]: number } = {
+            tough: 0,
+            claim: 0,
+            attack: 0,
+            ranged_attack: 0,
+            secondaryTough: 0,
+            secondaryRangedAttack: 0,
+            work: 0,
+            carry: 0,
+            move: 0,
+            secondaryAttack: 0,
+            heal: 0,
         }
         let tier = 0
         let cost = 0

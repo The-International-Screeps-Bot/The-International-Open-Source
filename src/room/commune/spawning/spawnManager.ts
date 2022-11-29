@@ -1,4 +1,4 @@
-import { myColors, partsByPriority } from 'international/constants'
+import { myColors, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import { CommuneManager } from '../communeManager'
@@ -19,7 +19,6 @@ export class SpawnManager {
      * Assign spawnIDs to creeps
      */
     public organizeSpawns() {
-
         const spawns = this.communeManager.structures.spawn
         if (!spawns.length) return
 
@@ -60,7 +59,7 @@ export class SpawnManager {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Spawn Manager', cpuUsed.toFixed(2), {
                 textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                bgColor: myColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'smcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -81,7 +80,6 @@ export class SpawnManager {
         // Loop through priorities inside requestsByPriority
 
         for (const index in this.communeManager.room.spawnRequests) {
-
             const request = this.communeManager.room.spawnRequests[index]
 
             // Try to find inactive spawn, if can't, stop the loop
@@ -98,8 +96,8 @@ export class SpawnManager {
                     `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${request.cost}, body: (${request.bodyPartCounts}) ${request.body}`,
                     {
                         textColor: myColors.white,
-                        bgColor: myColors.red
-                    }
+                        bgColor: myColors.red,
+                    },
                 )
 
                 continue
@@ -121,10 +119,10 @@ export class SpawnManager {
                     `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                     {
                         textColor: myColors.white,
-                        bgColor: myColors.red
-                    }
+                        bgColor: myColors.red,
+                    },
                 )
-/*
+                /*
                 //We don't want one bad spawn request to block all of spawning.
                 if (testSpawnResult == ERR_INVALID_ARGS) continue
  */
@@ -138,7 +136,7 @@ export class SpawnManager {
             // Spawn the creep
 
             spawn.advancedSpawn(request)
-/*
+            /*
             // Record in stats the costs
 
             this.communeManager.room.energyAvailable -= spawnRequest.cost
@@ -153,28 +151,38 @@ export class SpawnManager {
     }
 
     configSpawnRequest(index: number) {
-
         const request = this.communeManager.room.spawnRequests[index]
 
         request.body = []
         const endParts: BodyPartConstant[] = []
 
-        for (const part of partsByPriority) {
+        for (const partIndex in partsByPriority) {
+
+            const partType = partsByPriority[partIndex]
+            const part = partsByPriorityPartType[partType]
 
             if (!request.bodyPartCounts[part]) continue
 
-            for (let i = 0; i < request.bodyPartCounts[part] - 1; i++) {
+            let priorityPartsCount: number
+            if (part === ATTACK) priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
+            else priorityPartsCount = request.bodyPartCounts[part] - 1
 
+            for (let i = 0; i < priorityPartsCount; i++) {
                 request.body.push(part)
             }
 
-            // Ensure each part besides tough has a place at the end to reduce CPU when creeps perform actions
-
             if (part === TOUGH) {
-
                 request.body.push(part)
                 continue
             }
+
+            if (part === ATTACK) {
+
+                request.bodyPartCounts.secondaryAttack = Math.floor(request.bodyPartCounts[part] - priorityPartsCount)
+                continue
+            }
+
+            // Ensure each part besides tough has a place at the end to reduce CPU when creeps perform actions
 
             endParts.push(part)
         }
@@ -194,19 +202,19 @@ export class SpawnManager {
      * Spawn request debugging
      */
     private test() {
-
         return
 
         if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
 
         for (const request of this.communeManager.room.spawnRequests) {
-
             /* customLog('SPAWN REQUESTS', priority + ', ' + request.role + ', ') */
 
             if (request.role !== 'remoteSourceHarvester0' && request.role !== 'remoteSourceHarvester1') continue
 
-            customLog('SPAWN REQUEST REMOTE HARVESTER', request.priority + ', ' + request.extraOpts.memory.RN + ', ' + request.extraOpts.memory.SI)
+            customLog(
+                'SPAWN REQUEST REMOTE HARVESTER',
+                request.priority + ', ' + request.extraOpts.memory.RN + ', ' + request.extraOpts.memory.SI,
+            )
         }
-
     }
 }
