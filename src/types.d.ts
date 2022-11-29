@@ -298,7 +298,8 @@ declare global {
         role: CreepRoles
         priority: number
         defaultParts: number
-        body: BodyPartConstant[]
+        bodyPartCounts: { [key in BodyPartConstant]: number }
+        body?: BodyPartConstant[]
         tier: number
         cost: number
         extraOpts: ExtraOpts
@@ -1153,7 +1154,7 @@ declare global {
             priority: number,
             role: CreepRoles,
             defaultParts: number,
-            body: BodyPartConstant[],
+            bodyPartCounts: { [key in BodyPartConstant]: number },
             tier: number,
             cost: number,
             memory: any,

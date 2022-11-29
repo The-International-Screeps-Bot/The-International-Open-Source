@@ -1,4 +1,4 @@
-import { myColors } from 'international/constants'
+import { myColors, partsByPriority } from 'international/constants'
 import { internationalManager } from 'international/internationalManager'
 import { customLog, newID } from 'international/utils'
 
@@ -7,7 +7,9 @@ StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
 
     return this.spawnCreep(
         spawnRequest.body,
-        `${spawnRequest.role} ${spawnRequest.cost} ${this.room.name} T${spawnRequest.tier} ${spawnRequest.defaultParts} ${newID()}`,
+        `${spawnRequest.role} ${spawnRequest.cost} ${this.room.name} T${spawnRequest.tier} ${
+            spawnRequest.defaultParts
+        } ${newID()}`,
         spawnRequest.extraOpts,
     )
 }
@@ -49,20 +51,19 @@ Room.prototype.findMaxCostPerCreep = function (maxCostPerCreep) {
     return Math.min(maxCostPerCreep, this.energyCapacityAvailable)
 }
 
-Room.prototype.createSpawnRequest = function (priority, role, defaultParts, body, tier, cost, memory) {
-
+Room.prototype.createSpawnRequest = function (priority, role, defaultParts, bodyPartCounts, tier, cost, memory) {
     this.spawnRequests.push({
         role,
         priority,
         defaultParts,
-        body,
+        bodyPartCounts,
         tier,
         cost,
         extraOpts: {
             memory,
             energyStructures: this.spawningStructuresByPriority,
             dryRun: true,
-        }
+        },
     })
 }
 
@@ -76,7 +77,17 @@ Room.prototype.spawnRequestIndividually = function (opts) {
     while (opts.minCreeps > (opts.spawnGroup ? opts.spawnGroup.length : this.creepsFromRoom[opts.role].length)) {
         // Construct important imformation for the spawnRequest
 
-        const body: BodyPartConstant[] = []
+        let bodyPartCounts: { [key in BodyPartConstant]: number } = {
+            [TOUGH]: 0,
+            [CLAIM]: 0,
+            [ATTACK]: 0,
+            [RANGED_ATTACK]: 0,
+            [WORK]: 0,
+            [CARRY]: 0,
+            [HEAL]: 0,
+            [MOVE]: 0,
+        }
+
         let tier = 0
         let cost = 0
 
@@ -104,9 +115,7 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
                 cost += partCost
 
-                // Add the part the the body
-
-                body.push(part)
+                bodyPartCounts[part] += 1
             }
         }
 
@@ -123,6 +132,8 @@ Room.prototype.spawnRequestIndividually = function (opts) {
             // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
             while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
+                const addedParts: BodyPartConstant[] = []
+
                 // Loop through each part in extraParts
 
                 for (const part of opts.extraParts) {
@@ -132,68 +143,73 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
                     // Otherwise add the part the the body
 
-                    body.push(part)
+                    addedParts.push(part)
 
                     // Reduce remainingAllowedParts
 
                     remainingAllowedParts -= 1
                 }
 
-                // Increase tier
+                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
 
-                tier += 1
-            }
+                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+                    // Assign partIndex as the length of extraParts
 
-            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
+                    let partIndex = opts.extraParts.length - 1
 
-            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-                // So long as partIndex is above 0
+                    while (partIndex >= 0) {
+                        // Get the part using the partIndex
 
-                let part
+                        const part = opts.extraParts[partIndex]
 
-                // Assign partIndex as the length of extraParts
+                        // Get the cost of the part
 
-                let partIndex = opts.extraParts.length - 1
+                        partCost = BODYPART_COST[part]
 
-                while (partIndex >= 0) {
-                    // Get the part using the partIndex
+                        // If the cost minus partCost is below minCost, stop the loop
 
-                    part = opts.extraParts[partIndex]
+                        if (cost - partCost < opts.minCost) break
 
-                    // Get the cost of the part
+                        // And remove the part's cost to the cost
 
-                    partCost = BODYPART_COST[part]
+                        cost -= partCost
 
-                    // If the cost minus partCost is below minCost, stop the loop
+                        // Remove the last part in the body
 
-                    if (cost - partCost < opts.minCost) break
+                        addedParts.pop()
 
-                    // And remove the part's cost to the cost
+                        // Increase remainingAllowedParts
 
-                    cost -= partCost
+                        remainingAllowedParts += 1
 
-                    // Remove the last part in the body
+                        // Decrease the partIndex
 
-                    body.pop()
+                        partIndex -= 1
+                    }
 
-                    // Increase remainingAllowedParts
+                    // Increase tier by a percentage (2 decimals) of the extraParts it added
 
-                    remainingAllowedParts += 1
-
-                    // Decrease the partIndex
-
-                    partIndex -= 1
+                    tier += Math.floor((addedParts.length / opts.extraParts.length) * 100) / 100
+                    for (const part of addedParts) bodyPartCounts[part] += 1
+                    break
                 }
 
-                // Decrease tier
-
-                tier -= 1
+                tier += 1
+                for (const part of addedParts) bodyPartCounts[part] += 1
             }
         }
 
         // Create a spawnRequest using previously constructed information
 
-        this.createSpawnRequest(opts.priority, opts.role, opts.defaultParts.length, body, tier, cost, opts.memoryAdditions)
+        this.createSpawnRequest(
+            opts.priority,
+            opts.role,
+            opts.defaultParts.length,
+            bodyPartCounts,
+            tier,
+            cost,
+            opts.memoryAdditions,
+        )
 
         // Reduce the number of minCreeps
 
@@ -219,7 +235,6 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     // Loop through creep names of the requested role
 
     for (const creepName of opts.spawnGroup || this.creepsFromRoom[opts.role]) {
-
         const creep = Game.creeps[creepName]
 
         // Take away the amount of parts the creep with the name has from totalExtraParts
@@ -240,21 +255,25 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
     //Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
     if (opts.extraParts.length == 0) {
-        customLog(
-            'spawnRequestByGroup error',
-            '0 length extraParts?' + JSON.stringify(opts),
-            {
-                textColor: myColors.white,
-                bgColor: myColors.red
-            }
-        )
+        customLog('spawnRequestByGroup error', '0 length extraParts?' + JSON.stringify(opts), {
+            textColor: myColors.white,
+            bgColor: myColors.red,
+        })
         return
     }
 
     while (totalExtraParts >= opts.extraParts.length && opts.maxCreeps > 0) {
-        // Construct important imformation for the spawnRequest
 
-        const body: BodyPartConstant[] = []
+        let bodyPartCounts: { [key in BodyPartConstant]: number } = {
+            [TOUGH]: 0,
+            [CLAIM]: 0,
+            [ATTACK]: 0,
+            [RANGED_ATTACK]: 0,
+            [WORK]: 0,
+            [CARRY]: 0,
+            [HEAL]: 0,
+            [MOVE]: 0,
+        }
         let tier = 0
         let cost = 0
 
@@ -288,14 +307,14 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
                 // Add the part the the body
 
-                body.push(part)
+                bodyPartCounts[part] += 1
             }
         }
 
         // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
         while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
-            // Loop through each part in extraParts
+            const addedParts: BodyPartConstant[] = []
 
             for (const part of opts.extraParts) {
                 // And add the part's cost to the cost
@@ -304,7 +323,7 @@ Room.prototype.spawnRequestByGroup = function (opts) {
 
                 // Add the part the the body
 
-                body.push(part)
+                addedParts.push(part)
 
                 // Reduce remainingAllowedParts and totalExtraParts
 
@@ -312,61 +331,70 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 totalExtraParts -= 1
             }
 
-            // Increase tier
+            // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
-            tier += 1
-        }
+            if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+                let part
 
-        // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
+                // Assign partIndex as the length of extraParts
 
-        if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-            let part
+                let partIndex = opts.extraParts.length - 1
 
-            // Assign partIndex as the length of extraParts
+                // So long as partIndex is greater or equal to 0
 
-            let partIndex = opts.extraParts.length - 1
+                while (partIndex >= 0) {
+                    // Get the part using the partIndex
 
-            // So long as partIndex is greater or equal to 0
+                    part = opts.extraParts[partIndex]
 
-            while (partIndex >= 0) {
-                // Get the part using the partIndex
+                    // Get the cost of the part
 
-                part = opts.extraParts[partIndex]
+                    partCost = BODYPART_COST[part]
 
-                // Get the cost of the part
+                    // If the cost minus partCost is below minCost, stop the loop
 
-                partCost = BODYPART_COST[part]
+                    if (cost - partCost < opts.minCost) break
 
-                // If the cost minus partCost is below minCost, stop the loop
+                    // And remove the part's cost to the cost
 
-                if (cost - partCost < opts.minCost) break
+                    cost -= partCost
 
-                // And remove the part's cost to the cost
+                    // Remove the last part in the body
 
-                cost -= partCost
+                    addedParts.pop()
 
-                // Remove the last part in the body
+                    // Increase remainingAllowedParts and totalExtraParts
 
-                body.pop()
+                    remainingAllowedParts += 1
+                    totalExtraParts += 1
 
-                // Increase remainingAllowedParts and totalExtraParts
+                    // Decrease the partIndex
 
-                remainingAllowedParts += 1
-                totalExtraParts += 1
+                    partIndex -= 1
+                }
 
-                // Decrease the partIndex
+                // Increase tier by a percentage (2 decimals) of the extraParts it added
 
-                partIndex -= 1
+                tier += Math.floor((addedParts.length / opts.extraParts.length) * 100) / 100
+                for (const part of addedParts) bodyPartCounts[part] += 1
+                break
             }
 
-            // Decrease tier
-
-            tier -= 1
+            tier += 1
+            for (const part of addedParts) bodyPartCounts[part] += 1
         }
 
         // Create a spawnRequest using previously constructed information
 
-        this.createSpawnRequest(opts.priority, opts.role, opts.defaultParts.length, body, tier, cost, opts.memoryAdditions)
+        this.createSpawnRequest(
+            opts.priority,
+            opts.role,
+            opts.defaultParts.length,
+            bodyPartCounts,
+            tier,
+            cost,
+            opts.memoryAdditions,
+        )
 
         // Decrease maxCreeps counter
 

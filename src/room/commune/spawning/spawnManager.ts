@@ -1,4 +1,4 @@
-import { myColors } from 'international/constants'
+import { myColors, partsByPriority } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import { CommuneManager } from '../communeManager'
@@ -80,7 +80,9 @@ export class SpawnManager {
 
         // Loop through priorities inside requestsByPriority
 
-        for (const request of this.communeManager.room.spawnRequests) {
+        for (const index in this.communeManager.room.spawnRequests) {
+
+            const request = this.communeManager.room.spawnRequests[index]
 
             // Try to find inactive spawn, if can't, stop the loop
 
@@ -89,10 +91,11 @@ export class SpawnManager {
             //We want to continue instead of break in this sub-case.  If we're asked to build a creep larger
             // than what we can possibly build, if we break out, we'll get stuck in a loop where the rest of the
             // spawns never run.
+            // This should never be activated. If it is, there is a bug in spawn request creation
             if (request.cost > this.communeManager.room.energyCapacityAvailable) {
                 customLog(
                     'Failed to spawn',
-                    `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
+                    `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${request.cost}, body: (${request.bodyPartCounts}) ${request.body}`,
                     {
                         textColor: myColors.white,
                         bgColor: myColors.red
@@ -102,7 +105,10 @@ export class SpawnManager {
                 continue
             }
 
+            this.configSpawnRequest(parseInt(index))
+
             // See if creep can be spawned
+
             const testSpawnResult = spawn.advancedSpawn(request)
 
             // If creep can't be spawned
@@ -143,6 +149,21 @@ export class SpawnManager {
 
             spawnIndex -= 1
             if (spawnIndex < 0) return
+        }
+    }
+
+    configSpawnRequest(index: number) {
+
+        const request = this.communeManager.room.spawnRequests[index]
+
+        request.body = []
+
+        for (const part of partsByPriority) {
+
+            for (let i = 0; i < request.bodyPartCounts[part]; i++) {
+
+                request.body.push(part)
+            }
         }
     }
 

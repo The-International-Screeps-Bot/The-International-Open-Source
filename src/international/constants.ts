@@ -1102,3 +1102,14 @@ export const remoteTypeWeights: Partial<{ [key in RoomTypes]: number }> = {
 export const maxClaimRequestDistance = 10
 export const maxCombatDistance = 20
 export const maxHaulDistance = 15
+
+export const partsByPriority = [
+    TOUGH,
+    CLAIM,
+    ATTACK,
+    RANGED_ATTACK,
+    WORK,
+    CARRY,
+    HEAL,
+    MOVE
+]
