@@ -416,9 +416,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             continue
                         }
 
-                        // Otherwise if the rampart is owned by an ally, iterate
+                        // If the rampart is public and owned by an ally
+                        // We don't want to try to walk through enemy public ramparts as it could trick our pathing
 
-                        if (rampart.isPublic) continue
+                        if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username)) continue
 
                         // Otherwise set the rampart's pos as impassible
 
