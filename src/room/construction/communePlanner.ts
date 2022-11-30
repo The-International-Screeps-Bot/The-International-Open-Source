@@ -145,21 +145,25 @@ export function basePlanner(room: Room) {
         closestSourceToControllerRange = range
         closestSourceToController = source
     }
-/*
-    // Find the average pos between the sources
 
-    const avgSourcePos = sources.length > 1 ? findAvgBetweenCoords(sources[0].pos, sources[1].pos) : sources[0].pos
- */
-    // Find the average pos between some sources and the controller
+    let path: RoomPosition[]
 
-    let path = room.advancedFindPath({
-        origin: closestSourceToController.pos,
-        goals: [{ pos: room.controller.pos, range: 1 }],
-        weightCoordMaps: [room.roadCoords],
-        plainCost: defaultRoadPlanningPlainCost,
-    })
+    let avgControllerSourcePos: RoomPosition
+    if (closestSourceToControllerRange <= 1) {
 
-    const avgControllerSourcePos = path[Math.floor(path.length / 2)]
+        avgControllerSourcePos = closestSourceToController.pos
+    }
+    else {
+
+        path = room.advancedFindPath({
+            origin: closestSourceToController.pos,
+            goals: [{ pos: room.controller.pos, range: 1 }],
+            weightCoordMaps: [room.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost,
+        })
+
+        avgControllerSourcePos = path[Math.floor(path.length / 2)]
+    }
 
     const controllerAdjacentCoords = findCoordsInsideRect(
         room.controller.pos.x - 3,
