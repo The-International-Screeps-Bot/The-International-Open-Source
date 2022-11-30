@@ -825,7 +825,7 @@ Room.prototype.spawnRequester = function () {
 
             // If the controllerContainer or controllerLink exists
 
-            if (this.controllerContainer || controllerLink) {
+            if (this.controllerContainer || (controllerLink && controllerLink.RCLActionable)) {
                 // If the controller is level 8
 
                 if (this.controller.level === 8) {
@@ -840,29 +840,29 @@ Room.prototype.spawnRequester = function () {
                         extraParts = [
                             WORK,
                             WORK,
-                            MOVE,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
+                            WORK,
                             CARRY,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            MOVE,
                             CARRY,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            MOVE,
-                            WORK,
-                            WORK,
-                            MOVE,
                             CARRY,
-                            WORK,
+                            MOVE,
+                            MOVE,
+                            MOVE,
+                            MOVE,
+                            MOVE,
+                            MOVE,
+                            MOVE,
                             MOVE,
                         ]
 
@@ -1469,10 +1469,14 @@ Room.prototype.spawnRequester = function () {
         )
         const rangedAttackAmount = minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
 
-        const minAttackCost = this.communeManager.findMinMeleeAttackCost(request.data[CombatRequestData.minDamage] + (request.data[CombatRequestData.maxTowerDamage] || 0))
+        const minAttackCost = this.communeManager.findMinMeleeAttackCost(
+            request.data[CombatRequestData.minDamage] + (request.data[CombatRequestData.maxTowerDamage] || 0),
+        )
         const attackAmount = minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE])
 
-        const minMeleeHealCost = this.communeManager.findMinMeleeHealCost(request.data[CombatRequestData.minMeleeHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0))
+        const minMeleeHealCost = this.communeManager.findMinMeleeHealCost(
+            request.data[CombatRequestData.minMeleeHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
+        )
         const meleeHealAmount = minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
         const minRangedHealCost = this.communeManager.findMinRangedHealCost(
@@ -1485,7 +1489,6 @@ Room.prototype.spawnRequester = function () {
                 request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
 
         if (request.T === 'attack' || request.T === 'defend') {
-
             if (
                 minRangedAttackCost + minRangedHealCost > this.energyCapacityAvailable ||
                 minAttackCost > this.energyCapacityAvailable

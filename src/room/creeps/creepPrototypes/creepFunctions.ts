@@ -207,8 +207,11 @@ Creep.prototype.advancedUpgradeController = function () {
 
     // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-    const controllerStructure: StructureLink | StructureContainer | undefined =
-        room.controllerContainer || room.controllerLink
+    let controllerStructure: StructureLink | StructureContainer | undefined =
+        room.controllerContainer
+
+    const controllerLink = room.controllerLink
+    if (!controllerStructure && controllerLink && controllerLink.RCLActionable) controllerStructure = controllerLink
 
     // If there is a controllerContainer
 
