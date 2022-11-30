@@ -157,30 +157,30 @@ export class SpawnManager {
         const endParts: BodyPartConstant[] = []
 
         for (const partIndex in partsByPriority) {
-
             const partType = partsByPriority[partIndex]
             const part = partsByPriorityPartType[partType]
 
             if (!request.bodyPartCounts[part]) continue
 
+            let skipEndPart: boolean
+
             let priorityPartsCount: number
-            if (part === ATTACK || part === TOUGH) priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
-            else priorityPartsCount = request.bodyPartCounts[part] - 1
+            if (partType === RANGED_ATTACK) {
+                priorityPartsCount = request.bodyPartCounts[part]
+                skipEndPart = true
+            } else if (partType === ATTACK || partType === TOUGH) {
+                priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
+                skipEndPart = true
+            } else if (partType === 'secondaryTough' || partType === 'secondaryAttack') {
+                priorityPartsCount = Math.floor(request.bodyPartCounts[part] / 2)
+                skipEndPart = true
+            } else priorityPartsCount = request.bodyPartCounts[part] - 1
 
             for (let i = 0; i < priorityPartsCount; i++) {
                 request.body.push(part)
             }
 
-            if (part === TOUGH) {
-                request.bodyPartCounts.secondaryTough = Math.floor(request.bodyPartCounts[part] - priorityPartsCount)
-                continue
-            }
-
-            if (part === ATTACK) {
-
-                request.bodyPartCounts.secondaryAttack = Math.floor(request.bodyPartCounts[part] - priorityPartsCount)
-                continue
-            }
+            if (skipEndPart) continue
 
             // Ensure each part besides tough has a place at the end to reduce CPU when creeps perform actions
 
@@ -207,10 +207,9 @@ export class SpawnManager {
         if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
 
         for (const request of this.communeManager.room.spawnRequests) {
-
             customLog(
                 'SPAWN REQUEST',
-                request.role + ', ' + request.priority + ', ' + request.cost + ', ' + request.body
+                request.role + ', ' + request.priority + ', ' + request.cost + ', ' + request.body,
             )
         }
     }
