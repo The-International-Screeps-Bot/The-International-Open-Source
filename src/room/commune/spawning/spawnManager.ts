@@ -169,10 +169,10 @@ export class SpawnManager {
                 priorityPartsCount = request.bodyPartCounts[part]
                 skipEndPart = true
             } else if (partType === ATTACK || partType === TOUGH) {
-                priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
+                priorityPartsCount = Math.floor(request.bodyPartCounts[part] / 2)
                 skipEndPart = true
             } else if (partType === 'secondaryTough' || partType === 'secondaryAttack') {
-                priorityPartsCount = Math.floor(request.bodyPartCounts[part] / 2)
+                priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
                 skipEndPart = true
             } else priorityPartsCount = request.bodyPartCounts[part] - 1
 
