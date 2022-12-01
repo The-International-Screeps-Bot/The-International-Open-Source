@@ -4,6 +4,7 @@ import {
     quadAttackMemberOffsets,
     quadTransformIndexes,
     quadTransformOffsets,
+    rangedMassAttackMultiplierByRange,
     roomDimensions,
 } from 'international/constants'
 import {
@@ -33,6 +34,8 @@ export class Quad {
     members: Antifa[] = []
     leader: Antifa
     membersByCoord: { [packedCoord: string]: Antifa }
+
+    target: Structure | Creep
 
     _combatStrength: CombatStrength
 
@@ -139,18 +142,25 @@ export class Quad {
 
     runCombatRoom() {
         if (this.leader.room.name !== this.leader.memory.CRN) return false
-
+        /*
         if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
             return true
         }
-
+ */
         if (!this.getInFormation()) {
             this.passiveRangedAttack()
             return true
         }
 
         this.runCombat()
+
+        if (!this.members.find(member => member.moveRequest || !member.canMove)) {
+
+            const bestTransformType = this.findBestTransform()
+            if (bestTransformType) this.transform(bestTransformType)
+        }
+
         return true
     }
 
@@ -366,6 +376,59 @@ export class Quad {
         }
 
         return true
+    }
+
+    scoreTransform(transformType: QuadTransformTypes) {
+        let score = 0
+        const transformOffsets = quadTransformOffsets[transformType]
+        const membersByCoordArray = Object.values(this.membersByCoord)
+
+        for (let i = 0; i < membersByCoordArray.length; i++) {
+            const member = membersByCoordArray[i]
+            if (!member) continue
+
+            const offset = transformOffsets[i]
+
+            score += (1 - member.defenceStrength) * 5000
+
+            const range = getRange(this.target.pos.x, this.target.pos.y, member.pos.x + offset.x, member.pos.y + offset.y)
+
+            if (this.leader.memory.ST === 'rangedAttack') {
+                score += rangedMassAttackMultiplierByRange.get(range) * member.combatStrength.ranged
+
+                continue
+            }
+
+            if (this.leader.memory.ST === 'attack') {
+                score += member.combatStrength.melee
+                continue
+            }
+
+            // Dismantle type
+
+            score += member.combatStrength.dismantle
+            continue
+        }
+
+        return score
+    }
+
+    findBestTransform(): QuadTransformTypes | false {
+        if (!this.target) return false
+
+        let highestScore = 0
+        let bestTransformName: QuadTransformTypes
+
+        for (const transformType in quadTransformOffsets) {
+            const score = this.scoreTransform(transformType as QuadTransformTypes)
+
+            if (score <= highestScore) continue
+
+            highestScore = score
+            bestTransformName = transformType as QuadTransformTypes
+        }
+
+        return bestTransformName
     }
 
     passiveHealQuad() {

@@ -1128,3 +1128,10 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
     secondaryAttack: ATTACK,
     [HEAL]: HEAL,
 }
+
+export const rangedMassAttackMultiplierByRange: Map<number, number> = new Map()
+rangedMassAttackMultiplierByRange.set(0, 1)
+rangedMassAttackMultiplierByRange.set(1, 1)
+rangedMassAttackMultiplierByRange.set(2, 0.4)
+rangedMassAttackMultiplierByRange.set(3, 0.1)
+
