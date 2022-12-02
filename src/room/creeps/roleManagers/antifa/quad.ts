@@ -132,7 +132,7 @@ export class Quad {
             typeWeights: {
                 enemy: Infinity,
                 ally: Infinity,
-                keeper: Infinity,
+                keeper: 5,
                 enemyRemote: 5,
                 allyRemote: 5,
                 neutral: 2,
@@ -432,14 +432,26 @@ export class Quad {
     }
 
     passiveHealQuad() {
-        for (const member1 of this.members) {
-            if (member1.hits === member1.hitsMax) continue
 
-            for (const member2 of this.members) {
-                if (member2.worked) continue
+        let lowestHits = Infinity
+        let lowestHitsMember: Creep | undefined
 
-                member2.heal(member1)
-                member2.worked = true
+        for (const member of this.members) {
+            if (member.hits === member.hitsMax) continue
+
+            if (member.hits >= lowestHits) continue
+
+            lowestHits = member.hits
+            lowestHitsMember = member
+        }
+
+        if (lowestHitsMember) {
+
+            for (const member of this.members) {
+                if (member.worked) continue
+
+                member.heal(lowestHitsMember)
+                member.worked = true
             }
 
             return
@@ -476,7 +488,7 @@ export class Quad {
     /**
      * Attack viable targets without moving
      */
-    passiveRangedAttack(target?: Structure | Creep) {
+    passiveRangedAttack() {
         const attackingMemberNames = new Set(this.leader.memory.SMNs)
 
         // Sort enemies by number of members that can attack them
@@ -531,16 +543,16 @@ export class Quad {
 
         // If there is a target and there are members left that can attack, attack the target
 
-        if (!target) return
+        if (!this.target) return
 
         for (const memberName of attackingMemberNames) {
             const member = Game.creeps[memberName]
 
-            const range = getRangeOfCoords(member.pos, target.pos)
+            const range = getRangeOfCoords(member.pos, this.target.pos)
             if (range > 3) continue
 
             if (range === 1) member.rangedMassAttack()
-            else member.rangedAttack(target)
+            else member.rangedAttack(this.target)
         }
     }
 
@@ -574,7 +586,8 @@ export class Quad {
             this.leader.say(range.toString())
 
             if (range <= 3) {
-                this.passiveRangedAttack(enemyCreep)
+                this.target = enemyCreep
+                this.passiveRangedAttack()
             }
 
             // If the range is more than 1
@@ -610,7 +623,9 @@ export class Quad {
             // If too close
 
             if (range <= 3) {
-                this.passiveRangedAttack(enemyAttacker)
+
+                this.target = enemyAttacker
+                this.passiveRangedAttack()
 
                 // Have the squad flee
 
@@ -639,7 +654,8 @@ export class Quad {
 
         this.leader.say('AEA')
 
-        this.passiveRangedAttack(enemyAttacker)
+        this.target = enemyAttacker
+        this.passiveRangedAttack()
 
         if (range > 1) {
             this.createMoveRequest({
@@ -701,7 +717,8 @@ export class Quad {
 
         if (range > 3) return true
 
-        this.passiveRangedAttack(bulldozeTarget)
+        this.target = bulldozeTarget
+        this.passiveRangedAttack()
         return true
     }
 
@@ -729,7 +746,8 @@ export class Quad {
 
         if (range > 3) return true
 
-        this.passiveRangedAttack(structure)
+        this.target = structure
+        this.passiveRangedAttack()
         return true
     }
 
