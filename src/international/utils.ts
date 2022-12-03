@@ -107,9 +107,9 @@ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
 }
 
 interface CustomLogOpts {
-    superPosition?: number,
-    textColor?: string,
-    bgColor?: string,
+    superPosition?: number
+    textColor?: string
+    bgColor?: string
 }
 
 /**
@@ -128,11 +128,17 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
 
     // Create the title
 
-    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${opts.bgColor}; margin-left: ${(opts.superPosition || 0) * 8}px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
+    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${
+        opts.bgColor
+    }; margin-left: ${
+        (opts.superPosition || 0) * 8
+    }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
 
     // Create the content
 
-    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${opts.textColor};'>${message || ''}</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${
+        opts.textColor
+    };'>${message || ''}</div></div>`
 }
 
 /**
@@ -550,6 +556,24 @@ export function cleanRoomMemory(roomName: string) {
 
         delete roomMemory[key as keyof RoomMemory]
     }
+}
+
+export function findSquadTradeableParts(tradeTypes: { [tradeType: string]: number }, totalTradeableParts: number) {
+
+    let smallestTradeType: string
+    let smallestRatio = Infinity
+
+    for (const type in tradeTypes) {
+
+        const ratio = tradeTypes[type] / totalTradeableParts
+
+        if (ratio >= smallestRatio) continue
+
+        smallestTradeType = type
+        smallestRatio = ratio
+    }
+
+    return Math.ceil(tradeTypes[smallestTradeType] * smallestRatio * 1.5)
 }
 
 /*

@@ -186,7 +186,7 @@ export class RemoteHauler extends Creep {
                     },
                     {
                         packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                        remoteName: this.memory.RN
+                        remoteName: this.memory.RN,
                     },
                 )
 
@@ -270,7 +270,7 @@ export class RemoteHauler extends Creep {
             },
             {
                 packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                remoteName: this.memory.RN
+                remoteName: this.memory.RN,
             },
         )
 
@@ -329,7 +329,7 @@ export class RemoteHauler extends Creep {
         if (this.room.name === this.commune.name) {
             // Try to renew the creep
 
-            this.advancedRenew()
+            this.passiveRenew()
 
             const storingStructure = this.room.storage || this.room.terminal
 
@@ -430,7 +430,7 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                    remoteName: this.memory.RN
+                    remoteName: this.memory.RN,
                 },
             )
 

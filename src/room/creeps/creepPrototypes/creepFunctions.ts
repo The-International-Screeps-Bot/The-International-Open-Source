@@ -28,6 +28,7 @@ import {
     unpackNumAsPos,
     packXYAsNum,
     unpackNumAsCoord,
+    getRangeOfCoords,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { pick, repeat } from 'lodash'
@@ -207,8 +208,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
     // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-    let controllerStructure: StructureLink | StructureContainer | undefined =
-        room.controllerContainer
+    let controllerStructure: StructureLink | StructureContainer | undefined = room.controllerContainer
 
     const controllerLink = room.controllerLink
     if (!controllerStructure && controllerLink && controllerLink.RCLActionable) controllerStructure = controllerLink
@@ -780,17 +780,50 @@ Creep.prototype.advancedRecycle = function () {
     return true
 }
 
-Creep.prototype.advancedRenew = function () {
+Creep.prototype.activeRenew = function () {
     const { room } = this
-
-    if (this.body.length > 8) return
 
     // If there is insufficient CPU to renew, inform false
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return
-
     if (!room.myCreeps.fastFiller.length) return
+    if (this.dying) return
 
+    // If the creep's age is less than the benefit from renewing, inform false
+
+    const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
+    if (CREEP_LIFE_TIME - this.ticksToLive < energyCost) return
+
+    const spawns = room.structures.spawn
+    if (!spawns.length) return
+
+    const spawn = findClosestObject(this.pos, spawns)
+    if (spawn.renewed) return
+    if (spawn.spawning) return
+
+    if (getRangeOfCoords(this.pos, spawn.pos) > 1) {
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [{ pos: spawn.pos, range: 1 }],
+            avoidEnemyRanges: true,
+        })
+        return
+    }
+
+    const result = spawn.renewCreep(this)
+    if (result === OK) {
+        globalStatsUpdater(this.room.name, 'eosp', energyCost)
+        spawn.renewed = true
+    }
+}
+
+Creep.prototype.passiveRenew = function () {
+    const { room } = this
+
+    // If there is insufficient CPU to renew, inform false
+
+    if (Game.cpu.bucket < CPUBucketRenewThreshold) return
+    if (!room.myCreeps.fastFiller.length) return
     if (this.dying) return
 
     // If the creep's age is less than the benefit from renewing, inform false
@@ -808,13 +841,7 @@ Creep.prototype.advancedRenew = function () {
         spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable,
     )
     if (!spawn) return
-
-    // If the spawn has already renewed this tick, inform false
-
     if (spawn.renewed) return
-
-    // If the spawn is spawning, inform false
-
     if (spawn.spawning) return
 
     const result = spawn.renewCreep(this)

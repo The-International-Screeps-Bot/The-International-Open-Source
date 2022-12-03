@@ -1,4 +1,5 @@
 import {
+    CombatRequestData,
     myColors,
     numbersByStructureTypes,
     quadAttackMemberOffsets,
@@ -20,6 +21,7 @@ import {
     isCoordExit,
     isXYExit,
 } from 'international/utils'
+import { find, transform } from 'lodash'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
 import { Antifa } from './antifa'
 
@@ -77,6 +79,8 @@ export class Quad {
         this.leader = this.members[0]
 
         this.sortMembersByCoord()
+
+        Memory.combatRequests[this.leader.memory.CRN].data[CombatRequestData.quads] += 1
     }
 
     sortMembersByCoord() {
@@ -118,7 +122,15 @@ export class Quad {
 
         this.leader.say('IF')
 
-        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
+        if (this.leader.room.enemyDamageThreat && this.runCombat()) {
+            customLog('NEAR COND')
+            if (!this.members.find(member => member.moveRequest || !member.canMove)) {
+                customLog('AT COND')
+                const bestTransformType = this.findBestTransform()
+                if (bestTransformType) this.transform(bestTransformType)
+            }
+            return
+        }
 
         this.passiveRangedAttack()
 
@@ -156,7 +168,6 @@ export class Quad {
         this.runCombat()
 
         if (!this.members.find(member => member.moveRequest || !member.canMove)) {
-
             const bestTransformType = this.findBestTransform()
             if (bestTransformType) this.transform(bestTransformType)
         }
@@ -378,6 +389,13 @@ export class Quad {
         return true
     }
 
+    randomTransform() {
+        const quadTransformKeys = Object.keys(quadTransformIndexes)
+        return this.transform(
+            quadTransformKeys[Math.floor(Math.random() * quadTransformKeys.length)] as QuadTransformTypes,
+        )
+    }
+
     scoreTransform(transformType: QuadTransformTypes) {
         let score = 0
         const transformOffsets = quadTransformOffsets[transformType]
@@ -391,10 +409,15 @@ export class Quad {
 
             score += (1 - member.defenceStrength) * 5000
 
-            const range = getRange(this.target.pos.x, this.target.pos.y, member.pos.x + offset.x, member.pos.y + offset.y)
+            const range = getRange(
+                this.target.pos.x,
+                member.pos.x + offset.x,
+                this.target.pos.y,
+                member.pos.y + offset.y,
+            )
 
             if (this.leader.memory.ST === 'rangedAttack') {
-                score += rangedMassAttackMultiplierByRange.get(range) * member.combatStrength.ranged
+                score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
 
                 continue
             }
@@ -409,7 +432,7 @@ export class Quad {
             score += member.combatStrength.dismantle
             continue
         }
-
+        customLog(transformType, score)
         return score
     }
 
@@ -427,12 +450,11 @@ export class Quad {
             highestScore = score
             bestTransformName = transformType as QuadTransformTypes
         }
-
+        customLog('FOUND TRANSFORM', bestTransformName)
         return bestTransformName
     }
 
     passiveHealQuad() {
-
         let lowestHits = Infinity
         let lowestHitsMember: Creep | undefined
 
@@ -446,7 +468,6 @@ export class Quad {
         }
 
         if (lowestHitsMember) {
-
             for (const member of this.members) {
                 if (member.worked) continue
 
@@ -457,16 +478,38 @@ export class Quad {
             return
         }
 
-        if (!this.leader.room.enemyDamageThreat) return
-
         if (this.preHeal()) return
+    }
+
+    shouldPreHeal() {
+        // Inform true if there are enemy threats in range
+
+        if (
+            this.leader.room.enemyAttackers.find(
+                enemyCreep =>
+                    (enemyCreep.combatStrength.ranged && this.findMinRange(enemyCreep.pos) <= 3) ||
+                    (enemyCreep.combatStrength.melee && this.findMinRange(enemyCreep.pos) <= 1),
+            )
+        )
+            return true
+
+        // Only inform true if there are enemy owned active towers
+
+        const controller = this.leader.room.controller
+        if (!controller) return false
+        if (!controller.owner) return false
+        if (controller.owner.username === Memory.me) return false
+        if (Memory.allyPlayers.includes(controller.owner.username)) return false
+        if (!this.leader.room.structures.tower.length) return false
+
+        return true
     }
 
     /**
      * The precogs are delighted to assist
      */
     preHeal() {
-        if (!this.leader.room.enemyDamageThreat) return false
+        if (!this.shouldPreHeal()) return false
 
         // Have members semi-randomly heal each other
 
@@ -623,7 +666,6 @@ export class Quad {
             // If too close
 
             if (range <= 3) {
-
                 this.target = enemyAttacker
                 this.passiveRangedAttack()
 

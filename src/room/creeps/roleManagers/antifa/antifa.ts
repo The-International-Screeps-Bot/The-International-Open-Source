@@ -63,7 +63,10 @@ export class Antifa extends Creep {
 
         if (this.squadRan) return true
 
-        if (!this.findSquad()) return true
+        if (!this.findSquad()) {
+            this.activeRenew()
+            return true
+        }
 
         this.squad.run()
         return true

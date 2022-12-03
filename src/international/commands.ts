@@ -184,11 +184,13 @@ global.deleteClaimRequests = function () {
 
 global.combat = function (requestName, type, opts, communeName) {
     if (!Memory.combatRequests[requestName]) {
-        Memory.combatRequests[requestName] = {
+        const request = Memory.combatRequests[requestName] = {
             T: type || 'attack',
             responder: communeName,
             data: [0],
         }
+
+        for (const key in CombatRequestData) request.data[key] = 0
     }
 
     const request = Memory.combatRequests[requestName]

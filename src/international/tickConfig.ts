@@ -285,6 +285,7 @@ class TickConfig {
             if (request.responder) {
                 internationalManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+                request.data[CombatRequestData.quads] = 0
                 continue
             }
 

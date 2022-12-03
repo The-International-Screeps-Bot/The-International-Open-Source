@@ -14,7 +14,14 @@ import {
     remoteHaulerRoles,
     roadUpkeepCost,
 } from 'international/constants'
-import { customLog, findCarryPartsRequired, findLinkThroughput, getRange, getRangeOfCoords } from 'international/utils'
+import {
+    customLog,
+    findCarryPartsRequired,
+    findLinkThroughput,
+    findSquadTradeableParts,
+    getRange,
+    getRangeOfCoords,
+} from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -1496,22 +1503,48 @@ Room.prototype.spawnRequester = function () {
                 this.communeManager.deleteCombatRequest(requestName, i)
                 continue
             }
-
             // Spawn quad
 
             this.constructSpawnRequests(
                 ((): SpawnRequestOpts | false => {
+                    // We currently have enough quads
+
+                    if (request.data[CombatRequestData.quads] >= request.data[CombatRequestData.quadQuota]) return false
+
                     role = 'antifaRangedAttacker'
                     spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
 
-                    for (let i = 0; i < rangedAttackAmount; i++) {
-                        extraParts.push(RANGED_ATTACK, MOVE)
+                    const tradeAmount = findSquadTradeableParts(
+                        {
+                            rangedAttackAmount,
+                            rangedHealAmount,
+                        },
+                        rangedAttackAmount + rangedHealAmount,
+                    )
+
+                    // We need attack and tough oriented creeps
+
+                    if (this.squadRequests.size < (request.data[CombatRequestData.quads] + 1) * 4 - 2) {
+                        for (let i = 0; i < rangedAttackAmount + tradeAmount; i++) {
+                            extraParts.push(RANGED_ATTACK, MOVE)
+                        }
+
+                        for (let i = 0; i < rangedHealAmount - tradeAmount; i++) {
+                            extraParts.push(HEAL, MOVE)
+                        }
                     }
 
-                    for (let i = 0; i < rangedHealAmount; i++) {
-                        extraParts.push(HEAL, MOVE)
+                    // We need heal-oriented creeps
+                    else {
+                        for (let i = 0; i < rangedAttackAmount - tradeAmount; i++) {
+                            extraParts.push(RANGED_ATTACK, MOVE)
+                        }
+
+                        for (let i = 0; i < rangedHealAmount + tradeAmount; i++) {
+                            extraParts.push(HEAL, MOVE)
+                        }
                     }
 
                     if (!extraParts.length) return false
@@ -1524,7 +1557,7 @@ Room.prototype.spawnRequester = function () {
                         minCost,
                         priority: 8,
                         spawnGroup,
-                        minCreeps: request.data[CombatRequestData.quadCount] * 4,
+                        minCreeps: request.data[CombatRequestData.quadQuota] * 4,
                         memoryAdditions: {
                             CRN: requestName,
                             SS: 4,

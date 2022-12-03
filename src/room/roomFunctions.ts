@@ -189,18 +189,15 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (room.centerUpgradePos) opts.weightCoords[roomName][packCoord(room.centerUpgradePos)] = 255
 
                 if (roomMemory.SPs.length) {
-
                     for (const path of Game.rooms[roomName].sourcePaths) {
                         for (const pos of path) opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
                 }
             } else if (roomMemory.T === 'remote') {
-
                 for (const packedPath of roomMemory.SPs) {
                     const path = unpackPosList(packedPath)
 
                     for (const pos of path) {
-
                         if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
                         opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
@@ -471,14 +468,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         // If the pathFindResult is incomplete, inform an empty array
 
         if (pathFinderResult.incomplete) {
-            customLog(
-                'Incomplete Path',
-                `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`,
-                {
-                    textColor: myColors.white,
-                    bgColor: myColors.red
-                }
-            )
+            customLog('Incomplete Path', `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`, {
+                textColor: myColors.white,
+                bgColor: myColors.red,
+            })
 
             room.pathVisual(pathFinderResult.path, 'red')
             room.errorVisual(opts.origin)
@@ -707,7 +700,7 @@ Room.prototype.scoutEnemyRoom = function () {
     // Combat request creation
 
     this.createAttackCombatRequest({
-        maxTowerDamage: Math.ceil((this.structures.tower.length * TOWER_POWER_ATTACK) * 1.1),
+        maxTowerDamage: Math.ceil(this.structures.tower.length * TOWER_POWER_ATTACK * 1.1),
         minDamage: 50,
     })
 
@@ -988,10 +981,12 @@ Room.prototype.createAttackCombatRequest = function (opts) {
         data: [0],
     }
 
+    for (const key in CombatRequestData) request.data[key] = 0
+
     request.data[CombatRequestData.minDamage] = 10
     request.data[CombatRequestData.minMeleeHeal] = 10
     request.data[CombatRequestData.minRangedHeal] = 10
-    request.data[CombatRequestData.quadCount] = 1
+    request.data[CombatRequestData.quadQuota] = 1
 
     if (opts) {
         for (const key in opts) {
@@ -1027,6 +1022,8 @@ Room.prototype.createHarassCombatRequest = function (opts) {
         T: 'harass',
         data: [0],
     }
+
+    for (const key in CombatRequestData) request.data[key] = 0
 
     request.data[CombatRequestData.attack] = 3
     request.data[CombatRequestData.minDamage] = 40
@@ -1071,6 +1068,8 @@ Room.prototype.createDefendCombatRequest = function (opts) {
         T: 'defend',
         data: [0],
     }
+
+    for (const key in CombatRequestData) request.data[key] = 0
 
     request.data[CombatRequestData.inactionTimer] = 0
     request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))

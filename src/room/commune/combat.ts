@@ -4,7 +4,7 @@ import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick 
 import { packCoord } from 'other/packrat'
 import { CommuneManager } from './communeManager'
 
-export class DefenceManager {
+export class CombatManager {
     communeManager: CommuneManager
 
     totalThreat: number
@@ -31,7 +31,7 @@ export class DefenceManager {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Defense Manager', cpuUsed.toFixed(2), {
                 textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                bgColor: myColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'dmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -210,8 +210,8 @@ export class DefenceManager {
             minDamage,
             minMeleeHeal,
             minRangedHeal,
-            quadCount: 1,
-            inactionTimerMax: onlyInvader ? 1 : undefined
+            quadQuota: 1,
+            inactionTimerMax: onlyInvader ? 1 : undefined,
         })
     }
 

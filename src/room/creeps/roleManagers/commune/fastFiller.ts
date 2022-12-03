@@ -116,13 +116,13 @@ export class FastFiller extends Creep {
             }
 
             let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = []
-            if (room.fastFillerLink && room.fastFillerLink.RCLActionable) fastFillerStoringStructures.push(room.fastFillerLink)
+            if (room.fastFillerLink && room.fastFillerLink.RCLActionable)
+                fastFillerStoringStructures.push(room.fastFillerLink)
             fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 
             // Loop through each fastFillerStoringStructure
 
             for (const structure of fastFillerStoringStructures) {
-
                 // Otherwise, if the structure is not in range 1 to the this
 
                 if (getRangeOfCoords(this.pos, structure.pos) > 1) continue
@@ -211,7 +211,7 @@ export class FastFiller extends Creep {
 
             if (creep.fillFastFiller()) continue
 
-            creep.advancedRenew()
+            creep.passiveRenew()
 
             /* creep.say('🚬') */
         }

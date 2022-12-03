@@ -10,7 +10,7 @@ import { TradeManager } from './market/tradeManager'
 import './spawning/spawnManager'
 
 import { constructionManager } from '../construction/constructionManager'
-import './defence'
+import './combat'
 import './allyCreepRequestManager'
 import './claimRequestManager'
 import './combatRequestManager'
@@ -37,7 +37,7 @@ import { PowerSpawnManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
 import { TowerManager } from './towers'
-import { DefenceManager } from './defence'
+import { CombatManager } from './combat'
 import { SpawnManager } from './spawning/spawnManager'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
@@ -45,7 +45,7 @@ import { HaulerNeedManager } from './haulerNeedManager'
 import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
 
 export class CommuneManager {
-    defenceManager: DefenceManager
+    combatManager: CombatManager
 
     towerManager: TowerManager
     labManager: LabManager
@@ -66,7 +66,7 @@ export class CommuneManager {
     //
 
     constructor() {
-        this.defenceManager = new DefenceManager(this)
+        this.combatManager = new CombatManager(this)
 
         this.towerManager = new TowerManager(this)
         this.labManager = new LabManager(this)
@@ -165,10 +165,10 @@ export class CommuneManager {
     public run() {
         constructionManager(this.room)
 
-        this.defenceManager.run()
+        this.combatManager.run()
         this.towerManager.run()
-        this.defenceManager.manageThreat()
-        this.defenceManager.manageDefenceRequests()
+        this.combatManager.manageThreat()
+        this.combatManager.manageDefenceRequests()
 
         try {
             this.tradeManager.run()
@@ -235,43 +235,31 @@ export class CommuneManager {
 
     public findMinRangedAttackCost(minDamage: number = 10) {
         return (
-            minDamage / RANGED_ATTACK_POWER * BODYPART_COST[RANGED_ATTACK] +
-            minDamage / RANGED_ATTACK_POWER * BODYPART_COST[MOVE]
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
         )
     }
 
     public findMinMeleeAttackCost(minDamage: number = 30) {
-        return (
-            minDamage / ATTACK_POWER * BODYPART_COST[ATTACK] +
-            minDamage / ATTACK_POWER * BODYPART_COST[MOVE]
-        )
+        return (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
     }
 
     /**
      * Finds how expensive it will be to provide enough heal parts to withstand a melee attack
      */
     public findMinMeleeHealCost(minHeal: number = 0) {
-        return (
-            minHeal / HEAL_POWER * BODYPART_COST[HEAL] +
-            minHeal / HEAL_POWER * BODYPART_COST[MOVE]
-        )
+        return (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] + (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
     }
 
     /**
      * Finds how expensive it will be to provide enough heal parts to withstand a ranged attack
      */
     public findMinRangedHealCost(minHeal: number = 0) {
-        return (
-            minHeal / HEAL_POWER * BODYPART_COST[HEAL] +
-            minHeal / HEAL_POWER * BODYPART_COST[MOVE]
-        )
+        return (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] + (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
     }
 
     public findMinDismantleCost(minDismantle: number = 0) {
-        return (
-            minDismantle * BODYPART_COST[WORK] +
-            minDismantle * BODYPART_COST[MOVE]
-        )
+        return minDismantle * BODYPART_COST[WORK] + minDismantle * BODYPART_COST[MOVE]
     }
 
     get storedEnergyUpgradeThreshold() {

@@ -136,7 +136,7 @@ declare global {
         | 'antifaDismantler'
         | 'antifaDowngrader'
 
-    type QuadTransformTypes = 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
+    type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
 
     interface PathGoal {
         pos: RoomPosition
@@ -1980,7 +1980,9 @@ declare global {
 
         // Creep Functions
 
-        advancedRenew(): void
+        activeRenew(): void
+
+        passiveRenew(): void
 
         findBulzodeTargets(goalCoord: RoomPosition): Id<Structure>[]
 

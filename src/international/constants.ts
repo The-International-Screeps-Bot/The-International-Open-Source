@@ -738,9 +738,9 @@ export enum CombatRequestData {
     minMeleeHeal,
     minRangedHeal,
     maxTowerDamage,
-    swarm,
+    quads,
     priority,
-    quadCount,
+    quadQuota,
     inactionTimerMax,
     inactionTimer,
     maxThreat,
@@ -1003,6 +1003,24 @@ export const quadAttackMemberOffsets = [
 ]
 
 export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number }[]> = {
+    none: [
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: 0,
+        },
+        {
+            x: 0,
+            y: 0,
+        },
+    ],
     rotateLeft: [
         {
             x: 0,
@@ -1078,6 +1096,7 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
 }
 
 export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
+    none: [0, 1, 2, 3],
     rotateLeft: [1, 2, 3, 0],
     rotateRight: [3, 2, 1, 0],
     tradeHorizontal: [3, 2, 1, 0],
@@ -1129,9 +1148,9 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
     [HEAL]: HEAL,
 }
 
-export const rangedMassAttackMultiplierByRange: Map<number, number> = new Map()
-rangedMassAttackMultiplierByRange.set(0, 1)
-rangedMassAttackMultiplierByRange.set(1, 1)
-rangedMassAttackMultiplierByRange.set(2, 0.4)
-rangedMassAttackMultiplierByRange.set(3, 0.1)
-
+export const rangedMassAttackMultiplierByRange = [
+    1,
+    1,
+    0.4,
+    0.1
+]
