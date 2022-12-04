@@ -318,14 +318,24 @@ export class LabManager {
         this.doLayoutCheck()
 
         this.assignBoosts()
+        this.manageReactions()
+    }
 
-        if (this.lab1Id) {
-            this.updateDeficits()
-            this.setCurrentReaction()
-            if (this.isProperlyLoaded) {
-                this.react()
-            }
-        }
+    manageReactions() {
+
+        // Make sure we have
+
+        if (!this.lab1Id) return
+
+        this.communeManager.room.errorVisual(this.input1.pos, true)
+        this.communeManager.room.errorVisual(this.input2.pos, true)
+
+        this.updateDeficits()
+        this.setCurrentReaction()
+
+        if (!this.isProperlyLoaded) return
+
+        this.runReactions()
     }
 
     assignBoosts() {
@@ -409,7 +419,7 @@ export class LabManager {
         )
     }
 
-    react() {
+    runReactions() {
         if (!this.reactionPossible()) return false
 
         for (const output of this.outputs) {
@@ -435,6 +445,9 @@ export class LabManager {
         }
     }
 
+    /**
+     * Figures out what we have
+     */
     private updateDeficits() {
         //We don't need to update this super often, so save CPU, this is midly expensive.
         if (Game.time % 10 != 0) return
@@ -533,6 +546,7 @@ export class LabManager {
     }
 
     private findNextReaction(): { type: MineralCompoundConstant; amount: number } {
+
         let targets = _.sortBy(
             _.filter(
                 Object.keys(this.targetCompounds),
@@ -540,6 +554,7 @@ export class LabManager {
             ),
             v => -this.deficits[v as MineralConstant | MineralCompoundConstant],
         )
+
         for (let target of targets) {
             var result = this.chainFindNextReaction(
                 target as MineralConstant | MineralCompoundConstant,
@@ -547,6 +562,7 @@ export class LabManager {
             )
             if (result) return result
         }
+
         return null
     }
 
@@ -575,7 +591,7 @@ export class LabManager {
             if (inputLab.mineralType == inputRsc || inputLab.mineralType == null) {
                 let source =
                     this.communeManager.room?.storage.store[inputRsc] >
-                        this.communeManager.room?.terminal.store[inputRsc]
+                    this.communeManager.room?.terminal.store[inputRsc]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -615,7 +631,7 @@ export class LabManager {
             if (outputLab.mineralType == this.outputRsc || outputLab.mineralType == null) {
                 let source =
                     this.communeManager.room?.storage.store[this.outputRsc] >
-                        this.communeManager.room?.terminal.store[this.outputRsc]
+                    this.communeManager.room?.terminal.store[this.outputRsc]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -672,7 +688,7 @@ export class LabManager {
             ) {
                 let source =
                     this.communeManager.room?.storage.store[RESOURCE_ENERGY] >
-                        this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
+                    this.communeManager.room?.terminal.store[RESOURCE_ENERGY]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 
@@ -681,7 +697,7 @@ export class LabManager {
             } else {
                 let source: AnyStoreStructure =
                     this.communeManager.room?.storage.store[compound] >
-                        this.communeManager.room?.terminal.store[compound]
+                    this.communeManager.room?.terminal.store[compound]
                         ? this.communeManager.room.storage
                         : this.communeManager.room.terminal
 

@@ -68,6 +68,8 @@ export class Quad {
     get enemyThreatCoords() {
         if (this._enemyThreatCoords) return this._enemyThreatCoords
 
+        this._enemyThreatCoords = new Set()
+
         const enemyAttackers: Creep[] = []
         const enemyRangedAttackers: Creep[] = []
 
@@ -380,7 +382,7 @@ export class Quad {
 
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
         if (!this.willMove) {
-            this.holdFormation()
+            /* this.holdFormation() */
             return false
         }
 
@@ -402,7 +404,7 @@ export class Quad {
         // Attack mode
 
         opts.weightCostMatrixes = ['quadCostMatrix']
-        if (!moveLeader.createMoveRequest(opts)) return false
+        if (moveLeader.createMoveRequest(opts) !== true) return false
 
         if (!this.membersAttackMove()) return false
 
@@ -527,8 +529,10 @@ export class Quad {
             highestScore = score
             bestTransformName = transformType as QuadTransformTypes
         }
+
         customLog('FOUND TRANSFORM', bestTransformName)
 
+        if (bestTransformName === 'none') return true
         return this.transform(bestTransformName)
     }
 
@@ -736,7 +740,7 @@ export class Quad {
         const range = this.findMinRange(enemyAttacker.pos)
 
         // If the squad is outmatched
-
+/*
         if (
             this.combatStrength.heal + this.combatStrength.ranged <
             enemyAttacker.combatStrength.heal + enemyAttacker.combatStrength.ranged
@@ -758,7 +762,7 @@ export class Quad {
 
             return true
         }
-
+ */
         // If it's more than range 3
 
         if (range > 3) {
@@ -874,6 +878,7 @@ export class Quad {
     advancedAttack() {
         return true
     }
+
     advancedDismantle() {
         return true
     }
@@ -884,12 +889,14 @@ export class Quad {
         for (const member of this.members) {
             if (!this.enemyThreatCoords.has(packCoord(member.pos))) continue
 
+            this.leader.room.errorVisual(member.pos, true)
             this.createMoveRequest(
                 {
-                    origin: member.pos,
+                    origin: this.leader.pos,
                     goals: this.leader.room.enemyThreatGoals,
+                    flee: true,
                 },
-                member,
+                /* member, */
             )
             return
         }
