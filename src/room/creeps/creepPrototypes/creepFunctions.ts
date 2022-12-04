@@ -838,11 +838,9 @@ Creep.prototype.passiveRenew = function () {
     // Get a spawn in range of 1, informing false if there are none
 
     const spawn = spawns.find(
-        spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && spawn.RCLActionable,
+        spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && !spawn.renewed && !spawn.spawning && spawn.RCLActionable,
     )
     if (!spawn) return
-    if (spawn.renewed) return
-    if (spawn.spawning) return
 
     const result = spawn.renewCreep(this)
     if (result === OK) {

@@ -1,6 +1,7 @@
 import { impassibleStructureTypes, myColors } from 'international/constants'
 import {
     areCoordsEqual,
+    customLog,
     findClosestObject,
     findClosestObjectEuc,
     findObjectWithID,
@@ -59,14 +60,10 @@ export class MeleeDefender extends Creep {
 
         // Get enemyAttackers in the room, informing false if there are none
 
-        let enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
-            return !enemyAttacker.isOnExit
-        })
+        let enemyCreeps = room.enemyAttackers
 
         if (!enemyCreeps.length) {
-            enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
-                return !enemyAttacker.isOnExit
-            })
+            enemyCreeps = room.enemyAttackers
 
             if (!enemyCreeps.length) return
         }
@@ -86,10 +83,9 @@ export class MeleeDefender extends Creep {
 
         if (Memory.roomVisuals) this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
 
-        // If the range is more than 1
+        // If out of range move to it
 
         if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
-            // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
                 origin: this.pos,
@@ -136,6 +132,8 @@ export class MeleeDefender extends Creep {
  */
             return true
         })
+
+        if (!ramparts.length) return false
 
         // Find the closest rampart to the enemyAttacker
 

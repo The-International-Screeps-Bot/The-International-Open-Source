@@ -88,9 +88,9 @@ export class RangedDefender extends Creep {
 
         if (Memory.roomVisuals) this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
 
-        // If the range is more than 1
+        // If out of range, move to
 
-        if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
+        if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 3) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
@@ -105,7 +105,6 @@ export class RangedDefender extends Creep {
 
         /* this.attack(enemyCreep) */
 
-        if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
         return true
     }
 
@@ -138,6 +137,7 @@ export class RangedDefender extends Creep {
  */
             return true
         })
+        if (!ramparts.length) return false
 
         // Find the closest rampart to the enemyAttacker
 
