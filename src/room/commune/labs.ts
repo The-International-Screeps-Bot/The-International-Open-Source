@@ -137,12 +137,12 @@ export class LabManager {
 
     communeManager: CommuneManager
     outputRsc: MineralConstant | MineralCompoundConstant
-    input1Rsc: MineralConstant | MineralCompoundConstant
-    input2Rsc: MineralConstant | MineralCompoundConstant
+    inputLab1Rsc: MineralConstant | MineralCompoundConstant
+    inputLab2Rsc: MineralConstant | MineralCompoundConstant
     isReverse: boolean
     targetAmount: number
-    lab1Id: Id<StructureLab>
-    lab2Id: Id<StructureLab>
+    inputLab1ID: Id<StructureLab>
+    inputLab2ID: Id<StructureLab>
     private lastLayoutCheck: number
     private requestedBoosts: MineralBoostConstant[] = []
     private assignedBoosts: { [key in MineralBoostConstant]?: Id<StructureLab> }
@@ -229,23 +229,16 @@ export class LabManager {
         return true
     }
 
-    private labsInRange(thisLab: StructureLab, otherLab: StructureLab = null): number {
-        return _.filter(
-            this.communeManager.structures.lab,
-            lab => lab != thisLab && lab != otherLab && lab.pos.getRangeTo(thisLab.pos) <= 2,
-        ).length
-    }
-
     // Checks to ensure all of the internal data is valid, populate it if it's not.
     private doLayoutCheck(): void {
-        if (this.lastLayoutCheck + 1000 > Game.time) return
+        /* if (this.lastLayoutCheck + 1000 > Game.time) return */
 
         this.lastLayoutCheck = Game.time
 
-        if (this.lab1Id && this.lab2Id && this.input1 && this.input2) return
+        if (this.inputLab1ID && this.inputLab2ID && this.inputLab1 && this.inputLab2) return
 
-        this.lab1Id = null
-        this.lab2Id = null
+        this.inputLab1ID = null
+        this.inputLab2ID = null
 
         const terminal = this.communeManager.room.terminal
         if (!terminal) return
@@ -257,45 +250,38 @@ export class LabManager {
             return getRangeOfCoords(a.pos, terminal.pos) - getRangeOfCoords(b.pos, terminal.pos)
         })
 
-        let bestLab = labs[0]
+        const inputLabIDs: Id<StructureLab>[] = []
 
-        // Starting at 2 intentally, to skip the first two records, which will be the default best labs...
-        //  then we see if there's a lab that's better.
-        // I'm not 100% sure this logic is perfect, but it's decent, but I think there may be an error in here
+        for (const lab of labs) {
+            // We don't need more than 2 input labs
 
-        for (let i = 2; i < labs.length; i++) {
-            let thisLab = labs[i]
-            if (this.labsInRange(thisLab) > this.labsInRange(bestLab)) bestLab = thisLab
-        }
-        this.lab1Id = bestLab.id
-        let lab1 = bestLab
+            if (inputLabIDs.length >= 2) break
 
-        bestLab = labs[1]
-        for (let i = 2; i < labs.length; i++) {
-            let thisLab = labs[i]
-            if (this.labsInRange(thisLab, lab1) > this.labsInRange(bestLab, lab1)) bestLab = thisLab
+            // We need the input lab to be in range of all labs
+
+            const labsInRangeAmount = labs.filter(structure => getRangeOfCoords(lab.pos, structure.pos) <= 2).length
+            if (labsInRangeAmount < labs.length) continue
+
+            inputLabIDs.push(lab.id)
         }
-        this.lab2Id = bestLab.id
-        //Make sure that both the sending labs are valid.... technically this should check to see how many labs overlap both labs.
-        if (this.labsInRange(bestLab) == 0 || this.labsInRange(lab1) == 0) {
-            this.lab1Id = null
-            this.lab2Id = null
-        }
+
+        this.inputLab1ID = inputLabIDs[0]
+        this.inputLab2ID = inputLabIDs[1]
     }
 
-    public get input1(): StructureLab {
-        return findObjectWithID(this.lab1Id)
+    public get inputLab1(): StructureLab {
+        return findObjectWithID(this.inputLab1ID)
     }
 
-    public get input2(): StructureLab {
-        return findObjectWithID(this.lab2Id)
+    public get inputLab2(): StructureLab {
+        return findObjectWithID(this.inputLab2ID)
     }
 
-    public get outputs(): StructureLab[] {
+    public get outputLabs(): StructureLab[] {
         let boostingLabs = Object.values(this.assignedBoosts)
-        return _.filter(
-            this.communeManager.structures.lab,
-            lab => lab.id != this.lab1Id && lab.id != this.lab2Id && !boostingLabs.includes(lab.id),
+
+        return this.communeManager.structures.lab.filter(
+            lab => lab.id != this.inputLab1ID && lab.id != this.inputLab2ID && !boostingLabs.includes(lab.id),
         )
     }
 
@@ -305,8 +291,8 @@ export class LabManager {
 
     private isProperlyLoaded(): boolean {
         if (
-            (this.input1.mineralType == this.input1Rsc || this.input1.mineralType == null) &&
-            (this.input2.mineralType == this.input2Rsc || this.input2.mineralType == null)
+            (this.inputLab1.mineralType == this.inputLab1Rsc || this.inputLab1.mineralType == null) &&
+            (this.inputLab2.mineralType == this.inputLab2Rsc || this.inputLab2.mineralType == null)
         )
             return true
         return false
@@ -322,13 +308,12 @@ export class LabManager {
     }
 
     manageReactions() {
-
         // Make sure we have
 
-        if (!this.lab1Id) return
+        if (!this.inputLab1ID) return
 
-        this.communeManager.room.errorVisual(this.input1.pos, true)
-        this.communeManager.room.errorVisual(this.input2.pos, true)
+        this.communeManager.room.errorVisual(this.inputLab1.pos, true)
+        this.communeManager.room.errorVisual(this.inputLab2.pos, true)
 
         this.updateDeficits()
         this.setCurrentReaction()
@@ -343,27 +328,27 @@ export class LabManager {
         for (let compund of boostsInOrder) {
             if (this.requestedBoosts.includes(compund)) {
                 //Special cases: an input lab can do double-duty as a boosting lab.
-                if (this.input1Rsc === compund) {
-                    this.assignedBoosts[compund] = this.lab1Id
+                if (this.inputLab1Rsc === compund) {
+                    this.assignedBoosts[compund] = this.inputLab1ID
                     continue
                 }
-                if (this.input2Rsc === compund) {
-                    this.assignedBoosts[compund] = this.lab2Id
+                if (this.inputLab2Rsc === compund) {
+                    this.assignedBoosts[compund] = this.inputLab2ID
                     continue
                 }
 
                 //Otherwise grab a lab that's not the input labs, and not a boosting lab.
                 let boostingLabs = Object.values(this.assignedBoosts)
                 let freelabs = this.communeManager.structures.lab.filter(
-                    lab => lab.id != this.lab1Id && lab.id != this.lab2Id && !boostingLabs.includes(lab.id),
+                    lab => lab.id != this.inputLab1ID && lab.id != this.inputLab2ID && !boostingLabs.includes(lab.id),
                 )
 
-                if (freelabs.length == 0 && this.lab1Id && !boostingLabs.includes(this.lab1Id)) {
-                    freelabs = [this.input1]
+                if (freelabs.length == 0 && this.inputLab1ID && !boostingLabs.includes(this.inputLab1ID)) {
+                    freelabs = [this.inputLab1]
                 }
 
-                if (freelabs.length == 0 && this.lab2Id && !boostingLabs.includes(this.lab2Id)) {
-                    freelabs = [this.input2]
+                if (freelabs.length == 0 && this.inputLab2ID && !boostingLabs.includes(this.inputLab2ID)) {
+                    freelabs = [this.inputLab2]
                 }
 
                 if (freelabs.length > 0) {
@@ -390,7 +375,7 @@ export class LabManager {
     }
 
     isValid(): boolean {
-        return this.outputs.length > 0 && this.input1 != null && this.input2 != null
+        return this.outputLabs.length > 0 && this.inputLab1 != null && this.inputLab2 != null
     }
 
     reactionPossible(): boolean {
@@ -398,8 +383,8 @@ export class LabManager {
         if (!this.outputRsc) return false
 
         if (!this.isReverse) {
-            if (!this.input1.mineralType || !this.inputSatisfied(this.input1, this.input1Rsc)) return false
-            if (!this.input2.mineralType || !this.inputSatisfied(this.input2, this.input2Rsc)) return false
+            if (!this.inputLab1.mineralType || !this.inputSatisfied(this.inputLab1, this.inputLab1Rsc)) return false
+            if (!this.inputLab2.mineralType || !this.inputSatisfied(this.inputLab2, this.inputLab2Rsc)) return false
         }
 
         return true
@@ -422,12 +407,12 @@ export class LabManager {
     runReactions() {
         if (!this.reactionPossible()) return false
 
-        for (const output of this.outputs) {
+        for (const output of this.outputLabs) {
             if (this.isReverse) {
                 if (output.mineralType == this.outputRsc && output.store[this.outputRsc] >= LAB_REACTION_AMOUNT)
-                    output.reverseReaction(this.input1, this.input2) //Reverse is here so the outputs line up with the expected locations
+                    output.reverseReaction(this.inputLab1, this.inputLab2) //Reverse is here so the outputLabs line up with the expected locations
             } else {
-                output.runReaction(this.input1, this.input2)
+                output.runReaction(this.inputLab1, this.inputLab2)
             }
         }
         return true
@@ -474,11 +459,11 @@ export class LabManager {
     private setupReaction(outputRsc: MineralCompoundConstant, targetAmount: number, reverse: boolean) {
         this.outputRsc = outputRsc
         if (outputRsc == null) {
-            this.input1Rsc = null
-            this.input2Rsc = null
+            this.inputLab1Rsc = null
+            this.inputLab2Rsc = null
         } else {
-            this.input1Rsc = reverseReactions[outputRsc][0]
-            this.input2Rsc = reverseReactions[outputRsc][1]
+            this.inputLab1Rsc = reverseReactions[outputRsc][0]
+            this.inputLab2Rsc = reverseReactions[outputRsc][1]
         }
         this.isReverse = reverse
         this.targetAmount = targetAmount
@@ -546,7 +531,6 @@ export class LabManager {
     }
 
     private findNextReaction(): { type: MineralCompoundConstant; amount: number } {
-
         let targets = _.sortBy(
             _.filter(
                 Object.keys(this.targetCompounds),
@@ -702,7 +686,7 @@ export class LabManager {
                         : this.communeManager.room.terminal
 
                 if (source.store[compound] == 0) {
-                    source = this.outputs.find(lab => lab.mineralType == compound && lab.mineralAmount > 100)
+                    source = this.outputLabs.find(lab => lab.mineralType == compound && lab.mineralAmount > 100)
                 }
 
                 if (source) {
@@ -767,26 +751,26 @@ export class LabManager {
             }
         }
 
-        if (!this.lab1Id || !this.lab2Id) return
+        if (!this.inputLab1ID || !this.inputLab2ID) return
 
         //Priortize the worstly loaded lab.
-        if (this.input2.store[this.input2Rsc] > this.input1.store[this.input1Rsc]) {
+        if (this.inputLab2.store[this.inputLab2Rsc] > this.inputLab1.store[this.inputLab1Rsc]) {
             if (this.isReverse) {
-                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
-                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab2, this.inputLab2Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab1, this.inputLab1Rsc)) return
             } else {
-                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
-                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab1, this.inputLab1Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab2, this.inputLab2Rsc)) return
             }
         } else {
             if (this.isReverse) {
-                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
-                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab1, this.inputLab1Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab2, this.inputLab2Rsc)) return
             } else {
-                if (this.setupInputLab(creep, this.input2, this.input2Rsc)) return
-                if (this.setupInputLab(creep, this.input1, this.input1Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab2, this.inputLab2Rsc)) return
+                if (this.setupInputLab(creep, this.inputLab1, this.inputLab1Rsc)) return
             }
         }
-        for (const output of this.outputs) if (this.setupOutputLab(creep, output)) return
+        for (const output of this.outputLabs) if (this.setupOutputLab(creep, output)) return
     }
 }

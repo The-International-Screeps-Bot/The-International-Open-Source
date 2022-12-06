@@ -422,10 +422,10 @@ export const stamps: Record<StampTypes, Stamp> = {
         asymmetry: 1,
         structures: {
             road: [
-                { x: 3, y: 3 },
+                /* { x: 3, y: 3 }, */
                 { x: 2, y: 2 },
                 { x: 1, y: 1 },
-                { x: 0, y: 0 },
+                /* { x: 0, y: 0 }, */
             ],
             /* empty: [
                 { x: 0, y: 1 },
