@@ -231,7 +231,7 @@ export class LabManager {
 
     // Checks to ensure all of the internal data is valid, populate it if it's not.
     private doLayoutCheck(): void {
-        /* if (this.lastLayoutCheck + 1000 > Game.time) return */
+        if (this.lastLayoutCheck + 1000 > Game.time) return
 
         this.lastLayoutCheck = Game.time
 
