@@ -131,7 +131,20 @@ export class Quad {
     }
 
     get canMove() {
-        for (const member of this.members) if (!member.canMove) return false
+        for (const member of this.members) {
+
+            if (member.canMove) continue
+            if (!member.fatigue) return false
+
+            for (const otherMember of this.members) {
+
+                if (member.name === otherMember.name) continue
+
+                otherMember.pull(member)
+            }
+
+            return false
+        }
         return true
     }
 
@@ -188,9 +201,9 @@ export class Quad {
     run() {
         this.leader.say(this.type)
 
-        if (this.runCombatRoom()) return
-
         this.passiveHealQuad()
+
+        if (this.runCombatRoom()) return
 
         if (!this.getInFormation()) {
             this.passiveRangedAttack()
@@ -199,7 +212,7 @@ export class Quad {
 
         this.leader.say('IF')
 
-        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
+        /* if (this.leader.room.enemyDamageThreat && this.runCombat()) return */
 
         this.passiveRangedAttack()
 

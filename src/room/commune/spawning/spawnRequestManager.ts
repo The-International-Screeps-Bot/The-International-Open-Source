@@ -1501,8 +1501,8 @@ Room.prototype.spawnRequester = function () {
             if (
                 minRangedAttackCost + minRangedHealCost > this.energyCapacityAvailable ||
                 minAttackCost > this.energyCapacityAvailable ||
-                rangedAttackAmount + rangedHealAmount > 50 ||
-                attackAmount > 50
+                (rangedAttackAmount + rangedHealAmount) * 2 > 50 ||
+                attackAmount * 2 > 50
             ) {
                 this.communeManager.deleteCombatRequest(requestName, i)
                 continue
