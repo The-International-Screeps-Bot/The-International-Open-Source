@@ -248,7 +248,7 @@ class TickConfig {
             }
 
             const communeName = findClosestRoomName(roomName, communes)
-            if (!communeName) break
+            if (!communeName) continue
 
             const maxRange = 20
 
@@ -283,6 +283,7 @@ class TickConfig {
             if (request.data[CombatRequestData.abandon]) request.data[CombatRequestData.abandon] -= 1
 
             if (request.responder) {
+                console.log('init', requestName)
                 internationalManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
                 request.data[CombatRequestData.quads] = 0
@@ -336,7 +337,7 @@ class TickConfig {
             }
 
             const communeName = findClosestRoomName(requestName, communes)
-            if (!communeName) break
+            if (!communeName) continue
 
             // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
@@ -402,7 +403,7 @@ class TickConfig {
             }
 
             const communeName = findClosestRoomName(requestName, communes)
-            if (!communeName) break
+            if (!communeName) continue
 
             // Run a more simple and less expensive check, then a more complex and expensive to confirm
 

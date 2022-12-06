@@ -1512,6 +1512,7 @@ Room.prototype.spawnRequester = function () {
                     if (request.data[CombatRequestData.quads] >= request.data[CombatRequestData.quadQuota]) return false
 
                     role = 'antifaRangedAttacker'
+                    console.log('run', requestName)
                     spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
