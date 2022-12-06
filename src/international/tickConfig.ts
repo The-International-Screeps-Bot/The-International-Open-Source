@@ -283,7 +283,7 @@ class TickConfig {
             if (request.data[CombatRequestData.abandon]) request.data[CombatRequestData.abandon] -= 1
 
             if (request.responder) {
-                console.log('init', requestName)
+
                 internationalManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
                 request.data[CombatRequestData.quads] = 0
