@@ -792,7 +792,7 @@ Creep.prototype.activeRenew = function () {
     // If the creep's age is less than the benefit from renewing, inform false
 
     const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
-    if (CREEP_LIFE_TIME - this.ticksToLive < energyCost) return
+    if (CREEP_LIFE_TIME - this.ticksToLive < Math.floor(600 / this.body.length)) return
 
     const spawns = room.structures.spawn
     if (!spawns.length) return
@@ -829,7 +829,7 @@ Creep.prototype.passiveRenew = function () {
     // If the creep's age is less than the benefit from renewing, inform false
 
     const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
-    if (CREEP_LIFE_TIME - this.ticksToLive < energyCost) return
+    if (CREEP_LIFE_TIME - this.ticksToLive < Math.floor(600 / this.body.length)) return
 
     // Get the room's spawns, stopping if there are none
 

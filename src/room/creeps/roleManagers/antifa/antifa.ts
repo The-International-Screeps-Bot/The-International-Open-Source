@@ -15,6 +15,7 @@ export class Antifa extends Creep {
 
         // We don't want a squad or we already have done
 
+        if (this.spawning) return
         if (!this.memory.SS) return
         if (this.memory.SF) return
 
