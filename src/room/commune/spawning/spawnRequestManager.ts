@@ -1552,7 +1552,7 @@ Room.prototype.spawnRequester = function () {
                             extraParts.push(HEAL, MOVE)
                         }
                     }
-                    customLog('BUG', requestName + ', ' + rangedAttackAmount + ', ' + rangedHealAmount)
+
                     if (!extraParts.length) return false
 
                     return {

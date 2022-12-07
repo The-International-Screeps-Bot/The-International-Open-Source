@@ -133,17 +133,7 @@ export class Quad {
     get canMove() {
         for (const member of this.members) {
 
-            if (member.canMove) continue
-            if (!member.fatigue) return false
-
-            for (const otherMember of this.members) {
-
-                if (member.name === otherMember.name) continue
-
-                otherMember.pull(member)
-            }
-
-            return false
+            if (!member.canMove) return false
         }
         return true
     }
@@ -395,6 +385,19 @@ export class Quad {
 
     createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
         if (!this.willMove) {
+
+            for (const member1 of this.members) {
+
+                if (!member1.fatigue) continue
+
+                for (const member2 of this.members) {
+
+                    if (member2.name === member1.name) continue
+
+                    member2.pull(member1)
+                }
+            }
+
             /* this.holdFormation() */
             return false
         }
