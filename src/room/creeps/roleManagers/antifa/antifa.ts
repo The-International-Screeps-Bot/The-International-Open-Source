@@ -13,9 +13,14 @@ export class Antifa extends Creep {
         if (internationalManager.creepsByCombatRequest[this.memory.CRN])
             internationalManager.creepsByCombatRequest[this.memory.CRN][this.role].push(this.name)
 
+        // We don't want a squad or we already have done
+
         if (!this.memory.SS) return
         if (this.memory.SF) return
 
+        // Tell others we want a squad
+
+/*
         const memberNames = [this.name]
 
         if (this.memory.SMNs) {
@@ -46,7 +51,7 @@ export class Antifa extends Creep {
                 return
             }
         }
-
+ */
         // The creep didn't have enough members to form a squad, so make a request
 
         this.memory.SMNs = [this.name]
@@ -64,7 +69,7 @@ export class Antifa extends Creep {
         if (this.squadRan) return true
 
         if (!this.findSquad()) {
-            this.activeRenew()
+            if (Memory.combatRequests[this.memory.CRN]) this.activeRenew()
             return true
         }
 
@@ -80,15 +85,21 @@ export class Antifa extends Creep {
         if (this.memory.SF) {
             const memberNames: string[] = []
 
+            // Filter out dead members
+
             for (const memberName of this.memory.SMNs) {
                 if (!Game.creeps[memberName]) continue
 
                 memberNames.push(memberName)
             }
 
+            // Update member list in case there was a change
+
             for (const memberName of memberNames) {
                 Memory.creeps[memberName].SMNs = memberNames
             }
+
+            // Don't try to make a squad if we have one member
 
             if (memberNames.length === 1) return false
 
@@ -96,28 +107,41 @@ export class Antifa extends Creep {
             return true
         }
 
+        // The squad is not yet formed
+
         for (const requestingCreepName of this.room.squadRequests) {
             if (requestingCreepName === this.name) continue
 
             const requestingCreep = Game.creeps[requestingCreepName]
 
+            // All members must be trying to make the same type of squad
+
             if (this.memory.ST !== requestingCreep.memory.ST) continue
 
-            // If the creep is allowed to join the other creep
+            // If the creep is allowed to join the other leader
 
             if (!allowedSquadCombinations[this.memory.SS][this.role].has(requestingCreep.role)) continue
 
             this.memory.SMNs.push(requestingCreepName)
 
+            // We've found enough members
+
             if (this.memory.SMNs.length === this.memory.SS) break
         }
+
+        // We weren't able to find enough members to form the squad we wanted
 
         if (this.memory.SMNs.length !== this.memory.SS) return false
 
         const memberNames: string[] = []
 
         for (const memberName of this.memory.SMNs) {
+
+            // We don't need others to think we need a squad when we have one now
+
             this.room.squadRequests.delete(memberName)
+
+            // Tell each member important squad info so each can take over as leader
 
             const memberMemory = Memory.creeps[memberName]
             memberMemory.SMNs = this.memory.SMNs

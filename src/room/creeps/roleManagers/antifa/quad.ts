@@ -160,7 +160,7 @@ export class Quad {
 
         this.sortMembersByCoord()
 
-        Memory.combatRequests[this.leader.memory.CRN].data[CombatRequestData.quads] += 1
+        if (Memory.combatRequests[this.leader.memory.CRN]) Memory.combatRequests[this.leader.memory.CRN].data[CombatRequestData.quads] += 1
     }
 
     sortMembersByCoord() {
