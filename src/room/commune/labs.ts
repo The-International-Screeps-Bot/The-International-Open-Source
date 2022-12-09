@@ -277,6 +277,13 @@ export class LabManager {
         return findObjectWithID(this.inputLab2ID)
     }
 
+    /**
+     * Array of input labs that are cached by ID, TBD
+     */
+    public get inputLabs(): StructureLab[] {
+        return []
+    }
+
     public get outputLabs(): StructureLab[] {
         let boostingLabs = Object.values(this.assignedBoosts)
 
@@ -310,7 +317,7 @@ export class LabManager {
     manageReactions() {
         // Make sure we have
 
-        if (!this.inputLab1ID) return
+        if (!this.inputLab1ID || !this.inputLab2ID) return
 
         this.communeManager.room.errorVisual(this.inputLab1.pos, true)
         this.communeManager.room.errorVisual(this.inputLab2.pos, true)
