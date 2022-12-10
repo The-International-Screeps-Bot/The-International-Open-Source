@@ -113,7 +113,6 @@ export class CommuneManager {
 
         room.spawnRequests = []
         room.upgradeStrength = 0
-        room.haulerNeed = 0
 
         if (!room.memory.remotes) room.memory.remotes = []
 
