@@ -136,6 +136,7 @@ declare global {
         | 'antifaDismantler'
         | 'antifaDowngrader'
 
+
     type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
 
     interface PathGoal {
