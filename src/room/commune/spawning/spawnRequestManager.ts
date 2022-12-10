@@ -1464,12 +1464,19 @@ Room.prototype.spawnRequester = function () {
         )
     }
 
+    priority = 8
+
     for (let i = this.memory.combatRequests.length - 1; i >= 0; i -= 1) {
         const requestName = Memory.rooms[this.name].combatRequests[i]
         const request = Memory.combatRequests[requestName]
+
         if (!request) continue
 
         if (request.data[CombatRequestData.abandon] > 0) continue
+
+        priority += 0.01
+
+        //
 
         const minRangedAttackCost = this.communeManager.findMinRangedAttackCost(
             request.data[CombatRequestData.minDamage],
@@ -1561,7 +1568,7 @@ Room.prototype.spawnRequester = function () {
                         extraParts,
                         partsMultiplier: 1,
                         minCost,
-                        priority: 8,
+                        priority,
                         spawnGroup,
                         minCreeps: request.data[CombatRequestData.quadQuota] * 4,
                         memoryAdditions: {
@@ -1610,7 +1617,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts,
                     partsMultiplier: 1,
                     minCost,
-                    priority: 8,
+                    priority,
                     spawnGroup,
                     memoryAdditions: {
                         CRN: requestName,
@@ -1642,7 +1649,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts,
                     partsMultiplier: 1,
                     minCost,
-                    priority: 8,
+                    priority,
                     spawnGroup,
                     memoryAdditions: {
                         CRN: requestName,
@@ -1672,7 +1679,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts,
                     partsMultiplier: 1,
                     minCost,
-                    priority: 8,
+                    priority,
                     spawnGroup,
                     memoryAdditions: {
                         SS: 2,
@@ -1702,7 +1709,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts,
                     partsMultiplier: 1,
                     minCost,
-                    priority: 8,
+                    priority,
                     spawnGroup,
                     memoryAdditions: {
                         SS: 2,
