@@ -238,7 +238,6 @@ export class LabManager {
     _outputLabs: StructureLab[]
 
     public get outputLabs() {
-
         if (this._outputLabs) return this._outputLabs
 
         let boostingLabs = Object.values(this.labsByBoost)
@@ -251,9 +250,8 @@ export class LabManager {
     run() {
         if (!this.communeManager.room.storage || !this.communeManager.room.terminal) return
 
-        // If we don't have outputs we can't do anything
-
-        if (!this.outputLabs.length) return
+        this.inputLab1 = this.communeManager.inputLabs[0]
+        this.inputLab2 = this.communeManager.inputLabs[1]
 
         this.assignBoosts()
         this.manageReactions()
