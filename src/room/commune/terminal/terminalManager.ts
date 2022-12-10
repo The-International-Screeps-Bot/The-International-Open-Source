@@ -59,19 +59,16 @@ export class TerminalManager {
 
         for (const resourceTarget of terminalResourceTargets) {
 
-            if (resourceTarget.min <= 0) continue
+            if (resourceTarget.max <= 0) continue
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
-            const targetAmount = terminal.store.getCapacity() * resourceTarget.min
-            let min = targetAmount * 0.7
+            // Half of the max
+
+            let targetAmount = terminal.store.getCapacity() * resourceTarget.max / 2
 
             // We have enough
 
-            if (terminal.store[resourceTarget.resource] >= min) continue
-
-            // 90% of initial min
-
-            min *= 1.2
+            if (terminal.store[resourceTarget.resource] >=  targetAmount * 0.7) continue
 
             const ID = newID()
 
@@ -79,7 +76,7 @@ export class TerminalManager {
                 ID,
                 priority: 1 - terminal.store[resourceTarget.resource] / targetAmount,
                 resource: resourceTarget.resource,
-                amount: min - terminal.store[resourceTarget.resource],
+                amount: targetAmount * 0.9 - terminal.store[resourceTarget.resource],
                 roomName: room.name
             }
         }
