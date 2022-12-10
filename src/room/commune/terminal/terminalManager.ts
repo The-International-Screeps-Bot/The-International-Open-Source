@@ -1,5 +1,5 @@
 import { minerals, terminalResourceTargets } from 'international/constants'
-import { customLog } from 'international/utils'
+import { customLog, newID } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
 import { internationalManager } from 'international/internationalManager'
@@ -36,7 +36,7 @@ const tradeBlacklistRoomNames = [
     'W17N16',
 ]
 
-export class TradeManager {
+export class TerminalManager {
     communeManager: CommuneManager
     room: Room
     terminal: StructureTerminal
@@ -45,8 +45,41 @@ export class TradeManager {
         this.communeManager = communeManager
     }
 
-    isTradingPossible() {
-        return this.room.terminal && this.room.storage
+    preTickRun() {
+        if (!this.terminal) return
+        if (!this.terminal.RCLActionable) return
+
+        this.createTerminalRequests()
+    }
+
+    private createTerminalRequests() {
+        const { room } = this.communeManager
+        const { terminal } = room
+
+        for (const resourceTarget of terminalResourceTargets) {
+            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
+
+            const targetAmount = terminal.store.getCapacity() * resourceTarget.min
+            let min = targetAmount * 0.7
+
+            // We have enough
+
+            if (terminal.store[resourceTarget.resource] >= min) continue
+
+            // 90% of initial min
+
+            min *= 1.2
+
+            const ID = newID()
+
+            internationalManager.terminalRequests[ID] = {
+                ID,
+                priority: 1 - terminal.store[resourceTarget.resource] / targetAmount,
+                resource: resourceTarget.resource,
+                amount: min - terminal.store[resourceTarget.resource],
+                roomName: room.name
+            }
+        }
     }
 
     run() {
@@ -62,72 +95,15 @@ export class TradeManager {
 
         if (terminal.cooldown > 0) return
 
-        this.manageAllyRequests()
+        if (this.respondToTerminalRequests()) return
+        if (this.respondToAllyRequests()) return
+
+        // The market is disabled by us or the server
 
         if (!Memory.marketUsage) return
-
-        // If the market is disabled, stop
-
         if (!internationalManager.marketIsFunctional) return
 
         this.manageResources()
-
-        /*
-        let resourceType: ResourceConstant
-        let min = 0
-        let max = 0
-
-        // Energy
-
-        resourceType = RESOURCE_ENERGY
-        min = 30000
-        max = 70000
-
-        // If there is insufficient energy
-
-        if (terminal.store[resourceType] < min) {
-            min *= 1.2
-
-            // Try to buy some more
-
-            if (room.advancedBuy(resourceType, min - terminal.store[resourceType], min)) return
-        }
-        else if (terminal.store[resourceType] > max) {
-
-            // Sell excess
-
-            if (room.advancedSell(resourceType, terminal.store[resourceType] - max, max)) return
-        }
-
-        // Minerals
-
-        for (resourceType of minerals) {
-
-            min = 4000
-
-            // We don't have enough
-
-            if (terminal.store[resourceType] < min) {
-
-                min *= 1.2
-
-                if (room.advancedBuy(resourceType, min - terminal.store[resourceType], min)) return
-                continue
-            }
-
-            max = 8000
-
-            // We have enough
-
-            if (terminal.store[resourceType] < max) continue
-
-            max *= 0.8
-
-            // Try to sell the excess amount
-
-            if (room.advancedSell(resourceType, terminal.store[resourceType] - max, max)) return
-        }
-         */
     }
 
     private createAllyRequests() {
@@ -166,11 +142,38 @@ export class TradeManager {
         }
     }
 
-    private manageAllyRequests() {
+    private respondToTerminalRequests() {
+
+        // Sort by range between rooms and priority, weighted
+
+        const terminalRequestsByScore = Object.values(internationalManager.terminalRequests).sort((a, b) => {
+            return (Game.map.getRoomLinearDistance(this.communeManager.room.name, a.roomName) + a.priority * 100) - (Game.map.getRoomLinearDistance(this.communeManager.room.name, b.roomName) + b.priority * 100)
+        })
+
+        for (const request of terminalRequestsByScore) {
+
+            // Don't respond to requests for this room
+
+            if (request.roomName === this.communeManager.room.name) continue
+
+            // Make sure we have extra
+
+            if (this.terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
+
+            this.terminal.send(request.resource, request.amount, request.roomName, 'Terminal request response')
+            delete internationalManager.terminalRequests[request.ID]
+            
+            return true
+        }
+
+        return false
+    }
+
+    private respondToAllyRequests() {
         const { room } = this.communeManager
         const { terminal } = room
 
-        if (!allyManager.allyRequests) return
+        if (!allyManager.allyRequests) return false
 
         // Filter out allyRequests that are requesting resources
 
@@ -206,7 +209,7 @@ export class TradeManager {
 
                 terminal.send(request.resourceType, amount, request.roomName, `Sending ${request} to ally`)
                 terminal.intended = true
-                return
+                return true
             }
 
             // If the resourceType is energy
@@ -232,13 +235,15 @@ export class TradeManager {
 
                 terminal.send(request.resourceType, amount, request.roomName, `Sending ${request} to ally`)
                 terminal.intended = true
-                return
+                return true
             }
 
             // Otherwise iterate
 
             continue
         }
+
+        return false
     }
 
     private manageResources() {
@@ -272,6 +277,10 @@ export class TradeManager {
 
             if (room.advancedSell(resourceTarget.resource, terminal.store[resourceTarget.resource] - max, max)) return
         }
+    }
+
+    isTradingPossible() {
+        return this.room.terminal && this.room.storage
     }
 
     runNewVersion() {

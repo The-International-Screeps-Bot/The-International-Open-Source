@@ -135,7 +135,16 @@ declare global {
         | 'antifaHealer'
         | 'antifaDismantler'
         | 'antifaDowngrader'
-
+    interface TerminalRequest {
+        ID: number
+        /**
+         * Preference from 0-1 where 1 is least prefered
+         */
+        priority: number
+        amount: number
+        resource: ResourceConstant
+        roomName: string
+    }
 
     type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
 

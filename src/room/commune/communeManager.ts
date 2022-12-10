@@ -8,7 +8,7 @@ import {
     getRangeOfCoords,
     unpackNumAsCoord,
 } from 'international/utils'
-import { TradeManager } from './market/tradeManager'
+import { TerminalManager } from './terminal/terminalManager'
 import './spawning/spawnManager'
 
 import { constructionManager } from '../construction/constructionManager'
@@ -57,7 +57,7 @@ export class CommuneManager {
     spawnManager: SpawnManager
     sourceManager: SourceManager
 
-    tradeManager: TradeManager
+    terminalManager: TerminalManager
     remotesManager: RemotesManager
     haulerSizeManager: HaulerSizeManager
 
@@ -80,7 +80,7 @@ export class CommuneManager {
         this.spawnManager = new SpawnManager(this)
         this.sourceManager = new SourceManager(this)
 
-        this.tradeManager = new TradeManager(this)
+        this.terminalManager = new TerminalManager(this)
         this.remotesManager = new RemotesManager(this)
         this.haulerSizeManager = new HaulerSizeManager(this)
 
@@ -128,6 +128,7 @@ export class CommuneManager {
 
         room.usedRampartIDs = new Set()
 
+        this.terminalManager.preTickRun()
         this.haulerSizeManager.preTickRun()
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
@@ -177,10 +178,10 @@ export class CommuneManager {
         this.combatManager.manageDefenceRequests()
 
         try {
-            this.tradeManager.run()
+            this.terminalManager.run()
         } catch (err) {
             customLog(
-                'Exception processing tradeManager in ' + this.room.name + '. ',
+                'Exception processing terminalManager in ' + this.room.name + '. ',
                 err + '\n' + (err as any).stack,
                 {
                     textColor: myColors.white,

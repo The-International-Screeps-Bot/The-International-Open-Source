@@ -149,6 +149,14 @@ export class LabManager {
         this.communeManager = communeManager
     }
 
+    /**
+     * Boost stuff
+     */
+    preTickRun() {
+
+
+    }
+
     //This is much like demand boost, but will return false if we don't have it, it can't be applied, etc.
     public acceptBoost(creep: Creep, boost: MineralBoostConstant): boolean {
         if (creep.ticksToLive < CREEP_LIFE_TIME - 100) return false

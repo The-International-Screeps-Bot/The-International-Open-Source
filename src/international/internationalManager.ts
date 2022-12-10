@@ -1,7 +1,14 @@
 import { allyManager } from 'international/simpleAllies'
 import { createPosMap, customLog, getAvgPrice, packXYAsNum } from './utils'
 
-import { cacheAmountModifier, ClaimRequestData, CPUBucketCapacity, mmoShardNames, myColors, roomDimensions } from './constants'
+import {
+    cacheAmountModifier,
+    ClaimRequestData,
+    CPUBucketCapacity,
+    mmoShardNames,
+    myColors,
+    roomDimensions,
+} from './constants'
 
 /**
  * Handles pre-roomManager, inter room, and multiple-room related matters
@@ -31,6 +38,8 @@ export class InternationalManager {
 
     unspawnedPowerCreepNames: string[]
 
+    terminalRequests: { [ID: string]: TerminalRequest }
+
     tickID: number
 
     /**
@@ -40,6 +49,7 @@ export class InternationalManager {
         this.creepsByCombatRequest = {}
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
+        this.terminalRequests = {}
 
         this.tickID = 0
         delete this._myOrders
@@ -191,8 +201,7 @@ export class InternationalManager {
     }
 
     newTickID() {
-
-        return this.tickID += 1
+        return (this.tickID += 1)
     }
 
     /**
