@@ -12,7 +12,7 @@ export class HaulerNeedManager {
 
         const  { room } = this.communeManager
 
-        room.haulerNeed = 2
+        room.haulerNeed += 2
 
         for (let index in room.sources) {
 

@@ -9,7 +9,7 @@ import { Hauler } from './roleManagers/commune/hauler'
 import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { Claimer } from './roleManagers/international/claimer'
 import { AllyVanguard } from './roleManagers/international/allyVanguard'
-import { HubHauler } from './roleManagers/commune/hubHaulerManager'
+import { HubHauler } from './roleManagers/commune/hubHauler'
 import { ControllerUpgrader } from './roleManagers/commune/controllerUpgrader'
 import { SourceHarvester } from './roleManagers/commune/sourceHarvester'
 import { MineralHarvester } from './roleManagers/commune/mineralHarvester'
@@ -82,14 +82,10 @@ export class CreepRoleManager {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             const cpuUsed2 = this.roomManager.room.myCreepsAmount ? cpuUsed / this.roomManager.room.myCreepsAmount : 0
-            customLog(
-                'Role Manager',
-                `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`,
-                {
-                    textColor: myColors.white,
-                    bgColor: myColors.lightBlue
-                },
-            )
+            customLog('Role Manager', `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`, {
+                textColor: myColors.white,
+                bgColor: myColors.lightBlue,
+            })
             const statName: RoomCommuneStatNames = 'rolmcu'
             const statName2: RoomCommuneStatNames = 'rolmpccu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -119,7 +115,7 @@ export class CreepRoleManager {
                 {
                     textColor: myColors.white,
                     bgColor: myColors.red,
-                    superPosition: 2
+                    superPosition: 2,
                 },
             )
         }
@@ -134,7 +130,7 @@ export class CreepRoleManager {
             ).toFixed(2)}`,
             {
                 superPosition: 3,
-            }
+            },
         )
     }
 }

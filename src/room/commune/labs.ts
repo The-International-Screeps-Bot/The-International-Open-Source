@@ -152,10 +152,7 @@ export class LabManager {
     /**
      * Boost stuff
      */
-    preTickRun() {
-
-
-    }
+    preTickRun() {}
 
     //This is much like demand boost, but will return false if we don't have it, it can't be applied, etc.
     public acceptBoost(creep: Creep, boost: MineralBoostConstant): boolean {
@@ -242,9 +239,9 @@ export class LabManager {
 
         let boostingLabs = Object.values(this.labsByBoost)
 
-        return this._outputLabs = this.communeManager.structures.lab.filter(
+        return (this._outputLabs = this.communeManager.structures.lab.filter(
             lab => !this.communeManager.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
-        )
+        ))
     }
 
     run() {
@@ -267,12 +264,21 @@ export class LabManager {
     }
 
     manageReactions() {
-
         if (this.communeManager.inputLabs.length < 2) return
         if (!this.outputLabs.length) return
 
-        this.communeManager.room.errorVisual(this.communeManager.inputLabs[0].pos, true)
-        this.communeManager.room.errorVisual(this.communeManager.inputLabs[1].pos, true)
+        if (Memory.roomVisuals) {
+            this.communeManager.room.visual.resource(
+                this.inputLab1Rsc,
+                this.communeManager.inputLabs[0].pos.x,
+                this.communeManager.inputLabs[0].pos.y,
+            )
+            this.communeManager.room.visual.resource(
+                this.inputLab2Rsc,
+                this.communeManager.inputLabs[1].pos.x,
+                this.communeManager.inputLabs[1].pos.y,
+            )
+        }
 
         this.updateDeficits()
         this.setCurrentReaction()
@@ -286,7 +292,6 @@ export class LabManager {
         this.labsByBoost = {}
         for (let compund of boostsInOrder) {
             if (this.requestedBoosts.includes(compund)) {
-
                 // Input labs can act as boosting labs too
 
                 if (this.inputLab1Rsc === compund) {
@@ -305,11 +310,19 @@ export class LabManager {
                     lab => !this.communeManager.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
                 )
 
-                if (freelabs.length == 0 && this.communeManager.inputLabIDs[1] && !boostingLabs.includes(this.communeManager.inputLabIDs[1])) {
+                if (
+                    freelabs.length == 0 &&
+                    this.communeManager.inputLabIDs[1] &&
+                    !boostingLabs.includes(this.communeManager.inputLabIDs[1])
+                ) {
                     freelabs = [this.inputLab1]
                 }
 
-                if (freelabs.length == 0 && this.communeManager.inputLabIDs[1] && !boostingLabs.includes(this.communeManager.inputLabIDs[1])) {
+                if (
+                    freelabs.length == 0 &&
+                    this.communeManager.inputLabIDs[1] &&
+                    !boostingLabs.includes(this.communeManager.inputLabIDs[1])
+                ) {
                     freelabs = [this.inputLab2]
                 }
 

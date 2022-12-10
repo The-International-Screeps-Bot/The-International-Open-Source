@@ -74,7 +74,7 @@ export class HubHauler extends Creep {
 
         if (!storage || !factory) return false
 
-        if (factory.store.energy > 10000 && storage.store.getFreeCapacity() > 10000) {
+        if (factory.store.energy > 11000 && storage.store.getFreeCapacity() > 10000) {
             this.createReservation('withdraw', factory.id, 10000, RESOURCE_ENERGY)
             this.createReservation('transfer', storage.id, 10000, RESOURCE_ENERGY)
             return true
@@ -376,9 +376,12 @@ export class HubHauler extends Creep {
 
                 this.createReservation('withdraw', provider.id, amount, component)
                 this.createReservation('transfer', factory.id, amount + this.store[component], component)
+                return true
             }
         }
 
+        return false
+/*
         // If the ratio of stored batteries to energy is sufficiently high
         // 100 : 1
         if (room.resourcesInStoringStructures.battery * 100 > room.resourcesInStoringStructures.energy) return false
@@ -398,6 +401,7 @@ export class HubHauler extends Creep {
         this.createReservation('withdraw', provider.id, amount)
         this.createReservation('transfer', factory.id, amount + this.store.energy)
         return true
+         */
     }
 
     /**
