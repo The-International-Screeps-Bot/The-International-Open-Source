@@ -143,6 +143,11 @@ export class TerminalManager {
     }
 
     private respondToTerminalRequests() {
+
+        // We don't have enough energy to help other rooms
+
+        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy / 2) return false
+
         const { terminal } = this.communeManager.room
 
         // Sort by range between rooms and priority, weighted
