@@ -15,7 +15,6 @@ export class CombatManager {
     }
 
     run() {
-        const { room } = this.communeManager
 
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -34,7 +33,7 @@ export class CombatManager {
                 bgColor: myColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'dmcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            globalStatsUpdater(this.communeManager.room.name, statName, cpuUsed)
         }
     }
 

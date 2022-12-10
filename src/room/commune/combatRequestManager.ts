@@ -158,7 +158,7 @@ export class CombatRequestManager {
     private manageInaction(requestName: string, index: number) {
         const request = Memory.combatRequests[requestName]
 
-        if (request.data[CombatRequestData.inactionTimer] >= request.data[CombatRequestData.inactionTimerMax]) {
+        if (request.data[CombatRequestData.inactionTimer] <= 0) {
             this.communeManager.deleteCombatRequest(requestName, index)
             return
         }
