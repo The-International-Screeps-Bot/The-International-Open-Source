@@ -335,7 +335,15 @@ export class RemoteHauler extends Creep {
 
             // We don't want remote haulers fulfilling reservations all over the place in the commune
 
-            if (storingStructure) {
+            if (
+                storingStructure &&
+                this.room.hubLink &&
+                this.room.hubLink.RCLActionable &&
+                this.room.fastFillerLink &&
+                this.room.fastFillerLink.RCLActionable &&
+                this.room.controllerLink &&
+                this.room.controllerLink.RCLActionable
+            ) {
                 let inRangeTransferTargets = this.pos.findInRange(
                     this.room.METT.filter(et => et.store.getFreeCapacity(RESOURCE_ENERGY) > 0),
                     1,
