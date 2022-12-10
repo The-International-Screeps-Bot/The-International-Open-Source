@@ -46,8 +46,9 @@ export class TerminalManager {
     }
 
     preTickRun() {
-        if (!this.terminal) return
-        if (!this.terminal.RCLActionable) return
+        const { terminal } = this.communeManager.room
+        if (!terminal) return
+        if (!terminal.RCLActionable) return
 
         this.createTerminalRequests()
     }
@@ -57,6 +58,8 @@ export class TerminalManager {
         const { terminal } = room
 
         for (const resourceTarget of terminalResourceTargets) {
+
+            if (resourceTarget.min <= 0) continue
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
             const targetAmount = terminal.store.getCapacity() * resourceTarget.min
@@ -143,6 +146,7 @@ export class TerminalManager {
     }
 
     private respondToTerminalRequests() {
+        const { terminal } = this.communeManager.room
 
         // Sort by range between rooms and priority, weighted
 
@@ -156,13 +160,17 @@ export class TerminalManager {
 
             if (request.roomName === this.communeManager.room.name) continue
 
+            // Make sure we have enough energy and some left over from the transfer cost
+
+            if (Game.market.calcTransactionCost(request.amount, this.communeManager.room.name, request.roomName) * 2 > terminal.store.energy) continue
+
             // Make sure we have extra
 
-            if (this.terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
+            if (terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
 
-            this.terminal.send(request.resource, request.amount, request.roomName, 'Terminal request response')
+            terminal.send(request.resource, request.amount, request.roomName, 'Terminal request response')
             delete internationalManager.terminalRequests[request.ID]
-            
+
             return true
         }
 

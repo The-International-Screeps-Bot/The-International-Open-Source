@@ -1404,6 +1404,9 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
             visitedCoords.add(packedCoord)
 
             for (const structure of this.room.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
+
+                if (structure.structureType === STRUCTURE_KEEPER_LAIR) continue
+
                 if (
                     !impassibleStructureTypes.includes(structure.structureType) &&
                     structure.structureType !== STRUCTURE_RAMPART

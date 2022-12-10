@@ -75,14 +75,14 @@ export class Quad {
 
         for (const enemyCreep of this.leader.room.enemyAttackers) {
             // We have sufficient superiority to ignore kiting this creep
-            /*
+
             if (
                 this.combatStrength.heal + this.combatStrength.melee + this.combatStrength.ranged >
                 (enemyCreep.combatStrength.heal + enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged) *
                     1.2
             )
                 continue
- */
+
             // Segregate by ranged
 
             if (enemyCreep.parts.ranged_attack) {
@@ -136,13 +136,17 @@ export class Quad {
         this._enemyThreatGoals = []
 
         for (const enemyCreep of this.leader.room.enemyAttackers) {
-            // The enemy is ranged and a threat
+
+            // The enemy is weak enough to be ignored
 
             if (
-                enemyCreep.parts.ranged_attack &&
-                (enemyCreep.combatStrength.ranged + enemyCreep.combatStrength.heal) * 1.2 >
-                    this.combatStrength.ranged + this.combatStrength.heal
-            ) {
+                (enemyCreep.combatStrength.ranged + enemyCreep.combatStrength.melee + enemyCreep.combatStrength.heal) *
+                    1.2 <
+                this.combatStrength.ranged + this.combatStrength.melee + this.combatStrength.heal
+            )
+                continue
+
+            if (enemyCreep.parts.ranged_attack) {
                 this._enemyThreatGoals.push({
                     pos: enemyCreep.pos,
                     range: 5,
@@ -233,7 +237,7 @@ export class Quad {
 
         this.leader.say('IF')
 
-        /* if (this.leader.room.enemyDamageThreat && this.runCombat()) return */
+        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
 
         this.passiveRangedAttack()
 
