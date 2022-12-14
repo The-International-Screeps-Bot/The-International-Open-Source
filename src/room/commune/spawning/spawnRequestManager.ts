@@ -273,7 +273,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            const priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
+            priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
 
             // Construct the required carry parts
 
@@ -392,13 +392,13 @@ Room.prototype.spawnRequester = function () {
             const fastFillerPositionsCount = this.fastFillerPositions.length
             if (!fastFillerPositionsCount) return false
 
-            let priority = 0.75
+            priority = 0.75
 
             let totalFastFillerEnergy = 0
             if (this.fastFillerContainerLeft) totalFastFillerEnergy += this.fastFillerContainerLeft.store.energy
             if (this.fastFillerContainerRight) totalFastFillerEnergy += this.fastFillerContainerRight.store.energy
 
-            if (totalFastFillerEnergy < 300) priority = 1.25
+            if (totalFastFillerEnergy < 1000) priority = 1.25
 
             let defaultParts: BodyPartConstant[]
             if (this.controller.level >= 8) defaultParts = [CARRY, MOVE, CARRY, CARRY, CARRY, CARRY]

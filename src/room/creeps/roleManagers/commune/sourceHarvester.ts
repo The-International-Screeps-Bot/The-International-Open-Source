@@ -195,7 +195,7 @@ export class SourceHarvester extends Creep {
         //See if there's a hauler to tranfer to if we're full so we're not drop mining.
         //   This shouldn't run if we're container mining however.
         if (this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK)) {
-            let haulers = this.room.myCreeps.hauler?.map(name => Game.creeps[name] as Hauler)
+            let haulers = this.room.myCreeps.hauler.map(name => Game.creeps[name] as Hauler)
             if (haulers && haulers.length > 0) {
                 let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
                 if (nearby) {
