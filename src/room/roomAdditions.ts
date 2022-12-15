@@ -408,12 +408,31 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._dismantleTargets) return this._dismantleTargets
 
+            // We own the room, attack enemy owned structures
+
+            if (this.controller && this.controller.my) {
+
+                return (this._dismantleTargets = this.find(FIND_STRUCTURES, {
+                    filter: structure =>
+                        (structure as OwnedStructure).owner &&
+                        !(structure as OwnedStructure).my &&
+                        structure.structureType !== STRUCTURE_INVADER_CORE
+                }))
+            }
+
+            // We don't own the room, attack things that we can that aren't roads or containers
+
             return (this._dismantleTargets = this.find(FIND_STRUCTURES, {
                 filter: structure =>
-                    (structure as OwnedStructure).owner &&
-                    !(structure as OwnedStructure).my &&
+                    structure.structureType !== STRUCTURE_ROAD &&
+                    structure.structureType !== STRUCTURE_CONTAINER &&
                     structure.structureType !== STRUCTURE_CONTROLLER &&
-                    structure.structureType !== STRUCTURE_INVADER_CORE,
+                    structure.structureType !== STRUCTURE_INVADER_CORE &&
+                    structure.structureType !== STRUCTURE_KEEPER_LAIR &&
+
+                    // We don't want to attack respawn or novice zone walls with infinite hits
+
+                    structure.hits,
             }))
         },
     },

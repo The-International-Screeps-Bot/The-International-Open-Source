@@ -374,11 +374,11 @@ export function basePlanner(room: Room) {
     }
 
     /* room.visualizeCoordMap(room.baseCoords) */
-
+ 
     // Try to plan the stamp
 
     path = room.advancedFindPath({
-        origin: avgControllerSourcePos,
+        origin: getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3 ? closestSourceToController.pos : avgControllerSourcePos,
         goals: [{ pos: room.anchor, range: 3 }],
         weightCoordMaps: [room.roadCoords],
         plainCost: defaultRoadPlanningPlainCost,
@@ -388,7 +388,7 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'hub',
             count: 1,
-            startCoords: [avgControllerSourcePos],
+            startCoords: [path[0]],
             normalDT: true,
             cardinalFlood: true,
         })
