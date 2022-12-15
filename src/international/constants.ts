@@ -1103,7 +1103,10 @@ export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
     tradeVertical: [1, 0, 3, 2],
 }
 
-export const ERROR_FAILED = 0
+export const RESULT_FAIL = 0
+export const RESULT_SUCCESS = 1
+export const RESULT_ACTION = 2
+export const RESULT_NO_ACTION = 3
 
 export const maxRemoteRoomDistance = 5
 export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]

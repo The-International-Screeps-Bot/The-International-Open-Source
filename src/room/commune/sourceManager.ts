@@ -1,3 +1,4 @@
+import { customLog } from 'international/utils'
 import { CommuneManager } from './communeManager'
 
 export class SourceManager {
@@ -42,6 +43,7 @@ export class SourceManager {
     }
 
     private createPowerTasks() {
+
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
         for (const source of this.sources) {

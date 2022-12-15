@@ -22,7 +22,7 @@ export class RemoteReserver extends Creep {
      * Finds a remote to reserve
      */
     findRemote?(): boolean {
-        if (this.memory.RN) return true
+        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
 
         const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
@@ -48,19 +48,7 @@ export class RemoteReserver extends Creep {
 
         const role = this.role as 'remoteReserver'
 
-        if (Memory.rooms[this.memory.RN].T !== 'remote') {
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
-        // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
+        if (!this.findRemote()) return
         if (this.dying) return
 
         // Reduce remote need

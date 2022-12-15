@@ -41,19 +41,7 @@ export class RemoteHarvester extends Creep {
         if (!this.findRemote()) return
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
-        if (Memory.rooms[this.memory.RN].T !== 'remote') {
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
-        // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
-            // Delete it from memory and try to find a new one
-
-            this.removeRemote()
-            if (!this.findRemote()) return
-        }
-
+        if (!this.findRemote()) return
         if (this.dying) return
 
         // Reduce remote need
@@ -72,7 +60,7 @@ export class RemoteHarvester extends Creep {
      * Finds a remote to harvest in
      */
     findRemote?(): boolean {
-        if (this.memory.RN) return true
+        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
 
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')

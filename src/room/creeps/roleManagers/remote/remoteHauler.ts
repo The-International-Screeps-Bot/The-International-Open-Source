@@ -36,19 +36,7 @@ export class RemoteHauler extends Creep {
         if (!this.memory.RN) return
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
-        if (Memory.rooms[this.memory.RN].T !== 'remote') {
-            delete this.memory.RN
-            return
-        }
-
-        // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
-            // Delete it from memory and try to find a new one
-
-            this.removeRemote()
-            return
-        }
-
+        if (!this.findRemote()) return
         if (this.dying) return
 
         Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
@@ -58,7 +46,7 @@ export class RemoteHauler extends Creep {
      * Finds a remote to haul from
      */
     findRemote?(): boolean {
-        if (this.memory.RN) return true
+        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
 
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
@@ -147,7 +135,7 @@ export class RemoteHauler extends Creep {
 
             // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-            this.createMoveRequestByPath(
+            this.createMoveRequest(
                 {
                     origin: this.pos,
                     goals: [
@@ -156,9 +144,6 @@ export class RemoteHauler extends Creep {
                             range: 25,
                         },
                     ],
-                },
-                {
-                    packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
                 },
             )
 

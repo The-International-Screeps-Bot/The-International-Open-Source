@@ -81,7 +81,7 @@ class PowerCreepOrganizer {
 
         // Record the creep's presence in the room
 
-        room.myCreepsAmount += 1
+        room.myPowerCreepsAmount += 1
 
         creep.preTickManager()
     }

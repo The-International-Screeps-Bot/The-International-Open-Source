@@ -1,4 +1,4 @@
-import { ERROR_FAILED, myColors } from 'international/constants'
+import { RESULT_FAIL, myColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS } from 'international/constants'
 import { customLog, findObjectWithID, getRangeOfCoords } from 'international/utils'
 
 export class Operator extends PowerCreep {
@@ -12,22 +12,24 @@ export class Operator extends PowerCreep {
 
     endTickManager() {}
 
+    // Basic tasks
+
     runTask?() {
-        if (!this.memory.TN && !this.findTask()) return false
+
+        if (!this.memory.TN && !this.findTask()) return RESULT_FAIL
 
         const taskResult = (this as any)[this.memory.TN]()
-        if (!taskResult) return taskResult === ERROR_FAILED
+        if (!taskResult) return taskResult === RESULT_FAIL
 
         delete this.memory.TN
-        delete this.memory.TTID
-        return true
+
+        return RESULT_SUCCESS
     }
 
     findTask?() {
         if (this.findRenewTask()) return true
         if (this.findEnablePowerTask()) return true
         if (this.findGenerateOpsTask()) return true
-        if (this.findSourceRegenTask()) return true
         return false
     }
 
@@ -36,13 +38,13 @@ export class Operator extends PowerCreep {
 
         if (!this.room.powerSpawn) return false
 
-        this.memory.TN = 'passiveRenew'
+        this.memory.TN = 'advancedRenew'
         return true
     }
 
-    passiveRenew?() {
+    advancedRenew?() {
         const powerSpawn = this.room.powerSpawn
-        if (!powerSpawn) return ERROR_FAILED
+        if (!powerSpawn) return RESULT_FAIL
 
         const minRange = 1
         if (getRangeOfCoords(this.pos, powerSpawn.pos) > minRange) {
@@ -76,7 +78,7 @@ export class Operator extends PowerCreep {
 
     advancedEnablePower?() {
         const { controller } = this.room
-        if (!controller) return ERROR_FAILED
+        if (!controller || controller.isPowerEnabled) return RESULT_NO_ACTION
 
         const minRange = 1
         if (getRangeOfCoords(this.pos, controller.pos) > minRange) {
@@ -91,11 +93,11 @@ export class Operator extends PowerCreep {
                 avoidEnemyRanges: true,
             })
 
-            return false
+            return RESULT_ACTION
         }
 
         this.enableRoom(controller)
-        return true
+        return RESULT_SUCCESS
     }
 
     findGenerateOpsTask?() {
@@ -116,71 +118,100 @@ export class Operator extends PowerCreep {
         if (this.powered) return false
 
         this.usePower(PWR_GENERATE_OPS)
+        this.powered = true
         return true
     }
 
-    isViablePowerTarget?(target: Structure | Source) {
-        const maxRange = getRangeOfCoords(this.pos, target.pos) * 1.2
+    // Complex power tasks
 
-        if (this.powers[PWR_REGEN_SOURCE].cooldown > maxRange) return false
+    findPowerTask?() {
 
-        if (!target.effectsData.get(PWR_REGEN_SOURCE)) return true
+        if (this.memory.TTID) {
 
-        if (target.effectsData.get(PWR_REGEN_SOURCE).ticksRemaining > maxRange) return false
+            const taskTarget = findObjectWithID(this.memory.TTID)
+            if (taskTarget) return taskTarget
 
-        return true
-    }
-
-    findSourceRegenTask?() {
-        const power = this.powers[PWR_REGEN_SOURCE]
-        if (!power) return false
-
-        const sources = this.room.sources.sort((a, b) => {
-            return getRangeOfCoords(this.pos, a.pos) - getRangeOfCoords(this.pos, b.pos)
-        })
-
-        for (const source of sources) {
-            if (!this.isViablePowerTarget(source)) continue
-
-            this.memory.TN = 'advancedRegenSource'
-            this.memory.TTID = source.id
-            return true
+            delete this.memory.TTID
         }
 
-        return false
+        let lowestScore = Infinity
+        let bestTask: PowerTask
+
+        for (const ID in this.room.powerTasks) {
+
+            const task = this.room.powerTasks[ID]
+
+            // We don't have the requested power
+
+            const power = this.powers[task.powerType]
+            if (!power) continue
+
+            // We don't have enough ops for the task
+
+            if ((POWER_INFO[task.powerType] as any).ops > this.store.ops) continue
+
+            const taskTargetPos = findObjectWithID(task.targetID).pos
+            const range = getRangeOfCoords(this.pos, taskTargetPos)
+
+            // The target doesn't need us yet or we can't yet provide
+
+            if (Math.max(task.cooldown, power.cooldown) + 5 > range) continue
+
+            let score = task.priority + (range / 100)
+
+            if (score >= lowestScore) continue
+
+            lowestScore = score
+            bestTask = task
+        }
+        customLog('FIND TASK', bestTask)
+        if (!bestTask) return RESULT_FAIL
+
+        const taskTarget = findObjectWithID(bestTask.targetID)
+        this.memory.PT = bestTask.powerType
+        delete this.room.powerTasks[bestTask.taskID]
+
+        return taskTarget
     }
 
-    advancedRegenSource?() {
-        this.say('ARS')
+    runPowerTasks?() {
 
-        const source = findObjectWithID(this.memory.TTID)
-        if (!source) return true
+        if (this.runPowerTask() === RESULT_SUCCESS) this.runPowerTask()
+    }
 
-        this.room.targetVisual(this.pos, source.pos)
+    runPowerTask?() {
 
-        const minRange = 3
-        if (getRangeOfCoords(this.pos, source.pos) > minRange) {
+        const taskTarget = this.findPowerTask()
+        if (!taskTarget) return RESULT_FAIL
+
+        taskTarget._reservePowers.add(this.memory.PT)
+
+        // We aren't in range, get closer
+
+        const minRange = (POWER_INFO[this.memory.PT] as any).range
+        if (minRange && getRangeOfCoords(this.pos, taskTarget.pos) > minRange) {
+
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [
-                    {
-                        pos: source.pos,
-                        range: minRange,
-                    },
-                ],
-                avoidEnemyRanges: true,
+                goals: [{ pos: taskTarget.pos, range: minRange, }]
             })
-
-            return false
+            return RESULT_ACTION
         }
 
-        if (this.powered) return false
-        if (this.powers[PWR_REGEN_SOURCE].cooldown) return false
-        if (source.effectsData.get(PWR_REGEN_SOURCE) && source.effectsData.get(PWR_REGEN_SOURCE).ticksRemaining)
-            return false
+        // We can't or failed the power
 
-        this.usePower(PWR_REGEN_SOURCE, source)
-        return true
+        if (this.powered) return RESULT_FAIL
+
+        const effect = taskTarget.effectsData.get(this.memory.PT)
+        if (effect && effect.ticksRemaining > 0) return RESULT_FAIL
+        if (this.usePower(this.memory.PT, taskTarget) !== OK) return RESULT_FAIL
+
+        // We did the power
+
+        this.powered = true
+        delete this.memory.TTID
+
+        return RESULT_SUCCESS
     }
 
     static operatorManager(room: Room, creepsOfRole: string[]) {
@@ -191,7 +222,9 @@ export class Operator extends PowerCreep {
 
             const creep: Operator = Game.powerCreeps[creepName]
 
-            if (creep.runTask()) creep.runTask()
+            if (creep.runTask()) continue
+            creep.runPowerTasks()
+            /* if (creep.runTask()) creep.runTask() */
         }
     }
 }

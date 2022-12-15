@@ -2271,15 +2271,13 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
     // There is already has a power creep responding to this target with the power
-
+    customLog('TRYING TO MAKE POWER TASK', target)
     if (target.reservePowers.has(powerType)) return false
 
     // Create a power task with info on the cooldown
 
-    let cooldown
-    const effectsData = target.effectsData
-    if (!effectsData.get(powerType)) cooldown = 0
-    else cooldown = effectsData.get(powerType).ticksRemaining
+    const effect = target.effectsData.get(powerType)
+    const cooldown = effect ? effect.ticksRemaining : 0
 
     const ID = internationalManager.newTickID()
 

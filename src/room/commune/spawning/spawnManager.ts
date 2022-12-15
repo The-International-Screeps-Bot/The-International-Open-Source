@@ -18,7 +18,7 @@ export class SpawnManager {
      * Find spawns that are inactive and active
      * Assign spawnIDs to creeps
      */
-    public organizeSpawns() {
+     public organizeSpawns() {
         const spawns = this.communeManager.structures.spawn
         if (!spawns.length) return
 
@@ -52,7 +52,6 @@ export class SpawnManager {
         if (!this.communeManager.structures.spawn.length) return
 
         this.runSpawning()
-        this.createPowerTasks()
         this.test()
 
         if (Memory.CPULogging === true) {
@@ -150,7 +149,7 @@ export class SpawnManager {
         }
     }
 
-    configSpawnRequest(index: number) {
+    private configSpawnRequest(index: number) {
         const request = this.communeManager.room.spawnRequests[index]
 
         request.body = []
@@ -190,8 +189,12 @@ export class SpawnManager {
         request.body = request.body.concat(endParts)
     }
 
-    private createPowerTasks() {
+    createPowerTasks() {
         if (!this.communeManager.room.myPowerCreepsAmount) return
+
+        // There is a vivid benefit to powering spawns
+
+        if (!this.inactiveSpawns.length) return
 
         for (const spawn of this.activeSpawns) {
             this.communeManager.room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)

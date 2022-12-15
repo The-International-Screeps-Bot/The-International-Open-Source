@@ -135,7 +135,7 @@ export class RemoteDismantler extends Creep {
             }
         }
 
-        const targets: Structure[] = room.dismantleTargets
+        const targets = room.dismantleTargets
 
         if (targets.length) {
             target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })

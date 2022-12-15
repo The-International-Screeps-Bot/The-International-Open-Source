@@ -592,7 +592,7 @@ declare global {
          */
         tcc: number
         /**
-         * Spawn Usage
+         * Spawn Usage as a decimal
          */
         su: number
         /**
@@ -2240,9 +2240,14 @@ declare global {
         TN: keyof Operator
 
         /**
-         * Task target, the ID of the target the creep is targeting for its task
+         * Task target ID, the ID of the target the creep is targeting for its task
          */
         TTID: Id<Structure | Source>
+
+        /**
+         * Power Type
+         */
+        PT: PowerConstant
     }
 
     // Structures

@@ -203,6 +203,7 @@ export class CommuneManager {
         this.labManager.run()
         this.powerSpawnManager.run()
         this.spawnManager.organizeSpawns()
+        this.spawnManager.createPowerTasks()
 
         this.room.roomManager.creepRoleManager.run()
         this.room.roomManager.powerCreepRoleManager.run()
@@ -216,6 +217,7 @@ export class CommuneManager {
     }
 
     private test() {
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
