@@ -133,6 +133,18 @@ export class Operator extends PowerCreep {
             delete this.memory.TTID
         }
 
+        const task = this.findNewBestPowerTask()
+        if (!task) return RESULT_FAIL
+        customLog('FIND TASK', findObjectWithID(task.targetID))
+        this.memory.TTID = task.targetID
+        this.memory.PT = task.powerType
+        delete this.room.powerTasks[task.taskID]
+
+        return findObjectWithID(task.targetID)
+    }
+
+    findNewBestPowerTask?() {
+
         let lowestScore = Infinity
         let bestTask: PowerTask
 
@@ -164,13 +176,7 @@ export class Operator extends PowerCreep {
             bestTask = task
         }
 
-        if (!bestTask) return RESULT_FAIL
-        customLog('FIND TASK', findObjectWithID(bestTask.targetID))
-        this.memory.TTID = bestTask.targetID
-        this.memory.PT = bestTask.powerType
-        delete this.room.powerTasks[bestTask.taskID]
-
-        return findObjectWithID(bestTask.targetID)
+        return bestTask
     }
 
     runPowerTask?() {
@@ -204,13 +210,18 @@ export class Operator extends PowerCreep {
         // We did the power
         customLog('WE DID THE POWA', taskTarget)
 
+        // Assume the power consumed ops if it does so
+
         const ops = (POWER_INFO[this.memory.PT] as any).ops
         if (ops) this.nextStore.ops -= ops
 
         this.powered = true
+        delete this.memory.TTID
+
+        // Define the cooldown so we don't assume the creep can still do this power immediately
+
         this.powerCooldowns
         this._powerCooldowns.set(this.memory.PT, POWER_INFO[this.memory.PT].cooldown)
-        delete this.memory.TTID
 
         return RESULT_SUCCESS
     }

@@ -141,14 +141,7 @@ export class TerminalManager {
         }
     }
 
-    private respondToTerminalRequests() {
-        // We don't have enough energy to help other rooms
-
-        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy)
-            return false
-
-        const { terminal } = this.communeManager.room
-
+    findBestTerminalRequest() {
         let lowestScore = Infinity
         let bestRequest: TerminalRequest
 
@@ -167,22 +160,37 @@ export class TerminalManager {
 
             if (
                 Game.market.calcTransactionCost(request.amount, this.communeManager.room.name, request.roomName) * 2 >
-                terminal.store.energy
+                this.communeManager.room.terminal.store.energy
             )
                 continue
 
             // Make sure we have extra
 
-            if (terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
+            if (this.communeManager.room.terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
 
             bestRequest = request
             lowestScore = score
         }
 
-        if (!bestRequest) return false
+        return bestRequest
+    }
 
-        terminal.send(bestRequest.resource, bestRequest.amount, bestRequest.roomName, 'Terminal request response')
-        delete internationalManager.terminalRequests[bestRequest.ID]
+    private respondToTerminalRequests() {
+        // We don't have enough energy to help other rooms
+
+        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy)
+            return false
+
+        const request = this.findBestTerminalRequest()
+        if (!request) return false
+
+        this.communeManager.room.terminal.send(
+            request.resource,
+            request.amount,
+            request.roomName,
+            'Terminal request response',
+        )
+        delete internationalManager.terminalRequests[request.ID]
 
         return true
     }
