@@ -20,6 +20,7 @@ function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
             else return 0
         case 'cc':
         case 'tcc':
+        case 'pcc':
         case 'cl':
         case 'bes':
         case 'es':
@@ -120,6 +121,7 @@ export class StatsManager {
             eih: 0,
             cc: 0,
             tcc: 0,
+            pcc: 0,
             cl: 0,
             bes: 0,
             es: 0,
@@ -241,14 +243,10 @@ export class StatsManager {
         const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
-            customLog(
-                'StatsManager',
-                `RoomCommuneFinalEndTick: ${roomName} stats not updated`,
-                {
-                    textColor: myColors.white,
-                    bgColor: myColors.red
-                }
-            )
+            customLog('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
+                textColor: myColors.white,
+                bgColor: myColors.red,
+            })
             return
         }
         const each250Ticks = Game.time % 250 === 0
@@ -281,6 +279,7 @@ export class StatsManager {
         if (room) {
             globalCommuneStats.cc = room.myCreepsAmount
             globalCommuneStats.tcc = room.creepsFromRoomAmount
+            globalCommuneStats.pcc = room.myPowerCreepsAmount
 
             const spawns = room.structures.spawn
             if (spawns.length > 0)
@@ -465,7 +464,7 @@ export class StatsManager {
             }
             customLog('Stats Manager', cpuUsed.toFixed(2), {
                 textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                bgColor: myColors.lightBlue,
             })
         } else {
             Memory.stats.CPUUsers = {

@@ -592,6 +592,10 @@ declare global {
          */
         tcc: number
         /**
+         * Power Creep Count
+         */
+        pcc: number
+        /**
          * Spawn Usage as a decimal
          */
         su: number
