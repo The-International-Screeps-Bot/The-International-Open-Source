@@ -297,6 +297,23 @@ Object.defineProperties(PowerCreep.prototype, {
             return (this._netTowerDamage -= this.macroHealStrength)
         },
     },
+    powerCooldowns: {
+        get() {
+            if (this._powerCooldowns) return this._powerCooldowns
+
+            this._powerCooldowns = new Map()
+
+            for (const powerType in this.powers) {
+
+                const cooldown = this.powers[powerType].cooldown
+                if (!cooldown) continue
+
+                this._powerCooldowns.set(parseInt(powerType) as PowerConstant, cooldown)
+            }
+
+            return this._powerCooldowns
+        }
+    }
 } as PropertyDescriptorMap & ThisType<PowerCreep>)
 
 const additions = {

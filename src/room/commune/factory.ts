@@ -155,12 +155,11 @@ Room.prototype.factoryManager = function () {
     function pickProduct() {
         setProduct(null)
 
+            // We want a certain ratio of batteries to stored energy
+
         if (
-            room.resourcesInStoringStructures[RESOURCE_ENERGY] > 150000 &&
-            //If We're either low in space, or we don't have any in storage.  We put some in storage so we can trade,
-            // but don't make it till we're low-ish on space.
-            (room.storage.store.getFreeCapacity() < 100000 ||
-                room.resourcesInStoringStructures[RESOURCE_BATTERY] < 5000)
+            room.resourcesInStoringStructures[RESOURCE_ENERGY] > room.communeManager.minStoredEnergy * 1.2 &&
+            room.resourcesInStoringStructures.battery < room.resourcesInStoringStructures.energy / 100
         ) {
             // Convert energy into batteries
             setProduct(RESOURCE_BATTERY)
@@ -168,7 +167,7 @@ Room.prototype.factoryManager = function () {
         }
 
         if (
-            room.resourcesInStoringStructures[RESOURCE_ENERGY] < 20000 &&
+            room.resourcesInStoringStructures[RESOURCE_ENERGY] < room.communeManager.minStoredEnergy &&
             room.resourcesInStoringStructures[RESOURCE_BATTERY] >= 600
         ) {
             setProduct(RESOURCE_ENERGY)

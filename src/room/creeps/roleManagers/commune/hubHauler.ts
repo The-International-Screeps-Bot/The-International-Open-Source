@@ -74,9 +74,9 @@ export class HubHauler extends Creep {
 
         if (!storage || !factory) return false
 
-        if (factory.store.energy > 11000 && storage.store.getFreeCapacity() > 10000) {
-            this.createReservation('withdraw', factory.id, 10000, RESOURCE_ENERGY)
-            this.createReservation('transfer', storage.id, 10000, RESOURCE_ENERGY)
+        if (factory.store.energy > 3000 && storage.store.getFreeCapacity() > 3000) {
+            this.createReservation('withdraw', factory.id, 3000, RESOURCE_ENERGY)
+            this.createReservation('transfer', storage.id, 3000, RESOURCE_ENERGY)
             return true
         }
 
@@ -361,7 +361,9 @@ export class HubHauler extends Creep {
 
         if (room.memory.factoryProduct && room.memory.factoryUsableResources) {
             for (let resource of room.memory.factoryUsableResources) {
+
                 //If there's enough of the component, for now it's just checking for 1000, but 1000 of a T3 resource is a lot, 1000 of a mineral isn't much...
+
                 if (factory.store[resource] >= 1000) continue
 
                 let provider

@@ -2226,6 +2226,10 @@ declare global {
          * Wether the creep has used a power this tick
          */
         powered: boolean
+
+        _powerCooldowns: Partial<Map<PowerConstant, number>>
+
+        readonly powerCooldowns: Partial<Map<PowerConstant, number>>
     }
 
     interface PowerCreepMemory extends CreepMemoryTemplate {

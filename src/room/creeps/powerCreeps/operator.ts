@@ -154,7 +154,7 @@ export class Operator extends PowerCreep {
 
             // The target doesn't need us yet or we can't yet provide
 
-            if (Math.max(task.cooldown, power.cooldown) + 5 > range) continue
+            if (Math.max(task.cooldown, this.powerCooldowns.get(task.powerType)) + 5 > range) continue
 
             let score = task.priority + (range / 100)
 
@@ -208,6 +208,8 @@ export class Operator extends PowerCreep {
         if (ops) this.nextStore.ops -= ops
 
         this.powered = true
+        this.powerCooldowns
+        this._powerCooldowns.set(this.memory.PT, POWER_INFO[this.memory.PT].cooldown)
         delete this.memory.TTID
 
         return RESULT_SUCCESS
