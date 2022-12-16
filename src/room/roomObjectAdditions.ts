@@ -27,14 +27,14 @@ Object.defineProperties(RoomObject.prototype, {
         get(this: AnyStoreStructure) {
             if (this._nextStore) return this._nextStore
 
-            return (this._nextStore = JSON.parse(JSON.stringify(this as AnyStoreStructure)))
+            return (this._nextStore = JSON.parse(JSON.stringify(this.store)))
         },
     },
     reserveStore: {
         get(this: AnyStoreStructure) {
             if (this._reserveStore) return this._reserveStore
 
-            return (this._reserveStore = JSON.parse(JSON.stringify(this as AnyStoreStructure)))
+            return (this._reserveStore = JSON.parse(JSON.stringify(this.store)))
         },
     },
     reservePowers: {

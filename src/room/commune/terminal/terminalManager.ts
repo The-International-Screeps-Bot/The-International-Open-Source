@@ -58,17 +58,16 @@ export class TerminalManager {
         const { terminal } = room
 
         for (const resourceTarget of terminalResourceTargets) {
-
             if (resourceTarget.max <= 0) continue
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
             // Half of the max
 
-            let targetAmount = terminal.store.getCapacity() * resourceTarget.max / 2
+            let targetAmount = (terminal.store.getCapacity() * resourceTarget.max) / 2
 
             // We have enough
 
-            if (terminal.store[resourceTarget.resource] >=  targetAmount * 0.7) continue
+            if (terminal.store[resourceTarget.resource] >= targetAmount * 0.7) continue
 
             const ID = newID()
 
@@ -77,7 +76,7 @@ export class TerminalManager {
                 priority: 1 - terminal.store[resourceTarget.resource] / targetAmount,
                 resource: resourceTarget.resource,
                 amount: targetAmount * 0.9 - terminal.store[resourceTarget.resource],
-                roomName: room.name
+                roomName: room.name,
             }
         }
     }
@@ -143,20 +142,22 @@ export class TerminalManager {
     }
 
     private respondToTerminalRequests() {
-
         // We don't have enough energy to help other rooms
 
-        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy / 2) return false
+        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy)
+            return false
 
         const { terminal } = this.communeManager.room
 
-        // Sort by range between rooms and priority, weighted
+        let lowestScore = Infinity
+        let bestRequest: TerminalRequest
 
-        const terminalRequestsByScore = Object.values(internationalManager.terminalRequests).sort((a, b) => {
-            return (Game.map.getRoomLinearDistance(this.communeManager.room.name, a.roomName) + a.priority * 100) - (Game.map.getRoomLinearDistance(this.communeManager.room.name, b.roomName) + b.priority * 100)
-        })
+        for (const ID in internationalManager.terminalRequests) {
+            const request = internationalManager.terminalRequests[ID]
 
-        for (const request of terminalRequestsByScore) {
+            const score =
+                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
+            if (score >= lowestScore) continue
 
             // Don't respond to requests for this room
 
@@ -164,19 +165,26 @@ export class TerminalManager {
 
             // Make sure we have enough energy and some left over from the transfer cost
 
-            if (Game.market.calcTransactionCost(request.amount, this.communeManager.room.name, request.roomName) * 2 > terminal.store.energy) continue
+            if (
+                Game.market.calcTransactionCost(request.amount, this.communeManager.room.name, request.roomName) * 2 >
+                terminal.store.energy
+            )
+                continue
 
             // Make sure we have extra
 
             if (terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
 
-            terminal.send(request.resource, request.amount, request.roomName, 'Terminal request response')
-            delete internationalManager.terminalRequests[request.ID]
-
-            return true
+            bestRequest = request
+            lowestScore = score
         }
 
-        return false
+        if (!bestRequest) return false
+
+        terminal.send(bestRequest.resource, bestRequest.amount, bestRequest.roomName, 'Terminal request response')
+        delete internationalManager.terminalRequests[bestRequest.ID]
+
+        return true
     }
 
     private respondToAllyRequests() {

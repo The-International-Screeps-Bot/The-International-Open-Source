@@ -360,22 +360,24 @@ export class HubHauler extends Creep {
         if (factory.freeStore() < this.store.getCapacity()) return false
 
         if (room.memory.factoryProduct && room.memory.factoryUsableResources) {
-            for (let component of room.memory.factoryUsableResources) {
+            for (let resource of room.memory.factoryUsableResources) {
                 //If there's enough of the component, for now it's just checking for 1000, but 1000 of a T3 resource is a lot, 1000 of a mineral isn't much...
-                if (factory.store[component] >= 1000) continue
+                if (factory.store[resource] >= 1000) continue
 
                 let provider
-                if (terminal && terminal.store[component] > 0) provider = terminal
-                else if (storage && storage.store[component] > 0) provider = storage
+                if (terminal && terminal.store[resource] > 0) provider = terminal
+                else if (storage && storage.store[resource] > 0) provider = storage
                 if (!provider) continue
 
-                let amount = Math.min(this.freeStore(), provider.store[component], 2000 - factory.store[component])
-
-                //If it doesn't need any of this resource...
+                const amount = Math.min(this.freeStore(), provider.store[resource], 2000 - factory.store[resource])
                 if (amount <= 0) continue
 
-                this.createReservation('withdraw', provider.id, amount, component)
-                this.createReservation('transfer', factory.id, amount + this.store[component], component)
+                // Make sure we aren't using vital energy
+
+                if (resource === RESOURCE_ENERGY && room.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy) continue
+
+                this.createReservation('withdraw', provider.id, amount, resource)
+                this.createReservation('transfer', factory.id, amount + this.store[resource], resource)
                 return true
             }
         }
