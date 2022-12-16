@@ -178,7 +178,7 @@ export class Operator extends PowerCreep {
 
             // The target doesn't need us yet or we can't yet provide
 
-            if (Math.max(task.cooldown, this.powerCooldowns.get(task.powerType) || 0) > range + 2) continue
+            if (Math.max(task.cooldown, this.powerCooldowns.get(task.powerType) || 0) > range + (POWER_INFO[this.memory.PT] as any).range + 2) continue
 
             let score = task.priority + range / 100
 
