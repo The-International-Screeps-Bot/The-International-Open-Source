@@ -21,7 +21,7 @@ export class Antifa extends Creep {
 
         // Tell others we want a squad
 
-/*
+        /*
         const memberNames = [this.name]
 
         if (this.memory.SMNs) {
@@ -137,7 +137,6 @@ export class Antifa extends Creep {
         const memberNames: string[] = []
 
         for (const memberName of this.memory.SMNs) {
-
             // We don't need others to think we need a squad when we have one now
 
             this.room.squadRequests.delete(memberName)
@@ -377,8 +376,8 @@ export class Antifa extends Creep {
 
         // See if the structure is destroyed next tick
 
-        structure.estimatedHits -= this.parts.ranged_attack * RANGED_ATTACK_POWER
-        if (structure.estimatedHits > 0) return true
+        structure.nextHits -= this.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.nextHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -490,8 +489,8 @@ export class Antifa extends Creep {
 
         // See if the structure is destroyed next tick
 
-        structure.estimatedHits -= this.parts.attack * ATTACK_POWER
-        if (structure.estimatedHits > 0) return true
+        structure.nextHits -= this.parts.attack * ATTACK_POWER
+        if (structure.nextHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -533,8 +532,8 @@ export class Antifa extends Creep {
 
         // See if the structure is destroyed next tick
 
-        structure.estimatedHits -= this.parts.work * DISMANTLE_POWER
-        if (structure.estimatedHits > 0) return true
+        structure.nextHits -= this.parts.work * DISMANTLE_POWER
+        if (structure.nextHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 

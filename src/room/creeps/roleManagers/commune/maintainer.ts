@@ -8,7 +8,6 @@ export class Maintainer extends Creep {
     }
 
     preTickManager() {
-
         this.avoidEnemyThreatCoords()
     }
 
@@ -97,19 +96,19 @@ export class Maintainer extends Creep {
 
         // Implement the results of the repair pre-emptively
 
-        repairTarget.estimatedHits += workPartCount * REPAIR_POWER
+        repairTarget.nextHits += workPartCount * REPAIR_POWER
 
         // If the structure is a rampart
 
         if (repairTarget.structureType === STRUCTURE_RAMPART) {
             // If the repairTarget will be below or equal to expectations next tick
 
-            /* if (repairTarget.estimatedHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25)  */
+            /* if (repairTarget.nextHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25)  */
             return true
         }
 
         // Otherwise if it isn't a rampart and it will be viable to repair next tick
-        else if (repairTarget.hitsMax - repairTarget.estimatedHits >= workPartCount * REPAIR_POWER) return true
+        else if (repairTarget.hitsMax - repairTarget.nextHits >= workPartCount * REPAIR_POWER) return true
 
         // Otherwise
 

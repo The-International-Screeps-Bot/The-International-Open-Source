@@ -19,7 +19,7 @@ class PowerCreepOrganizer {
         for (const creepName in Memory.powerCreeps) {
             // The creep has been deleted, delete it from memory
 
-            if (!Game.creeps[creepName]) delete Memory.powerCreeps[creepName]
+            if (!Game.powerCreeps[creepName]) delete Memory.powerCreeps[creepName]
         }
 
         // Process and organize existing creeps

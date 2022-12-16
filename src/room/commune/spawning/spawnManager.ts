@@ -194,7 +194,7 @@ export class SpawnManager {
 
         // There is a vivid benefit to powering spawns
 
-        if (!this.inactiveSpawns.length) return
+        if (this.inactiveSpawns.length) return
 
         for (const spawn of this.activeSpawns) {
             this.communeManager.room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)

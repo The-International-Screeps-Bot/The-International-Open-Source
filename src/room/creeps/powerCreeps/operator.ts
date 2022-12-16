@@ -22,7 +22,6 @@ export class Operator extends PowerCreep {
         if (!taskResult) return taskResult === RESULT_FAIL
 
         delete this.memory.TN
-
         return RESULT_SUCCESS
     }
 
@@ -148,7 +147,7 @@ export class Operator extends PowerCreep {
 
             // We don't have enough ops for the task
 
-            if ((POWER_INFO[task.powerType] as any).ops > this.store.ops) continue
+            if ((POWER_INFO[task.powerType] as any).ops > this.nextStore.ops) continue
 
             const taskTargetPos = findObjectWithID(task.targetID).pos
             const range = getRangeOfCoords(this.pos, taskTargetPos)
@@ -164,19 +163,14 @@ export class Operator extends PowerCreep {
             lowestScore = score
             bestTask = task
         }
-        customLog('FIND TASK', bestTask)
-        if (!bestTask) return RESULT_FAIL
 
-        const taskTarget = findObjectWithID(bestTask.targetID)
+        if (!bestTask) return RESULT_FAIL
+        customLog('FIND TASK', findObjectWithID(bestTask.targetID))
+        this.memory.TTID = bestTask.targetID
         this.memory.PT = bestTask.powerType
         delete this.room.powerTasks[bestTask.taskID]
 
-        return taskTarget
-    }
-
-    runPowerTasks?() {
-
-        if (this.runPowerTask() === RESULT_SUCCESS) this.runPowerTask()
+        return findObjectWithID(bestTask.targetID)
     }
 
     runPowerTask?() {
@@ -184,10 +178,11 @@ export class Operator extends PowerCreep {
         const taskTarget = this.findPowerTask()
         if (!taskTarget) return RESULT_FAIL
 
+        taskTarget.reservePowers
         taskTarget._reservePowers.add(this.memory.PT)
 
         // We aren't in range, get closer
-
+        customLog('TRY TASK', taskTarget)
         const minRange = (POWER_INFO[this.memory.PT] as any).range
         if (minRange && getRangeOfCoords(this.pos, taskTarget.pos) > minRange) {
 
@@ -207,6 +202,10 @@ export class Operator extends PowerCreep {
         if (this.usePower(this.memory.PT, taskTarget) !== OK) return RESULT_FAIL
 
         // We did the power
+        customLog('WE DID THE POWA', taskTarget)
+
+        const ops = (POWER_INFO[this.memory.PT] as any).ops
+        if (ops) this.nextStore.ops -= ops
 
         this.powered = true
         delete this.memory.TTID
@@ -223,8 +222,8 @@ export class Operator extends PowerCreep {
             const creep: Operator = Game.powerCreeps[creepName]
 
             if (creep.runTask()) continue
-            creep.runPowerTasks()
-            /* if (creep.runTask()) creep.runTask() */
+            if (creep.runPowerTask() === RESULT_SUCCESS) creep.runPowerTask()
+
         }
     }
 }

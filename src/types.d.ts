@@ -2253,7 +2253,7 @@ declare global {
     // Structures
 
     interface Structure {
-        estimatedHits: number
+        nextHits: number
 
         // Getters
 
@@ -2322,12 +2322,25 @@ declare global {
 
         readonly effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
 
-        _estimatedHits: number
+        _nextHits: number
 
-        estimatedHits: number
+        /**
+         * The estimated hits amount next tick
+         */
+        nextHits: number
+
+        _nextStore: Partial<StoreDefinition>
+
+        /**
+         * The estimated store values next tick
+         */
+        readonly nextStore: Partial<StoreDefinition>
 
         _reserveStore: Partial<StoreDefinition>
 
+        /**
+         * The store values including that reserved by tasks
+         */
         readonly reserveStore: Partial<StoreDefinition>
 
         _reservePowers: Set<PowerConstant>

@@ -38,7 +38,6 @@ export class Duo {
     }
 
     constructor(memberNames: string[]) {
-
         for (let i = 0; i < memberNames.length; i++) {
             const member = Game.creeps[memberNames[i]]
             this.members.push(member)
@@ -51,15 +50,16 @@ export class Duo {
 
         // Ensure the leader is the one with melee parts, if the quad is melee
 
-        if (!(this.leader.parts.attack + this.leader.parts.work) && (this.members[1].parts.attack + this.members[1].parts.work)) {
-
+        if (
+            !(this.leader.parts.attack + this.leader.parts.work) &&
+            this.members[1].parts.attack + this.members[1].parts.work
+        ) {
             this.members.reverse()
             this.leader = this.members[0]
         }
     }
 
     run() {
-
         if (this.runCombatRoom()) return
 
         this.advancedHeal()
@@ -90,11 +90,9 @@ export class Duo {
     }
 
     runCombatRoom() {
-
         if (this.leader.room.name !== this.leader.memory.CRN) return false
 
         if (!this.leader.room.enemyDamageThreat) {
-
             for (const member of this.members) member.runCombat()
             return true
         }
@@ -112,7 +110,6 @@ export class Duo {
     }
 
     getInFormation() {
-
         if (this.leader.room.name === this.members[1].room.name) {
             const range = getRangeOfCoords(this.leader.pos, this.members[1].pos)
             if (range === 1) return true
@@ -158,7 +155,6 @@ export class Duo {
         if (!moveLeader.createMoveRequest(opts)) return
 
         if (getRangeOfCoords(this.leader.pos, this.members[1].pos) > 1) {
-
             this.members[1].createMoveRequest({
                 origin: this.members[1].pos,
                 goals: [
@@ -247,7 +243,10 @@ export class Duo {
 
         // If the squad is outmatched
 
-        if (this.combatStrength.heal + this.combatStrength.ranged < enemyAttacker.combatStrength.heal + enemyAttacker.combatStrength.ranged) {
+        if (
+            this.combatStrength.heal + this.combatStrength.ranged <
+            enemyAttacker.combatStrength.heal + enemyAttacker.combatStrength.ranged
+        ) {
             if (range === 4) {
                 return true
             }
@@ -329,8 +328,8 @@ export class Duo {
 
         // See if the structure is destroyed next tick
 
-        structure.estimatedHits -= this.leader.parts.ranged_attack * RANGED_ATTACK_POWER
-        if (structure.estimatedHits > 0) return true
+        structure.nextHits -= this.leader.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.nextHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -447,8 +446,8 @@ export class Duo {
 
         // See if the structure is destroyed next tick
 
-        structure.estimatedHits -= this.leader.parts.attack * ATTACK_POWER
-        if (structure.estimatedHits > 0) return true
+        structure.nextHits -= this.leader.parts.attack * ATTACK_POWER
+        if (structure.nextHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 
@@ -491,8 +490,8 @@ export class Duo {
 
         // See if the structure is destroyed next tick
 
-        structure.estimatedHits -= this.leader.parts.work * DISMANTLE_POWER
-        if (structure.estimatedHits > 0) return true
+        structure.nextHits -= this.leader.parts.work * DISMANTLE_POWER
+        if (structure.nextHits > 0) return true
 
         // Try to find a new structure to preemptively move to
 

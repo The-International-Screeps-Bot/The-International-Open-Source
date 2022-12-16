@@ -374,7 +374,7 @@ export function basePlanner(room: Room) {
     }
 
     /* room.visualizeCoordMap(room.baseCoords) */
- 
+
     // Try to plan the stamp
 
     path = room.advancedFindPath({
@@ -388,7 +388,7 @@ export function basePlanner(room: Room) {
         !planStamp({
             stampType: 'hub',
             count: 1,
-            startCoords: [path[0]],
+            startCoords: [path[path.length - 1]],
             normalDT: true,
             cardinalFlood: true,
         })
