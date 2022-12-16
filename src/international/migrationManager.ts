@@ -111,6 +111,15 @@ class MigrationManager {
 
             Memory.breakingVersion += 1
         }
+        if (Memory.breakingVersion === 88) {
+
+            for (const creepName in Memory.powerCreeps) {
+
+                Memory.powerCreeps[creepName] = {} as any
+            }
+
+            Memory.breakingVersion += 1
+        }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
             global.killCreeps()
