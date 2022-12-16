@@ -89,10 +89,9 @@ class AllyManager {
         //
 
         if (RawMemory.foreignSegment && RawMemory.foreignSegment.username === currentAllyName) {
-            try {
-                // Get the allyRequests and record them in the allyManager
-                this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
-            } catch (err) {}
+            // Get the allyRequests and record them in the allyManager
+
+            this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
         }
 
         const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]

@@ -16,25 +16,14 @@ class CreepOrganizer {
         // Loop through all of my creeps
 
         for (const creepName in Memory.creeps) {
-            try {
-                this.processCreep(creepName)
-            } catch (err) {
-                customLog(
-                    'Exception processing creep: ' + creepName + err,
-                    (err as any).stack,
-                    {
-                        textColor: myColors.white,
-                        bgColor: myColors.red
-                    }
-                )
-            }
+            this.processCreep(creepName)
         }
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Creep Organizer', cpuUsed.toFixed(2), {
                 textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                bgColor: myColors.lightBlue,
             })
             const statName: InternationalStatNames = 'cocu'
             globalStatsUpdater('', statName, cpuUsed, true)

@@ -106,19 +106,7 @@ export class CreepRoleManager {
 
         // Run manager
 
-        try {
-            managers[role](this.roomManager.room, this.roomManager.room.myCreeps[role])
-        } catch (err) {
-            customLog(
-                'Exception processing creep role: ' + role + ' in ' + this.roomManager.room.name + '. ',
-                err + '\n' + (err as any).stack,
-                {
-                    textColor: myColors.white,
-                    bgColor: myColors.red,
-                    superPosition: 2,
-                },
-            )
-        }
+        managers[role](this.roomManager.room, this.roomManager.room.myCreeps[role])
 
         // Log role stats
 

@@ -25,25 +25,14 @@ class PowerCreepOrganizer {
         // Process and organize existing creeps
 
         for (const creepName in Game.powerCreeps) {
-            try {
-                this.processCreep(creepName)
-            } catch (err) {
-                customLog(
-                    'Exception processing creep: ' + creepName + err,
-                    (err as any).stack,
-                    {
-                        textColor: myColors.white,
-                        bgColor: myColors.red
-                    }
-                )
-            }
+            this.processCreep(creepName)
         }
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Power Creep Organizer', cpuUsed.toFixed(2), {
                 textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                bgColor: myColors.lightBlue,
             })
             const statName: InternationalStatNames = 'pccu'
             globalStatsUpdater('', statName, cpuUsed, true)
