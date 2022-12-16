@@ -231,6 +231,10 @@ declare global {
          * Wether or not to attempt a cardinal flood
          */
         cardinalFlood?: boolean
+        /**
+         * The protection offset of the stamp
+         */
+        protectionOffset?: number
     }
 
     interface FindClosestPosOfValueOptsAsym extends FindClosestPosOfValueOpts {
@@ -1477,6 +1481,10 @@ declare global {
         _unprotectedEnemyCreeps: Creep[]
 
         readonly unprotectedEnemyCreeps: Creep[]
+
+        _exitCoords: Set<string>
+
+        readonly exitCoords: Set<string>
 
         // Target finding
 

@@ -265,7 +265,7 @@ export const numbersByStructureTypes = {
     16: STRUCTURE_OBSERVER,
 }
 
-export const myColors = {
+export const customColors = {
     white: '#ffffff',
     lightGrey: '#eaeaea',
     midGrey: '#bcbcbc',
@@ -305,7 +305,7 @@ export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
 export const stamps: Record<StampTypes, Stamp> = {
     fastFiller: {
         offset: 3,
-        protectionOffset: 6,
+        protectionOffset: 7,
         size: 4,
         structures: {
             extension: [
@@ -393,7 +393,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     extensions: {
         offset: 2,
-        protectionOffset: 3,
+        protectionOffset: 4,
         size: 3,
         structures: {
             extension: [
@@ -1151,9 +1151,4 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
     [HEAL]: HEAL,
 }
 
-export const rangedMassAttackMultiplierByRange = [
-    1,
-    1,
-    0.4,
-    0.1
-]
+export const rangedMassAttackMultiplierByRange = [1, 1, 0.4, 0.1]

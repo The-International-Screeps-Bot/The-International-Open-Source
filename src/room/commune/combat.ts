@@ -1,4 +1,4 @@
-import { myColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
+import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick } from 'international/utils'
 import { packCoord } from 'other/packrat'
@@ -15,7 +15,6 @@ export class CombatManager {
     }
 
     run() {
-
         // If CPU logging is enabled, get the CPU used at the start
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
@@ -29,8 +28,8 @@ export class CombatManager {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Defense Manager', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue,
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'dmcu'
             globalStatsUpdater(this.communeManager.room.name, statName, cpuUsed)

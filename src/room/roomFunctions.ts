@@ -9,7 +9,7 @@ import {
     maxRampartGroupSize,
     maxRemoteRoomDistance,
     minHarvestWorkRatio,
-    myColors,
+    customColors,
     numbersByStructureTypes,
     PlayerData,
     prefferedCommuneRange,
@@ -30,6 +30,7 @@ import {
     findClosestCommuneName,
     findCoordsInsideRect,
     getRange,
+    isNearRoomEdge,
     newID,
     packAsNum,
     packXYAsNum,
@@ -57,8 +58,8 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
     // Construct colors for each type
 
     const colorsForTypes: { [key: string]: string } = {
-        success: myColors.lightBlue,
-        fail: myColors.red,
+        success: customColors.lightBlue,
+        fail: customColors.red,
     }
 
     // If no type, type is success. Construct type from color
@@ -75,7 +76,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
 Room.prototype.targetVisual = function (coord1, coord2, visualize = Memory.roomVisuals) {
     if (!visualize) return
 
-    this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, { color: myColors.green, opacity: 0.3 })
+    this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, { color: customColors.green, opacity: 0.3 })
 }
 
 /**
@@ -469,8 +470,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
         if (pathFinderResult.incomplete) {
             customLog('Incomplete Path', `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`, {
-                textColor: myColors.white,
-                bgColor: myColors.red,
+                textColor: customColors.white,
+                bgColor: customColors.red,
             })
 
             room.pathVisual(pathFinderResult.path, 'red')
@@ -484,7 +485,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (lastPos.roomName !== goal.pos.roomName) continue
 
                 room.visual.line(lastPos, goal.pos, {
-                    color: myColors.red,
+                    color: customColors.red,
                     width: 0.15,
                     opacity: 0.3,
                     lineStyle: 'solid',
@@ -1346,20 +1347,50 @@ Room.prototype.findClosestPosOfValue = function (opts) {
     if (opts.visuals) {
         for (const coord of opts.startCoords)
             this.visual.circle(coord.x, coord.y, {
-                stroke: myColors.yellow,
+                stroke: customColors.yellow,
             })
     }
 
     /**
      *
      */
-    function isViableAnchor(coord1: Coord): boolean {
+    function isViableAnchor(coord1: Coord, iterations: number): boolean {
         // Get the value of the pos4271
 
         const posValue = opts.coordMap[packAsNum(coord1)]
         if (posValue === 255) return false
         if (posValue === 0) return false
 
+        // We don't want to plan to close to exits for target given value
+
+
+        if (opts.protectionOffset) {
+
+            if (isNearRoomEdge(coord1, opts.protectionOffset)) {
+                const nearbyCoords = findCoordsInsideRect(
+                    coord1.x - opts.protectionOffset,
+                    coord1.y - opts.protectionOffset,
+                    coord1.x + opts.protectionOffset,
+                    coord1.y + opts.protectionOffset,
+                )
+
+                for (const coord of nearbyCoords) {
+
+                    if (room.exitCoords.has(packCoord(coord))) {
+
+                        room.visual.circle(coord1.x, coord1.y, { fill: customColors.red })
+                        return false
+                    }
+                }
+            }
+        }
+
+/*
+        if (opts.spaceFromExits && iterations <= opts.requiredValue) {
+            room.visual.circle(coord1.x, coord1.y, { fill: customColors.red })
+            return false
+        }
+ */
         // If the posValue is less than the requiredValue, inform false
 
         if (posValue < opts.requiredValue) return false
@@ -1418,7 +1449,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1, i)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
@@ -1476,7 +1507,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1, i)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
@@ -1517,7 +1548,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1, i)) return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
@@ -1549,7 +1580,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
                         font: 0.5,
-                        color: myColors.yellow,
+                        color: customColors.yellow,
                     })
             }
 
@@ -1574,7 +1605,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
     if (opts.visuals) {
         for (const coord of opts.startCoords)
             this.visual.circle(coord.x, coord.y, {
-                stroke: myColors.yellow,
+                stroke: customColors.yellow,
             })
     }
 
@@ -1794,7 +1825,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                 for (const coord of nextGeneration)
                     this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
                         font: 0.5,
-                        color: myColors.yellow,
+                        color: customColors.yellow,
                     })
             }
 
@@ -1834,7 +1865,7 @@ Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisual
     // Generate the visual
 
     this.visual.poly(path, {
-        stroke: myColors[color],
+        stroke: customColors[color],
         strokeWidth: 0.15,
         opacity: 0.3,
     })
@@ -1845,7 +1876,7 @@ Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {
 
     this.visual.circle(coord.x, coord.y, {
         fill: '',
-        stroke: myColors.red,
+        stroke: customColors.red,
         radius: 0.5,
         strokeWidth: 0.15,
         opacity: 0.3,

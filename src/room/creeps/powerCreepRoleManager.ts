@@ -1,4 +1,4 @@
-import { myColors, powerCreepClassNames } from 'international/constants'
+import { customColors, powerCreepClassNames } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import { RoomManager } from 'room/roomManager'
@@ -31,8 +31,8 @@ export class PowerCreepRoleManager {
                 ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
                 : 0
             customLog('Power Role Manager', `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`, {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue,
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'prmcu'
             const statName2: RoomCommuneStatNames = 'prmpccu'

@@ -1,6 +1,6 @@
 import {
     mmoShardNames,
-    myColors,
+    customColors,
     offsetsByDirection,
     RemoteData,
     roomDimensions,
@@ -123,8 +123,8 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
     if (!Memory.logging) return
 
     if (!opts) opts = {}
-    if (!opts.textColor) opts.textColor = myColors.black
-    if (!opts.bgColor) opts.bgColor = myColors.white
+    if (!opts.textColor) opts.textColor = customColors.black
+    if (!opts.bgColor) opts.bgColor = customColors.white
 
     // Create the title
 
@@ -377,9 +377,9 @@ export function findCPUColor(): string {
 
     // Inform color based on percent of cpu used of limit
 
-    if (CPU > Game.cpu.limit * 0.6) return myColors.green
-    if (CPU > Game.cpu.limit * 0.9) return myColors.green
-    return myColors.green
+    if (CPU > Game.cpu.limit * 0.6) return customColors.green
+    if (CPU > Game.cpu.limit * 0.9) return customColors.green
+    return customColors.green
 }
 
 export function createPosMap(innerArray?: boolean, initialValue?: string | number) {
@@ -559,12 +559,10 @@ export function cleanRoomMemory(roomName: string) {
 }
 
 export function findSquadTradeableParts(tradeTypes: { [tradeType: string]: number }, totalTradeableParts: number) {
-
     let smallestTradeType: string
     let smallestRatio = Infinity
 
     for (const type in tradeTypes) {
-
         const ratio = tradeTypes[type] / totalTradeableParts
 
         if (ratio >= smallestRatio) continue
@@ -574,6 +572,15 @@ export function findSquadTradeableParts(tradeTypes: { [tradeType: string]: numbe
     }
 
     return Math.ceil(tradeTypes[smallestTradeType] * smallestRatio * 1.5)
+}
+
+export function isNearRoomEdge(coord: Coord, minRange: number) {
+
+    if (coord.x <= minRange) return true
+    if (coord.x - roomDimensions - 1 <= minRange) return true
+    if (coord.y <= minRange) return true
+    if (coord.y - roomDimensions - 1 <= minRange) return true
+    return false
 }
 
 /*

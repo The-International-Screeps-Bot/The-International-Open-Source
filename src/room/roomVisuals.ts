@@ -2,7 +2,7 @@ import {
     ClaimRequestData,
     CombatRequestData,
     HaulRequestData,
-    myColors,
+    customColors,
     NORMAL,
     PROTECTED,
     RemoteData,
@@ -37,8 +37,8 @@ export class RoomVisualsManager {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Room Visuals Manager', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'rvmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -77,8 +77,8 @@ export class RoomVisualsManager {
                         backgroundColor: 'rgb(255, 0, 0, 0)',
                         font: 0.5,
                         opacity: 1,
-                        color: myColors.lightBlue,
-                        stroke: myColors.white,
+                        color: customColors.lightBlue,
+                        stroke: customColors.white,
                         strokeWidth: 0.03,
                     },
                 )
@@ -104,14 +104,14 @@ export class RoomVisualsManager {
 
             const color = () => {
                 if (this.roomManager.room.controller.reservation.username === Memory.me) {
-                    return myColors.lightBlue
+                    return customColors.lightBlue
                 }
 
                 if (Memory.allyPlayers.includes(this.roomManager.room.controller.reservation.username)) {
-                    return myColors.green
+                    return customColors.green
                 }
 
-                return myColors.red
+                return customColors.red
             }
 
             // Show the reservation time
@@ -124,7 +124,7 @@ export class RoomVisualsManager {
                     font: 0.5,
                     opacity: 0.8,
                     color: color(),
-                    stroke: myColors.white,
+                    stroke: customColors.white,
                     strokeWidth: 0.03,
                 },
             )
@@ -154,8 +154,8 @@ export class RoomVisualsManager {
                 backgroundColor: 'rgb(255, 0, 0, 0)',
                 font: 0.5,
                 opacity: 1,
-                color: myColors.lightBlue,
-                stroke: myColors.white,
+                color: customColors.lightBlue,
+                stroke: customColors.white,
                 strokeWidth: 0.03,
             })
 
@@ -169,8 +169,8 @@ export class RoomVisualsManager {
                     backgroundColor: 'rgb(255, 0, 0, 0)',
                     font: 0.5,
                     opacity: 1,
-                    color: myColors.lightBlue,
-                    stroke: myColors.white,
+                    color: customColors.lightBlue,
+                    stroke: customColors.white,
                     strokeWidth: 0.03,
                 },
             )
@@ -598,10 +598,7 @@ export class RoomVisualsManager {
         return y + height
     }
 
-    requestDataVisuals(y: number) {
-
-        
-    }
+    requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
         const headers: any[] = ['remote', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']

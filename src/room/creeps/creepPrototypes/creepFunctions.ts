@@ -7,7 +7,7 @@ import {
     defaultCreepSwampCost,
     defaultPlainCost,
     impassibleStructureTypes,
-    myColors,
+    customColors,
     nonCommuneSigns,
     quadAttackMemberOffsets,
     roomDimensions,
@@ -838,7 +838,11 @@ Creep.prototype.passiveRenew = function () {
     // Get a spawn in range of 1, informing false if there are none
 
     const spawn = spawns.find(
-        spawn => getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 && !spawn.renewed && !spawn.spawning && spawn.RCLActionable,
+        spawn =>
+            getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
+            !spawn.renewed &&
+            !spawn.spawning &&
+            spawn.RCLActionable,
     )
     if (!spawn) return
 
@@ -1153,7 +1157,7 @@ Creep.prototype.fulfillReservation = function () {
 
     if (Memory.roomVisuals)
         room.visual.line(this.pos, target.pos, {
-            color: myColors.green,
+            color: customColors.green,
             opacity: 0.2,
         })
 
@@ -1404,7 +1408,6 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
             visitedCoords.add(packedCoord)
 
             for (const structure of this.room.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
-
                 if (structure.structureType === STRUCTURE_KEEPER_LAIR) continue
 
                 if (

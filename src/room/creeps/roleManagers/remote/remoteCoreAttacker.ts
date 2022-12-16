@@ -1,4 +1,4 @@
-import { myColors, RemoteData } from 'international/constants'
+import { customColors, RemoteData } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
@@ -48,7 +48,12 @@ export class RemoteCoreAttacker extends Creep {
      * Finds a remote
      */
     findRemote?(): boolean {
-        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
+        if (
+            this.memory.RN &&
+            Memory.rooms[this.memory.RN].T === 'remote' &&
+            Memory.rooms[this.memory.RN].CN === this.commune.name
+        )
+            return true
 
         // Otherwise, get the creep's role
 

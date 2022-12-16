@@ -1,4 +1,4 @@
-import { myColors, relayOffsets, RemoteData } from 'international/constants'
+import { customColors, relayOffsets, RemoteData } from 'international/constants'
 import {
     customLog,
     findClosestObject,
@@ -46,7 +46,12 @@ export class RemoteHauler extends Creep {
      * Finds a remote to haul from
      */
     findRemote?(): boolean {
-        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
+        if (
+            this.memory.RN &&
+            Memory.rooms[this.memory.RN].T === 'remote' &&
+            Memory.rooms[this.memory.RN].CN === this.commune.name
+        )
+            return true
 
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
@@ -135,17 +140,15 @@ export class RemoteHauler extends Creep {
 
             // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-            this.createMoveRequest(
-                {
-                    origin: this.pos,
-                    goals: [
-                        {
-                            pos: this.commune.anchor,
-                            range: 25,
-                        },
-                    ],
-                },
-            )
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: this.commune.anchor,
+                        range: 25,
+                    },
+                ],
+            })
 
             return false
         }
@@ -460,7 +463,7 @@ export class RemoteHauler extends Creep {
     }
 
     relayCoord?(coord: Coord) {
-        if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: myColors.lightBlue })
+        if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
 
         const creepAtPosName = this.room.creepPositions.get(packCoord(coord))
         if (!creepAtPosName) return false

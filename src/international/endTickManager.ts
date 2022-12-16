@@ -1,4 +1,4 @@
-import { myColors } from 'international/constants'
+import { customColors } from 'international/constants'
 import { customLog, findCPUColor } from 'international/utils'
 import { allyManager } from 'international/simpleAllies'
 import { InternationalManager } from './internationalManager'
@@ -17,14 +17,10 @@ InternationalManager.prototype.endTickManager = function () {
 
     const CPUColor = findCPUColor()
 
-    customLog(
-        'Total CPU',
-        `${Game.cpu.getUsed().toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`,
-        {
-            textColor: myColors.white,
-            bgColor: CPUColor
-        },
-    )
+    customLog('Total CPU', `${Game.cpu.getUsed().toFixed(2)} / ${Game.cpu.limit} CPU Bucket: ${Game.cpu.bucket}`, {
+        textColor: customColors.white,
+        bgColor: CPUColor,
+    })
 
     // Log the accumilated global logs
 

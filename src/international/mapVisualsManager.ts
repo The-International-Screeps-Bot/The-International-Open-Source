@@ -1,5 +1,5 @@
 import { unpackPosList } from 'other/packrat'
-import { minHarvestWorkRatio, myColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
+import { minHarvestWorkRatio, customColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
 import { customLog } from './utils'
 import { InternationalManager } from './internationalManager'
 import { globalStatsUpdater } from './statsManager'
@@ -39,7 +39,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     room.anchor || new RoomPosition(25, 25, roomName),
                     new RoomPosition(25, 25, roomMemory.claimRequest),
                     {
-                        color: myColors.lightBlue,
+                        color: customColors.lightBlue,
                         width: 1.2,
                         opacity: 0.3,
                     },
@@ -51,7 +51,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     room.anchor || new RoomPosition(25, 25, roomName),
                     new RoomPosition(25, 25, roomMemory.allyCreepRequest),
                     {
-                        color: myColors.green,
+                        color: customColors.green,
                         width: 1.2,
                         opacity: 0.3,
                     },
@@ -64,7 +64,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                         room.anchor || new RoomPosition(25, 25, roomName),
                         new RoomPosition(25, 25, requestName),
                         {
-                            color: myColors.red,
+                            color: customColors.red,
                             width: 1.2,
                             opacity: 0.3,
                         },
@@ -87,7 +87,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     // Draw a line from the center of the remote to the best harvest pos
 
                     Game.map.visual.line(positions[0], commune.anchor || new RoomPosition(25, 25, commune.name), {
-                        color: myColors.yellow,
+                        color: customColors.yellow,
                         width: 1.2,
                         opacity: 0.3,
                     })
@@ -125,7 +125,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
 
         if (roomMemory.NC) {
             Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
-                stroke: myColors.red,
+                stroke: customColors.red,
                 strokeWidth: 2,
                 fill: 'transparent',
             })
@@ -160,8 +160,8 @@ InternationalManager.prototype.mapVisualsManager = function () {
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Map Visuals Manager', cpuUsed.toFixed(2), {
-            textColor: myColors.white,
-            bgColor: myColors.lightBlue
+            textColor: customColors.white,
+            bgColor: customColors.lightBlue,
         })
         const statName: InternationalStatNames = 'mvmcu'
         globalStatsUpdater('', statName, cpuUsed, true)

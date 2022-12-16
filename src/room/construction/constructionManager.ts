@@ -1,4 +1,4 @@
-import { myColors, stamps } from 'international/constants'
+import { customColors, stamps } from 'international/constants'
 import { customLog } from 'international/utils'
 import { basePlanner } from './communePlanner'
 import { rampartPlanner } from './rampartPlanner'
@@ -52,8 +52,8 @@ export function constructionManager(room: Room) {
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Construction Manager', cpuUsed.toFixed(2), {
-            textColor: myColors.white,
-            bgColor: myColors.lightBlue
+            textColor: customColors.white,
+            bgColor: customColors.lightBlue,
         })
         const statName: RoomCommuneStatNames = 'cmcu'
         globalStatsUpdater(room.name, statName, cpuUsed)

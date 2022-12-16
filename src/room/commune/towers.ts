@@ -1,4 +1,4 @@
-import { myColors } from 'international/constants'
+import { customColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, randomTick } from 'international/utils'
 import { packCoord } from 'other/packrat'
@@ -42,8 +42,8 @@ export class TowerManager {
         if (Memory.CPULogging) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Tower Manager', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'tmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)

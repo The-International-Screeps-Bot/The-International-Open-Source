@@ -1,4 +1,4 @@
-import { RESULT_FAIL, myColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS } from 'international/constants'
+import { RESULT_FAIL, customColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS } from 'international/constants'
 import { customLog, findObjectWithID, getRangeOfCoords } from 'international/utils'
 
 export class Operator extends PowerCreep {
@@ -178,7 +178,11 @@ export class Operator extends PowerCreep {
 
             // The target doesn't need us yet or we can't yet provide
 
-            if (Math.max(task.cooldown, this.powerCooldowns.get(task.powerType) || 0) > range + (POWER_INFO[task.powerType] as any).range + 2) continue
+            if (
+                Math.max(task.cooldown, this.powerCooldowns.get(task.powerType) || 0) >
+                range + (POWER_INFO[task.powerType] as any).range + 3
+            )
+                continue
 
             let score = task.priority + range / 100
 

@@ -3,7 +3,7 @@ import {
     defaultRoadPlanningPlainCost,
     defaultSwampCost,
     impassibleStructureTypes,
-    myColors,
+    customColors,
     remoteTypeWeights,
     roomDimensions,
     structureTypesByBuildPriority,
@@ -411,12 +411,11 @@ Object.defineProperties(Room.prototype, {
             // We own the room, attack enemy owned structures
 
             if (this.controller && this.controller.my) {
-
                 return (this._dismantleTargets = this.find(FIND_STRUCTURES, {
                     filter: structure =>
                         (structure as OwnedStructure).owner &&
                         !(structure as OwnedStructure).my &&
-                        structure.structureType !== STRUCTURE_INVADER_CORE
+                        structure.structureType !== STRUCTURE_INVADER_CORE,
                 }))
             }
 
@@ -429,7 +428,6 @@ Object.defineProperties(Room.prototype, {
                     structure.structureType !== STRUCTURE_CONTROLLER &&
                     structure.structureType !== STRUCTURE_INVADER_CORE &&
                     structure.structureType !== STRUCTURE_KEEPER_LAIR &&
-
                     // We don't want to attack respawn or novice zone walls with infinite hits
 
                     structure.hits,
@@ -922,7 +920,7 @@ Object.defineProperties(Room.prototype, {
 
                 const coord = unpackCoord(packedCoord)
 
-                this.visual.circle(coord.x, coord.y, { fill: myColors.red })
+                this.visual.circle(coord.x, coord.y, { fill: customColors.red })
             }
  */
             return this._usedUpgradePositions
@@ -1813,7 +1811,7 @@ Object.defineProperties(Room.prototype, {
 
                 const coord = unpackCoord(packedCoord)
 
-                this.visual.circle(coord.x, coord.y, { fill: myColors.red })
+                this.visual.circle(coord.x, coord.y, { fill: customColors.red })
             }
  */
             return this._enemyThreatCoords
@@ -2033,6 +2031,21 @@ Object.defineProperties(Room.prototype, {
                 return !this.coordHasStructureTypes(enemyCreep.pos, avoidStructureTypes)
             }))
         },
+    },
+    exitCoords: {
+        get() {
+
+            if (this._exitCoords) return this._exitCoords
+
+            this._exitCoords = new Set()
+
+            for (const exit of this.find(FIND_EXIT)) {
+
+                this._exitCoords.add(packCoord(exit))
+            }
+
+            return this._exitCoords
+        }
     },
     MEWT: {
         get() {

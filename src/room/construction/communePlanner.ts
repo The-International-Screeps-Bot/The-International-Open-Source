@@ -4,7 +4,7 @@ import {
     defaultRoadPlanningPlainCost,
     EXIT,
     maxRampartGroupSize,
-    myColors,
+    customColors,
     NORMAL,
     PROTECTED,
     roadUpkeepCost,
@@ -134,7 +134,6 @@ export function basePlanner(room: Room) {
     let closestSourceToControllerRange = Infinity
 
     for (const source of sources) {
-
         const range = room.advancedFindPath({
             origin: source.pos,
             goals: [{ pos: room.controller.pos, range: 1 }],
@@ -150,11 +149,8 @@ export function basePlanner(room: Room) {
 
     let avgControllerSourcePos: RoomPosition
     if (closestSourceToControllerRange <= 1) {
-
         avgControllerSourcePos = closestSourceToController.pos
-    }
-    else {
-
+    } else {
         path = room.advancedFindPath({
             origin: closestSourceToController.pos,
             goals: [{ pos: room.controller.pos, range: 1 }],
@@ -279,6 +275,7 @@ export function basePlanner(room: Room) {
                       offset: stamp.offset,
                       asymOffset: stamp.asymmetry,
                       cardinalFlood: opts.cardinalFlood,
+                      protectionOffset: stamp.protectionOffset,
                       /* visuals: opts.stampType === 'labs', */
                   })
                 : room.findClosestPosOfValue({
@@ -290,6 +287,7 @@ export function basePlanner(room: Room) {
                       adjacentToRoads: opts.adjacentToRoads,
                       roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
                       cardinalFlood: opts.cardinalFlood,
+                      protectionOffset: stamp.protectionOffset,
                       /* visuals: opts.stampType === 'extension' */
                   })
 
@@ -378,7 +376,10 @@ export function basePlanner(room: Room) {
     // Try to plan the stamp
 
     path = room.advancedFindPath({
-        origin: getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3 ? closestSourceToController.pos : avgControllerSourcePos,
+        origin:
+            getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3
+                ? closestSourceToController.pos
+                : avgControllerSourcePos,
         goals: [{ pos: room.anchor, range: 3 }],
         weightCoordMaps: [room.roadCoords],
         plainCost: defaultRoadPlanningPlainCost,

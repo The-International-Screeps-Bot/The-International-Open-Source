@@ -1,4 +1,4 @@
-import { impassibleStructureTypes, myColors } from 'international/constants'
+import { impassibleStructureTypes, customColors } from 'international/constants'
 import {
     areCoordsEqual,
     customLog,
@@ -81,12 +81,12 @@ export class MeleeDefender extends Creep {
 
         const enemyCreep = findClosestObject(this.pos, enemyCreeps)
 
-        if (Memory.roomVisuals) this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+        if (Memory.roomVisuals)
+            this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
 
         // If out of range move to it
 
         if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
-
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: enemyCreep.pos, range: 1 }],
@@ -177,11 +177,11 @@ export class MeleeDefender extends Creep {
                 )
  */
 
-            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, { color: myColors.yellow })
+            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, { color: customColors.yellow })
 
             this.room.targetVisual(this.pos, enemyCreep.pos)
 
-            room.visual.circle(enemyCreep.pos, { fill: myColors.green })
+            room.visual.circle(enemyCreep.pos, { fill: customColors.green })
         }
 
         // If the creep is range 0 to the closestRampart, inform false

@@ -1,4 +1,4 @@
-import { myColors, partsByPriority, partsByPriorityPartType } from 'international/constants'
+import { customColors, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import { CommuneManager } from '../communeManager'
@@ -18,7 +18,7 @@ export class SpawnManager {
      * Find spawns that are inactive and active
      * Assign spawnIDs to creeps
      */
-     public organizeSpawns() {
+    public organizeSpawns() {
         const spawns = this.communeManager.structures.spawn
         if (!spawns.length) return
 
@@ -57,8 +57,8 @@ export class SpawnManager {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Spawn Manager', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue,
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'smcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -94,8 +94,8 @@ export class SpawnManager {
                     'Failed to spawn',
                     `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${request.cost}, body: (${request.bodyPartCounts}) ${request.body}`,
                     {
-                        textColor: myColors.white,
-                        bgColor: myColors.red,
+                        textColor: customColors.white,
+                        bgColor: customColors.red,
                     },
                 )
 
@@ -117,8 +117,8 @@ export class SpawnManager {
                     'Failed to spawn',
                     `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                     {
-                        textColor: myColors.white,
-                        bgColor: myColors.red,
+                        textColor: customColors.white,
+                        bgColor: customColors.red,
                     },
                 )
                 /*

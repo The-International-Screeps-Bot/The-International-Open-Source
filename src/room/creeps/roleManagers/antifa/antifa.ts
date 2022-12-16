@@ -1,4 +1,4 @@
-import { allowedSquadCombinations, antifaRoles, myColors } from 'international/constants'
+import { allowedSquadCombinations, antifaRoles, customColors } from 'international/constants'
 import { customLog, findClosestObject, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { Duo } from './duo'
@@ -258,7 +258,7 @@ export class Antifa extends Creep {
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             if (Memory.roomVisuals)
-                this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+                this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
 
             // Get the range between the creeps
 
@@ -288,7 +288,7 @@ export class Antifa extends Creep {
 
         const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, enemyAttacker.pos, { color: customColors.green, opacity: 0.3 })
 
         // Get the range between the creeps
 
@@ -361,7 +361,8 @@ export class Antifa extends Creep {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
-        if (Memory.roomVisuals) this.room.visual.line(this.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+        if (Memory.roomVisuals)
+            this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
         if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 3) {
             this.createMoveRequest({
@@ -420,7 +421,7 @@ export class Antifa extends Creep {
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             if (Memory.roomVisuals)
-                this.room.visual.line(this.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+                this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
 
             // If the range is more than 1
 
@@ -443,7 +444,7 @@ export class Antifa extends Creep {
 
         const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, enemyAttacker.pos, { color: customColors.green, opacity: 0.3 })
 
         // If the range is more than 1
 
@@ -474,7 +475,8 @@ export class Antifa extends Creep {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
-        if (Memory.roomVisuals) this.room.visual.line(this.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+        if (Memory.roomVisuals)
+            this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
         if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
@@ -517,7 +519,8 @@ export class Antifa extends Creep {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
-        if (Memory.roomVisuals) this.room.visual.line(this.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+        if (Memory.roomVisuals)
+            this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
         if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({

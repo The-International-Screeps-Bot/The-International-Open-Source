@@ -6,7 +6,7 @@ import {
     ClaimRequestData,
     CPUBucketCapacity,
     mmoShardNames,
-    myColors,
+    customColors,
     roomDimensions,
 } from './constants'
 

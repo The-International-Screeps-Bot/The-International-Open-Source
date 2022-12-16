@@ -3,7 +3,7 @@ import {
     EXIT,
     maxRampartGroupSize,
     minOnboardingRamparts,
-    myColors,
+    customColors,
     NORMAL,
     PROTECTED,
     roomDimensions,
@@ -151,7 +151,7 @@ export class RampartPlanner {
 
                     if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: myColors.yellow,
+                            fill: customColors.yellow,
                             opacity: 0.3,
                         })
                         continue
@@ -159,7 +159,7 @@ export class RampartPlanner {
 
                     if (tileType === PROTECTED) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: myColors.green,
+                            fill: customColors.green,
                             opacity: 0.3,
                         })
                         continue
@@ -167,7 +167,7 @@ export class RampartPlanner {
 
                     if (tileType === UNWALKABLE) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: myColors.red,
+                            fill: customColors.red,
                             opacity: 0.3,
                         })
                         continue
@@ -1072,21 +1072,21 @@ export function rampartPlanner(room: Room) {
                     const tileType = room.tileCoords[packXYAsNum(x, y)]
                     if (tileType === NORMAL) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: myColors.yellow,
+                            fill: customColors.yellow,
                             opacity: 0.3,
                         })
                         continue
                     }
                     if (tileType === PROTECTED) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: myColors.green,
+                            fill: customColors.green,
                             opacity: 0.3,
                         })
                         continue
                     }
                     if (tileType === UNWALKABLE) {
                         room.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                            fill: myColors.red,
+                            fill: customColors.red,
                             opacity: 0.3,
                         })
                         continue

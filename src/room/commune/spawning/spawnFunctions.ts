@@ -1,4 +1,4 @@
-import { myColors, partsByPriority } from 'international/constants'
+import { customColors, partsByPriority } from 'international/constants'
 import { internationalManager } from 'international/internationalManager'
 import { customLog, newID } from 'international/utils'
 
@@ -262,8 +262,8 @@ Room.prototype.spawnRequestByGroup = function (opts) {
     //Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
     if (opts.extraParts.length == 0) {
         customLog('spawnRequestByGroup error', '0 length extraParts?' + JSON.stringify(opts), {
-            textColor: myColors.white,
-            bgColor: myColors.red,
+            textColor: customColors.white,
+            bgColor: customColors.red,
         })
         return
     }

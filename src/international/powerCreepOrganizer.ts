@@ -1,5 +1,5 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { myColors, remoteRoles } from './constants'
+import { customColors, remoteRoles } from './constants'
 import { customLog } from './utils'
 import { internationalManager, InternationalManager } from './internationalManager'
 import { packCoord } from 'other/packrat'
@@ -31,8 +31,8 @@ class PowerCreepOrganizer {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Power Creep Organizer', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue,
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: InternationalStatNames = 'pccu'
             globalStatsUpdater('', statName, cpuUsed, true)

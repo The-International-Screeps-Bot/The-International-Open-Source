@@ -1,6 +1,6 @@
 import {
     CombatRequestData,
-    myColors,
+    customColors,
     numbersByStructureTypes,
     quadAttackMemberOffsets,
     quadTransformIndexes,
@@ -124,7 +124,7 @@ export class Quad {
         for (const packedCoord of this._enemyThreatCoords) {
             const coord = unpackCoord(packedCoord)
 
-            this.leader.room.visual.circle(coord.x, coord.y, { fill: myColors.red })
+            this.leader.room.visual.circle(coord.x, coord.y, { fill: customColors.red })
         }
 
         return this._enemyThreatCoords
@@ -136,7 +136,6 @@ export class Quad {
         this._enemyThreatGoals = []
 
         for (const enemyCreep of this.leader.room.enemyAttackers) {
-
             // The enemy is weak enough to be ignored
 
             if (
@@ -751,7 +750,10 @@ export class Quad {
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
             if (Memory.roomVisuals)
-                this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, { color: myColors.green, opacity: 0.3 })
+                this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
+                    color: customColors.green,
+                    opacity: 0.3,
+                })
 
             // Get the range between the creeps
 
@@ -783,7 +785,10 @@ export class Quad {
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
         if (Memory.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, { color: myColors.green, opacity: 0.3 })
+            this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         const range = this.findMinRange(enemyAttacker.pos)
 
@@ -905,7 +910,7 @@ export class Quad {
 
         let structure = findClosestObject(this.leader.pos, structures)
         if (Memory.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: myColors.green, opacity: 0.3 })
+            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
         const range = this.findMinRange(structure.pos)
 

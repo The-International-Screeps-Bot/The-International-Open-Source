@@ -1,4 +1,4 @@
-import { myColors } from './constants'
+import { customColors } from './constants'
 import { customLog } from './utils'
 
 const CPUUsers: CpuUsers = {
@@ -244,8 +244,8 @@ export class StatsManager {
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
             customLog('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
-                textColor: myColors.white,
-                bgColor: myColors.red,
+                textColor: customColors.white,
+                bgColor: customColors.red,
             })
             return
         }
@@ -463,8 +463,8 @@ export class StatsManager {
                 smcu: this.average(CPUUsers.smcu, cpuUsed),
             }
             customLog('Stats Manager', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue,
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
         } else {
             Memory.stats.CPUUsers = {

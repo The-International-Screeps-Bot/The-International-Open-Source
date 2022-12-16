@@ -1,4 +1,4 @@
-import { myColors, roomTypesUsedForStats } from '../international/constants'
+import { customColors, roomTypesUsedForStats } from '../international/constants'
 
 import './roomFunctions'
 
@@ -59,8 +59,8 @@ export function roomsManager() {
             globalStatsUpdater(roomName, statName, cpuUsed)
         }
         customLog(room.name + ' ' + roomType, logMessage, {
-            textColor: myColors.white,
-            bgColor: myColors.lightBlue,
+            textColor: customColors.white,
+            bgColor: customColors.lightBlue,
             superPosition: 2,
         })
         if (statsActive) statsManager.roomEndTick(room.name, roomType)
@@ -71,8 +71,8 @@ export function roomsManager() {
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Room Manager', cpuUsed.toFixed(2), {
-            textColor: myColors.white,
-            bgColor: myColors.lightBlue,
+            textColor: customColors.white,
+            bgColor: customColors.lightBlue,
             superPosition: 1,
         })
         const statName: InternationalStatNames = 'roomcu'

@@ -1,4 +1,4 @@
-import { chant, myColors, powerCreepClassNames } from 'international/constants'
+import { chant, customColors, powerCreepClassNames } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, randomTick } from 'international/utils'
 import { RoomManager } from '../roomManager'
@@ -32,7 +32,6 @@ export class EndTickCreepManager {
         // Normal creeps go second
 
         for (const role in this.roomManager.room.myCreeps) {
-
             for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
                 const creep = Game.creeps[creepName]
 
@@ -48,8 +47,8 @@ export class EndTickCreepManager {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('End Tick Creep Manager', cpuUsed.toFixed(2), {
-                textColor: myColors.white,
-                bgColor: myColors.lightBlue
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'etcmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
@@ -57,7 +56,6 @@ export class EndTickCreepManager {
     }
 
     private runChant() {
-
         if (!Memory.doChant) return
 
         const currentChant = chant[Memory.chantIndex]

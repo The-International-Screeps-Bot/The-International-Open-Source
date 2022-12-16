@@ -3,7 +3,7 @@ import {
     defaultPlainCost,
     impassibleStructureTypes,
     impassibleStructureTypesSet,
-    myColors,
+    customColors,
     offsetsByDirection,
     RemoteData,
     roomDimensions,
@@ -68,10 +68,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
     return false
 }
 
-PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (
-    opts,
-    pathOpts
-) {
+PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (opts, pathOpts) {
     // Stop if the we know the creep won't move
 
     if (this.moveRequest) return false
@@ -84,7 +81,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     const index = pathOpts.packedPath.indexOf(packPos(this.pos))
 
     if (index >= 0) {
-
         if (index + 2 >= pathOpts.packedPath.length) {
             // If loose is enabled, don't try to get back on the cached path
 
@@ -190,7 +186,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         if (Memory.roomVisuals)
             room.visual.text('NP', path[0], {
                 align: 'center',
-                color: myColors.lightBlue,
+                color: customColors.lightBlue,
                 opacity: 0.5,
                 font: 0.5,
             })
@@ -214,7 +210,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         path.length > 1
             ? room.pathVisual(path, 'lightBlue')
             : room.visual.line(this.pos, path[0], {
-                  color: myColors.lightBlue,
+                  color: customColors.lightBlue,
                   opacity: 0.3,
               })
 
@@ -223,7 +219,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     } else {
         if (Memory.roomVisuals)
             room.visual.line(this.pos, path[0], {
-                color: myColors.lightBlue,
+                color: customColors.lightBlue,
                 opacity: 0.3,
             })
         delete this.memory.LC
@@ -384,7 +380,7 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
     if (Memory.roomVisuals)
         room.visual.circle(this.pos, {
             fill: '',
-            stroke: myColors.red,
+            stroke: customColors.red,
             radius: 0.5,
             strokeWidth: 0.15,
         })
@@ -394,14 +390,14 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
     if (Memory.roomVisuals) {
         room.visual.circle(this.pos, {
             fill: '',
-            stroke: myColors.yellow,
+            stroke: customColors.yellow,
             radius: 0.5,
             strokeWidth: 0.15,
             opacity: 0.3,
         })
 
         room.visual.line(this.pos, unpackCoordAsPos(this.moveRequest, this.room.name), {
-            color: myColors.yellow,
+            color: customColors.yellow,
         })
     }
 
@@ -422,7 +418,7 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     if (Memory.roomVisuals)
         room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
-            fill: myColors.lightBlue,
+            fill: customColors.lightBlue,
             opacity: 0.2,
         })
 
@@ -470,7 +466,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             const moveRequestPos = unpackCoordAsPos(this.moveRequest, room.name)
 
             room.visual.rect(moveRequestPos.x - 0.5, moveRequestPos.y - 0.5, 1, 1, {
-                fill: myColors.green,
+                fill: customColors.green,
                 opacity: 0.2,
             })
 
@@ -478,7 +474,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 const creep = Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]
 
                 room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, {
-                    fill: myColors.yellow,
+                    fill: customColors.yellow,
                     opacity: 0.2,
                 })
             }
@@ -535,7 +531,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (packedCoord === creepAtPos.moved) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: myColors.purple,
+                    fill: customColors.purple,
                     opacity: 0.2,
                 })
 
@@ -545,7 +541,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
  */
         if (Memory.roomVisuals)
             room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                fill: myColors.white,
+                fill: customColors.white,
                 opacity: 0.2,
             })
 
@@ -561,7 +557,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (Memory.roomVisuals)
             for (let index = queue.length - 1; index >= 0; index--)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: myColors.yellow,
+                    fill: customColors.yellow,
                     opacity: 0.2,
                 })
         return
@@ -576,7 +572,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             /*
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: myColors.teal,
+                    fill: customColors.teal,
                     opacity: 0.2,
                 })
 
@@ -598,7 +594,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (packedCoord === creepAtPos.moveRequest) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: myColors.teal,
+                    fill: customColors.teal,
                     opacity: 0.2,
                 })
 
@@ -614,7 +610,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (this.moveRequest === creepAtPos.moveRequest) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: myColors.pink,
+                    fill: customColors.pink,
                     opacity: 0.2,
                 })
 
@@ -647,7 +643,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: myColors.pink,
+                    fill: customColors.pink,
                     opacity: 0.2,
                 })
 
@@ -676,7 +672,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             if (Memory.roomVisuals)
                 for (let index = queue.length - 1; index >= 0; index--)
                     room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                        fill: myColors.yellow,
+                        fill: customColors.yellow,
                         opacity: 0.2,
                     })
 
@@ -700,7 +696,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     if (Memory.roomVisuals)
         room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-            fill: myColors.teal,
+            fill: customColors.teal,
             opacity: 0.2,
         })
 

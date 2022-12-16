@@ -71,6 +71,14 @@ global.removeCSites = function (removeInProgress, types?) {
 }
 
 global.destroyStructures = function (roomName, types?) {
+
+    if (!roomName) {
+
+        if (global.communes.size > 1) return 'Provide a room name'
+
+        roomName = Array.from(global.communes)[0]
+    }
+
     // Get the room with the roomName
 
     const room = Game.rooms[roomName]
@@ -253,7 +261,7 @@ global.ACR = global.allyCreepRequest
 
 global.deleteBasePlans = function (roomName) {
     if (!roomName) {
-        if (global.communes.size > 1) return 'Provide a roomName'
+        if (global.communes.size > 1) return 'Provide a room name'
 
         roomName = Array.from(global.communes)[0]
     }

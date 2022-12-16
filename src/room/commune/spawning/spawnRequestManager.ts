@@ -5,7 +5,7 @@ import {
     containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
     minHarvestWorkRatio,
-    myColors,
+    customColors,
     numbersByStructureTypes,
     rampartUpkeepCost,
     RemoteData,
@@ -1730,8 +1730,8 @@ Room.prototype.spawnRequester = function () {
     if (Memory.CPULogging === true) {
         const cpuUsed = Game.cpu.getUsed() - managerCPUStart
         customLog('Spawn Request Manager', cpuUsed.toFixed(2), {
-            textColor: myColors.white,
-            bgColor: myColors.lightBlue,
+            textColor: customColors.white,
+            bgColor: customColors.lightBlue,
         })
         const statName: RoomCommuneStatNames = 'srmcu'
         globalStatsUpdater(this.name, statName, cpuUsed)
