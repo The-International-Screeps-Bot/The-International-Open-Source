@@ -43,7 +43,7 @@ export class RemoteReserver extends Creep {
     }
 
     preTickManager() {
-        if (!this.findRemote()) return
+
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'remoteReserver'

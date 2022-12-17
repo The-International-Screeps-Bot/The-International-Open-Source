@@ -38,7 +38,7 @@ export class RemoteHarvester extends Creep {
     }
 
     preTickManager(): void {
-        if (!this.findRemote()) return
+
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
@@ -270,7 +270,7 @@ export class RemoteHarvester extends Creep {
 
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-                creep.createMoveRequestByPath(
+                creep.createMoveRequest(
                     {
                         origin: creep.pos,
                         goals: [
@@ -279,9 +279,6 @@ export class RemoteHarvester extends Creep {
                                 range: 5,
                             },
                         ],
-                    },
-                    {
-                        packedPath: Memory.rooms[creep.memory.RN].SPs[creep.memory.SI],
                     },
                 )
 

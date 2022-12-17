@@ -30,19 +30,6 @@ export class RemoteDismantler extends Creep {
 
         const role = this.role as 'remoteDismantler'
 
-        if (Memory.rooms[this.memory.RN].T !== 'remote') {
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
-        // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
         if (this.dying) return
 
         // Reduce remote need
@@ -60,19 +47,19 @@ export class RemoteDismantler extends Creep {
      * Finds a remote
      */
     findRemote?(): boolean {
-        const creep = this
+        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
 
         // If the creep already has a remote, inform true
 
-        if (creep.memory.RN) return true
+        if (this.memory.RN) return true
 
         // Otherwise, get the creep's role
 
-        const role = creep.role as 'remoteDismantler'
+        const role = this.role as 'remoteDismantler'
 
         // Get remotes by their efficacy
 
-        const remoteNamesByEfficacy = creep.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
         // Loop through each remote name
 
@@ -87,7 +74,7 @@ export class RemoteDismantler extends Creep {
 
             // Otherwise assign the remote to the creep and inform true
 
-            creep.memory.RN = roomName
+            this.memory.RN = roomName
             roomMemory.data[RemoteData[role]] -= 1
 
             return true

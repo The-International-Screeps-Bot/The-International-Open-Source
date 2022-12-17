@@ -88,7 +88,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             return true
         }
 
-        this.assignMoveRequest(unpackPosList(pathOpts.packedPath)[index / 2 + 1])
+        this.assignMoveRequest(unpackPosList(pathOpts.packedPath)[Math.ceil(index / 2 + 1)])
         return true
     }
 
