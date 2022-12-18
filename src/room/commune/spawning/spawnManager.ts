@@ -1,6 +1,6 @@
-import { customColors, partsByPriority, partsByPriorityPartType } from 'international/constants'
+import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog } from 'international/utils'
+import { customLog, getRangeOfCoords } from 'international/utils'
 import { CommuneManager } from '../communeManager'
 import './spawnFunctions'
 import './spawnRequestManager'
@@ -30,6 +30,7 @@ export class SpawnManager {
         for (const spawn of spawns) {
             if (spawn.spawning) {
                 const creep = Game.creeps[spawn.spawning.name]
+                creep.manageSpawning(spawn)
                 creep.spawnID = spawn.id
 
                 this.activeSpawns.push(spawn)
@@ -131,6 +132,7 @@ export class SpawnManager {
             // Disable dry run
 
             request.extraOpts.dryRun = false
+            request.extraOpts.directions = this.findDirections(spawn.pos)
 
             // Spawn the creep
 
@@ -187,6 +189,42 @@ export class SpawnManager {
         }
 
         request.body = request.body.concat(endParts)
+    }
+
+    private findDirections(pos: RoomPosition) {
+
+        const adjacentCoords: Coord[] = []
+
+        for (let x = pos.x - 1; x <= pos.x + 1; x += 1) {
+            for (let y = pos.y - 1; y <= pos.y + 1; y += 1) {
+                if (pos.x === x && pos.y === y) continue
+
+                const coord = { x, y }
+
+                /* if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue */
+
+                // Otherwise ass the x and y to positions
+
+                adjacentCoords.push(coord)
+            }
+        }
+
+        const anchor = this.communeManager.room.anchor
+
+        // Sort by distance from the first pos in the path
+
+        adjacentCoords.sort((a, b) => {
+            return getRangeOfCoords(a, anchor) - getRangeOfCoords(b, anchor)
+        })
+        adjacentCoords.reverse()
+
+        const directions: DirectionConstant[] = []
+
+        for (const coord of adjacentCoords) {
+            directions.push(pos.getDirectionTo(coord.x, coord.y))
+        }
+
+        return directions
     }
 
     createPowerTasks() {

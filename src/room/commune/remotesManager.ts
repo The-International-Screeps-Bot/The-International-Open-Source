@@ -6,7 +6,7 @@ import {
     RemoteData,
     remoteTypeWeights,
 } from 'international/constants'
-import { advancedFindDistance, customLog, findCarryPartsRequired, randomTick } from 'international/utils'
+import { advancedFindDistance, customLog, findCarryPartsRequired, randomRange, randomTick } from 'international/utils'
 import { unpackPosList } from 'other/packrat'
 import { CommuneManager } from './communeManager'
 
@@ -59,7 +59,7 @@ export class RemotesManager {
                 })
 
                 if (safeDistance > maxRemoteRoomDistance) {
-                    remoteMemory.data[RemoteData.abandon] = 1500
+                    remoteMemory.data[RemoteData.abandon] = randomRange(1000, 1500)
                     this.manageAbandonment(remoteName)
                     continue
                 }
@@ -69,7 +69,7 @@ export class RemotesManager {
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {
-                    remoteMemory.data[RemoteData.abandon] = 1500
+                    remoteMemory.data[RemoteData.abandon] = randomRange(1000, 1500)
                     this.manageAbandonment(remoteName)
                     continue
                 }

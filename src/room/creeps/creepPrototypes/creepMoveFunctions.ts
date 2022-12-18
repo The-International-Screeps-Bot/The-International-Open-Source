@@ -240,8 +240,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.spawning) {
         const spawn = findObjectWithID(this.spawnID)
 
-        if (spawn.spawning.remainingTime <= 1) this.assignMoveRequest(path[0])
-
         // Ensure we aren't using the default direction
 
         if (spawn.spawning.directions) return true

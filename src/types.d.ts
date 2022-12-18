@@ -314,12 +314,6 @@ declare global {
         maxCostPerCreep?: number | undefined
     }
 
-    interface ExtraOpts {
-        memory: CreepMemory
-        energyStructures: (StructureSpawn | StructureExtension)[]
-        dryRun: boolean
-    }
-
     interface SpawnRequest {
         role: CreepRoles
         priority: number
@@ -328,7 +322,7 @@ declare global {
         body?: BodyPartConstant[]
         tier: number
         cost: number
-        extraOpts: ExtraOpts
+        extraOpts: SpawnOptions
     }
 
     type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
@@ -465,8 +459,6 @@ declare global {
     }
 
     interface HaulRequest {
-        data: number[]
-        responder?: string
     }
 
     interface ControllerLevel {
@@ -2009,6 +2001,8 @@ declare global {
         findBulzodeTargets(goalCoord: RoomPosition): Id<Structure>[]
 
         findQuadBulldozeTargets(goalCoord: RoomPosition): Id<Structure>[]
+
+        manageSpawning(spawn: StructureSpawn): void
 
         // Creep Getters
 

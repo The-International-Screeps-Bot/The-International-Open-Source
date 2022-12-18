@@ -1109,7 +1109,16 @@ export const RESULT_ACTION = 2
 export const RESULT_NO_ACTION = 3
 
 export const maxRemoteRoomDistance = 5
-export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
+export const offsetsByDirection = [,
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1],
+]
 
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
 

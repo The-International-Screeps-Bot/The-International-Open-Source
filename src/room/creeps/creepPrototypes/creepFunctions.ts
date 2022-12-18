@@ -12,6 +12,7 @@ import {
     quadAttackMemberOffsets,
     roomDimensions,
     TrafficPriorities,
+    offsetsByDirection,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -1424,4 +1425,17 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
     }
 
     return (this.memory.QBTIDs = Array.from(targetStructureIDs))
+}
+
+Creep.prototype.manageSpawning = function(spawn: StructureSpawn) {
+
+    if (spawn.spawning.remainingTime > 1) return
+
+    const offset = offsetsByDirection[spawn.spawning.directions[0]]
+    const coord = {
+        x: this.pos.x + offset[0],
+        y: this.pos.y + offset[1]
+    }
+
+    this.assignMoveRequest(coord)
 }

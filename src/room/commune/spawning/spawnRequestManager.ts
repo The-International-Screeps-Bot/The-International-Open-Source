@@ -21,6 +21,7 @@ import {
     findSquadTradeableParts,
     getRange,
     getRangeOfCoords,
+    randomRange,
 } from 'international/utils'
 import { internationalManager } from 'international/internationalManager'
 import { unpackPosList } from 'other/packrat'
@@ -1189,13 +1190,13 @@ Room.prototype.spawnRequester = function () {
                 const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
 
                 if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
+                    Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
                     return false
                 }
 
                 const minCost = minRangedAttackCost + minHealCost
                 if (minCost > spawnEnergyCapacity) {
-                    Memory.rooms[remoteName].data[RemoteData.abandon] = 1500
+                    Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
                     return false
                 }
 
