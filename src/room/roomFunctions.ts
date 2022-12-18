@@ -954,7 +954,9 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 }
 
 Room.prototype.createAttackCombatRequest = function (opts) {
+
     if (!Memory.autoAttack) return
+    if (this.controller && this.controller.safeMode) return
 
     let request = Memory.combatRequests[this.name]
     if (request) {
@@ -1027,7 +1029,7 @@ Room.prototype.createHarassCombatRequest = function (opts) {
     for (const key in CombatRequestData) request.data[key] = 0
 
     request.data[CombatRequestData.attack] = 3
-    request.data[CombatRequestData.minDamage] = 40
+    request.data[CombatRequestData.minDamage] = 20
     request.data[CombatRequestData.minMeleeHeal] = 10
     request.data[CombatRequestData.minRangedHeal] = 10
 

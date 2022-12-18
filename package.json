@@ -1,6 +1,6 @@
 {
     "name": "@the-international-screeps-bot/the-international-open-source",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "description": "",
     "files": [
         "main.js"
