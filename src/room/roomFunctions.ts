@@ -1028,8 +1028,7 @@ Room.prototype.createHarassCombatRequest = function (opts) {
 
     for (const key in CombatRequestData) request.data[key] = 0
 
-    request.data[CombatRequestData.attack] = 3
-    request.data[CombatRequestData.minDamage] = 20
+    request.data[CombatRequestData.minDamage] = 10
     request.data[CombatRequestData.minMeleeHeal] = 10
     request.data[CombatRequestData.minRangedHeal] = 10
 

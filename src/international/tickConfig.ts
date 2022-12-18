@@ -321,11 +321,11 @@ class TickConfig {
                 const minRangedAttackCost = room.communeManager.findMinRangedAttackCost(
                     request.data[CombatRequestData.minDamage],
                 )
-                const minMeleeHealCost = room.communeManager.findMinMeleeHealCost(
+                const minMeleeHealCost = room.communeManager.findMinHealCost(
                     request.data[CombatRequestData.minMeleeHeal] +
                         (request.data[CombatRequestData.maxTowerDamage] || 0),
                 )
-                const minRangedHealCost = room.communeManager.findMinRangedHealCost(
+                const minRangedHealCost = room.communeManager.findMinHealCost(
                     request.data[CombatRequestData.minRangedHeal],
                 )
 

@@ -366,7 +366,7 @@ export class StatsManager {
             },
             cpu: {
                 bucket: 0,
-                usage: 0,
+                usage: Game.cpu.limit,
                 limit: 0,
             },
             memory: {

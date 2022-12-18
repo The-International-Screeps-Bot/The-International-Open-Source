@@ -1485,18 +1485,16 @@ Room.prototype.spawnRequester = function () {
             minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
         )
 
-        const minAttackCost = this.communeManager.findMinMeleeAttackCost(
-            request.data[CombatRequestData.minDamage] + (request.data[CombatRequestData.maxTowerDamage] || 0),
-        )
+        const minAttackCost = this.communeManager.findMinMeleeAttackCost(request.data[CombatRequestData.minDamage])
         const attackAmount = Math.floor(minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]))
 
-        const minMeleeHealCost = this.communeManager.findMinMeleeHealCost(
+        const minMeleeHealCost = this.communeManager.findMinHealCost(
             request.data[CombatRequestData.minMeleeHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
         )
         const meleeHealAmount = Math.floor(minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
-        const minRangedHealCost = this.communeManager.findMinRangedHealCost(
-            request.data[CombatRequestData.minRangedHeal],
+        const minRangedHealCost = this.communeManager.findMinHealCost(
+            request.data[CombatRequestData.minRangedHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
         )
         const rangedHealAmount = Math.floor(minRangedHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
