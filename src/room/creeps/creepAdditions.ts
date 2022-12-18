@@ -1,4 +1,4 @@
-import { dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
+import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
 import { customLog, getRange, getRangeOfCoords } from 'international/utils'
 
 Object.defineProperties(Creep.prototype, {
@@ -22,7 +22,7 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._role) return this._role
 
-            return (this._role = this.name.split(' ')[0] as CreepRoles)
+            return (this._role = creepRoles[parseInt(this.name.split(' ')[0])])
         },
     },
     cost: {

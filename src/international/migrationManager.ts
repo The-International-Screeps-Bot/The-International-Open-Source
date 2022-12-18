@@ -120,6 +120,11 @@ class MigrationManager {
 
             Memory.breakingVersion += 1
         }
+        if (Memory.breakingVersion === 89) {
+
+            global.killCreeps()
+            Memory.breakingVersion += 1
+        }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
             global.killCreeps()

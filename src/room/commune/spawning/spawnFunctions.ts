@@ -1,15 +1,17 @@
-import { customColors, partsByPriority } from 'international/constants'
+import { creepRoles, customColors, partsByPriority } from 'international/constants'
 import { internationalManager } from 'international/internationalManager'
 import { customLog, newID } from 'international/utils'
 
-StructureSpawn.prototype.advancedSpawn = function (spawnRequest) {
-    // Attempt to spawn using the values in the spawnRequest
+StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
+    return this.spawnCreep(spawnRequest.body, ID.toString(), { dryRun: true })
+}
 
+StructureSpawn.prototype.advancedSpawn = function (spawnRequest, ID) {
     return this.spawnCreep(
         spawnRequest.body,
-        `${spawnRequest.role} ${spawnRequest.cost} ${this.room.name} ${spawnRequest.defaultParts} T${
-            spawnRequest.tier
-        } ${newID()}`,
+        `${creepRoles.indexOf(spawnRequest.role)} ${spawnRequest.cost} ${this.room.name} ${
+            spawnRequest.defaultParts
+        } T${spawnRequest.tier} ${ID}`,
         spawnRequest.extraOpts,
     )
 }
@@ -62,7 +64,6 @@ Room.prototype.createSpawnRequest = function (priority, role, defaultParts, body
         extraOpts: {
             memory,
             energyStructures: this.spawningStructuresByPriority,
-            dryRun: true,
         },
     })
 }

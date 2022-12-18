@@ -97,6 +97,8 @@ export class CommuneManager {
     public update(room: Room) {
         this.room = room
         this.structures = room.structures
+
+        delete this._nextSpawnEnergyAvailable
     }
 
     preTickRun() {
@@ -370,5 +372,17 @@ export class CommuneManager {
             Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10),
             RAMPART_HITS_MAX[level],
         )
+    }
+
+    _nextSpawnEnergyAvailable: number
+
+    get nextSpawnEnergyAvailable() {
+        if (this._nextSpawnEnergyAvailable !== undefined) return this._nextSpawnEnergyAvailable
+
+        return (this._nextSpawnEnergyAvailable = this.room.energyAvailable)
+    }
+
+    set nextSpawnEnergyAvailable(newNextSpawnEnergyAvailable) {
+        this._nextSpawnEnergyAvailable = newNextSpawnEnergyAvailable
     }
 }

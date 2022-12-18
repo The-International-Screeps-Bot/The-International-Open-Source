@@ -1,6 +1,6 @@
 import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, getRangeOfCoords } from 'international/utils'
+import { customLog, getRangeOfCoords, newID } from 'international/utils'
 import { CommuneManager } from '../communeManager'
 import './spawnFunctions'
 import './spawnRequestManager'
@@ -80,16 +80,13 @@ export class SpawnManager {
         // Loop through priorities inside requestsByPriority
 
         for (const index in this.communeManager.room.spawnRequests) {
+
             const request = this.communeManager.room.spawnRequests[index]
+            if (request.cost > this.communeManager.nextSpawnEnergyAvailable) continue
 
-            // Try to find inactive spawn, if can't, stop the loop
+            // We're trying to build a creep larger than this room can spawn
+            // If this is ran then there is a bug in spawnRequest creation
 
-            const spawn = this.inactiveSpawns[spawnIndex]
-
-            //We want to continue instead of break in this sub-case.  If we're asked to build a creep larger
-            // than what we can possibly build, if we break out, we'll get stuck in a loop where the rest of the
-            // spawns never run.
-            // This should never be activated. If it is, there is a bug in spawn request creation
             if (request.cost > this.communeManager.room.energyCapacityAvailable) {
                 customLog(
                     'Failed to spawn',
@@ -105,9 +102,14 @@ export class SpawnManager {
 
             this.configSpawnRequest(parseInt(index))
 
+            // Try to find inactive spawn, if can't, stop the loop
+
+            const spawn = this.inactiveSpawns[spawnIndex]
+            const ID = newID()
+
             // See if creep can be spawned
 
-            const testSpawnResult = spawn.advancedSpawn(request)
+            const testSpawnResult = spawn.testSpawn(request, ID)
 
             // If creep can't be spawned
 
@@ -129,19 +131,14 @@ export class SpawnManager {
                 return
             }
 
-            // Disable dry run
+            // Spawn the creep for real
 
-            request.extraOpts.dryRun = false
             request.extraOpts.directions = this.findDirections(spawn.pos)
+            spawn.advancedSpawn(request, ID)
 
-            // Spawn the creep
-
-            spawn.advancedSpawn(request)
-            /*
             // Record in stats the costs
 
-            this.communeManager.room.energyAvailable -= spawnRequest.cost
- */
+            this.communeManager.nextSpawnEnergyAvailable -= request.cost
             globalStatsUpdater(this.communeManager.room.name, 'eosp', request.cost)
 
             // Decrease the spawnIndex
@@ -243,7 +240,7 @@ export class SpawnManager {
      * Spawn request debugging
      */
     private test() {
-        return
+        /* return */
 
         if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
 

@@ -327,31 +327,41 @@ declare global {
 
     type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
 
-    type LogisticTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
+    type RoomHaulTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
-    interface LogisticTask {
-        ID: number
-        Type: LogisticTaskTypes
-        TargetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-        ResourceType: ResourceConstant
+    interface RoomHaulTask {
+        ID?: number
+        type: RoomHaulTaskTypes
+        priority?: number
+        targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
+        resourceType: ResourceConstant
+        amount: number
+        /**
+         * If the responder should only take the task if it will use its full capacity. Default is false
+         */
+        fullCapacity?: boolean
     }
 
-    interface CreepLogisticTask {
+    interface CreepRoomHaulTask {
         /**
          * The Type of logistic task
          */
-        T: LogisticTaskTypes
+        T: RoomHaulTaskTypes
         /**
-         * The Amount of resources involved
+         * Target ID
          */
-        A: number
+        TID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
         /**
          * The Resource Type involved
          */
         RT: ResourceConstant
+        /**
+         * The Amount of resources involved
+         */
+        A: number
     }
 
-    interface CreepLogisticTansferTask extends CreepLogisticTask {
+    interface CreepRoomHaulTansferTask extends CreepRoomHaulTask {
         /**
          * The Type of logistic task
          */
@@ -362,7 +372,7 @@ declare global {
         TID: Id<AnyStoreStructure>
     }
 
-    interface CreepLogisticWithdrawTask extends CreepLogisticTask {
+    interface CreepRoomHaulWithdrawTask extends CreepRoomHaulTask {
         /**
          * The Type of logistic task
          */
@@ -373,7 +383,7 @@ declare global {
         TID: Id<AnyStoreStructure | Tombstone | Ruin | Creep>
     }
 
-    interface CreepLogisticPickupTask extends CreepLogisticTask {
+    interface CreepRoomHaulPickupTask extends CreepRoomHaulTask {
         /**
          * The Type of logistic task
          */
@@ -384,7 +394,7 @@ declare global {
         TID: Id<AnyStoreStructure>
     }
 
-    interface CreepLogisticOfferTask extends CreepLogisticTask {
+    interface CreepRoomHaulOfferTask extends CreepRoomHaulTask {
         /**
          * The Type of logistic task
          */
@@ -459,6 +469,8 @@ declare global {
     }
 
     interface HaulRequest {
+        data: number[]
+        responder?: string
     }
 
     interface ControllerLevel {
@@ -2288,7 +2300,9 @@ declare global {
 
         // Functions
 
-        advancedSpawn(spawnRequest: SpawnRequest): ScreepsReturnCode
+        testSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
+
+        advancedSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
     }
 
     interface StructureExtension {

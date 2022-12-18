@@ -1009,7 +1009,7 @@ Room.prototype.spawnRequester = function () {
         const remoteMemory = Memory.rooms[remoteName]
         const remoteData = Memory.rooms[remoteName].data
         const remote = Game.rooms[remoteName]
-        const priority = minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100
+        const priority = Math.round((minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100) * 100) / 100
 
         role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as 'remoteSourceHarvester0' | 'remoteSourceHarvester1'
 
@@ -1037,7 +1037,7 @@ Room.prototype.spawnRequester = function () {
                         maxCreeps: sourcePositionsAmount,
                         maxCostPerCreep: 50 + 150 * 6,
                         minCost: 200,
-                        priority: priority,
+                        priority,
                         memoryAdditions: {
                             R: true,
                             SI: sourceIndex,
@@ -1057,7 +1057,7 @@ Room.prototype.spawnRequester = function () {
                     maxCreeps: sourcePositionsAmount,
                     maxCostPerCreep: 50 + 250 * 3,
                     minCost: 300,
-                    priority: priority,
+                    priority,
                     memoryAdditions: {
                         R: true,
                         SI: sourceIndex,
