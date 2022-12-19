@@ -20,6 +20,7 @@ import {
     stagnantRoomTypes,
     stamps,
     structureTypesByBuildPriority,
+    RESULT_FAIL,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -779,7 +780,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     const newReservationEfficacy = this.advancedFindPath({
         origin: this.controller.pos,
-        goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+        goals: [{ pos: scoutingRoom.anchor, range: 4 }],
         typeWeights: {
             enemy: Infinity,
             ally: Infinity,
@@ -954,7 +955,6 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 }
 
 Room.prototype.createAttackCombatRequest = function (opts) {
-
     if (!Memory.autoAttack) return
     if (this.controller && this.controller.safeMode) return
 
@@ -1364,9 +1364,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         // We don't want to plan to close to exits for target given value
 
-
         if (opts.protectionOffset) {
-
             if (isNearRoomEdge(coord1, opts.protectionOffset)) {
                 const nearbyCoords = findCoordsInsideRect(
                     coord1.x - opts.protectionOffset,
@@ -1376,9 +1374,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 )
 
                 for (const coord of nearbyCoords) {
-
                     if (room.exitCoords.has(packCoord(coord))) {
-
                         room.visual.circle(coord1.x, coord1.y, { fill: customColors.red })
                         return false
                     }
@@ -1386,7 +1382,7 @@ Room.prototype.findClosestPosOfValue = function (opts) {
             }
         }
 
-/*
+        /*
         if (opts.spaceFromExits && iterations <= opts.requiredValue) {
             room.visual.circle(coord1.x, coord1.y, { fill: customColors.red })
             return false
@@ -2332,4 +2328,38 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
     if (this.storage.store.getUsedCapacity(resourceType) * 3 > this.terminal.store.getUsedCapacity(resourceType))
         return this.storage
     return this.terminal
+}
+
+Room.prototype.createRoomLogisticsRequest = function (args) {
+    if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
+    if (!args.threshold) args.threshold = 1
+
+    // Make sure we are not infringing on the threshold
+
+    if (args.type === 'transfer') {
+        args.threshold = (args.target as AnyStoreStructure).store.getCapacity(args.resourceType)
+        const amount = (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+
+        if (amount >= args.threshold) return RESULT_FAIL
+    } else {
+        args.threshold = 1
+        const amount =
+            args.type === 'pickup'
+                ? (args.target as Resource).amount
+                : (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+
+        if (amount < args.threshold) return RESULT_FAIL
+    }
+
+    const ID = internationalManager.newTickID()
+
+    return (this.roomLogisticsRequests[ID] = {
+        ID,
+        type: args.type,
+        targetID: args.target.id,
+        resourceType: args.resourceType,
+        amount: args.amount,
+        priority: args.priority || 1,
+        onlyFull: args.onlyFull,
+    })
 }

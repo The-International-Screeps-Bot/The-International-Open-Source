@@ -45,6 +45,7 @@ import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeedManager'
 import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
+import { ContainerManager } from './containerManager'
 
 export class CommuneManager {
     // Managers
@@ -56,6 +57,7 @@ export class CommuneManager {
     powerSpawnManager: PowerSpawnManager
     spawnManager: SpawnManager
     sourceManager: SourceManager
+    containerManager: ContainerManager
 
     terminalManager: TerminalManager
     remotesManager: RemotesManager
@@ -79,6 +81,7 @@ export class CommuneManager {
         this.powerSpawnManager = new PowerSpawnManager(this)
         this.spawnManager = new SpawnManager(this)
         this.sourceManager = new SourceManager(this)
+        this.containerManager = new ContainerManager(this)
 
         this.terminalManager = new TerminalManager(this)
         this.remotesManager = new RemotesManager(this)
@@ -93,12 +96,11 @@ export class CommuneManager {
 
     room: Room
     structures: OrganizedStructures
+    nextSpawnEnergyAvailable: number
 
     public update(room: Room) {
         this.room = room
         this.structures = room.structures
-
-        delete this._nextSpawnEnergyAvailable
     }
 
     preTickRun() {
@@ -115,7 +117,9 @@ export class CommuneManager {
 
         room.spawnRequests = []
         room.upgradeStrength = 0
+        room.roomLogisticsRequests = {}
         room.haulerNeed = 0
+        this.nextSpawnEnergyAvailable = room.energyAvailable
 
         if (!room.memory.remotes) room.memory.remotes = []
 
@@ -136,6 +140,7 @@ export class CommuneManager {
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
         this.claimRequestManager.preTickRun()
+        this.containerManager.preTickRun()
 
         // Add roomName to commune list
 
@@ -372,17 +377,5 @@ export class CommuneManager {
             Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10),
             RAMPART_HITS_MAX[level],
         )
-    }
-
-    _nextSpawnEnergyAvailable: number
-
-    get nextSpawnEnergyAvailable() {
-        if (this._nextSpawnEnergyAvailable !== undefined) return this._nextSpawnEnergyAvailable
-
-        return (this._nextSpawnEnergyAvailable = this.room.energyAvailable)
-    }
-
-    set nextSpawnEnergyAvailable(newNextSpawnEnergyAvailable) {
-        this._nextSpawnEnergyAvailable = newNextSpawnEnergyAvailable
     }
 }

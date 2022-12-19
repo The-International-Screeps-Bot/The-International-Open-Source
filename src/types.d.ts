@@ -327,11 +327,14 @@ declare global {
 
     type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
 
-    type RoomHaulTaskTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
+    type RoomLogisticsRequestTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
-    interface RoomHaulTask {
+    interface RoomLogisticsRequest {
         ID?: number
-        type: RoomHaulTaskTypes
+        type: RoomLogisticsRequestTypes
+        /**
+         * Consider in weighting the task
+         */
         priority?: number
         targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
         resourceType: ResourceConstant
@@ -339,14 +342,24 @@ declare global {
         /**
          * If the responder should only take the task if it will use its full capacity. Default is false
          */
-        fullCapacity?: boolean
+        onlyFull?: boolean
     }
 
-    interface CreepRoomHaulTask {
+    interface CreateRoomLogisticsRequestArgs {
+        type: RoomLogisticsRequestTypes
+        target: AnyStoreStructure | Creep | Tombstone | Ruin | Resource
+        resourceType?: ResourceConstant
+        amount: number
+        onlyFull?: boolean
+        threshold?: number
+        priority?: number
+    }
+
+    interface CreepRoomLogisticsRequest {
         /**
          * The Type of logistic task
          */
-        T: RoomHaulTaskTypes
+        T: RoomLogisticsRequestTypes
         /**
          * Target ID
          */
@@ -359,9 +372,13 @@ declare global {
          * The Amount of resources involved
          */
         A: number
+        /**
+         * Only Full, if they want a responder only if fully filled
+         */
+        OF?: boolean
     }
 
-    interface CreepRoomHaulTansferTask extends CreepRoomHaulTask {
+    interface CreepRoomLogisticsTansferTask extends CreepRoomLogisticsRequest {
         /**
          * The Type of logistic task
          */
@@ -372,7 +389,7 @@ declare global {
         TID: Id<AnyStoreStructure>
     }
 
-    interface CreepRoomHaulWithdrawTask extends CreepRoomHaulTask {
+    interface CreepRoomLogisticsWithdrawTask extends CreepRoomLogisticsRequest {
         /**
          * The Type of logistic task
          */
@@ -383,7 +400,7 @@ declare global {
         TID: Id<AnyStoreStructure | Tombstone | Ruin | Creep>
     }
 
-    interface CreepRoomHaulPickupTask extends CreepRoomHaulTask {
+    interface CreepRoomLogisticsPickupTask extends CreepRoomLogisticsRequest {
         /**
          * The Type of logistic task
          */
@@ -394,7 +411,7 @@ declare global {
         TID: Id<AnyStoreStructure>
     }
 
-    interface CreepRoomHaulOfferTask extends CreepRoomHaulTask {
+    interface CreepRoomLogisticsOfferTask extends CreepRoomLogisticsRequest {
         /**
          * The Type of logistic task
          */
@@ -966,6 +983,7 @@ declare global {
          */
         squadRequests: Set<string>
 
+        roomLogisticsRequests: { [ID: number]: RoomLogisticsRequest }
         powerTasks: { [ID: number]: PowerTask }
 
         attackingDefenderIDs: Set<Id<Creep>>
@@ -1145,6 +1163,8 @@ declare global {
         createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask | false
 
         highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
+
+        createRoomLogisticsRequest(args: CreateRoomLogisticsRequestArgs): void
 
         /**
          * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
