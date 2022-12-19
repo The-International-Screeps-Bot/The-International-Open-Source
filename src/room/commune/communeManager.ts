@@ -213,6 +213,9 @@ export class CommuneManager {
     }
 
     private test() {
+
+        customLog('LOGISTICS', JSON.stringify(this.room.roomLogisticsRequests, undefined, 3))
+        
         return
 
         let CPUUsed = Game.cpu.getUsed()

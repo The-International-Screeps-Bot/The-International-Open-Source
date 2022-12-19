@@ -240,7 +240,7 @@ export class SpawnManager {
      * Spawn request debugging
      */
     private test() {
-        /* return */
+        return
 
         if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
 

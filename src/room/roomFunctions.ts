@@ -2332,24 +2332,40 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 
 Room.prototype.createRoomLogisticsRequest = function (args) {
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
-    if (!args.threshold) args.threshold = 1
+
+    let amount: number
 
     // Make sure we are not infringing on the threshold
 
-    if (args.type === 'transfer') {
-        args.threshold = (args.target as AnyStoreStructure).store.getCapacity(args.resourceType)
-        const amount = (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+    if (args.type === 'pickup') {
+        if (!args.threshold) args.threshold = 1
+
+        amount = (args.target as Resource).amount
+    }
+    else if (args.type === 'transfer') {
+        if (!args.threshold) args.threshold = (args.target as AnyStoreStructure).store.getCapacity(args.resourceType)
+        amount = (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+
+        // We have enough of the resource to fulfill the threshold
 
         if (amount >= args.threshold) return RESULT_FAIL
-    } else {
-        args.threshold = 1
-        const amount =
-            args.type === 'pickup'
-                ? (args.target as Resource).amount
-                : (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+    }
+
+    // Offer or withdraw types
+
+    else {
+        if (!args.threshold) args.threshold = 1
+        amount = (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+
+        // We don't have enough resources to make a request
 
         if (amount < args.threshold) return RESULT_FAIL
+
+        if (args.maxAmount) amount = Math.min(amount, Math.round(args.maxAmount))
     }
+
+    if (!args.priority) args.priority = 1
+    else args.priority = (Math.round(args.priority * 100) / 100)
 
     const ID = internationalManager.newTickID()
 
@@ -2358,8 +2374,8 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         type: args.type,
         targetID: args.target.id,
         resourceType: args.resourceType,
-        amount: args.amount,
-        priority: args.priority || 1,
+        amount: amount,
+        priority: args.priority,
         onlyFull: args.onlyFull,
     })
 }

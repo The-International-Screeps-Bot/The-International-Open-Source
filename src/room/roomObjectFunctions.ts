@@ -17,3 +17,33 @@ RoomObject.prototype.freeStore = function (this: RoomObject & { store?: StoreDef
 RoomObject.prototype.freeSpecificStore = function (this: RoomObject & { store?: StoreDefinition }, resourceType = RESOURCE_ENERGY) {
     return this.store.getCapacity(resourceType) - this.store[resourceType]
 }
+
+RoomObject.prototype.usedNextStore = function(this: RoomObject & { store?: StoreDefinition }) {
+
+    let amount = 0
+    for (const type in this.nextStore) amount += this.nextStore[type as ResourceConstant]
+
+    return amount
+}
+
+RoomObject.prototype.freeNextStore = function(this: RoomObject & { store?: StoreDefinition }, resourceType) {
+
+    if (resourceType) return this.store.getCapacity() - this.nextStore[resourceType]
+
+    return this.store.getCapacity() - this.usedNextStore()
+}
+
+RoomObject.prototype.usedReserveStore = function(this: RoomObject & { store?: StoreDefinition }) {
+
+    let amount = 0
+    for (const type in this.reserveStore) amount += this.reserveStore[type as ResourceConstant]
+
+    return amount
+}
+
+RoomObject.prototype.freeReserveStore = function(this: RoomObject & { store?: StoreDefinition }, resourceType) {
+
+    if (resourceType) return this.store.getCapacity() - this.reserveStore[resourceType]
+
+    return this.store.getCapacity() - this.usedReserveStore()
+}

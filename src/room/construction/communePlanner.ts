@@ -575,10 +575,12 @@ export function basePlanner(room: Room) {
 
     const closestMineralHarvestPos = room.mineralPositions[0]
     if (closestMineralHarvestPos) room.roadCoords[packAsNum(closestMineralHarvestPos)] = 255
-    /*
 
-    structurePlans.set(mineralHarvestPos.x, mineralHarvestPos.y, structureTypesByNumber[STRUCTURE_CONTAINER])
- */
+
+    if (!room.memory.stampAnchors.container.includes(packAsNum(closestMineralHarvestPos))) {
+        room.memory.stampAnchors.container.push(packAsNum(closestMineralHarvestPos))
+    }
+
     // Path from the hubAnchor to the mineralHarvestPos
 
     path = room.advancedFindPath({

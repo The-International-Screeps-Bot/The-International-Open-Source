@@ -349,10 +349,10 @@ declare global {
         type: RoomLogisticsRequestTypes
         target: AnyStoreStructure | Creep | Tombstone | Ruin | Resource
         resourceType?: ResourceConstant
-        amount: number
         onlyFull?: boolean
         threshold?: number
         priority?: number
+        maxAmount?: number
     }
 
     interface CreepRoomLogisticsRequest {
@@ -2359,6 +2359,12 @@ declare global {
          * Finds the total free store capacity of a specific resource for this RoomObject
          */
         freeSpecificStore(resourceType?: ResourceConstant): number
+
+        usedNextStore(): number
+        freeNextStore(resourceType?: ResourceConstant): number
+
+        usedReserveStore(): number
+        freeReserveStore(resourceType?: ResourceConstant): number
 
         // RoomObject getters
 
