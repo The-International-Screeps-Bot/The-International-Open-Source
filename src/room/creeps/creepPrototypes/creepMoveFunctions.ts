@@ -458,7 +458,11 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
-        if (this.spawning) return
+        if (this.spawning) {
+
+            room.moveRequests.delete(this.moveRequest)
+            return
+        }
 
         // loop through each index of the queue, drawing visuals
 
