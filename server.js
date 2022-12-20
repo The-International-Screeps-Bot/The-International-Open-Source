@@ -1,5 +1,5 @@
 const { join } = require('path')
-const { execSync } = require('child_process')
+const { exec, execSync } = require('child_process')
 require('dotenv').config()
 
 const options = { stdio: 'inherit' }
