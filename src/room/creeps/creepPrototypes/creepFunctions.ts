@@ -13,6 +13,7 @@ import {
     roomDimensions,
     TrafficPriorities,
     offsetsByDirection,
+    RESULT_FAIL,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -679,17 +680,17 @@ Creep.prototype.findMineralHarvestPos = function () {
 }
 
 Creep.prototype.needsResources = function () {
-    // If the creep is empty
-    if (!this.freeCapacityNextTick) this.freeCapacityNextTick = this.store.getFreeCapacity()
 
-    if (this.freeCapacityNextTick === this.store.getCapacity())
+    const freeReserveStore = this.freeReserveStore()
+
+    if (freeReserveStore === this.store.getCapacity())
         // Record and inform that the creep needs resources
 
         return (this.memory.NR = true)
 
     // Otherwise if the creep is full
 
-    if (this.freeCapacityNextTick == 0) {
+    if (freeReserveStore == 0) {
         // Record and inform that the creep does not resources
 
         delete this.memory.NR
@@ -1438,4 +1439,34 @@ Creep.prototype.manageSpawning = function(spawn: StructureSpawn) {
     }
 
     this.assignMoveRequest(coord)
+}
+
+Creep.prototype.roomLogisticsRequestManager = function() {
+
+    if (!this.memory.RLRs) {
+        this.memory.RLRs = []
+        return
+    }
+    if (!this.memory.RLRs.length) return
+
+    for (let i = this.memory.RLRs.length - 1; i >= 0; i--) {
+
+        const request = this.memory.RLRs[i]
+        const target = findObjectWithID(request.TID)
+        if (!target) {
+
+            this.memory.RLRs.splice(i, 1)
+            continue
+        }
+    }
+}
+
+Creep.prototype.findRoomLogisticsRequest = function() {
+
+    return RESULT_FAIL
+}
+
+Creep.prototype.findNewRoomLogisticsRequest = function() {
+
+    return RESULT_FAIL
 }

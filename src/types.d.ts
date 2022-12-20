@@ -2036,7 +2036,11 @@ declare global {
 
         manageSpawning(spawn: StructureSpawn): void
 
+        roomLogisticsRequestManager(): void
+
         findRoomLogisticsRequest(): CreepRoomLogisticsRequest | 0
+
+        findNewRoomLogisticsRequest(): CreepRoomLogisticsRequest | 0
 
         // Creep Getters
 

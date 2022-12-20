@@ -474,8 +474,6 @@ export class RemoteHauler extends Creep {
     relayCoord?(coord: Coord) {
         if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
 
-
-
         const creepAtPosName = this.room.creepPositions.get(packCoord(coord))
         if (!creepAtPosName) return false
 
@@ -483,9 +481,9 @@ export class RemoteHauler extends Creep {
 
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
-        if (creepAtPos.store.getUsedCapacity() === creepAtPos.store.getCapacity()) return false
+        if (creepAtPos.usedReserveStore() === creepAtPos.store.getCapacity()) return false
         if (
-            creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY) &&
+            creepAtPos.freeReserveStore() !== this.usedReserveStore() &&
             creepAtPos.store.getCapacity() !== this.store.getCapacity()
         )
             return false
@@ -495,8 +493,8 @@ export class RemoteHauler extends Creep {
         this.movedResource = true
         creepAtPos.movedResource = true
 
-        this.store.energy -= creepAtPos.store.getFreeCapacity()
-        creepAtPos.store.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
+        this.reserveStore.energy -= creepAtPos.freeReserveStore()
+        creepAtPos.reserveStore.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
 
         // Stop previously attempted moveRequests as they do not account for a relay
 
@@ -574,13 +572,13 @@ export class RemoteHauler extends Creep {
 
         if (!this.moveRequest && (!this.memory.P || !this.memory.P.length)) return
         if (this.movedResource) return
-        if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return
+        if (!this.reserveStore.energy) return
 
-        // Don't relay too close to the source position
+        // Don't relay too close to the source position unless we are fatigued
 
-        if (this.memory.RN && getRangeOfCoords(unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0], this.pos) <= 1) return
+        if (!this.fatigue && this.memory.RN && getRangeOfCoords(unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0], this.pos) <= 1) return
 
-        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[0]
+        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[1]
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)

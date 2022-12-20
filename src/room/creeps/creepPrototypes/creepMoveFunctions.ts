@@ -91,10 +91,8 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     // We're on the path and not at the end
 
     if (cachedIndex >= 0) {
-        customLog('CACHING1', pathOpts.packedPath.length + ', ' + unpackPosList(pathOpts.packedPath).length + ', ' + cachedIndex)
-        pathOpts.packedPath = pathOpts.packedPath.slice(cachedIndex + 2)
 
-        customLog('CACHING2', pathOpts.packedPath.length + ', ' + unpackPosList(pathOpts.packedPath).length + ', ' + cachedIndex)
+        pathOpts.packedPath = pathOpts.packedPath.slice(cachedIndex + 2)
 
         let path: RoomPosition[]
 

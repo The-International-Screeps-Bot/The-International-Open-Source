@@ -1,5 +1,5 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { customColors, remoteRoles } from './constants'
+import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
 import { customLog } from './utils'
 import { InternationalManager } from './internationalManager'
 import { packCoord } from 'other/packrat'
@@ -62,6 +62,8 @@ class CreepOrganizer {
         // Add the creep's name to the position in its room
 
         if (!creep.spawning) creep.room.creepPositions.set(packCoord(creep.pos), creep.name)
+
+        if (roomLogisticsRoles.has(role)) creep.roomLogisticsRequestManager()
 
         // Get the commune the creep is from
 

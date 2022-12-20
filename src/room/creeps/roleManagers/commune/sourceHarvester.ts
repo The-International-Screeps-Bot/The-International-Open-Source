@@ -1,6 +1,6 @@
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
-import { unpackPos } from 'other/packrat'
+import { packCoord, packPos, unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {
@@ -52,6 +52,26 @@ export class SourceHarvester extends Creep {
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
         this.say(`⏩${this.memory.SI}`)
+
+        if (this.memory.PC === packCoord(this.room.sourcePositions[this.memory.SI][0])) {
+
+            this.createMoveRequestByPath({
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: new RoomPosition(harvestPos.x, harvestPos.y, this.room.name),
+                        range: 0,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            },
+            {
+                packedPath: this.room.memory.SPs[this.memory.SI],
+                loose: true,
+            })
+
+            return true
+        }
 
         this.createMoveRequest({
             origin: this.pos,
