@@ -2036,6 +2036,10 @@ declare global {
 
         manageSpawning(spawn: StructureSpawn): void
 
+        updateRoomLogisticsRequest(index: number): void
+
+        deleteRoomLogisticsRequest(index: number): void
+
         roomLogisticsRequestManager(): void
 
         findRoomLogisticsRequest(): CreepRoomLogisticsRequest | 0
@@ -2415,6 +2419,10 @@ declare global {
 
     interface Resource {
         // Getters
+
+        _nextAmount: number
+
+        nextAmount: number
 
         _reserveAmount: number
 

@@ -562,32 +562,6 @@ Creep.prototype.findRepairTarget = function () {
 
     this.memory.repairTarget = bestTarget.id
     return bestTarget
-    /*
-    // Filter viableRepairTargets that are low enough on hits
-
-    const viableRepairTargets = possibleRepairTargets.filter(function (structure) {
-        // If the structure's ID is to be excluded, inform false
-
-        if (excludedIDs.has(structure.id)) return false
-
-        // Otherwise if the structure is somewhat low on hits, inform true
-
-        return structure.hitsMax * 0.2 >= structure.hits
-    })
-
-    this.say('FRT')
-
-    // If there are no viableRepairTargets, inform false
-
-    if (!viableRepairTargets.length) return false
-
-    // Inform the closest viableRepairTarget to the creep's memory
-
-    return this.pos.findClosestByPath(viableRepairTargets, {
-        ignoreCreeps: true,
-        range: 3,
-    })
-     */
 }
 
 Creep.prototype.findOptimalSourceIndex = function () {
@@ -1441,6 +1415,16 @@ Creep.prototype.manageSpawning = function(spawn: StructureSpawn) {
     this.assignMoveRequest(coord)
 }
 
+Creep.prototype.updateRoomLogisticsRequest = function(index) {
+
+
+}
+
+Creep.prototype.deleteRoomLogisticsRequest = function(index) {
+
+
+}
+
 Creep.prototype.roomLogisticsRequestManager = function() {
 
     if (!this.memory.RLRs) {
@@ -1458,6 +1442,50 @@ Creep.prototype.roomLogisticsRequestManager = function() {
             this.memory.RLRs.splice(i, 1)
             continue
         }
+
+        // Pickup type
+
+        if (target instanceof Resource) {
+
+            if (target.nextAmount <= 0) {
+
+                this.memory.RLRs.splice(i, 1)
+                continue
+            }
+
+            // Update in accordance to potential resource decay
+
+            request.A = Math.min(request.A, target.nextAmount)
+
+            target.reserveAmount -= request.A
+            continue
+        }
+
+        if (request.T === 'transfer') {
+
+            // Delete the request if the target is fulfilled
+
+            if (target.freeNextStore() < request.A) {
+
+                this.memory.RLRs.splice(i, 1)
+                continue
+            }
+
+            target.reserveStore[request.RT] += request.A
+            continue
+        }
+
+        // Withdraw or offer type
+
+        // Delete the request if the target doesn't have what we need
+
+        if (target.nextStore[request.RT] < request.A) {
+
+            this.memory.RLRs.splice(i, 1)
+                continue
+        }
+
+        target.reserveStore[request.RT] -= request.A
     }
 }
 
