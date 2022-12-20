@@ -749,7 +749,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     for (const index in this.sources) {
         const path = this.advancedFindPath({
             origin: this.sourcePositions[index][0],
-            goals: [{ pos: scoutingRoom.anchor, range: 3 }],
+            goals: [{ pos: scoutingRoom.anchor, range: 4 }],
             typeWeights: {
                 enemy: Infinity,
                 ally: Infinity,

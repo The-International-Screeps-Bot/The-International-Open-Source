@@ -275,7 +275,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
-
+            
             // Construct the required carry parts
 
             partsMultiplier = this.haulerNeed

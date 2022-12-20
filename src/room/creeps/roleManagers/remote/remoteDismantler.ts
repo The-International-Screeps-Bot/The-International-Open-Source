@@ -43,19 +43,28 @@ export class RemoteDismantler extends Creep {
         if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
     }
 
+    hasValidRemote?() {
+
+        if (!this.memory.RN) return false
+
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
+    }
+
     /**
-     * Finds a remote
+     * Finds a remote to harvest in
      */
-    findRemote?(): boolean {
-        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
-
-        // If the creep already has a remote, inform true
-
-        if (this.memory.RN) return true
+    findRemote?() {
+        if (this.hasValidRemote()) return true
 
         // Otherwise, get the creep's role
 
-        const role = this.role as 'remoteDismantler'
+        const role = 'remoteDismantler'
 
         // Get remotes by their efficacy
 
@@ -64,12 +73,8 @@ export class RemoteDismantler extends Creep {
         // Loop through each remote name
 
         for (const roomName of remoteNamesByEfficacy) {
-            // Get the remote's memory using its name
 
             const roomMemory = Memory.rooms[roomName]
-
-            // If the needs of this remote are met, iterate
-
             if (roomMemory.data[RemoteData[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true
@@ -91,7 +96,7 @@ export class RemoteDismantler extends Creep {
     advancedDismantle?(): boolean {
         const { room } = this
 
-        if (this.room.controller.owner && Memory.allyPlayers.includes(this.room.controller.owner.username)) return true
+        if (this.room.controller && this.room.controller.owner && Memory.allyPlayers.includes(this.room.controller.owner.username)) return true
 
         let target
         let range

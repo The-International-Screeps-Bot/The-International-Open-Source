@@ -79,6 +79,19 @@ export const creepRoles: CreepRoles[] = [
     'antifaDowngrader',
 ]
 
+/**
+ * Roles that will interact with the room logistics system
+ */
+export const roomLogisticsRoles: Set<CreepRoles> = new Set([
+    'hauler',
+    'builder',
+    'maintainer',
+    'remoteSourceHarvester0',
+    'remoteSourceHarvester1',
+    'remoteHauler',
+    'hubHauler',
+])
+
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
 
 export enum TrafficPriorities {

@@ -82,7 +82,7 @@ export class SpawnManager {
         for (const index in this.communeManager.room.spawnRequests) {
 
             const request = this.communeManager.room.spawnRequests[index]
-            if (request.cost > this.communeManager.nextSpawnEnergyAvailable) continue
+            if (request.cost > this.communeManager.nextSpawnEnergyAvailable) break
 
             // We're trying to build a creep larger than this room can spawn
             // If this is ran then there is a bug in spawnRequest creation

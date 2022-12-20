@@ -22,28 +22,28 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._role) return this._role
 
-            return (this._role = creepRoles[parseInt(this.name.split(' ')[0])])
+            return (this._role = creepRoles[parseInt(this.name.split('_')[0])])
         },
     },
     cost: {
         get() {
             if (this._cost) return this._cost
 
-            return (this._cost = parseInt(this.name.split(' ')[1]))
+            return (this._cost = parseInt(this.name.split('_')[1]))
         },
     },
     commune: {
         get() {
-            if (this._commune !== undefined) return this._commune
+            if (this._commune) return this._commune
 
-            return (this._commune = Game.rooms[this.name.split(' ')[2]])
+            return (this._commune = Game.rooms[this.name.split('_')[2]])
         },
     },
     defaultParts: {
         get() {
             if (this._defaultParts) return this._defaultParts
 
-            return (this._defaultParts = parseInt(this.name.split(' ')[3]))
+            return (this._defaultParts = parseInt(this.name.split('_')[3]))
         },
     },
     strength: {
@@ -80,6 +80,13 @@ Object.defineProperties(Creep.prototype, {
             if (!this.memory.Rs[0]) return false
 
             return (this._reservation = this.memory.Rs[0])
+        },
+    },
+    roomLogisticsRequest: {
+        get() {
+            if (!this.memory.RLRs[0]) return false
+
+            return this.memory.RLRs[0]
         },
     },
     macroHealStrength: {

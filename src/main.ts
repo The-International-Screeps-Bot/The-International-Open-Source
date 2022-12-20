@@ -101,16 +101,11 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
         internationalManager.advancedGeneratePixel()
         internationalManager.advancedSellPixels()
-        internationalManager.endTickManager()
+    } catch (err) {
+        customLog('ERROR: ' + err, (err as any).stack, {
+            textColor: customColors.white,
+            bgColor: customColors.red,
+        })
     }
-    catch (err) {
-        customLog(
-            'ERROR: ' + err,
-            (err as any).stack,
-            {
-                textColor: customColors.white,
-                bgColor: customColors.red
-            }
-        )
-    }
+    internationalManager.endTickManager()
 })

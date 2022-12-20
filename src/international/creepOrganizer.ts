@@ -54,28 +54,18 @@ class CreepOrganizer {
 
         creep = Game.creeps[creepName] = new creepClass(creep.id)
 
-        // Get the creep's current room and the room it's from
-
-        const { room } = creep
-
         // Organize creep in its room by its role
 
-        room.myCreeps[role].push(creepName)
-
-        // Record the creep's presence in the room
-
-        room.myCreepsAmount += 1
+        creep.room.myCreeps[role].push(creepName)
+        creep.room.myCreepsAmount += 1
 
         // Add the creep's name to the position in its room
 
-        if (!creep.spawning) room.creepPositions.set(packCoord(creep.pos), creep.name)
+        if (!creep.spawning) creep.room.creepPositions.set(packCoord(creep.pos), creep.name)
 
         // Get the commune the creep is from
 
         const commune = creep.commune
-
-        // If there is not vision in the commune, stop
-
         if (!commune) return
 
         if (!commune.controller.my) {
@@ -84,15 +74,11 @@ class CreepOrganizer {
         }
 
         creep.preTickManager()
-
         creep.reservationManager()
 
         // If the creep isn't dying, organize by its roomFrom and role
 
         if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
-
-        // Record that the creep's existence in its roomFrom
-
         commune.creepsFromRoomAmount += 1
     }
 }

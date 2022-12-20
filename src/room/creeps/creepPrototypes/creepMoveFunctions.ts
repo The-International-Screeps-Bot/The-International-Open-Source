@@ -78,23 +78,63 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
 
-    const index = pathOpts.packedPath.indexOf(packPos(this.pos))
+    const cachedIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
-    if (index >= 0) {
-        if (index + 2 >= pathOpts.packedPath.length) {
-            // If loose is enabled, don't try to get back on the cached path
+    // We're at the end of the path
 
-            if (pathOpts.loose) return this.createMoveRequest(opts)
-            return true
+    if (cachedIndex + 2 === pathOpts.packedPath.length) {
+
+        if (pathOpts.loose) return this.createMoveRequest(opts)
+        return true
+    }
+
+    // We're on the path and not at the end
+
+    if (cachedIndex >= 0) {
+        customLog('CACHING1', pathOpts.packedPath.length + ', ' + unpackPosList(pathOpts.packedPath).length + ', ' + cachedIndex)
+        pathOpts.packedPath = pathOpts.packedPath.slice(cachedIndex + 2)
+
+        customLog('CACHING2', pathOpts.packedPath.length + ', ' + unpackPosList(pathOpts.packedPath).length + ', ' + cachedIndex)
+
+        let path: RoomPosition[]
+
+        // If we have a remote, avoid abandoned remotes
+
+        if (pathOpts.remoteName) {
+
+            const roomNames: Set<string> = new Set()
+            path = unpackPosList(pathOpts.packedPath)
+
+            for (const pos of path) {
+
+                roomNames.add(pos.roomName)
+            }
+
+            for (const roomName of roomNames) {
+
+                const roomMemory = Memory.rooms[roomName]
+
+                if (Memory.rooms[roomName].T !== 'remote') continue
+                if (!roomMemory.data[RemoteData.abandon]) continue
+
+                // The room is unsafe, don't use cached paths
+
+                return this.createMoveRequest(opts)
+            }
         }
 
-        this.assignMoveRequest(unpackPosList(pathOpts.packedPath)[Math.ceil(index / 2 + 1)])
+        if (!path) path = unpackPosList(pathOpts.packedPath)
+
+        this.memory.P = pathOpts.packedPath
+        this.assignMoveRequest(path[0])
         return true
     }
 
     // If loose is enabled, don't try to get back on the cached path
 
     if (pathOpts.loose) return this.createMoveRequest(opts)
+
+    // Try to get on the path
 
     opts.goals = []
 
@@ -460,6 +500,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if (!creepNameAtPos) {
         if (this.spawning) {
 
+            this.moved = this.moveRequest
             room.moveRequests.delete(this.moveRequest)
             return
         }
@@ -505,6 +546,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if (this.spawning) {
         if (creepAtPos.shove(this.pos)) {
 
+            this.moved = this.moveRequest
             room.moveRequests.delete(this.moveRequest)
         }
 
@@ -705,6 +747,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // Otherwise the creepAtPos has no moveRequest
 
     if (creepAtPos.shove(this.pos)) {
+        this.room.visual.text('S', creepAtPos.pos)
         this.runMoveRequest()
         return
     }

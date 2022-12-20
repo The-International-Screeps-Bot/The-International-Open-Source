@@ -56,16 +56,28 @@ export class RemoteHarvester extends Creep {
             commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
     }
 
+    hasValidRemote?() {
+
+        if (!this.memory.RN) return false
+
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
+    }
+
     /**
      * Finds a remote to harvest in
      */
-    findRemote?(): boolean {
-        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
+    findRemote?() {
+        if (this.hasValidRemote()) return true
 
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            const sourceIndex = parseInt(splitRemoteInfo[1])
             const remoteMemory = Memory.rooms[remoteName]
 
             // If there is no need
@@ -190,25 +202,33 @@ export class RemoteHarvester extends Creep {
             return false
         }
 
-        //So there's not a container.  Is there a construction site?
-        let constructionSite = this.room
+        // Don't build remote containers until we can reserve the room
+
+        if (this.commune.energyCapacityAvailable < 650) return false
+
+        // Check if there is a construction site
+
+        const cSite = this.room
             .lookForAt(LOOK_CONSTRUCTION_SITES, containerPosition)
             .find(st => st.structureType == STRUCTURE_CONTAINER)
-        if (constructionSite) {
-            //This needs to check to see how we're doing on energy, and pick it up off the ground if needed.
-            this.obtainEnergyIfNeeded()
-            this.build(constructionSite)
 
-            //The container gets built slowly, so delete the tracking flag each time we build.  We don't want the
-            //   container cancelled.
-            delete Memory.constructionSites[constructionSite.id]
+        if (cSite) {
+
+            // Pick energy off the ground if possible
+
+            this.obtainEnergyIfNeeded()
+
+            this.build(cSite)
+
+            // Don't allow the construction site manager to remove the site for while we're building
+
+            delete Memory.constructionSites[cSite.id]
             return true
         }
 
-        //So no container, no construction site.  Let's create one...  This probably needs some guards to make sure we're not creating
-        //  too many construction sites.
-        this.room.createConstructionSite(containerPosition, STRUCTURE_CONTAINER)
+        // Start on adding a container
 
+        this.room.createConstructionSite(containerPosition, STRUCTURE_CONTAINER)
         return false
     }
 

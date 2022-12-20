@@ -44,20 +44,27 @@ export class RemoteCoreAttacker extends Creep {
         if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
     }
 
-    /**
-     * Finds a remote
-     */
-    findRemote?(): boolean {
-        if (
-            this.memory.RN &&
-            Memory.rooms[this.memory.RN].T === 'remote' &&
-            Memory.rooms[this.memory.RN].CN === this.commune.name
-        )
-            return true
+    hasValidRemote?() {
 
+        if (!this.memory.RN) return false
+
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
+    }
+
+    /**
+     * Finds a remote to harvest in
+     */
+    findRemote?() {
+        if (this.hasValidRemote()) return true
         // Otherwise, get the creep's role
 
-        const role = this.role as 'remoteCoreAttacker'
+        const role = 'remoteCoreAttacker'
 
         // Get remotes by their efficacy
 
@@ -66,12 +73,8 @@ export class RemoteCoreAttacker extends Creep {
         // Loop through each remote name
 
         for (const roomName of remoteNamesByEfficacy) {
-            // Get the remote's memory using its name
 
             const roomMemory = Memory.rooms[roomName]
-
-            // If the needs of this remote are met, iterate
-
             if (roomMemory.data[RemoteData[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true

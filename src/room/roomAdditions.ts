@@ -633,7 +633,7 @@ Object.defineProperties(Room.prototype, {
                         return (
                             this.advancedFindPath({
                                 origin: a[0],
-                                goals: [{ pos: commune.anchor, range: 3 }],
+                                goals: [{ pos: commune.anchor, range: 4 }],
                                 typeWeights: remoteTypeWeights,
                                 plainCost: defaultRoadPlanningPlainCost,
                                 weightStructurePlans: true,
@@ -641,7 +641,7 @@ Object.defineProperties(Room.prototype, {
                             }).length -
                             this.advancedFindPath({
                                 origin: b[0],
-                                goals: [{ pos: commune.anchor, range: 3 }],
+                                goals: [{ pos: commune.anchor, range: 4 }],
                                 typeWeights: remoteTypeWeights,
                                 plainCost: defaultRoadPlanningPlainCost,
                                 weightStructurePlans: true,
@@ -654,7 +654,7 @@ Object.defineProperties(Room.prototype, {
                 for (let index in sources) {
                     const path = this.advancedFindPath({
                         origin: this.sourcePositions[index][0],
-                        goals: [{ pos: commune.anchor, range: 3 }],
+                        goals: [{ pos: commune.anchor, range: 4 }],
                         typeWeights: remoteTypeWeights,
                         plainCost: defaultRoadPlanningPlainCost,
                         weightStructurePlans: true,
@@ -676,7 +676,7 @@ Object.defineProperties(Room.prototype, {
                     return (
                         this.advancedFindPath({
                             origin: a[0],
-                            goals: [{ pos: this.anchor, range: 3 }],
+                            goals: [{ pos: this.anchor, range: 4 }],
                             typeWeights: remoteTypeWeights,
                             plainCost: defaultRoadPlanningPlainCost,
                             weightStructurePlans: true,
@@ -684,7 +684,7 @@ Object.defineProperties(Room.prototype, {
                         }).length -
                         this.advancedFindPath({
                             origin: b[0],
-                            goals: [{ pos: this.anchor, range: 3 }],
+                            goals: [{ pos: this.anchor, range: 4 }],
                             typeWeights: remoteTypeWeights,
                             plainCost: defaultRoadPlanningPlainCost,
                             weightStructurePlans: true,
@@ -697,7 +697,7 @@ Object.defineProperties(Room.prototype, {
             for (let index in sources) {
                 const path = this.advancedFindPath({
                     origin: this.sourcePositions[index][0],
-                    goals: [{ pos: this.anchor, range: 3 }],
+                    goals: [{ pos: this.anchor, range: 4 }],
                     typeWeights: remoteTypeWeights,
                     plainCost: defaultRoadPlanningPlainCost,
                     weightStructurePlans: true,

@@ -18,11 +18,24 @@ export class RemoteReserver extends Creep {
         return (this._dying = true)
     }
 
+    hasValidRemote?() {
+
+        if (!this.memory.RN) return false
+
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
+    }
+
     /**
-     * Finds a remote to reserve
+     * Finds a remote to harvest in
      */
-    findRemote?(): boolean {
-        if (this.memory.RN && Memory.rooms[this.memory.RN].T === 'remote' && Memory.rooms[this.memory.RN].CN === this.commune.name) return true
+    findRemote?() {
+        if (this.hasValidRemote()) return true
 
         const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 

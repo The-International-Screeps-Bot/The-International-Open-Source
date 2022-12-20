@@ -6,10 +6,11 @@ import {
     findFunctionCPU,
     findObjectWithID,
     getRange,
+    getRangeOfCoords,
     randomTick,
 } from 'international/utils'
 import { indexOf } from 'lodash'
-import { packCoord, reverseCoordList, unpackCoord, unpackPosList } from 'other/packrat'
+import { packCoord, reverseCoordList, unpackCoord, unpackPos, unpackPosList } from 'other/packrat'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
@@ -42,16 +43,24 @@ export class RemoteHauler extends Creep {
         Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
     }
 
+    hasValidRemote?() {
+
+        if (!this.memory.RN) return false
+
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
+    }
+
     /**
-     * Finds a remote to haul from
+     * Finds a remote to harvest in
      */
-    findRemote?(): boolean {
-        if (
-            this.memory.RN &&
-            Memory.rooms[this.memory.RN].T === 'remote' &&
-            Memory.rooms[this.memory.RN].CN === this.commune.name
-        )
-            return true
+    findRemote?() {
+        if (this.hasValidRemote()) return true
 
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
@@ -465,6 +474,8 @@ export class RemoteHauler extends Creep {
     relayCoord?(coord: Coord) {
         if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
 
+
+
         const creepAtPosName = this.room.creepPositions.get(packCoord(coord))
         if (!creepAtPosName) return false
 
@@ -558,12 +569,16 @@ export class RemoteHauler extends Creep {
         return false
     }
 
-    relayAsFull?() {
+    relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
 
         if (!this.moveRequest && (!this.memory.P || !this.memory.P.length)) return
         if (this.movedResource) return
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return
+
+        // Don't relay too close to the source position
+
+        if (this.memory.RN && getRangeOfCoords(unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0], this.pos) <= 1) return
 
         const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[0]
 
@@ -600,7 +615,7 @@ export class RemoteHauler extends Creep {
 
         // If the creep has a remoteName, delete it and delete it's fulfilled needs
 
-        if (this.deliverResources()) this.relayAsFull()
+        if (this.deliverResources()) this.relay()
     }
 
     static remoteHaulerManager(room: Room, creepsOfRole: string[]) {

@@ -9,7 +9,7 @@ StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest, ID) {
     return this.spawnCreep(
         spawnRequest.body,
-        `${creepRoles.indexOf(spawnRequest.role)} ${spawnRequest.cost} ${this.room.name} ${ID}`,
+        `${creepRoles.indexOf(spawnRequest.role)}_${spawnRequest.cost}_${this.room.name}_${spawnRequest.defaultParts}_${ID}`,
         spawnRequest.extraOpts,
     )
 }
