@@ -184,7 +184,7 @@ export class Operator extends PowerCreep {
             )
                 continue
 
-            let score = task.priority + range / 100
+            const score = task.priority + range / 100
 
             if (score >= lowestScore) continue
 

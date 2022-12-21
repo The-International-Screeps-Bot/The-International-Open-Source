@@ -355,6 +355,12 @@ declare global {
         maxAmount?: number
     }
 
+    interface findNewRoomLogisticsRequestArgs {
+        type?: RoomLogisticsRequestTypes
+        resourceType?: ResourceConstant
+        conditions?(request: RoomLogisticsRequest): any
+    }
+
     interface CreepRoomLogisticsRequest {
         /**
          * The Type of logistic task
@@ -376,50 +382,6 @@ declare global {
          * Only Full, if they want a responder only if fully filled
          */
         OF?: boolean
-    }
-
-    interface CreepRoomLogisticsTansferTask extends CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: 'transfer'
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure>
-    }
-
-    interface CreepRoomLogisticsWithdrawTask extends CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: 'withdraw'
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure | Tombstone | Ruin | Creep>
-    }
-
-    interface CreepRoomLogisticsPickupTask extends CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: 'pickup'
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure>
-    }
-
-    interface CreepRoomLogisticsOfferTask extends CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: 'offer'
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure>
     }
 
     interface PowerTask {
@@ -1826,9 +1788,9 @@ declare global {
 
         findOptimalSourceIndex(): boolean
 
-        findSourcePos(sourceIndex: number): false | Coord
+        findSourcePos(sourceIndex: number): false | RoomPosition
 
-        findMineralHarvestPos(): false | Coord
+        findMineralHarvestPos(): false | RoomPosition
 
         /**
          *
@@ -2036,15 +1998,16 @@ declare global {
 
         manageSpawning(spawn: StructureSpawn): void
 
-        updateRoomLogisticsRequest(index: number): void
-
-        deleteRoomLogisticsRequest(index: number): void
-
         roomLogisticsRequestManager(): void
 
-        findRoomLogisticsRequest(): CreepRoomLogisticsRequest | 0
+        findRoomLogisticsRequest(args: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
+        findRoomLogisticsRequestTypes(args: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
+        canAcceptRoomLogisticsRequest(request: RoomLogisticsRequest): boolean
+        findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
-        findNewRoomLogisticsRequest(): CreepRoomLogisticsRequest | 0
+        runRoomLogisticsRequest(args: findNewRoomLogisticsRequestArgs): number
+
+        runRoomLogisticsRequests(args: findNewRoomLogisticsRequestArgs): boolean
 
         // Creep Getters
 

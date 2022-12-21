@@ -152,6 +152,26 @@ export class SpawnManager {
         const request = this.communeManager.room.spawnRequests[index]
 
         request.body = []
+
+        if (request.role === 'hauler' || request.role === 'remoteHauler') {
+
+            const ratio = (request.bodyPartCounts[CARRY] + request.bodyPartCounts[WORK]) / request.bodyPartCounts[MOVE]
+
+            for (let i = 0; i < request.bodyPartCounts[CARRY]; i++) {
+
+                request.body.push(CARRY)
+                if (i % ratio === 0) request.body.push(MOVE)
+            }
+
+            for (let i = 0; i < request.bodyPartCounts[WORK]; i++) {
+
+                request.body.push(WORK)
+                if (i % ratio === 0) request.body.push(MOVE)
+            }
+
+            return
+        }
+
         const endParts: BodyPartConstant[] = []
 
         for (const partIndex in partsByPriority) {

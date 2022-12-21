@@ -1,6 +1,6 @@
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
-import { packCoord, packPos, unpackPos } from 'other/packrat'
+import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {
@@ -59,14 +59,14 @@ export class SourceHarvester extends Creep {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(harvestPos.x, harvestPos.y, this.room.name),
+                        pos: harvestPos,
                         range: 0,
                     },
                 ],
                 avoidEnemyRanges: true,
             },
             {
-                packedPath: this.room.memory.SPs[this.memory.SI],
+                packedPath: reverseCoordList(this.room.memory.SPs[this.memory.SI]),
                 loose: true,
             })
 
@@ -77,7 +77,7 @@ export class SourceHarvester extends Creep {
             origin: this.pos,
             goals: [
                 {
-                    pos: new RoomPosition(harvestPos.x, harvestPos.y, this.room.name),
+                    pos: harvestPos,
                     range: 0,
                 },
             ],
