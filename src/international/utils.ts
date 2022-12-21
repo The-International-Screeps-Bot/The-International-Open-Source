@@ -171,7 +171,7 @@ export function advancedFindDistance(
                 if (roomName === goalRoomName) return 1
                 return Infinity
             }
-            customLog('ERROR', roomName)
+
             if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
                 return Infinity
 
@@ -583,50 +583,16 @@ export function isNearRoomEdge(coord: Coord, minRange: number) {
     return false
 }
 
-/*
-export function getDirectionCoord(coord1: Coord, coord2: Coord) {
-
-    return getDirection(coord1.x, coord2.x, coord1.x, coord2.x)
-}
-
-export function getDirection(x1: number, x2: number, y1: number, y2: number) {
-
-    let dx = x2 - x1
-    let dy = y2 - y1
-    let adx = Math.abs(dx)
-    let ady = Math.abs(dy)
-
-    if(adx > ady*2) {
-        if(dx > 0) {
-            return RIGHT;
-        }
-        else {
-            return LEFT;
-        }
-    }
-    else if(ady > adx*2) {
-        if(dy > 0) {
-            return BOTTOM;
-        }
-        else {
-            return TOP;
-        }
-    }
-    else {
-        if(dx > 0 && dy > 0) {
-            return BOTTOM_RIGHT;
-        }
-        if(dx > 0 && dy < 0) {
-            return TOP_RIGHT;
-        }
-        if(dx < 0 && dy > 0) {
-            return BOTTOM_LEFT;
-        }
-        if(dx < 0 && dy < 0) {
-            return TOP_LEFT;
-        }
-    }
-
-    return undefined
-}
+/**
+ * Increases priority as a percentage of capacity used
+ * @param reverse Decreases priority as a percentage of capacity used
  */
+export function scalePriority(capacity: number, amount: number, multiplier: number = 1, reverse?: boolean) {
+
+    if (reverse) {
+
+        return (1 - amount / capacity) * multiplier
+    }
+
+    return amount / capacity * multiplier
+}

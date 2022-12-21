@@ -1,5 +1,5 @@
-import { CommuneManager } from './room/commune/communeManager'
-import { RoomManager } from './room/roomManager'
+import { CommuneManager } from './room/commune/commune'
+import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
@@ -333,7 +333,7 @@ declare global {
         ID?: number
         type: RoomLogisticsRequestTypes
         /**
-         * Consider in weighting the task
+         * Consider in weighting the task, lower is more preffered
          */
         priority?: number
         targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
@@ -357,7 +357,6 @@ declare global {
 
     interface findNewRoomLogisticsRequestArgs {
         type?: RoomLogisticsRequestTypes
-        resourceType?: ResourceConstant
         conditions?(request: RoomLogisticsRequest): any
     }
 
@@ -1543,6 +1542,10 @@ declare global {
          * Mandatory Other Fill Transfer Targets
          */
         readonly MOFTT: (Creep | AnyStoreStructure)[]
+
+        _advancedLogistics: boolean
+
+        readonly advancedLogistics: boolean
     }
 
     interface DepositRecord {
@@ -2000,14 +2003,14 @@ declare global {
 
         roomLogisticsRequestManager(): void
 
-        findRoomLogisticsRequest(args: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
-        findRoomLogisticsRequestTypes(args: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
+        findRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
+        findRoomLogisticsRequestTypes(args?: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
         canAcceptRoomLogisticsRequest(request: RoomLogisticsRequest): boolean
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
-        runRoomLogisticsRequest(args: findNewRoomLogisticsRequestArgs): number
+        runRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): number
 
-        runRoomLogisticsRequests(args: findNewRoomLogisticsRequestArgs): boolean
+        runRoomLogisticsRequests(args?: findNewRoomLogisticsRequestArgs): boolean
 
         // Creep Getters
 

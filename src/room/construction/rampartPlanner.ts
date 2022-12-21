@@ -20,8 +20,8 @@ import {
     unpackNumAsCoord,
     unpackNumAsPos,
 } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
-import { CommuneManager } from 'room/commune/communeManager'
+import { internationalManager } from 'international/international'
+import { CommuneManager } from 'room/commune/commune'
 
 /*
 - Posted 10 may 2018 by @saruss

@@ -8,14 +8,14 @@ import {
     getRangeOfCoords,
     unpackNumAsCoord,
 } from 'international/utils'
-import { TerminalManager } from './terminal/terminalManager'
-import './spawning/spawnManager'
+import { TerminalManager } from './terminal/terminal'
+import './spawning/spawningStructures'
 
 import { constructionManager } from '../construction/constructionManager'
 import './combat'
-import './allyCreepRequestManager'
-import './claimRequestManager'
-import './combatRequestManager'
+import './allyCreepRequest'
+import './claimRequest'
+import './combatRequest'
 import {
     creepRoles,
     impassibleStructureTypesSet,
@@ -32,20 +32,21 @@ import { RoomVisualsManager } from '../roomVisuals'
 import { EndTickCreepManager } from '../creeps/endTickCreepManager'
 import { CreepRoleManager } from '../creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
-import { ClaimRequestManager } from './claimRequestManager'
-import { CombatRequestManager } from './combatRequestManager'
-import { AllyCreepRequestManager } from './allyCreepRequestManager'
-import { PowerSpawnManager } from './powerSpawn'
+import { ClaimRequestManager } from './claimRequest'
+import { CombatRequestManager } from './combatRequest'
+import { AllyCreepRequestManager } from './allyCreepRequest'
+import { PowerSpawningStructuresManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
 import { TowerManager } from './towers'
 import { CombatManager } from './combat'
-import { SpawnManager } from './spawning/spawnManager'
+import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
-import { HaulerNeedManager } from './haulerNeedManager'
+import { HaulerNeedManager } from './haulerNeed'
 import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
-import { ContainerManager } from './containerManager'
+import { ContainerManager } from '../container'
+import { StoringStructuresManager } from './storingStructures'
 
 export class CommuneManager {
     // Managers
@@ -53,11 +54,11 @@ export class CommuneManager {
     combatManager: CombatManager
 
     towerManager: TowerManager
+    storingStructuresManager: StoringStructuresManager
     labManager: LabManager
-    powerSpawnManager: PowerSpawnManager
-    spawnManager: SpawnManager
+    powerSpawningStructuresManager: PowerSpawningStructuresManager
+    spawningStructuresManager: SpawningStructuresManager
     sourceManager: SourceManager
-    containerManager: ContainerManager
 
     terminalManager: TerminalManager
     remotesManager: RemotesManager
@@ -77,11 +78,11 @@ export class CommuneManager {
         this.combatManager = new CombatManager(this)
 
         this.towerManager = new TowerManager(this)
+        this.storingStructuresManager = new StoringStructuresManager(this)
         this.labManager = new LabManager(this)
-        this.powerSpawnManager = new PowerSpawnManager(this)
-        this.spawnManager = new SpawnManager(this)
+        this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
+        this.spawningStructuresManager = new SpawningStructuresManager(this)
         this.sourceManager = new SourceManager(this)
-        this.containerManager = new ContainerManager(this)
 
         this.terminalManager = new TerminalManager(this)
         this.remotesManager = new RemotesManager(this)
@@ -140,7 +141,6 @@ export class CommuneManager {
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
         this.claimRequestManager.preTickRun()
-        this.containerManager.preTickRun()
 
         // Add roomName to commune list
 
@@ -190,21 +190,25 @@ export class CommuneManager {
         this.combatRequestManager.run()
         this.allyCreepRequestManager.run()
         this.haulRequestManager.run()
+
         this.sourceManager.run()
         this.remotesManager.run()
         this.haulerNeedManager.run()
 
+        this.room.roomManager.containerManager.run()
+        this.spawningStructuresManager.createRoomLogisticsRequests()
+        this.storingStructuresManager.run()
         this.room.linkManager()
         this.room.factoryManager()
         this.labManager.run()
-        this.powerSpawnManager.run()
-        this.spawnManager.organizeSpawns()
-        this.spawnManager.createPowerTasks()
+        this.powerSpawningStructuresManager.run()
+        this.spawningStructuresManager.organizeSpawns()
+        this.spawningStructuresManager.createPowerTasks()
 
         this.room.roomManager.creepRoleManager.run()
         this.room.roomManager.powerCreepRoleManager.run()
 
-        this.spawnManager.run()
+        this.spawningStructuresManager.run()
 
         this.room.roomManager.endTickCreepManager.run()
         this.room.roomManager.roomVisualsManager.run()
@@ -213,7 +217,6 @@ export class CommuneManager {
     }
 
     private test() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()

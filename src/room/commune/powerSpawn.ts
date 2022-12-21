@@ -1,9 +1,9 @@
 import { globalStatsUpdater } from 'international/statsManager'
-import { CommuneManager } from './communeManager'
+import { CommuneManager } from './commune'
 import { customLog } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 
-export class PowerSpawnManager {
+export class PowerSpawningStructuresManager {
     communeManager: CommuneManager
     powerSpawn: StructurePowerSpawn
 
@@ -34,9 +34,7 @@ export class PowerSpawnManager {
      * Find unspawned power creeps and spawn them
      */
     private advancedSpawn() {
-
         for (let i = internationalManager.unspawnedPowerCreepNames.length - 1; i >= 0; i--) {
-
             const creep = Game.powerCreeps[internationalManager.unspawnedPowerCreepNames[i]]
 
             creep.spawn(this.powerSpawn)

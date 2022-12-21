@@ -1,11 +1,11 @@
 import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, getRangeOfCoords, newID } from 'international/utils'
-import { CommuneManager } from '../communeManager'
+import { CommuneManager } from '../commune'
 import './spawnFunctions'
 import './spawnRequestManager'
 
-export class SpawnManager {
+export class SpawningStructuresManager {
     communeManager: CommuneManager
     inactiveSpawns: StructureSpawn[]
     activeSpawns: StructureSpawn[]
@@ -80,7 +80,6 @@ export class SpawnManager {
         // Loop through priorities inside requestsByPriority
 
         for (const index in this.communeManager.room.spawnRequests) {
-
             const request = this.communeManager.room.spawnRequests[index]
             if (request.cost > this.communeManager.nextSpawnEnergyAvailable) break
 
@@ -154,17 +153,14 @@ export class SpawnManager {
         request.body = []
 
         if (request.role === 'hauler' || request.role === 'remoteHauler') {
-
             const ratio = (request.bodyPartCounts[CARRY] + request.bodyPartCounts[WORK]) / request.bodyPartCounts[MOVE]
 
-            for (let i = 0; i < request.bodyPartCounts[CARRY]; i++) {
-
+            for (let i = -1; i < request.bodyPartCounts[CARRY] - 1; i++) {
                 request.body.push(CARRY)
                 if (i % ratio === 0) request.body.push(MOVE)
             }
 
-            for (let i = 0; i < request.bodyPartCounts[WORK]; i++) {
-
+            for (let i = -1; i < request.bodyPartCounts[WORK] - 1; i++) {
                 request.body.push(WORK)
                 if (i % ratio === 0) request.body.push(MOVE)
             }
@@ -209,7 +205,6 @@ export class SpawnManager {
     }
 
     private findDirections(pos: RoomPosition) {
-
         const adjacentCoords: Coord[] = []
 
         for (let x = pos.x - 1; x <= pos.x + 1; x += 1) {
@@ -253,6 +248,17 @@ export class SpawnManager {
 
         for (const spawn of this.activeSpawns) {
             this.communeManager.room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)
+        }
+    }
+
+    createRoomLogisticsRequests() {
+        for (const structure of this.communeManager.room.spawningStructuresByNeed) {
+
+            this.communeManager.room.createRoomLogisticsRequest({
+                target: structure,
+                type: 'transfer',
+                priority: 3,
+            })
         }
     }
 

@@ -1,7 +1,7 @@
 import { customColors } from 'international/constants'
 import { customLog, findCPUColor } from 'international/utils'
 import { allyManager } from 'international/simpleAllies'
-import { InternationalManager } from './internationalManager'
+import { InternationalManager } from './international'
 import { statsManager } from './statsManager'
 
 InternationalManager.prototype.endTickManager = function () {

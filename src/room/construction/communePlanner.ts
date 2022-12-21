@@ -27,11 +27,11 @@ import {
     unpackNumAsCoord,
     unpackNumAsPos,
 } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { packPosList } from 'other/packrat'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
-import { CommuneManager } from 'room/commune/communeManager'
+import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './rampartPlanner'
 
 interface PlanStampOpts {
@@ -575,7 +575,6 @@ export function basePlanner(room: Room) {
 
     const closestMineralHarvestPos = room.mineralPositions[0]
     if (closestMineralHarvestPos) room.roadCoords[packAsNum(closestMineralHarvestPos)] = 255
-
 
     if (!room.memory.stampAnchors.container.includes(packAsNum(closestMineralHarvestPos))) {
         room.memory.stampAnchors.container.push(packAsNum(closestMineralHarvestPos))

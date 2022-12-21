@@ -4,7 +4,6 @@ import { unpackPos } from 'other/packrat'
 
 export class MineralHarvester extends Creep {
     advancedHarvestMineral?(mineral: Mineral): boolean {
-        if (!this.needsResources()) return false
 
         this.say('🚬')
 
@@ -22,7 +21,7 @@ export class MineralHarvester extends Creep {
 
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(harvestPos.x, harvestPos.y, this.room.name), range: 0 }],
+                goals: [{ pos: harvestPos, range: 0 }],
                 avoidEnemyRanges: true,
             })
 
@@ -41,10 +40,6 @@ export class MineralHarvester extends Creep {
             globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
 
         this.say(`⛏️${mineralsHarvested}`)
-
-        // If the creep will likely be full next tick
-
-        if (this.store.getUsedCapacity() + mineralsHarvested >= this.store.getCapacity()) return false
         return true
     }
 
@@ -65,15 +60,7 @@ export class MineralHarvester extends Creep {
                 continue
             }
 
-            if (creep.advancedHarvestMineral(mineral)) continue
-
-            // If there is a terminal
-
-            if (room.terminal && room.terminal.store.getFreeCapacity() >= 10000) {
-                // Transfer the creep's minerals to it
-
-                creep.advancedTransfer(room.terminal, mineral.mineralType)
-            }
+            creep.advancedHarvestMineral(mineral)
         }
     }
 }

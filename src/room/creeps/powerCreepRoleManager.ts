@@ -1,7 +1,7 @@
 import { customColors, powerCreepClassNames } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog } from 'international/utils'
-import { RoomManager } from 'room/roomManager'
+import { RoomManager } from 'room/room'
 import { Operator } from './powerCreeps/operator'
 
 const managers: { [key in PowerClassConstant]: Function } = {

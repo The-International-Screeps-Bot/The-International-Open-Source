@@ -2,7 +2,7 @@ import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'inter
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick } from 'international/utils'
 import { packCoord } from 'other/packrat'
-import { CommuneManager } from './communeManager'
+import { CommuneManager } from './commune'
 
 export class CombatManager {
     communeManager: CommuneManager

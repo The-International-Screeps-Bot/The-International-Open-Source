@@ -1,5 +1,5 @@
 import { customLog } from 'international/utils'
-import { CommuneManager } from './communeManager'
+import { CommuneManager } from './commune'
 
 export class SourceManager {
     communeManager: CommuneManager
@@ -16,12 +16,10 @@ export class SourceManager {
     }
 
     run() {
-
         this.createPowerTasks()
     }
 
     private estimateIncome() {
-
         const { room } = this.communeManager
 
         room.estimatedSourceIncome = []
@@ -43,7 +41,6 @@ export class SourceManager {
     }
 
     private createPowerTasks() {
-
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
         for (const source of this.sources) {

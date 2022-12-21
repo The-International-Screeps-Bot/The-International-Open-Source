@@ -1,7 +1,7 @@
 import { ClaimRequestData, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
-import { CommuneManager } from './communeManager'
+import { internationalManager } from 'international/international'
+import { CommuneManager } from './commune'
 import { globalStatsUpdater } from 'international/statsManager'
 
 export class ClaimRequestManager {

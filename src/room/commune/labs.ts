@@ -1,5 +1,5 @@
 import { minerals } from 'international/constants'
-import { CommuneManager } from './communeManager'
+import { CommuneManager } from './commune'
 import { Hauler } from '../creeps/roleManagers/commune/hauler'
 import { findObjectWithID, getRangeOfCoords } from 'international/utils'
 

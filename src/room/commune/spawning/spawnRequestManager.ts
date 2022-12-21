@@ -23,7 +23,7 @@ import {
     getRangeOfCoords,
     randomRange,
 } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
 const minRemotePriority = 10
@@ -275,7 +275,7 @@ Room.prototype.spawnRequester = function () {
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
             priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
-            
+
             // Construct the required carry parts
 
             partsMultiplier = this.haulerNeed
@@ -316,24 +316,13 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            // If there is no extractor, inform false
-
-            if (!this.structures.extractor.length) return false
-
             if (this.controller.level < 6) return false
-
+            if (!this.structures.extractor.length) return false
+            if (!this.mineralContainer) return false
             if (!storage) return false
-
             if (this.resourcesInStoringStructures.energy < 40000) return false
-
-            // If there is no terminal, inform false
-
             if (!terminal) return false
-
             if (terminal.store.getFreeCapacity() <= 10000) return false
-
-            // Get the mineral. If it's out of resources, inform false
-
             if (this.mineral.mineralAmount === 0) return false
 
             let minCost = 900
@@ -345,8 +334,19 @@ Room.prototype.spawnRequester = function () {
             return {
                 role,
                 defaultParts: [],
-                extraParts: [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK],
-                partsMultiplier: 4 /* this.get('mineralHarvestPositions')?.length * 4 */,
+                extraParts: [
+                    MOVE,
+                    MOVE,
+                    WORK,
+                    WORK,
+                    WORK,
+                    WORK,
+                    WORK,
+                    WORK,
+                    WORK,
+                    WORK,
+                ] /* [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK] */,
+                partsMultiplier: /* 4 */ 5,
                 minCreeps: 1,
                 minCost,
                 priority: 10 + this.creepsFromRoom.mineralHarvester.length * 3,

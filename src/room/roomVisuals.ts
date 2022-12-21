@@ -11,7 +11,7 @@ import {
 } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
-import { RoomManager } from './roomManager'
+import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
 

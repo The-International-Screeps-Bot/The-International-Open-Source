@@ -25,11 +25,12 @@ import {
     findClosestRoomName,
     randomTick,
 } from './utils'
-import { internationalManager, InternationalManager } from './internationalManager'
+import { internationalManager, InternationalManager } from './international'
 import { globalStatsUpdater, statsManager } from './statsManager'
 import { indexOf } from 'lodash'
-import { CommuneManager } from 'room/commune/communeManager'
+import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
+import { RoomManager } from 'room/room'
 
 class TickConfig {
     public run() {
@@ -77,60 +78,16 @@ class TickConfig {
 
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
-            const roomMemory = room.memory
 
-            // Every 100~ ticks
+            room.roomManager = global.roomManagers[room.name]
 
-            if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
-                room.basicScout()
-                cleanRoomMemory(room.name)
+            if (!room.roomManager) {
+                room.roomManager = new RoomManager()
+                global.roomManagers[room.name] = room.roomManager
             }
 
-            room.moveRequests = new Map()
-            room.creepPositions = new Map()
-            room.powerCreepPositions = new Map()
-
-            // Single tick properties
-
-            room.myCreeps = {}
-            for (const role of creepRoles) room.myCreeps[role] = []
-
-            room.myPowerCreeps = {}
-            for (const className of powerCreepClassNames) room.myPowerCreeps[className] = []
-
-            room.myCreepsAmount = 0
-            room.myPowerCreepsAmount = 0
-
-            room.creepsOfSourceAmount = []
-
-            room.partsOfRoles = {}
-            room.powerTasks = {}
-
-            for (const index in room.sources) room.creepsOfSourceAmount.push(0)
-
-            room.squadRequests = new Set()
-
-            // Check if the room is a commune
-
-            if (!room.controller) continue
-
-            if (!room.controller.my) {
-                if (room.memory.T === 'commune') {
-                    room.basicScout()
-                    cleanRoomMemory(room.name)
-                }
-                continue
-            }
-
-            room.communeManager = global.communeManagers[room.name]
-
-            if (!room.communeManager) {
-                room.communeManager = new CommuneManager()
-                global.communeManagers[room.name] = room.communeManager
-            }
-
-            room.communeManager.update(room)
-            room.communeManager.preTickRun()
+            room.roomManager.update(room)
+            room.roomManager.preTickRun()
         }
     }
 

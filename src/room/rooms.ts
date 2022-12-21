@@ -2,7 +2,7 @@ import { customColors, roomTypesUsedForStats } from '../international/constants'
 
 import './roomFunctions'
 
-import './commune/communeManager'
+import './commune/commune'
 
 import { CreepRoleManager } from './creeps/creepRoleManager'
 
@@ -11,8 +11,8 @@ import './roomVisuals'
 import { createPosMap, customLog } from 'international/utils'
 import { globalStatsUpdater, statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
-import { CommuneManager } from './commune/communeManager'
-import { RoomManager } from './roomManager'
+import { CommuneManager } from './commune/commune'
+import { RoomManager } from './room'
 
 export function roomsManager() {
     // If CPU logging is enabled, get the CPU used at the start
@@ -34,15 +34,6 @@ export function roomsManager() {
 
         const statsActive = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
         if (statsActive) statsManager.roomPreTick(room.name, roomType)
-
-        room.roomManager = global.roomManagers[room.name]
-
-        if (!room.roomManager) {
-            room.roomManager = new RoomManager()
-            global.roomManagers[room.name] = room.roomManager
-        }
-
-        room.roomManager.update(room)
 
         // If the room is a commune, run its specific manager
 

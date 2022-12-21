@@ -1,6 +1,6 @@
 import { allowedSquadCombinations, antifaRoles, customColors } from 'international/constants'
 import { customLog, findClosestObject, getRange, isCoordExit, isXYExit } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { Duo } from './duo'
 import { Quad } from './quad'
 

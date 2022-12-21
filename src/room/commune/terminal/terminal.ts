@@ -2,8 +2,8 @@ import { minerals, terminalResourceTargets } from 'international/constants'
 import { customLog, newID } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
-import { internationalManager } from 'international/internationalManager'
-import { CommuneManager } from 'room/commune/communeManager'
+import { internationalManager } from 'international/international'
+import { CommuneManager } from 'room/commune/commune'
 
 const MAX_TRANSFER = 20000
 const TERMINAL_MAX_FILL = 270000

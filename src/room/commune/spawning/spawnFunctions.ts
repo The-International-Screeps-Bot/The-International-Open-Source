@@ -1,5 +1,5 @@
 import { creepRoles, customColors, partsByPriority } from 'international/constants'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { customLog, newID } from 'international/utils'
 
 StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
@@ -9,7 +9,9 @@ StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest, ID) {
     return this.spawnCreep(
         spawnRequest.body,
-        `${creepRoles.indexOf(spawnRequest.role)}_${spawnRequest.cost}_${this.room.name}_${spawnRequest.defaultParts}_${ID}`,
+        `${creepRoles.indexOf(spawnRequest.role)}_${spawnRequest.cost}_${this.room.name}_${
+            spawnRequest.defaultParts
+        }_${ID}`,
         spawnRequest.extraOpts,
     )
 }

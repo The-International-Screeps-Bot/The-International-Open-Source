@@ -39,7 +39,7 @@ import {
     unpackNumAsCoord,
     unpackNumAsPos,
 } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/packrat'
 import { basePlanner } from './construction/communePlanner'
 import { posix } from 'path'
@@ -637,7 +637,6 @@ Room.prototype.scoutEnemyRoom = function () {
 
     let player = Memory.players[playerName]
     if (!player) {
-
         player = Memory.players[playerName] = {
             data: [0],
         }
@@ -2336,30 +2335,34 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 
 Room.prototype.createRoomLogisticsRequest = function (args) {
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
+    // We can only handle energy until we have a storage or terminal
+    else if (
+        args.resourceType !== RESOURCE_ENERGY &&
+        !(this.memory.CN ? Game.rooms[this.memory.CN].advancedLogistics : this.advancedLogistics)
+    )
+        return RESULT_FAIL
 
     let amount: number
 
     // Make sure we are not infringing on the threshold
 
-    if (args.type === 'pickup') {
+    if (args.target instanceof Resource) {
         if (!args.threshold) args.threshold = 1
 
         amount = (args.target as Resource).amount
-    }
-    else if (args.type === 'transfer') {
-        if (!args.threshold) args.threshold = (args.target as AnyStoreStructure).store.getCapacity(args.resourceType)
-        amount = (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+    } else if (args.type === 'transfer') {
+        if (!args.threshold) args.threshold = args.target.store.getCapacity(args.resourceType)
+        amount = args.target.reserveStore[args.resourceType]
 
         // We have enough of the resource to fulfill the threshold
-
+        this.visual.text(amount.toString(), args.target.pos)
         if (amount >= args.threshold) return RESULT_FAIL
     }
 
     // Offer or withdraw types
-
     else {
         if (!args.threshold) args.threshold = 1
-        amount = (args.target as AnyStoreStructure).reserveStore[args.resourceType]
+        amount = args.target.reserveStore[args.resourceType]
 
         // We don't have enough resources to make a request
 
@@ -2368,11 +2371,14 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         if (args.maxAmount) amount = Math.min(amount, Math.round(args.maxAmount))
     }
 
-    if (!args.priority) args.priority = 1
-    else args.priority = (Math.round(args.priority * 100) / 100)
+    if (args.priority === undefined) args.priority = 1
+    else args.priority = Math.round(args.priority * 100) / 100
+
+    if (args.onlyFull && !(this.memory.CN ? Game.rooms[this.memory.CN].advancedLogistics : this.advancedLogistics))
+        delete args.onlyFull
 
     const ID = internationalManager.newTickID()
-
+/*     this.visual.text(args.priority.toString(), args.target.pos) */
     return (this.roomLogisticsRequests[ID] = {
         ID,
         type: args.type,

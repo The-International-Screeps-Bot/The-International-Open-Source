@@ -3,7 +3,7 @@
 // International
 
 import './international/commands'
-import { internationalManager } from './international/internationalManager'
+import { internationalManager } from './international/international'
 import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
@@ -13,7 +13,7 @@ import './international/endTickManager'
 
 // Room
 
-import { roomsManager } from 'room/roomsManager'
+import { roomsManager } from 'room/rooms'
 import './room/roomAdditions'
 
 import './room/resourceAdditions'
@@ -30,13 +30,13 @@ import './room/creeps/creepAdditions'
 import { memHack } from 'other/memHack'
 import { customLog } from 'international/utils'
 import { customColors, TrafficPriorities } from 'international/constants'
-import { CommuneManager } from 'room/commune/communeManager'
+import { CommuneManager } from 'room/commune/commune'
 import { configManager } from './international/config'
 import { initProfiler } from 'other/profiler'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
-import { migrationManager } from 'international/migrationManager'
-import { respawnManager } from './international/respawnManager'
+import { migrationManager } from 'international/migration'
+import { respawnManager } from './international/respawn'
 import { tickConfig } from './international/tickConfig'
 import { allyManager } from 'international/simpleAllies'
 import ExecutePandaMasterCode from './other/PandaMaster/Execute'

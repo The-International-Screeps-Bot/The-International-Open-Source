@@ -1,5 +1,5 @@
 import { customLog, findLargestTransactionAmount, getAvgPrice } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
 
 Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {

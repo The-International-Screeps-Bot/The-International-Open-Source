@@ -1,8 +1,8 @@
 import { customColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, randomTick } from 'international/utils'
+import { customLog, findObjectWithID, randomTick, scalePriority } from 'international/utils'
 import { packCoord } from 'other/packrat'
-import { CommuneManager } from './communeManager'
+import { CommuneManager } from './commune'
 
 export class TowerManager {
     communeManager: CommuneManager
@@ -27,10 +27,12 @@ export class TowerManager {
         this.actionableTowerIDs = []
 
         for (const tower of towers) {
-            if (tower.store.energy < TOWER_ENERGY_COST) continue
+            if (tower.nextStore.energy < TOWER_ENERGY_COST) continue
 
             this.actionableTowerIDs.push(tower.id)
         }
+
+        this.createRoomLogisticsRequests()
 
         if (!this.attackEnemyCreeps()) return
         if (!this.healCreeps()) return
@@ -211,6 +213,18 @@ export class TowerManager {
 
         for (const tower of this.communeManager.structures.tower) {
             this.communeManager.room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
+        }
+    }
+
+    private createRoomLogisticsRequests() {
+        for (const structure of this.communeManager.room.structures.tower) {
+
+            this.communeManager.room.createRoomLogisticsRequest({
+                target: structure,
+                threshold: structure.store.getCapacity(RESOURCE_ENERGY) * 0.75,
+                type: 'transfer',
+                priority: scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy, 4),
+            })
         }
     }
 }

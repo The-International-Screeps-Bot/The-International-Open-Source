@@ -34,7 +34,7 @@ import {
     unpackNumAsCoord,
     getRangeOfCoords,
 } from 'international/utils'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import { pick, repeat } from 'lodash'
 import {
     packCoord,
@@ -656,16 +656,16 @@ Creep.prototype.findMineralHarvestPos = function () {
 }
 
 Creep.prototype.needsResources = function () {
-    const freeReserveStore = this.freeReserveStore()
+    const freeNextStore = this.freeNextStore()
 
-    if (freeReserveStore === this.store.getCapacity())
+    if (freeNextStore === this.store.getCapacity())
         // Record and inform that the creep needs resources
 
         return (this.memory.NR = true)
 
     // Otherwise if the creep is full
 
-    if (freeReserveStore == 0) {
+    if (freeNextStore == 0) {
         // Record and inform that the creep does not resources
 
         delete this.memory.NR
@@ -1440,8 +1440,7 @@ Creep.prototype.roomLogisticsRequestManager = function () {
 
             // Update in accordance to potential resource decay
 
-            request.A = Math.min(request.A, target.nextAmount)
-
+            request.A = Math.min(this.freeNextStore(), target.nextAmount)
             target.reserveAmount -= request.A
             continue
         }
@@ -1454,6 +1453,7 @@ Creep.prototype.roomLogisticsRequestManager = function () {
                 continue
             }
 
+            request.A = Math.min(target.freeNextStore(), this.nextStore.energy)
             target.reserveStore[request.RT] += request.A
             continue
         }
@@ -1467,6 +1467,7 @@ Creep.prototype.roomLogisticsRequestManager = function () {
             continue
         }
 
+        request.A = Math.min(target.nextStore.energy, this.freeNextStore())
         target.reserveStore[request.RT] -= request.A
     }
 }
@@ -1482,11 +1483,12 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     for (const ID in this.room.roomLogisticsRequests) {
         const request = this.room.roomLogisticsRequests[ID]
 
-        // Custom conditions
-
+        // Customizable conditions
+        customLog('TRY', request.type + ', ' + types.has(request.type))
         if (!types.has(request.type)) continue
-        if (args.conditions && !args.conditions(request)) continue
-        if (args.resourceType && args.resourceType !== request.resourceType) continue
+        if (args) {
+            if (args.conditions && !args.conditions(request)) continue
+        }
 
         // Default conditions
 
@@ -1500,7 +1502,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
         lowestScore = score
         bestRequest = request
     }
-
+    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types))
     if (!bestRequest) return RESULT_FAIL
 
     const creepRequest: CreepRoomLogisticsRequest = {
@@ -1533,8 +1535,10 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 }
 
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
-    if (args.type) return new Set([args.type])
-    if (!this.freeNextStore()) return new Set(['offer', 'withdraw', 'pickup'])
+    if (args && args.type) return new Set([args.type])
+
+    if (this.needsResources()) return new Set(['withdraw', 'pickup'])
+
     return new Set(['transfer'])
 }
 
@@ -1555,6 +1559,10 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (request) {
     }
 
     if (request.type === 'transfer') {
+        // We don't have enough resource
+
+        if (this.nextStore[request.resourceType] <= 0) return false
+
         if (request.onlyFull) {
             // If the creep has enough resource
 
@@ -1571,26 +1579,23 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (request) {
     if (request.onlyFull) {
         // If the creep has enough space
 
-        if (this.freeNextStore() >= target.reserveStore[request.resourceType]) return true
+        if (target.reserveStore[request.resourceType] >= this.freeNextStore()) return true
         return false
     }
 
     return true
 }
 
-Creep.prototype.findRoomLogisticRequestAmount = function(request) {
-
+Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     const target = findObjectWithID(request.targetID)
 
     // Pickup type
 
     if (target instanceof Resource) {
-
         return Math.min(this.freeNextStore(), target.reserveAmount)
     }
 
     if (request.type === 'transfer') {
-
         return Math.min(this.nextStore[request.resourceType], target.freeReserveStore())
     }
 
@@ -1602,7 +1607,7 @@ Creep.prototype.findRoomLogisticRequestAmount = function(request) {
 Creep.prototype.runRoomLogisticsRequest = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return RESULT_FAIL
-
+    customLog('REQUEST FOUND', request.T)
     const target = findObjectWithID(request.TID)
 
     if (getRangeOfCoords(target.pos, this.pos) > 1) {

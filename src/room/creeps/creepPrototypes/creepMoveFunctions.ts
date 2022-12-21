@@ -9,7 +9,7 @@ import {
     roomDimensions,
     TrafficPriorities,
 } from 'international/constants'
-import { internationalManager } from 'international/internationalManager'
+import { internationalManager } from 'international/international'
 import {
     areCoordsEqual,
     arePositionsEqual,
@@ -83,7 +83,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     // We're at the end of the path
 
     if (cachedIndex + 2 === pathOpts.packedPath.length) {
-
         if (pathOpts.loose) return this.createMoveRequest(opts)
         return true
     }
@@ -91,7 +90,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     // We're on the path and not at the end
 
     if (cachedIndex >= 0) {
-
         pathOpts.packedPath = pathOpts.packedPath.slice(cachedIndex + 2)
 
         let path: RoomPosition[]
@@ -99,17 +97,14 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // If we have a remote, avoid abandoned remotes
 
         if (pathOpts.remoteName) {
-
             const roomNames: Set<string> = new Set()
             path = unpackPosList(pathOpts.packedPath)
 
             for (const pos of path) {
-
                 roomNames.add(pos.roomName)
             }
 
             for (const roomName of roomNames) {
-
                 const roomMemory = Memory.rooms[roomName]
 
                 if (Memory.rooms[roomName].T !== 'remote') continue
@@ -497,7 +492,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     if (!creepNameAtPos) {
         if (this.spawning) {
-
             this.moved = this.moveRequest
             room.moveRequests.delete(this.moveRequest)
             return
@@ -543,7 +537,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     if (this.spawning) {
         if (creepAtPos.shove(this.pos)) {
-
             this.moved = this.moveRequest
             room.moveRequests.delete(this.moveRequest)
         }
