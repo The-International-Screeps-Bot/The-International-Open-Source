@@ -636,10 +636,14 @@ Room.prototype.scoutEnemyRoom = function () {
     roomMemory.T = 'enemy'
 
     let player = Memory.players[playerName]
-    if (!player)
+    if (!player) {
+
         player = Memory.players[playerName] = {
             data: [0],
         }
+
+        for (const key in PlayerData) this.memory.data[parseInt(key)] = 0
+    }
 
     // General
 

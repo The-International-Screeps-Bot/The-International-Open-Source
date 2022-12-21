@@ -171,7 +171,7 @@ export function advancedFindDistance(
                 if (roomName === goalRoomName) return 1
                 return Infinity
             }
-
+            customLog('ERROR', roomName)
             if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
                 return Infinity
 

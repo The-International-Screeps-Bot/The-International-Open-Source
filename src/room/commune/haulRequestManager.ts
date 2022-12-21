@@ -103,7 +103,7 @@ export class HaulRequestManager {
         // If there is a controller and it's in safemode, abandon until it ends
 
         if (requestRoom.controller && requestRoom.controller.safeMode) {
-            request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
+            request.data[HaulRequestData.abandon] = requestRoom.controller.safeMode
 
             room.memory.combatRequests.splice(index, 1)
             delete request.responder
