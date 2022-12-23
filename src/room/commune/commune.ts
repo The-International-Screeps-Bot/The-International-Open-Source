@@ -202,7 +202,7 @@ export class CommuneManager {
         this.haulerNeedManager.run()
 
         this.room.roomManager.containerManager.run()
-        findFunctionCPU(() => this.spawningStructuresManager.createRoomLogisticsRequests())
+        this.spawningStructuresManager.createRoomLogisticsRequests()
         this.storingStructuresManager.run()
         this.room.linkManager()
         this.room.factoryManager()

@@ -2382,11 +2382,8 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     if (args.priority === undefined) args.priority = 1
     else args.priority = Math.round(args.priority * 100) / 100
 
-    if (args.onlyFull && !(this.memory.CN ? Game.rooms[this.memory.CN].advancedLogistics : this.advancedLogistics))
-        delete args.onlyFull
-
     const ID = internationalManager.newTickID()
-/*     this.visual.text(args.priority.toString(), args.target.pos) */
+    this.visual.text(args.priority.toString(), args.target.pos)
     return (this.roomLogisticsRequests[args.type][ID] = {
         ID,
         type: args.type,

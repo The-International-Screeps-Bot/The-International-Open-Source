@@ -35,16 +35,16 @@ export class ContainerManager {
                 type: 'transfer',
                 threshold: container.store.getCapacity(),
                 onlyFull: true,
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 5, true),
+                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
             })
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                threshold: container.store.getCapacity() * 0.75,
-                maxAmount: container.reserveStore.energy * 0.75,
+                threshold: container.store.getCapacity() * 0.720,
+                maxAmount: container.reserveStore.energy * 0.720,
                 onlyFull: true,
                 type: 'offer',
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 5, true),
+                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
             })
         }
     }
@@ -55,7 +55,7 @@ export class ContainerManager {
                 target: container,
                 type: 'withdraw',
                 onlyFull: true,
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 5, true),
+                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
             })
         }
     }
@@ -66,10 +66,9 @@ export class ContainerManager {
 
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
-            resourceType: this.roomManager.room.mineral.mineralType,
             type: 'transfer',
-            threshold: container.store.getCapacity() * 0.75,
-            priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 5),
+            threshold: container.store.getCapacity() * 0.720,
+            priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
         })
     }
 
@@ -84,7 +83,7 @@ export class ContainerManager {
             resourceType,
             type: 'withdraw',
             onlyFull: true,
-            priority: scalePriority(container.store.getCapacity(), container.reserveStore[resourceType], 5, true),
+            priority: scalePriority(container.store.getCapacity(), container.reserveStore[resourceType], 20, true),
         })
     }
 }

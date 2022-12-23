@@ -12,9 +12,7 @@ export class StoringStructuresManager {
     }
 
     run() {
-        findFunctionCPU(() => {
-            this.createRoomLogisticsRequests()
-        })
+        this.createRoomLogisticsRequests()
     }
 
     private createRoomLogisticsRequests() {
