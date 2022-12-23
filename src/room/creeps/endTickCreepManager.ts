@@ -26,6 +26,8 @@ export class EndTickCreepManager {
 
                 creep.endTickManager()
                 creep.recurseMoveRequest()
+
+                creep.say(creep.message)
             }
         }
 
@@ -37,6 +39,8 @@ export class EndTickCreepManager {
 
                 creep.endTickManager()
                 creep.recurseMoveRequest()
+
+                creep.say(creep.message)
             }
         }
 

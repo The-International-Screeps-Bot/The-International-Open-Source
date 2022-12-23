@@ -3,6 +3,7 @@ import {
     createPosMap,
     customLog,
     findClosestObject,
+    findFunctionCPU,
     findObjectWithID,
     getRange,
     getRangeOfCoords,
@@ -118,7 +119,12 @@ export class CommuneManager {
 
         room.spawnRequests = []
         room.upgradeStrength = 0
-        room.roomLogisticsRequests = {}
+        room.roomLogisticsRequests = {
+            transfer: {},
+            withdraw: {},
+            offer: {},
+            pickup: {},
+        }
         room.haulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
 
@@ -196,7 +202,7 @@ export class CommuneManager {
         this.haulerNeedManager.run()
 
         this.room.roomManager.containerManager.run()
-        this.spawningStructuresManager.createRoomLogisticsRequests()
+        findFunctionCPU(() => this.spawningStructuresManager.createRoomLogisticsRequests())
         this.storingStructuresManager.run()
         this.room.linkManager()
         this.room.factoryManager()
@@ -381,5 +387,19 @@ export class CommuneManager {
             Math.floor(Math.pow((level - 3) * 10, 4) + 20000 + this.room.memory.AT * Math.pow(level, 1.8) * 10),
             RAMPART_HITS_MAX[level],
         )
+    }
+
+    _storingStructures: (StructureStorage | StructureTerminal)[]
+
+    get storingStructures() {
+
+        if (this._storingStructures) return this._storingStructures
+
+        this._storingStructures = []
+
+        if (this.room.storage) this._storingStructures.push(this.room.storage)
+        if (this.room.terminal) this._storingStructures.push(this.room.terminal)
+
+        return this._storingStructures
     }
 }

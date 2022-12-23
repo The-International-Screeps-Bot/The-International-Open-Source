@@ -1,6 +1,6 @@
 import { customColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, randomTick, scalePriority } from 'international/utils'
+import { customLog, findFunctionCPU, findObjectWithID, randomTick, scalePriority } from 'international/utils'
 import { packCoord } from 'other/packrat'
 import { CommuneManager } from './commune'
 
@@ -12,20 +12,40 @@ export class StoringStructuresManager {
     }
 
     run() {
-        this.createRoomLogisticsRequests()
+        findFunctionCPU(() => {
+            this.createRoomLogisticsRequests()
+        })
     }
 
     private createRoomLogisticsRequests() {
-        const storingStructures: AnyStoreStructure[] = [this.communeManager.room.storage]
+        const storingStructures: AnyStoreStructure[] = []
+
+        const storage = this.communeManager.room.storage
+        if (storage) storingStructures.push(storage)
 
         const terminal = this.communeManager.room.terminal
-        if (!terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(terminal)
+        if (terminal && !terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(terminal)
 
         for (const structure of storingStructures) {
-            if (!structure) continue
+            const createTransfer = structure.freeReserveStore > structure.store.getCapacity() * 0.9
 
-            const createTransfer = structure.freeNextStore() > structure.store.getCapacity() * 0.9
+            this.communeManager.room.createRoomLogisticsRequest({
+                target: structure,
+                onlyFull: true,
+                type: 'offer',
+                priority: 0,
+            })
 
+            if (!createTransfer) continue
+
+            this.communeManager.room.createRoomLogisticsRequest({
+                target: structure,
+                onlyFull: true,
+                type: 'transfer',
+                priority: 100,
+            })
+
+            /*
             for (const resourceType of RESOURCES_ALL) {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
@@ -45,6 +65,7 @@ export class StoringStructuresManager {
                     priority: 10,
                 })
             }
+             */
         }
     }
 }

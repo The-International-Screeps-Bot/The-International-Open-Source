@@ -49,7 +49,7 @@ import { playerManager } from 'international/players'
 global.profiler = initProfiler()
 
 export const loop = ErrorMapper.wrapLoop((): void => {
-    try {
+    /* try { */
         if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
             customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
                 textColor: customColors.white,
@@ -101,11 +101,14 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
         internationalManager.advancedGeneratePixel()
         internationalManager.advancedSellPixels()
-    } catch (err) {
-        customLog('ERROR: ' + err, (err as any).stack, {
-            textColor: customColors.white,
-            bgColor: customColors.red,
-        })
-    }
-    internationalManager.endTickManager()
+
+        internationalManager.endTickManager()
+    /* } catch (err) {
+
+            customLog('ERROR: ' + err, (err as any).stack, {
+                textColor: customColors.white,
+                bgColor: customColors.red,
+            })
+            console.log(global.logs)
+    } */
 })

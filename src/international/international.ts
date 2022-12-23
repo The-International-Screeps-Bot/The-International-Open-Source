@@ -201,7 +201,7 @@ export class InternationalManager {
     }
 
     newTickID() {
-        return (this.tickID += 1)
+        return (this.tickID += 1).toString()
     }
 
     /**
@@ -276,12 +276,10 @@ export class InternationalManager {
 
         const orders = Game.market.getAllOrders()
 
-        let order
-
         for (const orderID in orders) {
             // Get the order using its ID
 
-            order = orders[orderID]
+            const order = orders[orderID]
 
             // Assign the order to a resource-ordered location, creating it if undefined
 
@@ -326,11 +324,11 @@ export class InternationalManager {
     _defaultMinCacheAmount: number
 
     get defaultMinCacheAmount() {
-        if (this._defaultMinCacheAmount) return this._defaultMinCacheAmount
+        if (this._defaultMinCacheAmount !== undefined) return this._defaultMinCacheAmount
 
-        const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
+        const avgCPUUsagePercent = (Memory.stats.cpu.usage) / Game.cpu.limit
 
-        return Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1
+        return this._defaultMinCacheAmount = Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1
     }
 
     _marketIsFunctional: number

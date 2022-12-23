@@ -16,6 +16,7 @@ import {
     RESULT_FAIL,
     RESULT_ACTION,
     RESULT_SUCCESS,
+    RESULT_NO_ACTION,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -368,57 +369,76 @@ Creep.prototype.advancedUpgradeController = function () {
     return false
 }
 
-Creep.prototype.advancedBuildCSite = function () {
-    const { room } = this
+Creep.prototype.advancedBuild = function () {
+    const cSiteTarget = this.room.cSiteTarget
+    if (!cSiteTarget) return RESULT_FAIL
 
-    const cSiteTarget = room.cSiteTarget
+    if (this.needsResources()) {
+        this.runRoomLogisticsRequests({
+            types: new Set(['withdraw', 'offer', 'pickup']),
+            conditions: request => request.resourceType === RESOURCE_ENERGY,
+        })
 
-    // Stop if the cSite is undefined
+        if (!this.needsResources()) return RESULT_SUCCESS
+    }
 
-    if (!cSiteTarget) return false
+    // If there is a cSite, try to build it and iterate
 
-    this.say('ABCS')
+    this.advancedBuildCSite(cSiteTarget)
 
+    if (!this.needsResources()) return RESULT_SUCCESS
+
+    this.runRoomLogisticsRequests({
+        types: new Set(['withdraw', 'offer', 'pickup']),
+        conditions: request => request.resourceType === RESOURCE_ENERGY,
+    })
+
+    return RESULT_SUCCESS
+}
+
+Creep.prototype.advancedBuildCSite = function (cSite) {
     // If the cSite is out of range
 
-    if (getRange(this.pos.x, cSiteTarget.pos.x, this.pos.y, cSiteTarget.pos.y) > 3) {
-        this.say('➡️CS')
+    if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
+        this.message = '➡️CS'
 
         // Make a move request to it
 
         this.createMoveRequest({
             origin: this.pos,
-            goals: [{ pos: cSiteTarget.pos, range: 3 }],
+            goals: [{ pos: cSite.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
 
-        return true
+        return RESULT_ACTION
     }
+
+    if (this.worked) return RESULT_NO_ACTION
 
     // Buld the cSite
 
-    if (this.build(cSiteTarget) === OK) {
+    if (this.build(cSite) === OK) {
         // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
         const energySpentOnConstruction = Math.min(
             this.parts.work * BUILD_POWER,
-            (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
+            (cSite.progressTotal - cSite.progress) * BUILD_POWER,
             this.store.energy,
         )
 
-        if (this.store.energy - energySpentOnConstruction <= 0) this.memory.NR = true
+        this.nextStore.energy -= energySpentOnConstruction
 
         // Add control points to total controlPoints counter and say the success
 
         globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
-        this.say(`🚧${energySpentOnConstruction}`)
+        this.message = `🚧${energySpentOnConstruction}`
 
-        return true
+        return RESULT_SUCCESS
     }
 
     // Inform true
 
-    return false
+    return RESULT_SUCCESS
 }
 
 Creep.prototype.advancedBuildAllyCSite = function () {
@@ -656,7 +676,7 @@ Creep.prototype.findMineralHarvestPos = function () {
 }
 
 Creep.prototype.needsResources = function () {
-    const freeNextStore = this.freeNextStore()
+    const freeNextStore = this.freeNextStore
 
     if (freeNextStore === this.store.getCapacity())
         // Record and inform that the creep needs resources
@@ -1425,51 +1445,63 @@ Creep.prototype.roomLogisticsRequestManager = function () {
     for (let i = this.memory.RLRs.length - 1; i >= 0; i--) {
         const request = this.memory.RLRs[i]
         const target = findObjectWithID(request.TID)
-        if (!target) {
-            this.memory.RLRs.splice(i, 1)
-            continue
-        }
+        if (target) continue
 
-        // Pickup type
-
-        if (target instanceof Resource) {
-            if (target.nextAmount <= 0) {
-                this.memory.RLRs.splice(i, 1)
-                continue
-            }
-
-            // Update in accordance to potential resource decay
-
-            request.A = Math.min(this.freeNextStore(), target.nextAmount)
-            target.reserveAmount -= request.A
-            continue
-        }
-
-        if (request.T === 'transfer') {
-            // Delete the request if the target is fulfilled
-
-            if (target.freeNextStore() < request.A) {
-                this.memory.RLRs.splice(i, 1)
-                continue
-            }
-
-            request.A = Math.min(target.freeNextStore(), this.nextStore.energy)
-            target.reserveStore[request.RT] += request.A
-            continue
-        }
-
-        // Withdraw or offer type
-
-        // Delete the request if the target doesn't have what we need
-
-        if (target.nextStore[request.RT] < request.A) {
-            this.memory.RLRs.splice(i, 1)
-            continue
-        }
-
-        request.A = Math.min(target.nextStore.energy, this.freeNextStore())
-        target.reserveStore[request.RT] -= request.A
+        this.memory.RLRs.splice(i, 1)
     }
+
+    const request = this.memory.RLRs[0]
+    const target = findObjectWithID(request.TID)
+
+    // Pickup type
+
+    if (target instanceof Resource) {
+        // Update in accordance to potential resource decay
+
+        request.A = Math.min(Math.min(this.freeNextStore, target.nextAmount), request.A)
+        if (request.A <= 0) {
+            this.memory.RLRs.splice(0, 1)
+            return
+        }
+
+        target.reserveAmount -= request.A
+        return
+    }
+
+    if (request.T === 'transfer') {
+        // Delete the request if the target is fulfilled
+
+        if (target.freeNextStore < request.A) {
+            this.memory.RLRs.splice(0, 1)
+            return
+        }
+
+        request.A = Math.min(Math.min(this.nextStore[request.RT], target.freeNextStore), request.A)
+        if (request.A <= 0) {
+            this.memory.RLRs.splice(0, 1)
+            return
+        }
+
+        target.reserveStore[request.RT] += request.A
+        return
+    }
+
+    // Withdraw or offer type
+
+    // Delete the request if the target doesn't have what we need
+
+    if (target.nextStore[request.RT] < request.A) {
+        this.memory.RLRs.splice(0, 1)
+        return
+    }
+
+    request.A = Math.min(Math.min(this.freeNextStore, target.nextStore[request.RT]), request.A)
+    if (request.A <= 0) {
+        this.memory.RLRs.splice(0, 1)
+        return
+    }
+
+    target.reserveStore[request.RT] -= request.A
 }
 
 Creep.prototype.findRoomLogisticsRequest = function (args) {
@@ -1478,38 +1510,98 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     const types = this.findRoomLogisticsRequestTypes(args)
 
     let lowestScore = Infinity
-    let bestRequest: RoomLogisticsRequest
+    let bestRequest: RoomLogisticsRequest | 0
 
-    for (const ID in this.room.roomLogisticsRequests) {
-        const request = this.room.roomLogisticsRequests[ID]
+    for (const type of types) {
+        for (const requestID in this.room.roomLogisticsRequests[type]) {
+            const request = this.room.roomLogisticsRequests[type][requestID]
 
-        // Customizable conditions
-        customLog('TRY', request.type + ', ' + types.has(request.type))
-        if (!types.has(request.type)) continue
-        if (args) {
-            if (args.conditions && !args.conditions(request)) continue
+            delete request.delivery
+
+            // Customizable conditions
+
+            if (args) {
+                if (args.conditions && !args.conditions(request)) continue
+            }
+
+            // Default conditions
+
+            if (!this.canAcceptRoomLogisticsRequest(request.type, request.ID.toString())) continue
+
+            const targetPos = findObjectWithID(request.targetID).pos
+            const score = request.priority + getRangeOfCoords(targetPos, this.pos) / 100
+
+            if (score >= lowestScore) continue
+
+            lowestScore = score
+            bestRequest = request
+        }
+    }
+
+    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types))
+
+    let creepRequest: CreepRoomLogisticsRequest | 0
+
+    if (!bestRequest) {
+        creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(types)
+        if (!creepRequest) return RESULT_FAIL
+    } else {
+        creepRequest = {
+            T: bestRequest.type,
+            TID: bestRequest.targetID,
+            RT: bestRequest.resourceType,
+            A: this.findRoomLogisticRequestAmount(bestRequest),
         }
 
-        // Default conditions
+        if (bestRequest.delivery) {
+            let nextCreepRequest: CreepRoomLogisticsRequest
+            const storingStructure = findObjectWithID(bestRequest.delivery as Id<AnyStoreStructure>)
 
-        if (!this.canAcceptRoomLogisticsRequest(request)) continue
+            if (storingStructure) {
+                nextCreepRequest = {
+                    T: 'withdraw',
+                    TID: storingStructure.id,
+                    RT: bestRequest.resourceType,
+                    A: Math.min(storingStructure.reserveStore[bestRequest.resourceType], creepRequest.A),
+                }
+            } else {
+                const nextRequest =
+                    this.room.roomLogisticsRequests.withdraw[bestRequest.delivery] ||
+                    this.room.roomLogisticsRequests.offer[bestRequest.delivery] ||
+                    this.room.roomLogisticsRequests.pickup[bestRequest.delivery]
 
-        const targetPos = findObjectWithID(request.targetID).pos
-        const score = request.priority + getRangeOfCoords(targetPos, this.pos) / 100
+                nextCreepRequest = {
+                    T: nextRequest.type,
+                    TID: nextRequest.targetID,
+                    RT: nextRequest.resourceType,
+                    A: Math.max(Math.min(this.freeNextStore, nextRequest.amount), this.freeNextStore),
+                }
 
-        if (score >= lowestScore) continue
+                if (nextRequest.amount === nextCreepRequest.A)
+                    delete this.room.roomLogisticsRequests[nextRequest.type][nextRequest.ID]
+                else nextRequest.amount -= nextCreepRequest.A
 
-        lowestScore = score
-        bestRequest = request
-    }
-    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types))
-    if (!bestRequest) return RESULT_FAIL
+                const target = findObjectWithID(nextRequest.targetID)
 
-    const creepRequest: CreepRoomLogisticsRequest = {
-        T: bestRequest.type,
-        TID: bestRequest.targetID,
-        RT: bestRequest.resourceType,
-        A: this.findRoomLogisticRequestAmount(bestRequest),
+                // Pickup type
+
+                if (target instanceof Resource) {
+                    target.reserveAmount -= nextCreepRequest.A
+                } else {
+                    // Withdraw or offer type
+
+                    target.reserveStore[nextCreepRequest.RT] -= nextCreepRequest.A
+                }
+            }
+
+            this.memory.RLRs.push(nextCreepRequest)
+        }
+
+        // Delete the request if it has no more utility
+
+        if (bestRequest.amount === creepRequest.A)
+            delete this.room.roomLogisticsRequests[bestRequest.type][bestRequest.ID]
+        else bestRequest.amount -= creepRequest.A
     }
 
     this.memory.RLRs.push(creepRequest)
@@ -1520,29 +1612,33 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 
     if (target instanceof Resource) {
         target.reserveAmount -= creepRequest.A
-        return creepRequest
+
+        return this.memory.RLRs[0]
     }
 
     if (creepRequest.T === 'transfer') {
         target.reserveStore[creepRequest.RT] += creepRequest.A
-        return creepRequest
+
+        return this.memory.RLRs[0]
     }
 
     // Withdraw or offer type
 
     target.reserveStore[creepRequest.RT] -= creepRequest.A
-    return creepRequest
+
+    return this.memory.RLRs[0]
 }
 
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
-    if (args && args.type) return new Set([args.type])
+    if (args && args.types) return args.types
 
     if (this.needsResources()) return new Set(['withdraw', 'pickup'])
 
     return new Set(['transfer'])
 }
 
-Creep.prototype.canAcceptRoomLogisticsRequest = function (request) {
+Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID) {
+    const request = this.room.roomLogisticsRequests[requestType][requestID]
     const target = findObjectWithID(request.targetID)
 
     // Pickup type
@@ -1551,7 +1647,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (request) {
         if (request.onlyFull) {
             // If the creep has enough space
 
-            if (this.freeNextStore() >= target.reserveAmount) return true
+            if (this.freeNextStore >= target.reserveAmount) return true
             return false
         }
 
@@ -1559,15 +1655,56 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (request) {
     }
 
     if (request.type === 'transfer') {
+        const amount = Math.min(this.store.getCapacity(), request.amount)
+
         // We don't have enough resource
 
-        if (this.nextStore[request.resourceType] <= 0) return false
+        if (this.nextStore[request.resourceType] <= 0) {
+            // Try to find a sufficient withdraw or offer task
+
+            const types: RoomLogisticsRequestTypes[] = ['withdraw', 'offer', 'pickup']
+
+            let lowestScore = Infinity
+            let bestRequest2
+
+            for (const type of types) {
+                for (const request2ID in this.room.roomLogisticsRequests[type]) {
+                    const request2 = this.room.roomLogisticsRequests[type][request2ID]
+
+                    if (request2.resourceType !== request.resourceType) continue
+
+                    const target2Pos = findObjectWithID(request2.targetID).pos
+                    const score = request2.priority + getRangeOfCoords(target2Pos, this.pos) / 100
+
+                    if (score >= lowestScore) continue
+
+                    lowestScore = score
+                    bestRequest2 = request2
+                }
+            }
+
+            if (bestRequest2) {
+                request.delivery = bestRequest2.ID as unknown as string
+                return true
+            }
+
+            // Try to find a sufficient storing structure
+
+            if (this.room.name === this.commune.name) {
+                const storingStructure = this.commune.communeManager.storingStructures.find(
+                    structure => structure.store[request.resourceType] >= amount,
+                )
+                if (storingStructure) {
+                    request.delivery = storingStructure.id
+                    return true
+                }
+            }
+        }
 
         if (request.onlyFull) {
             // If the creep has enough resource
 
-            if (this.nextStore[request.resourceType] >= Math.min(this.store.getCapacity(), target.freeReserveStore()))
-                return true
+            if (this.nextStore[request.resourceType] >= amount) return true
             return false
         }
 
@@ -1579,11 +1716,42 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (request) {
     if (request.onlyFull) {
         // If the creep has enough space
 
-        if (target.reserveStore[request.resourceType] >= this.freeNextStore()) return true
+        if (target.reserveStore[request.resourceType] >= this.freeNextStore) return true
         return false
     }
 
     return true
+}
+
+Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (types) {
+    if (this.room.name !== this.commune.name) return RESULT_FAIL
+    if (!types.has('transfer')) return RESULT_FAIL
+
+    const storingStructures = this.commune.communeManager.storingStructures
+    if (!storingStructures.length) return RESULT_FAIL
+
+    let resourceType: ResourceConstant
+
+    for (const key in this.store) {
+        if (key === RESOURCE_ENERGY) continue
+
+        resourceType = key as ResourceConstant
+        break
+    }
+
+    const storingStructure = storingStructures.find(
+        structure => structure.freeReserveStore >= this.nextStore[resourceType],
+    )
+    if (!storingStructure) return RESULT_FAIL
+
+    return {
+        T: 'transfer',
+        TID: storingStructure.id,
+        RT: resourceType,
+        A: this.nextStore[resourceType],
+    }
+
+    return RESULT_FAIL
 }
 
 Creep.prototype.findRoomLogisticRequestAmount = function (request) {
@@ -1592,22 +1760,23 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     // Pickup type
 
     if (target instanceof Resource) {
-        return Math.min(this.freeNextStore(), target.reserveAmount)
+        return Math.min(this.freeNextStore, request.amount)
     }
 
     if (request.type === 'transfer') {
-        return Math.min(this.nextStore[request.resourceType], target.freeReserveStore())
+        if (request.delivery) return request.amount
+        return Math.min(this.nextStore[request.resourceType], request.amount)
     }
 
     // Withdraw or offer type
 
-    return Math.min(this.freeNextStore(), target.reserveStore[request.resourceType])
+    return Math.min(this.freeNextStore, request.amount)
 }
 
 Creep.prototype.runRoomLogisticsRequest = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return RESULT_FAIL
-    customLog('REQUEST FOUND', request.T)
+    customLog('REQUEST RESPONSE', request.T)
     const target = findObjectWithID(request.TID)
 
     if (getRangeOfCoords(target.pos, this.pos) > 1) {
@@ -1618,8 +1787,9 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
 
         return RESULT_ACTION
     }
+    customLog('REQUEST SUCCESS', 'See above ^')
 
-    //
+    // Pickup type
 
     if (target instanceof Resource) {
         this.pickup(target)
@@ -1665,6 +1835,8 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
 }
 
 Creep.prototype.runRoomLogisticsRequests = function (args) {
+    if (this.spawning) return false
+
     if (this.runRoomLogisticsRequest(args) !== RESULT_SUCCESS) return false
 
     this.runRoomLogisticsRequest(args)

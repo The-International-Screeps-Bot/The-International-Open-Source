@@ -146,7 +146,7 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
  * @returns an incremented ID
  */
 export function newID() {
-    return (Memory.ID += 1)
+    return (Memory.ID += 1).toString()
 }
 
 interface AdvancedFindDistanceOpts {

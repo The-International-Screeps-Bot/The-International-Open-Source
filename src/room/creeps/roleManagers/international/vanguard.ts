@@ -106,6 +106,56 @@ export class Vanguard extends Creep {
         return true
     }
 
+    run?() {
+
+        this.say(this.memory.TRN)
+
+        if (this.room.name === this.memory.TRN || !this.memory.TRN) {
+            if (this.needsResources()) {
+                // Define the creep's sourceName
+
+                if (!this.findOptimalSourceIndex()) return
+
+                const sourceIndex = this.memory.SI
+
+                // Try to move to source. If creep moved then iterate
+
+                if (this.travelToSource(sourceIndex)) return
+
+                // Try to normally harvest. Iterate if creep harvested
+
+                if (this.advancedHarvestSource(this.room.sources[sourceIndex])) return
+                return
+            }
+
+            delete this.memory.SI
+            delete this.memory.PC
+
+            if (this.upgradeRoom()) return
+            if (this.repairRampart()) return
+            if (this.room.cSiteTarget && this.advancedBuildCSite(this.room.cSiteTarget)) return
+            return
+        }
+
+        // Otherwise if the creep is not in the claimTarget
+
+        if (
+            this.createMoveRequest({
+                origin: this.pos,
+                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    enemy: Infinity,
+                    ally: Infinity,
+                    keeper: Infinity,
+                },
+            }) === 'unpathable'
+        ) {
+            const request = Memory.claimRequests[this.memory.TRN]
+            if (request) request.data[ClaimRequestData.abandon] = 20000
+        }
+    }
+
     static vanguardManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
@@ -113,53 +163,7 @@ export class Vanguard extends Creep {
             // Get the creep using its name
 
             const creep: Vanguard = Game.creeps[creepName]
-
-            creep.say(creep.memory.TRN)
-
-            if (room.name === creep.memory.TRN || !creep.memory.TRN) {
-                if (creep.needsResources()) {
-                    // Define the creep's sourceName
-
-                    if (!creep.findOptimalSourceIndex()) continue
-
-                    const sourceIndex = creep.memory.SI
-
-                    // Try to move to source. If creep moved then iterate
-
-                    if (creep.travelToSource(sourceIndex)) continue
-
-                    // Try to normally harvest. Iterate if creep harvested
-
-                    if (creep.advancedHarvestSource(room.sources[sourceIndex])) continue
-                    continue
-                }
-
-                delete creep.memory.SI
-                delete creep.memory.PC
-
-                if (creep.upgradeRoom()) continue
-                if (creep.repairRampart()) continue
-                if (creep.advancedBuildCSite()) continue
-                continue
-            }
-
-            // Otherwise if the creep is not in the claimTarget
-
-            if (
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
-                    avoidEnemyRanges: true,
-                    typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
-                    },
-                }) === 'unpathable'
-            ) {
-                const request = Memory.claimRequests[creep.memory.TRN]
-                if (request) request.data[ClaimRequestData.abandon] = 20000
-            }
+            creep.run()
         }
     }
 }

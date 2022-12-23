@@ -136,7 +136,7 @@ declare global {
         | 'antifaDismantler'
         | 'antifaDowngrader'
     interface TerminalRequest {
-        ID: number
+        ID: string
         /**
          * Preference from 0-1 where 1 is least prefered
          */
@@ -330,7 +330,7 @@ declare global {
     type RoomLogisticsRequestTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
     interface RoomLogisticsRequest {
-        ID?: number
+        ID: string
         type: RoomLogisticsRequestTypes
         /**
          * Consider in weighting the task, lower is more preffered
@@ -343,6 +343,10 @@ declare global {
          * If the responder should only take the task if it will use its full capacity. Default is false
          */
         onlyFull?: boolean
+        /**
+         * The ID of a roomLogisticsTask or store structure
+         */
+        delivery?: Id<AnyStoreStructure> | string
     }
 
     interface CreateRoomLogisticsRequestArgs {
@@ -356,7 +360,7 @@ declare global {
     }
 
     interface findNewRoomLogisticsRequestArgs {
-        type?: RoomLogisticsRequestTypes
+        types?: Set<RoomLogisticsRequestTypes>
         conditions?(request: RoomLogisticsRequest): any
     }
 
@@ -384,7 +388,7 @@ declare global {
     }
 
     interface PowerTask {
-        taskID: number
+        taskID: string
         targetID: Id<Structure | Source>
         powerType: PowerConstant
         packedCoord: string
@@ -944,8 +948,8 @@ declare global {
          */
         squadRequests: Set<string>
 
-        roomLogisticsRequests: { [ID: number]: RoomLogisticsRequest }
-        powerTasks: { [ID: number]: PowerTask }
+        roomLogisticsRequests: { [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }}
+        powerTasks: { [ID: string]: PowerTask }
 
         attackingDefenderIDs: Set<Id<Creep>>
         defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
@@ -1769,10 +1773,12 @@ declare global {
          */
         advancedUpgradeController(): boolean
 
+        advancedBuild(): number
+
         /**
          * Attempts multiple methods to build one of our construction sites
          */
-        advancedBuildCSite(): boolean
+        advancedBuildCSite(cSite: ConstructionSite): number
 
         /**
          * Attempts multiple methods to build an ally construction site
@@ -2005,7 +2011,8 @@ declare global {
 
         findRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
         findRoomLogisticsRequestTypes(args?: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
-        canAcceptRoomLogisticsRequest(request: RoomLogisticsRequest): boolean
+        canAcceptRoomLogisticsRequest(requestType: RoomLogisticsRequestTypes, requestID: string): boolean
+        createBackupStoringStructuresRoomLogisticsRequest(types: Set<RoomLogisticsRequestTypes>): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
         runRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): number
@@ -2049,10 +2056,6 @@ declare global {
         _reservation: Reservation
 
         readonly reservation: Reservation
-
-        _roomLogisticsRequest: CreepRoomLogisticsRequest
-
-        readonly roomLogisticsRequest: CreepRoomLogisticsRequest
 
         _upgradeStrength: number
 
@@ -2305,9 +2308,9 @@ declare global {
 
         // Functions
 
-        testSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
+        testSpawn(spawnRequest: SpawnRequest, ID: string): ScreepsReturnCode
 
-        advancedSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
+        advancedSpawn(spawnRequest: SpawnRequest, ID: string): ScreepsReturnCode
     }
 
     interface StructureExtension {
@@ -2323,6 +2326,10 @@ declare global {
 
     interface StructureTerminal {
         intended: boolean
+    }
+
+    interface CustomStore extends StoreDefinition {
+        parentID: Id<AnyStoreStructure>
     }
 
     interface RoomObject {
@@ -2345,11 +2352,9 @@ declare global {
          */
         freeSpecificStore(resourceType?: ResourceConstant): number
 
-        usedNextStore(): number
-        freeNextStore(resourceType?: ResourceConstant): number
+        freeNextStoreOf(resourceType: ResourceConstant): number
 
-        usedReserveStore(): number
-        freeReserveStore(resourceType?: ResourceConstant): number
+        freeReserveStoreOf(resourceType: ResourceConstant): number
 
         // RoomObject getters
 
@@ -2364,19 +2369,38 @@ declare global {
          */
         nextHits: number
 
-        _nextStore: Partial<StoreDefinition>
+        // _nextStore: Partial<StoreDefinition>
+
+        // /**
+        //  * The estimated store values next tick
+        //  */
+        // readonly nextStore: Partial<StoreDefinition>
+
+        _nextStore: Partial<CustomStore>
 
         /**
          * The estimated store values next tick
          */
-        readonly nextStore: Partial<StoreDefinition>
+        readonly nextStore: Partial<CustomStore>
 
-        _reserveStore: Partial<StoreDefinition>
+        _usedNextStore: number
+
+        readonly usedNextStore: number
+
+        readonly freeNextStore: number
+
+        _reserveStore: Partial<CustomStore>
 
         /**
          * The store values including that reserved by tasks
          */
-        readonly reserveStore: Partial<StoreDefinition>
+        readonly reserveStore: Partial<CustomStore>
+
+        _usedReserveStore: number
+
+        readonly usedReserveStore: number
+
+        readonly freeReserveStore: number
 
         _reservePowers: Set<PowerConstant>
 

@@ -1,3 +1,4 @@
+import { RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
 import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class Builder extends Creep {
@@ -70,31 +71,17 @@ export class Builder extends Creep {
         super(creepID)
     }
 
-    static builderManager(room: Room, creepsOfRole: string[]) {
-        const cSiteTarget = room.cSiteTarget
+    run?() {
+        if (this.advancedBuild() === RESULT_FAIL) this.advancedRecycle()
 
-        // Loop through creep names of creeps of the manager's role
+        this.say(this.message)
+    }
+
+    static builderManager(room: Room, creepsOfRole: string[]) {
 
         for (const creepName of creepsOfRole) {
-            // Get the creep using its name
-
             const creep: Builder = Game.creeps[creepName]
-
-            if (!cSiteTarget) {
-                creep.advancedRecycle()
-                continue
-            }
-
-            if (creep.getEnergy()) {
-                creep.say(creep.message)
-                continue
-            }
-
-            // If there is a cSite, try to build it and iterate
-
-            if (creep.advancedBuildCSite()) creep.getEnergy()
-
-            creep.say(creep.message)
+            creep.run()
         }
     }
 }

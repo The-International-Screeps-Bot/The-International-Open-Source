@@ -21,6 +21,7 @@ import {
     stamps,
     structureTypesByBuildPriority,
     RESULT_FAIL,
+    RESULT_NO_ACTION,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -2334,7 +2335,12 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 }
 
 Room.prototype.createRoomLogisticsRequest = function (args) {
+
+    // Don't make requests when there is nobody to respond
+
+    if (!this.myCreepsAmount) return RESULT_NO_ACTION
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
+
     // We can only handle energy until we have a storage or terminal
     else if (
         args.resourceType !== RESOURCE_ENERGY &&
@@ -2349,14 +2355,16 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     if (args.target instanceof Resource) {
         if (!args.threshold) args.threshold = 1
 
-        amount = (args.target as Resource).amount
+        amount = (args.target as Resource).reserveAmount
+
+        if (amount < args.threshold) return RESULT_FAIL
     } else if (args.type === 'transfer') {
         if (!args.threshold) args.threshold = args.target.store.getCapacity(args.resourceType)
-        amount = args.target.reserveStore[args.resourceType]
 
-        // We have enough of the resource to fulfill the threshold
-        this.visual.text(amount.toString(), args.target.pos)
-        if (amount >= args.threshold) return RESULT_FAIL
+        if (args.target.reserveStore[args.resourceType] >= args.threshold) return RESULT_FAIL
+
+        amount = args.target.freeReserveStoreOf(args.resourceType)
+        /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
     }
 
     // Offer or withdraw types
@@ -2379,7 +2387,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     const ID = internationalManager.newTickID()
 /*     this.visual.text(args.priority.toString(), args.target.pos) */
-    return (this.roomLogisticsRequests[ID] = {
+    return (this.roomLogisticsRequests[args.type][ID] = {
         ID,
         type: args.type,
         targetID: args.target.id,

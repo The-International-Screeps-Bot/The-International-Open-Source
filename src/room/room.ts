@@ -66,7 +66,12 @@ export class RoomManager {
         room.squadRequests = new Set()
 
         if (room.memory.T === 'remote') {
-            room.roomLogisticsRequests = {}
+            room.roomLogisticsRequests = {
+                transfer: {},
+                withdraw: {},
+                offer: {},
+                pickup: {},
+            }
             return
         }
 

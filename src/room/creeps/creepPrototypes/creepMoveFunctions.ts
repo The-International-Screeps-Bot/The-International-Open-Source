@@ -158,6 +158,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultMinCacheAmount
 
     let path: RoomPosition[]
+    if (this.spawning) path = []
 
     // If there is a path in the creep's memory and it isn't spawning
 
@@ -165,9 +166,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         path = unpackPosList(this.memory.P)
 
         // So long as the creep isn't standing on the first position in the path, and the pos is worth going on
-        /*
-        while (path[0] && getRangeOfCoords(path[0], this.pos) <= 1 && path.length > 1) {
- */
 
         while (path[0] && arePositionsEqual(this.pos, path[0])) {
             // Remove the first pos of the path
@@ -184,6 +182,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     if (needsNewPathResult) {
         // Assign the creep to the opts
+        room.visual.circle(this.pos, { fill: customColors.red })
 
         opts.creep = this
 

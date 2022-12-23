@@ -93,7 +93,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
                     })
 
                     // Get the income based on the reservation of the room and remoteHarvester need
-                    console.log(roomName)
+
                     const income =
                         (possibleReservation ? 10 : 5) -
                         Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)

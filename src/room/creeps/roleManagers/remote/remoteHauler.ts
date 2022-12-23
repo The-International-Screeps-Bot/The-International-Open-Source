@@ -44,7 +44,6 @@ export class RemoteHauler extends Creep {
     }
 
     hasValidRemote?() {
-
         if (!this.memory.RN) return false
 
         const remoteMemory = Memory.rooms[this.memory.RN]
@@ -481,9 +480,9 @@ export class RemoteHauler extends Creep {
 
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
-        if (creepAtPos.usedReserveStore() === creepAtPos.store.getCapacity()) return false
+        if (!creepAtPos.freeNextStore) return false
         if (
-            creepAtPos.freeReserveStore() !== this.usedReserveStore() &&
+            creepAtPos.freeNextStore !== this.usedNextStore &&
             creepAtPos.store.getCapacity() !== this.store.getCapacity()
         )
             return false
@@ -493,7 +492,7 @@ export class RemoteHauler extends Creep {
         this.movedResource = true
         creepAtPos.movedResource = true
 
-        this.reserveStore.energy -= creepAtPos.freeReserveStore()
+        this.reserveStore.energy -= creepAtPos.freeNextStore
         creepAtPos.reserveStore.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
 
         // Stop previously attempted moveRequests as they do not account for a relay
@@ -576,7 +575,12 @@ export class RemoteHauler extends Creep {
 
         // Don't relay too close to the source position unless we are fatigued
 
-        if (!this.fatigue && this.memory.RN && getRangeOfCoords(unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0], this.pos) <= 1) return
+        if (
+            !this.fatigue &&
+            this.memory.RN &&
+            getRangeOfCoords(unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0], this.pos) <= 1
+        )
+            return
 
         const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[1]
 

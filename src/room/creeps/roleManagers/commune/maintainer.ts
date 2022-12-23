@@ -17,27 +17,15 @@ export class Maintainer extends Creep {
         // If the this needs resources
 
         if (this.needsResources()) {
+
             delete this.memory.repairTarget
 
-            if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
-
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
+            this.runRoomLogisticsRequests({
+                types: new Set(['withdraw', 'offer', 'pickup']),
+                conditions: (request) => request.resourceType === RESOURCE_ENERGY
+            })
 
             if (this.needsResources()) return false
-        }
-
-        if (room.cSiteTarget.structureType === STRUCTURE_SPAWN) {
-            return this.advancedBuildCSite()
         }
 
         // Otherwise if the this doesn't need resources
@@ -200,7 +188,7 @@ export class Maintainer extends Creep {
 
             // Show the this tried to repair
 
-            this.say(`🗺️🔧${energySpentOnRepairs * REPAIR_POWER}`)
+            this.message = `🗺️🔧${energySpentOnRepairs * REPAIR_POWER}`
             return true
         }
 
@@ -209,21 +197,25 @@ export class Maintainer extends Creep {
         return false
     }
 
+    run?() {
+
+        const cSiteTarget = this.room.cSiteTarget
+        if (cSiteTarget && cSiteTarget.structureType === STRUCTURE_SPAWN) {
+
+            this.advancedBuild()
+            this.say(this.message)
+            return
+        }
+
+        if (this.advancedMaintain()) return
+        if (this.maintainNearby()) return
+    }
+
     static maintainerManager(room: Room, creepsOfRole: string[]) {
-        // Loop through creep names of creeps of the manager's role
 
         for (const creepName of creepsOfRole) {
-            // Get the creep using its name
-
             const creep: Maintainer = Game.creeps[creepName]
-
-            // Try to maintain structures, iterating if success
-
-            if (creep.advancedMaintain()) continue
-
-            // Otherwise, try to maintain at feet, iterating if success
-
-            if (creep.maintainNearby()) continue
+            creep.run()
         }
     }
 }

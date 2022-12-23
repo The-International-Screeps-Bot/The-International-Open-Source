@@ -82,13 +82,6 @@ Object.defineProperties(Creep.prototype, {
             return (this._reservation = this.memory.Rs[0])
         },
     },
-    roomLogisticsRequest: {
-        get() {
-            if (!this.memory.RLRs[0]) return false
-
-            return this.memory.RLRs[0]
-        },
-    },
     macroHealStrength: {
         get() {
             if (this._macroHealStrength !== undefined) return this._macroHealStrength
@@ -362,8 +355,6 @@ const additions = {
     message: {
         get() {
             if (this._message) return this._message
-
-            this.say(this._message)
 
             return (this._message = '')
         },

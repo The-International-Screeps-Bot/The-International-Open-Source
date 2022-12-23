@@ -223,7 +223,7 @@ export class TowerManager {
                 target: structure,
                 threshold: structure.store.getCapacity(RESOURCE_ENERGY) * 0.75,
                 type: 'transfer',
-                priority: scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy, 4),
+                priority: scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy, ),
             })
         }
     }
