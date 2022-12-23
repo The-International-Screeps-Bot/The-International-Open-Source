@@ -81,9 +81,8 @@ export class CombatManager {
 
             if (!(attackTarget instanceof Structure)) continue
 
-            // If a rampart was destroyed above a spawn
-
-            if (room.structureCoordsByType.spawn.has(packCoord(attackTarget.pos))) return true
+            const structuresAtCoord = room.structureCoords.get(packCoord(attackTarget.pos))
+            if (structuresAtCoord && structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)) return true
 
             if (safemodeTargets.includes(attackTarget.structureType)) return true
         }

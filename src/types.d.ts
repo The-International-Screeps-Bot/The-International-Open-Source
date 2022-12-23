@@ -832,27 +832,26 @@ declare global {
         // Containers
 
         sourceContainers: Id<StructureContainer>[]
-
-        sourceLinks: Id<StructureLink>[]
-
         fastFillerContainerLeft: Id<StructureContainer> | undefined
-
         fastFillerContainerRight: Id<StructureContainer> | undefined
-
         controllerContainer: Id<StructureContainer> | undefined
-
         mineralContainer: Id<StructureContainer> | undefined
 
         centerUpgradePos: RoomPosition | false
-
         upgradePositions: RoomPosition[]
+
+        allStructures: Structure[]
+        structures: Partial<OrganizedStructures>
+        structureCoords: Map<string, Id<Structure>[]>
+
+        allCSites: ConstructionSite[]
+        cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
 
         // Links
 
+        sourceLinks: Id<StructureLink>[]
         controllerLink: Id<StructureLink> | undefined
-
         fastFillerLink: Id<StructureLink> | undefined
-
         hubLink: Id<StructureLink> | undefined
     }
 
@@ -900,7 +899,7 @@ declare global {
         creepsOfRemote: { [remoteName: string]: Partial<{ [key in CreepRoles]: string[] }> }
 
         /**
-         * A set of roomNames representing the targets of scouts from this commune
+         * A set of roomNames representing the targets stof scouts from this commune
          */
         scoutTargets: Set<string>
 
@@ -1271,32 +1270,26 @@ declare global {
 
         // Buildings
 
-        _structures: Partial<OrganizedStructures>
+        structureUpdate: boolean
+        _allStructures: Structure[]
 
+        readonly allStructures: Structure[]
         readonly structures: OrganizedStructures
-
-        _structureCoords: Map<string, Id<Structure>[]>
-
         readonly structureCoords: Map<string, Id<Structure>[]>
 
-        _structureCoordsByType: Partial<{ [key in StructureConstant]: Map<string, Id<Structure>> }>
+        cSiteUpdate: boolean
+        _allCSites: ConstructionSite[]
 
-        readonly structureCoordsByType: { [key in StructureConstant]: Map<string, Id<Structure>> }
-
-        _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
-
+        readonly allCSites: ConstructionSite[]
         readonly cSites: Record<StructureConstant, ConstructionSite[]>
 
         _enemyCSites: ConstructionSite[]
-
         readonly enemyCSites: ConstructionSite[]
 
         _allyCSites: ConstructionSite[]
-
         readonly allyCSites: ConstructionSite[]
 
         _allyCSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>>
-
         readonly allyCSitesByType: Record<StructureConstant, ConstructionSite[]>
 
         readonly cSiteTarget: ConstructionSite | undefined
@@ -1304,11 +1297,9 @@ declare global {
         _spawningStructures: SpawningStructures
 
         readonly spawningStructures: SpawningStructures
-
         _spawningStructuresByPriority: SpawningStructures
 
         readonly spawningStructuresByPriority: SpawningStructures
-
         _spawningStructuresByNeed: SpawningStructures
 
         readonly spawningStructuresByNeed: SpawningStructures

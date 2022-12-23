@@ -182,7 +182,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     if (needsNewPathResult) {
         // Assign the creep to the opts
-        room.visual.circle(this.pos, { fill: customColors.red })
 
         opts.creep = this
 

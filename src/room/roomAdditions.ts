@@ -19,6 +19,7 @@ import {
     packAsNum,
     packXYAsNum,
     unpackNumAsPos,
+    findFunctionCPU,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import {
@@ -176,87 +177,108 @@ Object.defineProperties(Room.prototype, {
             }))
         },
     },
+    allStructures: {
+        get() {
+            if (this._allStructures) return this._allStructures
+
+            if (this.global.allStructures) {
+                const newAllStructures = this.find(FIND_STRUCTURES)
+
+                // Structures have been built or destroyed
+
+                if (
+                    newAllStructures.length !== this.global.allStructures.length ||
+                    this.global.allStructures.find(structure => !findObjectWithID(structure.id))
+                ) {
+                    this.structureUpdate = true
+                    return (this._allStructures = this.global.allStructures = newAllStructures)
+                }
+
+                return (this._allStructures = this.global.allStructures)
+            }
+
+            this.structureUpdate = true
+            return (this._allStructures = this.global.allStructures = this.find(FIND_STRUCTURES))
+        },
+    },
     structures: {
         get() {
-            if (this._structures) return this._structures
+            this.allStructures
+            if (this.global.structures && !this.structureUpdate) return this.global.structures
 
-            // Construct storage of structures based on structureType
-
-            this._structures = {}
-
-            // Make array keys for each structureType
-
-            for (const structureType of allStructureTypes) this._structures[structureType] = []
+            this.global.structures = {}
+            for (const structureType of allStructureTypes) this.global.structures[structureType] = []
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES))
-                this._structures[structure.structureType].push(structure as any)
+            for (const structure of this.allStructures)
+                this.global.structures[structure.structureType].push(structure as any)
 
-            return this._structures
+            return this.global.structures
         },
     },
     structureCoords: {
         get() {
-            if (this._structureCoords) return this._structureCoords
+            this.allStructures
+            if (this.global.structureCoords && !this.structureUpdate) return this.global.structureCoords
 
             // Construct storage of structures based on structureType
 
-            this._structureCoords = new Map()
+            this.global.structureCoords = new Map()
 
             // Group structures by structureType
 
-            for (const structure of this.find(FIND_STRUCTURES)) {
+            for (const structure of this.allStructures) {
                 const packedCoord = packCoord(structure.pos)
 
-                const coordStructureIDs = this._structureCoords.get(packedCoord)
+                const coordStructureIDs = this.global.structureCoords.get(packedCoord)
                 if (!coordStructureIDs) {
-                    this._structureCoords.set(packedCoord, [structure.id])
+                    this.global.structureCoords.set(packedCoord, [structure.id])
                     continue
                 }
                 coordStructureIDs.push(structure.id)
             }
 
-            return this._structureCoords
+            return this.global.structureCoords
         },
     },
-    structureCoordsByType: {
+    allCSites: {
         get() {
-            if (this._structureCoordsByType) return this._structureCoordsByType
+            if (this._allCSites) return this._allCSites
 
-            // Construct storage of structures based on structureType
+            if (this.global.allCSites) {
+                const newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
 
-            this._structureCoordsByType = {}
+                // Structures have been built or destroyed
 
-            // Make array keys for each structureType
+                if (
+                    newAllCSites.length !== this.global.allCSites.length ||
+                    this.global.allCSites.find(structure => !findObjectWithID(structure.id))
+                ) {
+                    this.cSiteUpdate = true
+                    return (this._allCSites = this.global.allCSites = newAllCSites)
+                }
 
-            for (const structureType of allStructureTypes) this._structureCoordsByType[structureType] = new Map()
+                return (this._allCSites = this.global.allCSites)
+            }
 
-            // Group structures by structureType
-
-            for (const structure of this.find(FIND_STRUCTURES))
-                this._structureCoordsByType[structure.structureType].set(packCoord(structure.pos), structure.id)
-
-            return this._structureCoordsByType
+            this.cSiteUpdate = true
+            return (this._allCSites = this.global.allCSites = this.find(FIND_CONSTRUCTION_SITES))
         },
     },
     cSites: {
         get() {
-            if (this._cSites) return this._cSites
+            this.allCSites
+            if (this.global.cSites && !this.cSiteUpdate) return this.global.cSites
 
-            // Construct storage of structures based on structureType
-
-            this._cSites = {}
-
-            // Make array keys for each structureType
-
-            for (const structureType of allStructureTypes) this._cSites[structureType] = []
+            this.global.cSites = {}
+            for (const structureType of allStructureTypes) this.global.cSites[structureType] = []
 
             // Group cSites by structureType
 
-            for (const cSite of this.find(FIND_MY_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
+            for (const cSite of this.allCSites) this.global.cSites[cSite.structureType].push(cSite)
 
-            return this._cSites
+            return this.global.cSites
         },
     },
     cSiteTarget: {
@@ -2240,10 +2262,9 @@ Object.defineProperties(Room.prototype, {
     },
     advancedLogistics: {
         get() {
-
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
             return (this._advancedLogistics = this.storage !== undefined || this.terminal !== undefined)
-        }
-    }
+        },
+    },
 } as PropertyDescriptorMap & ThisType<Room>)
