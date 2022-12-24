@@ -2335,18 +2335,13 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 }
 
 Room.prototype.createRoomLogisticsRequest = function (args) {
-
     // Don't make requests when there is nobody to respond
 
     if (!this.myCreepsAmount) return RESULT_NO_ACTION
-    if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
 
+    if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
     // We can only handle energy until we have a storage or terminal
-    else if (
-        args.resourceType !== RESOURCE_ENERGY &&
-        !(this.memory.CN ? Game.rooms[this.memory.CN].advancedLogistics : this.advancedLogistics)
-    )
-        return RESULT_FAIL
+    else if (args.resourceType !== RESOURCE_ENERGY && !this.advancedLogistics) return RESULT_FAIL
 
     let amount: number
 
@@ -2392,5 +2387,6 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         amount: amount,
         priority: args.priority,
         onlyFull: args.onlyFull,
+        noReserve: this.advancedLogistics,
     })
 }

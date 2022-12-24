@@ -347,6 +347,10 @@ declare global {
          * The ID of a roomLogisticsTask or store structure
          */
         delivery?: Id<AnyStoreStructure> | string
+        /**
+         * Wether the responder should interact with reserveStore of the target
+         */
+        noReserve?: boolean
     }
 
     interface CreateRoomLogisticsRequestArgs {
@@ -385,6 +389,10 @@ declare global {
          * Only Full, if they want a responder only if fully filled
          */
         OF?: boolean
+        /**
+         * No reserve, if the creep shouldn't interact with the reserveStore of the target
+         */
+        NR?: boolean
     }
 
     interface PowerTask {
@@ -840,12 +848,12 @@ declare global {
         centerUpgradePos: RoomPosition | false
         upgradePositions: RoomPosition[]
 
-        allStructures: Structure[]
-        structures: Partial<OrganizedStructures>
-        structureCoords: Map<string, Id<Structure>[]>
+        allStructureIDs: Id<Structure>[]
+        allCSiteIDs: Id<ConstructionSite>[]
 
-        allCSites: ConstructionSite[]
-        cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
+        structureCoords: Map<string, Id<Structure>[]>
+        cSiteCoords: Map<string, Id<ConstructionSite>[]>
+
 
         // Links
 
@@ -1270,17 +1278,18 @@ declare global {
 
         // Buildings
 
-        structureUpdate: boolean
-        _allStructures: Structure[]
-
-        readonly allStructures: Structure[]
-        readonly structures: OrganizedStructures
+        _structureUpdate: boolean
+        readonly structureUpdate: boolean
         readonly structureCoords: Map<string, Id<Structure>[]>
 
-        cSiteUpdate: boolean
-        _allCSites: ConstructionSite[]
+        _structures: Partial<OrganizedStructures>
+        readonly structures: OrganizedStructures
 
-        readonly allCSites: ConstructionSite[]
+        _cSiteUpdate: boolean
+        readonly cSiteUpdate: boolean
+        readonly cSiteCoords: Map<string, Id<ConstructionSite>[]>
+
+        _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
         readonly cSites: Record<StructureConstant, ConstructionSite[]>
 
         _enemyCSites: ConstructionSite[]
@@ -1573,6 +1582,11 @@ declare global {
          * Source IDs of the sources in the room
          */
         SIDs: Id<Source>[]
+
+        /**
+         * The ID of the mineral
+         */
+        MID: Id<Mineral>
 
         /**
          * Commune Name

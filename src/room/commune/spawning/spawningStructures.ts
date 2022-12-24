@@ -268,12 +268,12 @@ export class SpawningStructuresManager {
     private test() {
         return
 
-        if (!Object.keys(this.communeManager.room.spawnRequests).length) this.communeManager.room.spawnRequester()
+        if (!this.communeManager.room.spawnRequests.length) this.communeManager.room.spawnRequester()
 
         for (const request of this.communeManager.room.spawnRequests) {
             customLog(
                 'SPAWN REQUEST',
-                request.role + ', ' + request.priority + ', ' + request.cost + ', ' + request.body,
+                request.role + ', ' + request.priority + ', ' + request.cost + ', ' + request.bodyPartCounts,
             )
         }
     }

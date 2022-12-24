@@ -98,7 +98,12 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._mineral) return this._mineral
 
-            return (this._mineral = this.find(FIND_MINERALS)[0])
+            if (this.memory.MID) return findObjectWithID(this.memory.MID)
+
+            const mineral = this.find(FIND_MINERALS)[0]
+            this.memory.MID = mineral.id
+
+            return (this._mineral = mineral)
         },
     },
     enemyCreeps: {
@@ -177,49 +182,47 @@ Object.defineProperties(Room.prototype, {
             }))
         },
     },
-    allStructures: {
+    structureUpdate: {
         get() {
-            if (this._allStructures) return this._allStructures
+            if (this.structureUpdate !== undefined) return this.structureUpdate
 
-            if (this.global.allStructures) {
-                const newAllStructures = this.find(FIND_STRUCTURES)
+            let newAllStructures: Structure[]
 
-                // Structures have been built or destroyed
+            if (this.global.allStructureIDs) {
+                newAllStructures = this.find(FIND_STRUCTURES)
 
-                if (
-                    newAllStructures.length !== this.global.allStructures.length ||
-                    this.global.allStructures.find(structure => !findObjectWithID(structure.id))
-                ) {
-                    this.structureUpdate = true
-                    return (this._allStructures = this.global.allStructures = newAllStructures)
+                if (newAllStructures.length === this.global.allStructureIDs.length) {
+                    const allStructures: Structure[] = []
+
+                    for (const ID of this.global.allStructureIDs) {
+                        const structure = findObjectWithID(ID)
+                        if (!structure) break
+
+                        allStructures.push(structure)
+                    }
+
+                    if (allStructures.length === this.global.allStructureIDs.length) {
+                        return (this._structureUpdate = true)
+                    }
                 }
-
-                return (this._allStructures = this.global.allStructures)
             }
 
-            this.structureUpdate = true
-            return (this._allStructures = this.global.allStructures = this.find(FIND_STRUCTURES))
-        },
-    },
-    structures: {
-        get() {
-            this.allStructures
-            if (this.global.structures && !this.structureUpdate) return this.global.structures
+                        // Structures have been built, destroyed or aren't yet initialized
 
-            this.global.structures = {}
-            for (const structureType of allStructureTypes) this.global.structures[structureType] = []
+            if (!newAllStructures) newAllStructures = this.find(FIND_STRUCTURES)
+            const newAllStructureIDs: Id<Structure>[] = []
 
-            // Group structures by structureType
+            for (const structure of newAllStructures) {
 
-            for (const structure of this.allStructures)
-                this.global.structures[structure.structureType].push(structure as any)
+                newAllStructureIDs.push(structure.id)
+            }
 
-            return this.global.structures
+            this.global.allStructureIDs = newAllStructureIDs
+            return this._structureUpdate = true
         },
     },
     structureCoords: {
         get() {
-            this.allStructures
             if (this.global.structureCoords && !this.structureUpdate) return this.global.structureCoords
 
             // Construct storage of structures based on structureType
@@ -228,7 +231,7 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const structure of this.allStructures) {
+            for (const structure of this.find(FIND_STRUCTURES)) {
                 const packedCoord = packCoord(structure.pos)
 
                 const coordStructureIDs = this.global.structureCoords.get(packedCoord)
@@ -242,43 +245,97 @@ Object.defineProperties(Room.prototype, {
             return this.global.structureCoords
         },
     },
+    structures: {
+        get() {
+            if (this._structures) return this._structures
+
+            this._structures = {}
+            for (const structureType of allStructureTypes) this._structures[structureType] = []
+
+            // Group structures by structureType
+
+            for (const structure of this.find(FIND_STRUCTURES))
+                this._structures[structure.structureType].push(structure as any)
+
+            return this._structures
+        },
+    },
     allCSites: {
         get() {
-            if (this._allCSites) return this._allCSites
+            if (this._cSiteUpdate !== undefined) return this._cSiteUpdate
 
-            if (this.global.allCSites) {
-                const newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
+            let newAllCSites: ConstructionSite[]
 
-                // Structures have been built or destroyed
+            if (this.global.allCSiteIDs) {
+                newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
 
-                if (
-                    newAllCSites.length !== this.global.allCSites.length ||
-                    this.global.allCSites.find(structure => !findObjectWithID(structure.id))
-                ) {
-                    this.cSiteUpdate = true
-                    return (this._allCSites = this.global.allCSites = newAllCSites)
+                if (newAllCSites.length === this.global.allCSiteIDs.length) {
+                    const allCSites: ConstructionSite[] = []
+
+                    for (const ID of this.global.allCSiteIDs) {
+                        const cSite = findObjectWithID(ID)
+                        if (!cSite) break
+
+                        allCSites.push(cSite)
+                    }
+
+                    if (allCSites.length === this.global.allCSiteIDs.length) {
+                        return (this._cSiteUpdate = true)
+                    }
                 }
-
-                return (this._allCSites = this.global.allCSites)
             }
 
-            this.cSiteUpdate = true
-            return (this._allCSites = this.global.allCSites = this.find(FIND_CONSTRUCTION_SITES))
+                        // Structures have been built, destroyed or aren't yet initialized
+
+            if (!newAllCSites) newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
+            const newAllStructureIDs: Id<ConstructionSite>[] = []
+
+            for (const cSite of newAllCSites) {
+
+                newAllStructureIDs.push(cSite.id)
+            }
+
+            this.global.allCSiteIDs = newAllStructureIDs
+            return (this._cSiteUpdate = true)
+        },
+    },
+    cSiteCoords: {
+        get() {
+            if (this.global.cSiteCoords && !this.cSiteUpdate) return this.global.cSiteCoords
+
+            // Construct storage of structures based on structureType
+
+            this.global.cSiteCoords = new Map()
+
+            // Group structures by structureType
+
+            for (const cSite of this.find(FIND_CONSTRUCTION_SITES)) {
+                const packedCoord = packCoord(cSite.pos)
+
+                const coordStructureIDs = this.global.cSiteCoords.get(packedCoord)
+                if (!coordStructureIDs) {
+                    this.global.cSiteCoords.set(packedCoord, [cSite.id])
+                    continue
+                }
+                coordStructureIDs.push(cSite.id)
+            }
+
+            return this.global.cSiteCoords
         },
     },
     cSites: {
         get() {
-            this.allCSites
-            if (this.global.cSites && !this.cSiteUpdate) return this.global.cSites
+            if (this._cSites) return this._cSites
 
-            this.global.cSites = {}
-            for (const structureType of allStructureTypes) this.global.cSites[structureType] = []
+            this._cSites = {}
+            for (const structureType of allStructureTypes) this._cSites[structureType] = []
 
-            // Group cSites by structureType
+            // Group structures by structureType
 
-            for (const cSite of this.allCSites) this.global.cSites[cSite.structureType].push(cSite)
+            for (const cSite of this.find(FIND_CONSTRUCTION_SITES))
+                this._cSites[cSite.structureType].push(cSite)
 
-            return this.global.cSites
+            return this._cSites
         },
     },
     cSiteTarget: {
@@ -2264,6 +2321,7 @@ Object.defineProperties(Room.prototype, {
         get() {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
+            if (this.memory.T === 'remote') return (this._advancedLogistics = true)
             return (this._advancedLogistics = this.storage !== undefined || this.terminal !== undefined)
         },
     },

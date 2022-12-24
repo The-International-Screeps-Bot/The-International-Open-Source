@@ -1657,12 +1657,12 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
     if (request.type === 'transfer') {
         const amount = Math.min(this.store.getCapacity(), request.amount)
 
-        // We don't have enough resource
+        // We don't have enough resource and we have free space
 
-        if (this.nextStore[request.resourceType] <= 0) {
+        if (this.nextStore[request.resourceType] <= 0 && this.freeNextStore > 0) {
             // Try to find a sufficient withdraw or offer task
 
-            const types: RoomLogisticsRequestTypes[] = ['withdraw', 'offer', 'pickup']
+            const types: RoomLogisticsRequestTypes[] = ['withdraw', 'pickup']
 
             let lowestScore = Infinity
             let bestRequest2
@@ -1738,7 +1738,7 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
         resourceType = key as ResourceConstant
         break
     }
-
+    customLog("BACKUP", resourceType)
     const storingStructure = storingStructures.find(
         structure => structure.freeReserveStore >= this.nextStore[resourceType],
     )

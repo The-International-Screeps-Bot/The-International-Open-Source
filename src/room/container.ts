@@ -40,8 +40,8 @@ export class ContainerManager {
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                threshold: container.store.getCapacity() * 0.720,
-                maxAmount: container.reserveStore.energy * 0.720,
+                threshold: container.store.getCapacity() * 0.6,
+                maxAmount: container.reserveStore.energy * 0.6,
                 onlyFull: true,
                 type: 'offer',
                 priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
@@ -67,7 +67,7 @@ export class ContainerManager {
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             type: 'transfer',
-            threshold: container.store.getCapacity() * 0.720,
+            threshold: container.store.getCapacity() * 0.75,
             priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
         })
     }
