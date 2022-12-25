@@ -1779,6 +1779,7 @@ declare global {
         advancedUpgradeController(): boolean
 
         advancedBuild(): number
+        builderGetEnergy(): number
 
         /**
          * Attempts multiple methods to build one of our construction sites
@@ -1793,12 +1794,12 @@ declare global {
         /**
          *
          */
-        findRampartRepairTarget(): Structure | false
+        findRampartRepairTarget(): StructureRampart | false
 
         /**
          *
          */
-        findRepairTarget(): Structure | false
+        findRepairTarget(): Structure<BuildableStructureConstant> | false
 
         findOptimalSourceIndex(): boolean
 
@@ -2142,7 +2143,7 @@ declare global {
         /**
          * The target for which the creep should repair
          */
-        repairTarget: Id<Structure>
+        repairTarget: Id<Structure<BuildableStructureConstant>>
 
         /**
          * Scout Target, the name of the room the scout is trying to scout

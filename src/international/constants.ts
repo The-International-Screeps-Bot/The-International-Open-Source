@@ -1120,6 +1120,10 @@ export const RESULT_FAIL = 0
 export const RESULT_SUCCESS = 1
 export const RESULT_ACTION = 2
 export const RESULT_NO_ACTION = 3
+/**
+ * Wether there was success or fail is irrelevant. Stop future action
+ */
+export const RESULT_STOP = 4
 
 export const maxRemoteRoomDistance = 5
 export const offsetsByDirection = [,

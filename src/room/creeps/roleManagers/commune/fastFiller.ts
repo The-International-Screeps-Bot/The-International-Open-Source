@@ -129,7 +129,7 @@ export class FastFiller extends Creep {
 
                 // If there is a non-energy resource in the structure
 
-                if (structure.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
+                if (structure.nextStore.energy <= 0) continue
 
                 // Otherwise, withdraw from the structure and inform true
 
@@ -164,20 +164,20 @@ export class FastFiller extends Creep {
 
             // If the structure has no store property, iterate
 
-            if (!structure.store) continue
+            if (!structure.nextStore) continue
 
             // If the structureType is an extension or spawn, iterate
 
             if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
 
-            if (structure.store.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
+            if (structure.nextStore.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
 
             // Otherwise, transfer to the structure record the action and inform true
 
             this.say('T')
 
             this.transfer(structure, RESOURCE_ENERGY)
-            structure.store.energy += this.store.energy
+            structure.nextStore.energy += this.store.energy
             return true
         }
         /*

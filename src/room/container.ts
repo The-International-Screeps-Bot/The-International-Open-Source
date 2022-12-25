@@ -83,7 +83,7 @@ export class ContainerManager {
             resourceType,
             type: 'withdraw',
             onlyFull: true,
-            priority: scalePriority(container.store.getCapacity(), container.reserveStore[resourceType], 20, true),
+            priority: 20 + scalePriority(container.store.getCapacity(), container.reserveStore[resourceType], 20, true),
         })
     }
 }
