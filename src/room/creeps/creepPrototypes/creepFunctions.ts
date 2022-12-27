@@ -384,23 +384,7 @@ Creep.prototype.advancedBuild = function () {
     return RESULT_SUCCESS
 }
 
-Creep.prototype.builderGetEnergy = function() {
-
-    // If there is a sufficient storing structure
-
-    const needsOwnRequest = (this.room.fastFillerContainerLeft || this.room.fastFillerContainerRight || this.room.storage || this.room.terminal) !== undefined
-    if (needsOwnRequest) {
-
-        this.room.roomManager.room.createRoomLogisticsRequest({
-            target: this,
-            type: 'transfer',
-            priority: 8,
-            threshold: this.store.getCapacity() * 0.5,
-        })
-
-        return RESULT_SUCCESS
-    }
-
+Creep.prototype.builderGetEnergy = function () {
     if (!this.needsResources()) return RESULT_NO_ACTION
 
     // We need energy, find a request
@@ -577,7 +561,7 @@ Creep.prototype.findRepairTarget = function () {
 
     const { room } = this
 
-    let possibleRepairTargets: (Structure<BuildableStructureConstant>)[] = room.structures.road
+    let possibleRepairTargets: Structure<BuildableStructureConstant>[] = room.structures.road
     possibleRepairTargets = possibleRepairTargets.concat(room.structures.container)
 
     let lowestScore = Infinity
