@@ -15,11 +15,11 @@ export class ContainerManager {
 
         this.runFastFillerContainers()
         this.runControllerContainer()
+        this.runControllerLink()
         this.runMineralContainer()
     }
 
     private runFastFillerContainers() {
-
         if (!this.roomManager.room.myCreeps.fastFiller.length) return
 
         const fastFillerContainers = [
@@ -69,6 +69,17 @@ export class ContainerManager {
             type: 'transfer',
             threshold: container.store.getCapacity() * 0.75,
             priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
+        })
+    }
+
+    private runControllerLink() {
+        const link = this.roomManager.room.controllerLink
+        if (!link || this.roomManager.room.creepsFromRoom['hubHauler'].length > 0) return
+
+        this.roomManager.room.createRoomLogisticsRequest({
+            target: link,
+            type: 'transfer',
+            priority: scalePriority(link.store.getCapacity(), link.reserveStore.energy, 20),
         })
     }
 
