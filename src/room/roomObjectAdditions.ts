@@ -54,11 +54,12 @@ Object.defineProperties(RoomObject.prototype, {
                 set(target: Partial<CustomStore>, resourceType: ResourceConstant, newAmount) {
 
                     const parent = findObjectWithID(target.parentID)
-                    parent.usedNextStore
+
                     if (parent instanceof Creep) customLog('PRE CHECK', parent._usedNextStore + ', ' + parent.store.getCapacity(), { superPosition: 1 })
-                    if (parent._usedNextStore) {
+                    if (parent._usedNextStore !== undefined) {
 
                         parent._usedNextStore += newAmount - (target[resourceType] ?? 0)
+                        customLog('USED', parent._usedNextStore + ', ' + (newAmount - (target[resourceType] ?? 0)))
                     }
                     if (parent instanceof Creep) customLog('FIRST CHECK', newAmount + ', ' + target[resourceType], { superPosition: 1 })
                     // Update the change
@@ -73,6 +74,7 @@ Object.defineProperties(RoomObject.prototype, {
     },
     usedNextStore: {
         get(this: RoomObject & { store?: StoreDefinition }) {
+            customLog('PRESENT USED', this._usedNextStore)
             if (this._usedNextStore !== undefined) return this._usedNextStore
 
             this._usedNextStore = 0
@@ -82,7 +84,7 @@ Object.defineProperties(RoomObject.prototype, {
 
                 this._usedNextStore += this.nextStore[keys[i] as ResourceConstant]
             }
-
+            customLog('NEW USED', this._usedNextStore)
             return this._usedNextStore
         },
     },
@@ -103,7 +105,7 @@ Object.defineProperties(RoomObject.prototype, {
                 },
                 set(target: Partial<CustomStore>, resourceType: ResourceConstant, newAmount) {
                     const parent = findObjectWithID(target.parentID)
-                    if (parent._usedReserveStore) {
+                    if (parent._usedReserveStore !== undefined) {
 
                         parent._usedReserveStore += newAmount - (target[resourceType] ?? 0)
                     }

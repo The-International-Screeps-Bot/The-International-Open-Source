@@ -674,7 +674,8 @@ Creep.prototype.findMineralHarvestPos = function () {
 
 Creep.prototype.needsResources = function () {
     // If the creep is empty
-
+    this.nextStore.energy += 0
+    customLog('NEEDS CHECK', this.nextStore.energy + ', ' + this.store.getCapacity() + ', ' + this.usedNextStore + ', ' + this.freeNextStore)
     if (this.usedNextStore === 0) return (this.memory.NR = true)
 
     // Otherwise if the creep is full
@@ -1502,6 +1503,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     if (this.memory.RLRs[0]) return this.memory.RLRs[0]
 
     const types = this.findRoomLogisticsRequestTypes(args)
+    if (!types.size) return RESULT_FAIL
 
     let lowestScore = Infinity
     let bestRequest: RoomLogisticsRequest | 0
@@ -1629,7 +1631,21 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 }
 
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
-    if (args && args.types) return args.types
+    if (args && args.types) {
+
+        // Make sure we have the right store values for our types
+        customLog('NEEDS RESOURCES', this.needsResources())
+        if (this.needsResources()) {
+
+            args.types.delete('transfer')
+            return args.types
+        }
+
+        args.types.delete('pickup')
+        args.types.delete('offer')
+        args.types.delete('withdraw')
+        return args.types
+    }
 
     if (this.needsResources()) return new Set(['withdraw', 'pickup'])
 
