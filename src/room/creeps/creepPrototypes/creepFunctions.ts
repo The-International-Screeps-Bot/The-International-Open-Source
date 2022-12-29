@@ -674,8 +674,9 @@ Creep.prototype.findMineralHarvestPos = function () {
 
 Creep.prototype.needsResources = function () {
     // If the creep is empty
-    this.nextStore.energy += 0
+
     customLog('NEEDS CHECK', this.nextStore.energy + ', cap ' + this.store.getCapacity() + ', used ' + this.usedNextStore + ', free ' + this.freeNextStore, { superPosition: 1 })
+
     if (this.usedNextStore === 0) return (this.memory.NR = true)
 
     // Otherwise if the creep is full
@@ -1571,7 +1572,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
                     T: nextRequest.type,
                     TID: nextRequest.targetID,
                     RT: nextRequest.resourceType,
-                    A: Math.max(Math.min(this.freeNextStore, nextRequest.amount), this.freeNextStore),
+                    A: this.freeNextStore,
                     NR: creepRequest.NR,
                 }
 
@@ -1784,7 +1785,7 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     }
 
     // Withdraw or offer type
-    customLog('AMOUNT', this.freeNextStore + ', ' + this.store.getCapacity(), { superPosition: 1 })
+
     return Math.min(this.freeNextStore, request.amount)
 }
 
@@ -1817,7 +1818,7 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
     }
 
     if (request.T === 'transfer') {
-        this.transfer(target as AnyStoreStructure | Creep, request.RT, request.A)
+        if (this.transfer(target as AnyStoreStructure | Creep, request.RT, request.A) !== OK) return RESULT_FAIL
 
         this.nextStore[request.RT] -= request.A
         target.nextStore[request.RT] += request.A
@@ -1831,7 +1832,7 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
     // Creeps need to transfer to each other
 
     if (target instanceof Creep) {
-        target.transfer(this, request.RT, request.A)
+        if (target.transfer(this, request.RT, request.A) !== OK) return RESULT_FAIL
 
         this.nextStore[request.RT] += request.A
         target.nextStore[request.RT] -= request.A
@@ -1840,7 +1841,7 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
         return RESULT_SUCCESS
     }
 
-    this.withdraw(target, request.RT, request.A)
+    if (this.withdraw(target, request.RT, request.A) !== OK) return RESULT_FAIL
     customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A

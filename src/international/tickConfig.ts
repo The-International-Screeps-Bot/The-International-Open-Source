@@ -56,6 +56,7 @@ class TickConfig {
             globalStatsUpdater('', statName, cpuUsed, true)
         }
     }
+    
     private configGeneral() {
         // General
 
@@ -73,6 +74,7 @@ class TickConfig {
         global.constructionSitesCount = Object.keys(Game.constructionSites).length
         global.logs = ``
     }
+
     private configRooms() {
         // Configure rooms
 

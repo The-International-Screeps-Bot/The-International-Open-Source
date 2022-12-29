@@ -150,8 +150,6 @@ export class CommuneManager {
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
-        this.room.roomManager.containerManager.pretickRunCommune()
-        this.room.roomManager.droppedResourceManager.preTickRunCommune()
         this.claimRequestManager.preTickRun()
 
         // Add roomName to commune list
@@ -210,6 +208,8 @@ export class CommuneManager {
         this.spawningStructuresManager.createRoomLogisticsRequests()
         this.storingStructuresManager.run()
         this.room.factoryManager()
+        this.room.roomManager.containerManager.runCommune()
+        this.room.roomManager.droppedResourceManager.runCommune()
         this.linkManager.run()
         this.labManager.run()
         this.powerSpawningStructuresManager.run()

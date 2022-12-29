@@ -9,7 +9,7 @@ export class DroppedResourceManager {
         this.roomManager = roomManager
     }
 
-    preTickRunCommune() {
+    runCommune() {
 
         for (const resource of this.roomManager.room.droppedResources) {
 

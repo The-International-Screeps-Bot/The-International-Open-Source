@@ -13,9 +13,9 @@ export class ContainerManager {
         this.runSourceContainers()
     }
 
-    pretickRunCommune() {
-        this.runSourceContainers()
+    runCommune() {
 
+        this.runSourceContainers()
         this.runFastFillerContainers()
         this.runControllerContainer()
         this.runMineralContainer()
