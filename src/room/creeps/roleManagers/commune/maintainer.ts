@@ -126,32 +126,6 @@ export class Maintainer extends Creep {
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
         const workPartCount = this.parts.work
-
-        for (const structure of this.pos.lookFor(LOOK_STRUCTURES)) {
-            // If the structure is not a road, iterate
-
-            if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) continue
-
-            // If the structure is sufficiently repaired, inform false
-
-            if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) break
-
-            // Otherwise, try to repair the structure, informing false if failure
-
-            if (this.repair(structure) !== OK) return false
-
-            // Otherwise
-
-            // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
-
-            const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
-
-            // Show the this tried to repair
-
-            this.say(`👣🔧${energySpentOnRepairs * REPAIR_POWER}`)
-            return true
-        }
-
         const adjacentCoords = findCoordsInsideRect(this.pos.x - 3, this.pos.y - 3, this.pos.x + 3, this.pos.y + 3)
 
         let structureID: Id<Structure<BuildableStructureConstant>>

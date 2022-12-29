@@ -1,5 +1,5 @@
 import { globalStatsUpdater } from 'international/statsManager'
-import { getRange, getRangeOfCoords } from 'international/utils'
+import { findCoordsInsideRect, findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
 import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
 
@@ -54,21 +54,22 @@ export class SourceHarvester extends Creep {
         this.say(`⏩${this.memory.SI}`)
 
         if (this.memory.PC === packCoord(this.room.sourcePositions[this.memory.SI][0])) {
-
-            this.createMoveRequestByPath({
-                origin: this.pos,
-                goals: [
-                    {
-                        pos: harvestPos,
-                        range: 0,
-                    },
-                ],
-                avoidEnemyRanges: true,
-            },
-            {
-                packedPath: reverseCoordList(this.room.memory.SPs[this.memory.SI]),
-                loose: true,
-            })
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: harvestPos,
+                            range: 0,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                },
+                {
+                    packedPath: reverseCoordList(this.room.memory.SPs[this.memory.SI]),
+                    loose: true,
+                },
+            )
 
             return true
         }
@@ -98,45 +99,27 @@ export class SourceHarvester extends Creep {
 
         if (this.store.getFreeCapacity(RESOURCE_ENERGY) > this.parts.work * HARVEST_POWER) return false
 
-        // Get adjacent structures to the creep
+        const adjacentCoords = findCoordsInsideRect(this.pos.x - 1, this.pos.y - 1, this.pos.x + 1, this.pos.y + 1)
 
-        const adjacentStructures = room.lookForAtArea(
-            LOOK_STRUCTURES,
-            this.pos.y - 1,
-            this.pos.x - 1,
-            this.pos.y + 1,
-            this.pos.x + 1,
-            true,
-        )
+        let structureID: Id<Structure>
 
-        // For each structure of adjacentStructures
+        for (const coord of adjacentCoords) {
+            const structureIDs = room.structureCoords.get(packCoord(coord))
+            if (!structureIDs) continue
 
-        for (const adjacentPosData of adjacentStructures) {
-            // Get the structure at the adjacentPos
+            structureID = structureIDs.find(structureID => {
+                const structure = findObjectWithID(structureID) as AnyStoreStructure
 
-            const structure = adjacentPosData.structure as AnyStoreStructure
-
-            // If the structure has no store property, iterate
-
-            if (!structure.store) continue
-
-            // If the structureType is an extension, iterate
-
-            if (structure.structureType !== STRUCTURE_EXTENSION) continue
-
-            // Otherwise, if the structure is full, iterate
-
-            if (structure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) continue
-
-            // Otherwise, transfer to the structure and inform true
-
-            this.transfer(structure, RESOURCE_ENERGY)
-            return true
+                return structure.structureType === STRUCTURE_EXTENSION && structure.freeNextStore !== 0
+            })
         }
 
-        // Inform false
+        if (!structureID) return false
 
-        return false
+        const structure = findObjectWithID(structureID)
+
+        this.transfer(structure, RESOURCE_ENERGY)
+        return true
     }
 
     transferToSourceLink?(): boolean {
@@ -144,7 +127,7 @@ export class SourceHarvester extends Creep {
 
         // If the creep is not nearly full, stop
 
-        if (this.store.getFreeCapacity(RESOURCE_ENERGY) > this.parts.work * HARVEST_POWER) return false
+        if (this.nextStore.energy > 0) return false
 
         // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
@@ -157,8 +140,7 @@ export class SourceHarvester extends Creep {
     }
 
     repairSourceContainer?(sourceContainer: StructureContainer): boolean {
-        // If there is no container, inform false
-
+        if (this.worked) return false
         if (!sourceContainer) return false
 
         // Get the creep's number of work parts
@@ -171,12 +153,8 @@ export class SourceHarvester extends Creep {
 
         // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
-        if (this.store.getUsedCapacity(RESOURCE_ENERGY) < workPartCount && !this.movedResource)
+        if (this.nextStore.energy < workPartCount && !this.movedResource)
             this.withdraw(sourceContainer, RESOURCE_ENERGY)
-
-        // If the creep has already worked, inform false
-
-        if (this.worked) return false
 
         // Try to repair the target
 
@@ -212,19 +190,32 @@ export class SourceHarvester extends Creep {
     }
 
     transferToNearbyCreep?(): boolean {
-        //See if there's a hauler to tranfer to if we're full so we're not drop mining.
-        //   This shouldn't run if we're container mining however.
-        if (this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK)) {
-            let haulers = this.room.myCreeps.hauler.map(name => Game.creeps[name] as Hauler)
-            if (haulers && haulers.length > 0) {
-                let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
-                if (nearby) {
-                    this.transfer(nearby, RESOURCE_ENERGY)
-                    return true
-                }
-            }
-        }
-        return false
+        const sourceContainer = this.room.sourceContainers[this.memory.SI]
+        if (sourceContainer && sourceContainer.RCLActionable) return false
+
+        const sourceLink = this.room.sourceLinks[this.memory.SI]
+        if (sourceLink && sourceLink.RCLActionable) return false
+
+        // If the creep is not nearly full, stop
+
+        if (this.nextStore.energy > 0) return false
+
+        const haulers = this.room.myCreeps.hauler.map(name => Game.creeps[name] as Hauler)
+        if (!haulers.length) return false
+
+        const haulerName = this.room.myCreeps.hauler.find(haulerName => {
+            return getRangeOfCoords(this.pos, Game.creeps[haulerName].pos)
+        })
+        if (!haulerName) return false
+
+        const hauler = Game.creeps[haulerName]
+
+        this.transfer(hauler, RESOURCE_ENERGY)
+
+        const nextEnergy = this.nextStore.energy
+        this.nextStore.energy -= hauler.freeNextStore
+        hauler.nextStore.energy += nextEnergy
+        return true
     }
 
     static sourceHarvesterManager(room: Room, creepsOfRole: string[]): void | boolean {

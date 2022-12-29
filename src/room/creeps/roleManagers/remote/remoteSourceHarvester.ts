@@ -115,7 +115,7 @@ export class RemoteHarvester extends Creep {
         // Try to move to source. If creep moved then iterate
         if (this.travelToSource(this.memory.SI)) return
 
-        const container = this.getContainer()
+        const container = this.room.sourceContainers[this.memory.SI]
         let figuredOutWhatToDoWithTheEnergy = false
 
         const source = this.room.sources[this.memory.SI]
@@ -129,17 +129,23 @@ export class RemoteHarvester extends Creep {
         if (this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK) || source.energy == 0) {
             //See if there's a hauler to tranfer to if we're full so we're not drop mining.
             //   This shouldn't run if we're container mining however.
+
             if (!container) {
-                let haulers = this.room.myCreeps.remoteHauler?.map(name => Game.creeps[name] as RemoteHauler)
-                if (haulers && haulers.length > 0) {
-                    let nearby = haulers.find(haul => haul.pos.isNearTo(this.pos))
-                    if (nearby) {
-                        let transResult = this.transfer(nearby, RESOURCE_ENERGY)
-                        if (transResult == OK) {
-                            this.movedResource = true
-                            //We won't have energy, so don't consider maintenance.
-                            figuredOutWhatToDoWithTheEnergy = true
-                        }
+                const haulers = this.room.myCreeps.remoteHauler?.map(name => Game.creeps[name] as RemoteHauler)
+                if (haulers.length) {
+                    const hauler = haulers.find(haul => haul.pos.isNearTo(this.pos))
+                    if (hauler) {
+                        this.transfer(hauler, RESOURCE_ENERGY)
+                        customLog('TRANSFER')
+                        this.movedResource = true
+
+                        // We won't have energy, so don't consider maintenance
+
+                        figuredOutWhatToDoWithTheEnergy = true
+
+                        const nextEnergy = this.nextStore.energy
+                        this.nextStore.energy -= hauler.freeNextStore
+                        hauler.nextStore.energy += nextEnergy
                     }
                 }
             }
@@ -151,7 +157,7 @@ export class RemoteHarvester extends Creep {
                 !figuredOutWhatToDoWithTheEnergy &&
                 source.energy * 300 < (source.ticksToRegeneration - 1) * source.energyCapacity
             ) {
-                let didWork = this.doContainerMaintance()
+                let didWork = this.maintainContainer()
                 //If we did container maintance, that'll eat our work action.
                 if (didWork) return
             }
@@ -178,20 +184,11 @@ export class RemoteHarvester extends Creep {
         }
     }
 
-    getContainerPosition(): RoomPosition {
-        return this.room.sourcePositions[this.memory.SI][0]
-    }
+    maintainContainer(): boolean {
 
-    getContainer(): StructureContainer {
-        let containerPosition = this.getContainerPosition()
-        return this.room
-            .lookForAt(LOOK_STRUCTURES, containerPosition)
-            .find(st => st.structureType == STRUCTURE_CONTAINER) as StructureContainer
-    }
+        const container = this.room.sourceContainers[this.memory.SI]
+        const sourcePos = this.room.sourcePositions[this.memory.SI][0]
 
-    doContainerMaintance(): boolean {
-        let containerPosition = this.getContainerPosition()
-        let container = this.getContainer()
         if (container) {
             //If the container is below 80% health, repair it.
             if (container.hits < container.hitsMax * 0.8) {
@@ -209,7 +206,7 @@ export class RemoteHarvester extends Creep {
         // Check if there is a construction site
 
         const cSite = this.room
-            .lookForAt(LOOK_CONSTRUCTION_SITES, containerPosition)
+            .lookForAt(LOOK_CONSTRUCTION_SITES, sourcePos)
             .find(st => st.structureType == STRUCTURE_CONTAINER)
 
         if (cSite) {
@@ -228,7 +225,7 @@ export class RemoteHarvester extends Creep {
 
         // Start on adding a container
 
-        this.room.createConstructionSite(containerPosition, STRUCTURE_CONTAINER)
+        this.room.createConstructionSite(sourcePos, STRUCTURE_CONTAINER)
         return false
     }
 
@@ -256,7 +253,7 @@ export class RemoteHarvester extends Creep {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(harvestPos.x, harvestPos.y, this.memory.RN),
+                        pos: harvestPos,
                         range: 0,
                     },
                 ],

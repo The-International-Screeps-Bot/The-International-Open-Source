@@ -20,10 +20,14 @@ export class CombatRequestManager {
             const requestName = room.memory.combatRequests[index]
             const request = Memory.combatRequests[requestName]
 
+            // The request has been deleted by soemthing else
+
             if (!request) {
                 room.memory.combatRequests.splice(index, 1)
                 continue
             }
+
+            // We have no way to make creeps
 
             if (!room.structures.spawn.length) {
                 delete request.responder
@@ -31,11 +35,11 @@ export class CombatRequestManager {
                 continue
             }
 
-            // The room is closed or is now a respawn or novice zone
+            // We don't have enough energy to respond to the request
 
-            if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
-                this.communeManager.deleteCombatRequest(requestName, index)
-                continue
+            if (!this.canKeepRequest()) {
+                delete request.responder
+                room.memory.combatRequests.splice(index, 1)
             }
 
             this[`${request.T}Request`](requestName, index)
@@ -52,6 +56,19 @@ export class CombatRequestManager {
             const statName: RoomCommuneStatNames = 'cormcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
+    }
+
+    private canKeepRequest() {
+        const { room } = this.communeManager
+
+        // Ensure we aren't responding to too many requests for our energy level
+
+        if (room.storage && room.controller.level >= 4) {
+            if (room.memory.combatRequests.length >= room.communeManager.maxCombatRequests) return false
+        }
+
+        if (room.memory.combatRequests.length >= room.estimateIncome() / 10) return false
+        return true
     }
 
     private attackRequest(requestName: string, index: number) {

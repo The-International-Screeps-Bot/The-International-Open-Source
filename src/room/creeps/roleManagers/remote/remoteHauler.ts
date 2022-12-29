@@ -121,17 +121,6 @@ export class RemoteHauler extends Creep {
         return false
     }
  */
-    getDroppedEnergy?() {
-        for (const resource of this.pos.lookFor(LOOK_RESOURCES)) {
-            if (resource.resourceType !== RESOURCE_ENERGY) continue
-
-            this.pickup(resource)
-            this.movedResource = true
-            return true
-        }
-
-        return false
-    }
 
     getResources?() {
         // Try to find a remote
@@ -161,57 +150,19 @@ export class RemoteHauler extends Creep {
             return false
         }
 
-        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
-
         // If the creep is in the remote
 
         if (this.room.name === this.memory.RN) {
-            if ((this.memory?.Rs?.length || 0 == 0) && getRange(this.pos.x, sourcePos.x, this.pos.y, sourcePos.y) > 1) {
-                this.getDroppedEnergy()
 
-                this.createMoveRequestByPath(
-                    {
-                        origin: this.pos,
-                        goals: [
-                            {
-                                pos: sourcePos,
-                                range: 1,
-                            },
-                        ],
-                        avoidEnemyRanges: true,
-                    },
-                    {
-                        packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
-                        remoteName: this.memory.RN,
-                    },
-                )
+            if (!this.getRemoteSourceResources()) return false
 
-                return true
-            }
-
-            this.moved = 'yeild'
-
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
-
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
-
-            if (this.needsResources()) return false
+            // We have enough resources, return home
 
             delete this.moved
 
             this.message += this.commune.name
-            this.say(this.message)
 
+            this.message = 'X'
             this.createMoveRequestByPath(
                 {
                     origin: this.pos,
@@ -231,7 +182,7 @@ export class RemoteHauler extends Creep {
                     },
                 },
                 {
-                    packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
                     remoteName: this.memory.RN,
                     loose: true,
                 },
@@ -240,10 +191,12 @@ export class RemoteHauler extends Creep {
             return true
         }
 
+        // We aren't in the remote, go to the source
+
+        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+
         this.message += this.memory.RN
         this.say(this.message)
-
-        this.getDroppedEnergy()
 
         this.createMoveRequestByPath(
             {
@@ -273,52 +226,74 @@ export class RemoteHauler extends Creep {
         return true
     }
 
-    reserveWithdrawEnergy() {
-        if (this.memory.Rs && this.memory.Rs?.length) return
-        if (!this.needsResources()) return
+    /**
+     *
+     * @returns If the creep no longer needs energy
+     */
+    getRemoteSourceResources?() {
 
-        const { room } = this
-        const sourcePos = room.sourcePositions[this.memory.SI][0]
+        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
-        if (this.freeCapacityNextTick === undefined) this.freeCapacityNextTick = this.store.getFreeCapacity()
+        // We aren't next to the source
 
-        let withdrawTargets = room.MAWT.filter(target => {
-            if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
+        if (getRangeOfCoords(this.pos, sourcePos) > 1) {
 
-            if (target instanceof Resource) return true
+            // Fulfill requests near the hauler
 
-            return target.store.energy >= this.freeCapacityNextTick
-        })
+            this.runRoomLogisticsRequests({
+                types: new Set(['pickup']),
+                conditions: request => {
+                    if (request.resourceType !== RESOURCE_ENERGY) return false
 
-        let target
-        let amount
+                    // If the target is near the creep
 
-        if (withdrawTargets.length) {
-            target = findClosestObject(this.pos, withdrawTargets)
+                    const targetPos = findObjectWithID(request.targetID).pos
+                    return getRangeOfCoords(targetPos, this.pos) <= 1
+                },
+            })
 
-            if (target instanceof Resource) amount = target.reserveAmount
-            else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
+            if (!this.needsResources()) return true
 
-            this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
-            return
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: sourcePos,
+                            range: 1,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                },
+                {
+                    packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    remoteName: this.memory.RN,
+                },
+            )
+
+            return false
         }
 
-        withdrawTargets = room.OAWT.filter(target => {
-            if (getRange(target.pos.x, sourcePos.x, target.pos.y, sourcePos.y) > 1) return false
+        // We are next to the source
 
-            if (target instanceof Resource) return true
+        this.moved = 'yeild'
 
-            return target.store.energy >= this.freeCapacityNextTick
+        // Fulfill requests near the source
+
+        this.runRoomLogisticsRequests({
+            types: new Set(['withdraw', 'pickup']),
+            conditions: request => {
+                if (request.resourceType !== RESOURCE_ENERGY) return false
+
+                // If the target is near the hauler
+
+                const targetPos = findObjectWithID(request.targetID).pos
+                return getRangeOfCoords(targetPos, this.pos) <= 1
+            },
         })
 
-        if (!withdrawTargets.length) return
-
-        target = findClosestObject(this.pos, withdrawTargets)
-
-        if (target instanceof Resource) amount = target.reserveAmount
-        else amount = Math.min(this.freeCapacityNextTick, target.store.energy)
-
-        this.createReservation('withdraw', target.id, amount, RESOURCE_ENERGY)
+        customLog('END CHECK', this.nextStore.energy + ', ' + this.usedNextStore)
+        return !this.needsResources()
     }
 
     deliverResources?() {
@@ -327,83 +302,12 @@ export class RemoteHauler extends Creep {
 
             this.passiveRenew()
 
-            const storingStructure = this.room.storage || this.room.terminal
-
-            // We don't want remote haulers fulfilling reservations all over the place in the commune
-
-            if (
-                storingStructure &&
-                this.room.hubLink &&
-                this.room.hubLink.RCLActionable &&
-                this.room.fastFillerLink &&
-                this.room.fastFillerLink.RCLActionable &&
-                this.room.controllerLink &&
-                this.room.controllerLink.RCLActionable
-            ) {
-                let inRangeTransferTargets = this.pos.findInRange(
-                    this.room.METT.filter(et => et.store.getFreeCapacity(RESOURCE_ENERGY) > 0),
-                    1,
-                )
-                if (inRangeTransferTargets.length > 0) {
-                    const target = inRangeTransferTargets[0]
-                    const transferResult = this.transfer(target, RESOURCE_ENERGY)
-
-                    // If the action can be considered a success
-
-                    if (transferResult === OK) {
-                        this.movedResource = true
-                        this.message += 'ATG'
-                    } else {
-                        this.message += 'ATF'
-                        this.message += transferResult
-                    }
-                }
-
-                inRangeTransferTargets = this.pos.findInRange(
-                    this.room.MEFTT.filter(et => et.store.getFreeCapacity(RESOURCE_ENERGY) > 0),
-                    1,
-                )
-                if (inRangeTransferTargets.length > 0) {
-                    const target = inRangeTransferTargets[0]
-                    const transferResult = this.transfer(target, RESOURCE_ENERGY)
-
-                    // If the action can be considered a success
-
-                    if (transferResult === OK) {
-                        this.movedResource = true
-                        this.message += 'AFTG'
-                    } else {
-                        this.message += 'AFTF'
-                        this.message += transferResult
-                    }
-                }
-
-                if (!this.memory.Rs || this.memory.Rs.length == 0)
-                    this.createReservation(
-                        'transfer',
-                        storingStructure.id,
-                        this.store[RESOURCE_ENERGY],
-                        RESOURCE_ENERGY,
-                    )
-                if (!this.fulfillReservation()) {
-                    this.say(this.message)
-                    return true
-                }
-            } else {
-                this.reserveTransferEnergy()
-
-                if (this.fulfillReservation()) {
-                    this.say(this.message)
-                    return true
-                }
-
-                this.reserveTransferEnergy()
-
-                if (!this.fulfillReservation()) {
-                    this.say(this.message)
-                    return true
-                }
-            }
+            this.runRoomLogisticsRequests({
+                types: new Set(['transfer']),
+                conditions: request => {
+                    return request.resourceType === RESOURCE_ENERGY
+                },
+            })
 
             if (!this.needsResources()) return true
 
@@ -492,8 +396,9 @@ export class RemoteHauler extends Creep {
         this.movedResource = true
         creepAtPos.movedResource = true
 
-        this.reserveStore.energy -= creepAtPos.freeNextStore
-        creepAtPos.reserveStore.energy += this.store.getUsedCapacity(RESOURCE_ENERGY)
+        const nextEnergy = Math.min(this.nextStore.energy, creepAtPos.freeNextStore)
+        this.nextStore.energy -= nextEnergy
+        creepAtPos.nextStore.energy += nextEnergy
 
         // Stop previously attempted moveRequests as they do not account for a relay
 
@@ -569,9 +474,9 @@ export class RemoteHauler extends Creep {
     relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
 
-        if (!this.moveRequest && (!this.memory.P || this.memory.P.length < 2)) return
+        if (!this.moveRequest && (!this.memory.P || this.memory.P.length <= 2)) return
         if (this.movedResource) return
-        if (!this.reserveStore.energy) return
+        if (!this.nextStore.energy) return
 
         // Don't relay too close to the source position unless we are fatigued
 

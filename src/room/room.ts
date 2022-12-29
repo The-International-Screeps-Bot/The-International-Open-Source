@@ -1,7 +1,7 @@
 import { creepRoles, powerCreepClassNames } from 'international/constants'
 import { cleanRoomMemory } from 'international/utils'
 import { CommuneManager } from './commune/commune'
-import { DroppedResourceManager } from './commune/droppedResources'
+import { DroppedResourceManager } from './droppedResources'
 import { ContainerManager } from './container'
 import { CreepRoleManager } from './creeps/creepRoleManager'
 import { EndTickCreepManager } from './creeps/endTickCreepManager'
@@ -105,8 +105,8 @@ export class RoomManager {
 
         if (this.room.memory.T === 'remote') {
 
-            this.containerManager.run()
-            this.droppedResourceManager.run()
+            this.containerManager.runRemote()
+            this.droppedResourceManager.runRemote()
         }
 
         this.creepRoleManager.run()

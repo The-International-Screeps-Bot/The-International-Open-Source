@@ -79,24 +79,18 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
 
     const cachedIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
-
-    // We're at the end of the path
-
-    if (cachedIndex + 2 === pathOpts.packedPath.length) {
-        if (pathOpts.loose) return this.createMoveRequest(opts)
-        return true
-    }
-
-    // We're on the path and not at the end
-
-    if (cachedIndex >= 0) {
-        pathOpts.packedPath = pathOpts.packedPath.slice(cachedIndex + 2)
+    if (cachedIndex >= 0 && cachedIndex + 2 !== pathOpts.packedPath.length) {
+        console.log(pathOpts.packedPath.length, unpackPosList(pathOpts.packedPath))
+        console.log(pathOpts.packedPath[cachedIndex], pathOpts.packedPath)
+        pathOpts.packedPath = pathOpts.packedPath.slice(cachedIndex)
 
         let path: RoomPosition[]
 
         // If we have a remote, avoid abandoned remotes
 
         if (pathOpts.remoteName) {
+
+            console.log(pathOpts.packedPath.length, cachedIndex)
             const roomNames: Set<string> = new Set()
             path = unpackPosList(pathOpts.packedPath)
 
@@ -119,7 +113,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         if (!path) path = unpackPosList(pathOpts.packedPath)
 
         this.memory.P = pathOpts.packedPath
-        this.assignMoveRequest(path[0])
+        this.assignMoveRequest(path[1])
         return true
     }
 

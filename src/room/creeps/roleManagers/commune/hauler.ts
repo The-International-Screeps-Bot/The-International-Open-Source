@@ -174,8 +174,8 @@ export class Hauler extends Creep {
             const creep: Hauler = Game.creeps[creepName]
 
             creep.passiveRenew()
-
             creep.runRoomLogisticsRequests()
+            
             /* creep.room.visual.text((creep.nextStore.energy).toString(), creep.pos) */
 
 /*

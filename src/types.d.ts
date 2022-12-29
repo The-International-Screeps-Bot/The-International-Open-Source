@@ -1208,26 +1208,6 @@ declare global {
 
         communeConstructionPlacement(): void
 
-        // Link functions
-
-        /**
-         * Dictates and operates tasks for links
-         */
-        linkManager(): void
-
-        sourcesToReceivers(sourceLinks: (StructureLink | false)[], receiverLinks: (StructureLink | false)[]): void
-
-        hubToFastFiller(hubLink: StructureLink | undefined, fastFillerLink: StructureLink | undefined): void
-
-        hubToController(hubLink: StructureLink | undefined, controllerLink: StructureLink | undefined): void
-
-        // Room Visuals
-
-        /**
-         * Adds annotations to the room, if roomVisuals are enabled
-         */
-        roomVisualsManager(): void
-
         // Room Getters
 
         readonly global: Partial<RoomGlobal>

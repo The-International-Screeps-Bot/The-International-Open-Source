@@ -41,37 +41,43 @@ export class ClaimRequestManager {
 
         // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
 
-        if (!request || !room.structures.spawn.length) {
+        if (!request) {
             delete room.memory.claimRequest
             return
         }
 
+        if (!room.structures.spawn.length) {
+            this.stopResponse(true)
+            return
+        }
+
         const type = Memory.rooms[requestName].T
-        if (type !== 'neutral' && type != 'commune' && type !== 'remote') {
-            delete request.responder
-            delete room.memory.claimRequest
+        if (type !== 'neutral' && type !== 'commune' && type !== 'remote') {
+
+            // Delete the combat so long as the new type isn't ally
+
+            this.stopResponse(type !== 'ally')
             return
         }
 
         // The room is closed or is now a respawn or novice zone
 
         if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
-            delete request.responder
-            delete room.memory.claimRequest
+            this.delete()
             return
         }
 
         // If the request has been abandoned, have the commune abandon it too
 
         if (request.data[ClaimRequestData.abandon] > 0) {
-            delete request.responder
-            delete room.memory.claimRequest
+
+            this.stopResponse()
             return
         }
 
         if (room.energyCapacityAvailable < 650) {
-            delete request.responder
-            delete room.memory.claimRequest
+
+            this.stopResponse()
             return
         }
 
@@ -84,8 +90,8 @@ export class ClaimRequestManager {
         // If there is a spawn and we own it
 
         if (requestRoom.structures.spawn.length && requestRoom.structures.spawn.find(spawn => spawn.my)) {
-            delete Memory.claimRequests[room.memory.claimRequest]
-            delete room.memory.claimRequest
+
+            this.delete()
             return
         }
 
@@ -93,13 +99,9 @@ export class ClaimRequestManager {
 
         const invaderCores = requestRoom.structures.invaderCore
         if (invaderCores.length) {
-            // Abandon for its remaining existance plus the estimated reservation time
+            // Abandon for the core's remaining existance plus the estimated reservation time
 
-            request.data[ClaimRequestData.abandon] =
-                invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX
-
-            delete request.responder
-            delete room.memory.claimRequest
+            this.abandon(invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX)
             return
         }
 
@@ -126,7 +128,7 @@ export class ClaimRequestManager {
             }
 
             if (request.data[ClaimRequestData.minDamage] > 0 || request.data[ClaimRequestData.minHeal] > 0)
-                request.data[ClaimRequestData.abandon] = 20000
+                this.abandon()
         }
 
         // If CPU logging is enabled, log the CPU used by this manager
@@ -140,5 +142,52 @@ export class ClaimRequestManager {
             const statName: RoomCommuneStatNames = 'clrmcu'
             globalStatsUpdater(room.name, statName, cpuUsed)
         }
+    }
+
+    private stopResponse(deleteCombat?: boolean) {
+        const roomMemory = this.communeManager.room.memory
+        const request = Memory.claimRequests[roomMemory.claimRequest]
+
+        if (deleteCombat) this.deleteCombat()
+
+        delete request.responder
+        delete roomMemory.claimRequest
+    }
+
+    private delete() {
+        const roomMemory = this.communeManager.room.memory
+
+        this.deleteCombat()
+
+        delete Memory.claimRequests[roomMemory.claimRequest]
+        delete roomMemory.claimRequest
+    }
+
+    private abandon(abandonTime: number = 20000) {
+
+        const roomMemory = this.communeManager.room.memory
+        const request = Memory.claimRequests[roomMemory.claimRequest]
+
+        this.deleteCombat()
+
+        request.data[ClaimRequestData.abandon] = abandonTime
+        delete request.responder
+        delete roomMemory.claimRequest
+    }
+
+    private deleteCombat() {
+
+        const claimRequestName = this.communeManager.room.memory.claimRequest
+        const combatRequest = Memory.combatRequests[claimRequestName]
+        if (!combatRequest) return
+
+        if (combatRequest.responder) {
+
+            const combatRequestResponder = Game.rooms[combatRequest.responder]
+            combatRequestResponder.communeManager.deleteCombatRequest(combatRequest.responder, combatRequestResponder.memory.combatRequests.indexOf(claimRequestName))
+            return
+        }
+
+        delete Memory.combatRequests[claimRequestName]
     }
 }

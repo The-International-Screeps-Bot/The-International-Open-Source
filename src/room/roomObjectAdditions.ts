@@ -1,4 +1,4 @@
-import { findObjectWithID } from 'international/utils'
+import { customLog, findObjectWithID } from 'international/utils'
 
 Object.defineProperties(RoomObject.prototype, {
     effectsData: {
@@ -52,11 +52,18 @@ Object.defineProperties(RoomObject.prototype, {
                     return target[resourceType] ?? 0
                 },
                 set(target: Partial<CustomStore>, resourceType: ResourceConstant, newAmount) {
+
+                    const parent = findObjectWithID(target.parentID)
+                    parent.usedNextStore
+                    if (parent instanceof Creep) customLog('PRE CHECK', parent._usedNextStore + ', ' + parent.store.getCapacity(), { superPosition: 1 })
+                    if (parent._usedNextStore) {
+
+                        parent._usedNextStore += newAmount - (target[resourceType] ?? 0)
+                    }
+                    if (parent instanceof Creep) customLog('FIRST CHECK', newAmount + ', ' + target[resourceType], { superPosition: 1 })
                     // Update the change
 
                     target[resourceType] = newAmount
-
-                    findObjectWithID(target.parentID)._usedReserveStore = newAmount - target[resourceType]
                     return true
                 },
             })
@@ -95,11 +102,15 @@ Object.defineProperties(RoomObject.prototype, {
                     return target[resourceType] ?? 0
                 },
                 set(target: Partial<CustomStore>, resourceType: ResourceConstant, newAmount) {
+                    const parent = findObjectWithID(target.parentID)
+                    if (parent._usedReserveStore) {
+
+                        parent._usedReserveStore += newAmount - (target[resourceType] ?? 0)
+                    }
+
                     // Update the change
 
                     target[resourceType] = newAmount
-
-                    findObjectWithID(target.parentID)._usedReserveStore = newAmount - target[resourceType]
                     return true
                 },
             })
@@ -115,7 +126,6 @@ Object.defineProperties(RoomObject.prototype, {
             const keys = Object.keys(this.reserveStore)
 
             for (let i = 1; i < keys.length; i++) {
-
                 this._usedReserveStore += this.reserveStore[keys[i] as ResourceConstant]
             }
 

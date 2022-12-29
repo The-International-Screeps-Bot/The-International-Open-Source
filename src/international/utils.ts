@@ -131,14 +131,14 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
     global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${
         opts.bgColor
     }; margin-left: ${
-        (opts.superPosition || 0) * 8
+        (opts.superPosition ?? 0) * 8
     }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
 
     // Create the content
 
     global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${
         opts.textColor
-    };'>${message || ''}</div></div>`
+    };'>${message ?? ''}</div></div>`
 }
 
 /**

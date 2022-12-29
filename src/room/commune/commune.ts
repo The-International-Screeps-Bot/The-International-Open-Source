@@ -48,6 +48,8 @@ import { HaulerNeedManager } from './haulerNeed'
 import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
 import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
+import { DroppedResourceManager } from 'room/droppedResources'
+import { LinkManager } from './links'
 
 export class CommuneManager {
     // Managers
@@ -56,6 +58,7 @@ export class CommuneManager {
 
     towerManager: TowerManager
     storingStructuresManager: StoringStructuresManager
+    linkManager: LinkManager
     labManager: LabManager
     powerSpawningStructuresManager: PowerSpawningStructuresManager
     spawningStructuresManager: SpawningStructuresManager
@@ -80,6 +83,7 @@ export class CommuneManager {
 
         this.towerManager = new TowerManager(this)
         this.storingStructuresManager = new StoringStructuresManager(this)
+        this.linkManager = new LinkManager(this)
         this.labManager = new LabManager(this)
         this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
         this.spawningStructuresManager = new SpawningStructuresManager(this)
@@ -146,6 +150,8 @@ export class CommuneManager {
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
+        this.room.roomManager.containerManager.pretickRunCommune()
+        this.room.roomManager.droppedResourceManager.preTickRunCommune()
         this.claimRequestManager.preTickRun()
 
         // Add roomName to commune list
@@ -201,11 +207,10 @@ export class CommuneManager {
         this.remotesManager.run()
         this.haulerNeedManager.run()
 
-        this.room.roomManager.containerManager.run()
         this.spawningStructuresManager.createRoomLogisticsRequests()
         this.storingStructuresManager.run()
-        this.room.linkManager()
         this.room.factoryManager()
+        this.linkManager.run()
         this.labManager.run()
         this.powerSpawningStructuresManager.run()
         this.spawningStructuresManager.organizeSpawns()
@@ -392,7 +397,6 @@ export class CommuneManager {
     _storingStructures: (StructureStorage | StructureTerminal)[]
 
     get storingStructures() {
-
         if (this._storingStructures) return this._storingStructures
 
         this._storingStructures = []
@@ -401,5 +405,28 @@ export class CommuneManager {
         if (this.room.terminal) this._storingStructures.push(this.room.terminal)
 
         return this._storingStructures
+    }
+
+    _maxCombatRequests: number
+
+    /**
+     * The largest amount of combat requests the room can respond to
+     */
+    get maxCombatRequests() {
+        if (this._maxCombatRequests !== undefined) return this._maxCombatRequests
+
+        return (this._maxCombatRequests =
+            (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
+            (5000 + this.room.controller.level * 1000))
+    }
+
+    _buildersMakeRequests: boolean
+
+    get buildersMakeRequests() {
+        return (this._buildersMakeRequests =
+            (this.room.fastFillerContainerLeft ||
+                this.room.fastFillerContainerRight ||
+                this.room.storage ||
+                this.room.terminal) !== undefined)
     }
 }

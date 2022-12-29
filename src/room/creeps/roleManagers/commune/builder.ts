@@ -7,6 +7,18 @@ export class Builder extends Creep {
         super(creepID)
     }
 
+    preTickManager() {
+
+        if (!this.room.cSiteTarget) return
+
+        this.room.roomManager.room.createRoomLogisticsRequest({
+            target: this,
+            type: 'transfer',
+            priority: 8,
+            threshold: this.store.getCapacity() * 0.5,
+        })
+    }
+
     run?() {
         if (this.advancedBuild() === RESULT_FAIL) this.advancedRecycle()
 
