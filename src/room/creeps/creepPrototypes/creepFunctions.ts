@@ -675,7 +675,7 @@ Creep.prototype.findMineralHarvestPos = function () {
 Creep.prototype.needsResources = function () {
     // If the creep is empty
     this.nextStore.energy += 0
-    customLog('NEEDS CHECK', this.nextStore.energy + ', ' + this.store.getCapacity() + ', ' + this.usedNextStore + ', ' + this.freeNextStore)
+    customLog('NEEDS CHECK', this.nextStore.energy + ', cap ' + this.store.getCapacity() + ', used ' + this.usedNextStore + ', free ' + this.freeNextStore, { superPosition: 1 })
     if (this.usedNextStore === 0) return (this.memory.NR = true)
 
     // Otherwise if the creep is full
@@ -1534,7 +1534,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
         }
     }
 
-    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types))
+    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types), { superPosition: 1 })
 
     let creepRequest: CreepRoomLogisticsRequest | 0
 
@@ -1634,7 +1634,7 @@ Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     if (args && args.types) {
 
         // Make sure we have the right store values for our types
-        customLog('NEEDS RESOURCES', this.needsResources())
+        customLog('NEEDS RESOURCES', this.needsResources(), { superPosition: 1 })
         if (this.needsResources()) {
 
             args.types.delete('transfer')
@@ -1753,7 +1753,7 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
         resourceType = key as ResourceConstant
         break
     }
-    customLog('BACKUP', resourceType)
+    customLog('BACKUP', resourceType, { superPosition: 1 })
     const storingStructure = storingStructures.find(
         structure => structure.freeReserveStore >= this.nextStore[resourceType],
     )
@@ -1784,14 +1784,14 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     }
 
     // Withdraw or offer type
-    customLog('AMOUNT', this.freeNextStore + ', ' + this.store.getCapacity())
+    customLog('AMOUNT', this.freeNextStore + ', ' + this.store.getCapacity(), { superPosition: 1 })
     return Math.min(this.freeNextStore, request.amount)
 }
 
 Creep.prototype.runRoomLogisticsRequest = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return RESULT_FAIL
-    customLog('REQUEST RESPONSE', request.T)
+    customLog('REQUEST RESPONSE', request.T, { superPosition: 1 })
     const target = findObjectWithID(request.TID)
 
     if (getRangeOfCoords(target.pos, this.pos) > 1) {
@@ -1803,15 +1803,15 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
         return RESULT_ACTION
     }
 
-    customLog('DOING REQUEST', request.T + ', ' + request.A + ', ' + this.store.getCapacity(request.RT) + ', ' + this.name)
+    customLog('DOING REQUEST', request.T + ', ' + request.A + ', ' + this.store.getCapacity(request.RT) + ', ' + this.name, { superPosition: 1 })
     // Pickup type
 
     if (target instanceof Resource) {
         this.pickup(target)
-        customLog('PRE END AMOUNT', this.nextStore.energy)
+        customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy)
+        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy, { superPosition: 1 })
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }
@@ -1841,10 +1841,10 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
     }
 
     this.withdraw(target, request.RT, request.A)
-    customLog('PRE END AMOUNT', this.nextStore.energy)
+    customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A
-    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy)
+    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy, { superPosition: 1 })
     this.memory.RLRs.splice(0, 1)
     return RESULT_SUCCESS
 }

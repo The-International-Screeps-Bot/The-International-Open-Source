@@ -292,7 +292,7 @@ export class RemoteHauler extends Creep {
             },
         })
 
-        customLog('END CHECK', this.nextStore.energy + ', ' + this.usedNextStore)
+        customLog('END CHECK', this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
         return !this.needsResources()
     }
 
@@ -529,6 +529,7 @@ export class RemoteHauler extends Creep {
         for (const creepName of creepsOfRole) {
             const creep = Game.creeps[creepName] as RemoteHauler
             creep.run()
+            customLog('REMOTE RUN', creep.name)
         }
     }
 }
