@@ -31,13 +31,12 @@ Object.defineProperties(RoomObject.prototype, {
 
             if (this._nextStore) return this._nextStore
 
-            const referenceStore = Object.assign({ parentID: this.id }, this.store)
+            const parent = this
+            const referenceStore = Object.assign({}, this.store)
 
             this._nextStore = new Proxy(referenceStore, {
                 get(target: CustomStore, resourceType: ResourceConstant) {
-                    if (!allResources.has(resourceType)) return target[resourceType]
 
-                    const parent = findObjectWithID(target.parentID)
                     if (parent instanceof Creep)
                         customLog('GET', parent.name + ', ' + resourceType + ', ' + target[resourceType], {
                             superPosition: 1,
@@ -46,12 +45,6 @@ Object.defineProperties(RoomObject.prototype, {
                     return target[resourceType] ?? 0
                 },
                 set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
-                    if (!allResources.has(resourceType)) {
-                        target[resourceType] = newAmount
-                        return true
-                    }
-
-                    const parent = findObjectWithID(target.parentID)
 
                     if (parent instanceof Creep)
                         customLog(
@@ -68,7 +61,7 @@ Object.defineProperties(RoomObject.prototype, {
                     if (parent._usedNextStore !== undefined) {
                         parent._usedNextStore += newAmount - (target[resourceType] ?? 0)
                         if (parent instanceof Creep)
-                            customLog('USED', parent.usedNextStore + ', ' + (newAmount - (target[resourceType] ?? 0)), {
+                            customLog('USED', parent._usedNextStore + ', ' + (newAmount - (target[resourceType] ?? 0)), {
                                 superPosition: 1,
                             })
                     }
@@ -117,14 +110,15 @@ Object.defineProperties(RoomObject.prototype, {
         get(this: AnyStoreStructure) {
             if (this._reserveStore) return this._reserveStore
 
-            const referenceStore = Object.assign({ parentID: this.id }, this.store)
+            const parent = this
+            const referenceStore = Object.assign({}, this.store)
 
             this._reserveStore = new Proxy(referenceStore, {
                 get(target: CustomStore, resourceType: ResourceConstant) {
                     return target[resourceType] ?? 0
                 },
                 set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
-                    const parent = findObjectWithID(target.parentID)
+
                     if (parent._usedReserveStore !== undefined) {
                         parent._usedReserveStore += newAmount - (target[resourceType] ?? 0)
                     }
