@@ -94,7 +94,7 @@ Object.defineProperties(RoomObject.prototype, {
             this._usedNextStore = 0
             const keys = Object.keys(this.nextStore)
 
-            for (let i = 1; i < keys.length; i++) {
+            for (let i = 0; i < keys.length; i++) {
                 this._usedNextStore += this.nextStore[keys[i] as ResourceConstant]
             }
             if (this instanceof Creep) customLog('NEW USED', this._usedNextStore, { superPosition: 1 })
@@ -140,7 +140,7 @@ Object.defineProperties(RoomObject.prototype, {
             this._usedReserveStore = 0
             const keys = Object.keys(this.reserveStore)
 
-            for (let i = 1; i < keys.length; i++) {
+            for (let i = 0; i < keys.length; i++) {
                 this._usedReserveStore += this.reserveStore[keys[i] as ResourceConstant]
             }
 
