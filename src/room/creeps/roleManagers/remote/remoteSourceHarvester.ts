@@ -143,8 +143,8 @@ export class RemoteHarvester extends Creep {
 
                         figuredOutWhatToDoWithTheEnergy = true
 
-                        const nextEnergy = this.nextStore.energy
-                        this.nextStore.energy -= hauler.freeNextStore
+                        const nextEnergy = Math.min(this.nextStore.energy, hauler.freeNextStore)
+                        this.nextStore.energy -= nextEnergy
                         hauler.nextStore.energy += nextEnergy
                     }
                 }

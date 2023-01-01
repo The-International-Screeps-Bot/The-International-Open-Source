@@ -82,27 +82,20 @@ global.destroyStructures = function (roomName, types?) {
     // Get the room with the roomName
 
     const room = Game.rooms[roomName]
-
-    // Stop if the room isn't defined
-
     if (!room) return `You have no vision in ${roomName}`
 
-    // Otherwise loop through each structureType
+    // Count and destroy structures of types
 
     let destroyedStructureCount = 0
-
     for (const structureType of allStructureTypes) {
         // If types is constructed and the part isn't in types, iterate
 
         if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))
             continue
 
-        // Get the structures of the type
+        // Get the structures of the type and destroy
 
         const structures = room.structures[structureType]
-
-        // Loop through the structures
-
         for (const structure of structures) {
             if (structure.destroy() === OK) destroyedStructureCount += 1
         }

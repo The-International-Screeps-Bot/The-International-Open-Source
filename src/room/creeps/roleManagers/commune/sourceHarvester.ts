@@ -212,8 +212,8 @@ export class SourceHarvester extends Creep {
 
         this.transfer(hauler, RESOURCE_ENERGY)
 
-        const nextEnergy = this.nextStore.energy
-        this.nextStore.energy -= hauler.freeNextStore
+        const nextEnergy = Math.min(this.nextStore.energy, hauler.freeNextStore)
+        this.nextStore.energy -= nextEnergy
         hauler.nextStore.energy += nextEnergy
         return true
     }

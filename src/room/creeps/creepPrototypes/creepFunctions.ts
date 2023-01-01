@@ -1812,7 +1812,7 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
         customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy, { superPosition: 1 })
+        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }
@@ -1845,7 +1845,7 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
     customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A
-    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy, { superPosition: 1 })
+    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
     this.memory.RLRs.splice(0, 1)
     return RESULT_SUCCESS
 }

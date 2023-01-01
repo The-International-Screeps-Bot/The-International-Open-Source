@@ -552,6 +552,7 @@ export const minerals: Partial<ResourceConstant[]> = [
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
 export const dismantleBoosts = [RESOURCE_ZYNTHIUM_HYDRIDE, RESOURCE_ZYNTHIUM_ACID, RESOURCE_CATALYZED_ZYNTHIUM_ACID]
 export const dismantleBoostsSet = new Set(dismantleBoosts)
+export const allResources = new Set(RESOURCES_ALL)
 
 /**
  * The percent of the terminal to fill with each resource
