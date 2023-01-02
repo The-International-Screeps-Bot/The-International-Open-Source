@@ -32,11 +32,10 @@ export class StoringStructuresManager {
                 priority: 0,
             })
 
-            // We are not close to full
+            // We are close to full
 
-            const createTransfer = structure.store.getCapacity() * 0.9 > structure.freeReserveStore
-            if (!createTransfer) continue
-            
+            if (structure.usedReserveStore > structure.store.getCapacity() * 0.9) continue
+
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
                 type: 'transfer',

@@ -482,12 +482,12 @@ export class RemoteHauler extends Creep {
 
         if (
             !this.fatigue &&
-            this.memory.RN &&
-            getRangeOfCoords(unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0], this.pos) <= 1
+            this.memory.RN == this.room.name &&
+            getRangeOfCoords(this.room.sourcePositions[this.memory.SI][0], this.pos) <= 1
         )
             return
-
-        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[1]
+        if (!this.moveRequest) this.room.visual.circle(unpackPosList(this.memory.P)[2], { fill: customColors.red })
+        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[2]
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)
