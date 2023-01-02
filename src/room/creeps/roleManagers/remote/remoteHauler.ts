@@ -486,7 +486,7 @@ export class RemoteHauler extends Creep {
             getRangeOfCoords(this.room.sourcePositions[this.memory.SI][0], this.pos) <= 1
         )
             return
-        if (!this.moveRequest) this.room.visual.circle(unpackPosList(this.memory.P)[2], { fill: customColors.red })
+
         const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[2]
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
