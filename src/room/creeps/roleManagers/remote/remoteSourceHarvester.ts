@@ -115,14 +115,10 @@ export class RemoteHarvester extends Creep {
         // Try to move to source. If creep moved then iterate
         if (this.travelToSource(this.memory.SI)) return
 
-        const container = findObjectWithID(this.room.structureCoords.get(packCoord(this.pos)).find(ID => {
-            return findObjectWithID(ID).structureType === STRUCTURE_CONTAINER
-        }))
-
-        let figuredOutWhatToDoWithTheEnergy = false
-
+        const container = this.room.sourceContainers[this.memory.SI]
         const source = this.room.sources[this.memory.SI]
-
+        let figuredOutWhatToDoWithTheEnergy = false
+        this.room.targetVisual(this.pos, container.pos, true)
         //1) feed remote hauler
         //2) build if "ahead of the curve"
         //3) drop mine
@@ -172,6 +168,7 @@ export class RemoteHarvester extends Creep {
         let neededEnergy = this.parts.work * BUILD_POWER
         //We need to check to see if there's enough for the current tick, plus the next tick, otherwise
         //  We need to pick up on this tick, which is why the *2 is there.
+
         if (this.store[RESOURCE_ENERGY] < neededEnergy * 2) {
             let droppedResource = this.pos
                 .findInRange(FIND_DROPPED_RESOURCES, 1)
@@ -182,10 +179,9 @@ export class RemoteHarvester extends Creep {
 
     maintainContainer(): boolean {
         const container = this.room.sourceContainers[this.memory.SI]
-        const sourcePos = this.room.sourcePositions[this.memory.SI][0]
 
         if (container) {
-            //If the container is below 80% health, repair it.
+            // If the container is below 80% health, repair it.
             if (container.hits < container.hitsMax * 0.8) {
                 this.obtainEnergyIfNeeded()
                 this.repair(container)
@@ -194,15 +190,16 @@ export class RemoteHarvester extends Creep {
             return false
         }
 
-        // Don't build remote containers until we can reserve the room
+        // Don't build new remote containers until we can reserve the room
 
         if (this.commune.energyCapacityAvailable < 650) return false
 
         // Check if there is a construction site
 
-        const cSite = this.room
-            .lookForAt(LOOK_CONSTRUCTION_SITES, sourcePos)
-            .find(st => st.structureType == STRUCTURE_CONTAINER)
+        let cSite
+
+        const cSitesAtCoord = this.room.cSiteCoords.get(packCoord(this.pos))
+        if (cSitesAtCoord) cSite = findObjectWithID(cSitesAtCoord[0])
 
         if (cSite) {
             // Pick energy off the ground if possible
@@ -217,8 +214,9 @@ export class RemoteHarvester extends Creep {
             return true
         }
 
-        // Start on adding a container
+        // There is no container cSite, place one
 
+        const sourcePos = this.room.sourcePositions[this.memory.SI][0]
         this.room.createConstructionSite(sourcePos, STRUCTURE_CONTAINER)
         return false
     }
