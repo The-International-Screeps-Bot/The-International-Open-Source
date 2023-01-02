@@ -473,7 +473,7 @@ export class RemoteHauler extends Creep {
 
     relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
-
+        
         if (!this.moveRequest && (!this.memory.P || this.memory.P.length <= 2)) return
         if (this.movedResource) return
         if (!this.nextStore.energy) return

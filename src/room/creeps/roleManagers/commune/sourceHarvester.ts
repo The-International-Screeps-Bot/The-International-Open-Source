@@ -1,5 +1,5 @@
 import { globalStatsUpdater } from 'international/statsManager'
-import { findCoordsInsideRect, findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import { findCoordsInsideRect, findObjectWithID, getRange, getRangeOfCoords, scalePriority } from 'international/utils'
 import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
 
@@ -196,25 +196,15 @@ export class SourceHarvester extends Creep {
         const sourceLink = this.room.sourceLinks[this.memory.SI]
         if (sourceLink && sourceLink.RCLActionable) return false
 
-        // If the creep is not nearly full, stop
+        // If the creep isn't full enough to justify a request
 
-        if (this.nextStore.energy > 0) return false
+        if (this.nextStore.energy < this.store.getCapacity() * 0.5) return false
 
-        const haulers = this.room.myCreeps.hauler.map(name => Game.creeps[name] as Hauler)
-        if (!haulers.length) return false
-
-        const haulerName = this.room.myCreeps.hauler.find(haulerName => {
-            return getRangeOfCoords(this.pos, Game.creeps[haulerName].pos)
+        this.room.createRoomLogisticsRequest({
+            target: this,
+            type: 'withdraw',
+            priority: scalePriority(this.store.getCapacity(), this.reserveStore.energy, 5, true),
         })
-        if (!haulerName) return false
-
-        const hauler = Game.creeps[haulerName]
-
-        this.transfer(hauler, RESOURCE_ENERGY)
-
-        const nextEnergy = Math.min(this.nextStore.energy, hauler.freeNextStore)
-        this.nextStore.energy -= nextEnergy
-        hauler.nextStore.energy += nextEnergy
         return true
     }
 

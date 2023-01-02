@@ -1447,6 +1447,8 @@ Creep.prototype.roomLogisticsRequestManager = function () {
     }
 
     const request = this.memory.RLRs[0]
+    if (!request) return
+    
     const target = findObjectWithID(request.TID)
 
     // Pickup type

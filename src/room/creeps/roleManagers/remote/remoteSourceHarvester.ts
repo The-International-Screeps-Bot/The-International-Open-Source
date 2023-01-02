@@ -6,6 +6,7 @@ import {
     getRange,
     getRangeOfCoords,
     randomTick,
+    scalePriority,
 } from 'international/utils'
 import { reverseCoordList, unpackPos, unpackPosList } from 'other/packrat'
 import { RemoteHauler } from './remoteHauler'
@@ -38,7 +39,6 @@ export class RemoteHarvester extends Creep {
     }
 
     preTickManager(): void {
-
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
@@ -57,7 +57,6 @@ export class RemoteHarvester extends Creep {
     }
 
     hasValidRemote?() {
-
         if (!this.memory.RN) return false
 
         const remoteMemory = Memory.rooms[this.memory.RN]
@@ -131,22 +130,15 @@ export class RemoteHarvester extends Creep {
             //   This shouldn't run if we're container mining however.
 
             if (!container) {
-                const haulers = this.room.myCreeps.remoteHauler?.map(name => Game.creeps[name] as RemoteHauler)
-                if (haulers.length) {
-                    const hauler = haulers.find(haul => haul.pos.isNearTo(this.pos))
-                    if (hauler) {
-                        this.transfer(hauler, RESOURCE_ENERGY)
-                        customLog('TRANSFER')
-                        this.movedResource = true
+                // If the creep isn't full enough to justify a request
 
-                        // We won't have energy, so don't consider maintenance
+                if (this.nextStore.energy > this.store.getCapacity() * 0.5) {
 
-                        figuredOutWhatToDoWithTheEnergy = true
-
-                        const nextEnergy = Math.min(this.nextStore.energy, hauler.freeNextStore)
-                        this.nextStore.energy -= nextEnergy
-                        hauler.nextStore.energy += nextEnergy
-                    }
+                    this.room.createRoomLogisticsRequest({
+                        target: this,
+                        type: 'withdraw',
+                        priority: scalePriority(this.store.getCapacity(), this.reserveStore.energy, 5, true),
+                    })
                 }
             }
 
@@ -185,7 +177,6 @@ export class RemoteHarvester extends Creep {
     }
 
     maintainContainer(): boolean {
-
         const container = this.room.sourceContainers[this.memory.SI]
         const sourcePos = this.room.sourcePositions[this.memory.SI][0]
 
@@ -210,7 +201,6 @@ export class RemoteHarvester extends Creep {
             .find(st => st.structureType == STRUCTURE_CONTAINER)
 
         if (cSite) {
-
             // Pick energy off the ground if possible
 
             this.obtainEnergyIfNeeded()
@@ -287,17 +277,15 @@ export class RemoteHarvester extends Creep {
 
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-                creep.createMoveRequest(
-                    {
-                        origin: creep.pos,
-                        goals: [
-                            {
-                                pos: creep.commune.anchor,
-                                range: 5,
-                            },
-                        ],
-                    },
-                )
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: creep.commune.anchor,
+                            range: 5,
+                        },
+                    ],
+                })
 
                 continue
             }
@@ -334,7 +322,7 @@ export class RemoteHarvester extends Creep {
                 },
                 {
                     packedPath: reverseCoordList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
-                    remoteName: creep.memory.RN
+                    remoteName: creep.memory.RN,
                 },
             )
         }
