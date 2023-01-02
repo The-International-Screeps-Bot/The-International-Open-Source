@@ -26,7 +26,7 @@ import {
 import { internationalManager } from 'international/international'
 import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
-const minRemotePriority = 10
+const minRemotePriority = 9
 
 Room.prototype.spawnRequester = function () {
     // If CPU logging is enabled, get the CPU used at the start
@@ -274,7 +274,7 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 3)
+            priority = Math.min(0.5 + this.creepsFromRoom.hauler.length / 2, minRemotePriority - 2)
 
             // Construct the required carry parts
 
@@ -753,7 +753,7 @@ Room.prototype.spawnRequester = function () {
         ((): SpawnRequestOpts | false => {
             partsMultiplier = 1
             let maxCreeps = this.upgradePositions.length - 1
-            const priority = 8
+            const priority = minRemotePriority + 0.5
 
             // If there are enemyAttackers and the controller isn't soon to downgrade
 

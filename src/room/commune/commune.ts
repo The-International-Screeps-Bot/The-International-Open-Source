@@ -229,6 +229,7 @@ export class CommuneManager {
     }
 
     private test() {
+
         return
 
         let CPUUsed = Game.cpu.getUsed()

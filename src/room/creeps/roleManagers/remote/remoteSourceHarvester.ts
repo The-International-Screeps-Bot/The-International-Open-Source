@@ -8,7 +8,7 @@ import {
     randomTick,
     scalePriority,
 } from 'international/utils'
-import { reverseCoordList, unpackPos, unpackPosList } from 'other/packrat'
+import { packCoord, reverseCoordList, unpackPos, unpackPosList } from 'other/packrat'
 import { RemoteHauler } from './remoteHauler'
 
 export class RemoteHarvester extends Creep {
@@ -115,7 +115,10 @@ export class RemoteHarvester extends Creep {
         // Try to move to source. If creep moved then iterate
         if (this.travelToSource(this.memory.SI)) return
 
-        const container = this.room.sourceContainers[this.memory.SI]
+        const container = findObjectWithID(this.room.structureCoords.get(packCoord(this.pos)).find(ID => {
+            return findObjectWithID(ID).structureType === STRUCTURE_CONTAINER
+        }))
+
         let figuredOutWhatToDoWithTheEnergy = false
 
         const source = this.room.sources[this.memory.SI]
