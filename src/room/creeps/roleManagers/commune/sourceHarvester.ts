@@ -67,7 +67,6 @@ export class SourceHarvester extends Creep {
                 },
                 {
                     packedPath: reverseCoordList(this.room.memory.SPs[this.memory.SI]),
-                    loose: true,
                 },
             )
 

@@ -262,7 +262,6 @@ export class RemoteHarvester extends Creep {
             {
                 packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                 remoteName: this.memory.RN,
-                loose: true,
             },
         )
 
