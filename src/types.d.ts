@@ -964,6 +964,7 @@ declare global {
         towerAttackTarget: Creep
 
         upgradeStrength: number
+        mineralHarvestStrength: number
 
         /**
          * The carry parts needed to effectively run the commune
@@ -1345,6 +1346,10 @@ declare global {
 
         readonly usedMineralCoords: Set<string>
 
+        _mineralPath: RoomPosition[]
+
+        readonly mineralPath: RoomPosition[]
+
         _fastFillerPositions: RoomPosition[]
 
         readonly fastFillerPositions: RoomPosition[]
@@ -1672,6 +1677,10 @@ declare global {
          * Source Paths
          */
         SPs: string[]
+        /**
+         * Mineral Path
+         */
+        MPa: string
 
         /**
          * Mineral Positions, packed positions around the mineral where harvesters can sit

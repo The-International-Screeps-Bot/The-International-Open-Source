@@ -1635,7 +1635,7 @@ Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     if (args && args.types) {
 
         // Make sure we have the right store values for our types
-        customLog('NEEDS RESOURCES', this.needsResources(), { superPosition: 1 })
+
         if (this.needsResources()) {
 
             args.types.delete('transfer')
@@ -1677,7 +1677,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
 
         if (this.nextStore[request.resourceType] <= 0 && this.freeNextStore > 0) {
             // Try to find a sufficient withdraw or offer task
-
+            
             const types: RoomLogisticsRequestTypes[] = ['withdraw', 'pickup']
 
             let lowestScore = Infinity
@@ -1750,16 +1750,20 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
 
     for (const key in this.store) {
         if (key === RESOURCE_ENERGY) continue
+        if (this.nextStore[key as ResourceConstant] <= 0) continue
 
         resourceType = key as ResourceConstant
         break
     }
+
+    if (!resourceType) return RESULT_FAIL
+
     customLog('BACKUP', resourceType, { superPosition: 1 })
     const storingStructure = storingStructures.find(
         structure => structure.freeReserveStore >= this.nextStore[resourceType],
     )
     if (!storingStructure) return RESULT_FAIL
-
+    /* this.room.visual.text((this.nextStore[resourceType]).toString(), this.pos.x, this.pos.y, { color: customColors.red }) */
     return {
         T: 'transfer',
         TID: storingStructure.id,

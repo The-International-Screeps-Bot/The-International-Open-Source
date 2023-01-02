@@ -23,6 +23,8 @@ export class HaulerNeedManager {
         if (!room.controllerLink || !room.controller.RCLActionable)
             room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
 
+        room.haulerNeed += findCarryPartsRequired(room.mineralPath.length, room.mineralHarvestStrength)
+
         room.haulerNeed += room.structures.lab.length / 1.2
 
         room.haulerNeed += room.structures.extension.length / 10

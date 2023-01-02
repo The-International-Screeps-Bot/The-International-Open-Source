@@ -207,18 +207,17 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-                        // Structures have been built, destroyed or aren't yet initialized
+            // Structures have been built, destroyed or aren't yet initialized
 
             if (!newAllStructures) newAllStructures = this.find(FIND_STRUCTURES)
             const newAllStructureIDs: Id<Structure>[] = []
 
             for (const structure of newAllStructures) {
-
                 newAllStructureIDs.push(structure.id)
             }
 
             this.global.allStructureIDs = newAllStructureIDs
-            return this._structureUpdate = true
+            return (this._structureUpdate = true)
         },
     },
     structureCoords: {
@@ -285,13 +284,12 @@ Object.defineProperties(Room.prototype, {
                 }
             }
 
-                        // Structures have been built, destroyed or aren't yet initialized
+            // Structures have been built, destroyed or aren't yet initialized
 
             if (!newAllCSites) newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
             const newAllStructureIDs: Id<ConstructionSite>[] = []
 
             for (const cSite of newAllCSites) {
-
                 newAllStructureIDs.push(cSite.id)
             }
 
@@ -332,8 +330,7 @@ Object.defineProperties(Room.prototype, {
 
             // Group structures by structureType
 
-            for (const cSite of this.find(FIND_CONSTRUCTION_SITES))
-                this._cSites[cSite.structureType].push(cSite)
+            for (const cSite of this.find(FIND_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
 
             return this._cSites
         },
@@ -710,7 +707,7 @@ Object.defineProperties(Room.prototype, {
                         return (
                             this.advancedFindPath({
                                 origin: a[0],
-                                goals: [{ pos: commune.anchor, range: 4 }],
+                                goals: [{ pos: commune.anchor, range: 3 }],
                                 typeWeights: remoteTypeWeights,
                                 plainCost: defaultRoadPlanningPlainCost,
                                 weightStructurePlans: true,
@@ -718,7 +715,7 @@ Object.defineProperties(Room.prototype, {
                             }).length -
                             this.advancedFindPath({
                                 origin: b[0],
-                                goals: [{ pos: commune.anchor, range: 4 }],
+                                goals: [{ pos: commune.anchor, range: 3 }],
                                 typeWeights: remoteTypeWeights,
                                 plainCost: defaultRoadPlanningPlainCost,
                                 weightStructurePlans: true,
@@ -731,7 +728,7 @@ Object.defineProperties(Room.prototype, {
                 for (let index in sources) {
                     const path = this.advancedFindPath({
                         origin: this.sourcePositions[index][0],
-                        goals: [{ pos: commune.anchor, range: 4 }],
+                        goals: [{ pos: commune.anchor, range: 3 }],
                         typeWeights: remoteTypeWeights,
                         plainCost: defaultRoadPlanningPlainCost,
                         weightStructurePlans: true,
@@ -753,7 +750,7 @@ Object.defineProperties(Room.prototype, {
                     return (
                         this.advancedFindPath({
                             origin: a[0],
-                            goals: [{ pos: this.anchor, range: 4 }],
+                            goals: [{ pos: this.anchor, range: 3 }],
                             typeWeights: remoteTypeWeights,
                             plainCost: defaultRoadPlanningPlainCost,
                             weightStructurePlans: true,
@@ -761,7 +758,7 @@ Object.defineProperties(Room.prototype, {
                         }).length -
                         this.advancedFindPath({
                             origin: b[0],
-                            goals: [{ pos: this.anchor, range: 4 }],
+                            goals: [{ pos: this.anchor, range: 3 }],
                             typeWeights: remoteTypeWeights,
                             plainCost: defaultRoadPlanningPlainCost,
                             weightStructurePlans: true,
@@ -772,14 +769,17 @@ Object.defineProperties(Room.prototype, {
                 .reverse()
 
             for (let index in sources) {
-                const path = this.advancedFindPath({
-                    origin: this.sourcePositions[index][0],
-                    goals: [{ pos: this.anchor, range: 4 }],
-                    typeWeights: remoteTypeWeights,
-                    plainCost: defaultRoadPlanningPlainCost,
-                    weightStructurePlans: true,
-                    avoidStationaryPositions: true,
-                })
+                let path = [this.sourcePositions[index][0]]
+                path = path.concat(
+                    this.advancedFindPath({
+                        origin: this.sourcePositions[index][0],
+                        goals: [{ pos: this.anchor, range: 3 }],
+                        typeWeights: remoteTypeWeights,
+                        plainCost: defaultRoadPlanningPlainCost,
+                        weightStructurePlans: true,
+                        avoidStationaryPositions: true,
+                    }),
+                )
 
                 this._sourcePaths[index] = path
                 this.memory.SPs[index] = packPosList(path)
@@ -1096,6 +1096,38 @@ Object.defineProperties(Room.prototype, {
             }
 
             return this._usedMineralCoords
+        },
+    },
+    mineralPath: {
+        get() {
+            if (this._mineralPath && this._mineralPath.length) return this._mineralPath
+
+            this._mineralPath = []
+
+            const packedMineralPath = this.memory.MPa
+            if (packedMineralPath && packedMineralPath.length) {
+                return (this._mineralPath = unpackPosList(packedMineralPath))
+            }
+
+            delete this.memory.MPa
+            if (!this.anchor) return this._sourcePaths
+
+            let path = [this.mineralPositions[0]]
+            path = path.concat(
+                this.advancedFindPath({
+                    origin: this.mineralPositions[0],
+                    goals: [{ pos: this.anchor, range: 3 }],
+                    typeWeights: remoteTypeWeights,
+                    plainCost: defaultRoadPlanningPlainCost,
+                    weightStructurePlans: true,
+                    avoidStationaryPositions: true,
+                }),
+            )
+
+            this._mineralPath = path
+            this.memory.MPa = packPosList(path)
+
+            return this._mineralPath
         },
     },
     fastFillerPositions: {

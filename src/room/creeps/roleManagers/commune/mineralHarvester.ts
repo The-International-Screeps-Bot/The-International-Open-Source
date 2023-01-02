@@ -1,8 +1,13 @@
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
-import { unpackPos } from 'other/packrat'
+import { reverseCoordList, unpackPos } from 'other/packrat'
 
 export class MineralHarvester extends Creep {
+    preTickManager() {
+
+        this.room.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
+    }
+
     advancedHarvestMineral?(mineral: Mineral): boolean {
 
         this.say('🚬')
@@ -19,10 +24,14 @@ export class MineralHarvester extends Creep {
 
             // Make a move request to it
 
-            this.createMoveRequest({
+            this.createMoveRequestByPath({
                 origin: this.pos,
                 goals: [{ pos: harvestPos, range: 0 }],
                 avoidEnemyRanges: true,
+            },
+            {
+                loose: true,
+                packedPath: reverseCoordList(this.room.memory.MPa)
             })
 
             // And inform false

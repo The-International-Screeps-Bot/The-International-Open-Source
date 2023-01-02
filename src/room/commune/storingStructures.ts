@@ -38,7 +38,6 @@ export class StoringStructuresManager {
 
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
-                onlyFull: true,
                 type: 'transfer',
                 priority: 100,
             })
