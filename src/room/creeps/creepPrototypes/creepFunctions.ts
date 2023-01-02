@@ -1673,11 +1673,16 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
     if (request.type === 'transfer') {
         const amount = Math.min(this.store.getCapacity(), request.amount)
 
-        // We don't have enough resource and we have free space
+        // We don't have enough resource
 
-        if (this.nextStore[request.resourceType] <= 0 && this.freeNextStore > 0) {
+        if (this.nextStore[request.resourceType] <= 0) {
+
+            // We don't have space to get any
+
+            if (this.freeNextStore <= 0) return false
+
             // Try to find a sufficient withdraw or offer task
-            
+
             const types: RoomLogisticsRequestTypes[] = ['withdraw', 'pickup']
 
             let lowestScore = Infinity
@@ -1715,6 +1720,8 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
                     return true
                 }
             }
+
+            return false
         }
 
         if (request.onlyFull) {
