@@ -30,8 +30,8 @@ export class MineralHarvester extends Creep {
                 avoidEnemyRanges: true,
             },
             {
+                packedPath: reverseCoordList(this.room.memory.MPa),
                 loose: true,
-                packedPath: reverseCoordList(this.room.memory.MPa)
             })
 
             // And inform false
