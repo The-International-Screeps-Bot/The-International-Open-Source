@@ -409,12 +409,12 @@ export class RemoteHauler extends Creep {
         delete creepAtPos.moved
 
         // Trade memory
-
+/*
         const newCreepAtPosMemory = JSON.parse(JSON.stringify(this.memory))
 
         this.memory = creepAtPos.memory
         creepAtPos.memory = newCreepAtPosMemory
-
+ */
         // Delete old values
 
         delete this.memory.P
@@ -473,7 +473,7 @@ export class RemoteHauler extends Creep {
 
     relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
-        
+
         if (!this.moveRequest && (!this.memory.P || this.memory.P.length <= 2)) return
         if (this.movedResource) return
         if (!this.nextStore.energy) return

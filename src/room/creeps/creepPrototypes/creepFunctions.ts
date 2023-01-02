@@ -416,26 +416,22 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
     // Buld the cSite
 
-    if (this.build(cSite) === OK) {
-        // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
+    if (this.build(cSite) !== OK) return RESULT_FAIL
 
-        const energySpentOnConstruction = Math.min(
-            this.parts.work * BUILD_POWER,
-            (cSite.progressTotal - cSite.progress) * BUILD_POWER,
-            this.nextStore.energy,
-        )
+    // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-        this.nextStore.energy -= energySpentOnConstruction
+    const energySpentOnConstruction = Math.min(
+        this.parts.work * BUILD_POWER,
+        (cSite.progressTotal - cSite.progress) * BUILD_POWER,
+        this.nextStore.energy,
+    )
 
-        // Add control points to total controlPoints counter and say the success
+    this.nextStore.energy -= energySpentOnConstruction
 
-        globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
-        this.message = `🚧${energySpentOnConstruction}`
+    // Add control points to total controlPoints counter and say the success
 
-        return RESULT_SUCCESS
-    }
-
-    // Inform true
+    globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
+    this.message = `🚧${energySpentOnConstruction}`
 
     return RESULT_SUCCESS
 }
@@ -675,7 +671,17 @@ Creep.prototype.findMineralHarvestPos = function () {
 Creep.prototype.needsResources = function () {
     // If the creep is empty
 
-    customLog('NEEDS CHECK', this.nextStore.energy + ', cap ' + this.store.getCapacity() + ', used ' + this.usedNextStore + ', free ' + this.freeNextStore, { superPosition: 1 })
+    customLog(
+        'NEEDS CHECK',
+        this.nextStore.energy +
+            ', cap ' +
+            this.store.getCapacity() +
+            ', used ' +
+            this.usedNextStore +
+            ', free ' +
+            this.freeNextStore,
+        { superPosition: 1 },
+    )
 
     if (this.usedNextStore === 0) return (this.memory.NR = true)
 
@@ -1448,7 +1454,7 @@ Creep.prototype.roomLogisticsRequestManager = function () {
 
     const request = this.memory.RLRs[0]
     if (!request) return
-    
+
     const target = findObjectWithID(request.TID)
 
     // Pickup type
@@ -1635,11 +1641,9 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     if (args && args.types) {
-
         // Make sure we have the right store values for our types
 
         if (this.needsResources()) {
-
             args.types.delete('transfer')
             return args.types
         }
@@ -1678,7 +1682,6 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
         // We don't have enough resource
 
         if (this.nextStore[request.resourceType] <= 0) {
-
             // We don't have space to get any
 
             if (this.freeNextStore <= 0) return false
@@ -1817,7 +1820,11 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
         return RESULT_ACTION
     }
 
-    customLog('DOING REQUEST', request.T + ', ' + request.A + ', ' + this.store.getCapacity(request.RT) + ', ' + this.name, { superPosition: 1 })
+    customLog(
+        'DOING REQUEST',
+        request.T + ', ' + request.A + ', ' + this.store.getCapacity(request.RT) + ', ' + this.name,
+        { superPosition: 1 },
+    )
     // Pickup type
 
     if (target instanceof Resource) {
@@ -1825,7 +1832,9 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
         customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
+        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, {
+            superPosition: 1,
+        })
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }

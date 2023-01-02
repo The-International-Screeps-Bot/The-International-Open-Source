@@ -108,6 +108,7 @@ export class RemoteHarvester extends Creep {
         }
 
         delete this.memory.RN
+        delete this.memory.PC
     }
 
     remoteActions?() {
