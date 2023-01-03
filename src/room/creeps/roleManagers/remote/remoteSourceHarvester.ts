@@ -118,7 +118,7 @@ export class RemoteHarvester extends Creep {
         const container = this.room.sourceContainers[this.memory.SI]
         const source = this.room.sources[this.memory.SI]
         let figuredOutWhatToDoWithTheEnergy = false
-        this.room.targetVisual(this.pos, container.pos, true)
+        if (container) this.room.targetVisual(this.pos, container.pos, true)
         //1) feed remote hauler
         //2) build if "ahead of the curve"
         //3) drop mine
