@@ -9,12 +9,10 @@ export class ContainerManager {
     }
 
     runRemote() {
-
         this.runSourceContainers()
     }
 
     runCommune() {
-
         this.runSourceContainers()
         this.runFastFillerContainers()
         this.runControllerContainer()
@@ -22,7 +20,6 @@ export class ContainerManager {
     }
 
     private runFastFillerContainers() {
-
         if (!this.roomManager.room.myCreeps.fastFiller.length) return
 
         const fastFillerContainers = [
@@ -32,6 +29,7 @@ export class ContainerManager {
 
         for (const container of fastFillerContainers) {
             if (!container) continue
+            if (container.reserveStore.energy > container.store.getCapacity() * 0.8) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
@@ -41,14 +39,15 @@ export class ContainerManager {
                 priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
             })
 
-            this.roomManager.room.createRoomLogisticsRequest({
-                target: container,
-                threshold: container.store.getCapacity() * 0.6,
-                maxAmount: container.reserveStore.energy * 0.6,
-                onlyFull: true,
-                type: 'offer',
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
-            })
+            if (container.reserveStore.energy < container.store.getCapacity() * 0.6) {
+                this.roomManager.room.createRoomLogisticsRequest({
+                    target: container,
+                    maxAmount: container.reserveStore.energy * 0.5,
+                    onlyFull: true,
+                    type: 'offer',
+                    priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
+                })
+            }
         }
     }
 
