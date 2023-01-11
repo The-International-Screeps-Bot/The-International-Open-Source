@@ -1146,23 +1146,9 @@ Object.defineProperties(Room.prototype, {
                 new RoomPosition(anchor.x + 1, anchor.y + 1, this.name),
             ]
 
-            for (let index = rawFastFillerPositions.length - 1; index >= 0; index -= 1) {
-                // Get the pos using the index
-
-                const pos = rawFastFillerPositions[index]
-
-                // Get adjacent structures
-
-                const adjacentStructures = this.lookForAtArea(
-                    LOOK_STRUCTURES,
-                    pos.y - 1,
-                    pos.x - 1,
-                    pos.y + 1,
-                    pos.x + 1,
-                    true,
-                )
-
-                // Construct organized adjacent structures
+            for (const pos of rawFastFillerPositions) {
+                const structuresAtCoord = this.structureCoords.get(packCoord(pos))
+                if (!structuresAtCoord) continue
 
                 const adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {
                     spawn: 0,
@@ -1171,18 +1157,14 @@ Object.defineProperties(Room.prototype, {
                     link: 0,
                 }
 
-                // For each structure of adjacentStructures
+                for (const ID of structuresAtCoord) {
+                    const structure = findObjectWithID(ID)
 
-                for (const adjacentPosData of adjacentStructures) {
-                    // Get the structureType at the adjacentPos
-
-                    const { structureType } = adjacentPosData.structure
-
-                    if (adjacentStructuresByType[structureType] === undefined) continue
+                    if (adjacentStructuresByType[structure.structureType] === undefined) continue
 
                     // Increase structure amount for this structureType on the adjacentPos
 
-                    adjacentStructuresByType[structureType] += 1
+                    adjacentStructuresByType[structure.structureType] += 1
                 }
 
                 // If there is more than one adjacent extension and container, iterate

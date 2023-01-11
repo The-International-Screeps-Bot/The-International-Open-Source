@@ -361,13 +361,13 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-            // If there is no storage, inform false
 
-            if (!storage || this.controller.level < 4) return false
+            if (this.controller.level < 5) return false
+            if (!storage) return false
 
-            // Otherwise if there is no hubLink or terminal, inform false
+            // There is no hubLink and another link, or no terminal
 
-            if (!this.hubLink && (!terminal || this.controller.level < 6)) return false
+            if ((!this.hubLink || this.structures.link.length < 2) && (!terminal || !terminal.RCLActionable)) return false
 
             role = 'hubHauler'
 
@@ -392,7 +392,7 @@ Room.prototype.spawnRequester = function () {
 
             const fastFillerPositionsCount = this.fastFillerPositions.length
             if (!fastFillerPositionsCount) return false
-
+            
             priority = 0.75
 
             let totalFastFillerEnergy = 0
