@@ -44,6 +44,7 @@ Next, if you don't have it already, install Node Package Manager so we can insta
 ```powershell
 npm install
 ```
+**Make sure your node version is below 17.0.0**
 
 Then, when in the project folder, you'll want to install the devDependencies like so:
 
