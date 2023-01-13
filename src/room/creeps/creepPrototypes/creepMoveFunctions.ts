@@ -159,7 +159,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     if (posIndex !== undefined && posIndex + 1 < path.length) {
 
-        path = path.slice(posIndex)
+        path.splice(0, posIndex)
 
         // If we have a remote, avoid abandoned remotes
 
