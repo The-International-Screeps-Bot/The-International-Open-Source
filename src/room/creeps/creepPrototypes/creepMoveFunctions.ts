@@ -67,7 +67,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
 
     return false
 }
-
+/*
 PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (opts, pathOpts) {
     // Stop if the we know the creep won't move
 
@@ -113,6 +113,79 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         if (!path) path = unpackPosList(pathOpts.packedPath)
 
         this.memory.P = pathOpts.packedPath
+        this.assignMoveRequest(path[1])
+        return true
+    }
+
+    // If loose is enabled, don't try to get back on the cached path
+
+    if (pathOpts.loose) return this.createMoveRequest(opts)
+
+    // Try to get on the path
+
+    opts.goals = []
+
+    for (const pos of unpackPosList(pathOpts.packedPath))
+        opts.goals.push({
+            pos: pos,
+            range: 0,
+        })
+
+    return this.createMoveRequest(opts)
+}
+ */
+
+PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (opts, pathOpts) {
+    // Stop if the we know the creep won't move
+
+    if (this.moveRequest) return false
+    if (this.moved) return false
+    if (this.fatigue > 0) return false
+    if (this instanceof Creep && !this.parts.move) return false
+
+    if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
+
+    let path = unpackPosList(pathOpts.packedPath)
+    let posIndex: number
+
+    for (let i = 0; i < path.length; i++) {
+
+        const pos = path[i]
+        if (!arePositionsEqual(this.pos, pos)) continue
+
+        posIndex = i
+        break
+    }
+
+    if (posIndex !== undefined && posIndex + 1 < path.length) {
+
+        path = path.slice(posIndex)
+
+        // If we have a remote, avoid abandoned remotes
+
+        if (pathOpts.remoteName) {
+
+            const roomNames: Set<string> = new Set()
+
+            for (const pos of path) {
+                roomNames.add(pos.roomName)
+            }
+
+            for (const roomName of roomNames) {
+                const roomMemory = Memory.rooms[roomName]
+
+                if (Memory.rooms[roomName].T !== 'remote') continue
+                if (!roomMemory.data[RemoteData.abandon]) continue
+
+                // The room is unsafe, don't use cached paths
+
+                return this.createMoveRequest(opts)
+            }
+        }
+
+        // Give the creep a sliced version of the path it is trying to use
+
+        this.memory.P = packPosList(path)
         this.assignMoveRequest(path[1])
         return true
     }
