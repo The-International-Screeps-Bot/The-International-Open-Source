@@ -50,7 +50,6 @@ import {
 } from 'other/packrat'
 import { creepClasses } from '../creepClasses'
 import { globalStatsUpdater } from 'international/statsManager'
-import request from 'request'
 
 Creep.prototype.preTickManager = function () {}
 
