@@ -731,20 +731,21 @@ export class Quad {
     advancedRangedAttack() {
         const { room } = this.leader
 
-        let enemyAttackers = room.enemyAttackers.filter(function (creep) {
+        let enemyCreeps = room.enemyAttackers.filter(function (creep) {
             return !creep.isOnExit
         })
 
-        if (!room.enemyAttackers.length) enemyAttackers = room.enemyAttackers
+        if (!room.enemyAttackers.length) enemyCreeps = room.enemyAttackers
 
         // If there are none
 
-        if (!enemyAttackers.length) {
-            let enemyCreeps = room.enemyCreeps.filter(function (creep) {
+        if (!enemyCreeps.length) {
+            enemyCreeps = room.enemyCreeps.filter(function (creep) {
                 return !creep.isOnExit
             })
 
-            if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
+            if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps
+            if (!enemyCreeps.length) return false
 
             this.leader.say('EC')
 
@@ -783,7 +784,7 @@ export class Quad {
 
         // Otherwise, get the closest enemyAttacker
 
-        const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
+        const enemyAttacker = findClosestObject(this.leader.pos, enemyCreeps)
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
                 color: customColors.green,
