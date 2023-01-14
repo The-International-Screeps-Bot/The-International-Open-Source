@@ -2348,15 +2348,13 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     // Make sure we are not infringing on the threshold
 
     if (args.target instanceof Resource) {
-        if (!args.threshold) args.threshold = 1
 
         amount = (args.target as Resource).reserveAmount
 
-        if (amount < args.threshold) return RESULT_FAIL
+        if (amount < 1) return RESULT_FAIL
     } else if (args.type === 'transfer') {
-        if (!args.threshold) args.threshold = args.target.store.getCapacity(args.resourceType)
 
-        if (args.target.reserveStore[args.resourceType] >= args.threshold) return RESULT_FAIL
+        if (args.target.reserveStore[args.resourceType] >= args.target.store.getCapacity(args.resourceType)) return RESULT_FAIL
 
         amount = args.target.freeReserveStoreOf(args.resourceType)
         /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
@@ -2364,12 +2362,11 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     // Offer or withdraw types
     else {
-        if (!args.threshold) args.threshold = 1
         amount = args.target.reserveStore[args.resourceType]
 
         // We don't have enough resources to make a request
 
-        if (amount < args.threshold) return RESULT_FAIL
+        if (amount < 1) return RESULT_FAIL
 
         if (args.maxAmount) amount = Math.min(amount, Math.round(args.maxAmount))
     }

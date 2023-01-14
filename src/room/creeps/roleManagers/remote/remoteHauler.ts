@@ -241,7 +241,7 @@ export class RemoteHauler extends Creep {
             // Fulfill requests near the hauler
 
             this.runRoomLogisticsRequests({
-                types: new Set(['pickup']),
+                types: new Set(['pickup', 'withdraw']),
                 conditions: request => {
                     if (request.resourceType !== RESOURCE_ENERGY) return false
 
