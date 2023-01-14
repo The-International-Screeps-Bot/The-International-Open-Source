@@ -1146,9 +1146,7 @@ Object.defineProperties(Room.prototype, {
                 new RoomPosition(anchor.x + 1, anchor.y + 1, this.name),
             ]
 
-            for (const pos of rawFastFillerPositions) {
-                const structuresAtCoord = this.structureCoords.get(packCoord(pos))
-                if (!structuresAtCoord) continue
+            for (const fastFillerPos of rawFastFillerPositions) {
 
                 const adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {
                     spawn: 0,
@@ -1156,15 +1154,25 @@ Object.defineProperties(Room.prototype, {
                     container: 0,
                     link: 0,
                 }
+                const adjacentCoords = findCoordsInsideRect(fastFillerPos.x - 1, fastFillerPos.y - 1, fastFillerPos.x + 1, fastFillerPos.y + 1)
 
-                for (const ID of structuresAtCoord) {
-                    const structure = findObjectWithID(ID)
+                // Check coords around the fast filler pos for relevant structures
 
-                    if (adjacentStructuresByType[structure.structureType] === undefined) continue
+                for (const coord of adjacentCoords) {
 
-                    // Increase structure amount for this structureType on the adjacentPos
+                    const structuresAtCoord = this.structureCoords.get(packCoord(coord))
 
-                    adjacentStructuresByType[structure.structureType] += 1
+                    if (!structuresAtCoord) continue
+
+                    for (const ID of structuresAtCoord) {
+                        const structure = findObjectWithID(ID)
+
+                        if (adjacentStructuresByType[structure.structureType] === undefined) continue
+
+                        // Increase structure amount for this structureType on the adjacentPos
+
+                        adjacentStructuresByType[structure.structureType] += 1
+                    }
                 }
 
                 // If there is more than one adjacent extension and container, iterate
@@ -1175,7 +1183,7 @@ Object.defineProperties(Room.prototype, {
                 if (adjacentStructuresByType[STRUCTURE_SPAWN] + adjacentStructuresByType[STRUCTURE_EXTENSION] === 0)
                     continue
 
-                this._fastFillerPositions.push(pos)
+                this._fastFillerPositions.push(fastFillerPos)
             }
 
             return this._fastFillerPositions

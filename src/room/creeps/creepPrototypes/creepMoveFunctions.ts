@@ -159,7 +159,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     if (posIndex !== undefined && posIndex + 1 < path.length) {
 
-        path.splice(0, posIndex)
+        path.splice(0, posIndex + 1)
 
         // If we have a remote, avoid abandoned remotes
 
@@ -186,7 +186,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // Give the creep a sliced version of the path it is trying to use
 
         this.memory.P = packPosList(path)
-        this.assignMoveRequest(path[1])
+        this.assignMoveRequest(path[0])
         return true
     }
 
