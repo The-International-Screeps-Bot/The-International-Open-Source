@@ -13,8 +13,7 @@ export class LinkManager {
 
           if (!this.communeManager.room.storage && !this.communeManager.room.terminal) {
 
-               const controllerLink = this.communeManager.room.controllerLink
-               if (controllerLink) this.createControllerLinkRoomLogisticsRequest(controllerLink)
+               this.createControllerLinkRoomLogisticsRequest()
                return
           }
 
@@ -43,7 +42,7 @@ export class LinkManager {
 
                // Otherwise, loop through each receiverLink
 
-               for (const receiverLink of receiverLinks) {
+               for (const receiverLink of receiverLinks as StructureLink[]) {
 
                     // If the link is more than x% full, iterate
 
@@ -123,7 +122,10 @@ export class LinkManager {
           hubLink.store.energy -= controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)
      }
 
-     private createControllerLinkRoomLogisticsRequest(controllerLink: StructureLink = this.communeManager.room.controllerLink) {
+     private createControllerLinkRoomLogisticsRequest() {
+
+          const controllerLink = this.communeManager.room.controllerLink
+          if (!controllerLink) return
 
           // If we have suffient energy
 
