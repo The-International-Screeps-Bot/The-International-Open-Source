@@ -24,6 +24,8 @@ jobs:
                     cache: 'npm'
                - name: Get IP
                  run: hostname -I
+               - name: Echo runner context
+                 run: echo "${{ toJSON(runner) }}"
                - name: Install dependencies
                  run: npm install
                - name: Start instances
