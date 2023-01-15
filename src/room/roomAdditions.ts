@@ -1161,7 +1161,6 @@ Object.defineProperties(Room.prototype, {
                 for (const coord of adjacentCoords) {
 
                     const structuresAtCoord = this.structureCoords.get(packCoord(coord))
-
                     if (!structuresAtCoord) continue
 
                     for (const ID of structuresAtCoord) {
@@ -1339,6 +1338,8 @@ Object.defineProperties(Room.prototype, {
     },
     fastFillerContainerLeft: {
         get() {
+            if (this._fastFillerContainerLeft !== undefined) return this._fastFillerContainerLeft
+
             if (this.global.fastFillerContainerLeft) {
                 const container = findObjectWithID(this.global.fastFillerContainerLeft)
 
@@ -1347,38 +1348,39 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.anchor) return false
 
-            for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x - 2, this.anchor.y)) {
-                if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            const structure = this.findStructureAtXY(this.anchor.x - 2, this.anchor.y, STRUCTURE_CONTAINER) as StructureContainer | false
+            this._fastFillerContainerLeft = structure
 
-                this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>
-                return structure
-            }
+            if (!structure) return false
 
+            this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>
             return false
         },
     },
     fastFillerContainerRight: {
         get() {
+            if (this._fastFillerContainerRight !== undefined) return this._fastFillerContainerRight
+
             if (this.global.fastFillerContainerRight) {
                 const container = findObjectWithID(this.global.fastFillerContainerRight)
-
                 if (container) return container
             }
 
             if (!this.anchor) return false
 
-            for (const structure of this.lookForAt(LOOK_STRUCTURES, this.anchor.x + 2, this.anchor.y)) {
-                if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            const structure = this.findStructureAtXY(this.anchor.x + 2, this.anchor.y, STRUCTURE_CONTAINER) as StructureContainer | false
+            this._fastFillerContainerRight = structure
 
-                this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>
-                return structure
-            }
+            if (!structure) return false
 
+            this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>
             return false
         },
     },
     controllerContainer: {
         get() {
+            if (this._controllerContainer !== undefined) return this._controllerContainer
+
             if (this.global.controllerContainer) {
                 const container = findObjectWithID(this.global.controllerContainer)
 
@@ -1388,18 +1390,19 @@ Object.defineProperties(Room.prototype, {
             const centerUpgradePos = this.centerUpgradePos
             if (!centerUpgradePos) return false
 
-            for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            const structure = this.findStructureAtCoord(centerUpgradePos, STRUCTURE_CONTAINER) as StructureContainer | false
+            this._controllerContainer = structure
 
-                this.global.controllerContainer = structure.id as Id<StructureContainer>
-                return structure
-            }
+            if (!structure) return false
 
+            this.global.controllerContainer = structure.id as Id<StructureContainer>
             return false
         },
     },
     mineralContainer: {
         get() {
+            if (this._mineralContainer !== undefined) return this._mineralContainer
+
             if (this.global.mineralContainer) {
                 const container = findObjectWithID(this.global.mineralContainer)
 
@@ -1409,18 +1412,19 @@ Object.defineProperties(Room.prototype, {
             const mineralHarvestPos = this.mineralPositions[0]
             if (!mineralHarvestPos) return false
 
-            for (const structure of mineralHarvestPos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            const structure = this.findStructureAtCoord(mineralHarvestPos, STRUCTURE_CONTAINER) as StructureContainer | false
+            this._mineralContainer = structure
 
-                this.global.mineralContainer = structure.id as Id<StructureContainer>
-                return structure
-            }
+            if (!structure) return false
 
+            this.global.mineralContainer = structure.id as Id<StructureContainer>
             return false
         },
     },
     controllerLink: {
         get() {
+            if (this._controllerLink !== undefined) return this._controllerLink
+
             if (this.global.controllerLink) {
                 const container = findObjectWithID(this.global.controllerLink)
 
@@ -1430,18 +1434,19 @@ Object.defineProperties(Room.prototype, {
             const centerUpgradePos = this.centerUpgradePos
             if (!centerUpgradePos) return false
 
-            for (const structure of centerUpgradePos.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_LINK) continue
+            const structure = this.findStructureAtCoord(centerUpgradePos, STRUCTURE_LINK) as StructureLink | false
+            this._controllerLink = structure
 
-                this.global.controllerLink = structure.id as Id<StructureLink>
-                return structure
-            }
+            if (!structure) return false
 
+            this.global.controllerLink = structure.id as Id<StructureLink>
             return false
         },
     },
     fastFillerLink: {
         get() {
+            if (this._fastFillerLink !== undefined) return this._fastFillerLink
+
             if (this.global.fastFillerLink) {
                 const container = findObjectWithID(this.global.fastFillerLink)
 
@@ -1450,18 +1455,19 @@ Object.defineProperties(Room.prototype, {
 
             if (!this.anchor) return false
 
-            for (const structure of this.anchor.lookFor(LOOK_STRUCTURES)) {
-                if (structure.structureType !== STRUCTURE_LINK) continue
+            const structure = this.findStructureAtCoord(this.anchor, STRUCTURE_LINK) as StructureLink | false
+            this._fastFillerLink = structure
 
-                this.global.fastFillerLink = structure.id as Id<StructureLink>
-                return structure
-            }
+            if (!structure) return false
 
+            this.global.fastFillerLink = structure.id as Id<StructureLink>
             return false
         },
     },
     hubLink: {
         get() {
+            if (this._hubLink !== undefined) return this._hubLink
+
             if (this.global.hubLink) {
                 const structure = findObjectWithID(this.global.hubLink)
 
@@ -1472,30 +1478,13 @@ Object.defineProperties(Room.prototype, {
 
             const hubAnchor = unpackNumAsCoord(this.memory.stampAnchors.hub[0])
             if (!hubAnchor) return false
-            //console.log(JSON.stringify(hubAnchor))
-            for (const structure of new RoomPosition(hubAnchor.x, hubAnchor.y + 1, this.name).lookFor(
-                LOOK_STRUCTURES,
-            )) {
-                if (structure.structureType !== STRUCTURE_LINK) continue
 
-                this.global.hubLink = structure.id as Id<StructureLink>
-                return structure
-            }
+            const structure = this.findStructureAtXY(hubAnchor.x, hubAnchor.y + 1, STRUCTURE_LINK) as StructureLink | false
+            this._hubLink = structure
 
-            for (const structure of this.lookForAtArea(
-                LOOK_STRUCTURES,
-                hubAnchor.y - 1,
-                hubAnchor.x - 1,
-                hubAnchor.y + 1,
-                hubAnchor.x + 1,
-                true,
-            )) {
-                if (structure.structure.structureType !== STRUCTURE_LINK) continue
+            if (!structure) return false
 
-                this.global.hubLink = structure.structure.id as Id<StructureLink>
-                return structure.structure
-            }
-
+            this.global.hubLink = structure.id as Id<StructureLink>
             return false
         },
     },

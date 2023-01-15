@@ -31,6 +31,7 @@ import {
     findClosestClaimType,
     findClosestCommuneName,
     findCoordsInsideRect,
+    findObjectWithID,
     getRange,
     isNearRoomEdge,
     newID,
@@ -2386,4 +2387,26 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         onlyFull: args.onlyFull,
         noReserve: !this.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
     })
+}
+
+Room.prototype.findStructureAtCoord = function(coord, structureType) {
+
+    return this.findStructureAtXY(coord.x, coord.y, structureType)
+}
+
+
+Room.prototype.findStructureAtXY = function(x, y, structureType) {
+
+    const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
+    if (!structureIDs) return false
+
+    for (const ID of structureIDs) {
+
+        const structure = findObjectWithID(ID)
+        if (structure.structureType !== structureType) continue
+
+        return structure
+    }
+
+    return false
 }

@@ -1208,6 +1208,9 @@ declare global {
 
         communeConstructionPlacement(): void
 
+        findStructureAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): Structure | false
+        findStructureAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): Structure | false
+
         // Room Getters
 
         readonly global: Partial<RoomGlobal>
@@ -1375,21 +1378,28 @@ declare global {
 
         readonly sourceLinks: StructureLink[]
 
+        _fastFillerContainerLeft: StructureContainer | false
         readonly fastFillerContainerLeft: StructureContainer | undefined
 
+        _fastFillerContainerRight: StructureContainer | false
         readonly fastFillerContainerRight: StructureContainer | undefined
 
+        _controllerContainer: StructureContainer | false
         readonly controllerContainer: StructureContainer | undefined
 
-        readonly mineralContainer: StructureContainer | undefined
+        _mineralContainer: StructureContainer | false
+        readonly mineralContainer: StructureContainer | false
 
         // Links
 
-        readonly controllerLink: StructureLink | undefined
+        _controllerLink: StructureLink | false
+        readonly controllerLink: StructureLink | false
 
-        readonly fastFillerLink: StructureLink | undefined
+        _fastFillerLink: StructureLink | false
+        readonly fastFillerLink: StructureLink | false
 
-        readonly hubLink: StructureLink | undefined
+        _hubLink: StructureLink | false
+        readonly hubLink: StructureLink | false
 
         _droppedEnergy: Resource[]
 
