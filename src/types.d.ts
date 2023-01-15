@@ -1216,47 +1216,37 @@ declare global {
         readonly global: Partial<RoomGlobal>
 
         _anchor: RoomPosition | undefined
-
         readonly anchor: RoomPosition | undefined
 
         // Resources
 
         _sources: Source[]
-
         readonly sources: Source[]
 
         _sourcesByEfficacy: Source[]
-
         readonly sourcesByEfficacy: Source[]
 
         _mineral: Mineral
-
         readonly mineral: Mineral
 
         // Creeps
 
         _enemyCreeps: Creep[]
-
         readonly enemyCreeps: Creep[]
 
         _enemyAttackers: Creep[]
-
         readonly enemyAttackers: Creep[]
 
         _allyCreeps: Creep[]
-
         readonly allyCreeps: Creep[]
 
         _myDamagedCreeps: Creep[]
-
         readonly myDamagedCreeps: Creep[]
 
         _myDamagedPowerCreeps: PowerCreep[]
-
         readonly myDamagedPowerCreeps: PowerCreep[]
 
         _allyDamagedCreeps: Creep[]
-
         readonly allyDamagedCreeps: Creep[]
 
         // Buildings
@@ -1287,17 +1277,15 @@ declare global {
         readonly cSiteTarget: ConstructionSite | undefined
 
         _spawningStructures: SpawningStructures
-
         readonly spawningStructures: SpawningStructures
+
         _spawningStructuresByPriority: SpawningStructures
-
         readonly spawningStructuresByPriority: SpawningStructures
-        _spawningStructuresByNeed: SpawningStructures
 
+        _spawningStructuresByNeed: SpawningStructures
         readonly spawningStructuresByNeed: SpawningStructures
 
         _taskNeedingSpawningStructures: SpawningStructures
-
         readonly taskNeedingSpawningStructures: SpawningStructures
 
         _dismantleTargets: Structure[]
@@ -1331,51 +1319,40 @@ declare global {
         readonly upgradePositions: RoomPosition[]
 
         _usedUpgradePositions: Set<string>
-
         readonly usedUpgradePositions: Set<string>
 
         _controllerPositions: RoomPosition[]
-
         readonly controllerPositions: RoomPosition[]
 
         readonly upgradePathLength: number
 
         _mineralPositions: RoomPosition[]
-
         readonly mineralPositions: RoomPosition[]
 
         _usedMineralCoords: Set<string>
-
         readonly usedMineralCoords: Set<string>
 
         _mineralPath: RoomPosition[]
-
         readonly mineralPath: RoomPosition[]
 
         _fastFillerPositions: RoomPosition[]
-
         readonly fastFillerPositions: RoomPosition[]
 
         _usedFastFillerCoords: Set<string>
-
         readonly usedFastFillerCoords: Set<string>
 
         _remoteNamesBySourceEfficacy: string[]
-
         readonly remoteNamesBySourceEfficacy: string[]
 
         _remoteSourceIndexesByEfficacy: string[]
-
         readonly remoteSourceIndexesByEfficacy: string[]
 
         // Container
 
         _sourceContainers: StructureContainer[]
-
         readonly sourceContainers: StructureContainer[]
 
         _sourceLinks: StructureLink[]
-
         readonly sourceLinks: StructureLink[]
 
         _fastFillerContainerLeft: StructureContainer | false
@@ -1402,71 +1379,54 @@ declare global {
         readonly hubLink: StructureLink | false
 
         _droppedEnergy: Resource[]
-
         readonly droppedEnergy: Resource[]
 
         _droppedResources: Resource[]
-
         readonly droppedResources: Resource[]
 
         _actionableWalls: StructureWall[]
-
         readonly actionableWalls: StructureWall[]
 
         _quadCostMatrix: CostMatrix
-
         readonly quadCostMatrix: CostMatrix
 
         _quadBulldozeCostMatrix: CostMatrix
-
         readonly quadBulldozeCostMatrix: CostMatrix
 
         _enemyDamageThreat: boolean
-
         readonly enemyDamageThreat: boolean
 
         _enemyThreatCoords: Set<string>
-
         readonly enemyThreatCoords: Set<string>
 
         _enemyThreatGoals: PathGoal[]
-
         readonly enemyThreatGoals: PathGoal[]
 
         _flags: Partial<{ [key in FlagNames]: Flag }>
-
         readonly flags: { [key in FlagNames]: Flag }
 
         _defensiveRamparts: StructureRampart[]
-
         readonly defensiveRamparts: StructureRampart[]
 
         _factory: StructureFactory
-
         readonly factory: StructureFactory
 
         _powerSpawn: StructurePowerSpawn
-
         readonly powerSpawn: StructurePowerSpawn
 
         _nuker: StructureNuker
-
         readonly nuker: StructureNuker
 
         _observer: StructureObserver
-
         readonly observer: StructureObserver
 
         _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
-
         readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
 
         _unprotectedEnemyCreeps: Creep[]
-
         readonly unprotectedEnemyCreeps: Creep[]
 
         _exitCoords: Set<string>
-
         readonly exitCoords: Set<string>
 
         // Target finding
@@ -1542,7 +1502,6 @@ declare global {
         readonly MOFTT: (Creep | AnyStoreStructure)[]
 
         _advancedLogistics: boolean
-
         readonly advancedLogistics: boolean
     }
 
