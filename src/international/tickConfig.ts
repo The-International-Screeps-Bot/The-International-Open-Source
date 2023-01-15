@@ -31,6 +31,7 @@ import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 import { RoomManager } from 'room/room'
+import { profile } from 'other/Profiler'
 
 class TickConfig {
     public run() {
@@ -56,7 +57,7 @@ class TickConfig {
             globalStatsUpdater('', statName, cpuUsed, true)
         }
     }
-    
+
     private configGeneral() {
         // General
 
@@ -266,10 +267,7 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-                    if (
-                        room.memory.combatRequests.length + 1 >= room.communeManager.maxCombatRequests
-                    )
-                        continue
+                    if (room.memory.combatRequests.length + 1 >= room.communeManager.maxCombatRequests) continue
                 } else {
                     if (room.memory.combatRequests.length + 1 >= room.estimateIncome() / 10) continue
                 }

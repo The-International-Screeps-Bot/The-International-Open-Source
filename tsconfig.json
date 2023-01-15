@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "experimentalDecorators": true,
         "module": "esnext",
         "lib": ["es2019"],
         "target": "es2019",
@@ -14,7 +15,7 @@
         "allowUnreachableCode": true,
         "strictNullChecks": false,
         "esModuleInterop": true,
-        "sourceMap": true,
+        "sourceMap": true
     },
-    "exclude": ["node_modules", "dist"],
+    "exclude": ["node_modules", "dist"]
 }
