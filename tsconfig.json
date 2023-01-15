@@ -15,6 +15,7 @@
         "strictNullChecks": false,
         "esModuleInterop": true,
         "sourceMap": true,
+        "experimentalDecorators": true,
     },
     "exclude": ["node_modules", "dist"],
 }

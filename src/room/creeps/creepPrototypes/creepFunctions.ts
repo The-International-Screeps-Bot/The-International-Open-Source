@@ -683,18 +683,6 @@ Creep.prototype.findMineralHarvestPos = function () {
 Creep.prototype.needsResources = function () {
     // If the creep is empty
 
-    customLog(
-        'NEEDS CHECK',
-        this.nextStore.energy +
-            ', cap ' +
-            this.store.getCapacity() +
-            ', used ' +
-            this.usedNextStore +
-            ', free ' +
-            this.freeNextStore,
-        { superPosition: 1 },
-    )
-
     if (this.usedNextStore === 0) return (this.memory.NR = true)
 
     // Otherwise if the creep is full
@@ -1554,9 +1542,9 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             bestRequest = request
         }
     }
-
+/*
     customLog('FINDING REQ', bestRequest + ', ' + Array.from(types), { superPosition: 1 })
-
+ */
     let creepRequest: CreepRoomLogisticsRequest | 0
 
     if (!bestRequest) {
@@ -1820,7 +1808,7 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
 Creep.prototype.runRoomLogisticsRequest = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return RESULT_FAIL
-    customLog('REQUEST RESPONSE', request.T, { superPosition: 1 })
+    /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
 
     if (getRangeOfCoords(target.pos, this.pos) > 1) {
@@ -1832,11 +1820,11 @@ Creep.prototype.runRoomLogisticsRequest = function (args) {
         return RESULT_ACTION
     }
 
-    customLog(
+/*     customLog(
         'DOING REQUEST',
         request.T + ', ' + request.A + ', ' + this.store.getCapacity(request.RT) + ', ' + this.name,
         { superPosition: 1 },
-    )
+    ) */
     // Pickup type
 
     if (target instanceof Resource) {
