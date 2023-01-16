@@ -4,19 +4,30 @@ require('dotenv').config()
 const minimist = require('minimist')
 const argv = minimist(process.argv.slice(2))
 
-const runnerName = process.env.ACTIONS_RUNNER_NAME;
-console.log("runnerName: " + runnerName);
+function getPorts() {
+    const runnerName = process.env.ACTIONS_RUNNER_NAME || 'local - 21030';
+    const basePort = runnerName.split(' - ')[1] || 21025;
+    const baseServerPort = 21025;
+    const baseCliPort = 22025;
+    const baseGrafanaPort = 3000;
+    const baseRelayPort = 2003;
+    const additionalPort = basePort - baseServerPort;
 
-const grafanaPort = 3000
-const relayPort = 2003
-const serverPort = 21025
-const cliPort = 21026
+    const serverPort = baseServerPort + additionalPort;
+    const cliPort = baseCliPort + additionalPort;
+    const grafanaPort = baseGrafanaPort + additionalPort;
+    const relayPort = baseRelayPort + additionalPort;
+    if (!runnerName.includes("local")) console.log(`Runner name: ${runnerName}, base port: ${basePort}`);
+    return { serverPort, cliPort, grafanaPort, relayPort };
+}
+
+const ports = getPorts()
 
 const options = { stdio: 'inherit' }
 const botPath = join(__dirname, 'dist')
-exec(`npx screeps-grafana private --grafanaPort=${grafanaPort} --relayPort=${relayPort}`, options)
+execSync(`npx screeps-grafana private --grafanaPort=${ports.grafanaPort} --force`, options)
 execSync('npm run build', options)
 execSync(
-    `npx screeps-performance-server --maxTicks=${argv.maxTicks} --botFilePath=${botPath} --steamKey=${process.env.STEAM_KEY} --exportBaseUrl=${process.env.EXPORT_API_BASE_URL} --serverPort=${serverPort} --cliPort=${cliPort} --grafanaPort=${grafanaPort}`,
+    `npx screeps-performance-server --maxTicks=${argv.maxTicks} --botFilePath=${botPath} --steamKey=${process.env.STEAM_KEY} --exportBaseUrl=${process.env.EXPORT_API_BASE_URL} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force`,
     options,
 )

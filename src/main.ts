@@ -46,67 +46,66 @@ import { ErrorMapper } from 'other/ErrorMapper'
 import { globalStatsUpdater } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import profiler from 'other/screeps-profiler'
-// import profiler from 'screeps-profiler'
 // global.Profiler = Profiler.init()
 
-// profiler.enable()
+profiler.enable()
 export const loop = ErrorMapper.wrapLoop((): void => {
     /* try { */
-    // profiler.wrap(function () {
-    if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
-        customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-            textColor: customColors.white,
-            bgColor: customColors.red,
-        })
-        console.log(global.logs)
-        return
-    }
+    profiler.wrap(function () {
+        if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
+            customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+                textColor: customColors.white,
+                bgColor: customColors.red,
+            })
+            console.log(global.logs)
+            return
+        }
 
-    memHack.run()
+        memHack.run()
 
-    internationalManager.update()
+        internationalManager.update()
 
-    // If CPU logging is enabled, get the CPU used at the start
+        // If CPU logging is enabled, get the CPU used at the start
 
-    if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-    // Run prototypes
+        // Run prototypes
 
-    if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
-    migrationManager.run()
-    respawnManager.run()
-    configManager.run()
-    tickConfig.run()
-    playerManager.run()
-    creepOrganizer.run()
-    powerCreepOrganizer.run()
-    internationalManager.constructionSiteManager()
-    internationalManager.orderManager()
+        if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
+        migrationManager.run()
+        respawnManager.run()
+        configManager.run()
+        tickConfig.run()
+        playerManager.run()
+        creepOrganizer.run()
+        powerCreepOrganizer.run()
+        internationalManager.constructionSiteManager()
+        internationalManager.orderManager()
 
-    // Handle ally requests
+        // Handle ally requests
 
-    allyManager.tickConfig()
-    allyManager.getAllyRequests()
+        allyManager.tickConfig()
+        allyManager.getAllyRequests()
 
-    if (Memory.CPULogging === true) {
-        const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-        customLog('International Manager', cpuUsed.toFixed(2), {
-            textColor: customColors.white,
-            bgColor: customColors.lightBlue,
-        })
-        const statName: InternationalStatNames = 'imcu'
-        globalStatsUpdater('', statName, cpuUsed, true)
-    }
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('International Manager', cpuUsed.toFixed(2), {
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
+            })
+            const statName: InternationalStatNames = 'imcu'
+            globalStatsUpdater('', statName, cpuUsed, true)
+        }
 
-    roomsManager()
+        roomsManager()
 
-    internationalManager.mapVisualsManager()
+        internationalManager.mapVisualsManager()
 
-    internationalManager.advancedGeneratePixel()
-    internationalManager.advancedSellPixels()
+        internationalManager.advancedGeneratePixel()
+        internationalManager.advancedSellPixels()
 
-    internationalManager.endTickManager()
-    /* } catch (err) {
+        internationalManager.endTickManager()
+        /* } catch (err) {
 
             customLog('ERROR: ' + err, (err as any).stack, {
                 textColor: customColors.white,
@@ -114,5 +113,5 @@ export const loop = ErrorMapper.wrapLoop((): void => {
             })
             console.log(global.logs)
     } */
-    // })
+    })
 })
