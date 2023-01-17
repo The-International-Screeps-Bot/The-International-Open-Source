@@ -229,12 +229,9 @@ export class CommuneManager {
     }
 
     private test() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
-
-
 
         customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
@@ -430,13 +427,12 @@ export class CommuneManager {
      * Wether builders should ask for resources instead of seeking them out themselves
      */
     get buildersMakeRequests() {
-
         // Only set true if there are no viable storing structures
 
         return (this._buildersMakeRequests =
-            (!this.room.fastFillerContainerLeft &&
-                !this.room.fastFillerContainerRight &&
-                !this.room.storage &&
-                !this.room.terminal))
+            !this.room.fastFillerContainerLeft &&
+            !this.room.fastFillerContainerRight &&
+            !this.room.storage &&
+            !this.room.terminal)
     }
 }
