@@ -32,19 +32,19 @@ export class HubHauler extends Creep {
      * @returns If a reservation was made or not
      */
     createCreepRoomLogisticsRequests?(): void {
-        if (this.memory.RLRs?.length) return
+        if (this.memory.RLRs.length) return
 
         const { room } = this
         const { storage } = room
         const { terminal } = room
 
-        if (!storage && !terminal) return
+        if (!storage || !terminal) return
 
-        //Whenever we have a reservation, we should have a matching withdraw and transfer, so we should never
+        // Whenever we have a reservation, we should have a matching withdraw and transfer, so we should never
         // get here with anything.  If we do, it'll never be gotten rid of, so just transfer anything we have to the store
         if (this.store.getUsedCapacity() > 0) {
             const resource = Object.keys(this.store)[0] as ResourceConstant
-            this.createCreepRoomLogisticsRequest('transfer', storage.id, this.store[resource], resource)
+            this.createCreepRoomLogisticsRequest('transfer', (storage || terminal).id, this.store[resource], resource)
             return
         }
 
@@ -95,7 +95,7 @@ export class HubHauler extends Creep {
 
         // If the storage is sufficiently full
 
-        if (storage.freeStore() < this.store.getCapacity()) return false
+        if (storage.freeNextStore < this.store.getCapacity()) return false
 
         // If the terminal exists and isn't power disabled
 
@@ -114,7 +114,7 @@ export class HubHauler extends Creep {
 
                 this.message += 'RST'
 
-                let amount = this.freeStore()
+                let amount = this.freeNextStore
 
                 this.createCreepRoomLogisticsRequest('withdraw', terminal.id, amount, resourceType)
                 this.createCreepRoomLogisticsRequest(
@@ -142,7 +142,7 @@ export class HubHauler extends Creep {
 
         // If the terminal is sufficiently full
 
-        if (terminal.freeStore() < this.store.getCapacity()) return false
+        if (terminal.freeNextStore < this.store.getCapacity()) return false
 
         if (storage) {
             for (const key in storage.store) {
@@ -159,7 +159,7 @@ export class HubHauler extends Creep {
 
                 this.message += 'RTT'
 
-                let amount = this.freeStore()
+                let amount = this.freeNextStore
 
                 this.createCreepRoomLogisticsRequest('withdraw', storage.id, amount, resourceType)
                 this.createCreepRoomLogisticsRequest(
@@ -213,14 +213,14 @@ export class HubHauler extends Creep {
         // FInd a target
 
         let target
-        if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
-        else if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
+        if (terminal && terminal.freeNextStore > this.store.getCapacity()) target = terminal
+        else if (storage && storage.freeNextStore > this.store.getCapacity()) target = storage
 
         if (!target) return false
 
         this.message += 'RHLW'
 
-        let amount = Math.min(this.freeStore(), hubLink.store.getUsedCapacity(RESOURCE_ENERGY))
+        let amount = Math.min(this.freeNextStore, hubLink.store.getUsedCapacity(RESOURCE_ENERGY))
 
         this.createCreepRoomLogisticsRequest('withdraw', hubLink.id, amount)
         this.createCreepRoomLogisticsRequest('transfer', target.id, amount + this.store.energy)
@@ -261,7 +261,7 @@ export class HubHauler extends Creep {
         )
             return false
 
-        const amount = Math.min(this.freeStore(), hubLink.store.getFreeCapacity(RESOURCE_ENERGY))
+        const amount = Math.min(this.freeNextStore, hubLink.store.getFreeCapacity(RESOURCE_ENERGY))
 
         // Find a provider
 
@@ -274,7 +274,7 @@ export class HubHauler extends Creep {
         this.createCreepRoomLogisticsRequest(
             'transfer',
             hubLink.id,
-            Math.min(this.freeStore() + this.store.energy, hubLink.store.getFreeCapacity(RESOURCE_ENERGY)),
+            Math.min(this.freeNextStore + this.store.energy, hubLink.store.getFreeCapacity(RESOURCE_ENERGY)),
         )
         return true
     }
@@ -302,17 +302,17 @@ export class HubHauler extends Creep {
             if (resource == RESOURCE_BATTERY) continue
 
             //We don't want to remove the output if there's less then a full creep's worth.
-            if (resource == room.memory.factoryProduct && factory.store[resource] < this.freeStore()) continue
+            if (resource == room.memory.factoryProduct && factory.store[resource] < this.freeNextStore) continue
 
             //I'm favoring the terminal here because it's likely going to get sold, or shipped out in late game.
             let target
-            if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
-            else if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
+            if (terminal && terminal.freeNextStore > this.store.getCapacity()) target = terminal
+            else if (storage && storage.freeNextStore > this.store.getCapacity()) target = storage
             if (!target) return false
 
             let amount = Math.min(
-                this.freeStore(),
-                target.freeStore(),
+                this.freeNextStore,
+                target.freeNextStore,
                 factory.store[resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY],
             )
 
@@ -338,14 +338,14 @@ export class HubHauler extends Creep {
         // Find a target
 
         let target
-        if (terminal && terminal.freeStore() > this.store.getCapacity()) target = terminal
-        else if (storage && storage.freeStore() > this.store.getCapacity()) target = storage
+        if (terminal && terminal.freeNextStore > this.store.getCapacity()) target = terminal
+        else if (storage && storage.freeNextStore > this.store.getCapacity()) target = storage
 
         if (!target) return false
 
         this.message += 'RFW'
 
-        let amount = this.freeStore()
+        let amount = this.freeNextStore
 
         this.createCreepRoomLogisticsRequest('withdraw', factory.id, amount, RESOURCE_BATTERY)
         this.createCreepRoomLogisticsRequest('transfer', target.id, amount + this.store.battery, RESOURCE_BATTERY)
@@ -367,7 +367,7 @@ export class HubHauler extends Creep {
 
         // If there is not enough free store in the factory
 
-        if (factory.freeStore() < this.store.getCapacity()) return false
+        if (factory.freeNextStore < this.store.getCapacity()) return false
 
         if (room.memory.factoryProduct && room.memory.factoryUsableResources) {
             for (let resource of room.memory.factoryUsableResources) {
@@ -380,7 +380,7 @@ export class HubHauler extends Creep {
                 else if (storage && storage.store[resource] > 0) provider = storage
                 if (!provider) continue
 
-                const amount = Math.min(this.freeStore(), provider.store[resource], 2000 - factory.store[resource])
+                const amount = Math.min(this.freeNextStore, provider.store[resource], 2000 - factory.store[resource])
                 if (amount <= 0) continue
 
                 // Make sure we aren't using vital energy
@@ -413,7 +413,7 @@ export class HubHauler extends Creep {
 
         this.message += 'RFT'
 
-        let amount = this.freeStore()
+        let amount = this.freeNextStore
 
         this.createCreepRoomLogisticsRequest('withdraw', provider.id, amount)
         this.createCreepRoomLogisticsRequest('transfer', factory.id, amount + this.store.energy)
@@ -444,7 +444,7 @@ export class HubHauler extends Creep {
         )
             return false
 
-        const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
+        const amount = Math.min(this.freeNextStore, powerSpawn.freeSpecificStore(resource))
 
         // Find a provider
 
@@ -457,7 +457,7 @@ export class HubHauler extends Creep {
         this.createCreepRoomLogisticsRequest(
             'transfer',
             powerSpawn.id,
-            Math.min(this.freeStore() + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+            Math.min(this.freeNextStore + this.store[resource], powerSpawn.freeSpecificStore(resource)),
             resource,
         )
         return true
@@ -487,7 +487,7 @@ export class HubHauler extends Creep {
         )
             return false
 
-        const amount = Math.min(this.freeStore(), powerSpawn.freeSpecificStore(resource))
+        const amount = Math.min(this.freeNextStore, powerSpawn.freeSpecificStore(resource))
 
         // Find a provider
 
@@ -500,7 +500,7 @@ export class HubHauler extends Creep {
         this.createCreepRoomLogisticsRequest(
             'transfer',
             powerSpawn.id,
-            Math.min(this.freeStore() + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+            Math.min(this.freeNextStore + this.store[resource], powerSpawn.freeSpecificStore(resource)),
             resource,
         )
         return true
@@ -518,9 +518,12 @@ export class HubHauler extends Creep {
 
             if (creep.travelToHub()) continue
 
+            creep.createCreepRoomLogisticsRequests()
+
             // If the creep has no reservations but is full
 
-            if ((!creep.memory.RLRs || !creep.memory.RLRs.length) && creep.freeStore() === 0) {
+            if (!creep.memory.RLRs.length && creep.store.getFreeCapacity() === 0) {
+
                 for (const key in creep.store) {
                     const resourceType = key as ResourceConstant
 
@@ -531,8 +534,7 @@ export class HubHauler extends Creep {
                 continue
             }
 
-            creep.createCreepRoomLogisticsRequests()
-            if (!creep.runRoomLogisticsRequest()) continue
+            if (!creep.runRoomLogisticsRequests()) continue
 
             /*
             // Try balancing storing structures, iterating if there were resources moved
