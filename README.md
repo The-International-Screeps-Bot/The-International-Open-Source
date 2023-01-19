@@ -84,6 +84,8 @@ We're a huge fan of teamwork, and many useful features of this bot have been add
 
 If you want to join us in development for this bot, please join our [discord server](https://discord.gg/5QubDsB786) and share what you're working on, or hoping to add. We're happy to review issues, merge pull requests, and add collaborators!
 
+An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO for their essential contribution to this project.
+
 ## Support
 
 If you'd like to support the project, Carson Burke (AKA MarvinTMB) is happy to accept single time or monthly donations through the following links.
