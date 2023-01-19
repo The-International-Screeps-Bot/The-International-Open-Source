@@ -18,7 +18,7 @@ export class Maintainer extends Creep {
         if (this.needsResources()) {
             delete this.memory.repairTarget
 
-            this.runRoomLogisticsRequests({
+            this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['withdraw', 'offer', 'pickup']),
                 conditions: request => request.resourceType === RESOURCE_ENERGY,
             })
@@ -131,15 +131,14 @@ export class Maintainer extends Creep {
         let structureID: Id<Structure<BuildableStructureConstant>>
 
         for (const coord of adjacentCoords) {
-
             const structureIDs = room.structureCoords.get(packCoord(coord))
             if (!structureIDs) continue
 
             structureID = structureIDs.find(structureID => {
-
                 const structure = findObjectWithID(structureID)
 
-                if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) return false
+                if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER)
+                    return false
 
                 // The structure has sufficient hits
 

@@ -76,7 +76,6 @@ class CreepOrganizer {
         }
 
         creep.preTickManager()
-        creep.reservationManager()
 
         // If the creep isn't dying, organize by its roomFrom and role
 

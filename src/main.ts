@@ -32,7 +32,6 @@ import { customLog } from 'international/utils'
 import { customColors, TrafficPriorities } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
 import { configManager } from './international/config'
-// import * as Profiler from './other/Profiler'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migration'
@@ -114,4 +113,6 @@ export const loop = ErrorMapper.wrapLoop((): void => {
             console.log(global.logs)
     } */
     })
+
+    profiler.output(Infinity)
 })

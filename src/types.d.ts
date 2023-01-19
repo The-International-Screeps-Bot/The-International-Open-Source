@@ -418,15 +418,6 @@ declare global {
         C: number
     }
 
-    type Reservations = 'transfer' | 'withdraw' | 'pickup'
-
-    interface Reservation {
-        type: Reservations
-        amount: number
-        resourceType: ResourceConstant
-        targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-    }
-
     type CombatRequestTypes = 'attack' | 'harass' | 'defend'
 
     interface ClaimRequest {
@@ -853,7 +844,6 @@ declare global {
         structureCoords: Map<string, Id<Structure>[]>
         cSiteCoords: Map<string, Id<ConstructionSite>[]>
 
-
         // Links
 
         sourceLinks: Id<StructureLink>[]
@@ -954,7 +944,7 @@ declare global {
          */
         squadRequests: Set<string>
 
-        roomLogisticsRequests: { [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }}
+        roomLogisticsRequests: { [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest } }
         powerTasks: { [ID: string]: PowerTask }
 
         attackingDefenderIDs: Set<Id<Creep>>
@@ -1429,78 +1419,6 @@ declare global {
         _exitCoords: Set<string>
         readonly exitCoords: Set<string>
 
-        // Target finding
-
-        _MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        /**
-         * Mandatory energy withdraw targets
-         */
-        readonly MEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        _OEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        /**
-         * Optional energy withdraw targets
-         */
-        readonly OEWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        _MAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        /**
-         * Mandatory all withdraw targets
-         */
-        readonly MAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        _OAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        /**
-         * Optional all withdraw targets
-         */
-        readonly OAWT: (Creep | AnyStoreStructure | Tombstone | Ruin | Resource)[]
-
-        _METT: (Creep | AnyStoreStructure)[]
-
-        /**
-         * Mandatory energy transfer targets
-         */
-        readonly METT: (Creep | AnyStoreStructure)[]
-
-        _OETT: (Creep | AnyStoreStructure)[]
-
-        /**
-         * Optional energy transfer targets
-         */
-        readonly OETT: (Creep | AnyStoreStructure)[]
-
-        _MATT: (Creep | AnyStoreStructure)[]
-
-        /**
-         * Mandatory all transfer targets
-         */
-        readonly MATT: (Creep | AnyStoreStructure)[]
-
-        _OATT: (Creep | AnyStoreStructure)[]
-
-        /**
-         * Optional all transfer targets
-         */
-        readonly OATT: (Creep | AnyStoreStructure)[]
-
-        _MEFTT: (Creep | AnyStoreStructure)[]
-
-        /**
-         * Mandatory Energy Fill Transfer Targets
-         */
-        readonly MEFTT: (Creep | AnyStoreStructure)[]
-
-        _MOFTT: (Creep | AnyStoreStructure)[]
-
-        /**
-         * Mandatory Other Fill Transfer Targets
-         */
-        readonly MOFTT: (Creep | AnyStoreStructure)[]
-
         _advancedLogistics: boolean
         readonly advancedLogistics: boolean
     }
@@ -1821,28 +1739,6 @@ declare global {
          * Attack nearby enemies without moving
          */
         passiveRangedAttack(): boolean
-
-        reserveWithdrawEnergy(): void
-
-        reserveTransferEnergy(): void
-
-        // Reservation
-
-        deleteReservation(index: number): void
-
-        createReservation(
-            type: Reservations,
-            target: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
-            amount: number,
-            resourceType?: ResourceConstant,
-        ): void
-
-        /**
-         * Deletes reservations with no target, pre-emptively modifies store values
-         */
-        reservationManager(): void
-
-        fulfillReservation(): boolean
     }
 
     interface CreepProperties {
@@ -1975,12 +1871,29 @@ declare global {
         findRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
         findRoomLogisticsRequestTypes(args?: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
         canAcceptRoomLogisticsRequest(requestType: RoomLogisticsRequestTypes, requestID: string): boolean
-        createBackupStoringStructuresRoomLogisticsRequest(types: Set<RoomLogisticsRequestTypes>): CreepRoomLogisticsRequest | 0
+        createBackupStoringStructuresRoomLogisticsRequest(
+            types: Set<RoomLogisticsRequestTypes>,
+        ): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
-        runRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): number
+        runRoomLogisticsRequestAdvanced(args?: findNewRoomLogisticsRequestArgs): number
+        runRoomLogisticsRequestsAdvanced(args?: findNewRoomLogisticsRequestArgs): boolean
 
-        runRoomLogisticsRequests(args?: findNewRoomLogisticsRequestArgs): boolean
+        runRoomLogisticsRequest(): number
+        runRoomLogisticsRequests(): boolean
+
+        findCreepRoomLogisticsRequestAmount(
+            type: RoomLogisticsRequestTypes,
+            targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
+            amount: number,
+            resourceType: ResourceConstant,
+        ): number
+        createCreepRoomLogisticsRequest(
+            type: RoomLogisticsRequestTypes,
+            targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
+            amount: number,
+            resourceType?: ResourceConstant,
+        ): number
 
         // Creep Getters
 
@@ -2015,10 +1928,6 @@ declare global {
          * A numerical measurement of the combat abilites of the creep
          */
         readonly strength: number
-
-        _reservation: Reservation
-
-        readonly reservation: Reservation
 
         _upgradeStrength: number
 
@@ -2121,11 +2030,6 @@ declare global {
          * The target ID of the task (for hubHaulers)
          */
         taskTarget: Id<Creep | AnyStoreStructure>
-
-        /**
-         * Reservations, An array of targets with information to manage the resources of
-         */
-        Rs: Reservation[]
 
         /**
          * Room Logistics Requests

@@ -28,7 +28,7 @@ Room.prototype.communeConstructionPlacement = function () {
 
     // If there are some construction sites
 
-    if (this.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+    if (this.find(FIND_MY_CONSTRUCTION_SITES).length >= 2) return
 
     let placed = 0
 

@@ -153,7 +153,6 @@ export class RemoteHauler extends Creep {
         // If the creep is in the remote
 
         if (this.room.name === this.memory.RN) {
-
             if (!this.getRemoteSourceResources()) return false
 
             // We have enough resources, return home
@@ -231,16 +230,14 @@ export class RemoteHauler extends Creep {
      * @returns If the creep no longer needs energy
      */
     getRemoteSourceResources?() {
-
         const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
         // We aren't next to the source
 
         if (getRangeOfCoords(this.pos, sourcePos) > 1) {
-
             // Fulfill requests near the hauler
 
-            this.runRoomLogisticsRequests({
+            this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['pickup', 'withdraw']),
                 conditions: request => {
                     if (request.resourceType !== RESOURCE_ENERGY) return false
@@ -280,7 +277,7 @@ export class RemoteHauler extends Creep {
 
         // Fulfill requests near the source
 
-        this.runRoomLogisticsRequests({
+        this.runRoomLogisticsRequestsAdvanced({
             types: new Set(['withdraw', 'pickup']),
             conditions: request => {
                 if (request.resourceType !== RESOURCE_ENERGY) return false
@@ -301,7 +298,7 @@ export class RemoteHauler extends Creep {
 
             this.passiveRenew()
 
-            this.runRoomLogisticsRequests({
+            this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['transfer']),
                 conditions: request => {
                     return request.resourceType === RESOURCE_ENERGY
@@ -408,7 +405,7 @@ export class RemoteHauler extends Creep {
         delete creepAtPos.moved
 
         // Trade memory
-/*
+        /*
         const newCreepAtPosMemory = JSON.parse(JSON.stringify(this.memory))
 
         this.memory = creepAtPos.memory
@@ -528,7 +525,6 @@ export class RemoteHauler extends Creep {
         for (const creepName of creepsOfRole) {
             const creep = Game.creeps[creepName] as RemoteHauler
             creep.run()
-
         }
     }
 }

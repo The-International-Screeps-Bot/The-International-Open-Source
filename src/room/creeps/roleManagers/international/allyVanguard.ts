@@ -3,16 +3,12 @@ import { findObjectWithID, getRange, getRangeOfCoords } from 'international/util
 import { unpackCoord } from 'other/packrat'
 
 export class AllyVanguard extends Creep {
-
     preTickManager() {
-
         const request = Memory.claimRequests[this.memory.TRN]
 
         if (!request) return
 
-        request.data[
-            AllyCreepRequestData.allyVanguard
-        ] -= this.parts.work
+        request.data[AllyCreepRequestData.allyVanguard] -= this.parts.work
     }
 
     findRemote?(): boolean {
@@ -81,24 +77,16 @@ export class AllyVanguard extends Creep {
     getEnergyFromRoom?(): boolean {
         const { room } = this
 
-        if (room.controller && (room.controller.owner || room.controller.reservation)) {
-            if (!this.memory.Rs || !this.memory.Rs.length) this.reserveWithdrawEnergy()
+        if (
+            this.runRoomLogisticsRequestsAdvanced({
+                conditions(request) {
+                    return request.resourceType === RESOURCE_ENERGY
+                },
+            })
+        )
+            return true
 
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return true
-            }
-
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return true
-            }
-
-            if (this.needsResources()) return false
-            return false
-        }
+        if (!this.needsResources()) return true
 
         // Define the creep's sourceName
 

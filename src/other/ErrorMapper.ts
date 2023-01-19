@@ -1,8 +1,6 @@
 /* eslint-disable */
 import { SourceMapConsumer } from 'source-map'
-import { profile } from 'other/Profiler'
 
-@profile
 export class ErrorMapper {
     // Cache consumer
     private static _consumer?: SourceMapConsumer

@@ -75,13 +75,6 @@ Object.defineProperties(Creep.prototype, {
             return this._strength
         },
     },
-    reservation: {
-        get() {
-            if (!this.memory.Rs[0]) return false
-
-            return (this._reservation = this.memory.Rs[0])
-        },
-    },
     macroHealStrength: {
         get() {
             if (this._macroHealStrength !== undefined) return this._macroHealStrength

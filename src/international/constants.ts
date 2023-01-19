@@ -91,6 +91,7 @@ export const roomLogisticsRoles: Set<CreepRoles> = new Set([
     'remoteSourceHarvester1',
     'remoteHauler',
     'hubHauler',
+    'allyVanguard',
 ])
 
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
