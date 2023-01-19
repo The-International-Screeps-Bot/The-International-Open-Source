@@ -45,12 +45,10 @@ import { ErrorMapper } from 'other/ErrorMapper'
 import { globalStatsUpdater } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import profiler from 'other/screeps-profiler'
-// global.Profiler = Profiler.init()
 
 profiler.enable()
 export const loop = ErrorMapper.wrapLoop((): void => {
-    /* try { */
-    profiler.wrap(function () {
+    profiler.wrap((): void => {
         if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
             customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
                 textColor: customColors.white,
@@ -104,15 +102,5 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         internationalManager.advancedSellPixels()
 
         internationalManager.endTickManager()
-        /* } catch (err) {
-
-            customLog('ERROR: ' + err, (err as any).stack, {
-                textColor: customColors.white,
-                bgColor: customColors.red,
-            })
-            console.log(global.logs)
-    } */
     })
-
-    profiler.output(Infinity)
 })
