@@ -42,13 +42,13 @@ export class HubHauler extends Creep {
 
         // Whenever we have a reservation, we should have a matching withdraw and transfer, so we should never
         // get here with anything.  If we do, it'll never be gotten rid of, so just transfer anything we have to the store
-
+/*
         if (this.store.getFreeCapacity() === 0) {
             const resource = Object.keys(this.store)[0] as ResourceConstant
             this.createCreepRoomLogisticsRequest('transfer', (storage || terminal).id, this.store[resource], resource)
             return
         }
-
+ */
         //Factory-overfill is at the top of this list because it can be feeding energy to the rest of the base
         // by breaking down batteries... this is the only case it should have more then 10k energy in the factory.
         if (this.factoryEnergyOverfillTransfer()) return

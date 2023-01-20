@@ -1663,9 +1663,8 @@ Creep.prototype.findCreepRoomLogisticsRequestAmount = function (type, targetID, 
 }
 
 Creep.prototype.createCreepRoomLogisticsRequest = function (type, targetID, amount, resourceType) {
-    if (!this.memory.RLRs) this.memory.RLRs = []
 
-    this.findCreepRoomLogisticsRequestAmount(type, targetID, amount, (resourceType = RESOURCE_ENERGY))
+    /* amount = */ this.findCreepRoomLogisticsRequestAmount(type, targetID, amount, (resourceType = RESOURCE_ENERGY))
     if (amount <= 0) return RESULT_FAIL
 
     this.memory.RLRs.push({
