@@ -38,11 +38,12 @@ export class HubHauler extends Creep {
         const { storage } = room
         const { terminal } = room
 
-        if (!storage || !terminal) return
+        if (!storage && !terminal) return
 
         // Whenever we have a reservation, we should have a matching withdraw and transfer, so we should never
         // get here with anything.  If we do, it'll never be gotten rid of, so just transfer anything we have to the store
-        if (this.store.getUsedCapacity() > 0) {
+
+        if (this.store.getFreeCapacity() === 0) {
             const resource = Object.keys(this.store)[0] as ResourceConstant
             this.createCreepRoomLogisticsRequest('transfer', (storage || terminal).id, this.store[resource], resource)
             return
@@ -519,7 +520,7 @@ export class HubHauler extends Creep {
             if (creep.travelToHub()) continue
 
             creep.createCreepRoomLogisticsRequests()
-
+/*
             // If the creep has no reservations but is full
 
             if (!creep.memory.RLRs.length && creep.store.getFreeCapacity() === 0) {
@@ -533,18 +534,9 @@ export class HubHauler extends Creep {
 
                 continue
             }
-
+ */
             if (!creep.runRoomLogisticsRequests()) continue
 
-            /*
-            // Try balancing storing structures, iterating if there were resources moved
-
-            if (creep.balanceStoringStructures()) continue
-
-            // Try filling the hubLink, iterating if there were resources moved
-
-            if (creep.fillHubLink()) continue
-     */
             creep.message = '🚬'
         }
     }
