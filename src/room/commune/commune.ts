@@ -50,6 +50,7 @@ import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
 import { LinkManager } from './links'
+import { profiler } from 'other/screeps-profiler'
 
 export class CommuneManager {
     // Managers
@@ -436,3 +437,5 @@ export class CommuneManager {
             !this.room.terminal)
     }
 }
+
+profiler.registerClass(CommuneManager, 'Commune')

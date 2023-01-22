@@ -1669,8 +1669,11 @@ declare global {
         /**
          *
          */
-        findRampartRepairTarget(): StructureRampart | false
-
+        findNewRampartRepairTarget(): StructureRampart | false
+        /**
+         *
+         */
+        findNewRepairTarget(): Structure<BuildableStructureConstant> | false
         /**
          *
          */

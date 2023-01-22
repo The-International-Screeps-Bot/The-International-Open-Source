@@ -1,6 +1,6 @@
 import { roomDimensions } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { findCoordsInsideRect, findObjectWithID } from 'international/utils'
+import { findCoordsInsideRect, findObjectWithID, getRangeOfCoords } from 'international/utils'
 import { packCoord } from 'other/packrat'
 
 export class Maintainer extends Creep {
@@ -29,21 +29,19 @@ export class Maintainer extends Creep {
         // Otherwise if we don't need resources and can maintain
 
         const workPartCount = this.parts.work
-        const repairTarget = this.findRepairTarget() || this.findRampartRepairTarget()
+        let repairTarget = this.findRepairTarget()
 
         if (!repairTarget) {
-            this.say('❌🔧')
+            this.message = '❌🔧'
             return false
         }
 
-        this.say('⏩🔧')
-
+        this.message = '⏩🔧'
         room.targetVisual(this.pos, repairTarget.pos)
 
-        // If the repairTarget is out of repair range
+        // Move to target if out of range
 
-        if (this.pos.getRangeTo(repairTarget.pos) > 3) {
-            // Make a move request to it
+        if (getRangeOfCoords(this.pos, repairTarget.pos) > 3) {
 
             this.createMoveRequest({
                 origin: this.pos,
@@ -51,14 +49,10 @@ export class Maintainer extends Creep {
                 avoidEnemyRanges: true,
             })
 
-            // Inform false
-
             return false
         }
 
         if (this.worked) return true
-
-        // Try to repair, stopping if failed
 
         const repairResult = this.repair(repairTarget)
         if (repairResult !== OK) return false
@@ -73,47 +67,47 @@ export class Maintainer extends Creep {
 
         if (repairTarget.structureType === STRUCTURE_RAMPART || repairTarget.structureType === STRUCTURE_WALL) {
             globalStatsUpdater(this.room.name, 'eorwr', energySpentOnRepairs)
-            this.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
+            this.message = `🧱${energySpentOnRepairs * REPAIR_POWER}`
         } else {
             globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
-            this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
+            this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
         }
 
         // Implement the results of the repair pre-emptively
 
         repairTarget.nextHits = Math.min(repairTarget.nextHits + workPartCount * REPAIR_POWER, repairTarget.hitsMax)
 
-        // If the structure is a rampart
+        // If the structure is a rampart, continue repairing it
 
-        if (repairTarget.structureType === STRUCTURE_RAMPART) {
-            // If the repairTarget will be below or equal to expectations next tick
-
-            return true
-        }
+        if (repairTarget.structureType === STRUCTURE_RAMPART) return true
 
         // Otherwise if it isn't a rampart and it will be viable to repair next tick
         else if (repairTarget.hitsMax - repairTarget.nextHits >= workPartCount * REPAIR_POWER) return true
 
-        // Otherwise
-
-        // Delete the target from memory
+        // Otherwise we need a new target
 
         delete this.memory.repairTarget
 
+        // Find a target next tick, we can't do more
+
+        if (this.moved) return true
+
         // Find repair targets that don't include the current target, informing true if none were found
 
-        const newRepairTarget = this.findRepairTarget()
-        if (!newRepairTarget) return true
+        repairTarget = this.findNewRepairTarget() || this.findNewRampartRepairTarget()
+        if (!repairTarget) return true
+
+        // We are already in viable range
+
+        if (getRangeOfCoords(this.pos, repairTarget.pos) <= 3) return true
 
         // Make a move request to it
 
         this.createMoveRequest({
             origin: this.pos,
-            goals: [{ pos: newRepairTarget.pos, range: 3 }],
+            goals: [{ pos: repairTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
         })
-
-        // Inform false
 
         return true
     }

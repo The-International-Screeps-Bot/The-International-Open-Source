@@ -1,6 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
+interface OutputArgs {
+    maxLines?: number
+    /**
+     * Wether to sort by average. Default is false
+     */
+    byAvg?: boolean
+}
+
 let usedOnStart = 0
 let enabled = false
 let depth = 0
@@ -22,8 +30,10 @@ function setupProfiler() {
         email(duration, filter) {
             setupMemory('email', duration || 100, filter)
         },
-        profile(duration, filter) {
-            setupMemory('profile', duration || 100, filter)
+        profile(duration: number = 100, filter?: any) {
+
+            setupMemory('profile', duration, filter)
+            return `Profiling for ${duration} ticks`
         },
         background(filter) {
             setupMemory('background', false, filter)
@@ -272,68 +282,54 @@ const Profiler = {
         return body
     },
 
-    output(maxLines: number = Infinity) {
-
-        if (!Memory.profiler || !Memory.profiler.enabledTick) {
-            return 'Profiler not active.'
-        }
+    output(args: OutputArgs) {
+        if (!args.maxLines) args.maxLines = Infinity
+        if (!Memory.profiler || !Memory.profiler.enabledTick) return 'Profiler not active.'
 
         const endTick = Math.min(Memory.profiler.disableTick || Game.time, Game.time)
         const startTick = Memory.profiler.enabledTick
         const elapsedTicks = endTick - startTick + 1
         const header = 'calls\t\ttime\t\tavg\t\tfunction'
+        const lines = [header]
+
+        for (const line of Profiler.lines(args.byAvg)) {
+            if (lines.length > args.maxLines) break
+            lines.push(line)
+        }
+
         const footer = [
             `Ticks: ${elapsedTicks}`,
             `Time: ${Memory.profiler.totalTime.toFixed(2)}`,
             `Per tick: ${(Memory.profiler.totalTime / elapsedTicks).toFixed(2)}`,
         ].join('\t')
-
-        const lines = [header]
-
-        const allLines = Profiler.lines()
-        console.log(allLines.length)
-
-        for (const line of allLines) {
-
-            if (lines.length > maxLines) break
-            lines.push(line)
-        }
-/*
-        let done = false
-        while (!done && allLines.length) {
-            const line = allLines.shift()
-
-            // each line added adds the line length plus a new line character.
-
-            if (currentLength + line.length + 1 < outputLengthLimit) {
-                lines.push(line)
-                currentLength += line.length + 1
-            } else {
-                done = true
-            }
-        }
- */
         lines.push(footer)
+
         return lines.join('\n')
     },
 
-    lines() {
-        const stats = Object.keys(Memory.profiler.map)
-            .map(functionName => {
-                const functionCalls = Memory.profiler.map[functionName]
-                return {
-                    name: functionName,
-                    calls: functionCalls.calls,
-                    totalTime: functionCalls.time,
-                    averageTime: functionCalls.time / functionCalls.calls,
-                }
+    lines(byAvg: boolean) {
+        const stats = Object.keys(Memory.profiler.map).map(functionName => {
+            const functionCalls = Memory.profiler.map[functionName]
+            return {
+                name: functionName,
+                calls: functionCalls.calls,
+                totalTime: functionCalls.time,
+                averageTime: functionCalls.time / functionCalls.calls,
+            }
+        })
+
+        if (byAvg) {
+            stats.sort((val1, val2) => {
+                return val2.averageTime - val1.averageTime
             })
-            .sort((val1, val2) => {
+        } else {
+            stats.sort((val1, val2) => {
                 return val2.totalTime - val1.totalTime
             })
+        }
 
         const lines = stats.map(data => {
-            return [data.calls, data.totalTime.toFixed(1), data.averageTime.toFixed(3), data.name].join('\t\t')
+            return [data.calls, data.totalTime.toFixed(2), data.averageTime.toFixed(3), data.name].join('\t\t')
         })
         lines.splice(lines.length - 1)
 

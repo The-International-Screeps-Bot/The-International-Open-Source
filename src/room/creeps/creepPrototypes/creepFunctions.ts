@@ -410,7 +410,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
     // If the cSite is out of range
 
     if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
-        this.message = '➡️CS'
+        this.message = '➡️🚧'
 
         // Make a move request to it
 
@@ -442,7 +442,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
     // Add control points to total controlPoints counter and say the success
 
     globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
-    this.message = `🚧${energySpentOnConstruction}`
+    this.message = `🚧 ` + energySpentOnConstruction
 
     return RESULT_SUCCESS
 }
@@ -530,18 +530,46 @@ Creep.prototype.advancedBuildAllyCSite = function () {
     return true
 }
 
-Creep.prototype.findRampartRepairTarget = function () {
+Creep.prototype.findNewRampartRepairTarget = function () {
     let lowestScore = Infinity
     let bestTarget
 
     let ramparts = this.room.enemyAttackers.length ? this.room.defensiveRamparts : this.room.structures.rampart
-
     for (const structure of ramparts) {
         // If above 90% of max hits
 
-        if (structure.hits / structure.hitsMax > 0.9) continue
+        if (structure.nextHits / structure.hitsMax > 0.9) continue
 
-        const score = getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) + structure.hits / 1000
+        const score = getRangeOfCoords(this.pos, structure.pos) + structure.nextHits / 1000
+
+        if (score >= lowestScore) continue
+
+        lowestScore = score
+        bestTarget = structure
+    }
+
+    if (!bestTarget) return false
+
+    this.memory.repairTarget = bestTarget.id
+    return bestTarget
+}
+
+Creep.prototype.findNewRepairTarget = function () {
+
+    let possibleRepairTargets: Structure<BuildableStructureConstant>[] = this.room.structures.road
+    possibleRepairTargets = possibleRepairTargets.concat(this.room.structures.container)
+
+    let lowestScore = Infinity
+    let bestTarget
+
+    for (const structure of possibleRepairTargets) {
+        // If above 30% of max hits
+
+        if (structure.nextHits / structure.hitsMax > 0.3) continue
+
+        const score =
+            getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) +
+            (structure.nextHits / structure.hitsMax) * 1000
 
         if (score >= lowestScore) continue
 
@@ -561,33 +589,7 @@ Creep.prototype.findRepairTarget = function () {
         if (repairTarget) return repairTarget
     }
 
-    const { room } = this
-
-    let possibleRepairTargets: Structure<BuildableStructureConstant>[] = room.structures.road
-    possibleRepairTargets = possibleRepairTargets.concat(room.structures.container)
-
-    let lowestScore = Infinity
-    let bestTarget
-
-    for (const structure of possibleRepairTargets) {
-        // If above 30% of max hits
-
-        if (structure.hits / structure.hitsMax > 0.3) continue
-
-        const score =
-            getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) +
-            (structure.hits / structure.hitsMax) * 1000
-
-        if (score >= lowestScore) continue
-
-        lowestScore = score
-        bestTarget = structure
-    }
-
-    if (!bestTarget) return false
-
-    this.memory.repairTarget = bestTarget.id
-    return bestTarget
+    return this.findNewRepairTarget() || this.findNewRampartRepairTarget()
 }
 
 Creep.prototype.findOptimalSourceIndex = function () {

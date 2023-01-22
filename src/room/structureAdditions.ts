@@ -8,7 +8,7 @@ Object.defineProperties(Structure.prototype, {
             if (this._RCLActionable !== undefined) return this._RCLActionable
 
             if (!this.room.controller) return this._RCLActionable = true
-            if (this.room.memory.GRCL === this.room.controller.level) return this._RCLActionable = true
+            if (Memory.rooms[this.room.name].GRCL === this.room.controller.level) return this._RCLActionable = true
 
             return this._RCLActionable = this.isActive()
          }
