@@ -44,9 +44,11 @@ import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
 import { globalStatsUpdater } from 'international/statsManager'
 import { playerManager } from 'international/players'
-import profiler from 'other/screeps-profiler'
+import { profiler } from 'other/screeps-profiler'
 
-// profiler.enable()
+/* profiler.registerClass(CommuneManager, 'commune') */
+
+profiler.enable()
 export const loop = ErrorMapper.wrapLoop((): void => {
     profiler.wrap((): void => {
         if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {

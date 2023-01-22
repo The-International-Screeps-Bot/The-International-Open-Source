@@ -225,7 +225,7 @@ Creep.prototype.advancedUpgradeController = function () {
         const upgradePos = this.findUpgradePos()
         if (!upgradePos) return false
 
-        if (getRange(this.pos.x, upgradePos.x, this.pos.y, upgradePos.y) > 0) {
+        if (getRangeOfCoords(this.pos, upgradePos) > 0) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
@@ -241,7 +241,7 @@ Creep.prototype.advancedUpgradeController = function () {
         }
 
         const workPartCount = this.parts.work
-        const controllerRange = getRange(this.pos.x, room.controller.pos.x, this.pos.y, room.controller.pos.y)
+        const controllerRange = getRangeOfCoords(this.pos, room.controller.pos)
 
         if (controllerRange <= 3 && this.nextStore.energy > 0) {
             if (this.upgradeController(room.controller) === OK) {
@@ -254,13 +254,7 @@ Creep.prototype.advancedUpgradeController = function () {
             }
         }
 
-        const controllerStructureRange = getRange(
-            this.pos.x,
-            controllerStructure.pos.x,
-            this.pos.y,
-            controllerStructure.pos.y,
-        )
-
+        const controllerStructureRange = getRangeOfCoords(this.pos, controllerStructure.pos)
         if (controllerStructureRange <= 3) {
             // If the controllerStructure is a container and is in need of repair
 
@@ -327,7 +321,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
     // If the controller is out of upgrade range
 
-    if (this.pos.getRangeTo(room.controller.pos) > 3) {
+    if (getRangeOfCoords(this.pos, room.controller.pos) > 3) {
         // Make a move request to it
 
         this.createMoveRequest({
@@ -1350,7 +1344,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
             // We don't have space to get any
 
             if (this.freeNextStore <= 0) return false
-
+            /*
             // Try to find a sufficient withdraw or offer task
 
             const types: RoomLogisticsRequestTypes[] = ['withdraw', 'pickup']
@@ -1378,7 +1372,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
                 request.delivery = bestRequest2.ID as unknown as string
                 return true
             }
-
+ */
             // Try to find a sufficient storing structure
 
             if (this.room.name === this.commune.name) {
@@ -1663,7 +1657,6 @@ Creep.prototype.findCreepRoomLogisticsRequestAmount = function (type, targetID, 
 }
 
 Creep.prototype.createCreepRoomLogisticsRequest = function (type, targetID, amount, resourceType) {
-
     /* amount = */ this.findCreepRoomLogisticsRequestAmount(type, targetID, amount, (resourceType = RESOURCE_ENERGY))
     if (amount <= 0) return RESULT_FAIL
 

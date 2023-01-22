@@ -22,7 +22,7 @@ import {
     findFunctionCPU,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import profiler from 'other/screeps-profiler'
+import { profiler } from 'other/screeps-profiler'
 import {
     packCoord,
     packCoordList,
@@ -202,7 +202,7 @@ const roomAdditions = {
                     }
 
                     if (allStructures.length === this.global.allStructureIDs.length) {
-                        return (this._structureUpdate = true)
+                        return (this._structureUpdate = false)
                     }
                 }
             }
@@ -222,6 +222,7 @@ const roomAdditions = {
     },
     structureCoords: {
         get() {
+
             if (this.global.structureCoords && !this.structureUpdate) return this.global.structureCoords
 
             // Construct storage of structures based on structureType
@@ -279,7 +280,7 @@ const roomAdditions = {
                     }
 
                     if (allCSites.length === this.global.allCSiteIDs.length) {
-                        return (this._cSiteUpdate = true)
+                        return (this._cSiteUpdate = false)
                     }
                 }
             }

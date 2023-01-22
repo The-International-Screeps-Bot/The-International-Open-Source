@@ -272,8 +272,8 @@ const Profiler = {
         return body
     },
 
-    output(passedOutputLengthLimit) {
-        const outputLengthLimit = passedOutputLengthLimit || 1000
+    output(maxLines: number = Infinity) {
+
         if (!Memory.profiler || !Memory.profiler.enabledTick) {
             return 'Profiler not active.'
         }
@@ -283,18 +283,28 @@ const Profiler = {
         const elapsedTicks = endTick - startTick + 1
         const header = 'calls\t\ttime\t\tavg\t\tfunction'
         const footer = [
-            `Avg: ${(Memory.profiler.totalTime / elapsedTicks).toFixed(2)}`,
-            `Total: ${Memory.profiler.totalTime.toFixed(2)}`,
             `Ticks: ${elapsedTicks}`,
+            `Time: ${Memory.profiler.totalTime.toFixed(2)}`,
+            `Per tick: ${(Memory.profiler.totalTime / elapsedTicks).toFixed(2)}`,
         ].join('\t')
 
         const lines = [header]
-        let currentLength = header.length + 1 + footer.length
+
         const allLines = Profiler.lines()
+        console.log(allLines.length)
+
+        for (const line of allLines) {
+
+            if (lines.length > maxLines) break
+            lines.push(line)
+        }
+/*
         let done = false
         while (!done && allLines.length) {
             const line = allLines.shift()
+
             // each line added adds the line length plus a new line character.
+
             if (currentLength + line.length + 1 < outputLengthLimit) {
                 lines.push(line)
                 currentLength += line.length + 1
@@ -302,6 +312,7 @@ const Profiler = {
                 done = true
             }
         }
+ */
         lines.push(footer)
         return lines.join('\n')
     },
@@ -324,6 +335,7 @@ const Profiler = {
         const lines = stats.map(data => {
             return [data.calls, data.totalTime.toFixed(1), data.averageTime.toFixed(3), data.name].join('\t\t')
         })
+        lines.splice(lines.length - 1)
 
         return lines
     },
@@ -441,7 +453,7 @@ const Profiler = {
     },
 }
 
-export default {
+const profiler = {
     wrap(callback) {
         if (enabled) {
             setupProfiler()
@@ -486,3 +498,4 @@ export default {
     registerFN: profileFunction,
     registerClass: profileObjectFunctions,
 }
+export { profiler }

@@ -37,7 +37,7 @@ export class HubHauler extends Creep {
         const { room } = this
         const { storage } = room
         const { terminal } = room
-
+        
         if (!storage && !terminal) return
 
         // Whenever we have a reservation, we should have a matching withdraw and transfer, so we should never
@@ -55,6 +55,7 @@ export class HubHauler extends Creep {
 
         //Fill the Link before the storage/terminal because the storage transfers can take a long time,
         // the link transfers are just 2 or 4 ticks long.
+
         if (this.reserveHubLinkTransfer()) return
         if (this.reserveHubLinkWithdraw()) return
 

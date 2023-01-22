@@ -1,5 +1,6 @@
 import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
 import { customLog, getRange, getRangeOfCoords } from 'international/utils'
+import { profiler } from 'other/screeps-profiler'
 
 Object.defineProperties(Creep.prototype, {
     dying: {
@@ -375,6 +376,8 @@ const additions = {
         },
     },
 } as PropertyDescriptorMap & (ThisType<Creep> | ThisType<PowerCreep>)
+
+/* profiler.registerObject(additions, 'creepAdditions') */
 
 Object.defineProperties(Creep.prototype, additions)
 Object.defineProperties(PowerCreep.prototype, additions)
