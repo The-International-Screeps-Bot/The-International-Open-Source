@@ -91,9 +91,9 @@ export interface Settings {
     logging: boolean
 
     /**
-     * Wether or not creeps should engage in a multi-tick public chant
+     * Wether or not creeps should use .say
      */
-    doChant: boolean
+    creepSay: boolean
 
     /**
      * The public segment number (0-100) that you and your allies are using
@@ -132,6 +132,6 @@ export const settings: Settings = {
     allyTrading: true,
     marketUsage: true,
     logging: false,
-    doChant: true,
+    creepSay: true,
     simpleAlliesSegment: 90,
 }

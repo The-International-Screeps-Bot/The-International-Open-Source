@@ -27,7 +27,7 @@ export class EndTickCreepManager {
                 creep.endTickManager()
                 creep.recurseMoveRequest()
 
-                if (creep.message.length) creep.say(creep.message)
+                if (Memory.creepSay && creep.message.length) creep.say(creep.message)
             }
         }
 
@@ -40,7 +40,7 @@ export class EndTickCreepManager {
                 creep.endTickManager()
                 creep.recurseMoveRequest()
 
-                if (creep.message.length) creep.say(creep.message)
+                if (Memory.creepSay && creep.message.length) creep.say(creep.message)
             }
         }
 
@@ -63,17 +63,19 @@ export class EndTickCreepManager {
      * If enabled and there is a chant this tick, have a random creeps that isn't on an exit say the chant
      */
     private runChant() {
-        if (!Memory.doChant) return
+        if (!Memory.creepSay) return
 
         const currentChant = chant[Memory.chantIndex]
         if (!currentChant) return
 
         let creeps: (Creep | PowerCreep)[] = this.roomManager.room.find(FIND_MY_POWER_CREEPS, {
-            filter: creep => !creep.isOnExit
+            filter: creep => !creep.isOnExit,
         })
-        creeps = creeps.concat(this.roomManager.room.find(FIND_MY_CREEPS, {
-            filter: creep => !creep.isOnExit
-        }))
+        creeps = creeps.concat(
+            this.roomManager.room.find(FIND_MY_CREEPS, {
+                filter: creep => !creep.isOnExit,
+            }),
+        )
 
         const creep = creeps[Math.floor(Math.random() * creeps.length)]
         if (creep) creep.say(currentChant, true)
