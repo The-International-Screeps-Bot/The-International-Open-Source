@@ -437,5 +437,3 @@ export class CommuneManager {
             !this.room.terminal)
     }
 }
-
-profiler.registerClass(CommuneManager, 'Commune')

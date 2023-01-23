@@ -23,64 +23,6 @@ function AlreadyWrappedError() {
 function setupProfiler() {
     depth = 0 // reset depth, this needs to be done each tick.
     parentFn = '(tick)'
-    Game.profiler = {
-        stream(duration, filter) {
-            setupMemory('stream', duration || 10, filter)
-        },
-        email(duration, filter) {
-            setupMemory('email', duration || 100, filter)
-        },
-        profile(duration: number = 100, filter?: any) {
-
-            setupMemory('profile', duration, filter)
-            return `Profiling for ${duration} ticks`
-        },
-        background(filter) {
-            setupMemory('background', false, filter)
-        },
-        callgrind() {
-            const id = `id${Math.random()}`
-            /* eslint-disable */
-            const download = `
-<script>
-  var element = document.getElementById('${id}');
-  if (!element) {
-    element = document.createElement('a');
-    element.setAttribute('id', '${id}');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,${encodeURIComponent(Profiler.callgrind())}');
-    element.setAttribute('download', 'callgrind.out.${Game.time}');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-  }
-</script>
-      `
-            /* eslint-enable */
-            console.log(
-                download
-                    .split('\n')
-                    .map(s => s.trim())
-                    .join(''),
-            )
-        },
-        restart() {
-            if (Profiler.isProfiling()) {
-                const filter = Memory.profiler.filter
-                let duration = false
-                if (!!Memory.profiler.disableTick) {
-                    // Calculate the original duration, profile is enabled on the tick after the first call,
-                    // so add 1.
-                    duration = Memory.profiler.disableTick - Memory.profiler.enabledTick + 1
-                }
-                const type = Memory.profiler.type
-                setupMemory(type, duration, filter)
-            }
-        },
-        reset: resetMemory,
-        output: Profiler.output,
-    }
 
     overloadCPUCalc()
 }
@@ -447,6 +389,66 @@ const Profiler = {
     shouldEmail() {
         return Profiler.type() === 'email' && Memory.profiler.disableTick === Game.time
     },
+}
+
+global.profiler = {
+    stream(duration, filter) {
+        setupMemory('stream', duration || 10, filter)
+    },
+    email(duration, filter) {
+        setupMemory('email', duration || 100, filter)
+    },
+    profile(duration: number = 100, filter?: any) {
+        if (!enabled) profiler.enable()
+
+        setupMemory('profile', duration, filter)
+        return `Profiling for ${duration} ticks`
+    },
+    background(filter) {
+        setupMemory('background', false, filter)
+    },
+    callgrind() {
+        const id = `id${Math.random()}`
+        /* eslint-disable */
+        const download = `
+<script>
+var element = document.getElementById('${id}');
+if (!element) {
+element = document.createElement('a');
+element.setAttribute('id', '${id}');
+element.setAttribute('href', 'data:text/plain;charset=utf-8,${encodeURIComponent(Profiler.callgrind())}');
+element.setAttribute('download', 'callgrind.out.${Game.time}');
+
+element.style.display = 'none';
+document.body.appendChild(element);
+
+element.click();
+}
+</script>
+  `
+        /* eslint-enable */
+        console.log(
+            download
+                .split('\n')
+                .map(s => s.trim())
+                .join(''),
+        )
+    },
+    restart() {
+        if (Profiler.isProfiling()) {
+            const filter = Memory.profiler.filter
+            let duration = false
+            if (!!Memory.profiler.disableTick) {
+                // Calculate the original duration, profile is enabled on the tick after the first call,
+                // so add 1.
+                duration = Memory.profiler.disableTick - Memory.profiler.enabledTick + 1
+            }
+            const type = Memory.profiler.type
+            setupMemory(type, duration, filter)
+        }
+    },
+    reset: resetMemory,
+    output: Profiler.output,
 }
 
 const profiler = {
