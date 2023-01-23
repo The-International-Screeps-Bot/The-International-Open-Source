@@ -575,7 +575,6 @@ export function findSquadTradeableParts(tradeTypes: { [tradeType: string]: numbe
 }
 
 export function isNearRoomEdge(coord: Coord, minRange: number) {
-
     if (coord.x <= minRange) return true
     if (coord.x - roomDimensions - 1 <= minRange) return true
     if (coord.y <= minRange) return true
@@ -588,11 +587,21 @@ export function isNearRoomEdge(coord: Coord, minRange: number) {
  * @param reverse Decreases priority as a percentage of capacity used
  */
 export function scalePriority(capacity: number, amount: number, multiplier: number = 1, reverse?: boolean) {
-
     if (reverse) {
-
         return (1 - amount / capacity) * multiplier
     }
 
-    return amount / capacity * multiplier
+    return (amount / capacity) * multiplier
+}
+
+export function makeRoomCoord(roomName: string) {
+    // Find the numbers in the room's name
+
+    let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/);
+
+    return {
+        name: name,
+        x: cx === 'W' ? ~x : parseInt(x),
+        y: cy === 'N' ? ~y : parseInt(y)
+    }
 }

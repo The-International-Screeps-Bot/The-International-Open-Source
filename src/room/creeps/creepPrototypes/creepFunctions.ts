@@ -235,6 +235,7 @@ Creep.prototype.advancedUpgradeController = function () {
                     },
                 ],
                 avoidEnemyRanges: true,
+                weightCostMatrix: 'defaultCostMatrix',
             })
 
             this.message += '➡️'
@@ -312,6 +313,7 @@ Creep.prototype.advancedUpgradeController = function () {
             origin: this.pos,
             goals: [{ pos: room.controller.pos, range: 3 }],
             avoidEnemyRanges: true,
+            weightCostMatrix: 'defaultCostMatrix',
         })
         return false
     }
@@ -327,6 +329,7 @@ Creep.prototype.advancedUpgradeController = function () {
             origin: this.pos,
             goals: [{ pos: room.controller.pos, range: 3 }],
             avoidEnemyRanges: true,
+            weightCostMatrix: 'defaultCostMatrix',
         })
 
         // Inform false
@@ -1474,6 +1477,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],
+            weightCostMatrix: 'defaultCostMatrix',
         })
 
         return RESULT_ACTION
@@ -1550,6 +1554,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],
+            weightCostMatrix: 'defaultCostMatrix',
         })
 
         return RESULT_ACTION

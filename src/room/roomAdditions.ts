@@ -20,6 +20,7 @@ import {
     packXYAsNum,
     unpackNumAsPos,
     findFunctionCPU,
+    areCoordsEqual,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { profiler } from 'other/screeps-profiler'
@@ -222,7 +223,6 @@ const roomAdditions = {
     },
     structureCoords: {
         get() {
-
             if (this.global.structureCoords && !this.structureUpdate) return this.global.structureCoords
 
             // Construct storage of structures based on structureType
@@ -965,7 +965,9 @@ const roomAdditions = {
 
             this.global.upgradePositions.push(this.global.upgradePositions.shift())
 
-            this.global.upgradePositions.splice(0, 0, centerUpgradePos)
+            // Make the center pos the first to be chosen (we want upgraders to stand on the container)
+
+            this.global.upgradePositions.unshift(centerUpgradePos)
 
             return this.global.upgradePositions
         },
@@ -2152,6 +2154,109 @@ const roomAdditions = {
 
             if (this.memory.T === 'remote') return (this._advancedLogistics = true)
             return (this._advancedLogistics = this.storage !== undefined || this.terminal !== undefined)
+        },
+    },
+    defaultCostMatrix: {
+        get() {
+            if (this._defaultCostMatrix) return this._defaultCostMatrix
+            /*
+            if (this.global.defaultCostMatrix) {
+                return (this._defaultCostMatrix = PathFinder.CostMatrix.deserialize(this.global.defaultCostMatrix))
+            }
+ */
+            const cm = new PathFinder.CostMatrix()
+
+            for (const road of this.structures.road) cm.set(road.pos.x, road.pos.y, 1)
+
+            // Loop through them
+
+            for (const index in this.sources) {
+                // Loop through each position of harvestPositions, have creeps prefer to avoid
+
+                for (const pos of this.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
+            }
+
+            if (this.anchor) {
+                // The last upgrade position should be the deliver pos, which we want to weight normal
+
+                const upgradePositions = this.upgradePositions
+                upgradePositions.pop()
+
+                // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
+
+                for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
+            }
+
+            // Get the hubAnchor
+
+            const hubAnchor =
+                this.memory.stampAnchors && this.memory.stampAnchors.hub[0]
+                    ? unpackNumAsPos(this.memory.stampAnchors.hub[0], this.name)
+                    : undefined
+
+            // If the hubAnchor is defined
+
+            if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
+
+            // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+            for (const pos of this.fastFillerPositions) cm.set(pos.x, pos.y, 10)
+
+            for (const portal of this.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+
+            // Loop trough each construction site belonging to an ally
+
+            for (const cSite of this.allyCSites) cm.set(cSite.pos.x, cSite.pos.y, 255)
+
+            // The controller isn't in safemode or it isn't ours, avoid enemies
+
+            if (!this.controller || !this.controller.safeMode || !this.controller.my) {
+                for (const packedCoord of this.enemyThreatCoords) {
+                    const coord = unpackCoord(packedCoord)
+                    cm.set(coord.x, coord.y, 255)
+                }
+            }
+
+            if (!this.controller || !this.controller.safeMode) {
+                for (const creep of this.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
+                for (const creep of this.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
+
+                for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
+            }
+
+            for (const rampart of this.structures.rampart) {
+                // If the rampart is mine
+
+                if (rampart.my) continue
+
+                // If the rampart is public and owned by an ally
+                // We don't want to try to walk through enemy public ramparts as it could trick our pathing
+
+                if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username)) continue
+
+                // Otherwise set the rampart's pos as impassible
+
+                cm.set(rampart.pos.x, rampart.pos.y, 255)
+            }
+
+            // Loop through structureTypes of impassibleStructureTypes
+
+            for (const structureType of impassibleStructureTypes) {
+                for (const structure of this.structures[structureType]) {
+                    // Set pos as impassible
+
+                    cm.set(structure.pos.x, structure.pos.y, 255)
+                }
+
+                for (const cSite of this.cSites[structureType]) {
+                    // Set pos as impassible
+
+                    cm.set(cSite.pos.x, cSite.pos.y, 255)
+                }
+            }
+
+            /* this.global.defaultCostMatrix = cm.serialize() */
+            return (this._defaultCostMatrix = cm)
         },
     },
 } as PropertyDescriptorMap & ThisType<Room>

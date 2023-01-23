@@ -218,6 +218,7 @@ export class RemoteHauler extends Creep {
             {
                 packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                 remoteName: this.memory.RN,
+                loose: true,
             },
         )
 
@@ -264,6 +265,7 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                     remoteName: this.memory.RN,
+                    loose: true,
                 },
             )
 
@@ -333,6 +335,7 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                     remoteName: this.memory.RN,
+                    loose: true,
                 },
             )
 
@@ -361,6 +364,7 @@ export class RemoteHauler extends Creep {
             },
             {
                 packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+                loose: true,
             },
         )
 
@@ -378,11 +382,7 @@ export class RemoteHauler extends Creep {
         if (creepAtPos.role !== 'remoteHauler') return false
         if (creepAtPos.movedResource) return false
         if (!creepAtPos.freeNextStore) return false
-        if (
-            creepAtPos.freeNextStore !== this.usedNextStore &&
-            creepAtPos.store.getCapacity() !== this.store.getCapacity()
-        )
-            return false
+        if (creepAtPos.freeNextStore !== this.usedNextStore) return false
 
         this.transfer(creepAtPos, RESOURCE_ENERGY)
 
@@ -401,13 +401,6 @@ export class RemoteHauler extends Creep {
         delete this.moved
         delete creepAtPos.moved
 
-        // Trade memory
-        /*
-        const newCreepAtPosMemory = JSON.parse(JSON.stringify(this.memory))
-
-        this.memory = creepAtPos.memory
-        creepAtPos.memory = newCreepAtPosMemory
- */
         // Delete old values
 
         delete this.memory.P

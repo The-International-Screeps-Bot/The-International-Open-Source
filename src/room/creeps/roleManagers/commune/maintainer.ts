@@ -46,6 +46,7 @@ export class Maintainer extends Creep {
                 origin: this.pos,
                 goals: [{ pos: repairTarget.pos, range: 3 }],
                 avoidEnemyRanges: true,
+                weightCostMatrix: 'defaultCostMatrix',
             })
 
             return false
@@ -105,6 +106,7 @@ export class Maintainer extends Creep {
             origin: this.pos,
             goals: [{ pos: repairTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
+            weightCostMatrix: 'defaultCostMatrix',
         })
 
         return true

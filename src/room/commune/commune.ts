@@ -7,6 +7,7 @@ import {
     findObjectWithID,
     getRange,
     getRangeOfCoords,
+    makeRoomCoord,
     unpackNumAsCoord,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
@@ -230,11 +231,14 @@ export class CommuneManager {
     }
 
     private test() {
+
+        customLog('room name', JSON.stringify(makeRoomCoord(this.room.name)))
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
 
-        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, {
+        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
         })
     }

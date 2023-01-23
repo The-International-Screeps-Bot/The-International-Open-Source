@@ -195,7 +195,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (roomMemory.SPs.length) {
                     for (const path of Game.rooms[roomName].sourcePaths) {
                         for (const pos of path) {
-
                             if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
                             opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                         }
@@ -228,9 +227,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
 
             roomCallback(roomName) {
-                // Get the room using the roomName
-
-                const room = Game.rooms[roomName]
 
                 // If the room is not allowed
 
@@ -238,9 +234,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 /* const roomMemory = Memory.rooms[roomName] */
 
-                // Create a costMatrix for the room
-
-                const cm = new PathFinder.CostMatrix()
+                const room = Game.rooms[roomName]
+                const cm = (room && opts.weightCostMatrix) ? room[opts.weightCostMatrix as keyof Room] as CostMatrix : new PathFinder.CostMatrix()
 
                 // If there is no route
 
@@ -267,6 +262,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     x = roomDimensions - 1
                     for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
                 }
+
+                if (opts.weightCostMatrix) return cm
 
                 /* if (room) room.visualizeCostMatrix(cm) */
 
@@ -295,9 +292,22 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                // If there is no vision in the room, inform the costMatrix
+                // If we have no vision in the room
 
                 if (!room) return cm
+
+                // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
+
+                if (
+                    opts.creep &&
+                    (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) &&
+                    (!opts.weightStructures || !opts.weightStructures.road)
+                ) {
+                    let roadCost = 1
+                    if (!opts.creep.memory.R) roadCost = opts.plainCost
+
+                    for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
+                }
 
                 // If avoidStationaryPositions is requested
 
@@ -310,29 +320,15 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                         for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
                     }
 
-                    // If the anchor is defined
-
                     if (room.anchor) {
-                        // Get the upgradePositions, and use the anchor to find the closest upgradePosition to the anchor
+                        // The last upgrade position should be the deliver pos, which we want to weight normal
 
                         const upgradePositions = room.upgradePositions
-                        const deliverUpgradePos = room.anchor.findClosestByPath(upgradePositions, {
-                            ignoreCreeps: true,
-                            ignoreDestructibleStructures: true,
-                            ignoreRoads: true,
-                        })
+                        upgradePositions.pop()
 
                         // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 
-                        for (const pos of upgradePositions) {
-                            // If the pos and deliverUpgradePos are the same, iterate
-
-                            if (areCoordsEqual(pos, deliverUpgradePos)) continue
-
-                            // Otherwise have the creep prefer to avoid the pos
-
-                            cm.set(pos.x, pos.y, 10)
-                        }
+                        for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
                     }
 
                     // Get the hubAnchor
@@ -349,19 +345,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
                     for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
-                }
-
-                // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
-
-                if (
-                    opts.creep &&
-                    (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) &&
-                    (!opts.weightStructures || !opts.weightStructures.road)
-                ) {
-                    let roadCost = 1
-                    if (!opts.creep.memory.R) roadCost = opts.plainCost
-
-                    for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
                 }
 
                 // Weight structures
@@ -524,7 +507,7 @@ Room.prototype.scoutByRoomName = function () {
     const EW = parseInt(EWstring)
     const NS = parseInt(NSstring)
 
-    // Use the numbers to deduce some room types - quickly!
+    // Use the numbers to deduce some room types - cheaply!
 
     if (EW % 10 === 0 && NS % 10 === 0) return (this.memory.T = 'intersection')
     if (EW % 10 === 0 || NS % 10 === 0) return (this.memory.T = 'highway')
@@ -2353,13 +2336,12 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     // Make sure we are not infringing on the threshold
 
     if (args.target instanceof Resource) {
-
         amount = (args.target as Resource).reserveAmount
 
         if (amount < 1) return RESULT_FAIL
     } else if (args.type === 'transfer') {
-
-        if (args.target.reserveStore[args.resourceType] >= args.target.store.getCapacity(args.resourceType)) return RESULT_FAIL
+        if (args.target.reserveStore[args.resourceType] >= args.target.store.getCapacity(args.resourceType))
+            return RESULT_FAIL
 
         amount = args.target.freeReserveStoreOf(args.resourceType)
         /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
@@ -2393,19 +2375,15 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     })
 }
 
-Room.prototype.findStructureAtCoord = function(coord, structureType) {
-
+Room.prototype.findStructureAtCoord = function (coord, structureType) {
     return this.findStructureAtXY(coord.x, coord.y, structureType)
 }
 
-
-Room.prototype.findStructureAtXY = function(x, y, structureType) {
-
+Room.prototype.findStructureAtXY = function (x, y, structureType) {
     const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
     if (!structureIDs) return false
 
     for (const ID of structureIDs) {
-
         const structure = findObjectWithID(ID)
         if (structure.structureType !== structureType) continue
 

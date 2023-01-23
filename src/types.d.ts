@@ -33,6 +33,13 @@ declare global {
         y: number
     }
 
+    interface roomCoord extends Coord {
+        /**
+         * The name of the room
+         */
+        name: string
+    }
+
     interface Rect {
         x1: number
         y1: number
@@ -180,7 +187,12 @@ declare global {
         weightCoords?: { [roomName: string]: { [packedCoord: string]: number } }
 
         /**
-         *
+         * The name of the costMatrix to weight. Will apply minimal alterations in use
+         */
+        weightCostMatrix?: string
+
+        /**
+         * The names of the costMatrixes to weight. Will apply onto cost matrix in use
          */
         weightCostMatrixes?: string[]
 
@@ -817,14 +829,14 @@ declare global {
     interface RoomGlobal {
         [key: string]: any
 
-        // RoomObjects
+        //
 
         stampAnchors: StampAnchors
 
+        // Paths
+
         source1PathLength: number
-
         source2PathLength: number
-
         upgradePathLength: number
 
         // Containers
@@ -850,6 +862,10 @@ declare global {
         controllerLink: Id<StructureLink> | undefined
         fastFillerLink: Id<StructureLink> | undefined
         hubLink: Id<StructureLink> | undefined
+
+        //
+
+        defaultCostMatrix: number[]
     }
 
     interface Room {
@@ -1421,6 +1437,9 @@ declare global {
 
         _advancedLogistics: boolean
         readonly advancedLogistics: boolean
+
+        _defaultCostMatrix: CostMatrix
+        defaultCostMatrix: CostMatrix
     }
 
     interface DepositRecord {
