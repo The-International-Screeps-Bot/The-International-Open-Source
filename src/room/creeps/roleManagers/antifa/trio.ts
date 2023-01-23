@@ -66,7 +66,7 @@ export class Trio {
 
         if (!this.getInFormation()) return
 
-        this.leader.say('IF')
+        this.leader.message = 'IF'
 
         if (this.leader.room.enemyDamageThreat && this.runCombat()) return
 
@@ -127,7 +127,7 @@ export class Trio {
             }
         }
 
-        this.leader.say('GIF')
+        this.leader.message = 'GIF'
 
         this.members[1].createMoveRequest({
             origin: this.members[1].pos,
@@ -151,7 +151,7 @@ export class Trio {
             this.holdFormation()
             return
         }
-        this.leader.say('x')
+        this.leader.message = 'x'
         if (!moveLeader.createMoveRequest(opts)) return
 
         if (getRangeOfCoords(this.leader.pos, this.members[1].pos) > 1) {
@@ -197,7 +197,7 @@ export class Trio {
 
             if (this.leader.passiveHeal()) return true
 
-            this.leader.say('EC')
+            this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
             if (Memory.roomVisuals)
@@ -291,7 +291,7 @@ export class Trio {
             return true
         }
 
-        this.leader.say('AEA')
+        this.leader.message = 'AEA'
 
         if (range === 1) this.leader.rangedMassAttack()
         else this.leader.rangedAttack(enemyAttacker)
@@ -374,7 +374,7 @@ export class Trio {
 
             if (!enemyCreeps.length) return this.attackStructures()
 
-            this.leader.say('EC')
+            this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
             if (Memory.roomVisuals)

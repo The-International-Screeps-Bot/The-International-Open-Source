@@ -1,6 +1,6 @@
 import { chant, customColors, powerCreepClassNames } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, randomTick } from 'international/utils'
+import { customLog, randomRange, randomTick } from 'international/utils'
 import { RoomManager } from '../room'
 
 export class EndTickCreepManager {
@@ -65,6 +65,11 @@ export class EndTickCreepManager {
         const currentChant = chant[Memory.chantIndex]
         if (!currentChant) return
 
+        let creeps: (Creep | PowerCreep)[] = this.roomManager.room.find(FIND_MY_POWER_CREEPS)
+        let creep = creeps[Math.floor(Math.random() * creeps.length)]
+        if (creep) creep.say(currentChant, true)
+
+        /*
         // Power creeps go first
 
         for (const className of powerCreepClassNames) {
@@ -74,7 +79,13 @@ export class EndTickCreepManager {
                 creep.say(currentChant, true)
             }
         }
+        */
 
+        creeps = this.roomManager.room.find(FIND_MY_CREEPS)
+        creep = creeps[Math.floor(Math.random() * creeps.length)]
+        if (creep) creep.say(currentChant, true)
+
+        /*
         // Normal creeps go second
 
         for (const role in this.roomManager.room.myCreeps)
@@ -83,5 +94,6 @@ export class EndTickCreepManager {
 
                 creep.say(currentChant, true)
             }
+        */
     }
 }

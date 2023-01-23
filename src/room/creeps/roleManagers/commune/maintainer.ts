@@ -42,7 +42,6 @@ export class Maintainer extends Creep {
         // Move to target if out of range
 
         if (getRangeOfCoords(this.pos, repairTarget.pos) > 3) {
-
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: repairTarget.pos, range: 3 }],
@@ -80,7 +79,6 @@ export class Maintainer extends Creep {
         // If the structure is a rampart, continue repairing it
 
         if (repairTarget.structureType === STRUCTURE_RAMPART) return true
-
         // Otherwise if it isn't a rampart and it will be viable to repair next tick
         else if (repairTarget.hitsMax - repairTarget.nextHits >= workPartCount * REPAIR_POWER) return true
 
@@ -163,7 +161,7 @@ export class Maintainer extends Creep {
         const cSiteTarget = this.room.cSiteTarget
         if (cSiteTarget && cSiteTarget.structureType === STRUCTURE_SPAWN) {
             this.advancedBuild()
-            this.say(this.message)
+
             return
         }
 

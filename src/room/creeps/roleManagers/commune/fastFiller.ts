@@ -12,7 +12,7 @@ export class FastFiller extends Creep {
 
         // Otherwise, make a move request to it
 
-        this.say('⏩F')
+        this.message = '⏩F'
 
         this.createMoveRequest({
             origin: this.pos,
@@ -27,7 +27,7 @@ export class FastFiller extends Creep {
     findFastFillerPos?() {
         const { room } = this
 
-        this.say('FFP')
+        this.message = 'FFP'
 
         // Stop if the creep already has a packedFastFillerPos
 
@@ -54,7 +54,7 @@ export class FastFiller extends Creep {
     fillFastFiller?(): boolean {
         const { room } = this
 
-        this.say('💁')
+        this.message = '💁'
 
         // If the creep has a non-energy resource
 
@@ -62,7 +62,7 @@ export class FastFiller extends Creep {
             for (const resourceType in this.store) {
                 if (resourceType == RESOURCE_ENERGY) continue
 
-                this.say('WR')
+                this.message = 'WR'
 
                 this.drop(resourceType as ResourceConstant)
                 return true
@@ -99,7 +99,7 @@ export class FastFiller extends Creep {
 
                         if (resourceType === RESOURCE_ENERGY) continue
 
-                        this.say('WCR')
+                        this.message = 'WCR'
 
                         this.withdraw(structure, resourceType as ResourceConstant)
 
@@ -133,7 +133,7 @@ export class FastFiller extends Creep {
 
                 // Otherwise, withdraw from the structure and inform true
 
-                this.say('W')
+                this.message = 'W'
 
                 this.withdraw(structure, RESOURCE_ENERGY)
                 return true
@@ -174,7 +174,7 @@ export class FastFiller extends Creep {
 
             // Otherwise, transfer to the structure record the action and inform true
 
-            this.say('T')
+            this.message = 'T'
 
             this.transfer(structure, RESOURCE_ENERGY)
             structure.nextStore.energy += this.store.energy
@@ -188,7 +188,7 @@ export class FastFiller extends Creep {
 
               if (container.store.getCapacity() - container.store.energy < this.store.energy) continue
 
-              this.say('FC')
+              this.message = ('FC')
 
               this.transfer(container, RESOURCE_ENERGY)
               return true
@@ -213,7 +213,7 @@ export class FastFiller extends Creep {
 
             creep.passiveRenew()
 
-            /* creep.say('🚬') */
+            /* creep.message = ('🚬') */
         }
     }
 }

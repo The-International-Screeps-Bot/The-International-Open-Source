@@ -44,7 +44,6 @@ export class RemoteDismantler extends Creep {
     }
 
     hasValidRemote?() {
-
         if (!this.memory.RN) return false
 
         const remoteMemory = Memory.rooms[this.memory.RN]
@@ -73,7 +72,6 @@ export class RemoteDismantler extends Creep {
         // Loop through each remote name
 
         for (const roomName of remoteNamesByEfficacy) {
-
             const roomMemory = Memory.rooms[roomName]
             if (roomMemory.data[RemoteData[role]] <= 0) continue
 
@@ -96,7 +94,12 @@ export class RemoteDismantler extends Creep {
     advancedDismantle?(): boolean {
         const { room } = this
 
-        if (this.room.controller && this.room.controller.owner && Memory.allyPlayers.includes(this.room.controller.owner.username)) return true
+        if (
+            this.room.controller &&
+            this.room.controller.owner &&
+            Memory.allyPlayers.includes(this.room.controller.owner.username)
+        )
+            return true
 
         let target
         let range
@@ -189,7 +192,7 @@ export class RemoteDismantler extends Creep {
                 continue
             }
 
-            creep.say(creep.memory.RN)
+            creep.message = creep.memory.RN
 
             // If the creep is its remote
 

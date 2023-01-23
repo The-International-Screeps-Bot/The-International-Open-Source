@@ -115,7 +115,7 @@ export class RemoteDefender extends Creep {
 
             if (this.passiveHeal()) return true
 
-            this.say('EC')
+            this.message = 'EC'
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             // Get the range between the creeps
@@ -167,7 +167,7 @@ export class RemoteDefender extends Creep {
             return true
         }
 
-        this.say('AEA')
+        this.message = 'AEA'
 
         // Otherwise, have the creep pre-heal itself
 
@@ -283,7 +283,7 @@ export class RemoteDefender extends Creep {
                 continue
             }
 
-            creep.say(creep.memory.RN)
+            creep.message = creep.memory.RN
 
             // Try to attack enemyAttackers, iterating if there are none or one was attacked
 

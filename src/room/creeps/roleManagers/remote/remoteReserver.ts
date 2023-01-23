@@ -19,7 +19,6 @@ export class RemoteReserver extends Creep {
     }
 
     hasValidRemote?() {
-
         if (!this.memory.RN) return false
 
         const remoteMemory = Memory.rooms[this.memory.RN]
@@ -56,7 +55,6 @@ export class RemoteReserver extends Creep {
     }
 
     preTickManager() {
-
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'remoteReserver'
@@ -110,7 +108,7 @@ export class RemoteReserver extends Creep {
                 continue
             }
 
-            creep.say(creep.memory.RN)
+            creep.message = creep.memory.RN
 
             // If the creep is in the remote
 

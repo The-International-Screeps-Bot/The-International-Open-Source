@@ -25,7 +25,6 @@ export class RemoteCoreAttacker extends Creep {
     }
 
     preTickManager(): void {
-
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'remoteCoreAttacker'
@@ -45,7 +44,6 @@ export class RemoteCoreAttacker extends Creep {
     }
 
     hasValidRemote?() {
-
         if (!this.memory.RN) return false
 
         const remoteMemory = Memory.rooms[this.memory.RN]
@@ -73,7 +71,6 @@ export class RemoteCoreAttacker extends Creep {
         // Loop through each remote name
 
         for (const roomName of remoteNamesByEfficacy) {
-
             const roomMemory = Memory.rooms[roomName]
             if (roomMemory.data[RemoteData[role]] <= 0) continue
 
@@ -107,7 +104,7 @@ export class RemoteCoreAttacker extends Creep {
         // If the creep at the core
 
         if (getRange(this.pos.x, closestCore.pos.x, this.pos.y, closestCore.pos.y) === 1) {
-            this.say('🗡️C')
+            this.message = '🗡️C'
 
             this.attack(closestCore)
             return true
@@ -115,7 +112,7 @@ export class RemoteCoreAttacker extends Creep {
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.say('⏩C')
+        this.message = '⏩C'
 
         this.createMoveRequest({
             origin: this.pos,
@@ -157,7 +154,7 @@ export class RemoteCoreAttacker extends Creep {
                 continue
             }
 
-            creep.say(creep.memory.RN)
+            creep.message = creep.memory.RN
 
             if (creep.advancedAttackCores()) continue
 

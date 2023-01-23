@@ -62,7 +62,7 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            creep.say(creep.memory.TRN)
+            creep.message = creep.memory.TRN
 
             if (room.name === creep.memory.TRN) {
                 creep.claimRoom()

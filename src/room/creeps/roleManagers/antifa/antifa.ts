@@ -166,7 +166,7 @@ export class Antifa extends Creep {
 
     runSingle?() {
         const { room } = this
-        this.say('S')
+        this.message = 'S'
         // In attackTarget
 
         if (this.memory.CRN === room.name) {
@@ -254,7 +254,7 @@ export class Antifa extends Creep {
 
             if (this.passiveHeal()) return true
 
-            this.say('EC')
+            this.message = 'EC'
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             if (Memory.roomVisuals)
@@ -311,7 +311,7 @@ export class Antifa extends Creep {
             return true
         }
 
-        this.say('AEA')
+        this.message = 'AEA'
 
         // Have the creep pre-heal itself
 
@@ -354,7 +354,7 @@ export class Antifa extends Creep {
     }
 
     rangedAttackStructures?() {
-        this.say('RAS')
+        this.message = 'RAS'
 
         const structures = this.room.combatStructureTargets
 
@@ -417,7 +417,7 @@ export class Antifa extends Creep {
 
             if (!enemyCreeps.length) return this.attackStructures()
 
-            this.say('EC')
+            this.message = 'EC'
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             if (Memory.roomVisuals)
@@ -468,7 +468,7 @@ export class Antifa extends Creep {
     }
 
     attackStructures?() {
-        this.say('AS')
+        this.message = 'AS'
 
         const structures = this.room.combatStructureTargets
 

@@ -34,7 +34,7 @@ export class SourceHarvester extends Creep {
     }
 
     travelToSource?(): boolean {
-        this.say('🚬')
+        this.message = '🚬'
 
         // Unpack the harvestPos
 
@@ -51,7 +51,7 @@ export class SourceHarvester extends Creep {
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.say(`⏩${this.memory.SI}`)
+        this.message = `⏩${this.memory.SI}`
 
         if (this.memory.PC === packCoord(this.room.sourcePositions[this.memory.SI][0])) {
             this.createMoveRequestByPath(
@@ -177,7 +177,7 @@ export class SourceHarvester extends Creep {
 
             // Add repair points to total repairPoints counter and say the success
             globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
-            this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
+            this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
 
             // Inform success
 

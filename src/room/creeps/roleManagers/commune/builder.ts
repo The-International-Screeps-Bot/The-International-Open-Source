@@ -22,8 +22,6 @@ export class Builder extends Creep {
 
     run?() {
         if (this.advancedBuild() === RESULT_FAIL) this.advancedRecycle()
-
-        this.say(this.message)
     }
 
     static builderManager(room: Room, creepsOfRole: string[]) {

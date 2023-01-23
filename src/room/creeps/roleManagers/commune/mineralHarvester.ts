@@ -4,13 +4,11 @@ import { reverseCoordList, unpackPos } from 'other/packrat'
 
 export class MineralHarvester extends Creep {
     preTickManager() {
-
         this.room.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
     }
 
     advancedHarvestMineral?(mineral: Mineral): boolean {
-
-        this.say('🚬')
+        this.message = '🚬'
 
         // Unpack the creep's packedHarvestPos
 
@@ -20,19 +18,21 @@ export class MineralHarvester extends Creep {
         // If the creep is not standing on the harvestPos
 
         if (getRangeOfCoords(this.pos, harvestPos) > 0) {
-            this.say('⏩M')
+            this.message = '⏩M'
 
             // Make a move request to it
 
-            this.createMoveRequestByPath({
-                origin: this.pos,
-                goals: [{ pos: harvestPos, range: 0 }],
-                avoidEnemyRanges: true,
-            },
-            {
-                packedPath: reverseCoordList(this.room.memory.MPa),
-                loose: true,
-            })
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [{ pos: harvestPos, range: 0 }],
+                    avoidEnemyRanges: true,
+                },
+                {
+                    packedPath: reverseCoordList(this.room.memory.MPa),
+                    loose: true,
+                },
+            )
 
             // And inform false
 
@@ -46,9 +46,9 @@ export class MineralHarvester extends Creep {
         // Find amount of minerals harvested and record it in data
 
         const mineralsHarvested = Math.min(this.parts.work * HARVEST_MINERAL_POWER, mineral.mineralAmount)
-            globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
+        globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
 
-        this.say(`⛏️${mineralsHarvested}`)
+        this.message = `⛏️${mineralsHarvested}`
         return true
     }
 

@@ -127,7 +127,7 @@ export class Operator extends PowerCreep {
     }
 
     advancedGenerateOps?() {
-        this.say('AGO')
+        this.message = 'AGO'
 
         if (this.powered) return false
 

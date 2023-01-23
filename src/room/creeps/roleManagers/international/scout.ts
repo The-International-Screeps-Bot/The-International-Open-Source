@@ -71,7 +71,6 @@ export class Scout extends Creep {
     }
 
     findBestScoutTarget?() {
-
         this.findScoutTargets()
 
         // Find the closest room to the creep's commune
@@ -151,7 +150,7 @@ export class Scout extends Creep {
 
         if (room.name !== this.memory.siT) return true
 
-        this.say('🔤')
+        this.message = '🔤'
 
         // Construct the signMessage
 
@@ -202,7 +201,7 @@ export class Scout extends Creep {
             )
                 return true
 
-            this.say(this.moveRequest.toString())
+            this.message = this.moveRequest.toString()
 
             return false
         }
@@ -227,7 +226,7 @@ export class Scout extends Creep {
             // If the creep is in the scoutTarget
 
             if (creep.memory.scT === room.name) {
-                creep.say('👁️')
+                creep.message = '👁️'
 
                 // Get information about the room
 
@@ -248,7 +247,7 @@ export class Scout extends Creep {
 
             // Say the scoutTarget
 
-            creep.say(`🔭${creep.memory.scT.toString()}`)
+            creep.message = `🔭${creep.memory.scT.toString()}`
 
             if (!creep.advancedSignController()) continue
 
@@ -256,19 +255,20 @@ export class Scout extends Creep {
 
             // Try to go to the scoutTarget
 
-            if (creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.scT),
-                        range: 25,
-                    },
-                ],
-                avoidEnemyRanges: true,
-                plainCost: 1,
-                swampCost: 1,
-            }) === 'unpathable') {
-
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory.scT),
+                            range: 25,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    plainCost: 1,
+                    swampCost: 1,
+                }) === 'unpathable'
+            ) {
                 let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory.scT]
                 if (!roomMemory) roomMemory = (Memory.rooms[creep.memory.scT] as Partial<RoomMemory>) = {}
 

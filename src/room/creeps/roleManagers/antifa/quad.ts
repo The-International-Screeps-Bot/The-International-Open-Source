@@ -223,7 +223,7 @@ export class Quad {
     }
 
     run() {
-        this.leader.say(this.type)
+        this.leader.message = this.type
 
         this.passiveHealQuad()
 
@@ -234,7 +234,7 @@ export class Quad {
             return
         }
 
-        this.leader.say('IF')
+        this.leader.message = 'IF'
 
         if (this.leader.room.enemyDamageThreat && this.runCombat()) return
 
@@ -747,7 +747,7 @@ export class Quad {
             if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps
             if (!enemyCreeps.length) return false
 
-            this.leader.say('EC')
+            this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
             if (Memory.roomVisuals)
@@ -759,7 +759,7 @@ export class Quad {
             // Get the range between the creeps
 
             const range = this.findMinRange(enemyCreep.pos)
-            this.leader.say(range.toString())
+            this.leader.message = range.toString()
 
             if (range <= 3) {
                 this.target = enemyCreep
@@ -830,7 +830,7 @@ export class Quad {
             return true
         }
 
-        this.leader.say('AEA')
+        this.leader.message = 'AEA'
 
         this.target = enemyAttacker
         this.passiveRangedAttack()

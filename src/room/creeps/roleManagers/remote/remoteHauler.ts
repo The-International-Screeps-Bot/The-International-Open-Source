@@ -195,7 +195,6 @@ export class RemoteHauler extends Creep {
         const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
         this.message += this.memory.RN
-        this.say(this.message)
 
         this.createMoveRequestByPath(
             {
@@ -310,7 +309,6 @@ export class RemoteHauler extends Creep {
             if (!this.findRemote()) return false
 
             this.message += this.memory.RN
-            this.say(this.message)
 
             const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
 
@@ -342,7 +340,6 @@ export class RemoteHauler extends Creep {
         }
 
         this.message += this.commune.name
-        this.say(this.message)
 
         this.createMoveRequestByPath(
             {

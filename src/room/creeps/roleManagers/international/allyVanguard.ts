@@ -111,7 +111,7 @@ export class AllyVanguard extends Creep {
     travelToSource?(sourceIndex: number): boolean {
         const { room } = this
 
-        this.say('🚬')
+        this.message = '🚬'
 
         const harvestPos = this.findSourcePos(this.memory.SI)
         if (!harvestPos) return true
@@ -122,7 +122,7 @@ export class AllyVanguard extends Creep {
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.say(`⏩ ${sourceIndex}`)
+        this.message = `⏩ ${sourceIndex}`
 
         this.createMoveRequest({
             origin: this.pos,
@@ -186,7 +186,7 @@ export class AllyVanguard extends Creep {
 
             const request = creep.memory.TRN
 
-            creep.say(request)
+            creep.message = request
 
             if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
                 creep.buildRoom()

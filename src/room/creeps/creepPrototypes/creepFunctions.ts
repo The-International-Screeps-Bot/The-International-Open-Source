@@ -160,7 +160,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Harvest the source, informing the result if it didn't succeed
 
     if (harvestResult !== OK) {
-        this.say(`⛏️${harvestResult} ${source.index}`)
+        this.message = `⛏️${harvestResult} ${source.index}`
         return false
     }
 
@@ -174,7 +174,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
     globalStatsUpdater(this.room.name, 'eih', energyHarvested)
 
-    this.say(`⛏️${energyHarvested}`)
+    this.message = `⛏️${energyHarvested}`
     return true
 }
 
@@ -295,7 +295,6 @@ Creep.prototype.advancedUpgradeController = function () {
             }
         }
 
-        this.say(this.message)
         return true
     }
 
@@ -343,7 +342,7 @@ Creep.prototype.advancedUpgradeController = function () {
         const energySpentOnUpgrades = Math.min(this.nextStore.energy, this.parts.work * UPGRADE_CONTROLLER_POWER)
 
         globalStatsUpdater(this.room.name, 'eou', energySpentOnUpgrades)
-        this.say(`🔋${energySpentOnUpgrades}`)
+        this.message = `🔋${energySpentOnUpgrades}`
 
         // Inform true
 
@@ -478,12 +477,12 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     if (!cSiteTarget) return false
 
-    this.say('ABCS')
+    this.message = 'ABCS'
 
     // If the cSite is out of range
 
     if (getRange(this.pos.x, cSiteTarget.pos.x, this.pos.y, cSiteTarget.pos.y) > 3) {
-        this.say('➡️CS')
+        this.message = '➡️CS'
 
         // Make a move request to it
 
@@ -518,7 +517,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
         // Add control points to total controlPoints counter and say the success
 
         globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
-        this.say(`🚧${energySpentOnConstruction}`)
+        this.message = `🚧${energySpentOnConstruction}`
 
         // Inform true
 
@@ -555,7 +554,6 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 }
 
 Creep.prototype.findNewRepairTarget = function () {
-
     let possibleRepairTargets: Structure<BuildableStructureConstant>[] = this.room.structures.road
     possibleRepairTargets = possibleRepairTargets.concat(this.room.structures.container)
 
@@ -595,7 +593,7 @@ Creep.prototype.findRepairTarget = function () {
 Creep.prototype.findOptimalSourceIndex = function () {
     const { room } = this
 
-    this.say('FOSN')
+    this.message = 'FOSN'
 
     if (this.memory.SI !== undefined) return true
     if (!room.anchor) return false
@@ -629,7 +627,7 @@ Creep.prototype.findOptimalSourceIndex = function () {
 Creep.prototype.findSourcePos = function (index) {
     const { room } = this
 
-    this.say('FSHP')
+    this.message = 'FSHP'
 
     // Stop if the creep already has a packedHarvestPos
 
@@ -653,7 +651,7 @@ Creep.prototype.findSourcePos = function (index) {
 Creep.prototype.findMineralHarvestPos = function () {
     const { room } = this
 
-    this.say('FMHP')
+    this.message = 'FMHP'
 
     // Stop if the creep already has a packedHarvestPos
 
@@ -733,7 +731,7 @@ Creep.prototype.advancedRecycle = function () {
     // If the target is a spawn
 
     if (recycleTarget instanceof StructureSpawn) {
-        this.say('♻️ S')
+        this.message = '♻️ S'
 
         // If the recycleTarget is out of actionable range, move to it
 
@@ -754,7 +752,7 @@ Creep.prototype.advancedRecycle = function () {
 
     // Otherwise if the target is a container
 
-    this.say('♻️ C')
+    this.message = '♻️ C'
 
     if (range === 0) {
         const spawn = findClosestObject(this.pos, room.structures.spawn)
@@ -861,21 +859,21 @@ Creep.prototype.advancedReserveController = function () {
         if (controller.reservation && controller.reservation.username !== Memory.me) {
             // Try to attack it, informing the result
 
-            this.say('🗡️')
+            this.message = '🗡️'
 
             return this.attackController(controller) === OK
         }
 
         // Try to reserve it, informing the result
 
-        this.say('🤳')
+        this.message = '🤳'
 
         return this.reserveController(controller) === OK
     }
 
     // Otherwise, make a move request to it and inform true
 
-    this.say('⏩🤳')
+    this.message = '⏩🤳'
 
     this.createMoveRequest({
         origin: this.pos,
@@ -898,7 +896,7 @@ Creep.prototype.findCost = function () {
 Creep.prototype.passiveHeal = function () {
     const { room } = this
 
-    this.say('PH')
+    this.message = 'PH'
 
     if (!this.worked) {
         // If the creep is below max hits
@@ -982,7 +980,7 @@ Creep.prototype.passiveHeal = function () {
 Creep.prototype.aggressiveHeal = function () {
     const { room } = this
 
-    this.say('AH')
+    this.message = 'AH'
 
     if (!this.worked) {
         // If the creep is below max hits

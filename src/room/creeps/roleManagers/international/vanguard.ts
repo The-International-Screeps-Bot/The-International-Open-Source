@@ -8,7 +8,6 @@ export class Vanguard extends Creep {
     }
 
     preTickManager() {
-
         if (this.dying) return
 
         if (this.memory.SI !== undefined) this.room.creepsOfSourceAmount[this.memory.SI] += 1
@@ -16,8 +15,7 @@ export class Vanguard extends Creep {
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return
 
-        request.data[ClaimRequestData.vanguard] -=
-            this.parts.work
+        request.data[ClaimRequestData.vanguard] -= this.parts.work
     }
 
     /**
@@ -26,7 +24,7 @@ export class Vanguard extends Creep {
     travelToSource?(sourceIndex: number): boolean {
         const { room } = this
 
-        this.say('🚬')
+        this.message = '🚬'
 
         const harvestPos = this.findSourcePos(this.memory.SI)
         if (!harvestPos) return true
@@ -37,7 +35,7 @@ export class Vanguard extends Creep {
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.say(`⏩ ${sourceIndex}`)
+        this.message = `⏩ ${sourceIndex}`
 
         this.createMoveRequest({
             origin: this.pos,
@@ -72,9 +70,7 @@ export class Vanguard extends Creep {
     }
 
     repairRampart?() {
-
         if (this.room.cSites.rampart.length) {
-
             const cSite = this.room.cSites.rampart[0]
 
             if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
@@ -107,8 +103,7 @@ export class Vanguard extends Creep {
     }
 
     run?() {
-
-        this.say(this.memory.TRN)
+        this.message = this.memory.TRN
 
         if (this.room.name === this.memory.TRN || !this.memory.TRN) {
             if (this.needsResources()) {

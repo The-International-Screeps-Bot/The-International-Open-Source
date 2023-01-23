@@ -282,7 +282,7 @@ const Profiler = {
         return body
     },
 
-    output(args: OutputArgs) {
+    output(args: OutputArgs = {}) {
         if (!args.maxLines) args.maxLines = Infinity
         if (!Memory.profiler || !Memory.profiler.enabledTick) return 'Profiler not active.'
 
