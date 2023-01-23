@@ -1090,7 +1090,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
 }
 
 Creep.prototype.manageSpawning = function (spawn: StructureSpawn) {
-    if (spawn.spawning.remainingTime > 1) return
+    if (spawn.spawning.remainingTime > 1 || spawn.spawning.name.includes('shard')) return
 
     const offset = offsetsByDirection[spawn.spawning.directions[0]]
     const coord = {
