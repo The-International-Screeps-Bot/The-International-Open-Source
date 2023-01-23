@@ -227,7 +227,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             // Create costMatrixes for room tiles, where lower values are priority, and 255 or more is considered impassible
 
             roomCallback(roomName) {
-
                 // If the room is not allowed
 
                 if (!allowedRoomNames.has(roomName)) return false
@@ -235,7 +234,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 /* const roomMemory = Memory.rooms[roomName] */
 
                 const room = Game.rooms[roomName]
-                const cm = (room && opts.weightCostMatrix) ? room[opts.weightCostMatrix as keyof Room] as CostMatrix : new PathFinder.CostMatrix()
+                const cm =
+                    room && opts.weightCostMatrix
+                        ? (room[opts.weightCostMatrix as keyof Room] as CostMatrix)
+                        : new PathFinder.CostMatrix()
 
                 // If there is no route
 

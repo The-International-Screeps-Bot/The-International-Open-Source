@@ -14,10 +14,12 @@ export class HaulerNeedManager {
             const sourceLink = room.sourceLinks[index]
             if (sourceLink && sourceLink.RCLActionable) continue
 
-            room.haulerNeed += findCarryPartsRequired(
-                room.sourcePaths[index].length + 3,
-                room.estimatedSourceIncome[index],
-            )
+            if (room.sourcePaths[index])
+                room.haulerNeed += findCarryPartsRequired(
+                    room.sourcePaths[index].length + 3,
+                    room.estimatedSourceIncome[index],
+                )
+            else console.log(`No source path for ${room.name} source ${index}`)
         }
 
         // There is a viable controllerContainer
