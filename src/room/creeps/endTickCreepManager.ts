@@ -59,41 +59,23 @@ export class EndTickCreepManager {
         }
     }
 
+    /**
+     * If enabled and there is a chant this tick, have a random creeps that isn't on an exit say the chant
+     */
     private runChant() {
         if (!Memory.doChant) return
 
         const currentChant = chant[Memory.chantIndex]
         if (!currentChant) return
 
-        let creeps: (Creep | PowerCreep)[] = this.roomManager.room.find(FIND_MY_POWER_CREEPS)
-        let creep = creeps[Math.floor(Math.random() * creeps.length)]
+        let creeps: (Creep | PowerCreep)[] = this.roomManager.room.find(FIND_MY_POWER_CREEPS, {
+            filter: creep => !creep.isOnExit
+        })
+        creeps = creeps.concat(this.roomManager.room.find(FIND_MY_CREEPS, {
+            filter: creep => !creep.isOnExit
+        }))
+
+        const creep = creeps[Math.floor(Math.random() * creeps.length)]
         if (creep) creep.say(currentChant, true)
-
-        /*
-        // Power creeps go first
-
-        for (const className of powerCreepClassNames) {
-            for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
-                const creep = Game.powerCreeps[creepName]
-
-                creep.say(currentChant, true)
-            }
-        }
-        */
-
-        creeps = this.roomManager.room.find(FIND_MY_CREEPS)
-        creep = creeps[Math.floor(Math.random() * creeps.length)]
-        if (creep) creep.say(currentChant, true)
-
-        /*
-        // Normal creeps go second
-
-        for (const role in this.roomManager.room.myCreeps)
-            for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
-                const creep = Game.creeps[creepName]
-
-                creep.say(currentChant, true)
-            }
-        */
     }
 }
