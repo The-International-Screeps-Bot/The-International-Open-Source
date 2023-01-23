@@ -323,8 +323,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (room.anchor) {
                         // The last upgrade position should be the deliver pos, which we want to weight normal
 
-                        const upgradePositions = room.upgradePositions
-                        upgradePositions.pop()
+                        const upgradePositions = room.upgradePositions.slice(0, room.upgradePositions.length - 1)
 
                         // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 

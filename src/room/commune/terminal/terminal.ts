@@ -148,13 +148,13 @@ export class TerminalManager {
         for (const ID in internationalManager.terminalRequests) {
             const request = internationalManager.terminalRequests[ID]
 
-            const score =
-                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
-            if (score >= lowestScore) continue
-
             // Don't respond to requests for this room
 
             if (request.roomName === this.communeManager.room.name) continue
+
+            const score =
+                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
+            if (score >= lowestScore) continue
 
             // Make sure we have enough energy and some left over from the transfer cost
 

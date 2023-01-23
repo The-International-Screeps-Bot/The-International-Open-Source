@@ -103,12 +103,10 @@ export class CommuneManager {
     }
 
     room: Room
-    structures: OrganizedStructures
     nextSpawnEnergyAvailable: number
 
     public update(room: Room) {
         this.room = room
-        this.structures = room.structures
     }
 
     preTickRun() {

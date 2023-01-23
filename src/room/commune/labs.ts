@@ -162,7 +162,7 @@ export class LabManager {
         const labId = this.labsByBoost[boost]
         if (!labId) return false
 
-        const lab = this.communeManager.structures.lab.find(lab => lab.id == labId)
+        const lab = this.communeManager.room.structures.lab.find(lab => lab.id == labId)
 
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return false
@@ -202,7 +202,7 @@ export class LabManager {
         const labId = this.labsByBoost[boost]
         if (!labId) return true
 
-        const lab = this.communeManager.structures.lab.find(lab => lab.id == labId)
+        const lab = this.communeManager.room.structures.lab.find(lab => lab.id == labId)
 
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return true
@@ -238,7 +238,7 @@ export class LabManager {
 
         let boostingLabs = Object.values(this.labsByBoost)
 
-        return (this._outputLabs = this.communeManager.structures.lab.filter(
+        return (this._outputLabs = this.communeManager.room.structures.lab.filter(
             lab => !this.communeManager.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
         ))
     }
@@ -305,7 +305,7 @@ export class LabManager {
                 //Otherwise grab a lab that's not the input labs, and not a boosting lab
 
                 let boostingLabs = Object.values(this.labsByBoost)
-                let freelabs = this.communeManager.structures.lab.filter(
+                let freelabs = this.communeManager.room.structures.lab.filter(
                     lab => !this.communeManager.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
                 )
 
@@ -366,8 +366,10 @@ export class LabManager {
         if (!this.outputResource) return false
 
         if (!this.isReverse) {
-            if (!this.inputLab1.mineralType || !this.inputSatisfied(this.inputLab1, this.inputResources[0])) return false
-            if (!this.inputLab2.mineralType || !this.inputSatisfied(this.inputLab2, this.inputResources[1])) return false
+            if (!this.inputLab1.mineralType || !this.inputSatisfied(this.inputLab1, this.inputResources[0]))
+                return false
+            if (!this.inputLab2.mineralType || !this.inputSatisfied(this.inputLab2, this.inputResources[1]))
+                return false
         }
 
         return true
@@ -378,7 +380,10 @@ export class LabManager {
 
         for (const output of this.outputLabs) {
             if (this.isReverse) {
-                if (output.mineralType == this.outputResource && output.store[this.outputResource] >= LAB_REACTION_AMOUNT)
+                if (
+                    output.mineralType == this.outputResource &&
+                    output.store[this.outputResource] >= LAB_REACTION_AMOUNT
+                )
                     output.reverseReaction(this.inputLab1, this.inputLab2) //Reverse is here so the outputLabs line up with the expected locations
             } else {
                 output.runReaction(this.inputLab1, this.inputLab2)
@@ -526,7 +531,7 @@ export class LabManager {
 
         let amount = this.communeManager.room.resourcesInStoringStructures[resource]
 
-        for (const lab of this.communeManager.structures.lab) {
+        for (const lab of this.communeManager.room.structures.lab) {
             if (lab.mineralType !== resource) continue
             amount += lab.mineralAmount
         }
@@ -539,24 +544,20 @@ export class LabManager {
     }
 
     createRoomLogisticsRequests() {
-
         this.createInputRoomLogisticsRequests()
         this.createOutputRoomLogisticsRequests()
         this.createBoostRoomLogisticsRequests()
     }
 
     createInputRoomLogisticsRequests() {
-
         let inputLabs = [this.inputLab1, this.inputLab2]
         for (let i = 0; i < inputLabs.length; i++) {
-
             const lab = inputLabs[i]
             const resource = this.inputResources[i]
 
             // We have the right resource or no resource
 
             if (!lab.mineralType || lab.mineralType === resource) {
-
                 // We have enough
 
                 if (lab.store.getUsedCapacity(lab.mineralType) > lab.store.getCapacity(lab.mineralType) * 0.5) continue
@@ -567,7 +568,9 @@ export class LabManager {
                     target: lab,
                     resourceType: lab.mineralType,
                     type: 'transfer',
-                    priority: 50 + scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20),
+                    priority:
+                        50 +
+                        scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20),
                 })
                 continue
             }
@@ -578,15 +581,15 @@ export class LabManager {
                 target: lab,
                 resourceType: lab.mineralType,
                 type: 'withdraw',
-                priority: 20 + scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
+                priority:
+                    20 +
+                    scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
             })
         }
     }
 
     createOutputRoomLogisticsRequests() {
-
         for (const lab of this.outputLabs) {
-
             // There is no resource to withdraw
 
             if (!lab.mineralType) continue
@@ -594,7 +597,6 @@ export class LabManager {
             // We have the right resource, withdraw after a threshold
 
             if (!lab.mineralType || lab.mineralType === this.outputResource) {
-
                 // We have a small amount
 
                 if (lab.store.getUsedCapacity(lab.mineralType) < lab.store.getCapacity(lab.mineralType) * 0.25) continue
@@ -605,7 +607,14 @@ export class LabManager {
                     target: lab,
                     resourceType: lab.mineralType,
                     type: 'withdraw',
-                    priority: 20 + scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
+                    priority:
+                        20 +
+                        scalePriority(
+                            lab.store.getCapacity(lab.mineralType),
+                            lab.reserveStore[lab.mineralType],
+                            20,
+                            true,
+                        ),
                 })
                 continue
             }
@@ -616,16 +625,15 @@ export class LabManager {
                 target: lab,
                 resourceType: lab.mineralType,
                 type: 'withdraw',
-                priority: 20 + scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
+                priority:
+                    20 +
+                    scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
             })
         }
     }
 
-    createBoostRoomLogisticsRequests() {
-
-
-    }
-/*
+    createBoostRoomLogisticsRequests() {}
+    /*
     private setupInputLab(
         creep: Hauler,
         inputLab: StructureLab,
@@ -797,7 +805,7 @@ export class LabManager {
         return false
     }
  */
-/*
+    /*
     public requestBoost(compound: MineralBoostConstant) {
         if (!this.requestedBoosts.includes(compound)) this.requestedBoosts.push(compound)
     }
@@ -807,7 +815,7 @@ export class LabManager {
         if (this.labsByBoost) {
             for (const compound in this.labsByBoost) {
                 const labId = this.labsByBoost[compound as MineralBoostConstant]
-                const lab = this.communeManager.structures.lab.find(lab => lab.id == labId)
+                const lab = this.communeManager.room.structures.lab.find(lab => lab.id == labId)
                 if (this.setupBoosterLab(creep, lab, compound as MineralBoostConstant)) return
             }
         }

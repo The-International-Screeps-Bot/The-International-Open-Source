@@ -18,7 +18,7 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const towers = this.communeManager.structures.tower.filter(tower => tower.RCLActionable)
+        const towers = this.communeManager.room.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
             this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
             return
@@ -152,7 +152,7 @@ export class TowerManager {
     }
 
     findRampartRepairTargets() {
-        return this.communeManager.structures.rampart.filter(function (rampart) {
+        return this.communeManager.room.structures.rampart.filter(function (rampart) {
             return rampart.hits <= RAMPART_DECAY_AMOUNT
         })
     }
@@ -180,8 +180,8 @@ export class TowerManager {
     }
 
     findGeneralRepairTargets() {
-        let structures: Structure[] = this.communeManager.structures.spawn
-        structures = structures.concat(this.communeManager.structures.tower)
+        let structures: Structure[] = this.communeManager.room.structures.spawn
+        structures = structures.concat(this.communeManager.room.structures.tower)
 
         return structures
     }
@@ -211,20 +211,20 @@ export class TowerManager {
     private createPowerTasks() {
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
-        for (const tower of this.communeManager.structures.tower) {
+        for (const tower of this.communeManager.room.structures.tower) {
             this.communeManager.room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
         }
     }
 
     private createRoomLogisticsRequests() {
         for (const structure of this.communeManager.room.structures.tower) {
-
             if (structure.usedReserveStore > structure.store.getCapacity(RESOURCE_ENERGY) * 0.75) continue
 
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
                 type: 'transfer',
-                priority: 3 + scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy, ),
+                priority:
+                    3 + scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy),
             })
         }
     }

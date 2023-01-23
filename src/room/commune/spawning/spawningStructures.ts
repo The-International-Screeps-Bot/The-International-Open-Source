@@ -19,7 +19,7 @@ export class SpawningStructuresManager {
      * Assign spawnIDs to creeps
      */
     public organizeSpawns() {
-        const spawns = this.communeManager.structures.spawn
+        const spawns = this.communeManager.room.structures.spawn
         if (!spawns.length) return
 
         // Find spawns that are and aren't spawning
@@ -50,7 +50,7 @@ export class SpawningStructuresManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        if (!this.communeManager.structures.spawn.length) return
+        if (!this.communeManager.room.structures.spawn.length) return
 
         this.runSpawning()
         this.test()
@@ -82,10 +82,11 @@ export class SpawningStructuresManager {
         for (const index in this.communeManager.room.spawnRequests) {
             const request = this.communeManager.room.spawnRequests[index]
             if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
-
                 customLog(
                     'Failed to spawn',
-                    `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${this.communeManager.nextSpawnEnergyAvailable} / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
+                    `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
+                        this.communeManager.nextSpawnEnergyAvailable
+                    } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
                     {
                         textColor: customColors.white,
                         bgColor: customColors.red,
@@ -100,7 +101,9 @@ export class SpawningStructuresManager {
             if (request.cost > this.communeManager.room.energyCapacityAvailable) {
                 customLog(
                     'Failed to spawn',
-                    `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${this.communeManager.room.energyCapacityAvailable} / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
+                    `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${
+                        this.communeManager.room.energyCapacityAvailable
+                    } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
                     {
                         textColor: customColors.white,
                         bgColor: customColors.red,
@@ -264,7 +267,6 @@ export class SpawningStructuresManager {
 
     createRoomLogisticsRequests() {
         for (const structure of this.communeManager.room.spawningStructuresByNeed) {
-
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
                 type: 'transfer',

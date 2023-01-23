@@ -2179,8 +2179,7 @@ const roomAdditions = {
             if (this.anchor) {
                 // The last upgrade position should be the deliver pos, which we want to weight normal
 
-                const upgradePositions = this.upgradePositions
-                upgradePositions.pop()
+                const upgradePositions = this.upgradePositions.slice(0, this.upgradePositions.length - 1)
 
                 // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
 

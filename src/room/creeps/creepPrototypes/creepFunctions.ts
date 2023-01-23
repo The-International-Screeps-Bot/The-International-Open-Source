@@ -420,6 +420,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
             origin: this.pos,
             goals: [{ pos: cSite.pos, range: 3 }],
             avoidEnemyRanges: true,
+            weightCostMatrix: 'defaultCostMatrix',
         })
 
         return RESULT_ACTION
@@ -493,6 +494,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
             origin: this.pos,
             goals: [{ pos: cSiteTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
+            weightCostMatrix: 'defaultCostMatrix',
         })
 
         return true

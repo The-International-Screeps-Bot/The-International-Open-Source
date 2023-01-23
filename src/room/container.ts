@@ -14,14 +14,11 @@ export class ContainerManager {
     }
 
     runCommune() {
-        let CPUUsed = Game.cpu.getUsed()
+
         this.runSourceContainers()
         this.runFastFillerContainers()
         this.runControllerContainer()
         this.runMineralContainer()
-        customLog('CPU TEST 1', Game.cpu.getUsed() - CPUUsed, {
-            bgColor: customColors.red,
-        })
     }
 
     private runFastFillerContainers() {
