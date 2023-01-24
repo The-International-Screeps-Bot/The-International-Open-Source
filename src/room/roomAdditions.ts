@@ -994,7 +994,8 @@ const roomAdditions = {
                 this._usedUpgradePositions.add(creep.memory.PC)
             }
 
-            if (this.controllerLink) this._usedUpgradePositions.add(packPos(this.controllerLink.pos))
+            if (this.controllerLink)
+                this._usedUpgradePositions.add(packXYAsCoord(this.controllerLink.pos.x, this.controllerLink.pos.y))
             /*
             for (const packedCoord of this._usedUpgradePositions) {
 
