@@ -2416,6 +2416,8 @@ declare global {
             allyCreepRequest(requestName: string, communeName?: string): string
 
             deleteBasePlans(roomName?: string): string
+
+            usedHeap(): string
         }
     }
 

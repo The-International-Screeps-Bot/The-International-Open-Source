@@ -267,3 +267,9 @@ global.deleteBasePlans = function (roomName) {
 
     return 'Deleted base plans for ' + roomName
 }
+
+global.usedHeap = function() {
+
+    const usedHeap = Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
+    return (usedHeap * 100).toFixed(2) + '%'
+}
