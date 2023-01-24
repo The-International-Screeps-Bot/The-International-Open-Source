@@ -11,7 +11,7 @@ export default class GetShardVision {
         const spawnShardFlag = Game.flags[this._shardNames[0]]
         if (!spawnShardFlag) return
 
-        const roomNames = ['E72N14', 'E74N12', 'E68N11']
+        const roomNames = ['E65N11', 'E72N14', 'E74N7']
         const spawns = Object.values(Game.spawns).filter(s => roomNames.includes(s.room.name))
         const spawn = spawns.filter(s => s.spawning === null)[0]
         if (!spawn) return
@@ -37,7 +37,7 @@ export default class GetShardVision {
         if (!this._shardNames.includes(Game.shard.name)) return
 
         this._shardNames.forEach((shardName, index): void => {
-            if (Game.time % 100 === 0 && index === 0) {
+            if (Game.time % 50 === 0 && index === 0) {
                 this.SpawnCreeps()
             }
             let loggedOrders = false
