@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { SourceMapConsumer } from 'source-map'
-
+import ErrorExporter from './ErrorExporter'
 export class ErrorMapper {
     // Cache consumer
     private static _consumer?: SourceMapConsumer
@@ -84,9 +84,11 @@ export class ErrorMapper {
                     } else {
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${_.escape(this.sourceMappedStackTrace(e))}</p>`)
+                        ErrorExporter.addErrorToSegment(_.escape(this.sourceMappedStackTrace(e)))
                     }
                 } else {
                     // can't handle it
+                    Game.notify(`Error: ${e}`, 0)
                     throw e
                 }
             }
