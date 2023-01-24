@@ -373,6 +373,7 @@ export class StatsManager {
                 usage: 0,
                 limit: 2097,
             },
+            heapUsage: 0,
             gcl: {
                 level: 0,
                 progress: 0,
@@ -420,6 +421,8 @@ export class StatsManager {
             usage: this.average(Memory.stats.cpu.usage, Game.cpu.getUsed()),
         }
         Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
+        Memory.stats.heapUsage =
+            Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
         Memory.stats.gcl = {
             progress: Game.gcl.progress,
             progressTotal: Game.gcl.progressTotal,
@@ -430,8 +433,6 @@ export class StatsManager {
             progressTotal: Game.gpl.progressTotal,
             level: Game.gpl.level,
         }
-
-        Memory.stats.heap = Game.cpu.getHeapStatistics()
 
         const globalRoomKeys = Object.keys(global.roomStats.commune)
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))

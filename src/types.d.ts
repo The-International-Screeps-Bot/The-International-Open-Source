@@ -728,13 +728,13 @@ declare global {
             limit: number
         }
 
+        heapUsage: number
         gcl: ControllerLevel
 
         gpl: ControllerLevel
         rooms: { [roomName: string]: Partial<RoomCommuneStats> }
         constructionSiteCount: number
         CPUUsers: CpuUsers
-        heap: HeapStatistics
     }
 
     type StatsRoomTypes = 'commune' | 'remote'
