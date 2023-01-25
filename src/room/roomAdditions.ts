@@ -1114,10 +1114,9 @@ const roomAdditions = {
             }
 
             delete this.memory.MPa
-            if (!this.anchor) return this._sourcePaths
+            if (!this.anchor) return this._mineralPath
 
-            let path = [this.mineralPositions[0]]
-            path = path.concat(
+            let path = [this.mineralPositions[0]].concat(
                 this.advancedFindPath({
                     origin: this.mineralPositions[0],
                     goals: [{ pos: this.anchor, range: 3 }],

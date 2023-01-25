@@ -130,6 +130,8 @@ class MigrationManager {
             global.killCreeps()
             global.clearMemory()
             global.removeCSites()
+            
+            Memory.breakingVersion = settings.breakingVersion
         }
     }
 }

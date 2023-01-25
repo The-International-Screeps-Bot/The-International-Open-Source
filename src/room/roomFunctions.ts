@@ -192,8 +192,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 const room = Game.rooms[roomName]
                 if (room.centerUpgradePos) opts.weightCoords[roomName][packCoord(room.centerUpgradePos)] = 255
 
-                if (roomMemory.SPs.length) {
-                    for (const path of Game.rooms[roomName].sourcePaths) {
+                if (room._sourcePaths) {
+                    for (const path of Game.rooms[roomName]._sourcePaths) {
                         for (const pos of path) {
                             if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
                             opts.weightCoords[pos.roomName][packCoord(pos)] = 1
@@ -242,10 +242,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If there is no route
 
                 if (allowedRoomNames.size <= 1) {
-                    let x
 
                     // Configure y and loop through top exits
 
+                    let x
                     let y = 0
                     for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
 
