@@ -972,11 +972,11 @@ const roomAdditions = {
             return this.global.upgradePositions
         },
     },
-    usedUpgradePositions: {
+    usedUpgradeCoords: {
         get() {
-            if (this._usedUpgradePositions) return this._usedUpgradePositions
+            if (this._usedUpgradeCoords) return this._usedUpgradeCoords
 
-            this._usedUpgradePositions = new Set()
+            this._usedUpgradeCoords = new Set()
 
             for (const creepName of this.myCreeps.controllerUpgrader) {
                 // Get the creep using its name
@@ -986,25 +986,24 @@ const roomAdditions = {
                 // If the creep is dying, iterate
 
                 if (creep.dying) continue
-
                 if (!creep.memory.PC) continue
 
                 // The creep has a packedPos
 
-                this._usedUpgradePositions.add(creep.memory.PC)
+                this._usedUpgradeCoords.add(creep.memory.PC)
             }
 
             if (this.controllerLink)
-                this._usedUpgradePositions.add(packXYAsCoord(this.controllerLink.pos.x, this.controllerLink.pos.y))
+                this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
             /*
-            for (const packedCoord of this._usedUpgradePositions) {
+            for (const packedCoord of this._usedUpgradeCoords) {
 
                 const coord = unpackCoord(packedCoord)
 
                 this.visual.circle(coord.x, coord.y, { fill: customColors.red })
             }
  */
-            return this._usedUpgradePositions
+            return this._usedUpgradeCoords
         },
     },
     upgradePathLength: {
@@ -1114,10 +1113,9 @@ const roomAdditions = {
             }
 
             delete this.memory.MPa
-            if (!this.anchor) return this._sourcePaths
+            if (!this.anchor) return this._mineralPath
 
-            let path = [this.mineralPositions[0]]
-            path = path.concat(
+            let path = [this.mineralPositions[0]].concat(
                 this.advancedFindPath({
                     origin: this.mineralPositions[0],
                     goals: [{ pos: this.anchor, range: 3 }],

@@ -35,10 +35,10 @@ export class FastFiller extends Creep {
 
         // Get usedFastFillerPositions
 
-        const usedFastFillerPositions = room.usedFastFillerCoords
+        const usedFastFillerCoords = room.usedFastFillerCoords
 
         const openFastFillerPositions = room.fastFillerPositions.filter(
-            pos => !usedFastFillerPositions.has(packCoord(pos)),
+            pos => !usedFastFillerCoords.has(packCoord(pos)),
         )
         if (!openFastFillerPositions.length) return false
 
