@@ -3,138 +3,136 @@ import { customLog } from 'international/utils'
 import { CommuneManager } from './commune'
 
 export class LinkManager {
-     communeManager: CommuneManager
+    communeManager: CommuneManager
 
-     constructor(communeManager: CommuneManager) {
-         this.communeManager = communeManager
-     }
+    constructor(communeManager: CommuneManager) {
+        this.communeManager = communeManager
+    }
 
-     run() {
+    run() {
+        if (!this.communeManager.room.storage && !this.communeManager.room.terminal) {
+            this.createControllerLinkRoomLogisticsRequest()
+            return
+        }
 
-          if (!this.communeManager.room.storage && !this.communeManager.room.terminal) {
+        this.sourcesToReceivers()
+        this.hubToFastFiller()
+        this.hubToController()
+    }
 
-               this.createControllerLinkRoomLogisticsRequest()
-               return
-          }
+    private sourcesToReceivers() {
+        const sourceLinks = this.communeManager.room.sourceLinks
+        if (!sourceLinks.length) return
 
-          this.sourcesToReceivers()
-          this.hubToFastFiller()
-          this.hubToController()
-     }
+        let receiverLinks = [
+            this.communeManager.room.fastFillerLink,
+            this.communeManager.room.hubLink,
+            this.communeManager.room.controllerLink,
+        ].filter(link => link)
 
-     private sourcesToReceivers() {
+        if (!receiverLinks.length) return
 
-          const sourceLinks = this.communeManager.room.sourceLinks
-          if (!sourceLinks.length) return
+        // Loop through each sourceLink
 
-          const receiverLinks = [this.communeManager.room.fastFillerLink, this.communeManager.room.hubLink, this.communeManager.room.controllerLink].filter(link => {
-               return link !== undefined
-          })
-          if (!receiverLinks.length) return
+        for (const sourceLink of sourceLinks) {
+            // If the link is not nearly full, iterate
 
-          // Loop through each sourceLink
+            if (sourceLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > sourceLink.store.energy) continue
 
-          for (const sourceLink of sourceLinks) {
+            // Otherwise, loop through each receiverLink
 
-               // If the link is not nearly full, iterate
+            for (const receiverLink of receiverLinks as StructureLink[]) {
+                // If the link is more than x% full, iterate
 
-               if (sourceLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > sourceLink.store.energy) continue
+                if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold)
+                    continue
 
-               // Otherwise, loop through each receiverLink
+                // Otherwise, have the sourceLink transfer to the receiverLink
 
-               for (const receiverLink of receiverLinks as StructureLink[]) {
+                sourceLink.transferEnergy(receiverLink)
 
-                    // If the link is more than x% full, iterate
+                receiverLink.store.energy += sourceLink.store.energy
+                sourceLink.store.energy -= receiverLink.store.getCapacity(RESOURCE_ENERGY) - receiverLink.store.energy
 
-                    if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold) continue
+                // And stop the loop
 
-                    // Otherwise, have the sourceLink transfer to the receiverLink
+                break
+            }
+        }
+    }
 
-                    sourceLink.transferEnergy(receiverLink)
+    private hubToFastFiller() {
+        const hubLink = this.communeManager.room.hubLink
+        if (!hubLink) return
 
-                    receiverLink.store.energy += sourceLink.store.energy
-                    sourceLink.store.energy -= receiverLink.store.getCapacity(RESOURCE_ENERGY) - receiverLink.store.energy
+        const fastFillerLink = this.communeManager.room.fastFillerLink
+        if (!fastFillerLink) return
 
-                    // And stop the loop
+        // If the hubLink is not sufficiently full, stop
 
-                    break
-               }
-          }
-     }
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
 
-     private hubToFastFiller() {
+        // If the fastFillerLink is more than x% full, stop
 
-          const hubLink = this.communeManager.room.hubLink
-          if (!hubLink) return
+        if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold)
+            return
 
-          const fastFillerLink = this.communeManager.room.fastFillerLink
-          if (!fastFillerLink) return
+        // Otherwise, have the sourceLink transfer to the recieverLink
 
-          // If the hubLink is not sufficiently full, stop
+        hubLink.transferEnergy(fastFillerLink)
 
-          if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
+        fastFillerLink.store.energy += hubLink.store.energy
+        hubLink.store.energy -= fastFillerLink.store.getFreeCapacity(RESOURCE_ENERGY)
+    }
 
-          // If the fastFillerLink is more than x% full, stop
+    private hubToController() {
+        const controllerLink = this.communeManager.room.controllerLink
+        if (!controllerLink) return
 
-          if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold) return
+        const hubLink = this.communeManager.room.hubLink
+        if (!hubLink) {
+            this.createControllerLinkRoomLogisticsRequest()
+            return
+        }
 
-          // Otherwise, have the sourceLink transfer to the recieverLink
+        // If the controller is close to downgrading and the storage has insufficient energy, stop
 
-          hubLink.transferEnergy(fastFillerLink)
+        if (
+            this.communeManager.room.controller.ticksToDowngrade > 10000 &&
+            this.communeManager.room.resourcesInStoringStructures.energy <
+                this.communeManager.storedEnergyUpgradeThreshold * 0.5
+        )
+            return
 
-          fastFillerLink.store.energy += hubLink.store.energy
-          hubLink.store.energy -= fastFillerLink.store.getFreeCapacity(RESOURCE_ENERGY)
-     }
+        // If the hubLink is not sufficiently full, stop
 
-     private hubToController() {
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
 
-          const controllerLink = this.communeManager.room.controllerLink
-          if (!controllerLink) return
+        // If the controllerLink is more than x% full, stop
 
-          const hubLink = this.communeManager.room.hubLink
-          if (!hubLink) {
+        if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold)
+            return
 
-               this.createControllerLinkRoomLogisticsRequest()
-               return
-          }
+        // Otherwise, have the sourceLink transfer to the recieverLink
 
-          // If the controller is close to downgrading and the storage has insufficient energy, stop
+        hubLink.transferEnergy(controllerLink)
 
-          if (
-               this.communeManager.room.controller.ticksToDowngrade > 10000 &&
-               this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.storedEnergyUpgradeThreshold * 0.5
-          )
-               return
+        controllerLink.store.energy += hubLink.store.energy
+        hubLink.store.energy -= controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)
+    }
 
-          // If the hubLink is not sufficiently full, stop
+    private createControllerLinkRoomLogisticsRequest() {
+        const controllerLink = this.communeManager.room.controllerLink
+        if (!controllerLink) return
 
-          if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
+        // If we have suffient energy
 
-          // If the controllerLink is more than x% full, stop
+        if (controllerLink.reserveStore.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.75) return
 
-          if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold) return
-
-          // Otherwise, have the sourceLink transfer to the recieverLink
-
-          hubLink.transferEnergy(controllerLink)
-
-          controllerLink.store.energy += hubLink.store.energy
-          hubLink.store.energy -= controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)
-     }
-
-     private createControllerLinkRoomLogisticsRequest() {
-
-          const controllerLink = this.communeManager.room.controllerLink
-          if (!controllerLink) return
-
-          // If we have suffient energy
-
-          if (controllerLink.reserveStore.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.75) return
-
-          this.communeManager.room.createRoomLogisticsRequest({
-               target: controllerLink,
-               type: 'transfer',
-               priority: 100,
-           })
-     }
+        this.communeManager.room.createRoomLogisticsRequest({
+            target: controllerLink,
+            type: 'transfer',
+            priority: 100,
+        })
+    }
 }

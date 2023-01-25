@@ -184,9 +184,9 @@ Creep.prototype.findUpgradePos = function () {
 
     if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
 
-    // Get usedUpgradePositions, informing false if they're undefined
+    // Get usedUpgradeCoords, informing false if they're undefined
 
-    const usedUpgradePositions = room.usedUpgradePositions
+    const usedUpgradeCoords = room.usedUpgradeCoords
 
     // Loop through each upgradePositions
 
@@ -197,12 +197,12 @@ Creep.prototype.findUpgradePos = function () {
 
         // Iterate if the pos is used
 
-        if (usedUpgradePositions.has(packedPos)) continue
+        if (usedUpgradeCoords.has(packedPos)) continue
 
-        // Otherwise record packedPos in the creep's memory and in usedUpgradePositions
+        // Otherwise record packedPos in the creep's memory and in usedUpgradeCoords
 
         this.memory.PC = packedPos
-        usedUpgradePositions.add(packedPos)
+        usedUpgradeCoords.add(packedPos)
 
         return pos
     }

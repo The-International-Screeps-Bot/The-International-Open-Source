@@ -1324,8 +1324,8 @@ declare global {
 
         readonly upgradePositions: RoomPosition[]
 
-        _usedUpgradePositions: Set<string>
-        readonly usedUpgradePositions: Set<string>
+        _usedUpgradeCoords: Set<string>
+        readonly usedUpgradeCoords: Set<string>
 
         _controllerPositions: RoomPosition[]
         readonly controllerPositions: RoomPosition[]
