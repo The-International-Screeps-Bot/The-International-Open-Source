@@ -110,7 +110,7 @@ export class SourceHarvester extends Creep {
             structureID = structureIDs.find(structureID => {
                 const structure = findObjectWithID(structureID) as AnyStoreStructure
 
-                return structure.structureType === STRUCTURE_EXTENSION && structure.freeNextStore !== 0
+                return structure.structureType === STRUCTURE_EXTENSION && structure.store.getCapacity(RESOURCE_ENERGY) - this.nextStore.energy > 0
             })
         }
 
