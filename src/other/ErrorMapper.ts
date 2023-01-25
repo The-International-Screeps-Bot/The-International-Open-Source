@@ -1,6 +1,8 @@
 /* eslint-disable */
+import { Constants } from 'discord.js'
 import { SourceMapConsumer } from 'source-map'
 import ErrorExporter from './ErrorExporter'
+import { settings } from '../international/settings'
 export class ErrorMapper {
     // Cache consumer
     private static _consumer?: SourceMapConsumer
@@ -82,9 +84,10 @@ export class ErrorMapper {
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${message}<br>${_.escape(e.stack)}</p>`)
                     } else {
+                        const stack = _.escape(this.sourceMappedStackTrace(e))
                         // @ts-ignore
-                        console.log(`<p style='color:#bb3d3d;'>${_.escape(this.sourceMappedStackTrace(e))}</p>`)
-                        ErrorExporter.addErrorToSegment(_.escape(this.sourceMappedStackTrace(e)))
+                        console.log(`<p style='color:#bb3d3d;'>${stack}</p>`)
+                        ErrorExporter.addErrorToSegment(stack, settings.breakingVersion)
                     }
                 } else {
                     // can't handle it
