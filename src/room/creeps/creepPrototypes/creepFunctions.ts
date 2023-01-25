@@ -171,6 +171,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Find amount of energy harvested and record it in data
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
+    this.nextStore.energy += energyHarvested
 
     globalStatsUpdater(this.room.name, 'eih', energyHarvested)
 

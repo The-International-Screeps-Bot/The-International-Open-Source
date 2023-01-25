@@ -95,9 +95,9 @@ export class SourceHarvester extends Creep {
 
         if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-        // If the creep is not nearly full, inform false
+        // If the creep is not nearly full, stop
 
-        if (this.store.getFreeCapacity(RESOURCE_ENERGY) > this.parts.work * HARVEST_POWER) return false
+        if (this.store.getCapacity() - this.nextStore.energy > 0) return false
 
         const adjacentCoords = findCoordsInsideRect(this.pos.x - 1, this.pos.y - 1, this.pos.x + 1, this.pos.y + 1)
 
@@ -124,10 +124,11 @@ export class SourceHarvester extends Creep {
 
     transferToSourceLink?(): boolean {
         const { room } = this
-
+        const link = room.sourceLinks[this.memory.SI]
+        if (link) room.visual.text(this.nextStore.energy.toFixed(), link.pos)
         // If the creep is not nearly full, stop
 
-        if (this.nextStore.energy > 0) return false
+        if (this.store.getCapacity() - this.nextStore.energy > 0) return false
 
         // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
