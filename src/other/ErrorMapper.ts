@@ -91,7 +91,6 @@ export class ErrorMapper {
                     }
                 } else {
                     // can't handle it
-                    Game.notify(`Error: ${e}`, 0)
                     throw e
                 }
             }

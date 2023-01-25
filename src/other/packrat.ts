@@ -184,11 +184,10 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
 }
 
 export function reverseCoordList(coordList: string) {
-    //     return coordList
-    //         .match(/.{1,2}/g)
-    //         .reverse()
-    //         .join('')
-    return coordList.split(',').reverse().join(',')
+    return coordList
+        .match(/.{1,2}/g)
+        .reverse()
+        .join('')
 }
 
 /**
@@ -201,7 +200,7 @@ export function packCoordList(coords: Coord[]) {
     let str = ''
     const maxLength = coords.length
     for (let i = 0; i < maxLength; i++) {
-        str += packCoord(coords[i]) + (i === maxLength - 1 ? '' : ',')
+        str += packCoord(coords[i])
         //    str += String.fromCharCode(((coords[i].x << 6) | coords[i].y) + 65)
     }
     return str
@@ -214,9 +213,8 @@ export function packCoordList(coords: Coord[]) {
  */
 export function unpackCoordList(chars: string) {
     const coords: Coord[] = []
-    const charsArray = chars.split(',')
-    for (let i = 0; i < charsArray.length; ++i) {
-        coords.push(unpackCoord(charsArray[i]))
+    for (let i = 0; i < chars.length; i += 2) {
+        coords.push(unpackCoord(chars[i] + chars[i + 1]))
     }
     //     let xShiftedSixOrY: number
     //     for (let i = 0; i < chars.length; ++i) {
@@ -237,13 +235,11 @@ export function unpackCoordList(chars: string) {
 export function unpackCoordListAsPosList(packedCoords: string, roomName: string) {
     const positions: RoomPosition[] = []
     let coord: Coord
-    const charsArray = packedCoords.split(',')
-
     // for (let i = 0; i < packedCoords.length; ++i) {
-    for (let i = 0; i < charsArray.length; i++) {
+    for (let i = 0; i < packedCoords.length; i += 2) {
         // Each coord is saved as a single character; unpack each and insert the room name to get the positions list
         // coord = unpackCoord(packedCoords[i])
-        coord = unpackCoord(charsArray[i])
+        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1])
         positions.push(new RoomPosition(coord.x, coord.y, roomName))
     }
     return positions
@@ -395,7 +391,7 @@ export function packPosList(posList: RoomPosition[]) {
     const maxLength = posList.length
     for (let i = 0; i < maxLength; i++) {
         //    str += packPos(posList[i])
-        str += packXYAsPos(posList[i].x, posList[i].y, posList[i].roomName) + (i === maxLength - 1 ? '' : ',')
+        str += packXYAsPos(posList[i].x, posList[i].y, posList[i].roomName)
     }
     return str
 }
@@ -407,10 +403,9 @@ export function packPosList(posList: RoomPosition[]) {
  */
 export function unpackPosList(chars: string) {
     const posList: RoomPosition[] = []
-    const charsArray = chars.split(',')
-    for (let i = 0; i < charsArray.length; i++) {
+    for (let i = 0; i < chars.length; i += 2) {
         // for (let i = 0; i < chars.length; i += 2) {
-        posList.push(unpackPos(charsArray[i]))
+        posList.push(unpackPos(chars[i] + chars[i + 1]))
         //    posList.push(unpackPos(chars.substr(i, 2)))
     }
     return posList
