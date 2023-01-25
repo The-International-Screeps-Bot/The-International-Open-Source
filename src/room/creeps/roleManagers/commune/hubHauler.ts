@@ -245,7 +245,7 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy) return false
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy + room.upgradeStrength * 2) return false
 
         const { controllerLink } = room
         const { fastFillerLink } = room
