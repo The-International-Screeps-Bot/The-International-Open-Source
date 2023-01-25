@@ -124,8 +124,7 @@ export class SourceHarvester extends Creep {
 
     transferToSourceLink?(): boolean {
         const { room } = this
-        const link = room.sourceLinks[this.memory.SI]
-        if (link) room.visual.text(this.nextStore.energy.toFixed(), link.pos)
+
         // If the creep is not nearly full, stop
 
         if (this.store.getCapacity() - this.nextStore.energy > 0) return false
