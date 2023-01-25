@@ -127,11 +127,10 @@ class MigrationManager {
         }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
+
             global.killCreeps()
             global.clearMemory()
             global.removeCSites()
-            
-            Memory.breakingVersion = settings.breakingVersion
         }
     }
 }
