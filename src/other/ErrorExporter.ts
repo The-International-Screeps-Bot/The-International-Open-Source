@@ -2,7 +2,7 @@ const errorSegment = 10
 RawMemory.setActiveSegments([errorSegment])
 
 interface ErrorData {
-    errors: string[];
+    errors: string[]
     version?: number
 }
 
@@ -20,12 +20,12 @@ export default class ErrorExporter {
     public static addErrorToSegment(stack: string, version?: number): void {
         const data = this.getSegmentData()
         if (JSON.stringify(data).length > 90000) {
-            Game.notify(`Error segment (${errorSegment}) is full`)
+            Game.notify(`Error segment (${errorSegment}) is almost full`)
             return
         }
 
         data.errors.push(stack)
-        if (version) data.version = version;
+        if (version) data.version = version
         this.setSegmentData(data)
     }
 }
