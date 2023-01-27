@@ -15,7 +15,7 @@
         "push-pserver": "rollup -c --environment DEST:pServer",
         "watch-mmo": "rollup -cw --environment DEST:mmo",
         "watch-pserver": "rollup -cw --environment DEST:pServer",
-        "server": "node server %npm_config_tickLength%",
+        "server": "node server",
         "grafana": "npx screeps-grafana private"
     },
     "repository": {
@@ -60,8 +60,8 @@
         "rollup-plugin-screeps": "^1.0.1",
         "rollup-plugin-terser": "^7.0.2",
         "rollup-plugin-typescript2": "^0.30.0",
-        "screeps-grafana": "^1.4.1",
-        "screeps-performance-server": "^1.6.0",
+        "screeps-grafana": "^1.6.3",
+        "screeps-performance-server": "^1.7.4",
         "sinon": "^6.3.5",
         "sinon-chai": "^3.2.0",
         "ts-node": "^10.2.0",
