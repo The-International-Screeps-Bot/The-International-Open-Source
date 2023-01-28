@@ -697,8 +697,7 @@ Creep.prototype.needsResources = function () {
     return this.memory.NR
 }
 
-Creep.prototype.hasNonEnergyResource = function() {
-
+Creep.prototype.hasNonEnergyResource = function () {
     return !!Object.keys(this.nextStore).find(resourceType => resourceType !== RESOURCE_ENERGY)
 }
 
@@ -1314,23 +1313,17 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 }
 
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
-
     if (args && args.types) {
+        if (args.types.has('transfer') && this.hasNonEnergyResource()) {
+            this.noDelivery = true
+            return new Set(['transfer'])
+        }
 
-        if (args.types.has('transfer')) {
+        // Make sure we have the right store values for our types
 
-            if (this.hasNonEnergyResource()) {
-
-                this.noDelivery = true
-                return new Set(['transfer'])
-            }
-
-            // Make sure we have the right store values for our types
-
-            if (this.needsResources()) {
-                args.types.delete('transfer')
-                return args.types
-            }
+        if (this.needsResources()) {
+            args.types.delete('transfer')
+            return args.types
         }
 
         args.types.delete('pickup')
@@ -1340,7 +1333,6 @@ Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     }
 
     if (this.hasNonEnergyResource()) {
-
         this.noDelivery = true
         return new Set(['transfer'])
     }
@@ -1373,7 +1365,6 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
         // We don't have enough resource and we can deliver
 
         if (this.nextStore[request.resourceType] <= 0) {
-
             if (this.noDelivery) return false
 
             // We don't have space to get any
@@ -1416,13 +1407,10 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
                 // If energy, make sure there is enough to fill us to full
 
                 if (request.resourceType === RESOURCE_ENERGY) {
-
                     storingStructure = this.commune.communeManager.storingStructures.find(
                         structure => structure.store[request.resourceType] >= this.freeNextStore,
                     )
-                }
-                else {
-
+                } else {
                     storingStructure = this.commune.communeManager.storingStructures.find(
                         structure => structure.store[request.resourceType] >= amount,
                     )
@@ -1505,11 +1493,9 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
 
     if (request.type === 'transfer') {
         if (request.delivery) {
-
             // Take extra energy in case its needed
 
             if (request.resourceType === RESOURCE_ENERGY) {
-
                 return this.nextStore[request.resourceType] + this.freeNextStore
             }
 
@@ -1526,6 +1512,7 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
 Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return RESULT_FAIL
+
     /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
 
@@ -1603,6 +1590,7 @@ Creep.prototype.runRoomLogisticsRequestsAdvanced = function (args) {
 Creep.prototype.runRoomLogisticsRequest = function () {
     const request = this.memory.RLRs[0]
     if (!request) return RESULT_FAIL
+
     /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
 
