@@ -2409,11 +2409,9 @@ Room.prototype.findStructureInsideRect = function (x1, y1, x2, y2, condition) {
                 return condition(findObjectWithID(structureID))
             })
 
-            if (structureID) break
+            if (structureID) return findObjectWithID(structureID)
         }
     }
 
-    if (!structureID) return false
-
-    return findObjectWithID(structureID)
+    return false
 }

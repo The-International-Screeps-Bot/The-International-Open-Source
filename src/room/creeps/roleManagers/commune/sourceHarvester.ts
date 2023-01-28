@@ -119,7 +119,7 @@ export class SourceHarvester extends Creep {
         )
         if (!structure) return false
 
-        return this.advancedTransfer(structure as AnyStoreStructure, RESOURCE_ENERGY)
+        return this.advancedTransfer(structure as AnyStoreStructure)
     }
 
     transferToSourceLink?(): boolean {

@@ -78,7 +78,7 @@ Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENE
 
     // If the action can be considered a success
 
-    if (transferResult === OK /* || transferResult === ERR_FULL */ || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
+    if (transferResult === OK || transferResult === ERR_FULL || transferResult === ERR_NOT_ENOUGH_RESOURCES) {
         this.movedResource = true
         return true
     }
