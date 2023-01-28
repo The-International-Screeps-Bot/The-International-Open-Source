@@ -96,11 +96,6 @@ export interface Settings {
     creepSay: boolean
 
     /**
-     * Wether or not errors should be exported
-     */
-    errorExporting: boolean
-
-    /**
      * The public segment number (0-100) that you and your allies are using
      */
     simpleAlliesSegment: number
@@ -142,7 +137,6 @@ export const settings: Settings = {
     marketUsage: true,
     logging: false,
     creepSay: true,
-    errorExporting: true,
     simpleAlliesSegment: 90,
     errorExporting: false
 }

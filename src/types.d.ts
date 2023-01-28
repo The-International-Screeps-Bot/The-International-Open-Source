@@ -1743,6 +1743,11 @@ declare global {
          */
         needsResources(): boolean
 
+        /**
+         * Wether the creep has a > 0 amount of a resorce that isn't energy
+         */
+        hasNonEnergyResource(): boolean
+
         findRecycleTarget(): StructureSpawn | StructureContainer | false
 
         advancedRecycle(): boolean
@@ -1785,50 +1790,48 @@ declare global {
          */
         pathOpts: PathOpts
 
-        _dying: boolean
+        /**
+         * Wether the creep is allowed accept room logistics requests that require delivery
+         */
+        noDelivery: boolean
 
+        _dying: boolean
         /**
          * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
          */
         readonly dying: boolean
 
         _macroHealStrength: number
-
         /**
          * The heal strength of the creep alongside its neighbours that we dopn't own
          */
         readonly macroHealStrength: number
 
         _grossTowerDamage: number
-
         /**
          * The highest possible tower damage
          */
         readonly grossTowerDamage: number
 
         _netTowerDamage: number
-
         /**
          * The highest possible tower damage, accounting for maximum possible enemy heal
          */
         readonly netTowerDamage: number
 
         _message: string
-
         /**
          * The cumulative message to present in say()
          */
         message: string
 
         _freeCapacityNextTick: number
-
         /**
          * The estimated total free capacity the creep will have next tick
          */
         freeCapacityNextTick: number
 
         _isOnExit: boolean
-
         readonly isOnExit: boolean
     }
 

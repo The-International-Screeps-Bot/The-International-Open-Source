@@ -697,6 +697,11 @@ Creep.prototype.needsResources = function () {
     return this.memory.NR
 }
 
+Creep.prototype.hasNonEnergyResource = function() {
+
+    return !!Object.keys(this.nextStore).find(resourceType => resourceType !== RESOURCE_ENERGY)
+}
+
 Creep.prototype.findRecycleTarget = function () {
     const { room } = this
 
@@ -1178,6 +1183,8 @@ Creep.prototype.roomLogisticsRequestManager = function () {
 Creep.prototype.findRoomLogisticsRequest = function (args) {
     if (this.memory.RLRs[0]) return this.memory.RLRs[0]
 
+    delete this.noDelivery
+
     const types = this.findRoomLogisticsRequestTypes(args)
     if (!types.size) return RESULT_FAIL
 
@@ -1307,18 +1314,35 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 }
 
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
-    if (args && args.types) {
-        // Make sure we have the right store values for our types
 
-        if (this.needsResources()) {
-            args.types.delete('transfer')
-            return args.types
+    if (args && args.types) {
+
+        if (args.types.has('transfer')) {
+
+            if (this.hasNonEnergyResource()) {
+
+                this.noDelivery = true
+                return new Set(['transfer'])
+            }
+
+            // Make sure we have the right store values for our types
+
+            if (this.needsResources()) {
+                args.types.delete('transfer')
+                return args.types
+            }
         }
 
         args.types.delete('pickup')
         args.types.delete('offer')
         args.types.delete('withdraw')
         return args.types
+    }
+
+    if (this.hasNonEnergyResource()) {
+
+        this.noDelivery = true
+        return new Set(['transfer'])
     }
 
     if (this.needsResources()) return new Set(['withdraw', 'pickup'])
@@ -1346,9 +1370,12 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
     if (request.type === 'transfer') {
         const amount = Math.min(this.store.getCapacity(), request.amount)
 
-        // We don't have enough resource
+        // We don't have enough resource and we can deliver
 
         if (this.nextStore[request.resourceType] <= 0) {
+
+            if (this.noDelivery) return false
+
             // We don't have space to get any
 
             if (this.freeNextStore <= 0) return false
