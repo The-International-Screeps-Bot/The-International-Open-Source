@@ -72,10 +72,12 @@ Room.prototype.spawnRequester = function () {
                     )
                 }
 
+                if (workAmount % 2 !== 0) defaultParts.push(MOVE)
+
                 for (let i = 1; i <= workAmount; i++) {
                     if (i % 2 === 0) defaultParts.push(MOVE)
                     defaultParts.push(WORK)
-                    if (i % 6 === 0) defaultParts.push(CARRY)
+                    if (i % 5 === 0) defaultParts.push(CARRY)
                 }
 
                 return {
@@ -184,10 +186,12 @@ Room.prototype.spawnRequester = function () {
                         )
                     }
 
+                    if (workAmount % 2 !== 0) defaultParts.push(MOVE)
+
                     for (let i = 1; i <= workAmount; i++) {
                         if (i % 2 === 0) defaultParts.push(MOVE)
                         defaultParts.push(WORK)
-                        if (i % 6 === 0) defaultParts.push(CARRY)
+                        if (i % 5 === 0) defaultParts.push(CARRY)
                     }
 
                     return {
@@ -361,13 +365,13 @@ Room.prototype.spawnRequester = function () {
 
     this.constructSpawnRequests(
         ((): SpawnRequestOpts | false => {
-
             if (this.controller.level < 5) return false
             if (!storage) return false
 
             // There is no hubLink and another link, or no terminal
 
-            if ((!this.hubLink || this.structures.link.length < 2) && (!terminal || !terminal.RCLActionable)) return false
+            if ((!this.hubLink || this.structures.link.length < 2) && (!terminal || !terminal.RCLActionable))
+                return false
 
             role = 'hubHauler'
 
@@ -767,7 +771,9 @@ Room.prototype.spawnRequester = function () {
 
                 if (this.resourcesInStoringStructures.energy >= this.communeManager.storedEnergyUpgradeThreshold)
                     partsMultiplier = Math.pow(
-                        (this.resourcesInStoringStructures.energy - this.communeManager.storedEnergyUpgradeThreshold * 0.5) / (6000 + this.controller.level * 2000),
+                        (this.resourcesInStoringStructures.energy -
+                            this.communeManager.storedEnergyUpgradeThreshold * 0.5) /
+                            (6000 + this.controller.level * 2000),
                         2,
                     )
                 // Otherwise, set partsMultiplier to 0

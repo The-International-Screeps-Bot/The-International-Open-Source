@@ -120,17 +120,13 @@ export class Maintainer extends Creep {
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
         const workPartCount = this.parts.work
-        const adjacentCoords = findCoordsInsideRect(this.pos.x - 3, this.pos.y - 3, this.pos.x + 3, this.pos.y + 3)
 
-        let structureID: Id<Structure<BuildableStructureConstant>>
-
-        for (const coord of adjacentCoords) {
-            const structureIDs = room.structureCoords.get(packCoord(coord))
-            if (!structureIDs) continue
-
-            structureID = structureIDs.find(structureID => {
-                const structure = findObjectWithID(structureID)
-
+        const structure = room.findStructureInsideRect(
+            this.pos.x - 3,
+            this.pos.y - 3,
+            this.pos.x + 3,
+            this.pos.y + 3,
+            structure => {
                 if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER)
                     return false
 
@@ -139,12 +135,10 @@ export class Maintainer extends Creep {
                 if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) return false
 
                 return true
-            }) as Id<Structure<BuildableStructureConstant>>
-        }
+            },
+        )
+        if (!structure) return false
 
-        if (!structureID) return false
-
-        const structure = findObjectWithID(structureID)
         if (this.repair(structure) !== OK) return false
 
         // Otherwise we repaired successfully

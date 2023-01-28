@@ -1217,6 +1217,7 @@ declare global {
         findStructureAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): Structure | false
         findStructureAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): Structure | false
 
+        findStructureInsideRect(x1: number, y1: number, x2: number, y2: number, condition: (structure: Structure) => boolean): Structure | false
         // Room Getters
 
         readonly global: Partial<RoomGlobal>

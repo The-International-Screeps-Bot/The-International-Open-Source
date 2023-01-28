@@ -1384,9 +1384,23 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
             // Try to find a sufficient storing structure
 
             if (this.room.name === this.commune.name) {
-                const storingStructure = this.commune.communeManager.storingStructures.find(
-                    structure => structure.store[request.resourceType] >= amount,
-                )
+                let storingStructure
+
+                // If energy, make sure there is enough to fill us to full
+
+                if (request.resourceType === RESOURCE_ENERGY) {
+
+                    storingStructure = this.commune.communeManager.storingStructures.find(
+                        structure => structure.store[request.resourceType] >= this.freeNextStore,
+                    )
+                }
+                else {
+
+                    storingStructure = this.commune.communeManager.storingStructures.find(
+                        structure => structure.store[request.resourceType] >= amount,
+                    )
+                }
+
                 if (storingStructure) {
                     request.delivery = storingStructure.id
                     return true
@@ -1463,7 +1477,17 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     }
 
     if (request.type === 'transfer') {
-        if (request.delivery) return Math.min(request.amount, this.nextStore[request.resourceType] + this.freeNextStore)
+        if (request.delivery) {
+
+            // Take extra energy in case its needed
+
+            if (request.resourceType === RESOURCE_ENERGY) {
+
+                return this.nextStore[request.resourceType] + this.freeNextStore
+            }
+
+            return Math.min(request.amount, this.nextStore[request.resourceType] + this.freeNextStore)
+        }
         return Math.min(this.nextStore[request.resourceType], request.amount)
     }
 
