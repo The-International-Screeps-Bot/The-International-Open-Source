@@ -7,6 +7,9 @@ StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
 }
 
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest, ID) {
+
+    spawnRequest.extraOpts.energyStructures = this.room.spawningStructuresByPriority
+
     return this.spawnCreep(
         spawnRequest.body,
         `${creepRoles.indexOf(spawnRequest.role)}_${spawnRequest.cost}_${this.room.name}_${
@@ -63,7 +66,6 @@ Room.prototype.createSpawnRequest = function (priority, role, defaultParts, body
         cost,
         extraOpts: {
             memory,
-            energyStructures: this.spawningStructuresByPriority,
         },
     })
 }

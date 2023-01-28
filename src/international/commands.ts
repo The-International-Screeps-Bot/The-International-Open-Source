@@ -165,6 +165,7 @@ global.claim = function (requestName, communeName) {
         if (!roomMemory) return `No memory for ${communeName}`
 
         roomMemory.claimRequest = requestName
+        request.responder = communeName
     }
 
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`

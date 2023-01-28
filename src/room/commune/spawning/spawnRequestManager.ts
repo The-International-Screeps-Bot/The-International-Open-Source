@@ -1371,7 +1371,6 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                if (!request.data[ClaimRequestData.claimer]) return false
                 if (request.data[ClaimRequestData.claimer] <= 0) return false
 
                 role = 'claimer'
@@ -1395,7 +1394,6 @@ Room.prototype.spawnRequester = function () {
 
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                if (!request.data[ClaimRequestData.vanguard]) return false
                 if (request.data[ClaimRequestData.vanguard] <= 0) return false
 
                 role = 'vanguard'
@@ -1406,7 +1404,7 @@ Room.prototype.spawnRequester = function () {
                     extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                     partsMultiplier: request.data[ClaimRequestData.vanguard],
                     minCost: 250,
-                    priority: 8.2 + this.creepsFromRoom.vanguard.length,
+                    priority: 8.2,
                     memoryAdditions: {
                         TRN: requestName,
                     },
