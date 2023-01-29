@@ -54,7 +54,7 @@ export class FastFiller extends Creep {
     fillFastFiller?(): boolean {
         const { room } = this
 
-        this.message = '💁'
+        this.message = '🚬'
 
         // If the creep has a non-energy resource
 
