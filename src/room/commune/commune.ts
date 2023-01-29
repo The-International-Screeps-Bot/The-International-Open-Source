@@ -230,8 +230,6 @@ export class CommuneManager {
 
     private test() {
 
-        customLog('room name', JSON.stringify(makeRoomCoord(this.room.name)))
-
         return
 
         let CPUUsed = Game.cpu.getUsed()

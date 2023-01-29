@@ -108,7 +108,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (roomName === goal.pos.roomName) return 1
                     return Infinity
                 }
-                console.log(roomName)
+                /* console.log(roomName) */
                 if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote' && roomMemory.data[RemoteData.abandon])
                     return Infinity
 
@@ -2363,7 +2363,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     const ID = internationalManager.newTickID()
     /* this.visual.text(args.priority.toString(), args.target.pos) */
-    this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
+    /* this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
     return (this.roomLogisticsRequests[args.type][ID] = {
         ID,
         type: args.type,

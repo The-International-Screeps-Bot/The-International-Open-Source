@@ -205,8 +205,8 @@ export function findCarryPartsRequired(distance: number, income: number) {
     return Math.ceil((distance * 2 * income) / CARRY_CAPACITY)
 }
 
-export function findLinkThroughput(range: number, income: number = 1) {
-    return Math.min(LINK_CAPACITY / range, LINK_CAPACITY / income)
+export function findLinkThroughput(range: number, income: number = LINK_CAPACITY) {
+    return Math.min(LINK_CAPACITY / range, income) *  (1 - LINK_LOSS_RATIO)
 }
 
 /**
