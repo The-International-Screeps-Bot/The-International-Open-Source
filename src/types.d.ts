@@ -1923,33 +1923,31 @@ declare global {
 
         // Creep Getters
 
-        _role: CreepRoles
+        _nameData: string[]
+        nameData: string[]
 
+        _role: CreepRoles
         /**
          * The lifetime designation that boardly describes what the creep should do
          */
         readonly role: CreepRoles
 
         _cost: number
-
         /**
          * The amount of energy required to spawn the creep
          */
         readonly cost: number
 
         _commune: Room | undefined
-
         /**
          * The name of the room the creep is from
          */
         readonly commune: Room | undefined
 
         _defaultParts: number
-
         readonly defaultParts: number
 
         _strength: number
-
         /**
          * A numerical measurement of the combat abilites of the creep
          */
