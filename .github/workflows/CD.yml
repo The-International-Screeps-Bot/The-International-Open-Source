@@ -27,7 +27,7 @@ jobs:
                - name: Install dependencies
                  run: npm install
                - name: Start instances
-                 run: node server --maxTicks=50000
+                 run: node server --maxTicks=50000 --debug
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     EXPORT_API_BASE_URL: ${{ secrets.EXPORT_API_BASE_URL }}

@@ -26,10 +26,10 @@ const ports = getPorts()
 const options = { stdio: 'inherit' }
 const botPath = join(__dirname, 'dist')
 console.log('START')
-execSync(`npx screeps-grafana private --grafanaPort=${ports.grafanaPort} --relayPort=${ports.relayPort} --force`, options)
+execSync(`npx screeps-grafana private --grafanaPort=${ports.grafanaPort} --relayPort=${ports.relayPort} --force ${argv.debug ? "--debug" : ""}`, options)
 execSync('npm run build', options)
 execSync(
-    `npx screeps-performance-server --maxTicks=${argv.maxTicks} --maxBots=9 --botFilePath=${botPath} --steamKey=${process.env.STEAM_KEY} --exportBaseUrl=${process.env.EXPORT_API_BASE_URL} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force`,
+    `npx screeps-performance-server --maxTicks=${argv.maxTicks} --maxBots=9 --botFilePath=${botPath} --steamKey=${process.env.STEAM_KEY} --exportBaseUrl=${process.env.EXPORT_API_BASE_URL} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force ${argv.debug ? "--debug" : ""}`,
     options,
 )
 if (argv.stopGrafana) execSync("npx screeps-grafana stop")
