@@ -1715,6 +1715,6 @@ Creep.prototype.createCreepRoomLogisticsRequest = function (type, targetID, amou
         RT: resourceType,
         A: amount,
     })
-    this.room.visual.text(resourceType, findObjectWithID(targetID).pos)
+
     return RESULT_SUCCESS
 }
