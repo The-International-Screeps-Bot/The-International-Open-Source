@@ -244,22 +244,15 @@ export class LabManager {
     }
 
     run() {
-        if (!this.communeManager.room.storage || !this.communeManager.room.terminal) return
+        if (!this.communeManager.room.storage) return
+        if (!this.communeManager.room.terminal) return
 
+        delete this._outputLabs
         this.inputLab1 = this.communeManager.inputLabs[0]
         this.inputLab2 = this.communeManager.inputLabs[1]
 
         this.assignBoosts()
         this.manageReactions()
-    }
-
-    private isProperlyLoaded() {
-        if (
-            (this.inputLab1.mineralType == this.inputResources[0] || this.inputLab1.mineralType == null) &&
-            (this.inputLab2.mineralType == this.inputResources[1] || this.inputLab2.mineralType == null)
-        )
-            return true
-        return false
     }
 
     manageReactions() {
@@ -282,9 +275,43 @@ export class LabManager {
         this.updateDeficits()
         this.setCurrentReaction()
 
-        if (!this.isProperlyLoaded) return
+        if (!this.outputResource) return
 
+        this.createRoomLogisticsRequests()
         this.runReactions()
+    }
+
+    private canReact() {
+
+        if (this.outputLabs[0].cooldown) return false
+
+        const inputLabs = this.communeManager.inputLabs
+        for (let i = 0; i < inputLabs.length; i++) {
+            const lab = inputLabs[i]
+
+            if (lab.mineralType !== this.inputResources[i]) return false
+        }
+
+        return true
+    }
+
+    runReactions() {
+        if (!this.canReact()) return false
+
+        for (const output of this.outputLabs) {
+
+            if (this.isReverse) {
+                if (
+                    output.mineralType == this.outputResource &&
+                    output.store[this.outputResource] >= LAB_REACTION_AMOUNT
+                )
+                    output.reverseReaction(this.inputLab1, this.inputLab2) //Reverse is here so the outputLabs line up with the expected locations
+            } else {
+                output.runReaction(this.inputLab1, this.inputLab2)
+            }
+        }
+
+        return true
     }
 
     assignBoosts() {
@@ -302,7 +329,7 @@ export class LabManager {
                     continue
                 }
 
-                //Otherwise grab a lab that's not the input labs, and not a boosting lab
+                // Otherwise grab a lab that's not the input labs, and not a boosting lab
 
                 let boostingLabs = Object.values(this.labsByBoost)
                 let freelabs = this.communeManager.room.structures.lab.filter(
@@ -348,11 +375,6 @@ export class LabManager {
         }
     }
 
-    inputSatisfied(inputLab: StructureLab, inputRsc: MineralConstant | MineralCompoundConstant): boolean {
-        if (!inputLab) return false
-        return !inputLab.mineralType || inputLab.mineralType === inputRsc
-    }
-
     inputFull(inputLab: StructureLab) {
         if (!inputLab) return false
         if (!inputLab.mineralType) return false
@@ -360,36 +382,6 @@ export class LabManager {
             inputLab.store.getFreeCapacity(inputLab.mineralType) === 0 &&
             inputLab.store.getUsedCapacity(inputLab.mineralType) >= this.reactionAmountRemaining
         )
-    }
-
-    reactionPossible(): boolean {
-        if (!this.outputResource) return false
-
-        if (!this.isReverse) {
-            if (!this.inputLab1.mineralType || !this.inputSatisfied(this.inputLab1, this.inputResources[0]))
-                return false
-            if (!this.inputLab2.mineralType || !this.inputSatisfied(this.inputLab2, this.inputResources[1]))
-                return false
-        }
-
-        return true
-    }
-
-    runReactions() {
-        if (!this.reactionPossible()) return false
-
-        for (const output of this.outputLabs) {
-            if (this.isReverse) {
-                if (
-                    output.mineralType == this.outputResource &&
-                    output.store[this.outputResource] >= LAB_REACTION_AMOUNT
-                )
-                    output.reverseReaction(this.inputLab1, this.inputLab2) //Reverse is here so the outputLabs line up with the expected locations
-            } else {
-                output.runReaction(this.inputLab1, this.inputLab2)
-            }
-        }
-        return true
     }
 
     chainDecompose(compound: MineralConstant | MineralCompoundConstant, amount: number) {
@@ -560,23 +552,23 @@ export class LabManager {
     }
 
     createInputRoomLogisticsRequests() {
-        let inputLabs = [this.inputLab1, this.inputLab2]
+        let inputLabs = this.communeManager.inputLabs
         for (let i = 0; i < inputLabs.length; i++) {
             const lab = inputLabs[i]
-            const resource = this.inputResources[i]
+            const resourceType = this.inputResources[i]
 
             // We have the right resource or no resource
 
-            if (!lab.mineralType || lab.mineralType === resource) {
+            if (!lab.mineralType || lab.mineralType === resourceType) {
                 // We have enough
 
-                if (lab.store.getUsedCapacity(lab.mineralType) > lab.store.getCapacity(lab.mineralType) * 0.5) continue
+                if (lab.mineralType && lab.reserveStore[lab.mineralType] > lab.store.getCapacity(lab.mineralType) * 0.5) continue
 
                 // Ask for more
 
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: lab,
-                    resourceType: lab.mineralType,
+                    resourceType,
                     type: 'transfer',
                     priority:
                         50 +
@@ -609,13 +601,13 @@ export class LabManager {
             if (!lab.mineralType || lab.mineralType === this.outputResource) {
                 // We have a small amount
 
-                if (lab.store.getUsedCapacity(lab.mineralType) < lab.store.getCapacity(lab.mineralType) * 0.25) continue
+                if (lab.mineralType && lab.reserveStore[lab.mineralType] < lab.store.getCapacity(lab.mineralType) * 0.25) continue
 
                 // Ask for more
 
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: lab,
-                    resourceType: lab.mineralType,
+                    resourceType: this.outputResource,
                     type: 'withdraw',
                     priority:
                         20 +

@@ -2363,6 +2363,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     const ID = internationalManager.newTickID()
     /* this.visual.text(args.priority.toString(), args.target.pos) */
+    this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
     return (this.roomLogisticsRequests[args.type][ID] = {
         ID,
         type: args.type,

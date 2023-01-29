@@ -1367,6 +1367,10 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
         if (this.nextStore[request.resourceType] <= 0) {
             if (this.noDelivery) return false
 
+            // There are no practical storing structures to deliver from
+
+            if (this.room.name !== this.commune.name) return false
+
             // We don't have space to get any
 
             if (this.freeNextStore <= 0) return false
@@ -1401,25 +1405,23 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
  */
             // Try to find a sufficient storing structure
 
-            if (this.room.name === this.commune.name) {
-                let storingStructure
+            let storingStructure
 
-                // If energy, make sure there is enough to fill us to full
+            // If energy, make sure there is enough to fill us to full
 
-                if (request.resourceType === RESOURCE_ENERGY) {
-                    storingStructure = this.commune.communeManager.storingStructures.find(
-                        structure => structure.store[request.resourceType] >= this.freeNextStore,
-                    )
-                } else {
-                    storingStructure = this.commune.communeManager.storingStructures.find(
-                        structure => structure.store[request.resourceType] >= amount,
-                    )
-                }
+            if (request.resourceType === RESOURCE_ENERGY) {
+                storingStructure = this.commune.communeManager.storingStructures.find(
+                    structure => structure.store[request.resourceType] >= this.freeNextStore,
+                )
+            } else {
+                storingStructure = this.commune.communeManager.storingStructures.find(
+                    structure => structure.store[request.resourceType] >= amount,
+                )
+            }
 
-                if (storingStructure) {
-                    request.delivery = storingStructure.id
-                    return true
-                }
+            if (storingStructure) {
+                request.delivery = storingStructure.id
+                return true
             }
 
             return false
