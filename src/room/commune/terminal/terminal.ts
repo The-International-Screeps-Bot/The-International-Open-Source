@@ -75,7 +75,7 @@ export class TerminalManager {
                 ID,
                 priority: 1 - terminal.store[resourceTarget.resource] / targetAmount,
                 resource: resourceTarget.resource,
-                amount: targetAmount * 0.9 - terminal.store[resourceTarget.resource],
+                amount: targetAmount - terminal.store[resourceTarget.resource],
                 roomName: room.name,
             }
         }

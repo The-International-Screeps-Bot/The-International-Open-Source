@@ -88,6 +88,16 @@ export class SourceHarvester extends Creep {
         return true
     }
 
+    transferToSourceStructures?(): boolean {
+        // If the creep is not nearly full, stop
+
+        if (this.store.getCapacity() - this.nextStore.energy > 0) return false
+
+        if (this.transferToSourceExtensions()) return true
+        if (this.transferToSourceLink()) return true
+        return false
+    }
+
     transferToSourceExtensions?(): boolean {
         const { room } = this
 
@@ -95,39 +105,25 @@ export class SourceHarvester extends Creep {
 
         if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-        // If the creep is not nearly full, stop
+        const structure = room.findStructureInsideRect(
+            this.pos.x - 1,
+            this.pos.y - 1,
+            this.pos.x + 1,
+            this.pos.y + 1,
+            structure => {
+                return (
+                    structure.structureType === STRUCTURE_EXTENSION &&
+                    (structure as AnyStoreStructure).store.getCapacity(RESOURCE_ENERGY) - structure.nextStore.energy > 0
+                )
+            },
+        )
+        if (!structure) return false
 
-        if (this.store.getCapacity() - this.nextStore.energy > 0) return false
-
-        const adjacentCoords = findCoordsInsideRect(this.pos.x - 1, this.pos.y - 1, this.pos.x + 1, this.pos.y + 1)
-
-        let structureID: Id<Structure>
-
-        for (const coord of adjacentCoords) {
-            const structureIDs = room.structureCoords.get(packCoord(coord))
-            if (!structureIDs) continue
-
-            structureID = structureIDs.find(structureID => {
-                const structure = findObjectWithID(structureID) as AnyStoreStructure
-
-                return structure.structureType === STRUCTURE_EXTENSION && structure.store.getCapacity(RESOURCE_ENERGY) - this.nextStore.energy > 0
-            })
-        }
-
-        if (!structureID) return false
-
-        const structure = findObjectWithID(structureID)
-
-        this.transfer(structure, RESOURCE_ENERGY)
-        return true
+        return this.advancedTransfer(structure as AnyStoreStructure)
     }
 
     transferToSourceLink?(): boolean {
         const { room } = this
-
-        // If the creep is not nearly full, stop
-
-        if (this.store.getCapacity() - this.nextStore.energy > 0) return false
 
         // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
@@ -191,7 +187,7 @@ export class SourceHarvester extends Creep {
 
     transferToNearbyCreep?(): boolean {
         const sourceContainer = this.room.sourceContainers[this.memory.SI]
-        if (sourceContainer && sourceContainer.RCLActionable) return false
+        if (sourceContainer) return false
 
         const sourceLink = this.room.sourceLinks[this.memory.SI]
         if (sourceLink && sourceLink.RCLActionable) return false
@@ -228,13 +224,7 @@ export class SourceHarvester extends Creep {
 
             creep.advancedHarvestSource(room.sources[sourceIndex])
 
-            // Try to transfer to source extensions, iterating if success
-
-            if (creep.transferToSourceExtensions()) continue
-
-            // Try to transfer to the source link, iterating if success
-
-            if (creep.transferToSourceLink()) continue
+            if (creep.transferToSourceStructures()) continue
 
             // Try to repair the sourceContainer
 

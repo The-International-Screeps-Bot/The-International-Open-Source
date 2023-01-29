@@ -1,7 +1,7 @@
 import { minerals } from 'international/constants'
 import { CommuneManager } from './commune'
 import { Hauler } from '../creeps/roleManagers/commune/hauler'
-import { findObjectWithID, getRangeOfCoords, scalePriority } from 'international/utils'
+import { findObjectWithID, getRangeOfCoords, randomTick, scalePriority } from 'international/utils'
 
 const reactionCycleAmount = 5000
 
@@ -244,22 +244,15 @@ export class LabManager {
     }
 
     run() {
-        if (!this.communeManager.room.storage || !this.communeManager.room.terminal) return
+        if (!this.communeManager.room.storage) return
+        if (!this.communeManager.room.terminal) return
 
+        delete this._outputLabs
         this.inputLab1 = this.communeManager.inputLabs[0]
         this.inputLab2 = this.communeManager.inputLabs[1]
 
         this.assignBoosts()
         this.manageReactions()
-    }
-
-    private isProperlyLoaded() {
-        if (
-            (this.inputLab1.mineralType == this.inputResources[0] || this.inputLab1.mineralType == null) &&
-            (this.inputLab2.mineralType == this.inputResources[1] || this.inputLab2.mineralType == null)
-        )
-            return true
-        return false
     }
 
     manageReactions() {
@@ -282,9 +275,43 @@ export class LabManager {
         this.updateDeficits()
         this.setCurrentReaction()
 
-        if (!this.isProperlyLoaded) return
+        if (!this.outputResource) return
 
+        this.createRoomLogisticsRequests()
         this.runReactions()
+    }
+
+    private canReact() {
+
+        if (this.outputLabs[0].cooldown) return false
+
+        const inputLabs = this.communeManager.inputLabs
+        for (let i = 0; i < inputLabs.length; i++) {
+            const lab = inputLabs[i]
+
+            if (lab.mineralType !== this.inputResources[i]) return false
+        }
+
+        return true
+    }
+
+    runReactions() {
+        if (!this.canReact()) return false
+
+        for (const output of this.outputLabs) {
+
+            if (this.isReverse) {
+                if (
+                    output.mineralType == this.outputResource &&
+                    output.store[this.outputResource] >= LAB_REACTION_AMOUNT
+                )
+                    output.reverseReaction(this.inputLab1, this.inputLab2) //Reverse is here so the outputLabs line up with the expected locations
+            } else {
+                output.runReaction(this.inputLab1, this.inputLab2)
+            }
+        }
+
+        return true
     }
 
     assignBoosts() {
@@ -302,7 +329,7 @@ export class LabManager {
                     continue
                 }
 
-                //Otherwise grab a lab that's not the input labs, and not a boosting lab
+                // Otherwise grab a lab that's not the input labs, and not a boosting lab
 
                 let boostingLabs = Object.values(this.labsByBoost)
                 let freelabs = this.communeManager.room.structures.lab.filter(
@@ -348,11 +375,6 @@ export class LabManager {
         }
     }
 
-    inputSatisfied(inputLab: StructureLab, inputRsc: MineralConstant | MineralCompoundConstant): boolean {
-        if (!inputLab) return false
-        return !inputLab.mineralType || inputLab.mineralType === inputRsc
-    }
-
     inputFull(inputLab: StructureLab) {
         if (!inputLab) return false
         if (!inputLab.mineralType) return false
@@ -360,36 +382,6 @@ export class LabManager {
             inputLab.store.getFreeCapacity(inputLab.mineralType) === 0 &&
             inputLab.store.getUsedCapacity(inputLab.mineralType) >= this.reactionAmountRemaining
         )
-    }
-
-    reactionPossible(): boolean {
-        if (!this.outputResource) return false
-
-        if (!this.isReverse) {
-            if (!this.inputLab1.mineralType || !this.inputSatisfied(this.inputLab1, this.inputResources[0]))
-                return false
-            if (!this.inputLab2.mineralType || !this.inputSatisfied(this.inputLab2, this.inputResources[1]))
-                return false
-        }
-
-        return true
-    }
-
-    runReactions() {
-        if (!this.reactionPossible()) return false
-
-        for (const output of this.outputLabs) {
-            if (this.isReverse) {
-                if (
-                    output.mineralType == this.outputResource &&
-                    output.store[this.outputResource] >= LAB_REACTION_AMOUNT
-                )
-                    output.reverseReaction(this.inputLab1, this.inputLab2) //Reverse is here so the outputLabs line up with the expected locations
-            } else {
-                output.runReaction(this.inputLab1, this.inputLab2)
-            }
-        }
-        return true
     }
 
     chainDecompose(compound: MineralConstant | MineralCompoundConstant, amount: number) {
@@ -409,38 +401,44 @@ export class LabManager {
      */
     private updateDeficits() {
         //We don't need to update this super often, so save CPU, this is midly expensive.
-        if (Game.time % 10 != 0) return
+
+        if (!randomTick()) return
 
         this.deficits = {}
-        for (let key of allCompounds) {
+        for (const key of allCompounds) {
             this.deficits[key as MineralConstant | MineralCompoundConstant] = -this.resourceAmount(
                 key as MineralConstant | MineralCompoundConstant,
             )
         }
-        for (let compound in this.targetCompounds) {
-            console.log('updateDeficits ' + this.communeManager.room.name + ': ' + compound)
+        for (const compound in this.targetCompounds) {
             var amount = Math.max(0, this.targetCompounds[compound as MineralConstant | MineralCompoundConstant]) // this.communeManager.roomai.trading.maxStorageAmount(compound))
-
+            console.log('updateDeficits ' + this.communeManager.room.name + ': ' + compound + ', ' + amount)
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
         }
 
-        for (let key of Object.keys(this.deficits)) {
-            if (this.deficits[key as MineralConstant | MineralCompoundConstant] < 0)
-                this.deficits[key as MineralConstant | MineralCompoundConstant] = 0
+        for (const key in this.deficits) {
+            Math.max(this.deficits[key as MineralConstant | MineralCompoundConstant], 0)
         }
     }
 
-    private setupReaction(outputResource: MineralCompoundConstant, targetAmount: number, reverse: boolean) {
+    /**
+     * Assigns input resources based on the output, alongside reaction settings
+     */
+    private assignReaction(outputResource: MineralCompoundConstant, targetAmount: number, reverse: boolean) {
         this.outputResource = outputResource
-        if (outputResource == null) {
-            this.inputResources[0] = null
-            this.inputResources[1] = null
-        } else {
-            this.inputResources[0] = reverseReactions[outputResource][0]
-            this.inputResources[1] = reverseReactions[outputResource][1]
-        }
+
+        this.inputResources[0] = reverseReactions[outputResource][0]
+        this.inputResources[1] = reverseReactions[outputResource][1]
+
         this.isReverse = reverse
         this.targetAmount = targetAmount
+    }
+
+    assignNoReaction() {
+        this.outputResource = null
+        this.inputResources[0] = null
+        this.inputResources[1] = null
+        this.targetAmount = 0
     }
 
     snoozeUntil: number
@@ -450,29 +448,28 @@ export class LabManager {
         if (this.snoozeUntil && this.snoozeUntil > Game.time) return
         if (!this.isCurrentReactionFinished() && this.replanAt > Game.time) return
 
-        let nextReaction = this.findNextReaction()
+        const nextReaction = this.findNextReaction()
 
-        //was...   But I kept getting negative values in the targetAmount.  I think I jusut need to get to the cycleAmount instead.
+        // was...   But I kept getting negative values in the targetAmount.  I think I jusut need to get to the cycleAmount instead.
         //  Even then, that doesn't seem quite right.  Maybe it's correct for intermediates, but not for the end products.
         //  The second argtument is what amount level will cause the reactor to stop.
-        //this.setupReaction(nextReaction, reactionCycleAmount - this.resourceAmount(nextReaction));
+        /* this.assignReaction(nextReaction, reactionCycleAmount - this.resourceAmount(nextReaction)); */
 
         if (nextReaction) {
-            this.setupReaction(
+            this.assignReaction(
                 nextReaction.type,
                 this.resourceAmount(nextReaction.type) + Math.min(reactionCycleAmount, nextReaction.amount),
                 false,
             )
-        } else if (this.communeManager.room.storage.store['GO'] > 1000) {
-            this.setupReaction('GO', 1000, true)
-        } else if (this.communeManager.room.storage.store['LO'] > 500) {
-            this.setupReaction('LO', 500, true)
-        } else {
-            this.setupReaction(null, 0, false)
-            this.snoozeUntil = Game.time + 30
+
+            // Prevents continious reactions that take a long time, like breaking down 10000's of a compound
+
+            this.replanAt = Game.time + 3000
+            return
         }
-        //ReplanAt prevents some reactions that could run for a super long time, like breaking down 10000's of a compound,
-        this.replanAt = Game.time + 3000
+
+        this.assignNoReaction()
+        this.snoozeUntil = Game.time + 30
     }
 
     private isCurrentReactionFinished(): boolean {
@@ -491,35 +488,40 @@ export class LabManager {
         target: MineralConstant | MineralCompoundConstant,
         targetAmount: number,
     ): { type: MineralCompoundConstant; amount: number } {
-        let nextReaction = target
-        let missing = _.filter(decompose(nextReaction), r => this.resourceAmount(r) < LAB_REACTION_AMOUNT)
-        console.log(targetAmount + ':' + target + ' missing: ' + JSON.stringify(missing))
-        if (missing.length === 0) return { type: target as MineralCompoundConstant, amount: targetAmount }
+        const nextReaction = target
+        let missing = decompose(nextReaction).filter(r => this.resourceAmount(r) < targetAmount)
 
-        // filter uncookable resources (e.g. H). Can't get those using reactions.
-        missing = _.filter(decompose(nextReaction), r => this.resourceAmount(r) < targetAmount)
-        missing = _.filter(missing, r => decompose(r))
-        for (let target of missing) {
-            var result = this.chainFindNextReaction(target, targetAmount - this.resourceAmount(target))
+        console.log(target + ':' + targetAmount + ' missing: ' + JSON.stringify(missing))
+
+        if (!missing.length) return { type: target as MineralCompoundConstant, amount: targetAmount }
+
+        // filter uncookable resources (e.g. H). Can't get those using reactions
+
+        missing = decompose(nextReaction).filter(r => this.resourceAmount(r) < targetAmount)
+        missing = missing.filter(r => decompose(r))
+
+        for (const resource of missing) {
+            const result = this.chainFindNextReaction(resource, targetAmount - this.resourceAmount(resource))
             if (result) return result
         }
+
         return null
     }
 
     private findNextReaction(): { type: MineralCompoundConstant; amount: number } {
-        let targets = _.sortBy(
-            _.filter(
-                Object.keys(this.targetCompounds),
+        const resources = _.sortBy(
+            Object.keys(this.targetCompounds).filter(
                 v => this.deficits[v as MineralConstant | MineralCompoundConstant] > 0,
             ),
             v => -this.deficits[v as MineralConstant | MineralCompoundConstant],
         )
 
-        for (let target of targets) {
-            var result = this.chainFindNextReaction(
-                target as MineralConstant | MineralCompoundConstant,
-                this.deficits[target as MineralConstant | MineralCompoundConstant],
+        for (const resource of resources) {
+            const result = this.chainFindNextReaction(
+                resource as MineralConstant | MineralCompoundConstant,
+                this.deficits[resource as MineralConstant | MineralCompoundConstant],
             )
+
             if (result) return result
         }
 
@@ -529,7 +531,7 @@ export class LabManager {
     private resourceAmount(resource: MineralConstant | MineralCompoundConstant): number {
         if (!resource) return 0
 
-        let amount = this.communeManager.room.resourcesInStoringStructures[resource]
+        let amount = this.communeManager.room.resourcesInStoringStructures[resource] || 0
 
         for (const lab of this.communeManager.room.structures.lab) {
             if (lab.mineralType !== resource) continue
@@ -550,23 +552,23 @@ export class LabManager {
     }
 
     createInputRoomLogisticsRequests() {
-        let inputLabs = [this.inputLab1, this.inputLab2]
+        let inputLabs = this.communeManager.inputLabs
         for (let i = 0; i < inputLabs.length; i++) {
             const lab = inputLabs[i]
-            const resource = this.inputResources[i]
+            const resourceType = this.inputResources[i]
 
             // We have the right resource or no resource
 
-            if (!lab.mineralType || lab.mineralType === resource) {
+            if (!lab.mineralType || lab.mineralType === resourceType) {
                 // We have enough
 
-                if (lab.store.getUsedCapacity(lab.mineralType) > lab.store.getCapacity(lab.mineralType) * 0.5) continue
+                if (lab.mineralType && lab.reserveStore[lab.mineralType] > lab.store.getCapacity(lab.mineralType) * 0.5) continue
 
                 // Ask for more
 
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: lab,
-                    resourceType: lab.mineralType,
+                    resourceType,
                     type: 'transfer',
                     priority:
                         50 +
@@ -599,13 +601,13 @@ export class LabManager {
             if (!lab.mineralType || lab.mineralType === this.outputResource) {
                 // We have a small amount
 
-                if (lab.store.getUsedCapacity(lab.mineralType) < lab.store.getCapacity(lab.mineralType) * 0.25) continue
+                if (lab.mineralType && lab.reserveStore[lab.mineralType] < lab.store.getCapacity(lab.mineralType) * 0.25) continue
 
                 // Ask for more
 
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: lab,
-                    resourceType: lab.mineralType,
+                    resourceType: this.outputResource,
                     type: 'withdraw',
                     priority:
                         20 +

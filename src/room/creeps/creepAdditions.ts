@@ -19,32 +19,39 @@ Object.defineProperties(Creep.prototype, {
             return true
         },
     },
+    nameData: {
+        get() {
+            if (this._nameData) return this._nameData
+
+            return (this._nameData = this.name.split('_'))
+        },
+    },
     role: {
         get() {
             if (this._role) return this._role
 
-            return (this._role = creepRoles[parseInt(this.name.split('_')[0])])
+            return (this._role = creepRoles[parseInt(this.nameData[0])])
         },
     },
     cost: {
         get() {
             if (this._cost) return this._cost
 
-            return (this._cost = parseInt(this.name.split('_')[1]))
+            return (this._cost = parseInt(this.nameData[1]))
         },
     },
     commune: {
         get() {
             if (this._commune) return this._commune
 
-            return (this._commune = Game.rooms[this.name.split('_')[2]])
+            return (this._commune = Game.rooms[this.nameData[2]])
         },
     },
     defaultParts: {
         get() {
             if (this._defaultParts) return this._defaultParts
 
-            return (this._defaultParts = parseInt(this.name.split('_')[3]))
+            return (this._defaultParts = parseInt(this.nameData[3]))
         },
     },
     strength: {

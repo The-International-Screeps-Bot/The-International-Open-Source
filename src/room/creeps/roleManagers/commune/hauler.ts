@@ -5,6 +5,14 @@ export class Hauler extends Creep {
         super(creepID)
     }
 
+    run?() {
+
+        this.passiveRenew()
+        this.runRoomLogisticsRequestsAdvanced()
+
+        /* customLog('HAULER RUN', this.name) */
+    }
+
     static haulerManager(room: Room, creepsOfRole: string[]) {
         // Loop through creep names of this role
 
@@ -12,17 +20,7 @@ export class Hauler extends Creep {
             // Get the creep using its name
 
             const creep: Hauler = Game.creeps[creepName]
-
-            creep.passiveRenew()
-            creep.runRoomLogisticsRequestsAdvanced()
-
-            customLog('HAULER RUN', creep.name)
-
-            /* creep.room.visual.text((creep.nextStore.energy).toString(), creep.pos) */
-
-            /*
-            creep.haul()
-             */
+            creep.run()
         }
     }
 }

@@ -7,6 +7,9 @@ StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
 }
 
 StructureSpawn.prototype.advancedSpawn = function (spawnRequest, ID) {
+
+    spawnRequest.extraOpts.energyStructures = this.room.spawningStructuresByPriority
+
     return this.spawnCreep(
         spawnRequest.body,
         `${creepRoles.indexOf(spawnRequest.role)}_${spawnRequest.cost}_${this.room.name}_${
@@ -63,7 +66,6 @@ Room.prototype.createSpawnRequest = function (priority, role, defaultParts, body
         cost,
         extraOpts: {
             memory,
-            energyStructures: this.spawningStructuresByPriority,
         },
     })
 }
@@ -99,25 +101,17 @@ Room.prototype.spawnRequestIndividually = function (opts) {
         // If there are defaultParts
 
         if (opts.defaultParts.length) {
-            // Increment tier
 
             tier += 1
 
             // Loop through defaultParts
 
             for (const part of opts.defaultParts) {
-                // Get the cost of the part
 
                 partCost = BODYPART_COST[part]
-
-                // If adding the part will put the body above minCost, stop adding parts
-
                 if (cost + partCost > maxCostPerCreep) break
 
-                // And add the partCost to the cost
-
                 cost += partCost
-
                 bodyPartCounts[part] += 1
             }
         }
@@ -161,7 +155,6 @@ Room.prototype.spawnRequestIndividually = function (opts) {
                     let partIndex = opts.extraParts.length - 1
 
                     while (partIndex >= 0) {
-                        // Get the part using the partIndex
 
                         const part = opts.extraParts[partIndex]
 
@@ -218,8 +211,6 @@ Room.prototype.spawnRequestIndividually = function (opts) {
 
         opts.minCreeps -= 1
     }
-
-    // If minCreeps is equal to 0, stop
 }
 
 Room.prototype.spawnRequestByGroup = function (opts) {
@@ -303,20 +294,11 @@ Room.prototype.spawnRequestByGroup = function (opts) {
             // Loop through defaultParts
 
             for (const part of opts.defaultParts) {
-                // Get the cost of the part
 
                 partCost = BODYPART_COST[part]
-
-                // If adding the part will put the body above minCost, stop adding parts
-
                 if (cost + partCost > maxCostPerCreep) break
 
-                // And add the partCost to the cost
-
                 cost += partCost
-
-                // Add the part the the body
-
                 bodyPartCounts[part] += 1
             }
         }
@@ -327,15 +309,9 @@ Room.prototype.spawnRequestByGroup = function (opts) {
             const addedParts: BodyPartConstant[] = []
 
             for (const part of opts.extraParts) {
-                // And add the part's cost to the cost
 
                 cost += BODYPART_COST[part]
-
-                // Add the part the the body
-
                 addedParts.push(part)
-
-                // Reduce remainingAllowedParts and totalExtraParts
 
                 remainingAllowedParts -= 1
                 totalExtraParts -= 1
@@ -351,16 +327,10 @@ Room.prototype.spawnRequestByGroup = function (opts) {
                 // So long as partIndex is greater or equal to 0
 
                 while (partIndex >= 0) {
-                    // Get the part using the partIndex
 
                     const part = opts.extraParts[partIndex]
 
-                    // Get the cost of the part
-
                     partCost = BODYPART_COST[part]
-
-                    // If the cost minus partCost is below minCost, stop the loop
-
                     if (cost - partCost < opts.minCost) break
 
                     // And remove the part's cost to the cost

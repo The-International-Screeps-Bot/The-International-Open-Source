@@ -94,6 +94,7 @@ export class HubHauler extends Creep {
         const { terminal } = room
 
         if (!storage) return false
+        if (!terminal) return false
 
         // If the storage is sufficiently full
 
@@ -101,32 +102,31 @@ export class HubHauler extends Creep {
 
         // If the terminal exists and isn't power disabled
 
-        if (terminal && (!terminal.effects || !terminal.effects[PWR_DISRUPT_TERMINAL])) {
-            for (const key in terminal.store) {
-                const resourceType = key as ResourceConstant
+        if (terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) return false
 
-                // If there is not sufficient resources to justify moving
+        for (const key in terminal.store) {
+            const resourceType = key as ResourceConstant
 
-                if (terminal.store[resourceType] < this.store.getCapacity()) continue
+            // If there is not sufficient resources to justify moving
 
-                // If the terminal is sufficiently balanced compared to the storage
+            if (terminal.store[resourceType] < this.store.getCapacity()) continue
 
-                if (terminal.store[resourceType] < storage.store[resourceType] * 0.3 + this.store.getCapacity())
-                    continue
+            // If the terminal is sufficiently balanced compared to the storage
 
-                this.message += 'RST'
+            if (terminal.store[resourceType] < storage.store[resourceType] * 0.3 + this.store.getCapacity()) continue
 
-                let amount = this.freeNextStore
+            this.message += 'RST ' + resourceType
 
-                this.createCreepRoomLogisticsRequest('withdraw', terminal.id, amount, resourceType)
-                this.createCreepRoomLogisticsRequest(
-                    'transfer',
-                    storage.id,
-                    amount + this.store[resourceType],
-                    resourceType,
-                )
-                return true
-            }
+            let amount = this.freeNextStore
+
+            this.createCreepRoomLogisticsRequest('withdraw', terminal.id, amount, resourceType)
+            this.createCreepRoomLogisticsRequest(
+                'transfer',
+                storage.id,
+                amount + this.store[resourceType],
+                resourceType,
+            )
+            return true
         }
 
         return false
@@ -140,38 +140,36 @@ export class HubHauler extends Creep {
         const { storage } = room
         const { terminal } = room
 
-        if (!storage || !terminal) return false
+        if (!storage) return false
+        if (!terminal) return false
 
         // If the terminal is sufficiently full
 
         if (terminal.freeNextStore < this.store.getCapacity()) return false
 
-        if (storage) {
-            for (const key in storage.store) {
-                const resourceType = key as ResourceConstant
+        for (const key in storage.store) {
+            const resourceType = key as ResourceConstant
 
-                // If there is not sufficient resources to justify moving
+            // If there is not sufficient resources to justify moving
 
-                if (storage.store[resourceType] < this.store.getCapacity()) continue
+            if (storage.store[resourceType] < this.store.getCapacity()) continue
 
-                // If the storage is sufficiently balanced compared to the storage
+            // If the storage is sufficiently balanced compared to the storage
 
-                if (storage.store[resourceType] * 0.3 < terminal.store[resourceType] + this.store.getCapacity())
-                    continue
+            if (storage.store[resourceType] * 0.3 < terminal.store[resourceType] + this.store.getCapacity()) continue
 
-                this.message += 'RTT'
+            this.message += 'RTT ' + resourceType
 
-                let amount = this.freeNextStore
+            let amount = this.freeNextStore
 
-                this.createCreepRoomLogisticsRequest('withdraw', storage.id, amount, resourceType)
-                this.createCreepRoomLogisticsRequest(
-                    'transfer',
-                    terminal.id,
-                    amount + this.store[resourceType],
-                    resourceType,
-                )
-                return true
-            }
+            this.createCreepRoomLogisticsRequest('withdraw', storage.id, amount, resourceType)
+            this.createCreepRoomLogisticsRequest(
+                'transfer',
+                terminal.id,
+                amount + this.store[resourceType],
+                resourceType,
+            )
+            return true
         }
 
         return false
@@ -245,7 +243,11 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy + room.upgradeStrength * 2) return false
+        if (
+            hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold <
+            hubLink.store.energy + room.upgradeStrength * 2
+        )
+            return false
 
         const { controllerLink } = room
         const { fastFillerLink } = room
@@ -538,7 +540,7 @@ export class HubHauler extends Creep {
  */
             if (!creep.runRoomLogisticsRequests()) continue
 
-            creep.message = '🚬'
+            creep.message += '🚬'
         }
     }
 }

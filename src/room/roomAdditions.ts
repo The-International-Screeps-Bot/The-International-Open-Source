@@ -21,6 +21,7 @@ import {
     unpackNumAsPos,
     findFunctionCPU,
     areCoordsEqual,
+    getRangeOfCoords,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { profiler } from 'other/screeps-profiler'
@@ -438,13 +439,45 @@ const roomAdditions = {
         get() {
             if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
+            this._spawningStructuresByPriority = []
+
+            const structuresToWeight: SpawningStructures = []
+
+            /**
+             * Check if the structure is for a source and add it if so
+             */
+            const isSourceStructure = (structure: StructureExtension | StructureSpawn) => {
+                for (const i in this.sourcePositions) {
+                    const pos = this.sourcePositions[i][0]
+
+                    if (getRangeOfCoords(structure.pos, pos) > 1) continue
+
+                    this._spawningStructuresByPriority.push(structure)
+                    return true
+                }
+
+                return false
+            }
+
+            for (const structure of this.spawningStructures) {
+                if (isSourceStructure(structure)) continue
+
+                structuresToWeight.push(structure)
+            }
+
+            // Add in the non-source structures, by distance to anchor
+
+            this._spawningStructuresByPriority = this._spawningStructuresByPriority.concat(
+                structuresToWeight.sort(
+                    (a, b) =>
+                        getRange(a.pos.x, this.anchor.x, a.pos.y, this.anchor.y) -
+                        getRange(b.pos.x, this.anchor.x, b.pos.y, this.anchor.y),
+                ),
+            )
+
             // Sort based on lowest range from the anchor
 
-            return (this._spawningStructuresByPriority = this.spawningStructures.sort(
-                (a, b) =>
-                    getRange(a.pos.x, this.anchor.x, a.pos.y, this.anchor.y) -
-                    getRange(b.pos.x, this.anchor.x, b.pos.y, this.anchor.y),
-            ))
+            return this._spawningStructuresByPriority
         },
     },
     spawningStructuresByNeed: {
@@ -993,8 +1026,7 @@ const roomAdditions = {
                 this._usedUpgradeCoords.add(creep.memory.PC)
             }
 
-            if (this.controllerLink)
-                this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
+            if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
             /*
             for (const packedCoord of this._usedUpgradeCoords) {
 
