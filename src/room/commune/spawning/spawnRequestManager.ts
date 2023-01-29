@@ -779,7 +779,6 @@ Room.prototype.spawnRequester = function () {
                 // Otherwise, set partsMultiplier to 0
                 else partsMultiplier = 0
             }
-
             // Otherwise if there is no storage
             else {
                 partsMultiplier += estimatedIncome * 0.75

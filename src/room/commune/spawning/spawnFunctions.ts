@@ -359,7 +359,10 @@ Room.prototype.spawnRequestByGroup = function (opts) {
             }
 
             tier += 1
-            for (const part of addedParts) bodyPartCounts[part] += 1
+            for (const part of addedParts) {
+
+                bodyPartCounts[part] += 1
+            }
         }
 
         // Create a spawnRequest using previously constructed information

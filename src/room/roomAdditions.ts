@@ -2139,6 +2139,7 @@ const roomAdditions = {
 
             for (const structure of storingStructures) {
                 if (!structure) continue
+                if (!structure.RCLActionable) continue
 
                 for (const key in structure.store) {
                     const resourceType = key as ResourceConstant
