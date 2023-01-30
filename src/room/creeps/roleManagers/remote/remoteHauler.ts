@@ -373,7 +373,7 @@ export class RemoteHauler extends Creep {
     relayCoord?(coord: Coord) {
         if (Memory.roomVisuals) this.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
 
-        const creepAtPosName = this.room.creepPositions.get(packCoord(coord))
+        const creepAtPosName = this.room.creepPositions[packCoord(coord)]
         if (!creepAtPosName) return false
 
         const creepAtPos = Game.creeps[creepAtPosName]

@@ -61,7 +61,7 @@ class CreepOrganizer {
 
         // Add the creep's name to the position in its room
 
-        if (!creep.spawning) creep.room.creepPositions.set(packCoord(creep.pos), creep.name)
+        if (!creep.spawning) creep.room.creepPositions[packCoord(creep.pos)] = creep.name
 
         if (roomLogisticsRoles.has(role)) creep.roomLogisticsRequestManager()
 

@@ -387,9 +387,9 @@ PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = fun
 
     this.moveRequest = packedCoord
 
-    room.moveRequests.get(packedCoord)
-        ? room.moveRequests.get(packedCoord).push(this.name)
-        : room.moveRequests.set(packedCoord, [this.name])
+    room.moveRequests[packedCoord]
+        ? room.moveRequests[packedCoord].push(this.name)
+        : room.moveRequests[packedCoord] = [this.name]
 }
 
 PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = function (avoidPackedPositions) {
@@ -416,8 +416,8 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
     for (let index = 0; index < adjacentPackedPositions.length; index++) {
         const packedCoord = adjacentPackedPositions[index]
 
-        if (room.creepPositions.get(packedCoord)) continue
-        if (room.powerCreepPositions.get(packedCoord)) continue
+        if (room.creepPositions[packedCoord]) continue
+        if (room.powerCreepPositions[packedCoord]) continue
 
         if (avoidPackedPositions.has(packedCoord)) continue
 
@@ -508,7 +508,7 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     // If requests are not allowed for this pos, inform false
 
-    if (!room.moveRequests.get(this.moveRequest)) return false
+    if (!room.moveRequests[this.moveRequest]) return false
 
     if (this.move(this.pos.getDirectionTo(unpackCoordAsPos(this.moveRequest, room.name))) !== OK) return false
 
@@ -524,7 +524,7 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     // Remove all moveRequests to the position
 
-    room.moveRequests.delete(this.moveRequest)
+    delete room.moveRequests[this.moveRequest]
     delete this.moveRequest
 
     // Remove record of the creep being on its current position
@@ -542,7 +542,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     const { room } = this
 
     if (!this.moveRequest) return
-    if (!room.moveRequests.get(this.moveRequest)) {
+    if (!room.moveRequests[this.moveRequest]) {
         this.moved = 'moved'
         return
     }
@@ -551,14 +551,14 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     // Try to find the name of the creep at pos
 
-    const creepNameAtPos = room.creepPositions.get(this.moveRequest) || room.powerCreepPositions.get(this.moveRequest)
+    const creepNameAtPos = room.creepPositions[this.moveRequest] || room.powerCreepPositions[this.moveRequest]
 
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
         if (this.spawning) {
             this.moved = this.moveRequest
-            room.moveRequests.delete(this.moveRequest)
+            room.moveRequests[this.moveRequest]
             return
         }
 
@@ -603,7 +603,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if (this.spawning) {
         if (creepAtPos.shove(this.pos)) {
             this.moved = this.moveRequest
-            room.moveRequests.delete(this.moveRequest)
+            delete room.moveRequests[this.moveRequest]
         }
 
         return
@@ -629,7 +629,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 // Have the creepAtPos move to the creep and inform true
 
                 creepAtPos.moveRequest = packedCoord
-                room.moveRequests.set(packedCoord, [creepAtPos.name])
+                room.moveRequests[packedCoord] = [creepAtPos.name]
                 creepAtPos.runMoveRequest()
                 return
             }
@@ -681,7 +681,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if (creepAtPos.moveRequest) {
         // If it's not valid
 
-        if (!room.moveRequests.get(creepAtPos.moveRequest)) {
+        if (!room.moveRequests[creepAtPos.moveRequest]) {
             /*
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -765,7 +765,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             // Have the creepAtPos move to the creep and inform true
 
             creepAtPos.moveRequest = packedCoord
-            room.moveRequests.set(packedCoord, [creepAtPos.name])
+            room.moveRequests[packedCoord] = [creepAtPos.name]
             creepAtPos.runMoveRequest()
             return
         }
@@ -821,7 +821,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // Have the creepAtPos move to the creep and inform true
 
     creepAtPos.moveRequest = packedCoord
-    room.moveRequests.set(packedCoord, [creepAtPos.name])
+    room.moveRequests[packedCoord] = [creepAtPos.name]
     creepAtPos.runMoveRequest()
 }
 

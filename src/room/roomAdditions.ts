@@ -432,7 +432,9 @@ const roomAdditions = {
 
             if (!this.anchor) return []
 
-            return (this._spawningStructures = [...this.structures.spawn, ...this.structures.extension])
+            this._spawningStructures = [...this.structures.spawn, ...this.structures.extension].filter(structure => structure.RCLActionable)
+
+            return this._spawningStructures
         },
     },
     spawningStructuresByPriority: {

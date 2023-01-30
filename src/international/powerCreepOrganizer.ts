@@ -62,7 +62,7 @@ class PowerCreepOrganizer {
 
         const { room } = creep
 
-        room.powerCreepPositions.set(packCoord(creep.pos), creep.name)
+        room.powerCreepPositions[packCoord(creep.pos)] = creep.name
 
         // Organize creep in its room by its role
 

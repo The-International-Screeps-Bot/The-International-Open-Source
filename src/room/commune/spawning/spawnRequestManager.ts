@@ -55,7 +55,7 @@ Room.prototype.spawnRequester = function () {
                 role = 'sourceHarvester'
 
                 const spawnGroup = this.creepsOfSource[sourceIndex]
-                customLog('SPAWN GROUP', spawnGroup)
+
                 const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + spawnGroup.length
 
                 if (spawnEnergyCapacity >= 800) {

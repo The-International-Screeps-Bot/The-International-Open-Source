@@ -944,17 +944,17 @@ declare global {
         /**
          * A matrix with indexes of packed coords and values of creep names
          */
-        creepPositions: Map<string, string>
+        creepPositions: { [packedCoord: string]: string }
 
         /**
          * A matrix with indexes of packed coords and values of creep names
          */
-        powerCreepPositions: Map<string, string>
+        powerCreepPositions: { [packedCoord: string]: string }
 
         /**
          * A matrix with indexes of packed coords and values of creep names
          */
-        moveRequests: Map<string, string[]>
+        moveRequests: { [packedCoord: string]: string[] }
 
         roomManager: RoomManager
 
@@ -1007,10 +1007,9 @@ declare global {
 
         scoutByRoomName(): RoomTypes | false
 
-        scoutReservedRemote(): RoomTypes | false
-
-        scoutUnreservedRemote(): RoomTypes | false
-
+        scoutRemote(scoutingRoom?: Room): RoomTypes | false
+        scoutEnemyReservedRemote(): RoomTypes | false
+        scoutEnemyUnreservedRemote(): RoomTypes | false
         scoutMyRemote(scoutingRoom: Room): RoomTypes | false
 
         scoutEnemyRoom(): RoomTypes | false
@@ -1222,7 +1221,13 @@ declare global {
         findStructureAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): Structure | false
         findStructureAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): Structure | false
 
-        findStructureInsideRect(x1: number, y1: number, x2: number, y2: number, condition: (structure: Structure) => boolean): Structure | false
+        findStructureInsideRect(
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+            condition: (structure: Structure) => boolean,
+        ): Structure | false
         // Room Getters
 
         readonly global: Partial<RoomGlobal>

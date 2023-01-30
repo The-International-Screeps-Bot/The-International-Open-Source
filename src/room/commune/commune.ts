@@ -231,10 +231,6 @@ export class CommuneManager {
     }
 
     private test() {
-        const P = packPlanCoord(STRUCTURE_EXTENSION, 3)
-        customLog('P', P)
-
-        customLog("R", JSON.stringify(unpackPlanCoord(P)))
 
         return
 

@@ -44,9 +44,9 @@ export class RoomManager {
             cleanRoomMemory(room.name)
         }
 
-        room.moveRequests = new Map()
-        room.creepPositions = new Map()
-        room.powerCreepPositions = new Map()
+        room.moveRequests = {}
+        room.creepPositions = {}
+        room.powerCreepPositions = {}
 
         // Single tick properties
 

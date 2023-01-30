@@ -17,7 +17,7 @@ import {
     roomDimensions,
     roomTypeProperties,
     roomTypes,
-    stagnantRoomTypes,
+    constantRoomTypes,
     stamps,
     structureTypesByBuildPriority,
     RESULT_FAIL,
@@ -517,65 +517,56 @@ Room.prototype.scoutByRoomName = function () {
     return false
 }
 
-Room.prototype.scoutReservedRemote = function () {
+Room.prototype.scoutRemote = function (scoutingRoom) {
+    if (this.scoutEnemyReservedRemote()) return this.memory.T
+    if (this.scoutEnemyUnreservedRemote()) return this.memory.T
+
+    if (!scoutingRoom) return this.memory.T
+    return this.scoutMyRemote(scoutingRoom)
+}
+
+Room.prototype.scoutEnemyReservedRemote = function () {
     const { controller } = this
 
-    // If there is no reservation inform false
-
     if (!controller.reservation) return false
-
-    // If I am the reserver, inform false
-
     if (controller.reservation.username === Memory.me) return false
-
-    // If the reserver is an Invader, inform false
-
     if (controller.reservation.username === 'Invader') return false
-
-    const harvestedSources = this.find(FIND_SOURCES, {
-        filter: source => source.ticksToRegeneration > 0,
-    })
 
     // If there are roads or containers or sources harvested, inform false
 
-    if (!this.structures.road && !this.structures.container && !harvestedSources) return false
+    if (
+        !this.structures.road &&
+        !this.structures.container &&
+        !this.find(FIND_SOURCES, {
+            filter: source => source.ticksToRegeneration > 0,
+        })
+    )
+        return false
 
     // If the controller is not reserved by an ally
 
     if (!Memory.allyPlayers.includes(controller.reservation.username)) {
-        // Set type to enemyRemote and inform true
-
         this.memory.owner = controller.reservation.username
         return (this.memory.T = 'enemyRemote')
     }
 
     // Otherwise if the room is reserved by an ally
 
-    // Set type to allyRemote and inform true
-
     this.memory.owner = controller.reservation.username
     return (this.memory.T = 'allyRemote')
 }
 
-Room.prototype.scoutUnreservedRemote = function () {
+Room.prototype.scoutEnemyUnreservedRemote = function () {
     const { controller } = this
 
     if (controller.reservation) {
-        // If I am the reserver, inform false
-
         if (controller.reservation.username === Memory.me) return false
-
-        // If the reserver is an Invader, inform false
-
         if (controller.reservation.username === 'Invader') return false
     }
 
     const harvestedSources = this.find(FIND_SOURCES, {
         filter: source => source.ticksToRegeneration > 0,
     })
-
-    // If there are no sources harvested
-
     if (!harvestedSources.length) return false
 
     // Find creeps that I don't own that aren't invaders
@@ -615,90 +606,6 @@ Room.prototype.scoutUnreservedRemote = function () {
     }
 
     return false
-}
-
-Room.prototype.scoutEnemyRoom = function () {
-    const { controller } = this
-    const playerName = controller.owner.username
-    const roomMemory = this.memory
-
-    roomMemory.T = 'enemy'
-
-    let player = Memory.players[playerName]
-    if (!player) {
-        player = Memory.players[playerName] = {
-            data: [0],
-        }
-
-        for (const key in PlayerData) this.memory.data[parseInt(key)] = 0
-    }
-
-    // General
-
-    const level = controller.level
-    roomMemory.level = level
-
-    roomMemory.powerEnabled = controller.isPowerEnabled
-
-    // Offensive threat
-
-    let threat = 0
-
-    threat += Math.pow(level, 2)
-
-    threat += this.structures.spawn.length * 50
-    threat += this.structures.nuker.length * 300
-    threat += Math.pow(this.structures.lab.length * 10000, 0.4)
-
-    threat = Math.floor(threat)
-
-    roomMemory.OS = threat
-    Memory.players[playerName].data[PlayerData.offensiveStrength] = Math.max(
-        threat,
-        player.data[PlayerData.offensiveStrength],
-    )
-
-    // Defensive threat
-
-    threat = 0
-
-    const energy = this.resourcesInStoringStructures.energy
-
-    roomMemory.energy = energy
-    threat += Math.pow(energy, 0.5)
-
-    const ramparts = this.structures.rampart
-    const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
-
-    threat += Math.pow(avgRampartHits, 0.5)
-    threat += this.structures.spawn.length * 100
-    threat += this.structures.tower.length * 300
-    threat += Math.pow(this.structures.extension.length * 400, 0.8)
-
-    const hasTerminal = this.terminal !== undefined
-
-    if (hasTerminal) {
-        threat += 800
-
-        roomMemory.terminal = true
-    }
-
-    threat = Math.floor(threat)
-
-    roomMemory.DS = threat
-    Memory.players[playerName].data[PlayerData.defensiveStrength] = Math.max(
-        threat,
-        player.data[PlayerData.defensiveStrength],
-    )
-
-    // Combat request creation
-
-    this.createAttackCombatRequest({
-        maxTowerDamage: Math.ceil(this.structures.tower.length * TOWER_POWER_ATTACK * 1.1),
-        minDamage: 50,
-    })
-
-    return roomMemory.T
 }
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
@@ -855,6 +762,90 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     return this.memory.T
 }
 
+Room.prototype.scoutEnemyRoom = function () {
+    const { controller } = this
+    const playerName = controller.owner.username
+    const roomMemory = this.memory
+
+    roomMemory.T = 'enemy'
+
+    let player = Memory.players[playerName]
+    if (!player) {
+        player = Memory.players[playerName] = {
+            data: [0],
+        }
+
+        for (const key in PlayerData) this.memory.data[parseInt(key)] = 0
+    }
+
+    // General
+
+    const level = controller.level
+    roomMemory.level = level
+
+    roomMemory.powerEnabled = controller.isPowerEnabled
+
+    // Offensive threat
+
+    let threat = 0
+
+    threat += Math.pow(level, 2)
+
+    threat += this.structures.spawn.length * 50
+    threat += this.structures.nuker.length * 300
+    threat += Math.pow(this.structures.lab.length * 10000, 0.4)
+
+    threat = Math.floor(threat)
+
+    roomMemory.OS = threat
+    Memory.players[playerName].data[PlayerData.offensiveStrength] = Math.max(
+        threat,
+        player.data[PlayerData.offensiveStrength],
+    )
+
+    // Defensive threat
+
+    threat = 0
+
+    const energy = this.resourcesInStoringStructures.energy
+
+    roomMemory.energy = energy
+    threat += Math.pow(energy, 0.5)
+
+    const ramparts = this.structures.rampart
+    const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
+
+    threat += Math.pow(avgRampartHits, 0.5)
+    threat += this.structures.spawn.length * 100
+    threat += this.structures.tower.length * 300
+    threat += Math.pow(this.structures.extension.length * 400, 0.8)
+
+    const hasTerminal = this.terminal !== undefined
+
+    if (hasTerminal) {
+        threat += 800
+
+        roomMemory.terminal = true
+    }
+
+    threat = Math.floor(threat)
+
+    roomMemory.DS = threat
+    Memory.players[playerName].data[PlayerData.defensiveStrength] = Math.max(
+        threat,
+        player.data[PlayerData.defensiveStrength],
+    )
+
+    // Combat request creation
+
+    this.createAttackCombatRequest({
+        maxTowerDamage: Math.ceil(this.structures.tower.length * TOWER_POWER_ATTACK * 1.1),
+        minDamage: 50,
+    })
+
+    return roomMemory.T
+}
+
 Room.prototype.basicScout = function () {
     const { controller } = this
 
@@ -862,42 +853,31 @@ Room.prototype.basicScout = function () {
 
     this.memory.LST = Game.time
 
-    if (stagnantRoomTypes.has(this.memory.T)) return this.memory.T
+    if (!controller) return this.memory.T
 
-    // If there is a controller
+    // If the contoller is owned
 
-    if (controller) {
-        // If the contoller is owned
+    if (controller.owner) {
+        // Stop if the controller is owned by me
 
-        if (controller.owner) {
-            // Stop if the controller is owned by me
+        if (controller.my) return this.memory.T
 
-            if (controller.my) return this.memory.T
+        const owner = controller.owner.username
+        this.memory.owner = owner
 
-            const owner = controller.owner.username
+        // If the controller is owned by an ally
 
-            this.memory.owner = owner
+        if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
 
-            // If the controller is owned by an ally
+        if (this.scoutEnemyRoom()) return this.memory.T
 
-            if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
-
-            if (this.scoutEnemyRoom()) return this.memory.T
-
-            return this.memory.T
-        }
-
-        if (this.scoutReservedRemote()) return this.memory.T
-
-        if (this.scoutUnreservedRemote()) return this.memory.T
-
-        if (this.memory.T === 'remote') return this.memory.T
-
-        this.createClaimRequest()
-        return (this.memory.T = 'neutral')
+        return this.memory.T
     }
 
-    return this.memory.T
+    if (this.scoutRemote()) return this.memory.T
+
+    this.createClaimRequest()
+    return (this.memory.T = 'neutral')
 }
 
 Room.prototype.advancedScout = function (scoutingRoom: Room) {
@@ -907,7 +887,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
     this.memory.LST = Game.time
 
-    if (stagnantRoomTypes.has(this.memory.T)) return this.memory.T
+    if (constantRoomTypes.has(this.memory.T)) return this.memory.T
     if (this.scoutByRoomName()) return this.memory.T
 
     // If there is a controller
@@ -933,11 +913,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
             return this.memory.T
         }
 
-        if (this.scoutReservedRemote()) return this.memory.T
-
-        if (this.scoutUnreservedRemote()) return this.memory.T
-
-        if (this.scoutMyRemote(scoutingRoom)) return this.memory.T
+        if (this.scoutRemote(scoutingRoom)) return this.memory.T
 
         this.createClaimRequest()
         return (this.memory.T = 'neutral')

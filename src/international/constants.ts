@@ -44,7 +44,7 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     intersection: new Set(['portalsTo']),
 }
 
-export const stagnantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
+export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
 
 export const roomTypesUsedForStats = ['commune', 'remote']
 
@@ -731,6 +731,10 @@ export enum RemoteData {
     abandon,
     onlyInvader,
     disableCachedPaths,
+    /**
+     * Wether or not we are
+     */
+    active
 }
 
 export enum ClaimRequestData {
