@@ -7,7 +7,7 @@ const coord_Codec = new Impl.Codec({ array: 1, depth: coordDepths })
 const posDepths = [2, 7, 7, 6, 6] // max = [4,128,128,64,64]
 const pos_Codec = new Impl.Codec({ array: 1, depth: posDepths })
 
-const planCoordDepths = [5, 3, 6, 6] // max = [32,8,64,64]
+const planCoordDepths = [5, 4] // max = [32,16]
 const planCoord_codec = new Impl.Codec({ depth: planCoordDepths, array: 1 })
 /**
  * screeps-packrat
@@ -418,39 +418,37 @@ export function unpackPosList(chars: string) {
 /**
  * Pack a planned cord for base building
  */
-export function packPlanCoord(coord: PlanCoord, x: number, y: number) {
-    return planCoord_codec.encode([allStructureTypes.indexOf(coord.structureType), coord.minRCL, x, y])
+export function packPlanCoord(coord: PlanCoord) {
+    return planCoord_codec.encode([allStructureTypes.indexOf(coord.structureType), coord.minRCL])
 }
 
 /**
  * Packs a list of planned coords for base building
  */
 export function packPlanCoordList(coordList: PlanCoord[]) {
-    let str = ''
+    let strArr = []
     const maxLength = coordList.length
     for (let i = 0; i < maxLength; i++) {
-        const x = (i % 50) + 1
-        const y = Math.floor(i / 50) + 1
-        str += packPlanCoord(coordList[i], x, y)
+        strArr.push(packPlanCoord(coordList[i]))
     }
-    return str
+    return strArr
 }
 
 /**
  * Unpack a planned cord for base building
  */
 export function unpackPlanCoord(chars: string) {
-    const coord = planCoord_codec.decode(chars) as [number, number, number, number]
-    return { structureType: allStructureTypes[coord[0]], minRCL: coord[1], x: coord[2], y: coord[3] }
+    const coord = planCoord_codec.decode(chars) as [number, number]
+    return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
 }
 
 /**
  * Unpacks a list of planned coords for base building
  */
-export function unpackPlanCoordList(chars: string) {
+export function unpackPlanCoordList(chars: string[]): PlanCoord[] {
     const coordList: PlanCoord[] = []
-    for (let i = 0; i < chars.length; i += 2) {
-        coordList.push(unpackPlanCoord(chars[i] + chars[i + 1]))
+    for (let i = 0; i < chars.length; i += 1) {
+        coordList.push(unpackPlanCoord(chars[i]))
     }
     return coordList
 }
