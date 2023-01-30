@@ -74,10 +74,10 @@ const roomAdditions = {
 
             const sources = this.find(FIND_SOURCES)
 
-            for (let i = 0; i < this.memory.SIDs.length; i++) {
+            for (const i in sources) {
                 const source = sources[i]
 
-                source.index = i
+                source.index = parseInt(i)
 
                 this.memory.SIDs.push(source.id)
                 this._sources.push(source)
@@ -686,13 +686,11 @@ const roomAdditions = {
             this._usedSourceCoords = []
 
             for (const i in this.sources) {
-
                 this._usedSourceCoords.push(new Set())
 
                 // Record used source coords
 
                 for (const creepName of this.creepsOfSource[i]) {
-
                     const creep = Game.creeps[creepName]
 
                     // If the creep is dying, iterate
