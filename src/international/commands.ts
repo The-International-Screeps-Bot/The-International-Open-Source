@@ -1,6 +1,6 @@
 import { allStructureTypes, AllyCreepRequestData, ClaimRequestData, CombatRequestData } from './constants'
 
-const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN, STRUCTURE_STORAGE, STRUCTURE_TERMINAL]
+const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
 
 global.clearGlobal = function () {
     // Clear global and stop CPU usage for a tick
