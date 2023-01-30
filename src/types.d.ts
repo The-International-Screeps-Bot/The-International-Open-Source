@@ -141,6 +141,7 @@ declare global {
         | 'antifaHealer'
         | 'antifaDismantler'
         | 'antifaDowngrader'
+
     interface TerminalRequest {
         ID: string
         /**
@@ -150,6 +151,11 @@ declare global {
         amount: number
         resource: ResourceConstant
         roomName: string
+    }
+
+    interface PlanCoord {
+        structureType: StructureConstant
+        minRCL: number
     }
 
     type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'

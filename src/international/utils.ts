@@ -6,6 +6,7 @@ import {
     roomDimensions,
     roomTypeProperties,
     roomTypes,
+    allStructureTypes,
 } from './constants'
 
 /**
@@ -603,5 +604,20 @@ export function makeRoomCoord(roomName: string) {
         name: name,
         x: cx === 'W' ? ~x : parseInt(x),
         y: cy === 'N' ? ~y : parseInt(y)
+    }
+}
+
+export function packPlanCoord(structureType: StructureConstant, minRCL: number) {
+
+    return allStructureTypes.indexOf(structureType) + '_' + minRCL
+}
+
+export function unpackPlanCoord(packedPlanCoord: string): PlanCoord {
+
+    const packedPlanCoordData = packedPlanCoord.split('_')
+
+    return {
+        structureType: allStructureTypes[packedPlanCoordData[0] as any],
+        minRCL: parseInt(packedPlanCoordData[1])
     }
 }

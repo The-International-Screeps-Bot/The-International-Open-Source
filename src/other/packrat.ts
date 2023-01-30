@@ -10,7 +10,7 @@ const pos_Codec = new Impl.Codec({ array: 1, depth: posDepths })
  * ---------------
  * Lightning-fast and memory-efficient serialization of Screeps IDs, Coords, and RoomPositions
  * Code written by Muon as part of Overmind Screeps AI
- * Modified by Carson Burke
+ * Modified by Carson Burke and Pieter Brandsen
  *
  * Feel free to adapt as desired
  * Package repository: https://github.com/bencbartlett/screeps-packrat

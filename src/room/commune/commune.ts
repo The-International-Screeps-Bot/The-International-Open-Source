@@ -8,7 +8,9 @@ import {
     getRange,
     getRangeOfCoords,
     makeRoomCoord,
+    packPlanCoord,
     unpackNumAsCoord,
+    unpackPlanCoord,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -229,7 +231,10 @@ export class CommuneManager {
     }
 
     private test() {
-        this.storedEnergyUpgradeThreshold
+        const P = packPlanCoord(STRUCTURE_EXTENSION, 3)
+        customLog('P', P)
+
+        customLog("R", JSON.stringify(unpackPlanCoord(P)))
 
         return
 
