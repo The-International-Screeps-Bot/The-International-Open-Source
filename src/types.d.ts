@@ -114,8 +114,7 @@ declare global {
     type CoordMap = Uint8Array
 
     type CreepRoles =
-        | 'source1Harvester'
-        | 'source2Harvester'
+        | 'sourceHarvester'
         | 'hauler'
         | 'requestHauler'
         | 'controllerUpgrader'
@@ -870,9 +869,9 @@ declare global {
 
     interface Room {
         /**
-         * The amount of creeps with a task of harvesting sources in the room
+         * The names of creeps harvesting each source
          */
-        creepsOfSourceAmount: number[]
+        creepsOfSource: string[][]
 
         estimatedSourceIncome: number[]
 
@@ -2003,7 +2002,7 @@ declare global {
         /**
          * The Source Index of recorded sources in the room
          */
-        SI: 0 | 1
+        SI: number
 
         /**
          * The creep's packed coord for a designated target

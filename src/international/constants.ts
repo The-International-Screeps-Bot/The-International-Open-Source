@@ -49,8 +49,7 @@ export const stagnantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'ke
 export const roomTypesUsedForStats = ['commune', 'remote']
 
 export const creepRoles: CreepRoles[] = [
-    'source1Harvester',
-    'source2Harvester',
+    'sourceHarvester',
     'hauler',
     'requestHauler',
     'controllerUpgrader',
@@ -103,8 +102,7 @@ export enum TrafficPriorities {
     scout,
     hubHauler,
     fastFiller,
-    source1Harvester,
-    source2Harvester,
+    sourceHarvester,
     mineralHarvester,
     remoteSourceHarvester0,
     remoteSourceHarvester1,

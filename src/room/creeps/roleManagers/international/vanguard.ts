@@ -10,7 +10,7 @@ export class Vanguard extends Creep {
     preTickManager() {
         if (this.dying) return
 
-        if (this.memory.SI !== undefined) this.room.creepsOfSourceAmount[this.memory.SI] += 1
+        if (this.memory.SI !== undefined) this.room.creepsOfSource[this.memory.SI].push(this.name)
 
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return

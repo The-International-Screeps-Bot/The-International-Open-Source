@@ -1,5 +1,5 @@
 import { globalStatsUpdater } from 'international/statsManager'
-import { findCoordsInsideRect, findObjectWithID, getRange, getRangeOfCoords, scalePriority } from 'international/utils'
+import { customLog, findCoordsInsideRect, findObjectWithID, getRange, getRangeOfCoords, scalePriority } from 'international/utils'
 import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/packrat'
 import { Hauler } from './hauler'
 
@@ -30,7 +30,7 @@ export class SourceHarvester extends Creep {
     preTickManager() {
         const { room } = this
 
-        if (this.memory.SI && !this.dying) room.creepsOfSourceAmount[this.memory.SI] += 1
+        if (this.memory.SI !== undefined && !this.dying) room.creepsOfSource[this.memory.SI].push(this.name)
     }
 
     travelToSource?(): boolean {
@@ -208,7 +208,6 @@ export class SourceHarvester extends Creep {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {
-            // Get the creep using its name
 
             const creep: SourceHarvester = Game.creeps[creepName]
 

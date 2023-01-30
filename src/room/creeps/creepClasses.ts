@@ -22,8 +22,7 @@ import { RequestHauler } from './roleManagers/international/requestHauler'
 import { RangedDefender } from './roleManagers/commune/rangedDefender'
 
 export const creepClasses: { [key in CreepRoles]: any } = {
-    source1Harvester: SourceHarvester,
-    source2Harvester: SourceHarvester,
+    sourceHarvester: SourceHarvester,
     hauler: Hauler,
     requestHauler: RequestHauler,
     controllerUpgrader: ControllerUpgrader,

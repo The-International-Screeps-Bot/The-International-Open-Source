@@ -59,12 +59,12 @@ export class RoomManager {
         room.myCreepsAmount = 0
         room.myPowerCreepsAmount = 0
 
-        room.creepsOfSourceAmount = []
+        room.creepsOfSource = []
 
         room.partsOfRoles = {}
         room.powerTasks = {}
 
-        for (const index in room.sources) room.creepsOfSourceAmount.push(0)
+        for (const index in room.sources) room.creepsOfSource.push([])
 
         room.squadRequests = new Set()
 
@@ -102,9 +102,7 @@ export class RoomManager {
     }
 
     public run() {
-
         if (this.room.memory.T === 'remote') {
-
             this.containerManager.runRemote()
             this.droppedResourceManager.runRemote()
         }

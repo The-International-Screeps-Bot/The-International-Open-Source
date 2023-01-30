@@ -47,128 +47,16 @@ Room.prototype.spawnRequester = function () {
     let minPriority: number
     let maxPriority: number
 
-    // Construct requests for sourceHarvesters
+    for (let sourceIndex = 0; sourceIndex < this.sources.length; sourceIndex++) {
+        // Construct requests for sourceHarvesters
 
-    this.constructSpawnRequests(
-        ((): SpawnRequestOpts | false => {
-            const sourceIndex = 0
-            role = 'source1Harvester'
-
-            const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
-
-            if (spawnEnergyCapacity >= 800) {
-                let defaultParts: BodyPartConstant[] = [CARRY]
-                let workAmount = 6
-
-                // Account for power regenerating sources
-
-                const source = this.sources[sourceIndex]
-                const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
-                if (effect) {
-                    workAmount += Math.round(
-                        POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] /
-                            POWER_INFO[PWR_REGEN_SOURCE].period /
-                            HARVEST_POWER,
-                    )
-                }
-
-                if (workAmount % 2 !== 0) defaultParts.push(MOVE)
-
-                for (let i = 1; i <= workAmount; i++) {
-                    if (i % 2 === 0) defaultParts.push(MOVE)
-                    defaultParts.push(WORK)
-                    if (i % 5 === 0) defaultParts.push(CARRY)
-                }
-
-                return {
-                    role,
-                    defaultParts,
-                    extraParts: [],
-                    partsMultiplier: 1,
-                    minCreeps: 1,
-                    minCost: 300,
-                    priority: 1,
-                    memoryAdditions: {
-                        SI: sourceIndex,
-                        R: true,
-                    },
-                }
-            }
-
-            if (spawnEnergyCapacity >= 750) {
-                return {
-                    role,
-                    defaultParts: [],
-                    extraParts: [WORK, MOVE, WORK],
-                    partsMultiplier: 3,
-                    minCreeps: 1,
-                    minCost: 200,
-                    priority,
-                    memoryAdditions: {
-                        SI: sourceIndex,
-                        R: true,
-                    },
-                }
-            }
-
-            if (spawnEnergyCapacity >= 600) {
-                return {
-                    role,
-                    defaultParts: [MOVE, CARRY],
-                    extraParts: [WORK],
-                    partsMultiplier: 6,
-                    minCreeps: 1,
-                    minCost: 300,
-                    priority,
-                    memoryAdditions: {
-                        SI: sourceIndex,
-                        R: true,
-                    },
-                }
-            }
-
-            //Only Spawn one larger creep if we have the ability to mine using one large creep
-            if (this.sourceContainers[sourceIndex] && spawnEnergyCapacity >= 650) {
-                return {
-                    role,
-                    defaultParts: [MOVE],
-                    extraParts: [WORK],
-                    partsMultiplier: 6,
-                    minCreeps: 1,
-                    minCost: 150,
-                    priority,
-                    memoryAdditions: {
-                        SI: sourceIndex,
-                        R: true,
-                    },
-                }
-            }
-
-            return {
-                role,
-                defaultParts: [MOVE, CARRY],
-                extraParts: [WORK],
-                partsMultiplier: 6,
-                minCreeps: undefined,
-                maxCreeps: Math.min(3, this.sourcePositions[sourceIndex].length),
-                minCost: 200,
-                priority,
-                memoryAdditions: {
-                    SI: sourceIndex,
-                    R: true,
-                },
-            }
-        })(),
-    )
-
-    // Construct requests for sourceHarvesters
-    if (this.sources.length > 1)
         this.constructSpawnRequests(
             ((): SpawnRequestOpts | false => {
-                const sourceIndex = 1
-                role = 'source2Harvester'
+                role = 'sourceHarvester'
 
-                const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + this.creepsFromRoom[role].length
+                const spawnGroup = this.creepsOfSource[sourceIndex]
+                customLog('SPAWN GROUP', spawnGroup)
+                const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + spawnGroup.length
 
                 if (spawnEnergyCapacity >= 800) {
                     let defaultParts: BodyPartConstant[] = [CARRY]
@@ -201,7 +89,8 @@ Room.prototype.spawnRequester = function () {
                         partsMultiplier: 1,
                         minCreeps: 1,
                         minCost: 300,
-                        priority: 1,
+                        priority,
+                        spawnGroup: spawnGroup,
                         memoryAdditions: {
                             SI: sourceIndex,
                             R: true,
@@ -218,6 +107,7 @@ Room.prototype.spawnRequester = function () {
                         minCreeps: 1,
                         minCost: 200,
                         priority,
+                        spawnGroup: spawnGroup,
                         memoryAdditions: {
                             SI: sourceIndex,
                             R: true,
@@ -234,6 +124,7 @@ Room.prototype.spawnRequester = function () {
                         minCreeps: 1,
                         minCost: 300,
                         priority,
+                        spawnGroup: spawnGroup,
                         memoryAdditions: {
                             SI: sourceIndex,
                             R: true,
@@ -241,7 +132,8 @@ Room.prototype.spawnRequester = function () {
                     }
                 }
 
-                if (this.sourceContainers[sourceIndex]) {
+                //Only Spawn one larger creep if we have the ability to mine using one large creep
+                if (this.sourceContainers[sourceIndex] && spawnEnergyCapacity >= 650) {
                     return {
                         role,
                         defaultParts: [MOVE],
@@ -250,6 +142,7 @@ Room.prototype.spawnRequester = function () {
                         minCreeps: 1,
                         minCost: 150,
                         priority,
+                        spawnGroup: spawnGroup,
                         memoryAdditions: {
                             SI: sourceIndex,
                             R: true,
@@ -266,6 +159,7 @@ Room.prototype.spawnRequester = function () {
                     maxCreeps: Math.min(3, this.sourcePositions[sourceIndex].length),
                     minCost: 200,
                     priority,
+                    spawnGroup: spawnGroup,
                     memoryAdditions: {
                         SI: sourceIndex,
                         R: true,
@@ -273,6 +167,7 @@ Room.prototype.spawnRequester = function () {
                 }
             })(),
         )
+    }
 
     // Construct requests for haulers
 

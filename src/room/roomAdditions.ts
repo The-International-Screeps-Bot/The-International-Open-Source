@@ -60,10 +60,10 @@ const roomAdditions = {
             this._sources = []
 
             if (this.memory.SIDs) {
-                for (const index in this.memory.SIDs) {
-                    const source = findObjectWithID(this.memory.SIDs[index])
+                for (let i = 0; i < this.memory.SIDs.length; i++) {
+                    const source = findObjectWithID(this.memory.SIDs[i])
 
-                    source.index = parseInt(index)
+                    source.index = i
                     this._sources.push(source)
                 }
 
@@ -74,10 +74,10 @@ const roomAdditions = {
 
             const sources = this.find(FIND_SOURCES)
 
-            for (const index in sources) {
-                const source = sources[index]
+            for (let i = 0; i < this.memory.SIDs.length; i++) {
+                const source = sources[i]
 
-                source.index = parseInt(index)
+                source.index = i
 
                 this.memory.SIDs.push(source.id)
                 this._sources.push(source)
@@ -685,33 +685,26 @@ const roomAdditions = {
 
             this._usedSourceCoords = []
 
-            for (const i in this.sources) this._usedSourceCoords.push(new Set())
+            for (const i in this.sources) {
 
-            let harvesterNames
-            if (this.memory.T === 'commune') {
-                harvesterNames = this.myCreeps.source1Harvester
-                if (this.sources.length >= 2) harvesterNames = harvesterNames.concat(this.myCreeps.source2Harvester)
-                harvesterNames = harvesterNames.concat(this.myCreeps.vanguard)
-            } else {
-                harvesterNames = this.myCreeps.remoteSourceHarvester0
-                if (this.sources.length >= 2)
-                    harvesterNames = harvesterNames.concat(this.myCreeps.remoteSourceHarvester1)
-            }
+                this._usedSourceCoords.push(new Set())
 
-            for (const creepName of harvesterNames) {
-                // Get the creep using its name
+                // Record used source coords
 
-                const creep = Game.creeps[creepName]
+                for (const creepName of this.creepsOfSource[i]) {
 
-                // If the creep is dying, iterate
+                    const creep = Game.creeps[creepName]
 
-                if (creep.dying) continue
-                if (creep.memory.SI === undefined) continue
-                if (!creep.memory.PC) continue
+                    // If the creep is dying, iterate
 
-                // If the creep has a packedHarvestPos, record it in usedHarvestPositions
+                    if (creep.dying) continue
+                    if (creep.memory.SI === undefined) continue
+                    if (!creep.memory.PC) continue
 
-                this._usedSourceCoords[creep.memory.SI].add(creep.memory.PC)
+                    // If the creep has a packedHarvestPos, record it in usedHarvestPositions
+
+                    this._usedSourceCoords[creep.memory.SI].add(creep.memory.PC)
+                }
             }
 
             return this._usedSourceCoords

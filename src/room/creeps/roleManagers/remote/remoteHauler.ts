@@ -40,7 +40,7 @@ export class RemoteHauler extends Creep {
         if (!this.findRemote()) return
         if (this.dying) return
 
-        Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+        Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] -= this.parts.carry
     }
 
     hasValidRemote?() {
@@ -84,12 +84,12 @@ export class RemoteHauler extends Creep {
 
         if (this.dying) return
 
-        Memory.rooms[remoteName].data[RemoteData[`remoteHauler${this.memory.SI}`]] -= this.parts.carry
+        Memory.rooms[remoteName].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] -= this.parts.carry
     }
 
     removeRemote?() {
         if (!this.dying && Memory.rooms[this.memory.RN].data) {
-            Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI}`]] += this.parts.carry
+            Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI  as 0 | 1}`]] += this.parts.carry
         }
 
         delete this.memory.RN

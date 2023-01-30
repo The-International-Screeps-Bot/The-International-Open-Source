@@ -2088,8 +2088,7 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 }
 
 Room.prototype.estimateIncome = function () {
-    const harvesterNames = this.creepsFromRoom.source1Harvester
-        .concat(this.creepsFromRoom.source2Harvester)
+    const harvesterNames = this.creepsFromRoom.sourceHarvester
         .concat(this.creepsFromRoom.remoteSourceHarvester0)
         .concat(this.creepsFromRoom.remoteSourceHarvester1)
 
