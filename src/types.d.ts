@@ -661,7 +661,7 @@ declare global {
          */
         prmcu: number
         /**
-         * Role Manager Per Creep CPU Usage
+         * Power Role Manager Per Creep CPU Usage
          */
         prmpccu: number
     }

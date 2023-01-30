@@ -1,70 +1,68 @@
-import { customColors } from './constants'
+import { customColors, InternationalStatNamesEnum, RoomStatNamesEnum } from './constants'
 import { customLog } from './utils'
 
 const CPUUsers: CpuUsers = {
-    imcu: 0,
-    cocu: 0,
-    mvmcu: 0,
-    pccu: 0,
-    tccu: 0,
-    roomcu: 0,
-    smcu: 0,
+    [InternationalStatNamesEnum.InternationalManagerCPUUsage]: 0,
+    [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: 0,
+    [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: 0,
+    [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: 0,
+    [InternationalStatNamesEnum.TickConfigCPUUsage]: 0,
+    [InternationalStatNamesEnum.RoomManagerCPUUsage]: 0,
+    [InternationalStatNamesEnum.StatsManagerCPUUsage]: 0,
 }
 
 function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
     const roomStatsLevel = Memory.roomStats
     switch (statName) {
-        case 'su':
-        case 'eih':
+        case RoomStatNamesEnum.SpawnUsagePercentage:
+        case RoomStatNamesEnum.EnergyInputHarvest:
             if (roomStatsLevel >= 1) return 1
             else return 0
-        case 'cc':
-        case 'tcc':
-        case 'pcc':
-        case 'cl':
-        case 'bes':
-        case 'es':
+        case RoomStatNamesEnum.CreepCount:
+        case RoomStatNamesEnum.TotalCreepCount:
+        case RoomStatNamesEnum.PowerCreepCount:
+        case RoomStatNamesEnum.ControllerLevel:
+        case RoomStatNamesEnum.BatteriesStoredTimes10:
+        case RoomStatNamesEnum.EnergyStored:
             if (roomStatsLevel >= 1) return 1.5
             else return 0
-        case 'mh':
-        case 'eib':
-        case 'eos':
-        case 'eou':
-        case 'eob':
-        case 'eoro':
-        case 'eorwr':
-        case 'eosp':
-        case 'eop':
-        case 'rc':
-        case 'res':
-        case 'reih':
-        case 'reoro':
-        case 'reob':
+        case RoomStatNamesEnum.MineralsHarvested:
+        case RoomStatNamesEnum.EnergyInputBought:
+        case RoomStatNamesEnum.EnergyOutputSold:
+        case RoomStatNamesEnum.EnergyOutputUpgrade:
+        case RoomStatNamesEnum.EnergyOutputBuild:
+        case RoomStatNamesEnum.EnergyOutputRepairOther:
+        case RoomStatNamesEnum.EnergyOutputRepairWallOrRampart:
+        case RoomStatNamesEnum.EnergyOutputSpawn:
+        case RoomStatNamesEnum.EnergyOutputPower:
+        case RoomStatNamesEnum.RemoteCount:
+        case RoomStatNamesEnum.RemoteEnergyStored:
+        case RoomStatNamesEnum.RemoteEnergyInputHarvest:
+        case RoomStatNamesEnum.RemoteEnergyOutputRepairOther:
+        case RoomStatNamesEnum.RemoteEnergyOutputBuild:
             if (roomStatsLevel >= 2) return 2
             else return 0
-        case 'rrvmcu':
-        case 'rcmcu':
-        case 'rrolmcu':
-        case 'retcmcu':
-        case 'rprmcu':
-        case 'acrmcu':
-        case 'clrmcu':
-        case 'tmcu':
-        case 'smcu':
-        case 'cormcu':
-        case 'dmcu':
-        case 'srmcu':
-        case 'rocu':
-        case 'rvmcu':
-        case 'cmcu':
-        case 'rolmcu':
-        case 'rolmpccu':
-        case 'rrolmpccu':
-        case 'etcmcu':
-        case 'prmcu':
-        case 'prmpccu':
-        case 'rprmpccu':
-        case 'rrocu':
+        case RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage:
+        case RoomStatNamesEnum.RemoteConstructionManagerCPUUsage:
+        case RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage:
+        case RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage:
+        case RoomStatNamesEnum.AllyCreepRequestManangerCPUUsage:
+        case RoomStatNamesEnum.ClaimRequestManagerCPUUsage:
+        case RoomStatNamesEnum.TowerManagerCPUUsage:
+        case RoomStatNamesEnum.SpawnManagerCPUUsage:
+        case RoomStatNamesEnum.CombatRequestManagerCPUUsage:
+        case RoomStatNamesEnum.DefenceManagerCPUUsage:
+        case RoomStatNamesEnum.SpawnRequestManagerCPUUsage:
+        case RoomStatNamesEnum.RoomCPUUsage:
+        case RoomStatNamesEnum.RoomVisualsManagerCPUUsage:
+        case RoomStatNamesEnum.ConstructionManagerCPUUsage:
+        case RoomStatNamesEnum.RoleManagerCPUUsage:
+        case RoomStatNamesEnum.RoleManagerPerCreepCPUUsage:
+        case RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage:
+        case RoomStatNamesEnum.EndTickCreepManagerCPUUsage:
+        case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
+        case RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage:
+        case RoomStatNamesEnum.RemoteRoomCPUUsage:
             if (Memory.CPULogging === true) return 3
             else return 0
         default:
@@ -74,18 +72,17 @@ function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
 
 function GetRemoteStatsName(name: RoomCommuneStatNames): RoomStatNames {
     switch (name) {
-        case 'es':
-        case 'eih':
-        case 'eoro':
-        case 'eob':
-        case 'rocu':
-        case 'rvmcu':
-        case 'cmcu':
-        case 'rolmcu':
-        case 'rolmpccu':
-        case 'etcmcu':
-        case 'prmcu':
-        case 'prmpccu':
+        case RoomStatNamesEnum.EnergyStored:
+        case RoomStatNamesEnum.EnergyInputHarvest:
+        case RoomStatNamesEnum.EnergyOutputRepairOther:
+        case RoomStatNamesEnum.EnergyOutputBuild:
+        case RoomStatNamesEnum.RoomCPUUsage:
+        case RoomStatNamesEnum.RoomVisualsManagerCPUUsage:
+        case RoomStatNamesEnum.ConstructionManagerCPUUsage:
+        case RoomStatNamesEnum.RoleManagerPerCreepCPUUsage:
+        case RoomStatNamesEnum.EndTickCreepManagerCPUUsage:
+        case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
+        case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
             return ('r' + name) as RoomStatNames
         default:
             return name as RoomStatNames
@@ -95,78 +92,79 @@ function GetRemoteStatsName(name: RoomCommuneStatNames): RoomStatNames {
 export class StatsManager {
     roomConfig(roomName: string, roomType: string) {
         const remoteLevel1: Partial<RoomStats> = {
-            res: 0,
-            gt: 0,
-            reih: 0,
+            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
+            [RoomStatNamesEnum.GameTime]: 0,
+            [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
         }
         const remoteLevel2: Partial<RoomStats> = {
             ...remoteLevel1,
-            reoro: 0,
-            reob: 0,
-            res: 0,
+            [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
+            [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
+            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
         }
         const remoteLevel3: Partial<RoomStats> = {
-            rrocu: 0,
-            rrvmcu: 0,
-            rcmcu: 0,
-            rrolmcu: 0,
-            rrolmpccu: 0,
-            retcmcu: 0,
-            rprmcu: 0,
-            rprmpccu: 0,
+            [RoomStatNamesEnum.RemoteRoomCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteRoomCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteRoleManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]: 0,
         }
 
         const communeLevel1: Partial<RoomCommuneStats> = {
-            su: 0,
-            eih: 0,
-            cc: 0,
-            tcc: 0,
-            pcc: 0,
-            cl: 0,
-            bes: 0,
-            es: 0,
-            gt: 0,
+            [RoomStatNamesEnum.SpawnUsagePercentage]: 0,
+            [RoomStatNamesEnum.EnergyInputHarvest]: 0,
+            [RoomStatNamesEnum.CreepCount]: 0,
+            [RoomStatNamesEnum.TotalCreepCount]: 0,
+            [RoomStatNamesEnum.PowerCreepCount]: 0,
+            [RoomStatNamesEnum.ControllerLevel]: 0,
+            [RoomStatNamesEnum.BatteriesStoredTimes10]: 0,
+            [RoomStatNamesEnum.EnergyStored]: 0,
+            [RoomStatNamesEnum.GameTime]: 0,
         }
         const communeLevel2: Partial<RoomCommuneStats> = {
             ...communeLevel1,
-            mh: 0,
-            eib: 0,
-            eos: 0,
-            eou: 0,
-            eob: 0,
-            eoro: 0,
-            eorwr: 0,
-            eosp: 0,
-            eop: 0,
-            rc: 0,
-            res: 0,
-            reih: 0,
-            reoro: 0,
-            reob: 0,
+            [RoomStatNamesEnum.MineralsHarvested]: 0,
+            [RoomStatNamesEnum.EnergyInputBought]: 0,
+            [RoomStatNamesEnum.EnergyOutputSold]: 0,
+            [RoomStatNamesEnum.EnergyOutputUpgrade]: 0,
+            [RoomStatNamesEnum.EnergyOutputBuild]: 0,
+            [RoomStatNamesEnum.EnergyOutputRepairOther]: 0,
+            [RoomStatNamesEnum.EnergyOutputRepairWallOrRampart]: 0,
+            [RoomStatNamesEnum.EnergyOutputSpawn]: 0,
+            [RoomStatNamesEnum.EnergyOutputPower]: 0,
+            [RoomStatNamesEnum.RemoteCount]: 0,
+            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
+            [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
+            [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
+            [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
         }
         const communeLevel3: Partial<RoomCommuneStats> = {
-            rrvmcu: 0,
-            rcmcu: 0,
-            rrolmcu: 0,
-            rolmcu: 0,
-            rolmpccu: 0,
-            rrolmpccu: 0,
-            retcmcu: 0,
-            prmcu: 0,
-            rprmcu: 0,
-            prmpccu: 0,
-            rprmpccu: 0,
-            acrmcu: 0,
-            clrmcu: 0,
-            tmcu: 0,
-            smcu: 0,
-            cormcu: 0,
-            dmcu: 0,
-            srmcu: 0,
-            rocu: 0,
-            rvmcu: 0,
-            cmcu: 0,
-            etcmcu: 0,
+            [RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteRoleManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RoleManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RoleManagerPerCreepCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]: 0,
+            [RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.PowerRoleManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]: 0,
+            [RoomStatNamesEnum.PowerRoleManagerPerCreepCPUUsage]: 0,
+            [RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]: 0,
+            [RoomStatNamesEnum.AllyCreepRequestManangerCPUUsage]: 0,
+            [RoomStatNamesEnum.ClaimRequestManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.TowerManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.SpawnManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.CombatRequestManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.DefenceManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.SpawnRequestManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.RoomCPUUsage]: 0,
+            [RoomStatNamesEnum.RoomVisualsManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.ConstructionManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.EndTickCreepManagerCPUUsage]: 0,
         }
         const roomStats = Memory.roomStats
         let stats = undefined
@@ -227,12 +225,12 @@ export class StatsManager {
         if (roomType === 'commune') {
             const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
             if (globalStats) {
-                globalStats.gt = Game.time
+                globalStats[RoomStatNamesEnum.GameTime] = Game.time
             }
         } else if (roomType === 'remote') {
             const globalStats = global.roomStats.remote[roomName] as RoomStats
             if (globalStats) {
-                globalStats.gt = Game.time
+                globalStats[RoomStatNamesEnum.GameTime] = Game.time
             }
         }
     }
@@ -254,32 +252,44 @@ export class StatsManager {
         Object.entries(global.roomStats.remote)
             .filter(([roomName]) => roomMemory.remotes.includes(roomName))
             .forEach(([remoteRoomName, remoteRoomStats]) => {
-                if (globalCommuneStats.gt === Game.time) {
-                    globalCommuneStats.rc += 1
-                    globalCommuneStats.reih += remoteRoomStats.reih
-                    globalCommuneStats.reoro += remoteRoomStats.reoro
-                    globalCommuneStats.reob += remoteRoomStats.reob
+                if (globalCommuneStats[RoomStatNamesEnum.GameTime] === Game.time) {
+                    globalCommuneStats[RoomStatNamesEnum.RemoteCount] += 1
+                    globalCommuneStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] +=
+                        remoteRoomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest]
+                    globalCommuneStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther] +=
+                        remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther]
+                    globalCommuneStats[RoomStatNamesEnum.RemoteEnergyOutputBuild] +=
+                        remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild]
 
                     // CPU
                     if (Memory.CPULogging === true) {
-                        globalCommuneStats.rrocu += remoteRoomStats.rrocu
-                        globalCommuneStats.rrvmcu += remoteRoomStats.rrvmcu
-                        globalCommuneStats.rcmcu += remoteRoomStats.rcmcu
-                        globalCommuneStats.rrolmcu += remoteRoomStats.rrolmcu
-                        globalCommuneStats.rrolmpccu += remoteRoomStats.rrolmpccu
-                        globalCommuneStats.retcmcu += remoteRoomStats.retcmcu
-                        globalCommuneStats.rprmcu += remoteRoomStats.rprmcu
-                        globalCommuneStats.rprmpccu += remoteRoomStats.rprmpccu
+                        globalCommuneStats[RoomStatNamesEnum.RemoteRoomCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemoteRoomCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemoteConstructionManagerCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemoteRoleManagerCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemoteRoleManagerCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]
+                        globalCommuneStats[RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage] +=
+                            remoteRoomStats[RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]
                     }
 
                     if (each250Ticks)
-                        globalCommuneStats.res += Game.rooms[remoteRoomName]?.resourcesInStoringStructures.energy || 0
+                        globalCommuneStats[RoomStatNamesEnum.RemoteEnergyStored] +=
+                            Game.rooms[remoteRoomName]?.resourcesInStoringStructures.energy || 0
                 }
             })
         if (room) {
-            globalCommuneStats.cc = room.myCreepsAmount
-            globalCommuneStats.tcc = room.creepsFromRoomAmount
-            globalCommuneStats.pcc = room.myPowerCreepsAmount
+            globalCommuneStats[RoomStatNamesEnum.CreepCount] = room.myCreepsAmount
+            globalCommuneStats[RoomStatNamesEnum.TotalCreepCount] = room.creepsFromRoomAmount
+            globalCommuneStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
 
             const spawns = room.structures.spawn
             if (spawns.length > 0)
@@ -299,12 +309,14 @@ export class StatsManager {
                     globalCommuneStats.cl =
                         progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
                 }
-                globalCommuneStats.es = room.resourcesInStoringStructures.energy
-                globalCommuneStats.bes = room.resourcesInStoringStructures.battery * 10
+                globalCommuneStats[RoomStatNamesEnum.EnergyStored] = room.resourcesInStoringStructures.energy
+                globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
+                    room.resourcesInStoringStructures.battery * 10
             } else {
-                globalCommuneStats.es = roomStats.es
-                globalCommuneStats.bes = roomStats.bes
-                globalCommuneStats.cl = roomStats.cl
+                globalCommuneStats[RoomStatNamesEnum.EnergyStored] = roomStats[RoomStatNamesEnum.EnergyStored]
+                globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
+                    roomStats[RoomStatNamesEnum.BatteriesStoredTimes10]
+                globalCommuneStats[RoomStatNamesEnum.ControllerLevel] = roomStats[RoomStatNamesEnum.ControllerLevel]
             }
         }
 
@@ -455,13 +467,34 @@ export class StatsManager {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             const CPUUsers = Memory.stats.CPUUsers
             Memory.stats.CPUUsers = {
-                cocu: this.average(CPUUsers.cocu, global.CPUUsers.cocu),
-                imcu: this.average(CPUUsers.imcu, global.CPUUsers.imcu),
-                mvmcu: this.average(CPUUsers.mvmcu, global.CPUUsers.mvmcu),
-                pccu: this.average(CPUUsers.pccu, global.CPUUsers.pccu),
-                tccu: this.average(CPUUsers.tccu, global.CPUUsers.tccu),
-                roomcu: this.average(CPUUsers.roomcu, global.CPUUsers.roomcu),
-                smcu: this.average(CPUUsers.smcu, cpuUsed),
+                [InternationalStatNamesEnum.InternationalManagerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.InternationalManagerCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.InternationalManagerCPUUsage],
+                ),
+                [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.CreepOrganizerCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.CreepOrganizerCPUUsage],
+                ),
+                [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.MapVisualsManangerCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.MapVisualsManangerCPUUsage],
+                ),
+                [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage],
+                ),
+                [InternationalStatNamesEnum.TickConfigCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.TickConfigCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.TickConfigCPUUsage],
+                ),
+                [InternationalStatNamesEnum.RoomManagerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.RoomManagerCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.RoomManagerCPUUsage],
+                ),
+                [InternationalStatNamesEnum.StatsManagerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.StatsManagerCPUUsage],
+                    cpuUsed,
+                ),
             }
             customLog('Stats Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -469,13 +502,13 @@ export class StatsManager {
             })
         } else {
             Memory.stats.CPUUsers = {
-                cocu: undefined,
-                imcu: undefined,
-                mvmcu: undefined,
-                pccu: undefined,
-                tccu: undefined,
-                roomcu: undefined,
-                smcu: undefined,
+                [InternationalStatNamesEnum.InternationalManagerCPUUsage]: undefined,
+                [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: undefined,
+                [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: undefined,
+                [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: undefined,
+                [InternationalStatNamesEnum.TickConfigCPUUsage]: undefined,
+                [InternationalStatNamesEnum.RoomManagerCPUUsage]: undefined,
+                [InternationalStatNamesEnum.StatsManagerCPUUsage]: undefined,
             }
         }
     }
@@ -502,7 +535,7 @@ export const globalStatsUpdater = function (
     nonRoomStat: boolean = false,
 ) {
     if (nonRoomStat) {
-        global.CPUUsers[name as InternationalStatNames] = value
+        global.CPUUsers[name as InternationalStatNamesEnum] = value
         return
     }
     const roomStatName = name as RoomStatNames
