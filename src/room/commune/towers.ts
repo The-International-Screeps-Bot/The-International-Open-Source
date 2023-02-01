@@ -243,7 +243,7 @@ export class TowerManager {
                     maxAmount: structure.reserveStore.energy * 0.75,
                     onlyFull: true,
                     type: 'offer',
-                    priority: scalePriority(structure.store.getCapacity(), structure.reserveStore.energy, 10, true),
+                    priority: scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy, 10, true),
                 })
             }
         }
