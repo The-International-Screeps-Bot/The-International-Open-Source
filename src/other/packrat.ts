@@ -418,6 +418,13 @@ export function unpackPosList(chars: string) {
 /**
  * Pack a planned cord for base building
  */
+export function packPlanValues(structureType: StructureConstant, minRCL: number) {
+    return planCoord_codec.encode([allStructureTypes.indexOf(structureType), minRCL])
+}
+
+/**
+ * Pack a planned cord for base building
+ */
 export function packPlanCoord(coord: PlanCoord) {
     return planCoord_codec.encode([allStructureTypes.indexOf(coord.structureType), coord.minRCL])
 }
