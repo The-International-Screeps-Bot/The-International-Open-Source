@@ -60,7 +60,7 @@
         "rollup-plugin-screeps": "^1.0.1",
         "rollup-plugin-terser": "^7.0.2",
         "rollup-plugin-typescript2": "^0.30.0",
-        "screeps-grafana": "^2.1.6",
+        "screeps-grafana": "^2.2.2",
         "screeps-performance-server": "^1.8.3",
         "sinon": "^6.3.5",
         "sinon-chai": "^3.2.0",
