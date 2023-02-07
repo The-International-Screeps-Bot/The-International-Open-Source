@@ -25,11 +25,13 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 ## Progress and Design
 
-[Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
-
 [Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)
 
-[My screeps profile](https://screeps.com/a/#!/profile/MarvinTMB)
+[MarvinTMB's screeps profile](https://screeps.com/a/#!/profile/MarvinTMB)
+
+[Issues](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues)
+
+[Wiki](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki)
 
 ## Requirements
 
