@@ -60,6 +60,8 @@ Before you use this bot, please consider two things. First, if you're a new play
 
 Secondly, DO NOT USE THIS BOT TO BULLY. Do not attack noobs, taking their remotes or claimed rooms. This is a fun game where people often program their own bots from scratch, so it is entirely fun-ruining and incredibly rude to pick on those who aren't using an open source bot like this one. If you find yourself against another open source bot, or a bot that can put up a fair fight against you, then best of luck. Please feel welcome to share experiences or ask questions in the [discord server](https://discord.gg/5QubDsB786).
 
+To begin, you need to decide what branch to use. Main is generally old but stable, while Development is less stable but more up to date. If you want to find bugs or test new features, Development is for you.
+
 Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in the screeps.json file. This reduces cpu usage, and compiles the code so it can be run by Screeps while we develop using folders and typescript.
 
 First, rename example.screeps.json to screeps.json and fill in the required information for each environment you want to run the bot in.
@@ -83,6 +85,8 @@ I'd also suggest using this less-laggy tool [steamless-client](https://github.co
 We're a huge fan of teamwork, and many useful features of this bot have been added by contributors.
 
 If you want to join us in development for this bot, please join our [discord server](https://discord.gg/5QubDsB786) and share what you're working on, or hoping to add. We're happy to review issues, merge pull requests, and add collaborators!
+
+**Please use the development branch for pull requests, commits, etc.**
 
 An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO for their essential contribution to this project.
 
