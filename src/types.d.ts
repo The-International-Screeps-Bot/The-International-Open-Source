@@ -1170,11 +1170,6 @@ declare global {
 
         trafficManager(): void
 
-        /**
-         * Dictates and operates tasks for factories
-         */
-        factoryManager(): void
-
         // Spawn functions
 
         /**

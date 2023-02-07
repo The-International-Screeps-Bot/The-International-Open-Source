@@ -55,6 +55,7 @@ import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
 import { LinkManager } from './links'
 import { profiler } from 'other/screeps-profiler'
+import { FactoryManager } from './factory'
 
 export class CommuneManager {
     // Managers
@@ -79,9 +80,7 @@ export class CommuneManager {
     haulRequestManager: HaulRequestManager
     haulerNeedManager: HaulerNeedManager
 
-    //
-
-    //
+    factoryManager: FactoryManager
 
     constructor() {
         this.combatManager = new CombatManager(this)
@@ -103,6 +102,8 @@ export class CommuneManager {
         this.allyCreepRequestManager = new AllyCreepRequestManager(this)
         this.haulRequestManager = new HaulRequestManager(this)
         this.haulerNeedManager = new HaulerNeedManager(this)
+
+        this.factoryManager = new FactoryManager(this)
     }
 
     room: Room
@@ -211,7 +212,7 @@ export class CommuneManager {
 
         this.spawningStructuresManager.createRoomLogisticsRequests()
         this.storingStructuresManager.run()
-        this.room.factoryManager()
+        this.factoryManager.run()
         this.room.roomManager.containerManager.runCommune()
         this.room.roomManager.droppedResourceManager.runCommune()
         this.linkManager.run()
