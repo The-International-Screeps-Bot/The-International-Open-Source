@@ -40,7 +40,7 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            // Otherwise ass the x and y to positions
+            // Otherwise add the x and y to positions
 
             positions.push({ x, y })
         }
