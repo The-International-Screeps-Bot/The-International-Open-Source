@@ -1674,7 +1674,7 @@ Creep.prototype.findCreepRoomLogisticsRequestAmount = function (type, targetID, 
     if (target instanceof Resource) {
         // Update in accordance to potential resource decay
 
-        amount = Math.min(Math.min(this.freeNextStore, target.nextAmount), amount)
+        amount = Math.min(target.nextAmount, amount)
         if (amount <= 0) return amount
 
         target.reserveAmount -= amount

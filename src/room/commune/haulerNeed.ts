@@ -10,22 +10,32 @@ export class HaulerNeedManager {
     run() {
         const { room } = this.communeManager
 
-        for (let index in room.sources) {
-            const sourceLink = room.sourceLinks[index]
-            if (sourceLink && sourceLink.RCLActionable) continue
+        if (room.hubLink && room.hubLink.RCLActionable) {
+            for (let index in room.sources) {
+                const sourceLink = room.sourceLinks[index]
+                if (sourceLink && sourceLink.RCLActionable) continue
 
-            if (room.sourcePaths[index])
-                room.haulerNeed += findCarryPartsRequired(
-                    room.sourcePaths[index].length + 3,
-                    room.estimatedSourceIncome[index],
-                )
-            else console.log(`No source path for ${room.name} source ${index}`)
+                if (room.sourcePaths[index])
+                    room.haulerNeed += findCarryPartsRequired(
+                        room.sourcePaths[index].length + 3,
+                        room.estimatedSourceIncome[index],
+                    )
+                else console.log(`No source path for ${room.name} source ${index}`)
+            }
         }
 
         // There is a viable controllerContainer
 
         if (room.controllerContainer && room.controllerContainer.RCLActionable)
             room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
+        // There is a viable controllerLink but we need to haul to it
+        else if (
+            room.controllerLink &&
+            room.controllerLink.RCLActionable &&
+            (!room.hubLink || !room.hubLink.RCLActionable)
+        ) {
+            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
+        }
 
         room.haulerNeed += findCarryPartsRequired(room.mineralPath.length, room.mineralHarvestStrength)
 
