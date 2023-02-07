@@ -39,17 +39,12 @@ First you'll want to download or fork the repository.
 
 ### NPM
 
-Next, if you don't have it already, install Node Package Manager so we can install other things:
-
-```powershell
-npm install
-```
 **Make sure your node version is below 17.0.0**
 
-Then, when in the project folder, you'll want to install the devDependencies like so:
+When in the project folder (not src), you'll want to install the devDependencies - and if you don't have it, node - like so:
 
 ```powershell
-npm install --only=dev
+npm i
 ```
 
 And that's it. Join our [discord server](https://discord.gg/5QubDsB786) if you need help.
