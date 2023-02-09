@@ -20,7 +20,7 @@ export class Maintainer extends Creep {
 
             this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['withdraw', 'offer', 'pickup']),
-                conditions: request => request.resourceType === RESOURCE_ENERGY,
+                resourceTypes: new Set([RESOURCE_ENERGY])
             })
 
             if (this.needsResources()) return false

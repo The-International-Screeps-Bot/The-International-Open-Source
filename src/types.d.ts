@@ -381,6 +381,13 @@ declare global {
 
     interface findNewRoomLogisticsRequestArgs {
         types?: Set<RoomLogisticsRequestTypes>
+        /**
+         * Use this to command certain resourceTypes
+         */
+        resourceTypes?: Set<ResourceConstant>
+        /**
+         * DO NOT USE THIS TO COMMAND CERTAIN RESOURCETYPES, instead use resourceTypes
+         */
         conditions?(request: RoomLogisticsRequest): any
     }
 
@@ -1903,7 +1910,13 @@ declare global {
         findRoomLogisticsRequestTypes(args?: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
         canAcceptRoomLogisticsRequest(requestType: RoomLogisticsRequestTypes, requestID: string): boolean
         createBackupStoringStructuresRoomLogisticsRequest(
-            types: Set<RoomLogisticsRequestTypes>,
+            types?: Set<RoomLogisticsRequestTypes>,
+            resourceTypes?: Set<ResourceConstant>
+        ): CreepRoomLogisticsRequest | 0
+        createBackupStoringStructuresRoomLogisticsRequestTransfer(
+        ): CreepRoomLogisticsRequest | 0
+        createBackupStoringStructuresRoomLogisticsRequestWithdraw(
+            resourceTypes?: Set<ResourceConstant>
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 

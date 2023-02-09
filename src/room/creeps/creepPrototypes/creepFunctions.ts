@@ -698,7 +698,6 @@ Creep.prototype.needsResources = function () {
 }
 
 Creep.prototype.hasNonEnergyResource = function () {
-
     return !!Object.keys(this.nextStore).find(resourceType => resourceType !== RESOURCE_ENERGY)
 }
 
@@ -1200,6 +1199,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             // Customizable conditions
 
             if (args) {
+                if (args.resourceTypes && !args.resourceTypes.has(request.resourceType)) continue
                 if (args.conditions && !args.conditions(request)) continue
             }
 
@@ -1222,7 +1222,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     let creepRequest: CreepRoomLogisticsRequest | 0
 
     if (!bestRequest) {
-        creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(types)
+        creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(args.types, args.resourceTypes)
         if (!creepRequest) return RESULT_FAIL
     } else {
         creepRequest = {
@@ -1448,10 +1448,15 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
     return true
 }
 
-Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (types) {
+Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (types, resourceTypes) {
     if (this.room.name !== this.commune.name) return RESULT_FAIL
-    if (!types.has('transfer')) return RESULT_FAIL
 
+    if (types.has('transfer')) return this.createBackupStoringStructuresRoomLogisticsRequestTransfer()
+
+    return this.createBackupStoringStructuresRoomLogisticsRequestWithdraw(resourceTypes)
+}
+
+Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = function () {
     const storingStructures = this.commune.communeManager.storingStructures
     if (!storingStructures.length) return RESULT_FAIL
 
@@ -1467,7 +1472,6 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
 
     if (!resourceType) return RESULT_FAIL
 
-    customLog('BACKUP', resourceType, { superPosition: 1 })
     const storingStructure = storingStructures.find(
         structure => structure.freeReserveStore >= this.nextStore[resourceType],
     )
@@ -1479,8 +1483,32 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
         RT: resourceType,
         A: this.nextStore[resourceType],
     }
+}
 
-    return RESULT_FAIL
+Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = function(resourceTypes) {
+    const storingStructures = this.commune.communeManager.storingStructures
+    if (!storingStructures.length) return RESULT_FAIL
+
+    let resourceType: ResourceConstant
+    let storingStructure: AnyStoreStructure
+
+    for (resourceType of resourceTypes) {
+
+        storingStructure = storingStructures.find(
+            structure => structure.reserveStore[resourceType] >= this.freeNextStore,
+        )
+        if (storingStructure) break
+    }
+
+    if (!storingStructure) return RESULT_FAIL
+
+    /* this.room.visual.text((this.nextStore[resourceType]).toString(), this.pos.x, this.pos.y, { color: customColors.red }) */
+    return {
+        T: 'withdraw',
+        TID: storingStructure.id,
+        RT: resourceType,
+        A: this.freeNextStore,
+    }
 }
 
 Creep.prototype.findRoomLogisticRequestAmount = function (request) {

@@ -238,8 +238,8 @@ export class RemoteHauler extends Creep {
 
             this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['pickup', 'withdraw']),
+                resourceTypes: new Set([RESOURCE_ENERGY]),
                 conditions: request => {
-                    if (request.resourceType !== RESOURCE_ENERGY) return false
 
                     // If the target is near the creep
 
@@ -279,8 +279,8 @@ export class RemoteHauler extends Creep {
 
         this.runRoomLogisticsRequestsAdvanced({
             types: new Set(['withdraw', 'pickup']),
+            resourceTypes: new Set([RESOURCE_ENERGY]),
             conditions: request => {
-                if (request.resourceType !== RESOURCE_ENERGY) return false
 
                 // If the target is near the hauler
 
@@ -300,9 +300,7 @@ export class RemoteHauler extends Creep {
 
             this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['transfer']),
-                conditions: request => {
-                    return request.resourceType === RESOURCE_ENERGY
-                },
+                resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 
             if (!this.needsResources()) return true
