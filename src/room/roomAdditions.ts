@@ -505,7 +505,7 @@ const roomAdditions = {
             if (
                 this.anchor &&
                 this.myCreeps.fastFiller.length &&
-                ((this.fastFillerLink && this.hubLink && this.storage) ||
+                ((this.controller.level >= 6 && this.fastFillerLink && this.hubLink && (this.storage || this.terminal) && this.myCreeps.hubHauler.length) ||
                     (this.fastFillerContainerLeft && this.fastFillerContainerRight))
             ) {
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
