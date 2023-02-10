@@ -1222,7 +1222,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     let creepRequest: CreepRoomLogisticsRequest | 0
 
     if (!bestRequest) {
-        creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(args.types, args.resourceTypes)
+        creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(types, args?.resourceTypes)
         if (!creepRequest) return RESULT_FAIL
     } else {
         creepRequest = {
@@ -1485,7 +1485,8 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = func
     }
 }
 
-Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = function(resourceTypes) {
+Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = function(resourceTypes = new Set([RESOURCE_ENERGY])) {
+
     const storingStructures = this.commune.communeManager.storingStructures
     if (!storingStructures.length) return RESULT_FAIL
 
