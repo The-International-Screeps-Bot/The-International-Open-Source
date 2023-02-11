@@ -10,19 +10,7 @@ export class HaulerNeedManager {
     run() {
         const { room } = this.communeManager
 
-        if (room.hubLink && room.hubLink.RCLActionable) {
-            for (let index in room.sources) {
-                const sourceLink = room.sourceLinks[index]
-                if (sourceLink && sourceLink.RCLActionable) continue
-
-                if (room.sourcePaths[index])
-                    room.haulerNeed += findCarryPartsRequired(
-                        room.sourcePaths[index].length + 3,
-                        room.estimatedSourceIncome[index],
-                    )
-                else console.log(`No source path for ${room.name} source ${index}`)
-            }
-        }
+        this.sourceNeed()
 
         // There is a viable controllerContainer
 
@@ -47,5 +35,39 @@ export class HaulerNeedManager {
             room.haulerNeed += Memory.stats.rooms[room.name].eosp / 50
 
         room.haulerNeed = Math.floor(room.haulerNeed)
+    }
+
+    sourceNeed() {
+        const { room } = this.communeManager
+
+        if (room.hubLink && room.hubLink.RCLActionable) {
+            for (let index in room.sources) {
+                const sourceLink = room.sourceLinks[index]
+                if (sourceLink && sourceLink.RCLActionable) continue
+
+                if (room.sourcePaths[index])
+                    room.haulerNeed += findCarryPartsRequired(
+                        room.sourcePaths[index].length + 3,
+                        room.estimatedSourceIncome[index],
+                    )
+                else console.log(`No source path for ${room.name} source ${index}`)
+            }
+
+            return
+        }
+
+        // No valid hubLink
+
+        for (let index in room.sources) {
+            const sourceLink = room.sourceLinks[index]
+            if (sourceLink && sourceLink.RCLActionable) continue
+
+            if (room.sourcePaths[index])
+                room.haulerNeed += findCarryPartsRequired(
+                    room.sourcePaths[index].length + 3,
+                    room.estimatedSourceIncome[index],
+                )
+            else console.log(`No source path for ${room.name} source ${index}`)
+        }
     }
 }
