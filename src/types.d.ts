@@ -283,7 +283,7 @@ declare global {
         y: number
     }
 
-    interface SpawnRequestOpts {
+    interface SpawnRequestArgs {
         role: CreepRoles
         /**
          * Parts that should be attempted to be implemented once
@@ -329,6 +329,13 @@ declare global {
          * The absolute max cost a creep may be applied with
          */
         maxCostPerCreep?: number | undefined
+    }
+
+    interface SpawnRequestSkeleton {
+        role: CreepRoles
+        priority: number
+        defaultParts: number
+        bodyPartCounts: { [key in PartsByPriority]: number }
     }
 
     interface SpawnRequest {
@@ -928,7 +935,10 @@ declare global {
          */
         scoutTargets: Set<string>
 
-        spawnRequests: SpawnRequest[]
+        /**
+         * Arguments for construction spawn requests
+         */
+        spawnRequestsArgs: SpawnRequestArgs[]
 
         /**
          * Tile types as defined by the rampartPlanner
@@ -1179,12 +1189,7 @@ declare global {
 
         // Spawn functions
 
-        /**
-         * Creates spawn requests for the commune
-         */
-        spawnRequester(): void
-
-        constructSpawnRequests(opts: SpawnRequestOpts | false): void
+        constructSpawnRequests(opts: SpawnRequestArgs | false): void
 
         findMaxCostPerCreep(maxCostPerCreep: number): number
 
@@ -1198,9 +1203,9 @@ declare global {
             memory: any,
         ): void
 
-        spawnRequestIndividually(opts: SpawnRequestOpts): void
+        spawnRequestIndividually(opts: SpawnRequestArgs): void
 
-        spawnRequestByGroup(opts: SpawnRequestOpts): void
+        spawnRequestByGroup(opts: SpawnRequestArgs): void
 
         // Market functions
 
@@ -1911,12 +1916,11 @@ declare global {
         canAcceptRoomLogisticsRequest(requestType: RoomLogisticsRequestTypes, requestID: string): boolean
         createBackupStoringStructuresRoomLogisticsRequest(
             types?: Set<RoomLogisticsRequestTypes>,
-            resourceTypes?: Set<ResourceConstant>
+            resourceTypes?: Set<ResourceConstant>,
         ): CreepRoomLogisticsRequest | 0
-        createBackupStoringStructuresRoomLogisticsRequestTransfer(
-        ): CreepRoomLogisticsRequest | 0
+        createBackupStoringStructuresRoomLogisticsRequestTransfer(): CreepRoomLogisticsRequest | 0
         createBackupStoringStructuresRoomLogisticsRequestWithdraw(
-            resourceTypes?: Set<ResourceConstant>
+            resourceTypes?: Set<ResourceConstant>,
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 

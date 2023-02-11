@@ -56,6 +56,7 @@ import { DroppedResourceManager } from 'room/droppedResources'
 import { LinkManager } from './links'
 import { profiler } from 'other/screeps-profiler'
 import { FactoryManager } from './factory'
+import { SpawnRequestManager } from './spawning/spawnRequests'
 
 export class CommuneManager {
     // Managers
@@ -67,6 +68,7 @@ export class CommuneManager {
     linkManager: LinkManager
     labManager: LabManager
     powerSpawningStructuresManager: PowerSpawningStructuresManager
+    spawnRequestManager: SpawnRequestManager
     spawningStructuresManager: SpawningStructuresManager
     sourceManager: SourceManager
 
@@ -90,6 +92,7 @@ export class CommuneManager {
         this.linkManager = new LinkManager(this)
         this.labManager = new LabManager(this)
         this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
+        this.spawnRequestManager = new SpawnRequestManager(this)
         this.spawningStructuresManager = new SpawningStructuresManager(this)
         this.sourceManager = new SourceManager(this)
 
@@ -125,7 +128,7 @@ export class CommuneManager {
         if (!room.memory.combatRequests) room.memory.combatRequests = []
         if (!room.memory.haulRequests) room.memory.haulRequests = []
 
-        room.spawnRequests = []
+        room.spawnRequestsArgs = []
         room.upgradeStrength = 0
         room.mineralHarvestStrength = 0
         room.roomLogisticsRequests = {
