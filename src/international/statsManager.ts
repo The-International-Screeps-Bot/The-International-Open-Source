@@ -52,7 +52,7 @@ function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
         case RoomStatNamesEnum.SpawnManagerCPUUsage:
         case RoomStatNamesEnum.CombatRequestManagerCPUUsage:
         case RoomStatNamesEnum.DefenceManagerCPUUsage:
-        case RoomStatNamesEnum.SpawnRequestManagerCPUUsage:
+        case RoomStatNamesEnum.SpawnRequestsManagerCPUUsage:
         case RoomStatNamesEnum.RoomCPUUsage:
         case RoomStatNamesEnum.RoomVisualsManagerCPUUsage:
         case RoomStatNamesEnum.ConstructionManagerCPUUsage:
@@ -160,7 +160,7 @@ export class StatsManager {
             [RoomStatNamesEnum.SpawnManagerCPUUsage]: 0,
             [RoomStatNamesEnum.CombatRequestManagerCPUUsage]: 0,
             [RoomStatNamesEnum.DefenceManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.SpawnRequestManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.SpawnRequestsManagerCPUUsage]: 0,
             [RoomStatNamesEnum.RoomCPUUsage]: 0,
             [RoomStatNamesEnum.RoomVisualsManagerCPUUsage]: 0,
             [RoomStatNamesEnum.ConstructionManagerCPUUsage]: 0,

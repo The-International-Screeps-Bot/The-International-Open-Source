@@ -72,7 +72,7 @@ export class SpawningStructuresManager {
     private runSpawning() {
         if (!this.inactiveSpawns.length) return
 
-        this.communeManager.spawnRequestManager.run()
+        this.communeManager.spawnRequestsManager.run()
 
         this.spawnIndex = this.inactiveSpawns.length - 1
         this.spawnRequests = []

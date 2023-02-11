@@ -56,7 +56,7 @@ import { DroppedResourceManager } from 'room/droppedResources'
 import { LinkManager } from './links'
 import { profiler } from 'other/screeps-profiler'
 import { FactoryManager } from './factory'
-import { SpawnRequestManager } from './spawning/spawnRequests'
+import { SpawnRequestsManager } from './spawning/spawnRequests'
 
 export class CommuneManager {
     // Managers
@@ -68,7 +68,7 @@ export class CommuneManager {
     linkManager: LinkManager
     labManager: LabManager
     powerSpawningStructuresManager: PowerSpawningStructuresManager
-    spawnRequestManager: SpawnRequestManager
+    spawnRequestsManager: SpawnRequestsManager
     spawningStructuresManager: SpawningStructuresManager
     sourceManager: SourceManager
 
@@ -92,7 +92,7 @@ export class CommuneManager {
         this.linkManager = new LinkManager(this)
         this.labManager = new LabManager(this)
         this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
-        this.spawnRequestManager = new SpawnRequestManager(this)
+        this.spawnRequestsManager = new SpawnRequestsManager(this)
         this.spawningStructuresManager = new SpawningStructuresManager(this)
         this.sourceManager = new SourceManager(this)
 
@@ -236,15 +236,11 @@ export class CommuneManager {
     }
 
     private test() {
-
         const array = new Array(2500)
 
         for (let i = 0; i < array.length; i++) {
-
             array[i] = packPlanCoord(STRUCTURE_SPAWN, 1)
         }
-
-
 
         return
 

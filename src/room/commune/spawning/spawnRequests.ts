@@ -28,7 +28,7 @@ import { unpackPosList } from 'other/packrat'
 import { globalStatsUpdater } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 
-export class SpawnRequestManager {
+export class SpawnRequestsManager {
     communeManager: CommuneManager
 
     constructor(communeManager: CommuneManager) {

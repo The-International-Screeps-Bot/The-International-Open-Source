@@ -46,7 +46,7 @@ import { globalStatsUpdater } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import { profiler } from 'other/screeps-profiler'
 import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
-import { SpawnRequestManager } from 'room/commune/spawning/spawnRequests'
+import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 
 export const loop = ErrorMapper.wrapLoop((): void => {
     profiler.wrap((): void => {
@@ -110,5 +110,5 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
 profiler.registerClass(CommuneManager, 'CommuneManager')
 profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
-profiler.registerClass(SpawnRequestManager, 'SpawnRequestManager')
+profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
 profiler.registerFN(loop, 'loop')
