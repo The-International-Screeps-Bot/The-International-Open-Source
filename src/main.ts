@@ -67,7 +67,6 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
         // Run prototypes
 
-        if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
         migrationManager.run()
         respawnManager.run()
         configManager.run()
@@ -101,6 +100,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         internationalManager.advancedSellPixels()
 
         internationalManager.endTickManager()
+        if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
     })
 })
 
