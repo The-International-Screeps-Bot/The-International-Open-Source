@@ -684,17 +684,15 @@ Creep.prototype.needsResources = function () {
     // If the creep is empty
 
     if (this.usedNextStore === 0) return (this.memory.NR = true)
-
     // Otherwise if the creep is full
-
-    if (this.freeNextStore <= 0) {
+    else if (this.freeNextStore <= 0) {
         delete this.memory.NR
         return false
+    } else {
+        // Otherwise keep it the same
+
+        return this.memory.NR
     }
-
-    // Otherwise keep it the same
-
-    return this.memory.NR
 }
 
 Creep.prototype.hasNonEnergyResource = function () {
@@ -1453,6 +1451,7 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
 
     if (types.has('transfer')) return this.createBackupStoringStructuresRoomLogisticsRequestTransfer()
 
+    if (this.role === 'hauler') return RESULT_FAIL
     return this.createBackupStoringStructuresRoomLogisticsRequestWithdraw(resourceTypes)
 }
 
@@ -1485,8 +1484,9 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = func
     }
 }
 
-Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = function(resourceTypes = new Set([RESOURCE_ENERGY])) {
-
+Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = function (
+    resourceTypes = new Set([RESOURCE_ENERGY]),
+) {
     const storingStructures = this.commune.communeManager.storingStructures
     if (!storingStructures.length) return RESULT_FAIL
 
@@ -1494,7 +1494,6 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = func
     let storingStructure: AnyStoreStructure
 
     for (resourceType of resourceTypes) {
-
         storingStructure = storingStructures.find(
             structure => structure.reserveStore[resourceType] >= this.freeNextStore,
         )

@@ -734,7 +734,7 @@ export enum RemoteData {
     /**
      * Wether or not we are
      */
-    active
+    active,
 }
 
 export enum ClaimRequestData {
@@ -1199,7 +1199,7 @@ export enum RoomStatNamesEnum {
     SpawnManagerCPUUsage = 'smcu',
     CombatRequestManagerCPUUsage = 'cormcu',
     DefenceManagerCPUUsage = 'dmcu',
-    SpawnRequestManagerCPUUsage = 'srmcu',
+    SpawnRequestsManagerCPUUsage = 'srmcu',
     RoomCPUUsage = 'rocu',
     RoomVisualsManagerCPUUsage = 'rvmcu',
     ConstructionManagerCPUUsage = 'cmcu',
