@@ -125,6 +125,7 @@ export const settings: Settings = {
         'Allorrian',
         'Aerics',
         'PlaidRabbit',
+        'SokarNox',
     ],
     nonAggressionPlayers: ['Q13214', 'HerrKai', 'Raggy', 'somygame', 'shley92822212'],
     tradeBlacklist: [''],

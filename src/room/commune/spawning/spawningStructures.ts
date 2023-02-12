@@ -1,4 +1,5 @@
 import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
+import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, getRangeOfCoords, newID } from 'international/utils'
 import { CommuneManager } from '../commune'
@@ -128,7 +129,7 @@ export class SpawningStructuresManager {
         // Try to find inactive spawn, if can't, stop the loop
 
         const spawn = this.inactiveSpawns[this.spawnIndex]
-        const ID = newID()
+        const ID = internationalManager.newCustomCreepID()
 
         // See if creep can be spawned
 

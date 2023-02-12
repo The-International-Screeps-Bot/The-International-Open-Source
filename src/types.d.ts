@@ -1969,6 +1969,9 @@ declare global {
         _defaultParts: number
         readonly defaultParts: number
 
+        _customID: number
+        readonly customID: number
+
         _strength: number
         /**
          * A numerical measurement of the combat abilites of the creep
@@ -2221,9 +2224,9 @@ declare global {
 
         // Functions
 
-        testSpawn(spawnRequest: SpawnRequest, ID: string): ScreepsReturnCode
+        testSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
 
-        advancedSpawn(spawnRequest: SpawnRequest, ID: string): ScreepsReturnCode
+        advancedSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
     }
 
     interface StructureExtension {

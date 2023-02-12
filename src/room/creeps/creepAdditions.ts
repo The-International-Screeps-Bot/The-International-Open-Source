@@ -54,6 +54,13 @@ Object.defineProperties(Creep.prototype, {
             return (this._defaultParts = parseInt(this.nameData[3]))
         },
     },
+    customID: {
+        get() {
+            if (this._customID) return this._customID
+
+            return (this._customID = parseInt(this.nameData[4]))
+        },
+    },
     strength: {
         get() {
             if (this._strength) return this._strength

@@ -41,6 +41,8 @@ export class InternationalManager {
     terminalRequests: { [ID: string]: TerminalRequest }
 
     tickID: number
+    customCreepIDs: true[]
+    customCreepIDIndex: number
 
     /**
      * Updates values to be present for this tick
@@ -52,11 +54,34 @@ export class InternationalManager {
         this.terminalRequests = {}
 
         this.tickID = 0
+        this.customCreepIDs = []
+        this.customCreepIDIndex = 0
+
         delete this._myOrders
         delete this._orders
         delete this._myOrdersCount
         delete this._claimRequestsByScore
         delete this._defaultMinCacheAmount
+    }
+
+    newCustomCreepID() {
+
+        // Try to use an existing unused ID index
+
+        for (; this.customCreepIDIndex < this.customCreepIDs.length; this.customCreepIDIndex++) {
+
+            if (this.customCreepIDs[this.customCreepIDIndex]) continue
+
+            this.customCreepIDs[this.customCreepIDIndex] = true
+            this.customCreepIDIndex += 1
+            return this.customCreepIDIndex - 1
+        }
+
+        // All previous indexes are being used, add a new index
+
+        this.customCreepIDs.push(true)
+        this.customCreepIDIndex += 1
+        return this.customCreepIDIndex - 1
     }
 
     /**
