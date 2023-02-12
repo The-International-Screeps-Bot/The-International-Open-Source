@@ -1451,6 +1451,7 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (ty
 
     if (types.has('transfer')) return this.createBackupStoringStructuresRoomLogisticsRequestTransfer()
 
+    if (this.role === 'hauler') return RESULT_FAIL
     return this.createBackupStoringStructuresRoomLogisticsRequestWithdraw(resourceTypes)
 }
 
