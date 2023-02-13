@@ -8,7 +8,7 @@ import './international/config'
 import './international/tickConfig'
 import './international/creepOrganizer'
 import './international/constructionSiteManager'
-import './international/mapVisualsManager'
+import './international/mapVisuals'
 import './international/endTickManager'
 
 // Room

@@ -24,12 +24,17 @@ InternationalManager.prototype.mapVisualsManager = function () {
             align: 'left',
             fontSize: 5,
         })
-
+/*
+        Game.map.visual.text((Game.time - roomMemory.LST).toString(), new RoomPosition(2, 40, roomName), {
+            align: 'left',
+            fontSize: 5,
+        })
+ */
         if (roomMemory.T === 'commune') {
             const room = Game.rooms[roomName]
             if (!room) continue
 
-            Game.map.visual.text(`⚡${room.resourcesInStoringStructures.energy}`, new RoomPosition(2, 8, roomName), {
+            Game.map.visual.text(`⚡${room.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`, new RoomPosition(2, 8, roomName), {
                 align: 'left',
                 fontSize: 8,
             })

@@ -8,10 +8,8 @@ import {
     getRange,
     getRangeOfCoords,
     makeRoomCoord,
-    packPlanCoord,
     randomIntRange,
     unpackNumAsCoord,
-    unpackPlanCoord,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -57,6 +55,7 @@ import { LinkManager } from './links'
 import { profiler } from 'other/screeps-profiler'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
+import { ObserverManager } from './observer'
 
 export class CommuneManager {
     // Managers
@@ -72,6 +71,7 @@ export class CommuneManager {
     spawningStructuresManager: SpawningStructuresManager
     sourceManager: SourceManager
 
+    observerManager: ObserverManager
     terminalManager: TerminalManager
     remotesManager: RemotesManager
     haulerSizeManager: HaulerSizeManager
@@ -96,6 +96,7 @@ export class CommuneManager {
         this.spawningStructuresManager = new SpawningStructuresManager(this)
         this.sourceManager = new SourceManager(this)
 
+        this.observerManager = new ObserverManager(this)
         this.terminalManager = new TerminalManager(this)
         this.remotesManager = new RemotesManager(this)
         this.haulerSizeManager = new HaulerSizeManager(this)
@@ -153,6 +154,7 @@ export class CommuneManager {
 
         room.usedRampartIDs = new Set()
 
+        this.observerManager.preTickRun()
         this.terminalManager.preTickRun()
         this.haulerSizeManager.preTickRun()
         this.remotesManager.preTickRun()
@@ -236,12 +238,14 @@ export class CommuneManager {
     }
 
     private test() {
+        return
+/*
         const array = new Array(2500)
 
         for (let i = 0; i < array.length; i++) {
             array[i] = packPlanCoord(STRUCTURE_SPAWN, 1)
         }
-
+ */
         return
 
         let CPUUsed = Game.cpu.getUsed()

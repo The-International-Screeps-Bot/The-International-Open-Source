@@ -33,11 +33,12 @@ declare global {
         y: number
     }
 
-    interface roomCoord extends Coord {
+    interface RoomCoord extends Coord {
         /**
          * The name of the room
          */
-        name: string
+        x: number
+        y: number
     }
 
     interface Rect {

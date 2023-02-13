@@ -64,7 +64,7 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            // Otherwise ass the x and y to positions
+            // Otherwise pass the x and y to positions
 
             positions.push({ x, y })
         }
@@ -84,7 +84,7 @@ export function findAdjacentCoordsToCoord(coord: Coord) {
 
             if (coord.x === x && coord.y === y) continue
 
-            // Otherwise ass the x and y to positions
+            // Otherwise pass the x and y to positions
 
             positions.push({ x, y })
         }
@@ -207,7 +207,7 @@ export function findCarryPartsRequired(distance: number, income: number) {
 }
 
 export function findLinkThroughput(range: number, income: number = LINK_CAPACITY) {
-    return Math.min(LINK_CAPACITY / range, income) *  (1 - LINK_LOSS_RATIO)
+    return Math.min(LINK_CAPACITY / range, income) * (1 - LINK_LOSS_RATIO)
 }
 
 /**
@@ -598,15 +598,44 @@ export function scalePriority(capacity: number, amount: number, multiplier: numb
 export function makeRoomCoord(roomName: string) {
     // Find the numbers in the room's name
 
-    let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/);
+    let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/)
 
     return {
-        name: name,
         x: cx === 'W' ? ~x : parseInt(x),
-        y: cy === 'N' ? ~y : parseInt(y)
+        y: cy === 'N' ? ~y : parseInt(y),
     }
 }
 
+export function roomNameFromRoomXY(x: number, y: number) {
+    return (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'N' + String(~y) : 'S' + String(y))
+}
+
+export function roomNameFromRoomCoord(roomCoord: RoomCoord) {
+    return roomNameFromRoomXY(roomCoord.x, roomCoord.y)
+}
+
+/**
+ * Takes a rectange and returns the positions inside of it in an array
+ */
+export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: number) {
+    const positions: RoomCoord[] = []
+
+    for (let x = x1; x <= x2; x += 1) {
+        for (let y = y1; y <= y2; y += 1) {
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+
+            // Otherwise pass the x and y to positions
+
+            positions.push({ x, y })
+        }
+    }
+
+    return positions
+}
+
+/*
 export function packPlanCoord(structureType: StructureConstant, minRCL: number) {
 
     return allStructureTypes.indexOf(structureType) + '_' + minRCL
@@ -621,3 +650,4 @@ export function unpackPlanCoord(packedPlanCoord: string): PlanCoord {
         minRCL: parseInt(packedPlanCoordData[1])
     }
 }
+ */

@@ -37,7 +37,7 @@ export class RoomManager {
         const { room } = this
         const roomMemory = room.memory
 
-        // Every 100~ ticks
+        // If it hasn't been scouted for 100~ ticks
 
         if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
             room.basicScout()

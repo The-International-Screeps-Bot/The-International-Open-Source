@@ -255,7 +255,7 @@ export function unpackCoordListAsPosList(packedCoords: string, roomName: string)
 /**
  * Packs a roomName as a single utf-16 character. Character values are stored on permacache.
  */
-function packRoomName(roomName: string) {
+export function packRoomName(roomName: string) {
     //     if (global.packedRoomNames[roomName] === undefined) {
     const coordinateRegex = /(E|W)(\d+)(N|S)(\d+)/g
     const match = coordinateRegex.exec(roomName)!
@@ -325,7 +325,7 @@ function packRoomName(roomName: string) {
 //     }
 //     return global.unpackedRoomNames[char]
 // }
-function unpackRoomName(q: number, x: number, y: number) {
+export function unpackRoomName(q: number, x: number, y: number) {
     let roomName: string
     switch (q) {
         case 0:
