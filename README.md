@@ -41,6 +41,8 @@ First you'll want to download or fork the repository.
 
 ### NPM
 
+Ensure you have downloaded [Node](https://nodejs.org/en/)
+
 **Make sure your node version is below 17.0.0**
 
 When in the project folder (not src), you'll want to install the devDependencies - and if you don't have it, node - like so:
