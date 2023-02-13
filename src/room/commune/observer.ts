@@ -58,10 +58,6 @@ export class ObserverManager {
                         (Memory.rooms[roomName].LST || 0) +
                         (OBSERVER_RANGE - Game.map.getRoomLinearDistance(roomName, this.communeManager.room.name)) * 10
                 }
-                Game.map.visual.text((`${score}, ${Game.time - (Memory.rooms[roomName].LST || 0)}`).toString(), new RoomPosition(2, 40, roomName), {
-                    align: 'left',
-                    fontSize: 5,
-                })
 
                 if (score <= highestScore) continue
 
