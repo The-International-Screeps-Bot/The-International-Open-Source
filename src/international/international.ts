@@ -1,5 +1,5 @@
 import { allyManager } from 'international/simpleAllies'
-import { createPosMap, customLog, getAvgPrice, packXYAsNum } from './utils'
+import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomTick } from './utils'
 
 import {
     cacheAmountModifier,
@@ -62,6 +62,11 @@ export class InternationalManager {
         delete this._myOrdersCount
         delete this._claimRequestsByScore
         delete this._defaultMinCacheAmount
+
+        if (randomTick()) {
+
+            delete this._minCredits
+        }
     }
 
     newCustomCreepID() {
@@ -227,6 +232,15 @@ export class InternationalManager {
 
     newTickID() {
         return (this.tickID += 1).toString()
+    }
+
+    _minCredits: number
+
+    get minCredits() {
+
+        if (this._minCredits !== undefined) return this._minCredits
+
+        return this._minCredits = global.communes.size * 10000
     }
 
     /**

@@ -37,9 +37,7 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
     // If there is already an order in this room for the resourceType, inform true
 
     if (mySpecificOrders.length) return false
-
-    // If there are too many existing orders, inform false
-
+    if (Game.market.credits < internationalManager.minCredits) return false
     if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
     // Decide a price based on existing market orders, at max of the adjusted average price

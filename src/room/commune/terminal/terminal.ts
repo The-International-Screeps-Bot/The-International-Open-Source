@@ -284,6 +284,9 @@ export class TerminalManager {
             // We don't have enough
 
             if (terminal.store[resourceTarget.resource] < min) {
+
+                if (Game.market.credits < internationalManager.minCredits) continue
+
                 min *= 1.2
 
                 if (room.advancedBuy(resourceTarget.resource, min - terminal.store[resourceTarget.resource], min))
