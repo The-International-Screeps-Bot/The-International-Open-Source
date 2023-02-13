@@ -8,6 +8,7 @@ import {
     RemoteData,
     roomDimensions,
     TrafficPriorities,
+    rampartSet,
 } from 'international/constants'
 import { internationalManager } from 'international/international'
 import {
@@ -392,7 +393,7 @@ PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = fun
         : room.moveRequests[packedCoord] = [this.name]
 }
 
-PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = function (avoidPackedPositions) {
+PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function (avoidPackedPositions, goalCoord) {
     const { room } = this
 
     const { x } = this.pos
@@ -409,7 +410,8 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
         packXYAsCoord(x + 1, y - 1),
     ]
 
-    const shovePositions = []
+    let shoveCoord: Coord
+    let lowestScore = Infinity
 
     const terrain = room.getTerrain()
 
@@ -425,24 +427,29 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
 
         if (coord.x < 1 || coord.x >= roomDimensions - 1 || coord.y < 1 || coord.y >= roomDimensions - 1) continue
 
-        const pos = new RoomPosition(coord.x, coord.y, room.name)
+        let score: number
+        if (goalCoord) {
 
-        if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+            score = getRangeOfCoords(coord, goalCoord)
+            if (score >= lowestScore) continue
+        }
+
+        if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
 
         // If the coord isn't safe to stand on
 
         if (room.enemyThreatCoords.has(packedCoord)) continue
 
-        if (room.coordHasStructureTypes(pos, impassibleStructureTypesSet)) continue
+        if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue
 
-        if (this.memory.ROS && !room.coordHasStructureTypes(pos, new Set([STRUCTURE_RAMPART]))) continue
+        if (this.memory.ROS && !room.coordHasStructureTypes(coord, rampartSet)) continue
 
         let hasImpassibleStructure
 
-        for (const cSite of pos.lookFor(LOOK_CONSTRUCTION_SITES)) {
+        for (const cSite of room.lookForAt(LOOK_CONSTRUCTION_SITES, coord.x, coord.y)) {
             if (!cSite.my && !Memory.allyPlayers.includes(cSite.owner.username)) continue
 
-            if (impassibleStructureTypes.includes(cSite.structureType)) {
+            if (impassibleStructureTypesSet.has(cSite.structureType)) {
                 hasImpassibleStructure = true
                 break
             }
@@ -450,29 +457,31 @@ PowerCreep.prototype.findShovePositions = Creep.prototype.findShovePositions = f
 
         if (hasImpassibleStructure) continue
 
-        shovePositions.push(pos)
+        if (goalCoord) {
+
+            lowestScore = score
+            shoveCoord = coord
+            continue
+        }
+
+        // There is no goalCoord, use this coord
+
+        return shoveCoord
     }
 
-    return shovePositions
+    return shoveCoord
 }
 
 PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
     const { room } = this
 
-    const shovePositions = this.findShovePositions(new Set([packCoord(shoverPos), packCoord(this.pos)]))
-    if (!shovePositions.length) return false
+    let currentGoalPos: Coord
+    if (this.memory.GP) currentGoalPos = unpackPos(this.memory.GP)
 
-    let goalPos: RoomPosition
+    const shoveCoord = this.findShoveCoord(new Set([packCoord(shoverPos), packCoord(this.pos)]), currentGoalPos)
+    if (!shoveCoord) return false
 
-    if (this.memory.GP) {
-        goalPos = unpackPos(this.memory.GP)
-
-        goalPos = shovePositions.sort((a, b) => {
-            return getRange(goalPos.x, a.x, goalPos.y, a.y) - getRange(goalPos.x, b.x, goalPos.y, b.y)
-        })[0]
-    } else goalPos = shovePositions[Math.floor(Math.random() * shovePositions.length)]
-
-    this.assignMoveRequest(goalPos)
+    this.assignMoveRequest(shoveCoord)
     if (Memory.roomVisuals)
         room.visual.circle(this.pos, {
             fill: '',

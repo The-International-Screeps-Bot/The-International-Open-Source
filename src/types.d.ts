@@ -1740,7 +1740,7 @@ declare global {
 
         assignMoveRequest(coord: Coord): void
 
-        findShovePositions(avoidPackedPositions: Set<string>): RoomPosition[]
+        findShoveCoord(avoidPackedPositions: Set<string>, goalCoord?: Coord): Coord
 
         shove(shoverPos: RoomPosition): boolean
 

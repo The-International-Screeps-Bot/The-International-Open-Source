@@ -115,6 +115,11 @@ export class CommuneManager {
 
     public update(room: Room) {
         this.room = room
+
+        delete this._inputLabs
+        delete this._minStoredEnergy
+        delete this._storingStructures
+        delete this._maxCombatRequests
     }
 
     preTickRun() {
@@ -312,6 +317,8 @@ export class CommuneManager {
      * Finds the input labs we need to opperate production
      */
     public get inputLabs() {
+        if (this._inputLabs) return this._inputLabs
+
         this._inputLabs = []
 
         // We need at least 3 labs to opperate

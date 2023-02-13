@@ -311,6 +311,8 @@ export class TerminalManager {
         }
     }
 
+    // "New" version, not yet in use
+
     isTradingPossible() {
         return this.room.terminal && this.room.storage
     }
