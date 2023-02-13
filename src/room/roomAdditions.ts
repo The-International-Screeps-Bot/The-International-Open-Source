@@ -2205,10 +2205,9 @@ const roomAdditions = {
                 // The last upgrade position should be the deliver pos, which we want to weight normal
 
                 const upgradePositions = this.upgradePositions.slice(0, this.upgradePositions.length - 1)
-
-                // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
-
                 for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
+
+                for (const pos of this.mineralPositions) cm.set(pos.x, pos.y, 10)
             }
 
             // Get the hubAnchor

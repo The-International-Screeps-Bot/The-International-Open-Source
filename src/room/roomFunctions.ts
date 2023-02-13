@@ -325,10 +325,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                         // The last upgrade position should be the deliver pos, which we want to weight normal
 
                         const upgradePositions = room.upgradePositions.slice(0, room.upgradePositions.length - 1)
-
-                        // Loop through each pos of upgradePositions, assigning them as prefer to avoid in the cost matrix
-
                         for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
+
+                        for (const pos of room.mineralPositions) cm.set(pos.x, pos.y, 10)
                     }
 
                     // Get the hubAnchor
