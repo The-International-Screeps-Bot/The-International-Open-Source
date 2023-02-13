@@ -141,9 +141,10 @@ export class TerminalManager {
         }
     }
 
-    findBestTerminalRequest() {
+    findBestTerminalRequest(): [TerminalRequest, number] {
         let lowestScore = Infinity
         let bestRequest: TerminalRequest
+        let amount: number
 
         for (const ID in internationalManager.terminalRequests) {
             const request = internationalManager.terminalRequests[ID]
@@ -151,6 +152,11 @@ export class TerminalManager {
             // Don't respond to requests for this room
 
             if (request.roomName === this.communeManager.room.name) continue
+
+            // Ensure we have more than the asking amount
+
+            let newAmount = Math.min(request.amount, this.communeManager.room.resourcesInStoringStructures[request.resource])
+            if (newAmount / request.amount < 0.5) continue
 
             const score =
                 Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
@@ -164,15 +170,12 @@ export class TerminalManager {
             )
                 continue
 
-            // Make sure we have extra
-
-            if (this.communeManager.room.terminal.store.getUsedCapacity(request.resource) < request.amount * 2) continue
-
+            amount = newAmount
             bestRequest = request
             lowestScore = score
         }
 
-        return bestRequest
+        return [bestRequest, amount]
     }
 
     private respondToTerminalRequests() {
@@ -181,12 +184,12 @@ export class TerminalManager {
         if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy)
             return false
 
-        const request = this.findBestTerminalRequest()
+        const [request, amount] = this.findBestTerminalRequest()
         if (!request) return false
 
         this.communeManager.room.terminal.send(
             request.resource,
-            request.amount,
+            amount,
             request.roomName,
             'Terminal request response',
         )

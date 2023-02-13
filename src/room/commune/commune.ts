@@ -383,7 +383,7 @@ export class CommuneManager {
 
         // Consider the controller level to an exponent and this room's attack threat
 
-        this._minStoredEnergy = Math.floor(Math.pow(this.room.controller.level * 6000, 1.05) + this.room.memory.AT * 20)
+        this._minStoredEnergy = Math.pow(this.room.controller.level * 6000, 1.06) + this.room.memory.AT * 20
 
         // If there is a next RCL, Take away some minimum based on how close we are to the next RCL
 
@@ -391,7 +391,7 @@ export class CommuneManager {
         if (RClCost) {
             this._minStoredEnergy -= Math.pow((Math.min(this.room.controller.progress, RClCost) / RClCost) * 20, 3.35)
         }
-        return this._minStoredEnergy
+        return this._minStoredEnergy = Math.floor(this._minStoredEnergy)
     }
 
     get storedEnergyUpgradeThreshold() {
