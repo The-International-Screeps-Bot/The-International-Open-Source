@@ -258,13 +258,14 @@ export class RoomVisualsManager {
             'build',
             'repair other',
             'barricade repair',
-            'spawn',
+            'spawn util',
         ]
 
         const data: any[][] = [[]]
 
         let totalEstimatedIncome = 0
-        let totalEnergyHarvested = 0
+        let totalCommuneEnergyHarvested = 0
+        let totalRemoteEnergyHarvested = 0
         let totalUpgrade = 0
         let totalBuild = 0
         let totalRepairOther = 0
@@ -276,7 +277,8 @@ export class RoomVisualsManager {
             const roomStats = Memory.stats.rooms[roomName]
 
             totalEstimatedIncome += room.estimateIncome()
-            totalEnergyHarvested += roomStats.eih
+            totalCommuneEnergyHarvested += roomStats.eih
+            totalRemoteEnergyHarvested += roomStats.reih
             totalUpgrade += roomStats.eou
             totalBuild += roomStats.eob
             totalRepairOther = roomStats.eoro
@@ -288,8 +290,8 @@ export class RoomVisualsManager {
 
         data[0].push(
             totalEstimatedIncome,
-            totalEnergyHarvested.toFixed(2),
-            totalEnergyHarvested.toFixed(2),
+            totalCommuneEnergyHarvested.toFixed(2),
+            totalRemoteEnergyHarvested.toFixed(2),
             totalUpgrade.toFixed(2),
             totalBuild.toFixed(2),
             totalRepairOther.toFixed(2),
@@ -588,10 +590,10 @@ export class RoomVisualsManager {
             'RHarvest',
             'upgrade',
             'build',
-            'repairOther',
-            'barricadeRepair',
-            'towerInferiority',
-            'spawn',
+            'rep Other',
+            'rep barricade',
+            'inferiority',
+            'spawn util',
         ]
 
         const roomStats = Memory.stats.rooms[this.roomManager.room.name]
