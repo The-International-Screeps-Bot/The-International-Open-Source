@@ -380,6 +380,12 @@ export class InternationalManager {
 
         return (this._marketIsFunctional = Game.market.getHistory(RESOURCE_ENERGY).length)
     }
+
+    _maxCommunes: number
+    get maxCommunes() {
+
+        return this._maxCommunes = Math.round(Game.cpu.limit / 10)
+    }
 }
 
 export const internationalManager = new InternationalManager()

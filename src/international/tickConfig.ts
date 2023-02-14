@@ -138,6 +138,7 @@ class TickConfig {
             // If there is not enough reserved GCL to make a new request
 
             if (reservedGCL <= 0) continue
+            if (global.communes.size >= internationalManager.maxCommunes) continue
 
             // If the requested room is no longer neutral
 
