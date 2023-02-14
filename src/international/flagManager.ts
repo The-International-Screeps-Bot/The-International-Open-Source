@@ -17,7 +17,17 @@ class FlagManager {
     internationalDataVisuals(flagNameParts: string[]) {
 
         const room = Game.rooms[flagNameParts[1] || Game.flags[flagNameParts[0].pos.roomName]]
+        if (!room) return
+
         room.roomManager.roomVisualsManager.internationalDataVisuals()
+    }
+
+    abandonCommune(flagNameParts: string[]) {
+
+        const roomMemory = Memory.rooms[flagNameParts[1] || Game.flags[flagNameParts[0].pos.roomName]]
+        if (!roomMemory) return
+
+        roomMemory.Ab = true
     }
 }
 
