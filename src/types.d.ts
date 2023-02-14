@@ -75,8 +75,8 @@ declare global {
     interface ResourceTarget {
         resource: ResourceConstant
         conditions?(communeManager: CommuneManager): any
-        min: number
-        max: number
+        min(communeManager?: CommuneManager): number
+        max(communeManager?: CommuneManager): number
     }
 
     type RemoteStampTypes = 'road' | 'container'

@@ -1,5 +1,5 @@
 import { minerals, terminalResourceTargets } from 'international/constants'
-import { customLog, newID } from 'international/utils'
+import { customLog, findLargestTransactionAmount, newID } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
 import { internationalManager } from 'international/international'
@@ -58,24 +58,25 @@ export class TerminalManager {
         const { terminal } = room
 
         for (const resourceTarget of terminalResourceTargets) {
-            if (resourceTarget.max <= 0) continue
+
+            let targetAmount = resourceTarget.min(this.communeManager)
+            if (targetAmount <= 0) continue
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
-
-            // Half of the max
-
-            let targetAmount = (terminal.store.getCapacity() * resourceTarget.max) / 2
 
             // We have enough
 
-            if (terminal.store[resourceTarget.resource] >= targetAmount * 0.7) continue
+            const storedResourceAmount = this.communeManager.room.resourcesInStoringStructures[resourceTarget.resource] || 0
+            if (storedResourceAmount >= targetAmount) continue
+
+            targetAmount = Math.floor(targetAmount * 1.1)
 
             const ID = newID()
 
             internationalManager.terminalRequests[ID] = {
                 ID,
-                priority: 1 - terminal.store[resourceTarget.resource] / targetAmount,
+                priority: 1 - storedResourceAmount / targetAmount,
                 resource: resourceTarget.resource,
-                amount: targetAmount - terminal.store[resourceTarget.resource],
+                amount: Math.min(targetAmount - storedResourceAmount, terminal.store.getFreeCapacity()),
                 roomName: room.name,
             }
         }
@@ -142,6 +143,11 @@ export class TerminalManager {
     }
 
     findBestTerminalRequest(): [TerminalRequest, number] {
+        const budget = Math.min(
+            this.communeManager.room.resourcesInStoringStructures.energy - this.communeManager.minStoredEnergy,
+            this.communeManager.room.terminal.store[RESOURCE_ENERGY],
+        )
+
         let lowestScore = Infinity
         let bestRequest: TerminalRequest
         let amount: number
@@ -155,20 +161,17 @@ export class TerminalManager {
 
             // Ensure we have more than the asking amount
 
-            let newAmount = Math.min(request.amount, this.communeManager.room.resourcesInStoringStructures[request.resource])
-            if (newAmount / request.amount < 0.5) continue
+            const newAmount = findLargestTransactionAmount(
+                budget,
+                Math.min(request.amount, this.communeManager.room.resourcesInStoringStructures[request.resource]),
+                this.communeManager.room.name,
+                request.roomName,
+            )
+            if (newAmount / request.amount < 0.25) continue
 
             const score =
                 Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
             if (score >= lowestScore) continue
-
-            // Make sure we have enough energy and some left over from the transfer cost
-
-            if (
-                Game.market.calcTransactionCost(request.amount, this.communeManager.room.name, request.roomName) * 2 >
-                this.communeManager.room.terminal.store.energy
-            )
-                continue
 
             amount = newAmount
             bestRequest = request
@@ -187,12 +190,7 @@ export class TerminalManager {
         const [request, amount] = this.findBestTerminalRequest()
         if (!request) return false
 
-        this.communeManager.room.terminal.send(
-            request.resource,
-            amount,
-            request.roomName,
-            'Terminal request response',
-        )
+        this.communeManager.room.terminal.send(request.resource, amount, request.roomName, 'Terminal request response')
         delete internationalManager.terminalRequests[request.ID]
 
         return true
@@ -282,12 +280,11 @@ export class TerminalManager {
         for (const resourceTarget of terminalResourceTargets) {
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
-            let min = terminal.store.getCapacity() * resourceTarget.min
+            let min = terminal.store.getCapacity() * resourceTarget.min()
 
             // We don't have enough
 
             if (terminal.store[resourceTarget.resource] < min) {
-
                 if (Game.market.credits < internationalManager.minCredits) continue
 
                 min *= 1.2
@@ -297,7 +294,7 @@ export class TerminalManager {
                 continue
             }
 
-            let max = terminal.store.getCapacity() * resourceTarget.max
+            let max = terminal.store.getCapacity() * resourceTarget.max()
 
             // We have enough
 

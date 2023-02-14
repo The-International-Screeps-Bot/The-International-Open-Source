@@ -431,6 +431,14 @@ export class CommuneManager {
         return this._storingStructures
     }
 
+    get storingStructuresCapacity() {
+
+        let capacity = 0
+        if (this.room.storage) capacity += this.room.storage.store.getCapacity()
+        if (this.room.terminal) capacity += this.room.terminal.store.getCapacity()
+        return capacity
+    }
+
     _maxCombatRequests: number
 
     /**

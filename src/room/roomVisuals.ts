@@ -14,6 +14,7 @@ import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/uti
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
+import { internationalManager } from 'international/international'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -240,7 +241,9 @@ export class RoomVisualsManager {
         this.internationalAllyBuildRequestsDataVisuals(
             this.internationalAllyCombatRequestsDataVisuals(
                 this.internationalAllyResourceRequestsDataVisuals(
-                    this.internationalRequestsDataVisuals(this.internationalGeneralDataVisuals(1)),
+                    this.internationalRequestsDataVisuals(
+                        this.internationalTerminalRequestsDataVisuals(this.internationalGeneralDataVisuals(1)),
+                    ),
                 ),
             ),
         )
@@ -385,6 +388,48 @@ export class RoomVisualsManager {
                             data,
                             config: {
                                 label: 'My Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalTerminalRequestsDataVisuals(y: number) {
+        const headers: any[] = ['roomName', 'resource', 'amount', 'priority']
+
+        const data: any[][] = []
+
+        for (const ID in internationalManager.terminalRequests) {
+            const request = internationalManager.terminalRequests[ID]
+
+            const row: any[] = [request.roomName, request.resource, request.amount, request.priority]
+            data.push(row)
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'My Terminal Requests',
                                 headers,
                             },
                         })),
