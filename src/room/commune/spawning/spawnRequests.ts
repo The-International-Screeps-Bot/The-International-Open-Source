@@ -426,7 +426,7 @@ export class SpawnRequestsManager {
                         if (!room.structures.tower.length) requiredStrength += attackStrength
                     }
 
-                    const priority = Math.min(minPriority + 0.1 + room.myCreeps[role].length * 0.75, maxPriority)
+                    const priority = Math.min(minPriority - 0.1 + room.myCreeps[role].length * 0.75, maxPriority)
 
                     // If all RCL 3 extensions are build
 
@@ -475,7 +475,7 @@ export class SpawnRequestsManager {
 
                 if (!room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
-                let priority = 8
+                priority = minRemotePriority + 0.5
                 partsMultiplier = 0
 
                 // If there is an active storage
@@ -575,10 +575,6 @@ export class SpawnRequestsManager {
 
         rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                minPriority = 6
-                maxPriority = minRemotePriority - 0.5
-
-                priority = Math.min(minPriority + room.creepsFromRoom.maintainer.length * 0.5, maxPriority)
 
                 // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
@@ -595,6 +591,15 @@ export class SpawnRequestsManager {
                 // If there are no ramparts or repair targets
 
                 if (!ramparts.length && !repairTargets.length) return false
+
+                if (repairTargets.length || this.communeManager.room.towerInferiority) {
+
+                    priority = Math.min(6 + room.creepsFromRoom.maintainer.length * 0.5, minRemotePriority - 0.5)
+                }
+                else {
+
+                    priority = minRemotePriority + 0.5
+                }
 
                 // Construct the partsMultiplier
 
@@ -664,7 +669,7 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 partsMultiplier = 1
                 let maxCreeps = room.upgradePositions.length - 1
-                const priority = minRemotePriority + 0.5
+                priority = minRemotePriority + 0.5
 
                 // If there are enemyAttackers and the controller isn't soon to downgrade
 
@@ -1066,7 +1071,7 @@ export class SpawnRequestsManager {
                         minCreeps: 1,
                         maxCreeps: Infinity,
                         minCost: cost,
-                        priority: minRemotePriority + 1,
+                        priority: minRemotePriority + 0.1,
                         memoryAdditions: {
                             RN: remoteName,
                         },
