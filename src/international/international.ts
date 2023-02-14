@@ -44,6 +44,8 @@ export class InternationalManager {
     customCreepIDs: true[]
     customCreepIDIndex: number
 
+    internationalDataVisuals: boolean
+
     /**
      * Updates values to be present for this tick
      */
@@ -62,6 +64,7 @@ export class InternationalManager {
         delete this._myOrdersCount
         delete this._claimRequestsByScore
         delete this._defaultMinCacheAmount
+        delete this.internationalDataVisuals
 
         if (randomTick()) {
 

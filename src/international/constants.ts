@@ -12,7 +12,8 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     'HU',
     'AT',
     'LAT',
-    'AB',
+    'Ab',
+    'S',
 
     'CN',
     'RE',
@@ -32,7 +33,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
 ])
 
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
-    commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT', 'AB']),
+    commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT', 'AB', 'S']),
     remote: new Set(['CN', 'RE', 'data', 'NC', 'PC']),
     ally: new Set(['owner', 'level', 'NC', 'PC']),
     allyRemote: new Set(['owner', 'NC', 'PC']),

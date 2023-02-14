@@ -48,6 +48,7 @@ import { profiler } from 'other/screeps-profiler'
 import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
 import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { flagManager } from 'international/flagManager'
+import { roomPruningManager } from 'international/roomPruning'
 
 export const loop = ErrorMapper.wrapLoop((): void => {
     profiler.wrap((): void => {
@@ -75,6 +76,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         configManager.run()
         tickConfig.run()
         playerManager.run()
+        roomPruningManager.run()
         flagManager.run()
         creepOrganizer.run()
         powerCreepOrganizer.run()

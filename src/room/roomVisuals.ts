@@ -226,7 +226,6 @@ export class RoomVisualsManager {
     }
 
     private dataVisuals() {
-        this.internationalDataVisuals()
 
         if (!Memory.dataVisuals) return
 
@@ -235,8 +234,7 @@ export class RoomVisualsManager {
         this.remoteDataVisuals(this.generalDataVisuals(1))
     }
 
-    private internationalDataVisuals() {
-        if (!this.roomManager.room.flags.internationalDataVisuals) return
+    public internationalDataVisuals() {
 
         this.internationalAllyBuildRequestsDataVisuals(
             this.internationalAllyCombatRequestsDataVisuals(

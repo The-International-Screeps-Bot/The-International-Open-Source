@@ -1510,7 +1510,7 @@ declare global {
         /**
          * abandoned, true if a commune is to be unclaimed ASAP
          */
-        AB: boolean
+        Ab: boolean
 
         /**
          * A list of needs the remote wants met
@@ -1655,6 +1655,11 @@ declare global {
          * Greatest Room Controller Level
          */
         GRCL: number
+
+        /**
+         * The score for claim evaluation
+         */
+        S: number
 
         hasTerminal: boolean
 

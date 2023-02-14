@@ -125,7 +125,7 @@ export class CommuneManager {
     preTickRun() {
         const { room } = this
 
-        if (room.memory.AB) {
+        if (room.memory.Ab) {
 
             room.controller.unclaim()
             return
