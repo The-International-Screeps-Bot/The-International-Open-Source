@@ -1508,6 +1508,11 @@ declare global {
         RE: number
 
         /**
+         * abandoned, true if a commune is to be unclaimed ASAP
+         */
+        AB: boolean
+
+        /**
          * A list of needs the remote wants met
          */
         data: number[]

@@ -125,6 +125,12 @@ export class CommuneManager {
     preTickRun() {
         const { room } = this
 
+        if (room.memory.AB) {
+
+            room.controller.unclaim()
+            return
+        }
+
         const roomMemory = Memory.rooms[room.name]
 
         room.memory.T = 'commune'
