@@ -2,6 +2,7 @@
 export default class GetShardVision {
     private _mainShard = 'shard0'
     private _shardNames = ['shard0', 'shard1', 'shard2', 'shard3']
+    private _lastSpawnRotation = global.lastSpawnRotation ?? 1500
 
     private _lastShardIndex = this._shardNames.indexOf(
         global.lastShardTarget ?? this._shardNames[this._shardNames.length - 1],
@@ -16,14 +17,16 @@ export default class GetShardVision {
         const spawn = spawns.filter(s => s.spawning === null)[0]
         if (!spawn) return
 
-        const shardTarget =
-            this._lastShardIndex === this._shardNames.length - 1
-                ? this._shardNames[0]
-                : this._shardNames[this._lastShardIndex + 1]
+        const maxShardIndex = this._lastShardIndex === this._shardNames.length - 1
+        const shardTarget = maxShardIndex ? this._shardNames[0] : this._shardNames[this._lastShardIndex + 1]
 
         const spawnResult = spawn.spawnCreep([MOVE], `${shardTarget}-${Game.time}`)
         if (spawnResult === OK || spawnResult === ERR_NAME_EXISTS) {
             global.lastShardTarget = shardTarget
+        }
+
+        if (maxShardIndex) {
+            global.lastSpawnRotation = 0
         }
     }
 
@@ -37,8 +40,9 @@ export default class GetShardVision {
         if (!this._shardNames.includes(Game.shard.name)) return
 
         this._shardNames.forEach((shardName, index): void => {
-            if (Game.time % 100 === 0 && index === 0) {
-                this.SpawnCreeps()
+            if (index === 0) {
+                if (this._lastSpawnRotation > 500) this.SpawnCreeps()
+                else global.lastSpawnRotation += 1
             }
             let loggedOrders = false
 

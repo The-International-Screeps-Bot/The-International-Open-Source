@@ -1,0 +1,270 @@
+// eslint-disable
+import { allStructureTypes } from 'international/constants'
+import { encode, decode } from 'base32768'
+import packrat from "packrat"
+
+/**
+ * Convert a standard 24-character hex id in screeps to a compressed UTF-16 encoded string of length 6.
+ *
+ * Benchmarking: average of 500ns to execute on shard2 public server, reduce stringified size by 75%
+ */
+export function packId(id: string) {
+    return packrat.packId(id)
+}
+
+/**
+ * Convert a compressed six-character UTF-encoded id back into the original 24-character format.
+ *
+ * Benchmarking: average of 1.3us to execute on shard2 public server
+ */
+export function unpackId(packedId: string) {
+    return packrat.unpackId(packedId)
+}
+
+/**
+ * Packs a list of ids as a utf-16 string. This is better than having a list of packed coords, as it avoids
+ * extra commas and "" when memory gets stringified.
+ *
+ * Benchmarking: average of 500ns per id to execute on shard2 public server, reduce stringified size by 81%
+ */
+export function packIdList(ids: string[]) {
+    return packrat.packIdList(ids)
+}
+
+/**
+ * Unpacks a list of ids stored as a utf-16 string.
+ *
+ * Benchmarking: average of 1.2us per id to execute on shard2 public server.
+ */
+export function unpackIdList(packedIds: string) {
+    return packrat.unpackIdList(packedIds)
+}
+
+/**
+ * Packs a coord as two UInt8 characters.
+ */
+export function packCoord(coord: Coord) {
+    return encode(new Uint8Array([coord.x, coord.y]))
+}
+
+/**
+ * Packs a coord as two Base32768 characters
+ */
+export function packXYAsCoord(x: number, y: number) {
+    return encode(new Uint8Array([x, y]))
+}
+
+/**
+ * Unpacks a coord stored as two Uint8 characters
+ *
+ * Benchmarking: average of 60ns-100ns to execute on shard2 public server
+ */
+export function unpackCoord(char: string) {
+    const decoded = decode(char) as number[]
+    return { x: decoded[0], y: decoded[1] }
+}
+
+/**
+ * Unpacks a coordinate and creates a RoomPosition object from a specified roomName
+ */
+export function unpackCoordAsPos(packedCoord: string, roomName: string) {
+    const coord = unpackCoord(packedCoord)
+    return new RoomPosition(coord.x, coord.y, roomName)
+}
+
+/**
+ * Reverse the encoded coordList
+ */
+export function reverseCoordList(coordList: string) {
+    return coordList
+        .match(/.{1,2}/g)
+        .reverse()
+        .join('')
+}
+
+/**
+ * Packs a list of coords as a Base32768 string. This is better than having a list of packed coords, as it avoids
+ * extra commas and "" when memory gets stringified.
+ */
+export function packCoordList(coords: Coord[]) {
+    let str = ''
+    const maxLength = coords.length
+    for (let i = 0; i < maxLength; i++) {
+        str += packCoord(coords[i])
+    }
+    return str
+}
+
+/**
+ * Unpacks a list of coords stored as a Base32768 string
+ *
+ * Benchmarking: average of 100ns per coord to execute on shard2 public server
+ */
+export function unpackCoordList(chars: string) {
+    const coords: Coord[] = []
+    for (let i = 0; i < chars.length; i += 2) {
+        coords.push(unpackCoord(chars[i] + chars[i + 1]))
+    }
+    return coords
+}
+
+/**
+ * Unpacks a list of coordinates and creates a list of RoomPositions from a specified roomName
+ */
+export function unpackCoordListAsPosList(packedCoords: string, roomName: string) {
+    const positions: RoomPosition[] = []
+    let coord: Coord
+    for (let i = 0; i < packedCoords.length; i += 2) {
+        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1])
+        positions.push(new RoomPosition(coord.x, coord.y, roomName))
+    }
+    return positions
+}
+
+global.packedRoomNames = global.packedRoomNames || {}
+global.unpackedRoomNames = global.unpackedRoomNames || {}
+
+/**
+ * Packs a roomName as Base32768 string.
+ */
+export function packRoomName(roomName: string) {
+    const coordinateRegex = /(E|W)(\d+)(N|S)(\d+)/g
+    const match = coordinateRegex.exec(roomName)!
+
+    const xDir = match[1]
+    const x = Number(match[2])
+    const yDir = match[3]
+    const y = Number(match[4])
+
+    let quadrant
+    if (xDir === 'W') {
+        if (yDir === 'N') {
+            quadrant = 0
+        } else {
+            quadrant = 1
+        }
+    } else if (yDir === 'N') {
+        quadrant = 2
+    } else {
+        quadrant = 3
+    }
+
+    return { quadrant, x, y }
+}
+
+/**
+ * Unpack room name
+ */
+export function unpackRoomName(q: number, x: number, y: number) {
+    let roomName: string
+    switch (q) {
+        case 0:
+            roomName = `W${x}N${y}`
+            break
+        case 1:
+            roomName = `W${x}S${y}`
+            break
+        case 2:
+            roomName = `E${x}N${y}`
+            break
+        case 3:
+            roomName = `E${x}S${y}`
+            break
+        default:
+            roomName = 'ERROR'
+    }
+    return roomName
+}
+
+/**
+ * Packs a RoomPosition as a pair Uint8 characters.
+ */
+export function packPos(pos: RoomPosition) {
+    const map = packRoomName(pos.roomName)
+    return encode(new Uint8Array([map.quadrant, map.x, map.y, pos.x, pos.y]))
+}
+
+/**
+ * Packs a RoomPosition as a pair Uint8 characters.
+ */
+export function packXYAsPos(x: number, y: number, roomName: string) {
+    const map = packRoomName(roomName)
+    return encode(new Uint8Array([map.quadrant, map.x, map.y, x, y]))
+}
+
+/**
+ * Unpacks a RoomPosition stored as a pair of Base32768 characters.
+ */
+export function unpackPos(chars: string) {
+    const pos = decode(chars) as [number, number, number, number, number]
+    return new RoomPosition(pos[3], pos[4], unpackRoomName(pos[0], pos[1], pos[2]))
+}
+
+/**
+ * Packs a list of RoomPositions as a Base32768 string. This is better than having a list of packed RoomPositions, as it
+ * avoids extra commas and "" when memory gets stringified.
+ */
+export function packPosList(posList: RoomPosition[]) {
+    let str = ''
+    const maxLength = posList.length
+    for (let i = 0; i < maxLength; i++) {
+        str += packXYAsPos(posList[i].x, posList[i].y, posList[i].roomName)
+    }
+    return str
+}
+
+/**
+ * Unpacks a list of RoomPositions stored as a Base32768 string.
+ */
+export function unpackPosList(chars: string) {
+    const posList: RoomPosition[] = []
+    for (let i = 0; i < chars.length; i += 2) {
+        posList.push(unpackPos(chars[i] + chars[i + 1]))
+    }
+    return posList
+}
+
+/**
+ * Pack a planned cord for base building
+ */
+export function packPlanValues(structureType: StructureConstant, minRCL: number) {
+    return encode(new Uint8Array([allStructureTypes.indexOf(structureType), minRCL]))
+}
+
+/**
+ * Pack a planned cord for base building
+ */
+export function packPlanCoord(coord: PlanCoord) {
+    return encode(new Uint8Array([allStructureTypes.indexOf(coord.structureType), coord.minRCL]))
+}
+
+/**
+ * Packs a list of planned coords for base building
+ */
+export function packPlanCoordList(coordList: PlanCoord[]) {
+    let strArr = []
+    const maxLength = coordList.length
+    for (let i = 0; i < maxLength; i++) {
+        strArr.push(packPlanCoord(coordList[i]))
+    }
+    return strArr
+}
+
+/**
+ * Unpack a planned cord for base building
+ */
+export function unpackPlanCoord(chars: string) {
+    const coord = decode(chars) as [number, number]
+    return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
+}
+
+/**
+ * Unpacks a list of planned coords for base building
+ */
+export function unpackPlanCoordList(chars: string[]): PlanCoord[] {
+    const coordList: PlanCoord[] = []
+    for (let i = 0; i < chars.length; i += 1) {
+        coordList.push(unpackPlanCoord(chars[i]))
+    }
+    return coordList
+}
