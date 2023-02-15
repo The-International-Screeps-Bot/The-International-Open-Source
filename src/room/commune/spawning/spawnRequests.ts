@@ -460,10 +460,6 @@ export class SpawnRequestsManager {
             )
         }
 
-        // Get the estimates income
-
-        const estimatedIncome = room.estimateIncome()
-
         // Construct requests for builders
 
         rawSpawnRequestsArgs.push(
@@ -493,7 +489,7 @@ export class SpawnRequestsManager {
 
                 // Otherwise if there is no storage
                 else {
-                    partsMultiplier += estimatedIncome / 5
+                    partsMultiplier += this.communeManager.estimatedEnergyIncome / 5
 
                     // Spawn some extra builders to handle the primarily road building RCL 3 and needy storage building
 
@@ -688,7 +684,7 @@ export class SpawnRequestsManager {
                 }
                 // Otherwise if there is no storage
                 else {
-                    partsMultiplier += estimatedIncome * 0.75
+                    partsMultiplier += this.communeManager.estimatedEnergyIncome * 0.75
                 }
 
                 // Get the controllerLink and baseLink

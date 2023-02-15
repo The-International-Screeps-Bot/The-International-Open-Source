@@ -67,7 +67,7 @@ export class CombatRequestManager {
             if (room.memory.combatRequests.length >= room.communeManager.maxCombatRequests) return false
         }
 
-        if (room.memory.combatRequests.length >= room.estimateIncome() / 10) return false
+        if (room.memory.combatRequests.length >= room.communeManager.estimatedEnergyIncome / 10) return false
         return true
     }
 

@@ -155,6 +155,7 @@ Creep.prototype.advancedPickup = function (target) {
 }
 
 Creep.prototype.advancedHarvestSource = function (source) {
+
     const harvestResult = this.harvest(source)
 
     // Harvest the source, informing the result if it didn't succeed
@@ -172,6 +173,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
     this.nextStore.energy += energyHarvested
+    this.commune.communeManager.estimatedEnergyIncome += energyHarvested
 
     globalStatsUpdater(this.room.name, 'eih', energyHarvested)
 
