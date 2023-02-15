@@ -140,5 +140,5 @@ export const settings: Settings = {
     logging: false,
     creepSay: true,
     simpleAlliesSegment: 90,
-    errorExporting: false
+    errorExporting: true,
 }

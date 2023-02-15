@@ -86,7 +86,7 @@ export class ErrorMapper {
                         const stack = _.escape(this.sourceMappedStackTrace(e))
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${stack}</p>`)
-                        if (settings.errorExporting) ErrorExporter.addErrorToSegment(stack, settings.breakingVersion)
+                        if (Memory.errorExporting) ErrorExporter.addErrorToSegment(stack, settings.breakingVersion)
                     }
                 } else {
                     // can't handle it
