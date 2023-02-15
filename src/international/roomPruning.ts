@@ -41,7 +41,7 @@ class RoomPruningManager {
         for (const )
         */
 
-        highestScoreCommuneName.Ab = true
+        Memory.rooms[highestScoreCommuneName].Ab = true
     }
 }
 
