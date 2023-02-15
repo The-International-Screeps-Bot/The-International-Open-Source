@@ -18,7 +18,6 @@ import {
     customLog,
     findCarryPartsRequired,
     findLinkThroughput,
-    findSquadTradeableParts,
     getRange,
     getRangeOfCoords,
     randomRange,
@@ -575,7 +574,6 @@ export class SpawnRequestsManager {
 
         rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-
                 // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
                 let repairTargets: Structure<BuildableStructureConstant>[] = room.structures.road
@@ -593,11 +591,8 @@ export class SpawnRequestsManager {
                 if (!ramparts.length && !repairTargets.length) return false
 
                 if (repairTargets.length || this.communeManager.room.towerInferiority) {
-
                     priority = Math.min(6 + room.creepsFromRoom.maintainer.length * 0.5, minRemotePriority - 0.5)
-                }
-                else {
-
+                } else {
                     priority = minRemotePriority + 0.5
                 }
 
@@ -1446,13 +1441,46 @@ export class SpawnRequestsManager {
                         const minCost = minRangedAttackCost + minRangedHealCost
                         const extraParts: BodyPartConstant[] = []
 
-                        const tradeAmount = findSquadTradeableParts(
-                            {
-                                rangedAttackAmount,
-                                rangedHealAmount,
+                        interface TradeType {
+                            amount: number
+                            other: BodyPartConstant
+                        }
+
+                        const tradeTypes: { [key in BodyPartConstant]?: TradeType } = {
+                            [RANGED_ATTACK]: {
+                                amount: rangedAttackAmount,
+                                other: HEAL,
                             },
-                            rangedAttackAmount + rangedHealAmount,
-                        )
+                            [HEAL]: {
+                                amount: rangedHealAmount,
+                                other: RANGED_ATTACK,
+                            },
+                        }
+                        const totalTradeableParts = rangedAttackAmount + rangedHealAmount
+
+                        let tradeAmount = Infinity
+
+                        for (const key in tradeTypes) {
+                            const partType = key as BodyPartConstant
+                            const tradeType = tradeTypes[partType]
+                            const ratio = tradeType.amount / totalTradeableParts
+
+                            let localTradeAmount = Math.ceil(tradeType.amount * ratio * 1.5)
+                            if (localTradeAmount >= tradeAmount) continue
+
+                            function findCost() {
+                                return (
+                                    (tradeType.amount + localTradeAmount) * BODYPART_COST[partType] +
+                                    (tradeTypes[tradeType.other].amount - localTradeAmount) * BODYPART_COST[tradeType.other]
+                                )
+                            }
+
+                            while (findCost() > spawnEnergyCapacity) {
+                                localTradeAmount -= 1
+                            }
+
+                            tradeAmount = localTradeAmount
+                        }
 
                         // We need attack and tough oriented creeps
 

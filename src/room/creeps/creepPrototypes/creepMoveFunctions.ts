@@ -157,7 +157,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         posIndex = i
         break
     }
-
+    /* this.room.visual.text((posIndex || -1).toString(), this.pos) */
     if (posIndex !== undefined && posIndex + 1 < path.length) {
 
         path.splice(0, posIndex + 1)

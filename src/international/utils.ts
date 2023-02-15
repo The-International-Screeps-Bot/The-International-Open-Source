@@ -559,22 +559,6 @@ export function cleanRoomMemory(roomName: string) {
     }
 }
 
-export function findSquadTradeableParts(tradeTypes: { [tradeType: string]: number }, totalTradeableParts: number) {
-    let smallestTradeType: string
-    let smallestRatio = Infinity
-
-    for (const type in tradeTypes) {
-        const ratio = tradeTypes[type] / totalTradeableParts
-
-        if (ratio >= smallestRatio) continue
-
-        smallestTradeType = type
-        smallestRatio = ratio
-    }
-
-    return Math.ceil(tradeTypes[smallestTradeType] * smallestRatio * 1.5)
-}
-
 export function isNearRoomEdge(coord: Coord, minRange: number) {
     if (coord.x <= minRange) return true
     if (coord.x - roomDimensions - 1 <= minRange) return true

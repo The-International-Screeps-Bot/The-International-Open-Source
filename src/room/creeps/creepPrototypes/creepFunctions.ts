@@ -573,10 +573,7 @@ Creep.prototype.findNewRepairTarget = function () {
 
         if (structure.nextHits / structure.hitsMax > 0.3) continue
 
-        const score =
-            getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) +
-            (structure.nextHits / structure.hitsMax) * 1000
-
+        const score = getRangeOfCoords(this.pos, structure.pos) + (structure.nextHits / structure.hitsMax) * 1000
         if (score >= lowestScore) continue
 
         lowestScore = score
