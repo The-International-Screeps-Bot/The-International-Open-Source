@@ -4,7 +4,7 @@ class FlagManager {
 
     run() {
 
-        for (const flagName of Game.flags) {
+        for (const flagName in Game.flags) {
 
             const flagNameParts = flagName.split(" ")
 
@@ -16,7 +16,7 @@ class FlagManager {
 
     internationalDataVisuals(flagNameParts: string[]) {
 
-        const room = Game.rooms[flagNameParts[1] || Game.flags[flagNameParts[0].pos.roomName]]
+        const room = Game.rooms[flagNameParts[1] || Game.flags[flagNameParts[0]].pos.roomName]
         if (!room) return
 
         room.roomManager.roomVisualsManager.internationalDataVisuals()
@@ -24,7 +24,7 @@ class FlagManager {
 
     abandonCommune(flagNameParts: string[]) {
 
-        const roomMemory = Memory.rooms[flagNameParts[1] || Game.flags[flagNameParts[0].pos.roomName]]
+        const roomMemory = Memory.rooms[flagNameParts[1] || Game.flags[flagNameParts[0]].pos.roomName]
         if (!roomMemory) return
 
         roomMemory.Ab = true
