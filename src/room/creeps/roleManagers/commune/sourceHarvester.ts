@@ -45,13 +45,11 @@ export class SourceHarvester extends Creep {
         if (!harvestPos) return
 
         if (getRangeOfCoords(this.pos, harvestPos) === 0) {
-
             this.advancedHarvestSource(this.room.sources[this.memory.SI])
         }
     }
 
     travelToSource?(): boolean {
-
         this.message = '🚬'
 
         // Unpack the harvestPos
@@ -222,25 +220,22 @@ export class SourceHarvester extends Creep {
         return true
     }
 
-
     run?() {
-
         if (!this.worked) {
-
             // Try to move to source. If creep moved then iterate
 
             if (this.travelToSource()) return
 
             // Try to harvest the designated source
 
-            this.advancedHarvestSource(room.sources[this.memory.SI])
+            this.advancedHarvestSource(this.room.sources[this.memory.SI])
         }
 
         if (this.transferToSourceStructures()) return
 
         // Try to repair the sourceContainer
 
-        this.repairSourceContainer(room.sourceContainers[this.memory.SI])
+        this.repairSourceContainer(this.room.sourceContainers[this.memory.SI])
 
         if (this.transferToNearbyCreep()) return
     }
