@@ -1,20 +1,10 @@
 // eslint-disable
-import { allStructureTypes } from 'international/constants'
-import Impl from './utf15'
-const coordDepths = [6, 6] // max = [64,64]
-const coord_Codec = new Impl.Codec({ array: 1, depth: coordDepths })
-
-const posDepths = [2, 7, 7, 6, 6] // max = [4,128,128,64,64]
-const pos_Codec = new Impl.Codec({ array: 1, depth: posDepths })
-
-const planCoordDepths = [5, 4] // max = [32,16]
-const planCoord_codec = new Impl.Codec({ depth: planCoordDepths, array: 1 })
 /**
  * screeps-packrat
  * ---------------
  * Lightning-fast and memory-efficient serialization of Screeps IDs, Coords, and RoomPositions
  * Code written by Muon as part of Overmind Screeps AI
- * Modified by Carson Burke and Pieter Brandsen
+ * Modified by Carson Burke
  *
  * Feel free to adapt as desired
  * Package repository: https://github.com/bencbartlett/screeps-packrat
@@ -146,8 +136,7 @@ export function unpackIdList(packedIds: string) {
  * Benchmarking: average of 150ns to execute on shard2 public server, reduce stringified size by 80%
  */
 export function packCoord(coord: Coord) {
-    return coord_Codec.encode([coord.x, coord.y])
-    // return String.fromCharCode(((coord.x << 6) | coord.y) + 65)
+    return String.fromCharCode(((coord.x << 6) | coord.y) + 65)
 }
 
 /**
@@ -158,8 +147,7 @@ export function packCoord(coord: Coord) {
  * Benchmarking: average of 150ns to execute on shard2 public server, reduce stringified size by 80%
  */
 export function packXYAsCoord(x: number, y: number) {
-    return coord_Codec.encode([x, y])
-    // return String.fromCharCode(((x << 6) | y) + 65)
+    return String.fromCharCode(((x << 6) | y) + 65)
 }
 
 /**
@@ -168,13 +156,11 @@ export function packXYAsCoord(x: number, y: number) {
  * Benchmarking: average of 60ns-100ns to execute on shard2 public server
  */
 export function unpackCoord(char: string) {
-    const decoded = coord_Codec.decode(char) as number[]
-    return { x: decoded[0], y: decoded[1] }
-    //     const xShiftedSixOrY = char.charCodeAt(0) - 65
-    //     return {
-    //         x: (xShiftedSixOrY & 0b111111000000) >>> 6,
-    //         y: xShiftedSixOrY & 0b000000111111,
-    //     }
+    const xShiftedSixOrY = char.charCodeAt(0) - 65
+    return {
+        x: (xShiftedSixOrY & 0b111111000000) >>> 6,
+        y: xShiftedSixOrY & 0b000000111111,
+    }
 }
 
 /**
@@ -202,10 +188,8 @@ export function reverseCoordList(coordList: string) {
  */
 export function packCoordList(coords: Coord[]) {
     let str = ''
-    const maxLength = coords.length
-    for (let i = 0; i < maxLength; i++) {
-        str += packCoord(coords[i])
-        //    str += String.fromCharCode(((coords[i].x << 6) | coords[i].y) + 65)
+    for (let i = 0; i < coords.length; ++i) {
+        str += String.fromCharCode(((coords[i].x << 6) | coords[i].y) + 65)
     }
     return str
 }
@@ -217,17 +201,14 @@ export function packCoordList(coords: Coord[]) {
  */
 export function unpackCoordList(chars: string) {
     const coords: Coord[] = []
-    for (let i = 0; i < chars.length; i += 2) {
-        coords.push(unpackCoord(chars[i] + chars[i + 1]))
+    let xShiftedSixOrY: number
+    for (let i = 0; i < chars.length; ++i) {
+        xShiftedSixOrY = chars.charCodeAt(i) - 65
+        coords.push({
+            x: (xShiftedSixOrY & 0b111111000000) >>> 6,
+            y: xShiftedSixOrY & 0b000000111111,
+        })
     }
-    //     let xShiftedSixOrY: number
-    //     for (let i = 0; i < chars.length; ++i) {
-    //         xShiftedSixOrY = chars.charCodeAt(i) - 65
-    //         coords.push({
-    //             x: (xShiftedSixOrY & 0b111111000000) >>> 6,
-    //             y: xShiftedSixOrY & 0b000000111111,
-    //         })
-    //     }
     return coords
 }
 
@@ -239,111 +220,87 @@ export function unpackCoordList(chars: string) {
 export function unpackCoordListAsPosList(packedCoords: string, roomName: string) {
     const positions: RoomPosition[] = []
     let coord: Coord
-    // for (let i = 0; i < packedCoords.length; ++i) {
-    for (let i = 0; i < packedCoords.length; i += 2) {
+    for (let i = 0; i < packedCoords.length; ++i) {
         // Each coord is saved as a single character; unpack each and insert the room name to get the positions list
-        // coord = unpackCoord(packedCoords[i])
-        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1])
+        coord = unpackCoord(packedCoords[i])
         positions.push(new RoomPosition(coord.x, coord.y, roomName))
     }
     return positions
 }
 
-// global.packedRoomNames = global.packedRoomNames || {}
-// global.unpackedRoomNames = global.unpackedRoomNames || {}
+global.packedRoomNames = global.packedRoomNames || {}
+global.unpackedRoomNames = global.unpackedRoomNames || {}
 
 /**
  * Packs a roomName as a single utf-16 character. Character values are stored on permacache.
  */
-export function packRoomName(roomName: string) {
-    //     if (global.packedRoomNames[roomName] === undefined) {
-    const coordinateRegex = /(E|W)(\d+)(N|S)(\d+)/g
-    const match = coordinateRegex.exec(roomName)!
+function packRoomName(roomName: string) {
+    if (global.packedRoomNames[roomName] === undefined) {
+        const coordinateRegex = /(E|W)(\d+)(N|S)(\d+)/g
+        const match = coordinateRegex.exec(roomName)!
 
-    const xDir = match[1]
-    const x = Number(match[2])
-    const yDir = match[3]
-    const y = Number(match[4])
+        const xDir = match[1]
+        const x = Number(match[2])
+        const yDir = match[3]
+        const y = Number(match[4])
 
-    let quadrant
-    if (xDir === 'W') {
-        if (yDir === 'N') {
-            quadrant = 0
+        let quadrant
+        if (xDir === 'W') {
+            if (yDir === 'N') {
+                quadrant = 0
+            } else {
+                quadrant = 1
+            }
+        } else if (yDir === 'N') {
+            quadrant = 2
         } else {
-            quadrant = 1
+            quadrant = 3
         }
-    } else if (yDir === 'N') {
-        quadrant = 2
-    } else {
-        quadrant = 3
+
+        // y is 6 bits, x is 6 bits, quadrant is 2 bits
+        const num = ((quadrant << 12) | (x << 6) | y) + 65
+        const char = String.fromCharCode(num)
+
+        global.packedRoomNames[roomName] = char
+        global.unpackedRoomNames[char] = roomName
     }
-
-    return { quadrant, x, y }
-
-    // y is 6 bits, x is 6 bits, quadrant is 2 bits
-    // const num = ((quadrant << 12) | (x << 6) | y) + 65
-    // const char = String.fromCharCode(num)
-
-    //    global.packedRoomNames[roomName] = char
-    //    global.unpackedRoomNames[char] = roomName
-    //     }
-    //     return global.packedRoomNames[roomName]
+    return global.packedRoomNames[roomName]
 }
 
 /**
  * Packs a roomName as a single utf-16 character. Character values are stored on permacache.
  */
-// function unpackRoomName(char: string) {
-//     if (global.unpackedRoomNames[char] === undefined) {
-//            const num = char.charCodeAt(0) - 65
-//            const { q, x, y } = {
-//                q: (num & 0b11000000111111) >>> 12,
-//                x: (num & 0b00111111000000) >>> 6,
-//                y: num & 0b00000000111111,
-//            }
+function unpackRoomName(char: string) {
+    if (global.unpackedRoomNames[char] === undefined) {
+        const num = char.charCodeAt(0) - 65
+        const { q, x, y } = {
+            q: (num & 0b11000000111111) >>> 12,
+            x: (num & 0b00111111000000) >>> 6,
+            y: num & 0b00000000111111,
+        }
 
-//         let roomName: string
-//         switch (q) {
-//             case 0:
-//                 roomName = `W${x}N${y}`
-//                 break
-//             case 1:
-//                 roomName = `W${x}S${y}`
-//                 break
-//             case 2:
-//                 roomName = `E${x}N${y}`
-//                 break
-//             case 3:
-//                 roomName = `E${x}S${y}`
-//                 break
-//             default:
-//                 roomName = 'ERROR'
-//         }
+        let roomName: string
+        switch (q) {
+            case 0:
+                roomName = `W${x}N${y}`
+                break
+            case 1:
+                roomName = `W${x}S${y}`
+                break
+            case 2:
+                roomName = `E${x}N${y}`
+                break
+            case 3:
+                roomName = `E${x}S${y}`
+                break
+            default:
+                roomName = 'ERROR'
+        }
 
-//         global.packedRoomNames[roomName] = char
-//         global.unpackedRoomNames[char] = roomName
-//     }
-//     return global.unpackedRoomNames[char]
-// }
-export function unpackRoomName(q: number, x: number, y: number) {
-    let roomName: string
-    switch (q) {
-        case 0:
-            roomName = `W${x}N${y}`
-            break
-        case 1:
-            roomName = `W${x}S${y}`
-            break
-        case 2:
-            roomName = `E${x}N${y}`
-            break
-        case 3:
-            roomName = `E${x}S${y}`
-            break
-        default:
-            roomName = 'ERROR'
+        global.packedRoomNames[roomName] = char
+        global.unpackedRoomNames[char] = roomName
     }
-    return roomName
+    return global.unpackedRoomNames[char]
 }
 
 /**
@@ -354,9 +311,7 @@ export function unpackRoomName(q: number, x: number, y: number) {
  * Benchmarking: average of 150ns to execute on shard2 public server, reduce stringified size by 90%
  */
 export function packPos(pos: RoomPosition) {
-    const map = packRoomName(pos.roomName)
-    return pos_Codec.encode([map.quadrant, map.x, map.y, pos.x, pos.y])
-    //     return packCoord(pos) + packRoomName(pos.roomName)
+    return packCoord(pos) + packRoomName(pos.roomName)
 }
 
 /**
@@ -367,9 +322,7 @@ export function packPos(pos: RoomPosition) {
  * Benchmarking: average of 150ns to execute on shard2 public server, reduce stringified size by 90%
  */
 export function packXYAsPos(x: number, y: number, roomName: string) {
-    const map = packRoomName(roomName)
-    return pos_Codec.encode([map.quadrant, map.x, map.y, x, y])
-    // return packXYAsCoord(x, y) + packRoomName(roomName)
+    return packXYAsCoord(x, y) + packRoomName(roomName)
 }
 
 /**
@@ -378,10 +331,8 @@ export function packXYAsPos(x: number, y: number, roomName: string) {
  * Benchmarking: average of 600ns to execute on shard2 public server.
  */
 export function unpackPos(chars: string) {
-    const pos = pos_Codec.decode(chars) as [number, number, number, number, number]
-    return new RoomPosition(pos[3], pos[4], unpackRoomName(pos[0], pos[1], pos[2]))
-    //     const { x, y } = unpackCoord(chars[0])
-    //     return new RoomPosition(x, y, unpackRoomName(chars[1]))
+    const { x, y } = unpackCoord(chars[0])
+    return new RoomPosition(x, y, unpackRoomName(chars[1]))
 }
 
 /**
@@ -392,10 +343,8 @@ export function unpackPos(chars: string) {
  */
 export function packPosList(posList: RoomPosition[]) {
     let str = ''
-    const maxLength = posList.length
-    for (let i = 0; i < maxLength; i++) {
-        //    str += packPos(posList[i])
-        str += packXYAsPos(posList[i].x, posList[i].y, posList[i].roomName)
+    for (let i = 0; i < posList.length; ++i) {
+        str += packPos(posList[i])
     }
     return str
 }
@@ -408,54 +357,7 @@ export function packPosList(posList: RoomPosition[]) {
 export function unpackPosList(chars: string) {
     const posList: RoomPosition[] = []
     for (let i = 0; i < chars.length; i += 2) {
-        // for (let i = 0; i < chars.length; i += 2) {
-        posList.push(unpackPos(chars[i] + chars[i + 1]))
-        //    posList.push(unpackPos(chars.substr(i, 2)))
+        posList.push(unpackPos(chars.substr(i, 2)))
     }
     return posList
-}
-
-/**
- * Pack a planned cord for base building
- */
-export function packPlanValues(structureType: StructureConstant, minRCL: number) {
-    return planCoord_codec.encode([allStructureTypes.indexOf(structureType), minRCL])
-}
-
-/**
- * Pack a planned cord for base building
- */
-export function packPlanCoord(coord: PlanCoord) {
-    return planCoord_codec.encode([allStructureTypes.indexOf(coord.structureType), coord.minRCL])
-}
-
-/**
- * Packs a list of planned coords for base building
- */
-export function packPlanCoordList(coordList: PlanCoord[]) {
-    let strArr = []
-    const maxLength = coordList.length
-    for (let i = 0; i < maxLength; i++) {
-        strArr.push(packPlanCoord(coordList[i]))
-    }
-    return strArr
-}
-
-/**
- * Unpack a planned cord for base building
- */
-export function unpackPlanCoord(chars: string) {
-    const coord = planCoord_codec.decode(chars) as [number, number]
-    return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
-}
-
-/**
- * Unpacks a list of planned coords for base building
- */
-export function unpackPlanCoordList(chars: string[]): PlanCoord[] {
-    const coordList: PlanCoord[] = []
-    for (let i = 0; i < chars.length; i += 1) {
-        coordList.push(unpackPlanCoord(chars[i]))
-    }
-    return coordList
 }
