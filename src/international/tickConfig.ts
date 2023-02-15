@@ -269,7 +269,7 @@ class TickConfig {
                 if (room.storage && room.controller.level >= 4) {
                     if (room.memory.combatRequests.length + 1 >= room.communeManager.maxCombatRequests) continue
                 } else {
-                    if (room.memory.combatRequests.length + 1 >= room.estimateIncome() / 10) continue
+                    if (room.memory.combatRequests.length + 1 >= room.communeManager.estimatedEnergyIncome / 10) continue
                 }
 
                 // Ensure we can afford the creeps required

@@ -1166,11 +1166,6 @@ declare global {
 
         createRoomLogisticsRequest(args: CreateRoomLogisticsRequestArgs): void
 
-        /**
-         * Crudely estimates a room's income by accounting for the number of work parts owned by sourceHarvesters
-         */
-        estimateIncome(): number
-
         partsOfRoles: Partial<{ [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }> }>
 
         getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>

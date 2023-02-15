@@ -2062,30 +2062,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
     return groupedPositions
 }
 
-Room.prototype.estimateIncome = function () {
-    const harvesterNames = this.creepsFromRoom.sourceHarvester
-        .concat(this.creepsFromRoom.remoteSourceHarvester0)
-        .concat(this.creepsFromRoom.remoteSourceHarvester1)
-
-    // Construct income starting at 0
-
-    let income = 0
-
-    for (const creepName of harvesterNames) {
-        // Get the creep using creepName
-
-        const creep = Game.creeps[creepName]
-
-        // Add the number of work parts owned by the creep at a max of 5, times harvest power
-
-        income += Math.min(5, creep.parts.work) * HARVEST_POWER
-    }
-
-    // Inform income
-
-    return Math.floor(income)
-}
-
 Room.prototype.findPositionsInsideRect = function (x1, y1, x2, y2) {
     // Construct positions
 

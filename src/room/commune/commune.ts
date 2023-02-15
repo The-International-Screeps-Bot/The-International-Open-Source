@@ -84,6 +84,12 @@ export class CommuneManager {
 
     factoryManager: FactoryManager
 
+    //
+
+    room: Room
+    nextSpawnEnergyAvailable: number
+    estimatedEnergyIncome: number
+
     constructor() {
         this.combatManager = new CombatManager(this)
 
@@ -109,9 +115,6 @@ export class CommuneManager {
 
         this.factoryManager = new FactoryManager(this)
     }
-
-    room: Room
-    nextSpawnEnergyAvailable: number
 
     public update(room: Room) {
         this.room = room
@@ -151,6 +154,7 @@ export class CommuneManager {
         }
         room.haulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
+        this.estimatedEnergyIncome = 0
 
         if (!room.memory.remotes) room.memory.remotes = []
 

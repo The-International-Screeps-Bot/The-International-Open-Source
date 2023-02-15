@@ -31,9 +31,20 @@ export class SourceHarvester extends Creep {
         const { room } = this
 
         if (this.memory.SI !== undefined && !this.dying) room.creepsOfSource[this.memory.SI].push(this.name)
+
+        // Unpack the harvestPos
+
+        const harvestPos = this.findSourcePos(this.memory.SI)
+        if (!harvestPos) return
+
+        if (getRangeOfCoords(this.pos, harvestPos) === 0) {
+
+            this.advancedHarvestSource(this.room.sources[this.memory.SI])
+        }
     }
 
     travelToSource?(): boolean {
+
         this.message = '🚬'
 
         // Unpack the harvestPos
@@ -204,32 +215,36 @@ export class SourceHarvester extends Creep {
         return true
     }
 
+
+    run?() {
+
+        if (!this.worked) {
+
+            // Try to move to source. If creep moved then iterate
+
+            if (this.travelToSource()) return
+
+            // Try to harvest the designated source
+
+            this.advancedHarvestSource(room.sources[this.memory.SI])
+        }
+
+        if (this.transferToSourceStructures()) return
+
+        // Try to repair the sourceContainer
+
+        this.repairSourceContainer(room.sourceContainers[this.memory.SI])
+
+        if (this.transferToNearbyCreep()) return
+    }
+
     static sourceHarvesterManager(room: Room, creepsOfRole: string[]): void | boolean {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {
 
             const creep: SourceHarvester = Game.creeps[creepName]
-
-            // Define the creep's designated source
-
-            const sourceIndex = creep.memory.SI
-
-            // Try to move to source. If creep moved then iterate
-
-            if (creep.travelToSource()) continue
-
-            // Try to harvest the designated source
-
-            creep.advancedHarvestSource(room.sources[sourceIndex])
-
-            if (creep.transferToSourceStructures()) continue
-
-            // Try to repair the sourceContainer
-
-            creep.repairSourceContainer(room.sourceContainers[sourceIndex])
-
-            if (creep.transferToNearbyCreep()) continue
+            creep.run()
         }
     }
 }

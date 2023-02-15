@@ -52,8 +52,21 @@ export class RemoteHarvester extends Creep {
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune && commune.creepsOfRemote[this.memory.RN])
+        if (commune.creepsOfRemote[this.memory.RN])
             commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
+
+        if (this.memory.RN === this.removeRemote.name) {
+
+            // Unpack the harvestPos
+
+            const harvestPos = this.findSourcePos(this.memory.SI)
+            if (!harvestPos) return
+
+            if (getRangeOfCoords(this.pos, harvestPos) === 0) {
+
+                this.advancedHarvestSource(this.room.sources[this.memory.SI])
+            }
+        }
     }
 
     hasValidRemote?() {

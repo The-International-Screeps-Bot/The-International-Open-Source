@@ -274,7 +274,7 @@ export class RoomVisualsManager {
             const room = Game.rooms[roomName]
             const roomStats = Memory.stats.rooms[roomName]
 
-            totalEstimatedIncome += room.estimateIncome()
+            totalEstimatedIncome += room.communeManager.estimatedEnergyIncome
             totalCommuneEnergyHarvested += roomStats.eih
             totalRemoteEnergyHarvested += roomStats.reih
             totalUpgrade += roomStats.eou
@@ -601,7 +601,7 @@ export class RoomVisualsManager {
                 this.roomManager.room.resourcesInStoringStructures.energy || 0,
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
-                this.roomManager.room.estimateIncome(),
+                this.roomManager.room.communeManager.estimatedEnergyIncome,
                 roomStats.eih.toFixed(2),
                 roomStats.reih.toFixed(2),
                 roomStats.eou.toFixed(2),
