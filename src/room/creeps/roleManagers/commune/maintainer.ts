@@ -1,7 +1,7 @@
 import { roomDimensions } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { findCoordsInsideRect, findObjectWithID, getRangeOfCoords } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 
 export class Maintainer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -20,7 +20,7 @@ export class Maintainer extends Creep {
 
             this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['withdraw', 'offer', 'pickup']),
-                resourceTypes: new Set([RESOURCE_ENERGY])
+                resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 
             if (this.needsResources()) return false

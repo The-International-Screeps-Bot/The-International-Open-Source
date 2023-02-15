@@ -10,7 +10,7 @@ import {
     randomTick,
 } from 'international/utils'
 import { indexOf } from 'lodash'
-import { packCoord, reverseCoordList, unpackCoord, unpackPos, unpackPosList } from 'other/packrat'
+import { packCoord, reverseCoordList, unpackCoord, unpackPos, unpackPosList } from 'other/codec'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
@@ -89,7 +89,7 @@ export class RemoteHauler extends Creep {
 
     removeRemote?() {
         if (!this.dying && Memory.rooms[this.memory.RN].data) {
-            Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI  as 0 | 1}`]] += this.parts.carry
+            Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] += this.parts.carry
         }
 
         delete this.memory.RN
@@ -240,7 +240,6 @@ export class RemoteHauler extends Creep {
                 types: new Set(['pickup', 'withdraw']),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
                 conditions: request => {
-
                     // If the target is near the creep
 
                     const targetPos = findObjectWithID(request.targetID).pos
@@ -281,7 +280,6 @@ export class RemoteHauler extends Creep {
             types: new Set(['withdraw', 'pickup']),
             resourceTypes: new Set([RESOURCE_ENERGY]),
             conditions: request => {
-
                 // If the target is near the hauler
 
                 const targetPos = findObjectWithID(request.targetID).pos

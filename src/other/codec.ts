@@ -1,7 +1,6 @@
 // eslint-disable
 import { allStructureTypes } from 'international/constants'
 import { encode, decode } from 'base32768'
-import packrat from "packrat"
 
 /**
  * Convert a standard 24-character hex id in screeps to a compressed UTF-16 encoded string of length 6.
@@ -9,7 +8,14 @@ import packrat from "packrat"
  * Benchmarking: average of 500ns to execute on shard2 public server, reduce stringified size by 75%
  */
 export function packId(id: string) {
-    return packrat.packId(id)
+    return (
+        String.fromCharCode(parseInt(id.substr(0, 4), 16)) +
+        String.fromCharCode(parseInt(id.substr(4, 4), 16)) +
+        String.fromCharCode(parseInt(id.substr(8, 4), 16)) +
+        String.fromCharCode(parseInt(id.substr(12, 4), 16)) +
+        String.fromCharCode(parseInt(id.substr(16, 4), 16)) +
+        String.fromCharCode(parseInt(id.substr(20, 4), 16))
+    )
 }
 
 /**
@@ -18,7 +24,14 @@ export function packId(id: string) {
  * Benchmarking: average of 1.3us to execute on shard2 public server
  */
 export function unpackId(packedId: string) {
-    return packrat.unpackId(packedId)
+    let id = ''
+    let current: number
+    for (let i = 0; i < 6; ++i) {
+        current = packedId.charCodeAt(i)
+        id += (current >>> 8).toString(16).padStart(2, '0') // String.padStart() requires es2017+ target
+        id += (current & 0xff).toString(16).padStart(2, '0')
+    }
+    return id
 }
 
 /**
@@ -28,7 +41,11 @@ export function unpackId(packedId: string) {
  * Benchmarking: average of 500ns per id to execute on shard2 public server, reduce stringified size by 81%
  */
 export function packIdList(ids: string[]) {
-    return packrat.packIdList(ids)
+    let str = ''
+    for (let i = 0; i < ids.length; ++i) {
+        str += packId(ids[i])
+    }
+    return str
 }
 
 /**
@@ -37,7 +54,11 @@ export function packIdList(ids: string[]) {
  * Benchmarking: average of 1.2us per id to execute on shard2 public server.
  */
 export function unpackIdList(packedIds: string) {
-    return packrat.unpackIdList(packedIds)
+    const ids: string[] = []
+    for (let i = 0; i < packedIds.length; i += 6) {
+        ids.push(unpackId(packedIds.substr(i, 6)))
+    }
+    return ids
 }
 
 /**
@@ -60,7 +81,7 @@ export function packXYAsCoord(x: number, y: number) {
  * Benchmarking: average of 60ns-100ns to execute on shard2 public server
  */
 export function unpackCoord(char: string) {
-    const decoded = decode(char) as number[]
+    const decoded = decode(char)
     return { x: decoded[0], y: decoded[1] }
 }
 
@@ -77,7 +98,7 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
  */
 export function reverseCoordList(coordList: string) {
     return coordList
-        .match(/.{1,2}/g)
+        .match(/.{1,3}/g)
         .reverse()
         .join('')
 }
@@ -102,8 +123,8 @@ export function packCoordList(coords: Coord[]) {
  */
 export function unpackCoordList(chars: string) {
     const coords: Coord[] = []
-    for (let i = 0; i < chars.length; i += 2) {
-        coords.push(unpackCoord(chars[i] + chars[i + 1]))
+    for (let i = 0; i < chars.length; i += 3) {
+        coords.push(unpackCoord(chars[i] + chars[i + 1] + chars[i + 2]))
     }
     return coords
 }
@@ -114,8 +135,8 @@ export function unpackCoordList(chars: string) {
 export function unpackCoordListAsPosList(packedCoords: string, roomName: string) {
     const positions: RoomPosition[] = []
     let coord: Coord
-    for (let i = 0; i < packedCoords.length; i += 2) {
-        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1])
+    for (let i = 0; i < packedCoords.length; i += 3) {
+        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1] + packedCoords[i + 2])
         positions.push(new RoomPosition(coord.x, coord.y, roomName))
     }
     return positions
@@ -181,6 +202,7 @@ export function unpackRoomName(q: number, x: number, y: number) {
  */
 export function packPos(pos: RoomPosition) {
     const map = packRoomName(pos.roomName)
+    // console.log([map.quadrant, map.x, map.y, pos.x, pos.y])
     return encode(new Uint8Array([map.quadrant, map.x, map.y, pos.x, pos.y]))
 }
 
@@ -189,6 +211,7 @@ export function packPos(pos: RoomPosition) {
  */
 export function packXYAsPos(x: number, y: number, roomName: string) {
     const map = packRoomName(roomName)
+    // console.log([map.quadrant, map.x, map.y, x, y])
     return encode(new Uint8Array([map.quadrant, map.x, map.y, x, y]))
 }
 
@@ -196,7 +219,7 @@ export function packXYAsPos(x: number, y: number, roomName: string) {
  * Unpacks a RoomPosition stored as a pair of Base32768 characters.
  */
 export function unpackPos(chars: string) {
-    const pos = decode(chars) as [number, number, number, number, number]
+    const pos = decode(chars)
     return new RoomPosition(pos[3], pos[4], unpackRoomName(pos[0], pos[1], pos[2]))
 }
 
@@ -218,8 +241,10 @@ export function packPosList(posList: RoomPosition[]) {
  */
 export function unpackPosList(chars: string) {
     const posList: RoomPosition[] = []
-    for (let i = 0; i < chars.length; i += 2) {
-        posList.push(unpackPos(chars[i] + chars[i + 1]))
+    // console.log(chars)
+    for (let i = 0; i < chars.length; i += 3) {
+        // console.log(i, chars[i] + chars[i + 1] + chars[i + 2])
+        posList.push(unpackPos(chars[i] + chars[i + 1] + chars[i + 2]))
     }
     return posList
 }
@@ -254,7 +279,7 @@ export function packPlanCoordList(coordList: PlanCoord[]) {
  * Unpack a planned cord for base building
  */
 export function unpackPlanCoord(chars: string) {
-    const coord = decode(chars) as [number, number]
+    const coord = decode(chars)
     return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
 }
 

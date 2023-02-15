@@ -8,7 +8,7 @@ import {
     randomTick,
     scalePriority,
 } from 'international/utils'
-import { packCoord, reverseCoordList, unpackPos, unpackPosList } from 'other/packrat'
+import { packCoord, reverseCoordList, unpackPos, unpackPosList } from 'other/codec'
 import { RemoteHauler } from './remoteHauler'
 
 export class RemoteHarvester extends Creep {
@@ -46,7 +46,8 @@ export class RemoteHarvester extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -= this.parts.work
+        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -=
+            this.parts.work
 
         const commune = this.commune
 

@@ -1,6 +1,6 @@
 import { ClaimRequestData } from 'international/constants'
 import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
-import { unpackCoord } from 'other/packrat'
+import { unpackCoord } from 'other/codec'
 
 export class Vanguard extends Creep {
     constructor(creepID: Id<Creep>) {

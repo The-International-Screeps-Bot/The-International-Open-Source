@@ -1,6 +1,6 @@
 import { RemoteData } from 'international/constants'
 import { findClosestObject, getRange, randomIntRange } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 
 export class RemoteDefender extends Creep {
     public get dying() {

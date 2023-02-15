@@ -1,7 +1,7 @@
 import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
 export class CombatManager {
@@ -82,7 +82,11 @@ export class CombatManager {
             if (!(attackTarget instanceof Structure)) continue
 
             const structuresAtCoord = room.structureCoords.get(packCoord(attackTarget.pos))
-            if (structuresAtCoord && structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)) return true
+            if (
+                structuresAtCoord &&
+                structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)
+            )
+                return true
 
             if (safemodeTargets.includes(attackTarget.structureType)) return true
         }

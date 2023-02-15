@@ -47,7 +47,7 @@ import {
     unpackCoordAsPos,
     unpackPos,
     unpackPosList,
-} from 'other/packrat'
+} from 'other/codec'
 import { creepClasses } from '../creepClasses'
 import { globalStatsUpdater } from 'international/statsManager'
 

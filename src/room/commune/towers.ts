@@ -1,7 +1,7 @@
 import { customColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, randomTick, scalePriority } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
 export class TowerManager {
@@ -218,11 +218,9 @@ export class TowerManager {
 
     private createRoomLogisticsRequests() {
         for (const structure of this.communeManager.room.structures.tower) {
-
             // If don't have enough energy, request more
 
             if (structure.usedReserveStore < structure.store.getCapacity(RESOURCE_ENERGY) * 0.75) {
-
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
                     type: 'transfer',
@@ -237,13 +235,17 @@ export class TowerManager {
                 !this.communeManager.room.enemyAttackers.length &&
                 structure.usedReserveStore > structure.store.getCapacity(RESOURCE_ENERGY) * 0.5
             ) {
-
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
                     maxAmount: structure.reserveStore.energy * 0.75,
                     onlyFull: true,
                     type: 'offer',
-                    priority: scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy, 10, true),
+                    priority: scalePriority(
+                        structure.store.getCapacity(RESOURCE_ENERGY),
+                        structure.reserveStore.energy,
+                        10,
+                        true,
+                    ),
                 })
             }
         }

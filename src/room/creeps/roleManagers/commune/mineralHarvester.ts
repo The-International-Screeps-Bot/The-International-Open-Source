@@ -1,6 +1,6 @@
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
-import { reverseCoordList, unpackPos } from 'other/packrat'
+import { reverseCoordList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
     preTickManager() {

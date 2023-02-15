@@ -23,7 +23,7 @@ import {
     randomRange,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { unpackPosList } from 'other/packrat'
+import { unpackPosList } from 'other/codec'
 import { globalStatsUpdater } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 
@@ -1471,7 +1471,8 @@ export class SpawnRequestsManager {
                             function findCost() {
                                 return (
                                     (tradeType.amount + localTradeAmount) * BODYPART_COST[partType] +
-                                    (tradeTypes[tradeType.other].amount - localTradeAmount) * BODYPART_COST[tradeType.other]
+                                    (tradeTypes[tradeType.other].amount - localTradeAmount) *
+                                        BODYPART_COST[tradeType.other]
                                 )
                             }
 

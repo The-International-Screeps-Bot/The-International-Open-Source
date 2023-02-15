@@ -7,7 +7,7 @@ import {
     remoteTypeWeights,
 } from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomRange, randomTick } from 'international/utils'
-import { unpackPosList } from 'other/packrat'
+import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
 
 export class RemotesManager {

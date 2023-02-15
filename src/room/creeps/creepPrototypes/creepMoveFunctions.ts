@@ -29,7 +29,7 @@ import {
     unpackCoordAsPos,
     unpackPos,
     unpackPosList,
-} from 'other/packrat'
+} from 'other/codec'
 
 PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
     // Inform true if there is no path
@@ -150,7 +150,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     let posIndex: number
 
     for (let i = 0; i < path.length; i++) {
-
         const pos = path[i]
         if (!arePositionsEqual(this.pos, pos)) continue
 
@@ -159,13 +158,11 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     }
     /* this.room.visual.text((posIndex || -1).toString(), this.pos) */
     if (posIndex !== undefined && posIndex + 1 < path.length) {
-
         path.splice(0, posIndex + 1)
 
         // If we have a remote, avoid abandoned remotes
 
         if (pathOpts.remoteName) {
-
             const roomNames: Set<string> = new Set()
 
             for (const pos of path) {
@@ -390,7 +387,7 @@ PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = fun
 
     room.moveRequests[packedCoord]
         ? room.moveRequests[packedCoord].push(this.name)
-        : room.moveRequests[packedCoord] = [this.name]
+        : (room.moveRequests[packedCoord] = [this.name])
 }
 
 PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function (avoidPackedPositions, goalCoord) {
@@ -429,7 +426,6 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         let score: number
         if (goalCoord) {
-
             score = getRangeOfCoords(coord, goalCoord)
             if (score >= lowestScore) continue
         }
@@ -458,7 +454,6 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         if (hasImpassibleStructure) continue
 
         if (goalCoord) {
-
             lowestScore = score
             shoveCoord = coord
             continue

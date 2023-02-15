@@ -1,6 +1,6 @@
 import { AllyCreepRequestData } from 'international/constants'
 import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
-import { unpackCoord } from 'other/packrat'
+import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
     preTickManager() {
@@ -79,7 +79,7 @@ export class AllyVanguard extends Creep {
 
         if (
             this.runRoomLogisticsRequestsAdvanced({
-                resourceTypes: new Set([RESOURCE_ENERGY])
+                resourceTypes: new Set([RESOURCE_ENERGY]),
             })
         )
             return true

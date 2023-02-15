@@ -50,7 +50,8 @@ import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { flagManager } from 'international/flagManager'
 import { roomPruningManager } from 'international/roomPruning'
 
-export const loop = ErrorMapper.wrapLoop((): void => {
+export const loop = (): void => {
+    // export const loop = ErrorMapper.wrapLoop((): void => {
     profiler.wrap((): void => {
         if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
             customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
@@ -108,7 +109,8 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         internationalManager.endTickManager()
         if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
     })
-})
+    // })
+}
 
 // Profiler decs
 

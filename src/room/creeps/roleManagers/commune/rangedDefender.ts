@@ -9,7 +9,7 @@ import {
     getRangeOfCoords,
     randomTick,
 } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 
 export class RangedDefender extends Creep {
     preTickManager() {

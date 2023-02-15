@@ -1,4 +1,4 @@
-import { unpackPosList } from 'other/packrat'
+import { unpackPosList } from 'other/codec'
 import { minHarvestWorkRatio, customColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
 import { customLog } from './utils'
 import { InternationalManager } from './international'
@@ -24,7 +24,7 @@ InternationalManager.prototype.mapVisualsManager = function () {
             align: 'left',
             fontSize: 5,
         })
-/*
+        /*
         Game.map.visual.text((Game.time - roomMemory.LST).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
@@ -34,10 +34,14 @@ InternationalManager.prototype.mapVisualsManager = function () {
             const room = Game.rooms[roomName]
             if (!room) continue
 
-            Game.map.visual.text(`⚡${room.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`, new RoomPosition(2, 8, roomName), {
-                align: 'left',
-                fontSize: 8,
-            })
+            Game.map.visual.text(
+                `⚡${room.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`,
+                new RoomPosition(2, 8, roomName),
+                {
+                    align: 'left',
+                    fontSize: 8,
+                },
+            )
 
             if (roomMemory.claimRequest) {
                 Game.map.visual.line(

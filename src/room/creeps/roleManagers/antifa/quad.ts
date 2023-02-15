@@ -23,7 +23,7 @@ import {
     isXYExit,
 } from 'international/utils'
 import { find, transform } from 'lodash'
-import { packCoord, packXYAsCoord, unpackCoord } from 'other/packrat'
+import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { Antifa } from './antifa'
 
 export class Quad {

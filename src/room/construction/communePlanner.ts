@@ -28,7 +28,7 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { packPosList } from 'other/packrat'
+import { packPosList } from 'other/codec'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
 import { CommuneManager } from 'room/commune/commune'

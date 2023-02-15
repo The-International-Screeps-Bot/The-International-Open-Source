@@ -1,7 +1,7 @@
 import { customColors } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findFunctionCPU, findObjectWithID, randomTick, scalePriority } from 'international/utils'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
 export class StoringStructuresManager {

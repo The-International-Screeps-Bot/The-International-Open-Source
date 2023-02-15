@@ -47,7 +47,7 @@ import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
-import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/packrat'
+import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
 import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
@@ -126,7 +126,6 @@ export class CommuneManager {
         const { room } = this
 
         if (room.memory.Ab) {
-
             room.controller.unclaim()
             return
         }
@@ -250,7 +249,7 @@ export class CommuneManager {
 
     private test() {
         return
-/*
+        /*
         const array = new Array(2500)
 
         for (let i = 0; i < array.length; i++) {
@@ -404,7 +403,7 @@ export class CommuneManager {
         if (RClCost) {
             this._minStoredEnergy -= Math.pow((Math.min(this.room.controller.progress, RClCost) / RClCost) * 20, 3.35)
         }
-        return this._minStoredEnergy = Math.floor(this._minStoredEnergy)
+        return (this._minStoredEnergy = Math.floor(this._minStoredEnergy))
     }
 
     get storedEnergyUpgradeThreshold() {
@@ -438,7 +437,6 @@ export class CommuneManager {
     }
 
     get storingStructuresCapacity() {
-
         let capacity = 0
         if (this.room.storage) capacity += this.room.storage.store.getCapacity()
         if (this.room.terminal) capacity += this.room.terminal.store.getCapacity()

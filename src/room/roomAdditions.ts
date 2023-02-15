@@ -25,15 +25,7 @@ import {
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { profiler } from 'other/screeps-profiler'
-import {
-    packCoord,
-    packCoordList,
-    packPos,
-    packPosList,
-    packXYAsCoord,
-    unpackCoord,
-    unpackPosList,
-} from 'other/packrat'
+import { packCoord, packCoordList, packPos, packPosList, packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
 
 const roomAdditions = {
     global: {
@@ -432,7 +424,9 @@ const roomAdditions = {
 
             if (!this.anchor) return []
 
-            this._spawningStructures = [...this.structures.spawn, ...this.structures.extension].filter(structure => structure.RCLActionable)
+            this._spawningStructures = [...this.structures.spawn, ...this.structures.extension].filter(
+                structure => structure.RCLActionable,
+            )
 
             return this._spawningStructures
         },
@@ -505,7 +499,11 @@ const roomAdditions = {
             if (
                 this.anchor &&
                 this.myCreeps.fastFiller.length &&
-                ((this.controller.level >= 6 && this.fastFillerLink && this.hubLink && (this.storage || this.terminal) && this.myCreeps.hubHauler.length) ||
+                ((this.controller.level >= 6 &&
+                    this.fastFillerLink &&
+                    this.hubLink &&
+                    (this.storage || this.terminal) &&
+                    this.myCreeps.hubHauler.length) ||
                     (this.fastFillerContainerLeft && this.fastFillerContainerRight))
             ) {
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
@@ -635,6 +633,7 @@ const roomAdditions = {
                         )
                     })
 
+                    console.log('sourcePositions', this.name, positions, packPosList(positions))
                     this.memory.SP.push(packPosList(positions))
                     this._sourcePositions.push(positions)
                 }
@@ -674,6 +673,7 @@ const roomAdditions = {
                     )
                 })
 
+                console.log('sourcePositions', this.name, positions, packPosList(positions))
                 this.memory.SP.push(packPosList(positions))
                 this._sourcePositions.push(positions)
             }

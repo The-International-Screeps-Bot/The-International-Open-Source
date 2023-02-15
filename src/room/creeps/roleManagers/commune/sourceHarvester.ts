@@ -1,6 +1,13 @@
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findCoordsInsideRect, findObjectWithID, getRange, getRangeOfCoords, scalePriority } from 'international/utils'
-import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/packrat'
+import {
+    customLog,
+    findCoordsInsideRect,
+    findObjectWithID,
+    getRange,
+    getRangeOfCoords,
+    scalePriority,
+} from 'international/utils'
+import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {
@@ -208,7 +215,6 @@ export class SourceHarvester extends Creep {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {
-
             const creep: SourceHarvester = Game.creeps[creepName]
 
             // Define the creep's designated source

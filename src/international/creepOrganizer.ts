@@ -2,7 +2,7 @@ import { creepClasses } from 'room/creeps/creepClasses'
 import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
 import { customLog } from './utils'
 import { internationalManager, InternationalManager } from './international'
-import { packCoord } from 'other/packrat'
+import { packCoord } from 'other/codec'
 import { globalStatsUpdater } from './statsManager'
 
 class CreepOrganizer {
