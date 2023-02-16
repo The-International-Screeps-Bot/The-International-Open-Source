@@ -280,7 +280,7 @@ export class TerminalManager {
         for (const resourceTarget of terminalResourceTargets) {
             if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
 
-            let min = terminal.store.getCapacity() * resourceTarget.min(this.communeManager)
+            let min = resourceTarget.min(this.communeManager)
 
             // We don't have enough
 
@@ -294,7 +294,7 @@ export class TerminalManager {
                 continue
             }
 
-            let max = terminal.store.getCapacity() * resourceTarget.max(this.communeManager)
+            let max = resourceTarget.max(this.communeManager)
 
             // We have enough
 
