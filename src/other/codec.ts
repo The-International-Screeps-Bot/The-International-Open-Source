@@ -202,7 +202,6 @@ export function unpackRoomName(q: number, x: number, y: number) {
  */
 export function packPos(pos: RoomPosition) {
     const map = packRoomName(pos.roomName)
-    // console.log([map.quadrant, map.x, map.y, pos.x, pos.y])
     return encode(new Uint8Array([map.quadrant, map.x, map.y, pos.x, pos.y]))
 }
 
@@ -211,7 +210,6 @@ export function packPos(pos: RoomPosition) {
  */
 export function packXYAsPos(x: number, y: number, roomName: string) {
     const map = packRoomName(roomName)
-    // console.log([map.quadrant, map.x, map.y, x, y])
     return encode(new Uint8Array([map.quadrant, map.x, map.y, x, y]))
 }
 
@@ -241,9 +239,7 @@ export function packPosList(posList: RoomPosition[]) {
  */
 export function unpackPosList(chars: string) {
     const posList: RoomPosition[] = []
-    // console.log(chars)
     for (let i = 0; i < chars.length; i += 3) {
-        // console.log(i, chars[i] + chars[i + 1] + chars[i + 2])
         posList.push(unpackPos(chars[i] + chars[i + 1] + chars[i + 2]))
     }
     return posList

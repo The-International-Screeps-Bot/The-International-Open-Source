@@ -672,7 +672,6 @@ const roomAdditions = {
                     )
                 })
 
-                console.log('sourcePositions', this.name, positions, packPosList(positions))
                 this.memory.SP.push(packPosList(positions))
                 this._sourcePositions.push(positions)
             }
