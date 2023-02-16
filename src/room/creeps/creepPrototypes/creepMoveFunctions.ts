@@ -156,9 +156,20 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         posIndex = i
         break
     }
-    /* this.room.visual.text((posIndex || -1).toString(), this.pos) */
+    this.room.visual.text((posIndex || -1).toString(), this.pos)
     if (posIndex !== undefined && posIndex + 1 < path.length) {
         path.splice(0, posIndex + 1)
+
+        // If we're on an exit and the next pos is in the other room, wait
+
+        if (path[0].roomName !== this.room.name) {
+
+            /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
+            this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
+            this.memory.P = packPosList(path)
+            this.moved = 'moved'
+            return true
+        }
 
         // If we have a remote, avoid abandoned remotes
 
@@ -372,6 +383,11 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         return true
     }
 
+    if (path[0].roomName !== this.room.name) {
+
+        this.moved = 'moved'
+        return true
+    }
     this.assignMoveRequest(path[0])
 
     // Inform success
