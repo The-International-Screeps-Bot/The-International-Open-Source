@@ -1,4 +1,4 @@
-import { creepRoles, powerCreepClassNames } from 'international/constants'
+import { creepRoles, powerCreepClassNames, roomTypesUsedForStats } from 'international/constants'
 import { cleanRoomMemory } from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
@@ -7,6 +7,7 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 import { EndTickCreepManager } from './creeps/endTickCreepManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import { RoomVisualsManager } from './roomVisuals'
+import { statsManager } from 'international/statsManager'
 
 export class RoomManager {
     containerManager: ContainerManager
@@ -43,6 +44,10 @@ export class RoomManager {
             room.basicScout()
             cleanRoomMemory(room.name)
         }
+
+        const roomType = roomMemory.T
+        if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
+            statsManager.roomPreTick(room.name, roomType)
 
         room.moveRequests = {}
         room.creepPositions = {}

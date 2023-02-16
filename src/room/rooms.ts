@@ -32,9 +32,6 @@ export function roomsManager() {
         const room = Game.rooms[roomName]
         const roomType = room.memory.T
 
-        const statsActive = Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)
-        if (statsActive) statsManager.roomPreTick(room.name, roomType)
-
         // If the room is a commune, run its specific manager
 
         if (room.memory.T === 'commune') room.communeManager.run()
@@ -54,7 +51,8 @@ export function roomsManager() {
             bgColor: customColors.lightBlue,
             superPosition: 2,
         })
-        if (statsActive) statsManager.roomEndTick(room.name, roomType)
+        if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
+            statsManager.roomEndTick(room.name, roomType)
     }
 
     // If CPU logging is enabled, log the CPU used by this manager
