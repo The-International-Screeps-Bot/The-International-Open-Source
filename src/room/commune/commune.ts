@@ -128,12 +128,21 @@ export class CommuneManager {
     preTickRun() {
         const { room } = this
 
+        const roomMemory = Memory.rooms[room.name]
+
+        // If we should abandon the room
+
         if (room.memory.Ab) {
             room.controller.unclaim()
+            roomMemory.T = 'neutral'
+            cleanRoomMemory(room.name)
+
+            for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
+
+                cSite.remove()
+            }
             return
         }
-
-        const roomMemory = Memory.rooms[room.name]
 
         room.memory.T = 'commune'
 

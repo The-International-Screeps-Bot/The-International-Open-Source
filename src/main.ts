@@ -47,7 +47,7 @@ import { playerManager } from 'international/players'
 import { profiler } from 'other/screeps-profiler'
 import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
 import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
-import { flagManager } from 'international/flagManager'
+import { flagManager } from 'international/flags'
 import { roomPruningManager } from 'international/roomPruning'
 
 const originalLoop = (): void => {
