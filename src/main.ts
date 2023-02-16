@@ -77,17 +77,15 @@ export const loop = (): void => {
         configManager.run()
         tickConfig.run()
         playerManager.run()
-        roomPruningManager.run()
-        flagManager.run()
         creepOrganizer.run()
         powerCreepOrganizer.run()
-        internationalManager.constructionSiteManager()
-        internationalManager.orderManager()
 
-        // Handle ally requests
-
+        roomPruningManager.run()
         allyManager.tickConfig()
         allyManager.getAllyRequests()
+        flagManager.run()
+        internationalManager.constructionSiteManager()
+        internationalManager.orderManager()
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart

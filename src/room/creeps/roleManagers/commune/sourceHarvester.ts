@@ -1,3 +1,4 @@
+import { RESULT_ACTION, RESULT_FAIL, RESULT_NO_ACTION, RESULT_SUCCESS } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import {
     customLog,
@@ -49,21 +50,23 @@ export class SourceHarvester extends Creep {
         }
     }
 
-    travelToSource?(): boolean {
+    travelToSource?(): number {
+        if (this.worked) return RESULT_SUCCESS
+
         this.message = '🚬'
 
         // Unpack the harvestPos
 
         const harvestPos = this.findSourcePos(this.memory.SI)
-        if (!harvestPos) return true
+        if (!harvestPos) return RESULT_FAIL
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
+        if (getRangeOfCoords(this.pos, harvestPos) === 0) return RESULT_SUCCESS
 
         // If the creep's movement type is pull
 
-        if (this.memory.getPulled) return true
+        if (this.memory.getPulled) return RESULT_NO_ACTION
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -87,7 +90,7 @@ export class SourceHarvester extends Creep {
                 },
             )
 
-            return true
+            return RESULT_ACTION
         }
 
         this.createMoveRequest({
@@ -101,7 +104,7 @@ export class SourceHarvester extends Creep {
             avoidEnemyRanges: true,
         })
 
-        return true
+        return RESULT_ACTION
     }
 
     transferToSourceStructures?(): boolean {
@@ -221,16 +224,8 @@ export class SourceHarvester extends Creep {
     }
 
     run?() {
-        if (!this.worked) {
-            // Try to move to source. If creep moved then iterate
 
-            if (this.travelToSource()) return
-
-            // Try to harvest the designated source
-
-            this.advancedHarvestSource(this.room.sources[this.memory.SI])
-        }
-
+        if (this.travelToSource() !== RESULT_SUCCESS) return
         if (this.transferToSourceStructures()) return
 
         // Try to repair the sourceContainer

@@ -56,7 +56,7 @@ export class RemoteHarvester extends Creep {
         if (commune.creepsOfRemote[this.memory.RN])
             commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
 
-        if (this.memory.RN === this.removeRemote.name) {
+        if (this.memory.RN === this.room.name) {
 
             // Unpack the harvestPos
 
@@ -173,8 +173,6 @@ export class RemoteHarvester extends Creep {
                 this.transfer(container, RESOURCE_ENERGY)
             }
         }
-
-        if (this.advancedHarvestSource(source)) return
     }
 
     private obtainEnergyIfNeeded() {
