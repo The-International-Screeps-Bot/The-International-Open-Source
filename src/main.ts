@@ -50,7 +50,7 @@ import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { flagManager } from 'international/flagManager'
 import { roomPruningManager } from 'international/roomPruning'
 
-const loop = (): void => {
+const originalLoop = (): void => {
     profiler.wrap((): void => {
         if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
             customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
@@ -108,12 +108,12 @@ const loop = (): void => {
     })
 }
 
-export default ErrorMapper.wrapLoop(loop)
-// export default loop
+export const loop = ErrorMapper.wrapLoop(originalLoop)
+// export const loop = originalLoop
 
 // Profiler decs
 
 profiler.registerClass(CommuneManager, 'CommuneManager')
 profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
 profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
-profiler.registerFN(loop, 'loop')
+profiler.registerFN(originalLoop, 'loop')
