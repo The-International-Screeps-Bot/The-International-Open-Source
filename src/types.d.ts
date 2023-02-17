@@ -6,6 +6,7 @@ import { CombatRequestData } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
 import { Settings } from 'international/settings'
+import { Dynamic } from 'room/creeps/roleManagers/antifa/dynamic'
 
 declare global {
     interface ProfilerMemory {
@@ -1669,6 +1670,10 @@ declare global {
         }
     }
 
+    interface IdealSquadMembers {
+
+    }
+
     interface CreepFunctions {
         preTickManager(): void
 
@@ -1891,7 +1896,7 @@ declare global {
         /**
          * The squad the creep belongs to
          */
-        squad: Duo | Quad | undefined
+        squad: Duo | Quad | Dynamic | undefined
 
         /**
          * Wether the squad has ran yet
@@ -2014,8 +2019,10 @@ declare global {
         readonly boosts: Partial<Record<MineralBoostConstant, number>>
 
         _canMove: boolean
-
         readonly canMove: boolean
+
+        _idealSquadMembers: IdealSquadMembers
+        readonly idealSquadMembers: IdealSquadMembers
     }
 
     interface CreepMemoryTemplate {
@@ -2117,9 +2124,14 @@ declare global {
         SS: number | undefined
 
         /**
+         * Squad type
+         */
+        ST: 'duo' | 'quad' | 'dynamic'
+
+        /**
          * Squad Type the combat method the creep's squad is attempting
          */
-        ST: 'rangedAttack' | 'attack' | 'dismantle'
+        SCT: 'rangedAttack' | 'attack' | 'dismantle'
 
         /**
          * Squad Formed, wether the creep has joined a squad or not

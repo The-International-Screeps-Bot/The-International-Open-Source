@@ -277,7 +277,7 @@ export class Quad {
     }
 
     runCombat() {
-        if (this.leader.memory.ST === 'rangedAttack') {
+        if (this.leader.memory.SCT === 'rangedAttack') {
             this.passiveRangedAttack()
 
             const nearbyThreat = this.leader.room.enemyAttackers.find(
@@ -294,7 +294,7 @@ export class Quad {
             if (this.rangedAttackStructures()) return true
             return false
         }
-        if (this.leader.memory.ST === 'attack') {
+        if (this.leader.memory.SCT === 'attack') {
             if (this.advancedAttack()) return false
         }
 
@@ -540,13 +540,13 @@ export class Quad {
                 member.pos.y + offset.y,
             )
 
-            if (this.leader.memory.ST === 'rangedAttack') {
+            if (this.leader.memory.SCT === 'rangedAttack') {
                 score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
 
                 continue
             }
 
-            if (this.leader.memory.ST === 'attack') {
+            if (this.leader.memory.SCT === 'attack') {
                 score += member.combatStrength.melee
                 continue
             }

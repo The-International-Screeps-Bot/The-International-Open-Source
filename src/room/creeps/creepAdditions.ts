@@ -245,6 +245,26 @@ Object.defineProperties(Creep.prototype, {
             return (this._canMove = !this.fatigue && !this.spawning && this.parts.move > 0)
         },
     },
+    idealSquadMembers: {
+        get() {
+
+            if (this._idealSquadMembers) return this._idealSquadMembers
+
+            if (this.memory.SS === 2) {
+
+
+            }
+
+            if (this.memory.SS === 4) {
+
+
+            }
+
+            // Dynamic
+
+            return this._idealSquadMembers
+        }
+    }
 } as PropertyDescriptorMap & ThisType<Creep>)
 
 Object.defineProperties(PowerCreep.prototype, {
@@ -389,6 +409,7 @@ const additions = {
             return x <= 0 || x >= 49 || y <= 0 || y >= 49
         },
     },
+
 } as PropertyDescriptorMap & (ThisType<Creep> | ThisType<PowerCreep>)
 
 /* profiler.registerObject(additions, 'creepAdditions') */

@@ -1516,13 +1516,16 @@ export class SpawnRequestsManager {
                             memoryAdditions: {
                                 CRN: requestName,
                                 SS: 4,
-                                ST: 'rangedAttack',
+                                ST: 'quad',
+                                SCT: 'rangedAttack',
                             },
                         }
                     })(),
                 )
                 continue
             }
+
+            // Harass
 
             if (
                 minRangedAttackCost + minRangedHealCost > room.energyCapacityAvailable ||
@@ -1535,7 +1538,7 @@ export class SpawnRequestsManager {
 
             // If the request isn't an attack
             // Spawn RangedAttack Heal singletons
-
+/*
             rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaRangedAttacker'
@@ -1562,6 +1565,7 @@ export class SpawnRequestsManager {
                         priority,
                         spawnGroup,
                         memoryAdditions: {
+                            ST: 'dynamic',
                             CRN: requestName,
                         },
                     }
@@ -1594,6 +1598,7 @@ export class SpawnRequestsManager {
                         priority,
                         spawnGroup,
                         memoryAdditions: {
+                            ST: 'dynamic',
                             CRN: requestName,
                         },
                     }
@@ -1625,7 +1630,7 @@ export class SpawnRequestsManager {
                         spawnGroup,
                         memoryAdditions: {
                             SS: 2,
-                            ST: 'attack',
+                            ST: 'dynamic',
                             CRN: requestName,
                         },
                     }
@@ -1655,12 +1660,12 @@ export class SpawnRequestsManager {
                         spawnGroup,
                         memoryAdditions: {
                             SS: 2,
-                            ST: 'attack',
+                            ST: 'dynamic',
                             CRN: requestName,
                         },
                     }
                 })(),
-            )
+            ) */
         }
 
         room.spawnRequestsArgs = rawSpawnRequestsArgs.filter(args => args) as SpawnRequestArgs[]

@@ -104,8 +104,8 @@ export class Duo {
     }
 
     runCombat() {
-        if (this.leader.memory.ST === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.leader.memory.ST === 'attack') return this.advancedAttack()
+        if (this.leader.memory.SCT === 'rangedAttack') return this.advancedRangedAttack()
+        if (this.leader.memory.SCT === 'attack') return this.advancedAttack()
         return this.advancedDismantle()
     }
 

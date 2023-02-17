@@ -117,7 +117,7 @@ export class Antifa extends Creep {
 
             // All members must be trying to make the same type of squad
 
-            if (this.memory.ST !== requestingCreep.memory.ST) continue
+            if (this.memory.SCT !== requestingCreep.memory.SCT) continue
 
             // If the creep is allowed to join the other leader
 

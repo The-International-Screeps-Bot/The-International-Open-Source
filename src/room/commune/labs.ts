@@ -153,6 +153,77 @@ export class LabManager {
      */
     preTickRun() {}
 
+    inputLabIDs: Id<StructureLab>[]
+
+    _inputLabs: StructureLab[]
+
+    /**
+     * Finds the input labs we need to opperate production
+     */
+    public get inputLabs() {
+        if (this._inputLabs) return this._inputLabs
+
+        this._inputLabs = []
+
+        // We need at least 3 labs to opperate
+
+        const labs = this.communeManager.room.structures.lab
+        if (labs.length < 3) return this._inputLabs
+
+        // We need a storage or terminal
+
+        const storingStructure = this.communeManager.room.terminal || this.communeManager.room.storage
+        if (!storingStructure) return this._inputLabs
+
+        // Try to use cached lab IDs if valid
+
+        if (this.inputLabIDs && this.inputLabIDs.length >= 2) {
+            if (this.unpackLabIDsByType()) return this._inputLabs
+
+            // Reset labs in case any were added
+
+            this._inputLabs = []
+        }
+
+        // Reset lab IDs
+
+        this.inputLabIDs = []
+
+        // Prefer labs closer to the hub to be inputs
+
+        labs.sort((a, b) => {
+            return getRangeOfCoords(a.pos, storingStructure.pos) - getRangeOfCoords(b.pos, storingStructure.pos)
+        })
+
+        for (const lab of labs) {
+            // We have enough inputs
+
+            if (this._inputLabs.length >= 2) break
+
+            // Tzhe lab isn't in range of all labs
+
+            if (labs.filter(otherLab => getRangeOfCoords(lab.pos, otherLab.pos) <= 2).length < labs.length) continue
+
+            // Make the lab an input
+
+            this._inputLabs.push(lab)
+            this.inputLabIDs.push(lab.id)
+        }
+
+        return this._inputLabs
+    }
+
+    private unpackLabIDsByType() {
+        for (const ID of this.inputLabIDs) {
+            const lab = findObjectWithID(ID)
+            if (!lab) return false
+
+            this._inputLabs.push(lab)
+        }
+
+        return true
+    }
+
     _outputLabs: StructureLab[]
 
     public get outputLabs() {
@@ -161,7 +232,7 @@ export class LabManager {
         let boostingLabs = Object.values(this.labsByBoost)
 
         return (this._outputLabs = this.communeManager.room.structures.lab.filter(
-            lab => !this.communeManager.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
+            lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
         ))
     }
 
@@ -170,8 +241,8 @@ export class LabManager {
         if (!this.communeManager.room.terminal) return
 
         delete this._outputLabs
-        this.inputLab1 = this.communeManager.inputLabs[0]
-        this.inputLab2 = this.communeManager.inputLabs[1]
+        this.inputLab1 = this.inputLabs[0]
+        this.inputLab2 = this.inputLabs[1]
 
         this.assignBoosts()
         this.manageReactions()
@@ -256,19 +327,19 @@ export class LabManager {
     }
 
     private manageReactions() {
-        if (this.communeManager.inputLabs.length < 2) return
+        if (this.inputLabs.length < 2) return
         if (!this.outputLabs.length) return
 
         if (Memory.roomVisuals) {
             this.communeManager.room.visual.resource(
                 this.inputResources[0],
-                this.communeManager.inputLabs[0].pos.x,
-                this.communeManager.inputLabs[0].pos.y,
+                this.inputLabs[0].pos.x,
+                this.inputLabs[0].pos.y,
             )
             this.communeManager.room.visual.resource(
                 this.inputResources[1],
-                this.communeManager.inputLabs[1].pos.x,
-                this.communeManager.inputLabs[1].pos.y,
+                this.inputLabs[1].pos.x,
+                this.inputLabs[1].pos.y,
             )
         }
 
@@ -284,7 +355,7 @@ export class LabManager {
     private canReact() {
         if (this.outputLabs[0].cooldown) return false
 
-        const inputLabs = this.communeManager.inputLabs
+        const inputLabs = this.inputLabs
         for (let i = 0; i < inputLabs.length; i++) {
             const lab = inputLabs[i]
 
@@ -319,11 +390,11 @@ export class LabManager {
                 // Input labs can act as boosting labs too
 
                 if (this.inputResources[0] === compund) {
-                    this.labsByBoost[compund] = this.communeManager.inputLabs[0].id
+                    this.labsByBoost[compund] = this.inputLabs[0].id
                     continue
                 }
                 if (this.inputResources[1] === compund) {
-                    this.labsByBoost[compund] = this.communeManager.inputLabs[1].id
+                    this.labsByBoost[compund] = this.inputLabs[1].id
                     continue
                 }
 
@@ -331,21 +402,21 @@ export class LabManager {
 
                 let boostingLabs = Object.values(this.labsByBoost)
                 let freelabs = this.communeManager.room.structures.lab.filter(
-                    lab => !this.communeManager.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
+                    lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
                 )
 
                 if (
                     freelabs.length == 0 &&
-                    this.communeManager.inputLabIDs[1] &&
-                    !boostingLabs.includes(this.communeManager.inputLabIDs[1])
+                    this.inputLabIDs[1] &&
+                    !boostingLabs.includes(this.inputLabIDs[1])
                 ) {
                     freelabs = [this.inputLab1]
                 }
 
                 if (
                     freelabs.length == 0 &&
-                    this.communeManager.inputLabIDs[1] &&
-                    !boostingLabs.includes(this.communeManager.inputLabIDs[1])
+                    this.inputLabIDs[1] &&
+                    !boostingLabs.includes(this.inputLabIDs[1])
                 ) {
                     freelabs = [this.inputLab2]
                 }
@@ -553,7 +624,7 @@ export class LabManager {
     }
 
     private createInputRoomLogisticsRequests() {
-        let inputLabs = this.communeManager.inputLabs
+        let inputLabs = this.inputLabs
         for (let i = 0; i < inputLabs.length; i++) {
             const lab = inputLabs[i]
             const resourceType = this.inputResources[i]
@@ -828,7 +899,7 @@ export class LabManager {
             }
         }
 
-        if (this.communeManager.inputLabs.length < 2) return
+        if (this.inputLabs.length < 2) return
 
         //Priortize the worstly loaded lab.
         if (this.inputLab2.store[this.inputResources[1]] > this.inputLab1.store[this.inputResources[0]]) {

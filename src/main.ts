@@ -49,6 +49,9 @@ import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructu
 import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { flagManager } from 'international/flags'
 import { roomPruningManager } from 'international/roomPruning'
+import { TerminalManager } from 'room/commune/terminal/terminal'
+import { LabManager } from 'room/commune/labs'
+import { FactoryManager } from 'room/commune/factory'
 
 const originalLoop = (): void => {
     profiler.wrap((): void => {
@@ -116,4 +119,7 @@ export const loop = ErrorMapper.wrapLoop(originalLoop)
 profiler.registerClass(CommuneManager, 'CommuneManager')
 profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
 profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
+profiler.registerClass(TerminalManager, 'TerminalManager')
+profiler.registerClass(LabManager, 'LabManager')
+profiler.registerClass(FactoryManager, 'FactoryManager')
 profiler.registerFN(originalLoop, 'loop')
