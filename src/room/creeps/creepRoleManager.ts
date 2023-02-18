@@ -93,21 +93,18 @@ export class CreepRoleManager {
     }
 
     private runManager(role: CreepRoles) {
-        const roleCPUStart = Game.cpu.getUsed()
-
-        // Get the amount of creeps with the role
-
-        const creepsOfRoleAmount = this.roomManager.room.myCreeps[role].length
 
         // If there are no creeps for this manager, iterate
 
         if (!this.roomManager.room.myCreeps[role].length) return
 
-        // Run manager
+        const roleCPUStart = Game.cpu.getUsed()
 
         managers[role](this.roomManager.room, this.roomManager.room.myCreeps[role])
 
         // Log role stats
+
+        const creepsOfRoleAmount = this.roomManager.room.myCreeps[role].length
 
         customLog(
             `${role}s`,

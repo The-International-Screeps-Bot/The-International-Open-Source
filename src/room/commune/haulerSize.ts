@@ -22,6 +22,7 @@ export class HaulerSizeManager {
 
                 roomMemory.HU = haulerUpdateDefault
                 roomMemory.MHC = this.communeManager.room.energyCapacityAvailable
+                return
             }
 
             // Make the cost the smallest possible

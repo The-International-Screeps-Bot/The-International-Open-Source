@@ -257,6 +257,7 @@ export class CommuneManager {
 
         customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
+            textColor: customColors.white
         })
     }
 
@@ -275,6 +276,7 @@ export class CommuneManager {
 
         customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
+            textColor: customColors.white
         })
     }
 

@@ -602,8 +602,7 @@ const roomAdditions = {
                 if (!commune) return []
 
                 const anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
-
-                const terrainCoords = internationalManager.getTerrainCoords(this.name)
+                const terrain = this.getTerrain()
 
                 for (const source of this.sources) {
                     const positions = []
@@ -613,7 +612,7 @@ const roomAdditions = {
                     for (const pos of this.findAdjacentPositions(source.pos.x, source.pos.y)) {
                         // Iterate if terrain for pos is a wall
 
-                        if (terrainCoords[packAsNum(pos)] === 255) continue
+                        if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                         // Add pos to harvestPositions
 
@@ -641,8 +640,7 @@ const roomAdditions = {
             }
 
             const anchor = this.anchor || new RoomPosition(25, 25, this.name)
-
-            const terrainCoords = internationalManager.getTerrainCoords(this.name)
+            const terrain = this.getTerrain()
 
             for (const source of this.sources) {
                 const positions = []
@@ -652,7 +650,7 @@ const roomAdditions = {
                 for (const pos of this.findAdjacentPositions(source.pos.x, source.pos.y)) {
                     // Iterate if terrain for pos is a wall
 
-                    if (terrainCoords[packAsNum(pos)] === 255) continue
+                    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                     // Add pos to harvestPositions
 
@@ -828,7 +826,7 @@ const roomAdditions = {
                 const commune = Game.rooms[this.memory.CN]
                 if (!commune) return undefined
 
-                const terrainCoords = internationalManager.getTerrainCoords(this.name)
+                const terrain = this.getTerrain()
 
                 const anchor = commune.anchor || new RoomPosition(25, 25, commune.name)
 
@@ -842,9 +840,7 @@ const roomAdditions = {
                 )
 
                 for (const pos of adjacentPositions) {
-                    // Iterate if terrain for pos is a wall
-
-                    if (terrainCoords[packAsNum(pos)] === 255) continue
+                    if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                     // Add pos to harvestPositions
 
@@ -870,7 +866,7 @@ const roomAdditions = {
 
             const anchor = this.anchor || new RoomPosition(25, 25, this.name)
 
-            const terrainCoords = internationalManager.getTerrainCoords(this.name)
+            const terrain = this.getTerrain()
 
             // Find positions adjacent to source
 
@@ -882,9 +878,7 @@ const roomAdditions = {
             )
 
             for (const pos of adjacentPositions) {
-                // Iterate if terrain for pos is a wall
-
-                if (terrainCoords[packAsNum(pos)] === 255) continue
+                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                 // Add pos to harvestPositions
 
@@ -954,7 +948,7 @@ const roomAdditions = {
 
             // Find terrain in room
 
-            const terrainCoords = internationalManager.getTerrainCoords(this.name)
+            const terrain = this.getTerrain()
 
             // Find positions adjacent to source
 
@@ -963,9 +957,7 @@ const roomAdditions = {
             // Loop through each pos
 
             for (const pos of adjacentPositions) {
-                // Iterate if terrain for pos is a wall
-
-                if (terrainCoords[packAsNum(pos)] === 255) continue
+                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                 // Add pos to harvestPositions
 
@@ -1068,14 +1060,12 @@ const roomAdditions = {
                 mineralPos.y + 1,
             )
 
-            const terrainCoords = internationalManager.getTerrainCoords(this.name)
+            const terrain = this.getTerrain()
 
             // Loop through each pos
 
             for (const pos of adjacentPositions) {
-                // Iterate if terrain for pos is a wall
-
-                if (terrainCoords[packAsNum(pos)] === 255) continue
+                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
                 // Add pos to harvestPositions
 
@@ -2282,7 +2272,6 @@ const roomAdditions = {
     },
     totalEnemyCombatStrength: {
         get() {
-
             if (this._totalEnemyCombatStrength) return this._totalEnemyCombatStrength
 
             this._totalEnemyCombatStrength = {
@@ -2293,7 +2282,6 @@ const roomAdditions = {
             }
 
             for (const enemyCreep of this.enemyAttackers) {
-
                 const combatStrength = enemyCreep.combatStrength
                 this._totalEnemyCombatStrength.melee += combatStrength.melee
                 this._totalEnemyCombatStrength.ranged += combatStrength.ranged
@@ -2303,7 +2291,7 @@ const roomAdditions = {
 
             return this._totalEnemyCombatStrength
         },
-    }
+    },
 } as PropertyDescriptorMap & ThisType<Room>
 
 profiler.registerObject(roomAdditions, 'roomAdditions')
