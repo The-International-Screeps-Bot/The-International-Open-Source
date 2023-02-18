@@ -2,7 +2,6 @@
 import { allStructureTypes } from 'international/constants'
 import { encode, decode } from 'base32768'
 import { BasePlans } from 'room/commune/basePlans'
-import { customLog } from 'international/utils'
 
 /**
  * Convert a standard 24-character hex id in screeps to a compressed UTF-16 encoded string of length 6.
@@ -125,8 +124,8 @@ export function packCoordList(coords: Coord[]) {
  */
 export function unpackCoordList(chars: string) {
     const coords: Coord[] = []
-    for (let i = 0; i < chars.length; i += 3) {
-        coords.push(unpackCoord(chars[i] + chars[i + 1] + chars[i + 2]))
+    for (let i = 0; i < chars.length; i += 2) {
+        coords.push(unpackCoord(chars[i] + chars[i + 1]))
     }
     return coords
 }
@@ -137,15 +136,12 @@ export function unpackCoordList(chars: string) {
 export function unpackCoordListAsPosList(packedCoords: string, roomName: string) {
     const positions: RoomPosition[] = []
     let coord: Coord
-    for (let i = 0; i < packedCoords.length; i += 3) {
-        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1] + packedCoords[i + 2])
+    for (let i = 0; i < packedCoords.length; i += 2) {
+        coord = unpackCoord(packedCoords[i] + packedCoords[i + 1])
         positions.push(new RoomPosition(coord.x, coord.y, roomName))
     }
     return positions
 }
-
-global.packedRoomNames = global.packedRoomNames || {}
-global.unpackedRoomNames = global.unpackedRoomNames || {}
 
 /**
  * Packs a roomName as Base32768 string.
@@ -200,7 +196,7 @@ export function unpackRoomName(q: number, x: number, y: number) {
 }
 
 /**
- * Packs a RoomPosition as a pair Uint8 characters.
+ * Packs a RoomPosition as a 3 Uint8 characters.
  */
 export function packPos(pos: RoomPosition) {
     const map = packRoomName(pos.roomName)
@@ -208,7 +204,7 @@ export function packPos(pos: RoomPosition) {
 }
 
 /**
- * Packs a RoomPosition as a pair Uint8 characters.
+ * Packs a RoomPosition as a 3 Uint8 characters.
  */
 export function packXYAsPos(x: number, y: number, roomName: string) {
     const map = packRoomName(roomName)

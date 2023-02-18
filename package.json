@@ -12,11 +12,14 @@
         "lint-ci": "eslint '**/*'",
         "lint-fix": "eslint **/* --fix",
         "push-mmo": "rollup -c --environment DEST:mmo",
-        "push-pserver": "rollup -c --environment DEST:pServer2",
+        "push-pserver": "rollup -c --environment DEST:pServer",
         "watch-mmo": "rollup -cw --environment DEST:mmo",
         "watch-pserver": "rollup -cw --environment DEST:pServer",
         "server": "node server --maxTicks=10000",
-        "grafana": "npx screeps-grafana private"
+        "test": "jest",
+        "test-watch": "jest --watch",
+        "test-cov": "jest --coverage",
+        "test-only": "bash -c 'jest --watch --coverage --verbose --collectCoverageFrom=\"**/*$1*\" $1' -- "
     },
     "repository": {
         "type": "git",
@@ -32,6 +35,7 @@
         "@rollup/plugin-commonjs": "^20.0.0",
         "@rollup/plugin-node-resolve": "^13.0.4",
         "@types/chai": "^4.3.0",
+        "@types/jest": "^27.0.1",
         "@types/lodash": "3.10.2",
         "@types/mocha": "^5.2.5",
         "@types/node": "^13.13.1",
@@ -61,9 +65,11 @@
         "rollup-plugin-terser": "^7.0.2",
         "rollup-plugin-typescript2": "^0.30.0",
         "screeps-grafana": "^2.2.2",
+        "screeps-jest": "^2.0.2",
         "screeps-performance-server": "^1.9.1",
         "sinon": "^6.3.5",
         "sinon-chai": "^3.2.0",
+        "ts-jest": "^27.0.5",
         "ts-node": "^10.2.0",
         "tsconfig-paths": "^3.10.1",
         "typescript": "^4.3.5"
