@@ -1,6 +1,8 @@
 // eslint-disable
 import { allStructureTypes } from 'international/constants'
 import { encode, decode } from 'base32768'
+import { BasePlans } from 'room/commune/basePlans'
+import { customLog } from 'international/utils'
 
 /**
  * Convert a standard 24-character hex id in screeps to a compressed UTF-16 encoded string of length 6.
@@ -96,7 +98,7 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
 /**
  * Reverse the encoded coordList
  */
-export function reverseCoordList(coordList: string) {
+export function reversePosList(coordList: string) {
     return coordList
         .match(/.{1,3}/g)
         .reverse()
@@ -227,9 +229,9 @@ export function unpackPos(chars: string) {
  */
 export function packPosList(posList: RoomPosition[]) {
     let str = ''
-    const maxLength = posList.length
-    for (let i = 0; i < maxLength; i++) {
-        str += packXYAsPos(posList[i].x, posList[i].y, posList[i].roomName)
+
+    for (const pos of posList) {
+        str += packXYAsPos(pos.x, pos.y, pos.roomName)
     }
     return str
 }
@@ -248,27 +250,8 @@ export function unpackPosList(chars: string) {
 /**
  * Pack a planned cord for base building
  */
-export function packPlanValues(structureType: StructureConstant, minRCL: number) {
-    return encode(new Uint8Array([allStructureTypes.indexOf(structureType), minRCL]))
-}
-
-/**
- * Pack a planned cord for base building
- */
-export function packPlanCoord(coord: PlanCoord) {
-    return encode(new Uint8Array([allStructureTypes.indexOf(coord.structureType), coord.minRCL]))
-}
-
-/**
- * Packs a list of planned coords for base building
- */
-export function packPlanCoordList(coordList: PlanCoord[]) {
-    let strArr = []
-    const maxLength = coordList.length
-    for (let i = 0; i < maxLength; i++) {
-        strArr.push(packPlanCoord(coordList[i]))
-    }
-    return strArr
+export function packPlanCoord(planCoord: PlanCoord) {
+    return encode(new Uint8Array([allStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
 }
 
 /**
@@ -279,13 +262,26 @@ export function unpackPlanCoord(chars: string) {
     return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
 }
 
-/**
- * Unpacks a list of planned coords for base building
- */
-export function unpackPlanCoordList(chars: string[]): PlanCoord[] {
-    const coordList: PlanCoord[] = []
-    for (let i = 0; i < chars.length; i += 1) {
-        coordList.push(unpackPlanCoord(chars[i]))
+export function packBasePlans(map: { [packedCoord: string]: PlanCoord }) {
+    let str = ''
+
+    for (const packedCoord in map) {
+        str += packedCoord + packPlanCoord(map[packedCoord])
     }
-    return coordList
+
+    return str
+}
+
+export function unpackBasePlans(packedMap: string) {
+    const basePlans = new BasePlans()
+
+    for (let i = 0; i < packedMap.length; i += 4) {
+        const data = decode(packedMap[i + 2] + packedMap[i + 3])
+        basePlans.map[packedMap[i] + packedMap[i + 1]] = {
+            structureType: allStructureTypes[data[0]],
+            minRCL: data[1],
+        }
+    }
+
+    return basePlans
 }

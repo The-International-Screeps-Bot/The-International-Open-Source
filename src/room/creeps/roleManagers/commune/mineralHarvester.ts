@@ -1,6 +1,6 @@
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRange, getRangeOfCoords } from 'international/utils'
-import { reverseCoordList, unpackPos } from 'other/codec'
+import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
     preTickManager() {
@@ -29,7 +29,7 @@ export class MineralHarvester extends Creep {
                     avoidEnemyRanges: true,
                 },
                 {
-                    packedPath: reverseCoordList(this.room.memory.MPa),
+                    packedPath: reversePosList(this.room.memory.MPa),
                     loose: true,
                 },
             )

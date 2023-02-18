@@ -415,12 +415,12 @@ export function packXYAsNum(x: number, y: number) {
     return x * roomDimensions + y
 }
 
-export function unpackNumAsCoord(packedPos: number) {
+export function unpackNumAsCoord(packedCoord: number) {
     // Inform an unpacked pos
 
     return {
-        x: Math.floor(packedPos / roomDimensions),
-        y: Math.floor(packedPos % roomDimensions),
+        x: Math.floor(packedCoord / roomDimensions),
+        y: Math.floor(packedCoord % roomDimensions),
     }
 }
 

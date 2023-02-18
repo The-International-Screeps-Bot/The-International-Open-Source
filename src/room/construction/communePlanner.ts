@@ -373,13 +373,21 @@ export function basePlanner(room: Room) {
 
     /* room.visualizeCoordMap(room.baseCoords) */
 
+    let origin: RoomPosition
+    if (getRangeOfCoords(room.anchor, centerUpgadePos) >= 10) {
+        origin = centerUpgadePos
+    } else {
+        if (getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3) {
+            origin = closestSourceToController.pos
+        } else {
+            origin = avgControllerSourcePos
+        }
+    }
+
     // Try to plan the stamp
 
     path = room.advancedFindPath({
-        origin:
-            getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3
-                ? closestSourceToController.pos
-                : avgControllerSourcePos,
+        origin,
         goals: [{ pos: room.anchor, range: 3 }],
         weightCoordMaps: [room.roadCoords],
         plainCost: defaultRoadPlanningPlainCost,

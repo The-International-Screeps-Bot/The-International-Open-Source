@@ -8,7 +8,7 @@ import {
     randomTick,
     scalePriority,
 } from 'international/utils'
-import { packCoord, reverseCoordList, unpackPos, unpackPosList } from 'other/codec'
+import { packCoord, reversePosList, unpackPos, unpackPosList } from 'other/codec'
 import { RemoteHauler } from './remoteHauler'
 
 export class RemoteHarvester extends Creep {
@@ -53,18 +53,15 @@ export class RemoteHarvester extends Creep {
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsOfRemote[this.memory.RN])
-            commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
+        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
 
         if (this.memory.RN === this.room.name) {
-
             // Unpack the harvestPos
 
             const harvestPos = this.findSourcePos(this.memory.SI)
             if (!harvestPos) return
 
             if (getRangeOfCoords(this.pos, harvestPos) === 0) {
-
                 this.advancedHarvestSource(this.room.sources[this.memory.SI])
             }
         }
@@ -263,7 +260,7 @@ export class RemoteHarvester extends Creep {
                 avoidEnemyRanges: true,
             },
             {
-                packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                 remoteName: this.memory.RN,
                 loose: true,
             },
@@ -334,7 +331,7 @@ export class RemoteHarvester extends Creep {
                     avoidAbandonedRemotes: true,
                 },
                 {
-                    packedPath: reverseCoordList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
+                    packedPath: reversePosList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
                     remoteName: creep.memory.RN,
                 },
             )

@@ -8,7 +8,7 @@ import {
     getRangeOfCoords,
     scalePriority,
 } from 'international/utils'
-import { packCoord, packPos, reverseCoordList, unpackPos } from 'other/codec'
+import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
 
 export class SourceHarvester extends Creep {
@@ -85,7 +85,7 @@ export class SourceHarvester extends Creep {
                     avoidEnemyRanges: true,
                 },
                 {
-                    packedPath: reverseCoordList(this.room.memory.SPs[this.memory.SI]),
+                    packedPath: reversePosList(this.room.memory.SPs[this.memory.SI]),
                     loose: true,
                 },
             )
@@ -224,7 +224,6 @@ export class SourceHarvester extends Creep {
     }
 
     run?() {
-
         if (this.travelToSource() !== RESULT_SUCCESS) return
         if (this.transferToSourceStructures()) return
 

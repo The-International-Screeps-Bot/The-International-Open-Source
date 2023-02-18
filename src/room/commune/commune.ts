@@ -47,7 +47,7 @@ import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
-import { packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
+import { packBasePlans, packXYAsCoord, unpackBasePlans, unpackCoord, unpackPosList } from 'other/codec'
 import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
@@ -56,6 +56,8 @@ import { profiler } from 'other/screeps-profiler'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
+import { encode } from 'base32768'
+import { BasePlans } from './basePlans'
 
 export class CommuneManager {
     // Managers
@@ -251,6 +253,15 @@ export class CommuneManager {
 
     private preTickTest() {
 
+        const basePlans = new BasePlans()
+        basePlans.setXY(25, 25, STRUCTURE_ROAD, 2)
+
+        customLog('BASE DATA', JSON.stringify(basePlans.map))
+
+        customLog('PACK', packBasePlans(basePlans.map))
+
+        customLog('UNPACK', JSON.stringify(unpackBasePlans(packBasePlans(basePlans.map)).map))
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -262,6 +273,7 @@ export class CommuneManager {
     }
 
     private test() {
+
         return
         /*
         const array = new Array(2500)

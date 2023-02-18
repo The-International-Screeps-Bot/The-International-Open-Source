@@ -10,7 +10,7 @@ import {
     randomTick,
 } from 'international/utils'
 import { indexOf } from 'lodash'
-import { packCoord, reverseCoordList, unpackCoord, unpackPos, unpackPosList } from 'other/codec'
+import { packCoord, reversePosList, unpackCoord, unpackPos, unpackPosList } from 'other/codec'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
@@ -215,7 +215,7 @@ export class RemoteHauler extends Creep {
                 avoidAbandonedRemotes: true,
             },
             {
-                packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                 remoteName: this.memory.RN,
                 loose: true,
             },
@@ -261,7 +261,7 @@ export class RemoteHauler extends Creep {
                     avoidEnemyRanges: true,
                 },
                 {
-                    packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                     remoteName: this.memory.RN,
                     loose: true,
                 },
@@ -328,7 +328,7 @@ export class RemoteHauler extends Creep {
                     },
                 },
                 {
-                    packedPath: reverseCoordList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
                     remoteName: this.memory.RN,
                     loose: true,
                 },
