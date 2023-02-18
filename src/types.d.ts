@@ -1583,6 +1583,11 @@ declare global {
         CSTID: Id<ConstructionSite>
 
         stampAnchors: Partial<Record<StampTypes, number[]>>
+        
+        /**
+         * Stamp Anchors
+         */
+        SA: Partial<{ [key in StampTypes]: string }>
 
         powerBanks: { [roomName: string]: number[] }
 

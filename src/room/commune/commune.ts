@@ -7,6 +7,7 @@ import {
     findObjectWithID,
     getRange,
     getRangeOfCoords,
+    isXYExit,
     makeRoomCoord,
     randomIntRange,
     unpackNumAsCoord,
@@ -26,6 +27,8 @@ import {
     remoteRoles,
     roomDimensions,
     stamps,
+    gridOffsets,
+    minorGridOffsets,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -139,7 +142,6 @@ export class CommuneManager {
             cleanRoomMemory(room.name)
 
             for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
-
                 cSite.remove()
             }
             return
@@ -252,15 +254,31 @@ export class CommuneManager {
     }
 
     private preTickTest() {
+        if (this.room.name !== 'W7N3') return
 
-        const basePlans = new BasePlans()
-        basePlans.setXY(25, 25, STRUCTURE_ROAD, 2)
+        const gridSize = 4
 
-        customLog('BASE DATA', JSON.stringify(basePlans.map))
+        // Get the anchor position (use the result of the previous code snippet)
+        const anchor = { x: this.room.anchor.x, y: this.room.anchor.y }
+        const terrain = this.room.getTerrain()
 
-        customLog('PACK', packBasePlans(basePlans.map))
+        // Loop over all cells in the room
+        for (let x = 0; x < 50; x++) {
+            for (let y = 0; y < 50; y++) {
+                if (isXYExit(x, y)) continue
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                // Calculate the position of the cell relative to the anchor
 
-        customLog('UNPACK', JSON.stringify(unpackBasePlans(packBasePlans(basePlans.map)).map))
+                const relX = x - anchor.x
+                const relY = y - anchor.y
+
+                // Check if the cell is part of a diagonal line
+                if (Math.abs(relX - 3 * relY) % gridSize === 0 || Math.abs(relX + 3 * relY) % gridSize === 0) {
+                    this.room.visual.text('X', x, y)
+
+                }
+            }
+        }
 
         return
 
@@ -268,12 +286,11 @@ export class CommuneManager {
 
         customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
-            textColor: customColors.white
+            textColor: customColors.white,
         })
     }
 
     private test() {
-
         return
         /*
         const array = new Array(2500)
@@ -288,7 +305,7 @@ export class CommuneManager {
 
         customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
-            textColor: customColors.white
+            textColor: customColors.white,
         })
     }
 

@@ -12,6 +12,8 @@ import {
     stamps,
     TO_EXIT,
     UNWALKABLE,
+    RESULT_SUCCESS,
+    RESULT_FAIL,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -28,7 +30,7 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { packPosList } from 'other/codec'
+import { packCoord, packPosList, packXYAsCoord } from 'other/codec'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
 import { CommuneManager } from 'room/commune/commune'
@@ -53,13 +55,71 @@ export class CommunePlanner {
     communeManager: CommuneManager
     room: Room
 
+    terrainCoords: CoordMap
+    baseCoords: Uint8Array
+    roadCoords: Uint8Array
+    rampartCoords: Uint8Array
+    grid: Uint8Array
+
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
         this.room = communeManager.room
     }
-    public run() {}
+    run() {
+        // Stop if there isn't sufficient CPU
+
+        if (Game.cpu.bucket < CPUMaxPerTick) return RESULT_FAIL
+        this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
+
+        let x
+        let y = 0
+        for (x = 0; x < roomDimensions; x += 1) this.recordExits(x, y)
+
+        // Configure x and loop through left exits
+
+        x = 0
+        for (y = 0; y < roomDimensions; y += 1) this.recordExits(x, y)
+
+        // Configure y and loop through bottom exits
+
+        y = roomDimensions - 1
+        for (x = 0; x < roomDimensions; x += 1) this.recordExits(x, y)
+
+        // Configure x and loop through right exits
+
+        x = roomDimensions - 1
+        for (y = 0; y < roomDimensions; y += 1) this.recordExits(x, y)
+
+        return RESULT_SUCCESS
+    }
+    private recordExits(x: number, y: number) {
+
+        const packedCoord = packXYAsNum(x, y)
+        if (this.terrainCoords[packedCoord] === 255) return
+
+        this.baseCoords[packedCoord] = 255
+
+        // Loop through adjacent positions
+
+        for (const coord of findCoordsInsideRect(x - 1, y - 1, x + 1, y + 1)) {
+
+            const packedCoord = packAsNum(coord)
+            if (this.terrainCoords[packedCoord] === 255) continue
+
+            this.baseCoords[packedCoord] = 255
+        }
+    }
     private flipStampVertical() {}
     private flipStampHorizontal() {}
+    private generateGrid() {
+
+        this.grid = new Uint8Array
+
+    }
+    private generateGridBlock() {
+
+
+    }
     private planStamps(opts: PlanStampOpts) {}
     private planStamp(startPos: Coord) {}
     private planSourceStructures() {}
