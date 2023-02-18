@@ -42,12 +42,6 @@ export class RemoteHarvester extends Creep {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
-        if (this.dying) return
-
-        // Reduce remote need
-
-        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -=
-            this.parts.work
 
         const commune = this.commune
 
@@ -65,6 +59,13 @@ export class RemoteHarvester extends Creep {
                 this.advancedHarvestSource(this.room.sources[this.memory.SI])
             }
         }
+
+        if (this.dying) return
+
+        // Reduce remote need
+
+        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -=
+            this.parts.work
     }
 
     hasValidRemote?() {
