@@ -240,6 +240,7 @@ export class LabManager {
         if (!this.communeManager.room.storage) return
         if (!this.communeManager.room.terminal) return
 
+        delete this._inputLabs
         delete this._outputLabs
         this.inputLab1 = this.inputLabs[0]
         this.inputLab2 = this.inputLabs[1]

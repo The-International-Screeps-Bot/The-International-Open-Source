@@ -889,6 +889,13 @@ declare global {
         defaultCostMatrix: number[]
     }
 
+    interface TotalEnemyCombatStrength {
+        melee: number
+        ranged: number
+        heal: number
+        dismantle: number
+    }
+
     interface Room {
         /**
          * The names of creeps harvesting each source
@@ -1454,7 +1461,10 @@ declare global {
         readonly advancedLogistics: boolean
 
         _defaultCostMatrix: CostMatrix
-        defaultCostMatrix: CostMatrix
+        readonly defaultCostMatrix: CostMatrix
+
+        _totalEnemyCombatStrength: TotalEnemyCombatStrength
+        readonly totalEnemyCombatStrength: TotalEnemyCombatStrength
     }
 
     interface DepositRecord {

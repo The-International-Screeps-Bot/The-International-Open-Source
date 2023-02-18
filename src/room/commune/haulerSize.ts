@@ -8,16 +8,43 @@ export class HaulerSizeManager {
         this.communeManager = communeManager
     }
 
-    preTickRun() {
+    run() {
+
         const roomMemory = Memory.rooms[this.communeManager.room.name]
+
+        // If there is no Hauler Size
+
+        if (roomMemory.MHC === undefined) {
+
+            // We have multiple communes, start at max possible cost
+
+            if (global.communes.size > 1) {
+
+                roomMemory.HU = haulerUpdateDefault
+                roomMemory.MHC = this.communeManager.room.energyCapacityAvailable
+            }
+
+            // Make the cost the smallest possible
+
+            roomMemory.MHC = BODYPART_COST[CARRY] + BODYPART_COST[MOVE]
+
+            this.updateMinHaulerCost()
+            return
+        }
 
         roomMemory.HU -= 1
         if (roomMemory.HU > 0) return
 
+        this.updateMinHaulerCost()
+    }
+
+    private updateMinHaulerCost() {
+
+        const roomMemory = Memory.rooms[this.communeManager.room.name]
+
         roomMemory.HU = haulerUpdateDefault
 
         const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
-
         const newMinHaulerCost =
             (Math.floor(
                 Math.max(Math.pow(avgCPUUsagePercent, 1.3) - 0.4, 0) *

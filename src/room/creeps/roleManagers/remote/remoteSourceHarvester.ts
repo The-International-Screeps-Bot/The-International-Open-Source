@@ -139,7 +139,7 @@ export class RemoteHarvester extends Creep {
         //4) means you're idle, try building the container.
 
         //If we're going to be overfilled after the next harvest, figure out what to do with the extra energy.
-        if (this.store.getFreeCapacity() <= this.getActiveBodyparts(WORK) || source.energy == 0) {
+        if (this.store.getFreeCapacity() <= this.parts.work || source.energy == 0) {
             //See if there's a hauler to tranfer to if we're full so we're not drop mining.
             //   This shouldn't run if we're container mining however.
 

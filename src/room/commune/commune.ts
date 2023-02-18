@@ -144,6 +144,8 @@ export class CommuneManager {
         }
 
         room.memory.T = 'commune'
+        global.communes.add(room.name)
+        this.preTickTest()
 
         if (!roomMemory.GRCL || room.controller.level > roomMemory.GRCL) roomMemory.GRCL = room.controller.level
 
@@ -164,29 +166,16 @@ export class CommuneManager {
         this.estimatedEnergyIncome = 0
 
         if (!room.memory.remotes) room.memory.remotes = []
-
-        // If there is no Hauler Size
-
-        if (!room.memory.MHC) {
-            room.memory.MHC = 0
-            room.memory.HU = 0
-        }
-
         if (roomMemory.AT == undefined) roomMemory.AT = 0
 
         room.usedRampartIDs = new Set()
 
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()
-        this.haulerSizeManager.preTickRun()
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
         this.claimRequestManager.preTickRun()
-
-        // Add roomName to commune list
-
-        global.communes.add(room.name)
 
         room.creepsOfRemote = {}
 
@@ -251,12 +240,24 @@ export class CommuneManager {
         this.room.roomManager.creepRoleManager.run()
         this.room.roomManager.powerCreepRoleManager.run()
 
+        this.haulerSizeManager.run()
         this.spawningStructuresManager.run()
 
         this.room.roomManager.endTickCreepManager.run()
         this.room.roomManager.roomVisualsManager.run()
 
         this.test()
+    }
+
+    private preTickTest() {
+
+        return
+
+        let CPUUsed = Game.cpu.getUsed()
+
+        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+            bgColor: customColors.red,
+        })
     }
 
     private test() {

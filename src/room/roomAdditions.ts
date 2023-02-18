@@ -2280,6 +2280,30 @@ const roomAdditions = {
             return (this._defaultCostMatrix = cm)
         },
     },
+    totalEnemyCombatStrength: {
+        get() {
+
+            if (this._totalEnemyCombatStrength) return this._totalEnemyCombatStrength
+
+            this._totalEnemyCombatStrength = {
+                melee: 0,
+                ranged: 0,
+                heal: 0,
+                dismantle: 0,
+            }
+
+            for (const enemyCreep of this.enemyAttackers) {
+
+                const combatStrength = enemyCreep.combatStrength
+                this._totalEnemyCombatStrength.melee += combatStrength.melee
+                this._totalEnemyCombatStrength.ranged += combatStrength.ranged
+                this._totalEnemyCombatStrength.heal += combatStrength.heal
+                this._totalEnemyCombatStrength.dismantle += combatStrength.dismantle
+            }
+
+            return this._totalEnemyCombatStrength
+        },
+    }
 } as PropertyDescriptorMap & ThisType<Room>
 
 profiler.registerObject(roomAdditions, 'roomAdditions')
