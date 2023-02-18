@@ -1335,9 +1335,8 @@ Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
         return new Set(['transfer'])
     }
 
-    if (this.needsResources()) return new Set(['withdraw', 'pickup'])
-
-    return new Set(['transfer'])
+    if (!this.needsResources()) return new Set(['transfer'])
+    return new Set(['withdraw', 'pickup', 'transfer'])
 }
 
 Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID) {
