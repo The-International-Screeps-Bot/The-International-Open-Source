@@ -14,6 +14,8 @@ import {
     UNWALKABLE,
     RESULT_SUCCESS,
     RESULT_FAIL,
+    cardinalOffsets,
+    adjacentOffsets,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -50,6 +52,28 @@ interface PlanStampOpts {
     coordMap?: CoordMap
     minAvoid?: number
     cardinalFlood?: boolean
+}
+
+interface PlanStampsArgs {
+    stampType: StampTypes
+    count: number
+    startCoords: Coord[]
+    initialWeight?: number
+    diagonalDT?: boolean
+    coordMap?: CoordMap
+    minAvoid?: number
+    cardinalFlood?: number
+    conditions?(coord: Coord): boolean
+}
+
+interface PlanStampArgs {
+    startCoords: Coord[]
+    initialWeight?: number
+    diagonalDT?: boolean
+    coordMap?: CoordMap
+    minAvoid?: number
+    cardinalFlood?: number
+    conditions?(coord: Coord): boolean
 }
 
 /**
@@ -123,8 +147,6 @@ export class CommunePlanner {
             this.baseCoords[packedCoord] = 255
         }
     }
-    private flipStampVertical() {}
-    private flipStampHorizontal() {}
     private generateGrid() {
         const gridSize = 4
         const anchor = this.room.anchor
@@ -223,7 +245,7 @@ export class CommunePlanner {
                     }
                 }
 
-                if (groupSize > 25) break
+                if (groupSize > 20) break
                 thisGeneration = nextGeneration
             }
 
@@ -308,7 +330,6 @@ export class CommunePlanner {
         // Paths for exit groups
 
         for (const group of exitGroups) {
-            this.room.errorVisual(group[0], true)
 
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
@@ -327,7 +348,17 @@ export class CommunePlanner {
 
         this.pruneGridCoords()
 
-        this.room.visualizeCoordMap(this.gridCoords, true, 100)
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+
+                const packedCoord = packXYAsNum(x, y)
+                if (this.gridCoords[packedCoord] !== 1) continue
+
+                this.room.visual.structure(x, y, STRUCTURE_ROAD)
+            }
+        }
+
+        this.room.visual.connectRoads()
     }
     private pruneGridCoords() {
         for (let x = 0; x < roomDimensions; x++) {
@@ -384,13 +415,83 @@ export class CommunePlanner {
 
         this.gridCoords[packedCoord] = 0
     }
-    private generateGridBlock() {}
-    private planStamps(args: PlanStampOpts) {}
-    private planStamp(args: PlanStampOpts) {}
-    private hub() {}
+    private flipStampVertical() {}
+    private flipStampHorizontal() {}
+    private planStamps(args: PlanStampsArgs) {}
+    private planStamp(args: PlanStampArgs) {}
+    private fastFiller() {
+        /*
+                this.planStamps({
+                    count: 1,
+                    startCoords: [{x:25, y:25}],
+
+                })
+                 */
+            }
+    private hub() {
+        this.planStamps({
+            stampType: 'hub',
+            count: 1,
+            startCoords: [this.room.anchor],
+            /**
+             * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords
+             */
+            conditions: (coord) => {
+
+                if (this.gridCoords[packAsNum(coord)] === 1) return false
+
+                for (const offsets of cardinalOffsets) {
+
+                    const x = coord.x + offsets.x
+                    const y = coord.y + offsets.y
+
+                    if (this.gridCoords[packXYAsNum(x, y)] === 1) return false
+                }
+
+                return true
+            }
+        })
+    }
     private labs() {}
+    private gridExtensions() {
+
+        this.planStamps({
+            stampType: 'gridExtension',
+            count: 40,
+            startCoords: [this.room.anchor],
+            /**
+             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             */
+            conditions: (coord) => {
+
+                if (this.gridCoords[packAsNum(coord)] === 1) return false
+
+                for (const offsets of adjacentOffsets) {
+
+                    const x = coord.x + offsets.x
+                    const y = coord.y + offsets.y
+
+                    if (this.gridCoords[packXYAsNum(x, y)] === 1) return true
+                }
+
+                return false
+            }
+        })
+
+    }
     private towers() {}
     private planSourceStructures() {}
+    private observer() {
+
+    }
+    private nuker() {
+
+
+    }
+    private powerSpawn() {
+
+
+    }
 }
 
 /**

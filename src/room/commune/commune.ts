@@ -33,8 +33,6 @@ import {
     remoteRoles,
     roomDimensions,
     stamps,
-    gridOffsets,
-    minorGridOffsets,
     defaultRoadPlanningPlainCost,
 } from 'international/constants'
 import './factory'

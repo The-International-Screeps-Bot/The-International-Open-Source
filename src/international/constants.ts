@@ -527,6 +527,14 @@ export const stamps: Record<StampTypes, Stamp> = {
             rampart: [{ x: 0, y: 0 }],
         },
     },
+    gridExtension: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            extension: [{ x: 0, y: 0 }],
+        },
+    }
 }
 
 export const minerals: Partial<ResourceConstant[]> = [
@@ -1332,7 +1340,9 @@ export enum InternationalStatNamesEnum {
     StatsManagerCPUUsage = 'smcu',
 }
 
-export const minorGridOffsets = [
+
+export const packedPosLength = 3
+export const cardinalOffsets = [
     {
         x: -1,
         y: 0,
@@ -1351,39 +1361,37 @@ export const minorGridOffsets = [
     },
 ]
 
-export const gridOffsets = [
+export const adjacentOffsets = [
     {
-        x: -2,
+        x: -1,
+        y: -1,
+    },
+    {
+        x: -1,
         y: 0,
     },
     {
-        x: -2,
-        y: -2,
+        x: 1,
+        y: -1,
+    },
+    {
+        x: 1,
+        y: 0,
+    },
+    {
+        x: 1,
+        y: 1,
     },
     {
         x: 0,
-        y: -2,
+        y: -1,
     },
     {
-        x: 2,
-        y: -2,
+        x: -1,
+        y: 1,
     },
     {
-        x: 2,
-        y: 0,
-    },
-    {
-        x: 2,
-        y: 2,
-    },
-    {
-        x: -2,
-        y: 0,
-    },
-    {
-        x: -2,
+        x: -1,
         y: 0,
     },
 ]
-
-export const packedPosLength = 3
