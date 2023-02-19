@@ -1162,9 +1162,9 @@ declare global {
          */
         createWithdrawTasks(creator: Structure | Creep | Resource): void
 
-        visualizeCoordMap(coordMap: CoordMap, color?: boolean): void
+        visualizeCoordMap(coordMap: CoordMap, color?: boolean, magnification?: number): void
 
-        visualizeCostMatrix(cm: CostMatrix, color?: boolean): void
+        visualizeCostMatrix(cm: CostMatrix, color?: boolean, magnification?: number): void
 
         coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
@@ -1583,7 +1583,7 @@ declare global {
         CSTID: Id<ConstructionSite>
 
         stampAnchors: Partial<Record<StampTypes, number[]>>
-        
+
         /**
          * Stamp Anchors
          */

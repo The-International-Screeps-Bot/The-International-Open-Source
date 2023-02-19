@@ -2180,12 +2180,12 @@ Room.prototype.findSwampPlainsRatio = function () {
     return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
 }
 
-Room.prototype.visualizeCoordMap = function (coordMap, color) {
+Room.prototype.visualizeCoordMap = function (coordMap, color, magnification = 2) {
     if (color) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * 2}, 100%, 60%)`,
+                    fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * magnification}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }
@@ -2203,12 +2203,12 @@ Room.prototype.visualizeCoordMap = function (coordMap, color) {
     }
 }
 
-Room.prototype.visualizeCostMatrix = function (cm, color) {
+Room.prototype.visualizeCostMatrix = function (cm, color, magnification = 2) {
     if (color) {
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
                 this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${cm.get(x, y) * 2}, 100%, 60%)`,
+                    fill: `hsl(${200}${cm.get(x, y) * magnification}, 100%, 60%)`,
                     opacity: 0.4,
                 })
             }

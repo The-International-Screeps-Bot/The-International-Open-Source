@@ -10,6 +10,8 @@ import {
     getRange,
     getRangeOfCoords,
     isXYExit,
+    isXYInBorder,
+    isXYInRoom,
     makeRoomCoord,
     packAsNum,
     packXYAsNum,
@@ -33,6 +35,7 @@ import {
     stamps,
     gridOffsets,
     minorGridOffsets,
+    defaultRoadPlanningPlainCost,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -263,9 +266,32 @@ export class CommuneManager {
         const gridSize = 4
         const anchor = this.room.anchor
         const terrain = this.room.getTerrain()
+        const inset = 1
+
+        const diagonalCoords = new Uint8Array(2500)
+
+        // Checkerboard
+
+        for (let x = inset; x < roomDimensions - inset; x++) {
+            for (let y = inset; y < roomDimensions - inset; y++) {
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+                // Calculate the position of the cell relative to the anchor
+
+                const relX = x - anchor.x
+                const relY = y - anchor.y
+
+                // Check if the cell is part of a diagonal line
+                if (Math.abs(relX - 3 * relY) % (gridSize / 2) !== 0 && Math.abs(relX + 3 * relY) % (gridSize / 2) !== 0) continue
+
+                diagonalCoords[packXYAsNum(x, y)] = 3
+            }
+        }
+
         const gridCoords = new Uint8Array(2500)
         const gridCoordsArray: Coord[] = []
-        let inset = 2
+
+        // Grid
 
         for (let x = inset; x < roomDimensions - inset; x++) {
             for (let y = inset; y < roomDimensions - inset; y++) {
@@ -280,7 +306,7 @@ export class CommuneManager {
                 if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0) continue
 
                 gridCoordsArray.push({ x, y })
-                gridCoords[packXYAsNum(x, y)] = /* 1 */255
+                gridCoords[packXYAsNum(x, y)] = 1
             }
         }
 
@@ -328,15 +354,39 @@ export class CommuneManager {
                     }
                 }
 
-                if (groupSize > 20) break
+                if (groupSize > 25) break
                 thisGeneration = nextGeneration
             }
 
             groupIndex += 1
         }
 
+        const groupLeaders: Coord[] = []
+
         for (const group of gridGroups) {
-            this.room.errorVisual(group[0], true)
+
+            groupLeaders.push(group[0])
+        }
+
+        // Sort by closer to anchor
+
+        groupLeaders.sort((a, b) => {
+            return getRangeOfCoords(a, anchor) - getRangeOfCoords(b, anchor)
+        })
+
+        for (const leaderCoord of groupLeaders) {
+
+            const path = this.room.advancedFindPath({
+                origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
+                goals: [{ pos: anchor, range: 3}],
+                weightCoordMaps: [diagonalCoords, gridCoords],
+                plainCost: defaultRoadPlanningPlainCost * 3,
+            })
+
+            for (const coord of path) {
+
+                gridCoords[packAsNum(coord)] = 1
+            }
         }
 
         const exits: Coord[] = []
@@ -422,9 +472,23 @@ export class CommuneManager {
 
         for (const group of exitGroups) {
             this.room.errorVisual(group[0], true)
+
+            const path = this.room.advancedFindPath({
+                origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
+                goals: [{ pos: anchor, range: 3}],
+                weightCoordMaps: [diagonalCoords, gridCoords],
+                plainCost: defaultRoadPlanningPlainCost * 3,
+            })
+
+            for (const coord of path) {
+
+                if (!isXYInBorder(group[0].x, group[0].y, inset)) continue
+
+                gridCoords[packAsNum(coord)] = 1
+            }
         }
 
-        this.room.visualizeCoordMap(gridCoords, true)
+        this.room.visualizeCoordMap(gridCoords, true, 100)
 
         return
 
