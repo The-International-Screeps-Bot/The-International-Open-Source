@@ -266,8 +266,6 @@ export class CommuneManager {
     private preTickTest() {
         if (this.room.name === 'W7N3') this.communePlanner.preTickRun()
 
-
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -314,8 +312,8 @@ export class CommuneManager {
 
     public findMinRangedAttackCost(minDamage: number = 10) {
         const rawCost =
-          (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-          (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
@@ -323,7 +321,7 @@ export class CommuneManager {
 
     public findMinMeleeAttackCost(minDamage: number = 30) {
         const rawCost =
-          (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+            (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
@@ -379,8 +377,8 @@ export class CommuneManager {
         const level = this.room.controller.level
 
         return Math.min(
-          Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
-          RAMPART_HITS_MAX[level],
+            Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
+            RAMPART_HITS_MAX[level],
         )
     }
 
@@ -413,11 +411,9 @@ export class CommuneManager {
         if (this._maxCombatRequests !== undefined) return this._maxCombatRequests
 
         return (this._maxCombatRequests =
-          (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
-          (5000 + this.room.controller.level * 1000))
+            (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
+            (5000 + this.room.controller.level * 1000))
     }
-
-    _buildersMakeRequests: boolean
 
     /**
      * Wether builders should ask for resources instead of seeking them out themselves
@@ -425,10 +421,11 @@ export class CommuneManager {
     get buildersMakeRequests() {
         // Only set true if there are no viable storing structures
 
-        return (this._buildersMakeRequests =
-          !this.room.fastFillerContainerLeft &&
-          !this.room.fastFillerContainerRight &&
-          !this.room.storage &&
-          !this.room.terminal)
+        return (
+            !this.room.fastFillerContainerLeft &&
+            !this.room.fastFillerContainerRight &&
+            !this.room.storage &&
+            !this.room.terminal
+        )
     }
 }

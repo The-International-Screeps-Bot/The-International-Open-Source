@@ -20,6 +20,7 @@ import {
     createPosMap,
     customLog,
     findAdjacentCoordsToCoord,
+    findAdjacentCoordsToXY,
     findAvgBetweenCoords,
     findClosestPos,
     findCoordsInsideRect,
@@ -134,8 +135,8 @@ export class CommunePlanner {
 
         // Checkerboard
 
-        for (let x = inset; x < roomDimensions - inset; x++) {
-            for (let y = inset; y < roomDimensions - inset; y++) {
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
                 if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
 
                 // Calculate the position of the cell relative to the anchor
@@ -150,7 +151,7 @@ export class CommunePlanner {
                 )
                     continue
 
-                this.diagonalCoords[packXYAsNum(x, y)] = 3
+                this.diagonalCoords[packXYAsNum(x, y)] = 4
             }
         }
 
@@ -246,18 +247,16 @@ export class CommunePlanner {
         // Paths for grid groups
 
         for (let i = 0; i < groupLeaders.length; i++) {
-
             const leaderCoord = groupLeaders[i]
 
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
                 weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.baseCoords],
-                plainCost: defaultRoadPlanningPlainCost * 3,
+                plainCost: defaultRoadPlanningPlainCost * 4,
             })
 
             for (const coord of path) {
-
                 this.gridCoords[packAsNum(coord)] = 1
             }
         }
@@ -315,7 +314,7 @@ export class CommunePlanner {
                 origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
                 weightCoordMaps: [this.diagonalCoords, this.gridCoords],
-                plainCost: defaultRoadPlanningPlainCost * 3,
+                plainCost: defaultRoadPlanningPlainCost * 4,
             })
 
             for (const coord of path) {
@@ -326,26 +325,71 @@ export class CommunePlanner {
             }
         }
 
+        this.pruneGridCoords()
+
         this.room.visualizeCoordMap(this.gridCoords, true, 100)
+    }
+    private pruneGridCoords() {
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                this.pruneGridXY(x, y)
+            }
+        }
+    }
+    private pruneGridXY(x: number, y: number) {
+        const packedCoord = packXYAsNum(x, y)
+        if (this.gridCoords[packedCoord] !== 1) return
+
+        let adjNonGridCoords: Coord[] = []
+        let adjGridCoords = 0
+
+        for (const adjCoord of findAdjacentCoordsToXY(x, y)) {
+            const packedAdjCoord = packAsNum(adjCoord)
+
+            if (this.gridCoords[packedAdjCoord] === 1) {
+                adjGridCoords += 1
+                continue
+            }
+
+            if (this.terrainCoords[packedAdjCoord] === 255) continue
+
+            adjNonGridCoords.push(adjCoord)
+        }
+
+        if (adjGridCoords > 1) return
+
+        // No reason to keep a coord that does nothing
+
+        if (adjNonGridCoords.length <= 1) {
+            this.gridCoords[packedCoord] = 0
+            return
+        }
+
+        let noAltNonGridCoord: boolean
+
+        for (const adjNonGridCoord of adjNonGridCoords) {
+            adjGridCoords = 0
+
+            for (const adjCoord of findAdjacentCoordsToCoord(adjNonGridCoord)) {
+                if (this.gridCoords[packAsNum(adjCoord)] !== 1) continue
+
+                adjGridCoords += 1
+            }
+
+            if (adjGridCoords > 1) continue
+            if (noAltNonGridCoord) return
+
+            noAltNonGridCoord = true
+        }
+
+        this.gridCoords[packedCoord] = 0
     }
     private generateGridBlock() {}
     private planStamps(args: PlanStampOpts) {}
-    private planStamp(args: PlanStampOpts) {
-
-
-    }
-    private hub() {
-
-
-    }
-    private labs() {
-
-
-    }
-    private towers() {
-
-
-    }
+    private planStamp(args: PlanStampOpts) {}
+    private hub() {}
+    private labs() {}
+    private towers() {}
     private planSourceStructures() {}
 }
 
