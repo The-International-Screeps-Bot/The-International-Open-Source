@@ -1,5 +1,7 @@
 import { packXYAsNum } from 'international/utils'
 import { packCoord, packPlanCoord, packXYAsCoord } from 'other/codec'
+import { encode, decode } from 'base32768'
+import { allStructureTypes } from 'international/constants'
 
 export class BasePlans {
     map: { [packedCoord: string]: PlanCoord }
@@ -36,5 +38,19 @@ export class BasePlans {
     }
     getXY(x: number, y: number) {
         return this.get(packXYAsCoord(x, y))
+    }
+
+    static unpackBasePlans(packedMap: string) {
+        const basePlans = new BasePlans()
+
+        for (let i = 0; i < packedMap.length; i += 4) {
+            const data = decode(packedMap[i + 2] + packedMap[i + 3])
+            basePlans.map[packedMap[i] + packedMap[i + 1]] = {
+                structureType: allStructureTypes[data[0]],
+                minRCL: data[1],
+            }
+        }
+
+        return basePlans
     }
 }

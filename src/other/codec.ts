@@ -1,7 +1,6 @@
 // eslint-disable
 import { allStructureTypes, packedPosLength } from 'international/constants'
 import { encode, decode } from 'base32768'
-import { BasePlans } from 'room/commune/basePlans'
 
 /**
  * Convert a standard 24-character hex id in screeps to a compressed UTF-16 encoded string of length 6.
@@ -266,18 +265,4 @@ export function packBasePlans(map: { [packedCoord: string]: PlanCoord }) {
     }
 
     return str
-}
-
-export function unpackBasePlans(packedMap: string) {
-    const basePlans = new BasePlans()
-
-    for (let i = 0; i < packedMap.length; i += 4) {
-        const data = decode(packedMap[i + 2] + packedMap[i + 3])
-        basePlans.map[packedMap[i] + packedMap[i + 1]] = {
-            structureType: allStructureTypes[data[0]],
-            minRCL: data[1],
-        }
-    }
-
-    return basePlans
 }

@@ -5,6 +5,7 @@ mockGlobal<Game>('Game', {
 })
 
 import * as Codec from './codec'
+import { BasePlans } from 'room/commune/basePlans'
 import { allStructureTypes } from 'international/constants'
 
 const roomName = 'W1N1'
@@ -51,6 +52,7 @@ describe('codec', () => {
 
     it('should encode and decode coords with a roomName', () => {
         const positions = []
+        let encodedCoords: string = ''
         for (let x = 1; x < 50; x++) {
             for (let y = 1; y < 50; y++) {
                 const pos = new RoomPosition(x, y, roomName)
@@ -64,6 +66,7 @@ describe('codec', () => {
                 })
 
                 const encodedCoord = Codec.packCoord({ x, y })
+                encodedCoords += encodedCoord
                 const decodedCoordAsPos = Codec.unpackCoordAsPos(encodedCoord, roomName)
                 expect({
                     x: decodedCoordAsPos.x,
@@ -81,6 +84,19 @@ describe('codec', () => {
         const decodedList = Codec.unpackPosList(encodedList)
         for (let p = 0; p < positions.length; p++) {
             expect({ x: decodedList[p].x, y: decodedList[p].y, roomName: decodedList[p].roomName }).toEqual({
+                x: positions[p].x,
+                y: positions[p].y,
+                roomName: positions[p].roomName,
+            })
+        }
+
+        const decodedCoordAsPosList = Codec.unpackCoordListAsPosList(encodedCoords, roomName)
+        for (let p = 0; p < positions.length; p++) {
+            expect({
+                x: decodedCoordAsPosList[p].x,
+                y: decodedCoordAsPosList[p].y,
+                roomName: decodedCoordAsPosList[p].roomName,
+            }).toEqual({
                 x: positions[p].x,
                 y: positions[p].y,
                 roomName: positions[p].roomName,
@@ -104,12 +120,14 @@ describe('codec', () => {
     })
 
     it('should encode and decode room names', () => {
-        const roomNames = ['W1N1', 'W1N2', 'W2N1', 'W2N2']
+        const roomNames = ['W1N1', 'W1S1', 'E1N1', 'E1S1']
         for (const roomName of roomNames) {
             const encoded = Codec.packRoomName(roomName)
             const decoded = Codec.unpackRoomName(encoded.quadrant, encoded.x, encoded.y)
             expect(decoded).toEqual(roomName)
         }
+
+        expect(Codec.unpackRoomName(-1, 0, 0)).toEqual('ERROR')
     })
 
     it('should encode and decode plan coord', () => {
@@ -134,7 +152,7 @@ describe('codec', () => {
         }
 
         const encoded = Codec.packBasePlans(basePlan)
-        const decoded = Codec.unpackBasePlans(encoded)
+        const decoded = BasePlans.unpackBasePlans(encoded)
         const values = Object.values(decoded.map)
         values.forEach(planCoord => {
             expect(planCoord).toEqual({ minRCL: 1, structureType: STRUCTURE_EXTENSION })
