@@ -329,8 +329,20 @@ export class CommunePlanner {
         this.room.visualizeCoordMap(this.gridCoords, true, 100)
     }
     private generateGridBlock() {}
-    private planStamps(opts: PlanStampOpts) {}
-    private planStamp(startPos: Coord) {
+    private planStamps(args: PlanStampOpts) {}
+    private planStamp(args: PlanStampOpts) {
+
+
+    }
+    private hub() {
+
+
+    }
+    private labs() {
+
+
+    }
+    private towers() {
 
 
     }
