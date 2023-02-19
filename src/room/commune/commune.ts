@@ -70,54 +70,7 @@ import { encode } from 'base32768'
 import { BasePlans } from './basePlans'
 import { CommunePlanner } from 'room/construction/communePlanner'
 
-export class CommuneManager {
-    // Managers
 
-    communePlanner: CommunePlanner
-    combatManager: CombatManager
-
-    towerManager: TowerManager
-    storingStructuresManager: StoringStructuresManager
-    linkManager: LinkManager
-    labManager: LabManager
-    powerSpawningStructuresManager: PowerSpawningStructuresManager
-    spawnRequestsManager: SpawnRequestsManager
-    spawningStructuresManager: SpawningStructuresManager
-    sourceManager: SourceManager
-
-    observerManager: ObserverManager
-    terminalManager: TerminalManager
-    remotesManager: RemotesManager
-    haulerSizeManager: HaulerSizeManager
-
-    claimRequestManager: ClaimRequestManager
-    combatRequestManager: CombatRequestManager
-    allyCreepRequestManager: AllyCreepRequestManager
-    haulRequestManager: HaulRequestManager
-    haulerNeedManager: HaulerNeedManager
-
-    factoryManager: FactoryManager
-
-    //
-
-    room: Room
-    nextSpawnEnergyAvailable: number
-    estimatedEnergyIncome: number
-
-    constructor() {
-        this.communePlanner = new CommunePlanner(this)
-        this.combatManager = new CombatManager(this)
-
-        this.towerManager = new TowerManager(this)
-        this.storingStructuresManager = new StoringStructuresManager(this)
-        this.linkManager = new LinkManager(this)
-        this.labManager = new LabManager(this)
-        this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
-        this.spawnRequestsManager = new SpawnRequestsManager(this)
-        this.spawningStructuresManager = new SpawningStructuresManager(this)
-        this.sourceManager = new SourceManager(this)
-
-        this.observerManager = new ObserverManager(this)
         this.terminalManager = new TerminalManager(this)
         this.remotesManager = new RemotesManager(this)
         this.haulerSizeManager = new HaulerSizeManager(this)
@@ -135,6 +88,49 @@ export class CommuneManager {
         this.room = room
 
         delete this._minStoredEnergy
+    export class CommuneManager {
+            // Managers
+            communePlanner: CommunePlanner
+            combatManager: CombatManager
+            towerManager: TowerManager
+            storingStructuresManager: StoringStructuresManager
+            linkManager: LinkManager
+            labManager: LabManager
+            powerSpawningStructuresManager: PowerSpawningStructuresManager
+            spawnRequestsManager: SpawnRequestsManager
+            spawningStructuresManager: SpawningStructuresManager
+            sourceManager: SourceManager
+            observerManager: ObserverManager
+            terminalManager: TerminalManager
+            remotesManager: RemotesManager
+            haulerSizeManager: HaulerSizeManager
+            claimRequestManager: ClaimRequestManager
+            combatRequestManager: CombatRequestManager
+            allyCreepRequestManager: AllyCreepRequestManager
+            haulRequestManager: HaulRequestManager
+            haulerNeedManager: HaulerNeedManager
+            factoryManager: FactoryManager
+
+         //
+
+            room: Room
+            nextSpawnEnergyAvailable: number
+            estimatedEnergyIncome: number
+
+            constructor() {
+                this.communePlanner = new CommunePlanner(this)
+                this.combatManager = new CombatManager(this)
+
+                this.towerManager = new TowerManager(this)
+                this.storingStructuresManager = new StoringStructuresManager(this)
+                this.linkManager = new LinkManager(this)
+                this.labManager = new LabManager(this)
+                this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
+                this.spawnRequestsManager = new SpawnRequestsManager(this)
+                this.spawningStructuresManager = new SpawningStructuresManager(this)
+                this.sourceManager = new SourceManager(this)
+
+                this.observerManager = new ObserverManager(this)
         delete this._storingStructures
         delete this._maxCombatRequests
     }
