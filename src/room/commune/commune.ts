@@ -70,7 +70,54 @@ import { encode } from 'base32768'
 import { BasePlans } from './basePlans'
 import { CommunePlanner } from 'room/construction/communePlanner'
 
+export class CommuneManager {
+    // Managers
 
+    communePlanner: CommunePlanner
+    combatManager: CombatManager
+
+    towerManager: TowerManager
+    storingStructuresManager: StoringStructuresManager
+    linkManager: LinkManager
+    labManager: LabManager
+    powerSpawningStructuresManager: PowerSpawningStructuresManager
+    spawnRequestsManager: SpawnRequestsManager
+    spawningStructuresManager: SpawningStructuresManager
+    sourceManager: SourceManager
+
+    observerManager: ObserverManager
+    terminalManager: TerminalManager
+    remotesManager: RemotesManager
+    haulerSizeManager: HaulerSizeManager
+
+    claimRequestManager: ClaimRequestManager
+    combatRequestManager: CombatRequestManager
+    allyCreepRequestManager: AllyCreepRequestManager
+    haulRequestManager: HaulRequestManager
+    haulerNeedManager: HaulerNeedManager
+
+    factoryManager: FactoryManager
+
+    //
+
+    room: Room
+    nextSpawnEnergyAvailable: number
+    estimatedEnergyIncome: number
+
+    constructor() {
+        this.communePlanner = new CommunePlanner(this)
+        this.combatManager = new CombatManager(this)
+
+        this.towerManager = new TowerManager(this)
+        this.storingStructuresManager = new StoringStructuresManager(this)
+        this.linkManager = new LinkManager(this)
+        this.labManager = new LabManager(this)
+        this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
+        this.spawnRequestsManager = new SpawnRequestsManager(this)
+        this.spawningStructuresManager = new SpawningStructuresManager(this)
+        this.sourceManager = new SourceManager(this)
+
+        this.observerManager = new ObserverManager(this)
         this.terminalManager = new TerminalManager(this)
         this.remotesManager = new RemotesManager(this)
         this.haulerSizeManager = new HaulerSizeManager(this)
@@ -88,49 +135,6 @@ import { CommunePlanner } from 'room/construction/communePlanner'
         this.room = room
 
         delete this._minStoredEnergy
-    export class CommuneManager {
-            // Managers
-            communePlanner: CommunePlanner
-            combatManager: CombatManager
-            towerManager: TowerManager
-            storingStructuresManager: StoringStructuresManager
-            linkManager: LinkManager
-            labManager: LabManager
-            powerSpawningStructuresManager: PowerSpawningStructuresManager
-            spawnRequestsManager: SpawnRequestsManager
-            spawningStructuresManager: SpawningStructuresManager
-            sourceManager: SourceManager
-            observerManager: ObserverManager
-            terminalManager: TerminalManager
-            remotesManager: RemotesManager
-            haulerSizeManager: HaulerSizeManager
-            claimRequestManager: ClaimRequestManager
-            combatRequestManager: CombatRequestManager
-            allyCreepRequestManager: AllyCreepRequestManager
-            haulRequestManager: HaulRequestManager
-            haulerNeedManager: HaulerNeedManager
-            factoryManager: FactoryManager
-
-         //
-
-            room: Room
-            nextSpawnEnergyAvailable: number
-            estimatedEnergyIncome: number
-
-            constructor() {
-                this.communePlanner = new CommunePlanner(this)
-                this.combatManager = new CombatManager(this)
-
-                this.towerManager = new TowerManager(this)
-                this.storingStructuresManager = new StoringStructuresManager(this)
-                this.linkManager = new LinkManager(this)
-                this.labManager = new LabManager(this)
-                this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
-                this.spawnRequestsManager = new SpawnRequestsManager(this)
-                this.spawningStructuresManager = new SpawningStructuresManager(this)
-                this.sourceManager = new SourceManager(this)
-
-                this.observerManager = new ObserverManager(this)
         delete this._storingStructures
         delete this._maxCombatRequests
     }
@@ -310,8 +314,8 @@ import { CommunePlanner } from 'room/construction/communePlanner'
 
     public findMinRangedAttackCost(minDamage: number = 10) {
         const rawCost =
-            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
-            (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+          (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+          (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
@@ -319,7 +323,7 @@ import { CommunePlanner } from 'room/construction/communePlanner'
 
     public findMinMeleeAttackCost(minDamage: number = 30) {
         const rawCost =
-            (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+          (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
@@ -375,8 +379,8 @@ import { CommunePlanner } from 'room/construction/communePlanner'
         const level = this.room.controller.level
 
         return Math.min(
-            Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
-            RAMPART_HITS_MAX[level],
+          Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
+          RAMPART_HITS_MAX[level],
         )
     }
 
@@ -409,8 +413,8 @@ import { CommunePlanner } from 'room/construction/communePlanner'
         if (this._maxCombatRequests !== undefined) return this._maxCombatRequests
 
         return (this._maxCombatRequests =
-            (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
-            (5000 + this.room.controller.level * 1000))
+          (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
+          (5000 + this.room.controller.level * 1000))
     }
 
     _buildersMakeRequests: boolean
@@ -422,9 +426,9 @@ import { CommunePlanner } from 'room/construction/communePlanner'
         // Only set true if there are no viable storing structures
 
         return (this._buildersMakeRequests =
-            !this.room.fastFillerContainerLeft &&
-            !this.room.fastFillerContainerRight &&
-            !this.room.storage &&
-            !this.room.terminal)
+          !this.room.fastFillerContainerLeft &&
+          !this.room.fastFillerContainerRight &&
+          !this.room.storage &&
+          !this.room.terminal)
     }
 }
