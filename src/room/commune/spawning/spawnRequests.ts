@@ -56,9 +56,11 @@ export class SpawnRequestsManager {
         this.remoteSourceHarvesters()
         this.generalRemoteRoles()
         this.remoteHaulers()
+        this.scout()
         this.claimRequestRoles()
         this.allyVanguard()
         this.requestHauler()
+        this.antifa()
 
         this.communeManager.room.spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
             args => args,
