@@ -263,38 +263,80 @@ export class CommuneManager {
         const gridSize = 4
         const anchor = this.room.anchor
         const terrain = this.room.getTerrain()
-
         const gridCoords = new Uint8Array(2500)
+        const gridCoordsArray: Coord[] = []
+        let inset = 2
+
+        for (let x = inset; x < roomDimensions - inset; x++) {
+            for (let y = inset; y < roomDimensions - inset; y++) {
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+                // Calculate the position of the cell relative to the anchor
+
+                const relX = x - anchor.x
+                const relY = y - anchor.y
+
+                // Check if the cell is part of a diagonal line
+                if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0) continue
+
+                gridCoordsArray.push({ x, y })
+                gridCoords[packXYAsNum(x, y)] = /* 1 */255
+            }
+        }
+
+        const gridGroups: Coord[][] = []
         let visitedCoords: Set<string> = new Set()
-        let thisGeneration: Coord[] = [anchor]
-        let nextGeneration: Coord[]
+        let groupIndex = 0
 
-        while (thisGeneration.length) {
-            nextGeneration = []
+        for (const gridCoord of gridCoordsArray) {
+            const packedCoord = packCoord(gridCoord)
+            if (visitedCoords.has(packedCoord)) continue
 
-            for (const coord of thisGeneration) {
+            visitedCoords.add(packedCoord)
 
-                for (const adjCoord of findAdjacentCoordsToCoord(coord)) {
-                    if (isXYExit(adjCoord.x, adjCoord.y)) continue
-                    if (terrain.get(adjCoord.x, adjCoord.y) === TERRAIN_MASK_WALL) continue
+            gridGroups[groupIndex] = [gridCoord]
 
-                    const packedAdjCoord = packCoord(adjCoord)
-                    if (visitedCoords.has(packedAdjCoord)) continue
+            let thisGeneration = [gridCoord]
+            let nextGeneration: Coord[] = []
+            let groupSize = 0
 
-                    visitedCoords.add(packedAdjCoord)
+            while (thisGeneration.length) {
+                nextGeneration = []
 
-                    const relX = adjCoord.x - anchor.x
-                    const relY = adjCoord.y - anchor.y
+                for (const coord of thisGeneration) {
+                    for (const adjCoord of findAdjacentCoordsToCoord(coord)) {
 
-                    if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0)
-                        continue
+                        const packedAdjCoord = packCoord(adjCoord)
+                        if (visitedCoords.has(packedAdjCoord)) continue
 
-                    gridCoords[packAsNum(adjCoord)] = 255
-                    nextGeneration.push(adjCoord)
+                        visitedCoords.add(packedAdjCoord)
+
+                        if (!gridCoords[packAsNum(adjCoord)]) continue
+
+                        // Calculate the position of the cell relative to the anchor
+
+                        const relX = adjCoord.x - anchor.x
+                        const relY = adjCoord.y - anchor.y
+
+                        // Check if the cell is part of a diagonal line
+                        if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0)
+                            continue
+
+                        groupSize += 1
+                        gridGroups[groupIndex].push(adjCoord)
+                        nextGeneration.push(adjCoord)
+                    }
                 }
+
+                if (groupSize > 20) break
+                thisGeneration = nextGeneration
             }
 
-            thisGeneration = nextGeneration
+            groupIndex += 1
+        }
+
+        for (const group of gridGroups) {
+            this.room.errorVisual(group[0], true)
         }
 
         const exits: Coord[] = []
@@ -304,107 +346,86 @@ export class CommuneManager {
         let x
         let y = 0
         for (x = 0; x < roomDimensions; x += 1) {
-            if (isXYExit(x, y)) thisGeneration.push({ x, y })
+            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+            exits.push({ x, y })
         }
 
         // Configure x and loop through left exits
 
         x = 0
         for (y = 0; y < roomDimensions; y += 1) {
-            if (isXYExit(x, y)) thisGeneration.push({ x, y })
+            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+            exits.push({ x, y })
         }
 
         // Configure y and loop through bottom exits
 
         y = roomDimensions - 1
         for (x = 0; x < roomDimensions; x += 1) {
-            if (isXYExit(x, y)) thisGeneration.push({ x, y })
+            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+            exits.push({ x, y })
         }
 
         // Configure x and loop through right exits
 
         x = roomDimensions - 1
         for (y = 0; y < roomDimensions; y += 1) {
-            if (isXYExit(x, y)) thisGeneration.push({ x, y })
+            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+            exits.push({ x, y })
         }
 
         const exitGroups: Coord[][] = []
         visitedCoords = new Set()
-        let groupIndex = 0
+        groupIndex = 0
 
-        for (let coord of exits) {
-
-            const packedCoord = packCoord(coord)
+        for (const exitCoord of exits) {
+            const packedCoord = packCoord(exitCoord)
             if (visitedCoords.has(packedCoord)) continue
 
             visitedCoords.add(packedCoord)
 
-            exitGroups[groupIndex] = [coord]
+            exitGroups[groupIndex] = [exitCoord]
 
-            thisGeneration = [coord]
-            nextGeneration = []
+            let thisGeneration = [exitCoord]
+            let nextGeneration: Coord[] = []
+            let groupSize = 0
 
             while (thisGeneration.length) {
                 nextGeneration = []
 
-                for (coord of thisGeneration) {
-
+                for (const coord of thisGeneration) {
                     for (const adjCoord of findAdjacentCoordsToCoord(coord)) {
                         if (!isXYExit(adjCoord.x, adjCoord.y)) continue
                         if (terrain.get(adjCoord.x, adjCoord.y) === TERRAIN_MASK_WALL) continue
 
-                        const packedCoord2 = packCoord(adjCoord)
-                        if (visitedCoords.has(packedCoord2)) continue
+                        const packedAdjCoord = packCoord(adjCoord)
+                        if (visitedCoords.has(packedAdjCoord)) continue
 
-                        visitedCoords.add(packedCoord2)
+                        visitedCoords.add(packedAdjCoord)
 
+                        groupSize += 1
                         exitGroups[groupIndex].push(adjCoord)
                         nextGeneration.push(adjCoord)
                     }
                 }
 
+                if (groupSize > 10) break
                 thisGeneration = nextGeneration
             }
 
             groupIndex += 1
         }
 
-        for (const exitGroup of exitGroups) {
-
-            this.room.errorVisual(exitGroup[0], true)
+        for (const group of exitGroups) {
+            this.room.errorVisual(group[0], true)
         }
 
         this.room.visualizeCoordMap(gridCoords, true)
 
-        /*
-        // Get the anchor position (use the result of the previous code snippet)
-        const anchor = { x: this.room.anchor.x, y: this.room.anchor.y }
-        const terrain = this.room.getTerrain()
-
-        // Loop over all cells in the room
-        for (let x = 0; x < 50; x++) {
-            for (let y = 0; y < 50; y++) {
-                if (isXYExit(x, y)) continue
-                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-                // Calculate the position of the cell relative to the anchor
-
-                const relX = x - anchor.x
-                const relY = y - anchor.y
-
-                // Check if the cell is part of a diagonal line
-                if (Math.abs(relX - 3 * relY) % gridSize === 0 || Math.abs(relX + 3 * relY) % gridSize === 0) {
-                    this.room.visual.text('X', x, y)
-                    gridCoords[packXYAsNum(x, y)] = 255
-
-                    let adjacent
-
-                    for (let i = x - 1; i <= x + 1; i += 1) {
-                        for (let j = y - 1; j <= y + 1; j += 1) {}
-                    }
-                }
-            }
-        }
- */
         return
 
         let CPUUsed = Game.cpu.getUsed()
