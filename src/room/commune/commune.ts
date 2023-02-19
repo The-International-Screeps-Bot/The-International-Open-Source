@@ -68,10 +68,12 @@ import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
 import { encode } from 'base32768'
 import { BasePlans } from './basePlans'
+import { CommunePlanner } from 'room/construction/communePlanner'
 
 export class CommuneManager {
     // Managers
 
+    communePlanner: CommunePlanner
     combatManager: CombatManager
 
     towerManager: TowerManager
@@ -103,6 +105,7 @@ export class CommuneManager {
     estimatedEnergyIncome: number
 
     constructor() {
+        this.communePlanner = new CommunePlanner(this)
         this.combatManager = new CombatManager(this)
 
         this.towerManager = new TowerManager(this)
@@ -261,234 +264,9 @@ export class CommuneManager {
     }
 
     private preTickTest() {
-        if (this.room.name !== 'W7N3') return
+        if (this.room.name === 'W7N3') this.communePlanner.preTickRun()
 
-        const gridSize = 4
-        const anchor = this.room.anchor
-        const terrain = this.room.getTerrain()
-        const inset = 1
 
-        const diagonalCoords = new Uint8Array(2500)
-
-        // Checkerboard
-
-        for (let x = inset; x < roomDimensions - inset; x++) {
-            for (let y = inset; y < roomDimensions - inset; y++) {
-                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-
-                // Calculate the position of the cell relative to the anchor
-
-                const relX = x - anchor.x
-                const relY = y - anchor.y
-
-                // Check if the cell is part of a diagonal line
-                if (Math.abs(relX - 3 * relY) % (gridSize / 2) !== 0 && Math.abs(relX + 3 * relY) % (gridSize / 2) !== 0) continue
-
-                diagonalCoords[packXYAsNum(x, y)] = 3
-            }
-        }
-
-        const gridCoords = new Uint8Array(2500)
-        const gridCoordsArray: Coord[] = []
-
-        // Grid
-
-        for (let x = inset; x < roomDimensions - inset; x++) {
-            for (let y = inset; y < roomDimensions - inset; y++) {
-                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-
-                // Calculate the position of the cell relative to the anchor
-
-                const relX = x - anchor.x
-                const relY = y - anchor.y
-
-                // Check if the cell is part of a diagonal line
-                if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0) continue
-
-                gridCoordsArray.push({ x, y })
-                gridCoords[packXYAsNum(x, y)] = 1
-            }
-        }
-
-        const gridGroups: Coord[][] = []
-        let visitedCoords: Set<string> = new Set()
-        let groupIndex = 0
-
-        for (const gridCoord of gridCoordsArray) {
-            const packedCoord = packCoord(gridCoord)
-            if (visitedCoords.has(packedCoord)) continue
-
-            visitedCoords.add(packedCoord)
-
-            gridGroups[groupIndex] = [gridCoord]
-
-            let thisGeneration = [gridCoord]
-            let nextGeneration: Coord[] = []
-            let groupSize = 0
-
-            while (thisGeneration.length) {
-                nextGeneration = []
-
-                for (const coord of thisGeneration) {
-                    for (const adjCoord of findAdjacentCoordsToCoord(coord)) {
-
-                        const packedAdjCoord = packCoord(adjCoord)
-                        if (visitedCoords.has(packedAdjCoord)) continue
-
-                        visitedCoords.add(packedAdjCoord)
-
-                        if (!gridCoords[packAsNum(adjCoord)]) continue
-
-                        // Calculate the position of the cell relative to the anchor
-
-                        const relX = adjCoord.x - anchor.x
-                        const relY = adjCoord.y - anchor.y
-
-                        // Check if the cell is part of a diagonal line
-                        if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0)
-                            continue
-
-                        groupSize += 1
-                        gridGroups[groupIndex].push(adjCoord)
-                        nextGeneration.push(adjCoord)
-                    }
-                }
-
-                if (groupSize > 25) break
-                thisGeneration = nextGeneration
-            }
-
-            groupIndex += 1
-        }
-
-        const groupLeaders: Coord[] = []
-
-        for (const group of gridGroups) {
-
-            groupLeaders.push(group[0])
-        }
-
-        // Sort by closer to anchor
-
-        groupLeaders.sort((a, b) => {
-            return getRangeOfCoords(a, anchor) - getRangeOfCoords(b, anchor)
-        })
-
-        for (const leaderCoord of groupLeaders) {
-
-            const path = this.room.advancedFindPath({
-                origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
-                goals: [{ pos: anchor, range: 3}],
-                weightCoordMaps: [diagonalCoords, gridCoords],
-                plainCost: defaultRoadPlanningPlainCost * 3,
-            })
-
-            for (const coord of path) {
-
-                gridCoords[packAsNum(coord)] = 1
-            }
-        }
-
-        const exits: Coord[] = []
-
-        // Configure y and loop through top exits
-
-        let x
-        let y = 0
-        for (x = 0; x < roomDimensions; x += 1) {
-            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-
-            exits.push({ x, y })
-        }
-
-        // Configure x and loop through left exits
-
-        x = 0
-        for (y = 0; y < roomDimensions; y += 1) {
-            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-
-            exits.push({ x, y })
-        }
-
-        // Configure y and loop through bottom exits
-
-        y = roomDimensions - 1
-        for (x = 0; x < roomDimensions; x += 1) {
-            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-
-            exits.push({ x, y })
-        }
-
-        // Configure x and loop through right exits
-
-        x = roomDimensions - 1
-        for (y = 0; y < roomDimensions; y += 1) {
-            if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-
-            exits.push({ x, y })
-        }
-
-        const exitGroups: Coord[][] = []
-        visitedCoords = new Set()
-        groupIndex = 0
-
-        for (const exitCoord of exits) {
-            const packedCoord = packCoord(exitCoord)
-            if (visitedCoords.has(packedCoord)) continue
-
-            visitedCoords.add(packedCoord)
-
-            exitGroups[groupIndex] = [exitCoord]
-
-            let thisGeneration = [exitCoord]
-            let nextGeneration: Coord[] = []
-            let groupSize = 0
-
-            while (thisGeneration.length) {
-                nextGeneration = []
-
-                for (const coord of thisGeneration) {
-                    for (const adjCoord of findAdjacentCoordsToCoord(coord)) {
-                        if (!isXYExit(adjCoord.x, adjCoord.y)) continue
-                        if (terrain.get(adjCoord.x, adjCoord.y) === TERRAIN_MASK_WALL) continue
-
-                        const packedAdjCoord = packCoord(adjCoord)
-                        if (visitedCoords.has(packedAdjCoord)) continue
-
-                        visitedCoords.add(packedAdjCoord)
-
-                        groupSize += 1
-                        exitGroups[groupIndex].push(adjCoord)
-                        nextGeneration.push(adjCoord)
-                    }
-                }
-
-                if (groupSize > 10) break
-                thisGeneration = nextGeneration
-            }
-
-            groupIndex += 1
-        }
-
-        for (const group of exitGroups) {
-            this.room.errorVisual(group[0], true)
-
-            const path = this.room.advancedFindPath({
-                origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
-                goals: [{ pos: anchor, range: 3}],
-                weightCoordMaps: [diagonalCoords, gridCoords],
-                plainCost: defaultRoadPlanningPlainCost * 3,
-            })
-
-            for (const coord of path) {
-
-                if (!isXYInBorder(group[0].x, group[0].y, inset)) continue
-
-                gridCoords[packAsNum(coord)] = 1
-            }
-        }
-
-        this.room.visualizeCoordMap(gridCoords, true, 100)
 
         return
 
