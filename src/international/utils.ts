@@ -632,18 +632,18 @@ export function isXYInBorder(x: number, y: number, inset: number) {
 }
 
 /*
-export function packPlanCoord(structureType: StructureConstant, minRCL: number) {
+export function packBasePlanCoord(structureType: StructureConstant, minRCL: number) {
 
     return allStructureTypes.indexOf(structureType) + '_' + minRCL
 }
 
-export function unpackPlanCoord(packedPlanCoord: string): PlanCoord {
+export function unpackBasePlanCoord(packedBasePlanCoord: string): BasePlanCoord {
 
-    const packedPlanCoordData = packedPlanCoord.split('_')
+    const packedBasePlanCoordData = packedBasePlanCoord.split('_')
 
     return {
-        structureType: allStructureTypes[packedPlanCoordData[0] as any],
-        minRCL: parseInt(packedPlanCoordData[1])
+        structureType: allStructureTypes[packedBasePlanCoordData[0] as any],
+        minRCL: parseInt(packedBasePlanCoordData[1])
     }
 }
  */

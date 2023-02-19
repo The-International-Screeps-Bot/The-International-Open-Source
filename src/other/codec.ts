@@ -245,24 +245,31 @@ export function unpackPosList(chars: string) {
 /**
  * Pack a planned cord for base building
  */
-export function packPlanCoord(planCoord: PlanCoord) {
+export function packBasePlanCoord(planCoord: BasePlanCoord) {
     return encode(new Uint8Array([allStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
 }
 
 /**
  * Unpack a planned cord for base building
  */
-export function unpackPlanCoord(chars: string) {
+export function unpackBasePlanCoord(chars: string): BasePlanCoord {
     const coord = decode(chars)
     return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
 }
 
-export function packBasePlans(map: { [packedCoord: string]: PlanCoord }) {
-    let str = ''
+/**
+ * Pack a planned cord for base building
+ */
+export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
+    return encode(
+        new Uint8Array([planCoord.minRCL, planCoord.coversStructure, planCoord.buildForNuke, planCoord.buildForThreat]),
+    )
+}
 
-    for (const packedCoord in map) {
-        str += packedCoord + packPlanCoord(map[packedCoord])
-    }
-
-    return str
+/**
+ * Unpack a planned cord for base building
+ */
+export function unpackRampartPlanCoord(chars: string): RampartPlanCoord {
+    const coord = decode(chars)
+    return { minRCL: coord[0], coversStructure: coord[1], buildForNuke: coord[2], buildForThreat: coord[3] }
 }

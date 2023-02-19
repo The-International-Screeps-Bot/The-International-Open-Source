@@ -5,7 +5,7 @@ mockGlobal<Game>('Game', {
 })
 
 import * as Codec from './codec'
-import { BasePlans } from 'room/commune/basePlans'
+import { BasePlans } from 'room/construction/basePlans'
 import { allStructureTypes } from 'international/constants'
 
 const roomName = 'W1N1'
@@ -133,15 +133,15 @@ describe('codec', () => {
     it('should encode and decode plan coord', () => {
         for (let s = 1; s < 5; s++) {
             for (let r = 1; r < 10; r++) {
-                const encoded = Codec.packPlanCoord({ minRCL: r, structureType: allStructureTypes[s] })
-                const decoded = Codec.unpackPlanCoord(encoded)
+                const encoded = Codec.packBasePlanCoord({ minRCL: r, structureType: allStructureTypes[s] })
+                const decoded = Codec.unpackBasePlanCoord(encoded)
                 expect(decoded).toEqual({ minRCL: r, structureType: allStructureTypes[s] })
             }
         }
     })
 
     it('should encode and decode base plans', () => {
-        const basePlan: { [packedCoord: string]: PlanCoord } = {}
+        const basePlan: { [packedCoord: string]: BasePlanCoord } = {}
 
         for (let x = 1; x < 50; x++) {
             for (let y = 1; y < 50; y++) {

@@ -7,6 +7,7 @@ import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
 import { Settings } from 'international/settings'
 import { Dynamic } from 'room/creeps/roleManagers/antifa/dynamic'
+import { BasePlans } from 'room/construction/basePlans'
 
 declare global {
     interface ProfilerMemory {
@@ -156,9 +157,25 @@ declare global {
         roomName: string
     }
 
-    interface PlanCoord {
+    interface BasePlanCoord {
         structureType: StructureConstant
         minRCL: number
+    }
+
+    interface RampartPlanCoord {
+        minRCL: number
+        /**
+         * Flase or truthy number
+         */
+        coversStructure: number
+        /**
+         * Flase or truthy number
+         */
+        buildForNuke: number
+        /**
+         * Flase or truthy number
+         */
+        buildForThreat: number
     }
 
     type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
@@ -229,6 +246,13 @@ declare global {
         myRampartWeight?: number
 
         weightStructurePlans?: boolean
+    }
+
+    interface BasePlanAttempts {
+        stampAnchors: { [key in StampTypes]: string[] }
+        score: number
+        basePlans: { [packedCoord: string]: string }
+        rampartPlans: { [packedCoord: string]: string }
     }
 
     interface CombatStrength {

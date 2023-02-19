@@ -55,7 +55,7 @@ import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
-import { packBasePlans, packCoord, packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
+import { packCoord, packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
 import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
@@ -65,7 +65,7 @@ import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
 import { encode } from 'base32768'
-import { BasePlans } from './basePlans'
+import { BasePlans } from '../construction/basePlans'
 import { CommunePlanner } from 'room/construction/communePlanner'
 
 export class CommuneManager {
@@ -280,7 +280,7 @@ export class CommuneManager {
         const array = new Array(2500)
 
         for (let i = 0; i < array.length; i++) {
-            array[i] = packPlanCoord(STRUCTURE_SPAWN, 1)
+            array[i] = packBasePlanCoord(STRUCTURE_SPAWN, 1)
         }
  */
         return
