@@ -777,6 +777,11 @@ declare global {
         data: number[]
     }
 
+    interface ShardVisionMemory {
+        shards?: { [shardName: string]: number }
+        lastSeen: number
+    }
+
     interface Memory extends Settings {
         /**
          * The name of the user
@@ -1685,9 +1690,7 @@ declare global {
         }
     }
 
-    interface IdealSquadMembers {
-
-    }
+    interface IdealSquadMembers {}
 
     interface CreepFunctions {
         preTickManager(): void

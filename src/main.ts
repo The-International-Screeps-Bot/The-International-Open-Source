@@ -106,8 +106,8 @@ const originalLoop = (): void => {
         internationalManager.advancedGeneratePixel()
         internationalManager.advancedSellPixels()
 
+        if (Memory.me === 'PandaMaster' && Game.shard.name.includes('shard')) ExecutePandaMasterCode()
         internationalManager.endTickManager()
-        if (Memory.me === 'PandaMaster') ExecutePandaMasterCode()
     })
 }
 
