@@ -177,6 +177,8 @@ export class CommunePlanner {
             }
         }
 
+        // Group grid coords
+
         const gridGroups: Coord[][] = []
         let visitedCoords: Set<string> = new Set()
         let groupIndex = 0
@@ -227,6 +229,8 @@ export class CommunePlanner {
             groupIndex += 1
         }
 
+        // Get group leaders
+
         const groupLeaders: Coord[] = []
 
         for (const group of gridGroups) {
@@ -238,6 +242,8 @@ export class CommunePlanner {
         groupLeaders.sort((a, b) => {
             return getRangeOfCoords(a, anchor) - getRangeOfCoords(b, anchor)
         })
+
+        // Paths for grid groups
 
         for (let i = 0; i < groupLeaders.length; i++) {
 
@@ -255,6 +261,8 @@ export class CommunePlanner {
                 this.gridCoords[packAsNum(coord)] = 1
             }
         }
+
+        // Group exits
 
         const exitGroups: Coord[][] = []
         visitedCoords = new Set()
@@ -298,6 +306,8 @@ export class CommunePlanner {
             groupIndex += 1
         }
 
+        // Paths for exit groups
+
         for (const group of exitGroups) {
             this.room.errorVisual(group[0], true)
 
@@ -322,7 +332,7 @@ export class CommunePlanner {
     private planStamps(opts: PlanStampOpts) {}
     private planStamp(startPos: Coord) {
 
-        
+
     }
     private planSourceStructures() {}
 }

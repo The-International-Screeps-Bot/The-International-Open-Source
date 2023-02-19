@@ -521,7 +521,10 @@ export class SpawnRequestsManager {
 
                 // For each rampart, add a multiplier
 
-                partsMultiplier += ramparts.length * rampartUpkeepCost * 1.2
+                partsMultiplier +=
+                    this.communeManager.room.structures.rampart.filter(r => r.hits / r.hitsMax > 0.9).length *
+                    rampartUpkeepCost *
+                    1.2
 
                 // For every attackValue, add a multiplier
 
@@ -701,10 +704,8 @@ export class SpawnRequestsManager {
 
                 let priority: number
                 if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
-
                     priority = this.minRemotePriority + 0.5
-                }
-                else priority = this.minRemotePriority - 1
+                } else priority = this.minRemotePriority - 1
 
                 // If there are enemyAttackers and the controller isn't soon to downgrade
 
@@ -962,7 +963,6 @@ export class SpawnRequestsManager {
     }
 
     private remoteSourceHarvesters() {
-
         for (const remoteInfo of this.communeManager.room.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
@@ -974,7 +974,9 @@ export class SpawnRequestsManager {
             const priority =
                 Math.round((this.minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100) * 100) / 100
 
-            const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as 'remoteSourceHarvester0' | 'remoteSourceHarvester1'
+            const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
+                | 'remoteSourceHarvester0'
+                | 'remoteSourceHarvester1'
 
             // If there are no data for this.communeManager.room this.communeManager.room, inform false
 
@@ -1033,7 +1035,6 @@ export class SpawnRequestsManager {
     }
 
     private generalRemoteRoles() {
-
         this.remoteHaulerNeed = 0
 
         const remoteNamesByEfficacy = this.communeManager.room.remoteNamesBySourceEfficacy
@@ -1077,7 +1078,10 @@ export class SpawnRequestsManager {
 
                     // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                    this.remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SPs[index].length / packedPosLength, income)
+                    this.remoteHaulerNeed += findCarryPartsRequired(
+                        remoteMemory.SPs[index].length / packedPosLength,
+                        income,
+                    )
                 }
             }
 
@@ -1250,7 +1254,6 @@ export class SpawnRequestsManager {
     }
 
     private remoteHaulers() {
-
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 if (this.remoteHaulerNeed === 0) return false
@@ -1295,10 +1298,8 @@ export class SpawnRequestsManager {
     }
 
     private scout() {
-
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-
                 let minCreeps: number
                 if (this.communeManager.room.structures.observer.length) minCreeps = 1
                 else minCreeps = 2
@@ -1318,7 +1319,6 @@ export class SpawnRequestsManager {
     }
 
     private claimRequestRoles() {
-
         if (this.communeManager.room.memory.claimRequest) {
             const requestName = this.communeManager.room.memory.claimRequest
             const request = Memory.claimRequests[requestName]
@@ -1367,7 +1367,6 @@ export class SpawnRequestsManager {
     }
 
     private allyVanguard() {
-
         if (this.communeManager.room.memory.allyCreepRequest) {
             const allyCreepRequestNeeds =
                 Memory.allyCreepRequests[this.communeManager.room.memory.allyCreepRequest].data
@@ -1395,7 +1394,6 @@ export class SpawnRequestsManager {
     }
 
     private requestHauler() {
-
         for (const requestName of this.communeManager.room.memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
             if (!request) continue
@@ -1425,7 +1423,6 @@ export class SpawnRequestsManager {
     }
 
     private antifa() {
-
         let priority = 8
 
         for (let i = this.communeManager.room.memory.combatRequests.length - 1; i >= 0; i -= 1) {
