@@ -1385,3 +1385,5 @@ export const gridOffsets = [
         y: 0,
     },
 ]
+
+export const packedPosLength = 3

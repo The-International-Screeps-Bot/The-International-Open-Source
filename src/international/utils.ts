@@ -73,24 +73,28 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
     return positions
 }
 
-export function findAdjacentCoordsToCoord(coord: Coord) {
+export function findAdjacentCoordsToXY(x: number, y: number) {
     const positions: Coord[] = []
 
-    for (let x = coord.x - 1; x <= coord.x + 1; x += 1) {
-        for (let y = coord.y - 1; y <= coord.y + 1; y += 1) {
+    for (let i = x - 1; i <= x + 1; i += 1) {
+        for (let j = y - 1; j <= y + 1; j += 1) {
             // Iterate if the pos doesn't map onto a room
 
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+            if (i < 0 || i >= roomDimensions || j < 0 || j >= roomDimensions) continue
 
-            if (coord.x === x && coord.y === y) continue
+            if (x === i && y === j) continue
 
             // Otherwise pass the x and y to positions
 
-            positions.push({ x, y })
+            positions.push({ x: i, y: j })
         }
     }
 
     return positions
+}
+
+export function findAdjacentCoordsToCoord(coord: Coord) {
+    return findAdjacentCoordsToXY(coord.x, coord.y)
 }
 
 /**
@@ -617,6 +621,10 @@ export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: 
     }
 
     return positions
+}
+
+export function isXYInRoom(x: number, y: number) {
+    return x <= 0 && x >= roomDimensions && y <= 0 && y >= roomDimensions
 }
 
 /*

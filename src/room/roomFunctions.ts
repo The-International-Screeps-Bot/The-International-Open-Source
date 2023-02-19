@@ -28,6 +28,7 @@ import {
     areCoordsEqual,
     createPosMap,
     customLog,
+    findAdjacentCoordsToCoord,
     findClosestClaimType,
     findClosestCommuneName,
     findCoordsInsideRect,
@@ -1280,7 +1281,7 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
             // Loop through adjacent positions
 
-            for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            for (const coord2 of findAdjacentCoordsToCoord(coord1)) {
                 const packedCoord2 = packAsNum(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
@@ -2005,13 +2006,9 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
             // Iterate through positions of this gen
 
             for (const pos of thisGeneration) {
-                // Construct a rect and get the positions in a range of 1 (not diagonals)
-
-                const adjacentPositions = findCoordsInsideRect(pos.x - 1, pos.y - 1, pos.x + 1, pos.y + 1)
-
                 // Loop through adjacent positions
 
-                for (const adjacentPos of adjacentPositions) {
+                for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
                     // Iterate if adjacentPos is out of room bounds
 
                     if (

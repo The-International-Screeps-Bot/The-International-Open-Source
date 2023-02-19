@@ -8,6 +8,7 @@ import {
     RemoteData,
     roomDimensions,
     stamps,
+    packedPosLength,
 } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
@@ -660,7 +661,7 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            row.push(remoteMemory.SPs[sourceIndex].length)
+            row.push(remoteMemory.SPs[sourceIndex].length / packedPosLength)
             row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
             row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
             row.push(remoteData[RemoteData.remoteReserver])

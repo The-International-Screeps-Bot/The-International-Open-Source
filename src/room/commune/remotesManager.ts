@@ -5,6 +5,7 @@ import {
     maxRemoteRoomDistance,
     RemoteData,
     remoteTypeWeights,
+    packedPosLength,
 } from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomRange, randomTick } from 'international/utils'
 import { unpackPosList } from 'other/codec'
@@ -172,7 +173,7 @@ export class RemotesManager {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory.data[RemoteData[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(
-                    remoteMemory.SPs[sourceIndex].length / 2,
+                    remoteMemory.SPs[sourceIndex].length / packedPosLength,
                     income,
                 )
             }

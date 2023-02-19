@@ -1,32 +1,50 @@
-import { internationalManager } from "./international"
+import { customColors } from './constants'
+import { internationalManager } from './international'
 
 class FlagManager {
-
     run() {
-
         for (const flagName in Game.flags) {
-
-            const flagNameParts = flagName.split(" ")
+            const flagNameParts = flagName.split(' ')
 
             if (!this[flagNameParts[0] as keyof FlagManager]) continue
 
-            this[flagNameParts[0] as keyof FlagManager](flagNameParts)
+            this[flagNameParts[0] as keyof FlagManager](flagName, flagNameParts)
         }
     }
 
-    internationalDataVisuals(flagNameParts: string[]) {
+    /**
+     * Tricks typescript into accepting the dynamic function call in run()
+     */
+    public doNothing(flagName: string, flagNameParts: string[]) {}
 
-        const room = Game.rooms[flagNameParts[1] || Game.flags[flagNameParts[0]].pos.roomName]
-        if (!room) return
+    private internationalDataVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+            flag.setColor(COLOR_RED)
+            return
+        }
 
+        flag.setColor(COLOR_GREEN)
         room.roomManager.roomVisualsManager.internationalDataVisuals()
     }
 
-    abandonCommune(flagNameParts: string[]) {
+    private abandonCommune(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const roomMemory = Memory.rooms[roomName]
+        if (!roomMemory) {
+            flag.setColor(COLOR_RED)
+            return
+        }
 
-        const roomMemory = Memory.rooms[flagNameParts[1] || Game.flags[flagNameParts[0]].pos.roomName]
-        if (!roomMemory) return
+        if (roomMemory.T !== 'commune') {
+            flag.setColor(COLOR_RED)
+            return
+        }
 
+        flag.remove()
         roomMemory.Ab = true
     }
 }

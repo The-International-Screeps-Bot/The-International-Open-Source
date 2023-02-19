@@ -13,6 +13,7 @@ import {
     RemoteHarvesterRolesBySourceIndex,
     remoteHaulerRoles,
     roadUpkeepCost,
+    packedPosLength,
 } from 'international/constants'
 import {
     customLog,
@@ -1076,7 +1077,7 @@ export class SpawnRequestsManager {
 
                     // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                    this.remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SPs[index].length / 2, income)
+                    this.remoteHaulerNeed += findCarryPartsRequired(remoteMemory.SPs[index].length / packedPosLength, income)
                 }
             }
 

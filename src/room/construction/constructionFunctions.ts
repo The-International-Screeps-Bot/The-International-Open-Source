@@ -20,7 +20,10 @@ Room.prototype.communeConstructionPlacement = function () {
 
     // Only run every x ticks or if there are builders (temporary fix)
 
-    if (!this.myCreeps.builder.length && !randomTick(200)) return
+    if (!this.myCreeps.builder.length) {
+        if (!randomTick(200)) return
+        if (this.resourcesInStoringStructures.energy < this.communeManager.storedEnergyBuildThreshold) return
+    }
 
     // If the construction site count is at its limit, stop
 

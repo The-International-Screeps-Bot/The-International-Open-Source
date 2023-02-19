@@ -1,5 +1,5 @@
 // eslint-disable
-import { allStructureTypes } from 'international/constants'
+import { allStructureTypes, packedPosLength } from 'international/constants'
 import { encode, decode } from 'base32768'
 import { BasePlans } from 'room/commune/basePlans'
 
@@ -237,7 +237,7 @@ export function packPosList(posList: RoomPosition[]) {
  */
 export function unpackPosList(chars: string) {
     const posList: RoomPosition[] = []
-    for (let i = 0; i < chars.length; i += 3) {
+    for (let i = 0; i < chars.length; i += packedPosLength) {
         posList.push(unpackPos(chars[i] + chars[i + 1] + chars[i + 2]))
     }
     return posList
