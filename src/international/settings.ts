@@ -3,12 +3,7 @@ export interface Settings {
      * The current breaking version of the bot
      * Increment by 1 when a change has been made that will break previous versions of the bot
      */
-    breakingVersion: '1.1.2',
-    /**
-     * The current commit version of the bot
-     * Increments by 1 on each commit
-     */
-    Version: '1.1.2',
+    breakingVersion: number | undefined
     /**
      * Wether the bot should generate any room visuals
      */
@@ -110,8 +105,7 @@ export interface Settings {
 }
 
 export const settings: Settings = {
-    breakingVersion: '1.1.2',
-    Version: '1.1.2',
+    breakingVersion: 94,
 
     // Default values, do not change. Instead modify clones in memory
 
