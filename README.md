@@ -7,6 +7,8 @@
 [![Badge](https://forthebadge.com/images/badges/open-source.svg)](https://forthebadge.com)
 [![Badge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 
+[![Badge](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/actions/workflows/CD.yml/badge.svg?branch=Development)](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/actions/workflows/CD.yml)
+
 ## About
 
 The International is my bot for [Screeps](https://screeps.com/), thematically based after [communist](https://en.wikipedia.org/wiki/Communism) aesthetics. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as the Proletariat, and the Revolutionaries establish new communes and rebuild destroyed ones.
@@ -24,6 +26,10 @@ If you have specific questions or want to discuss the bot, please join our disco
 ![Information panel](images/grafana.png)
 
 ## Progress and Design
+
+[Grafana board](http://pandascreeps.com)
+
+[Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
 
 [Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)
 
@@ -71,15 +77,19 @@ For more information, please go to the [wiki](https://github.com/CarsonBurke/The
 
 ### Grafana
 
-You can set up [grafana](https://grafana.com/), a graphing and stat recording tool, using the screepsplus supported tool [hosted agent](https://screepspl.us/services/grafana/). With this, metrics recorded in Memory.stats can be viewed. There is a JSON model in this repository, grafanaModel.json which you can copy and paste to use to instantiate your graphs. 
+Soon to be added again when PandaMaster fixes the new ScreepsPlus replacement site!
 
 ### Private server
+
+To run the bot on an performance checking server, run `npm run server` and check out `localhost:21025` (server) and `localhost:3000` (grafana) in your browser.
+
+For the performance server users its always RoomName as email and password is `password`.
 
 If you'd like to use rollup to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
 
 I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client ) to watch your private server run from the comfort of your browser.
 
-## Contribution 
+## Contribution
 
 We're a huge fan of teamwork, and many useful features of this bot have been added by contributors.
 

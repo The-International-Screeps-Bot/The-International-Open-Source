@@ -1,8 +1,11 @@
 # Build
-/dist
+dist
+logs
+main.js
 
 # User's Push Information
 screeps.json
+config.yml
 
 # Visual Studio cache/options directory
 .vs
@@ -17,3 +20,4 @@ log.log
 push.log
 /.VSCodeCounter
 tmp-test-server
+coverage

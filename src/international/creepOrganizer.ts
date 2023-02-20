@@ -1,18 +1,36 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { myColors, spawnByRoomRemoteRoles } from './constants'
-import { customLog, pack } from './generalFunctions'
-import { InternationalManager } from './internationalManager'
+import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
+import { customLog } from './utils'
+import { internationalManager, InternationalManager } from './international'
+import { packCoord } from 'other/codec'
+import { globalStatsUpdater } from './statsManager'
 
-InternationalManager.prototype.creepOrganizer = function () {
-    // If CPU logging is enabled, get the CPU used at the start
+class CreepOrganizer {
+    constructor() {}
 
-    if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+    public run() {
+        // If CPU logging is enabled, get the CPU used at the start
 
-    // Construct counter for creeps
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-    let totalCreepCount = 0
+        // Loop through all of my creeps
 
-    function processSingleCreep(creepName: string) {
+        for (const creepName in Memory.creeps) {
+            this.processCreep(creepName)
+        }
+
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('Creep Organizer', cpuUsed.toFixed(2), {
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
+            })
+            const statName: InternationalStatNames = 'cocu'
+            globalStatsUpdater('', statName, cpuUsed, true)
+        }
+    }
+
+    private processCreep(creepName: string) {
         let creep = Game.creeps[creepName]
 
         // If creep doesn't exist
@@ -23,10 +41,6 @@ InternationalManager.prototype.creepOrganizer = function () {
             delete Memory.creeps[creepName]
             return
         }
-
-        // Increase total creep counter
-
-        totalCreepCount += 1
 
         // Get the creep's role
 
@@ -40,28 +54,22 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         creep = Game.creeps[creepName] = new creepClass(creep.id)
 
-        // Get the creep's current room and the room it's from
-
-        const { room } = creep
-
         // Organize creep in its room by its role
 
-        room.myCreeps[role].push(creepName)
+        creep.room.myCreeps[role].push(creepName)
+        creep.room.myCreepsAmount += 1
 
-        // Record the creep's presence in the room
-
-        room.myCreepsAmount += 1
+        internationalManager.customCreepIDs[creep.customID] = true
 
         // Add the creep's name to the position in its room
 
-        if (!creep.spawning) room.creepPositions.set(pack(creep.pos), creep.name)
+        if (!creep.spawning) creep.room.creepPositions[packCoord(creep.pos)] = creep.name
+
+        if (roomLogisticsRoles.has(role)) creep.roomLogisticsRequestManager()
 
         // Get the commune the creep is from
 
         const commune = creep.commune
-
-        // If there is not vision in the commune, stop
-
         if (!commune) return
 
         if (!commune.controller.my) {
@@ -71,32 +79,11 @@ InternationalManager.prototype.creepOrganizer = function () {
 
         creep.preTickManager()
 
-        creep.reservationManager()
-
         // If the creep isn't dying, organize by its roomFrom and role
 
         if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
-
-        // Record that the creep's existence in its roomFrom
-
         commune.creepsFromRoomAmount += 1
     }
-
-    // Loop through all of my creeps
-
-    for (const creepName in Memory.creeps) {
-        try {
-            processSingleCreep(creepName)
-        } catch (err) {
-            customLog(
-                'Exception processing creep: ' + creepName + err,
-                (err as any).stack,
-                myColors.white,
-                myColors.red,
-            )
-        }
-    }
-
-    if (Memory.CPULogging)
-        customLog('Creep Organizer', (Game.cpu.getUsed() - managerCPUStart).toFixed(2), undefined, myColors.midGrey)
 }
+
+export const creepOrganizer = new CreepOrganizer()

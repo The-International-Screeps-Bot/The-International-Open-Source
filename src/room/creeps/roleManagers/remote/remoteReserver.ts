@@ -1,40 +1,52 @@
-import { RemoteNeeds } from 'international/constants'
+import { RemoteData } from 'international/constants'
+import { randomTick } from 'international/utils'
 
 export class RemoteReserver extends Creep {
     public get dying(): boolean {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 
-        if (!this.ticksToLive) return false
+        if (this.spawning) return false
 
         if (this.memory.RN) {
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE - 1)
-                return false
+            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE) return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
         return (this._dying = true)
     }
 
-    /**
-     * Finds a remote to reserve
-     */
-    findRemote?(): boolean {
-        if (this.memory.RN) return true
+    hasValidRemote?() {
+        if (!this.memory.RN) return false
 
-        const remoteNamesByEfficacy = this.commune?.remoteNamesBySourceEfficacy
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
+    }
+
+    /**
+     * Finds a remote to harvest in
+     */
+    findRemote?() {
+        if (this.hasValidRemote()) return true
+
+        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
         let roomMemory
 
         for (const roomName of remoteNamesByEfficacy) {
             roomMemory = Memory.rooms[roomName]
 
-            if (roomMemory.needs[RemoteNeeds.remoteReserver] <= 0) continue
+            if (roomMemory.data[RemoteData.remoteReserver] <= 0) continue
 
             this.memory.RN = roomName
-            roomMemory.needs[RemoteNeeds.remoteReserver] -= 1
+            roomMemory.data[RemoteData.remoteReserver] -= 1
 
             return true
         }
@@ -43,31 +55,22 @@ export class RemoteReserver extends Creep {
     }
 
     preTickManager() {
-        if (!this.memory.RN) return
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'remoteReserver'
 
-        // If the creep's remote no longer is managed by its commune
-
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
+        if (!this.findRemote()) return
         if (this.dying) return
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
+        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
 
         const commune = this.commune
 
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
+        // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
-            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
     }
 
     constructor(creepID: Id<Creep>) {
@@ -78,9 +81,34 @@ export class RemoteReserver extends Creep {
         for (const creepName of creepsOfRole) {
             const creep: RemoteReserver = Game.creeps[creepName]
 
-            if (!creep.findRemote()) continue
+            // Try to find a remote
 
-            creep.say(creep.memory.RN)
+            if (!creep.findRemote()) {
+                // If the room is the creep's commune
+
+                if (room.name === creep.commune.name) {
+                    // Advanced recycle and iterate
+
+                    creep.advancedRecycle()
+                    continue
+                }
+
+                // Otherwise, have the creep make a moveRequest to its commune and iterate
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: creep.commune.anchor,
+                            range: 5,
+                        },
+                    ],
+                })
+
+                continue
+            }
+
+            creep.message = creep.memory.RN
 
             // If the creep is in the remote
 
@@ -102,17 +130,15 @@ export class RemoteReserver extends Creep {
                     },
                 ],
                 avoidEnemyRanges: true,
-                plainCost: 1,
                 typeWeights: {
                     enemy: Infinity,
                     ally: Infinity,
                     keeper: Infinity,
                     enemyRemote: Infinity,
-                    allyRemote: Infinity
+                    allyRemote: Infinity,
                 },
+                avoidAbandonedRemotes: true,
             })
-
-            continue
         }
     }
 }

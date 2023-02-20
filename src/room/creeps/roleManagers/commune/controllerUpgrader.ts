@@ -6,11 +6,11 @@ export class ControllerUpgrader extends Creep {
     public get dying() {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 
-        if (!this.ticksToLive) return false
+        if (this.spawning) return false
 
         // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
@@ -19,6 +19,11 @@ export class ControllerUpgrader extends Creep {
         // Record creep as dying
 
         return (this._dying = true)
+    }
+
+    preTickManager() {
+
+        this.room.upgradeStrength += this.upgradeStrength
     }
 
     public static controllerUpgraderManager(room: Room, creepsOfRole: string[]) {

@@ -1,7 +1,6 @@
-const {execSync} = require('child_process')
+const { execSync } = require('child_process')
 
-const tokens = [];
+const tokens = []
 tokens.forEach(token => {
     execSync(`npx rollup -c --environment TOKEN:${token}`)
 })
-

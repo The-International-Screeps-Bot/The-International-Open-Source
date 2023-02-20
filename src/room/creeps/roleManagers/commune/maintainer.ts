@@ -1,131 +1,113 @@
-import { findObjectWithID } from 'international/generalFunctions'
+import { roomDimensions } from 'international/constants'
+import { globalStatsUpdater } from 'international/statsManager'
+import { findCoordsInsideRect, findObjectWithID, getRangeOfCoords } from 'international/utils'
+import { packCoord } from 'other/codec'
 
 export class Maintainer extends Creep {
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
+    preTickManager() {
+        this.avoidEnemyThreatCoords()
+    }
+
     advancedMaintain?(): boolean {
         const { room } = this
 
-        this.say('⏩🔧')
-
-        // If the this needs resources
-
         if (this.needsResources()) {
-            if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+            delete this.memory.repairTarget
 
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
-
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return false
-            }
+            this.runRoomLogisticsRequestsAdvanced({
+                types: new Set(['withdraw', 'offer', 'pickup']),
+                resourceTypes: new Set([RESOURCE_ENERGY]),
+            })
 
             if (this.needsResources()) return false
         }
 
-        // Otherwise if the this doesn't need resources
-
-        // Get the this's work part count
+        // Otherwise if we don't need resources and can maintain
 
         const workPartCount = this.parts.work
+        let repairTarget = this.findRepairTarget()
 
-        // Find a repair target based on the thiss work parts. If none are found, inform false
+        if (!repairTarget) {
+            this.message = '❌🔧'
+            return false
+        }
 
-        const repairTarget: Structure | false =
-            findObjectWithID(this.memory.repairTarget) ||
-            this.findRepairTarget() ||
-            this.findRampartRepairTarget(workPartCount)
-        if (!repairTarget) return false
+        this.message = '⏩🔧'
+        room.targetVisual(this.pos, repairTarget.pos)
 
-        // Add the repair target to memory
+        // Move to target if out of range
 
-        this.memory.repairTarget = repairTarget.id
-
-        // If roomVisuals are enabled
-
-        if (Memory.roomVisuals)
-            room.visual.text(repairTarget.structureType === STRUCTURE_RAMPART ? '🧱' : '🔧', repairTarget.pos)
-
-        // If the repairTarget is out of repair range
-
-        if (this.pos.getRangeTo(repairTarget.pos) > 3) {
-            // Make a move request to it
-
+        if (getRangeOfCoords(this.pos, repairTarget.pos) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: repairTarget.pos, range: 3 }],
                 avoidEnemyRanges: true,
+                weightCostMatrix: 'defaultCostMatrix',
             })
-
-            // Inform false
 
             return false
         }
 
-        // Otherwise
-
-        // Try to repair the target
+        if (this.worked) return true
 
         const repairResult = this.repair(repairTarget)
-
-        // If the repair failed, inform false
-
         if (repairResult !== OK) return false
 
         // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
 
-        const energySpentOnRepairs = Math.min(workPartCount, (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER)
+        const energySpentOnRepairs = Math.min(
+            workPartCount,
+            (repairTarget.hitsMax - repairTarget.hits) / REPAIR_POWER,
+            this.store.energy,
+        )
 
-        if (repairTarget.structureType === STRUCTURE_RAMPART) {
-            if (global.roomStats.commune[this.room.name])
-                (global.roomStats.commune[this.room.name] as RoomCommuneStats).eorwr += energySpentOnRepairs
-            this.say(`🧱${energySpentOnRepairs * REPAIR_POWER}`)
+        if (repairTarget.structureType === STRUCTURE_RAMPART || repairTarget.structureType === STRUCTURE_WALL) {
+            globalStatsUpdater(this.room.name, 'eorwr', energySpentOnRepairs)
+            this.message = `🧱${energySpentOnRepairs * REPAIR_POWER}`
         } else {
-            if (global.roomStats.commune[this.room.name])
-                (global.roomStats.commune[this.room.name] as RoomCommuneStats).eoro += energySpentOnRepairs
-            else if (global.roomStats.remote[this.room.name])
-                global.roomStats.remote[this.room.name].reoro += energySpentOnRepairs
-            this.say(`🔧${energySpentOnRepairs * REPAIR_POWER}`)
+            globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
+            this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
         }
 
         // Implement the results of the repair pre-emptively
 
-        repairTarget.realHits = repairTarget.hits + workPartCount * REPAIR_POWER
+        repairTarget.nextHits = Math.min(repairTarget.nextHits + workPartCount * REPAIR_POWER, repairTarget.hitsMax)
 
-        // If the structure is a rampart
+        // If the structure is a rampart, continue repairing it
 
-        if (repairTarget.structureType === STRUCTURE_RAMPART) {
-            // If the repairTarget will be below or equal to expectations next tick, inform true
+        if (repairTarget.structureType === STRUCTURE_RAMPART) return true
+        // Otherwise if it isn't a rampart and it will be viable to repair next tick
+        else if (repairTarget.hitsMax - repairTarget.nextHits >= workPartCount * REPAIR_POWER) return true
 
-            if (repairTarget.realHits <= this.memory.quota + workPartCount * REPAIR_POWER * 25) return true
-        }
-
-        // Otherwise if it isn't a rampart and it will be viable to repair next tick, inform true
-        else if (repairTarget.hitsMax - repairTarget.realHits >= workPartCount * REPAIR_POWER) return true
-
-        // Otherwise
-
-        // Delete the target from memory
+        // Otherwise we need a new target
 
         delete this.memory.repairTarget
 
+        // Find a target next tick, we can't do more
+
+        if (this.moved) return true
+
         // Find repair targets that don't include the current target, informing true if none were found
 
-        const newRepairTarget = this.findRepairTarget(new Set([repairTarget.id]))
-        if (!newRepairTarget) return true
+        repairTarget = this.findNewRepairTarget() || this.findNewRampartRepairTarget()
+        if (!repairTarget) return true
+
+        // We are already in viable range
+
+        if (getRangeOfCoords(this.pos, repairTarget.pos) <= 3) return true
 
         // Make a move request to it
 
         this.createMoveRequest({
             origin: this.pos,
-            goals: [{ pos: newRepairTarget.pos, range: 3 }],
+            goals: [{ pos: repairTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
+            weightCostMatrix: 'defaultCostMatrix',
         })
-
-        // Inform false
 
         return true
     }
@@ -137,103 +119,56 @@ export class Maintainer extends Creep {
 
         if (this.store.getUsedCapacity(RESOURCE_ENERGY) === 0) return false
 
-        // Otherwise, look at the this's pos for structures
-
-        const structuresAsPos = this.pos.lookFor(LOOK_STRUCTURES)
-
-        // Get the this's work parts
-
         const workPartCount = this.parts.work
 
-        let structure
+        const structure = room.findStructureInsideRect(
+            this.pos.x - 3,
+            this.pos.y - 3,
+            this.pos.x + 3,
+            this.pos.y + 3,
+            structure => {
+                if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER)
+                    return false
 
-        // Loop through structuresAtPos
+                // The structure has sufficient hits
 
-        for (structure of structuresAsPos) {
-            // If the structure is not a road, iterate
+                if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) return false
 
-            if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) continue
-
-            // If the structure is sufficiently repaired, inform false
-
-            if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) break
-
-            // Otherwise, try to repair the structure, informing false if failure
-
-            if (this.repair(structure) !== OK) return false
-
-            // Otherwise
-
-            // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
-
-            const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
-
-            // Show the this tried to repair
-
-            this.say(`👣🔧${energySpentOnRepairs * REPAIR_POWER}`)
-            return true
-        }
-
-        const adjacentStructures = room.lookForAtArea(
-            LOOK_STRUCTURES,
-            Math.max(Math.min(this.pos.y - 3, -1), 1),
-            Math.max(Math.min(this.pos.x - 3, -1), 1),
-            Math.max(Math.min(this.pos.y + 3, -1), 1),
-            Math.max(Math.min(this.pos.x + 3, -1), 1),
-            true,
+                return true
+            },
         )
+        if (!structure) return false
 
-        for (const adjacentPosData of adjacentStructures) {
-            structure = adjacentPosData.structure
+        if (this.repair(structure) !== OK) return false
 
-            // If the structure is not a road, iterate
+        // Otherwise we repaired successfully
 
-            if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER) continue
+        // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
 
-            // If the structure is sufficiently repaired, inform false
+        const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
 
-            if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) continue
+        // Show it tried to repair
 
-            // Otherwise, try to repair the structure, informing false if failure
-
-            if (this.repair(structure) !== OK) return false
-
-            // Otherwise
-
-            // Find the repair amount by finding the smaller of the this's work and the progress left for the cSite divided by repair power
-
-            const energySpentOnRepairs = Math.min(workPartCount, (structure.hitsMax - structure.hits) / REPAIR_POWER)
-
-            // Show the this tried to repair
-
-            this.say(`🗺️🔧${energySpentOnRepairs * REPAIR_POWER}`)
-            return true
-        }
-
-        // If no road to repair was found, inform false
-
-        return false
+        this.message = `🗺️🔧${energySpentOnRepairs * REPAIR_POWER}`
+        return true
     }
 
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
+    run?() {
+        const cSiteTarget = this.room.cSiteTarget
+        if (cSiteTarget && cSiteTarget.structureType === STRUCTURE_SPAWN) {
+            this.advancedBuild()
+
+            return
+        }
+
+        if (this.advancedMaintain()) return
+        if (this.maintainNearby()) return
     }
 
     static maintainerManager(room: Room, creepsOfRole: string[]) {
-        // Loop through creep names of creeps of the manager's role
-
         for (const creepName of creepsOfRole) {
-            // Get the creep using its name
-
             const creep: Maintainer = Game.creeps[creepName]
-
-            // Try to maintain structures, iterating if success
-
-            if (creep.advancedMaintain()) continue
-
-            // Otherwise, try to maintain at feet, iterating if success
-
-            if (creep.maintainNearby()) continue
+            creep.run()
         }
     }
 }

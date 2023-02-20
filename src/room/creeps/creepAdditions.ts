@@ -1,37 +1,14 @@
-import { allyList, roomDimensions } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
+import { customLog, getRange, getRangeOfCoords } from 'international/utils'
+import { profiler } from 'other/screeps-profiler'
 
 Object.defineProperties(Creep.prototype, {
-    role: {
-        get() {
-            if (this._role) return this._role
-
-            return (this._role = this.name.split(' ')[0] as CreepRoles)
-        },
-    },
-    cost: {
-        get() {
-            if (this._cost) return this._cost
-
-            return (this._cost = parseInt(this.name.split(' ')[1]))
-        },
-    },
-    commune: {
-        get() {
-            if (this._commune) return this._commune
-
-            return (this._commune = Game.rooms[this.name.split(' ')[2]])
-        },
-    },
     dying: {
         get() {
-            // Inform as dying if creep is already recorded as dying
-
-            if (this._dying) return true
 
             // Stop if creep is spawning
 
-            if (!this.ticksToLive) return false
+            if (this.spawning) return false
 
             // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
@@ -39,14 +16,49 @@ Object.defineProperties(Creep.prototype, {
 
             // Record creep as dying
 
-            return (this._dying = true)
+            return true
         },
     },
-    reservation: {
+    nameData: {
         get() {
-            if (!this.memory.reservations[0]) return false
+            if (this._nameData) return this._nameData
 
-            return (this._reservation = this.memory.reservations[0])
+            return (this._nameData = this.name.split('_'))
+        },
+    },
+    role: {
+        get() {
+            if (this._role) return this._role
+
+            return (this._role = creepRoles[parseInt(this.nameData[0])])
+        },
+    },
+    cost: {
+        get() {
+            if (this._cost) return this._cost
+
+            return (this._cost = parseInt(this.nameData[1]))
+        },
+    },
+    commune: {
+        get() {
+            if (this._commune) return this._commune
+
+            return (this._commune = Game.rooms[this.nameData[2]])
+        },
+    },
+    defaultParts: {
+        get() {
+            if (this._defaultParts) return this._defaultParts
+
+            return (this._defaultParts = parseInt(this.nameData[3]))
+        },
+    },
+    customID: {
+        get() {
+            if (this._customID) return this._customID
+
+            return (this._customID = parseInt(this.nameData[4]))
         },
     },
     strength: {
@@ -78,48 +90,121 @@ Object.defineProperties(Creep.prototype, {
             return this._strength
         },
     },
-    attackStrength: {
+    macroHealStrength: {
         get() {
-            if (this._attackStrength) return this._attackStrength
+            if (this._macroHealStrength !== undefined) return this._macroHealStrength
 
-            this._attackStrength = 1
+            this._macroHealStrength = this.combatStrength.heal
 
-            for (const part of this.body) {
-                switch (part.type) {
-                    case RANGED_ATTACK:
-                        this._attackStrength +=
-                            RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
-                        break
-                    case ATTACK:
-                        this._attackStrength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
-                        break
-                    default:
-                        this._attackStrength += 1
-                }
+            // Find adjacent creeps
+
+            let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
+            let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0)
+            let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
+            let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
+
+            const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+
+            // Calculate combined heal to this creep of adjacent creeps
+
+            for (const posData of adjacentCreeps) {
+                const { creep } = posData
+
+                if (this.owner.username === Memory.me) {
+                    if (creep.owner.username !== Memory.me) continue
+                } else if (this.owner.username !== creep.owner.username) continue
+
+                const range = getRangeOfCoords(this.pos, creep.pos)
+                if (range > 3) continue
+
+                let healStrength = creep.combatStrength.heal
+                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
+
+                this._macroHealStrength += Math.floor(healStrength)
             }
 
-            return this._attackStrength
+            return this._macroHealStrength
         },
     },
-    healStrength: {
+    netTowerDamage: {
         get() {
-            if (this._healStrength) return this._healStrength
+            if (this._netTowerDamage !== undefined) return this._netTowerDamage
 
-            this._healStrength = 0
+            this._netTowerDamage = this.grossTowerDamage
+            this._netTowerDamage *= this.defenceStrength
 
-            let toughBoost = 0
+            // The enemy can't heal when we're in safemode, so don't calculate it
+
+            if (this.room.controller.safeMode) return this._netTowerDamage
+
+            this._netTowerDamage -= this.macroHealStrength
+
+            return this._netTowerDamage
+        },
+    },
+    upgradeStrength: {
+        get() {
+            if (this._upgradeStrength !== undefined) return this._upgradeStrength
+
+            this._upgradeStrength = this.parts.work
+
+            if (this.boosts.XGH2O > 0) return (this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController)
+            else if (this.boosts.GH2O > 0) return (this._defenceStrength *= BOOSTS.upgrade.GH2O.upgradeController)
+            else if (this.boosts.GH > 0) return (this._defenceStrength *= BOOSTS.upgrade.GH.upgradeController)
+
+            return this._upgradeStrength
+        },
+    },
+    combatStrength: {
+        get() {
+            if (this._combatStrength) return this._combatStrength
+
+            this._combatStrength = {
+                dismantle: 0,
+                melee: 0,
+                ranged: 0,
+                heal: 0,
+            }
 
             for (const part of this.body) {
-                if (part.type === TOUGH) {
-                    toughBoost = Math.max(part.boost ? BOOSTS[part.type][part.boost].damage : 0, toughBoost)
+                if (part.type === WORK) {
+
+                    const boost = part.boost as RESOURCE_CATALYZED_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_HYDRIDE
+
+                    this._combatStrength.dismantle +=
+                        DISMANTLE_POWER *
+                        (part.boost && dismantleBoosts.includes(boost) ? BOOSTS[part.type][boost].dismantle : 1)
                     continue
                 }
 
-                if (part.type === HEAL)
-                    this._healStrength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+                if (part.type === ATTACK) {
+                    this._combatStrength.melee += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
+                    continue
+                }
+
+                if (part.type === RANGED_ATTACK) {
+                    this._combatStrength.ranged +=
+                        RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
+                    continue
+                }
+
+                if (part.type === HEAL) {
+                    this._combatStrength.heal += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+                }
             }
 
-            return (this._healStrength += this._healStrength * toughBoost)
+            return this._combatStrength
+        },
+    },
+    defenceStrength: {
+        get() {
+            if (this._defenceStrength) return this._defenceStrength
+
+            if (this.boosts.XGHO2 > 0) return (this._defenceStrength = BOOSTS.tough.XGHO2.damage)
+            else if (this.boosts.GHO2 > 0) return (this._defenceStrength = BOOSTS.tough.GHO2.damage)
+            else if (this.boosts.GO > 0) return (this._defenceStrength = BOOSTS.tough.GO.damage)
+
+            return 1
         },
     },
     parts: {
@@ -153,30 +238,47 @@ Object.defineProperties(Creep.prototype, {
             return this._boosts
         },
     },
-    towerDamage: {
+    canMove: {
         get() {
-            if (this._towerDamage) return this._towerDamage
+            if (this._canMove !== undefined) return this._canMove
 
-            const { room } = this
+            return (this._canMove = !this.fatigue && !this.spawning && this.parts.move > 0)
+        },
+    },
+    idealSquadMembers: {
+        get() {
 
-            this._towerDamage = 0
+            if (this._idealSquadMembers) return this._idealSquadMembers
 
-            for (const tower of room.structures.tower) {
-                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) <= 0) continue
+            if (this.memory.SS === 2) {
 
-                const range = getRange(this.pos.x, tower.pos.x, this.pos.y, tower.pos.y)
 
-                if (range <= TOWER_OPTIMAL_RANGE) {
-                    this._towerDamage += TOWER_POWER_ATTACK
-                    continue
-                }
-
-                const factor =
-                    range < TOWER_FALLOFF_RANGE
-                        ? (range - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
-                        : 1
-                this._towerDamage += Math.floor(TOWER_POWER_ATTACK * (1 - TOWER_FALLOFF * factor))
             }
+
+            if (this.memory.SS === 4) {
+
+
+            }
+
+            // Dynamic
+
+            return this._idealSquadMembers
+        }
+    }
+} as PropertyDescriptorMap & ThisType<Creep>)
+
+Object.defineProperties(PowerCreep.prototype, {
+    dying: {
+        get() {
+
+            return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
+        },
+    },
+    macroHealStrength: {
+        get() {
+            if (this._macroHealStrength !== undefined) return this._macroHealStrength
+
+            this._macroHealStrength = 0
 
             // Find adjacent creeps
 
@@ -187,27 +289,95 @@ Object.defineProperties(Creep.prototype, {
 
             // Find adjacent creeps
 
-            const adjacentCreeps = room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+            const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
-            // Loop through each adjacentCreep
+            // Loop through each adjacentCreep this creep
 
             for (const posData of adjacentCreeps) {
-                // If the creep is not owned and isn't an ally
+                const { creep } = posData
 
-                if (posData.creep.my || Memory.allyList.includes(posData.creep.owner.username)) continue
+                if (this.owner.username === Memory.me) {
+                    if (creep.owner.username !== Memory.me) continue
+                } else if (this.owner.username !== creep.owner.username) continue
 
-                const range = getRange(this.pos.x, posData.creep.pos.x, this.pos.y, posData.creep.pos.y)
-
+                const range = getRangeOfCoords(this.pos, creep.pos)
                 if (range > 3) continue
 
-                this._towerDamage -= posData.creep.findTotalHealPower(range)
+                let healStrength = creep.combatStrength.heal
+                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
+
+                this._macroHealStrength += Math.floor(healStrength)
             }
 
-            if (this.boosts.XGHO2 > 0) this._towerDamage *= BOOSTS.tough.XGHO2.damage
-            else if (this.boosts.GHO2 > 0) this._towerDamage *= BOOSTS.tough.GHO2.damage
-            else if (this.boosts.GO > 0) this._towerDamage *= BOOSTS.tough.GO.damage
+            return this._macroHealStrength
+        },
+    },
+    netTowerDamage: {
+        get() {
+            if (this._netTowerDamage !== undefined) return this._netTowerDamage
 
-            return this._towerDamage
+            this._netTowerDamage = this.grossTowerDamage
+
+            // The enemy can't heal when we're in safemode, so don't calculate it
+
+            if (this.room.controller.safeMode) return this._netTowerDamage
+
+            return (this._netTowerDamage -= this.macroHealStrength)
+        },
+    },
+    powerCooldowns: {
+        get() {
+            if (this._powerCooldowns) return this._powerCooldowns
+
+            this._powerCooldowns = new Map()
+
+            for (const powerType in this.powers) {
+
+                const cooldown = this.powers[powerType].cooldown
+                if (!cooldown) continue
+
+                this._powerCooldowns.set(parseInt(powerType) as PowerConstant, cooldown)
+            }
+
+            return this._powerCooldowns
+        }
+    }
+} as PropertyDescriptorMap & ThisType<PowerCreep>)
+
+const additions = {
+    grossTowerDamage: {
+        get() {
+            if (this._grossTowerDamage !== undefined) return this._grossTowerDamage
+
+            this._grossTowerDamage = 0
+
+            for (const tower of this.room.structures.tower) {
+                if (!tower.RCLActionable) continue
+                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
+
+                let damage = TOWER_POWER_ATTACK
+
+                let range = getRangeOfCoords(this.pos, tower.pos)
+
+                if (range > TOWER_OPTIMAL_RANGE) {
+                    if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
+
+                    damage -=
+                        (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
+                        (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
+                }
+
+                for (const powerType of towerPowers) {
+                    const effect = tower.effectsData.get(powerType) as PowerEffect
+                    if (!effect) continue
+
+                    damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
+                }
+
+                this._grossTowerDamage += Math.floor(damage)
+            }
+
+            return this._grossTowerDamage
         },
     },
     message: {
@@ -229,5 +399,20 @@ Object.defineProperties(Creep.prototype, {
         set(newFreeCapacityNextNext) {
             this._freeCapacityNextTick = newFreeCapacityNextNext
         },
-    }
-} as PropertyDescriptorMap & ThisType<Creep>)
+    },
+    isOnExit: {
+        get() {
+            if (this._isOnExit !== undefined) return this._isOnExit
+
+            const { x } = this.pos
+            const { y } = this.pos
+            return x <= 0 || x >= 49 || y <= 0 || y >= 49
+        },
+    },
+
+} as PropertyDescriptorMap & (ThisType<Creep> | ThisType<PowerCreep>)
+
+/* profiler.registerObject(additions, 'creepAdditions') */
+
+Object.defineProperties(Creep.prototype, additions)
+Object.defineProperties(PowerCreep.prototype, additions)

@@ -1,8 +1,7 @@
-import { RemoteNeeds } from 'international/constants'
-import { getRange } from 'international/generalFunctions'
+import { customColors, RemoteData } from 'international/constants'
+import { getRange, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
-
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
@@ -10,11 +9,11 @@ export class RemoteCoreAttacker extends Creep {
     public get dying() {
         // Inform as dying if creep is already recorded as dying
 
-        if (this._dying) return true
+        if (this._dying !== undefined) return this._dying
 
         // Stop if creep is spawning
 
-        if (!this.ticksToLive) return false
+        if (this.spawning) return false
 
         // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
@@ -26,66 +25,59 @@ export class RemoteCoreAttacker extends Creep {
     }
 
     preTickManager(): void {
-        if (!this.memory.RN) return
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         const role = this.role as 'remoteCoreAttacker'
 
-        // If the creep's remote no longer is managed by its commune
-
-        if (!Memory.rooms[this.commune.name].remotes.includes(this.memory.RN)) {
-            // Delete it from memory and try to find a new one
-
-            delete this.memory.RN
-            if (!this.findRemote()) return
-        }
-
+        if (!this.findRemote()) return
         if (this.dying) return
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].needs[RemoteNeeds[role]] -= 1
+        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
 
         const commune = this.commune
 
-        // Add the creep to creepsFromRoomWithRemote relative to its remote
+        // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsFromRoomWithRemote[this.memory.RN])
-            commune.creepsFromRoomWithRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+    }
+
+    hasValidRemote?() {
+        if (!this.memory.RN) return false
+
+        const remoteMemory = Memory.rooms[this.memory.RN]
+
+        if (remoteMemory.T !== 'remote') return false
+        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory.data[RemoteData.abandon]) return false
+
+        return true
     }
 
     /**
-     * Finds a remote
+     * Finds a remote to harvest in
      */
-    findRemote?(): boolean {
-        const creep = this
-
-        // If the creep already has a remote, inform true
-
-        if (creep.memory.RN) return true
-
+    findRemote?() {
+        if (this.hasValidRemote()) return true
         // Otherwise, get the creep's role
 
-        const role = creep.role as 'remoteCoreAttacker'
+        const role = 'remoteCoreAttacker'
 
         // Get remotes by their efficacy
 
-        const remoteNamesByEfficacy = creep.commune?.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
         // Loop through each remote name
 
         for (const roomName of remoteNamesByEfficacy) {
-            // Get the remote's memory using its name
-
             const roomMemory = Memory.rooms[roomName]
-
-            // If the needs of this remote are met, iterate
-
-            if (roomMemory.needs[RemoteNeeds[role]] <= 0) continue
+            if (roomMemory.data[RemoteData[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true
 
-            creep.memory.RN = roomName
-            roomMemory.needs[RemoteNeeds[role]] -= 1
+            this.memory.RN = roomName
+            roomMemory.data[RemoteData[role]] -= 1
 
             return true
         }
@@ -112,7 +104,7 @@ export class RemoteCoreAttacker extends Creep {
         // If the creep at the core
 
         if (getRange(this.pos.x, closestCore.pos.x, this.pos.y, closestCore.pos.y) === 1) {
-            this.say('🗡️C')
+            this.message = '🗡️C'
 
             this.attack(closestCore)
             return true
@@ -120,7 +112,7 @@ export class RemoteCoreAttacker extends Creep {
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.say('⏩C')
+        this.message = '⏩C'
 
         this.createMoveRequest({
             origin: this.pos,
@@ -153,8 +145,8 @@ export class RemoteCoreAttacker extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.commune.name),
-                            range: 25,
+                            pos: creep.commune.anchor,
+                            range: 5,
                         },
                     ],
                 })
@@ -162,7 +154,7 @@ export class RemoteCoreAttacker extends Creep {
                 continue
             }
 
-            creep.say(creep.memory.RN)
+            creep.message = creep.memory.RN
 
             if (creep.advancedAttackCores()) continue
 
@@ -188,8 +180,9 @@ export class RemoteCoreAttacker extends Creep {
                     ally: Infinity,
                     keeper: Infinity,
                     enemyRemote: Infinity,
-                    allyRemote: Infinity
+                    allyRemote: Infinity,
                 },
+                avoidAbandonedRemotes: true,
             })
         }
     }

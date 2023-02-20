@@ -1,8 +1,17 @@
-import { ClaimRequestNeeds } from 'international/constants'
+import { ClaimRequestData } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
         super(creepID)
+    }
+
+    preTickManager() {
+        if (this.dying) return
+
+        const request = Memory.claimRequests[this.memory.TRN]
+        if (!request) return
+
+        request.data[ClaimRequestData.claimer] -= 1
     }
 
     /**
@@ -24,10 +33,7 @@ export class Claimer extends Creep {
                 goals: [{ pos: room.controller.pos, range: 1 }],
                 avoidEnemyRanges: true,
                 plainCost: 1,
-                swampCost: 1,
-                typeWeights: {
-                    keeper: Infinity,
-                },
+                swampCost: creep.parts.move >= 5 ? 1 : undefined,
             })
 
             return
@@ -56,38 +62,32 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            const claimTarget = Memory.rooms[creep.commune.name].claimRequest
+            creep.message = creep.memory.TRN
 
-            // If the creep has no claim target, stop
-
-            if (!claimTarget) return
-
-            creep.say(claimTarget)
-
-            Memory.claimRequests[Memory.rooms[creep.commune.name].claimRequest].needs[ClaimRequestNeeds.claimer] = 0
-
-            if (room.name === claimTarget) {
+            if (room.name === creep.memory.TRN) {
                 creep.claimRoom()
                 continue
             }
 
             // Otherwise if the creep is not in the claimTarget
 
-            // Move to it
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: new RoomPosition(25, 25, claimTarget), range: 25 }],
-                avoidEnemyRanges: true,
-                swampCost: creep.parts.move >= 5 ? 1 : undefined,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity
-                },
-            })
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    avoidEnemyRanges: true,
+                    plainCost: 1,
+                    swampCost: creep.parts.move >= 5 ? 1 : undefined,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                    },
+                }) === 'unpathable'
+            ) {
+                const request = Memory.claimRequests[creep.memory.TRN]
+                if (request) request.data[ClaimRequestData.abandon] = 20000
+            }
         }
     }
 }

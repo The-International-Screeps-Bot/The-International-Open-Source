@@ -1,6 +1,4 @@
 
-# To run self hosted on ubuntu 20.04: apt install build-essential
-
 name: Continues Delivery
 
 on:
@@ -9,7 +7,7 @@ on:
 
 jobs:
      PerformanceTest:
-          timeout-minutes: 2880
+          timeout-minutes: 43200
           runs-on: self-hosted
           steps:
                - name: 'Cleanup build folder'
@@ -19,30 +17,18 @@ jobs:
                     rm -rf ./.??* || true
                     ls -la ./
                - uses: actions/checkout@v3
-               - name: Use Node.js 12.x
+               - name: Use Node.js 16.x
                  uses: actions/setup-node@v3
                  with:
-                    node-version: 12.x
+                    node-version: 16.x
                     cache: 'npm'
-               - name: Use Python 2.7
-                 uses: actions/setup-python@v3
-                 with:
-                    python-version: 2.7
-                 env:
-                    PYTHON_VERSION: 2.7
-               - name: Install dependencies
-                 run: |
-                    npm install
-                    cd server && npm install
-                    cd grafana && npm install
-               - name: Run build
-                 run: npm run build
                - name: Get IP
                  run: hostname -I
-               - name: Start Grafana instance
-                 run: cd server/grafana && node index
-               - name: Execute server
+               - name: Install dependencies
+                 run: npm install
+               - name: Start instances
+                 run: node server --maxTicks=25000 --debug
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                    STEAM_ID: ${{ secrets.STEAM_ID }}
-                 run: cd server && node index.js 50000
+                    EXPORT_API_URL: ${{ secrets.EXPORT_API_URL }}
+                    ACTIONS_RUNNER_NAME: ${{ runner.name }}

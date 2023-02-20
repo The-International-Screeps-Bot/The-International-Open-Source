@@ -1,7 +1,16 @@
-import { AllyCreepRequestNeeds } from 'international/constants'
-import { findObjectWithID, getRange, unpackAsPos } from 'international/generalFunctions'
+import { AllyCreepRequestData } from 'international/constants'
+import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
+    preTickManager() {
+        const request = Memory.claimRequests[this.memory.TRN]
+
+        if (!request) return
+
+        request.data[AllyCreepRequestData.allyVanguard] -= this.parts.work
+    }
+
     findRemote?(): boolean {
         if (this.memory.RN) return true
 
@@ -68,24 +77,14 @@ export class AllyVanguard extends Creep {
     getEnergyFromRoom?(): boolean {
         const { room } = this
 
-        if (room.controller && (room.controller.owner || room.controller.reservation)) {
-            if (!this.memory.reservations || !this.memory.reservations.length) this.reserveWithdrawEnergy()
+        if (
+            this.runRoomLogisticsRequestsAdvanced({
+                resourceTypes: new Set([RESOURCE_ENERGY]),
+            })
+        )
+            return true
 
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return true
-            }
-
-            this.reserveWithdrawEnergy()
-
-            if (!this.fulfillReservation()) {
-                this.say(this.message)
-                return true
-            }
-
-            if (this.needsResources()) return false
-            return false
-        }
+        if (!this.needsResources()) return true
 
         // Define the creep's sourceName
 
@@ -110,25 +109,18 @@ export class AllyVanguard extends Creep {
     travelToSource?(sourceIndex: number): boolean {
         const { room } = this
 
-        this.say('FHP')
+        this.message = '🚬'
 
-        // Try to find a harvestPosition, inform false if it failed
-
-        if (!this.findSourcePos(sourceIndex)) return false
-
-        this.say('🚬')
-
-        // Unpack the harvestPos
-
-        const harvestPos = unpackAsPos(this.memory.packedPos)
+        const harvestPos = this.findSourcePos(this.memory.SI)
+        if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRange(this.pos.x, harvestPos.x, this.pos.y, harvestPos.y) === 0) return false
+        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.say(`⏩ ${sourceIndex}`)
+        this.message = `⏩ ${sourceIndex}`
 
         this.createMoveRequest({
             origin: this.pos,
@@ -165,12 +157,10 @@ export class AllyVanguard extends Creep {
             return
         }
 
-        const request = Memory.rooms[this.commune.name].allyCreepRequest
-
-        if (room.name !== request) {
+        if (room.name !== this.memory.TRN) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, request), range: 25 }],
+                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
                 avoidEnemyRanges: true,
             })
 
@@ -192,17 +182,9 @@ export class AllyVanguard extends Creep {
 
             const creep: AllyVanguard = Game.creeps[creepName]
 
-            const request = Memory.rooms[creep.commune.name].allyCreepRequest
+            const request = creep.memory.TRN
 
-            // If the creep has no claim target, stop
-
-            if (!request) return
-
-            Memory.allyCreepRequests[Memory.rooms[creep.commune.name].allyCreepRequest].needs[
-                AllyCreepRequestNeeds.allyVanguard
-            ] -= creep.parts.work
-
-            creep.say(request)
+            creep.message = request
 
             if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
                 creep.buildRoom()
@@ -213,19 +195,21 @@ export class AllyVanguard extends Creep {
 
             // Move to it
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: new RoomPosition(25, 25, request), range: 25 }],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    commune: 1,
-                    neutral: 1,
-                    highway: 1,
-                },
-            })
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        enemy: Infinity,
+                        ally: Infinity,
+                        keeper: Infinity,
+                    },
+                }) === 'unpathable'
+            ) {
+                const request = Memory.claimRequests[creep.memory.TRN]
+                if (request) request.data[AllyCreepRequestData.abandon] = 20000
+            }
         }
     }
 }

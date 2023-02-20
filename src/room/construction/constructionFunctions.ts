@@ -1,12 +1,12 @@
 import { impassibleStructureTypes, stamps } from 'international/constants'
-import { unpackAsPos } from 'international/generalFunctions'
+import { customLog, randomTick, unpackNumAsCoord } from 'international/utils'
 
 Room.prototype.remotePlanner = function (commune) {
     return true
 }
 
 Room.prototype.clearOtherStructures = function () {
-    if (Game.time % 100 !== 0) return
+    if (!randomTick(100)) return
 
     for (const wall of this.structures.constructedWall) wall.destroy()
 
@@ -18,9 +18,12 @@ Room.prototype.remoteConstructionPlacement = function () {}
 Room.prototype.communeConstructionPlacement = function () {
     if (!this.memory.PC) return
 
-    // Only run the planner every x ticks or if there are builders (temporary fix)
+    // Only run every x ticks or if there are builders (temporary fix)
 
-    if (!this.myCreeps.builder.length && Game.time % Math.floor(Math.random() * 100) !== 0) return
+    if (!this.myCreeps.builder.length) {
+        if (!randomTick(200)) return
+        if (this.resourcesInStoringStructures.energy < this.communeManager.storedEnergyBuildThreshold) return
+    }
 
     // If the construction site count is at its limit, stop
 
@@ -28,7 +31,7 @@ Room.prototype.communeConstructionPlacement = function () {
 
     // If there are some construction sites
 
-    if (this.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+    if (this.find(FIND_MY_CONSTRUCTION_SITES).length >= 2) return
 
     let placed = 0
 
@@ -36,7 +39,7 @@ Room.prototype.communeConstructionPlacement = function () {
         const stamp = stamps[stampType as StampTypes]
 
         for (const packedStampAnchor of this.memory.stampAnchors[stampType as StampTypes]) {
-            const stampAnchor = unpackAsPos(packedStampAnchor)
+            const stampAnchor = unpackNumAsCoord(packedStampAnchor)
 
             for (const structureType in stamp.structures) {
                 if (structureType === 'empty') continue

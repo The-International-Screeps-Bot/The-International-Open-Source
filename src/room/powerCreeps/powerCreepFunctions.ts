@@ -1,1 +1,0 @@
-PowerCreep.prototype.advancedTrasnfer = function () {}
