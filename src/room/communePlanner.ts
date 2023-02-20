@@ -47,6 +47,7 @@ interface PlanStampsArgs {
     stampType: StampTypes
     count: number
     startCoords: Coord[]
+    dynamic?: boolean
     initialWeight?: number
     diagonalDT?: boolean
     coordMap?: CoordMap
@@ -55,11 +56,21 @@ interface PlanStampsArgs {
     conditions?(coord: Coord): boolean
 }
 
-interface PlanStampArgs {
+interface PlanStampDynamicArgs {
+    stampType: StampTypes
     startCoords: Coord[]
+    coordMap: CoordMap
     initialWeight?: number
-    diagonalDT?: boolean
-    coordMap?: CoordMap
+    minAvoid?: number
+    cardinalFlood?: number
+    conditions?(coord: Coord): boolean
+}
+
+interface PlanStampArgs {
+    stampType: StampTypes
+    startCoords: Coord[]
+    coordMap: CoordMap
+    initialWeight?: number
     minAvoid?: number
     cardinalFlood?: number
     conditions?(coord: Coord): boolean
@@ -83,6 +94,15 @@ export class CommunePlanner {
     constructor(roomManager: RoomManager) {
         this.roomManager = roomManager
     }
+
+    _planAttempt: BasePlanAttempt
+    get planAttempt() {
+        if (this._planAttempt) return this._planAttempt
+
+        const roomMemory = Memory.rooms[this.room.name]
+        return (this._planAttempt = roomMemory.BPAs[roomMemory.BPAs.length - 1])
+    }
+
     preTickRun() {
         // Stop if there isn't sufficient CPU
 
@@ -92,9 +112,9 @@ export class CommunePlanner {
 
         this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
-        this.baseCoords = new Uint8Array(2500)
-        this.roadCoords = new Uint8Array(2500)
-        this.rampartCoords = new Uint8Array(2500)
+        this.baseCoords = new Uint8Array()
+        this.roadCoords = new Uint8Array()
+        this.rampartCoords = new Uint8Array()
         this.exitCoords = new Set()
 
         let x
@@ -404,16 +424,47 @@ export class CommunePlanner {
     }
     private flipStampVertical() {}
     private flipStampHorizontal() {}
-    private planStamps(args: PlanStampsArgs) {}
-    private planStamp(args: PlanStampArgs) {}
-    private fastFiller() {
-        /*
-                this.planStamps({
-                    count: 1,
-                    startCoords: [{x:25, y:25}],
+    private planStamps(args: PlanStampsArgs) {
+        if (!args.coordMap) args.coordMap = this.baseCoords
 
+        const stamp = stamps[args.stampType]
+
+        args.count -= this.planAttempt.stampAnchors[args.stampType].length
+
+        for (; args.count > 0; args.count += 1) {
+            let stampAnchor: Coord
+
+            if (args.dynamic) {
+                this.planStampDynamic({
+                    stampType: args.stampType,
+                    startCoords: args.startCoords,
+                    coordMap: args.coordMap,
                 })
-                 */
+            }
+
+            // Not dynamic
+
+            // Run distance transform with the baseCM
+
+            const distanceCoords = args.diagonalDT
+                ? this.room.diagonalDistanceTransform(args.coordMap, false, args.minAvoid)
+                : this.room.distanceTransform(args.coordMap, false, args.minAvoid)
+
+            this.planStamp({
+                stampType: args.stampType,
+                startCoords: args.startCoords,
+                coordMap: distanceCoords,
+            })
+        }
+    }
+    private planStamp(args: PlanStampArgs) {}
+    private planStampDynamic(args: PlanStampDynamicArgs) {}
+    private fastFiller() {
+        this.planStamps({
+            stampType: 'fastFiller',
+            count: 1,
+            startCoords: [{ x: 25, y: 25 }],
+        })
     }
     private hub() {
         this.planStamps({

@@ -2141,7 +2141,7 @@ Room.prototype.createClaimRequest = function () {
 
     if (Memory.claimRequests[this.name]) return false
 
-    if (basePlanner(this) === 'failed') return false
+    if (basePlanner(this) !== true) return false
 
     const request = (Memory.claimRequests[this.name] = {
         data: [0],

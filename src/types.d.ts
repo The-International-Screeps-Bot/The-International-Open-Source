@@ -248,7 +248,7 @@ declare global {
         weightStructurePlans?: boolean
     }
 
-    interface BasePlanAttempts {
+    interface BasePlanAttempt {
         stampAnchors: { [key in StampTypes]: string[] }
         score: number
         basePlans: { [packedCoord: string]: string }
@@ -1507,6 +1507,11 @@ declare global {
          * A packed representation of the center of the fastFiller
          */
         anchor: number
+
+        /**
+         * Base Plan Attempts
+         */
+        BPAs: BasePlanAttempt[]
 
         /**
          * Type of a room that generally describes properties of the room

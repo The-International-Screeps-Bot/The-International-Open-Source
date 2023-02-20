@@ -1342,6 +1342,7 @@ export enum InternationalStatNamesEnum {
 
 
 export const packedPosLength = 3
+export const packedCoordLength = 2
 export const cardinalOffsets = [
     {
         x: -1,
