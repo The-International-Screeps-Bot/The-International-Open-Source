@@ -490,13 +490,13 @@ export class SpawnRequestsManager {
                 repairTargets = repairTargets.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
                 // Get ramparts below their max hits
 
-                const ramparts = this.communeManager.room.structures.rampart.filter(
+                const repairRamparts = this.communeManager.room.structures.rampart.filter(
                     rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits,
                 )
 
                 // If there are no ramparts or repair targets
 
-                if (!ramparts.length && !repairTargets.length) return false
+                if (!repairRamparts.length && !repairTargets.length) return false
 
                 let priority: number
 
@@ -521,12 +521,28 @@ export class SpawnRequestsManager {
 
                 partsMultiplier += this.communeManager.room.structures.container.length * containerUpkeepCost * 2
 
-                // For each rampart, add a multiplier
+                // Extra considerations if a storage is present
 
-                partsMultiplier +=
-                    this.communeManager.room.structures.rampart.filter(r => r.hits / r.hitsMax > 0.9).length *
-                    rampartUpkeepCost *
-                    1.2
+                let maxCreeps = Infinity
+
+                if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
+                    if (
+                        repairRamparts.length / this.communeManager.room.structures.rampart.length < 0.2 &&
+                        this.communeManager.room.totalEnemyCombatStrength.melee +
+                            this.communeManager.room.totalEnemyCombatStrength.ranged <=
+                            0
+                    ) {
+                        maxCreeps = 1
+                    }
+
+                    // For every x energy in storage, add 1 multiplier
+
+                    partsMultiplier += Math.pow(
+                        this.communeManager.room.resourcesInStoringStructures.energy /
+                            (16000 + this.communeManager.room.controller.level * 1000),
+                        2,
+                    )
+                }
 
                 // For every attackValue, add a multiplier
 
@@ -534,19 +550,6 @@ export class SpawnRequestsManager {
                     (this.communeManager.room.totalEnemyCombatStrength.melee +
                         this.communeManager.room.totalEnemyCombatStrength.ranged) /
                     (REPAIR_POWER / 3)
-
-                // For every x energy in storage, add 1 multiplier
-
-                if (
-                    this.communeManager.room.storage &&
-                    this.communeManager.room.controller.level >= 4 &&
-                    ramparts.length
-                )
-                    partsMultiplier += Math.pow(
-                        this.communeManager.room.resourcesInStoringStructures.energy /
-                            (16000 + this.communeManager.room.controller.level * 1000),
-                        2,
-                    )
 
                 const role = 'maintainer'
 
@@ -559,7 +562,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, MOVE, WORK],
                         partsMultiplier,
                         minCreeps: undefined,
-                        maxCreeps: Infinity,
+                        maxCreeps,
                         minCost: 200,
                         priority,
                         memoryAdditions: {
@@ -574,7 +577,7 @@ export class SpawnRequestsManager {
                     extraParts: [MOVE, CARRY, MOVE, WORK],
                     partsMultiplier,
                     minCreeps: undefined,
-                    maxCreeps: Infinity,
+                    maxCreeps,
                     minCost: 250,
                     priority,
                     memoryAdditions: {},
