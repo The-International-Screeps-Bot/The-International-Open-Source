@@ -122,7 +122,7 @@ export class CommunePlanner {
 
         this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
-        this.baseCoords = new Uint8Array(2500)
+        this.baseCoords = new Uint8Array(this.terrainCoords)
         this.roadCoords = new Uint8Array(2500)
         this.rampartCoords = new Uint8Array(2500)
         this.byExitCoords = new Uint8Array(2500)
@@ -149,8 +149,45 @@ export class CommunePlanner {
 
         this.fastFiller()
         this.generateGrid()
+        this.visualize()
 
         return RESULT_SUCCESS
+    }
+    private visualize() {
+
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                const packedCoord = packXYAsNum(x, y)
+                if (this.gridCoords[packedCoord] !== 1) continue
+
+                this.room.visual.structure(x, y, STRUCTURE_ROAD)
+            }
+        }
+
+        for (let key in this.planAttempt.stampAnchors) {
+            const stampType = key as StampTypes
+            const anchor = this.planAttempt.stampAnchors.fastFiller[0]
+            const stamp = stamps[stampType]
+
+            for (key in stamps) {
+                const structureType = key as StructureConstant
+
+                if (!stamp.structures[structureType]) continue
+
+                for (const coordOffset of stamp.structures[structureType]) {
+                    const coord = {
+                        x: coordOffset.x + anchor.x - stamp.offset,
+                        y: coordOffset.y + anchor.y - stamp.offset,
+                    }
+
+                    this.room.visual.structure(coord.x, coord.y, structureType)
+                }
+            }
+        }
+
+        this.room.visual.connectRoads({
+            opacity: 0.7,
+        })
     }
     private recordExits(x: number, y: number) {
         const packedCoord = packXYAsNum(x, y)
@@ -304,7 +341,6 @@ export class CommunePlanner {
         // Paths for grid groups
 
         for (const leaderCoord of groupLeaders) {
-
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
@@ -389,38 +425,6 @@ export class CommunePlanner {
         }
 
         this.pruneGridCoords()
-
-        for (let x = 0; x < roomDimensions; x++) {
-            for (let y = 0; y < roomDimensions; y++) {
-                const packedCoord = packXYAsNum(x, y)
-                if (this.gridCoords[packedCoord] !== 1) continue
-
-                this.room.visual.structure(x, y, STRUCTURE_ROAD)
-            }
-        }
-
-        for (let key in this.planAttempt.stampAnchors) {
-
-            const stampType = key as StampTypes
-            const anchor = this.planAttempt.stampAnchors.fastFiller[0]
-            const stamp = stamps[stampType]
-
-            for (key in stamps) {
-                const structureType = key as StructureConstant
-
-                for (const coordOffset of stamp.structures[structureType]) {
-
-                    const coord = {
-                        x: coordOffset.x + anchor.x,
-                        y: coordOffset.y + anchor.y
-                    }
-
-                    this.room.visual.structure(coord.x, coord.y, structureType)
-                }
-            }
-        }
-
-        this.room.visual.connectRoads()
     }
     private pruneGridCoords() {
         for (let x = 0; x < roomDimensions; x++) {
@@ -638,6 +642,7 @@ export class CommunePlanner {
         const posValue = args.coordMap[packAsNum(coord1)]
         if (posValue === 255) return false
         if (posValue === 0) return false
+        if (posValue < args.stamp.size) return false
 
         // Ensure we aren't too close to an exit
 
