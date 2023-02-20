@@ -220,13 +220,14 @@ export class InternationalManager {
 
         if (global.terrainCoords[roomName]) return global.terrainCoords[roomName]
 
-        global.terrainCoords[roomName] = new Uint8Array()
+        global.terrainCoords[roomName] = new Uint8Array(2500)
 
         const terrain = Game.map.getRoomTerrain(roomName)
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                global.terrainCoords[roomName][packXYAsNum(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
+                global.terrainCoords[roomName][packXYAsNum(x, y)] = (terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0)
+
             }
         }
 

@@ -112,9 +112,9 @@ export class CommunePlanner {
 
         this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
-        this.baseCoords = new Uint8Array()
-        this.roadCoords = new Uint8Array()
-        this.rampartCoords = new Uint8Array()
+        this.baseCoords = new Uint8Array(2500)
+        this.roadCoords = new Uint8Array(2500)
+        this.rampartCoords = new Uint8Array(2500)
         this.exitCoords = new Set()
 
         let x
