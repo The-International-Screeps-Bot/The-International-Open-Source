@@ -82,7 +82,7 @@ export class RoomManager {
 
         room.squadRequests = new Set()
 
-        if (room.memory.T === 'remote') {
+        if (roomMemory.T === 'remote') {
             room.roomLogisticsRequests = {
                 transfer: {},
                 withdraw: {},
@@ -97,7 +97,9 @@ export class RoomManager {
         if (!room.controller) return
 
         if (!room.controller.my) {
-            if (room.memory.T === 'commune') {
+            if (roomMemory.T === 'commune') {
+                delete roomMemory.T
+
                 room.basicScout()
                 cleanRoomMemory(room.name)
             }

@@ -869,10 +869,10 @@ Room.prototype.basicScout = function () {
 
         if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
 
-        if (this.scoutEnemyRoom()) return this.memory.T
-
-        return this.memory.T
+        return this.scoutEnemyRoom()
     }
+
+    // No controller owner
 
     if (this.scoutRemote()) return this.memory.T
 
@@ -908,10 +908,10 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
             if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
 
-            if (this.scoutEnemyRoom()) return this.memory.T
-
-            return this.memory.T
+            return this.scoutEnemyRoom()
         }
+
+        // No controlller owner
 
         if (this.scoutRemote(scoutingRoom)) return this.memory.T
 

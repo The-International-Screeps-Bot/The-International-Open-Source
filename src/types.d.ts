@@ -249,7 +249,7 @@ declare global {
     }
 
     interface BasePlanAttempt {
-        stampAnchors: { [key in StampTypes]: string[] }
+        stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
         score: number
         basePlans: { [packedCoord: string]: string }
         rampartPlans: { [packedCoord: string]: string }
@@ -1068,7 +1068,7 @@ declare global {
         scoutEnemyUnreservedRemote(): RoomTypes | false
         scoutMyRemote(scoutingRoom: Room): RoomTypes | false
 
-        scoutEnemyRoom(): RoomTypes | false
+        scoutEnemyRoom(): RoomTypes
 
         basicScout(): RoomTypes
 
