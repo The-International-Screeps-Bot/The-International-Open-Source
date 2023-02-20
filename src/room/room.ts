@@ -9,11 +9,15 @@ import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import { RoomVisualsManager } from './roomVisuals'
 import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
+import { TombstoneManager } from './tombstones'
+import { RuinManager } from './ruins'
 
 export class RoomManager {
     communePlanner: CommunePlanner
     containerManager: ContainerManager
     droppedResourceManager: DroppedResourceManager
+    tombstoneManager: TombstoneManager
+    ruinManager: RuinManager
 
     creepRoleManager: CreepRoleManager
     powerCreepRoleManager: PowerCreepRoleManager
@@ -24,6 +28,8 @@ export class RoomManager {
         this.communePlanner = new CommunePlanner(this)
         this.containerManager = new ContainerManager(this)
         this.droppedResourceManager = new DroppedResourceManager(this)
+        this.tombstoneManager = new TombstoneManager(this)
+        this.ruinManager = new RuinManager(this)
 
         this.creepRoleManager = new CreepRoleManager(this)
         this.powerCreepRoleManager = new PowerCreepRoleManager(this)
@@ -115,6 +121,8 @@ export class RoomManager {
         if (this.room.memory.T === 'remote') {
             this.containerManager.runRemote()
             this.droppedResourceManager.runRemote()
+            this.tombstoneManager.runRemote()
+            this.ruinManager.runRemote()
         }
 
         this.creepRoleManager.run()

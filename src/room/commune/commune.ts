@@ -240,6 +240,8 @@ export class CommuneManager {
         this.factoryManager.run()
         this.room.roomManager.containerManager.runCommune()
         this.room.roomManager.droppedResourceManager.runCommune()
+        this.room.roomManager.tombstoneManager.runCommune()
+        this.room.roomManager.ruinManager.runCommune()
         this.linkManager.run()
         this.labManager.run()
         this.powerSpawningStructuresManager.run()
