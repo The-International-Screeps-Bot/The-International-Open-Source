@@ -451,8 +451,9 @@ export class Quad {
         // Attack mode
 
         opts.weightCostMatrixes = ['quadCostMatrix']
-        if (moveLeader.createMoveRequest(opts) !== true) return false
+        moveLeader.createMoveRequest(opts)
 
+        if (!moveLeader.moveRequest) return false
         if (!this.membersAttackMove()) return false
 
         return true
