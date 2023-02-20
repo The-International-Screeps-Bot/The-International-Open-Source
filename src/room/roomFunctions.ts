@@ -775,7 +775,7 @@ Room.prototype.scoutEnemyRoom = function () {
             data: [0],
         }
 
-        for (const key in PlayerData) this.memory.data[parseInt(key)] = 0
+        for (const key in PlayerData) player.data[parseInt(key)] = 0
     }
 
     // General
