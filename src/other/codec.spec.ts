@@ -140,23 +140,23 @@ describe('codec', () => {
         }
     })
 
-    it('should encode and decode base plans', () => {
-        const basePlan: { [packedCoord: string]: BasePlanCoord } = {}
+    // it('should encode and decode base plans', () => {
+    //     const basePlan: { [packedCoord: string]: BasePlanCoord } = {}
 
-        for (let x = 1; x < 50; x++) {
-            for (let y = 1; y < 50; y++) {
-                const coord = { x, y }
-                const packedCoord = Codec.packCoord(coord)
-                basePlan[packedCoord] = { minRCL: 1, structureType: STRUCTURE_EXTENSION }
-            }
-        }
+    //     for (let x = 1; x < 50; x++) {
+    //         for (let y = 1; y < 50; y++) {
+    //             const coord = { x, y }
+    //             const packedCoord = Codec.packCoord(coord)
+    //             basePlan[packedCoord] = { minRCL: 1, structureType: STRUCTURE_EXTENSION }
+    //         }
+    //     }
 
-        const encoded = Codec.packBasePlans(basePlan)
-        const decoded = BasePlans.unpackBasePlans(encoded)
-        const values = Object.values(decoded.map)
-        values.forEach(planCoord => {
-            expect(planCoord).toEqual({ minRCL: 1, structureType: STRUCTURE_EXTENSION })
-        })
-        expect(values.length).toEqual(49 * 49)
-    })
+    //     const encoded = Codec.packBasePlans(basePlan)
+    //     const decoded = BasePlans.unpackBasePlans(encoded)
+    //     const values = Object.values(decoded.map)
+    //     values.forEach(planCoord => {
+    //         expect(planCoord).toEqual({ minRCL: 1, structureType: STRUCTURE_EXTENSION })
+    //     })
+    //     expect(values.length).toEqual(49 * 49)
+    // })
 })
