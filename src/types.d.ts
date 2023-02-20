@@ -97,7 +97,7 @@ declare global {
         | 'extractor'
         | 'road'
         | 'rampart'
-        | 'gridExtension'
+        /* | 'gridExtension' */
 
     interface Stamp {
         offset: number

@@ -456,7 +456,7 @@ export class CommunePlanner {
     private gridExtensions() {
 
         this.planStamps({
-            stampType: 'gridExtension',
+            stampType: /* 'gridExtension' */'extension',
             count: 40,
             startCoords: [this.room.anchor],
             /**

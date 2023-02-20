@@ -526,7 +526,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         structures: {
             rampart: [{ x: 0, y: 0 }],
         },
-    },
+    },/*
     gridExtension: {
         offset: 0,
         protectionOffset: 0,
@@ -534,7 +534,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         structures: {
             extension: [{ x: 0, y: 0 }],
         },
-    }
+    } */
 }
 
 export const minerals: Partial<ResourceConstant[]> = [
