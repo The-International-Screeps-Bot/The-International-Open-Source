@@ -1,6 +1,6 @@
 import { customColors, stamps } from 'international/constants'
 import { customLog } from 'international/utils'
-import { basePlanner } from './communePlanner'
+import { basePlanner } from '../communePlanner'
 import { rampartPlanner } from './rampartPlanner'
 import './constructionFunctions'
 import { globalStatsUpdater } from 'international/statsManager'

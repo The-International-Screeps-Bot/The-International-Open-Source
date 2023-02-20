@@ -8,8 +8,10 @@ import { EndTickCreepManager } from './creeps/endTickCreepManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import { RoomVisualsManager } from './roomVisuals'
 import { statsManager } from 'international/statsManager'
+import { CommunePlanner } from './communePlanner'
 
 export class RoomManager {
+    communePlanner: CommunePlanner
     containerManager: ContainerManager
     droppedResourceManager: DroppedResourceManager
 
@@ -19,6 +21,7 @@ export class RoomManager {
     roomVisualsManager: RoomVisualsManager
 
     constructor() {
+        this.communePlanner = new CommunePlanner(this)
         this.containerManager = new ContainerManager(this)
         this.droppedResourceManager = new DroppedResourceManager(this)
 
@@ -104,6 +107,8 @@ export class RoomManager {
 
         room.communeManager.update(room)
         room.communeManager.preTickRun()
+
+        if (this.room.name === 'W7N3') this.communePlanner.preTickRun()
     }
 
     public run() {

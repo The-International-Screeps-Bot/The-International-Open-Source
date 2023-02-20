@@ -66,12 +66,10 @@ import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
 import { encode } from 'base32768'
 import { BasePlans } from '../construction/basePlans'
-import { CommunePlanner } from 'room/construction/communePlanner'
 
 export class CommuneManager {
     // Managers
 
-    communePlanner: CommunePlanner
     combatManager: CombatManager
 
     towerManager: TowerManager
@@ -103,7 +101,6 @@ export class CommuneManager {
     estimatedEnergyIncome: number
 
     constructor() {
-        this.communePlanner = new CommunePlanner(this)
         this.combatManager = new CombatManager(this)
 
         this.towerManager = new TowerManager(this)
@@ -262,7 +259,7 @@ export class CommuneManager {
     }
 
     private preTickTest() {
-        if (this.room.name === 'W7N3') this.communePlanner.preTickRun()
+
 
         return
 

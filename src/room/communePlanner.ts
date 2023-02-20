@@ -40,19 +40,8 @@ import { packCoord, packPosList, packXYAsCoord, unpackCoord } from 'other/codec'
 import 'other/RoomVisual'
 import { toASCII } from 'punycode'
 import { CommuneManager } from 'room/commune/commune'
-import { rampartPlanner } from './rampartPlanner'
-
-interface PlanStampOpts {
-    stampType: StampTypes
-    count: number
-    startCoords: Coord[]
-    initialWeight?: number
-    adjacentToRoads?: boolean
-    diagonalDT?: boolean
-    coordMap?: CoordMap
-    minAvoid?: number
-    cardinalFlood?: boolean
-}
+import { rampartPlanner } from './construction/rampartPlanner'
+import { RoomManager } from './room'
 
 interface PlanStampsArgs {
     stampType: StampTypes
@@ -80,7 +69,7 @@ interface PlanStampArgs {
  *
  */
 export class CommunePlanner {
-    communeManager: CommuneManager
+    roomManager: RoomManager
     room: Room
 
     terrainCoords: CoordMap
@@ -91,15 +80,15 @@ export class CommunePlanner {
     diagonalCoords: Uint8Array
     gridCoords: Uint8Array
 
-    constructor(communeManager: CommuneManager) {
-        this.communeManager = communeManager
+    constructor(roomManager: RoomManager) {
+        this.roomManager = roomManager
     }
     preTickRun() {
         // Stop if there isn't sufficient CPU
 
         if (Game.cpu.bucket < CPUMaxPerTick) return RESULT_FAIL
 
-        this.room = this.communeManager.room
+        this.room = this.roomManager.room
 
         this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
@@ -330,7 +319,6 @@ export class CommunePlanner {
         // Paths for exit groups
 
         for (const group of exitGroups) {
-
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
@@ -350,7 +338,6 @@ export class CommunePlanner {
 
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
-
                 const packedCoord = packXYAsNum(x, y)
                 if (this.gridCoords[packedCoord] !== 1) continue
 
@@ -427,7 +414,7 @@ export class CommunePlanner {
 
                 })
                  */
-            }
+    }
     private hub() {
         this.planStamps({
             stampType: 'hub',
@@ -436,12 +423,10 @@ export class CommunePlanner {
             /**
              * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords
              */
-            conditions: (coord) => {
-
+            conditions: coord => {
                 if (this.gridCoords[packAsNum(coord)] === 1) return false
 
                 for (const offsets of cardinalOffsets) {
-
                     const x = coord.x + offsets.x
                     const y = coord.y + offsets.y
 
@@ -449,25 +434,22 @@ export class CommunePlanner {
                 }
 
                 return true
-            }
+            },
         })
     }
     private labs() {}
     private gridExtensions() {
-
         this.planStamps({
-            stampType: /* 'gridExtension' */'extension',
+            stampType: /* 'gridExtension' */ 'extension',
             count: 40,
             startCoords: [this.room.anchor],
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
-            conditions: (coord) => {
-
+            conditions: coord => {
                 if (this.gridCoords[packAsNum(coord)] === 1) return false
 
                 for (const offsets of adjacentOffsets) {
-
                     const x = coord.x + offsets.x
                     const y = coord.y + offsets.y
 
@@ -475,23 +457,14 @@ export class CommunePlanner {
                 }
 
                 return false
-            }
+            },
         })
-
     }
     private towers() {}
     private planSourceStructures() {}
-    private observer() {
-
-    }
-    private nuker() {
-
-
-    }
-    private powerSpawn() {
-
-
-    }
+    private observer() {}
+    private nuker() {}
+    private powerSpawn() {}
 }
 
 /**
