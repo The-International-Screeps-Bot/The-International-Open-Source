@@ -45,7 +45,6 @@ import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
 import { RoomManager } from './room'
 import { openStdin } from 'process'
-import e from 'express'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 
