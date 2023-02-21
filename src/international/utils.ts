@@ -291,20 +291,21 @@ export function findClosestObjectInRange<T extends _HasRoomPosition>(
 /**
  * Finds the closest position to a given target (Half Manhattan)
  */
-export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]) {
+export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]): [Coord, number] {
     let minRange = Infinity
-    let closest = undefined
+    let closestI = 0
 
-    for (const pos of positions) {
+    for (let i = 0; i < positions.length; i++) {
+        const pos = positions[i]
         const range = getRange(target.x, pos.x, target.y, pos.y)
 
         if (range > minRange) continue
 
         minRange = range
-        closest = pos
+        closestI = i
     }
 
-    return closest
+    return [positions[closestI], closestI]
 }
 
 /**

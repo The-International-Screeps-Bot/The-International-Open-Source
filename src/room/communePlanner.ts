@@ -58,7 +58,15 @@ interface PlanStampsArgs {
     coordMap?: CoordMap
     minAvoid?: number
     cardinalFlood?: boolean
+    /**
+     * How to consider potential stampAnchors
+     */
     conditions?(coord: Coord): boolean
+    /**
+     * What to do with the stampAnchor resulting from a successful individual plan
+     * @param coord the stampAnchor
+     */
+    consequence(coord: Coord): void
 }
 
 interface FindDynamicStampAnchorArgs {
@@ -88,17 +96,24 @@ export class CommunePlanner {
 
     terrainCoords: CoordMap
     exitCoords: Set<string>
+    /**
+     * Coords adjacent to exits, including exit coords
+     */
     byExitCoords: Uint8Array
     baseCoords: Uint8Array
     roadCoords: Uint8Array
     rampartCoords: Uint8Array
     diagonalCoords: Uint8Array
     gridCoords: Uint8Array
+    /**
+     * Coords adjacent to gridCoords
+     */
+    byGridCoords: Uint8Array
+    finishedGrid: boolean
     basePlans: BasePlans
     rampartPlans: RampartPlans
     stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
     score: number
-    finishedGrid: boolean
 
     constructor(roomManager: RoomManager) {
         this.roomManager = roomManager
@@ -115,7 +130,7 @@ export class CommunePlanner {
             this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
             this.baseCoords = new Uint8Array(this.terrainCoords)
-            this.roadCoords = new Uint8Array(2500)
+            this.roadCoords = new Uint8Array(this.terrainCoords)
             this.rampartCoords = new Uint8Array(2500)
             this.byExitCoords = new Uint8Array(2500)
             this.exitCoords = new Set()
@@ -131,6 +146,7 @@ export class CommunePlanner {
         this.fastFiller()
         this.generateGrid()
         this.hub()
+        this.gridExtensions()
         this.visualize()
 
         return RESULT_SUCCESS
@@ -139,12 +155,20 @@ export class CommunePlanner {
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
+                if (this.baseCoords[packedCoord] === 255) continue
                 if (this.gridCoords[packedCoord] !== 1) continue
 
                 this.room.visual.structure(x, y, STRUCTURE_ROAD)
             }
         }
 
+        for (const packedCoord in this.basePlans.map) {
+            const coord = unpackCoord(packedCoord)
+            const basePlansCoord = this.basePlans.map[packedCoord]
+
+            this.room.visual.structure(coord.x, coord.y, basePlansCoord.structureType)
+        }
+        /*
         for (let key in this.stampAnchors) {
             const stampType = key as StampTypes
             const stamp = stamps[stampType]
@@ -166,7 +190,7 @@ export class CommunePlanner {
                 }
             }
         }
-
+ */
         this.room.visual.connectRoads({
             opacity: 0.7,
         })
@@ -219,7 +243,7 @@ export class CommunePlanner {
         const gridSize = 4
         const anchor = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
-            this.stampAnchors.fastFiller[0].y,
+            this.stampAnchors.fastFiller[0].y - 1,
             this.room.name,
         )
 
@@ -434,6 +458,26 @@ export class CommunePlanner {
         }
 
         this.pruneGridCoords()
+
+        this.byGridCoords = new Uint8Array(2500)
+
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                const packedCoord = packXYAsNum(x, y)
+                if (this.gridCoords[packedCoord] !== 1) continue
+
+                for (const adjCoord of findAdjacentCoordsToXY(x, y)) {
+                    const packedAdjCoord = packAsNum(adjCoord)
+
+                    if (this.gridCoords[packedAdjCoord] === 1) continue
+                    if (this.terrainCoords[packedAdjCoord] === 255) continue
+
+                    this.byGridCoords[packedAdjCoord] = 1
+                }
+            }
+        }
+
+        this.finishedGrid = true
     }
     private pruneGridCoords() {
         for (let x = 0; x < roomDimensions; x++) {
@@ -496,7 +540,6 @@ export class CommunePlanner {
         if (!args.coordMap) args.coordMap = this.baseCoords
 
         const stamp = stamps[args.stampType]
-        const stampAnchors: Coord[] = []
 
         args.count -= this.stampAnchors[args.stampType].length
 
@@ -508,11 +551,13 @@ export class CommunePlanner {
                     stamp,
                     startCoords: args.startCoords,
                     coordMap: args.coordMap,
+                    cardinalFlood: args.cardinalFlood,
                     conditions: args.conditions,
                 })
                 if (!stampAnchor) continue
 
-                stampAnchors.push(stampAnchor)
+                args.consequence(stampAnchor)
+                this.stampAnchors[args.stampType].push(stampAnchor)
                 continue
             }
 
@@ -528,14 +573,13 @@ export class CommunePlanner {
                 stamp,
                 startCoords: args.startCoords,
                 coordMap: distanceCoords,
+                cardinalFlood: args.cardinalFlood,
             })
             if (!stampAnchor) continue
 
-            stampAnchors.push(stampAnchor)
+            args.consequence(stampAnchor)
+            this.stampAnchors[args.stampType].push(stampAnchor)
         }
-
-        this.stampAnchors[args.stampType] = this.stampAnchors[args.stampType].concat(stampAnchors)
-        return stampAnchors
     }
     private recordStamp(stampType: StampTypes, stampAnchor: Coord) {
         const stamp = stamps[stampType]
@@ -549,6 +593,8 @@ export class CommunePlanner {
                     x: coordOffset.x + stampAnchor.x - stamp.offset,
                     y: coordOffset.y + stampAnchor.y - stamp.offset,
                 }
+
+                this.basePlans.set(packCoord(coord), structureType, 8)
 
                 const packedCoord = packAsNum(coord)
 
@@ -602,7 +648,7 @@ export class CommunePlanner {
                 }
             }
 
-            // Flood all adjacent positions excluding diagonals
+            // Flood all adjacent positions
 
             if (!nextGeneration.length) {
                 localVisitedCoords = new Uint8Array(visitedCoords)
@@ -727,14 +773,14 @@ export class CommunePlanner {
                         if (localVisitedCoords[packAsNum(coord2)] === 1) continue
                         localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (args.coordMap[packAsNum(coord2)] === 0) continue
+                        if (args.coordMap[packAsNum(coord2)] === 255) continue
 
                         nextGeneration.push(coord2)
                     }
                 }
             }
 
-            // Flood all adjacent positions excluding diagonals
+            // Flood all adjacent positions
 
             if (!nextGeneration.length) {
                 localVisitedCoords = new Uint8Array(visitedCoords)
@@ -757,7 +803,7 @@ export class CommunePlanner {
                         if (localVisitedCoords[packAsNum(coord2)] === 1) continue
                         localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (args.coordMap[packAsNum(coord2)] === 0) continue
+                        if (args.coordMap[packAsNum(coord2)] === 255) continue
 
                         nextGeneration.push(coord2)
                     }
@@ -805,8 +851,8 @@ export class CommunePlanner {
     private isViableDynamicStampAnchor(args: FindDynamicStampAnchorArgs, coord1: Coord) {
         // Get the value of the pos
 
-        const posValue = args.coordMap[packAsNum(coord1)]
-        if (posValue === 255) return false
+        if (args.coordMap[packAsNum(coord1)] === 255) return false
+        if (this.roadCoords[packAsNum(coord1)] > 0) return false
         /* if (posValue === 0) return false */
 
         if (!args.conditions(coord1)) return false
@@ -828,100 +874,106 @@ export class CommunePlanner {
         return true
     }
     private fastFiller() {
-        const stampAnchors = this.planStamps({
+        this.planStamps({
             stampType: 'fastFiller',
             count: 1,
             startCoords: [this.room.controller.pos],
             cardinalFlood: true,
+            consequence: stampAnchor => {
+                this.recordStamp('fastFiller', stampAnchor)
+            },
         })
-
-        if (!stampAnchors.length) return
-
-        const stampAnchor = stampAnchors[0]
-        this.recordStamp('fastFiller', stampAnchor)
     }
     private hub() {
-        const stampAnchors = this.planStamps({
+        this.planStamps({
             stampType: 'hub',
             count: 1,
             startCoords: [this.stampAnchors.fastFiller[0]],
             dynamic: true,
             /**
-             * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords
+             * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords but are each adjacent to one
              */
             conditions: coord => {
                 if (this.gridCoords[packAsNum(coord)] === 1) return false
 
                 for (const offsets of cardinalOffsets) {
-                    const x = coord.x + offsets.x
-                    const y = coord.y + offsets.y
-
-                    if (this.gridCoords[packXYAsNum(x, y)] === 1) return false
+                    const packedCoord = packXYAsNum(coord.x + offsets.x, coord.y + offsets.y)
+                    if (this.byGridCoords[packedCoord] !== 1) return false
                 }
 
                 return true
             },
+            consequence: stampAnchor => {
+                this.room.errorVisual(stampAnchor)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 20
+
+                const structureCoords: Coord[] = []
+
+                for (const offset of cardinalOffsets) {
+                    structureCoords.push({
+                        x: stampAnchor.x + offset.x,
+                        y: stampAnchor.y + offset.y,
+                    })
+                }
+
+                let [coord, i] = findClosestCoord(this.stampAnchors.fastFiller[0], structureCoords)
+                structureCoords.splice(i, 1)
+                this.basePlans.set(packCoord(coord), STRUCTURE_STORAGE, 4)
+                this.baseCoords[packAsNum(coord)] = 255
+                this.roadCoords[packAsNum(coord)] = 255
+
+                if (stampAnchor.y === coord.y)
+                    coord = {
+                        x: stampAnchor.x - coord.x + stampAnchor.x,
+                        y: coord.y,
+                    }
+                else
+                    coord = {
+                        x: coord.x,
+                        y: stampAnchor.y - coord.y + stampAnchor.y,
+                    }
+
+                for (i = 0; i, structureCoords.length; i++) {
+                    if (areCoordsEqual(coord, structureCoords[i])) break
+                }
+
+                structureCoords.splice(i, 1)
+                this.basePlans.set(packCoord(coord), STRUCTURE_TERMINAL, 6)
+                this.baseCoords[packAsNum(coord)] = 255
+                this.roadCoords[packAsNum(coord)] = 255
+
+                //
+                ;[coord, i] = findClosestCoord(this.room.controller.pos, structureCoords)
+                structureCoords.splice(i, 1)
+                this.basePlans.set(packCoord(coord), STRUCTURE_LINK, 5)
+                this.baseCoords[packAsNum(coord)] = 255
+                this.roadCoords[packAsNum(coord)] = 255
+
+                coord = structureCoords[0]
+                this.basePlans.set(packCoord(coord), STRUCTURE_FACTORY, 7)
+                this.baseCoords[packAsNum(coord)] = 255
+                this.roadCoords[packAsNum(coord)] = 255
+            },
         })
-
-        if (!stampAnchors.length) return
-
-        const stampAnchor = stampAnchors[0]
-        this.baseCoords[packAsNum(stampAnchor)] = 255
-        this.roadCoords[packAsNum(stampAnchor)] = 20
-
-        const structureCoords: Coord[] = []
-
-        for (const offset of cardinalOffsets) {
-            structureCoords.push({
-                x: stampAnchor.x + offset.x,
-                y: stampAnchor.y + offset.y,
-            })
-        }
-
-        let coord = findClosestCoord(this.stampAnchors.fastFiller[0], structureCoords)
-        structureCoords.splice(structureCoords.indexOf(coord), 1)
-
-        this.baseCoords[packAsNum(coord)] = 255
-        this.roadCoords[packAsNum(coord)] = 255
-
-        if (stampAnchor.y === coord.y)
-            coord = {
-                x: Math.abs(stampAnchor.x - coord.x),
-                y: coord.y,
-            }
-        else
-            coord = {
-                x: coord.x,
-                y: Math.abs(stampAnchor.y - coord.y),
-            }
-
-        structureCoords.splice(structureCoords.indexOf(coord), 1)
-        this.baseCoords[packAsNum(coord)] = 255
-        this.roadCoords[packAsNum(coord)] = 255
-
-        structureCoords
     }
     private labs() {}
     private gridExtensions() {
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
-            count: 40,
+            count: CONTROLLER_STRUCTURES.extension[8] /* - planned extensions count */,
             startCoords: [this.stampAnchors.fastFiller[0]],
             dynamic: true,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
             conditions: coord => {
-                if (this.gridCoords[packAsNum(coord)] === 1) return false
-
-                for (const offsets of adjacentOffsets) {
-                    const x = coord.x + offsets.x
-                    const y = coord.y + offsets.y
-
-                    if (this.gridCoords[packXYAsNum(x, y)] === 1) return true
-                }
-
-                return false
+                return this.byGridCoords[packAsNum(coord)] === 1
+            },
+            consequence: stampAnchor => {
+                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_EXTENSION, 8)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 255
             },
         })
     }
