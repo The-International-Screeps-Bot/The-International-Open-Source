@@ -24,6 +24,7 @@ import {
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
     findAvgBetweenCoords,
+    findClosestCoord,
     findClosestPos,
     findCoordsInsideRect,
     getRange,
@@ -44,6 +45,9 @@ import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
 import { RoomManager } from './room'
 import { openStdin } from 'process'
+import e from 'express'
+import { BasePlans } from './construction/basePlans'
+import { RampartPlans } from './construction/rampartPlans'
 
 interface PlanStampsArgs {
     stampType: StampTypes
@@ -90,17 +94,14 @@ export class CommunePlanner {
     rampartCoords: Uint8Array
     diagonalCoords: Uint8Array
     gridCoords: Uint8Array
+    basePlans: BasePlans
+    rampartPlans: RampartPlans
+    stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
+    score: number
+    finishedGrid: boolean
 
     constructor(roomManager: RoomManager) {
         this.roomManager = roomManager
-    }
-
-    _planAttempt: BasePlanAttempt
-    get planAttempt() {
-        if (this._planAttempt) return this._planAttempt
-
-        const roomMemory = Memory.rooms[this.room.name]
-        return (this._planAttempt = roomMemory.BPAs[roomMemory.BPAs.length - 1])
     }
 
     preTickRun() {
@@ -109,52 +110,32 @@ export class CommunePlanner {
         if (Game.cpu.bucket < CPUMaxPerTick) return RESULT_FAIL
 
         this.room = this.roomManager.room
-        delete this._planAttempt
-        if (!this.room.memory.BPAs)
-            this.room.memory.BPAs = [
-                {
-                    score: 0,
-                    stampAnchors: {},
-                    basePlans: {},
-                    rampartPlans: {},
-                },
-            ]
 
-        this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
+        if (!this.terrainCoords) {
+            this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
-        this.baseCoords = new Uint8Array(this.terrainCoords)
-        this.roadCoords = new Uint8Array(2500)
-        this.rampartCoords = new Uint8Array(2500)
-        this.byExitCoords = new Uint8Array(2500)
-        this.exitCoords = new Set()
+            this.baseCoords = new Uint8Array(this.terrainCoords)
+            this.roadCoords = new Uint8Array(2500)
+            this.rampartCoords = new Uint8Array(2500)
+            this.byExitCoords = new Uint8Array(2500)
+            this.exitCoords = new Set()
+            this.basePlans = new BasePlans()
+            this.rampartPlans = new RampartPlans()
+            this.stampAnchors = {}
+            for (const stampType in stamps) this.stampAnchors[stampType as StampTypes] = []
 
-        let x
-        let y = 0
-        for (x = 0; x < roomDimensions; x += 1) this.recordExits(x, y)
-
-        // Configure x and loop through left exits
-
-        x = 0
-        for (y = 0; y < roomDimensions; y += 1) this.recordExits(x, y)
-
-        // Configure y and loop through bottom exits
-
-        y = roomDimensions - 1
-        for (x = 0; x < roomDimensions; x += 1) this.recordExits(x, y)
-
-        // Configure x and loop through right exits
-
-        x = roomDimensions - 1
-        for (y = 0; y < roomDimensions; y += 1) this.recordExits(x, y)
+            this.score = 0
+            this.recordExits()
+        }
 
         this.fastFiller()
         this.generateGrid()
+        this.hub()
         this.visualize()
 
         return RESULT_SUCCESS
     }
     private visualize() {
-
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
@@ -164,23 +145,24 @@ export class CommunePlanner {
             }
         }
 
-        for (let key in this.planAttempt.stampAnchors) {
+        for (let key in this.stampAnchors) {
             const stampType = key as StampTypes
-            const anchor = this.planAttempt.stampAnchors.fastFiller[0]
             const stamp = stamps[stampType]
 
-            for (key in stamps) {
-                const structureType = key as StructureConstant
+            for (const anchor of this.stampAnchors[stampType]) {
+                for (key in stamps) {
+                    const structureType = key as StructureConstant
 
-                if (!stamp.structures[structureType]) continue
+                    if (!stamp.structures[structureType]) continue
 
-                for (const coordOffset of stamp.structures[structureType]) {
-                    const coord = {
-                        x: coordOffset.x + anchor.x - stamp.offset,
-                        y: coordOffset.y + anchor.y - stamp.offset,
+                    for (const coordOffset of stamp.structures[structureType]) {
+                        const coord = {
+                            x: coordOffset.x + anchor.x - stamp.offset,
+                            y: coordOffset.y + anchor.y - stamp.offset,
+                        }
+
+                        this.room.visual.structure(coord.x, coord.y, structureType)
                     }
-
-                    this.room.visual.structure(coord.x, coord.y, structureType)
                 }
             }
         }
@@ -189,7 +171,27 @@ export class CommunePlanner {
             opacity: 0.7,
         })
     }
-    private recordExits(x: number, y: number) {
+    private recordExits() {
+        let x
+        let y = 0
+        for (x = 0; x < roomDimensions; x += 1) this.recordExit(x, y)
+
+        // Configure x and loop through left exits
+
+        x = 0
+        for (y = 0; y < roomDimensions; y += 1) this.recordExit(x, y)
+
+        // Configure y and loop through bottom exits
+
+        y = roomDimensions - 1
+        for (x = 0; x < roomDimensions; x += 1) this.recordExit(x, y)
+
+        // Configure x and loop through right exits
+
+        x = roomDimensions - 1
+        for (y = 0; y < roomDimensions; y += 1) this.recordExit(x, y)
+    }
+    private recordExit(x: number, y: number) {
         const packedCoord = packXYAsNum(x, y)
         if (this.terrainCoords[packedCoord] === 255) return
 
@@ -209,13 +211,18 @@ export class CommunePlanner {
         }
     }
     private generateGrid() {
+        if (this.finishedGrid) return
+
+        delete this.gridCoords
+        delete this.diagonalCoords
+
         const gridSize = 4
         const anchor = new RoomPosition(
-            this.planAttempt.stampAnchors.fastFiller[0].x,
-            this.planAttempt.stampAnchors.fastFiller[0].y,
+            this.stampAnchors.fastFiller[0].x,
+            this.stampAnchors.fastFiller[0].y,
             this.room.name,
         )
-        const terrain = this.room.getTerrain()
+
         const inset = 1
 
         this.diagonalCoords = new Uint8Array(2500)
@@ -224,7 +231,7 @@ export class CommunePlanner {
 
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
-                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                if (this.terrainCoords[packXYAsNum(x, y)] === 255) continue
 
                 // Calculate the position of the cell relative to the anchor
 
@@ -249,8 +256,10 @@ export class CommunePlanner {
 
         for (let x = inset; x < roomDimensions - inset; x++) {
             for (let y = inset; y < roomDimensions - inset; y++) {
-                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
-                if (this.byExitCoords[packXYAsNum(x, y)] > 0) continue
+                const packedCoord = packXYAsNum(x, y)
+                if (this.baseCoords[packedCoord] === 255) continue
+                /* if (this.terrainCoords[packedCoord] === 255) continue */
+                if (this.byExitCoords[packedCoord] > 0) continue
 
                 // Calculate the position of the cell relative to the anchor
 
@@ -386,7 +395,7 @@ export class CommunePlanner {
                 for (const coord of thisGeneration) {
                     for (const adjCoord of findAdjacentCoordsToCoord(coord)) {
                         if (!isXYExit(adjCoord.x, adjCoord.y)) continue
-                        if (terrain.get(adjCoord.x, adjCoord.y) === TERRAIN_MASK_WALL) continue
+                        if (this.terrainCoords[packAsNum(adjCoord)] === 255) continue
 
                         const packedAdjCoord = packCoord(adjCoord)
                         if (visitedCoords.has(packedAdjCoord)) continue
@@ -489,9 +498,7 @@ export class CommunePlanner {
         const stamp = stamps[args.stampType]
         const stampAnchors: Coord[] = []
 
-        if (this.planAttempt.stampAnchors[args.stampType])
-            args.count -= this.planAttempt.stampAnchors[args.stampType].length
-        else this.planAttempt.stampAnchors[args.stampType] = stampAnchors
+        args.count -= this.stampAnchors[args.stampType].length
 
         for (; args.count > 0; args.count -= 1) {
             let stampAnchor: Coord | false
@@ -501,6 +508,7 @@ export class CommunePlanner {
                     stamp,
                     startCoords: args.startCoords,
                     coordMap: args.coordMap,
+                    conditions: args.conditions,
                 })
                 if (!stampAnchor) continue
 
@@ -526,7 +534,33 @@ export class CommunePlanner {
             stampAnchors.push(stampAnchor)
         }
 
+        this.stampAnchors[args.stampType] = this.stampAnchors[args.stampType].concat(stampAnchors)
         return stampAnchors
+    }
+    private recordStamp(stampType: StampTypes, stampAnchor: Coord) {
+        const stamp = stamps[stampType]
+
+        for (const key in stamp.structures) {
+            const structureType = key as StructureConstant
+            if (!stamp.structures[structureType]) continue
+
+            for (const coordOffset of stamp.structures[structureType]) {
+                const coord = {
+                    x: coordOffset.x + stampAnchor.x - stamp.offset,
+                    y: coordOffset.y + stampAnchor.y - stamp.offset,
+                }
+
+                const packedCoord = packAsNum(coord)
+
+                if (structureType === STRUCTURE_ROAD) {
+                    this.roadCoords[packedCoord] = 1
+                    continue
+                }
+
+                this.baseCoords[packedCoord] = 255
+                this.roadCoords[packedCoord] = 255
+            }
+        }
     }
     private findStampAnchor(args: FindStampAnchorArgs) {
         let visitedCoords = new Uint8Array(2500)
@@ -655,7 +689,7 @@ export class CommunePlanner {
 
         for (const coord2 of rectCoords) {
             if (!isXYInRoom(coord2.x, coord2.y)) continue
-            if (this.exitCoords.has(packCoord(coord1))) return false
+            if (this.exitCoords.has(packCoord(coord2))) return false
         }
 
         return true
@@ -788,7 +822,7 @@ export class CommunePlanner {
 
         for (const coord2 of rectCoords) {
             if (!isXYInRoom(coord2.x, coord2.y)) continue
-            if (this.exitCoords.has(packCoord(coord1))) return false
+            if (this.exitCoords.has(packCoord(coord2))) return false
         }
 
         return true
@@ -801,13 +835,16 @@ export class CommunePlanner {
             cardinalFlood: true,
         })
 
-        /* this.room.errorVisual(stampAnchors[0], true) */
+        if (!stampAnchors.length) return
+
+        const stampAnchor = stampAnchors[0]
+        this.recordStamp('fastFiller', stampAnchor)
     }
     private hub() {
-        this.planStamps({
+        const stampAnchors = this.planStamps({
             stampType: 'hub',
             count: 1,
-            startCoords: [this.planAttempt.stampAnchors.fastFiller[0]],
+            startCoords: [this.stampAnchors.fastFiller[0]],
             dynamic: true,
             /**
              * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords
@@ -825,13 +862,51 @@ export class CommunePlanner {
                 return true
             },
         })
+
+        if (!stampAnchors.length) return
+
+        const stampAnchor = stampAnchors[0]
+        this.baseCoords[packAsNum(stampAnchor)] = 255
+        this.roadCoords[packAsNum(stampAnchor)] = 20
+
+        const structureCoords: Coord[] = []
+
+        for (const offset of cardinalOffsets) {
+            structureCoords.push({
+                x: stampAnchor.x + offset.x,
+                y: stampAnchor.y + offset.y,
+            })
+        }
+
+        let coord = findClosestCoord(this.stampAnchors.fastFiller[0], structureCoords)
+        structureCoords.splice(structureCoords.indexOf(coord), 1)
+
+        this.baseCoords[packAsNum(coord)] = 255
+        this.roadCoords[packAsNum(coord)] = 255
+
+        if (stampAnchor.y === coord.y)
+            coord = {
+                x: Math.abs(stampAnchor.x - coord.x),
+                y: coord.y,
+            }
+        else
+            coord = {
+                x: coord.x,
+                y: Math.abs(stampAnchor.y - coord.y),
+            }
+
+        structureCoords.splice(structureCoords.indexOf(coord), 1)
+        this.baseCoords[packAsNum(coord)] = 255
+        this.roadCoords[packAsNum(coord)] = 255
+
+        structureCoords
     }
     private labs() {}
     private gridExtensions() {
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
             count: 40,
-            startCoords: [this.planAttempt.stampAnchors.fastFiller[0]],
+            startCoords: [this.stampAnchors.fastFiller[0]],
             dynamic: true,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent

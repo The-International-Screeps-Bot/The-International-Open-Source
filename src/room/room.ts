@@ -113,10 +113,14 @@ export class RoomManager {
             global.communeManagers[room.name] = room.communeManager
         }
 
+        if (this.room.name === 'W7N3') {
+
+            this.communePlanner.preTickRun()
+            return
+        }
+
         room.communeManager.update(room)
         room.communeManager.preTickRun()
-
-        if (this.room.name === 'W7N3') this.communePlanner.preTickRun()
     }
 
     public run() {
