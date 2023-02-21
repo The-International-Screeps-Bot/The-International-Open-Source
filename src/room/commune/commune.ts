@@ -217,7 +217,7 @@ export class CommuneManager {
     }
 
     public run() {
-        constructionManager(this.room)
+        /* constructionManager(this.room) */
 
         this.combatManager.run()
         this.towerManager.run()

@@ -384,27 +384,14 @@ export const stamps: Record<StampTypes, Stamp> = {
     hub: {
         offset: 2,
         protectionOffset: 5,
-        size: 3,
+        size: 0,
         structures: {
-            road: [
-                { x: 1, y: 1 },
-                { x: 2, y: 0 },
-                { x: 3, y: 0 },
-                { x: 0, y: 3 },
-                { x: 0, y: 2 },
-                { x: 1, y: 4 },
-                { x: 2, y: 4 },
-                { x: 4, y: 2 },
-                { x: 4, y: 1 },
-                { x: 3, y: 3 },
+            storage: [
+                { x: 1, y: 0 },
+                { x: 0, y: 1 },
+                { x: 2, y: 1 },
+                { x: 1, y: 2 },
             ],
-            link: [{ x: 2, y: 3 }],
-            factory: [{ x: 2, y: 1 }],
-            nuker: [{ x: 1, y: 2 }],
-            terminal: [{ x: 1, y: 3 }],
-            storage: [{ x: 3, y: 1 }],
-            powerSpawn: [{ x: 3, y: 2 }],
-            empty: [{ x: 2, y: 2 }],
         },
     },
     extensions: {
@@ -526,7 +513,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         structures: {
             rampart: [{ x: 0, y: 0 }],
         },
-    },/*
+    } /*
     gridExtension: {
         offset: 0,
         protectionOffset: 0,
@@ -534,7 +521,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         structures: {
             extension: [{ x: 0, y: 0 }],
         },
-    } */
+    } */,
 }
 
 export const minerals: Partial<ResourceConstant[]> = [
@@ -1339,7 +1326,6 @@ export enum InternationalStatNamesEnum {
     RoomManagerCPUUsage = 'roomcu',
     StatsManagerCPUUsage = 'smcu',
 }
-
 
 export const packedPosLength = 3
 export const packedCoordLength = 2
