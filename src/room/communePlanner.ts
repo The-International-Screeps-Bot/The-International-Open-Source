@@ -55,6 +55,7 @@ interface PlanStampsArgs {
     count: number
     startCoords: Coord[]
     dynamic?: boolean
+    weighted?: boolean
     diagonalDT?: boolean
     coordMap?: CoordMap
     minAvoid?: number
@@ -73,10 +74,12 @@ interface PlanStampsArgs {
 interface FindDynamicStampAnchorArgs {
     stamp: Stamp
     startCoords: Coord[]
-    coordMap: CoordMap
     minAvoid?: number
-    cardinalFlood?: boolean
     conditions?(coord: Coord): boolean
+}
+
+interface FindDynamicStampAnchorWeightedArgs extends FindDynamicStampAnchorArgs {
+    coordMap: CoordMap
 }
 
 interface FindStampAnchorArgs {
@@ -638,7 +641,6 @@ export class CommunePlanner {
         return stamp
     } */
     private planStamps(args: PlanStampsArgs) {
-        if (!args.coordMap) args.coordMap = this.baseCoords
 
         const stamp = stamps[args.stampType]
 
@@ -651,8 +653,6 @@ export class CommunePlanner {
                 stampAnchor = this.findDynamicStampAnchor({
                     stamp,
                     startCoords: args.startCoords,
-                    coordMap: args.coordMap,
-                    cardinalFlood: args.cardinalFlood,
                     conditions: args.conditions,
                 })
                 if (!stampAnchor) continue
@@ -674,8 +674,8 @@ export class CommunePlanner {
             stampAnchor = this.findStampAnchor({
                 stamp,
                 startCoords: args.startCoords,
-                coordMap: distanceCoords,
                 cardinalFlood: args.cardinalFlood,
+                coordMap: distanceCoords,
             })
             if (!stampAnchor) continue
 
@@ -854,34 +854,6 @@ export class CommunePlanner {
 
             let localVisitedCoords = new Uint8Array(visitedCoords)
 
-            // Flood cardinal directions, excluding impassibles
-
-            if (args.cardinalFlood) {
-                // Iterate through positions of this gen
-
-                for (const coord1 of thisGeneration) {
-                    if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
-
-                    // Add viable adjacent coords to the next generation
-
-                    for (const offset of cardinalOffsets) {
-                        const coord2 = {
-                            x: coord1.x + offset.x,
-                            y: coord1.y + offset.y,
-                        }
-
-                        if (!isXYInRoom(coord2.x, coord2.y)) continue
-
-                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
-                        localVisitedCoords[packAsNum(coord2)] = 1
-
-                        if (args.coordMap[packAsNum(coord2)] === 255) continue
-
-                        nextGeneration.push(coord2)
-                    }
-                }
-            }
-
             // Flood all adjacent positions
 
             if (!nextGeneration.length) {
@@ -905,7 +877,97 @@ export class CommunePlanner {
                         if (localVisitedCoords[packAsNum(coord2)] === 1) continue
                         localVisitedCoords[packAsNum(coord2)] = 1
 
-                        if (args.coordMap[packAsNum(coord2)] === 255) continue
+                        if (this.baseCoords[packAsNum(coord2)] === 255) continue
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            // Flood all adjacent positions, including diagonals
+
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+                    if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
+
+                    // Add viable adjacent coords to the next generation
+
+                    for (const offset of adjacentOffsets) {
+                        const coord2 = {
+                            x: coord1.x + offset.x,
+                            y: coord1.y + offset.y,
+                        }
+
+                        if (!isXYInRoom(coord2.x, coord2.y)) continue
+
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
+                        localVisitedCoords[packAsNum(coord2)] = 1
+
+                        nextGeneration.push(coord2)
+                    }
+                }
+            }
+
+            // Set this gen to next gen
+
+            visitedCoords = new Uint8Array(localVisitedCoords)
+            thisGeneration = nextGeneration
+        }
+
+        // No stampAnchor was found
+
+        return false
+    }
+    private findDynamicStampAnchorWeighted(args: FindDynamicStampAnchorWeightedArgs) {
+        let visitedCoords = new Uint8Array(2500)
+        for (const coord of args.startCoords) visitedCoords[packAsNum(coord)] = 1
+
+        let thisGeneration = args.startCoords
+        let nextGeneration: Coord[] = []
+
+        while (thisGeneration.length) {
+            nextGeneration = []
+
+            let localVisitedCoords = new Uint8Array(visitedCoords)
+
+            // Flood all adjacent positions
+
+            if (!nextGeneration.length) {
+                localVisitedCoords = new Uint8Array(visitedCoords)
+
+                // Iterate through positions of this gen
+
+                for (const coord1 of thisGeneration) {
+
+                    const coord1Weight = args.coordMap[packAsNum(coord1)]
+                    if (coord1Weight > 0) {
+
+                        if (coord1Weight === 255) continue
+
+                        args.coordMap[packAsNum(coord1)] -= 1
+                        nextGeneration.push(coord1)
+                    }
+
+                    if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
+
+                    // Add viable adjacent coords to the next generation
+
+                    for (const offset of adjacentOffsets) {
+                        const coord2 = {
+                            x: coord1.x + offset.x,
+                            y: coord1.y + offset.y,
+                        }
+
+                        if (!isXYInRoom(coord2.x, coord2.y)) continue
+
+                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
+                        localVisitedCoords[packAsNum(coord2)] = 1
+
+                        if (this.baseCoords[packAsNum(coord2)] === 255) continue
 
                         nextGeneration.push(coord2)
                     }
@@ -953,7 +1015,7 @@ export class CommunePlanner {
     private isViableDynamicStampAnchor(args: FindDynamicStampAnchorArgs, coord1: Coord) {
         // Get the value of the pos
         /* this.room.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, { fill: customColors.red }) */
-        if (args.coordMap[packAsNum(coord1)] === 255) return false
+        if (this.baseCoords[packAsNum(coord1)] === 255) return false
         if (this.roadCoords[packAsNum(coord1)] === 1) return false
         /* if (posValue === 0) return false */
 
