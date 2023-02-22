@@ -14,14 +14,14 @@ export class ClaimRequestManager {
     preTickRun() {
         const { room } = this.communeManager
 
-        // create a claimRequet if needed
+        // create a claimRequest if needed
 
         if (room.structures.spawn.length) return
 
         let request = Memory.claimRequests[room.name]
         if (request) {
 
-            request.data[ClaimRequestData.score] = 0
+            request.data[ClaimRequestData.score] = -1
             return
         }
 
@@ -29,7 +29,7 @@ export class ClaimRequestManager {
             data: [0],
         })
 
-        request.data[ClaimRequestData.score] = 0
+        request.data[ClaimRequestData.score] = -1
     }
 
     public run() {
@@ -59,7 +59,7 @@ export class ClaimRequestManager {
         const type = Memory.rooms[requestName].T
         if (type !== 'neutral' && type !== 'commune' && type !== 'remote') {
 
-            // Delete the combat so long as the new type isn't ally
+            // Delete the request so long as the new type isn't ally
 
             this.stopResponse(type !== 'ally')
             return
