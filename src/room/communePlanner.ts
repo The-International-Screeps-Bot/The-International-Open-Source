@@ -16,6 +16,8 @@ import {
     RESULT_FAIL,
     cardinalOffsets,
     adjacentOffsets,
+    RESULT_NO_ACTION,
+    RESULT_ACTION,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -105,10 +107,15 @@ export class CommunePlanner {
     diagonalCoords: Uint8Array
     gridCoords: Uint8Array
     /**
-     * Coords adjacent to gridCoords
+     * Coords adjacent to planned roads
      */
-    byGridCoords: Uint8Array
+    byPlannedRoad: Uint8Array
     finishedGrid: boolean
+    finishedFastFillerRoadPrune: boolean
+    /**
+     * Coords we should be protecting using ramparts
+     */
+    protectCoords: Set<string>
     basePlans: BasePlans
     rampartPlans: RampartPlans
     stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
@@ -133,6 +140,7 @@ export class CommunePlanner {
             this.rampartCoords = new Uint8Array(2500)
             this.byExitCoords = new Uint8Array(2500)
             this.exitCoords = new Set()
+            this.byPlannedRoad = new Uint8Array(2500)
             this.basePlans = new BasePlans()
             this.rampartPlans = new RampartPlans()
             this.stampAnchors = {}
@@ -144,6 +152,7 @@ export class CommunePlanner {
 
         this.fastFiller()
         this.generateGrid()
+        this.pruneFastFillerRoads()
         this.hub()
         this.gridExtensions()
         this.visualize()
@@ -167,6 +176,9 @@ export class CommunePlanner {
 
             this.room.visual.structure(coord.x, coord.y, basePlansCoord.structureType)
         }
+
+        /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
+
         /*
         for (let key in this.stampAnchors) {
             const stampType = key as StampTypes
@@ -458,8 +470,6 @@ export class CommunePlanner {
 
         this.pruneGridCoords()
 
-        this.byGridCoords = new Uint8Array(2500)
-
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
@@ -471,7 +481,7 @@ export class CommunePlanner {
                     if (this.gridCoords[packedAdjCoord] === 1) continue
                     if (this.terrainCoords[packedAdjCoord] === 255) continue
 
-                    this.byGridCoords[packedAdjCoord] = 1
+                    this.byPlannedRoad[packedAdjCoord] = 1
                 }
             }
         }
@@ -533,8 +543,100 @@ export class CommunePlanner {
 
         this.gridCoords[packedCoord] = 0
     }
-    private flipStampVertical() {}
-    private flipStampHorizontal() {}
+    private pruneFastFillerRoads() {
+        if (this.finishedFastFillerRoadPrune) return
+
+        const anchor = this.stampAnchors.fastFiller[0]
+
+        const rectCoords = findCoordsInsideRect(
+            anchor.x - stamps.fastFiller.offset,
+            anchor.y - stamps.fastFiller.offset,
+            anchor.x + stamps.fastFiller.offset,
+            anchor.y + stamps.fastFiller.offset,
+        )
+
+        for (const coord of rectCoords) {
+            const packedCoordNum = packAsNum(coord)
+            if (this.roadCoords[packedCoordNum] !== 1) continue
+
+            if (this.fastFillerPruneRoadCoord(coord) === RESULT_ACTION) {
+                this.roadCoords[packedCoordNum] = 0
+                continue
+            }
+
+            this.basePlans.set(packCoord(coord), STRUCTURE_ROAD, 3)
+            this.roadCoords[packedCoordNum] = 1
+        }
+
+        this.finishedFastFillerRoadPrune = true
+    }
+    /**
+     *
+     * @param coord
+     * @returns RESULT_ACTION if the road should be removed
+     */
+    private fastFillerPruneRoadCoord(coord: Coord) {
+        let adjSpawn: boolean
+
+        for (const offset of adjacentOffsets) {
+            const adjCoord = {
+                x: offset.x + coord.x,
+                y: offset.y + coord.y,
+            }
+
+            const packedAdjCoord = packAsNum(adjCoord)
+            if (this.terrainCoords[packedAdjCoord] === 255) continue
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] !== 1)
+                this.byPlannedRoad[packedAdjCoord] = 1
+
+            if (this.basePlans.get(packCoord(adjCoord))?.structureType === STRUCTURE_SPAWN) adjSpawn = true
+        }
+
+        if (adjSpawn) return RESULT_NO_ACTION
+
+        let cardinalRoads = 0
+
+        for (const offset of cardinalOffsets) {
+            const adjCoord = {
+                x: offset.x + coord.x,
+                y: offset.y + coord.y,
+            }
+
+            const packedAdjCoord = packAsNum(adjCoord)
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] !== 1) continue
+
+            cardinalRoads += 1
+        }
+
+        if (cardinalRoads >= 3) return RESULT_ACTION
+        return RESULT_NO_ACTION
+    }
+    /*     private flipStampVertical(stamp: Stamp) {
+        const numRows = stamp.length
+        const numCols = stamp[0].length
+
+        for (let i = 0; i < numRows / 2; i++) {
+            const tempRow = stamp[i]
+            stamp[i] = stamp[numRows - 1 - i]
+            stamp[numRows - 1 - i] = tempRow
+        }
+
+        return stamp
+    }
+    private flipStampHorizontal(stamp: Stamp) {
+        const numRows = stamp.length
+        const numCols = stamp[0].length
+
+        for (let i = 0; i < numRows; i++) {
+            for (let j = 0; j < numCols / 2; j++) {
+                const tempCol = stamp[i][j]
+                stamp[i][j] = stamp[i][numCols - 1 - j]
+                stamp[i][numCols - 1 - j] = tempCol
+            }
+        }
+
+        return stamp
+    } */
     private planStamps(args: PlanStampsArgs) {
         if (!args.coordMap) args.coordMap = this.baseCoords
 
@@ -557,6 +659,7 @@ export class CommunePlanner {
 
                 args.consequence(stampAnchor)
                 this.stampAnchors[args.stampType].push(stampAnchor)
+
                 continue
             }
 
@@ -849,9 +952,9 @@ export class CommunePlanner {
     }
     private isViableDynamicStampAnchor(args: FindDynamicStampAnchorArgs, coord1: Coord) {
         // Get the value of the pos
-
+        /* this.room.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, { fill: customColors.red }) */
         if (args.coordMap[packAsNum(coord1)] === 255) return false
-        if (this.roadCoords[packAsNum(coord1)] > 0) return false
+        if (this.roadCoords[packAsNum(coord1)] === 1) return false
         /* if (posValue === 0) return false */
 
         if (!args.conditions(coord1)) return false
@@ -880,6 +983,32 @@ export class CommunePlanner {
             cardinalFlood: true,
             consequence: stampAnchor => {
                 this.recordStamp('fastFiller', stampAnchor)
+
+                const stamp = stamps.fastFiller
+
+                for (const key in stamp.structures) {
+                    const structureType = key as StructureConstant
+                    if (!stamp.structures[structureType]) continue
+
+                    for (const offset of stamp.structures[structureType]) {
+                        const coord = {
+                            x: offset.x + stampAnchor.x - stamp.offset,
+                            y: offset.y + stampAnchor.y - stamp.offset,
+                        }
+
+                        this.basePlans.set(packCoord(coord), structureType, 8)
+
+                        const packedCoord = packAsNum(coord)
+
+                        if (structureType === STRUCTURE_ROAD) {
+                            this.roadCoords[packedCoord] = 1
+                            continue
+                        }
+
+                        this.baseCoords[packedCoord] = 255
+                        this.roadCoords[packedCoord] = 255
+                    }
+                }
             },
         })
     }
@@ -897,7 +1026,7 @@ export class CommunePlanner {
 
                 for (const offsets of cardinalOffsets) {
                     const packedCoord = packXYAsNum(coord.x + offsets.x, coord.y + offsets.y)
-                    if (this.byGridCoords[packedCoord] !== 1) return false
+                    if (this.byPlannedRoad[packedCoord] !== 1) return false
                 }
 
                 return true
@@ -958,16 +1087,17 @@ export class CommunePlanner {
     }
     private labs() {}
     private gridExtensions() {
+
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
-            count: CONTROLLER_STRUCTURES.extension[8] /* - planned extensions count */,
+            count: CONTROLLER_STRUCTURES.extension[8] - stamps.fastFiller.structures[STRUCTURE_EXTENSION].length /* CONTROLLER_STRUCTURES.extension[8] - planned extensions count */,
             startCoords: [this.stampAnchors.fastFiller[0]],
             dynamic: true,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
             conditions: coord => {
-                return this.byGridCoords[packAsNum(coord)] === 1
+                return this.byPlannedRoad[packAsNum(coord)] === 1
             },
             consequence: stampAnchor => {
                 this.basePlans.set(packCoord(stampAnchor), STRUCTURE_EXTENSION, 8)
@@ -1288,8 +1418,6 @@ export function basePlanner(room: Room) {
         room.baseCoords[packAsNum(pos)] = 255
         room.roadCoords[packAsNum(pos)] = 20
     }
-
-    /* room.visualizeCoordMap(room.baseCoords) */
 
     let origin: RoomPosition
     if (getRangeOfCoords(room.anchor, centerUpgadePos) >= 10) {

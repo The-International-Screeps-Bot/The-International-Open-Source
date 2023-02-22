@@ -18,9 +18,14 @@ export class ClaimRequestManager {
 
         if (room.structures.spawn.length) return
 
-        if (Memory.claimRequests[room.name]) return
+        let request = Memory.claimRequests[room.name]
+        if (request) {
 
-        const request = (Memory.claimRequests[room.name] = {
+            request.data[ClaimRequestData.score] = 0
+            return
+        }
+
+        request = (Memory.claimRequests[room.name] = {
             data: [0],
         })
 
