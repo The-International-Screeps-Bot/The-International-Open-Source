@@ -1525,7 +1525,8 @@ export class SpawnRequestsManager {
                                 return (
                                     (tradeType.amount + localTradeAmount) * BODYPART_COST[partType] +
                                     (tradeTypes[tradeType.other].amount - localTradeAmount) *
-                                        BODYPART_COST[tradeType.other]
+                                        BODYPART_COST[tradeType.other] +
+                                    totalTradeableParts * BODYPART_COST[MOVE]
                                 )
                             }
 
