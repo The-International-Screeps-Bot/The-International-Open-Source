@@ -625,11 +625,11 @@ export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: 
 }
 
 export function isXYInRoom(x: number, y: number) {
-    return x > 0 && x < roomDimensions - 1 && y > 0 && y < roomDimensions - 1
+    return x >= 0 && x < roomDimensions - 1 && y >= 0 && y < roomDimensions - 1
 }
 
 export function isXYInBorder(x: number, y: number, inset: number) {
-    return x > inset && x < roomDimensions - 1 - inset && y > inset && y < roomDimensions - 1 - inset
+    return x >= inset && x < roomDimensions - 1 - inset && y >= inset && y < roomDimensions - 1 - inset
 }
 
 /*
