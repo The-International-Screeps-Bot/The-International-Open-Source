@@ -163,7 +163,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // If we're on an exit and the next pos is in the other room, wait
 
         if (path[0].roomName !== this.room.name) {
-
             /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
             this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
             this.memory.P = packPosList(path)
@@ -384,7 +383,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     }
 
     if (path[0].roomName !== this.room.name) {
-
         this.moved = 'moved'
         return true
     }
@@ -636,7 +634,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
 
-        if (creepAtPos.moved === 'yeild') {
+        if (creepAtPos.moved === '') {
             if (
                 creepAtPos instanceof PowerCreep ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
@@ -655,7 +653,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             }
 
             delete this.moveRequest
-            this.moved = 'yeild'
+            this.moved = ''
             return
         }
 

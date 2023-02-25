@@ -982,6 +982,16 @@ export class CommunePlanner {
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
+
+                    const coord1Weight = args.coordMap[packAsNum(coord1)]
+                    if (coord1Weight > 0) {
+
+                        if (coord1Weight === 255) continue
+
+                        args.coordMap[packAsNum(coord1)] -= 1
+                        nextGeneration.push(coord1)
+                    }
+
                     if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
 
                     // Add viable adjacent coords to the next generation

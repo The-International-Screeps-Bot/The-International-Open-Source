@@ -132,6 +132,7 @@ export class CommuneManager {
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
+        delete this._minRampartHits
     }
 
     preTickRun() {
@@ -369,6 +370,8 @@ export class CommuneManager {
     get storedEnergyBuildThreshold() {
         return this.minStoredEnergy * 1.2
     }
+
+    _minRampartHits: number
 
     get minRampartHits() {
         const level = this.room.controller.level
