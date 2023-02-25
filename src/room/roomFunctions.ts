@@ -611,6 +611,10 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
     if (this.memory.T === 'remote' && !global.communes.has(this.memory.CN)) this.memory.T = 'neutral'
 
+    // If the room is already a remote of the scoutingRoom
+
+    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.CN) return this.memory.T
+
     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
 
     if (distance > maxRemoteRoomDistance) return this.memory.T
@@ -629,10 +633,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         })
 
     if (distance > maxRemoteRoomDistance) return this.memory.T
-
-    // If the room is already a remote of the scoutingRoom
-
-    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.CN) return this.memory.T
 
     // Get the anchor from the scoutingRoom, stopping if it's undefined
 
