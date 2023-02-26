@@ -140,7 +140,7 @@ export class CommunePlanner {
 
         let depth = 2
         let thisGeneration = this.exitCoords
-        let nextGeneration: Coord[] = []
+        let nextGeneration: Coord[]
 
         while (thisGeneration.length) {
             nextGeneration = []
@@ -174,16 +174,6 @@ export class CommunePlanner {
             depth = Math.min(depth * 1.3, 255)
             thisGeneration = nextGeneration
         }
-
-        /*         for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-                const packedCoord = packXYAsNum(x, y)
-                const coordValue = this._reverseExitFlood[packedCoord]
-                if (coordValue === 255) continue
-
-                this._reverseExitFlood[packedCoord] = 255 - coordValue
-            }
-        } */
 
         return this._reverseExitFlood
     }
@@ -367,7 +357,7 @@ export class CommunePlanner {
             gridGroups[groupIndex] = [gridCoord]
 
             let thisGeneration = [gridCoord]
-            let nextGeneration: Coord[] = []
+            let nextGeneration: Coord[]
             let groupSize = 0
 
             while (thisGeneration.length) {
@@ -464,7 +454,7 @@ export class CommunePlanner {
             exitGroups[groupIndex] = [exitCoord]
 
             let thisGeneration = [exitCoord]
-            let nextGeneration: Coord[] = []
+            let nextGeneration: Coord[]
             let groupSize = 0
 
             while (thisGeneration.length) {
@@ -769,7 +759,7 @@ export class CommunePlanner {
         for (const coord of args.startCoords) visitedCoords[packAsNum(coord)] = 1
 
         let thisGeneration = args.startCoords
-        let nextGeneration: Coord[] = []
+        let nextGeneration: Coord[]
 
         while (thisGeneration.length) {
             nextGeneration = []
@@ -879,21 +869,7 @@ export class CommunePlanner {
         if (posValue === 255) return false
         if (posValue === 0) return false
         if (posValue < args.stamp.size) return false
-
-        // Ensure we aren't too close to an exit
-
-        const rectCoords = findCoordsInsideRect(
-            coord1.x - args.stamp.protectionOffset,
-            coord1.y - args.stamp.protectionOffset,
-            coord1.x + args.stamp.protectionOffset,
-            coord1.y + args.stamp.protectionOffset,
-        )
-
-        for (const coord2 of rectCoords) {
-            if (!isXYInRoom(coord2.x, coord2.y)) continue
-            if (this.packedExitCoords.has(packCoord(coord2))) return false
-        }
-
+        if (this.isCloseToExit(coord1, args.stamp.protectionOffset)) return false
         return true
     }
     private findDynamicStampAnchor(args: FindDynamicStampAnchorArgs) {
@@ -901,7 +877,7 @@ export class CommunePlanner {
         for (const coord of args.startCoords) visitedCoords[packAsNum(coord)] = 1
 
         let thisGeneration = args.startCoords
-        let nextGeneration: Coord[] = []
+        let nextGeneration: Coord[]
 
         while (thisGeneration.length) {
             nextGeneration = []
@@ -981,7 +957,7 @@ export class CommunePlanner {
         for (const coord of args.startCoords) visitedCoords[packAsNum(coord)] = 1
 
         let thisGeneration = args.startCoords
-        let nextGeneration: Coord[] = []
+        let nextGeneration: Coord[]
 
         while (thisGeneration.length) {
             nextGeneration = []
@@ -1079,22 +1055,56 @@ export class CommunePlanner {
         /* if (posValue === 0) return false */
 
         if (!args.conditions(coord1)) return false
-
-        // Ensure we aren't too close to an exit
-
-        const rectCoords = findCoordsInsideRect(
-            coord1.x - args.stamp.protectionOffset,
-            coord1.y - args.stamp.protectionOffset,
-            coord1.x + args.stamp.protectionOffset,
-            coord1.y + args.stamp.protectionOffset,
-        )
-
-        for (const coord2 of rectCoords) {
-            if (!isXYInRoom(coord2.x, coord2.y)) continue
-            if (this.packedExitCoords.has(packCoord(coord2))) return false
-        }
+        if (this.isCloseToExit(coord1, args.stamp.protectionOffset + 2)) return false
 
         return true
+    }
+    /**
+     * Finds wether the coord is in a specified range to an exit, flooding while avoiding walls
+     * @param startCoord The string coordinate
+     * @param range The max number of generations to do
+     */
+    private isCloseToExit(startCoord: Coord, range: number) {
+        let visitedCoords = new Uint8Array(2500)
+        visitedCoords[packAsNum(startCoord)] = 1
+
+        let generations = 0
+        let thisGeneration = [startCoord]
+        let nextGeneration: Coord[]
+
+        while (thisGeneration.length && generations < range) {
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const coord1 of thisGeneration) {
+
+                // Add viable adjacent coords to the next generation
+
+                for (const offset of adjacentOffsets) {
+                    const coord2 = {
+                        x: coord1.x + offset.x,
+                        y: coord1.y + offset.y,
+                    }
+
+                    if (visitedCoords[packAsNum(coord2)] === 1) continue
+                    visitedCoords[packAsNum(coord2)] = 1
+
+                    if (this.packedExitCoords.has(packCoord(coord2))) return true
+
+                    if (this.terrainCoords[packAsNum(coord2)] === 255) continue
+
+                    nextGeneration.push(coord2)
+                }
+            }
+
+            // Set up for next generation
+
+            generations += 1
+            thisGeneration = nextGeneration
+        }
+
+        return false
     }
     private fastFiller() {
         this.planStamps({
@@ -1211,12 +1221,11 @@ export class CommunePlanner {
     private gridExtensions() {
 
         const coordMap = this.reverseExitFlood
-        this.room.visualizeCoordMap(coordMap)
 
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
             count:
-                CONTROLLER_STRUCTURES.extension[8] -
+                100 + CONTROLLER_STRUCTURES.extension[8] -
                 stamps.fastFiller.structures[STRUCTURE_EXTENSION]
                     .length /* CONTROLLER_STRUCTURES.extension[8] - planned extensions count */,
             startCoords: [this.stampAnchors.fastFiller[0]],
