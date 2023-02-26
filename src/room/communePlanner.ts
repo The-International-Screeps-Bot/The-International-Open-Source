@@ -98,6 +98,8 @@ export class CommunePlanner {
     roomManager: RoomManager
     room: Room
 
+    centerUpgradePos: RoomPosition
+
     terrainCoords: CoordMap
     packedExitCoords: Set<string>
     exitCoords: Coord[]
@@ -120,6 +122,10 @@ export class CommunePlanner {
      * Coords we should be protecting using ramparts
      */
     protectCoords: Set<string>
+    /**
+     * Coords protected by ramparts
+     */
+    protectedCoords: Uint8Array
     basePlans: BasePlans
     rampartPlans: RampartPlans
     stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
@@ -207,6 +213,7 @@ export class CommunePlanner {
         this.fastFiller()
         this.generateGrid()
         this.pruneFastFillerRoads()
+        this.findCenterUpgradePos()
         this.hub()
         this.gridExtensions()
         this.visualize()
@@ -602,6 +609,35 @@ export class CommunePlanner {
         }
 
         this.finishedFastFillerRoadPrune = true
+    }
+    private findCenterUpgradePos() {
+        const controllerPos = this.room.controller.pos
+
+        // Get the open areas in a range of 3 to the controller
+
+        const distanceCoords = this.room.distanceTransform(
+            undefined,
+            false,
+            255,
+            controllerPos.x - 2,
+            controllerPos.y - 2,
+            controllerPos.x + 2,
+            controllerPos.y + 2,
+        )
+
+        // Find the closest value greater than two to the centerUpgradePos and inform it
+
+        const pos = this.room.findClosestPosOfValue({
+            coordMap: distanceCoords,
+            startCoords: [this.stampAnchors.fastFiller[0]],
+            requiredValue: 2,
+            reduceIterations: 1,
+            visuals: false,
+            cardinalFlood: true,
+        })
+        if (!pos) return false
+
+        return (this.centerUpgradePos = pos)
     }
     /**
      *
@@ -1078,7 +1114,6 @@ export class CommunePlanner {
             // Iterate through positions of this gen
 
             for (const coord1 of thisGeneration) {
-
                 // Add viable adjacent coords to the next generation
 
                 for (const offset of adjacentOffsets) {
@@ -1145,11 +1180,54 @@ export class CommunePlanner {
         })
     }
     private hub() {
+
+        const fastFillerPos = new RoomPosition(
+            this.stampAnchors.fastFiller[0].x,
+            this.stampAnchors.fastFiller[0].y,
+            this.room.name,
+        )
+
+        let closestSource: Source
+        let closestSourceDistance = Infinity
+
+        for (const source of this.room.sources) {
+            const range = this.room.advancedFindPath({
+                origin: source.pos,
+                goals: [
+                    {
+                        pos: fastFillerPos,
+                        range: 3,
+                    },
+                ],
+                plainCost: defaultRoadPlanningPlainCost,
+            }).length
+            if (range > closestSourceDistance) continue
+
+            closestSourceDistance = range
+            closestSource = source
+        }
+
+        let origin: RoomPosition
+        if (getRangeOfCoords(fastFillerPos, this.centerUpgradePos) >= 10) {
+            origin = this.centerUpgradePos
+        } else {
+            origin = closestSource.pos
+        }
+
+        const path = this.room.advancedFindPath({
+            origin,
+            goals: [{ pos: fastFillerPos, range: 3 }],
+            weightCoordMaps: [this.room.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost,
+        })
+
         this.planStamps({
             stampType: 'hub',
             count: 1,
-            startCoords: [this.stampAnchors.fastFiller[0]],
+            startCoords: [path[path.length - 1]],
             dynamic: true,
+            weighted: true,
+            coordMap: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords but are each adjacent to one
              */
@@ -1177,7 +1255,7 @@ export class CommunePlanner {
                     })
                 }
 
-                let [coord, i] = findClosestCoord(this.stampAnchors.fastFiller[0], structureCoords)
+                let [coord, i] = findClosestCoord(fastFillerPos, structureCoords)
                 structureCoords.splice(i, 1)
                 this.basePlans.set(packCoord(coord), STRUCTURE_STORAGE, 4)
                 this.baseCoords[packAsNum(coord)] = 255
@@ -1219,16 +1297,15 @@ export class CommunePlanner {
     }
     private labs() {}
     private gridExtensions() {
-
         const coordMap = this.reverseExitFlood
 
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
             count:
-                100 + CONTROLLER_STRUCTURES.extension[8] -
+                CONTROLLER_STRUCTURES.extension[8] -
                 stamps.fastFiller.structures[STRUCTURE_EXTENSION]
                     .length /* CONTROLLER_STRUCTURES.extension[8] - planned extensions count */,
-            startCoords: [this.stampAnchors.fastFiller[0]],
+            startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
             coordMap,
