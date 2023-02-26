@@ -99,7 +99,8 @@ export class CommunePlanner {
     room: Room
 
     terrainCoords: CoordMap
-    exitCoords: Set<string>
+    packedExitCoords: Set<string>
+    exitCoords: Coord[]
     /**
      * Coords adjacent to exits, including exit coords
      */
@@ -128,6 +129,65 @@ export class CommunePlanner {
         this.roomManager = roomManager
     }
 
+    _reverseExitFlood: Uint8Array
+    get reverseExitFlood() {
+        if (this._reverseExitFlood) return this._reverseExitFlood
+
+        this._reverseExitFlood = new Uint8Array(2500)
+
+        let visitedCoords = new Uint8Array(2500)
+        for (const coord of this.exitCoords) visitedCoords[packAsNum(coord)] = 1
+
+        let depth = 2
+        let thisGeneration = this.exitCoords
+        let nextGeneration: Coord[] = []
+
+        while (thisGeneration.length) {
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const coord1 of thisGeneration) {
+                this._reverseExitFlood[packAsNum(coord1)] = 255 - Math.round(depth)
+
+                // Add viable adjacent coords to the next generation
+
+                for (const offset of adjacentOffsets) {
+                    const coord2 = {
+                        x: coord1.x + offset.x,
+                        y: coord1.y + offset.y,
+                    }
+
+                    if (!isXYInRoom(coord2.x, coord2.y)) continue
+
+                    if (visitedCoords[packAsNum(coord2)] === 1) continue
+                    visitedCoords[packAsNum(coord2)] = 1
+
+                    if (this.terrainCoords[packAsNum(coord2)] === 255) continue
+
+                    nextGeneration.push(coord2)
+                }
+            }
+
+            // Set up for next generation
+
+            depth = Math.min(depth * 1.3, 255)
+            thisGeneration = nextGeneration
+        }
+
+        /*         for (let x = 0; x < roomDimensions; x += 1) {
+            for (let y = 0; y < roomDimensions; y += 1) {
+                const packedCoord = packXYAsNum(x, y)
+                const coordValue = this._reverseExitFlood[packedCoord]
+                if (coordValue === 255) continue
+
+                this._reverseExitFlood[packedCoord] = 255 - coordValue
+            }
+        } */
+
+        return this._reverseExitFlood
+    }
+
     preTickRun() {
         // Stop if there isn't sufficient CPU
 
@@ -142,7 +202,8 @@ export class CommunePlanner {
             this.roadCoords = new Uint8Array(this.terrainCoords)
             this.rampartCoords = new Uint8Array(2500)
             this.byExitCoords = new Uint8Array(2500)
-            this.exitCoords = new Set()
+            this.packedExitCoords = new Set()
+            this.exitCoords = []
             this.byPlannedRoad = new Uint8Array(2500)
             this.basePlans = new BasePlans()
             this.rampartPlans = new RampartPlans()
@@ -180,31 +241,9 @@ export class CommunePlanner {
             this.room.visual.structure(coord.x, coord.y, basePlansCoord.structureType)
         }
 
+        /* this.room.visualizeCoordMap(this.reverseExitFlood) */
         /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
 
-        /*
-        for (let key in this.stampAnchors) {
-            const stampType = key as StampTypes
-            const stamp = stamps[stampType]
-
-            for (const anchor of this.stampAnchors[stampType]) {
-                for (key in stamps) {
-                    const structureType = key as StructureConstant
-
-                    if (!stamp.structures[structureType]) continue
-
-                    for (const coordOffset of stamp.structures[structureType]) {
-                        const coord = {
-                            x: coordOffset.x + anchor.x - stamp.offset,
-                            y: coordOffset.y + anchor.y - stamp.offset,
-                        }
-
-                        this.room.visual.structure(coord.x, coord.y, structureType)
-                    }
-                }
-            }
-        }
- */
         this.room.visual.connectRoads({
             opacity: 0.7,
         })
@@ -233,7 +272,8 @@ export class CommunePlanner {
         const packedCoord = packXYAsNum(x, y)
         if (this.terrainCoords[packedCoord] === 255) return
 
-        this.exitCoords.add(packXYAsCoord(x, y))
+        this.packedExitCoords.add(packXYAsCoord(x, y))
+        this.exitCoords.push({ x, y })
 
         // Loop through adjacent positions
 
@@ -415,7 +455,7 @@ export class CommunePlanner {
         visitedCoords = new Set()
         groupIndex = 0
 
-        for (const packedCoord of this.exitCoords) {
+        for (const packedCoord of this.packedExitCoords) {
             const exitCoord = unpackCoord(packedCoord)
             if (visitedCoords.has(packedCoord)) continue
 
@@ -614,34 +654,34 @@ export class CommunePlanner {
         if (cardinalRoads >= 3) return RESULT_ACTION
         return RESULT_NO_ACTION
     }
-    /*     private flipStampVertical(stamp: Stamp) {
-        const numRows = stamp.length
-        const numCols = stamp[0].length
+    private flipStructuresVertical(stamp: Stamp) {
+        const flippedStructures: Partial<{ [key in StructureConstant]: Coord[] }> = {}
 
-        for (let i = 0; i < numRows / 2; i++) {
-            const tempRow = stamp[i]
-            stamp[i] = stamp[numRows - 1 - i]
-            stamp[numRows - 1 - i] = tempRow
+        for (const structureType in stamp.structures) {
+            const coords = stamp.structures[structureType]
+            flippedStructures[structureType as StructureConstant] = coords.map(coord => ({
+                x: coord.x,
+                y: stamp.size + stamp.offset - coord.y - 1,
+            }))
         }
 
-        return stamp
+        return flippedStructures
     }
-    private flipStampHorizontal(stamp: Stamp) {
-        const numRows = stamp.length
-        const numCols = stamp[0].length
 
-        for (let i = 0; i < numRows; i++) {
-            for (let j = 0; j < numCols / 2; j++) {
-                const tempCol = stamp[i][j]
-                stamp[i][j] = stamp[i][numCols - 1 - j]
-                stamp[i][numCols - 1 - j] = tempCol
-            }
+    private flipStructuresHorizontal(stamp: Stamp) {
+        const flippedStructures: Partial<{ [key in StructureConstant]: Coord[] }> = {}
+
+        for (const structureType in stamp.structures) {
+            const coords = stamp.structures[structureType]
+            flippedStructures[structureType as StructureConstant] = coords.map(coord => ({
+                x: stamp.size + stamp.offset - coord.x - 1,
+                y: coord.y,
+            }))
         }
 
-        return stamp
-    } */
+        return flippedStructures
+    }
     private planStamps(args: PlanStampsArgs) {
-
         const stamp = stamps[args.stampType]
 
         args.count -= this.stampAnchors[args.stampType].length
@@ -650,6 +690,20 @@ export class CommunePlanner {
             let stampAnchor: Coord | false
 
             if (args.dynamic) {
+                if (args.weighted) {
+                    stampAnchor = this.findDynamicStampAnchorWeighted({
+                        stamp,
+                        startCoords: args.startCoords,
+                        conditions: args.conditions,
+                        coordMap: args.coordMap,
+                    })
+                    if (!stampAnchor) continue
+
+                    args.consequence(stampAnchor)
+                    this.stampAnchors[args.stampType].push(stampAnchor)
+
+                    continue
+                }
                 stampAnchor = this.findDynamicStampAnchor({
                     stamp,
                     startCoords: args.startCoords,
@@ -837,7 +891,7 @@ export class CommunePlanner {
 
         for (const coord2 of rectCoords) {
             if (!isXYInRoom(coord2.x, coord2.y)) continue
-            if (this.exitCoords.has(packCoord(coord2))) return false
+            if (this.packedExitCoords.has(packCoord(coord2))) return false
         }
 
         return true
@@ -942,14 +996,13 @@ export class CommunePlanner {
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-
                     const coord1Weight = args.coordMap[packAsNum(coord1)]
                     if (coord1Weight > 0) {
-
                         if (coord1Weight === 255) continue
 
                         args.coordMap[packAsNum(coord1)] -= 1
                         nextGeneration.push(coord1)
+                        continue
                     }
 
                     if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
@@ -982,12 +1035,8 @@ export class CommunePlanner {
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
-
                     const coord1Weight = args.coordMap[packAsNum(coord1)]
-                    if (coord1Weight > 0) {
-
-                        if (coord1Weight === 255) continue
-
+                    if (coord1Weight > 0 && coord1Weight !== 255) {
                         args.coordMap[packAsNum(coord1)] -= 1
                         nextGeneration.push(coord1)
                     }
@@ -1042,7 +1091,7 @@ export class CommunePlanner {
 
         for (const coord2 of rectCoords) {
             if (!isXYInRoom(coord2.x, coord2.y)) continue
-            if (this.exitCoords.has(packCoord(coord2))) return false
+            if (this.packedExitCoords.has(packCoord(coord2))) return false
         }
 
         return true
@@ -1057,12 +1106,13 @@ export class CommunePlanner {
                 this.recordStamp('fastFiller', stampAnchor)
 
                 const stamp = stamps.fastFiller
+                const structures = stamps.fastFiller.structures
 
-                for (const key in stamp.structures) {
+                for (const key in structures) {
                     const structureType = key as StructureConstant
-                    if (!stamp.structures[structureType]) continue
+                    if (!structures[structureType]) continue
 
-                    for (const offset of stamp.structures[structureType]) {
+                    for (const offset of structures[structureType]) {
                         const coord = {
                             x: offset.x + stampAnchor.x - stamp.offset,
                             y: offset.y + stampAnchor.y - stamp.offset,
@@ -1160,11 +1210,19 @@ export class CommunePlanner {
     private labs() {}
     private gridExtensions() {
 
+        const coordMap = this.reverseExitFlood
+        this.room.visualizeCoordMap(coordMap)
+
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
-            count: CONTROLLER_STRUCTURES.extension[8] - stamps.fastFiller.structures[STRUCTURE_EXTENSION].length /* CONTROLLER_STRUCTURES.extension[8] - planned extensions count */,
+            count:
+                CONTROLLER_STRUCTURES.extension[8] -
+                stamps.fastFiller.structures[STRUCTURE_EXTENSION]
+                    .length /* CONTROLLER_STRUCTURES.extension[8] - planned extensions count */,
             startCoords: [this.stampAnchors.fastFiller[0]],
             dynamic: true,
+            weighted: true,
+            coordMap,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */

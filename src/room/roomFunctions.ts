@@ -22,6 +22,7 @@ import {
     structureTypesByBuildPriority,
     RESULT_FAIL,
     RESULT_NO_ACTION,
+    adjacentOffsets,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -692,8 +693,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // If the room isn't already a remote
 
     if (this.memory.T !== 'remote') {
-        this.memory.T = 'remote'
-
         // Assign the room's commune as the scoutingRoom
 
         this.memory.CN = scoutingRoom.name
@@ -712,15 +711,16 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         delete this._controllerPositions
         this.controllerPositions
 
-        // Add the room's name to the scoutingRoom's remotes list
-
-        scoutingRoom.memory.remotes.push(this.name)
-
         this.memory.RE = newReservationEfficacy
 
         this.memory.data = []
         for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
 
+        // Add the room's name to the scoutingRoom's remotes list
+
+        scoutingRoom.memory.remotes.push(this.name)
+
+        this.memory.T = 'remote'
         return this.memory.T
     }
 
@@ -766,8 +766,6 @@ Room.prototype.scoutEnemyRoom = function () {
     const { controller } = this
     const playerName = controller.owner.username
     const roomMemory = this.memory
-
-    roomMemory.T = 'enemy'
 
     let player = Memory.players[playerName]
     if (!player) {
@@ -843,6 +841,7 @@ Room.prototype.scoutEnemyRoom = function () {
         minDamage: 50,
     })
 
+    roomMemory.T = 'enemy'
     return roomMemory.T
 }
 
@@ -1281,7 +1280,12 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
             // Loop through adjacent positions
 
-            for (const coord2 of findAdjacentCoordsToCoord(coord1)) {
+            for (const offset of adjacentOffsets) {
+                const coord2 = {
+                    x: coord1.x + offset.x,
+                    y: coord1.y + offset.y,
+                }
+
                 const packedCoord2 = packAsNum(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile

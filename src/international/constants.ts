@@ -524,6 +524,10 @@ export const stamps: Record<StampTypes, Stamp> = {
     } */,
 }
 
+export const dynamicStamps = {
+
+}
+
 export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_HYDROGEN,
     RESOURCE_OXYGEN,

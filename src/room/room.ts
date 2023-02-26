@@ -98,7 +98,7 @@ export class RoomManager {
 
         if (!room.controller.my) {
             if (roomMemory.T === 'commune') {
-                delete roomMemory.T
+                roomMemory.T = 'remote'
 
                 room.basicScout()
                 cleanRoomMemory(room.name)
