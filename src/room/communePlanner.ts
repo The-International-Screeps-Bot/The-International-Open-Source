@@ -28,6 +28,7 @@ import {
     findAvgBetweenCoords,
     findClosestCoord,
     findClosestPos,
+    findCoordsInRange,
     findCoordsInsideRect,
     getRange,
     getRangeOfCoords,
@@ -49,6 +50,7 @@ import { RoomManager } from './room'
 import { openStdin } from 'process'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
+import { length } from 'node-persist'
 
 interface PlanStampsArgs {
     stampType: StampTypes
@@ -99,6 +101,8 @@ export class CommunePlanner {
     room: Room
 
     centerUpgradePos: RoomPosition
+    input2Coord: Coord
+    outputCoords: Coord[]
 
     terrainCoords: CoordMap
     packedExitCoords: Set<string>
@@ -215,6 +219,7 @@ export class CommunePlanner {
         this.pruneFastFillerRoads()
         this.findCenterUpgradePos()
         this.hub()
+        this.labs()
         this.gridExtensions()
         this.visualize()
 
@@ -606,6 +611,7 @@ export class CommunePlanner {
 
             this.basePlans.set(packCoord(coord), STRUCTURE_ROAD, 3)
             this.roadCoords[packedCoordNum] = 1
+            this.byPlannedRoad[packedCoordNum] = 0
         }
 
         this.finishedFastFillerRoadPrune = true
@@ -1088,10 +1094,8 @@ export class CommunePlanner {
         /* this.room.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, { fill: customColors.red }) */
         if (this.baseCoords[packAsNum(coord1)] === 255) return false
         if (this.roadCoords[packAsNum(coord1)] === 1) return false
-        /* if (posValue === 0) return false */
-
-        if (!args.conditions(coord1)) return false
         if (this.isCloseToExit(coord1, args.stamp.protectionOffset + 2)) return false
+        if (!args.conditions(coord1)) return false
 
         return true
     }
@@ -1180,7 +1184,6 @@ export class CommunePlanner {
         })
     }
     private hub() {
-
         const fastFillerPos = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
             this.stampAnchors.fastFiller[0].y,
@@ -1295,7 +1298,91 @@ export class CommunePlanner {
             },
         })
     }
-    private labs() {}
+    private labs() {
+        this.planStamps({
+            stampType: 'labs',
+            count: 1,
+            startCoords: [this.stampAnchors.hub[0]],
+            dynamic: true,
+            weighted: true,
+            coordMap: this.reverseExitFlood,
+            /**
+             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             */
+            conditions: coord1 => {
+                if (this.byPlannedRoad[packAsNum(coord1)] !== 1) return false
+
+                let outputCoords: Coord[]
+
+                // Record
+
+                const packedAdjCoords1: Set<string> = new Set()
+                const range = 2
+                for (let x = coord1.x - range; x <= coord1.x + range; x += 1) {
+                    for (let y = coord1.y - range; y <= coord1.y + range; y += 1) {
+
+                        const packedCoordNum = packXYAsNum(x, y)
+                        if (this.byPlannedRoad[packedCoordNum] !== 1) continue
+                        if (this.baseCoords[packedCoordNum] === 255) continue
+
+                        packedAdjCoords1.add(packXYAsCoord(x, y))
+                    }
+                }
+
+                const packedCoord1 = packCoord(coord1)
+
+                for (const coord2 of findCoordsInRange(coord1.x, coord1.y, range)) {
+
+                    const packedCoord2Num = packAsNum(coord2)
+                    if (this.byPlannedRoad[packedCoord2Num] !== 1) continue
+                    if (this.baseCoords[packedCoord2Num] === 255) continue
+
+                    const packedCoord2 = packCoord(coord2)
+                    if (packedCoord1 === packedCoord2) continue
+
+                    outputCoords = []
+
+                    for (const adjCoord2 of findCoordsInRange(coord2.x, coord2.y, range)) {
+
+                        const packedAdjCoord2 = packCoord(adjCoord2)
+                        if (packedCoord1 === packedAdjCoord2) continue
+                        if (packedCoord2 === packedAdjCoord2) continue
+                        if (!packedAdjCoords1.has(packedAdjCoord2)) continue
+
+                        outputCoords.push(adjCoord2)
+                        if (outputCoords.length >= 8) {
+
+                            this.input2Coord = coord2
+                            this.outputCoords = outputCoords
+                            return true
+                        }
+                    }
+                }
+
+                return false
+            },
+            consequence: stampAnchor => {
+
+                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_LAB, 6)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 255
+
+                this.basePlans.set(packCoord(this.input2Coord), STRUCTURE_LAB, 6)
+                this.baseCoords[packAsNum(this.input2Coord)] = 255
+                this.roadCoords[packAsNum(this.input2Coord)] = 255
+
+                for (const coord of this.outputCoords) {
+
+                    this.basePlans.set(packCoord(coord), STRUCTURE_LAB, 8)
+                    this.baseCoords[packAsNum(coord)] = 255
+                    this.roadCoords[packAsNum(coord)] = 255
+                }
+            },
+        })
+
+        this.room.visual.circle(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, {fill: customColors.red})
+        this.room.visual.circle(this.input2Coord.x, this.input2Coord.y, {fill: customColors.red})
+    }
     private gridExtensions() {
         const coordMap = this.reverseExitFlood
 

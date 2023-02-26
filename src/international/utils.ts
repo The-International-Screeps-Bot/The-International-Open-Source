@@ -56,7 +56,7 @@ export function doesCoordExist(coord: Coord) {
  * Takes a rectange and returns the positions inside of it in an array
  */
 export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: number) {
-    const positions: Coord[] = []
+    const coords: Coord[] = []
 
     for (let x = x1; x <= x2; x += 1) {
         for (let y = y1; y <= y2; y += 1) {
@@ -66,12 +66,34 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 
             // Otherwise pass the x and y to positions
 
-            positions.push({ x, y })
+            coords.push({ x, y })
         }
     }
 
-    return positions
+    return coords
 }
+
+/**
+ * Takes a rectange and returns the positions inside of it in an array
+ */
+export function findCoordsInRange(startX: number, startY: number, range: number) {
+    const coords: Coord[] = []
+
+    for (let x = startX - range; x <= startX + range; x += 1) {
+        for (let y = startY - range; y <= startY + range; y += 1) {
+            // Iterate if the pos doesn't map onto a room
+
+            if (startX < 0 || startX >= roomDimensions || startY < 0 || startY >= roomDimensions) continue
+
+            // Otherwise pass the x and y to positions
+
+            coords.push({ x, y })
+        }
+    }
+
+    return coords
+}
+
 
 export function findAdjacentCoordsToXY(x: number, y: number) {
     const positions: Coord[] = []
