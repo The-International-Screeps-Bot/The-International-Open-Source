@@ -104,6 +104,7 @@ export class CommunePlanner {
     input2Coord: Coord
     outputCoords: Coord[]
     sourceHarvestPositions: RoomPosition[][]
+    sourcePaths: RoomPosition[][]
 
     terrainCoords: CoordMap
     packedExitCoords: Set<string>
@@ -656,45 +657,71 @@ export class CommunePlanner {
         }
     }
     private preHubSources() {
+        if (this.sourcePaths) return
+
         const fastFillerAnchor = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
             this.stampAnchors.fastFiller[0].y,
             this.room.name,
         )
+        const sourcePaths: RoomPosition[][] = []
 
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
-            let closestPos: RoomPosition
-            let closestPath: RoomPosition[]
 
-            for (const pos of this.sourceHarvestPositions[i]) {
-                const path = this.room.advancedFindPath({
-                    origin: pos,
-                    goals: [
-                        {
-                            pos: fastFillerAnchor,
-                            range: 3,
-                        },
-                    ],
-                    weightCoordMaps: [this.gridCoords, this.roadCoords],
-                    plainCost: defaultRoadPlanningPlainCost,
-                })
+            this.sourceHarvestPositions[i].sort((a, b) => {
+                return (
+                    this.room.advancedFindPath({
+                        origin: a,
+                        goals: [
+                            {
+                                pos: fastFillerAnchor,
+                                range: 3,
+                            },
+                        ],
+                        weightCoordMaps: [this.gridCoords, this.roadCoords],
+                        plainCost: defaultRoadPlanningPlainCost,
+                    }).length -
+                    this.room.advancedFindPath({
+                        origin: b,
+                        goals: [
+                            {
+                                pos: fastFillerAnchor,
+                                range: 3,
+                            },
+                        ],
+                        weightCoordMaps: [this.gridCoords, this.roadCoords],
+                        plainCost: defaultRoadPlanningPlainCost,
+                    }).length
+                )
+            })
 
-                if (closestPath && path.length >= closestPath.length) continue
+            const closestHarvestPos = this.sourceHarvestPositions[i][0]
 
-                closestPos = pos
-                closestPath = path
-            }
-
-            this.basePlans.set(packCoord(closestPos), STRUCTURE_CONTAINER, 3)
-            const packedCoord = packAsNum(closestPos)
+            this.basePlans.set(packCoord(closestHarvestPos), STRUCTURE_CONTAINER, 3)
+            const packedCoord = packAsNum(closestHarvestPos)
             this.baseCoords[packedCoord] = 255
             this.gridCoords[packedCoord] = 0
 
-            for (const pos of closestPath) {
+            const path = this.room.advancedFindPath({
+                origin: closestHarvestPos,
+                goals: [
+                    {
+                        pos: fastFillerAnchor,
+                        range: 3,
+                    },
+                ],
+                weightCoordMaps: [this.gridCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost,
+            })
+            sourcePaths.push(path)
+
+            for (const pos of path) {
                 this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
                 this.roadCoords[packAsNum(pos)] = 1
             }
         }
+
+        this.sourcePaths = sourcePaths
     }
     private preExtensionSources() {}
     private findCenterUpgradePos() {
