@@ -103,6 +103,7 @@ export class CommunePlanner {
     centerUpgradePos: RoomPosition
     input2Coord: Coord
     outputCoords: Coord[]
+    sourceHarvestPositions: RoomPosition[][]
 
     terrainCoords: CoordMap
     packedExitCoords: Set<string>
@@ -214,18 +215,22 @@ export class CommunePlanner {
             this.recordExits()
         }
 
+        this.avoidSources()
         this.fastFiller()
+        this.preGridSources()
         this.generateGrid()
         this.pruneFastFillerRoads()
         this.findCenterUpgradePos()
+        this.preHubSources()
         this.hub()
         this.labs()
         this.gridExtensions()
+        this.planGridCoords()
         this.visualize()
 
         return RESULT_SUCCESS
     }
-    private visualize() {
+    private visualizeGrid() {
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
@@ -235,7 +240,8 @@ export class CommunePlanner {
                 this.room.visual.structure(x, y, STRUCTURE_ROAD)
             }
         }
-
+    }
+    private visualize() {
         for (const packedCoord in this.basePlans.map) {
             const coord = unpackCoord(packedCoord)
             const basePlansCoord = this.basePlans.map[packedCoord]
@@ -249,6 +255,9 @@ export class CommunePlanner {
         this.room.visual.connectRoads({
             opacity: 0.7,
         })
+
+        this.room.visual.circle(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, { fill: customColors.red })
+        this.room.visual.circle(this.input2Coord.x, this.input2Coord.y, { fill: customColors.red })
     }
     private recordExits() {
         let x
@@ -616,15 +625,88 @@ export class CommunePlanner {
 
         this.finishedFastFillerRoadPrune = true
     }
+    private avoidSources() {
+        if (this.sourceHarvestPositions) return
+
+        const sourceHarvestPositions: RoomPosition[][] = []
+
+        let i = -1
+        for (const source of this.room.sources) {
+            i += 1
+            sourceHarvestPositions.push([])
+
+            for (const offset of adjacentOffsets) {
+                const adjPos = new RoomPosition(offset.x + source.pos.x, offset.y + source.pos.y, this.room.name)
+
+                const packedCoord = packAsNum(adjPos)
+                if (this.terrainCoords[packedCoord] === 255) continue
+
+                this.baseCoords[packedCoord] = 255
+                sourceHarvestPositions[i].push(adjPos)
+            }
+        }
+
+        this.sourceHarvestPositions = sourceHarvestPositions
+    }
+    private preGridSources() {
+        for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
+            for (const pos of this.sourceHarvestPositions[i]) {
+                this.baseCoords[packAsNum(pos)] = 0
+            }
+        }
+    }
+    private preHubSources() {
+        const fastFillerAnchor = new RoomPosition(
+            this.stampAnchors.fastFiller[0].x,
+            this.stampAnchors.fastFiller[0].y,
+            this.room.name,
+        )
+
+        for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
+            let closestPos: RoomPosition
+            let closestPath: RoomPosition[]
+
+            for (const pos of this.sourceHarvestPositions[i]) {
+                const path = this.room.advancedFindPath({
+                    origin: pos,
+                    goals: [
+                        {
+                            pos: fastFillerAnchor,
+                            range: 3,
+                        },
+                    ],
+                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost,
+                })
+
+                if (closestPath && path.length >= closestPath.length) continue
+
+                closestPos = pos
+                closestPath = path
+            }
+
+            this.basePlans.set(packCoord(closestPos), STRUCTURE_CONTAINER, 3)
+            const packedCoord = packAsNum(closestPos)
+            this.baseCoords[packedCoord] = 255
+            this.gridCoords[packedCoord] = 0
+
+            for (const pos of closestPath) {
+                this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
+                this.roadCoords[packAsNum(pos)] = 1
+            }
+        }
+    }
+    private preExtensionSources() {}
     private findCenterUpgradePos() {
+        if (this.centerUpgradePos) return false
         const controllerPos = this.room.controller.pos
 
         // Get the open areas in a range of 3 to the controller
 
         const distanceCoords = this.room.distanceTransform(
-            undefined,
+            this.roadCoords,
             false,
-            255,
+            1,
             controllerPos.x - 2,
             controllerPos.y - 2,
             controllerPos.x + 2,
@@ -642,6 +724,45 @@ export class CommunePlanner {
             cardinalFlood: true,
         })
         if (!pos) return false
+
+        const packedCoord = packAsNum(pos)
+        this.baseCoords[packedCoord] = 255
+        this.gridCoords[packedCoord] = 0
+        this.basePlans.set(packCoord(pos), STRUCTURE_CONTAINER, 2)
+        this.basePlans.set(packCoord(pos), STRUCTURE_LINK, 5)
+
+        for (const offset of adjacentOffsets) {
+            const adjCoord = {
+                x: offset.x + pos.x,
+                y: offset.y + pos.y,
+            }
+
+            const packedAdjCoord = packAsNum(adjCoord)
+            this.baseCoords[packedAdjCoord] = 255
+            this.gridCoords[packedAdjCoord] = 0
+        }
+
+        const path = this.room.advancedFindPath({
+            origin: pos,
+            goals: [
+                {
+                    pos: new RoomPosition(
+                        this.stampAnchors.fastFiller[0].x,
+                        this.stampAnchors.fastFiller[0].y,
+                        this.room.name,
+                    ),
+                    range: 3,
+                },
+            ],
+            weightCoordMaps: [this.gridCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost,
+        })
+
+        for (const pos of path) {
+            const packedPathCoord = packAsNum(pos)
+            this.roadCoords[packedPathCoord] = 1
+            this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
+        }
 
         return (this.centerUpgradePos = pos)
     }
@@ -685,6 +806,36 @@ export class CommunePlanner {
 
         if (cardinalRoads >= 3) return RESULT_ACTION
         return RESULT_NO_ACTION
+    }
+    private planGridCoords() {
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                const packedCoord = packXYAsNum(x, y)
+                if (this.gridCoords[packedCoord] !== 1) continue
+                if (this.roadCoords[packedCoord] === 1) continue
+
+                let hasNeed
+
+                for (const offset of adjacentOffsets) {
+                    const adjCoord = {
+                        x: offset.x + x,
+                        y: offset.y + y,
+                    }
+
+                    const plan = this.basePlans.get(packCoord(adjCoord))
+                    if (!plan) continue
+                    if (plan.structureType === STRUCTURE_ROAD) continue
+
+                    hasNeed = true
+                    break
+                }
+
+                if (!hasNeed) continue
+
+                this.basePlans.setXY(x, y, STRUCTURE_ROAD, 3)
+                this.roadCoords[packedCoord] = 1
+            }
+        }
     }
     private flipStructuresVertical(stamp: Stamp) {
         const flippedStructures: Partial<{ [key in StructureConstant]: Coord[] }> = {}
@@ -1307,7 +1458,7 @@ export class CommunePlanner {
             weighted: true,
             coordMap: this.reverseExitFlood,
             /**
-             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             * Ensure we can place all 10 labs where they are in range 2 of the 2 inputs, so can all be utilized for reactions
              */
             conditions: coord1 => {
                 if (this.byPlannedRoad[packAsNum(coord1)] !== 1) return false
@@ -1320,7 +1471,6 @@ export class CommunePlanner {
                 const range = 2
                 for (let x = coord1.x - range; x <= coord1.x + range; x += 1) {
                     for (let y = coord1.y - range; y <= coord1.y + range; y += 1) {
-
                         const packedCoordNum = packXYAsNum(x, y)
                         if (this.byPlannedRoad[packedCoordNum] !== 1) continue
                         if (this.baseCoords[packedCoordNum] === 255) continue
@@ -1332,7 +1482,6 @@ export class CommunePlanner {
                 const packedCoord1 = packCoord(coord1)
 
                 for (const coord2 of findCoordsInRange(coord1.x, coord1.y, range)) {
-
                     const packedCoord2Num = packAsNum(coord2)
                     if (this.byPlannedRoad[packedCoord2Num] !== 1) continue
                     if (this.baseCoords[packedCoord2Num] === 255) continue
@@ -1343,7 +1492,6 @@ export class CommunePlanner {
                     outputCoords = []
 
                     for (const adjCoord2 of findCoordsInRange(coord2.x, coord2.y, range)) {
-
                         const packedAdjCoord2 = packCoord(adjCoord2)
                         if (packedCoord1 === packedAdjCoord2) continue
                         if (packedCoord2 === packedAdjCoord2) continue
@@ -1351,7 +1499,6 @@ export class CommunePlanner {
 
                         outputCoords.push(adjCoord2)
                         if (outputCoords.length >= 8) {
-
                             this.input2Coord = coord2
                             this.outputCoords = outputCoords
                             return true
@@ -1362,7 +1509,6 @@ export class CommunePlanner {
                 return false
             },
             consequence: stampAnchor => {
-
                 this.basePlans.set(packCoord(stampAnchor), STRUCTURE_LAB, 6)
                 this.baseCoords[packAsNum(stampAnchor)] = 255
                 this.roadCoords[packAsNum(stampAnchor)] = 255
@@ -1372,16 +1518,12 @@ export class CommunePlanner {
                 this.roadCoords[packAsNum(this.input2Coord)] = 255
 
                 for (const coord of this.outputCoords) {
-
                     this.basePlans.set(packCoord(coord), STRUCTURE_LAB, 8)
                     this.baseCoords[packAsNum(coord)] = 255
                     this.roadCoords[packAsNum(coord)] = 255
                 }
             },
         })
-
-        this.room.visual.circle(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, {fill: customColors.red})
-        this.room.visual.circle(this.input2Coord.x, this.input2Coord.y, {fill: customColors.red})
     }
     private gridExtensions() {
         const coordMap = this.reverseExitFlood
