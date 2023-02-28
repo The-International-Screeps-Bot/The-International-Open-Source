@@ -2367,3 +2367,8 @@ Room.prototype.findStructureInsideRect = function (x1, y1, x2, y2, condition) {
 
     return false
 }
+
+Room.prototype.coordVisual = function(x, y, fill = customColors.lightBlue) {
+
+    this.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill })
+}

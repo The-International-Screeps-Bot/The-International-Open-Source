@@ -451,7 +451,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         },
     },
     extension: {
-        offset: 0,
+        offset: 3,
         protectionOffset: 3,
         size: 1,
         structures: {

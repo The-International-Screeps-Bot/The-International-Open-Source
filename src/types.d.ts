@@ -50,6 +50,10 @@ declare global {
         y2: number
     }
 
+    interface CostMatrix {
+        _bits: Uint8Array
+    }
+
     interface Colors {
         white: string
         lightGrey: string
@@ -1269,6 +1273,12 @@ declare global {
             y2: number,
             condition: (structure: Structure) => boolean,
         ): Structure | false
+
+        /**
+         * Generates a square visual at the specified coordinate
+         */
+        coordVisual(x: number, y: number, fill?: string): void
+
         // Room Getters
 
         readonly global: Partial<RoomGlobal>
