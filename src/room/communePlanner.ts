@@ -47,7 +47,7 @@ import { toASCII } from 'punycode'
 import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
 import { RoomManager } from './room'
-import { openStdin } from 'process'
+import { off, openStdin } from 'process'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { length } from 'node-persist'
@@ -224,6 +224,7 @@ export class CommunePlanner {
         this.findCenterUpgradePos()
         this.preHubSources()
         this.hub()
+        this.preLabSources()
         this.labs()
         this.gridExtensions()
         this.planGridCoords()
@@ -667,12 +668,10 @@ export class CommunePlanner {
         const sourcePaths: RoomPosition[][] = []
 
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
-
             // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
             // Loop through each pos index
 
             for (let j = this.sourceHarvestPositions.length - 1; j >= 0; j -= 1) {
-
                 if (this.baseCoords[packAsNum(this.sourceHarvestPositions[i][j])] !== 255) continue
 
                 this.sourceHarvestPositions.splice(j, 1)
@@ -733,7 +732,56 @@ export class CommunePlanner {
 
         this.sourcePaths = sourcePaths
     }
-    private preExtensionSources() {}
+    private preLabSources() {
+        if (this.stampAnchors.sourceLink.length) return
+
+        const hubAnchor = this.stampAnchors.hub[0]
+        const sourceLinkCoords: Coord[] = []
+        const sourceExtensionCoords: Coord[] = []
+
+        for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
+            const closestHarvestPos = this.sourceHarvestPositions[i][0]
+            const packedAdjCoords: Set<string> = new Set([])
+            let closestAdjCoord: Coord
+            let closestRange = Infinity
+
+            for (const offset of adjacentOffsets) {
+                const adjCoord = {
+                    x: closestHarvestPos.x + offset.x,
+                    y: closestHarvestPos.y + offset.y,
+                }
+
+                const packedCoord = packAsNum(adjCoord)
+                if (this.baseCoords[packedCoord] === 255) continue
+                if (this.gridCoords[packedCoord] === 1) continue
+
+                packedAdjCoords.add(packCoord(adjCoord))
+
+                const range = getRangeOfCoords(hubAnchor, adjCoord)
+                if (range >= closestRange) continue
+
+                closestAdjCoord = adjCoord
+                closestRange = range
+            }
+
+            const packedClosestAdjCoord = packCoord(closestAdjCoord)
+            packedAdjCoords.delete(packedClosestAdjCoord)
+            sourceLinkCoords.push(closestAdjCoord)
+
+            this.basePlans.set(packedClosestAdjCoord, STRUCTURE_LINK, 6)
+            this.baseCoords[packAsNum(closestAdjCoord)] = 255
+
+            for (const packedAdjCoord of packedAdjCoords) {
+                this.basePlans.set(packedAdjCoord, STRUCTURE_EXTENSION, 7)
+                const coord = unpackCoord(packedAdjCoord)
+                this.baseCoords[packAsNum(coord)] = 255
+                sourceExtensionCoords.push(coord)
+            }
+        }
+
+        this.stampAnchors.sourceLink = sourceLinkCoords
+        this.stampAnchors.sourceExtension = sourceExtensionCoords
+    }
     private findCenterUpgradePos() {
         if (this.centerUpgradePos) return false
         const controllerPos = this.room.controller.pos
@@ -1563,18 +1611,16 @@ export class CommunePlanner {
         })
     }
     private gridExtensions() {
-        const coordMap = this.reverseExitFlood
-
         this.planStamps({
             stampType: /* 'gridExtension' */ 'extension',
             count:
                 CONTROLLER_STRUCTURES.extension[8] -
-                stamps.fastFiller.structures[STRUCTURE_EXTENSION]
-                    .length /* CONTROLLER_STRUCTURES.extension[8] - planned extensions count */,
+                stamps.fastFiller.structures[STRUCTURE_EXTENSION].length -
+                this.stampAnchors.sourceExtension.length,
             startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
-            coordMap,
+            coordMap: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */

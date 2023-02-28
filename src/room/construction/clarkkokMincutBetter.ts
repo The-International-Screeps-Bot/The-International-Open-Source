@@ -445,7 +445,7 @@ export function minCutToExit(sources: Coord[], costMap: CostMatrix): Coord[] {
 }
 
 export function runMinCut(room: Room) {
-
+    return
     const cm = new PathFinder.CostMatrix()
     cm._bits = internationalManager.getTerrainCoords(room.name)
 
