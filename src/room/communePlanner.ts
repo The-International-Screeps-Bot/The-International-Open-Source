@@ -668,6 +668,16 @@ export class CommunePlanner {
 
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
 
+            // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
+            // Loop through each pos index
+
+            for (let j = this.sourceHarvestPositions.length - 1; j >= 0; j -= 1) {
+
+                if (this.baseCoords[packAsNum(this.sourceHarvestPositions[i][j])] !== 255) continue
+
+                this.sourceHarvestPositions.splice(j, 1)
+            }
+
             this.sourceHarvestPositions[i].sort((a, b) => {
                 return (
                     this.room.advancedFindPath({
@@ -1584,6 +1594,8 @@ export class CommunePlanner {
     private nuker() {}
     private powerSpawn() {}
 }
+
+// Old basePlanner
 
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
