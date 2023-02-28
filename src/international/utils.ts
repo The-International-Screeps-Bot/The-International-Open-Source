@@ -74,9 +74,9 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 }
 
 /**
- * Takes a rectange and returns the positions inside of it in an array
+ * Takes a coord and returns the positions inside of it in an array
  */
-export function findCoordsInRange(startX: number, startY: number, range: number) {
+export function findCoordsInRangeXY(startX: number, startY: number, range: number) {
     const coords: Coord[] = []
 
     for (let x = startX - range; x <= startX + range; x += 1) {
@@ -94,6 +94,12 @@ export function findCoordsInRange(startX: number, startY: number, range: number)
     return coords
 }
 
+/**
+ * Takes a coord and returns the positions inside of it in an array
+ */
+export function findCoordsInRange(coord: Coord, range: number) {
+    return findCoordsInRangeXY(coord.x, coord.y, range)
+}
 
 export function findAdjacentCoordsToXY(x: number, y: number) {
     const positions: Coord[] = []

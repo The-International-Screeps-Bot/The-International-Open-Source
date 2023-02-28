@@ -66,7 +66,7 @@
 
 import { roomDimensions } from 'international/constants'
 import { internationalManager } from 'international/international'
-import { customLog, findCoordsInRange, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'international/utils'
+import { customLog, findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'international/utils'
 
 // the eight surrounding points of a tile
 // note the order here is somehow important, the element i and (i + 4) % 8 should be the opposite direction
@@ -450,7 +450,7 @@ export function runMinCut(room: Room) {
     cm._bits = internationalManager.getTerrainCoords(room.name)
 
     const range = 7
-    const coords = findCoordsInRange(33, 12, range).filter(coord => cm.get(coord.x, coord.y) !== 255)
+    const coords = findCoordsInRangeXY(33, 12, range).filter(coord => cm.get(coord.x, coord.y) !== 255)
 
     const result = minCutToExit(coords, cm)
 
@@ -462,7 +462,6 @@ export function runMinCut(room: Room) {
     })
 
     for (const coord of result) {
-
         room.coordVisual(coord.x, coord.y)
     }
 

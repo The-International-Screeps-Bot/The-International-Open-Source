@@ -29,6 +29,7 @@ import {
     findClosestCoord,
     findClosestPos,
     findCoordsInRange,
+    findCoordsInRangeXY,
     findCoordsInsideRect,
     getRange,
     getRangeOfCoords,
@@ -217,7 +218,14 @@ export class CommunePlanner {
         }
 
         this.avoidSources()
+
+        for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
+            this.baseCoords[packAsNum(coord)] = 255
+        }
         this.fastFiller()
+        for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
+            this.baseCoords[packAsNum(coord)] = 0
+        }
         this.preGridSources()
         this.generateGrid()
         this.pruneFastFillerRoads()
@@ -228,6 +236,7 @@ export class CommunePlanner {
         this.labs()
         this.gridExtensions()
         this.planGridCoords()
+        this.planSourceStructures()
         this.visualize()
 
         return RESULT_SUCCESS
@@ -766,21 +775,34 @@ export class CommunePlanner {
 
             const packedClosestAdjCoord = packCoord(closestAdjCoord)
             packedAdjCoords.delete(packedClosestAdjCoord)
-            sourceLinkCoords.push(closestAdjCoord)
 
-            this.basePlans.set(packedClosestAdjCoord, STRUCTURE_LINK, 6)
+            sourceLinkCoords.push(closestAdjCoord)
             this.baseCoords[packAsNum(closestAdjCoord)] = 255
 
             for (const packedAdjCoord of packedAdjCoords) {
-                this.basePlans.set(packedAdjCoord, STRUCTURE_EXTENSION, 7)
                 const coord = unpackCoord(packedAdjCoord)
+
+                sourceExtensionCoords.push(unpackCoord(packedAdjCoord))
                 this.baseCoords[packAsNum(coord)] = 255
-                sourceExtensionCoords.push(coord)
             }
         }
 
         this.stampAnchors.sourceLink = sourceLinkCoords
         this.stampAnchors.sourceExtension = sourceExtensionCoords
+    }
+    private planSourceStructures() {
+
+        if (this.basePlans.getXY(this.stampAnchors.sourceLink[0].x, this.stampAnchors.sourceLink[0].y)) return
+
+        for (const coord of this.stampAnchors.sourceLink) {
+
+            this.basePlans.set(packCoord(coord), STRUCTURE_LINK, 6)
+        }
+
+        for (const coord of this.stampAnchors.sourceExtension) {
+
+            this.basePlans.set(packCoord(coord), STRUCTURE_EXTENSION, 7)
+        }
     }
     private findCenterUpgradePos() {
         if (this.centerUpgradePos) return false
@@ -950,6 +972,8 @@ export class CommunePlanner {
         return flippedStructures
     }
     private planStamps(args: PlanStampsArgs) {
+        if (!args.coordMap) args.coordMap = this.baseCoords
+
         const stamp = stamps[args.stampType]
 
         args.count -= this.stampAnchors[args.stampType].length
@@ -1566,7 +1590,7 @@ export class CommunePlanner {
 
                 const packedCoord1 = packCoord(coord1)
 
-                for (const coord2 of findCoordsInRange(coord1.x, coord1.y, range)) {
+                for (const coord2 of findCoordsInRangeXY(coord1.x, coord1.y, range)) {
                     const packedCoord2Num = packAsNum(coord2)
                     if (this.byPlannedRoad[packedCoord2Num] !== 1) continue
                     if (this.baseCoords[packedCoord2Num] === 255) continue
@@ -1576,7 +1600,7 @@ export class CommunePlanner {
 
                     outputCoords = []
 
-                    for (const adjCoord2 of findCoordsInRange(coord2.x, coord2.y, range)) {
+                    for (const adjCoord2 of findCoordsInRangeXY(coord2.x, coord2.y, range)) {
                         const packedAdjCoord2 = packCoord(adjCoord2)
                         if (packedCoord1 === packedAdjCoord2) continue
                         if (packedCoord2 === packedAdjCoord2) continue
@@ -1635,7 +1659,6 @@ export class CommunePlanner {
         })
     }
     private towers() {}
-    private planSourceStructures() {}
     private observer() {}
     private nuker() {}
     private powerSpawn() {}

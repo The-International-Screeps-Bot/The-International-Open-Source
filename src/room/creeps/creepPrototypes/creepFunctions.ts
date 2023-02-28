@@ -1562,12 +1562,10 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
     if (target instanceof Resource) {
         this.pickup(target)
-        customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, {
-            superPosition: 1,
-        })
+
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }
@@ -1597,10 +1595,10 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     }
 
     if (this.withdraw(target, request.RT, request.A) !== OK) return RESULT_FAIL
-    customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A
-    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
+
     this.memory.RLRs.splice(0, 1)
     return RESULT_SUCCESS
 }
@@ -1640,12 +1638,10 @@ Creep.prototype.runRoomLogisticsRequest = function () {
 
     if (target instanceof Resource) {
         this.pickup(target)
-        customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, {
-            superPosition: 1,
-        })
+
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }
@@ -1675,10 +1671,10 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     }
 
     if (this.withdraw(target, request.RT, request.A) !== OK) return RESULT_FAIL
-    customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A
-    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
+
     this.memory.RLRs.splice(0, 1)
     return RESULT_SUCCESS
 }

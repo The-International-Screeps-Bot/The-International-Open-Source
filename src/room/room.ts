@@ -114,8 +114,7 @@ export class RoomManager {
             global.communeManagers[room.name] = room.communeManager
         }
 
-        if (this.room.name === 'W7N3') {
-
+        if (this.room.name === 'W8N3') {
             this.communePlanner.preTickRun()
             runMinCut(this.room)
             return
