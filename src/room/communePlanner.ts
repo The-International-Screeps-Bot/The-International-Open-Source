@@ -235,6 +235,9 @@ export class CommunePlanner {
         this.preLabSources()
         this.labs()
         this.gridExtensions()
+        this.nuker()
+        this.powerSpawn()
+        this.observer()
         this.planGridCoords()
         this.planSourceStructures()
         this.visualize()
@@ -791,16 +794,13 @@ export class CommunePlanner {
         this.stampAnchors.sourceExtension = sourceExtensionCoords
     }
     private planSourceStructures() {
-
         if (this.basePlans.getXY(this.stampAnchors.sourceLink[0].x, this.stampAnchors.sourceLink[0].y)) return
 
         for (const coord of this.stampAnchors.sourceLink) {
-
             this.basePlans.set(packCoord(coord), STRUCTURE_LINK, 6)
         }
 
         for (const coord of this.stampAnchors.sourceExtension) {
-
             this.basePlans.set(packCoord(coord), STRUCTURE_EXTENSION, 7)
         }
     }
@@ -1636,7 +1636,7 @@ export class CommunePlanner {
     }
     private gridExtensions() {
         this.planStamps({
-            stampType: /* 'gridExtension' */ 'extension',
+            stampType: 'gridExtension',
             count:
                 CONTROLLER_STRUCTURES.extension[8] -
                 stamps.fastFiller.structures[STRUCTURE_EXTENSION].length -
@@ -1659,9 +1659,71 @@ export class CommunePlanner {
         })
     }
     private towers() {}
-    private observer() {}
-    private nuker() {}
-    private powerSpawn() {}
+    private observer() {
+        this.planStamps({
+            stampType: 'observer',
+            count: 1,
+            startCoords: [this.stampAnchors.hub[0]],
+            dynamic: true,
+            weighted: true,
+            coordMap: this.reverseExitFlood,
+            /**
+             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             */
+            conditions: coord => {
+                if (this.gridCoords[packAsNum(coord)] === 1) return false
+
+                return this.baseCoords[packAsNum(coord)] === 0
+            },
+            consequence: stampAnchor => {
+                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_OBSERVER, 8)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 255
+            },
+        })
+    }
+    private nuker() {
+        this.planStamps({
+            stampType: 'nuker',
+            count: 1,
+            startCoords: [this.stampAnchors.hub[0]],
+            dynamic: true,
+            weighted: true,
+            coordMap: this.reverseExitFlood,
+            /**
+             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             */
+            conditions: coord => {
+                return this.byPlannedRoad[packAsNum(coord)] === 1
+            },
+            consequence: stampAnchor => {
+                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_NUKER, 8)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 255
+            },
+        })
+    }
+    private powerSpawn() {
+        this.planStamps({
+            stampType: 'powerSpawn',
+            count: 1,
+            startCoords: [this.stampAnchors.hub[0]],
+            dynamic: true,
+            weighted: true,
+            coordMap: this.reverseExitFlood,
+            /**
+             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             */
+            conditions: coord => {
+                return this.byPlannedRoad[packAsNum(coord)] === 1
+            },
+            consequence: stampAnchor => {
+                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_POWER_SPAWN, 8)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 255
+            },
+        })
+    }
 }
 
 // Old basePlanner
@@ -2104,7 +2166,7 @@ export function basePlanner(room: Room) {
 
     if (
         !planStamp({
-            stampType: 'extensions',
+            stampType: 'gridExtension',
             count: 6,
             startCoords: [hubAnchor],
         })
@@ -2113,7 +2175,7 @@ export function basePlanner(room: Room) {
 
     // Plan the stamp x times
 
-    for (const extensionsAnchor of room.memory.stampAnchors.extensions) {
+    for (const extensionsAnchor of room.memory.stampAnchors.gridExtension) {
         // Path from the extensionsAnchor to the hubAnchor
 
         path = room.advancedFindPath({
@@ -2228,8 +2290,7 @@ export function basePlanner(room: Room) {
         CONTROLLER_STRUCTURES.extension[8] -
         stamps.fastFiller.structures.extension.length -
         /* stamps.hub.structures.extension.length - */
-        room.memory.stampAnchors.extensions.length * stamps.extensions.structures.extension.length -
-        room.memory.stampAnchors.extension.length -
+        room.memory.stampAnchors.gridExtension.length * stamps.gridExtension.structures.extension.length -
         room.memory.stampAnchors.sourceExtension.length
 
     // Try to plan the stamp
@@ -2383,7 +2444,7 @@ export function basePlanner(room: Room) {
 
     if (
         !planStamp({
-            stampType: 'extension',
+            stampType: 'gridExtension',
             count: extraExtensionsAmount,
             startCoords: [hubAnchor],
             adjacentToRoads: true,

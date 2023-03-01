@@ -90,10 +90,8 @@ declare global {
     type StampTypes =
         | 'fastFiller'
         | 'hub'
-        | 'extensions'
         | 'labs'
         | 'tower'
-        | 'extension'
         | 'observer'
         | 'sourceLink'
         | 'sourceExtension'
@@ -101,7 +99,9 @@ declare global {
         | 'extractor'
         | 'road'
         | 'rampart'
-        /* | 'gridExtension' */
+        | 'gridExtension'
+        | 'nuker'
+        | 'powerSpawn'
 
     interface Stamp {
         offset: number

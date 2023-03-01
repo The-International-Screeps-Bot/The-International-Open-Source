@@ -394,7 +394,7 @@ export const stamps: Record<StampTypes, Stamp> = {
             ],
         },
     },
-    extensions: {
+    gridExtension: {
         offset: 2,
         protectionOffset: 4,
         size: 3,
@@ -450,20 +450,28 @@ export const stamps: Record<StampTypes, Stamp> = {
             tower: [{ x: 0, y: 0 }],
         },
     },
-    extension: {
-        offset: 3,
-        protectionOffset: 3,
-        size: 1,
-        structures: {
-            extension: [{ x: 0, y: 0 }],
-        },
-    },
     observer: {
         offset: 0,
-        protectionOffset: 0,
+        protectionOffset: 1,
         size: 1,
         structures: {
             observer: [{ x: 0, y: 0 }],
+        },
+    },
+    nuker: {
+        offset: 0,
+        protectionOffset: 1,
+        size: 1,
+        structures: {
+            nuker: [{ x: 0, y: 0 }],
+        },
+    },
+    powerSpawn: {
+        offset: 0,
+        protectionOffset: 1,
+        size: 1,
+        structures: {
+            powerSpawn: [{ x: 0, y: 0 }],
         },
     },
     sourceLink: {
