@@ -1,4 +1,4 @@
-import { minerals, terminalResourceTargets } from 'international/constants'
+import { minerals, RESULT_ACTION, RESULT_NO_ACTION, terminalResourceTargets } from 'international/constants'
 import { customLog, findLargestTransactionAmount, newID } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
@@ -107,6 +107,8 @@ export class TerminalManager {
     }
 
     private createAllyRequests() {
+        if (!Memory.allyTrading) return
+
         const { room } = this.communeManager
         const { terminal } = room
 
@@ -197,10 +199,10 @@ export class TerminalManager {
     }
 
     private respondToAllyRequests() {
+        if (!Memory.allyTrading) return RESULT_NO_ACTION
+
         const { room } = this.communeManager
         const { terminal } = room
-
-        if (!allyManager.allyRequests) return false
 
         // Filter out allyRequests that are requesting resources
 
@@ -236,7 +238,7 @@ export class TerminalManager {
 
                 terminal.send(request.resourceType, amount, request.roomName, `Sending ${request} to ally`)
                 terminal.intended = true
-                return true
+                return RESULT_ACTION
             }
 
             // If the resourceType is energy
@@ -262,7 +264,7 @@ export class TerminalManager {
 
                 terminal.send(request.resourceType, amount, request.roomName, `Sending ${request} to ally`)
                 terminal.intended = true
-                return true
+                return RESULT_ACTION
             }
 
             // Otherwise iterate
@@ -270,7 +272,7 @@ export class TerminalManager {
             continue
         }
 
-        return false
+        return RESULT_NO_ACTION
     }
 
     private manageResources() {

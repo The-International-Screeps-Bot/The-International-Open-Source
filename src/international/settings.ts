@@ -128,7 +128,7 @@ export const settings: Settings = {
         'Amberdark',
     ],
     nonAggressionPlayers: ['Q13214', 'HerrKai', 'Raggy', 'somygame', 'shley92822212'],
-    tradeBlacklist: [''],
+    tradeBlacklist: [],
     pixelSelling: false,
     pixelGeneration: false,
     autoClaim: true,

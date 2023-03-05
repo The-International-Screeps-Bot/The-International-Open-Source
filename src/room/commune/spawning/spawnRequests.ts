@@ -161,8 +161,7 @@ export class SpawnRequestsManager {
                         }
                     }
 
-                    //Only Spawn one larger creep if we have the ability to mine using one large creep
-                    if (this.communeManager.room.sourceContainers[sourceIndex] && this.spawnEnergyCapacity >= 650) {
+                    if (this.spawnEnergyCapacity >= 550) {
                         return {
                             role,
                             defaultParts: [MOVE],
@@ -1525,7 +1524,8 @@ export class SpawnRequestsManager {
                                 return (
                                     (tradeType.amount + localTradeAmount) * BODYPART_COST[partType] +
                                     (tradeTypes[tradeType.other].amount - localTradeAmount) *
-                                        BODYPART_COST[tradeType.other]
+                                        BODYPART_COST[tradeType.other] +
+                                    totalTradeableParts * BODYPART_COST[MOVE]
                                 )
                             }
 

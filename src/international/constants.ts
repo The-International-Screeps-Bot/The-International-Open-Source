@@ -384,30 +384,17 @@ export const stamps: Record<StampTypes, Stamp> = {
     hub: {
         offset: 2,
         protectionOffset: 5,
-        size: 3,
+        size: 0,
         structures: {
-            road: [
-                { x: 1, y: 1 },
-                { x: 2, y: 0 },
-                { x: 3, y: 0 },
-                { x: 0, y: 3 },
-                { x: 0, y: 2 },
-                { x: 1, y: 4 },
-                { x: 2, y: 4 },
-                { x: 4, y: 2 },
-                { x: 4, y: 1 },
-                { x: 3, y: 3 },
+            storage: [
+                { x: 1, y: 0 },
+                { x: 0, y: 1 },
+                { x: 2, y: 1 },
+                { x: 1, y: 2 },
             ],
-            link: [{ x: 2, y: 3 }],
-            factory: [{ x: 2, y: 1 }],
-            nuker: [{ x: 1, y: 2 }],
-            terminal: [{ x: 1, y: 3 }],
-            storage: [{ x: 3, y: 1 }],
-            powerSpawn: [{ x: 3, y: 2 }],
-            empty: [{ x: 2, y: 2 }],
         },
     },
-    extensions: {
+    gridExtension: {
         offset: 2,
         protectionOffset: 4,
         size: 3,
@@ -457,26 +444,34 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     tower: {
         offset: 0,
-        protectionOffset: 2,
+        protectionOffset: 4,
         size: 1,
         structures: {
             tower: [{ x: 0, y: 0 }],
         },
     },
-    extension: {
-        offset: 0,
-        protectionOffset: 0,
-        size: 1,
-        structures: {
-            extension: [{ x: 0, y: 0 }],
-        },
-    },
     observer: {
         offset: 0,
-        protectionOffset: 0,
+        protectionOffset: 4,
         size: 1,
         structures: {
             observer: [{ x: 0, y: 0 }],
+        },
+    },
+    nuker: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            nuker: [{ x: 0, y: 0 }],
+        },
+    },
+    powerSpawn: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            powerSpawn: [{ x: 0, y: 0 }],
         },
     },
     sourceLink: {
@@ -519,6 +514,31 @@ export const stamps: Record<StampTypes, Stamp> = {
             road: [{ x: 0, y: 0 }],
         },
     },
+    minCutRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
+    onboardingRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
+    shieldRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
+    // Deprecate
     rampart: {
         offset: 0,
         protectionOffset: 0,
@@ -526,15 +546,11 @@ export const stamps: Record<StampTypes, Stamp> = {
         structures: {
             rampart: [{ x: 0, y: 0 }],
         },
-    },/*
-    gridExtension: {
-        offset: 0,
-        protectionOffset: 0,
-        size: 1,
-        structures: {
-            extension: [{ x: 0, y: 0 }],
-        },
-    } */
+    },
+}
+
+export const dynamicStamps = {
+
 }
 
 export const minerals: Partial<ResourceConstant[]> = [
@@ -1340,7 +1356,6 @@ export enum InternationalStatNamesEnum {
     StatsManagerCPUUsage = 'smcu',
 }
 
-
 export const packedPosLength = 3
 export const packedCoordLength = 2
 export const cardinalOffsets = [
@@ -1368,8 +1383,8 @@ export const adjacentOffsets = [
         y: -1,
     },
     {
-        x: -1,
-        y: 0,
+        x: 0,
+        y: -1,
     },
     {
         x: 1,
@@ -1385,7 +1400,7 @@ export const adjacentOffsets = [
     },
     {
         x: 0,
-        y: -1,
+        y: 1,
     },
     {
         x: -1,
@@ -1396,3 +1411,4 @@ export const adjacentOffsets = [
         y: 0,
     },
 ]
+export const defaultMinCutDepth = 4

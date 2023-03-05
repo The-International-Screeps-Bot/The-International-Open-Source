@@ -22,6 +22,7 @@ import {
     structureTypesByBuildPriority,
     RESULT_FAIL,
     RESULT_NO_ACTION,
+    adjacentOffsets,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -44,8 +45,8 @@ import {
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/codec'
-import { basePlanner } from './communePlanner'
 import { posix } from 'path'
+import { basePlanner } from './construction/oldCommunePlanner'
 
 /**
     @param pos1 pos of the object performing the action
@@ -288,7 +289,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             if (coordMap[packedCoord] === 0) continue
 
                             const coord = unpackNumAsCoord(packedCoord)
-
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
                         }
                     }
@@ -611,6 +611,10 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
     if (this.memory.T === 'remote' && !global.communes.has(this.memory.CN)) this.memory.T = 'neutral'
 
+    // If the room is already a remote of the scoutingRoom
+
+    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.CN) return this.memory.T
+
     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
 
     if (distance > maxRemoteRoomDistance) return this.memory.T
@@ -629,10 +633,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         })
 
     if (distance > maxRemoteRoomDistance) return this.memory.T
-
-    // If the room is already a remote of the scoutingRoom
-
-    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.CN) return this.memory.T
 
     // Get the anchor from the scoutingRoom, stopping if it's undefined
 
@@ -692,8 +692,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // If the room isn't already a remote
 
     if (this.memory.T !== 'remote') {
-        this.memory.T = 'remote'
-
         // Assign the room's commune as the scoutingRoom
 
         this.memory.CN = scoutingRoom.name
@@ -712,15 +710,16 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         delete this._controllerPositions
         this.controllerPositions
 
-        // Add the room's name to the scoutingRoom's remotes list
-
-        scoutingRoom.memory.remotes.push(this.name)
-
         this.memory.RE = newReservationEfficacy
 
         this.memory.data = []
         for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
 
+        // Add the room's name to the scoutingRoom's remotes list
+
+        scoutingRoom.memory.remotes.push(this.name)
+
+        this.memory.T = 'remote'
         return this.memory.T
     }
 
@@ -767,15 +766,13 @@ Room.prototype.scoutEnemyRoom = function () {
     const playerName = controller.owner.username
     const roomMemory = this.memory
 
-    roomMemory.T = 'enemy'
-
     let player = Memory.players[playerName]
     if (!player) {
         player = Memory.players[playerName] = {
             data: [0],
         }
 
-        for (const key in PlayerData) this.memory.data[parseInt(key)] = 0
+        for (const key in PlayerData) player.data[parseInt(key)] = 0
     }
 
     // General
@@ -843,6 +840,7 @@ Room.prototype.scoutEnemyRoom = function () {
         minDamage: 50,
     })
 
+    roomMemory.T = 'enemy'
     return roomMemory.T
 }
 
@@ -869,10 +867,10 @@ Room.prototype.basicScout = function () {
 
         if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
 
-        if (this.scoutEnemyRoom()) return this.memory.T
-
-        return this.memory.T
+        return this.scoutEnemyRoom()
     }
+
+    // No controller owner
 
     if (this.scoutRemote()) return this.memory.T
 
@@ -908,10 +906,10 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
             if (Memory.allyPlayers.includes(owner)) return (this.memory.T = 'ally')
 
-            if (this.scoutEnemyRoom()) return this.memory.T
-
-            return this.memory.T
+            return this.scoutEnemyRoom()
         }
+
+        // No controlller owner
 
         if (this.scoutRemote(scoutingRoom)) return this.memory.T
 
@@ -1281,7 +1279,12 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
 
             // Loop through adjacent positions
 
-            for (const coord2 of findAdjacentCoordsToCoord(coord1)) {
+            for (const offset of adjacentOffsets) {
+                const coord2 = {
+                    x: coord1.x + offset.x,
+                    y: coord1.y + offset.y,
+                }
+
                 const packedCoord2 = packAsNum(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
@@ -2362,4 +2365,9 @@ Room.prototype.findStructureInsideRect = function (x1, y1, x2, y2, condition) {
     }
 
     return false
+}
+
+Room.prototype.coordVisual = function(x, y, fill = customColors.lightBlue) {
+
+    this.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill })
 }

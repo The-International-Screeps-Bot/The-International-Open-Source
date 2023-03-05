@@ -155,7 +155,6 @@ Creep.prototype.advancedPickup = function (target) {
 }
 
 Creep.prototype.advancedHarvestSource = function (source) {
-
     const harvestResult = this.harvest(source)
 
     // Harvest the source, informing the result if it didn't succeed
@@ -382,15 +381,19 @@ Creep.prototype.builderGetEnergy = function () {
     if (this.room.communeManager.buildersMakeRequests) return RESULT_SUCCESS
     if (!this.needsResources()) return RESULT_NO_ACTION
 
-    let conditions
-    if (this.room.anchor && this.room.structures.extension.length < 5) {
-        // Only get from around the fastFiller
+    let conditions: (request: RoomLogisticsRequest) => boolean
+    if (this.room.anchor && (!this.room.storage || this.room.controller.level < 4)) {
+        // Only allow containers near the fastFiller
 
         conditions = (request: RoomLogisticsRequest) => {
-            return (
-                request.resourceType === RESOURCE_ENERGY &&
-                getRangeOfCoords(this.room.anchor, findObjectWithID(request.targetID).pos) <= 2
+            if (request.resourceType !== RESOURCE_ENERGY) return false
+            if (
+                findObjectWithID(request.targetID) instanceof Structure &&
+                getRangeOfCoords(this.room.anchor, findObjectWithID(request.targetID).pos) > 2
             )
+                return false
+
+            return true
         }
     } else {
         // Get from anywhere
@@ -404,7 +407,7 @@ Creep.prototype.builderGetEnergy = function () {
 
     this.runRoomLogisticsRequestsAdvanced({
         types: new Set(['withdraw', 'offer', 'pickup']),
-        conditions: request => request.resourceType === RESOURCE_ENERGY,
+        conditions,
     })
 
     // Don't try to build if we still need resources
@@ -1562,12 +1565,10 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
     if (target instanceof Resource) {
         this.pickup(target)
-        customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, {
-            superPosition: 1,
-        })
+
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }
@@ -1597,10 +1598,10 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     }
 
     if (this.withdraw(target, request.RT, request.A) !== OK) return RESULT_FAIL
-    customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A
-    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
+
     this.memory.RLRs.splice(0, 1)
     return RESULT_SUCCESS
 }
@@ -1640,12 +1641,10 @@ Creep.prototype.runRoomLogisticsRequest = function () {
 
     if (target instanceof Resource) {
         this.pickup(target)
-        customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
         this.nextStore[request.RT] += request.A
         target.nextAmount -= request.A
-        customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, {
-            superPosition: 1,
-        })
+
         this.memory.RLRs.splice(0, 1)
         return RESULT_SUCCESS
     }
@@ -1675,10 +1674,10 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     }
 
     if (this.withdraw(target, request.RT, request.A) !== OK) return RESULT_FAIL
-    customLog('PRE END AMOUNT', this.nextStore.energy, { superPosition: 1 })
+
     this.nextStore[request.RT] += request.A
     target.nextStore[request.RT] -= request.A
-    customLog('END AMOUNT', request.A + ', ' + this.nextStore.energy + ', ' + this.usedNextStore, { superPosition: 1 })
+
     this.memory.RLRs.splice(0, 1)
     return RESULT_SUCCESS
 }

@@ -76,8 +76,8 @@ export class EndTickCreepManager {
                 filter: creep => !creep.isOnExit,
             }),
         )
+        if (!creeps.length) return
 
-        const creep = creeps[Math.floor(Math.random() * creeps.length)]
-        if (creep) creep.say(currentChant, true)
+        creeps[Math.floor(Math.random() * creeps.length)].say(currentChant, true)
     }
 }

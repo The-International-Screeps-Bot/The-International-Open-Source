@@ -107,16 +107,13 @@ export class RemoteHarvester extends Creep {
 
         if (this.dying) return
 
-        const needs = Memory.rooms[remoteName].data
-
-        needs[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -= this.parts.work
+        Memory.rooms[remoteName].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -= this.parts.work
     }
 
     removeRemote?() {
         if (!this.dying) {
-            const needs = Memory.rooms[this.memory.RN].data
 
-            needs[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] += this.parts.work
+            Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] += this.parts.work
         }
 
         delete this.memory.RN
@@ -334,6 +331,7 @@ export class RemoteHarvester extends Creep {
                 {
                     packedPath: reversePosList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
                     remoteName: creep.memory.RN,
+                    loose: true,
                 },
             )
         }

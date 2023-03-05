@@ -52,6 +52,7 @@ import { roomPruningManager } from 'international/roomPruning'
 import { TerminalManager } from 'room/commune/terminal/terminal'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
+import './room/construction/minCut'
 
 const originalLoop = (): void => {
     profiler.wrap((): void => {

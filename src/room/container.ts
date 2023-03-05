@@ -67,7 +67,7 @@ export class ContainerManager {
         const container = this.roomManager.room.controllerContainer
         if (!container) return
 
-        if (container.usedReserveStore > container.store.getCapacity() * 0.75) return
+        if (container.usedReserveStore > container.store.getCapacity() * 0.9) return
 
         let priority = this.roomManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed ? 0 : 50
         priority += scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20)
@@ -75,6 +75,7 @@ export class ContainerManager {
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             type: 'transfer',
+            onlyFull: true,
             priority,
         })
     }

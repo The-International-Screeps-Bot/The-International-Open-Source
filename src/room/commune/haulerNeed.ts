@@ -14,18 +14,18 @@ export class HaulerNeedManager {
 
         // There is a viable controllerContainer
 
-        if (room.controllerContainer && room.controllerContainer.RCLActionable)
-            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
+        if (room.controllerContainer && room.controller.level > 1)
+            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength * 1.2)
         // There is a viable controllerLink but we need to haul to it
         else if (
             room.controllerLink &&
             room.controllerLink.RCLActionable &&
             (!room.hubLink || !room.hubLink.RCLActionable)
         ) {
-            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength)
+            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength * 1.2)
         }
 
-        room.haulerNeed += findCarryPartsRequired(room.mineralPath.length, room.mineralHarvestStrength)
+        room.haulerNeed += findCarryPartsRequired(room.mineralPath.length, room.mineralHarvestStrength * 1.1)
 
         room.haulerNeed += room.structures.lab.length / 1.5
 
@@ -34,7 +34,7 @@ export class HaulerNeedManager {
         if ((room.controller.level >= 4 && room.storage) || (room.terminal && room.controller.level >= 6))
             room.haulerNeed += Memory.stats.rooms[room.name].eosp / 50
 
-        room.haulerNeed = Math.floor(room.haulerNeed)
+        room.haulerNeed = Math.round(room.haulerNeed)
     }
 
     sourceNeed() {

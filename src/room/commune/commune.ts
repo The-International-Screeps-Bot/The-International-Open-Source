@@ -132,6 +132,7 @@ export class CommuneManager {
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
+        delete this._minRampartHits
     }
 
     preTickRun() {
@@ -217,7 +218,7 @@ export class CommuneManager {
     }
 
     public run() {
-        constructionManager(this.room)
+        /* constructionManager(this.room) */
 
         this.combatManager.run()
         this.towerManager.run()
@@ -302,7 +303,6 @@ export class CommuneManager {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        delete remoteMemory.CN
         remoteMemory.T = 'neutral'
         cleanRoomMemory(remoteName)
     }
@@ -369,6 +369,8 @@ export class CommuneManager {
     get storedEnergyBuildThreshold() {
         return this.minStoredEnergy * 1.2
     }
+
+    _minRampartHits: number
 
     get minRampartHits() {
         const level = this.room.controller.level

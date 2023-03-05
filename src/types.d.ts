@@ -50,6 +50,10 @@ declare global {
         y2: number
     }
 
+    interface CostMatrix {
+        _bits: Uint8Array
+    }
+
     interface Colors {
         white: string
         lightGrey: string
@@ -86,16 +90,21 @@ declare global {
     type StampTypes =
         | 'fastFiller'
         | 'hub'
-        | 'extensions'
         | 'labs'
         | 'tower'
-        | 'extension'
         | 'observer'
         | 'sourceLink'
         | 'sourceExtension'
         | 'container'
         | 'extractor'
         | 'road'
+        | 'minCutRampart'
+        | 'onboardingRampart'
+        | 'shieldRampart'
+        | 'gridExtension'
+        | 'nuker'
+        | 'powerSpawn'
+        //Deprecate
         | 'rampart'
     /* | 'gridExtension' */
 
@@ -161,6 +170,8 @@ declare global {
         structureType: StructureConstant
         minRCL: number
     }
+
+
 
     interface RampartPlanCoord {
         minRCL: number
@@ -249,10 +260,22 @@ declare global {
     }
 
     interface BasePlanAttempt {
-        stampAnchors: { [key in StampTypes]: string[] }
-        score: number
-        basePlans: { [packedCoord: string]: string }
-        rampartPlans: { [packedCoord: string]: string }
+        /**
+         * Stamp Anchors
+         */
+        SA: Partial<{ [key in StampTypes]: Coord[] }>
+        /**
+         * Score
+         */
+        S: number
+        /**
+         * Base Plans
+         */
+        BP: { [packedCoord: string]: string }
+        /**
+         * Stamp Anchors
+         */
+        RP: { [packedCoord: string]: string }
     }
 
     interface CombatStrength {
@@ -1068,7 +1091,7 @@ declare global {
         scoutEnemyUnreservedRemote(): RoomTypes | false
         scoutMyRemote(scoutingRoom: Room): RoomTypes | false
 
-        scoutEnemyRoom(): RoomTypes | false
+        scoutEnemyRoom(): RoomTypes
 
         basicScout(): RoomTypes
 
@@ -1269,6 +1292,12 @@ declare global {
             y2: number,
             condition: (structure: Structure) => boolean,
         ): Structure | false
+
+        /**
+         * Generates a square visual at the specified coordinate
+         */
+        coordVisual(x: number, y: number, fill?: string): void
+
         // Room Getters
 
         readonly global: Partial<RoomGlobal>

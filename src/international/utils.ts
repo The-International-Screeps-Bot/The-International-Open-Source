@@ -56,7 +56,7 @@ export function doesCoordExist(coord: Coord) {
  * Takes a rectange and returns the positions inside of it in an array
  */
 export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: number) {
-    const positions: Coord[] = []
+    const coords: Coord[] = []
 
     for (let x = x1; x <= x2; x += 1) {
         for (let y = y1; y <= y2; y += 1) {
@@ -66,11 +66,39 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 
             // Otherwise pass the x and y to positions
 
-            positions.push({ x, y })
+            coords.push({ x, y })
         }
     }
 
-    return positions
+    return coords
+}
+
+/**
+ * Takes a coord and returns the positions inside of it in an array
+ */
+export function findCoordsInRangeXY(startX: number, startY: number, range: number) {
+    const coords: Coord[] = []
+
+    for (let x = startX - range; x <= startX + range; x += 1) {
+        for (let y = startY - range; y <= startY + range; y += 1) {
+            // Iterate if the pos doesn't map onto a room
+
+            if (startX < 0 || startX >= roomDimensions || startY < 0 || startY >= roomDimensions) continue
+
+            // Otherwise pass the x and y to positions
+
+            coords.push({ x, y })
+        }
+    }
+
+    return coords
+}
+
+/**
+ * Takes a coord and returns the positions inside of it in an array
+ */
+export function findCoordsInRange(coord: Coord, range: number) {
+    return findCoordsInRangeXY(coord.x, coord.y, range)
 }
 
 export function findAdjacentCoordsToXY(x: number, y: number) {
@@ -293,20 +321,21 @@ export function findClosestObjectInRange<T extends _HasRoomPosition>(
 /**
  * Finds the closest position to a given target (Half Manhattan)
  */
-export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]) {
+export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]): [Coord, number] {
     let minRange = Infinity
-    let closest = undefined
+    let closestI = 0
 
-    for (const pos of positions) {
+    for (let i = 0; i < positions.length; i++) {
+        const pos = positions[i]
         const range = getRange(target.x, pos.x, target.y, pos.y)
 
         if (range > minRange) continue
 
         minRange = range
-        closest = pos
+        closestI = i
     }
 
-    return closest
+    return [positions[closestI], closestI]
 }
 
 /**
@@ -626,7 +655,7 @@ export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: 
 }
 
 export function isXYInRoom(x: number, y: number) {
-    return x > 0 && x < roomDimensions - 1 && y > 0 && y < roomDimensions - 1
+    return x >= 0 && x < roomDimensions && y >= 0 && y < roomDimensions
 }
 
 export function isXYInBorder(x: number, y: number, inset: number) {

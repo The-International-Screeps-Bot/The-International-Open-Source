@@ -82,7 +82,7 @@ export class RoomManager {
 
         room.squadRequests = new Set()
 
-        if (room.memory.T === 'remote') {
+        if (roomMemory.T === 'remote') {
             room.roomLogisticsRequests = {
                 transfer: {},
                 withdraw: {},
@@ -97,7 +97,9 @@ export class RoomManager {
         if (!room.controller) return
 
         if (!room.controller.my) {
-            if (room.memory.T === 'commune') {
+            if (roomMemory.T === 'commune') {
+                roomMemory.T = 'remote'
+
                 room.basicScout()
                 cleanRoomMemory(room.name)
             }
@@ -111,10 +113,13 @@ export class RoomManager {
             global.communeManagers[room.name] = room.communeManager
         }
 
+        if (this.room.name === 'W7N3') {
+            this.communePlanner.preTickRun()
+            return
+        }
+
         room.communeManager.update(room)
         room.communeManager.preTickRun()
-
-        if (this.room.name === 'W7N3') this.communePlanner.preTickRun()
     }
 
     public run() {

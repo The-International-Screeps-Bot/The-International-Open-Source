@@ -272,7 +272,7 @@ export class RemoteHauler extends Creep {
 
         // We are next to the source
 
-        this.moved = 'yeild'
+        this.moved = ''
 
         // Fulfill requests near the source
 

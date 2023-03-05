@@ -39,7 +39,7 @@ execSync(
         process.env.STEAM_KEY
     } --exportUrl=${process.env.EXPORT_API_URL} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force ${
         argv.debug ? '--debug' : ''
-    } --disableMongo  --deleteLogs --tickDuration=5000`,
+    } --disableMongo  --deleteLogs --tickDuration=${argv.tickDuration || 250}`,
     options,
 )
 if (argv.stopGrafana) execSync('npx screeps-grafana stop')
