@@ -97,7 +97,7 @@ declare global {
         | 'extractor'
         | 'road'
         | 'rampart'
-        /* | 'gridExtension' */
+    /* | 'gridExtension' */
 
     interface Stamp {
         offset: number
@@ -1720,7 +1720,7 @@ declare global {
         }
     }
 
-    interface IdealSquadMembers {}
+    interface IdealSquadMembers { }
 
     interface CreepFunctions {
         preTickManager(): void
@@ -2484,7 +2484,13 @@ declare global {
              * @param requestName The roomName of the claimRequest to respond to
              * @param commune The commune to respond to the claimRequest
              */
-            claim(requestName: string, communeName?: string): string
+            claim(requestName: string, communeName?: string, score?: number): string
+
+            /**
+             * Deletes claimRequests for a specified room, if there are any
+             * @param roomName The roomName of the claimRequest to delete
+             */
+            deleteClaimRequest(roomName: string): string
 
             deleteClaimRequests(): string
 

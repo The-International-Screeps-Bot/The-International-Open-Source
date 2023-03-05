@@ -7,7 +7,6 @@ class FlagManager {
             const flagNameParts = flagName.split(' ')
 
             if (!this[flagNameParts[0] as keyof FlagManager]) continue
-
             this[flagNameParts[0] as keyof FlagManager](flagName, flagNameParts)
         }
     }
@@ -15,7 +14,7 @@ class FlagManager {
     /**
      * Tricks typescript into accepting the dynamic function call in run()
      */
-    public doNothing(flagName: string, flagNameParts: string[]) {}
+    public doNothing(flagName: string, flagNameParts: string[]) { }
 
     private internationalDataVisuals(flagName: string, flagNameParts: string[]) {
         const flag = Game.flags[flagName]
@@ -46,6 +45,46 @@ class FlagManager {
 
         flag.remove()
         roomMemory.Ab = true
+    }
+
+    private claim(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const roomMemory = Memory.rooms[roomName]
+        const communeName = flagNameParts[2] || undefined
+        const score = flagNameParts[3] ? parseInt(flagNameParts[3]) : undefined
+
+        if (!roomMemory) {
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        if (communeName) {
+            const communeMemory = Memory.rooms[communeName]
+            if (!communeMemory) {
+                flag.setColor(COLOR_RED)
+                return
+            }
+        }
+
+        global.claim(roomName, communeName, score);
+
+        flag.remove()
+    }
+
+    private removeClaim(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const roomMemory = Memory.rooms[roomName]
+
+        if (!roomMemory) {
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        global.deleteClaimRequest(roomName)
+
+        flag.remove()
     }
 }
 

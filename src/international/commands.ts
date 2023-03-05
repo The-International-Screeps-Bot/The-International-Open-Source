@@ -103,9 +103,8 @@ global.destroyStructures = function (roomName, types?) {
 
     // Inform the result
 
-    return `Destroyed a total of ${destroyedStructureCount} structures in ${roomName} ${
-        types ? `with the types ${types}` : ''
-    }`
+    return `Destroyed a total of ${destroyedStructureCount} structures in ${roomName} ${types ? `with the types ${types}` : ''
+        }`
 }
 
 global.destroyCommuneStructures = function (types?) {
@@ -147,7 +146,9 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (requestName, communeName) {
+global.claim = function (requestName, communeName, score) {
+    score = score || 0
+
     if (!Memory.claimRequests[requestName]) {
         Memory.claimRequests[requestName] = {
             responder: communeName,
@@ -157,7 +158,7 @@ global.claim = function (requestName, communeName) {
 
     const request = Memory.claimRequests[requestName]
 
-    request.data[ClaimRequestData.score] = 0
+    request.data[ClaimRequestData.score] = score
     request.data[ClaimRequestData.abandon] = 0
 
     if (communeName) {
@@ -170,6 +171,19 @@ global.claim = function (requestName, communeName) {
 
     return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`
 }
+
+global.deleteClaimRequest = function (roomName) {
+    const request = Memory.claimRequests[roomName]
+
+    if (request.responder) {
+        delete Memory.rooms[request.responder].claimRequest
+    }
+
+    delete Memory.claimRequests[roomName]
+
+    return `Deleted claim request for ${roomName}`
+}
+
 global.deleteClaimRequests = function () {
     let deleteCount = 0
 
@@ -269,7 +283,7 @@ global.deleteBasePlans = function (roomName) {
     return 'Deleted base plans for ' + roomName
 }
 
-global.usedHeap = function() {
+global.usedHeap = function () {
 
     const usedHeap = Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
     return (usedHeap * 100).toFixed(2) + '%'
