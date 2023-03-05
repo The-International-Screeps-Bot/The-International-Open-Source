@@ -1,3 +1,5 @@
+import { customLog } from "./utils"
+
 export enum AllyRequestTypes {
     /**
      * Tell allies to send below a certain amount of resources a room
@@ -91,8 +93,13 @@ class AllyManager {
         if (RawMemory.foreignSegment && RawMemory.foreignSegment.username === currentAllyName) {
             // Get the allyRequests and record them in the allyManager
 
-            this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
-            if (this.allyRequests.length) this.allyRequests = []
+            try {
+                this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
+            }
+            catch(err) {
+                customLog('Error in getting requests for simpleAllies', currentAllyName);
+                this.allyRequests = []
+            }
         }
 
         const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]

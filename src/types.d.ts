@@ -98,10 +98,14 @@ declare global {
         | 'container'
         | 'extractor'
         | 'road'
-        | 'rampart'
+        | 'minCutRampart'
+        | 'onboardingRampart'
+        | 'shieldRampart'
         | 'gridExtension'
         | 'nuker'
         | 'powerSpawn'
+        //Deprecate
+        | 'rampart'
 
     interface Stamp {
         offset: number
@@ -165,6 +169,8 @@ declare global {
         structureType: StructureConstant
         minRCL: number
     }
+
+
 
     interface RampartPlanCoord {
         minRCL: number
@@ -253,10 +259,22 @@ declare global {
     }
 
     interface BasePlanAttempt {
-        stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
-        score: number
-        basePlans: { [packedCoord: string]: string }
-        rampartPlans: { [packedCoord: string]: string }
+        /**
+         * Stamp Anchors
+         */
+        SA: Partial<{ [key in StampTypes]: Coord[] }>
+        /**
+         * Score
+         */
+        S: number
+        /**
+         * Base Plans
+         */
+        BP: { [packedCoord: string]: string }
+        /**
+         * Stamp Anchors
+         */
+        RP: { [packedCoord: string]: string }
     }
 
     interface CombatStrength {

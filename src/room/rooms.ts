@@ -26,7 +26,7 @@ export function roomsManager() {
         // Get the CPU used at the start
 
         if (Memory.CPULogging === true) var roomCPUStart = Game.cpu.getUsed()
-        if (roomName === 'W8N3') continue
+        if (roomName === 'W7N3') continue
         // Get the room using the roomName
 
         const room = Game.rooms[roomName]

@@ -11,7 +11,6 @@ import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinManager } from './ruins'
-import { runMinCut } from './construction/clarkkokMincutBetter'
 
 export class RoomManager {
     communePlanner: CommunePlanner
@@ -114,9 +113,8 @@ export class RoomManager {
             global.communeManagers[room.name] = room.communeManager
         }
 
-        if (this.room.name === 'W8N3') {
+        if (this.room.name === 'W7N3') {
             this.communePlanner.preTickRun()
-            runMinCut(this.room)
             return
         }
 

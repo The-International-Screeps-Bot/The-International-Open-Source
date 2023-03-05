@@ -444,7 +444,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     tower: {
         offset: 0,
-        protectionOffset: 2,
+        protectionOffset: 4,
         size: 1,
         structures: {
             tower: [{ x: 0, y: 0 }],
@@ -452,7 +452,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     observer: {
         offset: 0,
-        protectionOffset: 1,
+        protectionOffset: 4,
         size: 1,
         structures: {
             observer: [{ x: 0, y: 0 }],
@@ -460,7 +460,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     nuker: {
         offset: 0,
-        protectionOffset: 1,
+        protectionOffset: 4,
         size: 1,
         structures: {
             nuker: [{ x: 0, y: 0 }],
@@ -468,7 +468,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
     powerSpawn: {
         offset: 0,
-        protectionOffset: 1,
+        protectionOffset: 4,
         size: 1,
         structures: {
             powerSpawn: [{ x: 0, y: 0 }],
@@ -514,6 +514,31 @@ export const stamps: Record<StampTypes, Stamp> = {
             road: [{ x: 0, y: 0 }],
         },
     },
+    minCutRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
+    onboardingRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
+    shieldRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
+    // Deprecate
     rampart: {
         offset: 0,
         protectionOffset: 0,
@@ -521,15 +546,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         structures: {
             rampart: [{ x: 0, y: 0 }],
         },
-    } /*
-    gridExtension: {
-        offset: 0,
-        protectionOffset: 0,
-        size: 1,
-        structures: {
-            extension: [{ x: 0, y: 0 }],
-        },
-    } */,
+    },
 }
 
 export const dynamicStamps = {
@@ -1394,3 +1411,4 @@ export const adjacentOffsets = [
         y: 0,
     },
 ]
+export const defaultMinCutDepth = 4

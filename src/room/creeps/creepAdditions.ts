@@ -149,8 +149,8 @@ Object.defineProperties(Creep.prototype, {
             this._upgradeStrength = this.parts.work
 
             if (this.boosts.XGH2O > 0) return (this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController)
-            else if (this.boosts.GH2O > 0) return (this._defenceStrength *= BOOSTS.upgrade.GH2O.upgradeController)
-            else if (this.boosts.GH > 0) return (this._defenceStrength *= BOOSTS.upgrade.GH.upgradeController)
+            else if (this.boosts.GH2O > 0) return (this._upgradeStrength *= BOOSTS.upgrade.GH2O.upgradeController)
+            else if (this.boosts.GH > 0) return (this._upgradeStrength *= BOOSTS.upgrade.GH.upgradeController)
 
             return this._upgradeStrength
         },

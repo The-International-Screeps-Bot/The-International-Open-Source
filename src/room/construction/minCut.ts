@@ -64,7 +64,7 @@
  * each round of bfs. See the comments in the code for details.
  */
 
-import { roomDimensions } from 'international/constants'
+import { customColors, roomDimensions } from 'international/constants'
 import { internationalManager } from 'international/international'
 import { customLog, findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'international/utils'
 
@@ -442,28 +442,4 @@ export function minCutToExit(sources: Coord[], costMap: CostMatrix): Coord[] {
     }
 
     return ret
-}
-
-export function runMinCut(room: Room) {
-    return
-    const cm = new PathFinder.CostMatrix()
-    cm._bits = internationalManager.getTerrainCoords(room.name)
-
-    const range = 7
-    const coords = findCoordsInRangeXY(33, 12, range).filter(coord => cm.get(coord.x, coord.y) !== 255)
-
-    const result = minCutToExit(coords, cm)
-
-    result.sort((a, b) => {
-        if (a.y != b.y) {
-            return a.y - b.y
-        }
-        return a.x - b.x
-    })
-
-    for (const coord of result) {
-        room.coordVisual(coord.x, coord.y)
-    }
-
-    customLog('COMPLETED MINCUT', result)
 }

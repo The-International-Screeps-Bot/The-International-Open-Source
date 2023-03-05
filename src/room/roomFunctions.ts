@@ -45,8 +45,8 @@ import {
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/codec'
-import { basePlanner } from './communePlanner'
 import { posix } from 'path'
+import { basePlanner } from './construction/oldCommunePlanner'
 
 /**
     @param pos1 pos of the object performing the action
@@ -289,7 +289,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             if (coordMap[packedCoord] === 0) continue
 
                             const coord = unpackNumAsCoord(packedCoord)
-
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
                         }
                     }

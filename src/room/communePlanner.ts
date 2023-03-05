@@ -18,6 +18,9 @@ import {
     adjacentOffsets,
     RESULT_NO_ACTION,
     RESULT_ACTION,
+    defaultMinCutDepth,
+    minOnboardingRamparts,
+    defaultSwampCost,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -49,9 +52,10 @@ import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
 import { RoomManager } from './room'
 import { off, openStdin } from 'process'
+import { length } from 'node-persist'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
-import { length } from 'node-persist'
+import { minCutToExit } from './construction/minCut'
 
 interface PlanStampsArgs {
     stampType: StampTypes
@@ -107,6 +111,9 @@ export class CommunePlanner {
     sourceHarvestPositions: RoomPosition[][]
     sourcePaths: RoomPosition[][]
 
+    mineralPath: RoomPosition[]
+    mineralHarvestCoord: Coord
+
     terrainCoords: CoordMap
     packedExitCoords: Set<string>
     exitCoords: Coord[]
@@ -117,6 +124,7 @@ export class CommunePlanner {
     baseCoords: Uint8Array
     roadCoords: Uint8Array
     rampartCoords: Uint8Array
+    weightedDiagonalCoords: Uint8Array
     diagonalCoords: Uint8Array
     gridCoords: Uint8Array
     /**
@@ -125,6 +133,7 @@ export class CommunePlanner {
     byPlannedRoad: Uint8Array
     finishedGrid: boolean
     finishedFastFillerRoadPrune: boolean
+    plannedGridCoords: boolean
     /**
      * Coords we should be protecting using ramparts
      */
@@ -136,6 +145,9 @@ export class CommunePlanner {
     basePlans: BasePlans
     rampartPlans: RampartPlans
     stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
+    fastFillerStartCoords: Coord[]
+    minCutCoords: Set<number>
+    groupedMinCutCoords: Coord[][]
     score: number
 
     constructor(roomManager: RoomManager) {
@@ -194,7 +206,7 @@ export class CommunePlanner {
     preTickRun() {
         // Stop if there isn't sufficient CPU
 
-        if (Game.cpu.bucket < CPUMaxPerTick) return RESULT_FAIL
+        if (Game.cpu.bucket < CPUMaxPerTick) return RESULT_NO_ACTION
 
         this.room = this.roomManager.room
 
@@ -215,23 +227,17 @@ export class CommunePlanner {
 
             this.score = 0
             this.recordExits()
+            this.room.memory.BPAs = []
         }
 
         this.avoidSources()
-
-        for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
-            this.baseCoords[packAsNum(coord)] = 255
-        }
         this.fastFiller()
-        for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
-            this.baseCoords[packAsNum(coord)] = 0
-        }
-        this.preGridSources()
         this.generateGrid()
         this.pruneFastFillerRoads()
         this.findCenterUpgradePos()
         this.preHubSources()
         this.hub()
+        this.mineral()
         this.preLabSources()
         this.labs()
         this.gridExtensions()
@@ -240,6 +246,10 @@ export class CommunePlanner {
         this.observer()
         this.planGridCoords()
         this.planSourceStructures()
+        this.runMinCut()
+        this.towers()
+        this.groupMinCutCoords()
+        this.onboardingRamparts()
         this.visualize()
 
         return RESULT_SUCCESS
@@ -249,7 +259,7 @@ export class CommunePlanner {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
                 if (this.baseCoords[packedCoord] === 255) continue
-                if (this.gridCoords[packedCoord] !== 1) continue
+                if (this.gridCoords[packedCoord] === 0) continue
 
                 this.room.visual.structure(x, y, STRUCTURE_ROAD)
             }
@@ -258,20 +268,32 @@ export class CommunePlanner {
     private visualize() {
         for (const packedCoord in this.basePlans.map) {
             const coord = unpackCoord(packedCoord)
-            const basePlansCoord = this.basePlans.map[packedCoord]
+            const plansCoord = this.basePlans.map[packedCoord]
 
-            this.room.visual.structure(coord.x, coord.y, basePlansCoord.structureType)
+            this.room.visual.structure(coord.x, coord.y, plansCoord.structureType)
+        }
+
+        for (const packedCoord in this.rampartPlans.map) {
+            const coord = unpackCoord(packedCoord)
+
+            this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART)
         }
 
         /* this.room.visualizeCoordMap(this.reverseExitFlood) */
         /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
+        /* this.room.visualizeCoordMap(this.baseCoords, true) */
 
         this.room.visual.connectRoads({
             opacity: 0.7,
         })
 
-        this.room.visual.circle(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, { fill: customColors.red })
-        this.room.visual.circle(this.input2Coord.x, this.input2Coord.y, { fill: customColors.red })
+        this.room.coordVisual(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, customColors.orange)
+        this.room.coordVisual(this.input2Coord.x, this.input2Coord.y, customColors.orange)
+
+        for (const coord of this.outputCoords) {
+            this.room.visual.line(coord.x, coord.y, this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y)
+            this.room.visual.line(coord.x, coord.y, this.input2Coord.x, this.input2Coord.y)
+        }
     }
     private recordExits() {
         let x
@@ -318,7 +340,9 @@ export class CommunePlanner {
 
         delete this.gridCoords
         delete this.diagonalCoords
+        delete this.weightedDiagonalCoords
 
+        const terrain = this.room.getTerrain()
         const gridSize = 4
         const anchor = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
@@ -329,6 +353,7 @@ export class CommunePlanner {
         const inset = 1
 
         this.diagonalCoords = new Uint8Array(2500)
+        this.weightedDiagonalCoords = new Uint8Array(2500)
 
         // Checkerboard
 
@@ -348,7 +373,15 @@ export class CommunePlanner {
                 )
                     continue
 
-                this.diagonalCoords[packXYAsNum(x, y)] = 4
+                const packedCoord = packXYAsNum(x, y)
+
+                if (terrain.get(x, y) === TERRAIN_MASK_SWAMP) {
+                    this.diagonalCoords[packedCoord] = 3 * defaultSwampCost
+                    this.weightedDiagonalCoords[packedCoord] = 8 * defaultSwampCost
+                    continue
+                }
+                this.diagonalCoords[packedCoord] = 3
+                this.weightedDiagonalCoords[packedCoord] = 8
             }
         }
 
@@ -361,7 +394,6 @@ export class CommunePlanner {
             for (let y = inset; y < roomDimensions - inset; y++) {
                 const packedCoord = packXYAsNum(x, y)
                 if (this.baseCoords[packedCoord] === 255) continue
-                /* if (this.terrainCoords[packedCoord] === 255) continue */
                 if (this.byExitCoords[packedCoord] > 0) continue
 
                 // Calculate the position of the cell relative to the anchor
@@ -373,7 +405,12 @@ export class CommunePlanner {
                 if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0) continue
 
                 gridCoordsArray.push({ x, y })
-                this.gridCoords[packXYAsNum(x, y)] = 1
+
+                if (terrain.get(x, y) === TERRAIN_MASK_SWAMP) {
+                    this.gridCoords[packedCoord] = 2 * defaultSwampCost
+                    continue
+                }
+                this.gridCoords[packedCoord] = 2
             }
         }
 
@@ -405,7 +442,7 @@ export class CommunePlanner {
 
                         visitedCoords.add(packedAdjCoord)
 
-                        if (!this.gridCoords[packAsNum(adjCoord)]) continue
+                        if (this.gridCoords[packAsNum(adjCoord)] === 0) continue
 
                         // Calculate the position of the cell relative to the anchor
 
@@ -456,8 +493,9 @@ export class CommunePlanner {
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.baseCoords],
-                plainCost: defaultRoadPlanningPlainCost * 4,
+                weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords, this.baseCoords],
+                plainCost: defaultRoadPlanningPlainCost * 8,
+                swampCost: defaultSwampCost * 8,
             })
 
             // If the path failed, delete all members of the group
@@ -470,7 +508,12 @@ export class CommunePlanner {
             }
 
             for (const coord of path) {
-                this.gridCoords[packAsNum(coord)] = 1
+                if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_SWAMP) {
+
+                    this.gridCoords[packAsNum(coord)] = 2 * defaultSwampCost
+                    continue
+                }
+                this.gridCoords[packAsNum(coord)] = 2
             }
         }
 
@@ -524,15 +567,21 @@ export class CommunePlanner {
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords],
-                plainCost: defaultRoadPlanningPlainCost * 4,
+                weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords],
+                plainCost: defaultRoadPlanningPlainCost * 8,
+                swampCost: defaultSwampCost * 8,
             })
 
             for (const coord of path) {
                 const packedCoord = packAsNum(coord)
                 if (this.baseCoords[packedCoord] === 255) continue
 
-                this.gridCoords[packedCoord] = 1
+                if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_SWAMP) {
+
+                    this.gridCoords[packAsNum(coord)] = 2 * defaultSwampCost
+                    continue
+                }
+                this.gridCoords[packAsNum(coord)] = 2
             }
         }
 
@@ -541,12 +590,12 @@ export class CommunePlanner {
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
-                if (this.gridCoords[packedCoord] !== 1) continue
+                if (this.gridCoords[packedCoord] === 0) continue
 
                 for (const adjCoord of findAdjacentCoordsToXY(x, y)) {
                     const packedAdjCoord = packAsNum(adjCoord)
 
-                    if (this.gridCoords[packedAdjCoord] === 1) continue
+                    if (this.gridCoords[packedAdjCoord] > 0) continue
                     if (this.terrainCoords[packedAdjCoord] === 255) continue
 
                     this.byPlannedRoad[packedAdjCoord] = 1
@@ -565,7 +614,7 @@ export class CommunePlanner {
     }
     private pruneGridXY(x: number, y: number) {
         const packedCoord = packXYAsNum(x, y)
-        if (this.gridCoords[packedCoord] !== 1) return
+        if (this.gridCoords[packedCoord] === 0) return
 
         let adjNonGridCoords: Coord[] = []
         let adjGridCoords = 0
@@ -573,7 +622,7 @@ export class CommunePlanner {
         for (const adjCoord of findAdjacentCoordsToXY(x, y)) {
             const packedAdjCoord = packAsNum(adjCoord)
 
-            if (this.gridCoords[packedAdjCoord] === 1) {
+            if (this.gridCoords[packedAdjCoord] > 0) {
                 adjGridCoords += 1
                 continue
             }
@@ -598,7 +647,7 @@ export class CommunePlanner {
             adjGridCoords = 0
 
             for (const adjCoord of findAdjacentCoordsToCoord(adjNonGridCoord)) {
-                if (this.gridCoords[packAsNum(adjCoord)] !== 1) continue
+                if (this.gridCoords[packAsNum(adjCoord)] === 0) continue
 
                 adjGridCoords += 1
             }
@@ -662,11 +711,16 @@ export class CommunePlanner {
 
         this.sourceHarvestPositions = sourceHarvestPositions
     }
-    private preGridSources() {
+    private postFastFillerConfig() {
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
             for (const pos of this.sourceHarvestPositions[i]) {
                 this.baseCoords[packAsNum(pos)] = 0
             }
+        }
+
+        for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
+            const packedCoord = packAsNum(coord)
+            this.baseCoords[packedCoord] = this.terrainCoords[packedCoord]
         }
     }
     private preHubSources() {
@@ -720,8 +774,8 @@ export class CommunePlanner {
 
             this.basePlans.set(packCoord(closestHarvestPos), STRUCTURE_CONTAINER, 3)
             const packedCoord = packAsNum(closestHarvestPos)
+            this.roadCoords[packedCoord] = 255
             this.baseCoords[packedCoord] = 255
-            this.gridCoords[packedCoord] = 0
 
             const path = this.room.advancedFindPath({
                 origin: closestHarvestPos,
@@ -731,8 +785,9 @@ export class CommunePlanner {
                         range: 3,
                     },
                 ],
-                weightCoordMaps: [this.gridCoords, this.roadCoords],
-                plainCost: defaultRoadPlanningPlainCost,
+                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
             })
             sourcePaths.push(path)
 
@@ -744,6 +799,34 @@ export class CommunePlanner {
 
         this.sourcePaths = sourcePaths
     }
+    private mineral() {
+        if (this.mineralPath) return
+
+        const mineralPos = this.room.mineral.pos
+        const goal = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+
+        this.mineralPath = this.room.advancedFindPath({
+            origin: new RoomPosition(mineralPos.x, mineralPos.y, this.room.name),
+            goals: [{ pos: goal, range: 1 }],
+            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost * 2,
+            swampCost: defaultSwampCost * 2,
+        })
+        this.mineralHarvestCoord = this.mineralPath[0]
+        const packedCoord = packAsNum(this.mineralHarvestCoord)
+        this.roadCoords[packedCoord] = 255
+        this.baseCoords[packedCoord] = 255
+        this.basePlans.setXY(this.mineralHarvestCoord.x, this.mineralHarvestCoord.y, STRUCTURE_CONTAINER, 6)
+        this.mineralPath.shift()
+
+        for (const pos of this.mineralPath) {
+            const packedCoord = packAsNum(pos)
+            this.roadCoords[packedCoord] = 1
+            this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 6)
+        }
+
+        this.basePlans.setXY(mineralPos.x, mineralPos.y, STRUCTURE_EXTRACTOR, 6)
+    }
     private preLabSources() {
         if (this.stampAnchors.sourceLink.length) return
 
@@ -753,7 +836,7 @@ export class CommunePlanner {
 
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
             const closestHarvestPos = this.sourceHarvestPositions[i][0]
-            const packedAdjCoords: Set<string> = new Set([])
+            const packedAdjCoords: Set<number> = new Set([])
             let closestAdjCoord: Coord
             let closestRange = Infinity
 
@@ -765,9 +848,9 @@ export class CommunePlanner {
 
                 const packedCoord = packAsNum(adjCoord)
                 if (this.baseCoords[packedCoord] === 255) continue
-                if (this.gridCoords[packedCoord] === 1) continue
+                if (this.gridCoords[packedCoord] > 0) continue
 
-                packedAdjCoords.add(packCoord(adjCoord))
+                packedAdjCoords.add(packAsNum(adjCoord))
 
                 const range = getRangeOfCoords(hubAnchor, adjCoord)
                 if (range >= closestRange) continue
@@ -776,17 +859,17 @@ export class CommunePlanner {
                 closestRange = range
             }
 
-            const packedClosestAdjCoord = packCoord(closestAdjCoord)
+            const packedClosestAdjCoord = packAsNum(closestAdjCoord)
             packedAdjCoords.delete(packedClosestAdjCoord)
 
             sourceLinkCoords.push(closestAdjCoord)
-            this.baseCoords[packAsNum(closestAdjCoord)] = 255
+            this.baseCoords[packedClosestAdjCoord] = 255
+            this.roadCoords[packedClosestAdjCoord] = 255
 
             for (const packedAdjCoord of packedAdjCoords) {
-                const coord = unpackCoord(packedAdjCoord)
-
-                sourceExtensionCoords.push(unpackCoord(packedAdjCoord))
-                this.baseCoords[packAsNum(coord)] = 255
+                sourceExtensionCoords.push(unpackNumAsCoord(packedAdjCoord))
+                this.baseCoords[packedAdjCoord] = 255
+                this.roadCoords[packedAdjCoord] = 255
             }
         }
 
@@ -822,7 +905,7 @@ export class CommunePlanner {
 
         // Find the closest value greater than two to the centerUpgradePos and inform it
 
-        const pos = this.room.findClosestPosOfValue({
+        const centerUpgradePos = this.room.findClosestPosOfValue({
             coordMap: distanceCoords,
             startCoords: [this.stampAnchors.fastFiller[0]],
             requiredValue: 2,
@@ -830,27 +913,16 @@ export class CommunePlanner {
             visuals: false,
             cardinalFlood: true,
         })
-        if (!pos) return false
+        if (!centerUpgradePos) return false
 
-        const packedCoord = packAsNum(pos)
+        const packedCoord = packAsNum(centerUpgradePos)
+        this.roadCoords[packedCoord] = 255
         this.baseCoords[packedCoord] = 255
-        this.gridCoords[packedCoord] = 0
-        this.basePlans.set(packCoord(pos), STRUCTURE_CONTAINER, 2)
-        this.basePlans.set(packCoord(pos), STRUCTURE_LINK, 5)
-
-        for (const offset of adjacentOffsets) {
-            const adjCoord = {
-                x: offset.x + pos.x,
-                y: offset.y + pos.y,
-            }
-
-            const packedAdjCoord = packAsNum(adjCoord)
-            this.baseCoords[packedAdjCoord] = 255
-            this.gridCoords[packedAdjCoord] = 0
-        }
+        this.basePlans.set(packCoord(centerUpgradePos), STRUCTURE_CONTAINER, 2)
+        this.basePlans.set(packCoord(centerUpgradePos), STRUCTURE_LINK, 5)
 
         const path = this.room.advancedFindPath({
-            origin: pos,
+            origin: centerUpgradePos,
             goals: [
                 {
                     pos: new RoomPosition(
@@ -861,9 +933,21 @@ export class CommunePlanner {
                     range: 3,
                 },
             ],
-            weightCoordMaps: [this.gridCoords, this.roadCoords],
-            plainCost: defaultRoadPlanningPlainCost,
+            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost * 2,
+            swampCost: defaultSwampCost * 2,
         })
+
+        for (const offset of adjacentOffsets) {
+            const adjCoord = {
+                x: offset.x + centerUpgradePos.x,
+                y: offset.y + centerUpgradePos.y,
+            }
+
+            const packedAdjCoord = packAsNum(adjCoord)
+            this.baseCoords[packedAdjCoord] = 255
+            this.roadCoords[packedAdjCoord] = 20
+        }
 
         for (const pos of path) {
             const packedPathCoord = packAsNum(pos)
@@ -871,7 +955,7 @@ export class CommunePlanner {
             this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
         }
 
-        return (this.centerUpgradePos = pos)
+        return (this.centerUpgradePos = centerUpgradePos)
     }
     /**
      *
@@ -889,7 +973,7 @@ export class CommunePlanner {
 
             const packedAdjCoord = packAsNum(adjCoord)
             if (this.terrainCoords[packedAdjCoord] === 255) continue
-            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] !== 1)
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0)
                 this.byPlannedRoad[packedAdjCoord] = 1
 
             if (this.basePlans.get(packCoord(adjCoord))?.structureType === STRUCTURE_SPAWN) adjSpawn = true
@@ -906,7 +990,7 @@ export class CommunePlanner {
             }
 
             const packedAdjCoord = packAsNum(adjCoord)
-            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] !== 1) continue
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0) continue
 
             cardinalRoads += 1
         }
@@ -915,11 +999,14 @@ export class CommunePlanner {
         return RESULT_NO_ACTION
     }
     private planGridCoords() {
+        if (this.plannedGridCoords) return
+
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
-                if (this.gridCoords[packedCoord] !== 1) continue
+                if (this.gridCoords[packedCoord] === 0) continue
                 if (this.roadCoords[packedCoord] === 1) continue
+                if (this.baseCoords[packedCoord] === 255) continue
 
                 let hasNeed
 
@@ -943,6 +1030,8 @@ export class CommunePlanner {
                 this.roadCoords[packedCoord] = 1
             }
         }
+
+        this.plannedGridCoords = true
     }
     private flipStructuresVertical(stamp: Stamp) {
         const flippedStructures: Partial<{ [key in StructureConstant]: Coord[] }> = {}
@@ -1405,11 +1494,61 @@ export class CommunePlanner {
 
         return false
     }
+    private findFastFillerOrigin() {
+        if (this.fastFillerStartCoords) return this.fastFillerStartCoords[this.room.memory.BPAs.length]
+
+        // Controller
+
+        const origins: Coord[] = [this.room.controller.pos]
+
+        // Both sources
+
+        const sources = this.room.sources
+        for (const source of sources) origins.push(source.pos)
+
+        // Find the closest source pos and its path to the controller
+
+        let shortestPath: RoomPosition[]
+
+        for (const source of sources) {
+            const path = this.room.advancedFindPath({
+                origin: source.pos,
+                goals: [{ pos: this.room.controller.pos, range: 1 }],
+                plainCost: defaultRoadPlanningPlainCost,
+            })
+            if (shortestPath && path.length >= shortestPath.length) continue
+
+            shortestPath = path
+        }
+
+        origins.push(shortestPath[Math.floor(shortestPath.length / 2)])
+
+        // Avg path between sources, if more than 1
+
+        if (sources.length > 1) {
+            const path = this.room.advancedFindPath({
+                origin: sources[0].pos,
+                goals: [{ pos: sources[1].pos, range: 1 }],
+                plainCost: defaultRoadPlanningPlainCost,
+            })
+
+            origins.push(path[Math.floor(path.length / 2)])
+        }
+
+        this.fastFillerStartCoords = origins
+        return this.fastFillerStartCoords[this.room.memory.BPAs.length]
+    }
     private fastFiller() {
+        if (this.stampAnchors.fastFiller.length) return
+
+        for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
+            this.baseCoords[packAsNum(coord)] = 255
+        }
+
         this.planStamps({
             stampType: 'fastFiller',
             count: 1,
-            startCoords: [this.room.controller.pos],
+            startCoords: [this.findFastFillerOrigin()],
             cardinalFlood: true,
             consequence: stampAnchor => {
                 this.recordStamp('fastFiller', stampAnchor)
@@ -1440,6 +1579,8 @@ export class CommunePlanner {
                         this.roadCoords[packedCoord] = 255
                     }
                 }
+
+                this.postFastFillerConfig()
             },
         })
     }
@@ -1495,7 +1636,7 @@ export class CommunePlanner {
              * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords but are each adjacent to one
              */
             conditions: coord => {
-                if (this.gridCoords[packAsNum(coord)] === 1) return false
+                if (this.gridCoords[packAsNum(coord)] > 0) return false
 
                 for (const offsets of cardinalOffsets) {
                     const packedCoord = packXYAsNum(coord.x + offsets.x, coord.y + offsets.y)
@@ -1570,7 +1711,9 @@ export class CommunePlanner {
              * Ensure we can place all 10 labs where they are in range 2 of the 2 inputs, so can all be utilized for reactions
              */
             conditions: coord1 => {
-                if (this.byPlannedRoad[packAsNum(coord1)] !== 1) return false
+                const packedNumCoord1 = packAsNum(coord1)
+                if (this.baseCoords[packedNumCoord1] === 255) return false
+                if (this.byPlannedRoad[packedNumCoord1] !== 1) return false
 
                 let outputCoords: Coord[]
 
@@ -1649,7 +1792,11 @@ export class CommunePlanner {
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
             conditions: coord => {
-                return this.byPlannedRoad[packAsNum(coord)] === 1
+                const packedCoord = packAsNum(coord)
+                if (this.baseCoords[packedCoord] === 255) return false
+                if (this.byPlannedRoad[packedCoord] !== 1) return false
+
+                return true
             },
             consequence: stampAnchor => {
                 this.basePlans.set(packCoord(stampAnchor), STRUCTURE_EXTENSION, 8)
@@ -1658,7 +1805,31 @@ export class CommunePlanner {
             },
         })
     }
-    private towers() {}
+    private towers() {
+        this.planStamps({
+            stampType: 'tower',
+            count: CONTROLLER_STRUCTURES.tower[8],
+            startCoords: [this.stampAnchors.hub[0]],
+            dynamic: true,
+            weighted: true,
+            coordMap: this.reverseExitFlood,
+            /**
+             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
+             */
+            conditions: coord => {
+                const packedCoord = packAsNum(coord)
+                if (this.baseCoords[packedCoord] === 255) return false
+                if (this.byPlannedRoad[packedCoord] !== 1) return false
+
+                return true
+            },
+            consequence: stampAnchor => {
+                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_TOWER, 3)
+                this.baseCoords[packAsNum(stampAnchor)] = 255
+                this.roadCoords[packAsNum(stampAnchor)] = 255
+            },
+        })
+    }
     private observer() {
         this.planStamps({
             stampType: 'observer',
@@ -1671,9 +1842,11 @@ export class CommunePlanner {
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
             conditions: coord => {
-                if (this.gridCoords[packAsNum(coord)] === 1) return false
+                const packedCoord = packAsNum(coord)
+                if (this.baseCoords[packedCoord] === 255) return false
+                if (this.gridCoords[packedCoord] > 0) return false
 
-                return this.baseCoords[packAsNum(coord)] === 0
+                return true
             },
             consequence: stampAnchor => {
                 this.basePlans.set(packCoord(stampAnchor), STRUCTURE_OBSERVER, 8)
@@ -1694,7 +1867,11 @@ export class CommunePlanner {
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
             conditions: coord => {
-                return this.byPlannedRoad[packAsNum(coord)] === 1
+                const packedCoord = packAsNum(coord)
+                if (this.baseCoords[packedCoord] === 255) return false
+                if (this.byPlannedRoad[packedCoord] !== 1) return false
+
+                return true
             },
             consequence: stampAnchor => {
                 this.basePlans.set(packCoord(stampAnchor), STRUCTURE_NUKER, 8)
@@ -1715,7 +1892,11 @@ export class CommunePlanner {
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
             conditions: coord => {
-                return this.byPlannedRoad[packAsNum(coord)] === 1
+                const packedCoord = packAsNum(coord)
+                if (this.baseCoords[packedCoord] === 255) return false
+                if (this.byPlannedRoad[packedCoord] !== 1) return false
+
+                return true
             },
             consequence: stampAnchor => {
                 this.basePlans.set(packCoord(stampAnchor), STRUCTURE_POWER_SPAWN, 8)
@@ -1724,783 +1905,305 @@ export class CommunePlanner {
             },
         })
     }
-}
+    private runMinCut() {
+        if (this.minCutCoords) return
 
-// Old basePlanner
+        const cm = new PathFinder.CostMatrix()
+        const terrain = this.room.getTerrain()
 
-/**
- * Checks if a room can be planner. If it can, it informs information on how to build the room
- */
-export function basePlanner(room: Room) {
-    // Stop if there isn't sufficient CPU
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                if (terrain.get(x, y) !== TERRAIN_MASK_WALL) continue
 
-    if (Game.cpu.bucket < CPUMaxPerTick) return false
-    const terrainCoords = internationalManager.getTerrainCoords(room.name)
-
-    room.baseCoords = new Uint8Array(terrainCoords)
-
-    // Loop through each exit of exits
-
-    for (const pos of room.find(FIND_EXIT)) {
-        // Record the exit as a pos to avoid
-
-        room.baseCoords[packAsNum(pos)] = 255
-
-        // Loop through adjacent positions
-
-        for (const coord of findCoordsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
-            room.baseCoords[packAsNum(coord)] = 255
-    }
-
-    room.roadCoords = new Uint8Array(terrainCoords)
-    room.rampartCoords = new Uint8Array(terrainCoords)
-
-    if (!room.memory.stampAnchors) {
-        room.memory.stampAnchors = {}
-
-        for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
-    }
-
-    function recordAdjacentPositions(x: number, y: number, range: number, weight?: number) {
-        // Loop through adjacent positions
-
-        for (const coord of findCoordsInsideRect(x - range, y - range, x + range, y + range)) {
-            // Otherwise record the position in the base cost matrix as avoid
-
-            room.baseCoords[packAsNum(coord)] = Math.max(weight || 255, room.baseCoords[packAsNum(coord)])
-        }
-    }
-
-    // Get the controller and set positions nearby to avoid
-
-    recordAdjacentPositions(room.controller.pos.x, room.controller.pos.y, 2)
-
-    // Get and record the mineralHarvestPos as avoid
-
-    for (const coord of room.mineralPositions) room.baseCoords[packAsNum(coord)] = 255
-
-    // Record the positions around sources as unusable
-
-    const sources = room.sources
-
-    // Loop through each source, marking nearby positions as avoid
-
-    for (const sourceIndex in sources) {
-        const sourcePositions = room.sourcePositions[sourceIndex]
-
-        recordAdjacentPositions(sourcePositions[0].x, sourcePositions[0].y, 1)
-
-        for (const pos of sourcePositions) room.baseCoords[packAsNum(pos)] = 255
-    }
-
-    let closestSourceToController: Source
-    let closestSourceToControllerRange = Infinity
-
-    for (const source of sources) {
-        const range = room.advancedFindPath({
-            origin: source.pos,
-            goals: [{ pos: room.controller.pos, range: 1 }],
-            plainCost: defaultRoadPlanningPlainCost,
-        }).length
-        if (range > closestSourceToControllerRange) continue
-
-        closestSourceToControllerRange = range
-        closestSourceToController = source
-    }
-
-    let path: RoomPosition[]
-
-    let avgControllerSourcePos: RoomPosition
-    if (closestSourceToControllerRange <= 1) {
-        avgControllerSourcePos = closestSourceToController.pos
-    } else {
-        path = room.advancedFindPath({
-            origin: closestSourceToController.pos,
-            goals: [{ pos: room.controller.pos, range: 1 }],
-            weightCoordMaps: [room.roadCoords],
-            plainCost: defaultRoadPlanningPlainCost,
-        })
-
-        avgControllerSourcePos = path[Math.floor(path.length / 2)]
-    }
-
-    const controllerAdjacentCoords = findCoordsInsideRect(
-        room.controller.pos.x - 3,
-        room.controller.pos.y - 3,
-        room.controller.pos.x + 3,
-        room.controller.pos.y + 3,
-    )
-
-    for (const coord of controllerAdjacentCoords) room.baseCoords[packAsNum(coord)] = 255
-
-    interface PlanStampOpts {
-        stampType: StampTypes
-        count: number
-        startCoords: Coord[]
-        initialWeight?: number
-        adjacentToRoads?: boolean
-        normalDT?: boolean
-        coordMap?: CoordMap
-        minAvoid?: number
-        cardinalFlood?: boolean
-    }
-
-    let stamp
-    let packedStampAnchor
-    let stampAnchor
-    let structureType
-    let pos
-    let x
-    let y
-
-    /**
-     * Tries to plan a stamp's placement in a room around an orient. Will inform the achor of the stamp if successful
-     */
-    function planStamp(opts: PlanStampOpts): false | RoomPosition[] {
-        if (!opts.coordMap) opts.coordMap = room.baseCoords
-        else {
-            opts.coordMap = new Uint8Array(opts.coordMap)
-
-            // Loop through each exit of exits
-
-            for (const pos of room.find(FIND_EXIT)) {
-                // Record the exit as a pos to avoid
-
-                opts.coordMap[packAsNum(pos)] = 255
-
-                // Loop through adjacent positions
-
-                for (const coord of findCoordsInsideRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2))
-                    opts.coordMap[packAsNum(coord)] = 255
+                cm.set(x, y, 255)
             }
         }
 
-        // Define the stamp using the stampType
+        const protectionCoords: Set<number> = new Set()
 
-        stamp = stamps[opts.stampType]
+        // General stamps
 
-        const newStampAnchors: RoomPosition[] = []
-        const newStampAnchorsPacked: number[] = []
+        for (const key in this.stampAnchors) {
+            const stampType = key as StampTypes
+            const stamp = stamps[stampType]
 
-        // So long as the count is more than 0
+            for (const coord of this.stampAnchors[stampType]) {
+                for (const nearbyCoord of findCoordsInRange(coord, stamp.protectionOffset)) {
+                    const packedNearbyCoord = packAsNum(nearbyCoord)
+                    if (this.terrainCoords[packedNearbyCoord] === 255) continue
+                    if (this.byExitCoords[packedNearbyCoord] === 255) continue
 
-        while (opts.count > 0) {
-            opts.count -= 1
+                    protectionCoords.add(packedNearbyCoord)
+                }
+            }
+        }
 
-            // If an anchor already exists with this index
+        // Prune protection coords not contigious with fastFiller anchor group
 
-            if (room.memory.stampAnchors[opts.stampType][opts.count]) {
-                for (packedStampAnchor of room.memory.stampAnchors[opts.stampType]) {
-                    stampAnchor = unpackNumAsCoord(packedStampAnchor)
+        const startCoords = this.stampAnchors.fastFiller
+        const contigiousProtectionCoords: Set<Coord> = new Set()
+        let visitedCoords = new Uint8Array(2500)
 
-                    for (structureType in stamp.structures) {
-                        for (pos of stamp.structures[structureType]) {
-                            // Re-assign the pos's x and y to align with the offset
+        for (const coord of startCoords) {
+            const packedCoord = packAsNum(coord)
+            visitedCoords[packedCoord] = 1
+            contigiousProtectionCoords.add(coord)
+            cm.set(coord.x, coord.y, 1)
+        }
 
-                            x = pos.x + stampAnchor.x - stamp.offset
-                            y = pos.y + stampAnchor.y - stamp.offset
+        let thisGeneration = startCoords
+        let nextGeneration: Coord[]
 
-                            // If the structureType is a road
+        while (thisGeneration.length) {
+            nextGeneration = []
 
-                            if (structureType === STRUCTURE_ROAD) {
-                                // Record the position in roadCM and iterate
+            // Flood all adjacent positions
 
-                                room.roadCoords[packXYAsNum(x, y)] = 1
-                                continue
-                            }
+            if (!nextGeneration.length) {
+                // Iterate through positions of this gen
 
-                            room.baseCoords[packXYAsNum(x, y)] = 255
-                            room.roadCoords[packXYAsNum(x, y)] = 255
+                for (const coord1 of thisGeneration) {
+                    // Add viable adjacent coords to the next generation
+
+                    for (const offset of adjacentOffsets) {
+                        const adjCoord = {
+                            x: coord1.x + offset.x,
+                            y: coord1.y + offset.y,
                         }
+                        const packedAdjCoord = packAsNum(adjCoord)
+
+                        if (visitedCoords[packedAdjCoord] === 1) continue
+                        visitedCoords[packedAdjCoord] = 1
+
+                        if (!protectionCoords.has(packedAdjCoord)) continue
+
+                        contigiousProtectionCoords.add(adjCoord)
+                        cm.set(adjCoord.x, adjCoord.y, defaultMinCutDepth)
+                        nextGeneration.push(adjCoord)
                     }
                 }
-
-                continue
             }
 
-            // Run distance transform with the baseCM
+            // Set this gen to next gen
 
-            const distanceCoords = opts.normalDT
-                ? room.distanceTransform(opts.coordMap, false, opts.minAvoid)
-                : room.diagonalDistanceTransform(opts.coordMap, false, opts.minAvoid)
+            thisGeneration = nextGeneration
+        }
 
-            // Try to find an anchor using the distance cost matrix, average pos between controller and sources, with an area able to fit the fastFiller
+        // Flood from contigious protectionCoords to get depth for distance-weighting
 
-            stampAnchor = stamp.asymmetry
-                ? room.findClosestPosOfValueAsym({
-                      coordMap: distanceCoords,
-                      startCoords: opts.startCoords,
-                      requiredValue: stamp.size,
-                      reduceIterations: 0,
-                      initialWeight: opts.initialWeight || 0,
-                      adjacentToRoads: opts.adjacentToRoads,
-                      roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                      offset: stamp.offset,
-                      asymOffset: stamp.asymmetry,
-                      cardinalFlood: opts.cardinalFlood,
-                      protectionOffset: stamp.protectionOffset,
-                      /* visuals: opts.stampType === 'labs', */
-                  })
-                : room.findClosestPosOfValue({
-                      coordMap: distanceCoords,
-                      startCoords: opts.startCoords,
-                      requiredValue: stamp.size,
-                      reduceIterations: 0,
-                      initialWeight: opts.initialWeight || 0,
-                      adjacentToRoads: opts.adjacentToRoads,
-                      roadCoords: opts.adjacentToRoads ? room.roadCoords : undefined,
-                      cardinalFlood: opts.cardinalFlood,
-                      protectionOffset: stamp.protectionOffset,
-                      /* visuals: opts.stampType === 'extension' */
-                  })
+        visitedCoords = new Uint8Array(2500)
 
-            // Inform false if no anchor was generated
+        for (const coord of contigiousProtectionCoords) {
+            thisGeneration.push(coord)
+            visitedCoords[packAsNum(coord)] = 1
+        }
 
-            if (!stampAnchor) return false
+        let depth = defaultMinCutDepth + 1
 
-            // Add the anchor to stampAnchors based on its type
+        while (thisGeneration.length) {
+            nextGeneration = []
 
-            newStampAnchors.push(stampAnchor)
-            newStampAnchorsPacked.push(packAsNum(stampAnchor))
+            // Flood all adjacent positions
 
-            for (structureType in stamp.structures) {
-                // Loop through positions
+            if (!nextGeneration.length) {
+                console.log(depth)
+                // Iterate through positions of this gen
 
-                for (pos of stamp.structures[structureType]) {
-                    // Re-assign the pos's x and y to align with the offset
+                for (const coord1 of thisGeneration) {
+                    // Add viable adjacent coords to the next generation
 
-                    x = pos.x + stampAnchor.x - stamp.offset
-                    y = pos.y + stampAnchor.y - stamp.offset
+                    for (const offset of adjacentOffsets) {
+                        const adjCoord = {
+                            x: coord1.x + offset.x,
+                            y: coord1.y + offset.y,
+                        }
+                        const packedAdjCoord = packAsNum(adjCoord)
 
-                    // If the structureType is a road
+                        if (!isXYInRoom(adjCoord.x, adjCoord.y)) continue
 
-                    if (structureType === STRUCTURE_ROAD) {
-                        // Record the position in roadCM and iterate
+                        if (visitedCoords[packedAdjCoord] === 1) continue
+                        visitedCoords[packedAdjCoord] = 1
 
-                        room.roadCoords[packXYAsNum(x, y)] = 1
-                        continue
+                        if (this.terrainCoords[packedAdjCoord] === 255) continue
+
+                        cm.set(adjCoord.x, adjCoord.y, depth)
+                        nextGeneration.push(adjCoord)
                     }
-
-                    room.baseCoords[packXYAsNum(x, y)] = 255
-                    room.roadCoords[packXYAsNum(x, y)] = 255
                 }
             }
+
+            // Set this gen to next gen
+
+            thisGeneration = nextGeneration
+            depth += 1
         }
 
-        room.memory.stampAnchors[opts.stampType] =
-            room.memory.stampAnchors[opts.stampType].concat(newStampAnchorsPacked)
-        return newStampAnchors
-    }
+        //
 
-    // Try to plan the stamp
+        const result = minCutToExit(Array.from(contigiousProtectionCoords), cm)
+        const minCutCoords: Set<number> = new Set()
 
-    if (
-        !planStamp({
-            stampType: 'fastFiller',
-            count: 1,
-            startCoords: [avgControllerSourcePos],
-            normalDT: true,
-            cardinalFlood: true,
-        })
-    )
-        return 'failed'
-
-    // If the stamp failed to be planned
-
-    if (!room.memory.stampAnchors.fastFiller.length) {
-        // Record that the room is not claimable and stop
-
-        room.memory.NC = true
-        return 'failed'
-    }
-
-    for (const coord of controllerAdjacentCoords) {
-        if (room.roadCoords[packAsNum(coord)] > 0) continue
-
-        room.baseCoords[packAsNum(coord)] = 0
-    }
-
-    const centerUpgadePos = room.centerUpgradePos
-    if (!centerUpgadePos) return 'failed'
-
-    const upgradePositions = room.upgradePositions
-
-    // Loop through each upgradePos
-
-    for (const pos of upgradePositions) {
-        // Mark as avoid in road and base cost matrixes
-
-        room.baseCoords[packAsNum(pos)] = 255
-        room.roadCoords[packAsNum(pos)] = 20
-    }
-
-    let origin: RoomPosition
-    if (getRangeOfCoords(room.anchor, centerUpgadePos) >= 10) {
-        origin = centerUpgadePos
-    } else {
-        if (getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3) {
-            origin = closestSourceToController.pos
-        } else {
-            origin = avgControllerSourcePos
-        }
-    }
-
-    // Try to plan the stamp
-
-    path = room.advancedFindPath({
-        origin,
-        goals: [{ pos: room.anchor, range: 3 }],
-        weightCoordMaps: [room.roadCoords],
-        plainCost: defaultRoadPlanningPlainCost,
-    })
-
-    if (
-        !planStamp({
-            stampType: 'hub',
-            count: 1,
-            startCoords: [path[path.length - 1]],
-            normalDT: true,
-            cardinalFlood: true,
-        })
-    )
-        return 'failed'
-
-    const hubAnchor = unpackNumAsPos(room.memory.stampAnchors.hub[0], room.name)
-
-    const fastFillerHubAnchor = findAvgBetweenCoords(room.anchor, hubAnchor)
-
-    // Get the closest upgrade pos
-
-    const closestUpgradePos = upgradePositions[upgradePositions.length - 1]
-    if (!closestUpgradePos) return 'failed'
-
-    for (const index in sources) {
-        // get the closestHarvestPos using the sourceName, iterating if undefined
-
-        const closestSourcePos = room.sourcePositions[index][0]
-
-        if (!room.memory.stampAnchors.container.includes(packAsNum(closestSourcePos))) {
-            room.memory.stampAnchors.container.push(packAsNum(closestSourcePos))
+        for (const coord of result) {
+            this.stampAnchors.minCutRampart.push(coord)
+            this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
+            this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, false)
+            minCutCoords.add(packAsNum(coord))
         }
 
-        for (const index2 in room.sources) {
-            if (index === index2) continue
-
-            for (const pos of room.sourcePositions[index2]) room.roadCoords[packAsNum(pos)] = 50
-
-            const closestSourcePos = room.sourcePositions[index2][0]
-
-            const adjacentCoords = findCoordsInsideRect(
-                closestSourcePos.x - 1,
-                closestSourcePos.y - 1,
-                closestSourcePos.x + 1,
-                closestSourcePos.y + 1,
-            )
-
-            for (const coord of adjacentCoords) {
-                if (room.roadCoords[packAsNum(coord)] > 0) continue
-
-                room.roadCoords[packAsNum(coord)] = 50
-            }
-
-            room.roadCoords[packAsNum(closestSourcePos)] = 150
+        /*
+        for (const coord of contigiousProtectionCoords) this.room.coordVisual(coord.x, coord.y)
+        for (const packedCoord of minCutCoords) {
+            const coord = unpackNumAsCoord(packedCoord)
+            this.room.coordVisual(coord.x, coord.y, customColors.green)
         }
-
-        // Path from the fastFillerAnchor to the closestHarvestPos
-
-        path = room.advancedFindPath({
-            origin: closestSourcePos,
-            goals: [{ pos: room.anchor, range: 3 }],
-            weightCoordMaps: [room.roadCoords],
-            plainCost: defaultRoadPlanningPlainCost,
-        })
-
-        // Record the path positions in roadCM
-
-        for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
-
-        // Path from the centerUpgradePos to the closestHarvestPos
-
-        path = room.advancedFindPath({
-            origin: closestSourcePos,
-            goals: [{ pos: closestUpgradePos, range: 1 }],
-            weightCoordMaps: [room.roadCoords],
-            plainCost: defaultRoadPlanningPlainCost,
-        })
-
-        // Loop through positions of the path
-
-        // Record the pos in roadCM
-
-        for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
-    }
-
-    room.roadCoords[packAsNum(closestUpgradePos)] = 1
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'labs',
-            count: 1,
-            startCoords: [hubAnchor],
-            normalDT: true,
-            coordMap: room.roadCoords,
-            cardinalFlood: true,
-        })
-    )
-        return 'failed'
-
-    // Plan roads
-
-    // Path from the fastFillerAnchor to the hubAnchor
-
-    path = room.advancedFindPath({
-        origin: hubAnchor,
-        goals: [{ pos: room.anchor, range: 4 }],
-        weightCoordMaps: [room.roadCoords],
-        plainCost: defaultRoadPlanningPlainCost,
-    })
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'gridExtension',
-            count: 6,
-            startCoords: [hubAnchor],
-        })
-    )
-        return 'failed'
-
-    // Plan the stamp x times
-
-    for (const extensionsAnchor of room.memory.stampAnchors.gridExtension) {
-        // Path from the extensionsAnchor to the hubAnchor
-
-        path = room.advancedFindPath({
-            origin: unpackNumAsPos(extensionsAnchor, room.name),
-            goals: [{ pos: hubAnchor, range: 2 }],
-            weightCoordMaps: [room.roadCoords],
-            plainCost: defaultRoadPlanningPlainCost,
-        })
-
-        // Loop through positions of the path
-
-        for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
-    }
-
-    // Loop through positions of the path
-
-    for (const pos of path) {
-        // Record the pos in roadCM
-
-        room.roadCoords[packAsNum(pos)] = 1
-    }
-
-    // Plan for a container at the pos
-
-    /* structurePlans.set(centerUpgadePos.x, centerUpgadePos.y, structureTypesByNumber[STRUCTURE_CONTAINER]) */
-
-    // Path from the hubAnchor to the closestUpgradePos
-
-    path = room.advancedFindPath({
-        origin: centerUpgadePos,
-        goals: [{ pos: hubAnchor, range: 2 }],
-        weightCoordMaps: [room.roadCoords],
-        plainCost: defaultRoadPlanningPlainCost,
-    })
-
-    // Loop through positions of the path
-
-    for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
-
-    // loop through sourceNames
-
-    for (const index in sources) {
-        // Get the closestHarvestPos using the sourceName, iterating if undefined
-
-        const closestSourcePos = room.sourcePositions[index][0]
-
-        // Record the pos in roadCM
-
-        room.roadCoords[packAsNum(closestSourcePos)] = 255
-    }
-
-    // Path from the hubAnchor to the labsAnchor
-
-    path = room.advancedFindPath({
-        origin: unpackNumAsPos(room.memory.stampAnchors.labs[0], room.name),
-        goals: [{ pos: hubAnchor, range: 1 }],
-        weightCoordMaps: [room.roadCoords],
-        plainCost: defaultRoadPlanningPlainCost,
-    })
-
-    // Loop through positions of the path
-
-    // Record the pos in roadCM
-
-    for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
-
-    const closestMineralHarvestPos = room.mineralPositions[0]
-    if (closestMineralHarvestPos) room.roadCoords[packAsNum(closestMineralHarvestPos)] = 255
-
-    if (!room.memory.stampAnchors.container.includes(packAsNum(closestMineralHarvestPos))) {
-        room.memory.stampAnchors.container.push(packAsNum(closestMineralHarvestPos))
-    }
-
-    // Path from the hubAnchor to the mineralHarvestPos
-
-    path = room.advancedFindPath({
-        origin: closestMineralHarvestPos,
-        goals: [{ pos: hubAnchor, range: 1 }],
-        weightCoordMaps: [room.roadCoords],
-        plainCost: defaultRoadPlanningPlainCost,
-    })
-
-    // Loop through positions of the path
-
-    // Record the pos in roadCM
-
-    for (const pos of path) room.roadCoords[packAsNum(pos)] = 1
-
-    // Plan for a road at the mineral's pos
-
-    if (!room.memory.stampAnchors.extractor.length) room.memory.stampAnchors.extractor.push(packAsNum(room.mineral.pos))
-
-    // Record road plans in the baseCM
-
-    // Iterate through each x and y in the room
-    /*
-    for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            // If there is road at the pos, assign it as avoid in baseCM
-
-            if (room.roadCoords[packAsNum(pos)] === 1) room.baseCoords[packAsNum(pos)] = 255
-        }
-    }
  */
-    // Mark the closestUpgradePos as avoid in the CM
 
-    room.baseCoords[packAsNum(closestUpgradePos)] = 255
-
-    // Construct extraExtensions count
-
-    let extraExtensionsAmount =
-        CONTROLLER_STRUCTURES.extension[8] -
-        stamps.fastFiller.structures.extension.length -
-        /* stamps.hub.structures.extension.length - */
-        room.memory.stampAnchors.gridExtension.length * stamps.gridExtension.structures.extension.length -
-        room.memory.stampAnchors.sourceExtension.length
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'tower',
-            count: 6,
-            startCoords: [fastFillerHubAnchor],
-            adjacentToRoads: true,
-            coordMap: room.roadCoords,
-            minAvoid: 255,
-        })
-    )
-        return 'failed'
-
-    rampartPlanner(room)
-
-    // Iterate through each x and y in the room
-
-    for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            const packedCoord = packXYAsNum(x, y)
-            // If there is road at the pos, assign it as avoid in baseCM
-
-            if (room.roadCoords[packedCoord] === 1) room.baseCoords[packedCoord] = 255
-        }
+        this.minCutCoords = minCutCoords
     }
+    private groupMinCutCoords() {
+        if (this.groupedMinCutCoords) return
 
-    if (room.memory.stampAnchors.sourceLink.length + room.memory.stampAnchors.sourceExtension.length === 0) {
-        // loop through sourceNames
+        // Construct a costMatrix to store visited positions
 
-        for (const sourceIndex in sources) {
-            // Record that the source has no link
+        const visitedCoords = new Uint8Array(2500)
 
-            let sourceHasLink = false
+        const groupedMinCutCoords: Coord[][] = []
+        let groupIndex = 0
 
-            // Get the closestHarvestPos of this sourceName
+        // Loop through each pos of positions
 
-            const closestSourcePos = room.sourcePositions[sourceIndex][0]
+        for (const packedCoord of this.minCutCoords) {
+            const coord = unpackNumAsCoord(packedCoord)
 
-            const OGCoords: Map<number, number> = new Map()
+            if (visitedCoords[packAsNum(coord)] === 1) continue
+            visitedCoords[packAsNum(coord)] = 1
 
-            for (let posIndex = 1; posIndex < room.sourcePositions[sourceIndex].length; posIndex += 1) {
-                const packedCoord = packAsNum(room.sourcePositions[sourceIndex][posIndex])
+            groupedMinCutCoords[groupIndex] = [new RoomPosition(coord.x, coord.y, this.room.name)]
 
-                OGCoords.set(packedCoord, room.roadCoords[packedCoord])
-                room.roadCoords[packedCoord] = 0
+            // Construct values for floodFilling
+
+            let thisGeneration = [coord]
+            let nextGeneration: Coord[] = []
+            let groupSize = 0
+
+            // So long as there are positions in this gen
+
+            while (thisGeneration.length) {
+                // Reset next gen
+
+                nextGeneration = []
+
+                // Iterate through positions of this gen
+
+                for (const pos of thisGeneration) {
+                    // Loop through adjacent positions
+
+                    for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
+                        // Iterate if adjacentPos is out of room bounds
+
+                        if (
+                            adjacentPos.x <= 0 ||
+                            adjacentPos.x >= roomDimensions ||
+                            adjacentPos.y <= 0 ||
+                            adjacentPos.y >= roomDimensions
+                        )
+                            continue
+
+                        const packedAdjacentCoord = packAsNum(adjacentPos)
+
+                        // Iterate if the adjacent pos has been visited or isn't a tile
+
+                        if (visitedCoords[packedAdjacentCoord] === 1) continue
+                        visitedCoords[packedAdjacentCoord] = 1
+
+                        // If a rampart is not planned for this position, iterate
+
+                        if (!this.minCutCoords.has(packedAdjacentCoord)) continue
+
+                        // Add it to the next gen and this group
+
+                        groupedMinCutCoords[groupIndex].push(
+                            new RoomPosition(adjacentPos.x, adjacentPos.y, this.room.name),
+                        )
+
+                        groupSize += 1
+                        nextGeneration.push(adjacentPos)
+                    }
+                }
+
+                if (groupSize >= maxRampartGroupSize) break
+
+                // Set this gen to next gen
+
+                thisGeneration = nextGeneration
             }
 
-            let adjacentCoords = findCoordsInsideRect(
-                closestSourcePos.x - 3,
-                closestSourcePos.y - 3,
-                closestSourcePos.x + 3,
-                closestSourcePos.y + 3,
-            )
+            // Config for next group
 
-            for (const coord of adjacentCoords) {
-                // If the coord is probably not protected
+            groupIndex += 1
+        }
 
-                if (room.unprotectedCoords[packAsNum(coord)] === 0) continue
+        this.groupedMinCutCoords = groupedMinCutCoords
+    }
+    private onboardingRamparts() {
+        if (this.stampAnchors.onboardingRampart.length) return
 
-                room.rampartCoords[packAsNum(closestSourcePos)] = 1
-                break
-            }
+        const onboardingCoords: Set<number> = new Set()
+        const origin = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
-            // Find positions adjacent to source
+        for (const group of this.groupedMinCutCoords) {
+            const [closestCoord] = findClosestCoord(origin, group)
 
-            adjacentCoords = findCoordsInsideRect(
-                closestSourcePos.x - 1,
-                closestSourcePos.y - 1,
-                closestSourcePos.x + 1,
-                closestSourcePos.y + 1,
-            )
+            // Path from the hubAnchor to the cloestPosToAnchor
 
-            // Sort adjacentPositions by range from the anchor
-
-            adjacentCoords.sort(function (a, b) {
-                return getRange(a.x, hubAnchor.x, a.y, hubAnchor.y) - getRange(b.x, hubAnchor.x, b.y, hubAnchor.y)
+            const path = this.room.advancedFindPath({
+                origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
+                goals: [{ pos: origin, range: 2 }],
+                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
             })
 
-            // Loop through each pos
+            // Loop through positions of the path
 
-            for (const coord1 of adjacentCoords) {
-                const packedCoord1 = packAsNum(coord1)
-
-                const roadCoordsValue = room.roadCoords[packedCoord1]
-
-                // Iterate if plan for pos is in use
-
-                if (roadCoordsValue === 1) continue
-                if (roadCoordsValue === 255) continue
-
-                if (room.rampartCoords[packedCoord1] > 0) continue
-
-                if (coord1.x < 2 || coord1.x >= roomDimensions - 2 || coord1.y < 2 || coord1.y >= roomDimensions - 2)
-                    continue
-
-                // Otherwise
-
-                // Assign 255 to this pos in baseCM
-
-                room.baseCoords[packedCoord1] = 255
-                room.roadCoords[packedCoord1] = 255
-                OGCoords.set(packedCoord1, 255)
-
-                // If there is no planned link for this source, plan one
-
-                if (!sourceHasLink) {
-                    sourceHasLink = true
-                    room.memory.stampAnchors.sourceLink.push(packedCoord1)
-
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 3, coord1.y - 3, coord1.x + 3, coord1.y + 3)
-
-                    for (const coord2 of adjacentCoords) {
-                        // If the coord is probably not protected
-
-                        if (room.unprotectedCoords[packAsNum(coord2)] === 0) continue
-
-                        room.rampartCoords[packedCoord1] = 1
-                        break
-                    }
-
-                    continue
-                }
-
-                // Otherwise plan for an extension
-
-                room.memory.stampAnchors.sourceExtension.push(packedCoord1)
-
-                // Decrease the extraExtensionsAmount and iterate
-
-                extraExtensionsAmount -= 1
-                continue
+            for (const pos of path) {
+                this.roadCoords[packAsNum(pos)] = 1
+                this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 4)
             }
 
-            for (const [coord, value] of OGCoords) room.roadCoords[coord] = value
-        }
-    }
+            // Construct the onboardingIndex
 
-    /*
-    if (!room.memory.stampAnchors.rampart.length) {
-        for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-                if (room.rampartCoords[packXYAsNum(x, y)] === 1) room.memory.stampAnchors.rampart.push(packAsNum({ x, y }))
+            let onboardingIndex = 0
+            let onboardingCount = 0
+
+            // So long as there is a pos in path with an index of onboardingIndex
+
+            while (path[onboardingIndex]) {
+                // Get the pos in path with an index of onboardingIndex
+
+                const coord = path[onboardingIndex]
+                const packedCoord = packAsNum(coord)
+
+                onboardingIndex += 1
+
+                // If there are already rampart plans at this pos
+
+                if (this.minCutCoords.has(packedCoord) && !onboardingCoords.has(packedCoord)) continue
+
+                // Record the coord
+
+                this.roadCoords[packedCoord] = 1
+                onboardingCoords.add(packedCoord)
+                this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
+                this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, false)
+
+                onboardingCount += 1
+                if (onboardingCount === minOnboardingRamparts) break
             }
         }
+
+        this.stampAnchors.onboardingRampart = Array.from(onboardingCoords).map(packedCoord =>
+            unpackNumAsCoord(packedCoord),
+        )
     }
- */
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'gridExtension',
-            count: extraExtensionsAmount,
-            startCoords: [hubAnchor],
-            adjacentToRoads: true,
-            coordMap: room.roadCoords,
-            minAvoid: 255,
-        })
-    )
-        return 'failed'
-
-    // Try to plan the stamp
-
-    if (
-        !planStamp({
-            stampType: 'observer',
-            count: 1,
-            startCoords: [fastFillerHubAnchor],
-            coordMap: room.roadCoords,
-        })
-    )
-        return 'failed'
-
-    const observerAnchor = unpackNumAsPos(room.memory.stampAnchors.observer[0], room.name)
-
-    let adjacentCoords = findCoordsInsideRect(
-        observerAnchor.x - 3,
-        observerAnchor.y - 3,
-        observerAnchor.x + 3,
-        observerAnchor.y + 3,
-    )
-
-    if (!room.unprotectedCoords) room.findUnprotectedCoords()
-
-    for (const coord of adjacentCoords) {
-        // If the coord is probably not protected
-
-        if (room.unprotectedCoords[packAsNum(coord)] === 0) continue
-
-        room.rampartCoords[packAsNum(observerAnchor)] = 1
-        break
-    }
-
-    // Iterate through each x and y in the room
-
-    for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            const packedPos = packXYAsNum(x, y)
-
-            if (room.rampartCoords[packedPos] === 1) room.memory.stampAnchors.rampart.push(packedPos)
-
-            if (!room.memory.stampAnchors.road.includes(packedPos) && room.roadCoords[packedPos] === 1)
-                room.memory.stampAnchors.road.push(packedPos)
-        }
-    }
-
-    // Record planning results in the room's global and inform true
-
-    room.memory.PC = true
-    return true
 }
