@@ -86,6 +86,50 @@ class FlagManager {
 
         flag.remove()
     }
+
+    private combat(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const communeName = flagNameParts[2] || undefined
+        const type: CombatRequestTypes = flagNameParts[3] as CombatRequestTypes || "attack"
+
+        if (communeName) {
+            if (!Memory.rooms[communeName]) {
+                flag.setColor(COLOR_RED)
+                return
+            }
+        }
+
+        global.combat(roomName, type, undefined, communeName)
+    }
+
+    private attack(flagName: string, flagNameParts: string[]) {
+        flagNameParts.push("attack");
+        this.combat(flagName, flagNameParts)
+    }
+
+    private harass(flagName: string, flagNameParts: string[]) {
+        flagNameParts.push("harass");
+        this.combat(flagName, flagNameParts)
+    }
+
+    private defend(flagName: string, flagNameParts: string[]) {
+        flagNameParts.push("defend");
+        this.combat(flagName, flagNameParts)
+    }
+
+    private dcr(flagName: string, flagNameParts: string[]) {
+        this.deleteCombatRequest(flagName, flagNameParts)
+    }
+
+    private deleteCombatRequest(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+
+        global.deleteCombatRequest(roomName)
+
+        flag.remove()
+    }
 }
 
 export const flagManager = new FlagManager()
