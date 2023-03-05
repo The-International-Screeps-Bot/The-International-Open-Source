@@ -11,22 +11,9 @@ export class HaulerNeedManager {
         const { room } = this.communeManager
 
         this.sourceNeed()
+        this.controllerNeed()
 
-        // There is a viable controllerContainer
-
-        if (room.controllerContainer && room.controller.level > 1)
-            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength * 1.2)
-        // There is a viable controllerLink but we need to haul to it
-        else if (
-            room.controllerLink &&
-            room.controllerLink.RCLActionable &&
-            (!room.hubLink || !room.hubLink.RCLActionable)
-        ) {
-            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength, room.upgradeStrength * 1.2)
-        }
-
-        room.haulerNeed += findCarryPartsRequired(room.mineralPath.length, room.mineralHarvestStrength * 1.1)
-
+        room.haulerNeed += findCarryPartsRequired(room.mineralPath.length + 3, room.mineralHarvestStrength * 1.1)
         room.haulerNeed += room.structures.lab.length / 1.5
 
         /* room.haulerNeed += room.structures.extension.length / 10 */
@@ -37,7 +24,7 @@ export class HaulerNeedManager {
         room.haulerNeed = Math.round(room.haulerNeed)
     }
 
-    sourceNeed() {
+    private sourceNeed() {
         const { room } = this.communeManager
 
         if (room.hubLink && room.hubLink.RCLActionable) {
@@ -48,7 +35,7 @@ export class HaulerNeedManager {
                 if (room.sourcePaths[index])
                     room.haulerNeed += findCarryPartsRequired(
                         room.sourcePaths[index].length + 3,
-                        room.estimatedSourceIncome[index],
+                        room.estimatedSourceIncome[index] * 1.1,
                     )
                 else console.log(`No source path for ${room.name} source ${index}`)
             }
@@ -65,9 +52,34 @@ export class HaulerNeedManager {
             if (room.sourcePaths[index])
                 room.haulerNeed += findCarryPartsRequired(
                     room.sourcePaths[index].length + 3,
-                    room.estimatedSourceIncome[index],
+                    room.estimatedSourceIncome[index] * 1.1,
                 )
             else console.log(`No source path for ${room.name} source ${index}`)
+        }
+    }
+
+    private controllerNeed() {
+        const { room } = this.communeManager
+
+        if (room.controller.level < 2) return
+
+        // There is a viable controllerContainer
+
+        if (room.controllerContainer) {
+
+            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength + 3, room.upgradeStrength * 1.1)
+            return
+        }
+
+        // There is a viable controllerLink but we need to haul to it
+
+        if (
+            room.controllerLink &&
+            room.controllerLink.RCLActionable &&
+            (!room.hubLink || !room.hubLink.RCLActionable)
+        ) {
+            room.haulerNeed += findCarryPartsRequired(room.upgradePathLength + 3, room.upgradeStrength * 1.1)
+            return
         }
     }
 }
