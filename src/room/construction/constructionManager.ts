@@ -1,9 +1,9 @@
 import { customColors, stamps } from 'international/constants'
 import { customLog } from 'international/utils'
-import { basePlanner } from '../communePlanner'
 import { rampartPlanner } from './rampartPlanner'
 import './constructionFunctions'
 import { globalStatsUpdater } from 'international/statsManager'
+import { basePlanner } from './oldCommunePlanner'
 
 /**
  * Creates construction sites and deletes structures in a room

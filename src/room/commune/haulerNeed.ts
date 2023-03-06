@@ -1,3 +1,4 @@
+import { stamps } from 'international/constants'
 import { customLog, findCarryPartsRequired } from 'international/utils'
 import { CommuneManager } from './commune'
 
@@ -15,6 +16,9 @@ export class HaulerNeedManager {
 
         room.haulerNeed += findCarryPartsRequired(room.mineralPath.length + 3, room.mineralHarvestStrength * 1.1)
         room.haulerNeed += room.structures.lab.length / 1.5
+
+        const extensions = room.structures.extension.length - stamps.fastFiller.structures.extension.length
+        if (extensions > 0) room.structures.extension.length / 3
 
         /* room.haulerNeed += room.structures.extension.length / 10 */
 

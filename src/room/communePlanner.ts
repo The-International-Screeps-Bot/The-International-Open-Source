@@ -1,4 +1,3 @@
-import { link } from 'fs'
 import {
     CPUMaxPerTick,
     defaultRoadPlanningPlainCost,
@@ -47,12 +46,9 @@ import {
 import { internationalManager } from 'international/international'
 import { packCoord, packPosList, packXYAsCoord, unpackCoord } from 'other/codec'
 import 'other/RoomVisual'
-import { toASCII } from 'punycode'
 import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
 import { RoomManager } from './room'
-import { off, openStdin } from 'process'
-import { length } from 'node-persist'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { minCutToExit } from './construction/minCut'
