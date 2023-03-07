@@ -18,7 +18,7 @@ export class HaulerNeedManager {
         room.haulerNeed += room.structures.lab.length / 1.5
 
         const extensions = room.structures.extension.length - stamps.fastFiller.structures.extension.length
-        if (extensions > 0) room.structures.extension.length / 3
+        if (extensions > 0) room.structures.extension.length / 4
 
         /* room.haulerNeed += room.structures.extension.length / 10 */
 
