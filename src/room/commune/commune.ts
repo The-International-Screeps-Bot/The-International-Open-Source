@@ -427,4 +427,78 @@ export class CommuneManager {
             !this.room.terminal
         )
     }
+
+    _maxUpgradeStrength: number
+    get maxUpgradeStrength() {
+
+        if (this._maxUpgradeStrength !== undefined) return this._maxUpgradeStrength
+
+        // There are no structures we can use for upgrading
+
+        if (this.room.controller.level < 2) return this.findNudeMaxUpgradeStrength()
+
+        // If any checks fail we can't use links,
+
+        if (this.room.controller.level < 5) {
+
+            return this.findNonLinkMaxUpgradeStrength()
+        }
+
+        const hubLink = this.room.hubLink
+        if (!hubLink || !hubLink.RCLActionable) return this.findNonLinkMaxUpgradeStrength()
+
+        const controllerLink = this.room.controllerLink
+        if (!controllerLink || !controllerLink.RCLActionable) return this.findNonLinkMaxUpgradeStrength()
+
+        // We can use links
+
+        const sourceLinks = this.room.sourceLinks
+
+        // If there are transfer links, max out partMultiplier to their ability
+
+        let maxPartsMultiplier = 0
+
+        if (hubLink && hubLink.RCLActionable) {
+            // Get the range between the controllerLink and hubLink
+
+            const range = getRangeOfCoords(controllerLink.pos, hubLink.pos)
+
+            // Limit partsMultiplier at the range with a multiplier
+
+            maxPartsMultiplier += findLinkThroughput(range) * 0.7
+        }
+
+        for (let i = 0; i < sourceLinks.length; i++) {
+            const sourceLink = sourceLinks[i]
+
+            if (!sourceLink.RCLActionable) continue
+
+            // Get the range between the controllerLink and hubLink
+
+            const range = getRangeOfCoords(sourceLink.pos, controllerLink.pos)
+
+            // Limit partsMultiplier at the range with a multiplier
+
+            maxPartsMultiplier +=
+                findLinkThroughput(range, this.communeManager.room.estimatedSourceIncome[i]) * 0.7
+        }
+
+        partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
+
+    }
+
+    findNonLinkMaxUpgradeStrength() {
+
+        const controllerContainer = this.room.controllerContainer
+        if (!controllerContainer) return this.findNudeMaxUpgradeStrength()
+
+        // We can use the controller container
+
+        return this._maxUpgradeStrength = controllerContainer.store.getCapacity() / (4 + this.room.upgradePathLength)
+    }
+
+    findNudeMaxUpgradeStrength() {
+
+        return this._maxUpgradeStrength = 100
+    }
 }
