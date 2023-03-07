@@ -56,6 +56,7 @@ export class TerminalManager {
     private createTerminalRequests() {
         const { room } = this.communeManager
         const { terminal } = room
+        const forAllies = Memory.allyTrading && Game.time % 2 === 0
 
         for (const resourceTarget of terminalResourceTargets) {
 
@@ -69,14 +70,24 @@ export class TerminalManager {
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)
+            const priority = 1 - storedResourceAmount / targetAmount
+            const amount = Math.min(targetAmount - storedResourceAmount, terminal.store.getFreeCapacity())
+
+            // If we have allies to trade with, alternate requesting eveyr tick
+
+            if (forAllies) {
+
+                allyManager.requestResource(room.name, resourceTarget.resource, amount, priority)
+                continue
+            }
 
             const ID = newID()
 
             internationalManager.terminalRequests[ID] = {
                 ID,
-                priority: 1 - storedResourceAmount / targetAmount,
+                priority,
                 resource: resourceTarget.resource,
-                amount: Math.min(targetAmount - storedResourceAmount, terminal.store.getFreeCapacity()),
+                amount,
                 roomName: room.name,
             }
         }
@@ -91,7 +102,7 @@ export class TerminalManager {
         if (!terminal) return
         if (!terminal.RCLActionable) return
 
-        this.createAllyRequests()
+        /* this.createAllyRequests() */
 
         if (terminal.cooldown > 0) return
 
@@ -105,7 +116,7 @@ export class TerminalManager {
 
         this.manageResources()
     }
-
+/*
     private createAllyRequests() {
         if (!Memory.allyTrading) return
 
@@ -136,14 +147,15 @@ export class TerminalManager {
         // For each mineral
 
         for (resource of minerals) {
-            const mineralAmount = terminal.store.getUsedCapacity(resource)
+            const mineralAmount = room.resourcesInStoringStructures[resource]
+            const min = room.communeManager.storingStructuresCapacity * 0.01
 
-            if (mineralAmount > 5000) continue
+            if (min > mineralAmount) continue
 
             allyManager.requestResource(room.name, resource, 7000 - mineralAmount, 0.25)
         }
     }
-
+ */
     findBestTerminalRequest(): [TerminalRequest, number] {
         const budget = Math.min(
             this.communeManager.room.resourcesInStoringStructures.energy - this.communeManager.minStoredEnergy,

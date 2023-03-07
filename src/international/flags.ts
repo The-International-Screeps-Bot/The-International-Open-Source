@@ -72,7 +72,7 @@ class FlagManager {
         flag.remove()
     }
 
-    private removeClaim(flagName: string, flagNameParts: string[]) {
+    private deleteClaim(flagName: string, flagNameParts: string[]) {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const roomMemory = Memory.rooms[roomName]
@@ -118,11 +118,7 @@ class FlagManager {
         this.combat(flagName, flagNameParts)
     }
 
-    private dcr(flagName: string, flagNameParts: string[]) {
-        this.deleteCombatRequest(flagName, flagNameParts)
-    }
-
-    private deleteCombatRequest(flagName: string, flagNameParts: string[]) {
+    private deleteCombat(flagName: string, flagNameParts: string[]) {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
 

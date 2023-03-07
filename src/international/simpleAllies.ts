@@ -81,11 +81,11 @@ class AllyManager {
 
         const allyArray = Array.from(Memory.allyPlayers)
         if (!allyArray.length) return
-
+/*
         // Run every so often, increasing based on ally count
 
         if (Game.time % (10 + allyArray.length) >= allyArray.length) return
-
+ */
         const currentAllyName = allyArray[Game.time % allyArray.length]
 
         //
