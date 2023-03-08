@@ -17,6 +17,7 @@ import {
     packAsNum,
     packXYAsNum,
     randomIntRange,
+    randomTick,
     unpackNumAsCoord,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
@@ -134,6 +135,9 @@ export class CommuneManager {
         delete this._storingStructures
         delete this._maxCombatRequests
         delete this._minRampartHits
+        if (randomTick()) {
+            delete this._maxUpgradeStrength
+        }
     }
 
     preTickRun() {
@@ -434,25 +438,19 @@ export class CommuneManager {
 
         if (this._maxUpgradeStrength !== undefined) return this._maxUpgradeStrength
 
-        // There are no structures we can use for upgrading
+        const upgradeStructure = this.upgradeStructure
+        if (!upgradeStructure) return this.findNudeMaxUpgradeStrength()
 
-        if (this.room.controller.level < 2) return this.findNudeMaxUpgradeStrength()
+        // Container
 
-        // If any checks fail we can't use links,
+        if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
 
-        if (this.room.controller.level < 5) {
-
-            return this.findNonLinkMaxUpgradeStrength()
+            return this._maxUpgradeStrength = upgradeStructure.store.getCapacity() / (4 + this.room.upgradePathLength)
         }
 
+        // Link
+
         const hubLink = this.room.hubLink
-        if (!hubLink || !hubLink.RCLActionable) return this.findNonLinkMaxUpgradeStrength()
-
-        const controllerLink = this.room.controllerLink
-        if (!controllerLink || !controllerLink.RCLActionable) return this.findNonLinkMaxUpgradeStrength()
-
-        // We can use links
-
         const sourceLinks = this.room.sourceLinks
 
         // If there are transfer links, max out partMultiplier to their ability
@@ -460,11 +458,10 @@ export class CommuneManager {
         this._maxUpgradeStrength = 0
 
         if (hubLink && hubLink.RCLActionable) {
-            // Get the range between the controllerLink and hubLink
 
-            const range = getRangeOfCoords(controllerLink.pos, hubLink.pos)
+            const range = getRangeOfCoords(upgradeStructure.pos, hubLink.pos)
 
-            // Limit partsMultiplier at the range with a multiplier
+            // Increase strength by throughput
 
             this._maxUpgradeStrength += findLinkThroughput(range) * 0.7
         }
@@ -474,32 +471,49 @@ export class CommuneManager {
 
             if (!sourceLink.RCLActionable) continue
 
-            // Get the range between the controllerLink and hubLink
+            const range = getRangeOfCoords(sourceLink.pos, upgradeStructure.pos)
 
-            const range = getRangeOfCoords(sourceLink.pos, controllerLink.pos)
-
-            // Limit partsMultiplier at the range with a multiplier
+            // Increase strength by throughput
 
             this._maxUpgradeStrength +=
                 findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
         }
 
         return this._maxUpgradeStrength
-
     }
 
-    findNonLinkMaxUpgradeStrength() {
-
-        const controllerContainer = this.room.controllerContainer
-        if (!controllerContainer) return this.findNudeMaxUpgradeStrength()
-
-        // We can use the controller container
-
-        return this._maxUpgradeStrength = controllerContainer.store.getCapacity() / (4 + this.room.upgradePathLength)
-    }
-
+    /**
+     * The max upgrade strength when we have no local storing structure
+     */
     findNudeMaxUpgradeStrength() {
 
         return this._maxUpgradeStrength = 100
+    }
+
+    _upgradeStructure: AnyStoreStructure | false
+    get upgradeStructure() {
+        if (this._upgradeStructure !== undefined) return this._upgradeStructure
+
+        // We can't use a structure
+
+        const controllerLevel = this.room.controller.level
+        if (controllerLevel < 2) return this._upgradeStructure = false
+
+        // We can use containers
+
+        if (controllerLevel < 5) {
+
+            return this._upgradeStructure = this.room.controllerContainer
+        }
+
+        // We can use links
+
+        const controllerLink = this.room.controllerLink
+        if (!controllerLink || !controllerLink.RCLActionable) return false
+
+        const hubLink = this.room.hubLink
+        if (!hubLink || !hubLink.RCLActionable) return false
+
+        return this._upgradeStructure = controllerLink
     }
 }

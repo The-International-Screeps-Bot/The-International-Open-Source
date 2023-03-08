@@ -742,51 +742,7 @@ export class SpawnRequestsManager {
                     partsMultiplier += this.communeManager.estimatedEnergyIncome * 0.75
                 }
 
-                // Get the controllerLink and baseLink
-
-                const controllerLink = this.communeManager.room.controllerLink
-
-                // If the controllerLink is defined
-
-                if (controllerLink && controllerLink.RCLActionable) {
-                    maxCreeps -= 1
-
-                    const hubLink = this.communeManager.room.hubLink
-                    const sourceLinks = this.communeManager.room.sourceLinks
-
-                    // If there are transfer links, max out partMultiplier to their ability
-
-                    if ((hubLink && hubLink.RCLActionable) || sourceLinks.find(link => link && link.RCLActionable)) {
-                        let maxPartsMultiplier = 0
-
-                        if (hubLink && hubLink.RCLActionable) {
-                            // Get the range between the controllerLink and hubLink
-
-                            const range = getRangeOfCoords(controllerLink.pos, hubLink.pos)
-
-                            // Limit partsMultiplier at the range with a multiplier
-
-                            maxPartsMultiplier += findLinkThroughput(range) * 0.7
-                        }
-
-                        for (let i = 0; i < sourceLinks.length; i++) {
-                            const sourceLink = sourceLinks[i]
-
-                            if (!sourceLink.RCLActionable) continue
-
-                            // Get the range between the controllerLink and hubLink
-
-                            const range = getRangeOfCoords(sourceLink.pos, controllerLink.pos)
-
-                            // Limit partsMultiplier at the range with a multiplier
-
-                            maxPartsMultiplier +=
-                                findLinkThroughput(range, this.communeManager.room.estimatedSourceIncome[i]) * 0.7
-                        }
-
-                        partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
-                    }
-                }
+                partsMultiplier = Math.min(partsMultiplier, this.communeManager.maxUpgradeStrength)
 
                 // If there are construction sites of my ownership in the this.communeManager.room, set multiplier to 1
 
@@ -797,7 +753,8 @@ export class SpawnRequestsManager {
 
                 // If the controllerContainer or controllerLink exists
 
-                if (this.communeManager.room.controllerContainer || (controllerLink && controllerLink.RCLActionable)) {
+                const upgradeStructure = this.communeManager.upgradeStructure
+                if (upgradeStructure) {
                     // If the controller is level 8
 
                     if (this.communeManager.room.controller.level === 8) {
