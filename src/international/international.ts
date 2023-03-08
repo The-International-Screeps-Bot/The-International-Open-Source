@@ -46,6 +46,8 @@ export class InternationalManager {
 
     internationalDataVisuals: boolean
 
+    terminalCommunes: string[]
+
     /**
      * Updates values to be present for this tick
      */
@@ -54,6 +56,7 @@ export class InternationalManager {
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
         this.terminalRequests = {}
+        this.terminalCommunes = []
 
         this.tickID = 0
         this.customCreepIDs = []

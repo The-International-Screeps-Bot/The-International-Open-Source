@@ -68,6 +68,7 @@ import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
 import { encode } from 'base32768'
 import { BasePlans } from '../construction/basePlans'
+import { internationalManager } from 'international/international'
 
 export class CommuneManager {
     // Managers
@@ -220,6 +221,8 @@ export class CommuneManager {
         room.attackingDefenderIDs = new Set()
         room.defenderEnemyTargetsWithDamage = new Map()
         room.defenderEnemyTargetsWithDefender = new Map()
+
+        if (this.room.terminal && this.room.controller.level >= 6) internationalManager.terminalCommunes.push(this.room.name)
     }
 
     public run() {
