@@ -56,7 +56,7 @@ export class MineralHarvester extends Creep {
         super(creepID)
     }
 
-    static mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: MineralHarvester = Game.creeps[creepName]
 

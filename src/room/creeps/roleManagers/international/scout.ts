@@ -211,7 +211,7 @@ export class Scout extends Creep {
         return this.signController(room.controller, signMessage) === OK
     }
 
-    static scoutManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {

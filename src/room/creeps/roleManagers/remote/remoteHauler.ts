@@ -506,7 +506,7 @@ export class RemoteHauler extends Creep {
         if (this.deliverResources()) this.relay()
     }
 
-    static remoteHaulerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep = Game.creeps[creepName] as RemoteHauler
             creep.run()

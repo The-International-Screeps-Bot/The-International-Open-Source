@@ -151,7 +151,7 @@ export class Vanguard extends Creep {
         }
     }
 
-    static vanguardManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {

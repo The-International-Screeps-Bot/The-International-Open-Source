@@ -28,38 +28,7 @@ import { RoomManager } from 'room/room'
 import { globalStatsUpdater } from 'international/statsManager'
 import { RequestHauler } from './roleManagers/international/requestHauler'
 import { RangedDefender } from './roleManagers/commune/rangedDefender'
-
-// Construct managers
-
-const managers: { [key in CreepRoles]: Function } = {
-    meleeDefender: MeleeDefender.meleeDefenderManager,
-    rangedDefender: RangedDefender.rangedDefenderManager,
-    allyVanguard: AllyVanguard.allyVanguardManager,
-    antifaRangedAttacker: Antifa.antifaManager,
-    antifaAttacker: Antifa.antifaManager,
-    antifaHealer: Antifa.antifaManager,
-    antifaDismantler: Antifa.antifaManager,
-    antifaDowngrader: Antifa.antifaManager,
-    claimer: Claimer.claimerManager,
-    remoteDefender: RemoteDefender.remoteDefenderManager,
-    sourceHarvester: SourceHarvester.sourceHarvesterManager,
-    hauler: Hauler.haulerManager,
-    requestHauler: RequestHauler.requestHaulerManager,
-    maintainer: Maintainer.maintainerManager,
-    fastFiller: FastFiller.fastFillerManager,
-    hubHauler: HubHauler.hubHaulerManager,
-    controllerUpgrader: ControllerUpgrader.controllerUpgraderManager,
-    builder: Builder.builderManager,
-    mineralHarvester: MineralHarvester.mineralHarvesterManager,
-    remoteSourceHarvester0: RemoteHarvester.RemoteHarvesterManager,
-    remoteSourceHarvester1: RemoteHarvester.RemoteHarvesterManager,
-    remoteHauler: RemoteHauler.remoteHaulerManager,
-    remoteReserver: RemoteReserver.remoteReserverManager,
-    remoteCoreAttacker: RemoteCoreAttacker.remoteCoreAttackerManager,
-    remoteDismantler: RemoteDismantler.remoteDismantlerManager,
-    scout: Scout.scoutManager,
-    vanguard: Vanguard.vanguardManager,
-}
+import { creepClasses } from './creepClasses'
 
 export class CreepRoleManager {
     roomManager: RoomManager
@@ -93,14 +62,13 @@ export class CreepRoleManager {
     }
 
     private runManager(role: CreepRoles) {
-
         // If there are no creeps for this manager, iterate
 
         if (!this.roomManager.room.myCreeps[role].length) return
 
         const roleCPUStart = Game.cpu.getUsed()
 
-        managers[role](this.roomManager.room, this.roomManager.room.myCreeps[role])
+        creepClasses[role].roleManager(this.roomManager.room, this.roomManager.room.myCreeps[role])
 
         // Log role stats
 

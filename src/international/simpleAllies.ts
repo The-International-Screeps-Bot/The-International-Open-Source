@@ -31,7 +31,7 @@ export enum AllyRequestTypes {
     build,
 }
 
-interface AllyRequest {
+export interface AllyRequest {
     requestType: AllyRequestTypes
     roomName?: string
     playerName?: string

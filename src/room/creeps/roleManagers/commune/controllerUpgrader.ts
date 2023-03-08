@@ -22,11 +22,10 @@ export class ControllerUpgrader extends Creep {
     }
 
     preTickManager() {
-
         this.room.upgradeStrength += this.upgradeStrength
     }
 
-    public static controllerUpgraderManager(room: Room, creepsOfRole: string[]) {
+    public static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through creepNames
 
         for (const creepName of creepsOfRole) {

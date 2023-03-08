@@ -165,7 +165,7 @@ export class Maintainer extends Creep {
         if (this.maintainNearby()) return
     }
 
-    static maintainerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: Maintainer = Game.creeps[creepName]
             creep.run()

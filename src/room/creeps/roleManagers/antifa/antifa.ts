@@ -574,7 +574,7 @@ export class Antifa extends Creep {
         return true
     }
 
-    static antifaManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: Antifa = Game.creeps[creepName]
             if (creep.spawning) continue

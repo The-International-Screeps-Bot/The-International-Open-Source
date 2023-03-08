@@ -161,7 +161,7 @@ export class RemoteDismantler extends Creep {
         return false
     }
 
-    static remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RemoteDismantler = Game.creeps[creepName]
 

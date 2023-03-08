@@ -242,11 +242,7 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (
-            hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold <
-            hubLink.store.energy
-        )
-            return false
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy) return false
 
         const { controllerLink } = room
         const { fastFillerLink } = room
@@ -512,7 +508,7 @@ export class HubHauler extends Creep {
         super(creepID)
     }
 
-    public static hubHaulerManager(room: Room, creepsOfRole: string[]) {
+    public static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: HubHauler = Game.creeps[creepName]
 

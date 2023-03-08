@@ -6,6 +6,7 @@ import {
     findAdjacentCoordsToXY,
     findClosestObject,
     findFunctionCPU,
+    findLinkThroughput,
     findObjectWithID,
     getRange,
     getRangeOfCoords,
@@ -456,7 +457,7 @@ export class CommuneManager {
 
         // If there are transfer links, max out partMultiplier to their ability
 
-        let maxPartsMultiplier = 0
+        this._maxUpgradeStrength = 0
 
         if (hubLink && hubLink.RCLActionable) {
             // Get the range between the controllerLink and hubLink
@@ -465,7 +466,7 @@ export class CommuneManager {
 
             // Limit partsMultiplier at the range with a multiplier
 
-            maxPartsMultiplier += findLinkThroughput(range) * 0.7
+            this._maxUpgradeStrength += findLinkThroughput(range) * 0.7
         }
 
         for (let i = 0; i < sourceLinks.length; i++) {
@@ -479,11 +480,11 @@ export class CommuneManager {
 
             // Limit partsMultiplier at the range with a multiplier
 
-            maxPartsMultiplier +=
-                findLinkThroughput(range, this.communeManager.room.estimatedSourceIncome[i]) * 0.7
+            this._maxUpgradeStrength +=
+                findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
         }
 
-        partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
+        return this._maxUpgradeStrength
 
     }
 

@@ -98,7 +98,7 @@ export class RoomManager {
 
         if (!room.controller.my) {
             if (roomMemory.T === 'commune') {
-                roomMemory.T = 'remote'
+                roomMemory.T = 'neutral'
 
                 room.basicScout()
                 cleanRoomMemory(room.name)

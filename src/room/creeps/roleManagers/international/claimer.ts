@@ -54,7 +54,7 @@ export class Claimer extends Creep {
         creep.claimController(room.controller)
     }
 
-    static claimerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {

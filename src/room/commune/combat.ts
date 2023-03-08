@@ -40,16 +40,10 @@ export class CombatManager {
         const { room } = this.communeManager
         const { controller } = room
 
-        // If safeMode is on cooldown, stop
+        // Conditions check
 
         if (controller.safeModeCooldown) return false
-
-        // Otherwise if there are no safeModes left, stop
-
         if (!controller.safeModeAvailable) return false
-
-        // Otherwise if the controller is upgradeBlocked, stop
-
         if (controller.upgradeBlocked) return false
 
         // Filter attackers that are not invaders. If there are none, stop
@@ -196,14 +190,12 @@ export class CombatManager {
         let minRangedHeal = 0
 
         for (const enemyCreep of room.enemyAttackers) {
-            minDamage += Math.max(Math.max(enemyCreep.combatStrength.heal, Math.ceil(enemyCreep.hits / 25)), minDamage)
-            minMeleeHeal += Math.max(enemyCreep.combatStrength.melee, minMeleeHeal)
-            minRangedHeal += Math.max(enemyCreep.combatStrength.ranged, minRangedHeal)
+            minDamage += Math.max(enemyCreep.combatStrength.heal, Math.ceil(enemyCreep.hits / 50))
+            minMeleeHeal += enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged
+            minRangedHeal += enemyCreep.combatStrength.ranged
 
             if (onlyInvader && enemyCreep.owner.username !== 'Invader') onlyInvader = false
         }
-
-        if (minRangedHeal > minMeleeHeal) minMeleeHeal = minRangedHeal
 
         // There is tower inferiority, make a defend request
 

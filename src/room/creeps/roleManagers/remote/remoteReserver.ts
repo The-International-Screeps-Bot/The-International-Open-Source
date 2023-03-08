@@ -77,7 +77,7 @@ export class RemoteReserver extends Creep {
         super(creepID)
     }
 
-    static remoteReserverManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RemoteReserver = Game.creeps[creepName]
 

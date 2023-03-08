@@ -1412,3 +1412,7 @@ export const adjacentOffsets = [
     },
 ]
 export const defaultMinCutDepth = 4
+/* export const defaultMineralPriority = {
+    [H]:
+}
+ */

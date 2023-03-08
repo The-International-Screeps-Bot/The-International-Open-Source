@@ -51,7 +51,3 @@ export const creepClasses: { [key in CreepRoles]: any } = {
     antifaDismantler: Antifa,
     antifaDowngrader: Antifa,
 }
-
-for (const creepClass of new Set(Object.values(creepClasses))) {
-    profiler.registerClass(creepClass, creepClass + '')
-}

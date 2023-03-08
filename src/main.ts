@@ -53,6 +53,7 @@ import { TerminalManager } from 'room/commune/terminal/terminal'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
 import './room/construction/minCut'
+import { creepClasses } from 'room/creeps/creepClasses'
 
 const originalLoop = (): void => {
     profiler.wrap((): void => {
@@ -124,3 +125,7 @@ profiler.registerClass(TerminalManager, 'TerminalManager')
 profiler.registerClass(LabManager, 'LabManager')
 profiler.registerClass(FactoryManager, 'FactoryManager')
 profiler.registerFN(originalLoop, 'loop')
+
+for (const creepClass of new Set(Object.values(creepClasses))) {
+    profiler.registerClass(creepClass, creepClass + '')
+}

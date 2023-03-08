@@ -208,7 +208,7 @@ export class MeleeDefender extends Creep {
         super(creepID)
     }
 
-    static meleeDefenderManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: MeleeDefender = Game.creeps[creepName]
 

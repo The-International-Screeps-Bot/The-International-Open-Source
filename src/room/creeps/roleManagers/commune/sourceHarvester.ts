@@ -234,7 +234,7 @@ export class SourceHarvester extends Creep {
         if (this.transferToNearbyCreep()) return
     }
 
-    static sourceHarvesterManager(room: Room, creepsOfRole: string[]): void | boolean {
+    static roleManager(room: Room, creepsOfRole: string[]): void | boolean {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {

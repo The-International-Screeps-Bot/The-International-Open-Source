@@ -6,14 +6,13 @@ export class Hauler extends Creep {
     }
 
     run?() {
-
         this.passiveRenew()
         this.runRoomLogisticsRequestsAdvanced()
 
         /* customLog('HAULER RUN', this.name) */
     }
 
-    static haulerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through creep names of this role
 
         for (const creepName of creepsOfRole) {

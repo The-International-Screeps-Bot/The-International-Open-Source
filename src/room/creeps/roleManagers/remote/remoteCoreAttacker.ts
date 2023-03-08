@@ -123,7 +123,7 @@ export class RemoteCoreAttacker extends Creep {
         return true
     }
 
-    static remoteCoreAttackerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RemoteCoreAttacker = Game.creeps[creepName]
 

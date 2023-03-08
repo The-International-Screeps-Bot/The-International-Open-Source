@@ -213,7 +213,7 @@ export class RangedDefender extends Creep {
         super(creepID)
     }
 
-    static rangedDefenderManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RangedDefender = Game.creeps[creepName]
 

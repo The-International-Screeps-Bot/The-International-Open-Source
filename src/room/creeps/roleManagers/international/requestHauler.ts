@@ -11,7 +11,7 @@ export class RequestHauler extends Creep {
         }
     }
 
-    static requestHaulerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RequestHauler = Game.creeps[creepName]
         }

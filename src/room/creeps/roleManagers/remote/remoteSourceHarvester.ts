@@ -112,8 +112,8 @@ export class RemoteHarvester extends Creep {
 
     removeRemote?() {
         if (!this.dying) {
-
-            Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] += this.parts.work
+            Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] +=
+                this.parts.work
         }
 
         delete this.memory.RN
@@ -267,7 +267,7 @@ export class RemoteHarvester extends Creep {
         return true
     }
 
-    static RemoteHarvesterManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RemoteHarvester = Game.creeps[creepName] as RemoteHarvester
 
