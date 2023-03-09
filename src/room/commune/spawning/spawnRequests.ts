@@ -440,7 +440,7 @@ export class SpawnRequestsManager {
                     }
 
                     const priority = Math.min(
-                        minPriority - 0.1 + this.communeManager.room.myCreeps[role].length * 0.75,
+                        minPriority + 0.1 + this.communeManager.room.myCreeps[role].length * 1,
                         maxPriority,
                     )
 
