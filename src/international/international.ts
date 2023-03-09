@@ -14,20 +14,6 @@ import {
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
-    /**
-     * Tracks and records constructionSites and thier age, deleting old sites
-     */
-    constructionSiteManager?(): void
-
-    /**
-     * Adds colours and annotations to the map if mapVisuals are enabled
-     */
-    mapVisualsManager?(): void
-
-    /**
-     * Handles logging, stat recording, and more at the end of the tick
-     */
-    endTickManager?(): void
 
     /**
      * Antifa creeps by combat request name, then by role with an array of creep names
@@ -47,6 +33,11 @@ export class InternationalManager {
     internationalDataVisuals: boolean
 
     terminalCommunes: string[]
+
+    /**
+     * The number of minerals in communes
+     */
+    mineralCommunes: { [key in MineralConstant]: number }
 
     /**
      * Updates values to be present for this tick
@@ -70,7 +61,8 @@ export class InternationalManager {
         delete this.internationalDataVisuals
 
         if (randomTick()) {
-
+            delete this._mineralPriority
+            delete this._funnelOrder
             delete this._minCredits
         }
     }
@@ -392,6 +384,43 @@ export class InternationalManager {
     get maxCommunes() {
 
         return this._maxCommunes = Math.round(Game.cpu.limit / 10)
+    }
+
+    /**
+ * The priority for claiming new rooms, for each mineral
+ */
+    _mineralPriority: Partial<{ [key in MineralConstant]: number }>
+
+    /**
+     * The priority for claiming new rooms, for each mineral
+     */
+    get mineralPriority() {
+
+        if (this._mineralPriority) return this._mineralPriority
+
+        this._mineralPriority = {}
+
+        for (const resource of MINERALS) {
+
+            this._mineralPriority[resource] = this.mineralCommunes[resource]
+        }
+
+        return this._mineralPriority
+    }
+
+    _funnelOrder: string[]
+
+
+    get funnelOrder() {
+        if (this._funnelOrder) return this._funnelOrder
+
+        this._funnelOrder = Array.from(global.communes).sort((a, b) => {
+            const controllerA = Game.rooms[a].controller
+            const controllerB = Game.rooms[b].controller
+            return (controllerA.level + controllerA.progressTotal / controllerA.progress) - (controllerB.level + controllerB.progressTotal / controllerB.progress)
+        })
+
+        return this._funnelOrder
     }
 }
 

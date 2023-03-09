@@ -54,6 +54,9 @@ import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
 import './room/construction/minCut'
 import { creepClasses } from 'room/creeps/creepClasses'
+import { constructionSiteManager } from './international/constructionSiteManager'
+import { mapVisualsManager } from './international/mapVisuals'
+import { endTickManager } from './international/endTickManager'
 
 const originalLoop = (): void => {
     profiler.wrap((): void => {
@@ -88,7 +91,7 @@ const originalLoop = (): void => {
 
         roomPruningManager.run()
         flagManager.run()
-        internationalManager.constructionSiteManager()
+        constructionSiteManager.run()
         internationalManager.orderManager()
 
         if (Memory.CPULogging === true) {
@@ -103,13 +106,13 @@ const originalLoop = (): void => {
 
         roomsManager()
 
-        internationalManager.mapVisualsManager()
+        mapVisualsManager.run()
 
         internationalManager.advancedGeneratePixel()
         internationalManager.advancedSellPixels()
 
         if (Memory.me === 'PandaMaster' && Game.shard.name.includes('shard')) ExecutePandaMasterCode()
-        internationalManager.endTickManager()
+        endTickManager.run()
     })
 }
 
