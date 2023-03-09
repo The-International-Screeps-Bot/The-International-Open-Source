@@ -131,7 +131,7 @@ export class RemoteHauler extends Creep {
             if (this.room.name === this.commune.name) {
                 // Advanced recycle and iterate
 
-                this.advancedRecycle()
+                /* this.advancedRecycle() */
                 return false
             }
 
