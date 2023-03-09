@@ -1,3 +1,4 @@
+import { internationalManager } from "./international"
 import { customLog } from "./utils"
 
 export enum AllyRequestTypes {
@@ -30,6 +31,7 @@ export enum AllyRequestTypes {
      */
     build,
 }
+export const allyRequestTypeKeys = Object.keys(AllyRequestTypes) as unknown as (keyof typeof AllyRequestTypes)[]
 
 export interface AllyRequest {
     requestType: AllyRequestTypes
@@ -68,50 +70,46 @@ class AllyManager {
      */
     myRequests: AllyRequest[]
 
-    /**
-     * An array of all the current requests made by other allies
-     */
-    allyRequests: AllyRequest[]
+    currentAlly: string
 
-    /**
-     * Gets allyRequests, sets up requirements to use the foreign segment
-     */
-    getAllyRequests() {
-        if (!Memory.allyTrading) return
+    _allyRequests: Partial<Record<keyof typeof AllyRequestTypes, { [ID: string]: AllyRequest }>>
+    get allyRequests() {
+        if (this._allyRequests) return this._allyRequests
 
-        const allyArray = Array.from(Memory.allyPlayers)
-        if (!allyArray.length) return
-/*
-        // Run every so often, increasing based on ally count
+        this._allyRequests = {}
+        for (const key in AllyRequestTypes) this._allyRequests[key as keyof typeof AllyRequestTypes] = {}
 
-        if (Game.time % (10 + allyArray.length) >= allyArray.length) return
- */
-        const currentAllyName = allyArray[Game.time % allyArray.length]
+        if (!RawMemory.foreignSegment) return this._allyRequests
+        if (RawMemory.foreignSegment.username !== this.currentAlly) return this._allyRequests
 
-        //
+        let rawAllyRequests: AllyRequest[]
 
-        if (RawMemory.foreignSegment && RawMemory.foreignSegment.username === currentAllyName) {
-            // Get the allyRequests and record them in the allyManager
-
-            try {
-                this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
-            }
-            catch(err) {
-                customLog('Error in getting requests for simpleAllies', currentAllyName);
-                this.allyRequests = []
-            }
+        try {
+            rawAllyRequests = JSON.parse(RawMemory.foreignSegment.data)
+        }
+        catch (err) {
+            customLog('Error in getting requests for simpleAllies', this.currentAlly);
+            this._allyRequests = {}
         }
 
-        const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]
-        RawMemory.setActiveForeignSegment(nextAllyName, Memory.simpleAlliesSegment)
+        for (const request of rawAllyRequests) {
+
+            this._allyRequests[allyRequestTypeKeys[request.requestType]][internationalManager.newTickID()] = request
+        }
+
+        return this._allyRequests
     }
+
     /**
      * To call before any requests are made. Configures some required values
      */
     tickConfig() {
-        // Initialize myRequests and allyRequests
+        if (!Memory.allyTrading) return
 
-        this.myRequests = []
+        const allyArray = Array.from(Memory.allyPlayers)
+        if (!allyArray.length) return
+
+        this.currentAlly = allyArray[Game.time % allyArray.length]
     }
 
     /**
