@@ -55,7 +55,7 @@ export class HaulerSizeManager {
             BODYPART_COST[CARRY]
 
         let diff
-        if (newMinHaulerCost < roomMemory.MHC) diff = (newMinHaulerCost - roomMemory.MHC) / 3
+        if (newMinHaulerCost < roomMemory.MHC) diff = (newMinHaulerCost - roomMemory.MHC) / 2
         else diff = newMinHaulerCost - roomMemory.MHC
 
         roomMemory.MHC += Math.floor(diff)

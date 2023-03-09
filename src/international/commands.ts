@@ -165,6 +165,8 @@ global.claim = function (requestName, communeName, score) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
+        if (roomMemory.claimRequest) delete Memory.claimRequests[roomMemory.claimRequest].responder
+
         roomMemory.claimRequest = requestName
         request.responder = communeName
     }

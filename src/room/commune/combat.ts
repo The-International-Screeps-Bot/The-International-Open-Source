@@ -270,7 +270,7 @@ export class CombatManager {
 
         // Reduce attack threat over time
 
-        if (roomMemory.AT > 0) roomMemory.AT -= 1 + roomMemory.LAT * 0.002
+        if (roomMemory.AT > 0) roomMemory.AT *= 0.99999
 
         roomMemory.LAT += 1
     }

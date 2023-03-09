@@ -570,9 +570,8 @@ export const allResources = new Set(RESOURCES_ALL)
 /**
  * The percent of the terminal to fill with each resource
  */
-export const terminalResourceTargets: ResourceTarget[] = [
-    {
-        resource: RESOURCE_BATTERY,
+export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: ResourceTarget }> = {
+    [RESOURCE_BATTERY]: {
         conditions: function (communeManager) {
             return communeManager.room.structures.factory.length
         },
@@ -583,8 +582,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.015
         },
     },
-    {
-        resource: RESOURCE_ENERGY,
+    [RESOURCE_ENERGY]: {
         min: function (communeManager) {
             if (communeManager.room.controller.level < 8) {
                 return communeManager.storedEnergyUpgradeThreshold * 1.2
@@ -596,8 +594,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.2
         },
     },
-    {
-        resource: RESOURCE_HYDROGEN,
+    [RESOURCE_HYDROGEN]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -605,8 +602,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_OXYGEN,
+    [RESOURCE_OXYGEN]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -614,8 +610,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_UTRIUM,
+    [RESOURCE_UTRIUM]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -623,8 +618,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_KEANIUM,
+    [RESOURCE_KEANIUM]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -632,8 +626,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_LEMERGIUM,
+    [RESOURCE_LEMERGIUM]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -641,8 +634,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_ZYNTHIUM,
+    [RESOURCE_ZYNTHIUM]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -650,8 +642,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_CATALYST,
+    [RESOURCE_CATALYST]: {
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.01
         },
@@ -659,8 +650,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.027
         },
     },
-    {
-        resource: RESOURCE_OXIDANT,
+    [RESOURCE_OXIDANT]: {
         min: function (communeManager) {
             return 0
         },
@@ -668,8 +658,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_REDUCTANT,
+    [RESOURCE_REDUCTANT]: {
         min: function (communeManager) {
             return 0
         },
@@ -677,8 +666,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_ZYNTHIUM_BAR,
+    [RESOURCE_ZYNTHIUM_BAR]: {
         min: function (communeManager) {
             return 0
         },
@@ -686,8 +674,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_LEMERGIUM_BAR,
+    [RESOURCE_LEMERGIUM_BAR]: {
         min: function (communeManager) {
             return 0
         },
@@ -695,8 +682,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_UTRIUM_BAR,
+    [RESOURCE_UTRIUM_BAR]: {
         min: function (communeManager) {
             return 0
         },
@@ -704,8 +690,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_KEANIUM_BAR,
+    [RESOURCE_KEANIUM_BAR]: {
         min: function (communeManager) {
             return 0
         },
@@ -713,8 +698,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_PURIFIER,
+    [RESOURCE_PURIFIER]: {
         min: function (communeManager) {
             return 0
         },
@@ -722,8 +706,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_GHODIUM_MELT,
+    [RESOURCE_GHODIUM_MELT]: {
         min: function (communeManager) {
             return 0
         },
@@ -731,8 +714,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    {
-        resource: RESOURCE_POWER,
+    [RESOURCE_POWER]: {
         conditions: function (communeManager) {
             return communeManager.room.structures.powerSpawn.length
         },
@@ -743,8 +725,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return communeManager.storingStructuresCapacity * 0.015
         },
     },
-    {
-        resource: RESOURCE_METAL,
+    [RESOURCE_METAL]: {
         min: function (communeManager) {
             return 0
         },
@@ -752,8 +733,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_BIOMASS,
+    [RESOURCE_BIOMASS]: {
         min: function (communeManager) {
             return 0
         },
@@ -761,8 +741,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_SILICON,
+    [RESOURCE_SILICON]: {
         min: function (communeManager) {
             return 0
         },
@@ -770,8 +749,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_MIST,
+    [RESOURCE_MIST]: {
         min: function (communeManager) {
             return 0
         },
@@ -779,8 +757,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_ALLOY,
+    [RESOURCE_ALLOY]: {
         min: function (communeManager) {
             return 0
         },
@@ -788,8 +765,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_CELL,
+    [RESOURCE_CELL]: {
         min: function (communeManager) {
             return 0
         },
@@ -797,8 +773,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_WIRE,
+    [RESOURCE_WIRE]: {
         min: function (communeManager) {
             return 0
         },
@@ -806,8 +781,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-    {
-        resource: RESOURCE_CONDENSATE,
+    [RESOURCE_CONDENSATE]: {
         min: function (communeManager) {
             return 0
         },
@@ -815,7 +789,7 @@ export const terminalResourceTargets: ResourceTarget[] = [
             return 0
         },
     },
-]
+}
 
 export enum PlayerData {
     /**

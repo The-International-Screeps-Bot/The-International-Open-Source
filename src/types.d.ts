@@ -79,7 +79,6 @@ declare global {
         | 'heal'
 
     interface ResourceTarget {
-        resource: ResourceConstant
         conditions?(communeManager: CommuneManager): any
         min(communeManager?: CommuneManager): number
         max(communeManager?: CommuneManager): number
