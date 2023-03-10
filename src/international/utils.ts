@@ -662,19 +662,7 @@ export function isXYInBorder(x: number, y: number, inset: number) {
     return x > inset && x < roomDimensions - 1 - inset && y > inset && y < roomDimensions - 1 - inset
 }
 
-/*
-export function packBasePlanCoord(structureType: StructureConstant, minRCL: number) {
+export function roundToDecimals(num: number, decimals: number) {
 
-    return allStructureTypes.indexOf(structureType) + '_' + minRCL
+    return parseInt(num.toFixed(decimals))
 }
-
-export function unpackBasePlanCoord(packedBasePlanCoord: string): BasePlanCoord {
-
-    const packedBasePlanCoordData = packedBasePlanCoord.split('_')
-
-    return {
-        structureType: allStructureTypes[packedBasePlanCoordData[0] as any],
-        minRCL: parseInt(packedBasePlanCoordData[1])
-    }
-}
- */

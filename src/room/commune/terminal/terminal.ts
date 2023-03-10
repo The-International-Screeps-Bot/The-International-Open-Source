@@ -226,14 +226,11 @@ export class TerminalManager {
 
         // Filter out allyRequests that are requesting resources
 
-        const resourceRequests = allyManager.allyRequests.filter(
-            request => request.requestType === AllyRequestTypes.resource,
-        )
+        const resourceRequests = allyManager.allyRequests.resource
 
-        for (const request of resourceRequests) {
-            // Don't respond to requests for this room
+        for (const ID in resourceRequests) {
 
-            if (request.roomName === this.communeManager.room.name) continue
+            const request = resourceRequests[ID]
 
             // Ensure we have more than the asking amount
 
@@ -274,6 +271,10 @@ export class TerminalManager {
 
         this.communeManager.room.terminal.send(request.resourceType, amount, request.roomName, 'Ally request')
         this.communeManager.room.terminal.intended = true
+
+        // Remove the request so other rooms don't try to respond to it
+
+        delete allyManager._allyRequests.resource[request.ID]
         return RESULT_ACTION
     }
 

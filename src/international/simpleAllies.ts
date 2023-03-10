@@ -34,6 +34,10 @@ export enum AllyRequestTypes {
 export const allyRequestTypeKeys = Object.keys(AllyRequestTypes) as unknown as (keyof typeof AllyRequestTypes)[]
 
 export interface AllyRequest {
+    /**
+     * Added to ally requests when organizing them for response
+     */
+    ID?: string,
     requestType: AllyRequestTypes
     roomName?: string
     playerName?: string
@@ -92,9 +96,14 @@ class AllyManager {
             this._allyRequests = {}
         }
 
+        // Organize requests by type with keys of ID
+
         for (const request of rawAllyRequests) {
 
-            this._allyRequests[allyRequestTypeKeys[request.requestType]][internationalManager.newTickID()] = request
+            const ID = internationalManager.newTickID()
+            request.ID = ID
+
+            this._allyRequests[allyRequestTypeKeys[request.requestType]][ID] = request
         }
 
         return this._allyRequests
@@ -110,6 +119,9 @@ class AllyManager {
         if (!allyArray.length) return
 
         this.currentAlly = allyArray[Game.time % allyArray.length]
+
+        const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]
+        RawMemory.setActiveForeignSegment(nextAllyName, Memory.simpleAlliesSegment)
     }
 
     /**
@@ -118,11 +130,13 @@ class AllyManager {
     endTickManager() {
         if (!Memory.allyTrading) return
 
-        if (Object.keys(RawMemory.segments).length < 10) {
-            // Assign myRequests to the public segment
-            RawMemory.segments[Memory.simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
-            RawMemory.setPublicSegments([Memory.simpleAlliesSegment])
-        }
+        // I have no idea what this is for
+        if (Object.keys(RawMemory.segments).length >= 10) return
+
+        // Assign myRequests to the public segment
+        RawMemory.segments[Memory.simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
+        RawMemory.setPublicSegments([Memory.simpleAlliesSegment])
+
     }
 
     requestAttack(
