@@ -410,9 +410,25 @@ export class InternationalManager {
 
     _funnelOrder: string[]
 
-
+    /**
+     * Commune names sorted by
+     */
     get funnelOrder() {
         if (this._funnelOrder) return this._funnelOrder
+
+        const communesByLevel: { [level: string]: [string, number][] } = {}
+        for (let i = 0; i < 8; i++) communesByLevel[i] = []
+
+        for (const roomName of global.communes) {
+
+            const controller = Game.rooms[roomName].controller
+            communesByLevel[controller.level].push([roomName, controller.progressTotal / controller.progress])
+        }
+
+        for (const key in communesByLevel) {
+            const level = key as unknown as number
+
+        }
 
         this._funnelOrder = Array.from(global.communes).sort((a, b) => {
             const controllerA = Game.rooms[a].controller
