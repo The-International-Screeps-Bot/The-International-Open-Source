@@ -547,8 +547,9 @@ export class SpawnRequestsManager {
 
                 partsMultiplier +=
                     (this.communeManager.room.totalEnemyCombatStrength.melee +
-                        this.communeManager.room.totalEnemyCombatStrength.ranged) /
-                    (REPAIR_POWER / 3)
+                        this.communeManager.room.totalEnemyCombatStrength.ranged +
+                        this.communeManager.room.totalEnemyCombatStrength.dismantle) /
+                    (REPAIR_POWER * 0.22)
 
                 const role = 'maintainer'
 
