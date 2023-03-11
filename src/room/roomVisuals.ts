@@ -447,7 +447,10 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        for (const request of allyManager.allyRequests) {
+        const requests = allyManager.allyRequests.resource
+        for (const ID in requests) {
+
+            const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.resource) continue
 
             const row: any[] = [request.roomName, request.resourceType, request.maxAmount, request.priority.toFixed(2)]
@@ -490,7 +493,10 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        for (const request of allyManager.allyRequests) {
+        const requests = allyManager.allyRequests.defense
+        for (const ID in requests) {
+
+            const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.attack && request.requestType !== AllyRequestTypes.defense)
                 continue
 
@@ -541,7 +547,10 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        for (const request of allyManager.allyRequests) {
+        const requests = allyManager.allyRequests.build
+        for (const ID in requests) {
+
+            const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.build) continue
 
             const row: any[] = [request.roomName, request.priority.toFixed(2)]

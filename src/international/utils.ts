@@ -666,3 +666,20 @@ export function roundToDecimals(num: number, decimals: number) {
 
     return parseInt(num.toFixed(decimals))
 }
+
+export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
+
+    let damage = TOWER_POWER_ATTACK
+
+    let range = getRangeOfCoords(coord1, coord2)
+
+    if (range > TOWER_OPTIMAL_RANGE) {
+        if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
+
+        damage -=
+            (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
+            (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
+    }
+
+    return Math.floor(damage)
+}

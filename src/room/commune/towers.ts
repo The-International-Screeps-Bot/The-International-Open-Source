@@ -1,6 +1,6 @@
-import { customColors } from 'international/constants'
+import { customColors, towerPowers } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, randomTick, scalePriority } from 'international/utils'
+import { customLog, estimateTowerDamage, findObjectWithID, randomTick, scalePriority } from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -110,6 +110,9 @@ export class TowerManager {
             if (tower.attack(attackTarget) !== OK) continue
 
             this.actionableTowerIDs.splice(i, 1)
+
+            const hits = attackTarget.reserveHits -= tower.estimateDamageNet(attackTarget)
+            if (hits <= 0) return true
         }
 
         return true
@@ -250,4 +253,30 @@ export class TowerManager {
             }
         }
     }
+}
+
+StructureTower.prototype.estimateDamageGross = function(target) {
+
+    if (!this.RCLActionable) return 0
+    if (this.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) return 0
+
+    let damage = estimateTowerDamage(this.pos, target.pos)
+
+    for (const powerType of towerPowers) {
+        const effect = this.effectsData.get(powerType) as PowerEffect
+        if (!effect) continue
+
+        damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
+    }
+
+    return Math.floor(damage)
+}
+
+StructureTower.prototype.estimateDamageNet = function(target) {
+
+    let damage = this.estimateDamageGross(target)
+    damage *= target.defenceStrength
+
+    damage -= target.macroHealStrength
+    return Math.floor(damage)
 }

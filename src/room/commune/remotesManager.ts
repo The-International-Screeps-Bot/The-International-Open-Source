@@ -113,7 +113,7 @@ export class RemotesManager {
                 for (const enemyCreep of remote.enemyCreeps) {
                     remoteMemory.data[RemoteData.minDamage] +=
                         enemyCreep.combatStrength.heal + enemyCreep.combatStrength.heal * enemyCreep.defenceStrength ||
-                        Math.max(Math.floor(enemyCreep.hits / 10), 1)
+                        Math.max(Math.floor(enemyCreep.hits / 20), 1)
                     remoteMemory.data[RemoteData.minHeal] += enemyCreep.combatStrength.ranged
                 }
 

@@ -1911,6 +1911,12 @@ declare global {
          */
         readonly macroHealStrength: number
 
+        _reserveHits: number
+        /**
+         * The max possible hits - accounting for nearby healers - subtracted by damage attempts
+         */
+        reserveHits: number
+
         _grossTowerDamage: number
         /**
          * The highest possible tower damage
@@ -2331,7 +2337,11 @@ declare global {
     }
 
     interface StructureTower {
-        intended: boolean
+        estimateDamageGross(target: Structure<BuildableStructureConstant> | Creep): number
+        /**
+         * Accounts for enemy defence and macro heal
+         */
+        estimateDamageNet(target: Creep): number
     }
 
     interface StructureTerminal {

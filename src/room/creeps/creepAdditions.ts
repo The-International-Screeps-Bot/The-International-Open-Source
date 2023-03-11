@@ -1,5 +1,5 @@
 import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
-import { customLog, getRange, getRangeOfCoords } from 'international/utils'
+import { customLog, estimateTowerDamage, getRange, getRangeOfCoords } from 'international/utils'
 import { profiler } from 'other/screeps-profiler'
 
 Object.defineProperties(Creep.prototype, {
@@ -322,7 +322,9 @@ Object.defineProperties(PowerCreep.prototype, {
 
             if (this.room.controller.safeMode) return this._netTowerDamage
 
-            return (this._netTowerDamage -= this.macroHealStrength)
+            this._netTowerDamage -= this.macroHealStrength
+
+            return this._netTowerDamage
         },
     },
     powerCooldowns: {
@@ -345,6 +347,18 @@ Object.defineProperties(PowerCreep.prototype, {
 } as PropertyDescriptorMap & ThisType<PowerCreep>)
 
 const additions = {
+    reserveHits: {
+        get() {
+
+            if (this._reserveHits !== undefined) return this._reserveHits
+
+            return this._reserveHits = this.hits + this.macroHealStrength
+        },
+        set(newHits) {
+
+            this._reserveHits = newHits
+        }
+    },
     grossTowerDamage: {
         get() {
             if (this._grossTowerDamage !== undefined) return this._grossTowerDamage
@@ -355,17 +369,7 @@ const additions = {
                 if (!tower.RCLActionable) continue
                 if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
 
-                let damage = TOWER_POWER_ATTACK
-
-                let range = getRangeOfCoords(this.pos, tower.pos)
-
-                if (range > TOWER_OPTIMAL_RANGE) {
-                    if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
-
-                    damage -=
-                        (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
-                        (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
-                }
+                let damage = estimateTowerDamage(this.pos, tower.pos)
 
                 for (const powerType of towerPowers) {
                     const effect = tower.effectsData.get(powerType) as PowerEffect
