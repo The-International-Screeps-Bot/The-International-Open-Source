@@ -549,9 +549,7 @@ export const stamps: Record<StampTypes, Stamp> = {
     },
 }
 
-export const dynamicStamps = {
-
-}
+export const dynamicStamps = {}
 
 export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_HYDROGEN,
@@ -947,6 +945,11 @@ export enum HaulRequestData {
     timer,
     priority,
     abandon,
+}
+
+export enum NukeRequestData {
+    x,
+    y,
 }
 
 export enum AllyCreepRequestData {

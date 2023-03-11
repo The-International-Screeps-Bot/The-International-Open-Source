@@ -170,8 +170,6 @@ declare global {
         minRCL: number
     }
 
-
-
     interface RampartPlanCoord {
         minRCL: number
         /**
@@ -501,6 +499,14 @@ declare global {
     type CombatRequestTypes = 'attack' | 'harass' | 'defend'
 
     interface ClaimRequest {
+        /**
+         * The name of the room responding to the request
+         */
+        responder?: string
+        data: number[]
+    }
+
+    interface NukeRequest {
         /**
          * The name of the room responding to the request
          */
@@ -855,6 +861,8 @@ declare global {
         combatRequests: { [roomName: string]: CombatRequest }
 
         haulRequests: { [roomName: string]: HaulRequest }
+
+        nukeRequests: { [roomName: string]: NukeRequest }
 
         allyCreepRequests: { [roomName: string]: AllyCreepRequest }
 
@@ -1753,7 +1761,7 @@ declare global {
         }
     }
 
-    interface IdealSquadMembers { }
+    interface IdealSquadMembers {}
 
     interface CreepFunctions {
         preTickManager(): void
