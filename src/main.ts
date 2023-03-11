@@ -83,7 +83,6 @@ const originalLoop = (): void => {
         respawnManager.run()
         configManager.run()
         allyManager.tickConfig()
-        allyManager.getAllyRequests()
         tickConfig.run()
         playerManager.run()
         creepOrganizer.run()

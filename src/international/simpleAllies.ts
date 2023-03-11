@@ -93,7 +93,6 @@ class AllyManager {
         }
         catch (err) {
             customLog('Error in getting requests for simpleAllies', this.currentAlly);
-            this._allyRequests = {}
         }
 
         // Organize requests by type with keys of ID
@@ -115,12 +114,13 @@ class AllyManager {
     tickConfig() {
         if (!Memory.allyTrading) return
 
-        const allyArray = Array.from(Memory.allyPlayers)
-        if (!allyArray.length) return
+        this.myRequests = []
 
-        this.currentAlly = allyArray[Game.time % allyArray.length]
+        if (!Memory.allyPlayers.length) return
 
-        const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]
+        this.currentAlly = Memory.allyPlayers[Game.time % Memory.allyPlayers.length]
+
+        const nextAllyName = Memory.allyPlayers[(Game.time + 1) % Memory.allyPlayers.length]
         RawMemory.setActiveForeignSegment(nextAllyName, Memory.simpleAlliesSegment)
     }
 

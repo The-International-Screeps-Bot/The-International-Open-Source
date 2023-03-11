@@ -101,7 +101,7 @@ export class CombatManager {
 
         // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
 
-        if (!enemyAttackers.length) {
+        if (!enemyAttackers.length || this.communeManager.room.controller.safeMode) {
             if (!Memory.publicRamparts) return
 
             // Stop if the tick is not divisible by a random range

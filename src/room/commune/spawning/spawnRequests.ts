@@ -1108,7 +1108,7 @@ export class SpawnRequestsManager {
                     }
 
                     const rangedAttackAmount =
-                        minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
+                        Math.floor(minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]))
 
                     let minHealCost = 0
 
@@ -1118,7 +1118,7 @@ export class SpawnRequestsManager {
                             (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]
                     }
 
-                    const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
+                    const healAmount = Math.floor(minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
                     if ((rangedAttackAmount + healAmount) * 2 > 50) {
                         Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
@@ -1385,7 +1385,7 @@ export class SpawnRequestsManager {
     }
 
     private antifa() {
-        let priority = 8
+        let priority = this.minRemotePriority
 
         for (let i = this.communeManager.room.memory.combatRequests.length - 1; i >= 0; i -= 1) {
             const requestName = Memory.rooms[this.communeManager.room.name].combatRequests[i]
@@ -1395,7 +1395,7 @@ export class SpawnRequestsManager {
 
             if (request.data[CombatRequestData.abandon] > 0) continue
 
-            priority += 0.01
+            priority -= 0.01
 
             //
 

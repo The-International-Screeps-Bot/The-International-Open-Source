@@ -95,9 +95,9 @@ export class SpawningStructuresManager {
         if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
             customLog(
                 'Failed to spawn',
-                `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
+                `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${request.cost} / ${
                     this.communeManager.nextSpawnEnergyAvailable
-                } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
+                }, body: ${JSON.stringify(request.bodyPartCounts)}`,
                 {
                     textColor: customColors.white,
                     bgColor: customColors.red,
