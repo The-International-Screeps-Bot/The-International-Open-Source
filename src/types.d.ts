@@ -2337,7 +2337,7 @@ declare global {
     }
 
     interface StructureTower {
-        estimateDamageGross(target: Structure<BuildableStructureConstant> | Creep): number
+        estimateDamageGross(targetCoord: Coord): number
         /**
          * Accounts for enemy defence and macro heal
          */

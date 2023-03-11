@@ -255,12 +255,9 @@ export class TowerManager {
     }
 }
 
-StructureTower.prototype.estimateDamageGross = function(target) {
+StructureTower.prototype.estimateDamageGross = function(targetCoord) {
 
-    if (!this.RCLActionable) return 0
-    if (this.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) return 0
-
-    let damage = estimateTowerDamage(this.pos, target.pos)
+    let damage = estimateTowerDamage(this.pos, targetCoord)
 
     for (const powerType of towerPowers) {
         const effect = this.effectsData.get(powerType) as PowerEffect
@@ -274,7 +271,7 @@ StructureTower.prototype.estimateDamageGross = function(target) {
 
 StructureTower.prototype.estimateDamageNet = function(target) {
 
-    let damage = this.estimateDamageGross(target)
+    let damage = this.estimateDamageGross(target.pos)
     damage *= target.defenceStrength
 
     damage -= target.macroHealStrength

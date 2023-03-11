@@ -811,6 +811,48 @@ export class SpawnRequestsManager {
                         }
                     }
 
+                    if (this.spawnEnergyCapacity >= 1400) {
+                        // If the controller is near to downgrading, set partsMultiplier to x
+
+                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                            partsMultiplier = Math.max(partsMultiplier, 12)
+
+                        partsMultiplier = Math.round(partsMultiplier / 12)
+                        if (partsMultiplier === 0) return false
+
+                        return {
+                            role,
+                            defaultParts: [],
+                            extraParts: [
+                                MOVE,
+                                CARRY,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                MOVE,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                MOVE,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                            ],
+                            partsMultiplier,
+                            threshold,
+                            minCreeps: undefined,
+                            maxCreeps,
+                            minCost: 200,
+                            priority,
+                            memoryAdditions: {
+                                R: true,
+                            },
+                        }
+                    }
+
                     if (this.spawnEnergyCapacity >= 1000) {
                         // If the controller is near to downgrading, set partsMultiplier to x
 
@@ -1107,8 +1149,9 @@ export class SpawnRequestsManager {
                             (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
                     }
 
-                    const rangedAttackAmount =
-                        Math.floor(minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]))
+                    const rangedAttackAmount = Math.floor(
+                        minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
+                    )
 
                     let minHealCost = 0
 
@@ -1475,7 +1518,7 @@ export class SpawnRequestsManager {
                             const tradeType = tradeTypes[partType]
                             const ratio = tradeType.amount / totalTradeableParts
 
-                            let localTradeAmount = Math.ceil(tradeType.amount * ratio * 1.5)
+                            let localTradeAmount = Math.ceil(tradeType.amount * ratio /*  * 1.5 */)
                             if (localTradeAmount >= tradeAmount) continue
 
                             function findCost() {

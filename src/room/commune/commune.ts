@@ -222,7 +222,8 @@ export class CommuneManager {
         room.defenderEnemyTargetsWithDamage = new Map()
         room.defenderEnemyTargetsWithDefender = new Map()
 
-        if (this.room.terminal && this.room.controller.level >= 6) internationalManager.terminalCommunes.push(this.room.name)
+        if (this.room.terminal && this.room.controller.level >= 6)
+            internationalManager.terminalCommunes.push(this.room.name)
     }
 
     public run() {
@@ -270,8 +271,6 @@ export class CommuneManager {
     }
 
     private preTickTest() {
-
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -417,9 +416,11 @@ export class CommuneManager {
     get maxCombatRequests() {
         if (this._maxCombatRequests !== undefined) return this._maxCombatRequests
 
-        return (this._maxCombatRequests =
+        /* return (this._maxCombatRequests =
             (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
-            (5000 + this.room.controller.level * 1000))
+            (5000 + this.room.controller.level * 1000)) */
+        return (this._maxCombatRequests =
+            this.room.resourcesInStoringStructures.energy / (10000 + this.room.controller.level * 3000))
     }
 
     /**
@@ -438,7 +439,6 @@ export class CommuneManager {
 
     _maxUpgradeStrength: number
     get maxUpgradeStrength() {
-
         if (this._maxUpgradeStrength !== undefined) return this._maxUpgradeStrength
 
         const upgradeStructure = this.upgradeStructure
@@ -447,8 +447,7 @@ export class CommuneManager {
         // Container
 
         if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
-
-            return this._maxUpgradeStrength = upgradeStructure.store.getCapacity() / (4 + this.room.upgradePathLength)
+            return (this._maxUpgradeStrength = upgradeStructure.store.getCapacity() / (4 + this.room.upgradePathLength))
         }
 
         // Link
@@ -461,7 +460,6 @@ export class CommuneManager {
         this._maxUpgradeStrength = 0
 
         if (hubLink && hubLink.RCLActionable) {
-
             const range = getRangeOfCoords(upgradeStructure.pos, hubLink.pos)
 
             // Increase strength by throughput
@@ -478,8 +476,7 @@ export class CommuneManager {
 
             // Increase strength by throughput
 
-            this._maxUpgradeStrength +=
-                findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
+            this._maxUpgradeStrength += findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
         }
 
         return this._maxUpgradeStrength
@@ -489,8 +486,7 @@ export class CommuneManager {
      * The max upgrade strength when we have no local storing structure
      */
     findNudeMaxUpgradeStrength() {
-
-        return this._maxUpgradeStrength = 100
+        return (this._maxUpgradeStrength = 100)
     }
 
     _upgradeStructure: AnyStoreStructure | false
@@ -500,13 +496,12 @@ export class CommuneManager {
         // We can't use a structure
 
         const controllerLevel = this.room.controller.level
-        if (controllerLevel < 2) return this._upgradeStructure = false
+        if (controllerLevel < 2) return (this._upgradeStructure = false)
 
         // We can use containers
 
         if (controllerLevel < 5) {
-
-            return this._upgradeStructure = this.room.controllerContainer
+            return (this._upgradeStructure = this.room.controllerContainer)
         }
 
         // We can use links
@@ -517,6 +512,6 @@ export class CommuneManager {
         const hubLink = this.room.hubLink
         if (!hubLink || !hubLink.RCLActionable) return false
 
-        return this._upgradeStructure = controllerLink
+        return (this._upgradeStructure = controllerLink)
     }
 }

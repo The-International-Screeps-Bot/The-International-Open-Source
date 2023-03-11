@@ -132,8 +132,6 @@ export class LabManager {
         [RESOURCE_CATALYZED_GHODIUM_ACID]: 10000,
     }
 
-    deficits: { [key in MineralConstant | MineralCompoundConstant]?: number } = {}
-
     communeManager: CommuneManager
     outputResource: MineralConstant | MineralCompoundConstant
     inputResources: (MineralConstant | MineralCompoundConstant)[] = []
@@ -344,7 +342,7 @@ export class LabManager {
             )
         }
 
-        this.updateDeficits()
+        if (randomTick(100)) delete this._deficits
         this.setCurrentReaction()
         this.createRoomLogisticsRequests()
 
@@ -466,17 +464,17 @@ export class LabManager {
         }
     }
 
+    _deficits: { [key in MineralConstant | MineralCompoundConstant]?: number }
     /**
      * Figures out what we have
      */
-    private updateDeficits() {
-        // We don't need to update this super often, so save CPU, this is midly expensive.
+    get deficits() {
 
-        if (!randomTick()) return
+        if (this._deficits) return this._deficits
 
-        this.deficits = {}
+        this._deficits = {}
         for (const key of allCompounds) {
-            this.deficits[key as MineralConstant | MineralCompoundConstant] = -this.resourceAmount(
+            this._deficits[key as MineralConstant | MineralCompoundConstant] = -this.resourceAmount(
                 key as MineralConstant | MineralCompoundConstant,
             )
         }
@@ -486,9 +484,11 @@ export class LabManager {
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
         }
 
-        for (const key in this.deficits) {
-            Math.max(this.deficits[key as MineralConstant | MineralCompoundConstant], 0)
+        for (const key in this._deficits) {
+            Math.max(this._deficits[key as MineralConstant | MineralCompoundConstant], 0)
         }
+
+        return this._deficits
     }
 
     /**

@@ -70,7 +70,8 @@ export class Antifa extends Creep {
         if (this.squadRan) return true
 
         if (!this.findSquad()) {
-            if (Memory.combatRequests[this.memory.CRN]) this.activeRenew()
+            const request = Memory.combatRequests[this.memory.CRN]
+            if (request && request.responder === this.room.name) this.activeRenew()
             return true
         }
 

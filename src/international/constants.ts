@@ -789,6 +789,87 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
             return 0
         },
     },
+    // Boosts
+    [RESOURCE_UTRIUM_HYDRIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_UTRIUM_HYDRIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_KEANIUM_HYDRIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_KEANIUM_OXIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_LEMERGIUM_HYDRIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_LEMERGIUM_OXIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_ZYNTHIUM_HYDRIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_ZYNTHIUM_OXIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_GHODIUM_HYDRIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
+    [RESOURCE_GHODIUM_OXIDE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
 }
 
 export enum PlayerData {

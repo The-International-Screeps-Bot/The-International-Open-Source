@@ -369,16 +369,7 @@ const additions = {
                 if (!tower.RCLActionable) continue
                 if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
 
-                let damage = estimateTowerDamage(this.pos, tower.pos)
-
-                for (const powerType of towerPowers) {
-                    const effect = tower.effectsData.get(powerType) as PowerEffect
-                    if (!effect) continue
-
-                    damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
-                }
-
-                this._grossTowerDamage += Math.floor(damage)
+                this._grossTowerDamage = tower.estimateDamageGross(this.pos)
             }
 
             return this._grossTowerDamage
