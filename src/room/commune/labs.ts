@@ -561,7 +561,7 @@ export class LabManager {
     ): { type: MineralCompoundConstant; amount: number } {
         const nextReaction = target
         let missing = decompose(nextReaction).filter(
-            r => this.resourceAmount(r) * (0.25 + 0.05 * this.outputLabs.length) < targetAmount,
+            r => this.resourceAmount(r) < targetAmount * (0.25 + 0.05 * this.outputLabs.length),
         )
 
         console.log(target + ':' + targetAmount + ' missing: ' + JSON.stringify(missing))
@@ -588,7 +588,7 @@ export class LabManager {
             ),
             v => -this.deficits[v as MineralConstant | MineralCompoundConstant],
         )
-        console.log(JSON.stringify(this.deficits))
+        console.log(this.communeManager.room.name, JSON.stringify(this.deficits))
         for (const resource of resources) {
             const result = this.chainFindNextReaction(
                 resource as MineralConstant | MineralCompoundConstant,
