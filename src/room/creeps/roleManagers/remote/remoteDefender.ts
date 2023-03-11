@@ -328,7 +328,6 @@ export class RemoteDefender extends Creep {
                     enemyRemote: Infinity,
                     allyRemote: Infinity,
                 },
-                avoidAbandonedRemotes: true,
             })
         }
     }

@@ -15,7 +15,7 @@ export class HaulerNeedManager {
         this.controllerNeed()
 
         room.haulerNeed += findCarryPartsRequired(room.mineralPath.length + 3, room.mineralHarvestStrength * 1.1)
-        room.haulerNeed += room.structures.lab.length / 1.5
+        room.haulerNeed += room.structures.lab.length
 
         const extensions = room.structures.extension.length - stamps.fastFiller.structures.extension.length
         if (extensions > 0) room.structures.extension.length / 4
@@ -23,7 +23,7 @@ export class HaulerNeedManager {
         /* room.haulerNeed += room.structures.extension.length / 10 */
 
         if ((room.controller.level >= 4 && room.storage) || (room.terminal && room.controller.level >= 6))
-            room.haulerNeed += Memory.stats.rooms[room.name].eosp / 15
+            room.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
 
         room.haulerNeed = Math.round(room.haulerNeed)
     }
