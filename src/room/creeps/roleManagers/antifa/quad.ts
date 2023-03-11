@@ -21,6 +21,7 @@ import {
     getRangeOfCoords,
     isCoordExit,
     isXYExit,
+    packAsNum,
 } from 'international/utils'
 import { find, transform } from 'lodash'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
@@ -63,12 +64,12 @@ export class Quad {
         return this._combatStrength
     }
 
-    _enemyThreatCoords: Set<string>
+    _enemyThreatCoords: Uint8Array
 
     get enemyThreatCoords() {
         if (this._enemyThreatCoords) return this._enemyThreatCoords
 
-        this._enemyThreatCoords = new Set()
+        this._enemyThreatCoords = new Uint8Array(2500)
 
         const enemyAttackers: Creep[] = []
         const enemyRangedAttackers: Creep[] = []
@@ -105,7 +106,7 @@ export class Quad {
                 enemyAttacker.pos.y + 2,
             )
 
-            for (const coord of coords) this._enemyThreatCoords.add(packCoord(coord))
+            for (const coord of coords) this._enemyThreatCoords[packAsNum(coord)]
         }
 
         for (const enemyAttacker of enemyRangedAttackers) {
@@ -118,15 +119,15 @@ export class Quad {
                 enemyAttacker.pos.y + 3,
             )
 
-            for (const coord of coords) this._enemyThreatCoords.add(packCoord(coord))
+            for (const coord of coords) this._enemyThreatCoords[packAsNum(coord)]
         }
-
+        /*
         for (const packedCoord of this._enemyThreatCoords) {
             const coord = unpackCoord(packedCoord)
 
             this.leader.room.visual.circle(coord.x, coord.y, { fill: customColors.red })
         }
-
+ */
         return this._enemyThreatCoords
     }
 
@@ -942,7 +943,7 @@ export class Quad {
         if (!this.willMove) return
 
         for (const member of this.members) {
-            if (!this.enemyThreatCoords.has(packCoord(member.pos))) continue
+            if (!this.enemyThreatCoords[packAsNum(member.pos)]) continue
 
             this.leader.room.errorVisual(member.pos, true)
             this.createMoveRequest(
