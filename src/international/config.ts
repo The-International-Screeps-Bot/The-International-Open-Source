@@ -56,6 +56,8 @@ class ConfigManager {
         Memory.players = {}
         Memory.claimRequests = {}
         Memory.combatRequests = {}
+        Memory.haulRequests = {}
+        Memory.nukeRequests = {}
         Memory.allyCreepRequests = {}
         statsManager.internationalConfig()
     }
