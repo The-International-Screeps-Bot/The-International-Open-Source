@@ -1,5 +1,5 @@
 import { minerals, RESULT_ACTION, RESULT_NO_ACTION, terminalResourceTargets } from 'international/constants'
-import { customLog, findLargestTransactionAmount, newID } from 'international/utils'
+import { customLog, findLargestTransactionAmount, newID, roundToDecimals } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequest, AllyRequestTypes } from 'international/simpleAllies'
 import { internationalManager } from 'international/international'
@@ -71,7 +71,7 @@ export class TerminalManager {
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)
-            const priority = 1 - storedResourceAmount / targetAmount
+            const priority = roundToDecimals(1 - storedResourceAmount / targetAmount, 2)
             const amount = Math.min(targetAmount - storedResourceAmount, terminal.store.getFreeCapacity())
 
             // If we have allies to trade with, alternate requesting eveyr tick

@@ -1518,7 +1518,7 @@ export class SpawnRequestsManager {
                             const tradeType = tradeTypes[partType]
                             const ratio = tradeType.amount / totalTradeableParts
 
-                            let localTradeAmount = Math.ceil(tradeType.amount * ratio /*  * 1.5 */)
+                            let localTradeAmount = Math.ceil(tradeType.amount * ratio * 0.75)
                             if (localTradeAmount >= tradeAmount) continue
 
                             function findCost() {

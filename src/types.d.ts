@@ -1639,6 +1639,11 @@ declare global {
         haulRequests: string[]
 
         /**
+         * Nuke Request, the name of request the room is responding to
+         */
+        NR: string
+
+        /**
          * The room name of the room's ally creep target
          */
         allyCreepRequest: string

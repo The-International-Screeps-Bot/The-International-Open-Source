@@ -619,7 +619,7 @@ export class RoomVisualsManager {
                 roomStats.eoro.toFixed(2),
                 roomStats.eorwr.toFixed(2),
                 this.roomManager.room.towerInferiority || 'false',
-                roomStats.su.toFixed(2) + '%',
+                Math.floor(roomStats.su * 100) + '%',
             ],
         ]
 
