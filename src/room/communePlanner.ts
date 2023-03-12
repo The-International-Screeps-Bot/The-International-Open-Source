@@ -53,6 +53,8 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { minCutToExit } from './construction/minCut'
 
+const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 2
+
 interface PlanStampsArgs {
     stampType: StampTypes
     count: number
@@ -110,6 +112,12 @@ export class CommunePlanner {
     mineralPath: RoomPosition[]
     mineralHarvestCoord: Coord
 
+    // Action checks
+
+    proctedSources: boolean
+
+    //
+
     terrainCoords: CoordMap
     packedExitCoords: Set<string>
     exitCoords: Coord[]
@@ -138,6 +146,10 @@ export class CommunePlanner {
      * Coords protected by ramparts
      */
     protectedCoords: Uint8Array
+    /**
+     * Coords outside of rampart protection or in range of defensive combat areas
+     */
+    unprotectedCoords: Uint8Array
     basePlans: BasePlans
     rampartPlans: RampartPlans
     stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
@@ -241,12 +253,16 @@ export class CommunePlanner {
         this.powerSpawn()
         this.observer()
         this.planGridCoords()
+        this.planMineralStructure()
         this.planSourceStructures()
         this.runMinCut()
         this.towers()
         this.groupMinCutCoords()
+        this.findUnprotectedCoords()
         this.onboardingRamparts()
+        this.protectSources()
         this.visualize()
+        /* this.visualizeGrid() */
 
         return RESULT_SUCCESS
     }
@@ -266,13 +282,9 @@ export class CommunePlanner {
             const coord = unpackCoord(packedCoord)
             const plansCoord = this.basePlans.map[packedCoord]
 
+            if (plansCoord.structureType !== STRUCTURE_ROAD) continue
+
             this.room.visual.structure(coord.x, coord.y, plansCoord.structureType)
-        }
-
-        for (const packedCoord in this.rampartPlans.map) {
-            const coord = unpackCoord(packedCoord)
-
-            this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART)
         }
 
         /* this.room.visualizeCoordMap(this.reverseExitFlood) */
@@ -280,8 +292,23 @@ export class CommunePlanner {
         /* this.room.visualizeCoordMap(this.baseCoords, true) */
 
         this.room.visual.connectRoads({
-            opacity: 0.7,
+            opacity: 1,
         })
+
+        for (const packedCoord in this.basePlans.map) {
+            const coord = unpackCoord(packedCoord)
+            const plansCoord = this.basePlans.map[packedCoord]
+
+            if (plansCoord.structureType === STRUCTURE_ROAD) continue
+
+            this.room.visual.structure(coord.x, coord.y, plansCoord.structureType)
+        }
+
+        for (const packedCoord in this.rampartPlans.map) {
+            const coord = unpackCoord(packedCoord)
+
+            this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.5 })
+        }
 
         this.room.coordVisual(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, customColors.orange)
         this.room.coordVisual(this.input2Coord.x, this.input2Coord.y, customColors.orange)
@@ -376,7 +403,7 @@ export class CommunePlanner {
                     this.weightedDiagonalCoords[packedCoord] = 8 * defaultSwampCost
                     continue
                 }
-                this.diagonalCoords[packedCoord] = 3
+                this.diagonalCoords[packedCoord] = 4
                 this.weightedDiagonalCoords[packedCoord] = 8
             }
         }
@@ -490,8 +517,8 @@ export class CommunePlanner {
                 origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
                 weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords, this.baseCoords],
-                plainCost: defaultRoadPlanningPlainCost * 8,
-                swampCost: defaultSwampCost * 8,
+                plainCost: defaultRoadPlanningPlainCost * 6,
+                swampCost: defaultSwampCost * 6,
             })
 
             // If the path failed, delete all members of the group
@@ -505,7 +532,6 @@ export class CommunePlanner {
 
             for (const coord of path) {
                 if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_SWAMP) {
-
                     this.gridCoords[packAsNum(coord)] = 2 * defaultSwampCost
                     continue
                 }
@@ -564,8 +590,8 @@ export class CommunePlanner {
                 origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
                 weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords],
-                plainCost: defaultRoadPlanningPlainCost * 8,
-                swampCost: defaultSwampCost * 8,
+                plainCost: defaultRoadPlanningPlainCost * 6,
+                swampCost: defaultSwampCost * 6,
             })
 
             for (const coord of path) {
@@ -573,7 +599,6 @@ export class CommunePlanner {
                 if (this.baseCoords[packedCoord] === 255) continue
 
                 if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_SWAMP) {
-
                     this.gridCoords[packAsNum(coord)] = 2 * defaultSwampCost
                     continue
                 }
@@ -729,7 +754,7 @@ export class CommunePlanner {
         )
         const sourcePaths: RoomPosition[][] = []
 
-        for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
+        for (let i = this.sourceHarvestPositions.length - 1; i >= 0; i -= 1) {
             // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
             // Loop through each pos index
 
@@ -844,7 +869,8 @@ export class CommunePlanner {
 
                 const packedCoord = packAsNum(adjCoord)
                 if (this.baseCoords[packedCoord] === 255) continue
-                if (this.gridCoords[packedCoord] > 0) continue
+                if (this.roadCoords[packedCoord] > 0) continue
+                /* if (this.gridCoords[packedCoord] > 0) continue */
 
                 packedAdjCoords.add(packAsNum(adjCoord))
 
@@ -872,6 +898,7 @@ export class CommunePlanner {
         this.stampAnchors.sourceLink = sourceLinkCoords
         this.stampAnchors.sourceExtension = sourceExtensionCoords
     }
+    private planMineralStructure() {}
     private planSourceStructures() {
         if (this.basePlans.getXY(this.stampAnchors.sourceLink[0].x, this.stampAnchors.sourceLink[0].y)) return
 
@@ -1343,83 +1370,96 @@ export class CommunePlanner {
         let visitedCoords = new Uint8Array(2500)
         for (const coord of args.startCoords) visitedCoords[packAsNum(coord)] = 1
 
+        let fromOrigin = new Uint8Array(2500)
+        let lowestNextGenCost = Infinity
         let thisGeneration = args.startCoords
         let nextGeneration: Coord[]
 
         while (thisGeneration.length) {
             nextGeneration = []
+            let lowestGenCost = lowestNextGenCost
+            lowestNextGenCost = Infinity
 
             let localVisitedCoords = new Uint8Array(visitedCoords)
 
-            // Flood all adjacent positions
+            // Flood adjacent coords that are passible
 
-            if (!nextGeneration.length) {
-                localVisitedCoords = new Uint8Array(visitedCoords)
+            for (const coord of thisGeneration) {
+                const packedCoord = packAsNum(coord)
+                const coordCostFromOrigin = fromOrigin[packedCoord]
+                const coordCost = args.coordMap[packedCoord] + coordCostFromOrigin
 
-                // Iterate through positions of this gen
+                if (coordCost > lowestGenCost) {
+                    nextGeneration.push(coord)
+                    continue
+                }
 
-                for (const coord1 of thisGeneration) {
-                    const coord1Weight = args.coordMap[packAsNum(coord1)]
-                    if (coord1Weight > 0) {
-                        if (coord1Weight === 255) continue
+                if (this.isViableDynamicStampAnchor(args, coord)) return coord
 
-                        args.coordMap[packAsNum(coord1)] -= 1
-                        nextGeneration.push(coord1)
-                        continue
+                // Add viable adjacent coords to the next generation
+
+                for (const offset of adjacentOffsets) {
+                    const adjCoord = {
+                        x: coord.x + offset.x,
+                        y: coord.y + offset.y,
                     }
 
-                    if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
+                    if (!isXYInRoom(coord.x, coord.y)) continue
 
-                    // Add viable adjacent coords to the next generation
+                    const packedAdjCoord = packAsNum(adjCoord)
 
-                    for (const offset of adjacentOffsets) {
-                        const coord2 = {
-                            x: coord1.x + offset.x,
-                            y: coord1.y + offset.y,
-                        }
+                    if (localVisitedCoords[packedAdjCoord] === 1) continue
+                    localVisitedCoords[packedAdjCoord] = 1
 
-                        if (!isXYInRoom(coord2.x, coord2.y)) continue
+                    if (this.baseCoords[packedAdjCoord] === 255) continue
 
-                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
-                        localVisitedCoords[packAsNum(coord2)] = 1
+                    nextGeneration.push(adjCoord)
 
-                        if (this.baseCoords[packAsNum(coord2)] === 255) continue
+                    const adjCostFromOrigin = (fromOrigin[packedAdjCoord] = coordCostFromOrigin + 1)
+                    const adjCoordCost = args.coordMap[packedAdjCoord] + adjCostFromOrigin
 
-                        nextGeneration.push(coord2)
-                    }
+                    if (adjCoordCost < lowestNextGenCost) lowestNextGenCost = adjCoordCost
                 }
             }
 
-            // Flood all adjacent positions, including diagonals
+            // Flood all adjacent coords
 
             if (!nextGeneration.length) {
                 localVisitedCoords = new Uint8Array(visitedCoords)
 
-                // Iterate through positions of this gen
+                for (const coord of thisGeneration) {
+                    const packedCoord = packAsNum(coord)
+                    const coordCostFromOrigin = fromOrigin[packedCoord]
+                    const coordCost = args.coordMap[packedCoord] + coordCostFromOrigin
 
-                for (const coord1 of thisGeneration) {
-                    const coord1Weight = args.coordMap[packAsNum(coord1)]
-                    if (coord1Weight > 0 && coord1Weight !== 255) {
-                        args.coordMap[packAsNum(coord1)] -= 1
-                        nextGeneration.push(coord1)
+                    if (coordCost > lowestGenCost) {
+                        nextGeneration.push(coord)
+                        continue
                     }
 
-                    if (this.isViableDynamicStampAnchor(args, coord1)) return coord1
+                    if (this.isViableDynamicStampAnchor(args, coord)) return coord
 
                     // Add viable adjacent coords to the next generation
 
                     for (const offset of adjacentOffsets) {
-                        const coord2 = {
-                            x: coord1.x + offset.x,
-                            y: coord1.y + offset.y,
+                        const adjCoord = {
+                            x: coord.x + offset.x,
+                            y: coord.y + offset.y,
                         }
 
-                        if (!isXYInRoom(coord2.x, coord2.y)) continue
+                        if (!isXYInRoom(coord.x, coord.y)) continue
 
-                        if (localVisitedCoords[packAsNum(coord2)] === 1) continue
-                        localVisitedCoords[packAsNum(coord2)] = 1
+                        const packedAdjCoord = packAsNum(adjCoord)
 
-                        nextGeneration.push(coord2)
+                        if (localVisitedCoords[packedAdjCoord] === 1) continue
+                        localVisitedCoords[packedAdjCoord] = 1
+
+                        nextGeneration.push(adjCoord)
+
+                        const adjCostFromOrigin = (fromOrigin[packedAdjCoord] = coordCostFromOrigin + 1)
+                        const adjCoordCost = args.coordMap[packedAdjCoord] + adjCostFromOrigin
+
+                        if (adjCoordCost < lowestNextGenCost) lowestNextGenCost = adjCoordCost
                     }
                 }
             }
@@ -1934,6 +1974,35 @@ export class CommunePlanner {
             }
         }
 
+        const hubAnchor = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const fastFillerAnchor = new RoomPosition(
+            this.stampAnchors.fastFiller[0].x,
+            this.stampAnchors.fastFiller[0].y,
+            this.room.name,
+        )
+
+        let path = this.room.advancedFindPath({
+            origin: hubAnchor,
+            goals: [
+                {
+                    pos: fastFillerAnchor,
+                    range: 3,
+                },
+            ],
+            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost * 2,
+            swampCost: defaultSwampCost * 2,
+        })
+
+        for (const pos of path) {
+            for (const adjCoord of findCoordsInRange(pos, 3)) {
+                const adjPackedCoord = packAsNum(adjCoord)
+                if (this.terrainCoords[adjPackedCoord] > 0) continue
+
+                protectionCoords.add(adjPackedCoord)
+            }
+        }
+
         // Prune protection coords not contigious with fastFiller anchor group
 
         const startCoords = this.stampAnchors.fastFiller
@@ -2002,7 +2071,6 @@ export class CommunePlanner {
             // Flood all adjacent positions
 
             if (!nextGeneration.length) {
-                console.log(depth)
                 // Iterate through positions of this gen
 
                 for (const coord1 of thisGeneration) {
@@ -2040,12 +2108,14 @@ export class CommunePlanner {
         const minCutCoords: Set<number> = new Set()
 
         for (const coord of result) {
+            const packedCoord = packAsNum(coord)
+            this.rampartCoords[packedCoord] = 1
+            minCutCoords.add(packAsNum(coord))
+
             this.stampAnchors.minCutRampart.push(coord)
             this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
             this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, false)
-            minCutCoords.add(packAsNum(coord))
         }
-
         /*
         for (const coord of contigiousProtectionCoords) this.room.coordVisual(coord.x, coord.y)
         for (const packedCoord of minCutCoords) {
@@ -2053,7 +2123,6 @@ export class CommunePlanner {
             this.room.coordVisual(coord.x, coord.y, customColors.green)
         }
  */
-
         this.minCutCoords = minCutCoords
     }
     private groupMinCutCoords() {
@@ -2141,8 +2210,79 @@ export class CommunePlanner {
 
         this.groupedMinCutCoords = groupedMinCutCoords
     }
+    /**
+     * Flood fill from exits, recording coords that aren't procted
+     */
+    private findUnprotectedCoords() {
+        if (this.unprotectedCoords) return
+
+        const unprotectedCoords = new Uint8Array(2500)
+
+        let visitedCoords = new Uint8Array(2500)
+        for (const coord of this.exitCoords) visitedCoords[packAsNum(coord)] = 1
+
+        let thisGeneration = this.exitCoords
+        let nextGeneration: Coord[]
+
+        while (thisGeneration.length) {
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const coord of thisGeneration) {
+                // Add viable adjacent coords to the next generation
+
+                for (const offset of adjacentOffsets) {
+                    const adjCoord = {
+                        x: coord.x + offset.x,
+                        y: coord.y + offset.y,
+                    }
+
+                    if (!isXYInRoom(adjCoord.x, adjCoord.y)) continue
+
+                    const packedAdjCoord = packAsNum(adjCoord)
+
+                    if (visitedCoords[packedAdjCoord] === 1) continue
+                    visitedCoords[packedAdjCoord] = 1
+
+                    // We have hit a barrier
+
+                    if (this.terrainCoords[packedAdjCoord] === 255) continue
+                    if (this.minCutCoords.has(packedAdjCoord)) continue
+
+                    unprotectedCoords[packedAdjCoord] = 255
+                    nextGeneration.push(adjCoord)
+                }
+            }
+
+            // Set up for next generation
+
+            thisGeneration = nextGeneration
+        }
+
+        // Weight coords near ramparts that could be ranged attacked
+
+        for (const packedCoord of this.minCutCoords) {
+            for (const adjCoord of findCoordsInRange(unpackNumAsCoord(packedCoord), 2)) {
+                const packedAdjCoord = packAsNum(adjCoord)
+                if (this.terrainCoords[packedAdjCoord] > 0) continue
+                if (this.minCutCoords.has(packedAdjCoord)) continue
+
+                const currentWeight = unprotectedCoords[packedAdjCoord]
+
+                if (this.roadCoords[packedAdjCoord] === 1) {
+                    unprotectedCoords[packedAdjCoord] = Math.max(unprotectedCoordWeight - 1, currentWeight)
+                    continue
+                }
+
+                unprotectedCoords[packedAdjCoord] = Math.max(unprotectedCoordWeight, currentWeight)
+            }
+        }
+
+        this.unprotectedCoords = unprotectedCoords
+    }
     private onboardingRamparts() {
-        if (this.stampAnchors.onboardingRampart.length) return
+        /* if (this.stampAnchors.onboardingRampart.length) return */
 
         const onboardingCoords: Set<number> = new Set()
         const origin = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
@@ -2155,9 +2295,14 @@ export class CommunePlanner {
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
                 goals: [{ pos: origin, range: 2 }],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
-                plainCost: defaultRoadPlanningPlainCost * 2,
-                swampCost: defaultSwampCost * 2,
+                weightCoordMaps: [
+                    this.diagonalCoords,
+                    this.roadCoords,
+                    this.rampartCoords,
+                    this.unprotectedCoords,
+                ],
+                plainCost: defaultRoadPlanningPlainCost,
+                swampCost: defaultSwampCost,
             })
 
             // Loop through positions of the path
@@ -2201,5 +2346,24 @@ export class CommunePlanner {
         this.stampAnchors.onboardingRampart = Array.from(onboardingCoords).map(packedCoord =>
             unpackNumAsCoord(packedCoord),
         )
+    }
+    private protectFromNuke(coord: Coord, minRCL: number) {}
+    private shield(coord: Coord, minRCL: number) {
+        const packedCoord = packAsNum(coord)
+        if (this.unprotectedCoords[packedCoord] === 0) return
+
+        this.rampartPlans.setXY(coord.x, coord.y, 4, true, false, false)
+        this.stampAnchors.shieldRampart.push(coord)
+        this.unprotectedCoords[packedCoord] = 0
+    }
+    private protectSources() {
+        if (this.proctedSources) return
+
+        for (const coord of this.stampAnchors.sourceExtension) this.shield(coord, 4)
+        for (const coord of this.stampAnchors.sourceLink) this.shield(coord, 4)
+        for (const sourceIndex in this.sourceHarvestPositions)
+            this.shield(this.sourceHarvestPositions[sourceIndex][0], 4)
+
+        this.proctedSources = true
     }
 }

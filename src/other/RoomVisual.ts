@@ -375,8 +375,7 @@ RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
             this.roads.push([x, y])
             break
         case STRUCTURE_RAMPART:
-            this.circle(x, y, {
-                radius: 0.5,
+            this.rect(x - 0.5, y - 0.5, 1, 1, {
                 fill: 'rgb(78, 104, 79)',
                 stroke: 'rgb(106, 180, 107)',
                 strokeWidth: 0.12,

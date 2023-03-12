@@ -321,7 +321,7 @@ export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
 export const stamps: Record<StampTypes, Stamp> = {
     fastFiller: {
         offset: 3,
-        protectionOffset: 7,
+        protectionOffset: 6,
         size: 4,
         structures: {
             extension: [
@@ -1176,8 +1176,8 @@ const allowedSquadCombinations: { [squadSize: string]: Partial<Record<CreepRoles
 export { allowedSquadCombinations }
 
 export const defaultPlainCost = 1
-export const defaultRoadPlanningPlainCost = 2
-export const defaultSwampCost = 3
+export const defaultRoadPlanningPlainCost = 3
+export const defaultSwampCost = 5
 export const defaultCreepSwampCost = 8
 
 export const quadAttackMemberOffsets = [
@@ -1469,7 +1469,7 @@ export const adjacentOffsets = [
         y: 0,
     },
 ]
-export const defaultMinCutDepth = 4
+export const defaultMinCutDepth = 7
 /* export const defaultMineralPriority = {
     [H]:
 }

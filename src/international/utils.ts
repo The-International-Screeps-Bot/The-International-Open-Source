@@ -53,7 +53,7 @@ export function doesCoordExist(coord: Coord) {
 }
 
 /**
- * Takes a rectange and returns the positions inside of it in an array
+ * Takes a rectange and returns the coords inside of it in an array
  */
 export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: number) {
     const coords: Coord[] = []
@@ -74,7 +74,7 @@ export function findCoordsInsideRect(x1: number, y1: number, x2: number, y2: num
 }
 
 /**
- * Takes a coord and returns the positions inside of it in an array
+ * Takes a coord and returns the coords inside of it in an array
  */
 export function findCoordsInRangeXY(startX: number, startY: number, range: number) {
     const coords: Coord[] = []

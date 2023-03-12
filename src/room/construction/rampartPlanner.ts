@@ -68,9 +68,12 @@ export class RampartPlanner {
         let y = 1
 
         for (; y < roomDimensions - 1; y += 1) {
-            if (this.communeManager.room.tileCoords[packXYAsNum(0, y - 1)] === EXIT) this.communeManager.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
-            if (this.communeManager.room.tileCoords[packXYAsNum(0, y)] === EXIT) this.communeManager.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
-            if (this.communeManager.room.tileCoords[packXYAsNum(0, y + 1)] === EXIT) this.communeManager.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (this.communeManager.room.tileCoords[packXYAsNum(0, y - 1)] === EXIT)
+                this.communeManager.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (this.communeManager.room.tileCoords[packXYAsNum(0, y)] === EXIT)
+                this.communeManager.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
+            if (this.communeManager.room.tileCoords[packXYAsNum(0, y + 1)] === EXIT)
+                this.communeManager.room.tileCoords[packXYAsNum(1, y)] = TO_EXIT
 
             if (this.communeManager.room.tileCoords[packXYAsNum(roomDimensions - 1, y - 1)] === EXIT)
                 this.communeManager.room.tileCoords[packXYAsNum(roomDimensions - 2, y)] = TO_EXIT
@@ -83,9 +86,12 @@ export class RampartPlanner {
         let x = 1
 
         for (; x < roomDimensions - 1; x += 1) {
-            if (this.communeManager.room.tileCoords[packXYAsNum(x - 1, 0)] === EXIT) this.communeManager.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
-            if (this.communeManager.room.tileCoords[packXYAsNum(x, 0)] === EXIT) this.communeManager.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
-            if (this.communeManager.room.tileCoords[packXYAsNum(x + 1, 0)] === EXIT) this.communeManager.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (this.communeManager.room.tileCoords[packXYAsNum(x - 1, 0)] === EXIT)
+                this.communeManager.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (this.communeManager.room.tileCoords[packXYAsNum(x, 0)] === EXIT)
+                this.communeManager.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
+            if (this.communeManager.room.tileCoords[packXYAsNum(x + 1, 0)] === EXIT)
+                this.communeManager.room.tileCoords[packXYAsNum(x, 1)] = TO_EXIT
 
             if (this.communeManager.room.tileCoords[packXYAsNum(x - 1, roomDimensions - 1)] === EXIT)
                 this.communeManager.room.tileCoords[packXYAsNum(x, roomDimensions - 2)] = TO_EXIT
@@ -708,7 +714,10 @@ export class RampartPlanner {
 
         // Get the hubAnchor
 
-        const hubAnchor = unpackNumAsPos(this.communeManager.room.memory.stampAnchors.hub[0], this.communeManager.room.name)
+        const hubAnchor = unpackNumAsPos(
+            this.communeManager.room.memory.stampAnchors.hub[0],
+            this.communeManager.room.name,
+        )
 
         const onboardingRampartCoords = new Uint8Array(2500)
 
@@ -722,12 +731,18 @@ export class RampartPlanner {
                     this.communeManager.room.advancedFindPath({
                         origin: a,
                         goals: [{ pos: hubAnchor, range: 3 }],
-                        weightCoordMaps: [this.communeManager.room.unprotectedCoords, this.communeManager.room.roadCoords],
+                        weightCoordMaps: [
+                            this.communeManager.room.unprotectedCoords,
+                            this.communeManager.room.roadCoords,
+                        ],
                     }).length -
                     this.communeManager.room.advancedFindPath({
                         origin: b,
                         goals: [{ pos: hubAnchor, range: 3 }],
-                        weightCoordMaps: [this.communeManager.room.unprotectedCoords, this.communeManager.room.roadCoords],
+                        weightCoordMaps: [
+                            this.communeManager.room.unprotectedCoords,
+                            this.communeManager.room.roadCoords,
+                        ],
                     }).length
                 )
             })[0]
@@ -761,7 +776,8 @@ export class RampartPlanner {
 
                 // If there are already rampart plans at this pos
 
-                if (this.communeManager.room.rampartCoords[packedPos] === 1 && onboardingRampartCoords[packedPos] === 0) continue
+                if (this.communeManager.room.rampartCoords[packedPos] === 1 && onboardingRampartCoords[packedPos] === 0)
+                    continue
 
                 // Record the pos in roadCM
 
