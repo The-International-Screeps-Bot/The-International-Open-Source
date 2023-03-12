@@ -114,7 +114,7 @@ export class CommunePlanner {
 
     // Action checks
 
-    proctedSources: boolean
+    generalShielded: boolean
 
     //
 
@@ -260,7 +260,7 @@ export class CommunePlanner {
         this.groupMinCutCoords()
         this.findUnprotectedCoords()
         this.onboardingRamparts()
-        this.protectSources()
+        this.generalShield()
         this.visualize()
         /* this.visualizeGrid() */
 
@@ -2352,7 +2352,6 @@ export class CommunePlanner {
 
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
-
                 const packedCoord = packXYAsNum(x, y)
 
                 if (this.terrainCoords[packedCoord] > 0) continue
@@ -2365,22 +2364,42 @@ export class CommunePlanner {
         this.protectedCoords = protectedCoords
     }
     private protectFromNuke(coord: Coord, minRCL: number) {}
-    private shield(coord: Coord, minRCL: number) {
+    private shield(coord: Coord, minRCL: number, coversStructure: boolean = true) {
         const packedCoord = packAsNum(coord)
         if (this.unprotectedCoords[packedCoord] === 0) return
 
-        this.rampartPlans.setXY(coord.x, coord.y, 4, true, false, false)
+        this.rampartPlans.setXY(coord.x, coord.y, 4, coversStructure, false, false)
         this.stampAnchors.shieldRampart.push(coord)
         this.unprotectedCoords[packedCoord] = 0
     }
-    private protectSources() {
-        if (this.proctedSources) return
+    private generalShield() {
+        if (this.generalShielded) return
+
+        // Protect source structures and best harvest pos
 
         for (const coord of this.stampAnchors.sourceExtension) this.shield(coord, 4)
         for (const coord of this.stampAnchors.sourceLink) this.shield(coord, 4)
         for (const sourceIndex in this.sourceHarvestPositions)
             this.shield(this.sourceHarvestPositions[sourceIndex][0], 4)
 
-        this.proctedSources = true
+        // Protect position of
+
+        this.shield(this.centerUpgradePos, 4)
+
+        // Protect around the controller
+
+        const controllerPos = this.room.controller.pos
+        for (const offset of adjacentOffsets) {
+            const adjCoord = {
+                x: controllerPos.x + offset.x,
+                y: controllerPos.y + offset.y,
+            }
+
+            if (this.unprotectedCoords[packAsNum(adjCoord)] !== 255) continue
+
+            this.shield(adjCoord, 4, false)
+        }
+
+        this.generalShielded = true
     }
 }
