@@ -594,7 +594,6 @@ const roomAdditions = {
                 return this._sourcePositions
             }
 
-            this.memory.SP = []
             this._sourcePositions = []
 
             if (this.memory.T === 'remote') {
@@ -632,10 +631,10 @@ const roomAdditions = {
                         )
                     })
 
-                    this.memory.SP.push(packPosList(positions))
                     this._sourcePositions.push(positions)
                 }
 
+                this.memory.SP = this._sourcePositions.map(positions => packPosList(positions))
                 return this._sourcePositions
             }
 
@@ -670,10 +669,10 @@ const roomAdditions = {
                     )
                 })
 
-                this.memory.SP.push(packPosList(positions))
                 this._sourcePositions.push(positions)
             }
 
+            this.memory.SP = this._sourcePositions.map(positions => packPosList(positions))
             return this._sourcePositions
         },
     },
@@ -718,8 +717,6 @@ const roomAdditions = {
                 return this._sourcePaths
             }
 
-            this.memory.SPs = []
-
             if (this.memory.T === 'remote') {
                 const commune = Game.rooms[this.memory.CN]
                 if (!commune) return []
@@ -759,9 +756,9 @@ const roomAdditions = {
                     })
 
                     this._sourcePaths[index] = path
-                    this.memory.SPs[index] = packPosList(path)
                 }
 
+                this.memory.SPs = this._sourcePaths.map(path => packPosList(path))
                 return this._sourcePaths
             }
 
@@ -805,9 +802,9 @@ const roomAdditions = {
                 )
 
                 this._sourcePaths[index] = path
-                this.memory.SPs[index] = packPosList(path)
             }
 
+            this.memory.SPs = this._sourcePaths.map(path => packPosList(path))
             return this._sourcePaths
         },
     },

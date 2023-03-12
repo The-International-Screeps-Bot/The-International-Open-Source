@@ -731,10 +731,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     if (newRemoteEfficacy >= currentRemoteEfficacy) return this.memory.T
 
-    // Assign the room's commune as the scoutingRoom
-
-    this.memory.CN = scoutingRoom.name
-
     // Generate new important positions
 
     delete this.memory.SP
@@ -758,6 +754,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     this.memory.data = []
     for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
 
+    // Assign the room's commune as the scoutingRoom
+
+    this.memory.CN = scoutingRoom.name
+    
     return this.memory.T
 }
 
@@ -2367,7 +2367,6 @@ Room.prototype.findStructureInsideRect = function (x1, y1, x2, y2, condition) {
     return false
 }
 
-Room.prototype.coordVisual = function(x, y, fill = customColors.lightBlue) {
-
+Room.prototype.coordVisual = function (x, y, fill = customColors.lightBlue) {
     this.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill })
 }
