@@ -24,7 +24,10 @@ export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
 
     // Iterate through each index less than days
 
-    for (let index = 0; index <= days; index += 1) totalPrice += history[index].avgPrice
+    for (let index = 0; index <= days; index += 1) {
+        if (!history[index]) continue
+        totalPrice += history[index].avgPrice
+    }
 
     // Inform the totalPrice divided by the days
 
@@ -161,14 +164,17 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
 
     // Create the title
 
-    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${opts.bgColor
-        }; margin-left: ${(opts.superPosition ?? 0) * 8
-        }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
+    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${
+        opts.bgColor
+    }; margin-left: ${
+        (opts.superPosition ?? 0) * 8
+    }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
 
     // Create the content
 
-    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${opts.textColor
-        };'>${message ?? ''}</div></div>`
+    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${
+        opts.textColor
+    };'>${message ?? ''}</div></div>`
 }
 
 /**
@@ -203,8 +209,7 @@ export function advancedFindDistance(
             }
 
             if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote') {
-                if (!roomMemory.data)
-                    return Infinity
+                if (!roomMemory.data) return Infinity
                 if (roomMemory.data[RemoteData.abandon]) {
                     return Infinity
                 }
@@ -663,12 +668,10 @@ export function isXYInBorder(x: number, y: number, inset: number) {
 }
 
 export function roundToDecimals(num: number, decimals: number) {
-
     return parseInt(num.toFixed(decimals))
 }
 
 export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
-
     let damage = TOWER_POWER_ATTACK
 
     let range = getRangeOfCoords(coord1, coord2)
@@ -676,9 +679,7 @@ export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
     if (range > TOWER_OPTIMAL_RANGE) {
         if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
 
-        damage -=
-            (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
-            (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
+        damage -= (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
     }
 
     return Math.floor(damage)

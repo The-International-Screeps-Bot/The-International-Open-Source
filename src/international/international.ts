@@ -14,7 +14,6 @@ import {
  * Handles pre-roomManager, inter room, and multiple-room related matters
  */
 export class InternationalManager {
-
     /**
      * Antifa creeps by combat request name, then by role with an array of creep names
      */
@@ -68,11 +67,9 @@ export class InternationalManager {
     }
 
     newCustomCreepID() {
-
         // Try to use an existing unused ID index
 
         for (; this.customCreepIDIndex < this.customCreepIDs.length; this.customCreepIDIndex++) {
-
             if (this.customCreepIDs[this.customCreepIDIndex]) continue
 
             this.customCreepIDs[this.customCreepIDIndex] = true
@@ -221,8 +218,7 @@ export class InternationalManager {
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                global.terrainCoords[roomName][packXYAsNum(x, y)] = (terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0)
-
+                global.terrainCoords[roomName][packXYAsNum(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
             }
         }
 
@@ -236,10 +232,9 @@ export class InternationalManager {
     _minCredits: number
 
     get minCredits() {
-
         if (this._minCredits !== undefined) return this._minCredits
 
-        return this._minCredits = global.communes.size * 10000
+        return (this._minCredits = global.communes.size * 10000)
     }
 
     /**
@@ -310,6 +305,11 @@ export class InternationalManager {
             sell: {},
         }
 
+        for (const resource of RESOURCES_ALL) {
+            this._orders.buy[resource] = []
+            this._orders.sell[resource] = []
+        }
+
         // Get the market's order and loop through them
 
         const orders = Game.market.getAllOrders()
@@ -319,11 +319,9 @@ export class InternationalManager {
 
             const order = orders[orderID]
 
-            // Assign the order to a resource-ordered location, creating it if undefined
+            // Assign the order to a resource-ordered location
 
-            this._orders[order.type][order.resourceType]
-                ? this._orders[order.type][order.resourceType].push(order)
-                : (this._orders[order.type][order.resourceType] = [order])
+            this._orders[order.type][order.resourceType].push(order)
         }
 
         return this._orders
@@ -364,9 +362,9 @@ export class InternationalManager {
     get defaultMinCacheAmount() {
         if (this._defaultMinCacheAmount !== undefined) return this._defaultMinCacheAmount
 
-        const avgCPUUsagePercent = (Memory.stats.cpu.usage) / Game.cpu.limit
+        const avgCPUUsagePercent = Memory.stats.cpu.usage / Game.cpu.limit
 
-        return this._defaultMinCacheAmount = Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1
+        return (this._defaultMinCacheAmount = Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1)
     }
 
     _marketIsFunctional: number
@@ -382,26 +380,23 @@ export class InternationalManager {
 
     _maxCommunes: number
     get maxCommunes() {
-
-        return this._maxCommunes = Math.round(Game.cpu.limit / 10)
+        return (this._maxCommunes = Math.round(Game.cpu.limit / 10))
     }
 
     /**
- * The priority for claiming new rooms, for each mineral
- */
+     * The priority for claiming new rooms, for each mineral
+     */
     _mineralPriority: Partial<{ [key in MineralConstant]: number }>
 
     /**
      * The priority for claiming new rooms, for each mineral
      */
     get mineralPriority() {
-
         if (this._mineralPriority) return this._mineralPriority
 
         this._mineralPriority = {}
 
         for (const resource of MINERALS) {
-
             this._mineralPriority[resource] = this.mineralCommunes[resource]
         }
 
@@ -420,20 +415,22 @@ export class InternationalManager {
         for (let i = 0; i < 8; i++) communesByLevel[i] = []
 
         for (const roomName of global.communes) {
-
             const controller = Game.rooms[roomName].controller
             communesByLevel[controller.level].push([roomName, controller.progressTotal / controller.progress])
         }
 
         for (const key in communesByLevel) {
             const level = key as unknown as number
-
         }
 
         this._funnelOrder = Array.from(global.communes).sort((a, b) => {
             const controllerA = Game.rooms[a].controller
             const controllerB = Game.rooms[b].controller
-            return (controllerA.level + controllerA.progressTotal / controllerA.progress) - (controllerB.level + controllerB.progressTotal / controllerB.progress)
+            return (
+                controllerA.level +
+                controllerA.progressTotal / controllerA.progress -
+                (controllerB.level + controllerB.progressTotal / controllerB.progress)
+            )
         })
 
         return this._funnelOrder
