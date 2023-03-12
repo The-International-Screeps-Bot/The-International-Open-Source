@@ -289,7 +289,7 @@ export class CommunePlanner {
 
         /* this.room.visualizeCoordMap(this.reverseExitFlood) */
         /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
-        /* this.room.visualizeCoordMap(this.baseCoords, true) */
+        /* this.room.visualizeCoordMap(this.terrainCoords, true) */
 
         this.room.visual.connectRoads({
             opacity: 1,
@@ -758,7 +758,8 @@ export class CommunePlanner {
             // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
             // Loop through each pos index
 
-            for (let j = this.sourceHarvestPositions.length - 1; j >= 0; j -= 1) {
+            for (let j = this.sourceHarvestPositions[i].length - 1; j >= 0; j -= 1) {
+
                 if (this.baseCoords[packAsNum(this.sourceHarvestPositions[i][j])] !== 255) continue
 
                 this.sourceHarvestPositions.splice(j, 1)
@@ -902,8 +903,6 @@ export class CommunePlanner {
         this.basePlans.setXY(this.mineralHarvestCoord.x, this.mineralHarvestCoord.y, STRUCTURE_CONTAINER, 6)
     }
     private planSourceStructures() {
-        if (this.basePlans.getXY(this.stampAnchors.sourceLink[0].x, this.stampAnchors.sourceLink[0].y)) return
-
         for (const coord of this.stampAnchors.sourceLink) {
             this.basePlans.set(packCoord(coord), STRUCTURE_LINK, 6)
         }
@@ -1697,7 +1696,7 @@ export class CommunePlanner {
                     })
                 }
 
-                let [coord, i] = findClosestCoord(fastFillerPos, structureCoords)
+                let [coord, i] = this.findStorageCoord(structureCoords)
                 structureCoords.splice(i, 1)
                 this.basePlans.set(packCoord(coord), STRUCTURE_STORAGE, 4)
                 this.baseCoords[packAsNum(coord)] = 255
@@ -1736,6 +1735,24 @@ export class CommunePlanner {
                 this.roadCoords[packAsNum(coord)] = 255
             },
         })
+    }
+    private findStorageCoord(structureCoords: Coord[]): [Coord, number] {
+        for (let i = 0; i < structureCoords.length; i++) {
+            const coord = structureCoords[i]
+
+            for (const positions of this.sourceHarvestPositions) {
+                this.room.visual.text(getRangeOfCoords(coord, positions[0]).toString(), coord.x, coord.y)
+                if (getRangeOfCoords(coord, positions[0]) > 1) continue
+
+                return [coord, i]
+            }
+
+            if (getRangeOfCoords(coord, this.centerUpgradePos) > 1) continue
+
+            return [coord, i]
+        }
+
+        return findClosestCoord(this.stampAnchors.fastFiller[0], structureCoords)
     }
     private labs() {
         this.planStamps({

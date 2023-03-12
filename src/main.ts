@@ -58,7 +58,7 @@ import { constructionSiteManager } from './international/constructionSiteManager
 import { mapVisualsManager } from './international/mapVisuals'
 import { endTickManager } from './international/endTickManager'
 
-const originalLoop = (): void => {
+function originalLoop() {
     profiler.wrap((): void => {
         if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
             customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {

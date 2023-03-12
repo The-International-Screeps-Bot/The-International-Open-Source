@@ -146,8 +146,7 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (requestName, communeName, score) {
-    score = score || 0
+global.claim = function (requestName, communeName, score = 0) {
 
     if (!Memory.claimRequests[requestName]) {
         Memory.claimRequests[requestName] = {
@@ -176,13 +175,13 @@ global.claim = function (requestName, communeName, score) {
 
 global.deleteClaimRequest = function (roomName) {
     const request = Memory.claimRequests[roomName]
+    if (!request) return `There is so claim request for ${roomName}`
 
     if (request.responder) {
         delete Memory.rooms[request.responder].claimRequest
     }
 
     delete Memory.claimRequests[roomName]
-
     return `Deleted claim request for ${roomName}`
 }
 
@@ -232,11 +231,13 @@ global.combat = function (requestName, type, opts, communeName) {
 }
 
 global.deleteCombatRequest = function (requestName) {
-    if (!Memory.combatRequests[requestName]) return 'No combatRequest for that room'
+
+    const request = Memory.combatRequests[requestName]
+    if (!request) return 'No combatRequest for that room'
 
     // If responder, remove from its memory
 
-    const responder = Memory.combatRequests[requestName].responder
+    const responder = request.responder
     if (responder)
         Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(requestName), 1)
 

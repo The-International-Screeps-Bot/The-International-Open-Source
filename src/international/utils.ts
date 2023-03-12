@@ -1,3 +1,4 @@
+import { ErrorMapper } from 'other/ErrorMapper'
 import {
     mmoShardNames,
     customColors,
@@ -683,4 +684,26 @@ export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
     }
 
     return Math.floor(damage)
+}
+
+/**
+ * Ripped from @external https://github.com/Mirroar/hivemind
+ * Runs a callback within a try/catch block while using the ErrorMapper to trace error
+ *
+ * @param {function} callback The callback to run.
+ * @return {mixed} Whatever the original fuction returns.
+ */
+export function tryMapped<T>(callback: () => T): T {
+    try {
+        return callback()
+    } catch (error: any) {
+        let stackTrace = error.stack
+        if (error instanceof Error) {
+            stackTrace = _.escape(ErrorMapper.sourceMappedStackTrace(error))
+        }
+
+        console.log('<span style="color:red">' + error.name + stackTrace + '</span>')
+    }
+
+    return undefined
 }
