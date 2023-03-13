@@ -75,7 +75,8 @@ export class AllyVanguard extends Creep {
     }
 
     getEnergyFromRoom?(): boolean {
-        const { room } = this
+
+        if (this.room.controller.owner) return false
 
         if (
             this.runRoomLogisticsRequestsAdvanced({
@@ -98,7 +99,7 @@ export class AllyVanguard extends Creep {
 
         // Try to normally harvest. Iterate if creep harvested
 
-        if (this.advancedHarvestSource(room.sources[sourceIndex])) return true
+        if (this.advancedHarvestSource(this.room.sources[sourceIndex])) return true
 
         return true
     }
@@ -147,8 +148,6 @@ export class AllyVanguard extends Creep {
                 this.getEnergyFromRemote()
                 return
             }
-
-            // If there is a controller and it's owned or reserved
 
             if (!this.getEnergyFromRoom()) {
                 this.getEnergyFromRemote()
