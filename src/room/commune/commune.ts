@@ -184,7 +184,7 @@ export class CommuneManager {
         if (!room.memory.remotes) room.memory.remotes = []
         if (roomMemory.AT == undefined) roomMemory.AT = 0
 
-        room.usedRampartIDs = new Set()
+        room.usedRampartIDs = new Map()
 
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()

@@ -1069,7 +1069,7 @@ declare global {
          */
         haulerNeed: number
 
-        usedRampartIDs: Set<Id<StructureRampart>>
+        usedRampartIDs: Map<Id<StructureRampart>, Id<Creep>>
 
         // Functions
 

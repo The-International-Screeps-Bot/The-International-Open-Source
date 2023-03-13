@@ -46,7 +46,7 @@ export class MeleeDefender extends Creep {
                 return
             }
 
-            room.usedRampartIDs.add(rampart.id)
+            room.usedRampartIDs.set(rampart.id, this.id)
         }
     }
 
@@ -111,15 +111,22 @@ export class MeleeDefender extends Creep {
         // Get the room's ramparts, filtering for those and informing false if there are none
 
         const ramparts = room.defensiveRamparts.filter(rampart => {
+            // Avoid ramparts that are low
+
+            if (rampart.hits < 3000) return false
+
             // Allow the rampart the creep is currently standing on
 
             if (areCoordsEqual(this.pos, rampart.pos)) return true
 
-            if (room.usedRampartIDs.has(rampart.id)) return false
+            // Allow the creep to take rampart reservations from other defender types - but not its own type
 
-            // Avoid ramparts that are low
+            const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
+            if (creepIDUsingRampart) {
 
-            if (rampart.hits < 3000) return false
+                const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
+                if (creepUsingRampart.role === 'meleeDefender') return false
+            }
 
             if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) return false
 
@@ -140,7 +147,7 @@ export class MeleeDefender extends Creep {
         const rampart = findClosestObjectEuc(enemyCreep.pos, ramparts)
 
         this.memory.RID = rampart.id
-        room.usedRampartIDs.add(rampart.id)
+        room.usedRampartIDs.set(rampart.id, this.id)
         return rampart
     }
 

@@ -45,7 +45,7 @@ export class RangedDefender extends Creep {
                 return
             }
 
-            room.usedRampartIDs.add(rampart.id)
+            room.usedRampartIDs.set(rampart.id, this.id)
         }
     }
 
@@ -117,15 +117,15 @@ export class RangedDefender extends Creep {
         // Get the room's ramparts, filtering for those and informing false if there are none
 
         const ramparts = room.defensiveRamparts.filter(rampart => {
+            // Avoid ramparts that are low
+
+            if (rampart.hits < 3000) return false
+
             // Allow the rampart the creep is currently standing on
 
             if (areCoordsEqual(this.pos, rampart.pos)) return true
 
             if (room.usedRampartIDs.has(rampart.id)) return false
-
-            // Avoid ramparts that are low
-
-            if (rampart.hits < 3000) return false
 
             if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) return false
 
@@ -145,7 +145,7 @@ export class RangedDefender extends Creep {
         const rampart = findClosestObjectEuc(enemyCreep.pos, ramparts)
 
         this.memory.RID = rampart.id
-        room.usedRampartIDs.add(rampart.id)
+        room.usedRampartIDs.set(rampart.id, this.id)
         return rampart
     }
 
