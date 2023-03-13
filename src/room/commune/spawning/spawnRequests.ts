@@ -1372,30 +1372,33 @@ export class SpawnRequestsManager {
     }
 
     private allyVanguard() {
-        if (this.communeManager.room.memory.allyCreepRequest) {
-            const allyCreepRequestNeeds =
-                Memory.allyCreepRequests[this.communeManager.room.memory.allyCreepRequest].data
+        const requestName = this.communeManager.room.memory.allyCreepRequest
+        if (!requestName) return
 
-            // Requests for vanguard
+        const request = Memory.allyCreepRequests[this.communeManager.room.memory.allyCreepRequest]
+        const allyCreepRequestNeeds = request.data
 
-            this.rawSpawnRequestsArgs.push(
-                ((): SpawnRequestArgs | false => {
-                    // If there is no vanguard need
+        // Requests for vanguard
 
-                    if (allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard] <= 0) return false
+        this.rawSpawnRequestsArgs.push(
+            ((): SpawnRequestArgs | false => {
+                // If there is no vanguard need
 
-                    return {
-                        role: 'allyVanguard',
-                        defaultParts: [],
-                        extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                        partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
-                        minCost: 250,
-                        priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
-                        memoryAdditions: {},
-                    }
-                })(),
-            )
-        }
+                if (allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard] <= 0) return false
+
+                return {
+                    role: 'allyVanguard',
+                    defaultParts: [],
+                    extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
+                    partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
+                    minCost: 250,
+                    priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
+                    memoryAdditions: {
+                        TRN: requestName,
+                    },
+                }
+            })(),
+        )
     }
 
     private requestHauler() {

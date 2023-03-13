@@ -186,7 +186,7 @@ export class AllyVanguard extends Creep {
 
             creep.message = request
 
-            if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
+            if (room.name === request || (creep.memory.TRN && room.name === creep.memory.TRN)) {
                 creep.buildRoom()
                 continue
             }

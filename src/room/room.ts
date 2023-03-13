@@ -82,15 +82,14 @@ export class RoomManager {
 
         room.squadRequests = new Set()
 
-        if (roomMemory.T === 'remote') {
-            room.roomLogisticsRequests = {
-                transfer: {},
-                withdraw: {},
-                offer: {},
-                pickup: {},
-            }
-            return
+        room.roomLogisticsRequests = {
+            transfer: {},
+            withdraw: {},
+            offer: {},
+            pickup: {},
         }
+
+        if (roomMemory.T === 'remote') return
 
         // Check if the room is a commune
 
