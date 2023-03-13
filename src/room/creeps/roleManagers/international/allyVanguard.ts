@@ -108,7 +108,6 @@ export class AllyVanguard extends Creep {
      *
      */
     travelToSource?(sourceIndex: number): boolean {
-        const { room } = this
 
         this.message = '🚬'
 
@@ -127,11 +126,10 @@ export class AllyVanguard extends Creep {
             origin: this.pos,
             goals: [
                 {
-                    pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+                    pos: harvestPos,
                     range: 0,
                 },
             ],
-            avoidEnemyRanges: true,
         })
 
         return true
@@ -185,7 +183,7 @@ export class AllyVanguard extends Creep {
 
             creep.message = request
 
-            if (room.name === request || (creep.memory.TRN && room.name === creep.memory.TRN)) {
+            if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
                 creep.buildRoom()
                 continue
             }
