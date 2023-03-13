@@ -680,7 +680,7 @@ export function isXYInBorder(x: number, y: number, inset: number) {
 }
 
 export function roundToDecimals(num: number, decimals: number) {
-    return parseInt(num.toFixed(decimals))
+    return parseFloat(num.toFixed(decimals))
 }
 
 export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
