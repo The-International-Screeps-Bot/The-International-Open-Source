@@ -627,12 +627,12 @@ export function makeRoomCoord(roomName: string) {
 
     return {
         x: cx === 'W' ? ~x : parseInt(x),
-        y: cy === 'N' ? ~y : parseInt(y),
+        y: cy === 'S' ? ~y : parseInt(y),
     }
 }
 
 export function roomNameFromRoomXY(x: number, y: number) {
-    return (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'N' + String(~y) : 'S' + String(y))
+    return (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
 }
 
 export function roomNameFromRoomCoord(roomCoord: RoomCoord) {
@@ -640,24 +640,35 @@ export function roomNameFromRoomCoord(roomCoord: RoomCoord) {
 }
 
 /**
- * Takes a rectange and returns the positions inside of it in an array
+ * Takes a rectange and returns the room name coords inside of the rect
  */
 export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: number) {
-    const positions: RoomCoord[] = []
+    const coords: RoomCoord[] = []
 
     for (let x = x1; x <= x2; x += 1) {
         for (let y = y1; y <= y2; y += 1) {
-            // Iterate if the pos doesn't map onto a room
 
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
-
-            // Otherwise pass the x and y to positions
-
-            positions.push({ x, y })
+            coords.push({ x, y })
         }
     }
 
-    return positions
+    return coords
+}
+
+/**
+ * Takes a rectange and returns the room name coords inside of the rect
+ */
+export function findRoomNamesInRangeXY(startX: number, startY: number, range: number) {
+    const coords: RoomCoord[] = []
+
+    for (let x = startX - range; x <= startX + range; x += 1) {
+        for (let y = startY - range; y <= startY + range; y += 1) {
+
+            coords.push({ x, y })
+        }
+    }
+
+    return coords
 }
 
 export function isXYInRoom(x: number, y: number) {

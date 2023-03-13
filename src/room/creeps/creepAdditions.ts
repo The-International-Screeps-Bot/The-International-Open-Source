@@ -5,7 +5,6 @@ import { profiler } from 'other/screeps-profiler'
 Object.defineProperties(Creep.prototype, {
     dying: {
         get() {
-
             // Stop if creep is spawning
 
             if (this.spawning) return false
@@ -118,7 +117,7 @@ Object.defineProperties(Creep.prototype, {
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
+                if (range > 1) healStrength /= HEAL_POWER / RANGED_HEAL_POWER
 
                 this._macroHealStrength += Math.floor(healStrength)
             }
@@ -168,8 +167,10 @@ Object.defineProperties(Creep.prototype, {
 
             for (const part of this.body) {
                 if (part.type === WORK) {
-
-                    const boost = part.boost as RESOURCE_CATALYZED_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_ACID | RESOURCE_ZYNTHIUM_HYDRIDE
+                    const boost = part.boost as
+                        | RESOURCE_CATALYZED_ZYNTHIUM_ACID
+                        | RESOURCE_ZYNTHIUM_ACID
+                        | RESOURCE_ZYNTHIUM_HYDRIDE
 
                     this._combatStrength.dismantle +=
                         DISMANTLE_POWER *
@@ -247,30 +248,24 @@ Object.defineProperties(Creep.prototype, {
     },
     idealSquadMembers: {
         get() {
-
             if (this._idealSquadMembers) return this._idealSquadMembers
 
             if (this.memory.SS === 2) {
-
-
             }
 
             if (this.memory.SS === 4) {
-
-
             }
 
             // Dynamic
 
             return this._idealSquadMembers
-        }
-    }
+        },
+    },
 } as PropertyDescriptorMap & ThisType<Creep>)
 
 Object.defineProperties(PowerCreep.prototype, {
     dying: {
         get() {
-
             return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
         },
     },
@@ -304,7 +299,7 @@ Object.defineProperties(PowerCreep.prototype, {
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength /= (HEAL_POWER / RANGED_HEAL_POWER)
+                if (range > 1) healStrength /= HEAL_POWER / RANGED_HEAL_POWER
 
                 this._macroHealStrength += Math.floor(healStrength)
             }
@@ -334,7 +329,6 @@ Object.defineProperties(PowerCreep.prototype, {
             this._powerCooldowns = new Map()
 
             for (const powerType in this.powers) {
-
                 const cooldown = this.powers[powerType].cooldown
                 if (!cooldown) continue
 
@@ -342,22 +336,20 @@ Object.defineProperties(PowerCreep.prototype, {
             }
 
             return this._powerCooldowns
-        }
-    }
+        },
+    },
 } as PropertyDescriptorMap & ThisType<PowerCreep>)
 
 const additions = {
     reserveHits: {
         get() {
-
             if (this._reserveHits !== undefined) return this._reserveHits
 
-            return this._reserveHits = this.hits + this.macroHealStrength
+            return (this._reserveHits = this.hits + this.macroHealStrength)
         },
         set(newHits) {
-
             this._reserveHits = newHits
-        }
+        },
     },
     grossTowerDamage: {
         get() {
@@ -404,7 +396,19 @@ const additions = {
             return x <= 0 || x >= 49 || y <= 0 || y >= 49
         },
     },
+    exitTo: {
+        get() {
+            if (this._exitTo !== undefined) return this._exitTo
 
+            if (!this.isOnExit) return (this._exitTo = false)
+
+            const exits = Game.map.describeExits(this.room.name)
+            if (this.pos.y === 0) return (this._exitTo = exits[TOP])
+            if (this.pos.x === 0) return (this._exitTo = exits[LEFT])
+            if (this.pos.y === roomDimensions - 1) return (this._exitTo = exits[BOTTOM])
+            return (this._exitTo = exits[RIGHT])
+        },
+    },
 } as PropertyDescriptorMap & (ThisType<Creep> | ThisType<PowerCreep>)
 
 /* profiler.registerObject(additions, 'creepAdditions') */

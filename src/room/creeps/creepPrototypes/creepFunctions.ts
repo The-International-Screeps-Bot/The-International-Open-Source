@@ -1195,7 +1195,13 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             const request = this.room.roomLogisticsRequests[type][requestID]
 
             delete request.delivery
+/*
+            // Make a personal amount based on existing amount plus estimated income for distance
 
+            request.personalAmount =
+                request.amount +
+                (request.income ? getRangeOfCoords(findObjectWithID(request.targetID).pos, this.pos) * request.income : 0)
+ */
             // Customizable conditions
 
             if (args) {
@@ -1428,7 +1434,11 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
         if (request.onlyFull) {
             // If the creep has enough resource
 
-            if (this.nextStore[request.resourceType] >= Math.max(amount, target.store.getCapacity(request.resourceType) / 2)) return true
+            if (
+                this.nextStore[request.resourceType] >=
+                Math.max(amount, target.store.getCapacity(request.resourceType) / 2)
+            )
+                return true
             return false
         }
 

@@ -1,6 +1,12 @@
 import { unpackPosList } from 'other/codec'
 import { minHarvestWorkRatio, customColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
-import { customLog } from './utils'
+import {
+    customLog,
+    findRoomNamesInRangeXY,
+    findRoomNamesInsideRect,
+    makeRoomCoord,
+    roomNameFromRoomCoord,
+} from './utils'
 import { InternationalManager } from './international'
 import { globalStatsUpdater } from './statsManager'
 
@@ -9,31 +15,20 @@ import { globalStatsUpdater } from './statsManager'
  */
 class MapVisualsManager {
     run() {
-        // Stop if mapVisuals are disabled
-
         if (!Memory.mapVisuals) return
 
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
-        // Loop through each roomName in Memory
-
         for (const roomName in Memory.rooms) {
-            // Get the roomMemory using the roomName
-
             const roomMemory = Memory.rooms[roomName]
+
+            // Room type
 
             Game.map.visual.text(roomMemory.T, new RoomPosition(2, 45, roomName), {
                 align: 'left',
                 fontSize: 5,
             })
-            /*
-            Game.map.visual.text((Game.time - roomMemory.LST).toString(), new RoomPosition(2, 40, roomName), {
-                align: 'left',
-                fontSize: 5,
-            })
-        */
+
+            this.test(roomName, roomMemory)
+
             if (roomMemory.T === 'commune') {
                 const room = Game.rooms[roomName]
                 if (!room) continue
@@ -109,7 +104,9 @@ class MapVisualsManager {
 
                         const income =
                             (possibleReservation ? 10 : 5) -
-                            Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio)
+                            Math.floor(
+                                roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio,
+                            )
 
                         Game.map.visual.text(
                             `⛏️${income},🚶‍♀️${roomMemory.SPs[sourceIndex].length}`,
@@ -146,6 +143,9 @@ class MapVisualsManager {
             }
         }
 
+        this.claimRequests()
+    }
+    private claimRequests() {
         for (const roomName in Memory.claimRequests) {
             Game.map.visual.text(
                 `💵${(Memory.claimRequests[roomName].data[ClaimRequestData.score] || 0).toFixed(2)}`,
@@ -167,18 +167,21 @@ class MapVisualsManager {
                 )
             }
         }
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (Memory.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Map Visuals Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: InternationalStatNames = 'mvmcu'
-            globalStatsUpdater('', statName, cpuUsed, true)
-        }
+    }
+    private test(roomName: string, roomMemory: RoomMemory) {
+        /*
+        Game.map.visual.text((Game.time - roomMemory.LST).toString(), new RoomPosition(2, 40, roomName), {
+            align: 'left',
+            fontSize: 5,
+        })
+        */
+        /*
+        const roomCoord = makeRoomCoord(roomName)
+        Game.map.visual.text(('x: ' + roomCoord.x + ', y: ' + roomCoord.y).toString(), new RoomPosition(2, 40, roomName), {
+            align: 'left',
+            fontSize: 5,
+        })
+        */
     }
 }
 

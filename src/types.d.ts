@@ -35,13 +35,7 @@ declare global {
         y: number
     }
 
-    interface RoomCoord extends Coord {
-        /**
-         * The name of the room
-         */
-        x: number
-        y: number
-    }
+    interface RoomCoord extends Coord {}
 
     interface Rect {
         x1: number
@@ -422,6 +416,14 @@ declare global {
          * Wether the responder should interact with reserveStore of the target
          */
         noReserve?: boolean
+        // /**
+        //  * The estimated income, positive or negative that is expected per tick for the request target
+        //  */
+        // income?: number
+        // /**
+        //  * The amount for the potential or actual responding creep
+        //  */
+        // personalAmount?: number
     }
 
     interface CreateRoomLogisticsRequestArgs {
@@ -1956,6 +1958,9 @@ declare global {
 
         _isOnExit: boolean
         readonly isOnExit: boolean
+
+        _exitTo: string | boolean
+        readonly exitTo: string | boolean
     }
 
     // Creeps
