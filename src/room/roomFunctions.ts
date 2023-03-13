@@ -757,7 +757,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // Assign the room's commune as the scoutingRoom
 
     this.memory.CN = scoutingRoom.name
-    
+
     return this.memory.T
 }
 
@@ -2012,15 +2012,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
                 // Loop through adjacent positions
 
                 for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
-                    // Iterate if adjacentPos is out of room bounds
-
-                    if (
-                        adjacentPos.x <= 0 ||
-                        adjacentPos.x >= roomDimensions ||
-                        adjacentPos.y <= 0 ||
-                        adjacentPos.y >= roomDimensions
-                    )
-                        continue
 
                     const packedAdjacentCoord = packAsNum(adjacentPos)
 

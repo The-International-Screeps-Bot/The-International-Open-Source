@@ -1140,6 +1140,7 @@ export class SpawnRequestsManager {
                     // If there are no related data
 
                     if (remoteData[RemoteData.minDamage] + remoteData[RemoteData.minHeal] <= 0) return false
+                    if (this.communeManager.room.towerInferiority) return false
 
                     let minRangedAttackCost = 0
 

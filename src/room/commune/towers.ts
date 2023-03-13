@@ -63,7 +63,7 @@ export class TowerManager {
 
         if (!attackTargets.length) return false
 
-        // Find the enemyCreep the towers can hurt the most
+        // Find the enemyCreep the towers can hurt the most, declaring tower inferiority if we can't out-damage a creep
 
         let highestDamage = 0
 
@@ -71,17 +71,17 @@ export class TowerManager {
             if (enemyCreep.isOnExit) continue
 
             const netTowerDamage = enemyCreep.netTowerDamage
+            if (!room.towerInferiority && netTowerDamage <= 0) {
+                room.towerInferiority = true
+                this.createPowerTasks()
+            }
+
             if (netTowerDamage < highestDamage) continue
 
             room.towerAttackTarget = enemyCreep
             highestDamage = netTowerDamage
         }
-
-        if (!room.towerAttackTarget) {
-            this.createPowerTasks()
-            room.towerInferiority = true
-            return false
-        }
+        if (!room.towerAttackTarget) return false
 
         // If we seem to be under attack from a swarm, record that the tower needs help
 
@@ -111,7 +111,7 @@ export class TowerManager {
 
             this.actionableTowerIDs.splice(i, 1)
 
-            const hits = attackTarget.reserveHits -= tower.estimateDamageNet(attackTarget)
+            const hits = (attackTarget.reserveHits -= tower.estimateDamageNet(attackTarget))
             if (hits <= 0) return true
         }
 
@@ -255,8 +255,7 @@ export class TowerManager {
     }
 }
 
-StructureTower.prototype.estimateDamageGross = function(targetCoord) {
-
+StructureTower.prototype.estimateDamageGross = function (targetCoord) {
     let damage = estimateTowerDamage(this.pos, targetCoord)
 
     for (const powerType of towerPowers) {
@@ -269,8 +268,7 @@ StructureTower.prototype.estimateDamageGross = function(targetCoord) {
     return Math.floor(damage)
 }
 
-StructureTower.prototype.estimateDamageNet = function(target) {
-
+StructureTower.prototype.estimateDamageNet = function (target) {
     let damage = this.estimateDamageGross(target.pos)
     damage *= target.defenceStrength
 

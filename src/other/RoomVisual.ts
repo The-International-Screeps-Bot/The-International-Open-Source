@@ -470,6 +470,15 @@ RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
                 opacity: opts.opacity,
             })
             break
+        case STRUCTURE_EXTRACTOR:
+            this.circle(x, y, {
+                radius: 0.65,
+                opacity: opts.opacity,
+                stroke: '#47b165',
+                strokeWidth: 0.12,
+                fill: 'transparent',
+            })
+            break
         default:
             this.circle(x, y, {
                 fill: colors.light,

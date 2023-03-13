@@ -1,5 +1,5 @@
 import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
-import { customLog, estimateTowerDamage, getRange, getRangeOfCoords } from 'international/utils'
+import { customLog, estimateTowerDamage, getRange, getRangeOfCoords, isXYExit } from 'international/utils'
 import { profiler } from 'other/screeps-profiler'
 
 Object.defineProperties(Creep.prototype, {
@@ -393,7 +393,7 @@ const additions = {
 
             const { x } = this.pos
             const { y } = this.pos
-            return x <= 0 || x >= 49 || y <= 0 || y >= 49
+            return isXYExit(x, y)
         },
     },
     exitTo: {

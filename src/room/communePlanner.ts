@@ -287,10 +287,6 @@ export class CommunePlanner {
             this.room.visual.structure(coord.x, coord.y, plansCoord.structureType)
         }
 
-        /* this.room.visualizeCoordMap(this.reverseExitFlood) */
-        /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
-        /* this.room.visualizeCoordMap(this.terrainCoords, true) */
-
         this.room.visual.connectRoads({
             opacity: 1,
         })
@@ -317,6 +313,10 @@ export class CommunePlanner {
             this.room.visual.line(coord.x, coord.y, this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y)
             this.room.visual.line(coord.x, coord.y, this.input2Coord.x, this.input2Coord.y)
         }
+
+        /* this.room.visualizeCoordMap(this.reverseExitFlood) */
+        /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
+        /* this.room.visualizeCoordMap(this.terrainCoords, true) */
     }
     private recordExits() {
         let x
@@ -759,7 +759,6 @@ export class CommunePlanner {
             // Loop through each pos index
 
             for (let j = this.sourceHarvestPositions[i].length - 1; j >= 0; j -= 1) {
-
                 if (this.baseCoords[packAsNum(this.sourceHarvestPositions[i][j])] !== 255) continue
 
                 this.sourceHarvestPositions.splice(j, 1)
@@ -2182,18 +2181,8 @@ export class CommunePlanner {
                 for (const pos of thisGeneration) {
                     // Loop through adjacent positions
 
-                    for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
-                        // Iterate if adjacentPos is out of room bounds
-
-                        if (
-                            adjacentPos.x <= 0 ||
-                            adjacentPos.x >= roomDimensions ||
-                            adjacentPos.y <= 0 ||
-                            adjacentPos.y >= roomDimensions
-                        )
-                            continue
-
-                        const packedAdjacentCoord = packAsNum(adjacentPos)
+                    for (const adjCoord of findAdjacentCoordsToCoord(pos)) {
+                        const packedAdjacentCoord = packAsNum(adjCoord)
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
 
@@ -2206,12 +2195,10 @@ export class CommunePlanner {
 
                         // Add it to the next gen and this group
 
-                        groupedMinCutCoords[groupIndex].push(
-                            new RoomPosition(adjacentPos.x, adjacentPos.y, this.room.name),
-                        )
+                        groupedMinCutCoords[groupIndex].push(new RoomPosition(adjCoord.x, adjCoord.y, this.room.name))
 
                         groupSize += 1
-                        nextGeneration.push(adjacentPos)
+                        nextGeneration.push(adjCoord)
                     }
                 }
 
@@ -2236,12 +2223,15 @@ export class CommunePlanner {
         if (this.unprotectedCoords) return
 
         const unprotectedCoords = new Uint8Array(2500)
-
         let visitedCoords = new Uint8Array(2500)
-        for (const coord of this.exitCoords) visitedCoords[packAsNum(coord)] = 1
-
         let thisGeneration = this.exitCoords
         let nextGeneration: Coord[]
+
+        for (const coord of thisGeneration) {
+            const packedCoord = packAsNum(coord)
+            visitedCoords[packedCoord] = 1
+            unprotectedCoords[packedCoord] = 255
+        }
 
         while (thisGeneration.length) {
             nextGeneration = []
@@ -2271,6 +2261,21 @@ export class CommunePlanner {
 
                     unprotectedCoords[packedAdjCoord] = 255
                     nextGeneration.push(adjCoord)
+
+                    for (const adjCoord2 of findCoordsInRange(adjCoord, 3)) {
+                        const packedAdjCoord2 = packAsNum(adjCoord2)
+                        if (this.terrainCoords[packedAdjCoord2] > 0) continue
+                        if (this.minCutCoords.has(packedAdjCoord2)) continue
+
+                        const currentWeight = unprotectedCoords[packedAdjCoord2]
+
+                        if (this.roadCoords[packedAdjCoord2] === 1) {
+                            unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight - 1, currentWeight)
+                            continue
+                        }
+
+                        unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight, currentWeight)
+                    }
                 }
             }
 
