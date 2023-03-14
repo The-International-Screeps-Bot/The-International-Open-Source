@@ -35,9 +35,10 @@ import {
     packXYAsNum,
     unpackNumAsCoord,
     getRangeOfCoords,
+    randomTick,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { any, pick, repeat } from 'lodash'
+import { any, pick, random, repeat } from 'lodash'
 import {
     packCoord,
     packPos,
@@ -641,7 +642,21 @@ Creep.prototype.findSourcePos = function (index) {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
+    if (this.memory.PC) {
+
+        // On random intervals take the best source pos if it's open
+
+        if (randomTick()) {
+            const sourcePos = room.sourcePositions[index][0]
+            const packedSourceCoord = packCoord(sourcePos)
+            if (!room.usedSourceCoords[index].has(packedSourceCoord)) {
+                this.memory.PC = packedSourceCoord
+                return sourcePos
+            }
+        }
+
+        return unpackCoordAsPos(this.memory.PC, room.name)
+    }
 
     // Get usedSourceHarvestPositions
 
@@ -797,12 +812,10 @@ Creep.prototype.activeRenew = function () {
     const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
     if (CREEP_LIFE_TIME - this.ticksToLive < Math.floor(600 / this.body.length)) return
 
-    const spawns = room.structures.spawn
+    const spawns = room.structures.spawn.filter(spawn => !spawn.renewed && !spawn.spawning)
     if (!spawns.length) return
 
     const spawn = findClosestObject(this.pos, spawns)
-    if (spawn.renewed) return
-    if (spawn.spawning) return
 
     if (getRangeOfCoords(this.pos, spawn.pos) > 1) {
         this.createMoveRequest({
@@ -1195,7 +1208,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             const request = this.room.roomLogisticsRequests[type][requestID]
 
             delete request.delivery
-/*
+            /*
             // Make a personal amount based on existing amount plus estimated income for distance
 
             request.personalAmount =

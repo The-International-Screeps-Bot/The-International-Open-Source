@@ -1,5 +1,11 @@
-import { creepRoles, powerCreepClassNames, roomTypesUsedForStats } from 'international/constants'
-import { cleanRoomMemory } from 'international/utils'
+import {
+    adjacentOffsets,
+    creepRoles,
+    customColors,
+    powerCreepClassNames,
+    roomTypesUsedForStats,
+} from 'international/constants'
+import { cleanRoomMemory, customLog, forAdjacentCoords, forCoordsInRange } from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
 import { ContainerManager } from './container'
@@ -114,9 +120,9 @@ export class RoomManager {
 
         // new commune planner
         this.communePlanner.preTickRun()
-        return
 
         room.communeManager.update(room)
+        return
         room.communeManager.preTickRun()
     }
 

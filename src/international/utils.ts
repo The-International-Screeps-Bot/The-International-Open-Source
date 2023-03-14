@@ -647,7 +647,6 @@ export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: 
 
     for (let x = x1; x <= x2; x += 1) {
         for (let y = y1; y <= y2; y += 1) {
-
             coords.push({ x, y })
         }
     }
@@ -663,7 +662,6 @@ export function findRoomNamesInRangeXY(startX: number, startY: number, range: nu
 
     for (let x = startX - range; x <= startX + range; x += 1) {
         for (let y = startY - range; y <= startY + range; y += 1) {
-
             coords.push({ x, y })
         }
     }
@@ -704,7 +702,7 @@ export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
  * @param {function} callback The callback to run.
  * @return {mixed} Whatever the original fuction returns.
  */
-export function tryMapped<T>(callback: () => T): T {
+export function tryErrorMapped<T>(callback: () => T): T {
     try {
         return callback()
     } catch (error: any) {
@@ -717,4 +715,41 @@ export function tryMapped<T>(callback: () => T): T {
     }
 
     return undefined
+}
+
+export function forAdjacentCoords(startCoord: Coord, f: (near: Coord) => void) {
+    for (let x = startCoord.x - 1; x <= startCoord.x + 1; x += 1) {
+        for (let y = startCoord.y - 1; y <= startCoord.y + 1; y += 1) {
+            if (isXYExit(x, y)) continue
+
+            f({ x, y })
+        }
+    }
+}
+
+/**
+ * Excludes center around range
+ */
+export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord: Coord) => void) {
+    for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
+        for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
+            if (x == startCoord.x && y === startCoord.y) continue
+            if (isXYExit(x, y)) continue
+
+            f({ x, y })
+        }
+    }
+}
+
+/**
+ * includes center around range
+ */
+export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Coord) => void) {
+    for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
+        for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
+            if (isXYExit(x, y)) continue
+
+            f({ x, y })
+        }
+    }
 }

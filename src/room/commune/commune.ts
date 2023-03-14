@@ -8,6 +8,8 @@ import {
     findFunctionCPU,
     findLinkThroughput,
     findObjectWithID,
+    forAdjacentCoords,
+    forCoordsInRange,
     getRange,
     getRangeOfCoords,
     isXYExit,
@@ -36,6 +38,7 @@ import {
     roomDimensions,
     stamps,
     defaultRoadPlanningPlainCost,
+    adjacentOffsets,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -282,14 +285,14 @@ export class CommuneManager {
     }
 
     private test() {
-        return
+
         /*
         const array = new Array(2500)
 
         for (let i = 0; i < array.length; i++) {
             array[i] = packBasePlanCoord(STRUCTURE_SPAWN, 1)
         }
- */
+        */
         return
 
         let CPUUsed = Game.cpu.getUsed()

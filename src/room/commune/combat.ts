@@ -1,4 +1,5 @@
 import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
+import { allyManager } from 'international/simpleAllies'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick } from 'international/utils'
 import { packCoord } from 'other/codec'
@@ -206,6 +207,11 @@ export class CombatManager {
             quadQuota: 1,
             inactionTimerMax: onlyInvader ? 1 : undefined,
         })
+
+        if (Memory.allyPlayers) {
+
+            allyManager.requestDefense(room.name, minDamage, minMeleeHeal, minRangedHeal, 1)
+        }
     }
 
     private calculateThreat() {
