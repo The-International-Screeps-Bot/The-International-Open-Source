@@ -44,7 +44,7 @@ import {
     unpackNumAsPos,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { packCoord, packPosList, packXYAsCoord, unpackCoord } from 'other/codec'
+import { packCoord, packPosList, packXYAsCoord, reversePosList, unpackCoord, unpackPosList } from 'other/codec'
 import 'other/RoomVisual'
 import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
@@ -303,6 +303,10 @@ export class CommunePlanner {
         for (const packedCoord in this.rampartPlans.map) {
             const coord = unpackCoord(packedCoord)
 
+            if (this.rampartPlans.get(packedCoord).buildForThreat) {
+                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
+                continue
+            }
             this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.5 })
         }
 
@@ -2287,19 +2291,23 @@ export class CommunePlanner {
         // Weight coords near ramparts that could be ranged attacked
 
         for (const packedCoord of this.minCutCoords) {
-            for (const adjCoord of findCoordsInRange(unpackNumAsCoord(packedCoord), 2)) {
+            const coord = unpackNumAsCoord(packedCoord)
+            for (const adjCoord of findCoordsInRange(coord, 2)) {
                 const packedAdjCoord = packAsNum(adjCoord)
                 if (this.terrainCoords[packedAdjCoord] > 0) continue
                 if (this.minCutCoords.has(packedAdjCoord)) continue
+                if (unprotectedCoords[packedAdjCoord] === 255) continue
 
-                const currentWeight = unprotectedCoords[packedAdjCoord]
+                if (getRangeOfCoords(coord, adjCoord) === 1) {
+                    this.rampartPlans.setXY(adjCoord.x, adjCoord.y, 4, false, false, true)
+                }
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
-                    unprotectedCoords[packedAdjCoord] = Math.max(unprotectedCoordWeight - 1, currentWeight)
+                    unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight - 1
                     continue
                 }
 
-                unprotectedCoords[packedAdjCoord] = Math.max(unprotectedCoordWeight, currentWeight)
+                unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight
             }
         }
 
@@ -2335,6 +2343,7 @@ export class CommunePlanner {
 
             let onboardingIndex = 0
             let onboardingCount = 0
+            let forThreat = false
 
             // So long as there is a pos in path with an index of onboardingIndex
 
@@ -2356,34 +2365,17 @@ export class CommunePlanner {
                 onboardingCoords.add(packedCoord)
                 this.rampartCoords[packedCoord] = 1
                 this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
-                this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, false)
+                this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, forThreat)
 
                 onboardingCount += 1
-                if (onboardingCount === minOnboardingRamparts) break
+                if (forThreat) break
+                if (onboardingCount === minOnboardingRamparts) forThreat = true
             }
         }
 
         this.stampAnchors.onboardingRampart = Array.from(onboardingCoords).map(packedCoord =>
             unpackNumAsCoord(packedCoord),
         )
-    }
-    private findProtectedCoords() {
-        if (this.protectCoords) return
-
-        const protectedCoords = new Uint8Array(2500)
-
-        for (let x = 0; x < roomDimensions; x++) {
-            for (let y = 0; y < roomDimensions; y++) {
-                const packedCoord = packXYAsNum(x, y)
-
-                if (this.terrainCoords[packedCoord] > 0) continue
-                if (this.unprotectedCoords[packedCoord] > 0) continue
-
-                protectedCoords[packedCoord] = 1
-            }
-        }
-
-        this.protectedCoords = protectedCoords
     }
     private protectFromNuke(coord: Coord, minRCL: number) {}
     private shield(coord: Coord, minRCL: number, coversStructure: boolean = true) {

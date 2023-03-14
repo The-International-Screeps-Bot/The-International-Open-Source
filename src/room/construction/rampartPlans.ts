@@ -10,23 +10,22 @@ export class RampartPlans {
         this.map = map || {}
     }
     set(packedCoord: string, minRCL: number, coversStructure: boolean, buildForNuke: boolean, buildForThreat: boolean) {
-        const planCoord = this.map[packedCoord]
-        if (!planCoord) {
-            this.map[packedCoord] = {
-                minRCL,
-                coversStructure: +coversStructure,
-                buildForNuke: +buildForNuke,
-                buildForThreat: +buildForThreat,
-            }
-            return
+        this.map[packedCoord] = {
+            minRCL,
+            coversStructure: +coversStructure,
+            buildForNuke: +buildForNuke,
+            buildForThreat: +buildForThreat,
         }
-
-        // The structureTypes are the same
-
-        planCoord.minRCL = Math.min(planCoord.minRCL, minRCL)
         return
     }
-    setXY(x: number, y: number, minRCL: number, coversStructure: boolean, buildForNuke: boolean, buildForThreat: boolean) {
+    setXY(
+        x: number,
+        y: number,
+        minRCL: number,
+        coversStructure: boolean,
+        buildForNuke: boolean,
+        buildForThreat: boolean,
+    ) {
         return this.set(packXYAsCoord(x, y), minRCL, coversStructure, buildForNuke, buildForThreat)
     }
     get(packedCoord: string) {

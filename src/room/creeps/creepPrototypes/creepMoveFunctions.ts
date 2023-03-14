@@ -9,6 +9,7 @@ import {
     roomDimensions,
     TrafficPriorities,
     rampartSet,
+    packedPosLength,
 } from 'international/constants'
 import { internationalManager } from 'international/international'
 import {
@@ -142,30 +143,28 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
-    if (this instanceof Creep && !this.parts.move) return false
+    if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
+
+        this.moved = 'moved'
+        return false
+    }
 
     if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
 
-    let path = unpackPosList(pathOpts.packedPath)
-    let posIndex: number
+    const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
-    for (let i = 0; i < path.length; i++) {
-        const pos = path[i]
-        if (!arePositionsEqual(this.pos, pos)) continue
-
-        posIndex = i
-        break
-    }
     this.room.visual.text((posIndex || -1).toString(), this.pos)
-    if (posIndex !== undefined && posIndex + 1 < path.length) {
-        path.splice(0, posIndex + 1)
+    if (posIndex >= 0 && posIndex + packedPosLength < pathOpts.packedPath.length) {
 
+        const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
+        const path = unpackPosList(packedPath)
+        this.room.targetVisual(this.pos, path[0])
         // If we're on an exit and the next pos is in the other room, wait
 
         if (path[0].roomName !== this.room.name) {
             /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
             this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
-            this.memory.P = packPosList(path)
+            this.memory.P = packedPath
             this.moved = 'moved'
             return true
         }
@@ -193,7 +192,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
         // Give the creep a sliced version of the path it is trying to use
 
-        this.memory.P = packPosList(path)
+        this.memory.P = packedPath
         this.assignMoveRequest(path[0])
         return true
     }
@@ -223,7 +222,11 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moveRequest) return false
     if (this.moved) return false
     if (this.fatigue > 0) return false
-    if (this instanceof Creep && !this.parts.move) return false
+    if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
+
+        this.moved = 'moved'
+        return false
+    }
     /*
     if (this.spawning) return false
  */

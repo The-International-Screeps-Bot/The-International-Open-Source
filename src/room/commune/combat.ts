@@ -101,12 +101,12 @@ export class CombatManager {
 
         // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
 
-        if (!enemyAttackers.length || this.communeManager.room.controller.safeMode) {
+        if (!enemyAttackers.length || room.controller.safeMode) {
             if (!Memory.publicRamparts) return
 
             // Stop if the tick is not divisible by a random range
 
-            if (!randomTick()) return
+            if (!randomTick(100)) return
 
             // Publicize at most 10 ramparts per tick, to avoid too many intents
 
@@ -220,8 +220,8 @@ export class CombatManager {
             let threat = 0
 
             threat += enemyCreep.combatStrength.dismantle
-            threat += enemyCreep.combatStrength.melee
-            threat += enemyCreep.combatStrength.ranged * 3
+            threat += enemyCreep.combatStrength.melee * 1.2
+            threat += enemyCreep.combatStrength.ranged * 3.5
 
             threat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
 

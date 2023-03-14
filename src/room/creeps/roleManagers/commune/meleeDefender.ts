@@ -123,7 +123,6 @@ export class MeleeDefender extends Creep {
 
             const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
             if (creepIDUsingRampart) {
-
                 const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
                 if (creepUsingRampart.role === 'meleeDefender') return false
             }
@@ -145,6 +144,12 @@ export class MeleeDefender extends Creep {
         // Find the closest rampart to the enemyAttacker
 
         const rampart = findClosestObjectEuc(enemyCreep.pos, ramparts)
+
+        const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
+        if (creepIDUsingRampart) {
+            const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
+            delete creepUsingRampart.memory.RID
+        }
 
         this.memory.RID = rampart.id
         room.usedRampartIDs.set(rampart.id, this.id)

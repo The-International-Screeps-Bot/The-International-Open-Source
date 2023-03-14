@@ -124,7 +124,7 @@ export class RemoteDefender extends Creep {
 
             // If the range is more than 1
 
-            if (range > 1) {
+            if (range > 1 && !enemyCreep.isOnExit) {
                 this.rangedAttack(enemyCreep)
 
                 // Have the create a moveRequest to the enemyAttacker and inform true

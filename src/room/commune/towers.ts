@@ -65,7 +65,7 @@ export class TowerManager {
 
         // Find the enemyCreep the towers can hurt the most, declaring tower inferiority if we can't out-damage a creep
 
-        let highestDamage = 0
+        let highestDamage = 1
 
         for (const enemyCreep of room.enemyCreeps) {
             if (enemyCreep.isOnExit) continue
@@ -74,6 +74,7 @@ export class TowerManager {
             if (!room.towerInferiority && netTowerDamage <= 0) {
                 room.towerInferiority = true
                 this.createPowerTasks()
+                continue
             }
 
             if (netTowerDamage < highestDamage) continue
