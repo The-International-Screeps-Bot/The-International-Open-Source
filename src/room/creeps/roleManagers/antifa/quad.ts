@@ -291,8 +291,8 @@ export class Quad {
             this.rangedKite()
 
             if (this.bulldoze()) return true
-            if (this.advancedRangedAttack()) return true
             if (this.rangedAttackStructures()) return true
+            if (this.advancedRangedAttack()) return true
             return false
         }
         if (this.leader.memory.SCT === 'attack') {
@@ -725,10 +725,18 @@ export class Quad {
             const range = getRangeOfCoords(member.pos, this.target.pos)
             if (range > 3) continue
 
-            if (range === 1) member.rangedMassAttack()
-            else member.rangedAttack(this.target)
+            if ((this.target instanceof Structure && this.target.structureType === STRUCTURE_WALL) || range > 1) {
+                member.rangedAttack(this.target)
+                continue
+            }
+
+            member.rangedMassAttack()
         }
     }
+
+    private rangedAttackAttackers() {}
+
+    private rangedAttackEnemies() {}
 
     advancedRangedAttack() {
         const { room } = this.leader

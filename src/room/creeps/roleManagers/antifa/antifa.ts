@@ -15,7 +15,6 @@ export class Antifa extends Creep {
 
         // We don't want a squad or we already have done
 
-        if (this.spawning) return
         if (!this.memory.SS) return
         if (this.memory.SF) return
 
@@ -112,6 +111,7 @@ export class Antifa extends Creep {
         // The squad is not yet formed
 
         for (const requestingCreepName of this.room.squadRequests) {
+            if (requestingCreepName) continue
             if (requestingCreepName === this.name) continue
 
             const requestingCreep = Game.creeps[requestingCreepName]
