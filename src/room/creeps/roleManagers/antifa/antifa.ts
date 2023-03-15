@@ -111,7 +111,7 @@ export class Antifa extends Creep {
         // The squad is not yet formed
 
         for (const requestingCreepName of this.room.squadRequests) {
-            if (requestingCreepName) continue
+            if (Game.creeps[requestingCreepName].spawning) continue
             if (requestingCreepName === this.name) continue
 
             const requestingCreep = Game.creeps[requestingCreepName]

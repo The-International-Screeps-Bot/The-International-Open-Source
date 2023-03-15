@@ -1180,6 +1180,10 @@ export const defaultRoadPlanningPlainCost = 3
 export const defaultSwampCost = 5
 export const defaultCreepSwampCost = 8
 
+/**
+ * @constant 1 4
+ * @constant 2 3
+ */
 export const quadAttackMemberOffsets = [
     {
         x: 0,
@@ -1292,10 +1296,15 @@ export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: nu
     ],
 }
 
+/**
+ * Member order is:
+ * @constant 1 4
+ * @constant 2 3
+ */
 export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
     none: [0, 1, 2, 3],
     rotateLeft: [1, 2, 3, 0],
-    rotateRight: [3, 2, 1, 0],
+    rotateRight: [3, 1, 2, 0],
     tradeHorizontal: [3, 2, 1, 0],
     tradeVertical: [1, 0, 3, 2],
 }

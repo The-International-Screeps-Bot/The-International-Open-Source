@@ -96,6 +96,10 @@ interface FindStampAnchorArgs {
     conditions?(coord: Coord): boolean
 }
 
+interface CommunePlannerSpecialKeys {
+    a: number
+}
+
 /**
  *
  */
@@ -2415,5 +2419,20 @@ export class CommunePlanner {
         }
 
         this.generalShielded = true
+    }
+    private findScore() {
+        if (this.score) return
+
+        const score = 0
+
+        this.score = score
+    }
+    private record() {
+
+        const planAttempt = {}
+
+        for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key]
+
+        this.room.memory.BPAs
     }
 }

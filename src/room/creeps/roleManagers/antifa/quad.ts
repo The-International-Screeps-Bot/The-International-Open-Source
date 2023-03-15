@@ -286,7 +286,11 @@ export class Quad {
                     this.findMinRange(enemyCreep.pos) <= 4 &&
                     (enemyCreep.combatStrength.ranged || enemyCreep.combatStrength.melee),
             )
-            if (nearbyThreat) this.advancedTransform()
+            if (nearbyThreat && !this.leader.room.findStructureAtCoord(nearbyThreat.pos, STRUCTURE_RAMPART)) {
+
+                this.target = nearbyThreat
+                this.advancedTransform()
+            }
 
             this.rangedKite()
 
@@ -297,6 +301,7 @@ export class Quad {
         }
         if (this.leader.memory.SCT === 'attack') {
             if (this.advancedAttack()) return false
+            this.randomTransform()
         }
 
         this.advancedDismantle()

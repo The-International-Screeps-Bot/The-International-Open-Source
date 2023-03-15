@@ -65,6 +65,14 @@ export interface AllyRequest {
     hateAmount?: number
 }
 
+export interface CreepCombatData {
+    meleeDamage: number
+    rangedDamage: number
+    heal: number
+    hits: number
+    defence: number
+}
+
 /**
  * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated simpleAlliesSegment before usage
  */

@@ -160,9 +160,10 @@ export class Maintainer extends Creep {
 
             return
         }
-
+        /*
         const rampartCSite = this.room.find(FIND_MY_CONSTRUCTION_SITES).find(site => site.structureType === STRUCTURE_RAMPART)
         if (rampartCSite && this.advancedBuildCSite(rampartCSite) !== RESULT_FAIL) return
+        */
         if (this.advancedMaintain()) return
         if (this.maintainNearby()) return
     }
