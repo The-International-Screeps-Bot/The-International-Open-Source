@@ -874,7 +874,7 @@ export enum PlayerData {
     /**
      * Generally how good their offense is
      */
-    offensiveStrength,
+    offensiveThreat,
     /**
      * Generally how good their defense is
      */

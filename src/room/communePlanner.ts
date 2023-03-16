@@ -125,7 +125,6 @@ export class CommunePlanner {
     //
 
     terrainCoords: CoordMap
-    packedExitCoords: Set<string>
     exitCoords: Coord[]
     /**
      * Coords adjacent to exits, including exit coords
@@ -231,7 +230,6 @@ export class CommunePlanner {
             this.roadCoords = new Uint8Array(this.terrainCoords)
             this.rampartCoords = new Uint8Array(2500)
             this.byExitCoords = new Uint8Array(2500)
-            this.packedExitCoords = new Set()
             this.exitCoords = []
             this.byPlannedRoad = new Uint8Array(2500)
             this.basePlans = new BasePlans()
@@ -329,43 +327,16 @@ export class CommunePlanner {
         /* this.room.visualizeCoordMap(this.terrainCoords, true) */
     }
     private recordExits() {
-        let x
-        let y = 0
-        for (x = 0; x < roomDimensions; x += 1) this.recordExit(x, y)
+        for (const packedCoord of this.room.exitCoords) {
+            const coord = unpackCoord(packedCoord)
+            this.exitCoords.push(coord)
+            forAdjacentCoords(coord, adjCoord => {
+                const packedAdjCoord = packAsNum(adjCoord)
+                if (this.terrainCoords[packedAdjCoord] === 255) return
 
-        // Configure x and loop through left exits
-
-        x = 0
-        for (y = 0; y < roomDimensions; y += 1) this.recordExit(x, y)
-
-        // Configure y and loop through bottom exits
-
-        y = roomDimensions - 1
-        for (x = 0; x < roomDimensions; x += 1) this.recordExit(x, y)
-
-        // Configure x and loop through right exits
-
-        x = roomDimensions - 1
-        for (y = 0; y < roomDimensions; y += 1) this.recordExit(x, y)
-    }
-    private recordExit(x: number, y: number) {
-        const packedCoord = packXYAsNum(x, y)
-        if (this.terrainCoords[packedCoord] === 255) return
-
-        this.packedExitCoords.add(packXYAsCoord(x, y))
-        this.exitCoords.push({ x, y })
-
-        // Loop through adjacent positions
-
-        for (const offset of adjacentOffsets) {
-            const adjX = x + offset.x
-            const adjY = y + offset.y
-
-            const packedCoord = packXYAsNum(adjX, adjY)
-            if (this.terrainCoords[packedCoord] === 255) continue
-
-            this.byExitCoords[packedCoord] = 255
-            this.baseCoords[packedCoord] = 255
+                this.byExitCoords[packedAdjCoord] = 255
+                this.baseCoords[packedAdjCoord] = 255
+            })
         }
     }
     private generateGrid() {
@@ -555,7 +526,7 @@ export class CommunePlanner {
         visitedCoords = new Set()
         groupIndex = 0
 
-        for (const packedCoord of this.packedExitCoords) {
+        for (const packedCoord of this.room.exitCoords) {
             const exitCoord = unpackCoord(packedCoord)
             if (visitedCoords.has(packedCoord)) continue
 
@@ -1524,7 +1495,7 @@ export class CommunePlanner {
                     if (visitedCoords[packAsNum(coord2)] === 1) continue
                     visitedCoords[packAsNum(coord2)] = 1
 
-                    if (this.packedExitCoords.has(packCoord(coord2))) return true
+                    if (this.room.exitCoords.has(packCoord(coord2))) return true
 
                     if (this.terrainCoords[packAsNum(coord2)] === 255) continue
 

@@ -1,7 +1,16 @@
 import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
+import { playerManager } from 'international/players'
 import { allyManager } from 'international/simpleAllies'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, findRangeFromExit, getRangeOfCoords, isXYInBorder, randomRange, randomTick } from 'international/utils'
+import {
+    customLog,
+    findObjectWithID,
+    findRangeFromExit,
+    getRangeOfCoords,
+    isXYInBorder,
+    randomRange,
+    randomTick,
+} from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -209,7 +218,6 @@ export class CombatManager {
         })
 
         if (Memory.allyPlayers) {
-
             allyManager.requestDefense(room.name, minDamage, minMeleeHeal, minRangedHeal, 1)
         }
     }
@@ -261,7 +269,7 @@ export class CombatManager {
                 }
             }
 
-            player.data[PlayerData.offensiveStrength] = Math.max(threat, player.data[PlayerData.offensiveStrength])
+            player.data[PlayerData.offensiveThreat] = Math.max(threat, player.data[PlayerData.offensiveThreat])
             player.data[PlayerData.hate] = Math.max(threat, player.data[PlayerData.hate])
 
             player.data[PlayerData.lastAttack] = 0
@@ -270,7 +278,7 @@ export class CombatManager {
         const roomMemory = Memory.rooms[room.name]
 
         if (this.totalThreat > 0) {
-            roomMemory.AT = Math.max(roomMemory.AT, this.totalThreat)
+            roomMemory.AT = Math.max(roomMemory.AT, this.totalThreat, playerManager.highestThreat / 2)
             roomMemory.LAT = 0
         }
 

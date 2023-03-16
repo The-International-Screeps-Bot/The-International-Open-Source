@@ -83,8 +83,8 @@ function originalLoop() {
         respawnManager.run()
         configManager.run()
         allyManager.tickConfig()
-        tickConfig.run()
         playerManager.run()
+        tickConfig.run()
         creepOrganizer.run()
         powerCreepOrganizer.run()
 

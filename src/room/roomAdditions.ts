@@ -2150,9 +2150,41 @@ const roomAdditions = {
             if (this._exitCoords) return this._exitCoords
 
             this._exitCoords = new Set()
+            const terrain = this.getTerrain()
 
-            for (const exit of this.find(FIND_EXIT)) {
-                this._exitCoords.add(packCoord(exit))
+            let x
+            let y = 0
+            for (x = 0; x < roomDimensions; x += 1) {
+
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                this._exitCoords.add(packXYAsCoord(x, y))
+            }
+
+            // Configure x and loop through left exits
+
+            x = 0
+            for (y = 0; y < roomDimensions; y += 1) {
+
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                this._exitCoords.add(packXYAsCoord(x, y))
+            }
+
+            // Configure y and loop through bottom exits
+
+            y = roomDimensions - 1
+            for (x = 0; x < roomDimensions; x += 1) {
+
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                this._exitCoords.add(packXYAsCoord(x, y))
+            }
+
+            // Configure x and loop through right exits
+
+            x = roomDimensions - 1
+            for (y = 0; y < roomDimensions; y += 1) {
+
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+                this._exitCoords.add(packXYAsCoord(x, y))
             }
 
             return this._exitCoords

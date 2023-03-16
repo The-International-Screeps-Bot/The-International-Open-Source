@@ -795,9 +795,9 @@ Room.prototype.scoutEnemyRoom = function () {
     threat = Math.floor(threat)
 
     roomMemory.OS = threat
-    Memory.players[playerName].data[PlayerData.offensiveStrength] = Math.max(
+    Memory.players[playerName].data[PlayerData.offensiveThreat] = Math.max(
         threat,
-        player.data[PlayerData.offensiveStrength],
+        player.data[PlayerData.offensiveThreat],
     )
 
     // Defensive threat
@@ -2012,7 +2012,6 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
                 // Loop through adjacent positions
 
                 for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
-
                     const packedAdjacentCoord = packAsNum(adjacentPos)
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
