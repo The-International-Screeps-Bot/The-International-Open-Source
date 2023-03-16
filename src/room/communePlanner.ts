@@ -2431,7 +2431,7 @@ export class CommunePlanner {
 
         const planAttempt = {}
 
-        for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key]
+        /* for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key] */
 
         this.room.memory.BPAs
     }

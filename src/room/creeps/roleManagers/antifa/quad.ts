@@ -3,8 +3,6 @@ import {
     customColors,
     numbersByStructureTypes,
     quadAttackMemberOffsets,
-    quadTransformIndexes,
-    quadTransformOffsets,
     rangedMassAttackMultiplierByRange,
     roomDimensions,
 } from 'international/constants'
@@ -287,7 +285,6 @@ export class Quad {
                     (enemyCreep.combatStrength.ranged || enemyCreep.combatStrength.melee),
             )
             if (nearbyThreat && !this.leader.room.findStructureAtCoord(nearbyThreat.pos, STRUCTURE_RAMPART)) {
-
                 this.target = nearbyThreat
                 this.advancedTransform()
             }
@@ -301,7 +298,6 @@ export class Quad {
         }
         if (this.leader.memory.SCT === 'attack') {
             if (this.advancedAttack()) return false
-            this.randomTransform()
         }
 
         this.advancedDismantle()
@@ -490,104 +486,71 @@ export class Quad {
         return true
     }
 
-    transform(transformType: QuadTransformTypes) {
-        /*
-        if (!this.canMove) {
-            this.holdFormation()
-            return false
-        }
- */
-        const transformOffsets = quadTransformOffsets[transformType]
-        const newIndexes = quadTransformIndexes[transformType]
-        const membersByCoordArray = Object.values(this.membersByCoord)
-        const newMemberNames: string[] = []
+    private scoreMemberTransform(memberName: string, coord: Coord) {
+        const member = Game.creeps[memberName]
 
-        for (let i = 0; i < membersByCoordArray.length; i++) {
-            const member = membersByCoordArray[i]
-            if (!member) continue
+        let score = (1 - member.defenceStrength) * 5000
 
-            const offset = transformOffsets[i]
-            member.assignMoveRequest({ x: member.pos.x + offset.x, y: member.pos.y + offset.y })
+        const range = getRange(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
 
-            const newIndex = newIndexes[i]
-            newMemberNames[newIndex] = member.name
+        if (this.leader.memory.SCT === 'rangedAttack') {
+            score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
+
+            return score
         }
 
-        for (const member of this.members) {
-            member.memory.SMNs = newMemberNames
+        if (range > 1) return score
+
+        if (this.leader.memory.SCT === 'attack') {
+            score += member.combatStrength.melee
+            return score
         }
 
-        return true
-    }
+        // Dismantle type
 
-    randomTransform() {
-        const quadTransformKeys = Object.keys(quadTransformIndexes)
-        return this.transform(
-            quadTransformKeys[Math.floor(Math.random() * quadTransformKeys.length)] as QuadTransformTypes,
-        )
-    }
-
-    scoreTransform(transformType: QuadTransformTypes) {
-        let score = 0
-        const transformOffsets = quadTransformOffsets[transformType]
-        const membersByCoordArray = Object.values(this.membersByCoord)
-
-        for (let i = 0; i < membersByCoordArray.length; i++) {
-            const member = membersByCoordArray[i]
-            if (!member) continue
-
-            const offset = transformOffsets[i]
-
-            score += (1 - member.defenceStrength) * 5000
-
-            const range = getRange(
-                this.target.pos.x,
-                member.pos.x + offset.x,
-                this.target.pos.y,
-                member.pos.y + offset.y,
-            )
-
-            if (this.leader.memory.SCT === 'rangedAttack') {
-                score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
-
-                continue
-            }
-
-            if (this.leader.memory.SCT === 'attack') {
-                score += member.combatStrength.melee
-                continue
-            }
-
-            // Dismantle type
-
-            score += member.combatStrength.dismantle
-            continue
-        }
-        customLog(transformType, score)
+        score += member.combatStrength.dismantle
         return score
     }
 
-    advancedTransform(): boolean {
+    private advancedTransform(): boolean {
         if (!this.willMove) return false
-
         if (!this.target) return false
 
-        let highestScore = 0
-        let bestTransformName: QuadTransformTypes
+        const memberTransforms: string[] = []
+        const transformableMemberNames = new Set(this.leader.memory.SMNs)
 
-        for (const transformType in quadTransformOffsets) {
-            const score = this.scoreTransform(transformType as QuadTransformTypes)
+        for (let i = 0; i < quadAttackMemberOffsets.length; i++) {
+            const coord = {
+                x: this.leader.pos.x + quadAttackMemberOffsets[i].x,
+                y: this.leader.pos.y + quadAttackMemberOffsets[i].y,
+            }
 
-            if (score <= highestScore) continue
+            let bestScore = 0
+            let bestMember: Antifa
 
-            highestScore = score
-            bestTransformName = transformType as QuadTransformTypes
+            for (const memberName of transformableMemberNames) {
+                const member = Game.creeps[memberName]
+                if (areCoordsEqual(member.pos, coord)) continue
+
+                const score = this.scoreMemberTransform(memberName, coord)
+                if (score <= bestScore) continue
+
+                bestScore = score
+                bestMember = member
+            }
+
+            bestMember.assignMoveRequest(coord)
+
+            transformableMemberNames.delete(bestMember.name)
+            memberTransforms[i] = bestMember.name
         }
 
-        customLog('FOUND TRANSFORM', bestTransformName)
+        const nonNullMemberTransforms = memberTransforms.filter(name => name)
 
-        if (bestTransformName === 'none') return true
-        return this.transform(bestTransformName)
+        for (const member of this.members) {
+            member.memory.SMNs = nonNullMemberTransforms
+        }
+        return true
     }
 
     passiveHealQuad() {
