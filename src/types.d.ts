@@ -2158,6 +2158,7 @@ declare global {
          */
         P: string
 
+
         /**
          * Goal Pos, the position the creep is or has tried to path to
          */

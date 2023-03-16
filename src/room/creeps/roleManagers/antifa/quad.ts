@@ -34,6 +34,12 @@ export class Quad {
      * All squad members, where index 0 is the leader
      */
     members: Antifa[] = []
+    /**
+     * @constant 1 2
+     * @constant 3 4
+     * @description where 1 is leader and 2, 3, 4 are squad members
+     */
+    memberNames: string[] = []
     leader: Antifa
     membersByCoord: { [packedCoord: string]: Antifa }
 
@@ -183,6 +189,7 @@ export class Quad {
         for (const memberName of memberNames) {
             const member = Game.creeps[memberName]
             this.members.push(member)
+            this.memberNames.push(memberName)
 
             member.squad = this
             member.squadRan = true
@@ -213,7 +220,9 @@ export class Quad {
             packXYAsCoord(this.leader.pos.x + 1, this.leader.pos.y),
         ]
 
-        for (const packedCoord of packedMemberCoords) {
+        for (let i = 0; i < packedMemberCoords.length; i++) {
+
+            const packedCoord = packedMemberCoords[i]
             const member = unsortedMembersByCoord[packedCoord]
             if (!member) continue
 
@@ -399,16 +408,13 @@ export class Quad {
 
         if (newLeader) {
             this.members[newLeaderIndex] = this.leader
+            this.memberNames[newLeaderIndex] = this.leader.name
             this.members[0] = newLeader
+            this.memberNames[0] = newLeader.name
             this.leader = newLeader
 
-            const memberNames: string[] = []
             for (const member of this.members) {
-                memberNames.push(member.name)
-            }
-
-            for (const member of this.members) {
-                member.memory.SMNs = memberNames
+                member.memory.SMNs = this.memberNames
             }
         }
 
@@ -526,11 +532,10 @@ export class Quad {
             }
 
             let bestScore = 0
-            let bestMember: Antifa
+            let bestMember: Antifa | undefined
 
             for (const memberName of transformableMemberNames) {
                 const member = Game.creeps[memberName]
-                if (areCoordsEqual(member.pos, coord)) continue
 
                 const score = this.scoreMemberTransform(memberName, coord)
                 if (score <= bestScore) continue
@@ -538,11 +543,14 @@ export class Quad {
                 bestScore = score
                 bestMember = member
             }
-
-            bestMember.assignMoveRequest(coord)
+            if (!bestMember) break
 
             transformableMemberNames.delete(bestMember.name)
             memberTransforms[i] = bestMember.name
+
+            if (areCoordsEqual(bestMember.pos, coord)) continue
+
+            bestMember.assignMoveRequest(coord)
         }
 
         const nonNullMemberTransforms = memberTransforms.filter(name => name)
@@ -631,7 +639,7 @@ export class Quad {
      * Attack viable targets without moving
      */
     passiveRangedAttack() {
-        const attackingMemberNames = new Set(this.leader.memory.SMNs)
+        const attackingMemberNames = new Set(this.memberNames)
 
         // Sort enemies by number of members that can attack them
 

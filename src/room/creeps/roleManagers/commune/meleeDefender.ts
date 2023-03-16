@@ -4,11 +4,13 @@ import {
     customLog,
     findClosestObject,
     findClosestObjectEuc,
+    findFurthestObjectEuc,
     findObjectWithID,
     getRange,
     getRangeEuc,
     getRangeOfCoords,
     randomTick,
+    randomVal,
 } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -103,57 +105,50 @@ export class MeleeDefender extends Creep {
         return true
     }
 
-    findRampart?(enemyCreep: Creep) {
+    findRampart?() {
         const { room } = this
 
         if (this.memory.RID && !randomTick(10)) return findObjectWithID(this.memory.RID)
 
-        // Get the room's ramparts, filtering for those and informing false if there are none
+        const enemyAttackers = room.enemyAttackers
 
-        const ramparts = room.defensiveRamparts.filter(rampart => {
-            // Avoid ramparts that are low
+        let bestScore = Infinity
+        let bestRampart: StructureRampart | undefined
 
-            if (rampart.hits < 3000) return false
-
-            // Allow the rampart the creep is currently standing on
-
-            if (areCoordsEqual(this.pos, rampart.pos)) return true
-
+        for (const rampart of room.defensiveRamparts) {
+            if (rampart.hits < 3000) continue
             // Allow the creep to take rampart reservations from other defender types - but not its own type
 
             const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
             if (creepIDUsingRampart) {
                 const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
-                if (creepUsingRampart.role === 'meleeDefender') return false
+                if (creepUsingRampart.role === 'meleeDefender') continue
             }
 
-            if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) return false
+            if (room.findStructureAtCoord(rampart.pos, STRUCTURE_RAMPART)) continue
 
-            // Inform wether there is a creep at the pos
-            /*
-            const packedCoord = packCoord(rampart.pos)
+            let score = getRangeOfCoords(rampart.pos, findClosestObjectEuc(rampart.pos, enemyAttackers).pos)
+            if (getRangeOfCoords(rampart.pos, this.pos) <= 1) score *= 0.5
 
-            if (room.creepPositions.get(packedCoord)) return false
-            if (room.powerCreepPositions.get(packedCoord)) return false
- */
-            return true
-        })
+            score += getRangeOfCoords(rampart.pos, room.anchor) * 0.01
 
-        if (!ramparts.length) return false
+            if (score >= bestScore) continue
 
-        // Find the closest rampart to the enemyAttacker
+            bestScore = score
+            bestRampart = rampart
+        }
 
-        const rampart = findClosestObjectEuc(enemyCreep.pos, ramparts)
+        if (!bestRampart) return false
 
-        const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
+        const creepIDUsingRampart = room.usedRampartIDs.get(bestRampart.id)
         if (creepIDUsingRampart) {
             const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
             delete creepUsingRampart.memory.RID
         }
 
-        this.memory.RID = rampart.id
-        room.usedRampartIDs.set(rampart.id, this.id)
-        return rampart
+        this.memory.RID = bestRampart.id
+        room.usedRampartIDs.set(bestRampart.id, this.id)
+        return bestRampart
     }
 
     defendWithRampart?() {
@@ -161,14 +156,7 @@ export class MeleeDefender extends Creep {
 
         const enemyCreeps = room.enemyAttackers
 
-        // Get the closest enemyAttacker
-
-        const enemyCreep = this.pos.findClosestByPath(enemyCreeps, {
-            ignoreCreeps: true,
-            ignoreRoads: true,
-        })
-
-        const rampart = this.findRampart(enemyCreep)
+        const rampart = this.findRampart()
         if (!rampart) return this.defendWithoutRamparts(enemyCreeps)
 
         this.memory.ROS = true
@@ -190,10 +178,6 @@ export class MeleeDefender extends Creep {
  */
 
             this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, { color: customColors.yellow })
-
-            this.room.targetVisual(this.pos, enemyCreep.pos)
-
-            room.visual.circle(enemyCreep.pos, { fill: customColors.green })
         }
 
         // If the creep is range 0 to the closestRampart, inform false

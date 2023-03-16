@@ -386,13 +386,32 @@ export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPos
     for (const object of objects) {
         const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
 
-        if (range > minRange) continue
+        if (range >= minRange) continue
 
         minRange = range
         closest = object
     }
 
     return closest
+}
+
+/**
+ * Finds the closest object with a position to a given target (Euclidean)
+ */
+export function findFurthestObjectEuc<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+    let maxRange = Infinity
+    let furthest = undefined
+
+    for (const object of objects) {
+        const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
+
+        if (range <= maxRange) continue
+
+        maxRange = range
+        furthest = object
+    }
+
+    return furthest
 }
 
 /**
@@ -405,7 +424,7 @@ export function findClosestPosEuc<T extends RoomPosition | Coord>(target: RoomPo
     for (const pos of positions) {
         const range = getRangeEuc(target.x, pos.x, target.y, pos.y)
 
-        if (range > minRange) continue
+        if (range >= minRange) continue
 
         minRange = range
         closest = pos
@@ -752,4 +771,9 @@ export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Co
             f({ x, y })
         }
     }
+}
+
+export function randomVal(array: any[]) {
+
+    return array[randomIntRange(0, array.length)]
 }
