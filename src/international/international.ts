@@ -63,6 +63,7 @@ export class InternationalManager {
             delete this._mineralPriority
             delete this._funnelOrder
             delete this._minCredits
+            delete this._resourcesInStoringStructures
         }
     }
 
@@ -403,6 +404,17 @@ export class InternationalManager {
         return this._mineralPriority
     }
 
+    _compoundPriority: Partial<{ [key in MineralCompoundConstant]: number }>
+    get compoundPriority() {
+        if (this._compoundPriority) return this._compoundPriority
+
+        this._compoundPriority = {}
+
+        
+
+        return this._compoundPriority
+    }
+
     _funnelOrder: string[]
 
     /**
@@ -434,6 +446,30 @@ export class InternationalManager {
         })
 
         return this._funnelOrder
+    }
+
+    _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+    get resourcesInStoringStructures() {
+
+        if (this._resourcesInStoringStructures) return this._resourcesInStoringStructures
+
+        this._resourcesInStoringStructures = {}
+
+        for (const roomName of global.communes) {
+
+            const room = Game.rooms[roomName]
+            const resources = room.resourcesInStoringStructures
+
+            for (const key in resources) {
+
+                const resource = key as unknown as ResourceConstant
+
+                if (!this._resourcesInStoringStructures[resource]) this._resourcesInStoringStructures[resource] = resources[resource]
+                this._resourcesInStoringStructures[resource] = resources[resource]
+            }
+        }
+
+        return this._resourcesInStoringStructures
     }
 }
 

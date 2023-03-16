@@ -59,62 +59,60 @@ import { mapVisualsManager } from './international/mapVisuals'
 import { endTickManager } from './international/endTickManager'
 
 function originalLoop() {
-    tryErrorMapped(
-        profiler.wrap((): void => {
-            if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
-                customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-                    textColor: customColors.white,
-                    bgColor: customColors.red,
-                })
-                console.log(global.logs)
-                return
-            }
+    profiler.wrap((): void => {
+        if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
+            customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+                textColor: customColors.white,
+                bgColor: customColors.red,
+            })
+            console.log(global.logs)
+            return
+        }
 
-            memHack.run()
+        memHack.run()
 
-            internationalManager.update()
+        internationalManager.update()
 
-            // If CPU logging is enabled, get the CPU used at the start
+        // If CPU logging is enabled, get the CPU used at the start
 
-            if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-            // Run prototypes
+        // Run prototypes
 
-            migrationManager.run()
-            respawnManager.run()
-            configManager.run()
-            allyManager.tickConfig()
-            tickConfig.run()
-            playerManager.run()
-            creepOrganizer.run()
-            powerCreepOrganizer.run()
+        migrationManager.run()
+        respawnManager.run()
+        configManager.run()
+        allyManager.tickConfig()
+        tickConfig.run()
+        playerManager.run()
+        creepOrganizer.run()
+        powerCreepOrganizer.run()
 
-            roomPruningManager.run()
-            flagManager.run()
-            constructionSiteManager.run()
-            internationalManager.orderManager()
+        roomPruningManager.run()
+        flagManager.run()
+        constructionSiteManager.run()
+        internationalManager.orderManager()
 
-            if (Memory.CPULogging === true) {
-                const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-                customLog('International Manager', cpuUsed.toFixed(2), {
-                    textColor: customColors.white,
-                    bgColor: customColors.lightBlue,
-                })
-                const statName: InternationalStatNames = 'imcu'
-                globalStatsUpdater('', statName, cpuUsed, true)
-            }
+        if (Memory.CPULogging === true) {
+            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
+            customLog('International Manager', cpuUsed.toFixed(2), {
+                textColor: customColors.white,
+                bgColor: customColors.lightBlue,
+            })
+            const statName: InternationalStatNames = 'imcu'
+            globalStatsUpdater('', statName, cpuUsed, true)
+        }
 
-            roomsManager()
+        roomsManager()
 
-            mapVisualsManager.run()
+        mapVisualsManager.run()
 
-            internationalManager.advancedGeneratePixel()
-            internationalManager.advancedSellPixels()
+        internationalManager.advancedGeneratePixel()
+        internationalManager.advancedSellPixels()
 
-            if (Memory.me === 'PandaMaster' && Game.shard.name.includes('shard')) ExecutePandaMasterCode()
-            endTickManager.run()
-        }),
-    )
+        if (Memory.me === 'PandaMaster' && Game.shard.name.includes('shard')) ExecutePandaMasterCode()
+        endTickManager.run()
+    })
 }
 
 export const loop = ErrorMapper.wrapLoop(originalLoop)

@@ -444,6 +444,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         let score: number
         if (goalCoord) {
             score = getRangeOfCoords(coord, goalCoord)
+            this.room.visual.text(score.toString(), coord.x, coord.y)
             if (score >= lowestScore) continue
         }
 

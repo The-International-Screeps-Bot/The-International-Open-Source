@@ -1,6 +1,6 @@
 import { customColors, towerPowers } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, estimateTowerDamage, findObjectWithID, randomTick, scalePriority } from 'international/utils'
+import { customLog, estimateTowerDamage, findObjectWithID, findRangeFromExit, isXYInBorder, randomTick, scalePriority } from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -57,10 +57,7 @@ export class TowerManager {
 
         if (room.towerAttackTarget) return room.towerAttackTarget
 
-        const attackTargets = room.enemyCreeps.filter(function (creep) {
-            return !creep.isOnExit
-        })
-
+        const attackTargets = room.enemyCreeps
         if (!attackTargets.length) return false
 
         // Find the enemyCreep the towers can hurt the most, declaring tower inferiority if we can't out-damage a creep
@@ -68,19 +65,18 @@ export class TowerManager {
         let highestDamage = 1
 
         for (const enemyCreep of room.enemyCreeps) {
-            if (enemyCreep.isOnExit) continue
 
-            const netTowerDamage = enemyCreep.netTowerDamage
-            if (!room.towerInferiority && netTowerDamage <= 0) {
+            const damage = enemyCreep.netTowerDamage
+            if (!room.towerInferiority && damage * findRangeFromExit(enemyCreep.pos) < enemyCreep.hits) {
                 room.towerInferiority = true
                 this.createPowerTasks()
                 continue
             }
 
-            if (netTowerDamage < highestDamage) continue
+            if (damage < highestDamage) continue
 
             room.towerAttackTarget = enemyCreep
-            highestDamage = netTowerDamage
+            highestDamage = damage
         }
         if (!room.towerAttackTarget) return false
 
@@ -103,7 +99,11 @@ export class TowerManager {
         if (!this.actionableTowerIDs.length) return false
 
         const attackTarget = this.findAttackTarget()
-        if (!attackTarget) return true
+        if (!attackTarget) {
+
+            this.scatterShot()
+            return true
+        }
 
         for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
             const tower = findObjectWithID(this.actionableTowerIDs[i])
@@ -117,6 +117,37 @@ export class TowerManager {
         }
 
         return true
+    }
+
+    /**
+     * @description Distribute fire amoung enemies
+     * Maybe we can mess up healing
+     */
+    scatterShot() {
+
+        if (!randomTick(100)) return
+
+        const enemyCreeps = this.communeManager.room.enemyCreeps
+        if (enemyCreeps.length < 4) return
+
+        let targetIndex = 0
+
+        for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
+            const tower = findObjectWithID(this.actionableTowerIDs[i])
+            const attackTarget = enemyCreeps[targetIndex]
+
+            if (tower.attack(attackTarget) !== OK) continue
+
+            this.actionableTowerIDs.splice(i, 1)
+            attackTarget.reserveHits -= tower.estimateDamageNet(attackTarget)
+
+            if (targetIndex >= enemyCreeps.length - 1) {
+                targetIndex = 0
+                continue
+            }
+
+            targetIndex += 1
+        }
     }
 
     findHealTarget() {

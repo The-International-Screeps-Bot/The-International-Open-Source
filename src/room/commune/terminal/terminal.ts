@@ -56,7 +56,6 @@ export class TerminalManager {
     private createTerminalRequests() {
         const { room } = this.communeManager
         const { terminal } = room
-        const forAllies = Memory.allyTrading && Game.time % 2 === 0
 
         for (const key in terminalResourceTargets) {
             const resource = key as ResourceConstant
@@ -76,10 +75,7 @@ export class TerminalManager {
 
             // If we have allies to trade with, alternate requesting eveyr tick
 
-            if (forAllies) {
-                allyManager.requestResource(room.name, resource, amount, priority)
-                continue
-            }
+            allyManager.requestResource(room.name, resource, amount, priority)
 
             const ID = newID()
 
@@ -229,7 +225,6 @@ export class TerminalManager {
         const resourceRequests = allyManager.allyRequests.resource
 
         for (const ID in resourceRequests) {
-
             const request = resourceRequests[ID]
 
             // Ensure we have more than the asking amount

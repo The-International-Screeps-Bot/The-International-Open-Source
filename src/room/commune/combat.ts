@@ -1,7 +1,7 @@
 import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
 import { allyManager } from 'international/simpleAllies'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, getRangeOfCoords, randomRange, randomTick } from 'international/utils'
+import { customLog, findObjectWithID, findRangeFromExit, getRangeOfCoords, isXYInBorder, randomRange, randomTick } from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -170,7 +170,7 @@ export class CombatManager {
 
             const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
             room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, { font: 0.3 })
-            if (damage > 0) {
+            if (damage * findRangeFromExit(enemyCreep.pos) >= enemyCreep.hits) {
                 if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
                 else if (damage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
                     room.towerAttackTarget = enemyCreep

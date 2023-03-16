@@ -33,6 +33,8 @@ import {
     findCoordsInRange,
     findCoordsInRangeXY,
     findCoordsInsideRect,
+    forAdjacentCoords,
+    forCoordsInRange,
     getRange,
     getRangeOfCoords,
     isXYExit,
@@ -2136,7 +2138,7 @@ export class CommunePlanner {
         for (const coord of result) {
             const packedCoord = packAsNum(coord)
             this.rampartCoords[packedCoord] = 1
-            minCutCoords.add(packAsNum(coord))
+            minCutCoords.add(packedCoord)
 
             this.stampAnchors.minCutRampart.push(coord)
             this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
@@ -2296,11 +2298,12 @@ export class CommunePlanner {
 
         for (const packedCoord of this.minCutCoords) {
             const coord = unpackNumAsCoord(packedCoord)
-            for (const adjCoord of findCoordsInRange(coord, 2)) {
+
+            forCoordsInRange(coord, 2, adjCoord => {
                 const packedAdjCoord = packAsNum(adjCoord)
-                if (this.terrainCoords[packedAdjCoord] > 0) continue
-                if (this.minCutCoords.has(packedAdjCoord)) continue
-                if (unprotectedCoords[packedAdjCoord] === 255) continue
+                if (this.terrainCoords[packedAdjCoord] > 0) return
+                if (this.minCutCoords.has(packedAdjCoord)) return
+                if (unprotectedCoords[packedAdjCoord] === 255) return
 
                 if (getRangeOfCoords(coord, adjCoord) === 1) {
                     this.rampartPlans.setXY(adjCoord.x, adjCoord.y, 4, false, false, true)
@@ -2308,11 +2311,11 @@ export class CommunePlanner {
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
                     unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight - 1
-                    continue
+                    return
                 }
 
                 unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight
-            }
+            })
         }
 
         this.unprotectedCoords = unprotectedCoords
@@ -2428,7 +2431,6 @@ export class CommunePlanner {
         this.score = score
     }
     private record() {
-
         const planAttempt = {}
 
         /* for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key] */

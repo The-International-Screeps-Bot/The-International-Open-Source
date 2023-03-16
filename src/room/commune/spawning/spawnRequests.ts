@@ -381,7 +381,7 @@ export class SpawnRequestsManager {
                                 this.communeManager.room.totalEnemyCombatStrength.ranged
                     }
 
-                    requiredStrength *= 1.5
+                    requiredStrength *= 1.2
 
                     const priority = Math.min(
                         minPriority + this.communeManager.room.myCreeps[role].length * 0.5,
@@ -438,6 +438,7 @@ export class SpawnRequestsManager {
                                 this.communeManager.room.totalEnemyCombatStrength.melee +
                                 this.communeManager.room.totalEnemyCombatStrength.ranged
                     }
+                    requiredStrength *= 0.4
 
                     const priority = Math.min(
                         minPriority + 0.1 + this.communeManager.room.myCreeps[role].length * 1,
@@ -528,7 +529,8 @@ export class SpawnRequestsManager {
                     if (
                         repairRamparts.length / this.communeManager.room.structures.rampart.length < 0.2 &&
                         this.communeManager.room.totalEnemyCombatStrength.melee +
-                            this.communeManager.room.totalEnemyCombatStrength.ranged <=
+                            this.communeManager.room.totalEnemyCombatStrength.ranged +
+                            this.communeManager.room.totalEnemyCombatStrength.dismantle <=
                             0
                     ) {
                         maxCreeps = 1
@@ -547,9 +549,9 @@ export class SpawnRequestsManager {
 
                 partsMultiplier +=
                     (this.communeManager.room.totalEnemyCombatStrength.melee +
-                        this.communeManager.room.totalEnemyCombatStrength.ranged +
+                        this.communeManager.room.totalEnemyCombatStrength.ranged * 1.6 +
                         this.communeManager.room.totalEnemyCombatStrength.dismantle) /
-                    (REPAIR_POWER * 0.22)
+                    (REPAIR_POWER * 0.3)
 
                 const role = 'maintainer'
 
@@ -611,7 +613,7 @@ export class SpawnRequestsManager {
 
                     partsMultiplier += Math.pow(
                         this.communeManager.room.resourcesInStoringStructures.energy /
-                            (18000 + this.communeManager.room.controller.level * 1200),
+                            (20000 + this.communeManager.room.controller.level * 1200),
                         2,
                     )
                 }

@@ -365,10 +365,6 @@ export function findClosestPos(target: RoomPosition | Coord, positions: RoomPosi
 
 /**
  * Gets the range between two positions' x and y (Euclidean)
- * @param x1 the first position's x
- * @param y1 the first position's y
- * @param x2 the second position's x
- * @param y2 the second position's y
  */
 export function getRangeEuc(x1: number, x2: number, y1: number, y2: number) {
     // Find the range using Chebyshev's formula
@@ -776,4 +772,11 @@ export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Co
 export function randomVal(array: any[]) {
 
     return array[randomIntRange(0, array.length)]
+}
+
+export function findRangeFromExit(coord: Coord) {
+
+    const dx = Math.min(coord.x, Math.abs(coord.x - roomDimensions - 1))
+    const dy = Math.min(coord.y, Math.abs(coord.y - roomDimensions - 1))
+    return Math.max(dx, dy)
 }

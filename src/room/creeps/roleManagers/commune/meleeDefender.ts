@@ -110,6 +110,8 @@ export class MeleeDefender extends Creep {
 
         if (this.memory.RID && !randomTick(10)) return findObjectWithID(this.memory.RID)
 
+        const currentRampart = findObjectWithID(this.memory.RID)
+
         const enemyAttackers = room.enemyAttackers
 
         let bestScore = Infinity
@@ -120,15 +122,17 @@ export class MeleeDefender extends Creep {
             // Allow the creep to take rampart reservations from other defender types - but not its own type
 
             const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
-            if (creepIDUsingRampart) {
+            if (creepIDUsingRampart && this.id !== creepIDUsingRampart) {
                 const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
                 if (creepUsingRampart.role === 'meleeDefender') continue
             }
 
-            if (room.findStructureAtCoord(rampart.pos, STRUCTURE_RAMPART)) continue
+            if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) continue
 
-            let score = getRangeOfCoords(rampart.pos, findClosestObjectEuc(rampart.pos, enemyAttackers).pos)
-            if (getRangeOfCoords(rampart.pos, this.pos) <= 1) score *= 0.5
+            const closestAttacker = findClosestObjectEuc(rampart.pos, enemyAttackers)
+
+            let score = getRangeEuc(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
+            if (currentRampart && getRangeOfCoords(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
             score += getRangeOfCoords(rampart.pos, room.anchor) * 0.01
 
