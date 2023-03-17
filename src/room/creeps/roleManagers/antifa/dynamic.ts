@@ -1,5 +1,5 @@
 import { customColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRange, getRangeOfCoords, isCoordExit, isXYExit } from 'international/utils'
+import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
 /**
@@ -118,7 +118,7 @@ export class Dynamic {
 
     getInFormation() {
         if (this.leader.room.name === this.members[1].room.name) {
-            const range = getRangeOfCoords(this.leader.pos, this.members[1].pos)
+            const range = getRange(this.leader.pos, this.members[1].pos)
             if (range === 1) return true
 
             if (range > 2) {
@@ -161,7 +161,7 @@ export class Dynamic {
         this.leader.message = 'x'
         if (!moveLeader.createMoveRequest(opts)) return
 
-        if (getRangeOfCoords(this.leader.pos, this.members[1].pos) > 1) {
+        if (getRange(this.leader.pos, this.members[1].pos) > 1) {
             this.members[1].createMoveRequest({
                 origin: this.members[1].pos,
                 goals: [

@@ -1,5 +1,5 @@
 import { AllyCreepRequestData } from 'international/constants'
-import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
@@ -75,7 +75,6 @@ export class AllyVanguard extends Creep {
     }
 
     getEnergyFromRoom?(): boolean {
-
         if (this.room.controller.owner) return false
 
         if (
@@ -108,7 +107,6 @@ export class AllyVanguard extends Creep {
      *
      */
     travelToSource?(sourceIndex: number): boolean {
-
         this.message = '🚬'
 
         const harvestPos = this.findSourcePos(this.memory.SI)
@@ -116,7 +114,7 @@ export class AllyVanguard extends Creep {
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
+        if (getRange(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 

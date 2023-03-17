@@ -1,10 +1,18 @@
-
 // Old basePlanner
 
-import { CPUMaxPerTick, defaultRoadPlanningPlainCost, roomDimensions, stamps } from "international/constants"
-import { internationalManager } from "international/international"
-import { findAvgBetweenCoords, findCoordsInsideRect, getRange, getRangeOfCoords, packAsNum, packXYAsNum, unpackNumAsCoord, unpackNumAsPos } from "international/utils"
-import { rampartPlanner } from "./rampartPlanner"
+import { CPUMaxPerTick, defaultRoadPlanningPlainCost, roomDimensions, stamps } from 'international/constants'
+import { internationalManager } from 'international/international'
+import {
+    findAvgBetweenCoords,
+    findCoordsInsideRect,
+    getRangeXY,
+    getRange,
+    packAsNum,
+    packXYAsNum,
+    unpackNumAsCoord,
+    unpackNumAsPos,
+} from 'international/utils'
+import { rampartPlanner } from './rampartPlanner'
 
 /**
  * Checks if a room can be planner. If it can, it informs information on how to build the room
@@ -313,10 +321,10 @@ export function basePlanner(room: Room) {
     }
 
     let origin: RoomPosition
-    if (getRangeOfCoords(room.anchor, centerUpgadePos) >= 10) {
+    if (getRange(room.anchor, centerUpgadePos) >= 10) {
         origin = centerUpgadePos
     } else {
-        if (getRangeOfCoords(room.anchor, avgControllerSourcePos) <= 3) {
+        if (getRange(room.anchor, avgControllerSourcePos) <= 3) {
             origin = closestSourceToController.pos
         } else {
             origin = avgControllerSourcePos
@@ -647,7 +655,7 @@ export function basePlanner(room: Room) {
             // Sort adjacentPositions by range from the anchor
 
             adjacentCoords.sort(function (a, b) {
-                return getRange(a.x, hubAnchor.x, a.y, hubAnchor.y) - getRange(b.x, hubAnchor.x, b.y, hubAnchor.y)
+                return getRangeXY(a.x, hubAnchor.x, a.y, hubAnchor.y) - getRangeXY(b.x, hubAnchor.x, b.y, hubAnchor.y)
             })
 
             // Loop through each pos

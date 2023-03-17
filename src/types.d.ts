@@ -1294,6 +1294,9 @@ declare global {
         findStructureAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): Structure | false
         findStructureAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): Structure | false
 
+        findCSiteAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): ConstructionSite | false
+        findCSiteAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): ConstructionSite | false
+
         findStructureInsideRect(
             x1: number,
             y1: number,

@@ -6,7 +6,7 @@ import {
     customLog,
     findObjectWithID,
     findRangeFromExit,
-    getRangeOfCoords,
+    getRange,
     isXYInBorder,
     randomRange,
     randomTick,
@@ -107,11 +107,9 @@ export class CombatManager {
     private manageRampartPublicity() {
         const { room } = this.communeManager
 
-        const enemyAttackers = room.enemyAttackers
-
         // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
 
-        if (!enemyAttackers.length || room.controller.safeMode) {
+        if (!room.enemyCreeps.length || room.controller.safeMode) {
             if (!Memory.publicRamparts) return
 
             // Stop if the tick is not divisible by a random range

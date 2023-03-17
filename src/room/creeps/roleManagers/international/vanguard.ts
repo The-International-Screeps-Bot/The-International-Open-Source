@@ -1,5 +1,5 @@
 import { ClaimRequestData } from 'international/constants'
-import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
 export class Vanguard extends Creep {
@@ -31,7 +31,7 @@ export class Vanguard extends Creep {
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
+        if (getRange(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -56,7 +56,7 @@ export class Vanguard extends Creep {
 
         if (controller.level >= 2 && controller.ticksToDowngrade > 5000) return false
 
-        if (getRangeOfCoords(this.pos, controller.pos) > 3) {
+        if (getRange(this.pos, controller.pos) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: controller.pos, range: 3 }],
@@ -73,7 +73,7 @@ export class Vanguard extends Creep {
         if (this.room.cSites.rampart.length) {
             const cSite = this.room.cSites.rampart[0]
 
-            if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
+            if (getRange(this.pos, cSite.pos) > 3) {
                 this.createMoveRequest({
                     origin: this.pos,
                     goals: [{ pos: cSite.pos, range: 3 }],
@@ -89,7 +89,7 @@ export class Vanguard extends Creep {
         const rampartTarget = this.room.structures.rampart.find(rampart => rampart.hits < 20000)
         if (!rampartTarget) return false
 
-        if (getRangeOfCoords(this.pos, rampartTarget.pos) > 3) {
+        if (getRange(this.pos, rampartTarget.pos) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: rampartTarget.pos, range: 3 }],

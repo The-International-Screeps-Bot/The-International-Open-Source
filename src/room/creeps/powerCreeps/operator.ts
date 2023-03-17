@@ -1,5 +1,5 @@
 import { RESULT_FAIL, customColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS } from 'international/constants'
-import { customLog, findObjectWithID, getRangeOfCoords } from 'international/utils'
+import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class Operator extends PowerCreep {
     constructor(creepID: Id<PowerCreep>) {
@@ -61,7 +61,7 @@ export class Operator extends PowerCreep {
         if (!powerSpawn) return RESULT_FAIL
 
         const minRange = 1
-        if (getRangeOfCoords(this.pos, powerSpawn.pos) > minRange) {
+        if (getRange(this.pos, powerSpawn.pos) > minRange) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
@@ -95,7 +95,7 @@ export class Operator extends PowerCreep {
         if (!controller || controller.isPowerEnabled) return RESULT_NO_ACTION
 
         const minRange = 1
-        if (getRangeOfCoords(this.pos, controller.pos) > minRange) {
+        if (getRange(this.pos, controller.pos) > minRange) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
@@ -174,7 +174,7 @@ export class Operator extends PowerCreep {
             if ((POWER_INFO[task.powerType] as any).ops > this.nextStore.ops) continue
 
             const taskTargetPos = findObjectWithID(task.targetID).pos
-            const range = getRangeOfCoords(this.pos, taskTargetPos)
+            const range = getRange(this.pos, taskTargetPos)
 
             // The target doesn't need us yet or we can't yet provide
 
@@ -202,7 +202,7 @@ export class Operator extends PowerCreep {
         // We aren't in range, get closer
         customLog('TRY TASK', taskTarget)
         const minRange = (POWER_INFO[this.memory.PT] as any).range
-        if (minRange && getRangeOfCoords(this.pos, taskTarget.pos) > minRange) {
+        if (minRange && getRange(this.pos, taskTarget.pos) > minRange) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: taskTarget.pos, range: minRange }],

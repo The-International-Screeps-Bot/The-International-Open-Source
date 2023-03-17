@@ -34,7 +34,7 @@ import {
     findClosestCommuneName,
     findCoordsInsideRect,
     findObjectWithID,
-    getRange,
+    getRangeXY,
     isNearRoomEdge,
     newID,
     packAsNum,
@@ -2329,6 +2329,24 @@ Room.prototype.findStructureAtXY = function (x, y, structureType) {
         if (structure.structureType !== structureType) continue
 
         return structure
+    }
+
+    return false
+}
+
+Room.prototype.findCSiteAtCoord = function (coord, structureType) {
+    return this.findCSiteAtXY(coord.x, coord.y, structureType)
+}
+
+Room.prototype.findCSiteAtXY = function (x, y, structureType) {
+    const cSiteIDs = this.cSiteCoords.get(packXYAsCoord(x, y))
+    if (!cSiteIDs) return false
+
+    for (const ID of cSiteIDs) {
+        const cSite = findObjectWithID(ID)
+        if (cSite.structureType !== structureType) continue
+
+        return cSite
     }
 
     return false

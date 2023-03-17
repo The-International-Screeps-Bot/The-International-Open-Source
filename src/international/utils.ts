@@ -269,14 +269,14 @@ export function findAvgBetweenCoords(pos1: Coord, pos2: Coord) {
  * @param x2 the second position's x
  * @param y2 the second position's y
  */
-export function getRange(x1: number, x2: number, y1: number, y2: number) {
+export function getRangeXY(x1: number, x2: number, y1: number, y2: number) {
     // Find the range using Chebyshev's formula
 
     return Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1))
 }
 
-export function getRangeOfCoords(coord1: Coord, coord2: Coord) {
-    return getRange(coord1.x, coord2.x, coord1.y, coord2.y)
+export function getRange(coord1: Coord, coord2: Coord) {
+    return getRangeXY(coord1.x, coord2.x, coord1.y, coord2.y)
 }
 
 /**
@@ -287,7 +287,7 @@ export function findClosestObject<T extends _HasRoomPosition>(target: RoomPositi
     let closest = undefined
 
     for (const object of objects) {
-        const range = getRange(target.x, object.pos.x, target.y, object.pos.y)
+        const range = getRangeXY(target.x, object.pos.x, target.y, object.pos.y)
 
         if (range > minRange) continue
 
@@ -310,7 +310,7 @@ export function findClosestObjectInRange<T extends _HasRoomPosition>(
     let closest = undefined
 
     for (const object of objects) {
-        const range = getRange(target.x, object.pos.x, target.y, object.pos.y)
+        const range = getRangeXY(target.x, object.pos.x, target.y, object.pos.y)
 
         if (range > minRange) continue
 
@@ -333,7 +333,7 @@ export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[
 
     for (let i = 0; i < positions.length; i++) {
         const pos = positions[i]
-        const range = getRange(target.x, pos.x, target.y, pos.y)
+        const range = getRangeXY(target.x, pos.x, target.y, pos.y)
 
         if (range > minRange) continue
 
@@ -352,7 +352,7 @@ export function findClosestPos(target: RoomPosition | Coord, positions: RoomPosi
     let closest = undefined
 
     for (const pos of positions) {
-        const range = getRange(target.x, pos.x, target.y, pos.y)
+        const range = getRangeXY(target.x, pos.x, target.y, pos.y)
 
         if (range > minRange) continue
 
@@ -366,10 +366,14 @@ export function findClosestPos(target: RoomPosition | Coord, positions: RoomPosi
 /**
  * Gets the range between two positions' x and y (Euclidean)
  */
-export function getRangeEuc(x1: number, x2: number, y1: number, y2: number) {
+export function getRangeEucXY(x1: number, x2: number, y1: number, y2: number) {
     // Find the range using Chebyshev's formula
 
     return Math.round(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * 10) / 10
+}
+
+export function getRangeEuc(coord1: Coord, coord2: Coord) {
+    return getRangeEucXY(coord1.x, coord2.x, coord1.y, coord2.y)
 }
 
 /**
@@ -380,7 +384,7 @@ export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPos
     let closest = undefined
 
     for (const object of objects) {
-        const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
+        const range = getRangeEucXY(target.x, object.pos.x, target.y, object.pos.y)
 
         if (range >= minRange) continue
 
@@ -399,7 +403,7 @@ export function findFurthestObjectEuc<T extends _HasRoomPosition>(target: RoomPo
     let furthest = undefined
 
     for (const object of objects) {
-        const range = getRangeEuc(target.x, object.pos.x, target.y, object.pos.y)
+        const range = getRangeEucXY(target.x, object.pos.x, target.y, object.pos.y)
 
         if (range <= maxRange) continue
 
@@ -418,7 +422,7 @@ export function findClosestPosEuc<T extends RoomPosition | Coord>(target: RoomPo
     let closest = undefined
 
     for (const pos of positions) {
-        const range = getRangeEuc(target.x, pos.x, target.y, pos.y)
+        const range = getRangeEucXY(target.x, pos.x, target.y, pos.y)
 
         if (range >= minRange) continue
 
@@ -699,7 +703,7 @@ export function roundToDecimals(num: number, decimals: number) {
 export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
     let damage = TOWER_POWER_ATTACK
 
-    let range = getRangeOfCoords(coord1, coord2)
+    let range = getRange(coord1, coord2)
 
     if (range > TOWER_OPTIMAL_RANGE) {
         if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
@@ -770,12 +774,10 @@ export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Co
 }
 
 export function randomVal(array: any[]) {
-
     return array[randomIntRange(0, array.length)]
 }
 
 export function findRangeFromExit(coord: Coord) {
-
     const dx = Math.min(coord.x, Math.abs(coord.x - roomDimensions - 1))
     const dy = Math.min(coord.y, Math.abs(coord.y - roomDimensions - 1))
     return Math.max(dx, dy)

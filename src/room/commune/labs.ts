@@ -1,7 +1,7 @@
 import { minerals } from 'international/constants'
 import { CommuneManager } from './commune'
 import { Hauler } from '../creeps/roleManagers/commune/hauler'
-import { findObjectWithID, getRangeOfCoords, randomTick, scalePriority } from 'international/utils'
+import { findObjectWithID, getRange, randomTick, scalePriority } from 'international/utils'
 
 const reactionCycleAmount = 5000
 
@@ -190,7 +190,7 @@ export class LabManager {
         // Prefer labs closer to the hub to be inputs
 
         labs.sort((a, b) => {
-            return getRangeOfCoords(a.pos, storingStructure.pos) - getRangeOfCoords(b.pos, storingStructure.pos)
+            return getRange(a.pos, storingStructure.pos) - getRange(b.pos, storingStructure.pos)
         })
 
         for (const lab of labs) {
@@ -200,7 +200,7 @@ export class LabManager {
 
             // Tzhe lab isn't in range of all labs
 
-            if (labs.filter(otherLab => getRangeOfCoords(lab.pos, otherLab.pos) <= 2).length < labs.length) continue
+            if (labs.filter(otherLab => getRange(lab.pos, otherLab.pos) <= 2).length < labs.length) continue
 
             // Make the lab an input
 
@@ -404,19 +404,11 @@ export class LabManager {
                     lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
                 )
 
-                if (
-                    freelabs.length == 0 &&
-                    this.inputLabIDs[1] &&
-                    !boostingLabs.includes(this.inputLabIDs[1])
-                ) {
+                if (freelabs.length == 0 && this.inputLabIDs[1] && !boostingLabs.includes(this.inputLabIDs[1])) {
                     freelabs = [this.inputLab1]
                 }
 
-                if (
-                    freelabs.length == 0 &&
-                    this.inputLabIDs[1] &&
-                    !boostingLabs.includes(this.inputLabIDs[1])
-                ) {
+                if (freelabs.length == 0 && this.inputLabIDs[1] && !boostingLabs.includes(this.inputLabIDs[1])) {
                     freelabs = [this.inputLab2]
                 }
 
@@ -469,7 +461,6 @@ export class LabManager {
      * Figures out what we have
      */
     get deficits() {
-
         if (this._deficits) return this._deficits
 
         this._deficits = {}
@@ -515,7 +506,6 @@ export class LabManager {
     replanAt: number
 
     private setCurrentReaction() {
-
         if (this.snoozeUntil && this.snoozeUntil > Game.time) return
         if (!this.isCurrentReactionFinished() && this.replanAt > Game.time) return
 

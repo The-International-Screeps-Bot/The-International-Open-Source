@@ -35,8 +35,8 @@ import {
     findCoordsInsideRect,
     forAdjacentCoords,
     forCoordsInRange,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     isXYExit,
     isXYInBorder,
     isXYInRoom,
@@ -488,7 +488,7 @@ export class CommunePlanner {
         // Sort by closer to anchor
 
         groupLeaders.sort((a, b) => {
-            return getRangeOfCoords(a, anchor) - getRangeOfCoords(b, anchor)
+            return getRange(a, anchor) - getRange(b, anchor)
         })
 
         // Paths for grid groups
@@ -853,7 +853,7 @@ export class CommunePlanner {
 
                 packedAdjCoords.add(packAsNum(adjCoord))
 
-                const range = getRangeOfCoords(hubAnchor, adjCoord)
+                const range = getRange(hubAnchor, adjCoord)
                 if (range >= closestRange) continue
 
                 closestAdjCoord = adjCoord
@@ -1629,7 +1629,7 @@ export class CommunePlanner {
         }
 
         let origin: RoomPosition
-        if (getRangeOfCoords(fastFillerPos, this.centerUpgradePos) >= 10) {
+        if (getRange(fastFillerPos, this.centerUpgradePos) >= 10) {
             origin = this.centerUpgradePos
         } else {
             origin = closestSource.pos
@@ -1721,13 +1721,13 @@ export class CommunePlanner {
             const coord = structureCoords[i]
 
             for (const positions of this.sourceHarvestPositions) {
-                this.room.visual.text(getRangeOfCoords(coord, positions[0]).toString(), coord.x, coord.y)
-                if (getRangeOfCoords(coord, positions[0]) > 1) continue
+                this.room.visual.text(getRange(coord, positions[0]).toString(), coord.x, coord.y)
+                if (getRange(coord, positions[0]) > 1) continue
 
                 return [coord, i]
             }
 
-            if (getRangeOfCoords(coord, this.centerUpgradePos) > 1) continue
+            if (getRange(coord, this.centerUpgradePos) > 1) continue
 
             return [coord, i]
         }
@@ -2276,7 +2276,7 @@ export class CommunePlanner {
                 if (this.minCutCoords.has(packedAdjCoord)) return
                 if (unprotectedCoords[packedAdjCoord] === 255) return
 
-                if (getRangeOfCoords(coord, adjCoord) === 1) {
+                if (getRange(coord, adjCoord) === 1) {
                     this.rampartPlans.setXY(adjCoord.x, adjCoord.y, 4, false, false, true)
                 }
 

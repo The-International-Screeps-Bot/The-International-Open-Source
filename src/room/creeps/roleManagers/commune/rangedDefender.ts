@@ -4,9 +4,9 @@ import {
     findClosestObject,
     findClosestObjectEuc,
     findObjectWithID,
+    getRangeXY,
+    getRangeEucXY,
     getRange,
-    getRangeEuc,
-    getRangeOfCoords,
     randomTick,
 } from 'international/utils'
 import { packCoord } from 'other/codec'
@@ -18,7 +18,7 @@ export class RangedDefender extends Creep {
         room.attackingDefenderIDs.add(this.id)
 
         for (const enemyCreep of this.room.unprotectedEnemyCreeps) {
-            const range = getRangeOfCoords(this.pos, enemyCreep.pos)
+            const range = getRange(this.pos, enemyCreep.pos)
             if (range > 3) continue
 
             const estimatedDamage = this.combatStrength.ranged * enemyCreep.defenceStrength
@@ -56,21 +56,20 @@ export class RangedDefender extends Creep {
             this.room.targetVisual(this.pos, this.combatTarget.pos)
 
             if (!room.towerAttackTarget || this.combatTarget.id !== room.towerAttackTarget.id) {
-
                 let massDamage = 0
                 for (const enemyCreep of this.room.enemyAttackers) {
-
-                    const range = getRangeOfCoords(this.pos, enemyCreep.pos)
+                    const range = getRange(this.pos, enemyCreep.pos)
                     if (range > 3) continue
 
-                    massDamage += RANGED_ATTACK_POWER * rangedMassAttackMultiplierByRange[range] * enemyCreep.defenceStrength
+                    massDamage +=
+                        RANGED_ATTACK_POWER * rangedMassAttackMultiplierByRange[range] * enemyCreep.defenceStrength
                 }
 
                 if (massDamage >= RANGED_ATTACK_POWER) this.rangedMassAttack()
                 else this.rangedAttack(this.combatTarget)
             }
 
-            if (getRangeOfCoords(this.pos, this.combatTarget.pos) <= 1) this.rangedMassAttack()
+            if (getRange(this.pos, this.combatTarget.pos) <= 1) this.rangedMassAttack()
             else this.rangedAttack(this.combatTarget)
         }
 
@@ -106,7 +105,7 @@ export class RangedDefender extends Creep {
 
         // If out of range, move to
 
-        if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 3) {
+        if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 3) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
@@ -146,10 +145,10 @@ export class RangedDefender extends Creep {
 
             const closestAttacker = findClosestObjectEuc(rampart.pos, enemyAttackers)
 
-            let score = getRangeEuc(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
-            if (currentRampart && getRangeOfCoords(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
+            let score = getRangeEucXY(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
+            if (currentRampart && getRange(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
-            score += getRangeOfCoords(rampart.pos, room.anchor) * 0.01
+            score += getRange(rampart.pos, room.anchor) * 0.01
 
             if (score >= bestScore) continue
 
@@ -158,7 +157,7 @@ export class RangedDefender extends Creep {
         }
 
         if (!bestRampart) return false
-/*
+        /*
         const creepIDUsingRampart = room.usedRampartIDs.get(bestRampart.id)
         if (creepIDUsingRampart) {
             const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
@@ -190,7 +189,7 @@ export class RangedDefender extends Creep {
             /*
             for (const rampart of ramparts)
                 room.visual.text(
-                    getRangeEuc(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
+                    getRangeEucXY(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
                     rampart.pos,
                     { font: 0.5 },
                 )
@@ -201,7 +200,7 @@ export class RangedDefender extends Creep {
 
         // If the creep is range 0 to the closestRampart, inform false
 
-        if (getRange(this.pos.x, rampart.pos.x, this.pos.y, rampart.pos.y) === 0) return false
+        if (getRangeXY(this.pos.x, rampart.pos.x, this.pos.y, rampart.pos.y) === 0) return false
 
         // Otherwise move to the rampart preffering ramparts and inform true
 

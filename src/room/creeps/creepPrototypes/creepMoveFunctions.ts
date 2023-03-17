@@ -8,7 +8,6 @@ import {
     RemoteData,
     roomDimensions,
     TrafficPriorities,
-    rampartSet,
     packedPosLength,
 } from 'international/constants'
 import { internationalManager } from 'international/international'
@@ -18,8 +17,10 @@ import {
     customLog,
     findAdjacentCoordsToCoord,
     findObjectWithID,
+    getRangeXY,
+    getRangeEuc,
+    getRangeEucXY,
     getRange,
-    getRangeOfCoords,
 } from 'international/utils'
 import {
     packCoord,
@@ -144,7 +145,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.moved) return false
     if (this.fatigue > 0) return false
     if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
-
         this.moved = 'moved'
         return false
     }
@@ -155,7 +155,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     this.room.visual.text((posIndex || -1).toString(), this.pos)
     if (posIndex >= 0 && posIndex + packedPosLength < pathOpts.packedPath.length) {
-
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const path = unpackPosList(packedPath)
         this.room.targetVisual(this.pos, path[0])
@@ -223,7 +222,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moved) return false
     if (this.fatigue > 0) return false
     if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
-
         this.moved = 'moved'
         return false
     }
@@ -372,7 +370,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         // Sort by distance from the first pos in the path
 
         adjacentCoords.sort((a, b) => {
-            return getRangeOfCoords(a, path[0]) - getRangeOfCoords(b, path[0])
+            return getRange(a, path[0]) - getRange(b, path[0])
         })
 
         const directions: DirectionConstant[] = []
@@ -443,7 +441,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         let score: number
         if (goalCoord) {
-            score = getRangeOfCoords(coord, goalCoord)
+            score = getRangeEuc(coord, goalCoord)
             this.room.visual.text(score.toString(), coord.x, coord.y)
             if (score >= lowestScore) continue
         }
@@ -456,7 +454,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue
 
-        if (this.memory.ROS && !room.coordHasStructureTypes(coord, rampartSet)) continue
+        if (this.memory.ROS && !room.findStructureAtCoord(coord, STRUCTURE_RAMPART)) continue
 
         let hasImpassibleStructure
 

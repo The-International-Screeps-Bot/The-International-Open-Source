@@ -3,8 +3,8 @@ import {
     customLog,
     findCarryPartsRequired,
     findObjectWithID,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     randomTick,
     scalePriority,
 } from 'international/utils'
@@ -55,7 +55,7 @@ export class RemoteHarvester extends Creep {
             const harvestPos = this.findSourcePos(this.memory.SI)
             if (!harvestPos) return
 
-            if (getRangeOfCoords(this.pos, harvestPos) === 0) {
+            if (getRange(this.pos, harvestPos) === 0) {
                 this.advancedHarvestSource(this.room.sources[this.memory.SI])
             }
         }
@@ -240,7 +240,7 @@ export class RemoteHarvester extends Creep {
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
+        if (getRange(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 

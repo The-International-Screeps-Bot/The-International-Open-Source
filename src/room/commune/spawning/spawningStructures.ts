@@ -1,7 +1,7 @@
 import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, getRangeOfCoords, newID } from 'international/utils'
+import { customLog, getRange, newID } from 'international/utils'
 import { CommuneManager } from '../commune'
 import './spawn'
 import './spawnRequests'
@@ -247,7 +247,7 @@ export class SpawningStructuresManager {
         // Sort by distance from the first pos in the path
 
         adjacentCoords.sort((a, b) => {
-            return getRangeOfCoords(a, anchor) - getRangeOfCoords(b, anchor)
+            return getRange(a, anchor) - getRange(b, anchor)
         })
         adjacentCoords.reverse()
 

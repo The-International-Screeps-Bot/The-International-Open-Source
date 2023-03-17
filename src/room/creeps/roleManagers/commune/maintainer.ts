@@ -1,6 +1,6 @@
 import { RESULT_FAIL, roomDimensions } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { findCoordsInsideRect, findObjectWithID, getRangeOfCoords } from 'international/utils'
+import { findCoordsInsideRect, findObjectWithID, getRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
 export class Maintainer extends Creep {
@@ -41,7 +41,7 @@ export class Maintainer extends Creep {
 
         // Move to target if out of range
 
-        if (getRangeOfCoords(this.pos, repairTarget.pos) > 3) {
+        if (getRange(this.pos, repairTarget.pos) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: repairTarget.pos, range: 3 }],
@@ -98,7 +98,7 @@ export class Maintainer extends Creep {
 
         // We are already in viable range
 
-        if (getRangeOfCoords(this.pos, repairTarget.pos) <= 3) return true
+        if (getRange(this.pos, repairTarget.pos) <= 3) return true
 
         // Make a move request to it
 

@@ -15,8 +15,8 @@ import {
     findClosestObject,
     findCoordsInsideRect,
     findObjectWithID,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     isCoordExit,
     isXYExit,
     packAsNum,
@@ -221,7 +221,6 @@ export class Quad {
         ]
 
         for (let i = 0; i < packedMemberCoords.length; i++) {
-
             const packedCoord = packedMemberCoords[i]
             const member = unsortedMembersByCoord[packedCoord]
             if (!member) continue
@@ -341,7 +340,7 @@ export class Quad {
                 const member = this.members[i]
 
                 if (
-                    getRange(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) <= 1 &&
+                    getRangeXY(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) <= 1 &&
                     member.room.name === lastMember.room.name
                 ) {
                     lastMember = member
@@ -497,7 +496,7 @@ export class Quad {
 
         let score = (1 - member.defenceStrength) * 5000
 
-        const range = getRange(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
+        const range = getRangeXY(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
 
         if (this.leader.memory.SCT === 'rangedAttack') {
             score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
@@ -654,7 +653,7 @@ export class Quad {
             for (const memberName of attackingMemberNames) {
                 const member = Game.creeps[memberName]
 
-                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 3) continue
+                if (getRange(member.pos, enemyCreep.pos) > 3) continue
 
                 netDamage += member.combatStrength.ranged
 
@@ -681,7 +680,7 @@ export class Quad {
                 const member = findObjectWithID(memberID)
                 if (!attackingMemberNames.has(member.name)) continue
 
-                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
+                if (getRange(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
                 else member.rangedMassAttack()
                 member.ranged = true
 
@@ -698,7 +697,7 @@ export class Quad {
         for (const memberName of attackingMemberNames) {
             const member = Game.creeps[memberName]
 
-            const range = getRangeOfCoords(member.pos, this.target.pos)
+            const range = getRange(member.pos, this.target.pos)
             if (range > 3) continue
 
             if ((this.target instanceof Structure && this.target.structureType === STRUCTURE_WALL) || range > 1) {
@@ -946,7 +945,7 @@ export class Quad {
         let minRange = Infinity
 
         for (const member of this.members) {
-            const range = getRangeOfCoords(member.pos, coord)
+            const range = getRange(member.pos, coord)
             if (range < minRange) minRange = range
         }
 

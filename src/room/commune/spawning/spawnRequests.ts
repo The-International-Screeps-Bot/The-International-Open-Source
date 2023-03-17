@@ -19,8 +19,8 @@ import {
     customLog,
     findCarryPartsRequired,
     findLinkThroughput,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     randomRange,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
@@ -375,10 +375,11 @@ export class SpawnRequestsManager {
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
                         requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
-                        if (!this.communeManager.room.structures.tower.length)
+                        if (!this.communeManager.room.structures.tower.length) {
                             requiredStrength +=
                                 this.communeManager.room.totalEnemyCombatStrength.melee +
                                 this.communeManager.room.totalEnemyCombatStrength.ranged
+                        }
                     }
 
                     requiredStrength *= 1.2
@@ -433,12 +434,13 @@ export class SpawnRequestsManager {
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
                         requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
-                        if (!this.communeManager.room.structures.tower.length)
+                        if (!this.communeManager.room.structures.tower.length) {
                             requiredStrength +=
                                 this.communeManager.room.totalEnemyCombatStrength.melee +
                                 this.communeManager.room.totalEnemyCombatStrength.ranged
+                        }
                     }
-                    requiredStrength *= 0.4
+                    requiredStrength *= 0.3
 
                     const priority = Math.min(
                         minPriority + 0.1 + this.communeManager.room.myCreeps[role].length * 1,
@@ -496,7 +498,14 @@ export class SpawnRequestsManager {
 
                 // If there are no ramparts or repair targets
 
-                if (!repairRamparts.length && !repairTargets.length) return false
+                if (
+                    !repairRamparts.length &&
+                    !repairTargets.length &&
+                    !this.communeManager.room.totalEnemyCombatStrength.melee &&
+                    !this.communeManager.room.totalEnemyCombatStrength.ranged &&
+                    !this.communeManager.room.totalEnemyCombatStrength.dismantle
+                )
+                    return false
 
                 let priority: number
 
@@ -528,10 +537,9 @@ export class SpawnRequestsManager {
                 if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
                     if (
                         repairRamparts.length / this.communeManager.room.structures.rampart.length < 0.2 &&
-                        this.communeManager.room.totalEnemyCombatStrength.melee +
-                            this.communeManager.room.totalEnemyCombatStrength.ranged +
-                            this.communeManager.room.totalEnemyCombatStrength.dismantle <=
-                            0
+                        !this.communeManager.room.totalEnemyCombatStrength.melee &&
+                        !this.communeManager.room.totalEnemyCombatStrength.ranged &&
+                        !this.communeManager.room.totalEnemyCombatStrength.dismantle
                     ) {
                         maxCreeps = 1
                     }
@@ -541,7 +549,7 @@ export class SpawnRequestsManager {
                     partsMultiplier += Math.pow(
                         this.communeManager.room.resourcesInStoringStructures.energy /
                             (16000 + this.communeManager.room.controller.level * 1000),
-                        2,
+                        1.8,
                     )
                 }
 

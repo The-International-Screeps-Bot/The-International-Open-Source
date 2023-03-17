@@ -1,5 +1,5 @@
 import { RemoteData } from 'international/constants'
-import { findClosestObject, getRange, randomIntRange } from 'international/utils'
+import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
 export class RemoteDefender extends Creep {
@@ -120,7 +120,7 @@ export class RemoteDefender extends Creep {
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             // Get the range between the creeps
 
-            const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
+            const range = getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
 
             // If the range is more than 1
 
@@ -148,7 +148,7 @@ export class RemoteDefender extends Creep {
 
         // Get the range between the creeps
 
-        const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
+        const range = getRangeXY(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
 
         // If it's more than range 3
 

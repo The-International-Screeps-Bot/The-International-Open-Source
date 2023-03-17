@@ -4,8 +4,8 @@ import {
     customLog,
     findCoordsInsideRect,
     findObjectWithID,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     scalePriority,
 } from 'international/utils'
 import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
@@ -45,7 +45,7 @@ export class SourceHarvester extends Creep {
         const harvestPos = this.findSourcePos(this.memory.SI)
         if (!harvestPos) return
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) {
+        if (getRange(this.pos, harvestPos) === 0) {
             this.advancedHarvestSource(this.room.sources[this.memory.SI])
         }
     }
@@ -62,7 +62,7 @@ export class SourceHarvester extends Creep {
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return RESULT_SUCCESS
+        if (getRange(this.pos, harvestPos) === 0) return RESULT_SUCCESS
 
         // If the creep's movement type is pull
 

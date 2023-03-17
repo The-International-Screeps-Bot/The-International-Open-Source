@@ -1,5 +1,5 @@
 import { allowedSquadCombinations, antifaRoles, customColors } from 'international/constants'
-import { customLog, findClosestObject, getRange, isCoordExit, isXYExit } from 'international/utils'
+import { customLog, findClosestObject, getRangeXY, isCoordExit, isXYExit } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { Duo } from './duo'
 import { Quad } from './quad'
@@ -263,7 +263,7 @@ export class Antifa extends Creep {
 
             // Get the range between the creeps
 
-            const range = getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
+            const range = getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y)
 
             // If the range is more than 1
 
@@ -293,7 +293,7 @@ export class Antifa extends Creep {
 
         // Get the range between the creeps
 
-        const range = getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
+        const range = getRangeXY(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y)
 
         // If it's more than range 3
 
@@ -365,7 +365,7 @@ export class Antifa extends Creep {
         if (Memory.roomVisuals)
             this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
-        if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 3) {
+        if (getRangeXY(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -388,7 +388,7 @@ export class Antifa extends Creep {
 
         structure = findClosestObject(this.pos, structures)
 
-        if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 3) {
+        if (getRangeXY(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -426,7 +426,7 @@ export class Antifa extends Creep {
 
             // If the range is more than 1
 
-            if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
+            if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
                 // Have the create a moveRequest to the enemyAttacker and inform true
 
                 this.createMoveRequest({
@@ -449,7 +449,7 @@ export class Antifa extends Creep {
 
         // If the range is more than 1
 
-        if (getRange(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
+        if (getRangeXY(this.pos.x, enemyAttacker.pos.x, this.pos.y, enemyAttacker.pos.y) > 1) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
@@ -479,7 +479,7 @@ export class Antifa extends Creep {
         if (Memory.roomVisuals)
             this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
-        if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -502,7 +502,7 @@ export class Antifa extends Creep {
 
         structure = findClosestObject(this.pos, structures)
 
-        if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -523,7 +523,7 @@ export class Antifa extends Creep {
         if (Memory.roomVisuals)
             this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
-        if (getRange(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -546,7 +546,7 @@ export class Antifa extends Creep {
 
         structure = findClosestObject(this.pos, structures)
 
-        if (getRange(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.pos.x, structure.pos.y, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: structure.pos, range: 1 }],

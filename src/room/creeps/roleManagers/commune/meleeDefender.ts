@@ -6,9 +6,9 @@ import {
     findClosestObjectEuc,
     findFurthestObjectEuc,
     findObjectWithID,
+    getRangeXY,
+    getRangeEucXY,
     getRange,
-    getRangeEuc,
-    getRangeOfCoords,
     randomTick,
     randomVal,
 } from 'international/utils'
@@ -21,7 +21,7 @@ export class MeleeDefender extends Creep {
         room.attackingDefenderIDs.add(this.id)
 
         for (const enemyCreep of this.room.unprotectedEnemyCreeps) {
-            const range = getRangeOfCoords(this.pos, enemyCreep.pos)
+            const range = getRange(this.pos, enemyCreep.pos)
             if (range > 1) continue
 
             const estimatedDamage = this.combatStrength.melee * enemyCreep.defenceStrength
@@ -88,7 +88,7 @@ export class MeleeDefender extends Creep {
 
         // If out of range move to it
 
-        if (getRange(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
+        if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: enemyCreep.pos, range: 1 }],
@@ -131,10 +131,10 @@ export class MeleeDefender extends Creep {
 
             const closestAttacker = findClosestObjectEuc(rampart.pos, enemyAttackers)
 
-            let score = getRangeEuc(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
-            if (currentRampart && getRangeOfCoords(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
+            let score = getRangeEucXY(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
+            if (currentRampart && getRange(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
-            score += getRangeOfCoords(rampart.pos, room.anchor) * 0.01
+            score += getRange(rampart.pos, room.anchor) * 0.01
 
             if (score >= bestScore) continue
 
@@ -175,7 +175,7 @@ export class MeleeDefender extends Creep {
             /*
             for (const rampart of ramparts)
                 room.visual.text(
-                    getRangeEuc(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
+                    getRangeEucXY(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
                     rampart.pos,
                     { font: 0.5 },
                 )
@@ -186,7 +186,7 @@ export class MeleeDefender extends Creep {
 
         // If the creep is range 0 to the closestRampart, inform false
 
-        if (getRange(this.pos.x, rampart.pos.x, this.pos.y, rampart.pos.y) === 0) return false
+        if (getRangeXY(this.pos.x, rampart.pos.x, this.pos.y, rampart.pos.y) === 0) return false
 
         // Otherwise move to the rampart preffering ramparts and inform true
 

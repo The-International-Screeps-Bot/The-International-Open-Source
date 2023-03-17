@@ -1,5 +1,5 @@
 import { RemoteData } from 'international/constants'
-import { findObjectWithID, getRange, randomTick } from 'international/utils'
+import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -108,7 +108,7 @@ export class RemoteDismantler extends Creep {
             target = findObjectWithID(this.memory.dismantleTarget)
 
             if (target) {
-                range = getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
+                range = getRangeXY(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
 
                 if (range > 1) {
                     this.createMoveRequest({
@@ -135,7 +135,7 @@ export class RemoteDismantler extends Creep {
         if (targets.length) {
             target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })
 
-            range = getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
+            range = getRangeXY(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
 
             if (range > 1) {
                 this.createMoveRequest({

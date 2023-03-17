@@ -18,12 +18,16 @@ export class HaulerNeedManager {
         room.haulerNeed += room.structures.lab.length
 
         const extensions = room.structures.extension.length - stamps.fastFiller.structures.extension.length
-        if (extensions > 0) room.structures.extension.length / 4
+        if (extensions > 0) {
+            room.structures.extension.length / (room.towerInferiority ? 1.5 : 4)
+        }
 
         /* room.haulerNeed += room.structures.extension.length / 10 */
 
-        if ((room.controller.level >= 4 && room.storage) || (room.terminal && room.controller.level >= 6))
+        if ((room.controller.level >= 4 && room.storage) || (room.terminal && room.controller.level >= 6)) {
             room.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
+            room.haulerNeed += Memory.stats.rooms[room.name].su * 8
+        }
 
         room.haulerNeed = Math.round(room.haulerNeed)
     }
@@ -70,7 +74,6 @@ export class HaulerNeedManager {
         // There is a viable controllerContainer
 
         if (room.controllerContainer) {
-
             room.haulerNeed += findCarryPartsRequired(room.upgradePathLength + 3, room.upgradeStrength * 1.1)
             return
         }

@@ -1,5 +1,5 @@
 import { customColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRange, getRangeOfCoords, isCoordExit, isXYExit } from 'international/utils'
+import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
 export class Duo {
@@ -111,7 +111,7 @@ export class Duo {
 
     getInFormation() {
         if (this.leader.room.name === this.members[1].room.name) {
-            const range = getRangeOfCoords(this.leader.pos, this.members[1].pos)
+            const range = getRange(this.leader.pos, this.members[1].pos)
             if (range === 1) return true
 
             if (range > 2) {
@@ -154,7 +154,7 @@ export class Duo {
         this.leader.message = 'x'
         if (!moveLeader.createMoveRequest(opts)) return
 
-        if (getRangeOfCoords(this.leader.pos, this.members[1].pos) > 1) {
+        if (getRange(this.leader.pos, this.members[1].pos) > 1) {
             this.members[1].createMoveRequest({
                 origin: this.members[1].pos,
                 goals: [
@@ -208,7 +208,7 @@ export class Duo {
 
             // Get the range between the creeps
 
-            const range = getRange(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
+            const range = getRangeXY(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
 
             // If the range is more than 1
 
@@ -245,7 +245,7 @@ export class Duo {
 
         // Get the range between the creeps
 
-        const range = getRange(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
+        const range = getRangeXY(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
 
         // If the squad is outmatched
 
@@ -321,7 +321,7 @@ export class Duo {
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
-        if (getRange(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3) {
+        if (getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -344,7 +344,7 @@ export class Duo {
 
         structure = findClosestObject(this.leader.pos, structures)
 
-        if (getRange(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 3) {
+        if (getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 3) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -385,7 +385,7 @@ export class Duo {
 
             // If the range is more than 1
 
-            if (getRange(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y) > 1) {
+            if (getRangeXY(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y) > 1) {
                 // Have the create a moveRequest to the enemyAttacker and inform true
 
                 this.createMoveRequest({
@@ -414,7 +414,7 @@ export class Duo {
 
         // If the range is more than 1
 
-        if (getRange(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y) > 1) {
+        if (getRangeXY(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y) > 1) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
@@ -445,7 +445,7 @@ export class Duo {
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
-        if (getRange(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -468,7 +468,7 @@ export class Duo {
 
         structure = findClosestObject(this.leader.pos, structures)
 
-        if (getRange(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -489,7 +489,7 @@ export class Duo {
         if (Memory.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
 
-        if (getRange(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -512,7 +512,7 @@ export class Duo {
 
         structure = findClosestObject(this.leader.pos, structures)
 
-        if (getRange(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
+        if (getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],

@@ -1,5 +1,5 @@
 import { globalStatsUpdater } from 'international/statsManager'
-import { getRange, getRangeOfCoords } from 'international/utils'
+import { getRangeXY, getRange } from 'international/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
@@ -17,7 +17,7 @@ export class MineralHarvester extends Creep {
 
         // If the creep is not standing on the harvestPos
 
-        if (getRangeOfCoords(this.pos, harvestPos) > 0) {
+        if (getRange(this.pos, harvestPos) > 0) {
             this.message = '⏩M'
 
             // Make a move request to it

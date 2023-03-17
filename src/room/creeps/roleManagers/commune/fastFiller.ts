@@ -1,4 +1,4 @@
-import { findClosestPos, getRange, getRangeOfCoords } from 'international/utils'
+import { findClosestPos, getRangeXY, getRange } from 'international/utils'
 import { packCoord, packPos, unpackCoordAsPos, unpackPos } from 'other/codec'
 
 export class FastFiller extends Creep {
@@ -8,7 +8,7 @@ export class FastFiller extends Creep {
 
         // If the this is standing on the fastFillerPos, inform false
 
-        if (getRangeOfCoords(this.pos, fastFillerPos) === 0) return false
+        if (getRange(this.pos, fastFillerPos) === 0) return false
 
         // Otherwise, make a move request to it
 
@@ -86,7 +86,7 @@ export class FastFiller extends Creep {
 
                 // Otherwise, if the structure is not in range 1 to the this
 
-                if (getRangeOfCoords(this.pos, structure.pos) > 1) {
+                if (getRange(this.pos, structure.pos) > 1) {
                     fastFillerContainers.splice(i, 1)
                     continue
                 }
@@ -125,7 +125,7 @@ export class FastFiller extends Creep {
             for (const structure of fastFillerStoringStructures) {
                 // Otherwise, if the structure is not in range 1 to the this
 
-                if (getRangeOfCoords(this.pos, structure.pos) > 1) continue
+                if (getRange(this.pos, structure.pos) > 1) continue
 
                 // If there is a non-energy resource in the structure
 

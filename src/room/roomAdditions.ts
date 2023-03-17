@@ -14,14 +14,14 @@ import {
     findClosestObject,
     findObjectWithID,
     findCoordsInsideRect,
-    getRange,
+    getRangeXY,
     unpackNumAsCoord,
     packAsNum,
     packXYAsNum,
     unpackNumAsPos,
     findFunctionCPU,
     areCoordsEqual,
-    getRangeOfCoords,
+    getRange,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { profiler } from 'other/screeps-profiler'
@@ -446,7 +446,7 @@ const roomAdditions = {
                 for (const i in this.sourcePositions) {
                     const pos = this.sourcePositions[i][0]
 
-                    if (getRangeOfCoords(structure.pos, pos) > 1) continue
+                    if (getRange(structure.pos, pos) > 1) continue
 
                     this._spawningStructuresByPriority.push(structure)
                     return true
@@ -466,8 +466,8 @@ const roomAdditions = {
             this._spawningStructuresByPriority = this._spawningStructuresByPriority.concat(
                 structuresToWeight.sort(
                     (a, b) =>
-                        getRange(a.pos.x, this.anchor.x, a.pos.y, this.anchor.y) -
-                        getRange(b.pos.x, this.anchor.x, b.pos.y, this.anchor.y),
+                        getRangeXY(a.pos.x, this.anchor.x, a.pos.y, this.anchor.y) -
+                        getRangeXY(b.pos.x, this.anchor.x, b.pos.y, this.anchor.y),
                 ),
             )
 
@@ -492,7 +492,8 @@ const roomAdditions = {
                 // Assign structuresForSpawning that are not in range of 1 to the closestHarvestPos
 
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
-                    structure => getRange(structure.pos.x, closestSourcePos.x, structure.pos.y, closestSourcePos.y) > 1,
+                    structure =>
+                        getRangeXY(structure.pos.x, closestSourcePos.x, structure.pos.y, closestSourcePos.y) > 1,
                 )
             }
 
@@ -507,7 +508,7 @@ const roomAdditions = {
                     (this.fastFillerContainerLeft && this.fastFillerContainerRight))
             ) {
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
-                    structure => getRange(structure.pos.x, this.anchor.x, structure.pos.y, this.anchor.y) > 2,
+                    structure => getRangeXY(structure.pos.x, this.anchor.x, structure.pos.y, this.anchor.y) > 2,
                 )
             }
 
@@ -2155,7 +2156,6 @@ const roomAdditions = {
             let x
             let y = 0
             for (x = 0; x < roomDimensions; x += 1) {
-
                 if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
                 this._exitCoords.add(packXYAsCoord(x, y))
             }
@@ -2164,7 +2164,6 @@ const roomAdditions = {
 
             x = 0
             for (y = 0; y < roomDimensions; y += 1) {
-
                 if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
                 this._exitCoords.add(packXYAsCoord(x, y))
             }
@@ -2173,7 +2172,6 @@ const roomAdditions = {
 
             y = roomDimensions - 1
             for (x = 0; x < roomDimensions; x += 1) {
-
                 if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
                 this._exitCoords.add(packXYAsCoord(x, y))
             }
@@ -2182,7 +2180,6 @@ const roomAdditions = {
 
             x = roomDimensions - 1
             for (y = 0; y < roomDimensions; y += 1) {
-
                 if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
                 this._exitCoords.add(packXYAsCoord(x, y))
             }

@@ -220,7 +220,6 @@ export const impassibleStructureTypes: StructureConstant[] = [
 ]
 
 export const impassibleStructureTypesSet = new Set(impassibleStructureTypes)
-export const rampartSet: Set<StructureConstant> = new Set([STRUCTURE_RAMPART])
 
 export const structureTypesByBuildPriority: StructureConstant[] = [
     STRUCTURE_SPAWN,

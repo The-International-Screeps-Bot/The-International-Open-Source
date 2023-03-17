@@ -1,5 +1,5 @@
 import { customColors, RemoteData } from 'international/constants'
-import { getRange, randomTick } from 'international/utils'
+import { getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -103,7 +103,7 @@ export class RemoteCoreAttacker extends Creep {
 
         // If the creep at the core
 
-        if (getRange(this.pos.x, closestCore.pos.x, this.pos.y, closestCore.pos.y) === 1) {
+        if (getRangeXY(this.pos.x, closestCore.pos.x, this.pos.y, closestCore.pos.y) === 1) {
             this.message = '🗡️C'
 
             this.attack(closestCore)

@@ -27,14 +27,14 @@ import {
     findCreepInQueueMatchingRequest,
     findObjectWithID,
     findCoordsInsideRect,
-    getRange,
+    getRangeXY,
     findClosestObjectInRange,
     isXYExit,
     packAsNum,
     unpackNumAsPos,
     packXYAsNum,
     unpackNumAsCoord,
-    getRangeOfCoords,
+    getRange,
     randomTick,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
@@ -230,7 +230,7 @@ Creep.prototype.advancedUpgradeController = function () {
         // console.log('pos', upgradePos, this.name)
         if (!upgradePos) return false
 
-        if (getRangeOfCoords(this.pos, upgradePos) > 0) {
+        if (getRange(this.pos, upgradePos) > 0) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
@@ -247,7 +247,7 @@ Creep.prototype.advancedUpgradeController = function () {
         }
 
         const workPartCount = this.parts.work
-        const controllerRange = getRangeOfCoords(this.pos, room.controller.pos)
+        const controllerRange = getRange(this.pos, room.controller.pos)
 
         if (controllerRange <= 3 && this.nextStore.energy > 0) {
             if (this.upgradeController(room.controller) === OK) {
@@ -260,7 +260,7 @@ Creep.prototype.advancedUpgradeController = function () {
             }
         }
 
-        const controllerStructureRange = getRangeOfCoords(this.pos, controllerStructure.pos)
+        const controllerStructureRange = getRange(this.pos, controllerStructure.pos)
         if (controllerStructureRange <= 3) {
             // If the controllerStructure is a container and is in need of repair
 
@@ -327,7 +327,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
     // If the controller is out of upgrade range
 
-    if (getRangeOfCoords(this.pos, room.controller.pos) > 3) {
+    if (getRange(this.pos, room.controller.pos) > 3) {
         // Make a move request to it
 
         this.createMoveRequest({
@@ -390,7 +390,7 @@ Creep.prototype.builderGetEnergy = function () {
             if (request.resourceType !== RESOURCE_ENERGY) return false
             if (
                 findObjectWithID(request.targetID) instanceof Structure &&
-                getRangeOfCoords(this.room.anchor, findObjectWithID(request.targetID).pos) > 2
+                getRange(this.room.anchor, findObjectWithID(request.targetID).pos) > 2
             )
                 return false
 
@@ -420,7 +420,7 @@ Creep.prototype.builderGetEnergy = function () {
 Creep.prototype.advancedBuildCSite = function (cSite) {
     // If the cSite is out of range
 
-    if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
+    if (getRange(this.pos, cSite.pos) > 3) {
         this.message = '➡️🚧'
 
         // Make a move request to it
@@ -494,7 +494,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // If the cSite is out of range
 
-    if (getRange(this.pos.x, cSiteTarget.pos.x, this.pos.y, cSiteTarget.pos.y) > 3) {
+    if (getRangeXY(this.pos.x, cSiteTarget.pos.x, this.pos.y, cSiteTarget.pos.y) > 3) {
         this.message = '➡️CS'
 
         // Make a move request to it
@@ -553,7 +553,7 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 
         if (structure.nextHits / structure.hitsMax > 0.9) continue
 
-        const score = getRangeOfCoords(this.pos, structure.pos) + structure.nextHits / 1000
+        const score = getRange(this.pos, structure.pos) + structure.nextHits / 1000
 
         if (score >= lowestScore) continue
 
@@ -579,7 +579,7 @@ Creep.prototype.findNewRepairTarget = function () {
 
         if (structure.nextHits / structure.hitsMax > 0.3) continue
 
-        const score = getRangeOfCoords(this.pos, structure.pos) + (structure.nextHits / structure.hitsMax) * 20
+        const score = getRange(this.pos, structure.pos) + (structure.nextHits / structure.hitsMax) * 20
         if (score >= lowestScore) continue
 
         lowestScore = score
@@ -643,7 +643,6 @@ Creep.prototype.findSourcePos = function (index) {
     // Stop if the creep already has a packedHarvestPos
 
     if (this.memory.PC) {
-
         // On random intervals take the best source pos if it's open
 
         if (randomTick()) {
@@ -753,7 +752,7 @@ Creep.prototype.advancedRecycle = function () {
     const recycleTarget = this.findRecycleTarget()
     if (!recycleTarget) return false
 
-    const range = getRange(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y)
+    const range = getRangeXY(this.pos.x, recycleTarget.pos.x, this.pos.y, recycleTarget.pos.y)
 
     // If the target is a spawn
 
@@ -817,7 +816,7 @@ Creep.prototype.activeRenew = function () {
 
     const spawn = findClosestObject(this.pos, spawns)
 
-    if (getRangeOfCoords(this.pos, spawn.pos) > 1) {
+    if (getRange(this.pos, spawn.pos) > 1) {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: spawn.pos, range: 1 }],
@@ -855,7 +854,7 @@ Creep.prototype.passiveRenew = function () {
 
     const spawn = spawns.find(
         spawn =>
-            getRange(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
+            getRangeXY(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
             !spawn.renewed &&
             !spawn.spawning &&
             spawn.RCLActionable,
@@ -1029,7 +1028,7 @@ Creep.prototype.aggressiveHeal = function () {
     if (!healTargets.length) return false
 
     const healTarget = findClosestObject(this.pos, healTargets)
-    const range = getRange(this.pos.x, healTarget.pos.x, this.pos.y, healTarget.pos.y)
+    const range = getRangeXY(this.pos.x, healTarget.pos.x, this.pos.y, healTarget.pos.y)
 
     if (range > 1) {
         if (this.ranged) return false
@@ -1213,7 +1212,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 
             request.personalAmount =
                 request.amount +
-                (request.income ? getRangeOfCoords(findObjectWithID(request.targetID).pos, this.pos) * request.income : 0)
+                (request.income ? getRange(findObjectWithID(request.targetID).pos, this.pos) * request.income : 0)
  */
             // Customizable conditions
 
@@ -1227,7 +1226,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             if (!this.canAcceptRoomLogisticsRequest(request.type, request.ID)) continue
 
             const targetPos = findObjectWithID(request.targetID).pos
-            const score = request.priority + getRangeOfCoords(targetPos, this.pos) / 100
+            const score = request.priority + getRange(targetPos, this.pos) / 100
 
             if (score >= lowestScore) continue
 
@@ -1408,7 +1407,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
                     if (request2.resourceType !== request.resourceType) continue
 
                     const target2Pos = findObjectWithID(request2.targetID).pos
-                    const score = request2.priority + getRangeOfCoords(target2Pos, this.pos) / 100
+                    const score = request2.priority + getRange(target2Pos, this.pos) / 100
 
                     if (score >= lowestScore) continue
 
@@ -1569,7 +1568,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
 
-    if (getRangeOfCoords(target.pos, this.pos) > 1) {
+    if (getRange(target.pos, this.pos) > 1) {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],
@@ -1645,7 +1644,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
 
-    if (getRangeOfCoords(target.pos, this.pos) > 1) {
+    if (getRange(target.pos, this.pos) > 1) {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],

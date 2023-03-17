@@ -1,5 +1,5 @@
 import { communeSign, nonCommuneSigns } from 'international/constants'
-import { cleanRoomMemory, findClosestCommuneName, getRange, getRangeOfCoords } from 'international/utils'
+import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
 import { partial } from 'lodash'
 
 export class Scout extends Creep {
@@ -187,7 +187,7 @@ export class Scout extends Creep {
 
         // If the controller is not in range
 
-        if (getRangeOfCoords(this.pos, controller.pos) > 1) {
+        if (getRange(this.pos, controller.pos) > 1) {
             // Request to move to the controller and inform false
 
             if (

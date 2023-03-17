@@ -1,5 +1,5 @@
 import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
-import { customLog, estimateTowerDamage, getRange, getRangeOfCoords, isXYExit } from 'international/utils'
+import { customLog, estimateTowerDamage, getRangeXY, getRange, isXYExit } from 'international/utils'
 import { profiler } from 'other/screeps-profiler'
 
 Object.defineProperties(Creep.prototype, {
@@ -113,7 +113,7 @@ Object.defineProperties(Creep.prototype, {
                     if (creep.owner.username !== Memory.me) continue
                 } else if (this.owner.username !== creep.owner.username) continue
 
-                const range = getRangeOfCoords(this.pos, creep.pos)
+                const range = getRange(this.pos, creep.pos)
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal
@@ -295,7 +295,7 @@ Object.defineProperties(PowerCreep.prototype, {
                     if (creep.owner.username !== Memory.me) continue
                 } else if (this.owner.username !== creep.owner.username) continue
 
-                const range = getRangeOfCoords(this.pos, creep.pos)
+                const range = getRange(this.pos, creep.pos)
                 if (range > 3) continue
 
                 let healStrength = creep.combatStrength.heal

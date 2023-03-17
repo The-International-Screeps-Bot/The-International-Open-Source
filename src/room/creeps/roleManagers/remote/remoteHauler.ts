@@ -5,8 +5,8 @@ import {
     findCoordsInsideRect,
     findFunctionCPU,
     findObjectWithID,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     randomTick,
 } from 'international/utils'
 import { indexOf } from 'lodash'
@@ -233,7 +233,7 @@ export class RemoteHauler extends Creep {
 
         // We aren't next to the source
 
-        if (getRangeOfCoords(this.pos, sourcePos) > 1) {
+        if (getRange(this.pos, sourcePos) > 1) {
             // Fulfill requests near the hauler
 
             this.runRoomLogisticsRequestsAdvanced({
@@ -243,7 +243,7 @@ export class RemoteHauler extends Creep {
                     // If the target is near the creep
 
                     const targetPos = findObjectWithID(request.targetID).pos
-                    return getRangeOfCoords(targetPos, this.pos) <= 1
+                    return getRange(targetPos, this.pos) <= 1
                 },
             })
 
@@ -283,7 +283,7 @@ export class RemoteHauler extends Creep {
                 // If the target is near the hauler
 
                 const targetPos = findObjectWithID(request.targetID).pos
-                return getRangeOfCoords(targetPos, this.pos) <= 1
+                return getRange(targetPos, this.pos) <= 1
             },
         })
 
@@ -464,7 +464,7 @@ export class RemoteHauler extends Creep {
         if (
             !this.fatigue &&
             this.memory.RN == this.room.name &&
-            getRangeOfCoords(this.room.sourcePositions[this.memory.SI][0], this.pos) <= 1
+            getRange(this.room.sourcePositions[this.memory.SI][0], this.pos) <= 1
         )
             return
 

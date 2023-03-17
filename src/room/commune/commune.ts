@@ -10,8 +10,8 @@ import {
     findObjectWithID,
     forAdjacentCoords,
     forCoordsInRange,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     isXYExit,
     isXYInBorder,
     isXYInRoom,
@@ -285,7 +285,6 @@ export class CommuneManager {
     }
 
     private test() {
-
         /*
         const array = new Array(2500)
 
@@ -463,7 +462,7 @@ export class CommuneManager {
         this._maxUpgradeStrength = 0
 
         if (hubLink && hubLink.RCLActionable) {
-            const range = getRangeOfCoords(upgradeStructure.pos, hubLink.pos)
+            const range = getRange(upgradeStructure.pos, hubLink.pos)
 
             // Increase strength by throughput
 
@@ -475,7 +474,7 @@ export class CommuneManager {
 
             if (!sourceLink.RCLActionable) continue
 
-            const range = getRangeOfCoords(sourceLink.pos, upgradeStructure.pos)
+            const range = getRange(sourceLink.pos, upgradeStructure.pos)
 
             // Increase strength by throughput
 
