@@ -778,7 +778,7 @@ export function randomVal(array: any[]) {
 }
 
 export function findRangeFromExit(coord: Coord) {
-    const dx = Math.min(coord.x, Math.abs(coord.x - roomDimensions - 1))
-    const dy = Math.min(coord.y, Math.abs(coord.y - roomDimensions - 1))
-    return Math.max(dx, dy)
+    const dx = Math.min(coord.x, roomDimensions - 1 - coord.x)
+    const dy = Math.min(coord.y, roomDimensions - 1 - coord.y)
+    return Math.min(dx, dy)
 }
