@@ -121,6 +121,7 @@ export class CommunePlanner {
     plannedGridCoords: boolean
     finishedGrid: boolean
     generalShielded: boolean
+    finishedGridExtensionPaths: boolean
 
     //
 
@@ -268,6 +269,7 @@ export class CommunePlanner {
         this.preLabSources()
         this.labs()
         this.gridExtensions()
+        this.gridExtensionPaths()
         this.nuker()
         this.powerSpawn()
         this.observer()
@@ -793,8 +795,8 @@ export class CommunePlanner {
 
             this.basePlans.set(packCoord(closestHarvestPos), STRUCTURE_CONTAINER, 3)
             const packedCoord = packAsNum(closestHarvestPos)
-            this.roadCoords[packedCoord] = 255
-            this.baseCoords[packedCoord] = 255
+            this.roadCoords[packedCoord] = 20
+            this.baseCoords[packedCoord] = 20
 
             const path = this.room.advancedFindPath({
                 origin: closestHarvestPos,
@@ -843,8 +845,8 @@ export class CommunePlanner {
 
         for (const pos of this.mineralHarvestPositions) {
             const packedCoord = packAsNum(pos)
-            this.roadCoords[packedCoord] = 255
-            this.baseCoords[packedCoord] = 255
+            this.roadCoords[packedCoord] = 20
+            this.baseCoords[packedCoord] = 20
         }
 
         for (const pos of mineralPath) {
@@ -1871,6 +1873,30 @@ export class CommunePlanner {
             },
         })
     }
+    private gridExtensionPaths() {
+        if (this.finishedGridExtensionPaths) return
+
+        const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+
+        for (let i = this.stampAnchors.gridExtension.length - 1; i >= 0; i -= 5) {
+
+            const path = this.room.advancedFindPath({
+                origin: new RoomPosition(this.stampAnchors.gridExtension[i].x, this.stampAnchors.gridExtension[i].y, this.room.name),
+                goals: [{ pos: hubAnchorPos, range: 2 }],
+                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
+            })
+
+            for (const pos of path) {
+
+                this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
+                this.roadCoords[packAsNum(pos)] = 1
+            }
+        }
+
+        this.finishedGridExtensionPaths = true
+    }
     private towers() {
         this.planStamps({
             stampType: 'tower',
@@ -2326,16 +2352,16 @@ export class CommunePlanner {
         /* if (this.stampAnchors.onboardingRampart.length) return */
 
         const onboardingCoords: Set<number> = new Set()
-        const origin = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
         for (const group of this.groupedMinCutCoords) {
-            const [closestCoord] = findClosestCoord(origin, group)
+            const [closestCoord] = findClosestCoord(hubAnchorPos, group)
 
             // Path from the hubAnchor to the cloestPosToAnchor
 
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
-                goals: [{ pos: origin, range: 2 }],
+                goals: [{ pos: hubAnchorPos, range: 2 }],
                 weightCoordMaps: [this.diagonalCoords, this.roadCoords, this.unprotectedCoords, this.rampartCoords],
                 plainCost: defaultRoadPlanningPlainCost,
                 swampCost: defaultSwampCost,
