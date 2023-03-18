@@ -136,10 +136,17 @@ export class RangedDefender extends Creep {
 
         for (const rampart of room.defensiveRamparts) {
             if (rampart.hits < 3000) continue
-            // Allow the creep to take rampart reservations from other defender types - but not its own type
+            // Allow the creep to take rampart reservations from weaker defenders
 
             const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
-            if (creepIDUsingRampart && this.id !== creepIDUsingRampart) continue
+            if (creepIDUsingRampart && this.id !== creepIDUsingRampart) {
+                const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
+                if (
+                    creepUsingRampart.combatStrength.melee + creepUsingRampart.combatStrength.ranged >=
+                    this.combatStrength.melee + this.combatStrength.ranged
+                )
+                    continue
+            }
 
             if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) continue
 
@@ -157,13 +164,12 @@ export class RangedDefender extends Creep {
         }
 
         if (!bestRampart) return false
-        /*
+
         const creepIDUsingRampart = room.usedRampartIDs.get(bestRampart.id)
         if (creepIDUsingRampart) {
             const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
             delete creepUsingRampart.memory.RID
         }
- */
         this.memory.RID = bestRampart.id
         room.usedRampartIDs.set(bestRampart.id, this.id)
         return bestRampart

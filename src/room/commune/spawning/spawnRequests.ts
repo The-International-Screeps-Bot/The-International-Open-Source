@@ -380,7 +380,7 @@ export class SpawnRequestsManager {
                         }
                     }
 
-                    requiredStrength *= 1.2
+                    requiredStrength *= 1.5
 
                     const priority = Math.min(
                         minPriority + this.communeManager.room.myCreeps[role].length * 0.5,
@@ -400,6 +400,7 @@ export class SpawnRequestsManager {
                             partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                             minCost: 210,
                             priority,
+                            threshold: 0.1,
                             memoryAdditions: {},
                         }
                     }
@@ -414,6 +415,7 @@ export class SpawnRequestsManager {
                         partsMultiplier: Math.max(requiredStrength / strength, 1),
                         minCost: 260,
                         priority,
+                        threshold: 0.1,
                         memoryAdditions: {},
                     }
                 })(),
@@ -458,6 +460,7 @@ export class SpawnRequestsManager {
                             partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                             minCost: 210,
                             priority,
+                            threshold: 0.1,
                             memoryAdditions: {},
                         }
                     }
@@ -472,6 +475,7 @@ export class SpawnRequestsManager {
                         partsMultiplier: Math.max(requiredStrength / strength, 1),
                         minCost: 260,
                         priority,
+                        threshold: 0.1,
                         memoryAdditions: {},
                     }
                 })(),

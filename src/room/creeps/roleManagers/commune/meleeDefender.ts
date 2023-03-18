@@ -119,12 +119,16 @@ export class MeleeDefender extends Creep {
 
         for (const rampart of room.defensiveRamparts) {
             if (rampart.hits < 3000) continue
-            // Allow the creep to take rampart reservations from other defender types - but not its own type
+            // Allow the creep to take rampart reservations from weaker defenders
 
             const creepIDUsingRampart = room.usedRampartIDs.get(rampart.id)
             if (creepIDUsingRampart && this.id !== creepIDUsingRampart) {
                 const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
-                if (creepUsingRampart.role === 'meleeDefender') continue
+                if (
+                    creepUsingRampart.combatStrength.melee + creepUsingRampart.combatStrength.ranged >=
+                    this.combatStrength.melee + this.combatStrength.ranged
+                )
+                    continue
             }
 
             if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) continue

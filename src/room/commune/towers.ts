@@ -67,7 +67,9 @@ export class TowerManager {
         for (const enemyCreep of room.enemyCreeps) {
 
             const damage = enemyCreep.netTowerDamage
-            if (!room.towerInferiority && damage * findRangeFromExit(enemyCreep.pos) < enemyCreep.hits) {
+            if (damage * findRangeFromExit(enemyCreep.pos) <= enemyCreep.hits) {
+
+                if (room.towerInferiority) continue
                 room.towerInferiority = true
                 this.createPowerTasks()
                 continue
@@ -124,7 +126,8 @@ export class TowerManager {
      * Maybe we can mess up healing
      */
     scatterShot() {
-
+        return
+        if (this.actionableTowerIDs.length <= 1) return
         if (!randomTick(100)) return
 
         const enemyCreeps = this.communeManager.room.enemyCreeps

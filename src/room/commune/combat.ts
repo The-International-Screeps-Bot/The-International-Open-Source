@@ -8,6 +8,7 @@ import {
     findRangeFromExit,
     getRange,
     isXYInBorder,
+    randomIntRange,
     randomRange,
     randomTick,
 } from 'international/utils'
@@ -107,14 +108,14 @@ export class CombatManager {
     private manageRampartPublicity() {
         const { room } = this.communeManager
 
-        // If there are no enemyAttackers, try to publicize private ramparts 10 at a time
+        // If there are no enemies it is safe to publicize ramparts
 
-        if (!room.enemyCreeps.length || room.controller.safeMode) {
+        if (!room.enemyCreeps.length) {
             if (!Memory.publicRamparts) return
 
-            // Stop if the tick is not divisible by a random range
+            // Wait some pseudo-random time before publicizing ramparts
 
-            if (!randomTick(100)) return
+            if (room.memory.LAT < randomIntRange(100, 150)) return
 
             // Publicize at most 10 ramparts per tick, to avoid too many intents
 
