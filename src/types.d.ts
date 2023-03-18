@@ -251,6 +251,19 @@ declare global {
     }
 
     interface BasePlanAttempt {
+        score: number
+        stampAnchors: Partial<{  [key in StampTypes]: Coord[] }>
+        basePlans: string
+        rampartPlans: string
+        sourceHarvestPositions: RoomPosition[][],
+        sourcePaths: RoomPosition[][],
+        mineralHarvestPositions: RoomPosition[],
+        mineralPath: RoomPosition[],
+        centerUpgradePos: RoomPosition,
+        upgradePath: RoomPosition[],
+    }
+
+    interface packedBasePlan {
         /**
          * Stamp Anchors
          */
@@ -262,11 +275,11 @@ declare global {
         /**
          * Base Plans
          */
-        BP: { [packedCoord: string]: string }
+        BP: string
         /**
          * Stamp Anchors
          */
-        RP: { [packedCoord: string]: string }
+        RP: string
     }
 
     interface CombatStrength {
@@ -1550,9 +1563,9 @@ declare global {
         anchor: number
 
         /**
-         * Base Plan Attempts
+         * Base Plan
          */
-        BPAs: BasePlanAttempt[]
+        BP: packedBasePlan[]
 
         /**
          * Type of a room that generally describes properties of the room

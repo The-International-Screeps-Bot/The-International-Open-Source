@@ -98,10 +98,6 @@ interface FindStampAnchorArgs {
     conditions?(coord: Coord): boolean
 }
 
-interface CommunePlannerSpecialKeys {
-    a: number
-}
-
 /**
  *
  */
@@ -110,13 +106,15 @@ export class CommunePlanner {
     room: Room
 
     centerUpgradePos: RoomPosition
-    input2Coord: Coord
-    outputCoords: Coord[]
+    upgradePath: RoomPosition[]
+
+    inputLab2Coord: Coord
+    outputLabCoords: Coord[]
     sourceHarvestPositions: RoomPosition[][]
     sourcePaths: RoomPosition[][]
 
     mineralPath: RoomPosition[]
-    mineralHarvestCoord: Coord
+    mineralHarvestPositions: RoomPosition[]
 
     // Action checks
 
@@ -162,6 +160,10 @@ export class CommunePlanner {
     minCutCoords: Set<number>
     groupedMinCutCoords: Coord[][]
     score: number
+
+    //
+
+    planAttempts: BasePlanAttempt[]
 
     constructor(roomManager: RoomManager) {
         this.roomManager = roomManager
@@ -223,6 +225,7 @@ export class CommunePlanner {
 
         this.room = this.roomManager.room
 
+        if (!this.planAttempts) this.planAttempts = []
         if (!this.terrainCoords) {
             this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
 
@@ -239,7 +242,6 @@ export class CommunePlanner {
 
             this.score = 0
             this.recordExits()
-            this.room.memory.BPAs = []
         }
 
         this.avoidSources()
@@ -315,11 +317,11 @@ export class CommunePlanner {
         }
 
         this.room.coordVisual(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, customColors.orange)
-        this.room.coordVisual(this.input2Coord.x, this.input2Coord.y, customColors.orange)
+        this.room.coordVisual(this.inputLab2Coord.x, this.inputLab2Coord.y, customColors.orange)
 
-        for (const coord of this.outputCoords) {
+        for (const coord of this.outputLabCoords) {
             this.room.visual.line(coord.x, coord.y, this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y)
-            this.room.visual.line(coord.x, coord.y, this.input2Coord.x, this.input2Coord.y)
+            this.room.visual.line(coord.x, coord.y, this.inputLab2Coord.x, this.inputLab2Coord.y)
         }
 
         /* this.room.visualizeCoordMap(this.reverseExitFlood) */
@@ -813,11 +815,23 @@ export class CommunePlanner {
             plainCost: defaultRoadPlanningPlainCost * 2,
             swampCost: defaultSwampCost * 2,
         })
-        this.mineralHarvestCoord = mineralPath[0]
-        const packedCoord = packAsNum(this.mineralHarvestCoord)
-        this.roadCoords[packedCoord] = 255
-        this.baseCoords[packedCoord] = 255
+
+        this.mineralHarvestPositions = [mineralPath[0]]
         mineralPath.shift()
+
+        forAdjacentCoords(this.room.mineral.pos, (adjCoord) => {
+            if (this.baseCoords[packAsNum(adjCoord)] === 255) return
+            if (getRange(mineralPath[0], adjCoord) > 1) return
+
+            this.mineralHarvestPositions.push(new RoomPosition(adjCoord.x, adjCoord.y, this.room.name))
+        })
+
+        for (const pos of this.mineralHarvestPositions) {
+
+            const packedCoord = packAsNum(pos)
+            this.roadCoords[packedCoord] = 255
+            this.baseCoords[packedCoord] = 255
+        }
 
         for (const pos of mineralPath) {
             const packedCoord = packAsNum(pos)
@@ -880,7 +894,9 @@ export class CommunePlanner {
     private planMineralStructure() {
         const mineralPos = this.room.mineral.pos
         this.basePlans.setXY(mineralPos.x, mineralPos.y, STRUCTURE_EXTRACTOR, 6)
-        this.basePlans.setXY(this.mineralHarvestCoord.x, this.mineralHarvestCoord.y, STRUCTURE_CONTAINER, 6)
+
+        const bestMineralHarvestPos = this.mineralHarvestPositions[0]
+        this.basePlans.setXY(bestMineralHarvestPos.x, bestMineralHarvestPos.y, STRUCTURE_CONTAINER, 6)
     }
     private planSourceStructures() {
         for (const coord of this.stampAnchors.sourceLink) {
@@ -959,6 +975,7 @@ export class CommunePlanner {
             this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
         }
 
+        this.upgradePath = path
         return (this.centerUpgradePos = centerUpgradePos)
     }
     /**
@@ -1512,7 +1529,7 @@ export class CommunePlanner {
         return false
     }
     private findFastFillerOrigin() {
-        if (this.fastFillerStartCoords) return this.fastFillerStartCoords[this.room.memory.BPAs.length]
+        if (this.fastFillerStartCoords) return this.fastFillerStartCoords[this.planAttempts.length]
 
         // Controller
 
@@ -1553,7 +1570,7 @@ export class CommunePlanner {
         }
 
         this.fastFillerStartCoords = origins
-        return this.fastFillerStartCoords[this.room.memory.BPAs.length]
+        return this.fastFillerStartCoords[this.planAttempts.length]
     }
     private fastFiller() {
         if (this.stampAnchors.fastFiller.length) return
@@ -1750,7 +1767,7 @@ export class CommunePlanner {
                 if (this.baseCoords[packedNumCoord1] === 255) return false
                 if (this.byPlannedRoad[packedNumCoord1] !== 1) return false
 
-                let outputCoords: Coord[]
+                let outputLabCoords: Coord[]
 
                 // Record
 
@@ -1776,7 +1793,7 @@ export class CommunePlanner {
                     const packedCoord2 = packCoord(coord2)
                     if (packedCoord1 === packedCoord2) continue
 
-                    outputCoords = []
+                    outputLabCoords = []
 
                     for (const adjCoord2 of findCoordsInRangeXY(coord2.x, coord2.y, range)) {
                         const packedAdjCoord2 = packCoord(adjCoord2)
@@ -1784,10 +1801,10 @@ export class CommunePlanner {
                         if (packedCoord2 === packedAdjCoord2) continue
                         if (!packedAdjCoords1.has(packedAdjCoord2)) continue
 
-                        outputCoords.push(adjCoord2)
-                        if (outputCoords.length >= 8) {
-                            this.input2Coord = coord2
-                            this.outputCoords = outputCoords
+                        outputLabCoords.push(adjCoord2)
+                        if (outputLabCoords.length >= 8) {
+                            this.inputLab2Coord = coord2
+                            this.outputLabCoords = outputLabCoords
                             return true
                         }
                     }
@@ -1800,11 +1817,11 @@ export class CommunePlanner {
                 this.baseCoords[packAsNum(stampAnchor)] = 255
                 this.roadCoords[packAsNum(stampAnchor)] = 255
 
-                this.basePlans.set(packCoord(this.input2Coord), STRUCTURE_LAB, 6)
-                this.baseCoords[packAsNum(this.input2Coord)] = 255
-                this.roadCoords[packAsNum(this.input2Coord)] = 255
+                this.basePlans.set(packCoord(this.inputLab2Coord), STRUCTURE_LAB, 6)
+                this.baseCoords[packAsNum(this.inputLab2Coord)] = 255
+                this.roadCoords[packAsNum(this.inputLab2Coord)] = 255
 
-                for (const coord of this.outputCoords) {
+                for (const coord of this.outputLabCoords) {
                     this.basePlans.set(packCoord(coord), STRUCTURE_LAB, 8)
                     this.baseCoords[packAsNum(coord)] = 255
                     this.roadCoords[packAsNum(coord)] = 255
@@ -2397,15 +2414,30 @@ export class CommunePlanner {
     private findScore() {
         if (this.score) return
 
-        const score = 0
+        let score = 0
+        score += this.room.findSwampPlainsRatio() * 10
+        score += this.sourcePaths.length
+        score += this.upgradePath.length
+        score += this.mineralPath.length * 0.1
+        score += this.stampAnchors.minCutRampart.length + this.stampAnchors.shieldRampart.length + this.stampAnchors.onboardingRampart.length
 
         this.score = score
     }
     private record() {
-        const planAttempt = {}
 
         /* for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key] */
 
-        this.room.memory.BPAs.push()
+        this.planAttempts.push({
+            score: this.score,
+            stampAnchors: this.stampAnchors,
+            basePlans: this.basePlans.pack(),
+            rampartPlans: this.rampartPlans.pack(),
+            sourceHarvestPositions: this.sourceHarvestPositions,
+            sourcePaths: this.sourcePaths,
+            mineralHarvestPositions: this.mineralHarvestPositions,
+            mineralPath: this.mineralPath,
+            centerUpgradePos: this.centerUpgradePos,
+            upgradePath: this.upgradePath,
+        })
     }
 }
