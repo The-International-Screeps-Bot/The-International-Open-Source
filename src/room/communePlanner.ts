@@ -118,6 +118,8 @@ export class CommunePlanner {
 
     // Action checks
 
+    plannedGridCoords: boolean
+    finishedGrid: boolean
     generalShielded: boolean
 
     //
@@ -138,9 +140,8 @@ export class CommunePlanner {
      * Coords adjacent to planned roads
      */
     byPlannedRoad: Uint8Array
-    finishedGrid: boolean
     finishedFastFillerRoadPrune: boolean
-    plannedGridCoords: boolean
+
     /**
      * Coords we should be protecting using ramparts
      */
@@ -163,6 +164,10 @@ export class CommunePlanner {
 
     //
 
+    /**
+     * If the planner is in the process of recording a plan attempt
+     */
+    recording: boolean
     planAttempts: BasePlanAttempt[]
 
     constructor(roomManager: RoomManager) {
@@ -225,23 +230,31 @@ export class CommunePlanner {
 
         this.room = this.roomManager.room
 
-        if (!this.planAttempts) this.planAttempts = []
+        if (this.recording) this.record()
+
+        // Initial configuration
+
         if (!this.terrainCoords) {
             this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
+            this.byExitCoords = new Uint8Array(2500)
+            this.exitCoords = []
+            this.recordExits()
+            this.planAttempts = []
+        }
+
+        // Plan attempt / configuration
+
+        if (!this.baseCoords) {
 
             this.baseCoords = new Uint8Array(this.terrainCoords)
             this.roadCoords = new Uint8Array(this.terrainCoords)
             this.rampartCoords = new Uint8Array(2500)
-            this.byExitCoords = new Uint8Array(2500)
-            this.exitCoords = []
             this.byPlannedRoad = new Uint8Array(2500)
             this.basePlans = new BasePlans()
             this.rampartPlans = new RampartPlans()
             this.stampAnchors = {}
             for (const stampType in stamps) this.stampAnchors[stampType as StampTypes] = []
-
             this.score = 0
-            this.recordExits()
         }
 
         this.avoidSources()
@@ -269,6 +282,8 @@ export class CommunePlanner {
         this.generalShield()
         this.visualize()
         /* this.visualizeGrid() */
+
+        this.record()
 
         return RESULT_SUCCESS
     }
@@ -819,7 +834,7 @@ export class CommunePlanner {
         this.mineralHarvestPositions = [mineralPath[0]]
         mineralPath.shift()
 
-        forAdjacentCoords(this.room.mineral.pos, (adjCoord) => {
+        forAdjacentCoords(this.room.mineral.pos, adjCoord => {
             if (this.baseCoords[packAsNum(adjCoord)] === 255) return
             if (getRange(mineralPath[0], adjCoord) > 1) return
 
@@ -827,7 +842,6 @@ export class CommunePlanner {
         })
 
         for (const pos of this.mineralHarvestPositions) {
-
             const packedCoord = packAsNum(pos)
             this.roadCoords[packedCoord] = 255
             this.baseCoords[packedCoord] = 255
@@ -2417,15 +2431,25 @@ export class CommunePlanner {
         let score = 0
         score += this.room.findSwampPlainsRatio() * 10
         score += this.sourcePaths.length
+
+        // Early RCL we want to have 3 or more harvest positions
+
+        for (const positions of this.sourceHarvestPositions) {
+            if (positions.length >= 3) continue
+            score += (3 - positions.length) * 12
+        }
         score += this.upgradePath.length
-        score += this.mineralPath.length * 0.1
-        score += this.stampAnchors.minCutRampart.length + this.stampAnchors.shieldRampart.length + this.stampAnchors.onboardingRampart.length
+        score += this.mineralPath.length / 10
+        score +=
+            this.stampAnchors.minCutRampart.length * 2 +
+            this.stampAnchors.shieldRampart.length +
+            this.stampAnchors.onboardingRampart.length
+        score += getRange(this.stampAnchors.hub[0], this.centerUpgradePos) / 10
 
         this.score = score
     }
     private record() {
-
-        /* for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key] */
+        this.recording = true
 
         this.planAttempts.push({
             score: this.score,
@@ -2439,5 +2463,11 @@ export class CommunePlanner {
             centerUpgradePos: this.centerUpgradePos,
             upgradePath: this.upgradePath,
         })
+
+        // Delete plan-specific properties
+
+
+
+        this.recording = false
     }
 }

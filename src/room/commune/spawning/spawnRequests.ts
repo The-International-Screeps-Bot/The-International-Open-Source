@@ -34,7 +34,6 @@ export class SpawnRequestsManager {
     rawSpawnRequestsArgs: (SpawnRequestArgs | false)[]
     spawnEnergyCapacity: number
     minRemotePriority = 9
-    remoteHaulerNeed: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -53,9 +52,8 @@ export class SpawnRequestsManager {
         this.maintainers()
         this.builders()
         this.controllerUpgraders()
-        this.remoteSourceHarvesters()
+        this.remoteSourceRoles()
         this.generalRemoteRoles()
-        this.remoteHaulers()
         this.scout()
         this.claimRequestRoles()
         this.allyVanguard()
@@ -976,7 +974,10 @@ export class SpawnRequestsManager {
         )
     }
 
-    private remoteSourceHarvesters() {
+    /**
+     * Spawn for roles that are per-source
+     */
+    private remoteSourceRoles() {
         for (const remoteInfo of this.communeManager.room.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
@@ -985,16 +986,6 @@ export class SpawnRequestsManager {
             const remoteMemory = Memory.rooms[remoteName]
             const remoteData = Memory.rooms[remoteName].data
             const remote = Game.rooms[remoteName]
-            const priority =
-                Math.round((this.minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100) * 100) / 100
-
-            const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
-                | 'remoteSourceHarvester0'
-                | 'remoteSourceHarvester1'
-
-            // If there are no data for this.communeManager.room this.communeManager.room, inform false
-
-            if (remoteData[RemoteData[role]] <= 0) continue
 
             const sourcePositionsAmount = remote
                 ? remote.sourcePositions.length
@@ -1004,6 +995,15 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
+                    const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
+                        | 'remoteSourceHarvester0'
+                        | 'remoteSourceHarvester1'
+                    if (RemoteData[role] <= 0) return false
+
+                    const priority =
+                        Math.round((this.minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100) * 100) /
+                        100
+
                     if (this.spawnEnergyCapacity >= 950) {
                         return {
                             role,
@@ -1045,12 +1045,70 @@ export class SpawnRequestsManager {
                     }
                 })(),
             )
+
+            const isReserved =
+                remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+
+            const income = Math.max(
+                (isReserved ? 10 : 5) -
+                    Math.floor(
+                        Math.max(remoteMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]], 0) *
+                            minHarvestWorkRatio,
+                    ),
+                0,
+            )
+
+            this.rawSpawnRequestsArgs.push(
+                ((): SpawnRequestArgs | false => {
+                    if (income <= 0) return false
+
+                    // Higher priority than remote harvesters
+
+                    const priority =
+                        Math.round((this.minRemotePriority + remoteMemory.SPs[sourceIndex].length / 100) * 100) / 100
+
+                    const partsMultiplier = findCarryPartsRequired(
+                        remoteMemory.SPs[sourceIndex].length / packedPosLength,
+                        income,
+                    )
+                    const role = 'remoteHauler'
+
+                    /*
+                    // If all RCL 3 extensions are built
+                    if (this.spawnEnergyCapacity >= 800) {
+                            partsMultiplier = this.remoteHaulerNeed / 2
+                            return {
+                                defaultParts: [],
+                                extraParts: [CARRY, CARRY, MOVE],
+                                threshold: 0,
+                                partsMultiplier,
+                                minCost: this.communeManager.room.memory.MHC,
+                                maxCostPerCreep: this.communeManager.room.memory.MHC,
+                                priority,
+                                memoryAdditions: {
+                                    R: true,
+                                },
+                            }
+                    }
+                    */
+
+                    return {
+                        role,
+                        defaultParts: [],
+                        extraParts: [CARRY, MOVE],
+                        threshold: 0,
+                        partsMultiplier,
+                        minCost: this.communeManager.room.memory.MHC,
+                        maxCostPerCreep: this.communeManager.room.memory.MHC,
+                        priority,
+                        memoryAdditions: {},
+                    }
+                })(),
+            )
         }
     }
 
     private generalRemoteRoles() {
-        this.remoteHaulerNeed = 0
-
         const remoteNamesByEfficacy = this.communeManager.room.remoteNamesBySourceEfficacy
 
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
@@ -1067,37 +1125,6 @@ export class SpawnRequestsManager {
                 Math.max(remoteData[RemoteData.remoteDismantler], 0) +
                 Math.max(remoteData[RemoteData.minDamage], 0) +
                 Math.max(remoteData[RemoteData.minHeal], 0)
-
-            const remoteMemory = Memory.rooms[remoteName]
-
-            if (!remoteMemory.data[RemoteData.enemyReserved] && !remoteMemory.data[RemoteData.abandon]) {
-                const remote = Game.rooms[remoteName]
-                const isReserved =
-                    remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
-
-                // Loop through each index of sourceEfficacies
-
-                for (let index = 0; index < remoteMemory.SIDs.length; index += 1) {
-                    // Get the income based on the reservation of the this.communeManager.room and remoteHarvester need
-                    // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
-
-                    const income = Math.max(
-                        (isReserved ? 10 : 5) -
-                            Math.floor(
-                                Math.max(remoteMemory.data[RemoteData[remoteHarvesterRoles[index]]], 0) *
-                                    minHarvestWorkRatio,
-                            ),
-                        0,
-                    )
-
-                    // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-                    this.remoteHaulerNeed += findCarryPartsRequired(
-                        remoteMemory.SPs[index].length / packedPosLength,
-                        income,
-                    )
-                }
-            }
 
             // If there is a need for any econ creep, inform the index
 
@@ -1267,50 +1294,6 @@ export class SpawnRequestsManager {
                 })(),
             )
         }
-    }
-
-    private remoteHaulers() {
-        this.rawSpawnRequestsArgs.push(
-            ((): SpawnRequestArgs | false => {
-                if (this.remoteHaulerNeed === 0) return false
-
-                const partsMultiplier = this.remoteHaulerNeed
-                const role = 'remoteHauler'
-
-                /*
-                // If all RCL 3 extensions are built
-                if (this.spawnEnergyCapacity >= 800) {
-                        partsMultiplier = this.remoteHaulerNeed / 2
-                        return {
-                            defaultParts: [],
-                            extraParts: [CARRY, CARRY, MOVE],
-                            threshold: 0.1,
-                            partsMultiplier,
-                            maxCreeps: Infinity,
-                            minCost: 150,
-                            maxCostPerCreep: this.communeManager.room.memory.MHC,
-                            priority: this.minRemotePriority,
-                            memoryAdditions: {
-                                role: 'remoteHauler',
-                                R: true,
-                            },
-                        }
-                }
-                */
-
-                return {
-                    role,
-                    defaultParts: [],
-                    extraParts: [CARRY, MOVE],
-                    threshold: 0.1,
-                    partsMultiplier,
-                    minCost: 100,
-                    maxCostPerCreep: this.communeManager.room.memory.MHC,
-                    priority: this.minRemotePriority,
-                    memoryAdditions: {},
-                }
-            })(),
-        )
     }
 
     private scout() {
