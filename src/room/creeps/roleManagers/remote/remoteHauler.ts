@@ -123,12 +123,15 @@ export class RemoteHauler extends Creep {
         // Try to find a remote
 
         if (!this.findRemote()) {
-            // If the room is the creep's commune
 
+            this.message = '❌ Remote'
+
+            // If the room is the creep's commune
+/*
             if (this.room.name === this.commune.name) {
                 // Advanced recycle and iterate
 
-                /* this.advancedRecycle() */
+                this.advancedRecycle()
                 return false
             }
 
@@ -143,7 +146,7 @@ export class RemoteHauler extends Creep {
                     },
                 ],
             })
-
+ */
             return false
         }
 

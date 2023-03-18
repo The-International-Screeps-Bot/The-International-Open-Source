@@ -270,6 +270,9 @@ export class RemoteHarvester extends Creep {
             // Try to find a remote
 
             if (!creep.findRemote()) {
+
+                creep.message = '❌ Remote'
+/*
                 // If the room is the creep's commune
 
                 if (room.name === creep.commune.name) {
@@ -290,7 +293,7 @@ export class RemoteHarvester extends Creep {
                         },
                     ],
                 })
-
+ */
                 continue
             }
 

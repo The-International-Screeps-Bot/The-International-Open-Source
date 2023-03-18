@@ -1,6 +1,14 @@
 import { customColors, towerPowers } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, estimateTowerDamage, findObjectWithID, findRangeFromExit, isXYInBorder, randomTick, scalePriority } from 'international/utils'
+import {
+    customLog,
+    estimateTowerDamage,
+    findObjectWithID,
+    findRangeFromExit,
+    isXYInBorder,
+    randomTick,
+    scalePriority,
+} from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -65,10 +73,16 @@ export class TowerManager {
         let highestDamage = 1
 
         for (const enemyCreep of room.enemyCreeps) {
-
             const damage = enemyCreep.netTowerDamage
-            if (damage * findRangeFromExit(enemyCreep.pos) <= enemyCreep.hits) {
 
+            if (enemyCreep.owner.username === 'Invader') {
+                if (damage <= 0) {
+                    if (room.towerInferiority) continue
+                    room.towerInferiority = true
+                    this.createPowerTasks()
+                    continue
+                }
+            } else if (damage * findRangeFromExit(enemyCreep.pos) < enemyCreep.hits) {
                 if (room.towerInferiority) continue
                 room.towerInferiority = true
                 this.createPowerTasks()
@@ -102,7 +116,6 @@ export class TowerManager {
 
         const attackTarget = this.findAttackTarget()
         if (!attackTarget) {
-
             this.scatterShot()
             return true
         }

@@ -82,6 +82,9 @@ export class RemoteReserver extends Creep {
             if (!creep.findRemote()) {
                 // If the room is the creep's commune
 
+                creep.message = '❌ Remote'
+
+/*
                 if (room.name === creep.commune.name) {
                     // Advanced recycle and iterate
 
@@ -100,7 +103,7 @@ export class RemoteReserver extends Creep {
                         },
                     ],
                 })
-
+ */
                 continue
             }
 

@@ -164,6 +164,8 @@ export class CombatManager {
         // Attack enemies in order of most members that can attack them
 
         for (const enemyCreepID of defenderEnemyTargetsByDamage) {
+            if (!room.attackingDefenderIDs.size) break
+
             const enemyCreep = findObjectWithID(enemyCreepID)
 
             for (const memberID of room.defenderEnemyTargetsWithDefender.get(enemyCreepID)) {
@@ -176,15 +178,16 @@ export class CombatManager {
                 room.attackingDefenderIDs.delete(memberID)
             }
 
+            if (room.towerAttackTarget) continue
+
             const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
             room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, { font: 0.3 })
-            if (damage * findRangeFromExit(enemyCreep.pos) >= enemyCreep.hits) {
-                if (!room.towerAttackTarget) room.towerAttackTarget = enemyCreep
-                else if (damage > room.defenderEnemyTargetsWithDamage.get(room.towerAttackTarget.id))
-                    room.towerAttackTarget = enemyCreep
-            }
 
-            if (!room.attackingDefenderIDs.size) break
+            if (enemyCreep.owner.username === 'Invader') {
+                if (damage <= 0) continue
+            } else if (damage * findRangeFromExit(enemyCreep.pos) < enemyCreep.hits) continue
+
+            room.towerAttackTarget = enemyCreep
         }
     }
 
