@@ -2406,6 +2406,6 @@ export class CommunePlanner {
 
         /* for (const key of keys<CommunePlannerSpecialKeys>()) delete this[key] */
 
-        this.room.memory.BPAs
+        this.room.memory.BPAs.push()
     }
 }

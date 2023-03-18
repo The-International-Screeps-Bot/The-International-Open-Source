@@ -79,9 +79,9 @@ class CreepOrganizer {
 
         creep.preTickManager()
 
-        // If the creep isn't dying, organize by its roomFrom and role
+        // If the creep isn't isDying, organize by its roomFrom and role
 
-        if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
+        if (!creep.isDying) commune.creepsFromRoom[role].push(creepName)
         commune.creepsFromRoomAmount += 1
     }
 }

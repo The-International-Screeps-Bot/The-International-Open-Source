@@ -56,6 +56,24 @@ Creep.prototype.preTickManager = function () {}
 
 Creep.prototype.endTickManager = function () {}
 
+Creep.prototype.isDying = function () {
+    // Stop if creep is spawning
+
+    if (this.spawning) return false
+
+    // If the creep's remaining ticks are more than the estimated spawn time, inform false
+
+    if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+
+    // Record creep as isDying
+
+    return true
+}
+PowerCreep.prototype.isDying = function () {
+
+    return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
+}
+
 Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
     // If creep isn't in transfer range
 
@@ -804,7 +822,7 @@ Creep.prototype.activeRenew = function () {
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return
     if (!room.myCreeps.fastFiller.length) return
-    if (this.dying) return
+    if (this.isDying) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 
@@ -839,7 +857,7 @@ Creep.prototype.passiveRenew = function () {
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return
     if (!room.myCreeps.fastFiller.length) return
-    if (this.dying) return
+    if (this.isDying) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 

@@ -16,11 +16,7 @@ export class RemoteHarvester extends Creep {
         super(creepID)
     }
 
-    public get dying(): boolean {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
-
+    public isDying(): boolean {
         // Stop if creep is spawning
 
         if (this.spawning) return false
@@ -33,9 +29,9 @@ export class RemoteHarvester extends Creep {
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-        // Record creep as dying
+        // Record creep as isDying
 
-        return (this._dying = true)
+        return true
     }
 
     preTickManager(): void {
@@ -60,7 +56,7 @@ export class RemoteHarvester extends Creep {
             }
         }
 
-        if (this.dying) return
+        if (this.isDying) return
 
         // Reduce remote need
 
@@ -105,13 +101,13 @@ export class RemoteHarvester extends Creep {
     assignRemote?(remoteName: string) {
         this.memory.RN = remoteName
 
-        if (this.dying) return
+        if (this.isDying) return
 
         Memory.rooms[remoteName].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -= this.parts.work
     }
 
     removeRemote?() {
-        if (!this.dying) {
+        if (!this.isDying) {
             Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] +=
                 this.parts.work
         }

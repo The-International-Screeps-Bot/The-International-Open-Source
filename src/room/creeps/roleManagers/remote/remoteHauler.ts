@@ -15,10 +15,7 @@ import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
 export class RemoteHauler extends Creep {
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
+    public isDying() {
 
         // Stop if creep is spawning
 
@@ -28,9 +25,9 @@ export class RemoteHauler extends Creep {
 
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-        // Record creep as dying
+        // Record creep as isDying
 
-        return (this._dying = true)
+        return true
     }
 
     preTickManager() {
@@ -38,7 +35,7 @@ export class RemoteHauler extends Creep {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
-        if (this.dying) return
+        if (this.isDying) return
 
         Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] -= this.parts.carry
     }
@@ -82,13 +79,13 @@ export class RemoteHauler extends Creep {
         this.memory.RN = remoteName
         this.memory.SI = sourceIndex
 
-        if (this.dying) return
+        if (this.isDying) return
 
         Memory.rooms[remoteName].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] -= this.parts.carry
     }
 
     removeRemote?() {
-        if (!this.dying && Memory.rooms[this.memory.RN].data) {
+        if (!this.isDying && Memory.rooms[this.memory.RN].data) {
             Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] += this.parts.carry
         }
 

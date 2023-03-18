@@ -691,9 +691,9 @@ const roomAdditions = {
                 for (const creepName of this.creepsOfSource[i]) {
                     const creep = Game.creeps[creepName]
 
-                    // If the creep is dying, iterate
+                    // If the creep is isDying, iterate
 
-                    if (creep.dying) continue
+                    if (creep.isDying) continue
                     if (creep.memory.SI === undefined) continue
                     if (!creep.memory.PC) continue
 
@@ -997,9 +997,9 @@ const roomAdditions = {
 
                 const creep = Game.creeps[creepName]
 
-                // If the creep is dying, iterate
+                // If the creep is isDying, iterate
 
-                if (creep.dying) continue
+                if (creep.isDying) continue
                 if (!creep.memory.PC) continue
 
                 // The creep has a packedPos
@@ -1098,9 +1098,9 @@ const roomAdditions = {
 
                 const creep = Game.creeps[creepName]
 
-                // If the creep is dying, iterate
+                // If the creep is isDying, iterate
 
-                if (creep.dying) continue
+                if (creep.isDying) continue
 
                 if (!creep.memory.PC) continue
 
@@ -1215,9 +1215,9 @@ const roomAdditions = {
 
                 const creep = Game.creeps[creepName]
 
-                // If the creep is dying, iterate
+                // If the creep is isDying, iterate
 
-                if (creep.dying) continue
+                if (creep.isDying) continue
                 if (!creep.memory.PC) continue
 
                 // The creep has a packedPos

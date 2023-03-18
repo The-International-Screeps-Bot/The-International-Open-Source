@@ -51,3 +51,8 @@ export const creepClasses: { [key in CreepRoles]: any } = {
     antifaDismantler: Antifa,
     antifaDowngrader: Antifa,
 }
+/*
+export const newCreepClasses: { [key in CreepRoles]: any } = {
+    hauler: HaulerManager,
+}
+ */

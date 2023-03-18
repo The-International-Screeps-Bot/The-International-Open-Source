@@ -37,6 +37,14 @@ export class CreepRoleManager {
         this.roomManager = roomManager
     }
 
+    public newRun() {
+
+        for (const role in creepClasses) {
+
+            creepClasses[role as CreepRoles].run()
+        }
+    }
+
     public run() {
         const { room } = this.roomManager
         // If CPU logging is enabled, get the CPU used at the start

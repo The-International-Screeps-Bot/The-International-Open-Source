@@ -6,11 +6,7 @@ export class RemoteDismantler extends Creep {
         super(creepID)
     }
 
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
-
+    public isDying() {
         // Stop if creep is spawning
 
         if (this.spawning) return false
@@ -19,9 +15,9 @@ export class RemoteDismantler extends Creep {
 
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-        // Record creep as dying
+        // Record creep as isDying
 
-        return (this._dying = true)
+        return true
     }
 
     preTickManager() {
@@ -30,7 +26,7 @@ export class RemoteDismantler extends Creep {
 
         const role = this.role as 'remoteDismantler'
 
-        if (this.dying) return
+        if (this.isDying) return
 
         // Reduce remote need
 

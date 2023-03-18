@@ -16,11 +16,7 @@ export class SourceHarvester extends Creep {
         super(creepID)
     }
 
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
-
+    public isDying() {
         // Stop if creep is spawning
 
         if (this.spawning) return false
@@ -30,15 +26,15 @@ export class SourceHarvester extends Creep {
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1))
             return false
 
-        // Record creep as dying
+        // Record creep as isDying
 
-        return (this._dying = true)
+        return true
     }
 
     preTickManager() {
         const { room } = this
 
-        if (this.memory.SI !== undefined && !this.dying) room.creepsOfSource[this.memory.SI].push(this.name)
+        if (this.memory.SI !== undefined && !this.isDying) room.creepsOfSource[this.memory.SI].push(this.name)
 
         // Unpack the harvestPos
 

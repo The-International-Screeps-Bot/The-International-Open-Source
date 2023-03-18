@@ -2,11 +2,7 @@ import { RemoteData } from 'international/constants'
 import { randomTick } from 'international/utils'
 
 export class RemoteReserver extends Creep {
-    public get dying(): boolean {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
-
+    public isDying(): boolean {
         // Stop if creep is spawning
 
         if (this.spawning) return false
@@ -15,7 +11,7 @@ export class RemoteReserver extends Creep {
             if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE) return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-        return (this._dying = true)
+        return true
     }
 
     hasValidRemote?() {
@@ -60,7 +56,7 @@ export class RemoteReserver extends Creep {
         const role = this.role as 'remoteReserver'
 
         if (!this.findRemote()) return
-        if (this.dying) return
+        if (this.isDying) return
 
         // Reduce remote need
 

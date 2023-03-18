@@ -206,13 +206,13 @@ export function advancedFindDistance(
             const roomMemory = Memory.rooms[roomName]
             if (!roomMemory) {
                 if (roomName === goalRoomName) return 1
-                return Infinity
+                return 50
             }
 
             if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote') {
-                if (!roomMemory.data) return Infinity
+                if (!roomMemory.data) return 30
                 if (roomMemory.data[RemoteData.abandon]) {
-                    return Infinity
+                    return 30
                 }
             }
 

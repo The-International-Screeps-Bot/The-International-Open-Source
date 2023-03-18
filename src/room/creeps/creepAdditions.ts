@@ -3,21 +3,6 @@ import { customLog, estimateTowerDamage, getRangeXY, getRange, isXYExit } from '
 import { profiler } from 'other/screeps-profiler'
 
 Object.defineProperties(Creep.prototype, {
-    dying: {
-        get() {
-            // Stop if creep is spawning
-
-            if (this.spawning) return false
-
-            // If the creep's remaining ticks are more than the estimated spawn time, inform false
-
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
-
-            // Record creep as dying
-
-            return true
-        },
-    },
     nameData: {
         get() {
             if (this._nameData) return this._nameData
@@ -264,11 +249,6 @@ Object.defineProperties(Creep.prototype, {
 } as PropertyDescriptorMap & ThisType<Creep>)
 
 Object.defineProperties(PowerCreep.prototype, {
-    dying: {
-        get() {
-            return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
-        },
-    },
     macroHealStrength: {
         get() {
             if (this._macroHealStrength !== undefined) return this._macroHealStrength

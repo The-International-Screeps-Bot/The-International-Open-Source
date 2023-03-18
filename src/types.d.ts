@@ -1773,6 +1773,8 @@ declare global {
 
         endTickManager(): void
 
+        isDying(): boolean
+
         advancedPickup(target: Resource): boolean
 
         advancedTransfer(target: Creep | AnyStoreStructure, resourceType?: ResourceConstant, amount?: number): boolean
@@ -1916,12 +1918,6 @@ declare global {
          * Wether the creep is allowed accept room logistics requests that require delivery
          */
         noDelivery: boolean
-
-        _dying: boolean
-        /**
-         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
-         */
-        readonly dying: boolean
 
         _macroHealStrength: number
         /**
@@ -2160,7 +2156,6 @@ declare global {
          * A packed pos list desciring where the creep neeeds to move to get to its goal
          */
         P: string
-
 
         /**
          * Goal Pos, the position the creep is or has tried to path to

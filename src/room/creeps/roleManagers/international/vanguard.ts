@@ -8,7 +8,7 @@ export class Vanguard extends Creep {
     }
 
     preTickManager() {
-        if (this.dying) return
+        if (this.isDying) return
 
         if (this.memory.SI !== undefined) this.room.creepsOfSource[this.memory.SI].push(this.name)
 
