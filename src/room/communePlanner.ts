@@ -878,8 +878,8 @@ export class CommunePlanner {
         this.basePlans.setXY(bestMineralHarvestPos.x, bestMineralHarvestPos.y, STRUCTURE_CONTAINER, 6)
     }
     private planSourceStructures() {
-        /* if (this.stampAnchors.sourceLink.length) return */
-        customLog('STRUCT COORDS', JSON.stringify(this.sourceStructureCoords))
+        if (this.stampAnchors.sourceLink.length) return
+
         const sourceLinkCoords: Coord[] = []
         const sourceExtensionCoords: Coord[] = []
         const hubAnchor = this.stampAnchors.hub[0]
