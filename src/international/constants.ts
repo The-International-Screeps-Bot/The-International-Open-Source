@@ -394,29 +394,36 @@ export const stamps: Record<StampTypes, Stamp> = {
         },
     },
     gridExtension: {
-        offset: 2,
+        offset: 0,
         protectionOffset: 4,
-        size: 3,
+        size: 1,
         structures: {
             extension: [
-                { x: 1, y: 2 },
-                { x: 2, y: 1 },
-                { x: 2, y: 3 },
-                { x: 2, y: 2 },
-                { x: 3, y: 2 },
-            ],
-            road: [
-                { x: 1, y: 3 },
-                { x: 0, y: 2 },
-                { x: 1, y: 1 },
-                { x: 2, y: 0 },
-                { x: 3, y: 1 },
-                { x: 4, y: 2 },
-                { x: 3, y: 3 },
-                { x: 2, y: 4 },
+                { x: 0, y: 0 },
             ],
         },
     },
+    inputLab: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            lab: [
+                { x: 0, y: 0 },
+            ],
+        },
+    },
+    outputLab: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            lab: [
+                { x: 0, y: 0 },
+            ],
+        },
+    },
+    // Deprecate
     labs: {
         offset: 1,
         protectionOffset: 5,
@@ -547,8 +554,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         },
     },
 }
-
-export const dynamicStamps = {}
+export const stampKeys = Object.keys(stamps) as StampTypes[]
 
 export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_HYDROGEN,
@@ -886,6 +892,12 @@ export enum PlayerData {
      * The last time we were attacked by them
      */
     lastAttack,
+}
+
+export enum CreepMemoryData {
+    preferRoads = 0,
+    sourceIndex = 1,
+    dying = 2,
 }
 
 export enum RemoteData {

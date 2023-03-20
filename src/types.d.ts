@@ -83,6 +83,9 @@ declare global {
     type StampTypes =
         | 'fastFiller'
         | 'hub'
+        | 'inputLab'
+        | 'outputLab'
+        // Deprecatef
         | 'labs'
         | 'tower'
         | 'observer'
@@ -97,7 +100,7 @@ declare global {
         | 'gridExtension'
         | 'nuker'
         | 'powerSpawn'
-        //Deprecate
+        // Deprecate
         | 'rampart'
     /* | 'gridExtension' */
 
@@ -113,7 +116,11 @@ declare global {
         asymmetry?: number
     }
 
-    type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
+    type StampAnchors = Partial<Record<StampTypes, Coord[]>>
+    /**
+     * key of packed stamp type with values of packed coord list
+     */
+    type PackedStampAnchors = Partial<{ [packedStampType: string]: string }>
 
     type PosMap<T> = T[]
 
@@ -252,34 +259,15 @@ declare global {
 
     interface BasePlanAttempt {
         score: number
-        stampAnchors: Partial<{  [key in StampTypes]: Coord[] }>
+        stampAnchors: PackedStampAnchors
         basePlans: string
         rampartPlans: string
-        sourceHarvestPositions: RoomPosition[][],
-        sourcePaths: RoomPosition[][],
-        mineralHarvestPositions: RoomPosition[],
-        mineralPath: RoomPosition[],
-        centerUpgradePos: RoomPosition,
-        upgradePath: RoomPosition[],
-    }
-
-    interface packedBasePlan {
-        /**
-         * Stamp Anchors
-         */
-        SA: Partial<{ [key in StampTypes]: Coord[] }>
-        /**
-         * Score
-         */
-        S: number
-        /**
-         * Base Plans
-         */
-        BP: string
-        /**
-         * Stamp Anchors
-         */
-        RP: string
+        sourceHarvestPositions: string[],
+        sourcePaths: string[],
+        mineralHarvestPositions: string,
+        mineralPath: string,
+        centerUpgradePos: string,
+        upgradePath: string,
     }
 
     interface CombatStrength {
@@ -929,6 +917,7 @@ declare global {
 
         stampAnchors: StampAnchors
 
+
         // Paths
 
         source1PathLength: number
@@ -1563,9 +1552,11 @@ declare global {
         anchor: number
 
         /**
-         * Base Plan
+         * Base Plans
          */
-        BP: packedBasePlan[]
+        BPs: string
+
+        RPs: string
 
         /**
          * Type of a room that generally describes properties of the room
@@ -1681,7 +1672,7 @@ declare global {
         /**
          * Stamp Anchors
          */
-        SA: Partial<{ [key in StampTypes]: string }>
+        SA: PackedStampAnchors
 
         powerBanks: { [roomName: string]: number[] }
 
@@ -1725,6 +1716,21 @@ declare global {
          * Controller Positions, packed positions around the controller where reservers and downgraders can sit
          */
         CP: string
+
+        /**
+         * Center Upgrade Position
+         */
+        CUP: string
+
+        /**
+         * Upgrade Positions, packed positions around the upgrade structure where upgraders can sit
+         */
+        UPs: string
+
+        /**
+         * Upgrade Path
+         */
+        UP: string
 
         /**
          * Defensive Strength
@@ -2136,6 +2142,14 @@ declare global {
         _idealSquadMembers: IdealSquadMembers
         readonly idealSquadMembers: IdealSquadMembers
     }
+
+    /*
+    interface CreepMemory {
+        0: boolean // preferRoads
+        1: number // sourceIndex
+        2: boolean // dying
+    }
+    */
 
     interface CreepMemoryTemplate {
         /**

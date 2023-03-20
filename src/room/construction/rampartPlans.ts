@@ -16,6 +16,7 @@ export class RampartPlans {
             buildForNuke: +buildForNuke,
             buildForThreat: +buildForThreat,
         }
+
         return
     }
     setXY(
@@ -46,8 +47,9 @@ export class RampartPlans {
     static unpack(packedMap: string) {
         const plans = new RampartPlans()
 
-        for (let i = 0; i < packedMap.length; i += 6) {
-            const data = decode(packedMap[i + 2] + packedMap[i + 3] + packedMap[i + 4] + packedMap[i + 5])
+        for (let i = 0; i < packedMap.length; i += 5) {
+            const data = decode(packedMap[i + 2] + packedMap[i + 3] + packedMap[i + 4])
+
             plans.map[packedMap[i] + packedMap[i + 1]] = {
                 minRCL: data[0],
                 coversStructure: data[1],

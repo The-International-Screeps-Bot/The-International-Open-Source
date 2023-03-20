@@ -24,7 +24,7 @@ import {
     getRange,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { profiler } from 'other/screeps-profiler'
+import { profiler } from 'other/profiler'
 import { packCoord, packCoordList, packPos, packPosList, packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
 
 const roomAdditions = {

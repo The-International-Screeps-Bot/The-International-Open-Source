@@ -1,6 +1,6 @@
 import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
 import { customLog, estimateTowerDamage, getRangeXY, getRange, isXYExit } from 'international/utils'
-import { profiler } from 'other/screeps-profiler'
+import { profiler } from 'other/profiler'
 
 Object.defineProperties(Creep.prototype, {
     nameData: {

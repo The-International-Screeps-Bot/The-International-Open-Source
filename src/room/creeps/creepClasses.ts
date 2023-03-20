@@ -20,7 +20,7 @@ import { RemoteHauler } from './roleManagers/remote/remoteHauler'
 import { RemoteReserver } from './roleManagers/remote/remoteReserver'
 import { RequestHauler } from './roleManagers/international/requestHauler'
 import { RangedDefender } from './roleManagers/commune/rangedDefender'
-import { profiler } from 'other/screeps-profiler'
+import { profiler } from 'other/profiler'
 
 export const creepClasses: { [key in CreepRoles]: any } = {
     sourceHarvester: SourceHarvester,

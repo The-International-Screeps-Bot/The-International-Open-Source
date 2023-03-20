@@ -1,5 +1,5 @@
 // eslint-disable
-import { allStructureTypes, packedPosLength } from 'international/constants'
+import { allStructureTypes, packedPosLength, stampKeys } from 'international/constants'
 import { encode, decode } from 'base32768'
 
 /**
@@ -272,4 +272,28 @@ export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
 export function unpackRampartPlanCoord(chars: string): RampartPlanCoord {
     const coord = decode(chars)
     return { minRCL: coord[0], coversStructure: coord[1], buildForNuke: coord[2], buildForThreat: coord[3] }
+}
+
+export function packStampAnchors(stampAnchors: StampAnchors) {
+    const packedStampAnchors: PackedStampAnchors = {}
+
+    for (const key in stampAnchors) {
+        const structureType = key as StampTypes
+
+        packedStampAnchors[stampKeys.indexOf(structureType)] = packCoordList(stampAnchors[structureType])
+    }
+
+    return packedStampAnchors
+}
+
+export function unpackStampAnchors(packedStampAnchors: PackedStampAnchors) {
+
+    const stampAnchors: StampAnchors = {}
+
+    for (const key in packedStampAnchors) {
+
+        stampAnchors[stampKeys[parseInt(key)]] = unpackCoordList(packedStampAnchors[key])
+    }
+
+    return stampAnchors
 }
