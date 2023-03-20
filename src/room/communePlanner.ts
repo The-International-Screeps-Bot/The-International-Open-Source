@@ -292,6 +292,7 @@ export class CommunePlanner {
         }
 
         this.avoidSources()
+        this.avoidMineral()
         this.fastFiller()
         this.generateGrid()
         this.pruneFastFillerRoads()
@@ -313,12 +314,10 @@ export class CommunePlanner {
         this.onboardingRamparts()
         this.mineral()
         this.planSourceStructures()
-        this.planMineralStructure()
         this.generalShield()
-        this.visualizeCurrentPlan()
+        /* this.visualizeCurrentPlan()
+        return RESULT_SUCCESS */
         this.findScore()
-
-        return RESULT_SUCCESS
         this.record()
 
         return RESULT_SUCCESS
@@ -710,6 +709,24 @@ export class CommunePlanner {
 
         this.sourceHarvestPositions = sourceHarvestPositions
     }
+    private avoidMineral() {
+        if (this.mineralHarvestPositions) return
+
+        const mineralHarvestPositions: RoomPosition[] = []
+        const mineralPos = this.room.mineral.pos
+
+        for (const offset of adjacentOffsets) {
+            const adjPos = new RoomPosition(offset.x + mineralPos.x, offset.y + mineralPos.y, this.room.name)
+
+            const packedCoord = packAsNum(adjPos)
+            if (this.terrainCoords[packedCoord] === 255) continue
+
+            this.baseCoords[packedCoord] = 255
+            mineralHarvestPositions.push(adjPos)
+        }
+
+        this.mineralHarvestPositions = mineralHarvestPositions
+    }
     private postFastFillerConfig() {
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
             for (const pos of this.sourceHarvestPositions[i]) {
@@ -814,36 +831,61 @@ export class CommunePlanner {
 
         const goal = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
-        const mineralPath = this.room.advancedFindPath({
-            origin: this.room.mineral.pos,
+        this.mineralHarvestPositions.sort((a, b) => {
+            return (
+                this.room.advancedFindPath({
+                    origin: a,
+                    goals: [
+                        {
+                            pos: goal,
+                            range: 3,
+                        },
+                    ],
+                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost,
+                }).length -
+                this.room.advancedFindPath({
+                    origin: b,
+                    goals: [
+                        {
+                            pos: goal,
+                            range: 3,
+                        },
+                    ],
+                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost,
+                }).length
+            )
+        })
+
+        const path = this.room.advancedFindPath({
+            origin: this.mineralHarvestPositions[0],
             goals: [{ pos: goal, range: 1 }],
             weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
             plainCost: defaultRoadPlanningPlainCost * 2,
             swampCost: defaultSwampCost * 2,
         })
 
-        this.mineralHarvestPositions = [mineralPath[0]]
-        mineralPath.shift()
-
-        forAdjacentCoords(this.room.mineral.pos, adjCoord => {
-            if (this.baseCoords[packAsNum(adjCoord)] === 255) return
-            if (getRange(mineralPath[0], adjCoord) > 1) return
-
-            this.mineralHarvestPositions.push(new RoomPosition(adjCoord.x, adjCoord.y, this.room.name))
-        })
-
-        for (const pos of this.mineralHarvestPositions) {
-            const packedCoord = packAsNum(pos)
-            this.roadCoords[packedCoord] = 20
-            this.baseCoords[packedCoord] = 255
-        }
-
-        for (const pos of mineralPath) {
+        for (const pos of path) {
             this.roadCoords[packAsNum(pos)] = 1
             this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 6)
         }
 
-        this.mineralPath = mineralPath
+        const closestMineralHarvestPos = this.mineralHarvestPositions[0]
+
+        this.basePlans.set(packCoord(closestMineralHarvestPos), STRUCTURE_CONTAINER, 6)
+        const packedCoord = packAsNum(closestMineralHarvestPos)
+        this.roadCoords[packedCoord] = 20
+        this.baseCoords[packedCoord] = 255
+
+        const mineralPos = this.room.mineral.pos
+        this.basePlans.setXY(mineralPos.x, mineralPos.y, STRUCTURE_EXTRACTOR, 6)
+
+        this.mineralHarvestPositions.filter(pos => {
+            return getRange(closestMineralHarvestPos, pos) <= 1
+        })
+
+        this.mineralPath = path
     }
     private sourceStructures() {
         if (this.sourceStructureCoords) return
@@ -870,13 +912,6 @@ export class CommunePlanner {
 
         this.sourceStructureCoords = sourceStructureCoords
     }
-    private planMineralStructure() {
-        const mineralPos = this.room.mineral.pos
-        this.basePlans.setXY(mineralPos.x, mineralPos.y, STRUCTURE_EXTRACTOR, 6)
-
-        const bestMineralHarvestPos = this.mineralHarvestPositions[0]
-        this.basePlans.setXY(bestMineralHarvestPos.x, bestMineralHarvestPos.y, STRUCTURE_CONTAINER, 6)
-    }
     private planSourceStructures() {
         if (this.stampAnchors.sourceLink.length) return
 
@@ -885,15 +920,12 @@ export class CommunePlanner {
         const hubAnchor = this.stampAnchors.hub[0]
 
         for (let i = 0; i < this.sourceStructureCoords.length; i++) {
-
             let closestCoordIndex: number
             let closestRange = Infinity
 
             for (let j = this.sourceStructureCoords[i].length - 1; j >= 0; j--) {
-
                 const coord = this.sourceStructureCoords[i][j]
                 if (this.minCutCoords.has(packAsNum(coord))) {
-
                     this.sourceStructureCoords[i].splice(j, 1)
                     continue
                 }
