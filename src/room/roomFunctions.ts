@@ -280,13 +280,15 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                // Weight costMatrixes
+                // Weight coord maps
 
                 if (opts.weightCoordMaps) {
                     for (const coordMap of opts.weightCoordMaps) {
                         for (const index in coordMap) {
                             const packedCoord = parseInt(index)
+
                             if (coordMap[packedCoord] === 0) continue
+                            if (cm._bits[packedCoord] === 255) continue
 
                             const coord = unpackNumAsCoord(packedCoord)
                             cm.set(coord.x, coord.y, coordMap[packedCoord])

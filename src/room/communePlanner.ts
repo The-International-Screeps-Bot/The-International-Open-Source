@@ -44,9 +44,20 @@ import {
     packXYAsNum,
     unpackNumAsCoord,
     unpackNumAsPos,
+    forCoordsAroundRange,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { packCoord, packPos, packPosList, packStampAnchors, packXYAsCoord, reversePosList, unpackCoord, unpackPosList, unpackStampAnchors } from 'other/codec'
+import {
+    packCoord,
+    packPos,
+    packPosList,
+    packStampAnchors,
+    packXYAsCoord,
+    reversePosList,
+    unpackCoord,
+    unpackPosList,
+    unpackStampAnchors,
+} from 'other/codec'
 import 'other/RoomVisual'
 import { CommuneManager } from 'room/commune/commune'
 import { rampartPlanner } from './construction/rampartPlanner'
@@ -111,7 +122,6 @@ export class CommunePlanner {
     planAttempts: BasePlanAttempt[]
     planVisualizeIndex: number
     terrainCoords: CoordMap
-
 
     //
 
@@ -236,7 +246,6 @@ export class CommunePlanner {
     }
 
     preTickRun() {
-
         this.room = this.roomManager.room
         if (this.room.memory.PC !== undefined) return RESULT_NO_ACTION
 
@@ -250,7 +259,6 @@ export class CommunePlanner {
         customLog('PLAN ATTEMPTS', this.planAttempts?.length)
         customLog('FASTFILLER ORIGINS', this.fastFillerStartCoords?.length)
         if (this.fastFillerStartCoords && this.planAttempts.length === this.fastFillerStartCoords.length) {
-
             this.visualizeBestPlan()
             /* this.choosePlan() */
             return RESULT_SUCCESS
@@ -306,11 +314,10 @@ export class CommunePlanner {
         this.mineral()
         this.planMineralStructure()
         this.generalShield()
-        this.findScore()
-        /* this.visualizeCurrentPlan() */
-        /* this.visualizeGrid() */
         this.visualizeCurrentPlan()
-        return RESULT_FAIL
+        this.findScore()
+
+        return RESULT_SUCCESS
         this.record()
 
         return RESULT_SUCCESS
@@ -767,9 +774,11 @@ export class CommunePlanner {
             const packedCoord = packAsNum(closestHarvestPos)
             this.roadCoords[packedCoord] = 20
             this.baseCoords[packedCoord] = 255
+        }
 
+        for (let i = this.sourceHarvestPositions.length - 1; i >= 0; i -= 1) {
             const path = this.room.advancedFindPath({
-                origin: closestHarvestPos,
+                origin: this.sourceHarvestPositions[i][0],
                 goals: [
                     {
                         pos: fastFillerAnchor,
@@ -820,7 +829,6 @@ export class CommunePlanner {
         }
 
         for (const pos of mineralPath) {
-
             this.roadCoords[packAsNum(pos)] = 1
             this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 6)
         }
@@ -840,24 +848,19 @@ export class CommunePlanner {
             let closestAdjCoord: Coord
             let closestRange = Infinity
 
-            for (const offset of adjacentOffsets) {
-                const adjCoord = {
-                    x: closestHarvestPos.x + offset.x,
-                    y: closestHarvestPos.y + offset.y,
-                }
-
+            forAdjacentCoords(closestHarvestPos, adjCoord => {
                 const packedCoord = packAsNum(adjCoord)
-                if (this.baseCoords[packedCoord] === 255) continue
-                if (this.roadCoords[packedCoord] > 0) continue
+                if (this.baseCoords[packedCoord] === 255) return
+                if (this.roadCoords[packedCoord] > 0) return
 
                 packedAdjCoords.add(packAsNum(adjCoord))
 
                 const range = getRange(hubAnchor, adjCoord)
-                if (range >= closestRange) continue
+                if (range >= closestRange) return
 
                 closestAdjCoord = adjCoord
                 closestRange = range
-            }
+            })
 
             const packedClosestAdjCoord = packAsNum(closestAdjCoord)
             packedAdjCoords.delete(packedClosestAdjCoord)
@@ -921,7 +924,7 @@ export class CommunePlanner {
         if (!centerUpgradePos) return false
 
         const packedCoord = packAsNum(centerUpgradePos)
-        this.roadCoords[packedCoord] = 20
+        this.roadCoords[packedCoord] = 255
         this.baseCoords[packedCoord] = 255
         this.basePlans.set(packCoord(centerUpgradePos), STRUCTURE_CONTAINER, 2)
         this.basePlans.set(packCoord(centerUpgradePos), STRUCTURE_LINK, 5)
@@ -943,14 +946,13 @@ export class CommunePlanner {
             swampCost: defaultSwampCost * 2,
         })
 
-        forAdjacentCoords(centerUpgradePos, (adjCoord) => {
+        forCoordsAroundRange(centerUpgradePos, 1, adjCoord => {
             const packedAdjCoord = packAsNum(adjCoord)
             this.baseCoords[packedAdjCoord] = 255
             this.roadCoords[packedAdjCoord] = 20
         })
 
         for (const pos of path) {
-
             this.roadCoords[packAsNum(pos)] = 1
             this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
         }
@@ -1434,7 +1436,8 @@ export class CommunePlanner {
 
                         nextGeneration.push(adjCoord)
 
-                        const adjCostFromOrigin = (fromOrigin[packedAdjCoord] = coordCostFromOrigin + dynamicDistanceWeight)
+                        const adjCostFromOrigin = (fromOrigin[packedAdjCoord] =
+                            coordCostFromOrigin + dynamicDistanceWeight)
                         const adjCoordCost = args.coordMap[packedAdjCoord] + adjCostFromOrigin
 
                         if (adjCoordCost < lowestNextGenCost) lowestNextGenCost = adjCoordCost
@@ -1550,7 +1553,7 @@ export class CommunePlanner {
         }
 
         this.fastFillerStartCoords = origins
-        return this.fastFillerStartCoords[this.planAttempts.length]
+        return this.fastFillerStartCoords[/* this.planAttempts.length */ 1]
     }
     private fastFiller() {
         if (this.stampAnchors.fastFiller.length) return
@@ -1730,7 +1733,6 @@ export class CommunePlanner {
             const coord = structureCoords[i]
 
             for (const positions of this.sourceHarvestPositions) {
-
                 if (getRange(coord, positions[0]) > 1) continue
 
                 return [coord, i]
@@ -2317,7 +2319,6 @@ export class CommunePlanner {
                 }
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
-
                     unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight * 0.75
                     return
                 }
@@ -2346,14 +2347,6 @@ export class CommunePlanner {
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })
-
-            // Loop through positions of the path
-
-            for (const pos of path) {
-
-                this.roadCoords[packAsNum(pos)] = 1
-                this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 4)
-            }
 
             // Construct the onboardingIndex
 
@@ -2388,6 +2381,13 @@ export class CommunePlanner {
                 if (forThreat) break
                 if (onboardingCount === minOnboardingRamparts) forThreat = true
             }
+
+            for (let i = onboardingIndex - 1; i < path.length; i++) {
+                const pos = path[i]
+
+                this.roadCoords[packAsNum(pos)] = 1
+                this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 4)
+            }
         }
 
         this.stampAnchors.onboardingRampart = Array.from(onboardingCoords).map(packedCoord =>
@@ -2413,9 +2413,7 @@ export class CommunePlanner {
         for (const coord of this.stampAnchors.sourceExtension) this.shield(coord, 4)
         for (const coord of this.stampAnchors.sourceLink) this.shield(coord, 4)
         for (const sourceIndex in this.sourceHarvestPositions) {
-
             if (this.unprotectedCoords[packAsNum(this.sourceHarvestPositions[sourceIndex][0])] === 255) {
-
                 unprotectedSources += 1
             }
             this.shield(this.sourceHarvestPositions[sourceIndex][0], 4)
@@ -2427,8 +2425,7 @@ export class CommunePlanner {
 
         // Protect around the controller
 
-        forAdjacentCoords(this.room.controller.pos, (adjCoord) => {
-
+        forAdjacentCoords(this.room.controller.pos, adjCoord => {
             if (this.unprotectedCoords[packAsNum(adjCoord)] !== 255) return
             this.isControllerProtected = false
 
@@ -2452,7 +2449,6 @@ export class CommunePlanner {
         // Early RCL we want to have 3 or more harvest positions
 
         for (const positions of this.sourceHarvestPositions) {
-
             if (positions.length >= 3) continue
             score += (3 - positions.length) * 12
         }
@@ -2525,12 +2521,10 @@ export class CommunePlanner {
      * Find the plan with the lowest score
      */
     private findBestPlanIndex() {
-
         let bestScore = Infinity
         let bestPlanIndex: number | undefined
 
         for (let i = 0; i < this.planAttempts.length; i++) {
-
             const plan = this.planAttempts[i]
 
             if (plan.score >= bestScore) continue
@@ -2542,7 +2536,6 @@ export class CommunePlanner {
         return bestPlanIndex
     }
     private choosePlan() {
-
         const plan = this.planAttempts[this.findBestPlanIndex()]
         const roomMemory = Memory.rooms[this.room.name]
 
@@ -2570,14 +2563,11 @@ export class CommunePlanner {
         }
     }
     private visualizeBestPlan() {
-
         this.visualizePlan(this.findBestPlanIndex())
     }
     private visualizePlans() {
-
         if (this.planVisualizeIndex === undefined) this.planVisualizeIndex = 0
         else {
-
             if (this.planVisualizeIndex >= this.planAttempts.length - 1) this.planVisualizeIndex = 0
             else this.planVisualizeIndex += 1
         }
@@ -2585,7 +2575,6 @@ export class CommunePlanner {
         this.visualizePlan(this.planVisualizeIndex)
     }
     private visualizePlan(planIndex: number) {
-
         const plan = this.planAttempts[planIndex]
         const basePlans = BasePlans.unpack(plan.basePlans)
 
@@ -2668,6 +2657,9 @@ export class CommunePlanner {
             this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.5 })
         }
 
+        // Labs
+
+        /*
         this.room.coordVisual(this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y, customColors.orange)
         this.room.coordVisual(this.inputLab2Coord.x, this.inputLab2Coord.y, customColors.orange)
 
@@ -2675,7 +2667,7 @@ export class CommunePlanner {
             this.room.visual.line(coord.x, coord.y, this.stampAnchors.labs[0].x, this.stampAnchors.labs[0].y)
             this.room.visual.line(coord.x, coord.y, this.inputLab2Coord.x, this.inputLab2Coord.y)
         }
-
+        */
         /* this.room.visualizeCoordMap(this.reverseExitFlood) */
         /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
         /* this.room.visualizeCoordMap(this.terrainCoords, true) */
