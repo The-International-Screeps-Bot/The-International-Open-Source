@@ -18,7 +18,7 @@ class EndTickManager {
         for (let i = 0; i < 99; i += 1) console.log()
 
         customLog('General data', '⬇️')
-        customLog('Creeps total', Object.values(Game.creeps).length)
+        customLog('Creeps total', Object.values(Game.creeps).length, { superPosition: 1 })
         customLog('Heap used', global.usedHeap(), { superPosition: 1 })
 
         // Get the CPU color based on the amount of used CPU

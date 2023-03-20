@@ -55,7 +55,7 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { minCutToExit } from './construction/minCut'
 
-const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 2
+const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 2
 
 interface PlanStampsArgs {
@@ -287,29 +287,30 @@ export class CommunePlanner {
         this.generateGrid()
         this.pruneFastFillerRoads()
         this.findCenterUpgradePos()
-        this.preHubSources()
         this.hub()
-        this.mineral()
-        this.preLabSources()
         this.labs()
         this.gridExtensions()
         this.gridExtensionPaths()
+        this.preHubSources()
+        this.preLabSources()
         this.nuker()
         this.powerSpawn()
         this.observer()
         this.planGridCoords()
-        this.planMineralStructure()
         this.planSourceStructures()
         this.runMinCut()
         this.towers()
         this.groupMinCutCoords()
         this.findUnprotectedCoords()
         this.onboardingRamparts()
+        this.mineral()
+        this.planMineralStructure()
         this.generalShield()
         this.findScore()
         /* this.visualizeCurrentPlan() */
         /* this.visualizeGrid() */
-
+        this.visualizeCurrentPlan()
+        return RESULT_FAIL
         this.record()
 
         return RESULT_SUCCESS
@@ -765,7 +766,7 @@ export class CommunePlanner {
             this.basePlans.set(packCoord(closestHarvestPos), STRUCTURE_CONTAINER, 3)
             const packedCoord = packAsNum(closestHarvestPos)
             this.roadCoords[packedCoord] = 20
-            this.baseCoords[packedCoord] = 20
+            this.baseCoords[packedCoord] = 255
 
             const path = this.room.advancedFindPath({
                 origin: closestHarvestPos,
@@ -819,8 +820,8 @@ export class CommunePlanner {
         }
 
         for (const pos of mineralPath) {
-            const packedCoord = packAsNum(pos)
-            this.roadCoords[packedCoord] = 1
+
+            this.roadCoords[packAsNum(pos)] = 1
             this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 6)
         }
 
@@ -848,7 +849,6 @@ export class CommunePlanner {
                 const packedCoord = packAsNum(adjCoord)
                 if (this.baseCoords[packedCoord] === 255) continue
                 if (this.roadCoords[packedCoord] > 0) continue
-                /* if (this.gridCoords[packedCoord] > 0) continue */
 
                 packedAdjCoords.add(packAsNum(adjCoord))
 
@@ -943,20 +943,15 @@ export class CommunePlanner {
             swampCost: defaultSwampCost * 2,
         })
 
-        for (const offset of adjacentOffsets) {
-            const adjCoord = {
-                x: offset.x + centerUpgradePos.x,
-                y: offset.y + centerUpgradePos.y,
-            }
-
+        forAdjacentCoords(centerUpgradePos, (adjCoord) => {
             const packedAdjCoord = packAsNum(adjCoord)
             this.baseCoords[packedAdjCoord] = 255
             this.roadCoords[packedAdjCoord] = 20
-        }
+        })
 
         for (const pos of path) {
-            const packedPathCoord = packAsNum(pos)
-            this.roadCoords[packedPathCoord] = 1
+
+            this.roadCoords[packAsNum(pos)] = 1
             this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
         }
 
@@ -1640,7 +1635,7 @@ export class CommunePlanner {
         const path = this.room.advancedFindPath({
             origin,
             goals: [{ pos: fastFillerPos, range: 3 }],
-            weightCoordMaps: [this.room.roadCoords],
+            weightCoordMaps: [this.roadCoords],
             plainCost: defaultRoadPlanningPlainCost,
         })
 
@@ -1715,6 +1710,14 @@ export class CommunePlanner {
                 this.basePlans.set(packCoord(coord), STRUCTURE_FACTORY, 7)
                 this.baseCoords[packAsNum(coord)] = 255
                 this.roadCoords[packAsNum(coord)] = 255
+
+                const path = this.room.advancedFindPath({
+                    origin,
+                    goals: [{ pos: fastFillerPos, range: 3 }],
+                    weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost * 2,
+                    swampCost: defaultSwampCost * 2,
+                })
 
                 for (const pos of path) {
                     this.roadCoords[packAsNum(pos)] = 1
@@ -1848,7 +1851,7 @@ export class CommunePlanner {
     }
     private gridExtensionPaths() {
         if (this.finishedGridExtensionPaths) return
-
+        return
         const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
         for (let i = this.stampAnchors.gridExtension.length - 1; i >= 0; i -= 5) {
@@ -2141,10 +2144,12 @@ export class CommunePlanner {
         for (const coord of result) {
             const packedCoord = packAsNum(coord)
             this.rampartCoords[packedCoord] = 1
+
             minCutCoords.add(packedCoord)
 
             this.stampAnchors.minCutRampart.push(coord)
-            this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
+            /* this.roadCoords[packedCoord] = 1
+            this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4) */
             this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, false)
         }
         /*
@@ -2283,7 +2288,7 @@ export class CommunePlanner {
                         const currentWeight = unprotectedCoords[packedAdjCoord2]
 
                         if (this.roadCoords[packedAdjCoord2] === 1) {
-                            unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight - 1, currentWeight)
+                            unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight * 0.75, currentWeight)
                             continue
                         }
 
@@ -2305,15 +2310,15 @@ export class CommunePlanner {
             forCoordsInRange(coord, 2, adjCoord => {
                 const packedAdjCoord = packAsNum(adjCoord)
                 if (this.terrainCoords[packedAdjCoord] > 0) return
-                if (this.minCutCoords.has(packedAdjCoord)) return
                 if (unprotectedCoords[packedAdjCoord] === 255) return
 
-                if (getRange(coord, adjCoord) === 1) {
+                if (!this.minCutCoords.has(packedAdjCoord) && getRange(coord, adjCoord) === 1) {
                     this.rampartPlans.setXY(adjCoord.x, adjCoord.y, 4, false, false, true)
                 }
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
-                    unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight - 1
+
+                    unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight * 0.75
                     return
                 }
 
@@ -2324,7 +2329,7 @@ export class CommunePlanner {
         this.unprotectedCoords = unprotectedCoords
     }
     private onboardingRamparts() {
-        /* if (this.stampAnchors.onboardingRampart.length) return */
+        if (this.stampAnchors.onboardingRampart.length) return
 
         const onboardingCoords: Set<number> = new Set()
         const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
@@ -2337,14 +2342,15 @@ export class CommunePlanner {
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
                 goals: [{ pos: hubAnchorPos, range: 2 }],
-                weightCoordMaps: [this.diagonalCoords, this.roadCoords, this.unprotectedCoords, this.rampartCoords],
-                plainCost: defaultRoadPlanningPlainCost,
-                swampCost: defaultSwampCost,
+                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords, this.unprotectedCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
             })
 
             // Loop through positions of the path
 
             for (const pos of path) {
+
                 this.roadCoords[packAsNum(pos)] = 1
                 this.basePlans.setXY(pos.x, pos.y, STRUCTURE_ROAD, 4)
             }
@@ -2371,10 +2377,11 @@ export class CommunePlanner {
 
                 // Record the coord
 
-                this.roadCoords[packedCoord] = 1
+                /* this.roadCoords[packedCoord] = 1
+                this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4) */
                 onboardingCoords.add(packedCoord)
                 this.rampartCoords[packedCoord] = 1
-                this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4)
+
                 this.rampartPlans.setXY(coord.x, coord.y, 4, false, false, forThreat)
 
                 onboardingCount += 1
@@ -2450,7 +2457,7 @@ export class CommunePlanner {
             score += (3 - positions.length) * 12
         }
         score += this.upgradePath.length
-        score += this.mineralPath.length / 10
+        score += this.mineralPath.length / 100
         score +=
             this.stampAnchors.minCutRampart.length * 2 +
             this.stampAnchors.shieldRampart.length +
@@ -2608,6 +2615,11 @@ export class CommunePlanner {
 
         for (const packedCoord in rampartPlans.map) {
             const coord = unpackCoord(packedCoord)
+
+            if (rampartPlans.get(packedCoord).buildForNuke) {
+                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
+                continue
+            }
 
             if (rampartPlans.get(packedCoord).buildForThreat) {
                 this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })

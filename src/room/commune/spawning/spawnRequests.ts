@@ -386,7 +386,7 @@ export class SpawnRequestsManager {
                         minPriority + this.communeManager.room.myCreeps[role].length * 0.5,
                         maxPriority,
                     )
-
+/*
                     // If all RCL 3 extensions are build
 
                     if (this.spawnEnergyCapacity >= 800) {
@@ -404,7 +404,7 @@ export class SpawnRequestsManager {
                             memoryAdditions: {},
                         }
                     }
-
+ */
                     const extraParts = [ATTACK, MOVE]
                     const strength = ATTACK_POWER
 
@@ -446,7 +446,7 @@ export class SpawnRequestsManager {
                         minPriority + 0.1 + this.communeManager.room.myCreeps[role].length * 1,
                         maxPriority,
                     )
-
+/*
                     // If all RCL 3 extensions are build
 
                     if (this.spawnEnergyCapacity >= 800) {
@@ -464,7 +464,7 @@ export class SpawnRequestsManager {
                             memoryAdditions: {},
                         }
                     }
-
+ */
                     const extraParts = [RANGED_ATTACK, MOVE]
                     const strength = RANGED_ATTACK_POWER
 
