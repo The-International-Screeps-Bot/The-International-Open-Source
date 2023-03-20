@@ -132,6 +132,7 @@ export class CommunePlanner {
     outputLabCoords: Coord[]
     sourceHarvestPositions: RoomPosition[][]
     sourcePaths: RoomPosition[][]
+    sourceStructureCoords: Coord[][]
 
     mineralPath: RoomPosition[]
     mineralHarvestPositions: RoomPosition[]
@@ -297,21 +298,21 @@ export class CommunePlanner {
         this.findCenterUpgradePos()
         this.hub()
         this.labs()
+        this.findSourcePaths()
+        this.sourceStructures()
         this.gridExtensions()
         this.gridExtensionPaths()
-        this.preHubSources()
-        this.preLabSources()
         this.nuker()
         this.powerSpawn()
         this.observer()
         this.planGridCoords()
-        this.planSourceStructures()
         this.runMinCut()
         this.towers()
         this.groupMinCutCoords()
         this.findUnprotectedCoords()
         this.onboardingRamparts()
         this.mineral()
+        this.planSourceStructures()
         this.planMineralStructure()
         this.generalShield()
         this.visualizeCurrentPlan()
@@ -500,7 +501,7 @@ export class CommunePlanner {
 
             // If the path failed, delete all members of the group
 
-            if (!path.length) {
+            if (!path.length && !gridGroups[leaderCoord.index].find(coord => getRange(coord, anchor) <= 3)) {
                 for (const coord of gridGroups[leaderCoord.index]) {
                     this.gridCoords[packAsNum(coord)] = 0
                 }
@@ -721,7 +722,7 @@ export class CommunePlanner {
             this.baseCoords[packedCoord] = this.terrainCoords[packedCoord]
         }
     }
-    private preHubSources() {
+    private findSourcePaths() {
         if (this.sourcePaths) return
 
         const fastFillerAnchor = new RoomPosition(
@@ -790,7 +791,16 @@ export class CommunePlanner {
                 swampCost: defaultSwampCost * 2,
             })
             sourcePaths.push(path)
+        }
 
+        if (sourcePaths.length > 0) {
+            sourcePaths.sort((a, b) => {
+                return a.length - b.length
+            })
+            sourcePaths.reverse()
+        }
+
+        for (const path of sourcePaths) {
             for (const pos of path) {
                 this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
                 this.roadCoords[packAsNum(pos)] = 1
@@ -835,49 +845,30 @@ export class CommunePlanner {
 
         this.mineralPath = mineralPath
     }
-    private preLabSources() {
-        if (this.stampAnchors.sourceLink.length) return
+    private sourceStructures() {
+        if (this.sourceStructureCoords) return
 
-        const hubAnchor = this.stampAnchors.hub[0]
-        const sourceLinkCoords: Coord[] = []
-        const sourceExtensionCoords: Coord[] = []
+        const sourceStructureCoords: Coord[][] = []
+        const packedSourceStructureCoords: Set<number> = new Set()
 
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
             const closestHarvestPos = this.sourceHarvestPositions[i][0]
-            const packedAdjCoords: Set<number> = new Set([])
-            let closestAdjCoord: Coord
-            let closestRange = Infinity
+            sourceStructureCoords.push([])
 
             forAdjacentCoords(closestHarvestPos, adjCoord => {
-                const packedCoord = packAsNum(adjCoord)
-                if (this.baseCoords[packedCoord] === 255) return
-                if (this.roadCoords[packedCoord] > 0) return
+                const packedAdjCoord = packAsNum(adjCoord)
+                if (this.baseCoords[packedAdjCoord] === 255) return
+                if (this.roadCoords[packedAdjCoord] > 0) return
+                if (packedSourceStructureCoords.has(packedAdjCoord)) return
 
-                packedAdjCoords.add(packAsNum(adjCoord))
-
-                const range = getRange(hubAnchor, adjCoord)
-                if (range >= closestRange) return
-
-                closestAdjCoord = adjCoord
-                closestRange = range
-            })
-
-            const packedClosestAdjCoord = packAsNum(closestAdjCoord)
-            packedAdjCoords.delete(packedClosestAdjCoord)
-
-            sourceLinkCoords.push(closestAdjCoord)
-            this.baseCoords[packedClosestAdjCoord] = 255
-            this.roadCoords[packedClosestAdjCoord] = 255
-
-            for (const packedAdjCoord of packedAdjCoords) {
-                sourceExtensionCoords.push(unpackNumAsCoord(packedAdjCoord))
+                packedSourceStructureCoords.add(packedAdjCoord)
+                sourceStructureCoords[i].push(adjCoord)
                 this.baseCoords[packedAdjCoord] = 255
                 this.roadCoords[packedAdjCoord] = 255
-            }
+            })
         }
 
-        this.stampAnchors.sourceLink = sourceLinkCoords
-        this.stampAnchors.sourceExtension = sourceExtensionCoords
+        this.sourceStructureCoords = sourceStructureCoords
     }
     private planMineralStructure() {
         const mineralPos = this.room.mineral.pos
@@ -887,13 +878,57 @@ export class CommunePlanner {
         this.basePlans.setXY(bestMineralHarvestPos.x, bestMineralHarvestPos.y, STRUCTURE_CONTAINER, 6)
     }
     private planSourceStructures() {
-        for (const coord of this.stampAnchors.sourceLink) {
-            this.basePlans.set(packCoord(coord), STRUCTURE_LINK, 6)
+        /* if (this.stampAnchors.sourceLink.length) return */
+        customLog('STRUCT COORDS', JSON.stringify(this.sourceStructureCoords))
+        const sourceLinkCoords: Coord[] = []
+        const sourceExtensionCoords: Coord[] = []
+        const hubAnchor = this.stampAnchors.hub[0]
+
+        for (let i = 0; i < this.sourceStructureCoords.length; i++) {
+
+            let closestCoordIndex: number
+            let closestRange = Infinity
+
+            for (let j = this.sourceStructureCoords[i].length - 1; j >= 0; j--) {
+
+                const coord = this.sourceStructureCoords[i][j]
+                if (this.minCutCoords.has(packAsNum(coord))) {
+
+                    this.sourceStructureCoords[i].splice(j, 1)
+                    continue
+                }
+
+                const range = getRange(hubAnchor, coord)
+                if (range >= closestRange) continue
+
+                closestCoordIndex = j
+                closestRange = range
+            }
+
+            if (!closestCoordIndex) continue
+
+            const closestCoord = this.sourceStructureCoords[i][closestCoordIndex]
+            this.sourceStructureCoords[i].splice(closestCoordIndex, 1)
+
+            sourceLinkCoords.push(closestCoord)
+            this.basePlans.setXY(closestCoord.x, closestCoord.y, STRUCTURE_LINK, 6)
+
+            const packedCoord = packAsNum(closestCoord)
+            this.baseCoords[packedCoord] = 255
+            this.roadCoords[packedCoord] = 255
+
+            for (const coord of this.sourceStructureCoords[i]) {
+                sourceExtensionCoords.push(coord)
+                this.basePlans.setXY(coord.x, coord.y, STRUCTURE_EXTENSION, 7)
+
+                const packedCoord = packAsNum(coord)
+                this.baseCoords[packedCoord] = 255
+                this.roadCoords[packedCoord] = 255
+            }
         }
 
-        for (const coord of this.stampAnchors.sourceExtension) {
-            this.basePlans.set(packCoord(coord), STRUCTURE_EXTENSION, 7)
-        }
+        this.stampAnchors.sourceLink = sourceLinkCoords
+        this.stampAnchors.sourceExtension = sourceExtensionCoords
     }
     private findCenterUpgradePos() {
         if (this.centerUpgradePos) return false
@@ -1553,7 +1588,7 @@ export class CommunePlanner {
         }
 
         this.fastFillerStartCoords = origins
-        return this.fastFillerStartCoords[/* this.planAttempts.length */ 1]
+        return this.fastFillerStartCoords[this.planAttempts.length]
     }
     private fastFiller() {
         if (this.stampAnchors.fastFiller.length) return
@@ -2290,7 +2325,7 @@ export class CommunePlanner {
                         const currentWeight = unprotectedCoords[packedAdjCoord2]
 
                         if (this.roadCoords[packedAdjCoord2] === 1) {
-                            unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight * 0.75, currentWeight)
+                            unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight * 0.5, currentWeight)
                             continue
                         }
 
@@ -2319,7 +2354,7 @@ export class CommunePlanner {
                 }
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
-                    unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight * 0.75
+                    unprotectedCoords[packedAdjCoord] = unprotectedCoordWeight * 0.5
                     return
                 }
 
@@ -2382,7 +2417,7 @@ export class CommunePlanner {
                 if (onboardingCount === minOnboardingRamparts) forThreat = true
             }
 
-            for (let i = onboardingIndex - 1; i < path.length; i++) {
+            for (let i = Math.max(onboardingIndex - 1, 0); i < path.length; i++) {
                 const pos = path[i]
 
                 this.roadCoords[packAsNum(pos)] = 1
@@ -2506,6 +2541,7 @@ export class CommunePlanner {
 
         delete this.sourceHarvestPositions
         delete this.sourcePaths
+        delete this.sourceStructureCoords
         delete this.mineralHarvestPositions
         delete this.mineralPath
         delete this.centerUpgradePos
