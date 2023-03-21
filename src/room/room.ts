@@ -3,6 +3,7 @@ import {
     creepRoles,
     customColors,
     powerCreepClassNames,
+    roomDimensions,
     roomTypesUsedForStats,
 } from 'international/constants'
 import { cleanRoomMemory, customLog, forAdjacentCoords, forCoordsInRange } from 'international/utils'

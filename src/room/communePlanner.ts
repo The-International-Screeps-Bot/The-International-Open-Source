@@ -45,6 +45,8 @@ import {
     unpackNumAsCoord,
     unpackNumAsPos,
     forCoordsAroundRange,
+    randomIntRange,
+    estimateTowerDamage,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import {
@@ -184,6 +186,11 @@ export class CommunePlanner {
      * Coords outside of rampart protection or in range of defensive combat areas
      */
     unprotectedCoords: Uint8Array
+    insideMinCut: Set<number>
+    outsideMinCut: Set<number>
+    bestTowerScore: number
+    bestTowerCoords: Coord[]
+    towerAttemptIndex: number
     stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
     fastFillerStartCoords: Coord[]
     minCutCoords: Set<number>
@@ -308,10 +315,13 @@ export class CommunePlanner {
         this.observer()
         this.planGridCoords()
         this.runMinCut()
-        this.towers()
         this.groupMinCutCoords()
         this.findUnprotectedCoords()
         this.onboardingRamparts()
+        this.findOutsideMinCut()
+        this.findInsideMinCut()
+        this.towers()
+        this.visualizeCurrentPlan()
         this.mineral()
         this.planSourceStructures()
         this.generalShield()
@@ -359,7 +369,7 @@ export class CommunePlanner {
 
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
-                if (this.terrainCoords[packXYAsNum(x, y)] === 255) continue
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
 
                 // Calculate the position of the cell relative to the anchor
 
@@ -367,11 +377,7 @@ export class CommunePlanner {
                 const relY = y - anchor.y
 
                 // Check if the cell is part of a diagonal line
-                if (
-                    Math.abs(relX - 3 * relY) % (gridSize / 2) !== 0 &&
-                    Math.abs(relX + 3 * relY) % (gridSize / 2) !== 0
-                )
-                    continue
+                if (Math.abs(relX - 3 * relY) % 2 !== 0 && Math.abs(relX + 3 * relY) % 2 !== 0) continue
 
                 const packedCoord = packXYAsNum(x, y)
 
@@ -1944,31 +1950,6 @@ export class CommunePlanner {
 
         this.finishedGridExtensionPaths = true
     }
-    private towers() {
-        this.planStamps({
-            stampType: 'tower',
-            count: CONTROLLER_STRUCTURES.tower[8],
-            startCoords: [this.stampAnchors.hub[0]],
-            dynamic: true,
-            weighted: true,
-            coordMap: this.reverseExitFlood,
-            /**
-             * Don't place on a gridCoord and ensure there is a gridCoord adjacent
-             */
-            conditions: coord => {
-                const packedCoord = packAsNum(coord)
-                if (this.baseCoords[packedCoord] === 255) return false
-                if (this.byPlannedRoad[packedCoord] !== 1) return false
-
-                return true
-            },
-            consequence: stampAnchor => {
-                this.basePlans.set(packCoord(stampAnchor), STRUCTURE_TOWER, 3)
-                this.baseCoords[packAsNum(stampAnchor)] = 255
-                this.roadCoords[packAsNum(stampAnchor)] = 255
-            },
-        })
-    }
     private observer() {
         this.planStamps({
             stampType: 'observer',
@@ -2125,30 +2106,26 @@ export class CommunePlanner {
         while (thisGeneration.length) {
             nextGeneration = []
 
-            // Flood all adjacent positions
+            // Iterate through positions of this gen
 
-            if (!nextGeneration.length) {
-                // Iterate through positions of this gen
+            for (const coord1 of thisGeneration) {
+                // Add viable adjacent coords to the next generation
 
-                for (const coord1 of thisGeneration) {
-                    // Add viable adjacent coords to the next generation
-
-                    for (const offset of adjacentOffsets) {
-                        const adjCoord = {
-                            x: coord1.x + offset.x,
-                            y: coord1.y + offset.y,
-                        }
-                        const packedAdjCoord = packAsNum(adjCoord)
-
-                        if (visitedCoords[packedAdjCoord] === 1) continue
-                        visitedCoords[packedAdjCoord] = 1
-
-                        if (!protectionCoords.has(packedAdjCoord)) continue
-
-                        contigiousProtectionCoords.add(adjCoord)
-                        cm.set(adjCoord.x, adjCoord.y, defaultMinCutDepth)
-                        nextGeneration.push(adjCoord)
+                for (const offset of adjacentOffsets) {
+                    const adjCoord = {
+                        x: coord1.x + offset.x,
+                        y: coord1.y + offset.y,
                     }
+                    const packedAdjCoord = packAsNum(adjCoord)
+
+                    if (visitedCoords[packedAdjCoord] === 1) continue
+                    visitedCoords[packedAdjCoord] = 1
+
+                    if (!protectionCoords.has(packedAdjCoord)) continue
+
+                    contigiousProtectionCoords.add(adjCoord)
+                    cm.set(adjCoord.x, adjCoord.y, defaultMinCutDepth)
+                    nextGeneration.push(adjCoord)
                 }
             }
 
@@ -2383,6 +2360,7 @@ export class CommunePlanner {
 
                 if (!this.minCutCoords.has(packedAdjCoord) && getRange(coord, adjCoord) === 1) {
                     this.rampartPlans.setXY(adjCoord.x, adjCoord.y, 4, false, false, true)
+                    this.rampartCoords[packedAdjCoord] = 1
                 }
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
@@ -2461,6 +2439,138 @@ export class CommunePlanner {
             unpackNumAsCoord(packedCoord),
         )
     }
+    private findOutsideMinCut() {
+        if (this.outsideMinCut) return
+
+        const outsideMinCut: Set<number> = new Set()
+
+        const visitedCoords = new Uint8Array(2500)
+        let thisGeneration = this.minCutCoords
+        let nextGeneration: Set<number>
+        let depth = 0
+
+        while (thisGeneration.size) {
+            nextGeneration = new Set()
+
+            for (const packedCoord of thisGeneration) {
+                const coord = unpackNumAsCoord(packedCoord)
+                forAdjacentCoords(coord, adjCoord => {
+                    const packedAdjCoord = packAsNum(adjCoord)
+
+                    if (visitedCoords[packedAdjCoord] === 1) return
+                    visitedCoords[packedAdjCoord] = 1
+
+                    if (this.unprotectedCoords[packedAdjCoord] !== 255) return
+
+                    outsideMinCut.add(packedAdjCoord)
+                    nextGeneration.add(packedAdjCoord)
+                })
+            }
+
+            if (depth >= 3) break
+
+            thisGeneration = nextGeneration
+            depth += 1
+        }
+
+        this.outsideMinCut = outsideMinCut
+    }
+    private findInsideMinCut() {
+        if (this.insideMinCut) return
+
+        const insideMinCut: Set<number> = new Set()
+
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                const packedCoord = packXYAsNum(x, y)
+                if (this.roadCoords[packedCoord] !== 0) continue
+                if (this.rampartCoords[packedCoord] === 1) continue
+                if (this.unprotectedCoords[packedCoord] === 255) continue
+
+                insideMinCut.add(packedCoord)
+            }
+        }
+
+        this.insideMinCut = insideMinCut
+    }
+    /**
+     * Sort of genetic algorithm to find best tower placement combination
+     */
+    private towers() {
+        if (this.stampAnchors.tower.length) return
+
+        if (this.bestTowerScore === undefined) {
+            this.bestTowerScore = 0
+            this.bestTowerCoords = []
+            this.towerAttemptIndex = 0
+        }
+
+        for (; this.towerAttemptIndex < 1000; this.towerAttemptIndex++) {
+            const towerOptions = Array.from(this.insideMinCut)
+            const towerCoords: Coord[] = []
+            const damageMap = new Uint32Array(roomDimensions * roomDimensions)
+
+            for (let towers = 0; towers < CONTROLLER_STRUCTURES.tower[8]; towers++) {
+                const index = randomIntRange(0, towerOptions.length)
+                const packedCoord = towerOptions[index]
+                towerOptions.splice(index, 1)
+
+                const coord = unpackNumAsCoord(packedCoord)
+                towerCoords.push(coord)
+
+                for (const packedCoord of this.outsideMinCut) {
+                    const damage = estimateTowerDamage(coord, unpackNumAsCoord(packedCoord))
+                    damageMap[packedCoord] += damage
+                }
+            }
+
+            let minDamage = Infinity
+
+            for (let x = 0; x < roomDimensions; x++) {
+                for (let y = 0; y < roomDimensions; y++) {
+                    const damage = damageMap[packXYAsNum(x, y)]
+                    if (damage === 0 || damage >= minDamage) continue
+
+                    minDamage = damage
+                }
+            }
+
+            if (minDamage <= this.bestTowerScore) continue
+
+            this.bestTowerScore = minDamage = minDamage
+            this.bestTowerCoords = towerCoords
+        }
+
+        const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+
+        for (const coord of this.bestTowerCoords) {
+            this.basePlans.setXY(coord.x, coord.y, STRUCTURE_TOWER, 3)
+
+            const packedCoord = packXYAsNum(coord.x, coord.y)
+            this.baseCoords[packedCoord] = 255
+            this.roadCoords[packedCoord] = 255
+
+            const path = this.room.advancedFindPath({
+                origin: new RoomPosition(coord.x, coord.y, this.room.name),
+                goals: [
+                    {
+                        pos: hubAnchorPos,
+                        range: 2,
+                    },
+                ],
+                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
+            })
+
+            for (const pos of path) {
+                this.basePlans.set(packCoord(pos), STRUCTURE_ROAD, 3)
+                this.roadCoords[packAsNum(pos)] = 1
+            }
+        }
+
+        this.stampAnchors.tower = this.bestTowerCoords
+    }
     private protectFromNuke(coord: Coord, minRCL: number) {}
     private shield(coord: Coord, minRCL: number, coversStructure: boolean = true) {
         const packedCoord = packAsNum(coord)
@@ -2527,6 +2637,7 @@ export class CommunePlanner {
             this.stampAnchors.onboardingRampart.length
         score += getRange(this.stampAnchors.hub[0], this.centerUpgradePos) / 10
         if (!this.isControllerProtected) score += 10
+        score += (CONTROLLER_STRUCTURES.tower[8] * TOWER_POWER_ATTACK - this.bestTowerScore) / 100
 
         this.score = score
     }
@@ -2564,6 +2675,11 @@ export class CommunePlanner {
         delete this.unprotectedCoords
         delete this.minCutCoords
         delete this.groupedMinCutCoords
+        delete this.insideMinCut
+        delete this.outsideMinCut
+        delete this.bestTowerScore
+        delete this.bestTowerCoords
+        delete this.towerAttemptIndex
 
         delete this.plannedGridCoords
         delete this.finishedGrid
