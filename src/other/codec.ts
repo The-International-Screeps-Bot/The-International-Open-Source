@@ -245,16 +245,33 @@ export function unpackPosList(chars: string) {
 /**
  * Pack a planned cord for base building
  */
-export function packBasePlanCoord(planCoord: BasePlanCoord) {
-    return encode(new Uint8Array([allStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
+export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
+    let packedCoords = ''
+    const lastIndex = planCoords.length - 1
+
+    for (let i = 0; i < planCoords.length; i++) {
+
+        const planCoord = planCoords[i]
+        packedCoords += encode(new Uint8Array([allStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
+        if (i < lastIndex) packedCoords += ','
+    }
+    packedCoords += '_'
+    return packedCoords
 }
 
 /**
  * Unpack a planned cord for base building
  */
-export function unpackBasePlanCoord(chars: string): BasePlanCoord {
-    const coord = decode(chars)
-    return { structureType: allStructureTypes[coord[0]], minRCL: coord[1] }
+export function unpackBasePlanCoords(packedPlanCoords: string) {
+    const planCoords: BasePlanCoord[] = []
+
+    for (const packedPlanCoord of packedPlanCoords.split(',')) {
+        if (!packedPlanCoord.length) continue
+
+        const data = decode(packedPlanCoord)
+        planCoords.push({ structureType: allStructureTypes[data[0]], minRCL: data[1] })
+    }
+    return planCoords
 }
 
 /**
@@ -287,11 +304,9 @@ export function packStampAnchors(stampAnchors: StampAnchors) {
 }
 
 export function unpackStampAnchors(packedStampAnchors: PackedStampAnchors) {
-
     const stampAnchors: StampAnchors = {}
 
     for (const key in packedStampAnchors) {
-
         stampAnchors[stampKeys[parseInt(key)]] = unpackCoordList(packedStampAnchors[key])
     }
 

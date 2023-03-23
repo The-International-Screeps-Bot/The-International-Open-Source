@@ -6,7 +6,6 @@ import {
     controllerDowngradeUpgraderNeed,
     minHarvestWorkRatio,
     customColors,
-    numbersByStructureTypes,
     rampartUpkeepCost,
     RemoteData,
     remoteHarvesterRoles,

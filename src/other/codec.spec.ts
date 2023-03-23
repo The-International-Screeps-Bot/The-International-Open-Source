@@ -134,7 +134,7 @@ describe('codec', () => {
         for (let s = 1; s < 5; s++) {
             for (let r = 1; r < 10; r++) {
                 const encoded = Codec.packBasePlanCoord({ minRCL: r, structureType: allStructureTypes[s] })
-                const decoded = Codec.unpackBasePlanCoord(encoded)
+                const decoded = Codec.unpackBasePlanCoords(encoded)
                 expect(decoded).toEqual({ minRCL: r, structureType: allStructureTypes[s] })
             }
         }

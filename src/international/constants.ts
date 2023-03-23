@@ -199,6 +199,25 @@ export const allStructureTypes: StructureConstant[] = [
     STRUCTURE_INVADER_CORE,
 ]
 
+export const buildableStructureTypes: BuildableStructureConstant[] = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_ROAD,
+    STRUCTURE_WALL,
+    STRUCTURE_RAMPART,
+    STRUCTURE_LINK,
+    STRUCTURE_STORAGE,
+    STRUCTURE_TOWER,
+    STRUCTURE_OBSERVER,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_EXTRACTOR,
+    STRUCTURE_LAB,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_CONTAINER,
+    STRUCTURE_NUKER,
+    STRUCTURE_FACTORY,
+]
+
 export const impassibleStructureTypes: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
@@ -221,7 +240,7 @@ export const impassibleStructureTypes: StructureConstant[] = [
 
 export const impassibleStructureTypesSet = new Set(impassibleStructureTypes)
 
-export const structureTypesByBuildPriority: StructureConstant[] = [
+export const defaultStructureTypesByBuildPriority: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
     STRUCTURE_CONTAINER,
@@ -240,45 +259,12 @@ export const structureTypesByBuildPriority: StructureConstant[] = [
     STRUCTURE_OBSERVER,
 ]
 
-export const structureTypesByNumber = {
-    empty: 0,
-    spawn: 1,
-    extension: 2,
-    container: 3,
-    tower: 4,
-    storage: 5,
-    road: 6,
-    wall: 7,
-    rampart: 8,
-    terminal: 9,
-    extractor: 10,
-    link: 11,
-    lab: 12,
-    factory: 13,
-    powerSpawn: 14,
-    nuker: 15,
-    observer: 16,
-}
+export const structureTypesToProtect = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_TOWER,
 
-export const numbersByStructureTypes = {
-    0: 'empty',
-    1: STRUCTURE_SPAWN,
-    2: STRUCTURE_EXTENSION,
-    3: STRUCTURE_CONTAINER,
-    4: STRUCTURE_TOWER,
-    5: STRUCTURE_STORAGE,
-    6: STRUCTURE_ROAD,
-    7: STRUCTURE_WALL,
-    8: STRUCTURE_RAMPART,
-    9: STRUCTURE_TERMINAL,
-    10: STRUCTURE_EXTRACTOR,
-    11: STRUCTURE_LINK,
-    12: STRUCTURE_LAB,
-    13: STRUCTURE_FACTORY,
-    14: STRUCTURE_POWER_SPAWN,
-    15: STRUCTURE_NUKER,
-    16: STRUCTURE_OBSERVER,
-}
+]
+export const structureTypesToProtectSet = new Set(structureTypesToProtect)
 
 export const customColors = {
     white: '#ffffff',

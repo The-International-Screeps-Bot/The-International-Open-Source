@@ -10,7 +10,6 @@ import {
     maxRemoteRoomDistance,
     minHarvestWorkRatio,
     customColors,
-    numbersByStructureTypes,
     PlayerData,
     prefferedCommuneRange,
     RemoteData,
@@ -19,7 +18,7 @@ import {
     roomTypes,
     constantRoomTypes,
     stamps,
-    structureTypesByBuildPriority,
+    defaultStructureTypesByBuildPriority,
     RESULT_FAIL,
     RESULT_NO_ACTION,
     adjacentOffsets,
@@ -1860,7 +1859,7 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 
     // Loop through structuretypes of the build priority
 
-    for (const structureType of structureTypesByBuildPriority) {
+    for (const structureType of defaultStructureTypesByBuildPriority) {
         // Get the structures with the relevant type
 
         const cSitesOfType = this.allyCSitesByType[structureType]

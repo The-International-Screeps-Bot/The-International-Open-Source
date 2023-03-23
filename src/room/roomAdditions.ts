@@ -6,7 +6,7 @@ import {
     customColors,
     remoteTypeWeights,
     roomDimensions,
-    structureTypesByBuildPriority,
+    defaultStructureTypesByBuildPriority,
 } from 'international/constants'
 import {
     createPosMap,
@@ -362,7 +362,7 @@ const roomAdditions = {
 
             // Loop through structuretypes of the build priority
 
-            for (const structureType of structureTypesByBuildPriority) {
+            for (const structureType of defaultStructureTypesByBuildPriority) {
                 const cSitesOfType = this.cSites[structureType]
                 if (!cSitesOfType.length) continue
 

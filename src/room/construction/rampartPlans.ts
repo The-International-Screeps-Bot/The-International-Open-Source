@@ -9,26 +9,6 @@ export class RampartPlans {
     constructor(map?: { [packedCoord: string]: RampartPlanCoord }) {
         this.map = map || {}
     }
-    set(packedCoord: string, minRCL: number, coversStructure: boolean, buildForNuke: boolean, buildForThreat: boolean) {
-        this.map[packedCoord] = {
-            minRCL,
-            coversStructure: +coversStructure,
-            buildForNuke: +buildForNuke,
-            buildForThreat: +buildForThreat,
-        }
-
-        return
-    }
-    setXY(
-        x: number,
-        y: number,
-        minRCL: number,
-        coversStructure: boolean,
-        buildForNuke: boolean,
-        buildForThreat: boolean,
-    ) {
-        return this.set(packXYAsCoord(x, y), minRCL, coversStructure, buildForNuke, buildForThreat)
-    }
     get(packedCoord: string) {
         return this.map[packedCoord]
     }

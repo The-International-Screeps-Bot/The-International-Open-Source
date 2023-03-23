@@ -783,3 +783,11 @@ export function findRangeFromExit(coord: Coord) {
     const dy = Math.min(coord.y, roomDimensions - 1 - coord.y)
     return Math.min(dx, dy)
 }
+
+/**
+ * @example splitAt('foo, 1), // ["f", "oo"]
+ */
+export function splitStringAt(string: string, index: number) {
+
+    return [string.slice(0, index), string.slice(index)]
+}

@@ -262,12 +262,17 @@ declare global {
         stampAnchors: PackedStampAnchors
         basePlans: string
         rampartPlans: string
-        sourceHarvestPositions: string[],
-        sourcePaths: string[],
-        mineralHarvestPositions: string,
-        mineralPath: string,
-        centerUpgradePos: string,
-        upgradePath: string,
+        sourceHarvestPositions: string[]
+        sourcePaths: string[]
+        mineralHarvestPositions: string
+        mineralPath: string
+        centerUpgradePos: string
+        upgradePath: string
+    }
+
+    interface RCLPlannedStructureType {
+        structures: number
+        minRCL: number
     }
 
     interface CombatStrength {
@@ -910,13 +915,16 @@ declare global {
         invaderCore: StructureInvaderCore[]
     }
 
+    type InterfaceToKV<T> = {
+        [K in keyof T]: { key: K; value: T[K] }
+    }[keyof T]
+
     interface RoomGlobal {
         [key: string]: any
 
         //
 
         stampAnchors: StampAnchors
-
 
         // Paths
 
@@ -1771,6 +1779,10 @@ declare global {
          * The score for claim evaluation
          */
         S: number
+        /**
+         * The dynamic score for claim evaluation
+         */
+        DyS: number
 
         hasTerminal: boolean
 

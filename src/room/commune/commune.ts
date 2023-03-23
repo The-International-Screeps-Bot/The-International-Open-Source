@@ -516,4 +516,30 @@ export class CommuneManager {
 
         return (this._upgradeStructure = controllerLink)
     }
+
+    _structureTypesByBuildPriority: BuildableStructureConstant[]
+    get structureTypesByBuildPriority() {
+        if (this._structureTypesByBuildPriority) return this._structureTypesByBuildPriority
+
+        this._structureTypesByBuildPriority = [
+            STRUCTURE_SPAWN,
+            STRUCTURE_EXTENSION,
+            STRUCTURE_CONTAINER,
+            STRUCTURE_ROAD,
+            STRUCTURE_STORAGE,
+            STRUCTURE_TOWER,
+            STRUCTURE_WALL,
+            STRUCTURE_RAMPART,
+            STRUCTURE_LINK,
+            STRUCTURE_TERMINAL,
+            STRUCTURE_EXTRACTOR,
+            STRUCTURE_LAB,
+            STRUCTURE_FACTORY,
+            STRUCTURE_POWER_SPAWN,
+            STRUCTURE_NUKER,
+            STRUCTURE_OBSERVER,
+        ]
+
+        return this._structureTypesByBuildPriority
+    }
 }
