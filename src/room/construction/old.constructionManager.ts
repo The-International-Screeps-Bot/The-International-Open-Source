@@ -1,14 +1,13 @@
 import { customColors, stamps } from 'international/constants'
 import { customLog } from 'international/utils'
-import { rampartPlanner } from './rampartPlanner'
 import './constructionFunctions'
 import { globalStatsUpdater } from 'international/statsManager'
-import { basePlanner } from './oldCommunePlanner'
 
 /**
  * Creates construction sites and deletes structures in a room
  */
 export function constructionManager(room: Room) {
+    return
     // If CPU logging is enabled, get the CPU used at the start
 
     if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
@@ -22,7 +21,7 @@ export function constructionManager(room: Room) {
     for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
  */
 
-    if (!room.memory.PC) basePlanner(room)
+    /* if (!room.memory.PC) basePlanner(room) */
 
     manageControllerStructures()
 

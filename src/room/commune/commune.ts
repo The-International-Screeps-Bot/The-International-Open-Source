@@ -25,7 +25,7 @@ import {
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
 
-import { constructionManager } from '../construction/constructionManager'
+import { constructionManager } from '../construction/old.constructionManager'
 import './combat'
 import './allyCreepRequest'
 import './claimRequest'
@@ -72,10 +72,11 @@ import { ObserverManager } from './observer'
 import { encode } from 'base32768'
 import { BasePlans } from '../construction/basePlans'
 import { internationalManager } from 'international/international'
+import { ConstructionManager } from 'room/construction/construction'
 
 export class CommuneManager {
     // Managers
-
+    constructionManager: ConstructionManager
     combatManager: CombatManager
 
     towerManager: TowerManager
@@ -107,6 +108,7 @@ export class CommuneManager {
     estimatedEnergyIncome: number
 
     constructor() {
+        this.constructionManager = new ConstructionManager(this)
         this.combatManager = new CombatManager(this)
 
         this.towerManager = new TowerManager(this)
@@ -230,7 +232,7 @@ export class CommuneManager {
     }
 
     public run() {
-        /* constructionManager(this.room) */
+        this.constructionManager.preTickRun()
 
         this.combatManager.run()
         this.towerManager.run()

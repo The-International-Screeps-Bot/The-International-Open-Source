@@ -121,8 +121,8 @@ export class RoomManager {
 
         // new commune planner
         this.communePlanner.preTickRun()
-
         room.communeManager.update(room)
+        room.communeManager.constructionManager.preTickRun()
         return
         room.communeManager.preTickRun()
     }

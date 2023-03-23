@@ -45,7 +45,6 @@ import {
 import { internationalManager } from 'international/international'
 import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/codec'
 import { posix } from 'path'
-import { basePlanner } from './construction/oldCommunePlanner'
 
 /**
     @param pos1 pos of the object performing the action
@@ -2135,7 +2134,11 @@ Room.prototype.createClaimRequest = function () {
 
     if (Memory.claimRequests[this.name]) return false
 
-    if (basePlanner(this) !== true) return false
+    if (this.roomManager.communePlanner.preTickRun() === RESULT_FAIL) {
+
+        this.memory.PC = false
+        return false
+    }
 
     const request = (Memory.claimRequests[this.name] = {
         data: [0],

@@ -1,7 +1,6 @@
 import {
     CombatRequestData,
     customColors,
-    numbersByStructureTypes,
     quadAttackMemberOffsets,
     rangedMassAttackMultiplierByRange,
     roomDimensions,

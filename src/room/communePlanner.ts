@@ -64,7 +64,6 @@ import {
 } from 'other/codec'
 import 'other/RoomVisual'
 import { CommuneManager } from 'room/commune/commune'
-import { rampartPlanner } from './construction/rampartPlanner'
 import { RoomManager } from './room'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
@@ -275,8 +274,8 @@ export class CommunePlanner {
         customLog('PLAN ATTEMPTS', this.planAttempts?.length)
         customLog('FASTFILLER ORIGINS', this.fastFillerStartCoords?.length)
         if (this.fastFillerStartCoords && this.planAttempts.length === this.fastFillerStartCoords.length) {
-            this.visualizeBestPlan()
-            /* this.choosePlan() */
+            /* this.visualizeBestPlan() */
+            this.choosePlan()
             return RESULT_SUCCESS
         }
 
@@ -314,7 +313,7 @@ export class CommunePlanner {
             }
             this.score = 0
         }
-/*
+        /*
         this.setBasePlansXY(24, 24, STRUCTURE_CONTAINER, 2)
         this.setBasePlansXY(25, 25, STRUCTURE_CONTAINER, 2)
         this.setBasePlansXY(25, 25, STRUCTURE_LINK, 5)
@@ -330,7 +329,7 @@ export class CommunePlanner {
  */
         this.avoidSources()
         this.avoidMineral()
-        this.fastFiller()
+        if (this.fastFiller() === RESULT_FAIL) return RESULT_FAIL
         this.generateGrid()
         this.pruneFastFillerRoads()
         this.findCenterUpgradePos()
@@ -1284,7 +1283,7 @@ export class CommunePlanner {
                         conditions: args.conditions,
                         coordMap: args.coordMap,
                     })
-                    if (!stampAnchor) continue
+                    if (!stampAnchor) return RESULT_FAIL
 
                     args.consequence(stampAnchor)
                     this.stampAnchors[args.stampType].push(stampAnchor)
@@ -1296,7 +1295,7 @@ export class CommunePlanner {
                     startCoords: args.startCoords,
                     conditions: args.conditions,
                 })
-                if (!stampAnchor) continue
+                if (!stampAnchor) return RESULT_FAIL
 
                 args.consequence(stampAnchor)
                 this.stampAnchors[args.stampType].push(stampAnchor)
@@ -1318,11 +1317,13 @@ export class CommunePlanner {
                 cardinalFlood: args.cardinalFlood,
                 coordMap: distanceCoords,
             })
-            if (!stampAnchor) continue
+            if (!stampAnchor) return RESULT_FAIL
 
             args.consequence(stampAnchor)
             this.stampAnchors[args.stampType].push(stampAnchor)
         }
+
+        return RESULT_SUCCESS
     }
     private findStampAnchor(args: FindStampAnchorArgs) {
         let visitedCoords = new Uint8Array(2500)
@@ -1732,13 +1733,13 @@ export class CommunePlanner {
         return this.fastFillerStartCoords[this.planAttempts.length]
     }
     private fastFiller() {
-        if (this.stampAnchors.fastFiller.length) return
+        if (this.stampAnchors.fastFiller.length) return RESULT_NO_ACTION
 
         for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
             this.baseCoords[packAsNum(coord)] = 255
         }
 
-        this.planStamps({
+        const result = this.planStamps({
             stampType: 'fastFiller',
             count: 1,
             startCoords: [this.findFastFillerOrigin()],
@@ -1865,6 +1866,8 @@ export class CommunePlanner {
                 this.postFastFillerConfig()
             },
         })
+
+        return result
     }
     private hub() {
         const fastFillerPos = new RoomPosition(
@@ -2668,6 +2671,10 @@ export class CommunePlanner {
 
         const visitedCoords = new Uint8Array(2500)
         let thisGeneration = this.minCutCoords
+        for (const packedCoord of thisGeneration) {
+            visitedCoords[packedCoord] = 1
+        }
+
         let nextGeneration: Set<number>
         let depth = 0
 
@@ -2689,7 +2696,8 @@ export class CommunePlanner {
                 })
             }
 
-            if (depth >= 3) break
+            depth += 1
+            if (depth >= 4) break
 
             thisGeneration = nextGeneration
             depth += 1
@@ -2701,7 +2709,7 @@ export class CommunePlanner {
         if (this.insideMinCut) return
 
         const insideMinCut: Set<number> = new Set()
-
+        /*
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const packedCoord = packXYAsNum(x, y)
@@ -2711,6 +2719,42 @@ export class CommunePlanner {
 
                 insideMinCut.add(packedCoord)
             }
+        }
+ */
+
+        const visitedCoords = new Uint8Array(2500)
+        let thisGeneration = this.minCutCoords
+        for (const packedCoord of thisGeneration) {
+            visitedCoords[packedCoord] = 1
+        }
+        let nextGeneration: Set<number>
+        let depth = 0
+
+        while (thisGeneration.size) {
+            nextGeneration = new Set()
+
+            for (const packedCoord of thisGeneration) {
+                const coord = unpackNumAsCoord(packedCoord)
+                forAdjacentCoords(coord, adjCoord => {
+                    const packedAdjCoord = packAsNum(adjCoord)
+
+                    if (visitedCoords[packedAdjCoord] === 1) return
+                    visitedCoords[packedAdjCoord] = 1
+
+                    if (this.roadCoords[packedAdjCoord] > 0) return
+                    if (this.unprotectedCoords[packedAdjCoord] === 255) return
+
+                    nextGeneration.add(packedAdjCoord)
+
+                    if (this.rampartCoords[packedAdjCoord] === 1) return
+                    insideMinCut.add(packedAdjCoord)
+                })
+            }
+
+            depth += 1
+            if (depth >= 5) break
+
+            thisGeneration = nextGeneration
         }
 
         this.insideMinCut = insideMinCut
