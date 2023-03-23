@@ -217,6 +217,7 @@ export const buildableStructureTypes: BuildableStructureConstant[] = [
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
 ]
+export const buildableStructuresSet: Set<BuildableStructureConstant> = new Set(buildableStructureTypes)
 
 export const impassibleStructureTypes: StructureConstant[] = [
     STRUCTURE_SPAWN,
@@ -241,16 +242,16 @@ export const impassibleStructureTypes: StructureConstant[] = [
 export const impassibleStructureTypesSet = new Set(impassibleStructureTypes)
 
 export const defaultStructureTypesByBuildPriority: StructureConstant[] = [
+    STRUCTURE_RAMPART,
+    STRUCTURE_WALL,
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
     STRUCTURE_CONTAINER,
     STRUCTURE_ROAD,
     STRUCTURE_STORAGE,
     STRUCTURE_TOWER,
-    STRUCTURE_WALL,
-    STRUCTURE_RAMPART,
-    STRUCTURE_LINK,
     STRUCTURE_TERMINAL,
+    STRUCTURE_LINK,
     STRUCTURE_EXTRACTOR,
     STRUCTURE_LAB,
     STRUCTURE_FACTORY,
@@ -259,10 +260,17 @@ export const defaultStructureTypesByBuildPriority: StructureConstant[] = [
     STRUCTURE_OBSERVER,
 ]
 
-export const structureTypesToProtect = [
+export const structureTypesToProtect: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_TOWER,
-
+    STRUCTURE_LAB,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_STORAGE,
+    STRUCTURE_FACTORY,
+    STRUCTURE_NUKER,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_OBSERVER,
+    STRUCTURE_LINK
 ]
 export const structureTypesToProtectSet = new Set(structureTypesToProtect)
 

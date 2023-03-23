@@ -1,5 +1,5 @@
 // eslint-disable
-import { allStructureTypes, packedPosLength, stampKeys } from 'international/constants'
+import { allStructureTypes, buildableStructureTypes, packedPosLength, stampKeys } from 'international/constants'
 import { encode, decode } from 'base32768'
 
 /**
@@ -252,7 +252,7 @@ export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
     for (let i = 0; i < planCoords.length; i++) {
 
         const planCoord = planCoords[i]
-        packedCoords += encode(new Uint8Array([allStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
+        packedCoords += encode(new Uint8Array([buildableStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
         if (i < lastIndex) packedCoords += ','
     }
     packedCoords += '_'
@@ -269,7 +269,7 @@ export function unpackBasePlanCoords(packedPlanCoords: string) {
         if (!packedPlanCoord.length) continue
 
         const data = decode(packedPlanCoord)
-        planCoords.push({ structureType: allStructureTypes[data[0]], minRCL: data[1] })
+        planCoords.push({ structureType: buildableStructureTypes[data[0]], minRCL: data[1] })
     }
     return planCoords
 }

@@ -22,6 +22,7 @@ import {
     defaultSwampCost,
     allStructureTypes,
     buildableStructureTypes,
+    structureTypesToProtectSet,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -259,6 +260,11 @@ export class CommunePlanner {
         return this._reverseExitFlood
     }
 
+    get isFirstRoom() {
+
+        return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
+    }
+
     preTickRun() {
         this.room = this.roomManager.room
 
@@ -350,10 +356,10 @@ export class CommunePlanner {
         this.findOutsideMinCut()
         this.findInsideMinCut()
         this.towers()
-        this.visualizeCurrentPlan()
         this.mineral()
         this.planSourceStructures()
         this.generalShield()
+        this.visualizeCurrentPlan()
         /* this.visualizeCurrentPlan()
         return RESULT_SUCCESS */
         this.findScore()
@@ -448,9 +454,9 @@ export class CommunePlanner {
         if (coordData) {
             this.rampartPlans.map[packedCoord] = {
                 minRCL: Math.min(coordData.minRCL, minRCL),
-                coversStructure: +coordData.coversStructure || +coversStructure,
-                buildForNuke: +coordData.buildForNuke || +buildForNuke,
-                buildForThreat: +coordData.buildForThreat || +buildForThreat,
+                coversStructure: +coordData.coversStructure /* || +coversStructure */,
+                buildForNuke: +coordData.buildForNuke /* || +buildForNuke */,
+                buildForThreat: +coordData.buildForThreat /* || +buildForThreat */,
             }
         }
 
@@ -1083,7 +1089,6 @@ export class CommunePlanner {
             this.sourceStructureCoords[i].splice(closestCoordIndex, 1)
 
             sourceLinkCoords.push(closestCoord)
-            this.setBasePlansXY(closestCoord.x, closestCoord.y, STRUCTURE_LINK)
 
             const packedCoord = packAsNum(closestCoord)
             this.baseCoords[packedCoord] = 255
@@ -1097,6 +1102,11 @@ export class CommunePlanner {
                 this.baseCoords[packedCoord] = 255
                 this.roadCoords[packedCoord] = 255
             }
+        }
+
+        sourceLinkCoords.reverse()
+        for (const coord of sourceLinkCoords) {
+            this.setBasePlansXY(coord.x, coord.y, STRUCTURE_LINK)
         }
 
         this.stampAnchors.sourceLink = sourceLinkCoords
@@ -1803,7 +1813,7 @@ export class CommunePlanner {
                     )
                 })
 
-                let containerMinRCL = 2
+                let containerMinRCL = 1
                 const containerCoords = [...structures.container]
                 const extensionCoords = [...structures.extension]
                 const spawnCoords = [...structures.spawn]
@@ -1840,6 +1850,13 @@ export class CommunePlanner {
                         this.baseCoords[packedCoord] = 255
                         this.roadCoords[packedCoord] = 255
 
+                        // It's not our first room, have a rampart planned to build the spawn under
+
+                        if (i === 0 && !this.isFirstRoom) {
+
+                            this.setRampartPlansXY(properCoord.x, properCoord.y, 1, false, false, false)
+                        }
+
                         spawnCoords.splice(j, 1)
                         break
                     }
@@ -1857,7 +1874,7 @@ export class CommunePlanner {
                         this.baseCoords[packedCoord] = 255
                         this.roadCoords[packedCoord] = 255
 
-                        containerMinRCL += 1
+                        containerMinRCL += 2
                         containerCoords.splice(j, 1)
                         break
                     }
@@ -2854,6 +2871,7 @@ export class CommunePlanner {
 
         this.setRampartPlansXY(coord.x, coord.y, 4, coversStructure, false, false)
         this.stampAnchors.shieldRampart.push(coord)
+        this.rampartCoords[packedCoord] = 1
         this.unprotectedCoords[packedCoord] = 0
     }
     private generalShield() {
@@ -2884,6 +2902,26 @@ export class CommunePlanner {
 
             this.shield(adjCoord, 4, false)
         })
+
+        // Protect important structures
+
+        for (const packedCoord in this.basePlans.map) {
+            const coord = unpackCoord(packedCoord)
+            const packedNumCoord = packAsNum(coord)
+            const coordData = this.basePlans.map[packedCoord]
+
+            for (const data of coordData) {
+
+                if (!structureTypesToProtectSet.has(data.structureType)) continue
+
+                const isProtected = this.unprotectedCoords[packedNumCoord] === 0
+                this.setRampartPlansXY(coord.x, coord.y, data.minRCL, true, isProtected, false)
+
+                this.stampAnchors.shieldRampart.push(coord)
+                this.rampartCoords[packedNumCoord] = 1
+                this.unprotectedCoords[packedNumCoord] = 0
+            }
+        }
 
         this.unprotectedSources = unprotectedSources
         this.generalShielded = true

@@ -167,7 +167,7 @@ declare global {
     }
 
     interface BasePlanCoord {
-        structureType: StructureConstant
+        structureType: BuildableStructureConstant
         minRCL: number
     }
 

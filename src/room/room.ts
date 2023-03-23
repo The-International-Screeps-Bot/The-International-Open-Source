@@ -6,7 +6,7 @@ import {
     roomDimensions,
     roomTypesUsedForStats,
 } from 'international/constants'
-import { cleanRoomMemory, customLog, forAdjacentCoords, forCoordsInRange } from 'international/utils'
+import { cleanRoomMemory, customLog, forAdjacentCoords, forCoordsInRange, packAsNum } from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
 import { ContainerManager } from './container'
@@ -139,5 +139,24 @@ export class RoomManager {
         this.powerCreepRoleManager.run()
         this.endTickCreepManager.run()
         this.roomVisualsManager.run()
+    }
+
+    _nukeTargetCoords: Uint8Array
+    get nukeTargetCoords() {
+        if (this._nukeTargetCoords) return this._nukeTargetCoords
+
+        this._nukeTargetCoords = new Uint8Array(roomDimensions * roomDimensions)
+
+        for (const nuke of this.room.find(FIND_NUKES)) {
+
+            this._nukeTargetCoords[packAsNum(nuke.pos)] += NUKE_DAMAGE[0]
+
+            forCoordsInRange(nuke.pos, 2, adjCoord => {
+
+                this._nukeTargetCoords[packAsNum(adjCoord)] += NUKE_DAMAGE[2]
+            })
+        }
+
+        return this._nukeTargetCoords
     }
 }

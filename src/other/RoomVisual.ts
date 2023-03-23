@@ -376,8 +376,8 @@ RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
             break
         case STRUCTURE_RAMPART:
             this.rect(x - 0.5, y - 0.5, 1, 1, {
-                fill: 'rgb(78, 104, 79)',
-                stroke: 'rgb(106, 180, 107)',
+                fill: opts.fill || 'rgb(78, 104, 79)',
+                stroke: opts.fill || 'rgb(106, 180, 107)',
                 strokeWidth: 0.12,
                 opacity: opts.opacity,
             })
