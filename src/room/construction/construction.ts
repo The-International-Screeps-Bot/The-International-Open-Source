@@ -1,5 +1,5 @@
 import { buildableStructuresSet } from 'international/constants'
-import { findObjectWithID, packAsNum } from 'international/utils'
+import { findObjectWithID, packAsNum, randomTick } from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
@@ -16,7 +16,25 @@ export class ConstructionManager {
     preTickRun() {
         this.room = this.communeManager.room
 
-        const RCL = /* this.room.controller.level */8
+        if (!this.room.memory.PC) return
+
+        /* this.visualize() */
+
+        // Only run every x ticks or if there are builders (temporary fix)
+
+        if (!this.room.myCreeps.builder.length) {
+            if (!randomTick(50)) return
+        }
+
+        // If the construction site count is at its limit, stop
+
+        if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
+
+        // If there are some construction sites
+
+        if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= Math.max(2, MAX_CONSTRUCTION_SITES / 1 + global.communes.size)) return
+
+        const RCL = this.room.controller.level
         const basePlans = BasePlans.unpack(this.room.memory.BPs)
 
         for (const packedCoord in basePlans.map) {
@@ -52,6 +70,8 @@ export class ConstructionManager {
             }
         }
 
+        if (RCL >= 4 && this.room.resourcesInStoringStructures.energy < 30000) return
+
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
         for (const packedCoord in rampartPlans.map) {
@@ -76,12 +96,9 @@ export class ConstructionManager {
 
             this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
         }
-
-        this.visualize()
     }
     private visualize() {
-
-        const RCL = /* this.room.controller.level */8
+        const RCL = /* this.room.controller.level */ 8
         const basePlans = BasePlans.unpack(this.room.memory.BPs)
 
         for (const packedCoord in basePlans.map) {
@@ -107,9 +124,7 @@ export class ConstructionManager {
 
             /* this.room.visual.text(data.minRCL.toString(), coord.x, coord.y) */
 
-            if (
-                rampartPlans.get(packedCoord).buildForNuke
-            ) {
+            if (rampartPlans.get(packedCoord).buildForNuke) {
                 this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2, fill: 'yellow' })
                 continue
             }

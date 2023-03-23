@@ -25,7 +25,6 @@ import {
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
 
-import { constructionManager } from '../construction/old.constructionManager'
 import './combat'
 import './allyCreepRequest'
 import './claimRequest'
