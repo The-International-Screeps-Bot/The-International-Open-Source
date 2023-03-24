@@ -71,9 +71,9 @@ export class SpawnRequestsManager {
     }
 
     private sourceHarvester() {
-        const mostOptimalSource = this.communeManager.room.sourcesByEfficacy[0]
 
-        for (let sourceIndex = 0; sourceIndex < this.communeManager.room.sources.length; sourceIndex++) {
+        const sources = this.communeManager.room.roomManager.communeSources
+        for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
             // Construct requests for sourceHarvesters
 
             this.rawSpawnRequestsArgs.push(
@@ -82,7 +82,7 @@ export class SpawnRequestsManager {
 
                     const spawnGroup = this.communeManager.room.creepsOfSource[sourceIndex]
 
-                    const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + spawnGroup.length
+                    const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
 
                     if (this.spawnEnergyCapacity >= 800) {
                         let defaultParts: BodyPartConstant[] = [CARRY]
@@ -90,7 +90,7 @@ export class SpawnRequestsManager {
 
                         // Account for power regenerating sources
 
-                        const source = this.communeManager.room.sources[sourceIndex]
+                        const source = this.communeManager.room.find(FIND_SOURCES)[sourceIndex]
                         const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
                         if (effect) {
                             workAmount += Math.round(
@@ -181,7 +181,7 @@ export class SpawnRequestsManager {
                         extraParts: [WORK],
                         partsMultiplier: 6,
                         minCreeps: undefined,
-                        maxCreeps: Math.min(3, this.communeManager.room.sourcePositions[sourceIndex].length),
+                        maxCreeps: Math.min(3, this.communeManager.room.roomManager.communeSourceHarvestPositions[sourceIndex].length),
                         minCost: 200,
                         priority,
                         spawnGroup: spawnGroup,
@@ -250,7 +250,7 @@ export class SpawnRequestsManager {
                 if (this.communeManager.room.resourcesInStoringStructures.energy < 40000) return false
                 if (!this.communeManager.room.terminal) return false
                 if (this.communeManager.room.terminal.store.getFreeCapacity() <= 10000) return false
-                if (this.communeManager.room.mineral.mineralAmount === 0) return false
+                if (this.communeManager.room.roomManager.mineral.mineralAmount === 0) return false
 
                 const minCost = 900
                 if (this.spawnEnergyCapacity < minCost) return false
@@ -714,7 +714,7 @@ export class SpawnRequestsManager {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 let partsMultiplier = 1
-                let maxCreeps = this.communeManager.room.upgradePositions.length - 1
+                let maxCreeps = this.communeManager.room.roomManager.upgradePositions.length - 1
 
                 // If there is a storage, prefer needed remote creeps over upgraders
 
@@ -990,9 +990,8 @@ export class SpawnRequestsManager {
             const remoteData = Memory.rooms[remoteName].data
             const remote = Game.rooms[remoteName]
 
-            const sourcePositionsAmount = remote
-                ? remote.sourcePositions.length
-                : unpackPosList(remoteMemory.SP[sourceIndex]).length
+            const sourcePositionsAmount = remoteMemory.RSHP[sourceIndex].length / packedPosLength
+            const sourcePathLength = remoteMemory.RSPs[sourceIndex].length
 
             // Construct requests for remoteSourceHarvester0s
 
@@ -1004,7 +1003,7 @@ export class SpawnRequestsManager {
                     if (RemoteData[role] <= 0) return false
 
                     const priority =
-                        Math.round((this.minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100) * 100) /
+                        Math.round((this.minRemotePriority + 1 + sourcePathLength / 100) * 100) /
                         100
 
                     if (this.spawnEnergyCapacity >= 950) {
@@ -1068,10 +1067,11 @@ export class SpawnRequestsManager {
                     // Higher priority than remote harvesters
 
                     const priority =
-                        Math.round((this.minRemotePriority + remoteMemory.SPs[sourceIndex].length / 100) * 100) / 100
+                    Math.round((this.minRemotePriority + 1 + sourcePathLength / 100) * 100) /
+                    100
 
                     const partsMultiplier = findCarryPartsRequired(
-                        remoteMemory.SPs[sourceIndex].length / packedPosLength,
+                        sourcePathLength / packedPosLength,
                         income,
                     )
                     const role = 'remoteHauler'

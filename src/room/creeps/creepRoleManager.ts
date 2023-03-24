@@ -3,31 +3,8 @@ import './creepPrototypes/creepMoveFunctions'
 
 import { creepRoles, customColors } from 'international/constants'
 import { customLog } from 'international/utils'
-import { Maintainer } from './roleManagers/commune/maintainer'
-import { Builder } from './roleManagers/commune/builder'
-import { Hauler } from './roleManagers/commune/hauler'
-import { RemoteHauler } from './roleManagers/remote/remoteHauler'
-import { Claimer } from './roleManagers/international/claimer'
-import { AllyVanguard } from './roleManagers/international/allyVanguard'
-import { HubHauler } from './roleManagers/commune/hubHauler'
-import { ControllerUpgrader } from './roleManagers/commune/controllerUpgrader'
-import { SourceHarvester } from './roleManagers/commune/sourceHarvester'
-import { MineralHarvester } from './roleManagers/commune/mineralHarvester'
-import { FastFiller } from './roleManagers/commune/fastFiller'
-import { MeleeDefender } from './roleManagers/commune/meleeDefender'
-import { RemoteHarvester } from './roleManagers/remote/remoteSourceHarvester'
-import { RemoteReserver } from './roleManagers/remote/remoteReserver'
-import { RemoteDefender } from './roleManagers/remote/remoteDefender'
-import { RemoteCoreAttacker } from './roleManagers/remote/remoteCoreAttacker'
-import { RemoteDismantler } from './roleManagers/remote/remoteDismantler'
-import { Scout } from './roleManagers/international/scout'
-import { Vanguard } from './roleManagers/international/vanguard'
-import { Antifa } from './roleManagers/antifa/antifa'
-import { CommuneManager } from 'room/commune/commune'
 import { RoomManager } from 'room/room'
 import { globalStatsUpdater } from 'international/statsManager'
-import { RequestHauler } from './roleManagers/international/requestHauler'
-import { RangedDefender } from './roleManagers/commune/rangedDefender'
 import { creepClasses } from './creepClasses'
 
 export class CreepRoleManager {
@@ -38,9 +15,7 @@ export class CreepRoleManager {
     }
 
     public newRun() {
-
         for (const role in creepClasses) {
-
             creepClasses[role as CreepRoles].run()
         }
     }

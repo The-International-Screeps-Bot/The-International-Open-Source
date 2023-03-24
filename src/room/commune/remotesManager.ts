@@ -157,7 +157,7 @@ export class RemotesManager {
 
             // Loop through each index of sourceEfficacies
 
-            for (let sourceIndex = 0; sourceIndex < remoteMemory.SP.length; sourceIndex += 1) {
+            for (let sourceIndex = 0; sourceIndex < remoteMemory.RSPs.length; sourceIndex += 1) {
                 // Get the income based on the reservation of the this and remoteHarvester need
                 // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
@@ -173,7 +173,7 @@ export class RemotesManager {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory.data[RemoteData[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(
-                    remoteMemory.SPs[sourceIndex].length / packedPosLength,
+                    remoteMemory.RSPs[sourceIndex].length / packedPosLength,
                     income,
                 )
             }
@@ -191,7 +191,7 @@ export class RemotesManager {
         for (let index in remoteMemory.SIDs) {
             const pathRoomNames: Set<string> = new Set()
 
-            for (const pos of unpackPosList(remoteMemory.SPs[index])) {
+            for (const pos of unpackPosList(remoteMemory.RSPs[index])) {
                 const roomName = pos.roomName
 
                 if (pathRoomNames.has(roomName)) continue

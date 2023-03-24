@@ -2,11 +2,20 @@ import {
     adjacentOffsets,
     creepRoles,
     customColors,
+    defaultRoadPlanningPlainCost,
     powerCreepClassNames,
+    remoteTypeWeights,
     roomDimensions,
     roomTypesUsedForStats,
 } from 'international/constants'
-import { cleanRoomMemory, customLog, forAdjacentCoords, forCoordsInRange, packAsNum } from 'international/utils'
+import {
+    cleanRoomMemory,
+    customLog,
+    findObjectWithID,
+    forAdjacentCoords,
+    forCoordsInRange,
+    packAsNum,
+} from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
 import { ContainerManager } from './container'
@@ -18,6 +27,7 @@ import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinManager } from './ruins'
+import { packPosList, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
 
 export class RoomManager {
     communePlanner: CommunePlanner
@@ -85,7 +95,7 @@ export class RoomManager {
         room.partsOfRoles = {}
         room.powerTasks = {}
 
-        for (const index in room.sources) room.creepsOfSource.push([])
+        for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])
 
         room.squadRequests = new Set()
 
@@ -120,10 +130,8 @@ export class RoomManager {
         }
 
         // new commune planner
-        this.communePlanner.preTickRun()
+
         room.communeManager.update(room)
-        room.communeManager.constructionManager.preTickRun()
-        return
         room.communeManager.preTickRun()
     }
 
@@ -141,6 +149,33 @@ export class RoomManager {
         this.roomVisualsManager.run()
     }
 
+    _anchor: RoomPosition
+    get anchor() {
+        if (this._anchor !== undefined) return this._anchor
+
+        const stampAnchors = this.stampAnchors
+        if (!stampAnchors) return false
+
+        return (this._anchor = new RoomPosition(
+            stampAnchors.fastFiller[0].x,
+            stampAnchors.fastFiller[0].y,
+            this.room.name,
+        ))
+    }
+
+    _mineral: Mineral
+    get mineral() {
+        if (this._mineral) return this._mineral
+
+        const mineralID = Memory.rooms[this.room.name].MID
+        if (mineralID) return findObjectWithID(mineralID)
+
+        const mineral = this.room.find(FIND_MINERALS)[0]
+        Memory.rooms[this.room.name].MID = mineral.id
+
+        return (this._mineral = mineral)
+    }
+
     _nukeTargetCoords: Uint8Array
     get nukeTargetCoords() {
         if (this._nukeTargetCoords) return this._nukeTargetCoords
@@ -148,15 +183,323 @@ export class RoomManager {
         this._nukeTargetCoords = new Uint8Array(roomDimensions * roomDimensions)
 
         for (const nuke of this.room.find(FIND_NUKES)) {
-
             this._nukeTargetCoords[packAsNum(nuke.pos)] += NUKE_DAMAGE[0]
 
             forCoordsInRange(nuke.pos, 2, adjCoord => {
-
                 this._nukeTargetCoords[packAsNum(adjCoord)] += NUKE_DAMAGE[2]
             })
         }
 
         return this._nukeTargetCoords
+    }
+
+    _stampAnchors: StampAnchors
+    get stampAnchors() {
+        if (this._stampAnchors !== undefined) return this._stampAnchors
+
+        const packedStampAnchors = this.room.memory.SA
+        if (!packedStampAnchors) return false
+
+        return (this._stampAnchors = unpackStampAnchors(packedStampAnchors))
+    }
+
+    /**
+     * Sources sorted by optimal commune utilization
+     */
+    _communeSources: Source[]
+    get communeSources() {
+        if (this._communeSources) return this._communeSources
+
+        const sourceIDs = this.room.memory.CSIDs
+        if (sourceIDs) {
+            this._communeSources = []
+
+            for (let i = 0; i < sourceIDs.length; i++) {
+                const source = findObjectWithID(sourceIDs[i])
+
+                source.communeIndex = i
+                this._communeSources.push(source)
+            }
+
+            return this._communeSources
+        }
+
+        throw Error('No commune sources ' + this.room.name)
+        return this._communeSources
+    }
+
+    /**
+     * Sources sorted for optimal remotes utilization
+     */
+    _remoteSources: Source[]
+    get remoteSources() {
+        if (this._remoteSources) return this._remoteSources
+
+        const sourceIDs = this.room.memory.RSIDs
+        if (sourceIDs) {
+            this._remoteSources = []
+
+            for (let i = 0; i < sourceIDs.length; i++) {
+                const source = findObjectWithID(sourceIDs[i])
+
+                source.remoteIndex = i
+                this._remoteSources.push(source)
+            }
+
+            return this._remoteSources
+        }
+
+        const commune = Game.rooms[this.room.memory.CN]
+        if (!commune) throw Error('No commune for remote source harvest positions ' + this.room.name)
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
+
+        const sources = this.room.find(FIND_SOURCES)
+
+        sources.sort((a, b) => {
+            return (
+                this.room.advancedFindPath({
+                    origin: a.pos,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length -
+                this.room.advancedFindPath({
+                    origin: b.pos,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length
+            )
+        })
+
+        this.room.memory.RSIDs = sources.map(source => source.id)
+        return (this._remoteSources = sources)
+    }
+
+    _sourceHarvestPositions: RoomPosition[][]
+    get sourceHarvestPositions() {
+        if (this._sourceHarvestPositions) return this._sourceHarvestPositions
+
+        const sourceHarvestPositions: RoomPosition[][] = []
+        const terrain = this.room.getTerrain()
+        const sources = this.room.find(FIND_SOURCES)
+
+        for (let i = 0; i < sources.length; i++) {
+            const source = sources[i]
+            sourceHarvestPositions.push([])
+
+            for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
+                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+
+                sourceHarvestPositions[i].push(pos)
+            }
+        }
+
+        return (this._sourceHarvestPositions = sourceHarvestPositions)
+    }
+
+    _communeSourceHarvestPositions: RoomPosition[][]
+    get communeSourceHarvestPositions() {
+        if (this._communeSourceHarvestPositions) return this._communeSourceHarvestPositions
+
+        this._communeSourceHarvestPositions = []
+
+        const packedSourceHarvestPositions = this.room.memory.CSHP
+        if (packedSourceHarvestPositions) {
+            for (const positions of packedSourceHarvestPositions)
+                this._communeSourceHarvestPositions.push(unpackPosList(positions))
+
+            return this._communeSourceHarvestPositions
+        }
+
+        throw Error('No commune source harvest positions ' + this.room.name)
+        return this._communeSourceHarvestPositions
+    }
+
+    _remoteSourceHarvestPositions: RoomPosition[][]
+    get remoteSourceHarvestPositions() {
+        if (this._remoteSourceHarvestPositions) return this._remoteSourceHarvestPositions
+
+        this._remoteSourceHarvestPositions = []
+
+        const packedSourceHarvestPositions = this.room.memory.RSHP
+        if (packedSourceHarvestPositions) {
+            for (const positions of packedSourceHarvestPositions)
+                this._remoteSourceHarvestPositions.push(unpackPosList(positions))
+
+            return this._remoteSourceHarvestPositions
+        }
+
+        const commune = Game.rooms[this.room.memory.CN]
+        if (!commune) throw Error('No commune for remote source harvest positions ' + this.room.name)
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
+
+        const terrain = this.room.getTerrain()
+
+        for (const source of this.remoteSources) {
+            const positions = []
+
+            // Loop through each pos
+
+            for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
+                // Iterate if terrain for pos is a wall
+
+                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+
+                // Add pos to harvestPositions
+
+                positions.push(pos)
+            }
+
+            positions.sort((a, b) => {
+                return (
+                    this.room.advancedFindPath({
+                        origin: a,
+                        goals: [{ pos: anchor, range: 3 }],
+                    }).length -
+                    this.room.advancedFindPath({
+                        origin: b,
+                        goals: [{ pos: anchor, range: 3 }],
+                    }).length
+                )
+            })
+
+            this._remoteSourceHarvestPositions.push(positions)
+        }
+
+        this.room.memory.RSHP = this._remoteSourceHarvestPositions.map(positions => packPosList(positions))
+        return this._remoteSourceHarvestPositions
+    }
+
+    _communeSourcePaths: RoomPosition[][]
+    get communeSourcePaths() {
+        if (this._communeSourcePaths) return this._communeSourcePaths
+
+        this._communeSourcePaths = []
+
+        const packedSourcePaths = this.room.memory.CSPs
+        if (packedSourcePaths) {
+            for (const path of packedSourcePaths) this._communeSourcePaths.push(unpackPosList(path))
+
+            return this._communeSourcePaths
+        }
+
+        throw Error('No commune source paths ' + this.room.name)
+        return (this._communeSourcePaths = [])
+    }
+
+    _remoteSourcePaths: RoomPosition[][]
+    get remoteSourcePaths() {
+        if (this._remoteSourcePaths) return this._remoteSourcePaths
+
+        this._remoteSourcePaths = []
+
+        const packedSourcePaths = this.room.memory.RSPs
+        if (packedSourcePaths) {
+            for (const path of packedSourcePaths) this._remoteSourcePaths.push(unpackPosList(path))
+
+            return this._remoteSourcePaths
+        }
+
+        const commune = Game.rooms[this.room.memory.CN]
+        if (!commune) throw Error('No commune for remote source harvest paths ' + this.room.name)
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote source harvest paths' + this.room.name)
+
+        const sourcePaths: RoomPosition[][] = []
+        const sourceHarvestPositions = this.remoteSourceHarvestPositions
+        for (let index in this.room.find(FIND_SOURCES)) {
+            const path = this.room.advancedFindPath({
+                origin: sourceHarvestPositions[index][0],
+                goals: [{ pos: anchor, range: 3 }],
+                typeWeights: remoteTypeWeights,
+                plainCost: defaultRoadPlanningPlainCost,
+                weightStructurePlans: true,
+                avoidStationaryPositions: true,
+            })
+
+            sourcePaths.push(path)
+        }
+
+        this.room.memory.RSPs = sourcePaths.map(path => packPosList(path))
+        return (this._remoteSourcePaths = sourcePaths)
+    }
+
+    _centerUpgradePos: RoomPosition
+    get centerUpgradePos() {
+        if (this._centerUpgradePos) return this._centerUpgradePos
+
+        const packedPos = this.room.memory.CUP
+        if (packedPos) {
+            return (this._centerUpgradePos = unpackPos(packedPos))
+        }
+
+        throw Error('No center upgrade pos ' + this.room.name)
+
+        return this._centerUpgradePos
+    }
+
+    _upgradePositions: RoomPosition[]
+    get upgradePositions() {
+        if (this._upgradePositions) return this._upgradePositions
+
+        // Get the center upgrade pos, stopping if it's undefined
+
+        const centerUpgradePos = this.centerUpgradePos
+
+        const anchor = this.anchor
+        if (!anchor) throw Error('No anchor for upgrade positions ' + this.room.name)
+
+        const positions: RoomPosition[] = []
+        const terrain = this.room.getTerrain()
+
+        for (const offset of adjacentOffsets) {
+            const adjPos = new RoomPosition(
+                offset.x + centerUpgradePos.x,
+                offset.y + centerUpgradePos.y,
+                this.room.name,
+            )
+
+            if (terrain.get(adjPos.x, adjPos.y) === TERRAIN_MASK_WALL) continue
+
+            positions.push(adjPos)
+        }
+
+        positions.sort((a, b) => {
+            return (
+                this.room.advancedFindPath({
+                    origin: a,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length -
+                this.room.advancedFindPath({
+                    origin: b,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length
+            )
+        })
+
+        // Make the closest pos the last to be chosen
+
+        positions.push(positions.shift())
+
+        // Make the center pos the first to be chosen (we want upgraders to stand on the container)
+
+        positions.unshift(centerUpgradePos)
+
+        return (this._upgradePositions = positions)
+    }
+
+    _mineralHarvestPositions: RoomPosition[]
+    get mineralHarvestPositions() {
+        if (this._mineralHarvestPositions) return this._mineralHarvestPositions
+
+        const packedPositions = this.room.memory.MP
+        if (packedPositions) {
+            return (this._mineralHarvestPositions = unpackPosList(packedPositions))
+        }
+
+        throw Error('No mineral harvest positions ' + this.room.name)
+        return this._mineralHarvestPositions
     }
 }

@@ -153,6 +153,15 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
+    //
+
+    const path = unpackPosList(pathOpts.packedPath)
+    for (const pos of path) this.room.coordVisual(pos.x, pos.y)
+
+    this.room.targetVisual(this.pos, opts.goals[0].pos, true)
+
+    //
+
     this.room.visual.text((posIndex || -1).toString(), this.pos)
     if (posIndex >= 0 && posIndex + packedPosLength < pathOpts.packedPath.length) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)

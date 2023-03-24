@@ -84,7 +84,7 @@ export class ContainerManager {
         const container = this.roomManager.room.mineralContainer
         if (!container) return
 
-        const resourceType = this.roomManager.room.mineral.mineralType
+        const resourceType = this.roomManager.mineral.mineralType
 
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,

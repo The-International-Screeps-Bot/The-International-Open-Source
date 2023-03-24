@@ -157,7 +157,7 @@ global.claim = function (requestName, communeName, score = 0) {
 
     const request = Memory.claimRequests[requestName]
 
-    request.data[ClaimRequestData.score] = score
+    Memory.rooms[requestName].S = score
     request.data[ClaimRequestData.abandon] = 0
 
     if (communeName) {
@@ -281,7 +281,6 @@ global.deleteBasePlans = function (roomName) {
     if (!room) return 'No vision in ' + roomName
 
     delete room.memory.PC
-    delete room.memory.stampAnchors
 
     return 'Deleted base plans for ' + roomName
 }

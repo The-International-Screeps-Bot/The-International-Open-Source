@@ -242,7 +242,8 @@ export class SpawningStructuresManager {
             }
         }
 
-        const anchor = this.communeManager.room.anchor
+        const anchor = this.communeManager.room.roomManager.anchor
+        if (!anchor) throw Error('No anchor for spawning structures ' + this.communeManager.room.name)
 
         // Sort by distance from the first pos in the path
 

@@ -45,6 +45,7 @@ import {
 import { internationalManager } from 'international/international'
 import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/codec'
 import { posix } from 'path'
+import { BasePlans } from './construction/basePlans'
 
 /**
     @param pos1 pos of the object performing the action
@@ -163,45 +164,31 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             const roomMemory = Memory.rooms[roomName]
 
             if (roomMemory.T === 'commune') {
-                for (const stampType in stamps) {
-                    const stamp = stamps[stampType as StampTypes]
+                const basePlans = BasePlans.unpack(this.memory.BPs)
 
-                    for (const packedStampAnchor of roomMemory.stampAnchors[stampType as StampTypes]) {
-                        const stampAnchor = unpackNumAsCoord(packedStampAnchor)
+                for (const packedCoord in basePlans.map) {
+                    const coordData = basePlans.map[packedCoord]
 
-                        for (const key in stamp.structures) {
-                            const structureType = key as BuildableStructureConstant | 'empty'
-                            if (structureType === 'empty') continue
+                    for (const data of coordData) {
+                        const weight = data.structureType === STRUCTURE_ROAD ? 1 : 255
 
-                            let weight = 0
-
-                            if (impassibleStructureTypesSet.has(structureType)) weight = 255
-                            else if (structureType === STRUCTURE_ROAD) weight = 1
-
-                            for (const pos of stamp.structures[structureType]) {
-                                const x = pos.x + stampAnchor.x - stamp.offset
-                                const y = pos.y + stampAnchor.y - stamp.offset
-
-                                const currentWeight = opts.weightCoords[roomName][packXYAsCoord(x, y)] || 0
-                                opts.weightCoords[roomName][packXYAsCoord(x, y)] = Math.max(weight, currentWeight)
-                            }
-                        }
+                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                        opts.weightCoords[roomName][packedCoord] = Math.max(weight, currentWeight)
                     }
                 }
 
                 const room = Game.rooms[roomName]
-                if (room.centerUpgradePos) opts.weightCoords[roomName][packCoord(room.centerUpgradePos)] = 255
+                opts.weightCoords[roomName][packCoord(room.roomManager.centerUpgradePos)] = 255
 
-                if (room._sourcePaths) {
-                    for (const path of Game.rooms[roomName]._sourcePaths) {
+                    for (const path of room.roomManager._communeSourcePaths) {
                         for (const pos of path) {
                             if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
                             opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                         }
                     }
-                }
+
             } else if (roomMemory.T === 'remote') {
-                for (const packedPath of roomMemory.SPs) {
+                for (const packedPath of roomMemory.RSPs) {
                     const path = unpackPosList(packedPath)
 
                     for (const pos of path) {
@@ -316,31 +303,23 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (opts.avoidStationaryPositions) {
                     // Loop through them
 
-                    for (const index in room.sources) {
+                    for (const index in room.find(FIND_SOURCES)) {
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                        for (const pos of room.sourcePositions[index]) cm.set(pos.x, pos.y, 10)
+                        for (const pos of room.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 10)
                     }
 
-                    if (room.anchor) {
+                    if (room.roomManager.anchor) {
                         // The last upgrade position should be the deliver pos, which we want to weight normal
 
-                        const upgradePositions = room.upgradePositions.slice(0, room.upgradePositions.length - 1)
+                        const upgradePositions = room.roomManager.upgradePositions.slice(0, room.roomManager.upgradePositions.length - 1)
                         for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
 
-                        for (const pos of room.mineralPositions) cm.set(pos.x, pos.y, 10)
+                        for (const pos of room.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 10)
                     }
 
-                    // Get the hubAnchor
-
-                    const hubAnchor =
-                        room.memory.stampAnchors && room.memory.stampAnchors.hub[0]
-                            ? unpackNumAsPos(room.memory.stampAnchors.hub[0], roomName)
-                            : undefined
-
-                    // If the hubAnchor is defined
-
-                    if (hubAnchor) cm.set(hubAnchor.x, hubAnchor.y, 10)
+                    const stampAnchors = room.roomManager.stampAnchors
+                    if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 10)
 
                     // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
@@ -636,7 +615,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-    if (!scoutingRoom.anchor) return this.memory.T
+    const anchor = scoutingRoom.roomManager.anchor
+    if (!anchor) return this.memory.T
 
     const newSourceEfficacies = []
     let newSourceEfficaciesTotal = 0
@@ -645,10 +625,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // loop through sourceNames
 
-    for (const index in this.sources) {
+    for (const source of this.find(FIND_SOURCES)) {
         const path = this.advancedFindPath({
-            origin: this.sourcePositions[index][0],
-            goals: [{ pos: scoutingRoom.anchor, range: 4 }],
+            origin: source.pos,
+            goals: [{ pos: anchor, range: 4 }],
             typeWeights: {
                 enemy: Infinity,
                 ally: Infinity,
@@ -662,7 +642,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Stop if there is a source inefficient enough
 
-        if (path.length > 250) return this.memory.T
+        if (path.length > 300) return this.memory.T
 
         let newSourceEfficacy = 0
 
@@ -679,7 +659,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     const newReservationEfficacy = this.advancedFindPath({
         origin: this.controller.pos,
-        goals: [{ pos: scoutingRoom.anchor, range: 4 }],
+        goals: [{ pos: anchor, range: 4 }],
         typeWeights: {
             enemy: Infinity,
             ally: Infinity,
@@ -698,13 +678,16 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Generate new important positions
 
-        delete this.memory.SP
-        delete this._sourcePositions
-        this.sourcePositions
+        delete this.memory.RSIDs
+        delete this.roomManager._remoteSources
 
-        delete this.memory.SPs
-        delete this._sourcePaths
-        this.sourcePaths
+        delete this.memory.RSHP
+        delete this.roomManager._remoteSourceHarvestPositions
+        this.roomManager.remoteSourceHarvestPositions
+
+        delete this.memory.RSPs
+        delete this.roomManager._remoteSources
+        this.roomManager._remoteSources
 
         delete this.memory.CP
         delete this._controllerPositions
@@ -724,7 +707,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     }
 
     const currentRemoteEfficacy =
-        this.memory.SPs.reduce((sum, el) => sum + el.length, 0) / this.memory.SPs.length + this.memory.RE
+        this.memory.RSPs.reduce((sum, el) => sum + el.length, 0) / this.memory.RSPs.length + this.memory.RE
     const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
     // If the new average source efficacy is above the current, stop
@@ -733,13 +716,16 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // Generate new important positions
 
-    delete this.memory.SP
-    delete this._sourcePositions
-    this.sourcePositions
+    delete this.memory.RSIDs
+    delete this.roomManager._remoteSources
 
-    delete this.memory.SPs
-    delete this._sourcePaths
-    this.sourcePaths
+    delete this.memory.RSHP
+    delete this.roomManager._remoteSourceHarvestPositions
+    this.roomManager.remoteSourceHarvestPositions
+
+    delete this.memory.RSPs
+    delete this.roomManager._remoteSources
+    this.roomManager._remoteSources
 
     delete this.memory.CP
     delete this._controllerPositions
@@ -1867,9 +1853,9 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 
         if (!cSitesOfType.length) continue
 
-        // Ptherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
+        // Otherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
 
-        const anchor = this.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
+        const anchor = this.roomManager.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
 
         // Record the closest site to the anchor in the room's global and inform true
 
@@ -2128,14 +2114,11 @@ Room.prototype.getPartsOfRole = function (role) {
 }
 
 Room.prototype.createClaimRequest = function () {
-    if (this.sources.length !== 2) return false
-
-    if (this.memory.NC) return false
-
+    if (this.find(FIND_SOURCES).length !== 2) return false
+    if (this.memory.PC === false) return false
     if (Memory.claimRequests[this.name]) return false
 
     if (this.roomManager.communePlanner.preTickRun() === RESULT_FAIL) {
-
         this.memory.PC = false
         return false
     }
@@ -2143,7 +2126,7 @@ Room.prototype.createClaimRequest = function () {
     const request = (Memory.claimRequests[this.name] = {
         data: [0],
     })
-
+    /*
     let score = 0
 
     // Prefer communes not too close and not too far from the commune
@@ -2155,11 +2138,13 @@ Room.prototype.createClaimRequest = function () {
     score += this.sourcePaths[0].length / 10
     score += this.sourcePaths[1].length / 10
     score += this.upgradePathLength / 10
-    score += this.memory.stampAnchors.rampart.length / 10
+
+    const stampAnchors = this.roomManager.stampAnchors
+    if (stampAnchors) score += stampAnchors.rampart.length / 10
     score += this.findSwampPlainsRatio() * 10
 
     request.data[ClaimRequestData.score] = score
-
+ */
     return true
 }
 
@@ -2356,7 +2341,13 @@ Room.prototype.findCSiteAtXY = function (x, y, structureType) {
     return false
 }
 
-Room.prototype.findStructureInsideRect = function (x1, y1, x2, y2, condition) {
+Room.prototype.findStructureInsideRect = function <T extends Structure>(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    condition: (structure: T) => boolean,
+): T | false {
     let structureID: Id<Structure>
 
     for (let x = x1; x <= x2; x += 1) {
@@ -2369,10 +2360,37 @@ Room.prototype.findStructureInsideRect = function (x1, y1, x2, y2, condition) {
             if (!structureIDs) continue
 
             structureID = structureIDs.find(structureID => {
-                return condition(findObjectWithID(structureID))
+                return condition(findObjectWithID(structureID) as T)
             })
 
-            if (structureID) return findObjectWithID(structureID)
+            if (structureID) return findObjectWithID(structureID) as T
+        }
+    }
+
+    return false
+}
+
+Room.prototype.findStructureInRange = function <T extends Structure>(
+    startCoord: Coord,
+    range: number,
+    condition: (structure: T) => boolean,
+): T | false {
+    let structureID: Id<Structure>
+
+    for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
+        for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+
+            const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
+            if (!structureIDs) continue
+
+            structureID = structureIDs.find(structureID => {
+                return condition(findObjectWithID(structureID) as T)
+            })
+
+            if (structureID) return findObjectWithID(structureID) as T
         }
     }
 

@@ -1,4 +1,4 @@
-import { RESULT_ACTION, RESULT_FAIL, RESULT_NO_ACTION, RESULT_SUCCESS } from 'international/constants'
+import { packedPosLength, RESULT_ACTION, RESULT_FAIL, RESULT_NO_ACTION, RESULT_SUCCESS } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import {
     customLog,
@@ -23,7 +23,7 @@ export class SourceHarvester extends Creep {
 
         // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1))
+        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.memory.CSPs[this.memory.SI].length / packedPosLength))
             return false
 
         // Record creep as isDying
@@ -38,11 +38,11 @@ export class SourceHarvester extends Creep {
 
         // Unpack the harvestPos
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return
 
         if (getRange(this.pos, harvestPos) === 0) {
-            this.advancedHarvestSource(this.room.sources[this.memory.SI])
+            this.advancedHarvestSource(this.room.find(FIND_SOURCES)[this.memory.SI])
         }
     }
 
@@ -53,7 +53,7 @@ export class SourceHarvester extends Creep {
 
         // Unpack the harvestPos
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return RESULT_FAIL
 
         // If the creep is at the creep's packedHarvestPos, inform false
@@ -68,37 +68,26 @@ export class SourceHarvester extends Creep {
 
         this.message = `⏩${this.memory.SI}`
 
-        if (this.memory.PC === packCoord(this.room.sourcePositions[this.memory.SI][0])) {
-            this.createMoveRequestByPath(
-                {
-                    origin: this.pos,
-                    goals: [
-                        {
-                            pos: harvestPos,
-                            range: 0,
-                        },
-                    ],
-                    avoidEnemyRanges: true,
-                },
-                {
-                    packedPath: reversePosList(this.room.memory.SPs[this.memory.SI]),
-                    loose: true,
-                },
-            )
+        // The packed path is meant for the closest harvest pos, so change loose usage based on the harvestPos
 
-            return RESULT_ACTION
-        }
+        const targetsClosestHarvestPos = this.memory.PC === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory.SI][0])
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: harvestPos,
-                    range: 0,
-                },
-            ],
-            avoidEnemyRanges: true,
-        })
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: harvestPos,
+                        range: 0,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            },
+            {
+                packedPath: reversePosList(this.room.memory.CSPs[this.memory.SI]),
+                loose: !!targetsClosestHarvestPos,
+            },
+        )
 
         return RESULT_ACTION
     }

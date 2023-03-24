@@ -257,13 +257,16 @@ export class RemoteDefender extends Creep {
                     continue
                 }
 
+                const anchor = creep.commune.roomManager.anchor
+                if (!anchor) throw Error('No anchor for remoteDefender ' + creep.room.name)
+
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
                 creep.createMoveRequest({
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: creep.commune.anchor,
+                            pos: anchor,
                             range: 5,
                         },
                     ],

@@ -2,8 +2,6 @@ import { unpackPosList } from 'other/codec'
 import { minHarvestWorkRatio, customColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
 import {
     customLog,
-    findRoomNamesInRangeXY,
-    findRoomNamesInsideRect,
     makeRoomCoord,
     roomNameFromRoomCoord,
 } from './utils'
@@ -33,6 +31,9 @@ class MapVisualsManager {
                 const room = Game.rooms[roomName]
                 if (!room) continue
 
+                const anchor = room.roomManager.anchor
+                if (!anchor) throw Error('No anchor for mapVisuals commune ' + roomName)
+
                 Game.map.visual.text(
                     `⚡${room.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`,
                     new RoomPosition(2, 8, roomName),
@@ -44,7 +45,7 @@ class MapVisualsManager {
 
                 if (roomMemory.claimRequest) {
                     Game.map.visual.line(
-                        room.anchor || new RoomPosition(25, 25, roomName),
+                        anchor || new RoomPosition(25, 25, roomName),
                         new RoomPosition(25, 25, roomMemory.claimRequest),
                         {
                             color: customColors.lightBlue,
@@ -56,7 +57,7 @@ class MapVisualsManager {
 
                 if (roomMemory.allyCreepRequest) {
                     Game.map.visual.line(
-                        room.anchor || new RoomPosition(25, 25, roomName),
+                        anchor || new RoomPosition(25, 25, roomName),
                         new RoomPosition(25, 25, roomMemory.allyCreepRequest),
                         {
                             color: customColors.green,
@@ -69,7 +70,7 @@ class MapVisualsManager {
                 if (roomMemory.combatRequests.length) {
                     for (const requestName of roomMemory.combatRequests) {
                         Game.map.visual.line(
-                            room.anchor || new RoomPosition(25, 25, roomName),
+                            anchor || new RoomPosition(25, 25, roomName),
                             new RoomPosition(25, 25, requestName),
                             {
                                 color: customColors.red,
@@ -86,15 +87,18 @@ class MapVisualsManager {
             if (roomMemory.T === 'remote') {
                 const commune = Game.rooms[roomMemory.CN]
 
+                const anchor = commune.roomManager.anchor
+                if (!anchor) throw Error('No anchor for mapVisuals remote ' + roomName)
+
                 if (commune) {
                     const possibleReservation = commune.energyCapacityAvailable >= 650
 
-                    for (const sourceIndex in roomMemory.SP) {
-                        const positions = unpackPosList(roomMemory.SP[sourceIndex])
+                    for (const sourceIndex in roomMemory.RSPs) {
+                        const positions = unpackPosList(roomMemory.RSPs[sourceIndex])
 
                         // Draw a line from the center of the remote to the best harvest pos
 
-                        Game.map.visual.line(positions[0], commune.anchor || new RoomPosition(25, 25, commune.name), {
+                        Game.map.visual.line(positions[0], anchor || new RoomPosition(25, 25, commune.name), {
                             color: customColors.yellow,
                             width: 1.2,
                             opacity: 0.3,
@@ -109,7 +113,7 @@ class MapVisualsManager {
                             )
 
                         Game.map.visual.text(
-                            `⛏️${income},🚶‍♀️${roomMemory.SPs[sourceIndex].length}`,
+                            `⛏️${income},🚶‍♀️${roomMemory.RSPs[sourceIndex].length}`,
                             new RoomPosition(positions[0].x, positions[0].y, roomName),
                             {
                                 align: 'center',
@@ -133,7 +137,7 @@ class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory.NC) {
+            if (roomMemory.PC === false) {
                 Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
                     stroke: customColors.red,
                     strokeWidth: 2,
@@ -148,7 +152,7 @@ class MapVisualsManager {
     private claimRequests() {
         for (const roomName in Memory.claimRequests) {
             Game.map.visual.text(
-                `💵${(Memory.claimRequests[roomName].data[ClaimRequestData.score] || 0).toFixed(2)}`,
+                `💵${(Memory.rooms[roomName].S || -1).toFixed(2)}`,
                 new RoomPosition(2, 24, roomName),
                 {
                     align: 'left',

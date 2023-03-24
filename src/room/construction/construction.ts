@@ -97,7 +97,7 @@ export class ConstructionManager {
             this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
         }
     }
-    private visualize() {
+    public visualize() {
         const RCL = /* this.room.controller.level */ 8
         const basePlans = BasePlans.unpack(this.room.memory.BPs)
 

@@ -353,8 +353,8 @@ export class InternationalManager {
 
         return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
             (a, b) =>
-                Memory.claimRequests[a].data[ClaimRequestData.score] -
-                Memory.claimRequests[b].data[ClaimRequestData.score],
+                Memory.rooms[a].S -
+                Memory.rooms[b].S
         ))
     }
 
@@ -410,7 +410,7 @@ export class InternationalManager {
 
         this._compoundPriority = {}
 
-        
+
 
         return this._compoundPriority
     }

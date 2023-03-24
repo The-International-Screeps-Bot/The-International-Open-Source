@@ -10,7 +10,7 @@ export class SourceManager {
     }
 
     preTickRun() {
-        this.sources = this.communeManager.room.sources
+        this.sources = this.communeManager.room.find(FIND_SOURCES)
 
         this.estimateIncome()
     }

@@ -26,7 +26,7 @@ export function roomsManager() {
         // Get the CPU used at the start
 
         if (Memory.CPULogging === true) var roomCPUStart = Game.cpu.getUsed()
-        continue // new commune planner
+
         // Get the room using the roomName
 
         const room = Game.rooms[roomName]

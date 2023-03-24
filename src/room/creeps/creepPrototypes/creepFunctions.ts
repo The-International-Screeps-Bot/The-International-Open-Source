@@ -70,7 +70,6 @@ Creep.prototype.isDying = function () {
     return true
 }
 PowerCreep.prototype.isDying = function () {
-
     return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
 }
 
@@ -179,7 +178,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     // Harvest the source, informing the result if it didn't succeed
 
     if (harvestResult !== OK) {
-        this.message = `⛏️${harvestResult} ${source.index}`
+        this.message = `⛏️` + harvestResult
         return false
     }
 
@@ -195,7 +194,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
     globalStatsUpdater(this.room.name, 'eih', energyHarvested)
 
-    this.message = `⛏️${energyHarvested}`
+    this.message = `⛏️` + energyHarvested
     return true
 }
 
@@ -210,7 +209,7 @@ Creep.prototype.findUpgradePos = function () {
 
     // Loop through each upgradePositions
 
-    for (const pos of room.upgradePositions) {
+    for (const pos of room.roomManager.upgradePositions) {
         // Construct the packedPos using pos
 
         const packedPos = packCoord(pos)
@@ -401,14 +400,18 @@ Creep.prototype.builderGetEnergy = function () {
     if (!this.needsResources()) return RESULT_NO_ACTION
 
     let conditions: (request: RoomLogisticsRequest) => boolean
-    if (this.room.anchor && (!this.room.storage || this.room.controller.level < 4)) {
+
+    const anchor = this.room.roomManager.anchor
+    if (!anchor) throw Error('No anchor for builder get energy ' + this.room.name)
+
+    if (anchor && (!this.room.storage || this.room.controller.level < 4)) {
         // Only allow containers near the fastFiller
 
         conditions = (request: RoomLogisticsRequest) => {
             if (request.resourceType !== RESOURCE_ENERGY) return false
             if (
                 findObjectWithID(request.targetID) instanceof Structure &&
-                getRange(this.room.anchor, findObjectWithID(request.targetID).pos) > 2
+                getRange(anchor, findObjectWithID(request.targetID).pos) > 2
             )
                 return false
 
@@ -619,13 +622,12 @@ Creep.prototype.findRepairTarget = function () {
     return this.findNewRepairTarget() || this.findNewRampartRepairTarget()
 }
 
-Creep.prototype.findOptimalSourceIndex = function () {
+Creep.prototype.findSourceIndex = function () {
     const { room } = this
 
     this.message = 'FOSN'
 
     if (this.memory.SI !== undefined) return true
-    if (!room.anchor) return false
 
     let creepThreshold = 1
 
@@ -634,12 +636,12 @@ Creep.prototype.findOptimalSourceIndex = function () {
     while (creepThreshold < 4) {
         // Find the first source with open spots
 
-        for (const source of room.sourcesByEfficacy) {
-            const index = source.index as 0 | 1
+        for (const source of room.find(FIND_SOURCES)) {
+            const index = source.communeIndex as 0 | 1
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
-            if (Math.min(creepThreshold, room.sourcePositions[index].length) - room.creepsOfSource[index].length > 0) {
+            if (Math.min(creepThreshold, room.roomManager.sourceHarvestPositions[index].length) - room.creepsOfSource[index].length > 0) {
                 this.memory.SI = index
                 return true
             }
@@ -653,7 +655,73 @@ Creep.prototype.findOptimalSourceIndex = function () {
     return false
 }
 
-Creep.prototype.findSourcePos = function (index) {
+Creep.prototype.findCommuneSourceIndex = function () {
+    const { room } = this
+
+    this.message = 'FOSN'
+
+    if (this.memory.SI !== undefined) return true
+
+    let creepThreshold = 1
+
+    // So long as the creepThreshold is less than 4
+
+    while (creepThreshold < 4) {
+        // Find the first source with open spots
+
+        for (const source of room.roomManager.communeSources) {
+            const index = source.communeIndex as 0 | 1
+
+            // If there are still creeps needed to harvest a source under the creepThreshold
+
+            if (Math.min(creepThreshold, room.roomManager.communeSourceHarvestPositions[index].length) - room.creepsOfSource[index].length > 0) {
+                this.memory.SI = index
+                return true
+            }
+        }
+
+        // Otherwise increase the creepThreshold
+
+        creepThreshold += 1
+    }
+
+    return false
+}
+
+Creep.prototype.findRemoteSourceIndex = function () {
+    const { room } = this
+
+    this.message = 'FOSN'
+
+    if (this.memory.SI !== undefined) return true
+
+    let creepThreshold = 1
+
+    // So long as the creepThreshold is less than 4
+
+    while (creepThreshold < 4) {
+        // Find the first source with open spots
+
+        for (const source of room.roomManager.remoteSources) {
+            const index = source.remoteIndex as 0 | 1
+
+            // If there are still creeps needed to harvest a source under the creepThreshold
+
+            if (Math.min(creepThreshold, room.roomManager.remoteSourceHarvestPositions[index].length) - room.creepsOfSource[index].length > 0) {
+                this.memory.SI = index
+                return true
+            }
+        }
+
+        // Otherwise increase the creepThreshold
+
+        creepThreshold += 1
+    }
+
+    return false
+}
+
+Creep.prototype.findSourceHarvestPos = function (index) {
     const { room } = this
 
     this.message = 'FSHP'
@@ -664,9 +732,9 @@ Creep.prototype.findSourcePos = function (index) {
         // On random intervals take the best source pos if it's open
 
         if (randomTick()) {
-            const sourcePos = room.sourcePositions[index][0]
+            const sourcePos = room.roomManager.sourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceCoords[index].has(packedSourceCoord)) {
+            if (!room.usedSourceHarvestCoords[index].has(packedSourceCoord)) {
                 this.memory.PC = packedSourceCoord
                 return sourcePos
             }
@@ -677,15 +745,89 @@ Creep.prototype.findSourcePos = function (index) {
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceCoords = room.usedSourceCoords[index]
+    const usedSourceHarvestCoords = room.usedSourceHarvestCoords[index]
 
-    const openSourcePositions = room.sourcePositions[index].filter(pos => !usedSourceCoords.has(packCoord(pos)))
+    const openSourcePositions = room.roomManager.sourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
     if (!openSourcePositions.length) return false
 
     const packedCoord = packCoord(openSourcePositions[0])
 
     this.memory.PC = packedCoord
-    room._usedSourceCoords[index].add(packedCoord)
+    room._usedSourceHarvestCoords[index].add(packedCoord)
+
+    return openSourcePositions[0]
+}
+
+Creep.prototype.findCommuneSourceHarvestPos = function (index) {
+    const { room } = this
+
+    this.message = 'FSHP'
+
+    // Stop if the creep already has a packedHarvestPos
+
+    if (this.memory.PC) {
+        // On random intervals take the best source pos if it's open
+
+        if (randomTick()) {
+            const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
+            const packedSourceCoord = packCoord(sourcePos)
+            if (!room.usedSourceHarvestCoords[index].has(packedSourceCoord)) {
+                this.memory.PC = packedSourceCoord
+                return sourcePos
+            }
+        }
+
+        return unpackCoordAsPos(this.memory.PC, room.name)
+    }
+
+    // Get usedSourceHarvestPositions
+
+    const usedSourceHarvestCoords = room.usedSourceHarvestCoords[index]
+
+    const openSourcePositions = room.roomManager.communeSourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    if (!openSourcePositions.length) return false
+
+    const packedCoord = packCoord(openSourcePositions[0])
+
+    this.memory.PC = packedCoord
+    room._usedSourceHarvestCoords[index].add(packedCoord)
+
+    return openSourcePositions[0]
+}
+
+Creep.prototype.findRemoteSourceHarvestPos = function (index) {
+    const { room } = this
+
+    this.message = 'FSHP'
+
+    // Stop if the creep already has a packedHarvestPos
+
+    if (this.memory.PC) {
+        // On random intervals take the best source pos if it's open
+
+        if (randomTick()) {
+            const sourcePos = room.roomManager.remoteSourceHarvestPositions[index][0]
+            const packedSourceCoord = packCoord(sourcePos)
+            if (!room.usedSourceHarvestCoords[index].has(packedSourceCoord)) {
+                this.memory.PC = packedSourceCoord
+                return sourcePos
+            }
+        }
+
+        return unpackCoordAsPos(this.memory.PC, room.name)
+    }
+
+    // Get usedSourceHarvestPositions
+
+    const usedSourceHarvestCoords = room.usedSourceHarvestCoords[index]
+
+    const openSourcePositions = room.roomManager.remoteSourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    if (!openSourcePositions.length) return false
+
+    const packedCoord = packCoord(openSourcePositions[0])
+
+    this.memory.PC = packedCoord
+    room._usedSourceHarvestCoords[index].add(packedCoord)
 
     return openSourcePositions[0]
 }
@@ -703,7 +845,7 @@ Creep.prototype.findMineralHarvestPos = function () {
 
     const usedMineralCoords = room.usedMineralCoords
 
-    const openMineralPositions = room.mineralPositions.filter(pos => !usedMineralCoords.has(packCoord(pos)))
+    const openMineralPositions = room.roomManager.mineralHarvestPositions.filter(pos => !usedMineralCoords.has(packCoord(pos)))
     if (!openMineralPositions.length) return false
 
     const packedCoord = packCoord(openMineralPositions[0])

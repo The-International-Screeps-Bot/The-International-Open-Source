@@ -7,14 +7,12 @@ export class HubHauler extends Creep {
     travelToHub?(): boolean {
         const { room } = this
 
-        // Get the hub, informing false if it's undefined
-
-        const hubAnchor = unpackNumAsPos(room.memory.stampAnchors.hub[0], room.name)
-        if (!hubAnchor) return true
+        const stampAnchors = room.roomManager.stampAnchors
+        if (!stampAnchors) throw Error('No stampAnchors for hubHauler ' + room.name)
 
         // Otherwise if the creep is on the hub, inform false
 
-        if (getRange(this.pos, hubAnchor) === 0) return false
+        if (getRange(this.pos, stampAnchors.hub[0]) === 0) return false
 
         // Otherwise move to the hub and inform true
 
@@ -22,7 +20,7 @@ export class HubHauler extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goals: [{ pos: hubAnchor, range: 0 }],
+            goals: [{ pos: new RoomPosition(stampAnchors.hub[0].x, stampAnchors.hub[0].y, room.name), range: 0 }],
         })
 
         return true

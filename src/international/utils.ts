@@ -658,34 +658,32 @@ export function roomNameFromRoomCoord(roomCoord: RoomCoord) {
     return roomNameFromRoomXY(roomCoord.x, roomCoord.y)
 }
 
-/**
- * Takes a rectange and returns the room name coords inside of the rect
- */
-export function findRoomNamesInsideRect(x1: number, y1: number, x2: number, y2: number) {
-    const coords: RoomCoord[] = []
-
-    for (let x = x1; x <= x2; x += 1) {
-        for (let y = y1; y <= y2; y += 1) {
-            coords.push({ x, y })
-        }
-    }
-
-    return coords
-}
-
-/**
- * Takes a rectange and returns the room name coords inside of the rect
- */
-export function findRoomNamesInRangeXY(startX: number, startY: number, range: number) {
-    const coords: RoomCoord[] = []
-
+export function forRoomNamesInRangeXY(
+    startX: number,
+    startY: number,
+    range: number,
+    f: (x: number, y: number) => void,
+) {
     for (let x = startX - range; x <= startX + range; x += 1) {
         for (let y = startY - range; y <= startY + range; y += 1) {
-            coords.push({ x, y })
+            if (startX === x && startY === y) continue
+            f(x, y)
         }
     }
+}
 
-    return coords
+export function forRoomNamesAroundRangeXY(
+    startX: number,
+    startY: number,
+    range: number,
+    f: (x: number, y: number) => void,
+) {
+    for (let x = startX - range; x <= startX + range; x += 1) {
+        for (let y = startY - range; y <= startY + range; y += 1) {
+            if (startX === x && startY === y) continue
+            f(x, y)
+        }
+    }
 }
 
 export function isXYInRoom(x: number, y: number) {
@@ -754,7 +752,9 @@ export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord
     for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
         for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
             if (x == startCoord.x && y === startCoord.y) continue
-            if (isXYExit(x, y)) continue
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
             f({ x, y })
         }
@@ -767,7 +767,9 @@ export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord
 export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Coord) => void) {
     for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
         for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
-            if (isXYExit(x, y)) continue
+            // Iterate if the pos doesn't map onto a room
+
+            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
             f({ x, y })
         }
@@ -788,6 +790,5 @@ export function findRangeFromExit(coord: Coord) {
  * @example splitAt('foo, 1), // ["f", "oo"]
  */
 export function splitStringAt(string: string, index: number) {
-
     return [string.slice(0, index), string.slice(index)]
 }

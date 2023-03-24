@@ -38,6 +38,7 @@ import {
     stamps,
     defaultRoadPlanningPlainCost,
     adjacentOffsets,
+    packedPosLength,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -59,7 +60,7 @@ import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
-import { packCoord, packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
+import { packCoord, packXYAsCoord, unpackCoord, unpackPosList, unpackStampAnchors } from 'other/codec'
 import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
@@ -190,6 +191,9 @@ export class CommuneManager {
 
         room.usedRampartIDs = new Map()
 
+        this.room.roomManager.communePlanner.preTickRun()
+        if (!roomMemory.PC) return
+        this.constructionManager.preTickRun()
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()
         this.remotesManager.preTickRun()
@@ -212,12 +216,6 @@ export class CommuneManager {
 
         room.creepsFromRoomAmount = 0
 
-        if (!room.memory.stampAnchors) {
-            room.memory.stampAnchors = {}
-
-            for (const type in stamps) room.memory.stampAnchors[type as StampTypes] = []
-        }
-
         room.scoutTargets = new Set()
 
         if (!room.memory.deposits) room.memory.deposits = {}
@@ -231,7 +229,7 @@ export class CommuneManager {
     }
 
     public run() {
-        this.constructionManager.preTickRun()
+        if (!this.room.memory.PC) return
 
         this.combatManager.run()
         this.towerManager.run()
@@ -450,7 +448,7 @@ export class CommuneManager {
         // Container
 
         if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
-            return (this._maxUpgradeStrength = upgradeStructure.store.getCapacity() / (4 + this.room.upgradePathLength))
+            return (this._maxUpgradeStrength = upgradeStructure.store.getCapacity() / (4 + this.room.memory.UP.length / packedPosLength))
         }
 
         // Link

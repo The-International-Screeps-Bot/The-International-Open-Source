@@ -21,7 +21,7 @@ export class ClaimRequestManager {
         let request = Memory.claimRequests[room.name]
         if (request) {
 
-            request.data[ClaimRequestData.score] = -1
+            Memory.rooms[room.name].S = -1
             return
         }
 
@@ -29,7 +29,7 @@ export class ClaimRequestManager {
             data: [0],
         })
 
-        request.data[ClaimRequestData.score] = -1
+        Memory.rooms[room.name].S = -1
     }
 
     public run() {

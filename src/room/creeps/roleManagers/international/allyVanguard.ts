@@ -61,7 +61,7 @@ export class AllyVanguard extends Creep {
 
         // Define the creep's sourceName
 
-        if (!this.findOptimalSourceIndex()) return
+        if (!this.findSourceIndex()) return
 
         const sourceIndex = this.memory.SI
 
@@ -71,7 +71,7 @@ export class AllyVanguard extends Creep {
 
         // Try to normally harvest. Iterate if creep harvested
 
-        if (this.advancedHarvestSource(room.sources[sourceIndex])) return
+        if (this.advancedHarvestSource(room.find(FIND_SOURCES)[sourceIndex])) return
     }
 
     getEnergyFromRoom?(): boolean {
@@ -88,7 +88,7 @@ export class AllyVanguard extends Creep {
 
         // Define the creep's sourceName
 
-        if (!this.findOptimalSourceIndex()) return true
+        if (!this.findSourceIndex()) return true
 
         const sourceIndex = this.memory.SI
 
@@ -98,7 +98,7 @@ export class AllyVanguard extends Creep {
 
         // Try to normally harvest. Iterate if creep harvested
 
-        if (this.advancedHarvestSource(this.room.sources[sourceIndex])) return true
+        if (this.advancedHarvestSource(this.room.find(FIND_SOURCES)[sourceIndex])) return true
 
         return true
     }
@@ -109,7 +109,7 @@ export class AllyVanguard extends Creep {
     travelToSource?(sourceIndex: number): boolean {
         this.message = '🚬'
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false

@@ -62,7 +62,7 @@ export class MineralHarvester extends Creep {
 
             // Get the mineral
 
-            const mineral = room.mineral
+            const mineral = room.roomManager.mineral
 
             if (mineral.mineralAmount === 0) {
                 creep.advancedRecycle()

@@ -155,7 +155,7 @@ export class RangedDefender extends Creep {
             let score = getRangeEucXY(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
             if (currentRampart && getRange(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
-            score += getRange(rampart.pos, room.anchor) * 0.01
+            score += getRange(rampart.pos, room.roomManager.anchor || {x:25,y:25}) * 0.01
 
             if (score >= bestScore) continue
 

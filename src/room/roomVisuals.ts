@@ -198,32 +198,7 @@ export class RoomVisualsManager {
 
         if (!this.roomManager.room.memory.PC) return
 
-        for (const stampType in stamps) {
-            const stamp = stamps[stampType as StampTypes]
-
-            for (const packedStampAnchor of this.roomManager.room.memory.stampAnchors[stampType as StampTypes]) {
-                const stampAnchor = unpackNumAsCoord(packedStampAnchor)
-
-                for (const structureType in stamp.structures) {
-                    if (structureType === 'empty') continue
-
-                    for (const pos of stamp.structures[structureType]) {
-                        // Re-assign the pos's x and y to align with the offset
-
-                        const x = pos.x + stampAnchor.x - stamp.offset
-                        const y = pos.y + stampAnchor.y - stamp.offset
-
-                        this.roomManager.room.visual.structure(x, y, structureType as StructureConstant, {
-                            opacity: 0.3,
-                        })
-                    }
-                }
-            }
-        }
-
-        this.roomManager.room.visual.connectRoads({
-            opacity: 0.3,
-        })
+        this.roomManager.room.communeManager.constructionManager.visualize()
     }
 
     private dataVisuals() {
@@ -670,7 +645,7 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            row.push(remoteMemory.SPs[sourceIndex].length / packedPosLength)
+            row.push(remoteMemory.RSPs[sourceIndex].length / packedPosLength)
             row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
             row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
             row.push(remoteData[RemoteData.remoteReserver])

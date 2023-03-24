@@ -4,7 +4,7 @@ import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import { CombatRequestData } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
-import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
+import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
 import { Dynamic } from 'room/creeps/roleManagers/antifa/dynamic'
 import { BasePlans } from 'room/construction/basePlans'
@@ -85,8 +85,6 @@ declare global {
         | 'hub'
         | 'inputLab'
         | 'outputLab'
-        // Deprecatef
-        | 'labs'
         | 'tower'
         | 'observer'
         | 'sourceLink'
@@ -100,9 +98,6 @@ declare global {
         | 'gridExtension'
         | 'nuker'
         | 'powerSpawn'
-        // Deprecate
-        | 'rampart'
-    /* | 'gridExtension' */
 
     interface Stamp {
         offset: number
@@ -262,6 +257,7 @@ declare global {
         stampAnchors: PackedStampAnchors
         basePlans: string
         rampartPlans: string
+        communeSources: Id<Source>[]
         sourceHarvestPositions: string[]
         sourcePaths: string[]
         mineralHarvestPositions: string
@@ -922,10 +918,6 @@ declare global {
     interface RoomGlobal {
         [key: string]: any
 
-        //
-
-        stampAnchors: StampAnchors
-
         // Paths
 
         source1PathLength: number
@@ -939,9 +931,6 @@ declare global {
         fastFillerContainerRight: Id<StructureContainer> | undefined
         controllerContainer: Id<StructureContainer> | undefined
         mineralContainer: Id<StructureContainer> | undefined
-
-        centerUpgradePos: RoomPosition | false
-        upgradePositions: RoomPosition[]
 
         allStructureIDs: Id<Structure>[]
         allCSiteIDs: Id<ConstructionSite>[]
@@ -1307,13 +1296,19 @@ declare global {
         findCSiteAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): ConstructionSite | false
         findCSiteAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): ConstructionSite | false
 
-        findStructureInsideRect(
+        findStructureInsideRect<T extends Structure>(
             x1: number,
             y1: number,
             x2: number,
             y2: number,
-            condition: (structure: Structure) => boolean,
-        ): Structure | false
+            condition: (structure: T) => boolean,
+        ): T | false
+
+        findStructureInRange<T extends Structure>(
+            startCoord: Coord,
+            range: number,
+            condition: (structure: T) => boolean,
+        ): T | false
 
         /**
          * Generates a square visual at the specified coordinate
@@ -1322,21 +1317,8 @@ declare global {
 
         // Room Getters
 
-        readonly global: Partial<RoomGlobal>
-
-        _anchor: RoomPosition | undefined
-        readonly anchor: RoomPosition | undefined
-
-        // Resources
-
-        _sources: Source[]
-        readonly sources: Source[]
-
-        _sourcesByEfficacy: Source[]
-        readonly sourcesByEfficacy: Source[]
-
-        _mineral: Mineral
-        readonly mineral: Mineral
+        _global: RoomGlobal
+        readonly global: RoomGlobal
 
         // Creeps
 
@@ -1411,21 +1393,8 @@ declare global {
 
         // Resource info
 
-        _sourcePositions: RoomPosition[][]
-
-        readonly sourcePositions: RoomPosition[][]
-
-        _usedSourceCoords: Set<string>[]
-
-        readonly usedSourceCoords: Set<string>[]
-
-        _sourcePaths: RoomPosition[][]
-
-        readonly sourcePaths: RoomPosition[][]
-
-        readonly centerUpgradePos: RoomPosition | false
-
-        readonly upgradePositions: RoomPosition[]
+        _usedSourceHarvestCoords: Set<string>[]
+        readonly usedSourceHarvestCoords: Set<string>[]
 
         _usedUpgradeCoords: Set<string>
         readonly usedUpgradeCoords: Set<string>
@@ -1433,16 +1402,8 @@ declare global {
         _controllerPositions: RoomPosition[]
         readonly controllerPositions: RoomPosition[]
 
-        readonly upgradePathLength: number
-
-        _mineralPositions: RoomPosition[]
-        readonly mineralPositions: RoomPosition[]
-
         _usedMineralCoords: Set<string>
         readonly usedMineralCoords: Set<string>
-
-        _mineralPath: RoomPosition[]
-        readonly mineralPath: RoomPosition[]
 
         _fastFillerPositions: RoomPosition[]
         readonly fastFillerPositions: RoomPosition[]
@@ -1560,10 +1521,23 @@ declare global {
         anchor: number
 
         /**
+         * Commune Sources
+         */
+        CSIDs: Id<Source>[]
+
+        /**
+         * Remote Sources
+         */
+        RSIDs: Id<Source>[]
+
+        /**
          * Base Plans
          */
         BPs: string
 
+        /**
+         * Rampart Plans
+         */
         RPs: string
 
         /**
@@ -1571,15 +1545,10 @@ declare global {
          */
         T: RoomTypes
 
-        /**
+        /**f
          * A set of names of remotes controlled by this room
          */
         remotes: string[]
-
-        /**
-         * Not Claimable, if the room can be constructed by the base planner
-         */
-        NC: boolean
 
         /**
          * Source IDs of the sources in the room
@@ -1675,8 +1644,6 @@ declare global {
 
         CSTID: Id<ConstructionSite>
 
-        stampAnchors: Partial<Record<StampTypes, number[]>>
-
         /**
          * Stamp Anchors
          */
@@ -1687,7 +1654,7 @@ declare global {
         deposits: Record<Id<Deposit>, DepositRecord>
 
         /**
-         * Planning Completed, Wether or not commune planning has been completed for the room
+         * Planning Completed, Wether or not commune planning has been completed for the room. If false, the room is not a valid claim target
          */
         PC: boolean
 
@@ -1702,14 +1669,25 @@ declare global {
         RSA: Partial<Record<RemoteStampTypes, string>>
 
         /**
-         * Source Positions, packed positions around sources where harvesters can sit
+         * Commune Source Harvest Positions, packed positions around sources where harvesters can sit
          */
-        SP: string[]
+        CSHP: string[]
 
         /**
-         * Source Paths
+         * Remote Source Harvest Positions, packed positions around sources where harvesters can sit
          */
-        SPs: string[]
+        RSHP: string[]
+
+        /**
+         * Commune source Paths
+         */
+        CSPs: string[]
+
+        /**
+         * Remote source Paths
+         */
+        RSPs: string[]
+
         /**
          * Mineral Path
          */
@@ -1854,9 +1832,19 @@ declare global {
          */
         findRepairTarget(): Structure<BuildableStructureConstant> | false
 
-        findOptimalSourceIndex(): boolean
+        /**
+         * Find a source index when not necessarily in a commune or remote
+         */
+        findSourceIndex(): boolean
+        findCommuneSourceIndex(): boolean
+        findRemoteSourceIndex(): boolean
 
-        findSourcePos(sourceIndex: number): false | RoomPosition
+        /**
+         * Find a source harvest pos when not necessarily in a commune or remote
+         */
+        findSourceHarvestPos(sourceIndex: number): RoomPosition | false
+        findCommuneSourceHarvestPos(sourceIndex: number): false | RoomPosition
+        findRemoteSourceHarvestPos(sourceIndex: number): false | RoomPosition
 
         findMineralHarvestPos(): false | RoomPosition
 
@@ -2496,10 +2484,8 @@ declare global {
     }
 
     interface Source {
-        /**
-         * The index of the source in room.sources
-         */
-        index: number
+        communeIndex: number | undefined
+        remoteIndex: number | undefined
     }
 
     // Global

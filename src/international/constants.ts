@@ -6,7 +6,6 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     'remotes',
     'deposits',
     'powerBanks',
-    'NC',
     'PC',
     'MHC',
     'HU',
@@ -34,12 +33,12 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
 
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT', 'Ab', 'S']),
-    remote: new Set(['CN', 'RE', 'data', 'NC', 'PC']),
-    ally: new Set(['owner', 'level', 'NC', 'PC']),
-    allyRemote: new Set(['owner', 'NC', 'PC']),
-    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'NC', 'PC', 'OS', 'DS']),
-    enemyRemote: new Set(['owner', 'NC', 'PC']),
-    neutral: new Set(['NC', 'PC']),
+    remote: new Set(['CN', 'RE', 'data', 'PC']),
+    ally: new Set(['owner', 'level', 'PC']),
+    allyRemote: new Set(['owner', 'PC']),
+    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'PC', 'OS', 'DS']),
+    enemyRemote: new Set(['owner', 'PC']),
+    neutral: new Set(['PC']),
     keeper: new Set(['owner']),
     keeperCenter: new Set(['owner']),
     highway: new Set([]),
@@ -270,7 +269,7 @@ export const structureTypesToProtect: StructureConstant[] = [
     STRUCTURE_NUKER,
     STRUCTURE_POWER_SPAWN,
     STRUCTURE_OBSERVER,
-    STRUCTURE_LINK
+    STRUCTURE_LINK,
 ]
 export const structureTypesToProtectSet = new Set(structureTypesToProtect)
 
@@ -392,9 +391,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         protectionOffset: 4,
         size: 1,
         structures: {
-            extension: [
-                { x: 0, y: 0 },
-            ],
+            extension: [{ x: 0, y: 0 }],
         },
     },
     inputLab: {
@@ -402,9 +399,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         protectionOffset: 4,
         size: 1,
         structures: {
-            lab: [
-                { x: 0, y: 0 },
-            ],
+            lab: [{ x: 0, y: 0 }],
         },
     },
     outputLab: {
@@ -412,34 +407,7 @@ export const stamps: Record<StampTypes, Stamp> = {
         protectionOffset: 4,
         size: 1,
         structures: {
-            lab: [
-                { x: 0, y: 0 },
-            ],
-        },
-    },
-    // Deprecate
-    labs: {
-        offset: 1,
-        protectionOffset: 5,
-        size: 2,
-        asymmetry: 1,
-        structures: {
-            road: [
-                { x: 2, y: 2 },
-                { x: 1, y: 1 },
-            ],
-            lab: [
-                { x: 0, y: 1 },
-                { x: 0, y: 2 },
-                { x: 1, y: 2 },
-                { x: 1, y: 3 },
-                { x: 2, y: 3 },
-                { x: 1, y: 0 },
-                { x: 2, y: 0 },
-                { x: 2, y: 1 },
-                { x: 3, y: 1 },
-                { x: 3, y: 2 },
-            ],
+            lab: [{ x: 0, y: 0 }],
         },
     },
     tower: {
@@ -531,15 +499,6 @@ export const stamps: Record<StampTypes, Stamp> = {
         },
     },
     shieldRampart: {
-        offset: 0,
-        protectionOffset: 0,
-        size: 1,
-        structures: {
-            rampart: [{ x: 0, y: 0 }],
-        },
-    },
-    // Deprecate
-    rampart: {
         offset: 0,
         protectionOffset: 0,
         size: 1,
@@ -922,7 +881,6 @@ export enum ClaimRequestData {
     minDamage,
     minHeal,
     abandon,
-    score,
 }
 
 export enum CombatRequestData {

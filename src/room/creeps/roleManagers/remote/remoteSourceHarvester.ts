@@ -24,7 +24,7 @@ export class RemoteHarvester extends Creep {
         if (this.memory.RN) {
             if (
                 this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].SPs[this.memory.SI].length
+                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RSPs[this.memory.SI].length
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -48,11 +48,11 @@ export class RemoteHarvester extends Creep {
         if (this.memory.RN === this.room.name) {
             // Unpack the harvestPos
 
-            const harvestPos = this.findSourcePos(this.memory.SI)
+            const harvestPos = this.findRemoteSourceHarvestPos(this.memory.SI)
             if (!harvestPos) return
 
             if (getRange(this.pos, harvestPos) === 0) {
-                this.advancedHarvestSource(this.room.sources[this.memory.SI])
+                this.advancedHarvestSource(this.room.find(FIND_SOURCES)[this.memory.SI])
             }
         }
 
@@ -121,7 +121,7 @@ export class RemoteHarvester extends Creep {
         if (this.travelToSource(this.memory.SI)) return
 
         const container = this.room.sourceContainers[this.memory.SI]
-        const source = this.room.sources[this.memory.SI]
+        const source = this.room.find(FIND_SOURCES)[this.memory.SI]
         let figuredOutWhatToDoWithTheEnergy = false
         if (container) this.room.targetVisual(this.pos, container.pos, true)
         //1) feed remote hauler
@@ -218,7 +218,7 @@ export class RemoteHarvester extends Creep {
 
         // There is no container cSite, place one
 
-        const sourcePos = this.room.sourcePositions[this.memory.SI][0]
+        const sourcePos = this.room.roomManager.remoteSourceHarvestPositions[this.memory.SI][0]
         this.room.createConstructionSite(sourcePos, STRUCTURE_CONTAINER)
         return false
     }
@@ -231,7 +231,7 @@ export class RemoteHarvester extends Creep {
 
         // Unpack the harvestPos
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findRemoteSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
@@ -254,7 +254,7 @@ export class RemoteHarvester extends Creep {
                 avoidEnemyRanges: true,
             },
             {
-                packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                 remoteName: this.memory.RN,
                 loose: true,
             },
@@ -270,9 +270,8 @@ export class RemoteHarvester extends Creep {
             // Try to find a remote
 
             if (!creep.findRemote()) {
-
                 creep.message = '❌ Remote'
-/*
+                /*
                 // If the room is the creep's commune
 
                 if (room.name === creep.commune.name) {
@@ -306,7 +305,7 @@ export class RemoteHarvester extends Creep {
 
             creep.message = creep.memory.RN
 
-            const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].SP[creep.memory.SI])[0]
+            const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].RSHP[creep.memory.SI])[0]
 
             creep.createMoveRequestByPath(
                 {
@@ -328,7 +327,7 @@ export class RemoteHarvester extends Creep {
                     avoidAbandonedRemotes: true,
                 },
                 {
-                    packedPath: reversePosList(Memory.rooms[creep.memory.RN].SPs[creep.memory.SI]),
+                    packedPath: reversePosList(Memory.rooms[creep.memory.RN].RSPs[creep.memory.SI]),
                     remoteName: creep.memory.RN,
                     loose: true,
                 },

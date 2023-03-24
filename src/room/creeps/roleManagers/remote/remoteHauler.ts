@@ -161,12 +161,15 @@ export class RemoteHauler extends Creep {
 
             this.message += this.commune.name
 
+            const anchor = this.commune.roomManager.anchor
+            if (!anchor) throw Error('No anchor for remoteHauler ' + this.room.name)
+
             this.createMoveRequestByPath(
                 {
                     origin: this.pos,
                     goals: [
                         {
-                            pos: this.commune.anchor,
+                            pos: anchor,
                             range: 3,
                         },
                     ],
@@ -180,7 +183,7 @@ export class RemoteHauler extends Creep {
                     },
                 },
                 {
-                    packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+                    packedPath: Memory.rooms[this.memory.RN].RSPs[this.memory.SI],
                     remoteName: this.memory.RN,
                     loose: true,
                 },
@@ -191,7 +194,7 @@ export class RemoteHauler extends Creep {
 
         // We aren't in the remote, go to the source
 
-        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+        const sourceHarvestPos = unpackPosList(Memory.rooms[this.memory.RN].RSHP[this.memory.SI])[0]
 
         this.message += this.memory.RN
 
@@ -200,7 +203,7 @@ export class RemoteHauler extends Creep {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: sourcePos,
+                        pos: sourceHarvestPos,
                         range: 1,
                     },
                 ],
@@ -215,7 +218,7 @@ export class RemoteHauler extends Creep {
                 avoidAbandonedRemotes: true,
             },
             {
-                packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                 remoteName: this.memory.RN,
                 loose: true,
             },
@@ -229,11 +232,11 @@ export class RemoteHauler extends Creep {
      * @returns If the creep no longer needs energy
      */
     getRemoteSourceResources?() {
-        const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+        const sourceHarvestPos = unpackPosList(Memory.rooms[this.memory.RN].RSHP[this.memory.SI])[0]
 
         // We aren't next to the source
 
-        if (getRange(this.pos, sourcePos) > 1) {
+        if (getRange(this.pos, sourceHarvestPos) > 1) {
             // Fulfill requests near the hauler
 
             this.runRoomLogisticsRequestsAdvanced({
@@ -254,14 +257,14 @@ export class RemoteHauler extends Creep {
                     origin: this.pos,
                     goals: [
                         {
-                            pos: sourcePos,
+                            pos: sourceHarvestPos,
                             range: 1,
                         },
                     ],
                     avoidEnemyRanges: true,
                 },
                 {
-                    packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                     remoteName: this.memory.RN,
                     loose: true,
                 },
@@ -307,14 +310,14 @@ export class RemoteHauler extends Creep {
 
             this.message += this.memory.RN
 
-            const sourcePos = unpackPosList(Memory.rooms[this.memory.RN].SP[this.memory.SI])[0]
+            const sourceHarvestPos = unpackPosList(Memory.rooms[this.memory.RN].RSHP[this.memory.SI])[0]
 
             this.createMoveRequestByPath(
                 {
                     origin: this.pos,
                     goals: [
                         {
-                            pos: sourcePos,
+                            pos: sourceHarvestPos,
                             range: 1,
                         },
                     ],
@@ -328,7 +331,7 @@ export class RemoteHauler extends Creep {
                     },
                 },
                 {
-                    packedPath: reversePosList(Memory.rooms[this.memory.RN].SPs[this.memory.SI]),
+                    packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                     remoteName: this.memory.RN,
                     loose: true,
                 },
@@ -339,12 +342,15 @@ export class RemoteHauler extends Creep {
 
         this.message += this.commune.name
 
+        const anchor = this.commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remoteHauler ' + this.room.name)
+
         this.createMoveRequestByPath(
             {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: this.commune.anchor,
+                        pos: anchor,
                         range: 3,
                     },
                 ],
@@ -358,7 +364,7 @@ export class RemoteHauler extends Creep {
                 },
             },
             {
-                packedPath: Memory.rooms[this.memory.RN].SPs[this.memory.SI],
+                packedPath: Memory.rooms[this.memory.RN].RSPs[this.memory.SI],
                 loose: true,
             },
         )
@@ -464,7 +470,7 @@ export class RemoteHauler extends Creep {
         if (
             !this.fatigue &&
             this.memory.RN == this.room.name &&
-            getRange(this.room.sourcePositions[this.memory.SI][0], this.pos) <= 1
+            getRange(this.room.roomManager.remoteSourceHarvestPositions[this.memory.SI][0], this.pos) <= 1
         )
             return
 
@@ -488,10 +494,10 @@ export class RemoteHauler extends Creep {
             // The 1.1 is to add some margin for the return trip
             if (
                 Memory.rooms[this.memory.RN] &&
-                Memory.rooms[this.memory.RN].SP &&
-                Memory.rooms[this.memory.RN].SPs.length > this.memory.SI + 1
+                Memory.rooms[this.memory.RN].RSHP &&
+                Memory.rooms[this.memory.RN].RSPs.length > this.memory.SI + 1
             )
-                returnTripTime = Memory.rooms[this.memory.RN].SPs[this.memory.SI].length * 1.1
+                returnTripTime = Memory.rooms[this.memory.RN].RSPs[this.memory.SI].length * 1.1
         }
 
         if (this.needsResources() && this.ticksToLive > returnTripTime) {

@@ -26,7 +26,7 @@ export class Vanguard extends Creep {
 
         this.message = '🚬'
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
@@ -109,7 +109,7 @@ export class Vanguard extends Creep {
             if (this.needsResources()) {
                 // Define the creep's sourceName
 
-                if (!this.findOptimalSourceIndex()) return
+                if (!this.findRemoteSourceIndex()) return
 
                 const sourceIndex = this.memory.SI
 
@@ -119,7 +119,7 @@ export class Vanguard extends Creep {
 
                 // Try to normally harvest. Iterate if creep harvested
 
-                if (this.advancedHarvestSource(this.room.sources[sourceIndex])) return
+                if (this.advancedHarvestSource(this.room.find(FIND_SOURCES)[sourceIndex])) return
                 return
             }
 
