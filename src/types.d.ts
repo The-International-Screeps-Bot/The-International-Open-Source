@@ -2185,6 +2185,11 @@ declare global {
         GP: string
 
         /**
+         * Used Path, completed usage of the packed for a specified GoalPos
+         */
+        UP: string
+
+        /**
          * Whether the creep is intended to move on its own or not
          */
         getPulled: boolean

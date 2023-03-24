@@ -324,10 +324,8 @@ export class RoomManager {
 
         const packedSourceHarvestPositions = this.room.memory.RSHP
         if (packedSourceHarvestPositions) {
-            for (const positions of packedSourceHarvestPositions)
-                this._remoteSourceHarvestPositions.push(unpackPosList(positions))
 
-            return this._remoteSourceHarvestPositions
+            return this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(positions => unpackPosList(positions))
         }
 
         const commune = Game.rooms[this.room.memory.CN]

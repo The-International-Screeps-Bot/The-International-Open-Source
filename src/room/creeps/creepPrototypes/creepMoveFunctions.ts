@@ -158,21 +158,25 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     const path = unpackPosList(pathOpts.packedPath)
     for (const pos of path) this.room.coordVisual(pos.x, pos.y)
 
+    const packedGoalPos = packPos(opts.goals[0].pos)
+    const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
+
     this.room.targetVisual(this.pos, opts.goals[0].pos, true)
     /* this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4}) */
-
-    //
-
     this.room.visual.text((posIndex || -1).toString(), this.pos)
-    if (posIndex >= 0 && posIndex + packedPosLength < pathOpts.packedPath.length) {
+
+    if (!isOnLastPos && posIndex !== -1 && this.memory.UP !== packedGoalPos) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const path = unpackPosList(packedPath)
+
         this.room.targetVisual(this.pos, path[0])
+
         // If we're on an exit and the next pos is in the other room, wait
 
         if (path[0].roomName !== this.room.name) {
             /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
             this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
+
             this.memory.P = packedPath
             this.moved = 'moved'
             return true
@@ -206,10 +210,19 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         return true
     }
 
+    if (isOnLastPos || this.memory.UP) {
+        this.memory.UP = packPos(opts.goals[0].pos)
+        return this.createMoveRequest(opts)
+    }
+
     // If loose is enabled, don't try to get back on the cached path
-    this.room.visual.text(pathOpts.loose.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4})
+
+    this.room.visual.text(pathOpts.loose.toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
+
     if (pathOpts.loose) return this.createMoveRequest(opts)
+
     this.room.errorVisual(this.pos, true)
+
     // Try to get on the path
 
     opts.goals = []

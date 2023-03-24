@@ -4,7 +4,6 @@ import {
     CombatRequestData,
     containerUpkeepCost,
     controllerDowngradeUpgraderNeed,
-    minHarvestWorkRatio,
     customColors,
     rampartUpkeepCost,
     RemoteData,
@@ -71,7 +70,6 @@ export class SpawnRequestsManager {
     }
 
     private sourceHarvester() {
-
         const sources = this.communeManager.room.roomManager.communeSources
         for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
             // Construct requests for sourceHarvesters
@@ -181,7 +179,10 @@ export class SpawnRequestsManager {
                         extraParts: [WORK],
                         partsMultiplier: 6,
                         minCreeps: undefined,
-                        maxCreeps: Math.min(3, this.communeManager.room.roomManager.communeSourceHarvestPositions[sourceIndex].length),
+                        maxCreeps: Math.min(
+                            3,
+                            this.communeManager.room.roomManager.communeSourceHarvestPositions[sourceIndex].length,
+                        ),
                         minCost: 200,
                         priority,
                         spawnGroup: spawnGroup,
@@ -385,7 +386,7 @@ export class SpawnRequestsManager {
                         minPriority + this.communeManager.room.myCreeps[role].length * 0.5,
                         maxPriority,
                     )
-/*
+                    /*
                     // If all RCL 3 extensions are build
 
                     if (this.spawnEnergyCapacity >= 800) {
@@ -445,7 +446,7 @@ export class SpawnRequestsManager {
                         minPriority + 0.1 + this.communeManager.room.myCreeps[role].length * 1,
                         maxPriority,
                     )
-/*
+                    /*
                     // If all RCL 3 extensions are build
 
                     if (this.spawnEnergyCapacity >= 800) {
@@ -987,31 +988,35 @@ export class SpawnRequestsManager {
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
             const remoteMemory = Memory.rooms[remoteName]
-            const remoteData = Memory.rooms[remoteName].data
+            const data = Memory.rooms[remoteName].data
             const remote = Game.rooms[remoteName]
 
             const sourcePositionsAmount = remoteMemory.RSHP[sourceIndex].length / packedPosLength
             const sourcePathLength = remoteMemory.RSPs[sourceIndex].length
 
+            const sourceHarvesterRole = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
+                | 'remoteSourceHarvester0'
+                | 'remoteSourceHarvester1'
+
             // Construct requests for remoteSourceHarvester0s
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
-                        | 'remoteSourceHarvester0'
-                        | 'remoteSourceHarvester1'
-                    if (RemoteData[role] <= 0) return false
 
-                    const priority =
-                        Math.round((this.minRemotePriority + 1 + sourcePathLength / 100) * 100) /
-                        100
+                    const partsMultiplier =
+                        data[RemoteData[`maxSourceIncome${sourceIndex as 0 | 1}`]] -
+                        data[RemoteData[sourceHarvesterRole]]
+                    if (partsMultiplier <= 0) return false
+
+                    const role = sourceHarvesterRole
+                    const priority = this.minRemotePriority + 1 + sourcePathLength / 100
 
                     if (this.spawnEnergyCapacity >= 950) {
                         return {
                             role,
                             defaultParts: [CARRY],
                             extraParts: [WORK, MOVE],
-                            partsMultiplier: remoteData[RemoteData[role]],
+                            partsMultiplier,
                             spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
                             threshold: 0.1,
                             minCreeps: 1,
@@ -1031,7 +1036,7 @@ export class SpawnRequestsManager {
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, WORK, MOVE],
-                        partsMultiplier: remoteData[RemoteData[role]],
+                        partsMultiplier: Math.ceil(partsMultiplier / 2),
                         spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
                         threshold: 0.1,
                         minCreeps: undefined,
@@ -1048,43 +1053,26 @@ export class SpawnRequestsManager {
                 })(),
             )
 
-            const isReserved =
-                remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
-
-            const income = Math.max(
-                (isReserved ? 10 : 5) -
-                    Math.floor(
-                        Math.max(remoteMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]], 0) *
-                            minHarvestWorkRatio,
-                    ),
-                0,
-            )
-
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (income <= 0) return false
+                    const role = 'remoteHauler'
+                    const partsMultiplier = data[RemoteData[`${role}${sourceIndex as 0 | 1}`]]
+
+                    if (partsMultiplier <= 0) return false
 
                     // Higher priority than remote harvesters
 
-                    const priority =
-                    Math.round((this.minRemotePriority + 1 + sourcePathLength / 100) * 100) /
-                    100
-
-                    const partsMultiplier = findCarryPartsRequired(
-                        sourcePathLength / packedPosLength,
-                        income,
-                    )
-                    const role = 'remoteHauler'
+                    const priority = this.minRemotePriority /* + 1 */ + sourcePathLength / 100
 
                     /*
                     // If all RCL 3 extensions are built
                     if (this.spawnEnergyCapacity >= 800) {
-                            partsMultiplier = this.remoteHaulerNeed / 2
+
                             return {
                                 defaultParts: [],
                                 extraParts: [CARRY, CARRY, MOVE],
                                 threshold: 0,
-                                partsMultiplier,
+                                partsMultiplier: partsMultiplier / 2,
                                 minCost: this.communeManager.room.memory.MHC,
                                 maxCostPerCreep: this.communeManager.room.memory.MHC,
                                 priority,
@@ -1099,6 +1087,7 @@ export class SpawnRequestsManager {
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE],
+                        spawnGroup: [],
                         threshold: 0,
                         partsMultiplier,
                         minCost: this.communeManager.room.memory.MHC,

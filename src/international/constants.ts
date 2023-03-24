@@ -873,6 +873,8 @@ export enum RemoteData {
      * Wether or not we are
      */
     active,
+    maxSourceIncome0,
+    maxSourceIncome1
 }
 
 export enum ClaimRequestData {
@@ -988,8 +990,6 @@ export const controllerDowngradeUpgraderNeed = 10000
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
  */
 export const cacheAmountModifier = 25
-
-export const minHarvestWorkRatio = 1.66666666667
 
 export const UNWALKABLE = -1
 export const NORMAL = 0

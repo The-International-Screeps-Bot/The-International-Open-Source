@@ -922,7 +922,7 @@ const roomAdditions = {
             if (this.global.fastFillerContainerLeft) {
                 const container = findObjectWithID(this.global.fastFillerContainerLeft)
 
-                if (container) return container
+                if (container) return this._fastFillerContainerLeft = container
             }
 
             const anchor = this.roomManager.anchor
@@ -935,17 +935,18 @@ const roomAdditions = {
 
             if (!structure) return false
 
-            this.global.fastFillerContainerLeft = structure.id as Id<StructureContainer>
-            return false
+            this.global.fastFillerContainerLeft = structure.id
+            return this._fastFillerContainerLeft
         },
     },
     fastFillerContainerRight: {
         get() {
+
             if (this._fastFillerContainerRight !== undefined) return this._fastFillerContainerRight
 
             if (this.global.fastFillerContainerRight) {
                 const container = findObjectWithID(this.global.fastFillerContainerRight)
-                if (container) return container
+                if (container) return this._fastFillerContainerRight = container
             }
 
             const anchor = this.roomManager.anchor
@@ -958,8 +959,8 @@ const roomAdditions = {
 
             if (!structure) return false
 
-            this.global.fastFillerContainerRight = structure.id as Id<StructureContainer>
-            return false
+            this.global.fastFillerContainerRight = structure.id
+            return this._fastFillerContainerRight
         },
     },
     controllerContainer: {

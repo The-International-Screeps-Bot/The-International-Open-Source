@@ -978,23 +978,22 @@ export class CommunePlanner {
         for (const i in this.communeSources) {
             const origin = sourceHarvestPositions[i][0]
 
-            const path = [origin].concat(
-                this.room.advancedFindPath({
-                    origin: origin,
-                    goals: [
-                        {
-                            pos: fastFillerAnchor,
-                            range: 3,
-                        },
-                    ],
-                    weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
-                    plainCost: defaultRoadPlanningPlainCost * 2,
-                    swampCost: defaultSwampCost * 2,
-                }),
-            )
+            const path = this.room.advancedFindPath({
+                origin: origin,
+                goals: [
+                    {
+                        pos: fastFillerAnchor,
+                        range: 3,
+                    },
+                ],
+                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
+            })
+
             sourcePaths.push(path)
         }
-/*
+        /*
         if (sourcePaths.length > 0) {
             sourcePaths.sort((a, b) => {
                 return a.length - b.length
@@ -1003,9 +1002,7 @@ export class CommunePlanner {
         }
  */
         for (const path of sourcePaths) {
-            for (let i = 1; i < path.length; i += 1) {
-                const pos = path[i]
-
+            for (const pos of path) {
                 this.setBasePlansXY(pos.x, pos.y, STRUCTURE_ROAD, 3)
                 this.roadCoords[packAsNum(pos)] = 1
             }
@@ -1046,18 +1043,15 @@ export class CommunePlanner {
             )
         })
 
-        const path = [this.mineralHarvestPositions[0]].concat(
-            this.room.advancedFindPath({
-                origin: this.mineralHarvestPositions[0],
-                goals: [{ pos: goal, range: 1 }],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
-                plainCost: defaultRoadPlanningPlainCost * 2,
-                swampCost: defaultSwampCost * 2,
-            }),
-        )
+        const path = this.room.advancedFindPath({
+            origin: this.mineralHarvestPositions[0],
+            goals: [{ pos: goal, range: 1 }],
+            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost * 2,
+            swampCost: defaultSwampCost * 2,
+        })
 
-        for (let i = 1; i < path.length; i += 1) {
-            const pos = path[i]
+        for (const pos of path) {
             this.roadCoords[packAsNum(pos)] = 1
             this.setBasePlansXY(pos.x, pos.y, STRUCTURE_ROAD, 6)
         }

@@ -36,13 +36,10 @@ export class SourceHarvester extends Creep {
 
         if (this.memory.SI !== undefined && !this.isDying()) room.creepsOfSource[this.memory.SI].push(this.name)
 
-        // Unpack the harvestPos
+        const source = this.room.roomManager.communeSources[this.memory.SI]
 
-        const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
-        if (!harvestPos) return
-
-        if (getRange(this.pos, harvestPos) === 0) {
-            this.advancedHarvestSource(this.room.find(FIND_SOURCES)[this.memory.SI])
+        if (getRange(this.pos, source.pos) === 0) {
+            this.advancedHarvestSource(source)
         }
     }
 

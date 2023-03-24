@@ -1608,7 +1608,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
 
             if (
                 this.nextStore[request.resourceType] >=
-                Math.max(amount, target.store.getCapacity(request.resourceType) / 2)
+                Math.min(amount, target.store.getCapacity(request.resourceType) / 2)
             )
                 return true
             return false

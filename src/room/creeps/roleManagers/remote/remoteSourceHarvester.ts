@@ -1,4 +1,4 @@
-import { minHarvestWorkRatio, RemoteData } from 'international/constants'
+import { RemoteData } from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,
@@ -46,21 +46,19 @@ export class RemoteHarvester extends Creep {
         if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][this.role].push(this.name)
 
         if (this.memory.RN === this.room.name) {
-            // Unpack the harvestPos
 
-            const harvestPos = this.findRemoteSourceHarvestPos(this.memory.SI)
-            if (!harvestPos) return
+            const source = this.room.roomManager.remoteSources[this.memory.SI]
 
-            if (getRange(this.pos, harvestPos) === 0) {
-                this.advancedHarvestSource(this.room.find(FIND_SOURCES)[this.memory.SI])
+            if (getRange(this.pos, source.pos) === 0) {
+                this.advancedHarvestSource(source)
             }
         }
 
         if (this.isDying()) return
 
-        // Reduce remote need
+        // Record response
 
-        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -=
+        Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] +=
             this.parts.work
     }
 
@@ -103,12 +101,12 @@ export class RemoteHarvester extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[remoteName].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -= this.parts.work
+        Memory.rooms[remoteName].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] += this.parts.work
     }
 
     removeRemote?() {
         if (!this.isDying()) {
-            Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] +=
+            Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -=
                 this.parts.work
         }
 

@@ -1,5 +1,4 @@
 import {
-    minHarvestWorkRatio,
     remoteHarvesterRoles,
     remoteRoles,
     maxRemoteRoomDistance,
@@ -76,6 +75,8 @@ export class RemotesManager {
                 }
             }
 
+            remoteMemory.data[RemoteData.maxSourceIncome0] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME // default is 5
+            remoteMemory.data[RemoteData.maxSourceIncome1] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME // default is 5
             remoteMemory.data[RemoteData.remoteSourceHarvester0] = 3
             remoteMemory.data[RemoteData.remoteSourceHarvester1] = remoteMemory.RSIDs[1] ? 3 : 0
             remoteMemory.data[RemoteData.remoteHauler0] = 0
@@ -93,6 +94,11 @@ export class RemotesManager {
             // If the remote is reserved
 
             if (possibleReservation) {
+                // We can potentially double our income
+
+                remoteMemory.data[RemoteData.maxSourceIncome0] *= 2
+                remoteMemory.data[RemoteData.maxSourceIncome1] *= 2
+
                 // Increase the remoteHarvester need accordingly
 
                 remoteMemory.data[RemoteData.remoteSourceHarvester0] *= 2
@@ -135,6 +141,8 @@ export class RemotesManager {
             // If the remote is assumed to be reserved by an enemy or to be an invader core
 
             if (remoteMemory.data[RemoteData.enemyReserved] || remoteMemory.data[RemoteData.invaderCore]) {
+                remoteMemory.data[RemoteData.maxSourceIncome0] = 0
+                remoteMemory.data[RemoteData.maxSourceIncome1] = 0
                 remoteMemory.data[RemoteData.remoteSourceHarvester0] = 0
                 remoteMemory.data[RemoteData.remoteSourceHarvester1] = 0
                 remoteMemory.data[RemoteData.remoteHauler0] = 0
@@ -148,27 +156,25 @@ export class RemotesManager {
 
         for (const remoteName of this.communeManager.room.memory.remotes) {
             const remoteMemory = Memory.rooms[remoteName]
+            const data = remoteMemory.data
 
-            if (remoteMemory.data[RemoteData.abandon]) continue
-
+            if (data[RemoteData.abandon]) continue
+/*
             const remote = Game.rooms[remoteName]
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
-
+ */
             // Loop through each index of sourceEfficacies
 
             for (let sourceIndex = 0; sourceIndex < remoteMemory.RSPs.length; sourceIndex += 1) {
-                // Get the income based on the reservation of the this and remoteHarvester need
-                // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
 
-                const income = Math.max(
-                    (isReserved ? 10 : 5) -
-                        Math.floor(
-                            Math.max(remoteMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]], 0) *
-                                minHarvestWorkRatio,
-                        ),
-                    0,
-                )
+                const sourceHarvesterRole = `remoteSourceHarvester${sourceIndex as 0 | 1}` as
+                    | 'remoteSourceHarvester0'
+                    | 'remoteSourceHarvester1'
+                const income = (data[RemoteData[sourceHarvesterRole]] = Math.min(
+                    data[RemoteData[sourceHarvesterRole]],
+                    data[RemoteData[`maxSourceIncome${sourceIndex as 0 | 1}`]],
+                ))
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 

@@ -140,9 +140,10 @@ export class CommuneManager {
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
-        delete this._minRampartHits
+
         if (randomTick()) {
             delete this._maxUpgradeStrength
+            delete this._minRampartHits
         }
     }
 
@@ -381,12 +382,14 @@ export class CommuneManager {
     _minRampartHits: number
 
     get minRampartHits() {
+        if (this._minRampartHits!== undefined) return this._minRampartHits
+
         const level = this.room.controller.level
 
-        return Math.min(
+        return this._minRampartHits = (Math.min(
             Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
-            RAMPART_HITS_MAX[level],
-        )
+            RAMPART_HITS_MAX[level] * 0.9,
+        ) || 20000)
     }
 
     _storingStructures: (StructureStorage | StructureTerminal)[]

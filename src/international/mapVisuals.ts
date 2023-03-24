@@ -1,5 +1,5 @@
 import { unpackPosList } from 'other/codec'
-import { minHarvestWorkRatio, customColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
+import { customColors, remoteHarvesterRoles, RemoteData, ClaimRequestData } from './constants'
 import {
     customLog,
     makeRoomCoord,
@@ -109,7 +109,7 @@ class MapVisualsManager {
                         const income =
                             (possibleReservation ? 10 : 5) -
                             Math.floor(
-                                roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]] * minHarvestWorkRatio,
+                                roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]],
                             )
 
                         Game.map.visual.text(
