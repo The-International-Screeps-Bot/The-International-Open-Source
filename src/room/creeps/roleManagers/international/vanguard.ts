@@ -109,7 +109,7 @@ export class Vanguard extends Creep {
             if (this.needsResources()) {
                 // Define the creep's sourceName
 
-                if (!this.findRemoteSourceIndex()) return
+                if (!this.findSourceIndex()) return
 
                 const sourceIndex = this.memory.SI
 

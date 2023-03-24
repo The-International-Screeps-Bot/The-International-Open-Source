@@ -1407,6 +1407,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                         partsMultiplier: request.data[ClaimRequestData.vanguard],
+                        maxCreeps: 6,
                         minCost: 250,
                         priority: 8.2,
                         memoryAdditions: {

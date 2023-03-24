@@ -183,7 +183,6 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath: Memory.rooms[this.memory.RN].RSPs[this.memory.SI],
                     remoteName: this.memory.RN,
-                    loose: true,
                 },
             )
 

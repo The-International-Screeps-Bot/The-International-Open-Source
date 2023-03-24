@@ -298,7 +298,7 @@ export class RoomManager {
                 sourceHarvestPositions[i].push(pos)
             }
         }
-
+        console.log('POSITIONs', sourceHarvestPositions)
         return (this._sourceHarvestPositions = sourceHarvestPositions)
     }
 
