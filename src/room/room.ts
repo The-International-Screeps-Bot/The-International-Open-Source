@@ -15,6 +15,7 @@ import {
     forAdjacentCoords,
     forCoordsInRange,
     packAsNum,
+    randomTick,
 } from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
@@ -58,6 +59,11 @@ export class RoomManager {
 
     public update(room: Room) {
         this.room = room
+
+        if (randomTick()) {
+
+            delete this._nukeTargetCoords
+        }
     }
 
     preTickRun() {
@@ -298,16 +304,14 @@ export class RoomManager {
 
     _communeSourceHarvestPositions: RoomPosition[][]
     get communeSourceHarvestPositions() {
+
         if (this._communeSourceHarvestPositions) return this._communeSourceHarvestPositions
 
-        this._communeSourceHarvestPositions = []
-
         const packedSourceHarvestPositions = this.room.memory.CSHP
-        if (packedSourceHarvestPositions) {
-            for (const positions of packedSourceHarvestPositions)
-                this._communeSourceHarvestPositions.push(unpackPosList(positions))
 
-            return this._communeSourceHarvestPositions
+        if (packedSourceHarvestPositions) {
+
+            return this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(positions => unpackPosList(positions))
         }
 
         throw Error('No commune source harvest positions ' + this.room.name)
@@ -317,8 +321,6 @@ export class RoomManager {
     _remoteSourceHarvestPositions: RoomPosition[][]
     get remoteSourceHarvestPositions() {
         if (this._remoteSourceHarvestPositions) return this._remoteSourceHarvestPositions
-
-        this._remoteSourceHarvestPositions = []
 
         const packedSourceHarvestPositions = this.room.memory.RSHP
         if (packedSourceHarvestPositions) {
@@ -335,6 +337,7 @@ export class RoomManager {
         if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
 
         const terrain = this.room.getTerrain()
+        const sourceHarvestPositions: RoomPosition[][] = []
 
         for (const source of this.remoteSources) {
             const positions = []
@@ -364,24 +367,21 @@ export class RoomManager {
                 )
             })
 
-            this._remoteSourceHarvestPositions.push(positions)
+            sourceHarvestPositions.push(positions)
         }
 
-        this.room.memory.RSHP = this._remoteSourceHarvestPositions.map(positions => packPosList(positions))
-        return this._remoteSourceHarvestPositions
+        this.room.memory.RSHP = sourceHarvestPositions.map(positions => packPosList(positions))
+        return this._remoteSourceHarvestPositions = sourceHarvestPositions
     }
 
     _communeSourcePaths: RoomPosition[][]
     get communeSourcePaths() {
         if (this._communeSourcePaths) return this._communeSourcePaths
 
-        this._communeSourcePaths = []
-
         const packedSourcePaths = this.room.memory.CSPs
         if (packedSourcePaths) {
-            for (const path of packedSourcePaths) this._communeSourcePaths.push(unpackPosList(path))
 
-            return this._communeSourcePaths
+            return this._communeSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions))
         }
 
         throw Error('No commune source paths ' + this.room.name)
@@ -392,13 +392,10 @@ export class RoomManager {
     get remoteSourcePaths() {
         if (this._remoteSourcePaths) return this._remoteSourcePaths
 
-        this._remoteSourcePaths = []
-
         const packedSourcePaths = this.room.memory.RSPs
         if (packedSourcePaths) {
-            for (const path of packedSourcePaths) this._remoteSourcePaths.push(unpackPosList(path))
 
-            return this._remoteSourcePaths
+            return this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions))
         }
 
         const commune = Game.rooms[this.room.memory.CN]

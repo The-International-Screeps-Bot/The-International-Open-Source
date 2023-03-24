@@ -56,7 +56,7 @@ export class RemoteHarvester extends Creep {
             }
         }
 
-        if (this.isDying) return
+        if (this.isDying()) return
 
         // Reduce remote need
 
@@ -101,13 +101,13 @@ export class RemoteHarvester extends Creep {
     assignRemote?(remoteName: string) {
         this.memory.RN = remoteName
 
-        if (this.isDying) return
+        if (this.isDying()) return
 
         Memory.rooms[remoteName].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] -= this.parts.work
     }
 
     removeRemote?() {
-        if (!this.isDying) {
+        if (!this.isDying()) {
             Memory.rooms[this.memory.RN].data[RemoteData[`remoteSourceHarvester${this.memory.SI as 0 | 1}`]] +=
                 this.parts.work
         }

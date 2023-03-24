@@ -34,7 +34,7 @@ export class SourceHarvester extends Creep {
     preTickManager() {
         const { room } = this
 
-        if (this.memory.SI !== undefined && !this.isDying) room.creepsOfSource[this.memory.SI].push(this.name)
+        if (this.memory.SI !== undefined && !this.isDying()) room.creepsOfSource[this.memory.SI].push(this.name)
 
         // Unpack the harvestPos
 

@@ -159,6 +159,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     for (const pos of path) this.room.coordVisual(pos.x, pos.y)
 
     this.room.targetVisual(this.pos, opts.goals[0].pos, true)
+    /* this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4}) */
 
     //
 
@@ -206,9 +207,9 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     }
 
     // If loose is enabled, don't try to get back on the cached path
-
+    this.room.visual.text(pathOpts.loose.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4})
     if (pathOpts.loose) return this.createMoveRequest(opts)
-
+    this.room.errorVisual(this.pos, true)
     // Try to get on the path
 
     opts.goals = []

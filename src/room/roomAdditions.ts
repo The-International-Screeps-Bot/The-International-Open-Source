@@ -532,10 +532,9 @@ const roomAdditions = {
         get() {
             if (this._usedSourceHarvestCoords) return this._usedSourceHarvestCoords
 
-            this._usedSourceHarvestCoords = []
+            this._usedSourceHarvestCoords = new Set()
 
             for (const i in this.find(FIND_SOURCES)) {
-                this._usedSourceHarvestCoords.push(new Set())
 
                 // Record used source coords
 
@@ -544,13 +543,13 @@ const roomAdditions = {
 
                     // If the creep is isDying, iterate
 
-                    if (creep.isDying) continue
+                    if (creep.isDying()) continue
                     if (creep.memory.SI === undefined) continue
                     if (!creep.memory.PC) continue
 
                     // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-                    this._usedSourceHarvestCoords[creep.memory.SI].add(creep.memory.PC)
+                    this._usedSourceHarvestCoords.add(creep.memory.PC)
                 }
             }
 
@@ -662,7 +661,7 @@ const roomAdditions = {
 
                 // If the creep is isDying, iterate
 
-                if (creep.isDying) continue
+                if (creep.isDying()) continue
                 if (!creep.memory.PC) continue
 
                 // The creep has a packedPos
@@ -695,7 +694,7 @@ const roomAdditions = {
 
                 // If the creep is isDying, iterate
 
-                if (creep.isDying) continue
+                if (creep.isDying()) continue
 
                 if (!creep.memory.PC) continue
 
@@ -781,7 +780,7 @@ const roomAdditions = {
 
                 // If the creep is isDying, iterate
 
-                if (creep.isDying) continue
+                if (creep.isDying()) continue
                 if (!creep.memory.PC) continue
 
                 // The creep has a packedPos
@@ -821,7 +820,7 @@ const roomAdditions = {
             for (const remoteName of this.memory.remotes) {
                 const remoteMemory = Memory.rooms[remoteName]
 
-                for (let sourceIndex = 0; sourceIndex < remoteMemory.SIDs.length; sourceIndex++) {
+                for (let sourceIndex = 0; sourceIndex < remoteMemory.RSIDs.length; sourceIndex++) {
                     this._remoteSourceIndexesByEfficacy.push(remoteName + ' ' + sourceIndex)
                 }
             }

@@ -32,7 +32,11 @@ export class ConstructionManager {
 
         // If there are some construction sites
 
-        if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= Math.max(2, MAX_CONSTRUCTION_SITES / 1 + global.communes.size)) return
+        if (
+            this.room.find(FIND_MY_CONSTRUCTION_SITES).length >=
+            Math.max(2, MAX_CONSTRUCTION_SITES / 1 + global.communes.size)
+        )
+            return
 
         const RCL = this.room.controller.level
         const basePlans = BasePlans.unpack(this.room.memory.BPs)
@@ -82,15 +86,17 @@ export class ConstructionManager {
             if (this.room.findStructureAtCoord(coord, STRUCTURE_RAMPART)) continue
             if (data.coversStructure && !this.room.coordHasStructureTypes(coord, buildableStructuresSet)) continue
 
-            if (
-                rampartPlans.get(packedCoord).buildForNuke &&
-                this.room.roomManager.nukeTargetCoords[packAsNum(coord)] > 0
-            ) {
+            if (data.buildForNuke) {
+                if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
+
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
                 continue
             }
 
-            if (rampartPlans.get(packedCoord).buildForThreat) {
+            if (data.buildForThreat) {
+                if (this.room.memory.AT < 20000) continue
+
+                this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
                 continue
             }
 
@@ -124,12 +130,12 @@ export class ConstructionManager {
 
             /* this.room.visual.text(data.minRCL.toString(), coord.x, coord.y) */
 
-            if (rampartPlans.get(packedCoord).buildForNuke) {
+            if (data.buildForNuke) {
                 this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2, fill: 'yellow' })
                 continue
             }
 
-            if (rampartPlans.get(packedCoord).buildForThreat) {
+            if (data.buildForThreat) {
                 this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
                 continue
             }

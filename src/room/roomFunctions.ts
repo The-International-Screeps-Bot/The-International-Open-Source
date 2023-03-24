@@ -164,7 +164,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             const roomMemory = Memory.rooms[roomName]
 
             if (roomMemory.T === 'commune') {
-                const basePlans = BasePlans.unpack(this.memory.BPs)
+                const basePlans = BasePlans.unpack(roomMemory.BPs)
 
                 for (const packedCoord in basePlans.map) {
                     const coordData = basePlans.map[packedCoord]
@@ -180,13 +180,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 const room = Game.rooms[roomName]
                 opts.weightCoords[roomName][packCoord(room.roomManager.centerUpgradePos)] = 255
 
-                    for (const path of room.roomManager._communeSourcePaths) {
-                        for (const pos of path) {
-                            if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
-                            opts.weightCoords[pos.roomName][packCoord(pos)] = 1
-                        }
+                for (const path of room.roomManager.communeSourcePaths) {
+                    for (const pos of path) {
+                        if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
+                        opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
-
+                }
             } else if (roomMemory.T === 'remote') {
                 for (const packedPath of roomMemory.RSPs) {
                     const path = unpackPosList(packedPath)
@@ -312,7 +311,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     if (room.roomManager.anchor) {
                         // The last upgrade position should be the deliver pos, which we want to weight normal
 
-                        const upgradePositions = room.roomManager.upgradePositions.slice(0, room.roomManager.upgradePositions.length - 1)
+                        const upgradePositions = room.roomManager.upgradePositions.slice(
+                            0,
+                            room.roomManager.upgradePositions.length - 1,
+                        )
                         for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
 
                         for (const pos of room.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 10)
@@ -680,14 +682,15 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         delete this.memory.RSIDs
         delete this.roomManager._remoteSources
+        this.roomManager.remoteSources
 
         delete this.memory.RSHP
         delete this.roomManager._remoteSourceHarvestPositions
         this.roomManager.remoteSourceHarvestPositions
 
         delete this.memory.RSPs
-        delete this.roomManager._remoteSources
-        this.roomManager._remoteSources
+        delete this.roomManager._remoteSourcePaths
+        this.roomManager.remoteSourcePaths
 
         delete this.memory.CP
         delete this._controllerPositions
@@ -718,14 +721,15 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     delete this.memory.RSIDs
     delete this.roomManager._remoteSources
+    this.roomManager.remoteSources
 
     delete this.memory.RSHP
     delete this.roomManager._remoteSourceHarvestPositions
     this.roomManager.remoteSourceHarvestPositions
 
     delete this.memory.RSPs
-    delete this.roomManager._remoteSources
-    this.roomManager._remoteSources
+    delete this.roomManager._remoteSourcePaths
+    this.roomManager.remoteSourcePaths
 
     delete this.memory.CP
     delete this._controllerPositions

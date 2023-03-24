@@ -26,7 +26,7 @@ export class RemoteDismantler extends Creep {
 
         const role = this.role as 'remoteDismantler'
 
-        if (this.isDying) return
+        if (this.isDying()) return
 
         // Reduce remote need
 

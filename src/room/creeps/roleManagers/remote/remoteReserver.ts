@@ -56,7 +56,7 @@ export class RemoteReserver extends Creep {
         const role = this.role as 'remoteReserver'
 
         if (!this.findRemote()) return
-        if (this.isDying) return
+        if (this.isDying()) return
 
         // Reduce remote need
 
@@ -84,7 +84,7 @@ export class RemoteReserver extends Creep {
 
                 creep.message = '❌ Remote'
 
-/*
+                /*
                 if (room.name === creep.commune.name) {
                     // Advanced recycle and iterate
 

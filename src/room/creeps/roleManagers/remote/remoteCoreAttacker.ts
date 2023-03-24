@@ -26,7 +26,7 @@ export class RemoteCoreAttacker extends Creep {
         const role = this.role as 'remoteCoreAttacker'
 
         if (!this.findRemote()) return
-        if (this.isDying) return
+        if (this.isDying()) return
 
         // Reduce remote need
 

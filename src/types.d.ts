@@ -1393,8 +1393,8 @@ declare global {
 
         // Resource info
 
-        _usedSourceHarvestCoords: Set<string>[]
-        readonly usedSourceHarvestCoords: Set<string>[]
+        _usedSourceHarvestCoords: Set<string>
+        readonly usedSourceHarvestCoords: Set<string>
 
         _usedUpgradeCoords: Set<string>
         readonly usedUpgradeCoords: Set<string>
@@ -1549,11 +1549,6 @@ declare global {
          * A set of names of remotes controlled by this room
          */
         remotes: string[]
-
-        /**
-         * Source IDs of the sources in the room
-         */
-        SIDs: Id<Source>[]
 
         /**
          * The ID of the mineral

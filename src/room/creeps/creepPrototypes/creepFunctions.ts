@@ -730,22 +730,22 @@ Creep.prototype.findSourceHarvestPos = function (index) {
 
     if (this.memory.PC) {
         // On random intervals take the best source pos if it's open
-
+/*
         if (randomTick()) {
-            const sourcePos = room.roomManager.sourceHarvestPositions[index][0]
+            const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceHarvestCoords[index].has(packedSourceCoord)) {
+            if (!room.usedSourceHarvestCoords.has(packedSourceCoord)) {
                 this.memory.PC = packedSourceCoord
                 return sourcePos
             }
         }
-
+ */
         return unpackCoordAsPos(this.memory.PC, room.name)
     }
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.usedSourceHarvestCoords[index]
+    const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
     const openSourcePositions = room.roomManager.sourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
     if (!openSourcePositions.length) return false
@@ -753,7 +753,7 @@ Creep.prototype.findSourceHarvestPos = function (index) {
     const packedCoord = packCoord(openSourcePositions[0])
 
     this.memory.PC = packedCoord
-    room._usedSourceHarvestCoords[index].add(packedCoord)
+    room._usedSourceHarvestCoords.add(packedCoord)
 
     return openSourcePositions[0]
 }
@@ -767,22 +767,22 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
 
     if (this.memory.PC) {
         // On random intervals take the best source pos if it's open
-
+/*
         if (randomTick()) {
             const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceHarvestCoords[index].has(packedSourceCoord)) {
+            if (!room.usedSourceHarvestCoords.has(packedSourceCoord)) {
                 this.memory.PC = packedSourceCoord
                 return sourcePos
             }
         }
-
+ */
         return unpackCoordAsPos(this.memory.PC, room.name)
     }
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.usedSourceHarvestCoords[index]
+    const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
     const openSourcePositions = room.roomManager.communeSourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
     if (!openSourcePositions.length) return false
@@ -790,7 +790,7 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
     const packedCoord = packCoord(openSourcePositions[0])
 
     this.memory.PC = packedCoord
-    room._usedSourceHarvestCoords[index].add(packedCoord)
+    room._usedSourceHarvestCoords.add(packedCoord)
 
     return openSourcePositions[0]
 }
@@ -804,22 +804,22 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
 
     if (this.memory.PC) {
         // On random intervals take the best source pos if it's open
-
+/*
         if (randomTick()) {
             const sourcePos = room.roomManager.remoteSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceHarvestCoords[index].has(packedSourceCoord)) {
+            if (!room.usedSourceHarvestCoords.has(packedSourceCoord)) {
                 this.memory.PC = packedSourceCoord
                 return sourcePos
             }
         }
-
+ */
         return unpackCoordAsPos(this.memory.PC, room.name)
     }
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.usedSourceHarvestCoords[index]
+    const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
     const openSourcePositions = room.roomManager.remoteSourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
     if (!openSourcePositions.length) return false
@@ -827,7 +827,7 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
     const packedCoord = packCoord(openSourcePositions[0])
 
     this.memory.PC = packedCoord
-    room._usedSourceHarvestCoords[index].add(packedCoord)
+    room._usedSourceHarvestCoords.add(packedCoord)
 
     return openSourcePositions[0]
 }
@@ -964,7 +964,7 @@ Creep.prototype.activeRenew = function () {
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return
     if (!room.myCreeps.fastFiller.length) return
-    if (this.isDying) return
+    if (this.isDying()) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 
@@ -999,7 +999,7 @@ Creep.prototype.passiveRenew = function () {
 
     if (Game.cpu.bucket < CPUBucketRenewThreshold) return
     if (!room.myCreeps.fastFiller.length) return
-    if (this.isDying) return
+    if (this.isDying()) return
 
     // If the creep's age is less than the benefit from renewing, inform false
 

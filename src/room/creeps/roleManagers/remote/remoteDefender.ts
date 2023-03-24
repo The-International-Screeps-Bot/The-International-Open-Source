@@ -35,7 +35,7 @@ export class RemoteDefender extends Creep {
             if (!this.findRemote()) return
         }
 
-        if (this.isDying) return
+        if (this.isDying()) return
 
         // Reduce remote need
 

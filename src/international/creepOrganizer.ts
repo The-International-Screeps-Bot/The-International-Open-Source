@@ -81,7 +81,7 @@ class CreepOrganizer {
 
         // If the creep isn't isDying, organize by its roomFrom and role
 
-        if (!creep.isDying) commune.creepsFromRoom[role].push(creepName)
+        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
         commune.creepsFromRoomAmount += 1
     }
 }

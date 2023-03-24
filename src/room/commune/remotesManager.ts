@@ -77,7 +77,7 @@ export class RemotesManager {
             }
 
             remoteMemory.data[RemoteData.remoteSourceHarvester0] = 3
-            remoteMemory.data[RemoteData.remoteSourceHarvester1] = remoteMemory.SIDs[1] ? 3 : 0
+            remoteMemory.data[RemoteData.remoteSourceHarvester1] = remoteMemory.RSIDs[1] ? 3 : 0
             remoteMemory.data[RemoteData.remoteHauler0] = 0
             remoteMemory.data[RemoteData.remoteHauler1] = 0
             remoteMemory.data[RemoteData.remoteReserver] = 1
@@ -188,7 +188,7 @@ export class RemotesManager {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        for (let index in remoteMemory.SIDs) {
+        for (let index in remoteMemory.RSIDs) {
             const pathRoomNames: Set<string> = new Set()
 
             for (const pos of unpackPosList(remoteMemory.RSPs[index])) {

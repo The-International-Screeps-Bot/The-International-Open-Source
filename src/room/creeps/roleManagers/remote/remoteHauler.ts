@@ -16,7 +16,6 @@ import { Hauler } from '../commune/hauler'
 
 export class RemoteHauler extends Creep {
     public isDying() {
-
         // Stop if creep is spawning
 
         if (this.spawning) return false
@@ -35,7 +34,7 @@ export class RemoteHauler extends Creep {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
-        if (this.isDying) return
+        if (this.isDying()) return
 
         Memory.rooms[this.memory.RN].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] -= this.parts.carry
     }
@@ -79,7 +78,7 @@ export class RemoteHauler extends Creep {
         this.memory.RN = remoteName
         this.memory.SI = sourceIndex
 
-        if (this.isDying) return
+        if (this.isDying()) return
 
         Memory.rooms[remoteName].data[RemoteData[`remoteHauler${this.memory.SI as 0 | 1}`]] -= this.parts.carry
     }
@@ -123,11 +122,10 @@ export class RemoteHauler extends Creep {
         // Try to find a remote
 
         if (!this.findRemote()) {
-
             this.message = '❌ Remote'
 
             // If the room is the creep's commune
-/*
+            /*
             if (this.room.name === this.commune.name) {
                 // Advanced recycle and iterate
 
