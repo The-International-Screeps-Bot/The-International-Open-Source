@@ -144,6 +144,7 @@ export class CommuneManager {
         if (randomTick()) {
             delete this._maxUpgradeStrength
             delete this._minRampartHits
+            delete this._upgradeStructure
         }
     }
 
@@ -274,6 +275,7 @@ export class CommuneManager {
     }
 
     private preTickTest() {
+
         return
 
         let CPUUsed = Game.cpu.getUsed()

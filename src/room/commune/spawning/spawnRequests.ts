@@ -659,7 +659,7 @@ export class SpawnRequestsManager {
 
                 // If all RCL 3 extensions are build
 
-                if (this.spawnEnergyCapacity >= 800) {
+                if (this.spawnEnergyCapacity >= 600) {
                     return {
                         role,
                         defaultParts: [],
@@ -667,6 +667,23 @@ export class SpawnRequestsManager {
                         partsMultiplier: partsMultiplier,
                         maxCreeps: Infinity,
                         minCost: 200,
+                        priority,
+                        memoryAdditions: {
+                            R: true,
+                        },
+                    }
+                }
+
+                // If all RCL 3 extensions are build
+
+                if (this.spawnEnergyCapacity >= 550) {
+                    return {
+                        role,
+                        defaultParts: [],
+                        extraParts: [WORK, MOVE, CARRY, MOVE],
+                        partsMultiplier: partsMultiplier,
+                        maxCreeps: Infinity,
+                        minCost: 250,
                         priority,
                         memoryAdditions: {
                             R: true,
@@ -1002,7 +1019,6 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-
                     const partsMultiplier =
                         data[RemoteData[`maxSourceIncome${sourceIndex as 0 | 1}`]] -
                         data[RemoteData[sourceHarvesterRole]]
@@ -1023,6 +1039,50 @@ export class SpawnRequestsManager {
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 150 * 6,
                             minCost: 200,
+                            priority,
+                            memoryAdditions: {
+                                R: true,
+                                SI: sourceIndex,
+                                RN: remoteName,
+                            },
+                        }
+                    }
+
+                    // We can start reserving
+
+                    if (this.spawnEnergyCapacity >= 650) {
+                        return {
+                            role,
+                            defaultParts: [CARRY],
+                            extraParts: [WORK, WORK, MOVE],
+                            partsMultiplier: Math.ceil(partsMultiplier / 2),
+                            spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                            threshold: 0.1,
+                            minCreeps: undefined,
+                            maxCreeps: sourcePositionsAmount,
+                            maxCostPerCreep: 50 + 250 * 3,
+                            minCost: 300,
+                            priority,
+                            memoryAdditions: {
+                                R: true,
+                                SI: sourceIndex,
+                                RN: remoteName,
+                            },
+                        }
+                    }
+
+                    if (this.spawnEnergyCapacity >= 450) {
+                        return {
+                            role,
+                            defaultParts: [CARRY],
+                            extraParts: [WORK, WORK, MOVE, WORK, MOVE],
+                            partsMultiplier: Math.floor(partsMultiplier / 2),
+                            spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                            threshold: 0.1,
+                            minCreeps: undefined,
+                            maxCreeps: sourcePositionsAmount,
+                            maxCostPerCreep: 50 + 400 * 2,
+                            minCost: 300,
                             priority,
                             memoryAdditions: {
                                 R: true,

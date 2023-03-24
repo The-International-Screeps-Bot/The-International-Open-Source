@@ -984,7 +984,7 @@ const roomAdditions = {
             if (!structure) return false
 
             this.global.controllerContainer = structure.id as Id<StructureContainer>
-            return false
+            return this._controllerContainer
         },
     },
     mineralContainer: {
@@ -1008,7 +1008,7 @@ const roomAdditions = {
             if (!structure) return false
 
             this.global.mineralContainer = structure.id as Id<StructureContainer>
-            return false
+            return this._mineralContainer
         },
     },
     controllerLink: {
@@ -1029,7 +1029,7 @@ const roomAdditions = {
             if (!structure) return false
 
             this.global.controllerLink = structure.id as Id<StructureLink>
-            return false
+            return this._controllerLink
         },
     },
     fastFillerLink: {
@@ -1051,7 +1051,7 @@ const roomAdditions = {
             if (!structure) return false
 
             this.global.fastFillerLink = structure.id as Id<StructureLink>
-            return false
+            return this._fastFillerLink
         },
     },
     hubLink: {
@@ -1078,7 +1078,7 @@ const roomAdditions = {
             if (!this._hubLink) return (this._hubLink = false)
 
             this.global.hubLink = this._hubLink.id
-            return false
+            return this._hubLink
         },
     },
     droppedEnergy: {

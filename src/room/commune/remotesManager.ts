@@ -130,7 +130,7 @@ export class RemotesManager {
                 // If the controller is not reserved or is by us
                 else remoteMemory.data[RemoteData.enemyReserved] = 0
 
-                remoteMemory.data[RemoteData.remoteCoreAttacker] = remote.structures.invaderCore.length
+                remoteMemory.data[RemoteData.remoteCoreAttacker] = remote.structures.invaderCore.length * 8
                 remoteMemory.data[RemoteData.invaderCore] = remote.structures.invaderCore.length
 
                 // Create need if there are any structures that need to be removed

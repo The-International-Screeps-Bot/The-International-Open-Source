@@ -21,6 +21,7 @@ import {
     getRangeEuc,
     getRangeEucXY,
     getRange,
+    isCoordExit,
 } from 'international/utils'
 import {
     packCoord,
@@ -156,7 +157,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     //
 
     const path = unpackPosList(pathOpts.packedPath)
-    for (const pos of path) this.room.coordVisual(pos.x, pos.y)
+    /* for (const pos of path) this.room.coordVisual(pos.x, pos.y) */
 
     const packedGoalPos = packPos(opts.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
@@ -459,8 +460,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         if (avoidPackedPositions.has(packedCoord)) continue
 
         const coord = unpackCoord(packedCoord)
-
-        if (coord.x < 1 || coord.x >= roomDimensions - 1 || coord.y < 1 || coord.y >= roomDimensions - 1) continue
+        if (isCoordExit(coord)) continue
 
         let score: number
         if (goalCoord) {
