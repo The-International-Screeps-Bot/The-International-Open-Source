@@ -38,7 +38,7 @@ export class SourceHarvester extends Creep {
 
         const source = this.room.roomManager.communeSources[this.memory.SI]
 
-        if (getRange(this.pos, source.pos) === 0) {
+        if (getRange(this.pos, source.pos) <= 1) {
             this.advancedHarvestSource(source)
         }
     }

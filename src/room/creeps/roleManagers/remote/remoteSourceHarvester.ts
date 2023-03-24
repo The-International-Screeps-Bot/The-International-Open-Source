@@ -49,7 +49,7 @@ export class RemoteHarvester extends Creep {
 
             const source = this.room.roomManager.remoteSources[this.memory.SI]
 
-            if (getRange(this.pos, source.pos) === 0) {
+            if (getRange(this.pos, source.pos) <= 1) {
                 this.advancedHarvestSource(source)
             }
         }
