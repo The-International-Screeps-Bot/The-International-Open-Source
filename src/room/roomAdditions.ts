@@ -845,32 +845,57 @@ const roomAdditions = {
             if (this._sourceContainers) return this._sourceContainers
 
             if (this.global.sourceContainers) {
-                const containers = []
+                const sourceContainers: StructureContainer[] = []
 
                 for (const ID of this.global.sourceContainers) {
                     const container = findObjectWithID(ID)
-                    if (!container) break
+                    if (!sourceContainers) break
 
-                    containers.push(container)
+                    sourceContainers.push(container)
                 }
 
-                if (containers.length === this.find(FIND_SOURCES).length) return (this._sourceContainers = containers)
+                return (this._sourceContainers = sourceContainers)
             }
 
-            this.global.sourceContainers = []
-            const containers = []
+            const sourceContainers: StructureContainer[] = []
 
-            for (const positions of this.roomManager.sourceHarvestPositions) {
-                for (let structure of positions[0].lookFor(LOOK_STRUCTURES) as StructureContainer[]) {
-                    if (structure.structureType !== STRUCTURE_CONTAINER) continue
+            const roomType = this.memory.T
+            if (roomType === 'commune') {
 
-                    this.global.sourceContainers.push(structure.id)
-                    containers.push(structure)
-                    break
+                const positions = this.roomManager.communeSourceHarvestPositions
+                for (let i = 0; i < positions.length; i++) {
+
+                    const structure = this.findStructureAtCoord(positions[i][0], STRUCTURE_CONTAINER)
+                    if (!structure) continue
+
+                    sourceContainers.push(structure as StructureContainer)
+                }
+            }
+            else if (roomType === 'remote') {
+
+                const positions = this.roomManager.remoteSourceHarvestPositions
+                for (let i = 0; i < positions.length; i++) {
+
+                    const structure = this.findStructureAtCoord(positions[i][0], STRUCTURE_CONTAINER)
+                    if (!structure) continue
+
+                    sourceContainers.push(structure as StructureContainer)
+                }
+            }
+            else {
+
+                const positions = this.roomManager.sourceHarvestPositions
+                for (let i = 0; i < positions.length; i++) {
+
+                    const structure = this.findStructureAtCoord(positions[i][0], STRUCTURE_CONTAINER)
+                    if (!structure) continue
+
+                    sourceContainers.push(structure as StructureContainer)
                 }
             }
 
-            return (this._sourceContainers = containers)
+            if (sourceContainers.length === this.find(FIND_SOURCES).length) this.global.sourceContainers = sourceContainers.map(container => container.id)
+            return (this._sourceContainers = sourceContainers)
         },
     },
     sourceLinks: {
@@ -1764,7 +1789,7 @@ const roomAdditions = {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
             if (this.memory.T === 'remote') return (this._advancedLogistics = true)
-            return (this._advancedLogistics = this.storage !== undefined || this.terminal !== undefined)
+            return (this._advancedLogistics = this.sourceContainers.length > 0 || this.storage !== undefined || this.terminal !== undefined)
         },
     },
     defaultCostMatrix: {

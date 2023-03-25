@@ -47,6 +47,7 @@ class ConfigManager {
                 : false
         Memory.creepSay = settings.creepSay
         Memory.simpleAlliesSegment = settings.simpleAlliesSegment
+        Memory.structureMigration = settings.structureMigration
 
         // Construct foundation
 

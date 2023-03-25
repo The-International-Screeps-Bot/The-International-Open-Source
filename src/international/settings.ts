@@ -102,6 +102,10 @@ export interface Settings {
      * Wether or not to send errors, if set up, to the error storer
      */
     errorExporting: boolean
+    /**
+     * Wether or not to try to migrate existing structures to planned positions
+     */
+    structureMigration: boolean
 }
 
 export const settings: Settings = {
@@ -140,4 +144,5 @@ export const settings: Settings = {
     creepSay: true,
     simpleAlliesSegment: 90,
     errorExporting: true,
+    structureMigration: false,
 }

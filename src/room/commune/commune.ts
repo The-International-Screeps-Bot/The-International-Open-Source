@@ -287,7 +287,8 @@ export class CommuneManager {
     }
 
     private test() {
-
+        customLog('LOGSTICS', this.room.advancedLogistics)
+        customLog('SC', this.room.sourceContainers)
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*

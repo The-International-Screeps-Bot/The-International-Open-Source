@@ -1,9 +1,28 @@
-import { buildableStructuresSet } from 'international/constants'
+import { buildableStructuresSet, buildableStructureTypes } from 'international/constants'
 import { findObjectWithID, packAsNum, randomTick } from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
+
+const generalMigrationStructures: BuildableStructureConstant[] = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_ROAD,
+    STRUCTURE_WALL,
+    STRUCTURE_RAMPART,
+    STRUCTURE_LINK,
+    STRUCTURE_STORAGE,
+    STRUCTURE_TOWER,
+    STRUCTURE_OBSERVER,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_EXTRACTOR,
+    STRUCTURE_LAB,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_CONTAINER,
+    STRUCTURE_NUKER,
+    STRUCTURE_FACTORY,
+]
 
 export class ConstructionManager {
     communeManager: CommuneManager
@@ -20,6 +39,10 @@ export class ConstructionManager {
 
         /* this.visualize() */
 
+        this.place()
+        this.migrate()
+    }
+    private place() {
         // Only run every x ticks or if there are builders (temporary fix)
 
         if (!this.room.myCreeps.builder.length) {
@@ -146,5 +169,73 @@ export class ConstructionManager {
 
         this.room.visual.connectRoads()
         this.room.visual.text(RCL.toString(), this.room.controller.pos)
+    }
+    private migrate() {
+        if (!Memory.structureMigration) return
+        if (!randomTick(100)) return
+
+        const structures = this.room.structures
+        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+
+        for (const structureType of generalMigrationStructures) {
+            for (const structure of structures[structureType]) {
+                const packedCoord = packCoord(structure.pos)
+
+                const coordData = basePlans.map[packedCoord]
+                if (coordData) continue
+
+                structure.destroy()
+                /*
+                let match = false
+
+                for (const data of coordData) {
+                    if (data.structureType !== structure.structureType) continue
+
+                    match = true
+                    break
+                }
+
+                if (match) continue
+
+                structure.destroy()
+ */
+            }
+        }
+
+        if (structures.spawn.length > 1) {
+            for (const structure of structures.spawn) {
+                const packedCoord = packCoord(structure.pos)
+
+                const coordData = basePlans.map[packedCoord]
+                if (coordData) continue
+
+                structure.destroy()
+                /*
+                let match = false
+
+                for (const data of coordData) {
+                    if (data.structureType !== structure.structureType) continue
+
+                    match = true
+                    break
+                }
+
+                if (match) continue
+
+                structure.destroy()
+ */
+            }
+        }
+
+        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
+
+        for (const structure of structures.rampart) {
+            const packedCoord = packCoord(structure.pos)
+
+            const data = rampartPlans.map[packedCoord]
+            if (data) continue
+
+            structure.destroy()
+        }
     }
 }
