@@ -20,6 +20,7 @@ import {
     getRangeXY,
     getRange,
     randomRange,
+    roundToDecimals,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { unpackPosList } from 'other/codec'
@@ -1128,13 +1129,15 @@ export class SpawnRequestsManager {
                     // If all RCL 3 extensions are built
                     if (this.spawnEnergyCapacity >= 800) {
 
+                        const cost = Math.floor(this.communeManager.room.memory.MHC / 150) * 150
+
                             return {
                                 defaultParts: [],
                                 extraParts: [CARRY, CARRY, MOVE],
                                 threshold: 0,
                                 partsMultiplier: partsMultiplier / 2,
-                                minCost: this.communeManager.room.memory.MHC,
-                                maxCostPerCreep: this.communeManager.room.memory.MHC,
+                                minCost: cost,
+                                maxCostPerCreep: cost,
                                 priority,
                                 memoryAdditions: {
                                     R: true,
@@ -1143,6 +1146,8 @@ export class SpawnRequestsManager {
                     }
                     */
 
+                    const cost = Math.floor(this.communeManager.room.memory.MHC / 100) * 100
+
                     return {
                         role,
                         defaultParts: [],
@@ -1150,8 +1155,8 @@ export class SpawnRequestsManager {
                         spawnGroup: [],
                         threshold: 0,
                         partsMultiplier,
-                        minCost: /* this.communeManager.room.memory.MHC */99,
-                        maxCostPerCreep: this.communeManager.room.memory.MHC,
+                        minCost: cost,
+                        maxCostPerCreep: cost,
                         priority,
                         memoryAdditions: {},
                     }
