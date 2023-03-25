@@ -1775,29 +1775,32 @@ const roomAdditions = {
 
             for (const road of this.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
-            // Loop through them
-
             for (const index in this.find(FIND_SOURCES)) {
                 // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                for (const pos of this.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 10)
+                for (const pos of this.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 20)
             }
 
             if (this.roomManager.anchor) {
                 // The last upgrade position should be the deliver pos, which we want to weight normal
 
-                const upgradePositions = this.roomManager.upgradePositions.slice(0, this.roomManager.upgradePositions.length - 1)
-                for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
+                for (const packedCoord of this.usedUpgradeCoords) {
+                    const coord = unpackCoord(packedCoord)
+                    cm.set(coord.x, coord.y, 20)
+                }
 
-                for (const pos of this.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 10)
+                for (const pos of this.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 20)
+
+                const stampAnchors = this.roomManager.stampAnchors
+                if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 20)
+
+                // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+                for (const packedCoord of this.usedFastFillerCoords) {
+                    const coord = unpackCoord(packedCoord)
+                    cm.set(coord.x, coord.y, 20)
+                }
             }
-
-            const stampAnchors = this.roomManager.stampAnchors
-            if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 10)
-
-            // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-            for (const pos of this.fastFillerPositions) cm.set(pos.x, pos.y, 10)
 
             for (const portal of this.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
 

@@ -187,7 +187,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
             } else if (roomMemory.T === 'remote') {
-
                 for (const packedPath of roomMemory.RSPs) {
                     const path = unpackPosList(packedPath)
 
@@ -301,31 +300,32 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoidStationaryPositions is requested
 
                 if (opts.avoidStationaryPositions) {
-                    // Loop through them
 
                     for (const index in room.find(FIND_SOURCES)) {
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                        for (const pos of room.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 10)
+                        for (const pos of room.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 20)
                     }
 
                     if (room.roomManager.anchor) {
                         // The last upgrade position should be the deliver pos, which we want to weight normal
 
-                        const upgradePositions = room.roomManager.upgradePositions.slice(
-                            0,
-                            room.roomManager.upgradePositions.length - 1,
-                        )
-                        for (const pos of upgradePositions) cm.set(pos.x, pos.y, 10)
+                        for (const packedCoord of room.usedUpgradeCoords) {
+                            const coord = unpackCoord(packedCoord)
+                            cm.set(coord.x, coord.y, 20)
+                        }
 
-                        for (const pos of room.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 10)
+                        for (const pos of room.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 20)
 
                         const stampAnchors = room.roomManager.stampAnchors
-                        if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 10)
+                        if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 20)
 
                         // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
-                        for (const pos of room.fastFillerPositions) cm.set(pos.x, pos.y, 10)
+                        for (const packedCoord of room.usedFastFillerCoords) {
+                            const coord = unpackCoord(packedCoord)
+                            cm.set(coord.x, coord.y, 20)
+                        }
                     }
                 }
 
