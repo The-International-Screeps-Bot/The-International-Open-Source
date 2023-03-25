@@ -1,4 +1,4 @@
-import { controllerDowngradeUpgraderNeed, customColors } from 'international/constants'
+import { customColors } from 'international/constants'
 import { customLog, scalePriority } from 'international/utils'
 import { RoomManager } from './room'
 
@@ -69,7 +69,7 @@ export class ContainerManager {
 
         if (container.usedReserveStore > container.store.getCapacity() * 0.9) return
 
-        let priority = this.roomManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed ? 0 : 50
+        let priority = this.roomManager.room.controller.ticksToDowngrade < this.roomManager.room.communeManager.controllerDowngradeUpgradeThreshold ? 0 : 50
         priority += scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20)
 
         this.roomManager.room.createRoomLogisticsRequest({

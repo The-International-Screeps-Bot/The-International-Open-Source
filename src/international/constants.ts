@@ -982,10 +982,6 @@ export const prefferedCommuneRange = 6
  */
 export const relayRoles: Set<CreepRoles> = new Set(['hauler', 'remoteHauler'])
 
-// The dowwngrade timer for when upgrading the controller is required
-
-export const controllerDowngradeUpgraderNeed = 10000
-
 /**
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
  */

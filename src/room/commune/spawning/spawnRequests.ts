@@ -3,7 +3,6 @@ import {
     ClaimRequestData,
     CombatRequestData,
     containerUpkeepCost,
-    controllerDowngradeUpgraderNeed,
     customColors,
     rampartUpkeepCost,
     RemoteData,
@@ -745,7 +744,7 @@ export class SpawnRequestsManager {
                 // If there are enemyAttackers and the controller isn't soon to downgrade
 
                 if (
-                    this.communeManager.room.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
+                    this.communeManager.room.controller.ticksToDowngrade > this.communeManager.controllerDowngradeUpgradeThreshold &&
                     this.communeManager.room.towerInferiority
                 )
                     return false
@@ -793,7 +792,7 @@ export class SpawnRequestsManager {
 
                         // If the controller is near to downgrading
 
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        if (this.communeManager.room.controller.ticksToDowngrade < this.communeManager.controllerDowngradeUpgradeThreshold)
                             extraParts = [CARRY, WORK, MOVE]
                         else if (partsMultiplier === 0) return false
                         else
@@ -844,7 +843,7 @@ export class SpawnRequestsManager {
                     if (this.spawnEnergyCapacity >= 1400) {
                         // If the controller is near to downgrading, set partsMultiplier to x
 
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        if (this.communeManager.room.controller.ticksToDowngrade < this.communeManager.controllerDowngradeUpgradeThreshold)
                             partsMultiplier = Math.max(partsMultiplier, 12)
 
                         partsMultiplier = Math.round(partsMultiplier / 12)
@@ -886,7 +885,7 @@ export class SpawnRequestsManager {
                     if (this.spawnEnergyCapacity >= 1000) {
                         // If the controller is near to downgrading, set partsMultiplier to x
 
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        if (this.communeManager.room.controller.ticksToDowngrade < this.communeManager.controllerDowngradeUpgradeThreshold)
                             partsMultiplier = Math.max(partsMultiplier, 4)
 
                         partsMultiplier = Math.round(partsMultiplier / 4)
@@ -913,7 +912,7 @@ export class SpawnRequestsManager {
                     if (this.spawnEnergyCapacity >= 800) {
                         // If the controller is near to downgrading, set partsMultiplier to x
 
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                        if (this.communeManager.room.controller.ticksToDowngrade < this.communeManager.controllerDowngradeUpgradeThreshold)
                             partsMultiplier = Math.max(partsMultiplier, 6)
 
                         partsMultiplier = Math.round(partsMultiplier / 6)
@@ -937,7 +936,7 @@ export class SpawnRequestsManager {
 
                     // If the controller is near to downgrading, set partsMultiplier to x
 
-                    if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                    if (this.communeManager.room.controller.ticksToDowngrade < this.communeManager.controllerDowngradeUpgradeThreshold)
                         partsMultiplier = Math.max(partsMultiplier, 4)
 
                     partsMultiplier = Math.round(partsMultiplier / 4)
@@ -961,7 +960,7 @@ export class SpawnRequestsManager {
 
                 // If the controller is near to downgrading, set partsMultiplier to x
 
-                if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                if (this.communeManager.room.controller.ticksToDowngrade < this.communeManager.controllerDowngradeUpgradeThreshold)
                     partsMultiplier = Math.max(partsMultiplier, 1)
                 if (this.communeManager.room.controller.level < 2) partsMultiplier = Math.max(partsMultiplier, 1)
 

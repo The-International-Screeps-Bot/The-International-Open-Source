@@ -573,4 +573,12 @@ export class CommuneManager {
 
         return this._structureTypesByBuildPriority
     }
+
+    /**
+     * When the room needs to upgrade at high priority to remove the downgrade timer
+     */
+    get controllerDowngradeUpgradeThreshold() {
+
+        return Math.floor(CONTROLLER_DOWNGRADE[this.room.controller.level] * 0.75)
+    }
 }
