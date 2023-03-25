@@ -217,7 +217,6 @@ export class RemoteHauler extends Creep {
             {
                 packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                 remoteName: this.memory.RN,
-                loose: true,
             },
         )
 
@@ -229,11 +228,8 @@ export class RemoteHauler extends Creep {
      * @returns If the creep no longer needs energy
      */
     getRemoteSourceResources?() {
-        const sourceHarvestPos = unpackPosList(Memory.rooms[this.memory.RN].RSHP[this.memory.SI])[0]
 
-        // We aren't next to the source
 
-        if (getRange(this.pos, sourceHarvestPos) > 1) {
             // Fulfill requests near the hauler
 
             this.runRoomLogisticsRequestsAdvanced({
@@ -246,6 +242,12 @@ export class RemoteHauler extends Creep {
                     return getRange(targetPos, this.pos) <= 1
                 },
             })
+
+            const sourceHarvestPos = unpackPosList(Memory.rooms[this.memory.RN].RSHP[this.memory.SI])[0]
+
+        // We aren't next to the source
+
+        if (getRange(this.pos, sourceHarvestPos) > 1) {
 
             if (!this.needsResources()) return true
 
@@ -263,7 +265,6 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                     remoteName: this.memory.RN,
-                    loose: true,
                 },
             )
 
@@ -272,20 +273,7 @@ export class RemoteHauler extends Creep {
 
         // We are next to the source
 
-        this.moved = ''
-
-        // Fulfill requests near the source
-
-        this.runRoomLogisticsRequestsAdvanced({
-            types: new Set(['withdraw', 'pickup']),
-            resourceTypes: new Set([RESOURCE_ENERGY]),
-            conditions: request => {
-                // If the target is near the hauler
-
-                const targetPos = findObjectWithID(request.targetID).pos
-                return getRange(targetPos, this.pos) <= 1
-            },
-        })
+        this.moved = 'wait'
 
         return !this.needsResources()
     }
@@ -330,7 +318,6 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                     remoteName: this.memory.RN,
-                    loose: true,
                 },
             )
 

@@ -74,7 +74,8 @@ export class ConstructionManager {
             }
         }
 
-        if (RCL >= 4 && this.room.resourcesInStoringStructures.energy < 30000) return
+        if (RCL < 4) return
+        if (this.room.resourcesInStoringStructures.energy < 30000) return
 
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 

@@ -1537,7 +1537,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
     }
 
     if (request.type === 'transfer') {
-        const amount = Math.min(this.store.getCapacity(), request.amount)
+        const amount = Math.min(this.nextStore[request.resourceType], request.amount)
 
         // We don't have enough resource and we can deliver
 
@@ -1604,7 +1604,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
 
         if (request.onlyFull) {
             // If the creep has enough resource
-
+            /* this.room.visual.text(Math.min(amount, target.store.getCapacity(request.resourceType) / 2).toString(), this.pos) */
             if (
                 this.nextStore[request.resourceType] >=
                 Math.min(amount, target.store.getCapacity(request.resourceType) / 2)
@@ -1726,7 +1726,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
     /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
-
+    this.room.targetVisual(this.pos, target.pos, true)
     if (getRange(target.pos, this.pos) > 1) {
         this.createMoveRequest({
             origin: this.pos,

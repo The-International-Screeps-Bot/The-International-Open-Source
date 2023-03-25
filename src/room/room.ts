@@ -96,11 +96,10 @@ export class RoomManager {
         room.myCreepsAmount = 0
         room.myPowerCreepsAmount = 0
 
-        room.creepsOfSource = []
-
         room.partsOfRoles = {}
         room.powerTasks = {}
 
+        room.creepsOfSource = []
         for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])
 
         room.squadRequests = new Set()

@@ -1921,7 +1921,7 @@ declare global {
         /**
          * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
          */
-        moved?: string | 'moved' | 'yield'
+        moved?: string | 'moved' | 'wait'
 
         /**
          * The creep's opts when trying to make a moveRequest intra tick

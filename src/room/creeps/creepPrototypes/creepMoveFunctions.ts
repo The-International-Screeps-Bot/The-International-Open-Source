@@ -218,7 +218,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     // If loose is enabled, don't try to get back on the cached path
 
-    this.room.visual.text(pathOpts.loose.toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
+    this.room.visual.text((pathOpts.loose || false).toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
 
     if (pathOpts.loose) return this.createMoveRequest(opts)
 
@@ -659,11 +659,18 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
 
-        if (creepAtPos.moved === '') {
+        if (creepAtPos.moved === 'wait') {
+            if (creepAtPos instanceof PowerCreep) {
+                delete this.moveRequest
+                this.moved = 'wait'
+                return
+            }
+
             if (
-                creepAtPos instanceof PowerCreep ||
+                this.memory.RN !== creepAtPos.memory.RN ||
+                this.memory.SI !== creepAtPos.memory.SI ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[(creepAtPos as Creep).role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
                 // Have the creep move to its moveRequest
 
@@ -678,7 +685,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             }
 
             delete this.moveRequest
-            this.moved = ''
+            this.moved = 'wait'
             return
         }
 

@@ -525,17 +525,39 @@ export class CommuneManager {
     get structureTypesByBuildPriority() {
         if (this._structureTypesByBuildPriority) return this._structureTypesByBuildPriority
 
+        if (!this.room.fastFillerContainerLeft && !this.room.fastFillerContainerRight) {
+
+            return this._structureTypesByBuildPriority = [
+                STRUCTURE_RAMPART,
+                STRUCTURE_WALL,
+                STRUCTURE_SPAWN,
+                STRUCTURE_CONTAINER,
+                STRUCTURE_EXTENSION,
+                STRUCTURE_ROAD,
+                STRUCTURE_STORAGE,
+                STRUCTURE_TOWER,
+                STRUCTURE_TERMINAL,
+                STRUCTURE_LINK,
+                STRUCTURE_EXTRACTOR,
+                STRUCTURE_LAB,
+                STRUCTURE_FACTORY,
+                STRUCTURE_POWER_SPAWN,
+                STRUCTURE_NUKER,
+                STRUCTURE_OBSERVER,
+            ]
+        }
+
         this._structureTypesByBuildPriority = [
+            STRUCTURE_RAMPART,
+            STRUCTURE_WALL,
             STRUCTURE_SPAWN,
             STRUCTURE_EXTENSION,
             STRUCTURE_CONTAINER,
             STRUCTURE_ROAD,
             STRUCTURE_STORAGE,
             STRUCTURE_TOWER,
-            STRUCTURE_WALL,
-            STRUCTURE_RAMPART,
-            STRUCTURE_LINK,
             STRUCTURE_TERMINAL,
+            STRUCTURE_LINK,
             STRUCTURE_EXTRACTOR,
             STRUCTURE_LAB,
             STRUCTURE_FACTORY,

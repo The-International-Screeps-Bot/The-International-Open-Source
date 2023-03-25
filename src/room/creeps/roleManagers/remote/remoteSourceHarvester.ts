@@ -254,7 +254,6 @@ export class RemoteHarvester extends Creep {
             {
                 packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                 remoteName: this.memory.RN,
-                loose: true,
             },
         )
 
@@ -327,7 +326,6 @@ export class RemoteHarvester extends Creep {
                 {
                     packedPath: reversePosList(Memory.rooms[creep.memory.RN].RSPs[creep.memory.SI]),
                     remoteName: creep.memory.RN,
-                    loose: true,
                 },
             )
         }

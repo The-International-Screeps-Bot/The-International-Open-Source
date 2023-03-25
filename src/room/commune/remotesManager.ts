@@ -77,8 +77,8 @@ export class RemotesManager {
 
             remoteMemory.data[RemoteData.maxSourceIncome0] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME // default is 5
             remoteMemory.data[RemoteData.maxSourceIncome1] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME // default is 5
-            remoteMemory.data[RemoteData.remoteSourceHarvester0] = 3
-            remoteMemory.data[RemoteData.remoteSourceHarvester1] = remoteMemory.RSIDs[1] ? 3 : 0
+            remoteMemory.data[RemoteData.remoteSourceHarvester0] = 0
+            remoteMemory.data[RemoteData.remoteSourceHarvester1] = 0
             remoteMemory.data[RemoteData.remoteHauler0] = 0
             remoteMemory.data[RemoteData.remoteHauler1] = 0
             remoteMemory.data[RemoteData.remoteReserver] = 1
@@ -98,11 +98,6 @@ export class RemotesManager {
 
                 remoteMemory.data[RemoteData.maxSourceIncome0] *= 2
                 remoteMemory.data[RemoteData.maxSourceIncome1] *= 2
-
-                // Increase the remoteHarvester need accordingly
-
-                remoteMemory.data[RemoteData.remoteSourceHarvester0] *= 2
-                remoteMemory.data[RemoteData.remoteSourceHarvester1] *= 2
 
                 // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
 
@@ -143,8 +138,6 @@ export class RemotesManager {
             if (remoteMemory.data[RemoteData.enemyReserved] || remoteMemory.data[RemoteData.invaderCore]) {
                 remoteMemory.data[RemoteData.maxSourceIncome0] = 0
                 remoteMemory.data[RemoteData.maxSourceIncome1] = 0
-                remoteMemory.data[RemoteData.remoteSourceHarvester0] = 0
-                remoteMemory.data[RemoteData.remoteSourceHarvester1] = 0
                 remoteMemory.data[RemoteData.remoteHauler0] = 0
                 remoteMemory.data[RemoteData.remoteHauler1] = 0
             }

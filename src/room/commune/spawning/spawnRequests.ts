@@ -1170,8 +1170,6 @@ export class SpawnRequestsManager {
             // Add up econ data for this.communeManager.room this.communeManager.room
 
             const totalRemoteNeed =
-                Math.max(remoteData[RemoteData.remoteHauler0], 0) +
-                Math.max(remoteData[RemoteData.remoteHauler1], 0) +
                 Math.max(remoteData[RemoteData.remoteReserver], 0) +
                 Math.max(remoteData[RemoteData.remoteCoreAttacker], 0) +
                 Math.max(remoteData[RemoteData.remoteDismantler], 0) +
@@ -1189,8 +1187,8 @@ export class SpawnRequestsManager {
                     // If there are insufficient harvesters for the remote's sources
 
                     if (
-                        Math.max(remoteData[RemoteData.remoteSourceHarvester0], 0) +
-                            Math.max(remoteData[RemoteData.remoteSourceHarvester1], 0) >
+                        remoteData[RemoteData.remoteSourceHarvester0] +
+                            remoteData[RemoteData.remoteSourceHarvester1] ===
                         0
                     )
                         return false

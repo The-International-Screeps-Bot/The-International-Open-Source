@@ -25,6 +25,7 @@ import {
 import {
     advancedFindDistance,
     areCoordsEqual,
+    cleanRoomMemory,
     createPosMap,
     customLog,
     findAdjacentCoordsToCoord,
@@ -186,6 +187,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
             } else if (roomMemory.T === 'remote') {
+
                 for (const packedPath of roomMemory.RSPs) {
                     const path = unpackPosList(packedPath)
 
@@ -715,6 +717,11 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // If the new average source efficacy is above the current, stop
 
     if (newRemoteEfficacy >= currentRemoteEfficacy) return this.memory.T
+
+    // Make neutral so we don't have type value issues
+
+    this.memory.T = 'neutral'
+    cleanRoomMemory(this.name)
 
     // Generate new important positions
 
