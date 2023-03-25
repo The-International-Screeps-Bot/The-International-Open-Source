@@ -484,9 +484,9 @@ export class RemoteHauler extends Creep {
             )
                 returnTripTime = Memory.rooms[this.memory.RN].RSPs[this.memory.SI].length * 1.1
         }
-
+        if (this.ticksToLive <= returnTripTime) this.room.visual.text('🕒', this.pos)
         if (this.needsResources() && this.ticksToLive > returnTripTime) {
-            this.room.visual.text('🕒', this.pos)
+
             this.getResources()
             return
         }
