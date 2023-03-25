@@ -8,8 +8,6 @@ import { RampartPlans } from './rampartPlans'
 const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
-    STRUCTURE_ROAD,
-    STRUCTURE_WALL,
     STRUCTURE_LINK,
     STRUCTURE_STORAGE,
     STRUCTURE_TOWER,
