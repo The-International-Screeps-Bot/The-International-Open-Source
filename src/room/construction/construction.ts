@@ -1,5 +1,5 @@
 import { buildableStructuresSet, buildableStructureTypes } from 'international/constants'
-import { findObjectWithID, packAsNum, randomTick } from 'international/utils'
+import { customLog, findObjectWithID, packAsNum, randomTick } from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
@@ -10,7 +10,6 @@ const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_EXTENSION,
     STRUCTURE_ROAD,
     STRUCTURE_WALL,
-    STRUCTURE_RAMPART,
     STRUCTURE_LINK,
     STRUCTURE_STORAGE,
     STRUCTURE_TOWER,
@@ -185,24 +184,13 @@ export class ConstructionManager {
                 if (coordData) continue
 
                 structure.destroy()
-                /*
-                let match = false
-
-                for (const data of coordData) {
-                    if (data.structureType !== structure.structureType) continue
-
-                    match = true
-                    break
-                }
-
-                if (match) continue
-
-                structure.destroy()
- */
             }
         }
 
-        if (structures.spawn.length > 1) {
+        // Keep one spawn even if all are misplaced
+
+        let i = structures.spawn.length
+        while (i > 1) {
             for (const structure of structures.spawn) {
                 const packedCoord = packCoord(structure.pos)
 
@@ -210,20 +198,7 @@ export class ConstructionManager {
                 if (coordData) continue
 
                 structure.destroy()
-                /*
-                let match = false
-
-                for (const data of coordData) {
-                    if (data.structureType !== structure.structureType) continue
-
-                    match = true
-                    break
-                }
-
-                if (match) continue
-
-                structure.destroy()
- */
+                i -= 1
             }
         }
 

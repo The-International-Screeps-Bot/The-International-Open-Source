@@ -1150,7 +1150,7 @@ export class SpawnRequestsManager {
                         spawnGroup: [],
                         threshold: 0,
                         partsMultiplier,
-                        minCost: this.communeManager.room.memory.MHC,
+                        minCost: /* this.communeManager.room.memory.MHC */99,
                         maxCostPerCreep: this.communeManager.room.memory.MHC,
                         priority,
                         memoryAdditions: {},

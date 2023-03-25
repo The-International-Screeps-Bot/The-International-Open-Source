@@ -73,6 +73,7 @@ import { encode } from 'base32768'
 import { BasePlans } from '../construction/basePlans'
 import { internationalManager } from 'international/international'
 import { ConstructionManager } from 'room/construction/construction'
+import { RampartPlans } from 'room/construction/rampartPlans'
 
 export class CommuneManager {
     // Managers
@@ -287,8 +288,8 @@ export class CommuneManager {
     }
 
     private test() {
-        customLog('LOGSTICS', this.room.advancedLogistics)
-        customLog('SC', this.room.sourceContainers)
+        customLog('MHC', this.room.memory.MHC)
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
