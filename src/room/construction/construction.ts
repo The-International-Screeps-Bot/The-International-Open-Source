@@ -189,17 +189,20 @@ export class ConstructionManager {
 
         // Keep one spawn even if all are misplaced
 
-        let i = structures.spawn.length
-        while (i > 1) {
-            i -= 1
-            const structure = structures.spawn[i]
+        const misplacedSpawns: StructureSpawn[] = []
+
+        for (const structure of structures.spawn) {
             const packedCoord = packCoord(structure.pos)
 
             const coordData = basePlans.map[packedCoord]
             if (coordData) continue
 
-            structure.destroy()
-            i -= 1
+            misplacedSpawns.push(structure)
+        }
+
+        let i = misplacedSpawns.length === structures.spawn.length ? 1 : 0
+        for (; i < misplacedSpawns.length; i++) {
+            misplacedSpawns[i].destroy()
         }
 
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
