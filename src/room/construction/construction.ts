@@ -191,15 +191,15 @@ export class ConstructionManager {
 
         let i = structures.spawn.length
         while (i > 1) {
-            for (const structure of structures.spawn) {
-                const packedCoord = packCoord(structure.pos)
+            i -= 1
+            const structure = structures.spawn[i]
+            const packedCoord = packCoord(structure.pos)
 
-                const coordData = basePlans.map[packedCoord]
-                if (coordData) continue
+            const coordData = basePlans.map[packedCoord]
+            if (coordData) continue
 
-                structure.destroy()
-                i -= 1
-            }
+            structure.destroy()
+            i -= 1
         }
 
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
