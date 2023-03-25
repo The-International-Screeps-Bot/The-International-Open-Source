@@ -123,6 +123,7 @@ export class RemoteHauler extends Creep {
 
         if (!this.findRemote()) {
             this.message = '❌ Remote'
+            this.room.visual.text('❌', this.pos)
 
             // If the room is the creep's commune
             /*
@@ -485,6 +486,7 @@ export class RemoteHauler extends Creep {
         }
 
         if (this.needsResources() && this.ticksToLive > returnTripTime) {
+            this.room.visual.text('🕒', this.pos)
             this.getResources()
             return
         }
