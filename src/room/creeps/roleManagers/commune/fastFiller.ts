@@ -1,5 +1,5 @@
 import { findClosestPos, getRangeXY, getRange } from 'international/utils'
-import { packCoord, packPos, unpackCoordAsPos, unpackPos } from 'other/codec'
+import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 
 export class FastFiller extends Creep {
     travelToFastFiller?(): boolean {

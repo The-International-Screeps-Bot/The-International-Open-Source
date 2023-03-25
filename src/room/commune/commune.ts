@@ -287,6 +287,8 @@ export class CommuneManager {
     }
 
     private test() {
+        /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
+
         /*
         const array = new Array(2500)
 

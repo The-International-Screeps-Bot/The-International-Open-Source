@@ -662,22 +662,24 @@ const roomAdditions = {
                 // If the creep is isDying, iterate
 
                 if (creep.isDying()) continue
-                if (!creep.memory.PC) continue
+
+                const packedCoord = creep.memory.PC
+                if (!packedCoord) continue
 
                 // The creep has a packedPos
 
-                this._usedUpgradeCoords.add(creep.memory.PC)
+                this._usedUpgradeCoords.add(packedCoord)
             }
 
             if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
-            /*
+
             for (const packedCoord of this._usedUpgradeCoords) {
 
                 const coord = unpackCoord(packedCoord)
 
                 this.visual.circle(coord.x, coord.y, { fill: customColors.red })
             }
- */
+
             return this._usedUpgradeCoords
         },
     },
@@ -781,11 +783,13 @@ const roomAdditions = {
                 // If the creep is isDying, iterate
 
                 if (creep.isDying()) continue
-                if (!creep.memory.PC) continue
+
+                const packedCoord = creep.memory.PC
+                if (!packedCoord) continue
 
                 // The creep has a packedPos
 
-                this._usedFastFillerCoords.add(creep.memory.PC)
+                this._usedFastFillerCoords.add(packedCoord)
             }
 
             return this._usedFastFillerCoords
@@ -1856,7 +1860,7 @@ const roomAdditions = {
             }
 
             /* this.global.defaultCostMatrix = cm.serialize() */
-            return (this._defaultCostMatrix = cm)
+            return (this._defaultCostMatrix = cm.clone())
         },
     },
     totalEnemyCombatStrength: {

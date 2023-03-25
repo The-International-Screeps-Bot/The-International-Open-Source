@@ -3037,7 +3037,7 @@ export class CommunePlanner {
             communeSources: this.communeSources.map(source => source.id),
             sourceHarvestPositions: this.sourceHarvestPositions.map(positions => packPosList(positions)),
             sourcePaths: this.sourcePaths.map(path => packPosList(path)),
-            mineralHarvestPositions: packPosList(this.mineralPath),
+            mineralHarvestPositions: packPosList(this.mineralHarvestPositions),
             mineralPath: packPosList(this.mineralPath),
             centerUpgradePos: packPos(this.centerUpgradePos),
             upgradePath: packPosList(this.upgradePath),

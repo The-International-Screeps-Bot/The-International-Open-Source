@@ -436,7 +436,7 @@ export class RoomManager {
 
     _upgradePositions: RoomPosition[]
     get upgradePositions() {
-        if (this._upgradePositions) return this._upgradePositions
+        /* if (this._upgradePositions) return this._upgradePositions */
 
         // Get the center upgrade pos, stopping if it's undefined
 
@@ -480,7 +480,7 @@ export class RoomManager {
         // Make the center pos the first to be chosen (we want upgraders to stand on the container)
 
         positions.unshift(centerUpgradePos)
-
+        
         return (this._upgradePositions = positions)
     }
 
