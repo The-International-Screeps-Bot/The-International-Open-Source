@@ -31,6 +31,8 @@ Room.prototype.advancedSell = function (resourceType, amount, targetAmount) {
     if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
     const orders = internationalManager.orders[ORDER_SELL][resourceType]
+    if (!orders) return false
+
     const price = Math.max(
       Math.min(...orders.map(o => o.price)) * 0.99,
       getAvgPrice(resourceType) * 0.8
@@ -78,6 +80,8 @@ Room.prototype.advancedBuy = function (resourceType, amount, targetAmount) {
     if (internationalManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
     const orders = internationalManager.orders[ORDER_BUY][resourceType]
+    if (!orders) return false
+    
     const price = Math.min(
       Math.max(...orders.map(o => o.price)) * 1.01,
       getAvgPrice(resourceType) * 1.2

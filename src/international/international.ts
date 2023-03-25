@@ -299,16 +299,11 @@ export class InternationalManager {
     get orders() {
         // If _orders are already defined, inform them
 
-        if (this._orders) return this._orders
+        /* if (this._orders) return this._orders */
 
         this._orders = {
             buy: {},
             sell: {},
-        }
-
-        for (const resource of RESOURCES_ALL) {
-            this._orders.buy[resource] = []
-            this._orders.sell[resource] = []
         }
 
         // Get the market's order and loop through them
@@ -319,6 +314,11 @@ export class InternationalManager {
             // Get the order using its ID
 
             const order = orders[orderID]
+
+            if (!this._orders[order.type][order.resourceType]) {
+                this._orders[order.type][order.resourceType] = [order]
+                continue
+            }
 
             // Assign the order to a resource-ordered location
 

@@ -672,14 +672,14 @@ const roomAdditions = {
             }
 
             if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
-
+/*
             for (const packedCoord of this._usedUpgradeCoords) {
 
                 const coord = unpackCoord(packedCoord)
 
                 this.visual.circle(coord.x, coord.y, { fill: customColors.red })
             }
-
+ */
             return this._usedUpgradeCoords
         },
     },

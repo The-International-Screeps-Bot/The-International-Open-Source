@@ -157,7 +157,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     //
 
     const path = unpackPosList(pathOpts.packedPath)
-    /* for (const pos of path) this.room.coordVisual(pos.x, pos.y) */
+    /* for (const pos of path) new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: customColors.lightBlue, opacity: 0.2 }) */
 
     const packedGoalPos = packPos(opts.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
@@ -669,8 +669,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             if (
                 this.memory.RN !== creepAtPos.memory.RN ||
                 this.memory.SI !== creepAtPos.memory.SI ||
-                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                (TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
             ) {
                 // Have the creep move to its moveRequest
 
@@ -748,7 +748,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             creepAtPos.moveRequest = packedCoord
             room.moveRequests.set(packedCoord, [creepAtPos.name])
             creepAtPos.runMoveRequest()
- */
+            */
             return
         }
 
@@ -780,9 +780,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             // Prefer the creep with the higher priority
 
             if (
-                creepAtPos instanceof PowerCreep ||
-                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                !(creepAtPos instanceof PowerCreep) &&
+                (TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
             ) {
                 this.runMoveRequest()
 
@@ -800,9 +800,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         }
 
         if (
-            creepAtPos instanceof PowerCreep ||
-            TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+            !(creepAtPos instanceof PowerCreep) &&
+            (TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
