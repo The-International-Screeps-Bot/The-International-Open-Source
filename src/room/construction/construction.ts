@@ -68,7 +68,7 @@ export class ConstructionManager {
             for (let i = 0; i < coordData.length; i++) {
                 const data = coordData[i]
                 if (data.minRCL > RCL) continue
-
+/*
                 const structureIDs = this.room.structureCoords.get(packCoord(coord))
                 if (structureIDs) {
                     let skip = false
@@ -88,14 +88,13 @@ export class ConstructionManager {
 
                     if (skip) break
                 }
-
+ */
                 this.room.createConstructionSite(coord.x, coord.y, data.structureType)
                 break
             }
         }
 
-        if (RCL < 4) return
-        if (this.room.resourcesInStoringStructures.energy < 30000) return
+        if ((this.room.storage || this.room.terminal) && this.room.resourcesInStoringStructures.energy < 30000) return
 
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
@@ -179,7 +178,19 @@ export class ConstructionManager {
                 const packedCoord = packCoord(structure.pos)
 
                 const coordData = basePlans.map[packedCoord]
-                if (coordData) continue
+                if (!coordData) {
+
+                    structure.destroy()
+                    continue
+                }
+
+                let match = false
+                for (const data of coordData) {
+                    if (data.structureType !== structure.structureType) continue
+                    match = true
+                    break
+                }
+                if (match) continue
 
                 structure.destroy()
             }
@@ -193,7 +204,19 @@ export class ConstructionManager {
             const packedCoord = packCoord(structure.pos)
 
             const coordData = basePlans.map[packedCoord]
-            if (coordData) continue
+            if (!coordData) {
+
+                misplacedSpawns.push(structure)
+                continue
+            }
+
+            let match = false
+            for (const data of coordData) {
+                if (data.structureType !== structure.structureType) continue
+                match = true
+                break
+            }
+            if (match) continue
 
             misplacedSpawns.push(structure)
         }
