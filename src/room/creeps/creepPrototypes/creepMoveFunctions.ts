@@ -477,7 +477,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue
 
-        if (this.memory.ROS && !room.findStructureAtCoord(coord, STRUCTURE_RAMPART)) continue
+        if (this.memory.ROS && !room.findStructureAtCoord(coord, (structure) => structure.structureType === STRUCTURE_RAMPART)) continue
 
         let hasImpassibleStructure
 

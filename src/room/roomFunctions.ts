@@ -2316,37 +2316,33 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     })
 }
 
-Room.prototype.findStructureAtCoord = function (coord, structureType) {
-    return this.findStructureAtXY(coord.x, coord.y, structureType)
+Room.prototype.findStructureAtCoord = function <T extends Structure>(coord: Coord, conditions: (structure: T) => boolean) {
+    return this.findStructureAtXY(coord.x, coord.y, conditions)
 }
 
-Room.prototype.findStructureAtXY = function (x, y, structureType) {
+Room.prototype.findStructureAtXY = function <T extends Structure>(x: number, y: number, conditions: (structure: T) => boolean) {
     const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
     if (!structureIDs) return false
 
     for (const ID of structureIDs) {
-        const structure = findObjectWithID(ID)
-        if (structure.structureType !== structureType) continue
-
-        return structure
+        const structure = findObjectWithID(ID) as T
+        if (conditions(structure)) return structure
     }
 
     return false
 }
 
-Room.prototype.findCSiteAtCoord = function (coord, structureType) {
-    return this.findCSiteAtXY(coord.x, coord.y, structureType)
+Room.prototype.findCSiteAtCoord = function <T extends ConstructionSite>(coord: Coord, conditions: (cSite: T) => boolean) {
+    return this.findCSiteAtXY(coord.x, coord.y, conditions)
 }
 
-Room.prototype.findCSiteAtXY = function (x, y, structureType) {
+Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(x: number, y: number, conditions: (cSite: T) => boolean) {
     const cSiteIDs = this.cSiteCoords.get(packXYAsCoord(x, y))
     if (!cSiteIDs) return false
 
     for (const ID of cSiteIDs) {
-        const cSite = findObjectWithID(ID)
-        if (cSite.structureType !== structureType) continue
-
-        return cSite
+        const cSite = findObjectWithID(ID) as T
+        if (conditions(cSite)) return cSite
     }
 
     return false

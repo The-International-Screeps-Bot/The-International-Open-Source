@@ -74,6 +74,7 @@ import { BasePlans } from '../construction/basePlans'
 import { internationalManager } from 'international/international'
 import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
+import { has } from 'lodash'
 
 export class CommuneManager {
     // Managers
@@ -389,7 +390,7 @@ export class CommuneManager {
     _minRampartHits: number
 
     get minRampartHits() {
-        if (this._minRampartHits!== undefined) return this._minRampartHits
+        if (this._minRampartHits !== undefined) return this._minRampartHits
 
         const level = this.room.controller.level
 
@@ -580,5 +581,30 @@ export class CommuneManager {
     get controllerDowngradeUpgradeThreshold() {
 
         return Math.floor(CONTROLLER_DOWNGRADE[this.room.controller.level] * 0.75)
+    }
+
+    _defensiveRamparts: StructureRampart[]
+    get defensiveRamparts() {
+        if (this._defensiveRamparts) return this._defensiveRamparts
+
+        const ramparts: StructureRampart[] = []
+        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
+
+        for (const packedCoord in rampartPlans.map) {
+            const coord = unpackCoord(packedCoord)
+            const data = rampartPlans.map[packedCoord]
+            if (!data) continue
+
+            const structure = this.room.findStructureAtCoord(coord, (structure) => structure.structureType === STRUCTURE_RAMPART) as StructureRampart | false
+            if (!structure) continue
+
+            if (this.room.findStructureInRange(coord, 0, (structure) => {
+                return impassibleStructureTypesSet.has(structure.structureType)
+            })) continue
+
+            ramparts.push(structure)
+        }
+
+        return this._defensiveRamparts = ramparts
     }
 }

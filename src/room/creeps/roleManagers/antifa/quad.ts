@@ -291,7 +291,7 @@ export class Quad {
                     this.findMinRange(enemyCreep.pos) <= 4 &&
                     (enemyCreep.combatStrength.ranged || enemyCreep.combatStrength.melee),
             )
-            if (nearbyThreat && !this.leader.room.findStructureAtCoord(nearbyThreat.pos, STRUCTURE_RAMPART)) {
+            if (nearbyThreat && !this.leader.room.findStructureAtCoord(nearbyThreat.pos, (structure) => structure.structureType === STRUCTURE_RAMPART)) {
                 this.target = nearbyThreat
                 this.advancedTransform()
             }

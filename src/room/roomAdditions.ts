@@ -865,7 +865,7 @@ const roomAdditions = {
                 const positions = this.roomManager.communeSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
 
-                    const structure = this.findStructureAtCoord(positions[i][0], STRUCTURE_CONTAINER)
+                    const structure = this.findStructureAtCoord(positions[i][0], (structure) => structure.structureType === STRUCTURE_CONTAINER)
                     if (!structure) continue
 
                     sourceContainers.push(structure as StructureContainer)
@@ -876,7 +876,7 @@ const roomAdditions = {
                 const positions = this.roomManager.remoteSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
 
-                    const structure = this.findStructureAtCoord(positions[i][0], STRUCTURE_CONTAINER)
+                    const structure = this.findStructureAtCoord(positions[i][0], (structure) => structure.structureType === STRUCTURE_CONTAINER)
                     if (!structure) continue
 
                     sourceContainers.push(structure as StructureContainer)
@@ -887,7 +887,7 @@ const roomAdditions = {
                 const positions = this.roomManager.sourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
 
-                    const structure = this.findStructureAtCoord(positions[i][0], STRUCTURE_CONTAINER)
+                    const structure = this.findStructureAtCoord(positions[i][0], (structure) => structure.structureType === STRUCTURE_CONTAINER)
                     if (!structure) continue
 
                     sourceContainers.push(structure as StructureContainer)
@@ -957,7 +957,7 @@ const roomAdditions = {
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No anchor found for fastFillerContainerLeft ' + this.name)
 
-            const structure = this.findStructureAtXY(anchor.x - 2, anchor.y, STRUCTURE_CONTAINER) as
+            const structure = this.findStructureAtXY(anchor.x - 2, anchor.y, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
                 | StructureContainer
                 | false
             this._fastFillerContainerLeft = structure
@@ -981,7 +981,7 @@ const roomAdditions = {
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No anchor found for fastFillerContainerLeft ' + this.name)
 
-            const structure = this.findStructureAtXY(anchor.x + 2, anchor.y, STRUCTURE_CONTAINER) as
+            const structure = this.findStructureAtXY(anchor.x + 2, anchor.y, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
                 | StructureContainer
                 | false
             this._fastFillerContainerRight = structure
@@ -1005,7 +1005,7 @@ const roomAdditions = {
             const centerUpgradePos = this.roomManager.centerUpgradePos
             if (!centerUpgradePos) return false
 
-            const structure = this.findStructureAtCoord(centerUpgradePos, STRUCTURE_CONTAINER) as
+            const structure = this.findStructureAtCoord(centerUpgradePos, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
                 | StructureContainer
                 | false
             this._controllerContainer = structure
@@ -1029,7 +1029,7 @@ const roomAdditions = {
             const mineralHarvestPos = this.roomManager.mineralHarvestPositions[0]
             if (!mineralHarvestPos) return false
 
-            const structure = this.findStructureAtCoord(mineralHarvestPos, STRUCTURE_CONTAINER) as
+            const structure = this.findStructureAtCoord(mineralHarvestPos, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
                 | StructureContainer
                 | false
             this._mineralContainer = structure
@@ -1052,7 +1052,7 @@ const roomAdditions = {
 
             const centerUpgradePos = this.roomManager.centerUpgradePos
 
-            const structure = this.findStructureAtCoord(centerUpgradePos, STRUCTURE_LINK) as StructureLink | false
+            const structure = this.findStructureAtCoord(centerUpgradePos, (structure) => structure.structureType === STRUCTURE_LINK) as StructureLink | false
             this._controllerLink = structure
 
             if (!structure) return false
@@ -1074,7 +1074,7 @@ const roomAdditions = {
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No ancnhor found for fastFillerLink ' + this.name)
 
-            const structure = this.findStructureAtCoord(anchor, STRUCTURE_LINK) as StructureLink | false
+            const structure = this.findStructureAtCoord(anchor, (structure) => structure.structureType === STRUCTURE_LINK) as StructureLink | false
             this._fastFillerLink = structure
 
             if (!structure) return false

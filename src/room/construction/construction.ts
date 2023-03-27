@@ -103,7 +103,7 @@ export class ConstructionManager {
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
 
-            if (this.room.findStructureAtCoord(coord, STRUCTURE_RAMPART)) continue
+            if (this.room.findStructureAtCoord(coord, (structure) => structure.structureType === STRUCTURE_RAMPART)) continue
             if (data.coversStructure && !this.room.coordHasStructureTypes(coord, buildableStructuresSet)) continue
 
             if (data.buildForNuke) {

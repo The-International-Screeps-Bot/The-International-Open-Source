@@ -1290,11 +1290,11 @@ declare global {
 
         communeConstructionPlacement(): void
 
-        findStructureAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): Structure | false
-        findStructureAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): Structure | false
+        findStructureAtCoord<T extends Structure>(coord: Coord, conditions: (structure: T) => boolean): T | false
+        findStructureAtXY<T extends Structure>(x: number, y: number, conditions: (structure: T) => boolean): T | false
 
-        findCSiteAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): ConstructionSite | false
-        findCSiteAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): ConstructionSite | false
+        findCSiteAtCoord<T extends ConstructionSite>(coord: Coord, conditions: (cSite: T) => boolean): T | false
+        findCSiteAtXY<T extends ConstructionSite>(x: number, y: number, conditions: (cSite: T) => boolean): T | false
 
         findStructureInsideRect<T extends Structure>(
             x1: number,
