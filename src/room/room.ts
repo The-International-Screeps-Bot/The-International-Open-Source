@@ -28,7 +28,8 @@ import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinManager } from './ruins'
-import { packPosList, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
+import { packCoord, packPosList, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
+import { BasePlans } from './construction/basePlans'
 
 export class RoomManager {
     communePlanner: CommunePlanner
@@ -480,7 +481,7 @@ export class RoomManager {
         // Make the center pos the first to be chosen (we want upgraders to stand on the container)
 
         positions.unshift(centerUpgradePos)
-        
+
         return (this._upgradePositions = positions)
     }
 
@@ -496,4 +497,41 @@ export class RoomManager {
         throw Error('No mineral harvest positions ' + this.room.name)
         return this._mineralHarvestPositions
     }
+
+    _generalRepairStructures: (StructureContainer | StructureRoad)[]
+    get generalRepairStructures() {
+
+        // THIS CODE WON'T WORK FOR HIGHWAY ROOMS! FIX!
+
+        if (this._generalRepairStructures) return this._generalRepairStructures
+
+        const generalRepairStructures: (StructureContainer | StructureRoad)[] = []
+
+        const structures = this.room.structures
+        const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(structures.road)
+        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+        const RCL = this.room.controller.level
+
+        for (const structure of relevantStructures) {
+
+            // If above 30% of max hits
+
+            if (structure.nextHits / structure.hitsMax > 0.3) continue
+
+            const coordData = basePlans.map[packCoord(structure.pos)]
+
+            for (const data of coordData) {
+
+                if (data.minRCL > RCL) continue
+                if (data.structureType !== structure.structureType) break
+
+                generalRepairStructures.push(structure)
+                break
+            }
+        }
+
+        return this._generalRepairStructures = generalRepairStructures
+    }
 }
+
+
