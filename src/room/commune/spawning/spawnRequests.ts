@@ -253,12 +253,23 @@ export class SpawnRequestsManager {
                 if (this.communeManager.room.terminal.store.getFreeCapacity() <= 10000) return false
                 if (this.communeManager.room.roomManager.mineral.mineralAmount === 0) return false
 
-                const minCost = 900
+                const minCost = 850
                 if (this.spawnEnergyCapacity < minCost) return false
 
                 return {
                     role: 'mineralHarvester',
-                    defaultParts: [],
+                    defaultParts: [
+                        MOVE,
+                        MOVE,
+                        WORK,
+                        WORK,
+                        WORK,
+                        WORK,
+                        WORK,
+                        WORK,
+                        WORK,
+                        CARRY,
+                    ],
                     extraParts: [
                         MOVE,
                         MOVE,
@@ -270,11 +281,11 @@ export class SpawnRequestsManager {
                         WORK,
                         WORK,
                         WORK,
-                    ] /* [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK] */,
-                    partsMultiplier: /* 4 */ 5,
-                    minCreeps: 1,
+                    ],
+                    partsMultiplier: 4,
+                    minCreeps: this.communeManager.room.roomManager.mineralHarvestPositions.length,
                     minCost,
-                    priority: 10 + this.communeManager.room.creepsFromRoom.mineralHarvester.length * 3,
+                    priority: 10 + this.communeManager.room.creepsFromRoom.mineralHarvester.length,
                     memoryAdditions: {
                         R: true,
                     },

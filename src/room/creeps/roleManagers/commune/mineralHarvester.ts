@@ -1,3 +1,4 @@
+import { RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRangeXY, getRange } from 'international/utils'
 import { reversePosList, unpackPos } from 'other/codec'
@@ -7,13 +8,13 @@ export class MineralHarvester extends Creep {
         this.room.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
     }
 
-    advancedHarvestMineral?(mineral: Mineral): boolean {
+    advancedHarvestMineral?(mineral: Mineral) {
         this.message = '🚬'
 
         // Unpack the creep's packedHarvestPos
 
         const harvestPos = this.findMineralHarvestPos()
-        if (!harvestPos) return true
+        if (!harvestPos) return RESULT_FAIL
 
         // If the creep is not standing on the harvestPos
 
@@ -34,22 +35,21 @@ export class MineralHarvester extends Creep {
                 },
             )
 
-            // And inform false
-
-            return true
+            return RESULT_ACTION
         }
 
         // Harvest the mineral, informing the result if it didn't succeed
 
-        if (this.harvest(mineral) !== OK) return true
+        if (this.harvest(mineral) !== OK) return RESULT_FAIL
 
         // Find amount of minerals harvested and record it in data
 
         const mineralsHarvested = Math.min(this.parts.work * HARVEST_MINERAL_POWER, mineral.mineralAmount)
+        this.reserveStore[mineral.mineralType] += mineralsHarvested
         globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
 
         this.message = `⛏️${mineralsHarvested}`
-        return true
+        return RESULT_SUCCESS
     }
 
     constructor(creepID: Id<Creep>) {
@@ -69,7 +69,13 @@ export class MineralHarvester extends Creep {
                 continue
             }
 
-            creep.advancedHarvestMineral(mineral)
+            if (creep.advancedHarvestMineral(mineral) !== RESULT_SUCCESS) continue
+
+            const mineralContainer = room.mineralContainer
+            if (mineralContainer && creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()) {
+
+                creep.transfer(mineralContainer, mineral.mineralType)
+            }
         }
     }
 }
