@@ -1336,3 +1336,7 @@ export const defaultMinCutDepth = 7
     [H]:
 }
  */
+export const decayCosts: Partial<{ [key in BuildableStructureConstant]: number }> = {
+    [STRUCTURE_ROAD]: roadUpkeepCost,
+    [STRUCTURE_CONTAINER]: containerUpkeepCost,
+}

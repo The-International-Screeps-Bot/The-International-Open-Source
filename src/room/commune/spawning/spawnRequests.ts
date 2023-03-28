@@ -11,6 +11,7 @@ import {
     remoteHaulerRoles,
     roadUpkeepCost,
     packedPosLength,
+    decayCosts,
 } from 'international/constants'
 import {
     customLog,
@@ -258,30 +259,8 @@ export class SpawnRequestsManager {
 
                 return {
                     role: 'mineralHarvester',
-                    defaultParts: [
-                        MOVE,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        CARRY,
-                    ],
-                    extraParts: [
-                        MOVE,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                    ],
+                    defaultParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+                    extraParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
                     partsMultiplier: 4,
                     minCreeps: this.communeManager.room.roomManager.mineralHarvestPositions.length,
                     minCost,
@@ -497,12 +476,10 @@ export class SpawnRequestsManager {
     private maintainers() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
 
-                let repairTargets: Structure<BuildableStructureConstant>[] = this.communeManager.room.structures.road
-                repairTargets = repairTargets.concat(this.communeManager.room.structures.container)
+                const generalRepairStructures = this.communeManager.room.roomManager.generalRepairStructures
+                const repairTargets = generalRepairStructures.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
 
-                repairTargets = repairTargets.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
                 // Get ramparts below their max hits
 
                 const repairRamparts = this.communeManager.room.structures.rampart.filter(
@@ -535,13 +512,12 @@ export class SpawnRequestsManager {
 
                 let partsMultiplier = 1
 
-                // For each road, add a multiplier
+                for (const structure of repairTargets) {
 
-                partsMultiplier += this.communeManager.room.structures.road.length * roadUpkeepCost * 2
+                    partsMultiplier += decayCosts[structure.structureType]
+                }
 
-                // For each container, add a multiplier
-
-                partsMultiplier += this.communeManager.room.structures.container.length * containerUpkeepCost * 2
+                partsMultiplier *= 2
 
                 // Extra considerations if a storage is present
 

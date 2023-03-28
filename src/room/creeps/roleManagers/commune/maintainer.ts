@@ -121,22 +121,9 @@ export class Maintainer extends Creep {
 
         const workPartCount = this.parts.work
 
-        const structure = room.findStructureInsideRect(
-            this.pos.x - 3,
-            this.pos.y - 3,
-            this.pos.x + 3,
-            this.pos.y + 3,
-            structure => {
-                if (structure.structureType !== STRUCTURE_ROAD && structure.structureType !== STRUCTURE_CONTAINER)
-                    return false
-
-                // The structure has sufficient hits
-
-                if (structure.hitsMax - structure.hits < workPartCount * REPAIR_POWER) return false
-
-                return true
-            },
-        )
+        const structure = this.room.roomManager.generalRepairStructures.find(structure => {
+            return getRange(structure.pos, this.pos) <= 3 && structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+        })
         if (!structure) return false
 
         if (this.repair(structure) !== OK) return false

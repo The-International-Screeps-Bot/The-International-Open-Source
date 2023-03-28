@@ -295,7 +295,7 @@ export class RoomManager {
             for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
                 if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
-                
+
                 sourceHarvestPositions[i].push(pos)
             }
         }
@@ -508,28 +508,36 @@ export class RoomManager {
 
         const generalRepairStructures: (StructureContainer | StructureRoad)[] = []
 
-        const structures = this.room.structures
-        const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(structures.road)
-        const basePlans = BasePlans.unpack(this.room.memory.BPs)
-        const RCL = this.room.controller.level
+        const roomType = this.room.memory.T
+        if (roomType === 'commune') {
 
-        for (const structure of relevantStructures) {
+            const structures = this.room.structures
+            const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(structures.road)
+            const basePlans = BasePlans.unpack(this.room.memory.BPs)
+            const RCL = this.room.controller.level
 
-            // If above 30% of max hits
+            for (const structure of relevantStructures) {
 
-            if (structure.nextHits / structure.hitsMax > 0.3) continue
+                const coordData = basePlans.map[packCoord(structure.pos)]
 
-            const coordData = basePlans.map[packCoord(structure.pos)]
+                for (const data of coordData) {
 
-            for (const data of coordData) {
+                    if (data.minRCL > RCL) continue
+                    if (data.structureType !== structure.structureType) break
 
-                if (data.minRCL > RCL) continue
-                if (data.structureType !== structure.structureType) break
-
-                generalRepairStructures.push(structure)
-                break
+                    generalRepairStructures.push(structure)
+                    break
+                }
             }
+
+            return this._generalRepairStructures = generalRepairStructures
         }
+        if (roomType === 'remote') {
+
+            return this._generalRepairStructures = generalRepairStructures
+        }
+
+        // Non-commune non-remote
 
         return this._generalRepairStructures = generalRepairStructures
     }
