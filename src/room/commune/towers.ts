@@ -139,9 +139,9 @@ export class TowerManager {
      * Maybe we can mess up healing
      */
     scatterShot() {
-        return
+
         if (this.actionableTowerIDs.length <= 1) return
-        if (!randomTick(100)) return
+        if (!randomTick(200)) return
 
         const enemyCreeps = this.communeManager.room.enemyCreeps
         if (enemyCreeps.length < 4) return

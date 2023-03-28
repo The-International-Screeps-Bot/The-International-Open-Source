@@ -2534,7 +2534,7 @@ declare global {
             /**
              * Deletes all properties of Memory
              */
-            clearMemory(avoidKeys?: string[]): string
+            clearMemory(includeSettings?: boolean): string
 
             /**
              * Kills all creeps owned by the bot

@@ -1,4 +1,5 @@
 import { allStructureTypes, AllyCreepRequestData, ClaimRequestData, CombatRequestData } from './constants'
+import { Settings, settings } from './settings'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
 
@@ -9,11 +10,16 @@ global.clearGlobal = function () {
 }
 global.CG = global.clearGlobal
 
-global.clearMemory = function (avoidKeys = []) {
+/**
+ * Delete properties in Memory
+ * @param includeSettings Skip settings deletion unless specified
+ */
+global.clearMemory = function (includeSettings: boolean = false) {
     // Clear all properties in memory
 
     for (const key in Memory) {
-        if (avoidKeys.includes(key)) continue
+
+        if (!includeSettings && settings[key as keyof Settings] !== undefined) continue
 
         delete Memory[key as keyof typeof Memory]
     }
