@@ -289,7 +289,6 @@ export class CommuneManager {
     }
 
     private test() {
-        customLog('MHC', this.room.memory.MHC)
 
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
@@ -300,6 +299,7 @@ export class CommuneManager {
             array[i] = packBasePlanCoord(STRUCTURE_SPAWN, 1)
         }
         */
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -588,19 +588,14 @@ export class CommuneManager {
         if (this._defensiveRamparts) return this._defensiveRamparts
 
         const ramparts: StructureRampart[] = []
-        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
-        for (const packedCoord in rampartPlans.map) {
-            const coord = unpackCoord(packedCoord)
-            const data = rampartPlans.map[packedCoord]
-            if (!data) continue
+        const stampAnchors = this.room.roomManager.stampAnchors
+        if (!stampAnchors) throw Error('No stampAnchors for defensive ramparts')
 
-            const structure = this.room.findStructureAtCoord(coord, (structure) => structure.structureType === STRUCTURE_RAMPART) as StructureRampart | false
+        for (const coord of stampAnchors.minCutRampart.concat(stampAnchors.onboardingRampart)) {
+
+            const structure = this.room.findStructureAtCoord<StructureRampart>(coord, (structure) => structure.structureType === STRUCTURE_RAMPART)
             if (!structure) continue
-
-            if (this.room.findStructureInRange(coord, 0, (structure) => {
-                return impassibleStructureTypesSet.has(structure.structureType)
-            })) continue
 
             ramparts.push(structure)
         }

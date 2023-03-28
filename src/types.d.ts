@@ -1475,9 +1475,6 @@ declare global {
         _flags: Partial<{ [key in FlagNames]: Flag }>
         readonly flags: { [key in FlagNames]: Flag }
 
-        _defensiveRamparts: StructureRampart[]
-        readonly defensiveRamparts: StructureRampart[]
-
         _factory: StructureFactory
         readonly factory: StructureFactory
 

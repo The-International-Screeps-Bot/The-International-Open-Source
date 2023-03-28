@@ -400,7 +400,7 @@ const roomAdditions = {
             }
 
             const anchor = this.roomManager.anchor
-            if (!anchor) throw new Error("No anchor finding spawn structures priority " + this.name)
+            if (!anchor) throw new Error('No anchor finding spawn structures priority ' + this.name)
 
             // Add in the non-source structures, by distance to anchor
 
@@ -535,7 +535,6 @@ const roomAdditions = {
             this._usedSourceHarvestCoords = new Set()
 
             for (const i in this.find(FIND_SOURCES)) {
-
                 // Record used source coords
 
                 for (const creepName of this.creepsOfSource[i]) {
@@ -672,7 +671,7 @@ const roomAdditions = {
             }
 
             if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
-/*
+            /*
             for (const packedCoord of this._usedUpgradeCoords) {
 
                 const coord = unpackCoord(packedCoord)
@@ -861,40 +860,42 @@ const roomAdditions = {
 
             const roomType = this.memory.T
             if (roomType === 'commune') {
-
                 const positions = this.roomManager.communeSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
-
-                    const structure = this.findStructureAtCoord(positions[i][0], (structure) => structure.structureType === STRUCTURE_CONTAINER)
+                    const structure = this.findStructureAtCoord(
+                        positions[i][0],
+                        structure => structure.structureType === STRUCTURE_CONTAINER,
+                    )
                     if (!structure) continue
 
                     sourceContainers.push(structure as StructureContainer)
                 }
-            }
-            else if (roomType === 'remote') {
-
+            } else if (roomType === 'remote') {
                 const positions = this.roomManager.remoteSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
-
-                    const structure = this.findStructureAtCoord(positions[i][0], (structure) => structure.structureType === STRUCTURE_CONTAINER)
+                    const structure = this.findStructureAtCoord(
+                        positions[i][0],
+                        structure => structure.structureType === STRUCTURE_CONTAINER,
+                    )
                     if (!structure) continue
 
                     sourceContainers.push(structure as StructureContainer)
                 }
-            }
-            else {
-
+            } else {
                 const positions = this.roomManager.sourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
-
-                    const structure = this.findStructureAtCoord(positions[i][0], (structure) => structure.structureType === STRUCTURE_CONTAINER)
+                    const structure = this.findStructureAtCoord(
+                        positions[i][0],
+                        structure => structure.structureType === STRUCTURE_CONTAINER,
+                    )
                     if (!structure) continue
 
                     sourceContainers.push(structure as StructureContainer)
                 }
             }
 
-            if (sourceContainers.length === this.find(FIND_SOURCES).length) this.global.sourceContainers = sourceContainers.map(container => container.id)
+            if (sourceContainers.length === this.find(FIND_SOURCES).length)
+                this.global.sourceContainers = sourceContainers.map(container => container.id)
             return (this._sourceContainers = sourceContainers)
         },
     },
@@ -951,15 +952,17 @@ const roomAdditions = {
             if (this.global.fastFillerContainerLeft) {
                 const container = findObjectWithID(this.global.fastFillerContainerLeft)
 
-                if (container) return this._fastFillerContainerLeft = container
+                if (container) return (this._fastFillerContainerLeft = container)
             }
 
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No anchor found for fastFillerContainerLeft ' + this.name)
 
-            const structure = this.findStructureAtXY(anchor.x - 2, anchor.y, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
-                | StructureContainer
-                | false
+            const structure = this.findStructureAtXY(
+                anchor.x - 2,
+                anchor.y,
+                structure => structure.structureType === STRUCTURE_CONTAINER,
+            ) as StructureContainer | false
             this._fastFillerContainerLeft = structure
 
             if (!structure) return false
@@ -970,20 +973,21 @@ const roomAdditions = {
     },
     fastFillerContainerRight: {
         get() {
-
             if (this._fastFillerContainerRight !== undefined) return this._fastFillerContainerRight
 
             if (this.global.fastFillerContainerRight) {
                 const container = findObjectWithID(this.global.fastFillerContainerRight)
-                if (container) return this._fastFillerContainerRight = container
+                if (container) return (this._fastFillerContainerRight = container)
             }
 
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No anchor found for fastFillerContainerLeft ' + this.name)
 
-            const structure = this.findStructureAtXY(anchor.x + 2, anchor.y, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
-                | StructureContainer
-                | false
+            const structure = this.findStructureAtXY(
+                anchor.x + 2,
+                anchor.y,
+                structure => structure.structureType === STRUCTURE_CONTAINER,
+            ) as StructureContainer | false
             this._fastFillerContainerRight = structure
 
             if (!structure) return false
@@ -1005,9 +1009,10 @@ const roomAdditions = {
             const centerUpgradePos = this.roomManager.centerUpgradePos
             if (!centerUpgradePos) return false
 
-            const structure = this.findStructureAtCoord(centerUpgradePos, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
-                | StructureContainer
-                | false
+            const structure = this.findStructureAtCoord(
+                centerUpgradePos,
+                structure => structure.structureType === STRUCTURE_CONTAINER,
+            ) as StructureContainer | false
             this._controllerContainer = structure
 
             if (!structure) return false
@@ -1029,9 +1034,10 @@ const roomAdditions = {
             const mineralHarvestPos = this.roomManager.mineralHarvestPositions[0]
             if (!mineralHarvestPos) return false
 
-            const structure = this.findStructureAtCoord(mineralHarvestPos, (structure) => structure.structureType === STRUCTURE_CONTAINER) as
-                | StructureContainer
-                | false
+            const structure = this.findStructureAtCoord(
+                mineralHarvestPos,
+                structure => structure.structureType === STRUCTURE_CONTAINER,
+            ) as StructureContainer | false
             this._mineralContainer = structure
 
             if (!structure) return false
@@ -1052,7 +1058,10 @@ const roomAdditions = {
 
             const centerUpgradePos = this.roomManager.centerUpgradePos
 
-            const structure = this.findStructureAtCoord(centerUpgradePos, (structure) => structure.structureType === STRUCTURE_LINK) as StructureLink | false
+            const structure = this.findStructureAtCoord(
+                centerUpgradePos,
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as StructureLink | false
             this._controllerLink = structure
 
             if (!structure) return false
@@ -1074,7 +1083,10 @@ const roomAdditions = {
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No ancnhor found for fastFillerLink ' + this.name)
 
-            const structure = this.findStructureAtCoord(anchor, (structure) => structure.structureType === STRUCTURE_LINK) as StructureLink | false
+            const structure = this.findStructureAtCoord(
+                anchor,
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as StructureLink | false
             this._fastFillerLink = structure
 
             if (!structure) return false
@@ -1565,116 +1577,6 @@ const roomAdditions = {
             return this._flags
         },
     },
-    defensiveRamparts: {
-        get() {
-            if (this._defensiveRamparts) return this._defensiveRamparts
-
-            this._defensiveRamparts = []
-
-            const anchor = this.roomManager.anchor
-            if (!anchor) throw Error('no anchor for defensive ramparts ' + this.name)
-
-            const ramparts = this.structures.rampart
-            if (!ramparts.length) return this._defensiveRamparts
-
-            // Construct a cost matrix for the flood
-
-            const coordMap = new Uint8Array(internationalManager.getTerrainCoords(this.name))
-
-            for (const road of this.structures.road) {
-                coordMap[packAsNum(road.pos)] = 0
-            }
-
-            const rampartsByCoord: Map<number, Id<StructureRampart>> = new Map()
-
-            for (const rampart of ramparts) {
-                const packedCoord = packAsNum(rampart.pos)
-                coordMap[packedCoord] = 254
-                rampartsByCoord.set(packedCoord, rampart.id)
-            }
-
-            const visitedCoords = new Uint8Array(2500)
-
-            // Construct values for the flood
-
-            let depth = 0
-            let thisGeneration: Coord[] = [anchor]
-            let nextGeneration: Coord[] = []
-
-            // Loop through positions of seeds
-
-            for (const coord of thisGeneration) visitedCoords[packAsNum(coord)] = 1
-
-            // So long as there are positions in this gen
-
-            while (thisGeneration.length) {
-                // Reset next gen
-
-                nextGeneration = []
-
-                // Iterate through positions of this gen
-
-                for (const coord1 of thisGeneration) {
-                    let isRampart: boolean
-
-                    // For anything after the first generation
-
-                    if (depth > 0) {
-                        const packedCoord1 = packAsNum(coord1)
-
-                        // Iterate if the terrain is a wall
-
-                        if (coordMap[packedCoord1] === 255) continue
-
-                        if (coordMap[packedCoord1] === 254) {
-                            this._defensiveRamparts.push(findObjectWithID(rampartsByCoord.get(packedCoord1)))
-                            isRampart = true
-                        }
-                    }
-
-                    const generationAdditions = []
-                    let foundRampart: boolean
-
-                    // Loop through adjacent positions
-
-                    for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
-                        const packedCoord2 = packAsNum(coord2)
-
-                        // Iterate if the adjacent pos has been visited or isn't a tile
-
-                        if (visitedCoords[packedCoord2] === 1) continue
-
-                        if (isRampart) {
-                            if (coordMap[packedCoord2] !== 254) continue
-                            foundRampart = true
-                        }
-
-                        // Otherwise record that it has been visited
-
-                        visitedCoords[packedCoord2] = 1
-
-                        // Add it to the next gen
-
-                        generationAdditions.push(coord2)
-                    }
-
-                    if (isRampart && !foundRampart) continue
-
-                    nextGeneration = nextGeneration.concat(generationAdditions)
-                }
-
-                // Set this gen to next gen
-
-                thisGeneration = nextGeneration
-
-                // Increment depth
-
-                depth += 1
-            }
-
-            return this._defensiveRamparts
-        },
-    },
     factory: {
         get() {
             if (this._factory !== undefined) return this._factory
@@ -1789,7 +1691,8 @@ const roomAdditions = {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
             if (this.memory.T === 'remote') return (this._advancedLogistics = true)
-            return (this._advancedLogistics = this.sourceContainers.length > 0 || this.storage !== undefined || this.terminal !== undefined)
+            return (this._advancedLogistics =
+                this.sourceContainers.length > 0 || this.storage !== undefined || this.terminal !== undefined)
         },
     },
     defaultCostMatrix: {

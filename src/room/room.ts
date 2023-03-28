@@ -295,10 +295,11 @@ export class RoomManager {
             for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
                 if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
+                
                 sourceHarvestPositions[i].push(pos)
             }
         }
-        console.log('POSITIONs', sourceHarvestPositions)
+
         return (this._sourceHarvestPositions = sourceHarvestPositions)
     }
 

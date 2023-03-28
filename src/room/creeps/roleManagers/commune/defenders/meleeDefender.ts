@@ -117,7 +117,7 @@ export class MeleeDefender extends Creep {
         let bestScore = Infinity
         let bestRampart: StructureRampart | undefined
 
-        for (const rampart of room.defensiveRamparts) {
+        for (const rampart of room.communeManager.defensiveRamparts) {
             if (rampart.hits < 3000) continue
             // Allow the creep to take rampart reservations from weaker defenders
 
@@ -130,8 +130,6 @@ export class MeleeDefender extends Creep {
                 )
                     continue
             }
-
-            if (room.coordHasStructureTypes(rampart.pos, new Set(impassibleStructureTypes))) continue
 
             const closestAttacker = findClosestObjectEuc(rampart.pos, enemyAttackers)
 
