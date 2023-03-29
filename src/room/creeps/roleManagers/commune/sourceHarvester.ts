@@ -49,7 +49,7 @@ export class SourceHarvester extends Creep {
 
             if (constructionSite) {
 
-                // Roll 10% dice and only build if creep is full othervise dropmine
+                // Roll 10% dice and only build if creep is full otherwise keep dropmining
 
                 if (Math.random() < 0.1 && this.store.getCapacity() - this.nextStore.energy == 0) {
                     this.build(constructionSite);
