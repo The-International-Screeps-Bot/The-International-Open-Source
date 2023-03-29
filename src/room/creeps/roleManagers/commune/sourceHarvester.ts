@@ -39,7 +39,26 @@ export class SourceHarvester extends Creep {
         const source = this.room.roomManager.communeSources[this.memory.SI]
 
         if (getRange(this.pos, source.pos) <= 1) {
-            this.advancedHarvestSource(source)
+            const constructionSite = this.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 1, {
+                filter: (structure) => {
+                    return structure.structureType === STRUCTURE_CONTAINER;
+                },
+            })[0];
+
+            // Check if there is container construction site placed and help building it 25% of the time
+
+            if (constructionSite) {
+
+                // Roll 25% dice and only build if creep is full othervise dropmine
+
+                if (Math.random() < 0.25 && this.store.getCapacity() - this.nextStore.energy == 0) {
+                    this.build(constructionSite);
+                } else {
+                    this.advancedHarvestSource(source);
+                }
+            } else {
+                this.advancedHarvestSource(source);
+            }
         }
     }
 
