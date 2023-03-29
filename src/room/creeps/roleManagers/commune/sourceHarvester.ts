@@ -45,13 +45,13 @@ export class SourceHarvester extends Creep {
                 },
             })[0];
 
-            // Check if there is container construction site placed and help building it 25% of the time
+            // Check if there is container construction site placed and help building it 10% of the time
 
             if (constructionSite) {
 
-                // Roll 25% dice and only build if creep is full othervise dropmine
+                // Roll 10% dice and only build if creep is full othervise dropmine
 
-                if (Math.random() < 0.25 && this.store.getCapacity() - this.nextStore.energy == 0) {
+                if (Math.random() < 0.1 && this.store.getCapacity() - this.nextStore.energy == 0) {
                     this.build(constructionSite);
                 } else {
                     this.advancedHarvestSource(source);
