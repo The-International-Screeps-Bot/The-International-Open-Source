@@ -47,6 +47,8 @@ export class RemoteHarvester extends Creep {
 
         if (this.memory.RN === this.room.name) {
 
+            if (!this.isDying()) this.room.creepsOfSource[this.memory.SI].push(this.name)
+
             const source = this.room.roomManager.remoteSources[this.memory.SI]
 
             if (getRange(this.pos, source.pos) <= 1) {
