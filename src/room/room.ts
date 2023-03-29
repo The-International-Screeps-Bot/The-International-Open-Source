@@ -549,8 +549,6 @@ export class RoomManager {
 
         this._remoteControllerPositions = []
 
-        if (roomMemory.T !== 'remote') throw Error('Is not remote for remote controller positions ' + this.room.name)
-
         const commune = Game.rooms[roomMemory.CN]
         if (!commune) throw Error('No commune for remote controller positions ' + this.room.name)
 
