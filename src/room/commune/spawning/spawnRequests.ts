@@ -1316,7 +1316,7 @@ export class SpawnRequestsManager {
                         partsMultiplier: 50 / extraParts.length,
                         spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteCoreAttacker,
                         /* minCreeps: 1, */
-                        maxCreeps: 8,
+                        maxCreeps: 3,
                         minCost: cost * extraParts.length,
                         priority: this.minRemotePriority - 2,
                         memoryAdditions: {
