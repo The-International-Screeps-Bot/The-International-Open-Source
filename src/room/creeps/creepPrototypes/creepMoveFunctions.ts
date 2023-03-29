@@ -155,17 +155,18 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
     //
-
+/*
     const path = unpackPosList(pathOpts.packedPath)
-    /* for (const pos of path) new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: customColors.lightBlue, opacity: 0.2 }) */
-
+    for (const pos of path) new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: customColors.lightBlue, opacity: 0.2 })
+ */
     const packedGoalPos = packPos(opts.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
-
+/*
     this.room.targetVisual(this.pos, opts.goals[0].pos, true)
-    /* this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4}) */
-    this.room.visual.text((posIndex || -1).toString(), this.pos)
 
+    this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4})
+    this.room.visual.text((posIndex || -1).toString(), this.pos)
+ */
     if (!isOnLastPos && posIndex !== -1 && this.memory.UP !== packedGoalPos) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const path = unpackPosList(packedPath)
@@ -217,13 +218,13 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     }
 
     // If loose is enabled, don't try to get back on the cached path
-
+/*
     this.room.visual.text((pathOpts.loose || false).toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
-
+ */
     if (pathOpts.loose) return this.createMoveRequest(opts)
 
-    this.room.errorVisual(this.pos, true)
-
+    this.room.errorVisual(this.pos)
+    
     // Try to get on the path
 
     opts.goals = []

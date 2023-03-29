@@ -155,7 +155,6 @@ export class CommunePlanner {
     plannedGridCoords: boolean
     finishedGrid: boolean
     generalShielded: boolean
-    finishedGridExtensionPaths: boolean
     finishedFastFillerRoadPrune: boolean
     /**
      * If the planner is in the process of recording a plan attempt
@@ -342,12 +341,12 @@ export class CommunePlanner {
         this.generateGrid()
         this.pruneFastFillerRoads()
         if (this.findCenterUpgradePos() === RESULT_FAIL) return RESULT_FAIL
-        this.findSourcePaths()
+        this.findSourceHarvestPositions()
         this.hub()
         this.labs()
         this.sourceStructures()
         this.gridExtensions()
-        this.gridExtensionPaths()
+        this.gridExtensionSourcePaths()
         this.nuker()
         this.powerSpawn()
         this.observer()
@@ -905,15 +904,15 @@ export class CommunePlanner {
 
         this.communeSources = sources
     }
-    private findSourcePaths() {
-        if (this.sourcePaths) return
+    private findSourceHarvestPositions() {
+        if (this.sourceHarvestPositions) return
 
         const fastFillerAnchor = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
             this.stampAnchors.fastFiller[0].y,
             this.room.name,
         )
-        const sourcePaths: RoomPosition[][] = []
+
         const sourceHarvestPositions: RoomPosition[][] = []
 
         for (const i in this.communeSources) {
@@ -991,25 +990,17 @@ export class CommunePlanner {
                 swampCost: defaultSwampCost * 2,
             })
 
-            sourcePaths.push(path)
-        }
-        /*
-        if (sourcePaths.length > 0) {
-            sourcePaths.sort((a, b) => {
-                return a.length - b.length
-            })
-            sourcePaths.reverse()
-        }
- */
-        for (const path of sourcePaths) {
-            for (const pos of path) {
-                this.setBasePlansXY(pos.x, pos.y, STRUCTURE_ROAD, 3)
-                this.roadCoords[packAsNum(pos)] = 1
+            let j = 0
+            let pos = path[j]
+            while (pos && getRange(pos, this.communeSources[i].pos) <= 2) {
+                this.baseCoords[packAsNum(pos)] = 255
+
+                j += 1
+                pos = path[j]
             }
         }
 
         this.sourceHarvestPositions = sourceHarvestPositions
-        this.sourcePaths = sourcePaths
     }
     private mineral() {
         if (this.mineralPath) return
@@ -2071,7 +2062,7 @@ export class CommunePlanner {
                 this.roadCoords[packAsNum(coord)] = 255
 
                 const path = this.room.advancedFindPath({
-                    origin,
+                    origin: new RoomPosition(stampAnchor.x, stampAnchor.y, this.room.name),
                     goals: [{ pos: fastFillerPos, range: 3 }],
                     weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
                     plainCost: defaultRoadPlanningPlainCost * 2,
@@ -2237,9 +2228,9 @@ export class CommunePlanner {
             },
         })
     }
-    private gridExtensionPaths() {
-        if (this.finishedGridExtensionPaths) return
-        return
+    private gridExtensionSourcePaths() {
+        if (this.sourcePaths) return
+
         const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
         for (let i = this.stampAnchors.gridExtension.length - 1; i >= 0; i -= 5) {
@@ -2261,7 +2252,38 @@ export class CommunePlanner {
             }
         }
 
-        this.finishedGridExtensionPaths = true
+        const fastFillerAnchor = new RoomPosition(
+            this.stampAnchors.fastFiller[0].x,
+            this.stampAnchors.fastFiller[0].y,
+            this.room.name,
+        )
+        const sourcePaths: RoomPosition[][] = []
+
+        for (let i = this.communeSources.length - 1; i >= 0; i -= 1) {
+            const origin = this.sourceHarvestPositions[i][0]
+
+            const path = this.room.advancedFindPath({
+                origin: origin,
+                goals: [
+                    {
+                        pos: fastFillerAnchor,
+                        range: 3,
+                    },
+                ],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
+            })
+
+            for (const pos of path) {
+                this.setBasePlansXY(pos.x, pos.y, STRUCTURE_ROAD, 3)
+                this.roadCoords[packAsNum(pos)] = 1
+            }
+
+            sourcePaths.push(path)
+        }
+
+        this.sourcePaths = sourcePaths
     }
     private observer() {
         this.planStamps({
@@ -2395,6 +2417,7 @@ export class CommunePlanner {
             for (const adjCoord of findCoordsInRange(pos, 3)) {
                 const adjPackedCoord = packAsNum(adjCoord)
                 if (this.terrainCoords[adjPackedCoord] > 0) continue
+                if (this.byExitCoords[adjPackedCoord] > 0) continue
 
                 protectionCoords.add(adjPackedCoord)
             }
@@ -3076,7 +3099,6 @@ export class CommunePlanner {
         delete this.plannedGridCoords
         delete this.finishedGrid
         delete this.generalShielded
-        delete this.finishedGridExtensionPaths
         delete this.finishedFastFillerRoadPrune
         delete this.markSourcesAvoid
 
