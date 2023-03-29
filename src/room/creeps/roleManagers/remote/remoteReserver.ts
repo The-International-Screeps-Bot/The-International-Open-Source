@@ -1,7 +1,13 @@
-import { RemoteData } from 'international/constants'
-import { randomTick } from 'international/utils'
+import { RemoteData, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { getRange, randomTick } from 'international/utils'
+import { packCoord, unpackCoordAsPos, unpackPosList } from 'other/codec'
 
 export class RemoteReserver extends Creep {
+
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
+
     public isDying(): boolean {
         // Stop if creep is spawning
 
@@ -56,21 +62,95 @@ export class RemoteReserver extends Creep {
         const role = this.role as 'remoteReserver'
 
         if (!this.findRemote()) return
+
+        const remoteName = this.memory.RN
+        if (this.room.name === remoteName && getRange(this.room.controller.pos, this.pos) <= 1) {
+
+            this.reserveController(this.room.controller)
+        }
+
         if (this.isDying()) return
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
+        Memory.rooms[remoteName].data[RemoteData[role]] -= this.parts.claim
 
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[remoteName]) commune.creepsOfRemote[remoteName][role].push(this.name)
     }
 
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
+    findControllerPos?() {
+
+        let packedCoord = this.memory.PC
+        if (packedCoord) {
+
+            return unpackCoordAsPos(packedCoord, this.room.name)
+        }
+
+        const usedControllerCoords = this.room.roomManager.usedControllerCoords
+
+        const usePos = this.room.roomManager.remoteControllerPositions.find(pos => !usedControllerCoords.has(packCoord(pos)))
+        if (!usePos) return false
+
+        packedCoord = packCoord(usePos)
+
+        this.memory.PC = packedCoord
+        this.room.roomManager._usedControllerCoords.add(packedCoord)
+
+        return usePos
+    }
+
+    travelToController?() {
+
+        const usePos = this.findControllerPos()
+        if (!usePos) return RESULT_FAIL
+
+        if (getRange(this.pos, usePos) === 0) return RESULT_SUCCESS
+
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: usePos,
+                    range: 0,
+                },
+            ],
+        })
+
+        return RESULT_ACTION
+    }
+
+    inRemote?() {
+
+        if (this.travelToController() !== RESULT_SUCCESS) return
+
+    }
+
+    outsideRemote?() {
+
+        const remoteControllerPositions = unpackPosList(Memory.rooms[this.memory.RN].RCP)
+
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: remoteControllerPositions[0],
+                    range: 0,
+                },
+            ],
+            avoidEnemyRanges: true,
+            typeWeights: {
+                enemy: Infinity,
+                ally: Infinity,
+                keeper: Infinity,
+                enemyRemote: Infinity,
+                allyRemote: Infinity,
+            },
+            avoidAbandonedRemotes: true,
+        })
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {
@@ -112,32 +192,12 @@ export class RemoteReserver extends Creep {
             // If the creep is in the remote
 
             if (room.name === creep.memory.RN) {
-                // Try to reserve the controller
 
-                creep.advancedReserveController()
+                creep.inRemote()
                 continue
             }
 
-            // Otherwise, make a moveRequest to it
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
-                        range: 25,
-                    },
-                ],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-                avoidAbandonedRemotes: true,
-            })
+            creep.outsideRemote()
         }
     }
 }

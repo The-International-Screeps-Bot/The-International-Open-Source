@@ -1399,9 +1399,6 @@ declare global {
         _usedUpgradeCoords: Set<string>
         readonly usedUpgradeCoords: Set<string>
 
-        _controllerPositions: RoomPosition[]
-        readonly controllerPositions: RoomPosition[]
-
         _usedMineralCoords: Set<string>
         readonly usedMineralCoords: Set<string>
 
@@ -1691,9 +1688,9 @@ declare global {
         MP: string
 
         /**
-         * Controller Positions, packed positions around the controller where reservers and downgraders can sit
+         * Remote Controller Positions, packed positions around the controller where reservers and downgraders can sit
          */
-        CP: string
+        RCP: string
 
         /**
          * Center Upgrade Position

@@ -62,7 +62,6 @@ export class RoomManager {
         this.room = room
 
         if (randomTick()) {
-
             delete this._nukeTargetCoords
         }
     }
@@ -295,7 +294,6 @@ export class RoomManager {
             for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
                 if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
 
-
                 sourceHarvestPositions[i].push(pos)
             }
         }
@@ -305,14 +303,14 @@ export class RoomManager {
 
     _communeSourceHarvestPositions: RoomPosition[][]
     get communeSourceHarvestPositions() {
-
         if (this._communeSourceHarvestPositions) return this._communeSourceHarvestPositions
 
         const packedSourceHarvestPositions = this.room.memory.CSHP
 
         if (packedSourceHarvestPositions) {
-
-            return this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(positions => unpackPosList(positions))
+            return (this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
+                unpackPosList(positions),
+            ))
         }
 
         throw Error('No commune source harvest positions ' + this.room.name)
@@ -325,8 +323,9 @@ export class RoomManager {
 
         const packedSourceHarvestPositions = this.room.memory.RSHP
         if (packedSourceHarvestPositions) {
-
-            return this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(positions => unpackPosList(positions))
+            return (this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
+                unpackPosList(positions),
+            ))
         }
 
         const commune = Game.rooms[this.room.memory.CN]
@@ -370,7 +369,7 @@ export class RoomManager {
         }
 
         this.room.memory.RSHP = sourceHarvestPositions.map(positions => packPosList(positions))
-        return this._remoteSourceHarvestPositions = sourceHarvestPositions
+        return (this._remoteSourceHarvestPositions = sourceHarvestPositions)
     }
 
     _communeSourcePaths: RoomPosition[][]
@@ -379,8 +378,7 @@ export class RoomManager {
 
         const packedSourcePaths = this.room.memory.CSPs
         if (packedSourcePaths) {
-
-            return this._communeSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions))
+            return (this._communeSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
         }
 
         throw Error('No commune source paths ' + this.room.name)
@@ -393,8 +391,7 @@ export class RoomManager {
 
         const packedSourcePaths = this.room.memory.RSPs
         if (packedSourcePaths) {
-
-            return this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions))
+            return (this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
         }
 
         const commune = Game.rooms[this.room.memory.CN]
@@ -501,7 +498,6 @@ export class RoomManager {
 
     _generalRepairStructures: (StructureContainer | StructureRoad)[]
     get generalRepairStructures() {
-
         // THIS CODE WON'T WORK FOR HIGHWAY ROOMS! FIX!
 
         if (this._generalRepairStructures) return this._generalRepairStructures
@@ -510,18 +506,18 @@ export class RoomManager {
 
         const roomType = this.room.memory.T
         if (roomType === 'commune') {
-
             const structures = this.room.structures
-            const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(structures.road)
+            const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(
+                structures.road,
+            )
             const basePlans = BasePlans.unpack(this.room.memory.BPs)
             const RCL = this.room.controller.level
 
             for (const structure of relevantStructures) {
-
                 const coordData = basePlans.map[packCoord(structure.pos)]
+                if (!coordData) continue
 
                 for (const data of coordData) {
-
                     if (data.minRCL > RCL) continue
                     if (data.structureType !== structure.structureType) break
 
@@ -530,17 +526,91 @@ export class RoomManager {
                 }
             }
 
-            return this._generalRepairStructures = generalRepairStructures
+            return (this._generalRepairStructures = generalRepairStructures)
         }
         if (roomType === 'remote') {
-
-            return this._generalRepairStructures = generalRepairStructures
+            return (this._generalRepairStructures = generalRepairStructures)
         }
 
         // Non-commune non-remote
 
-        return this._generalRepairStructures = generalRepairStructures
+        return (this._generalRepairStructures = generalRepairStructures)
+    }
+
+    _remoteControllerPositions: RoomPosition[]
+    get remoteControllerPositions() {
+        if (this._remoteControllerPositions) return this._remoteControllerPositions
+
+        const roomMemory = Memory.rooms[this.room.name]
+        const packedRemoteControllerPositions = roomMemory.RCP
+        if (packedRemoteControllerPositions) {
+            return (this._remoteControllerPositions = unpackPosList(packedRemoteControllerPositions))
+        }
+
+        this._remoteControllerPositions = []
+
+        if (roomMemory.T !== 'remote') throw Error('Is not remote for remote controller positions ' + this.room.name)
+
+        const commune = Game.rooms[roomMemory.CN]
+        if (!commune) throw Error('No commune for remote controller positions ' + this.room.name)
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('no anchor found for controller positions ' + this.room.name)
+
+        const controllerPos = this.room.controller.pos
+        const terrain = this.room.getTerrain()
+
+        for (let offset of adjacentOffsets) {
+            const adjPos = new RoomPosition(offset.x + controllerPos.x, offset.y + controllerPos.y, this.room.name)
+
+            if (terrain.get(adjPos.x, adjPos.y) === TERRAIN_MASK_WALL) continue
+
+            this._remoteControllerPositions.push(adjPos)
+        }
+
+        this._remoteControllerPositions.sort((a, b) => {
+            return (
+                this.room.advancedFindPath({
+                    origin: a,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length -
+                this.room.advancedFindPath({
+                    origin: b,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length
+            )
+        })
+
+        this.room.memory.RCP = packPosList(this._remoteControllerPositions)
+        return this._remoteControllerPositions
+    }
+
+    _usedControllerCoords: Set<string>
+    /**
+     * Positions around the controller used for reserving, claiming, and downgrading
+     */
+    get usedControllerCoords() {
+        if (this._usedControllerCoords) return this._usedControllerCoords
+
+        this._usedControllerCoords = new Set()
+
+        for (const creepName of this.room.myCreeps.remoteReserver) {
+            // Get the creep using its name
+
+            const creep = Game.creeps[creepName]
+
+            // If the creep is isDying, iterate
+
+            if (creep.isDying()) continue
+
+            const packedCoord = creep.memory.PC
+            if (!packedCoord) continue
+
+            // The creep has a packedPos
+
+            this._usedControllerCoords.add(packedCoord)
+        }
+
+        return this._usedControllerCoords
     }
 }
-
-

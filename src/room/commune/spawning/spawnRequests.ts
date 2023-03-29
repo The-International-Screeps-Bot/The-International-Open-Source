@@ -1175,7 +1175,8 @@ export class SpawnRequestsManager {
 
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
             const remoteName = remoteNamesByEfficacy[index]
-            const remoteData = Memory.rooms[remoteName].data
+            const remoteMemory = Memory.rooms[remoteName]
+            const remoteData = remoteMemory.data
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 
@@ -1217,10 +1218,9 @@ export class SpawnRequestsManager {
                         role: 'remoteReserver',
                         defaultParts: [],
                         extraParts: [MOVE, CLAIM],
-                        partsMultiplier: 6,
+                        partsMultiplier: remoteData[RemoteData.remoteReserver],
                         spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteReserver,
-                        minCreeps: 1,
-                        maxCreeps: Infinity,
+                        maxCreeps: remoteMemory.RCP.length / packedPosLength,
                         minCost: cost,
                         priority: this.minRemotePriority + 0.1,
                         memoryAdditions: {

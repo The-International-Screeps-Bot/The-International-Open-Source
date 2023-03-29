@@ -881,7 +881,7 @@ export class CommunePlanner {
                             range: 3,
                         },
                     ],
-                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                     plainCost: defaultRoadPlanningPlainCost,
                 }).length -
                 this.room.advancedFindPath({
@@ -892,7 +892,7 @@ export class CommunePlanner {
                             range: 3,
                         },
                     ],
-                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                     plainCost: defaultRoadPlanningPlainCost,
                 }).length
             )
@@ -950,7 +950,7 @@ export class CommunePlanner {
                                 range: 3,
                             },
                         ],
-                        weightCoordMaps: [this.gridCoords, this.roadCoords],
+                        weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                         plainCost: defaultRoadPlanningPlainCost,
                     }).length -
                     this.room.advancedFindPath({
@@ -961,7 +961,7 @@ export class CommunePlanner {
                                 range: 3,
                             },
                         ],
-                        weightCoordMaps: [this.gridCoords, this.roadCoords],
+                        weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                         plainCost: defaultRoadPlanningPlainCost,
                     }).length
                 )
@@ -986,7 +986,7 @@ export class CommunePlanner {
                         range: 3,
                     },
                 ],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })
@@ -1026,7 +1026,7 @@ export class CommunePlanner {
                             range: 3,
                         },
                     ],
-                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                     plainCost: defaultRoadPlanningPlainCost,
                 }).length -
                 this.room.advancedFindPath({
@@ -1037,7 +1037,7 @@ export class CommunePlanner {
                             range: 3,
                         },
                     ],
-                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                     plainCost: defaultRoadPlanningPlainCost,
                 }).length
             )
@@ -1046,7 +1046,7 @@ export class CommunePlanner {
         const path = this.room.advancedFindPath({
             origin: this.mineralHarvestPositions[0],
             goals: [{ pos: goal, range: 1 }],
-            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
             plainCost: defaultRoadPlanningPlainCost * 2,
             swampCost: defaultSwampCost * 2,
         })
@@ -1202,7 +1202,7 @@ export class CommunePlanner {
                     range: 3,
                 },
             ],
-            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
             plainCost: defaultRoadPlanningPlainCost * 2,
             swampCost: defaultSwampCost * 2,
         })
@@ -1834,7 +1834,7 @@ export class CommunePlanner {
                                     range: 3,
                                 },
                             ],
-                            weightCoordMaps: [this.gridCoords, this.roadCoords],
+                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                             plainCost: defaultRoadPlanningPlainCost,
                         }).length -
                         this.room.advancedFindPath({
@@ -1845,7 +1845,7 @@ export class CommunePlanner {
                                     range: 3,
                                 },
                             ],
-                            weightCoordMaps: [this.gridCoords, this.roadCoords],
+                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                             plainCost: defaultRoadPlanningPlainCost,
                         }).length
                     )
@@ -1866,7 +1866,7 @@ export class CommunePlanner {
                                     range: 1,
                                 },
                             ],
-                            weightCoordMaps: [this.gridCoords, this.roadCoords],
+                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                             plainCost: defaultRoadPlanningPlainCost,
                         }).length -
                         this.room.advancedFindPath({
@@ -1881,7 +1881,7 @@ export class CommunePlanner {
                                     range: 1,
                                 },
                             ],
-                            weightCoordMaps: [this.gridCoords, this.roadCoords],
+                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                             plainCost: defaultRoadPlanningPlainCost,
                         }).length
                     )
@@ -2386,7 +2386,7 @@ export class CommunePlanner {
                     range: 3,
                 },
             ],
-            weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
             plainCost: defaultRoadPlanningPlainCost * 2,
             swampCost: defaultSwampCost * 2,
         })
@@ -2661,6 +2661,8 @@ export class CommunePlanner {
             thisGeneration = nextGeneration
         }
 
+        const addedMinCutRamparts: Coord[] = []
+
         // Weight coords near ramparts that could be ranged attacked
 
         for (const packedCoord of this.minCutCoords) {
@@ -2674,6 +2676,8 @@ export class CommunePlanner {
                 if (!this.minCutCoords.has(packedAdjCoord) && getRange(coord, adjCoord) === 1) {
                     this.setRampartPlansXY(adjCoord.x, adjCoord.y, 4, false, false, true)
                     this.rampartCoords[packedAdjCoord] = 1
+
+                    addedMinCutRamparts.push(adjCoord)
                 }
 
                 if (this.roadCoords[packedAdjCoord] === 1) {
@@ -2685,6 +2689,7 @@ export class CommunePlanner {
             })
         }
 
+        this.stampAnchors.minCutRampart = this.stampAnchors.minCutRampart.concat(addedMinCutRamparts)
         this.unprotectedCoords = unprotectedCoords
     }
     private onboardingRamparts() {
@@ -2701,7 +2706,7 @@ export class CommunePlanner {
             const path = this.room.advancedFindPath({
                 origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
                 goals: [{ pos: hubAnchorPos, range: 2 }],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords, this.unprotectedCoords],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords, this.unprotectedCoords],
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })
@@ -2922,7 +2927,7 @@ export class CommunePlanner {
                         range: 2,
                     },
                 ],
-                weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords],
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })

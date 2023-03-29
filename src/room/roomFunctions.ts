@@ -693,9 +693,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         delete this.roomManager._remoteSourcePaths
         this.roomManager.remoteSourcePaths
 
-        delete this.memory.CP
-        delete this._controllerPositions
-        this.controllerPositions
+        delete this.memory.RCP
+        delete this.roomManager._remoteControllerPositions
+        this.roomManager.remoteControllerPositions
 
         this.memory.RE = newReservationEfficacy
 
@@ -737,9 +737,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     delete this.roomManager._remoteSourcePaths
     this.roomManager.remoteSourcePaths
 
-    delete this.memory.CP
-    delete this._controllerPositions
-    this.controllerPositions
+    delete this.memory.RCP
+    delete this.roomManager._remoteControllerPositions
+    this.roomManager.remoteControllerPositions
 
     // Add the room's name to the scoutingRoom's remotes list
 

@@ -81,7 +81,7 @@ export class RemotesManager {
             remoteMemory.data[RemoteData.remoteSourceHarvester1] = 0
             remoteMemory.data[RemoteData.remoteHauler0] = 0
             remoteMemory.data[RemoteData.remoteHauler1] = 0
-            remoteMemory.data[RemoteData.remoteReserver] = 1
+            remoteMemory.data[RemoteData.remoteReserver] = 5
 
             // Get the remote
 

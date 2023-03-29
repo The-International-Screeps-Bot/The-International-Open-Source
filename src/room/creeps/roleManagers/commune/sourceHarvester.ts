@@ -44,7 +44,6 @@ export class SourceHarvester extends Creep {
     }
 
     travelToSource?(): number {
-        if (this.worked) return RESULT_SUCCESS
 
         this.message = '🚬'
 

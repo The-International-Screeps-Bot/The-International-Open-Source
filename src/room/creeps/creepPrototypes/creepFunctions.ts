@@ -727,7 +727,8 @@ Creep.prototype.findSourceHarvestPos = function (index) {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (this.memory.PC) {
+    let packedCoord = this.memory.PC
+    if (packedCoord) {
         // On random intervals take the best source pos if it's open
 /*
         if (randomTick()) {
@@ -739,22 +740,22 @@ Creep.prototype.findSourceHarvestPos = function (index) {
             }
         }
  */
-        return unpackCoordAsPos(this.memory.PC, room.name)
+        return unpackCoordAsPos(packedCoord, room.name)
     }
 
     // Get usedSourceHarvestPositions
 
     const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
-    const openSourcePositions = room.roomManager.sourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
-    if (!openSourcePositions.length) return false
+    const usePos = room.roomManager.sourceHarvestPositions[index].find(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    if (!usePos) return false
 
-    const packedCoord = packCoord(openSourcePositions[0])
+    packedCoord = packCoord(usePos)
 
     this.memory.PC = packedCoord
     room._usedSourceHarvestCoords.add(packedCoord)
 
-    return openSourcePositions[0]
+    return usePos
 }
 
 Creep.prototype.findCommuneSourceHarvestPos = function (index) {
@@ -764,7 +765,8 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (this.memory.PC) {
+    let packedCoord = this.memory.PC
+    if (packedCoord) {
         // On random intervals take the best source pos if it's open
 /*
         if (randomTick()) {
@@ -776,22 +778,22 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
             }
         }
  */
-        return unpackCoordAsPos(this.memory.PC, room.name)
+        return unpackCoordAsPos(packedCoord, room.name)
     }
 
     // Get usedSourceHarvestPositions
 
     const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
-    const openSourcePositions = room.roomManager.communeSourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
-    if (!openSourcePositions.length) return false
+    const usePos = room.roomManager.communeSourceHarvestPositions[index].find(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    if (!usePos) return false
 
-    const packedCoord = packCoord(openSourcePositions[0])
+    packedCoord = packCoord(usePos)
 
     this.memory.PC = packedCoord
     room._usedSourceHarvestCoords.add(packedCoord)
 
-    return openSourcePositions[0]
+    return usePos
 }
 
 Creep.prototype.findRemoteSourceHarvestPos = function (index) {
@@ -800,8 +802,8 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
     this.message = 'FSHP'
 
     // Stop if the creep already has a packedHarvestPos
-
-    if (this.memory.PC) {
+    let packedCoord = this.memory.PC
+    if (packedCoord) {
         // On random intervals take the best source pos if it's open
 /*
         if (randomTick()) {
@@ -813,22 +815,22 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
             }
         }
  */
-        return unpackCoordAsPos(this.memory.PC, room.name)
+        return unpackCoordAsPos(packedCoord, room.name)
     }
 
     // Get usedSourceHarvestPositions
 
     const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
-    const openSourcePositions = room.roomManager.remoteSourceHarvestPositions[index].filter(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
-    if (!openSourcePositions.length) return false
+    const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    if (!usePos) return false
 
-    const packedCoord = packCoord(openSourcePositions[0])
+    packedCoord = packCoord(usePos)
 
     this.memory.PC = packedCoord
     room._usedSourceHarvestCoords.add(packedCoord)
 
-    return openSourcePositions[0]
+    return usePos
 }
 
 Creep.prototype.findMineralHarvestPos = function () {
@@ -838,21 +840,22 @@ Creep.prototype.findMineralHarvestPos = function () {
 
     // Stop if the creep already has a packedHarvestPos
 
-    if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
+    let packedCoord = this.memory.PC
+    if (packedCoord) return unpackCoordAsPos(packedCoord, room.name)
 
     // Get usedSourceHarvestPositions
 
     const usedMineralCoords = room.usedMineralCoords
 
-    const openMineralPositions = room.roomManager.mineralHarvestPositions.filter(pos => !usedMineralCoords.has(packCoord(pos)))
-    if (!openMineralPositions.length) return false
+    const usePos = room.roomManager.mineralHarvestPositions.find(pos => !usedMineralCoords.has(packCoord(pos)))
+    if (!usePos) return false
 
-    const packedCoord = packCoord(openMineralPositions[0])
+    packedCoord = packCoord(usePos)
 
     this.memory.PC = packedCoord
     room._usedMineralCoords.add(packedCoord)
 
-    return openMineralPositions[0]
+    return usePos
 }
 
 Creep.prototype.needsResources = function () {

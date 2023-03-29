@@ -68,7 +68,7 @@ export class ConstructionManager {
             for (let i = 0; i < coordData.length; i++) {
                 const data = coordData[i]
                 if (data.minRCL > RCL) continue
-/*
+
                 const structureIDs = this.room.structureCoords.get(packCoord(coord))
                 if (structureIDs) {
                     let skip = false
@@ -81,14 +81,14 @@ export class ConstructionManager {
                             break
                         }
 
-                        structure.destroy()
+                        if (structure.structureType !== STRUCTURE_SPAWN) structure.destroy()
                         skip = true
                         break
                     }
 
                     if (skip) break
                 }
- */
+
                 this.room.createConstructionSite(coord.x, coord.y, data.structureType)
                 break
             }
