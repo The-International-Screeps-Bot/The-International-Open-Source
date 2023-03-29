@@ -31,7 +31,7 @@ export class ContainerManager {
 
         for (const container of fastFillerContainers) {
             if (!container) continue
-            if (container.reserveStore.energy > container.store.getCapacity() * 0.8) continue
+            if (container.reserveStore.energy > container.store.getCapacity() * 0.9) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
@@ -40,7 +40,7 @@ export class ContainerManager {
                 priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
             })
 
-            if (container.reserveStore.energy < container.store.getCapacity() * 0.6) continue
+            if (container.reserveStore.energy < container.store.getCapacity() * 0.5) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
