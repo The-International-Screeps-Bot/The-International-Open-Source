@@ -2079,7 +2079,7 @@ export class CommunePlanner {
     private findStorageCoord(structureCoords: Coord[]): [Coord, number] {
         for (let i = 0; i < structureCoords.length; i++) {
             const coord = structureCoords[i]
-
+/*
             for (const positions of this.sourceHarvestPositions) {
                 if (getRange(coord, positions[0]) > 1) continue
 
@@ -2087,7 +2087,7 @@ export class CommunePlanner {
             }
 
             if (getRange(coord, this.centerUpgradePos) > 1) continue
-
+ */
             return [coord, i]
         }
 

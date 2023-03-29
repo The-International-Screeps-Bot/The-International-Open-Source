@@ -1596,12 +1596,18 @@ const roomAdditions = {
     },
     advancedLogistics: {
         get() {
-            /* if (this._advancedLogistics !== undefined) return this._advancedLogistics */
+            if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
-            return true
-            /* if (this.memory.T === 'remote') return (this._advancedLogistics = true)
-            return (this._advancedLogistics =
-                this.sourceContainers.length > 0 || this.storage !== undefined || this.terminal !== undefined) */
+            if (this.memory.T === 'remote') return (this._advancedLogistics = true)
+
+            // So long as we have some sort of storing structure
+
+            return (this._advancedLogistics = !!(
+                this.fastFillerContainerLeft ||
+                this.fastFillerContainerRight ||
+                (this.controller.level >= 4 && this.storage) ||
+                (this.controller.level >= 6 && this.terminal)
+            ))
         },
     },
     defaultCostMatrix: {
