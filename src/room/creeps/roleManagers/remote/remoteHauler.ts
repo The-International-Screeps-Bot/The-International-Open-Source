@@ -374,8 +374,13 @@ export class RemoteHauler extends Creep {
 
         this.movedResource = true
         creepAtPos.movedResource = true
-
+/*
         const nextEnergy = Math.min(this.nextStore.energy, creepAtPos.freeNextStore)
+        this.nextStore.energy -= nextEnergy
+        creepAtPos.nextStore.energy += nextEnergy
+ */
+
+        const nextEnergy = Math.min(this.store.energy, creepAtPos.freeNextStore)
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy
 
@@ -391,6 +396,7 @@ export class RemoteHauler extends Creep {
 
         delete this.memory.P
         delete creepAtPos.memory.P
+
 
         this.getResources()
 
