@@ -23,7 +23,10 @@ export class SourceHarvester extends Creep {
 
         // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.memory.CSPs[this.memory.SI].length / packedPosLength))
+        if (
+            this.ticksToLive >
+            this.body.length * CREEP_SPAWN_TIME + this.room.memory.CSPs[this.memory.SI].length / packedPosLength
+        )
             return false
 
         // Record creep as isDying
@@ -39,31 +42,13 @@ export class SourceHarvester extends Creep {
         const source = this.room.roomManager.communeSources[this.memory.SI]
 
         if (getRange(this.pos, source.pos) <= 1) {
-            const constructionSite = this.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 1, {
-                filter: (structure) => {
-                    return structure.structureType === STRUCTURE_CONTAINER;
-                },
-            })[0];
-
-            // Check if there is container construction site placed and help building it 10% of the time
-
-            if (constructionSite) {
-
-                // Roll 10% dice and only build if creep is full otherwise keep dropmining
-
-                if (Math.random() < 0.1 && this.store.getCapacity() - this.nextStore.energy == 0) {
-                    this.build(constructionSite);
-                } else {
-                    this.advancedHarvestSource(source);
-                }
-            } else {
-                this.advancedHarvestSource(source);
-            }
+            this.advancedHarvestSource(source)
         }
     }
 
-    travelToSource?(): number {
+    buildContainer?() {}
 
+    travelToSource?(): number {
         this.message = '🚬'
 
         // Unpack the harvestPos
@@ -85,7 +70,8 @@ export class SourceHarvester extends Creep {
 
         // The packed path is meant for the closest harvest pos, so change loose usage based on the harvestPos
 
-        const targetsClosestHarvestPos = this.memory.PC === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory.SI][0])
+        const targetsClosestHarvestPos =
+            this.memory.PC === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory.SI][0])
 
         this.createMoveRequestByPath(
             {
@@ -154,9 +140,30 @@ export class SourceHarvester extends Creep {
         return this.advancedTransfer(sourceLink)
     }
 
-    repairSourceContainer?(sourceContainer: StructureContainer): boolean {
+    maintainController?(sourceContainer: StructureContainer): boolean {
         if (this.worked) return false
-        if (!sourceContainer) return false
+        if (!sourceContainer) {
+
+            if (this.nextStore.energy < this.parts.work) {
+
+                if (this.movedResource) return false
+
+                const result = this.runRoomLogisticsRequestAdvanced({
+                    resourceTypes: new Set([RESOURCE_ENERGY]),
+                    types: new Set(['withdraw', 'pickup', 'offer']),
+                    conditions: (request) => {
+                        getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+                    },
+                })
+                if (result !== RESULT_SUCCESS) return false
+            }
+
+            const cSite = this.room.findCSiteAtCoord(this.pos, cSite => cSite.structureType === STRUCTURE_CONTAINER)
+            if (!cSite) return false
+
+            this.build(cSite)
+            return true
+        }
 
         // Get the creep's number of work parts
 
@@ -168,8 +175,19 @@ export class SourceHarvester extends Creep {
 
         // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
-        if (this.nextStore.energy < workPartCount && !this.movedResource)
-            this.withdraw(sourceContainer, RESOURCE_ENERGY)
+        if (this.nextStore.energy < workPartCount) {
+
+            if (this.movedResource) return false
+
+            const result = this.runRoomLogisticsRequestAdvanced({
+                resourceTypes: new Set([RESOURCE_ENERGY]),
+                types: new Set(['withdraw', 'pickup', 'offer']),
+                conditions: (request) => {
+                    getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+                },
+            })
+            if (result !== RESULT_SUCCESS) return false
+        }
 
         // Try to repair the target
 
@@ -229,7 +247,7 @@ export class SourceHarvester extends Creep {
 
         // Try to repair the sourceContainer
 
-        this.repairSourceContainer(this.room.sourceContainers[this.memory.SI])
+        this.maintainController(this.room.sourceContainers[this.memory.SI])
 
         if (this.transferToNearbyCreep()) return
     }

@@ -184,12 +184,9 @@ export class ConstructionManager {
                     continue
                 }
 
-                let match = false
-                for (const data of coordData) {
-                    if (data.structureType !== structure.structureType) continue
-                    match = true
-                    break
-                }
+                const match = coordData.find(data => {
+                    return data.structureType === structure.structureType
+                })
                 if (match) continue
 
                 structure.destroy()
@@ -210,12 +207,9 @@ export class ConstructionManager {
                 continue
             }
 
-            let match = false
-            for (const data of coordData) {
-                if (data.structureType !== structure.structureType) continue
-                match = true
-                break
-            }
+            const match = coordData.find(data => {
+                return data.structureType === structure.structureType
+            })
             if (match) continue
 
             misplacedSpawns.push(structure)

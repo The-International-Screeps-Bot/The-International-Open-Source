@@ -1,4 +1,4 @@
-import { RemoteData } from 'international/constants'
+import { RemoteData, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,
@@ -151,7 +151,7 @@ export class RemoteHarvester extends Creep {
             //  It's rearranged for performance.  This will also repair the container if needed.
             if (
                 !figuredOutWhatToDoWithTheEnergy &&
-                source.energy * 300 < (source.ticksToRegeneration - 1) * source.energyCapacity
+                source.energy * ENERGY_REGEN_TIME < source.ticksToRegeneration * 0.9 * source.energyCapacity
             ) {
                 let didWork = this.maintainContainer()
                 //If we did container maintance, that'll eat our work action.
@@ -167,16 +167,16 @@ export class RemoteHarvester extends Creep {
     }
 
     private obtainEnergyIfNeeded() {
-        let neededEnergy = this.parts.work * BUILD_POWER
-        //We need to check to see if there's enough for the current tick, plus the next tick, otherwise
-        //  We need to pick up on this tick, which is why the *2 is there.
+        if (this.nextStore.energy >= this.parts.work) return RESULT_SUCCESS
+        if (this.movedResource) return RESULT_FAIL
 
-        if (this.store[RESOURCE_ENERGY] < neededEnergy * 2) {
-            let droppedResource = this.pos
-                .findInRange(FIND_DROPPED_RESOURCES, 1)
-                .find(drop => drop.resourceType == RESOURCE_ENERGY)
-            if (droppedResource) this.pickup(droppedResource)
-        }
+        return this.runRoomLogisticsRequestAdvanced({
+            resourceTypes: new Set([RESOURCE_ENERGY]),
+            types: new Set(['withdraw', 'pickup', 'offer']),
+            conditions: (request) => {
+                getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+            },
+        })
     }
 
     maintainContainer(): boolean {
@@ -185,7 +185,7 @@ export class RemoteHarvester extends Creep {
         if (container) {
             // If the container is below 80% health, repair it.
             if (container.hits < container.hitsMax * 0.8) {
-                this.obtainEnergyIfNeeded()
+                if (this.obtainEnergyIfNeeded() !== RESULT_SUCCESS) return false
                 this.repair(container)
                 return true
             }
@@ -206,13 +206,13 @@ export class RemoteHarvester extends Creep {
         if (cSite) {
             // Pick energy off the ground if possible
 
-            this.obtainEnergyIfNeeded()
+            if (this.obtainEnergyIfNeeded() !== RESULT_SUCCESS) return false
 
             this.build(cSite)
 
             // Don't allow the construction site manager to remove the site for while we're building
 
-            delete Memory.constructionSites[cSite.id]
+            Memory.constructionSites[cSite.id] = 0
             return true
         }
 

@@ -397,7 +397,6 @@ export class RemoteHauler extends Creep {
         delete this.memory.P
         delete creepAtPos.memory.P
 
-
         this.getResources()
 
         const remoteHauler = creepAtPos as RemoteHauler

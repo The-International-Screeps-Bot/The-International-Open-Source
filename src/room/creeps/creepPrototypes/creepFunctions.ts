@@ -1729,7 +1729,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
     /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
     const target = findObjectWithID(request.TID)
-    this.room.targetVisual(this.pos, target.pos, true)
+    this.room.targetVisual(this.pos, target.pos)
     if (getRange(target.pos, this.pos) > 1) {
         this.createMoveRequest({
             origin: this.pos,

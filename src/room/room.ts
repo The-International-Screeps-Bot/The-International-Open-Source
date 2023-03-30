@@ -548,6 +548,7 @@ export class RoomManager {
         }
 
         this._remoteControllerPositions = []
+        const positions: RoomPosition[] = []
 
         const commune = Game.rooms[roomMemory.CN]
         if (!commune) throw Error('No commune for remote controller positions ' + this.room.name)
@@ -563,10 +564,10 @@ export class RoomManager {
 
             if (terrain.get(adjPos.x, adjPos.y) === TERRAIN_MASK_WALL) continue
 
-            this._remoteControllerPositions.push(adjPos)
+            positions.push(adjPos)
         }
 
-        this._remoteControllerPositions.sort((a, b) => {
+        positions.sort((a, b) => {
             return (
                 this.room.advancedFindPath({
                     origin: a,
@@ -579,8 +580,8 @@ export class RoomManager {
             )
         })
 
-        this.room.memory.RCP = packPosList(this._remoteControllerPositions)
-        return this._remoteControllerPositions
+        this.room.memory.RCP = packPosList(positions)
+        return this._remoteControllerPositions = positions
     }
 
     _usedControllerCoords: Set<string>

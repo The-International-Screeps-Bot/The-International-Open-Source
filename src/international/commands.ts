@@ -14,7 +14,7 @@ global.CG = global.clearGlobal
  * Delete properties in Memory
  * @param includeSettings Skip settings deletion unless specified
  */
-global.clearMemory = function (includeSettings: boolean = false) {
+global.clearMemory = function (includeSettings: boolean = true) {
     // Clear all properties in memory
 
     for (const key in Memory) {
