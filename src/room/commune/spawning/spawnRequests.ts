@@ -23,7 +23,7 @@ import {
     roundToDecimals,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { unpackPosList } from 'other/codec'
+import { packPos, unpackPosList } from 'other/codec'
 import { globalStatsUpdater } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 
@@ -1419,12 +1419,18 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     if (request.data[ClaimRequestData.vanguard] <= 0) return false
 
+                    let maxCreeps = 0
+                    for (const packedPositions of Memory.rooms[requestName].CSHP) {
+
+                        maxCreeps += packedPositions.length
+                    }
+
                     return {
                         role: 'vanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                         partsMultiplier: request.data[ClaimRequestData.vanguard],
-                        maxCreeps: 6,
+                        maxCreeps,
                         minCost: 250,
                         priority: 8.2,
                         memoryAdditions: {
