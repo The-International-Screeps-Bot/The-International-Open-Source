@@ -53,7 +53,7 @@ Ensure you have downloaded [Node](https://nodejs.org/en/)
 
 You can check your node version with:
 
-```pohershell
+```powershell
 node -v
 ```
 If your node version is too recent, you can change it with NVM:
