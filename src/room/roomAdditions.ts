@@ -761,7 +761,9 @@ const roomAdditions = {
                     sourceContainers.push(container)
                 }
 
-                return (this._sourceContainers = sourceContainers)
+                if (sourceContainers.length === this.global.sourceContainers.length) {
+                    return (this._sourceContainers = sourceContainers)
+                }
             }
 
             const sourceContainers: StructureContainer[] = []
@@ -821,7 +823,10 @@ const roomAdditions = {
                     links.push(link)
                 }
 
-                if (links.length === this.find(FIND_SOURCES).length) return (this._sourceLinks = links)
+                if (links.length === this.global.sourceContainers.length) {
+
+                    return (this._sourceLinks = links)
+                }
             }
 
             this.global.sourceLinks = []
