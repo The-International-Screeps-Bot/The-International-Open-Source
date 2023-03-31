@@ -1,5 +1,5 @@
 <div align="center">
-  
+
 <img src="https://user-images.githubusercontent.com/48334001/189508568-fb2c91e5-e348-48c7-87ec-6626a81e1330.png" align="center">
 </div>
 
@@ -51,7 +51,18 @@ Ensure you have downloaded [Node](https://nodejs.org/en/)
 
 **Make sure your node version is below 17.0.0**
 
-When in the project folder (not src), you'll want to install the devDependencies - and if you don't have it, node - like so:
+You can check your node version with:
+
+```powershell
+node -v
+```
+If your node version is too recent, you can change it with NVM:
+
+Linux/MacOS [nvm](https://github.com/nvm-sh/nvm)
+
+Windows [nvm-windows](https://github.com/coreybutler/nvm-windows)
+
+After making sure you have correct node version go to the project folder (not src), you'll want to install the devDependencies like so:
 
 ```powershell
 npm i
@@ -81,13 +92,13 @@ Soon to be added again when PandaMaster fixes the new ScreepsPlus replacement si
 
 ### Private server
 
-To run the bot on an performance checking server, run `npm run server` and check out `localhost:21025` (server) and `localhost:3000` (grafana) in your browser.
+To run the bot on an performance checking server, run `npm run server` and check out `localhost:21025` (server) and `localhost:3000` (grafana) in your browser. Alternatives with in-depth instructions can be found at [Using a Private Server](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki/Using-a-private-server)
 
 For the performance server users its always RoomName as email and password is `password`.
 
 If you'd like to use rollup to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
 
-I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client ) to watch your private server run from the comfort of your browser.
+I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client) to watch your private server run from the comfort of your browser.
 
 ## Contribution
 
