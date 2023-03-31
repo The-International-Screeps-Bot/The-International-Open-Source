@@ -71,7 +71,7 @@ import { RampartPlans } from './construction/rampartPlans'
 import { minCutToExit } from './construction/minCut'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
-const dynamicDistanceWeight = 2
+const dynamicDistanceWeight = 7
 
 interface PlanStampsArgs {
     stampType: StampTypes
@@ -340,7 +340,7 @@ export class CommunePlanner {
         if (this.fastFiller() === RESULT_FAIL) return RESULT_FAIL
         this.postFastFillerConfig()
         this.generateGrid()
-        this.pruneFastFillerRoads()
+        /* this.pruneFastFillerRoads() */
         if (this.findCenterUpgradePos() === RESULT_FAIL) return RESULT_FAIL
         this.findSourceHarvestPositions()
         this.hub()
@@ -802,6 +802,48 @@ export class CommunePlanner {
 
         this.gridCoords[packedCoord] = 0
     }
+    /**
+     *
+     * @param coord
+     * @returns RESULT_ACTION if the road should be removed
+     */
+    private fastFillerPruneRoadCoord(coord: Coord) {
+        let adjSpawn: boolean
+
+        forAdjacentCoords(coord, adjCoord => {
+            const packedAdjCoord = packAsNum(adjCoord)
+            if (this.terrainCoords[packedAdjCoord] === 255) return
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0)
+                this.byPlannedRoad[packedAdjCoord] = 1
+
+            const coordData = this.basePlans.get(packCoord(adjCoord))
+            if (!coordData) return
+
+            if (coordData[0].structureType === STRUCTURE_SPAWN) adjSpawn = true
+        })
+
+        if (adjSpawn) return RESULT_NO_ACTION
+
+        let cardinalRoads = 0
+
+        for (const offset of cardinalOffsets) {
+            const adjCoord = {
+                x: offset.x + coord.x,
+                y: offset.y + coord.y,
+            }
+
+            const packedAdjCoord = packAsNum(adjCoord)
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0) continue
+
+            cardinalRoads += 1
+        }
+
+        if (cardinalRoads >= 3) return RESULT_ACTION
+        return RESULT_NO_ACTION
+    }
+    /**
+     * Has some issues, is disabled
+     */
     private pruneFastFillerRoads() {
         if (this.finishedFastFillerRoadPrune) return
 
@@ -815,17 +857,17 @@ export class CommunePlanner {
         )
 
         for (const coord of rectCoords) {
-            const packedCoordNum = packAsNum(coord)
-            if (this.roadCoords[packedCoordNum] !== 1) continue
+            const packedCoord = packAsNum(coord)
+            if (this.roadCoords[packedCoord] !== 1) continue
 
             if (this.fastFillerPruneRoadCoord(coord) === RESULT_ACTION) {
-                this.roadCoords[packedCoordNum] = 0
+                this.roadCoords[packedCoord] = 0
                 continue
             }
 
             this.setBasePlansXY(coord.x, coord.y, STRUCTURE_ROAD, 3)
-            this.roadCoords[packedCoordNum] = 1
-            this.byPlannedRoad[packedCoordNum] = 0
+            this.roadCoords[packedCoord] = 1
+            this.byPlannedRoad[packedCoord] = 0
         }
 
         this.finishedFastFillerRoadPrune = true
@@ -1213,45 +1255,6 @@ export class CommunePlanner {
         this.upgradePath = path
         this.centerUpgradePos = centerUpgradePos
         return RESULT_SUCCESS
-    }
-    /**
-     *
-     * @param coord
-     * @returns RESULT_ACTION if the road should be removed
-     */
-    private fastFillerPruneRoadCoord(coord: Coord) {
-        let adjSpawn: boolean
-
-        forAdjacentCoords(coord, adjCoord => {
-            const packedAdjCoord = packAsNum(adjCoord)
-            if (this.terrainCoords[packedAdjCoord] === 255) return
-            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0)
-                this.byPlannedRoad[packedAdjCoord] = 1
-
-            const coordData = this.basePlans.get(packCoord(adjCoord))
-            if (!coordData) return
-
-            if (coordData[0].structureType === STRUCTURE_SPAWN) adjSpawn = true
-        })
-
-        if (adjSpawn) return RESULT_NO_ACTION
-
-        let cardinalRoads = 0
-
-        for (const offset of cardinalOffsets) {
-            const adjCoord = {
-                x: offset.x + coord.x,
-                y: offset.y + coord.y,
-            }
-
-            const packedAdjCoord = packAsNum(adjCoord)
-            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0) continue
-
-            cardinalRoads += 1
-        }
-
-        if (cardinalRoads >= 3) return RESULT_ACTION
-        return RESULT_NO_ACTION
     }
     private planGridCoords() {
         if (this.plannedGridCoords) return
@@ -1803,6 +1806,7 @@ export class CommunePlanner {
                     const packedCoord = packAsNum(properCoord)
                     this.setBasePlansXY(properCoord.x, properCoord.y, STRUCTURE_ROAD, 3)
                     this.roadCoords[packedCoord] = 1
+                    this.byPlannedRoad[packedCoord] = 0
                 }
 
                 const properCoord = {
@@ -2005,6 +2009,7 @@ export class CommunePlanner {
 
                 for (const offsets of cardinalOffsets) {
                     const packedCoord = packXYAsNum(coord.x + offsets.x, coord.y + offsets.y)
+                    if (this.roadCoords[packedCoord] > 0) return false
                     if (this.byPlannedRoad[packedCoord] !== 1) return false
                 }
 
@@ -2107,8 +2112,8 @@ export class CommunePlanner {
              */
             conditions: coord1 => {
                 const packedNumCoord1 = packAsNum(coord1)
-                if (this.baseCoords[packedNumCoord1] === 255) return false
                 if (this.byPlannedRoad[packedNumCoord1] !== 1) return false
+                if (this.roadCoords[packedNumCoord1] > 0) return false
 
                 let outputLabCoords: Coord[]
 
@@ -2120,7 +2125,7 @@ export class CommunePlanner {
                     for (let y = coord1.y - range; y <= coord1.y + range; y += 1) {
                         const packedCoordNum = packXYAsNum(x, y)
                         if (this.byPlannedRoad[packedCoordNum] !== 1) continue
-                        if (this.baseCoords[packedCoordNum] === 255) continue
+                        if (this.roadCoords[packedCoordNum] > 0) continue
 
                         packedAdjCoords1.add(packXYAsCoord(x, y))
                     }
@@ -2131,7 +2136,7 @@ export class CommunePlanner {
                 for (const coord2 of findCoordsInRangeXY(coord1.x, coord1.y, range)) {
                     const packedCoord2Num = packAsNum(coord2)
                     if (this.byPlannedRoad[packedCoord2Num] !== 1) continue
-                    if (this.baseCoords[packedCoord2Num] === 255) continue
+                    if (this.roadCoords[packedCoord2Num] > 0) continue
 
                     const packedCoord2 = packCoord(coord2)
                     if (packedCoord1 === packedCoord2) continue
@@ -3034,13 +3039,13 @@ export class CommunePlanner {
 
         // Prefer protecting the source even more if there is only one
 
-        score += this.unprotectedSources * (20 / this.sourcePaths.length)
+        score += this.unprotectedSources * (30 / this.sourcePaths.length)
 
         // Early RCL we want to have 3 or more harvest positions
 
         for (const positions of this.sourceHarvestPositions) {
             if (positions.length >= 3) continue
-            score += (3 - positions.length) * 12
+            score += (3 - positions.length) * 5
         }
         score += this.upgradePath.length
         score += this.mineralPath.length / 100
@@ -3049,7 +3054,7 @@ export class CommunePlanner {
             this.stampAnchors.shieldRampart.length +
             this.stampAnchors.onboardingRampart.length
         score += getRange(this.stampAnchors.hub[0], this.centerUpgradePos) / 10
-        if (!this.isControllerProtected) score += 10
+        if (!this.isControllerProtected) score += 15
         score += (CONTROLLER_STRUCTURES.tower[8] * TOWER_POWER_ATTACK - this.bestTowerScore) / 100
         score += this.RCLPlannedStructureTypes[STRUCTURE_ROAD].structures / 100
 
