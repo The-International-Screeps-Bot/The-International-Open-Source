@@ -3017,6 +3017,7 @@ export class CommunePlanner {
 
             for (const data of coordData) {
                 if (!structureTypesToProtectSet.has(data.structureType)) continue
+                if (this.rampartPlans.getXY(coord.x, coord.y)) continue
 
                 const isProtected = this.unprotectedCoords[packedNumCoord] === 0
                 this.setRampartPlansXY(coord.x, coord.y, data.minRCL, true, isProtected, false)
