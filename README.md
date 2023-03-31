@@ -1,5 +1,5 @@
 <div align="center">
-  
+
 <img src="https://user-images.githubusercontent.com/48334001/189508568-fb2c91e5-e348-48c7-87ec-6626a81e1330.png" align="center">
 </div>
 
@@ -51,7 +51,18 @@ Ensure you have downloaded [Node](https://nodejs.org/en/)
 
 **Make sure your node version is below 17.0.0**
 
-When in the project folder (not src), you'll want to install the devDependencies - and if you don't have it, node - like so:
+You can check your node version with:
+
+```pohershell
+node -v
+```
+If your node version is too recent, you can change it with NVM:
+
+Linux/MacOS [nvm](https://github.com/nvm-sh/nvm)
+
+Windows [nvm-windows](https://github.com/coreybutler/nvm-windows)
+
+After making sure you have correct node version go to the project folder (not src), you'll want to install the devDependencies - and if you don't have it, node - like so:
 
 ```powershell
 npm i
