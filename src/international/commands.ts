@@ -251,7 +251,6 @@ global.deleteCombatRequest = function (requestName) {
 
     return `deleted combatRequest for ${requestName}`
 }
-global.DCR = global.deleteCombatRequest
 
 global.allyCreepRequest = function (requestName, communeName?) {
     if (!Memory.allyCreepRequests[requestName]) {
@@ -290,6 +289,7 @@ global.deleteBasePlans = function (roomName) {
 
     return 'Deleted base plans for ' + roomName
 }
+global.DBP = global.deleteBasePlans
 
 global.usedHeap = function () {
 

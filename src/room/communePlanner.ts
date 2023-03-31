@@ -81,6 +81,7 @@ interface PlanStampsArgs {
     weighted?: boolean
     diagonalDT?: boolean
     coordMap?: CoordMap
+    dynamicWeight?: Uint32Array
     minAvoid?: number
     cardinalFlood?: boolean
     /**
@@ -102,7 +103,7 @@ interface FindDynamicStampAnchorArgs {
 }
 
 interface FindDynamicStampAnchorWeightedArgs extends FindDynamicStampAnchorArgs {
-    coordMap: CoordMap
+    dynamicWeight?: Uint32Array
 }
 
 interface FindStampAnchorArgs {
@@ -213,16 +214,16 @@ export class CommunePlanner {
         this.roomManager = roomManager
     }
 
-    _reverseExitFlood: Uint8Array
+    _reverseExitFlood: Uint32Array
     get reverseExitFlood() {
         if (this._reverseExitFlood) return this._reverseExitFlood
 
-        this._reverseExitFlood = new Uint8Array(2500)
+        this._reverseExitFlood = new Uint32Array(2500)
 
         let visitedCoords = new Uint8Array(2500)
         for (const coord of this.exitCoords) visitedCoords[packAsNum(coord)] = 1
 
-        let depth = 1
+        let depth = -1
         let thisGeneration = this.exitCoords
         let nextGeneration: Coord[]
 
@@ -232,7 +233,7 @@ export class CommunePlanner {
             // Iterate through positions of this gen
 
             for (const coord1 of thisGeneration) {
-                this._reverseExitFlood[packAsNum(coord1)] = 255 - depth
+                this._reverseExitFlood[packAsNum(coord1)] = depth
 
                 // Add viable adjacent coords to the next generation
 
@@ -255,7 +256,7 @@ export class CommunePlanner {
 
             // Set up for next generation
 
-            depth += 1
+            depth -= 1
             thisGeneration = nextGeneration
         }
 
@@ -1327,7 +1328,7 @@ export class CommunePlanner {
                         stamp,
                         startCoords: args.startCoords,
                         conditions: args.conditions,
-                        coordMap: args.coordMap,
+                        dynamicWeight: args.dynamicWeight,
                     })
                     if (!stampAnchor) return RESULT_FAIL
 
@@ -1590,7 +1591,7 @@ export class CommunePlanner {
             for (const coord of thisGeneration) {
                 const packedCoord = packAsNum(coord)
                 const coordCostFromOrigin = fromOrigin[packedCoord]
-                const coordCost = args.coordMap[packedCoord] + coordCostFromOrigin
+                const coordCost = args.dynamicWeight[packedCoord] + coordCostFromOrigin
 
                 if (coordCost > lowestGenCost) {
                     nextGeneration.push(coord)
@@ -1619,7 +1620,7 @@ export class CommunePlanner {
                     nextGeneration.push(adjCoord)
 
                     const adjCostFromOrigin = (fromOrigin[packedAdjCoord] = coordCostFromOrigin + dynamicDistanceWeight)
-                    const adjCoordCost = args.coordMap[packedAdjCoord] + adjCostFromOrigin
+                    const adjCoordCost = args.dynamicWeight[packedAdjCoord] + adjCostFromOrigin
 
                     if (adjCoordCost < lowestNextGenCost) lowestNextGenCost = adjCoordCost
                 }
@@ -1633,7 +1634,7 @@ export class CommunePlanner {
                 for (const coord of thisGeneration) {
                     const packedCoord = packAsNum(coord)
                     const coordCostFromOrigin = fromOrigin[packedCoord]
-                    const coordCost = args.coordMap[packedCoord] + coordCostFromOrigin
+                    const coordCost = args.dynamicWeight[packedCoord] + coordCostFromOrigin
 
                     if (coordCost > lowestGenCost) {
                         nextGeneration.push(coord)
@@ -1661,7 +1662,7 @@ export class CommunePlanner {
 
                         const adjCostFromOrigin = (fromOrigin[packedAdjCoord] =
                             coordCostFromOrigin + dynamicDistanceWeight)
-                        const adjCoordCost = args.coordMap[packedAdjCoord] + adjCostFromOrigin
+                        const adjCoordCost = args.dynamicWeight[packedAdjCoord] + adjCostFromOrigin
 
                         if (adjCoordCost < lowestNextGenCost) lowestNextGenCost = adjCoordCost
                     }
@@ -1995,7 +1996,7 @@ export class CommunePlanner {
             startCoords: [path[path.length - 1]],
             dynamic: true,
             weighted: true,
-            coordMap: this.reverseExitFlood,
+            dynamicWeight: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure cardinal directions aren't gridCoords but are each adjacent to one
              */
@@ -2100,7 +2101,7 @@ export class CommunePlanner {
             startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
-            coordMap: this.reverseExitFlood,
+            dynamicWeight: this.reverseExitFlood,
             /**
              * Ensure we can place all 10 labs where they are in range 2 of the 2 inputs, so can all be utilized for reactions
              */
@@ -2210,7 +2211,7 @@ export class CommunePlanner {
             startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
-            coordMap: this.reverseExitFlood,
+            dynamicWeight: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
@@ -2292,7 +2293,7 @@ export class CommunePlanner {
             startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
-            coordMap: this.reverseExitFlood,
+            dynamicWeight: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
@@ -2317,7 +2318,7 @@ export class CommunePlanner {
             startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
-            coordMap: this.reverseExitFlood,
+            dynamicWeight: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
@@ -2342,7 +2343,7 @@ export class CommunePlanner {
             startCoords: [this.stampAnchors.hub[0]],
             dynamic: true,
             weighted: true,
-            coordMap: this.reverseExitFlood,
+            dynamicWeight: this.reverseExitFlood,
             /**
              * Don't place on a gridCoord and ensure there is a gridCoord adjacent
              */
