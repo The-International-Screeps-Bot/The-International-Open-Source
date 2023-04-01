@@ -756,7 +756,7 @@ const roomAdditions = {
 
                 for (const ID of this.global.sourceContainers) {
                     const container = findObjectWithID(ID)
-                    if (!sourceContainers) break
+                    if (!container) break
 
                     sourceContainers.push(container)
                 }
