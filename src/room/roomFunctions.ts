@@ -21,6 +21,7 @@ import {
     RESULT_FAIL,
     RESULT_NO_ACTION,
     adjacentOffsets,
+    RESULT_SUCCESS,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -2137,8 +2138,14 @@ Room.prototype.createClaimRequest = function () {
     if (this.memory.PC === false) return false
     if (Memory.claimRequests[this.name]) return false
 
-    if (this.roomManager.communePlanner.preTickRun() === RESULT_FAIL) {
+    const result = this.roomManager.communePlanner.preTickRun()
+    if (result === RESULT_FAIL) {
         this.memory.PC = false
+        return false
+    }
+
+    if (result !== RESULT_SUCCESS) {
+
         return false
     }
 

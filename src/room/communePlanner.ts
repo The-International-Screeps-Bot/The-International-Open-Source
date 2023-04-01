@@ -368,7 +368,7 @@ export class CommunePlanner {
         this.findScore()
         this.record()
 
-        return RESULT_SUCCESS
+        return RESULT_ACTION
     }
     /**
      *
