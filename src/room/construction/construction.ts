@@ -6,7 +6,6 @@ import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
-    STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
     STRUCTURE_LINK,
     STRUCTURE_STORAGE,
