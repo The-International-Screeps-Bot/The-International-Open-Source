@@ -401,7 +401,7 @@ export class RemoteHauler extends Creep {
 
         const remoteHauler = creepAtPos as RemoteHauler
         remoteHauler.deliverResources()
-/*
+        /*
         for (const creep of [this, creepAtPos]) {
 
             if (creep.moveRequest) {
@@ -411,7 +411,7 @@ export class RemoteHauler extends Creep {
                 this.room.coordVisual(coord.x, coord.y)
             }
         }
- */
+        */
         return true
     }
 

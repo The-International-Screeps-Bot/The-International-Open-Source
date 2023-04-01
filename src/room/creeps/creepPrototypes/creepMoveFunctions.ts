@@ -224,7 +224,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (pathOpts.loose) return this.createMoveRequest(opts)
 
     this.room.errorVisual(this.pos)
-    
+
     // Try to get on the path
 
     opts.goals = []
@@ -602,7 +602,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if (!creepNameAtPos) {
         if (this.spawning) {
             this.moved = this.moveRequest
-            room.moveRequests[this.moveRequest]
+            delete room.moveRequests[this.moveRequest]
             return
         }
 
