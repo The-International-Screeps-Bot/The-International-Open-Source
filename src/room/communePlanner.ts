@@ -279,8 +279,7 @@ export class CommunePlanner {
         if (this.recording) this.record()
 
         // Planning is complete, choose the best one
-        customLog('PLAN ATTEMPTS', this.planAttempts?.length)
-        customLog('FASTFILLER ORIGINS', this.fastFillerStartCoords?.length)
+
         if (this.fastFillerStartCoords && this.planAttempts.length === this.fastFillerStartCoords.length) {
             /* this.visualizeBestPlan() */
             this.choosePlan()
@@ -2289,7 +2288,7 @@ export class CommunePlanner {
             sourcePaths.push(path)
         }
 
-        this.sourcePaths = sourcePaths
+        this.sourcePaths = sourcePaths.reverse()
     }
     private observer() {
         this.planStamps({
