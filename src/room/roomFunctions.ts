@@ -591,15 +591,16 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
 }
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
-    if (this.memory.T === 'remote' && !global.communes.has(this.memory.CN)) this.memory.T = 'neutral'
+    const roomMemory = Memory.rooms[this.name]
+    if (roomMemory.T === 'remote' && !global.communes.has(roomMemory.CN)) roomMemory.T = 'neutral'
 
     // If the room is already a remote of the scoutingRoom
 
-    if (this.memory.T === 'remote' && scoutingRoom.name === this.memory.CN) return this.memory.T
+    if (roomMemory.T === 'remote' && scoutingRoom.name === roomMemory.CN) return roomMemory.T
 
     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
 
-    if (distance > maxRemoteRoomDistance) return this.memory.T
+    if (distance > maxRemoteRoomDistance) return roomMemory.T
 
     // Find distance from scoutingRoom
 
@@ -614,12 +615,12 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             },
         })
 
-    if (distance > maxRemoteRoomDistance) return this.memory.T
+    if (distance > maxRemoteRoomDistance) return roomMemory.T
 
     // Get the anchor from the scoutingRoom, stopping if it's undefined
 
     const anchor = scoutingRoom.roomManager.anchor
-    if (!anchor) return this.memory.T
+    if (!anchor) return roomMemory.T
 
     const newSourceEfficacies = []
     let newSourceEfficaciesTotal = 0
@@ -645,7 +646,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Stop if there is a source inefficient enough
 
-        if (path.length > 300) return this.memory.T
+        if (path.length > 300) return roomMemory.T
 
         let newSourceEfficacy = 0
 
@@ -674,87 +675,95 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // If the room isn't already a remote
 
-    if (this.memory.T !== 'remote') {
+    if (roomMemory.T !== 'remote') {
         // Assign the room's commune as the scoutingRoom
 
-        this.memory.CN = scoutingRoom.name
+        roomMemory.CN = scoutingRoom.name
 
         // Generate new important positions
 
-        delete this.memory.RSIDs
+        delete roomMemory.RSIDs
         delete this.roomManager._remoteSources
         this.roomManager.remoteSources
 
-        delete this.memory.RSHP
+        delete roomMemory.RSHP
         delete this.roomManager._remoteSourceHarvestPositions
         this.roomManager.remoteSourceHarvestPositions
 
-        delete this.memory.RSPs
+        delete roomMemory.RSPs
         delete this.roomManager._remoteSourcePaths
         this.roomManager.remoteSourcePaths
 
-        delete this.memory.RCP
+        delete roomMemory.RCP
         delete this.roomManager._remoteControllerPositions
         this.roomManager.remoteControllerPositions
 
-        this.memory.RE = newReservationEfficacy
+        delete roomMemory.RCPa
+        delete this.roomManager._remoteControllerPath
+        this.roomManager.remoteControllerPath
 
-        this.memory.data = []
-        for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
+        roomMemory.RE = newReservationEfficacy
+
+        roomMemory.data = []
+        for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
 
         // Add the room's name to the scoutingRoom's remotes list
 
         scoutingRoom.memory.remotes.push(this.name)
 
-        this.memory.T = 'remote'
-        return this.memory.T
+        roomMemory.T = 'remote'
+        return roomMemory.T
     }
 
     const currentRemoteEfficacy =
-        this.memory.RSPs.reduce((sum, el) => sum + el.length, 0) / this.memory.RSPs.length + this.memory.RE
+        roomMemory.RSPs.reduce((sum, el) => sum + el.length, 0) / roomMemory.RSPs.length + roomMemory.RE
     const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
     // If the new average source efficacy is above the current, stop
 
-    if (newRemoteEfficacy >= currentRemoteEfficacy) return this.memory.T
+    if (newRemoteEfficacy >= currentRemoteEfficacy) return roomMemory.T
 
     // Make neutral so we don't have type value issues
 
-    this.memory.T = 'neutral'
+    roomMemory.T = 'neutral'
     cleanRoomMemory(this.name)
 
     // Generate new important positions
 
-    delete this.memory.RSIDs
+    delete roomMemory.RSIDs
     delete this.roomManager._remoteSources
     this.roomManager.remoteSources
 
-    delete this.memory.RSHP
+    delete roomMemory.RSHP
     delete this.roomManager._remoteSourceHarvestPositions
     this.roomManager.remoteSourceHarvestPositions
 
-    delete this.memory.RSPs
+    delete roomMemory.RSPs
     delete this.roomManager._remoteSourcePaths
     this.roomManager.remoteSourcePaths
 
-    delete this.memory.RCP
+    delete roomMemory.RCP
     delete this.roomManager._remoteControllerPositions
     this.roomManager.remoteControllerPositions
+
+    delete roomMemory.RCPa
+    delete this.roomManager._remoteControllerPath
+    this.roomManager.remoteControllerPath
 
     // Add the room's name to the scoutingRoom's remotes list
 
     scoutingRoom.memory.remotes.push(this.name)
 
-    this.memory.RE = newReservationEfficacy
+    roomMemory.RE = newReservationEfficacy
 
-    this.memory.data = []
-    for (const key in RemoteData) this.memory.data[parseInt(key)] = 0
+    roomMemory.data = []
+    for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
 
     // Assign the room's commune as the scoutingRoom
 
-    this.memory.CN = scoutingRoom.name
+    roomMemory.CN = scoutingRoom.name
 
-    return this.memory.T
+    return roomMemory.T
 }
 
 Room.prototype.scoutEnemyRoom = function () {

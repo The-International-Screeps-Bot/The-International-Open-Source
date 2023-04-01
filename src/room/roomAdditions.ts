@@ -823,7 +823,7 @@ const roomAdditions = {
                     links.push(link)
                 }
 
-                if (links.length === this.global.sourceContainers.length) {
+                if (links.length === this.global.sourceLinks.length) {
 
                     return (this._sourceLinks = links)
                 }

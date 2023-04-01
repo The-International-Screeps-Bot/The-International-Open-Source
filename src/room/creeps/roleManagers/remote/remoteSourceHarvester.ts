@@ -7,6 +7,7 @@ import {
     getRange,
     randomTick,
     scalePriority,
+    areCoordsEqual,
 } from 'international/utils'
 import { packCoord, reversePosList, unpackPos, unpackPosList } from 'other/codec'
 import { RemoteHauler } from './remoteHauler'
@@ -241,7 +242,9 @@ export class RemoteHarvester extends Creep {
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
         this.message = `⏩ ${sourceIndex}`
-
+/*
+        const targetsClosestHarvestPos = areCoordsEqual(harvestPos, unpackPosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI])[0])
+ */
         this.createMoveRequestByPath(
             {
                 origin: this.pos,
@@ -251,11 +254,11 @@ export class RemoteHarvester extends Creep {
                         range: 0,
                     },
                 ],
-                avoidEnemyRanges: true,
             },
             {
                 packedPath: reversePosList(Memory.rooms[this.memory.RN].RSPs[this.memory.SI]),
                 remoteName: this.memory.RN,
+                /* loose: !!targetsClosestHarvestPos */
             },
         )
 

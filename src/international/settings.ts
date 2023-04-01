@@ -109,7 +109,7 @@ export interface Settings {
 }
 
 export const settings: Settings = {
-    breakingVersion: 95,
+    breakingVersion: 96,
 
     // Default values, do not change. Instead modify clones in memory
 

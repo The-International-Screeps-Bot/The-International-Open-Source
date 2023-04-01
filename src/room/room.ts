@@ -581,7 +581,7 @@ export class RoomManager {
         })
 
         this.room.memory.RCP = packPosList(positions)
-        return this._remoteControllerPositions = positions
+        return (this._remoteControllerPositions = positions)
     }
 
     _usedControllerCoords: Set<string>
@@ -611,5 +611,33 @@ export class RoomManager {
         }
 
         return this._usedControllerCoords
+    }
+
+    _remoteControllerPath: RoomPosition[]
+    get remoteControllerPath() {
+        if (this._remoteControllerPath) return this._remoteControllerPath
+
+        const packedPath = this.room.memory.RCPa
+        if (packedPath) {
+            return (this._remoteControllerPath = unpackPosList(packedPath))
+        }
+
+        const commune = Game.rooms[this.room.memory.CN]
+        if (!commune) throw Error('No commune for remote controller path ' + this.room.name)
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
+
+        const path = this.room.advancedFindPath({
+            origin: this.remoteControllerPositions[0],
+            goals: [{ pos: anchor, range: 3 }],
+            typeWeights: remoteTypeWeights,
+            plainCost: defaultRoadPlanningPlainCost,
+            weightStructurePlans: true,
+            avoidStationaryPositions: true,
+        })
+
+        this.room.memory.RCPa = packPosList(path)
+        return (this._remoteControllerPath = path)
     }
 }

@@ -1683,6 +1683,11 @@ declare global {
         MPa: string
 
         /**
+         * Remote Controller Path
+         */
+        RCPa: string
+
+        /**
          * Mineral Positions, packed positions around the mineral where harvesters can sit
          */
         MP: string

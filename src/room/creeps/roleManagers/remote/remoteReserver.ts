@@ -1,6 +1,6 @@
 import { RemoteData, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
-import { packCoord, unpackCoordAsPos, unpackPosList } from 'other/codec'
+import { packCoord, reversePosList, unpackCoordAsPos, unpackPosList } from 'other/codec'
 
 export class RemoteReserver extends Creep {
 
@@ -110,15 +110,21 @@ export class RemoteReserver extends Creep {
 
         if (getRange(this.pos, usePos) === 0) return RESULT_SUCCESS
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: usePos,
-                    range: 0,
-                },
-            ],
-        })
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: usePos,
+                        range: 0,
+                    },
+                ],
+            },
+            {
+                packedPath: reversePosList(Memory.rooms[this.memory.RN].RCPa),
+                remoteName: this.memory.RN,
+            },
+        )
 
         return RESULT_ACTION
     }
@@ -133,24 +139,21 @@ export class RemoteReserver extends Creep {
 
         const remoteControllerPositions = unpackPosList(Memory.rooms[this.memory.RN].RCP)
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: remoteControllerPositions[0],
-                    range: 0,
-                },
-            ],
-            avoidEnemyRanges: true,
-            typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                enemyRemote: Infinity,
-                allyRemote: Infinity,
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: remoteControllerPositions[0],
+                        range: 0,
+                    },
+                ],
             },
-            avoidAbandonedRemotes: true,
-        })
+            {
+                packedPath: reversePosList(Memory.rooms[this.memory.RN].RCPa),
+                remoteName: this.memory.RN,
+            },
+        )
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {
