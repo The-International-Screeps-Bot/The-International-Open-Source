@@ -2,6 +2,7 @@ import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartT
 import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, getRange, newID } from 'international/utils'
+import { unpackPosList } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
 import './spawnRequests'
@@ -36,6 +37,11 @@ export class SpawningStructuresManager {
                 const creep = Game.creeps[spawn.spawning.name]
                 creep.manageSpawning(spawn)
                 creep.spawnID = spawn.id
+
+                if (spawn.spawning.remainingTime <= 2 && creep.memory.P && creep.memory.P.length) {
+
+                    creep.assignMoveRequest(unpackPosList(creep.memory.P)[0])
+                }
 
                 this.activeSpawns.push(spawn)
                 continue

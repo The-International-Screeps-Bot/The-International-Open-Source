@@ -461,7 +461,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         if (creepAtPosName) {
             const creepAtPos = Game.creeps[creepAtPosName]
             if (creepAtPos.fatigue > 0) continue
-            /* if (creepAtPos.moved) continue */
+            if (creepAtPos.moved) continue
             if (!this.getActiveBodyparts(MOVE)) continue
         }
 
@@ -642,7 +642,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
                 room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
                     fill: customColors.black,
-                    opacity: 0.6,
+                    opacity: 0.7,
                 })
             }
             return
@@ -690,15 +690,15 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (creepAtPos.shove(this.pos)) {
             this.moved = this.moveRequest
             delete room.moveRequests[this.moveRequest]
+        }
 
-            if (Memory.roomVisuals) {
-                const moved = unpackCoord(this.moved)
+        if (Memory.roomVisuals) {
+            const moved = unpackCoord(this.moveRequest)
 
-                room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
-                    fill: customColors.pink,
-                    opacity: 0.6,
-                })
-            }
+            room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
+                fill: customColors.pink,
+                opacity: 0.7,
+            })
         }
 
         return

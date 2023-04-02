@@ -293,7 +293,7 @@ export class TowerManager {
                     priority: scalePriority(
                         structure.store.getCapacity(RESOURCE_ENERGY),
                         structure.usedReserveStore,
-                        1,
+                        10,
                         true,
                     ),
                 })
