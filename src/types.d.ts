@@ -712,6 +712,7 @@ declare global {
         lastReset: number
 
         lastTickTimestamp: number
+        lastTick: number
         tickLength: number
 
         communeCount: number
