@@ -61,6 +61,14 @@ export class RoomManager {
     public update(room: Room) {
         this.room = room
 
+        delete this._usedControllerCoords
+
+        if (room.structureUpdate) {
+
+            delete this._generalRepairStructures
+            delete this._rampartRepairTargets
+        }
+
         if (randomTick()) {
             delete this._nukeTargetCoords
         }

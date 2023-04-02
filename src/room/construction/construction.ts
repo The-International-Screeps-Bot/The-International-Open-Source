@@ -19,6 +19,7 @@ const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
 ]
+const noOverlapDestroyStructures: Set<StructureConstant> = new Set([STRUCTURE_SPAWN, STRUCTURE_RAMPART])
 
 export class ConstructionManager {
     communeManager: CommuneManager
@@ -79,8 +80,8 @@ export class ConstructionManager {
                             skip = true
                             break
                         }
+                        if (noOverlapDestroyStructures.has(structure.structureType)) continue
 
-                        if (structure.structureType !== STRUCTURE_SPAWN) structure.destroy()
                         skip = true
                         break
                     }
@@ -102,7 +103,8 @@ export class ConstructionManager {
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
 
-            if (this.room.findStructureAtCoord(coord, (structure) => structure.structureType === STRUCTURE_RAMPART)) continue
+            if (this.room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART))
+                continue
             if (data.coversStructure && !this.room.coordHasStructureTypes(coord, buildableStructuresSet)) continue
 
             if (data.buildForNuke) {
@@ -178,7 +180,6 @@ export class ConstructionManager {
 
                 const coordData = basePlans.map[packedCoord]
                 if (!coordData) {
-
                     structure.destroy()
                     continue
                 }
@@ -201,7 +202,6 @@ export class ConstructionManager {
 
             const coordData = basePlans.map[packedCoord]
             if (!coordData) {
-
                 misplacedSpawns.push(structure)
                 continue
             }
