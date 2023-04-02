@@ -83,6 +83,7 @@ export const creepRoles: CreepRoles[] = [
  * Roles that will interact with the room logistics system
  */
 export const roomLogisticsRoles: Set<CreepRoles> = new Set([
+    'sourceHarvester',
     'hauler',
     'builder',
     'maintainer',

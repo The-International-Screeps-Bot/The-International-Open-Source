@@ -83,7 +83,7 @@ export class SpawnRequestsManager {
 
                     const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
 
-                    if (this.spawnEnergyCapacity >= 800) {
+                    if (this.spawnEnergyCapacity >= 850) {
                         let defaultParts: BodyPartConstant[] = [CARRY]
                         let workAmount = 6
 
@@ -114,6 +114,23 @@ export class SpawnRequestsManager {
                             partsMultiplier: 1,
                             minCreeps: 1,
                             minCost: 300,
+                            priority,
+                            spawnGroup: spawnGroup,
+                            memoryAdditions: {
+                                SI: sourceIndex,
+                                R: true,
+                            },
+                        }
+                    }
+
+                    if (this.spawnEnergyCapacity >= 800) {
+                        return {
+                            role,
+                            defaultParts: [CARRY],
+                            extraParts: [WORK, MOVE, WORK],
+                            partsMultiplier: 3,
+                            minCreeps: 1,
+                            minCost: 250,
                             priority,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {

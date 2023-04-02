@@ -140,7 +140,7 @@ export class SourceHarvester extends Creep {
         return this.advancedTransfer(sourceLink)
     }
 
-    maintainController?(sourceContainer: StructureContainer): boolean {
+    maintainContainer?(sourceContainer: StructureContainer): boolean {
         if (this.worked) return false
         if (!sourceContainer) {
 
@@ -247,7 +247,7 @@ export class SourceHarvester extends Creep {
 
         // Try to repair the sourceContainer
 
-        this.maintainController(this.room.sourceContainers[this.memory.SI])
+        this.maintainContainer(this.room.sourceContainers[this.memory.SI])
 
         if (this.transferToNearbyCreep()) return
     }

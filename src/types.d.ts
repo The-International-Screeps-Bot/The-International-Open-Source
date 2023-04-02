@@ -1861,7 +1861,7 @@ declare global {
 
         findShoveCoord(avoidPackedPositions: Set<string>, goalCoord?: Coord): Coord
 
-        shove(shoverPos: RoomPosition): boolean
+        shove(shoverPos: RoomPosition, shovedCoords?: Set<string>): boolean
 
         /**
          * Try to enforce a moveRequest and inform the result

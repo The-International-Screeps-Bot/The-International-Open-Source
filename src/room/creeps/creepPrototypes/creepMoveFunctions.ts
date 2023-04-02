@@ -456,7 +456,16 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
     for (let index = 0; index < adjacentPackedPositions.length; index++) {
         const packedCoord = adjacentPackedPositions[index]
-/*
+
+        const creepAtPosName = room.creepPositions[packedCoord]
+        if (creepAtPosName) {
+            const creepAtPos = Game.creeps[creepAtPosName]
+            if (creepAtPos.fatigue > 0) continue
+            /* if (creepAtPos.moved) continue */
+            if (!this.getActiveBodyparts(MOVE)) continue
+        }
+
+        /*
         if (room.creepPositions[packedCoord]) continue
         if (room.powerCreepPositions[packedCoord]) continue
  */
@@ -468,7 +477,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         let score: number
         if (goalCoord) {
             score = getRangeEuc(coord, goalCoord)
-            this.room.visual.text(score.toString(), coord.x, coord.y)
+            if (Memory.roomVisuals) this.room.visual.text(score.toString(), coord.x, coord.y)
             if (score >= lowestScore) continue
         }
 
@@ -513,7 +522,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
     return shoveCoord
 }
 
-PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
+PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos, shovedCoords) {
     const { room } = this
 
     let currentGoalPos: Coord
@@ -524,9 +533,16 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
 
     const packedShoveCoord = packCoord(shoveCoord)
     const creepAtPosName = room.creepPositions[packedShoveCoord] || room.powerCreepPositions[packedShoveCoord]
-    if (creepAtPosName) {
 
-        if (!Game.creeps[creepAtPosName].shove(this.pos)) return false
+    // If there is a creep make sure we aren't overlapping with other shoves
+
+    if (creepAtPosName && (!shovedCoords || !shovedCoords.has(packedShoveCoord))) {
+        if (!shovedCoords) shovedCoords = new Set()
+
+        shovedCoords.add(packCoord(this.pos))
+        shovedCoords.add(packedShoveCoord)
+
+        if (!Game.creeps[creepAtPosName].shove(this.pos, shovedCoords)) return false
     }
 
     this.assignMoveRequest(shoveCoord)
@@ -554,10 +570,12 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
         })
     }
 
+    return true
+/*
     this.recurseMoveRequest()
     if (this.moved) return true
 
-    return false
+    return false */
 }
 
 PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function () {
@@ -618,7 +636,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             delete room.moveRequests[this.moveRequest]
 
             if (Memory.roomVisuals) {
-
                 const moved = unpackCoord(this.moved)
 
                 room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
@@ -673,7 +690,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             delete room.moveRequests[this.moveRequest]
 
             if (Memory.roomVisuals) {
-
                 const moved = unpackCoord(this.moved)
 
                 room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
