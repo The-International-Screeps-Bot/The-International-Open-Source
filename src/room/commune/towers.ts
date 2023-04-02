@@ -271,7 +271,7 @@ export class TowerManager {
         for (const structure of this.communeManager.room.structures.tower) {
             // If don't have enough energy, request more
 
-            if (structure.usedReserveStore < structure.store.getCapacity(RESOURCE_ENERGY) * 0.75) {
+            if (structure.usedReserveStore < structure.store.getCapacity(RESOURCE_ENERGY) * 0.8) {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
                     type: 'transfer',
@@ -283,18 +283,17 @@ export class TowerManager {
             // If there are no attackers and the tower has some energy, make offer request
 
             if (
-                !this.communeManager.room.enemyAttackers.length &&
                 structure.usedReserveStore > structure.store.getCapacity(RESOURCE_ENERGY) * 0.5
             ) {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
-                    maxAmount: structure.reserveStore.energy * 0.75,
-                    onlyFull: true,
+                    maxAmount: structure.usedReserveStore - 100,
+                    /* onlyFull: true, */
                     type: 'offer',
                     priority: scalePriority(
                         structure.store.getCapacity(RESOURCE_ENERGY),
-                        structure.reserveStore.energy,
-                        10,
+                        structure.usedReserveStore,
+                        1,
                         true,
                     ),
                 })

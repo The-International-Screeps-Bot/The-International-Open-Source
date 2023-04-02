@@ -176,8 +176,8 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // If we're on an exit and the next pos is in the other room, wait
 
         if (path[0].roomName !== this.room.name) {
-            /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
-            this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
+            this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
+            /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
 
             this.memory.P = packedPath
             this.moved = 'moved'

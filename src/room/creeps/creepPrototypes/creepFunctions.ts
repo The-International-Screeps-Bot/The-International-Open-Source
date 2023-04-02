@@ -589,13 +589,11 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 }
 
 Creep.prototype.findNewRepairTarget = function () {
-    let possibleRepairTargets: Structure<BuildableStructureConstant>[] = this.room.structures.road
-    possibleRepairTargets = possibleRepairTargets.concat(this.room.structures.container)
 
     let lowestScore = Infinity
     let bestTarget
 
-    for (const structure of possibleRepairTargets) {
+    for (const structure of this.room.roomManager.generalRepairStructures) {
         // If above 30% of max hits
 
         if (structure.nextHits / structure.hitsMax > 0.3) continue
@@ -1388,7 +1386,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             if (!this.canAcceptRoomLogisticsRequest(request.type, request.ID)) continue
 
             const targetPos = findObjectWithID(request.targetID).pos
-            const score = request.priority + getRange(targetPos, this.pos) / 100
+            const score = request.priority + getRange(targetPos, this.pos) / 20
 
             if (score >= lowestScore) continue
 

@@ -119,7 +119,7 @@ export class Vanguard extends Creep {
 
                 // Try to normally harvest. Iterate if creep harvested
 
-                if (this.advancedHarvestSource(this.room.find(FIND_SOURCES)[sourceIndex])) return
+                if (this.advancedHarvestSource(this.room.roomManager.communeSources[sourceIndex])) return
                 return
             }
 
