@@ -399,39 +399,36 @@ Creep.prototype.builderGetEnergy = function () {
     if (this.room.communeManager.buildersMakeRequests) return RESULT_SUCCESS
     if (!this.needsResources()) return RESULT_NO_ACTION
 
-    let conditions: (request: RoomLogisticsRequest) => boolean
+    if (
+        (this.room.storage && this.room.controller.level >= 4) ||
+        (this.room.terminal && this.room.controller.level >= 6)
+    ) {
+        this.runRoomLogisticsRequestsAdvanced({
+            types: new Set(['withdraw', 'offer', 'pickup']),
+            resourceTypes: new Set([RESOURCE_ENERGY]),
+        })
 
-    const anchor = this.room.roomManager.anchor
-    if (!anchor) throw Error('No anchor for builder get energy ' + this.room.name)
+        // Don't try to build if we still need resources
 
-    if (anchor && (!this.room.storage || this.room.controller.level < 4)) {
-        // Only allow containers near the fastFiller
-
-        conditions = (request: RoomLogisticsRequest) => {
-            if (request.resourceType !== RESOURCE_ENERGY) return false
-            if (
-                findObjectWithID(request.targetID) instanceof Structure &&
-                getRange(anchor, findObjectWithID(request.targetID).pos) > 2
-            )
-                return false
-
-            return true
-        }
-    } else {
-        // Get from anywhere
-
-        conditions = (request: RoomLogisticsRequest) => {
-            return request.resourceType === RESOURCE_ENERGY
-        }
+        if (this.needsResources()) return RESULT_STOP
+        return RESULT_SUCCESS
     }
 
-    // We need energy, find a request
+    // We don't have a storage or terminal, don't allow use of sourceContainers
 
     this.runRoomLogisticsRequestsAdvanced({
         types: new Set(['withdraw', 'offer', 'pickup']),
-        conditions,
-    })
+        resourceTypes: new Set([RESOURCE_ENERGY]),
+        conditions: (request: RoomLogisticsRequest) => {
+            const target = findObjectWithID(request.targetID)
 
+            for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
+                if (getRange(target.pos, positions[0]) === 0) return false
+            }
+
+            return true
+        },
+    })
     // Don't try to build if we still need resources
 
     if (this.needsResources()) return RESULT_STOP
@@ -568,7 +565,9 @@ Creep.prototype.findNewRampartRepairTarget = function () {
     let lowestScore = Infinity
     let bestTarget
 
-    let ramparts = this.room.enemyAttackers.length ? this.room.communeManager.defensiveRamparts : this.room.structures.rampart
+    let ramparts = this.room.enemyAttackers.length
+        ? this.room.communeManager.defensiveRamparts
+        : this.room.structures.rampart
     for (const structure of ramparts) {
         // If above 90% of max hits
 
@@ -589,7 +588,6 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 }
 
 Creep.prototype.findNewRepairTarget = function () {
-
     let lowestScore = Infinity
     let bestTarget
 
@@ -635,10 +633,13 @@ Creep.prototype.findSourceIndex = function () {
         // Find the first source with open spots
 
         for (let i = 0; i < this.room.find(FIND_SOURCES).length; i++) {
-
             // If there are still creeps needed to harvest a source under the creepThreshold
 
-            if (Math.min(creepThreshold, room.roomManager.sourceHarvestPositions[i].length) - room.creepsOfSource[i].length > 0) {
+            if (
+                Math.min(creepThreshold, room.roomManager.sourceHarvestPositions[i].length) -
+                    room.creepsOfSource[i].length >
+                0
+            ) {
                 this.memory.SI = i
                 return true
             }
@@ -671,7 +672,11 @@ Creep.prototype.findCommuneSourceIndex = function () {
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
-            if (Math.min(creepThreshold, room.roomManager.communeSourceHarvestPositions[index].length) - room.creepsOfSource[index].length > 0) {
+            if (
+                Math.min(creepThreshold, room.roomManager.communeSourceHarvestPositions[index].length) -
+                    room.creepsOfSource[index].length >
+                0
+            ) {
                 this.memory.SI = index
                 return true
             }
@@ -704,7 +709,11 @@ Creep.prototype.findRemoteSourceIndex = function () {
 
             // If there are still creeps needed to harvest a source under the creepThreshold
 
-            if (Math.min(creepThreshold, room.roomManager.remoteSourceHarvestPositions[index].length) - room.creepsOfSource[index].length > 0) {
+            if (
+                Math.min(creepThreshold, room.roomManager.remoteSourceHarvestPositions[index].length) -
+                    room.creepsOfSource[index].length >
+                0
+            ) {
                 this.memory.SI = index
                 return true
             }
@@ -728,7 +737,7 @@ Creep.prototype.findSourceHarvestPos = function (index) {
     let packedCoord = this.memory.PC
     if (packedCoord) {
         // On random intervals take the best source pos if it's open
-/*
+        /*
         if (randomTick()) {
             const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
@@ -745,7 +754,9 @@ Creep.prototype.findSourceHarvestPos = function (index) {
 
     const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
-    const usePos = room.roomManager.sourceHarvestPositions[index].find(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    const usePos = room.roomManager.sourceHarvestPositions[index].find(
+        pos => !usedSourceHarvestCoords.has(packCoord(pos)),
+    )
     if (!usePos) return false
 
     packedCoord = packCoord(usePos)
@@ -766,7 +777,7 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
     let packedCoord = this.memory.PC
     if (packedCoord) {
         // On random intervals take the best source pos if it's open
-/*
+        /*
         if (randomTick()) {
             const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
@@ -783,7 +794,9 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
 
     const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
-    const usePos = room.roomManager.communeSourceHarvestPositions[index].find(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    const usePos = room.roomManager.communeSourceHarvestPositions[index].find(
+        pos => !usedSourceHarvestCoords.has(packCoord(pos)),
+    )
     if (!usePos) return false
 
     packedCoord = packCoord(usePos)
@@ -803,7 +816,7 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
     let packedCoord = this.memory.PC
     if (packedCoord) {
         // On random intervals take the best source pos if it's open
-/*
+        /*
         if (randomTick()) {
             const sourcePos = room.roomManager.remoteSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
@@ -820,7 +833,9 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
 
     const usedSourceHarvestCoords = room.usedSourceHarvestCoords
 
-    const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(pos => !usedSourceHarvestCoords.has(packCoord(pos)))
+    const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(
+        pos => !usedSourceHarvestCoords.has(packCoord(pos)),
+    )
     if (!usePos) return false
 
     packedCoord = packCoord(usePos)

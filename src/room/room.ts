@@ -640,4 +640,12 @@ export class RoomManager {
         this.room.memory.RCPa = packPosList(path)
         return (this._remoteControllerPath = path)
     }
+
+    _rampartRepairTargets: StructureRampart[]
+    get rampartRepairTargets() {
+
+        const rampartRepairTargets: StructureRampart[] = []
+
+        return this._rampartRepairTargets = rampartRepairTargets
+    }
 }

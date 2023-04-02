@@ -155,18 +155,20 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
     //
-/*
+    /*
     const path = unpackPosList(pathOpts.packedPath)
     for (const pos of path) new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: customColors.lightBlue, opacity: 0.2 })
  */
     const packedGoalPos = packPos(opts.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
-/*
-    this.room.targetVisual(this.pos, opts.goals[0].pos, true)
 
-    this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5,{font:0.4})
-    this.room.visual.text((posIndex || -1).toString(), this.pos)
- */
+    if (Memory.roomVisuals) {
+        this.room.targetVisual(this.pos, opts.goals[0].pos, true)
+
+        this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
+        this.room.visual.text((posIndex || -1).toString(), this.pos)
+    }
+
     if (!isOnLastPos && posIndex !== -1 && this.memory.UP !== packedGoalPos) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const path = unpackPosList(packedPath)
@@ -218,7 +220,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     }
 
     // If loose is enabled, don't try to get back on the cached path
-/*
+    /*
     this.room.visual.text((pathOpts.loose || false).toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
  */
     if (pathOpts.loose) return this.createMoveRequest(opts)
@@ -454,10 +456,10 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
     for (let index = 0; index < adjacentPackedPositions.length; index++) {
         const packedCoord = adjacentPackedPositions[index]
-
+/*
         if (room.creepPositions[packedCoord]) continue
         if (room.powerCreepPositions[packedCoord]) continue
-
+ */
         if (avoidPackedPositions.has(packedCoord)) continue
 
         const coord = unpackCoord(packedCoord)
@@ -478,7 +480,11 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue
 
-        if (this.memory.ROS && !room.findStructureAtCoord(coord, (structure) => structure.structureType === STRUCTURE_RAMPART)) continue
+        if (
+            this.memory.ROS &&
+            !room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART)
+        )
+            continue
 
         let hasImpassibleStructure
 
@@ -515,6 +521,13 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos) {
 
     const shoveCoord = this.findShoveCoord(new Set([packCoord(shoverPos), packCoord(this.pos)]), currentGoalPos)
     if (!shoveCoord) return false
+
+    const packedShoveCoord = packCoord(shoveCoord)
+    const creepAtPosName = room.creepPositions[packedShoveCoord] || room.powerCreepPositions[packedShoveCoord]
+    if (creepAtPosName) {
+
+        if (!Game.creeps[creepAtPosName].shove(this.pos)) return false
+    }
 
     this.assignMoveRequest(shoveCoord)
     if (Memory.roomVisuals)
@@ -603,6 +616,16 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (this.spawning) {
             this.moved = this.moveRequest
             delete room.moveRequests[this.moveRequest]
+
+            if (Memory.roomVisuals) {
+
+                const moved = unpackCoord(this.moved)
+
+                room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
+                    fill: customColors.black,
+                    opacity: 0.6,
+                })
+            }
             return
         }
 
@@ -648,6 +671,16 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         if (creepAtPos.shove(this.pos)) {
             this.moved = this.moveRequest
             delete room.moveRequests[this.moveRequest]
+
+            if (Memory.roomVisuals) {
+
+                const moved = unpackCoord(this.moved)
+
+                room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
+                    fill: customColors.pink,
+                    opacity: 0.6,
+                })
+            }
         }
 
         return
@@ -670,8 +703,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             if (
                 this.memory.RN !== creepAtPos.memory.RN ||
                 this.memory.SI !== creepAtPos.memory.SI ||
-                (TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
+                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
                 // Have the creep move to its moveRequest
 
@@ -782,8 +815,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             if (
                 !(creepAtPos instanceof PowerCreep) &&
-                (TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
+                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {
                 this.runMoveRequest()
 
@@ -802,8 +835,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
         if (
             !(creepAtPos instanceof PowerCreep) &&
-            (TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
+            TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {

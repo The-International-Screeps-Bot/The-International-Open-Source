@@ -104,7 +104,7 @@ export class RemoteReserver extends Creep {
     }
 
     travelToController?() {
-
+        
         const usePos = this.findControllerPos()
         if (!usePos) return RESULT_FAIL
 
