@@ -546,6 +546,8 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (shoverPos, shoved
     }
 
     this.assignMoveRequest(shoveCoord)
+    this.runMoveRequest()
+
     if (Memory.roomVisuals)
         room.visual.circle(this.pos, {
             fill: '',
