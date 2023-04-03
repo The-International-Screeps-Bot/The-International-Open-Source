@@ -1,4 +1,4 @@
-import { customColors, relayOffsets, RemoteData } from 'international/constants'
+import { customColors, packedPosLength, relayOffsets, RemoteData } from 'international/constants'
 import {
     customLog,
     findClosestObject,
@@ -468,7 +468,7 @@ export class RemoteHauler extends Creep {
     relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
 
-        if (!this.moveRequest && (!this.memory.P || !this.memory.P.length)) return
+        if (!this.moveRequest && (!this.memory.P || this.memory.P.length / packedPosLength < 2)) return
         if (this.movedResource) return
         if (!this.nextStore.energy) return
 
@@ -476,12 +476,12 @@ export class RemoteHauler extends Creep {
 
         if (
             !this.fatigue &&
-            this.memory.RN == this.room.name &&
+            this.memory.RN === this.room.name &&
             getRange(this.room.roomManager.remoteSourceHarvestPositions[this.memory.SI][0], this.pos) <= 1
         )
             return
 
-        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[0]
+        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory.P)[1]
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)
