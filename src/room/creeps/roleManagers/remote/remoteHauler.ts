@@ -397,6 +397,13 @@ export class RemoteHauler extends Creep {
         delete this.memory.P
         delete creepAtPos.memory.P
 
+        // Trade room logistics requests
+
+        creepAtPos.memory.RLRs = this.memory.RLRs
+        this.memory.RLRs = []
+
+        //
+
         this.getResources()
 
         const remoteHauler = creepAtPos as RemoteHauler
