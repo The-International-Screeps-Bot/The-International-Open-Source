@@ -62,12 +62,8 @@ export class RoomManager {
         this.room = room
 
         delete this._usedControllerCoords
-
-        if (room.structureUpdate) {
-
-            delete this._generalRepairStructures
-            delete this._rampartRepairTargets
-        }
+        delete this._generalRepairStructures
+        delete this._rampartRepairTargets
 
         if (randomTick()) {
             delete this._nukeTargetCoords
@@ -651,9 +647,8 @@ export class RoomManager {
 
     _rampartRepairTargets: StructureRampart[]
     get rampartRepairTargets() {
-
         const rampartRepairTargets: StructureRampart[] = []
 
-        return this._rampartRepairTargets = rampartRepairTargets
+        return (this._rampartRepairTargets = rampartRepairTargets)
     }
 }
