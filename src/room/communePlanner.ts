@@ -971,7 +971,7 @@ export class CommunePlanner {
                 this.baseCoords[packedCoord] = 0
                 sourceHarvestPositions[i].push(adjPos)
             }
-
+/*
             // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
             // Loop through each pos index
 
@@ -980,7 +980,7 @@ export class CommunePlanner {
 
                 sourceHarvestPositions.splice(j, 1)
             }
-
+ */
             sourceHarvestPositions[i].sort((a, b) => {
                 return (
                     this.room.advancedFindPath({
