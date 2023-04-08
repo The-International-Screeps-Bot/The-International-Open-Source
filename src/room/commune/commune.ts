@@ -172,7 +172,13 @@ export class CommuneManager {
         global.communes.add(room.name)
         this.preTickTest()
 
-        if (!roomMemory.GRCL || room.controller.level > roomMemory.GRCL) roomMemory.GRCL = room.controller.level
+        if (!roomMemory.GRCL) {
+
+            if (global.communes.size <= 1) roomMemory.GRCL = room.controller.level
+            else if (room.controller.progress > room.controller.progressTotal || room.find(FIND_MY_STRUCTURES).length) {
+                roomMemory.GRCL = 8
+            } else roomMemory.GRCL = room.controller.level
+        } else if (room.controller.level > roomMemory.GRCL) roomMemory.GRCL = room.controller.level
 
         if (!room.memory.combatRequests) room.memory.combatRequests = []
         if (!room.memory.haulRequests) room.memory.haulRequests = []
@@ -277,7 +283,6 @@ export class CommuneManager {
     }
 
     private preTickTest() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -289,7 +294,6 @@ export class CommuneManager {
     }
 
     private test() {
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -394,10 +398,11 @@ export class CommuneManager {
 
         const level = this.room.controller.level
 
-        return this._minRampartHits = (Math.min(
-            Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
-            RAMPART_HITS_MAX[level] * 0.9,
-        ) || 20000)
+        return (this._minRampartHits =
+            Math.min(
+                Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory.AT * 5 * Math.pow(level, 2)),
+                RAMPART_HITS_MAX[level] * 0.9,
+            ) || 20000)
     }
 
     _storingStructures: (StructureStorage | StructureTerminal)[]
@@ -459,7 +464,8 @@ export class CommuneManager {
         // Container
 
         if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
-            return (this._maxUpgradeStrength = upgradeStructure.store.getCapacity() / (4 + this.room.memory.UP.length / packedPosLength))
+            return (this._maxUpgradeStrength =
+                upgradeStructure.store.getCapacity() / (4 + this.room.memory.UP.length / packedPosLength))
         }
 
         // Link
@@ -532,8 +538,7 @@ export class CommuneManager {
         if (this._structureTypesByBuildPriority) return this._structureTypesByBuildPriority
 
         if (!this.room.fastFillerContainerLeft && !this.room.fastFillerContainerRight) {
-
-            return this._structureTypesByBuildPriority = [
+            return (this._structureTypesByBuildPriority = [
                 STRUCTURE_RAMPART,
                 STRUCTURE_WALL,
                 STRUCTURE_SPAWN,
@@ -550,7 +555,7 @@ export class CommuneManager {
                 STRUCTURE_POWER_SPAWN,
                 STRUCTURE_NUKER,
                 STRUCTURE_OBSERVER,
-            ]
+            ])
         }
 
         this._structureTypesByBuildPriority = [
@@ -579,7 +584,6 @@ export class CommuneManager {
      * When the room needs to upgrade at high priority to remove the downgrade timer
      */
     get controllerDowngradeUpgradeThreshold() {
-
         return Math.floor(CONTROLLER_DOWNGRADE[this.room.controller.level] * 0.75)
     }
 
@@ -593,13 +597,15 @@ export class CommuneManager {
         if (!stampAnchors) throw Error('No stampAnchors for defensive ramparts')
 
         for (const coord of stampAnchors.minCutRampart.concat(stampAnchors.onboardingRampart)) {
-
-            const structure = this.room.findStructureAtCoord<StructureRampart>(coord, (structure) => structure.structureType === STRUCTURE_RAMPART)
+            const structure = this.room.findStructureAtCoord<StructureRampart>(
+                coord,
+                structure => structure.structureType === STRUCTURE_RAMPART,
+            )
             if (!structure) continue
 
             ramparts.push(structure)
         }
 
-        return this._defensiveRamparts = ramparts
+        return (this._defensiveRamparts = ramparts)
     }
 }

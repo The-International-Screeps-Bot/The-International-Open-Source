@@ -33,6 +33,10 @@ export class SpawningStructuresManager {
         this.activeSpawns = []
 
         for (const spawn of spawns) {
+
+            if (spawn.renewed) continue
+            if (!spawn.RCLActionable) continue
+
             if (spawn.spawning) {
                 const creep = Game.creeps[spawn.spawning.name]
                 creep.manageSpawning(spawn)
@@ -46,9 +50,6 @@ export class SpawningStructuresManager {
                 this.activeSpawns.push(spawn)
                 continue
             }
-
-            if (spawn.renewed) continue
-            if (!spawn.RCLActionable) continue
 
             this.inactiveSpawns.push(spawn)
         }
