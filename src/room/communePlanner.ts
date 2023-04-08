@@ -1764,7 +1764,8 @@ export class CommunePlanner {
             shortestPath = path
         }
 
-        origins.push(shortestPath[Math.floor(shortestPath.length / 2)])
+        let origin = shortestPath[Math.floor(shortestPath.length / 2)]
+        if (origin) origins.push(origin)
 
         // Avg path between sources, if more than 1
 
@@ -1775,7 +1776,8 @@ export class CommunePlanner {
                 plainCost: defaultRoadPlanningPlainCost,
             })
 
-            origins.push(path[Math.floor(path.length / 2)])
+            origin = path[Math.floor(path.length / 2)]
+            if (origin) origins.push(origin)
         }
 
         this.fastFillerStartCoords = origins

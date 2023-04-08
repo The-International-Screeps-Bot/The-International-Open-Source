@@ -78,9 +78,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     const role = 'sourceHarvester'
-
                     const spawnGroup = this.communeManager.room.creepsOfSource[sourceIndex]
-
                     const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
 
                     if (this.spawnEnergyCapacity >= 850) {
@@ -89,7 +87,7 @@ export class SpawnRequestsManager {
 
                         // Account for power regenerating sources
 
-                        const source = this.communeManager.room.find(FIND_SOURCES)[sourceIndex]
+                        const source = sources[sourceIndex]
                         const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
                         if (effect) {
                             workAmount += Math.round(
