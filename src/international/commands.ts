@@ -154,6 +154,9 @@ global.destroyCommuneStructures = function (types?) {
 
 global.claim = function (requestName, communeName, score = 0) {
 
+    if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
+    if (Memory.rooms[requestName].PC !== true) return 'Planning not completed for ' + requestName
+
     if (!Memory.claimRequests[requestName]) {
         Memory.claimRequests[requestName] = {
             responder: communeName,
