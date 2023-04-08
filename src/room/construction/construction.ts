@@ -218,7 +218,7 @@ export class ConstructionManager {
         for (; i < misplacedSpawns.length; i++) {
             misplacedSpawns[i].destroy()
         }
-
+/*
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
         for (const structure of structures.rampart) {
@@ -228,6 +228,6 @@ export class ConstructionManager {
             if (data) continue
 
             structure.destroy()
-        }
+        } */
     }
 }
