@@ -491,6 +491,7 @@ export class SpawnRequestsManager {
     private maintainers() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
+
                 const generalRepairStructures = this.communeManager.room.roomManager.generalRepairStructures
                 const repairTargets = generalRepairStructures.filter(
                     structure => structure.hitsMax * 0.2 >= structure.hits,
