@@ -242,7 +242,7 @@ export class CommuneManager {
 
     public run() {
         if (!this.room.memory.PC) return
-
+        
         this.combatManager.run()
         this.towerManager.run()
         this.combatManager.manageThreat()

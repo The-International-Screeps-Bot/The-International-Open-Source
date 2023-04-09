@@ -1616,7 +1616,7 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
             }
 
             if (!storingStructure) return false
-            this.room.targetVisual(target.pos, storingStructure.pos)
+
             request.delivery = storingStructure.id
             return true
         }

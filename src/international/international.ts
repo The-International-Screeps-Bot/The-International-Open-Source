@@ -64,6 +64,7 @@ export class InternationalManager {
             delete this._funnelOrder
             delete this._minCredits
             delete this._resourcesInStoringStructures
+            delete this._maxCSitesPerRoom
         }
     }
 
@@ -470,6 +471,13 @@ export class InternationalManager {
         }
 
         return this._resourcesInStoringStructures
+    }
+
+    _maxCSitesPerRoom: number
+    get maxCSitesPerRoom() {
+        if (this._maxCSitesPerRoom) return this._maxCSitesPerRoom
+
+        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / global.communes.size, 20), 3);
     }
 }
 

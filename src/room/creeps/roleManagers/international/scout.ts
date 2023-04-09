@@ -26,7 +26,6 @@ export class Scout extends Creep {
         if (!scoutTarget) return false
 
         this.commune.scoutTargets.add(this.memory.scT)
-
         return true
     }
 

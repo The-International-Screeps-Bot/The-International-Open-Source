@@ -4,6 +4,7 @@ import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
+import { internationalManager } from 'international/international'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_EXTENSION,
@@ -40,11 +41,17 @@ export class ConstructionManager {
         this.migrate()
     }
     private place() {
-        // Only run every x ticks or if there are builders (temporary fix)
 
-        if (!this.room.myCreeps.builder.length) {
-            if (!randomTick(50)) return
+        // If there are builders and enough cSites, stop
+
+        if (this.room.myCreeps.builder.length) {
+
+            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length <= 2) return
         }
+
+        // If there are no builders, just run every 50 ticks
+
+        else if (!randomTick(50)) return
 
         // If the construction site count is at its limit, stop
 
@@ -59,9 +66,14 @@ export class ConstructionManager {
             return
 
         const RCL = this.room.controller.level
+        let placedSites = 0
+        const maxSites = internationalManager.maxCSitesPerRoom
         const basePlans = BasePlans.unpack(this.room.memory.BPs)
 
         for (const packedCoord in basePlans.map) {
+
+            if (placedSites >= maxSites) return
+
             const coord = unpackCoord(packedCoord)
             const coordData = basePlans.map[packedCoord]
 
@@ -90,6 +102,7 @@ export class ConstructionManager {
                 }
 
                 this.room.createConstructionSite(coord.x, coord.y, data.structureType)
+                placedSites += 1
                 break
             }
         }
@@ -99,6 +112,9 @@ export class ConstructionManager {
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
         for (const packedCoord in rampartPlans.map) {
+
+            if (placedSites >= maxSites) return
+
             const coord = unpackCoord(packedCoord)
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
@@ -111,6 +127,7 @@ export class ConstructionManager {
                 if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
+                placedSites += 1
                 continue
             }
 
@@ -118,10 +135,12 @@ export class ConstructionManager {
                 if (this.room.memory.AT < 20000) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
+                placedSites += 1
                 continue
             }
 
             this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
+            placedSites += 1
         }
     }
     public visualize() {
