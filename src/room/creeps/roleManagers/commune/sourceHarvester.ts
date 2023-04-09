@@ -56,6 +56,8 @@ export class SourceHarvester extends Creep {
         const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return RESULT_FAIL
 
+        this.actionCoord = this.room.roomManager.communeSources[this.memory.SI].pos
+
         // If the creep is at the creep's packedHarvestPos, inform false
 
         if (getRange(this.pos, harvestPos) === 0) return RESULT_SUCCESS

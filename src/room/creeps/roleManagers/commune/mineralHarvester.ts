@@ -16,6 +16,8 @@ export class MineralHarvester extends Creep {
         const harvestPos = this.findMineralHarvestPos()
         if (!harvestPos) return RESULT_FAIL
 
+        this.actionCoord = this.room.roomManager.mineral.pos
+
         // If the creep is not standing on the harvestPos
 
         if (getRange(this.pos, harvestPos) > 0) {

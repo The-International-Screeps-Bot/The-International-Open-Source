@@ -235,6 +235,8 @@ export class RemoteHarvester extends Creep {
         const harvestPos = this.findRemoteSourceHarvestPos(this.memory.SI)
         if (!harvestPos) return true
 
+        this.actionCoord = this.room.roomManager.remoteSources[this.memory.SI].pos
+
         // If the creep is at the creep's packedHarvestPos, inform false
 
         if (getRange(this.pos, harvestPos) === 0) return false

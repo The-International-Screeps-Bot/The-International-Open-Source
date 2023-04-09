@@ -264,6 +264,8 @@ Creep.prototype.advancedUpgradeController = function () {
             this.message += '➡️'
         }
 
+        this.actionCoord = room.controller.pos
+
         const workPartCount = this.parts.work
         const controllerRange = getRange(this.pos, room.controller.pos)
 
@@ -344,6 +346,8 @@ Creep.prototype.advancedUpgradeController = function () {
     // Otherwise if the creep doesn't need resources
 
     // If the controller is out of upgrade range
+
+    this.actionCoord = room.controller.pos
 
     if (getRange(this.pos, room.controller.pos) > 3) {
         // Make a move request to it
@@ -437,6 +441,9 @@ Creep.prototype.builderGetEnergy = function () {
 }
 
 Creep.prototype.advancedBuildCSite = function (cSite) {
+
+    this.actionCoord = cSite.pos
+
     // If the cSite is out of range
 
     if (getRange(this.pos, cSite.pos) > 3) {

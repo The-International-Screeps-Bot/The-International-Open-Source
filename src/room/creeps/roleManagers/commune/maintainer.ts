@@ -39,6 +39,8 @@ export class Maintainer extends Creep {
         this.message = '⏩🔧'
         room.targetVisual(this.pos, repairTarget.pos)
 
+        this.actionCoord = repairTarget.pos
+
         // Move to target if out of range
 
         if (getRange(this.pos, repairTarget.pos) > 3) {

@@ -1859,7 +1859,7 @@ declare global {
 
         assignMoveRequest(coord: Coord): void
 
-        findShoveCoord(avoidPackedCoords: Set<string>, goalCoord?: Coord): Coord
+        findShoveCoord(avoidPackedCoords: Set<string>, targetCoord?: Coord): Coord
 
         shove(avoidPackedCoords?: Set<string>): boolean
 
@@ -1933,9 +1933,9 @@ declare global {
         noDelivery: boolean
 
         /**
-         * The ID of the creep
+         * The coordinate the creep would prefer to be shoved towards, if it is to be shoved
          */
-        actionTargetID: Id<Source | Structure | Creep>
+        actionCoord: Coord
 
         _macroHealStrength: number
         /**

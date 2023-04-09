@@ -432,7 +432,7 @@ PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = fun
         : (room.moveRequests[packedCoord] = [this.name])
 }
 
-PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function (avoidPackedCoords, goalCoord) {
+PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function (avoidPackedCoords, targetCoord) {
     const { room } = this
 
     const { x } = this.pos
@@ -474,14 +474,18 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         const coord = unpackCoord(packedCoord)
         if (isCoordExit(coord)) continue
 
+        const terrainType = terrain.get(coord.x, coord.y)
+        if (terrainType === TERRAIN_MASK_WALL) continue
+
         let score: number
-        if (goalCoord) {
-            score = getRangeEuc(coord, goalCoord)
+        if (targetCoord) {
+            score = getRangeEuc(coord, targetCoord)
+            if (terrainType === TERRAIN_MASK_SWAMP) score += 1
+            if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord]) score += 1
+
             if (Memory.roomVisuals) this.room.visual.text(score.toString(), coord.x, coord.y)
             if (score >= lowestScore) continue
         }
-
-        if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) continue
 
         // If the coord isn't safe to stand on
 
@@ -508,7 +512,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         if (hasImpassibleStructure) continue
 
-        if (goalCoord) {
+        if (targetCoord) {
             lowestScore = score
             shoveCoord = coord
             continue
@@ -525,12 +529,12 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 PowerCreep.prototype.shove = Creep.prototype.shove = function (avoidPackedCoords) {
     const { room } = this
 
-    let currentGoalPos: Coord
-    if (this.memory.GP) currentGoalPos = unpackPos(this.memory.GP)
+    let targetCoord = this.actionCoord
+    if (!targetCoord && this.memory.GP) targetCoord = unpackPos(this.memory.GP)
 
     avoidPackedCoords.add(packCoord(this.pos))
 
-    const shoveCoord = this.findShoveCoord(avoidPackedCoords, currentGoalPos)
+    const shoveCoord = this.findShoveCoord(avoidPackedCoords, targetCoord)
     if (!shoveCoord) return false
 
     const packedShoveCoord = packCoord(shoveCoord)
@@ -539,7 +543,6 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (avoidPackedCoords
     // If there is a creep make sure we aren't overlapping with other shoves
 
     if (creepAtPosName) {
-
         avoidPackedCoords.add(packCoord(this.pos))
         avoidPackedCoords.add(packedShoveCoord)
 
