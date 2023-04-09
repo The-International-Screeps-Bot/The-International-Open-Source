@@ -1932,6 +1932,11 @@ declare global {
          */
         noDelivery: boolean
 
+        /**
+         * The ID of the creep
+         */
+        actionTargetID: Id<Source | Structure | Creep>
+
         _macroHealStrength: number
         /**
          * The heal strength of the creep alongside its neighbours that we dopn't own

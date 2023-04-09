@@ -298,11 +298,6 @@ export class CommuneManager {
 
     private test() {
 
-        for (const rampart of this.rampartRepairTargets) {
-
-            this.room.coordVisual(rampart.pos.x, rampart.pos.y)
-        }
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*

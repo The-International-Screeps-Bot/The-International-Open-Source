@@ -41,29 +41,22 @@ export class ConstructionManager {
         this.migrate()
     }
     private place() {
-
         // If there are builders and enough cSites, stop
 
         if (this.room.myCreeps.builder.length) {
-
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length <= 2) return
         }
-
+/*
         // If there are no builders, just run every 50 ticks
-
         else if (!randomTick(50)) return
-
+ */
         // If the construction site count is at its limit, stop
 
         if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
 
-        // If there are some construction sites
+        // If there are enough construction sites
 
-        if (
-            this.room.find(FIND_MY_CONSTRUCTION_SITES).length >=
-            Math.max(2, MAX_CONSTRUCTION_SITES / 1 + global.communes.size)
-        )
-            return
+        if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= internationalManager.maxCSitesPerRoom) return
 
         const RCL = this.room.controller.level
         let placedSites = 0
@@ -71,7 +64,6 @@ export class ConstructionManager {
         const basePlans = BasePlans.unpack(this.room.memory.BPs)
 
         for (const packedCoord in basePlans.map) {
-
             if (placedSites >= maxSites) return
 
             const coord = unpackCoord(packedCoord)
@@ -94,6 +86,8 @@ export class ConstructionManager {
                         }
                         if (noOverlapDestroyStructures.has(structure.structureType)) continue
 
+                        structure.destroy()
+
                         skip = true
                         break
                     }
@@ -112,7 +106,6 @@ export class ConstructionManager {
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
         for (const packedCoord in rampartPlans.map) {
-
             if (placedSites >= maxSites) return
 
             const coord = unpackCoord(packedCoord)
@@ -237,7 +230,7 @@ export class ConstructionManager {
         for (; i < misplacedSpawns.length; i++) {
             misplacedSpawns[i].destroy()
         }
-/*
+        /*
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
         for (const structure of structures.rampart) {
