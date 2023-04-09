@@ -203,7 +203,7 @@ export class TowerManager {
     }
 
     findRampartRepairTargets() {
-        return this.communeManager.room.structures.rampart.filter(function (rampart) {
+        return this.communeManager.rampartRepairTargets.filter(function (rampart) {
             return rampart.hits <= RAMPART_DECAY_AMOUNT
         })
     }

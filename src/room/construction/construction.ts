@@ -1,4 +1,4 @@
-import { buildableStructuresSet, buildableStructureTypes } from 'international/constants'
+import { buildableStructuresSet, buildableStructureTypes, structureTypesToProtectSet } from 'international/constants'
 import { customLog, findObjectWithID, packAsNum, randomTick } from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
@@ -121,7 +121,7 @@ export class ConstructionManager {
 
             if (this.room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART))
                 continue
-            if (data.coversStructure && !this.room.coordHasStructureTypes(coord, buildableStructuresSet)) continue
+            if (data.coversStructure && !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) continue
 
             if (data.buildForNuke) {
                 if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
@@ -132,7 +132,7 @@ export class ConstructionManager {
             }
 
             if (data.buildForThreat) {
-                if (this.room.memory.AT < 20000) continue
+                if (Memory.rooms[this.room.name].AT < this.communeManager.minThreatRampartsThreshold) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
                 placedSites += 1

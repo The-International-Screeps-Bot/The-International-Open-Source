@@ -451,7 +451,7 @@ export class RoomVisualsManager {
                         data: Table(() => ({
                             data,
                             config: {
-                                label: 'Ally Resource Requests',
+                                label: 'Incoming Ally Resource Requests',
                                 headers,
                             },
                         })),
@@ -505,7 +505,7 @@ export class RoomVisualsManager {
                         data: Table(() => ({
                             data,
                             config: {
-                                label: 'Ally Combat Requests',
+                                label: 'Incoming Ally Combat Requests',
                                 headers,
                             },
                         })),
@@ -551,7 +551,7 @@ export class RoomVisualsManager {
                         data: Table(() => ({
                             data,
                             config: {
-                                label: 'Ally Build Requests',
+                                label: 'Incoming Ally Build Requests',
                                 headers,
                             },
                         })),

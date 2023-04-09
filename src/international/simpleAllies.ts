@@ -1,5 +1,5 @@
-import { internationalManager } from "./international"
-import { customLog } from "./utils"
+import { internationalManager } from './international'
+import { customLog } from './utils'
 
 export enum AllyRequestTypes {
     /**
@@ -37,7 +37,7 @@ export interface AllyRequest {
     /**
      * Added to ally requests when organizing them for response
      */
-    ID?: string,
+    ID?: string
     requestType: AllyRequestTypes
     roomName?: string
     playerName?: string
@@ -98,15 +98,13 @@ class AllyManager {
 
         try {
             rawAllyRequests = JSON.parse(RawMemory.foreignSegment.data)
-        }
-        catch (err) {
-            customLog('Error in getting requests for simpleAllies', this.currentAlly);
+        } catch (err) {
+            customLog('Error in getting requests for simpleAllies', this.currentAlly)
         }
 
         // Organize requests by type with keys of ID
 
         for (const request of rawAllyRequests) {
-
             const ID = internationalManager.newTickID()
             request.ID = ID
 
@@ -138,13 +136,12 @@ class AllyManager {
     endTickManager() {
         if (!Memory.allyTrading) return
 
-        // I have no idea what this is for
+        // Make sure we don't have too many segments open
         if (Object.keys(RawMemory.segments).length >= 10) return
 
         // Assign myRequests to the public segment
         RawMemory.segments[Memory.simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
         RawMemory.setPublicSegments([Memory.simpleAlliesSegment])
-
     }
 
     requestAttack(

@@ -39,7 +39,8 @@ import {
     defaultRoadPlanningPlainCost,
     adjacentOffsets,
     packedPosLength,
-    structureTypesToProtectSet
+    structureTypesToProtectSet,
+    buildableStructuresSet
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -242,7 +243,7 @@ export class CommuneManager {
 
     public run() {
         if (!this.room.memory.PC) return
-        
+
         this.combatManager.run()
         this.towerManager.run()
         this.combatManager.manageThreat()
@@ -296,6 +297,12 @@ export class CommuneManager {
     }
 
     private test() {
+
+        for (const rampart of this.rampartRepairTargets) {
+
+            this.room.coordVisual(rampart.pos.x, rampart.pos.y)
+        }
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -604,7 +611,7 @@ export class CommuneManager {
 
         for (const structure of this.room.structures.rampart) {
 
-            if (minCutCoords.has(packCoord(structure.pos))) continue
+            if (!minCutCoords.has(packCoord(structure.pos))) continue
 
             ramparts.push(structure)
         }
@@ -628,17 +635,17 @@ export class CommuneManager {
             if (!data) continue
 
             if (data.minRCL > this.room.controller.level) continue
+            if (data.coversStructure && !this.room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)) continue
 
             if (data.buildForNuke) {
 
                 if (!this.room.roomManager.nukeTargetCoords[packAsNum(structure.pos)]) continue
-                if (!this.room.findStructureAtCoord(structure.pos, structure => structureTypesToProtectSet.has(structure.structureType))) continue
 
                 rampartRepairTargets.push(structure)
             }
             else if (data.buildForThreat) {
 
-                if (this.room.memory.AT < this.minThreatRampartsThreshold) continue
+                if (Memory.rooms[this.room.name].AT < this.minThreatRampartsThreshold) continue
                 rampartRepairTargets.push(structure)
             }
 
