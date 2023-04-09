@@ -664,7 +664,7 @@ export class SpawningStructuresManager {
      * Spawn request debugging
      */
     private test() {
-        /* return */
+        return
 
         this.testArgs()
         this.testRequests()
