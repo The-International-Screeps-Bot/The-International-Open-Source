@@ -310,6 +310,8 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
+
+
         customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             bgColor: customColors.red,
             textColor: customColors.white,
@@ -598,12 +600,11 @@ export class CommuneManager {
         const stampAnchors = this.room.roomManager.stampAnchors
         if (!stampAnchors) throw Error('No stampAnchors for defensive ramparts')
 
-        for (const coord of stampAnchors.minCutRampart.concat(stampAnchors.onboardingRampart)) {
-            const structure = this.room.findStructureAtCoord<StructureRampart>(
-                coord,
-                structure => structure.structureType === STRUCTURE_RAMPART,
-            )
-            if (!structure) continue
+        const minCutCoords = new Set(stampAnchors.minCutRampart.map(coord => packCoord(coord)))
+
+        for (const structure of this.room.structures.rampart) {
+
+            if (minCutCoords.has(packCoord(structure.pos))) continue
 
             ramparts.push(structure)
         }
