@@ -1262,9 +1262,9 @@ export class SpawnRequestsManager {
                             (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
                     }
 
-                    const rangedAttackAmount = Math.floor(
+                    const rangedAttackAmount = Math.max(Math.floor(
                         minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
-                    )
+                    ), 1)
 
                     let minHealCost = 0
 
