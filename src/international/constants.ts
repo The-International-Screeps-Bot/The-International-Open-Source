@@ -274,6 +274,8 @@ export const structureTypesToProtect: StructureConstant[] = [
 ]
 export const structureTypesToProtectSet = new Set(structureTypesToProtect)
 
+export const storingStructureTypesSet: Set<StructureConstant> = new Set([STRUCTURE_STORAGE, STRUCTURE_TERMINAL])
+
 export const customColors = {
     white: '#ffffff',
     lightGrey: '#eaeaea',

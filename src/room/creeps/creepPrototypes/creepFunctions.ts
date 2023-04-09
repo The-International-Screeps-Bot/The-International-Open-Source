@@ -18,6 +18,7 @@ import {
     RESULT_SUCCESS,
     RESULT_NO_ACTION,
     RESULT_STOP,
+    storingStructureTypesSet,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -1597,6 +1598,8 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
             }
  */
             // Try to find a sufficient storing structure
+
+            if (target instanceof Structure && storingStructureTypesSet.has(target.structureType)) return false
 
             let storingStructure
 

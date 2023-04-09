@@ -2325,6 +2325,11 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
         this.visual.text(args.priority.toString(), args.target.pos)
     } */
+    /* if (args.type === 'withdraw') {
+
+        this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
+        this.visual.text(args.priority.toString(), args.target.pos)
+    } */
     return (this.roomLogisticsRequests[args.type][ID] = {
         ID,
         type: args.type,
