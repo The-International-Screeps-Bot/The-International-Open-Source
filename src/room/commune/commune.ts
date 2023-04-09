@@ -39,6 +39,7 @@ import {
     defaultRoadPlanningPlainCost,
     adjacentOffsets,
     packedPosLength,
+    structureTypesToProtectSet
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -142,6 +143,7 @@ export class CommuneManager {
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
+        delete this._rampartRepairTargets
 
         if (randomTick()) {
             delete this._maxUpgradeStrength
@@ -607,5 +609,41 @@ export class CommuneManager {
         }
 
         return (this._defensiveRamparts = ramparts)
+    }
+
+    get minThreatRampartsThreshold() {
+
+        return 20000
+    }
+
+    _rampartRepairTargets: StructureRampart[]
+    get rampartRepairTargets() {
+        const rampartRepairTargets: StructureRampart[] = []
+        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
+
+        for (const structure of this.room.structures.rampart) {
+
+            const data = rampartPlans.map[packCoord(structure.pos)]
+            if (!data) continue
+
+            if (data.minRCL > this.room.controller.level) continue
+
+            if (data.buildForNuke) {
+
+                if (!this.room.roomManager.nukeTargetCoords[packAsNum(structure.pos)]) continue
+                if (!this.room.findStructureAtCoord(structure.pos, structure => structureTypesToProtectSet.has(structure.structureType))) continue
+
+                rampartRepairTargets.push(structure)
+            }
+            else if (data.buildForThreat) {
+
+                if (this.room.memory.AT < this.minThreatRampartsThreshold) continue
+                rampartRepairTargets.push(structure)
+            }
+
+            rampartRepairTargets.push(structure)
+        }
+
+        return (this._rampartRepairTargets = rampartRepairTargets)
     }
 }

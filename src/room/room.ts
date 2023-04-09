@@ -28,8 +28,9 @@ import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinManager } from './ruins'
-import { packCoord, packPosList, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
+import { packCoord, packPosList, unpackCoord, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
 import { BasePlans } from './construction/basePlans'
+import { RampartPlans } from './construction/rampartPlans'
 
 export class RoomManager {
     communePlanner: CommunePlanner
@@ -63,7 +64,6 @@ export class RoomManager {
 
         delete this._usedControllerCoords
         delete this._generalRepairStructures
-        delete this._rampartRepairTargets
 
         if (randomTick()) {
             delete this._nukeTargetCoords
@@ -645,10 +645,10 @@ export class RoomManager {
         return (this._remoteControllerPath = path)
     }
 
-    _rampartRepairTargets: StructureRampart[]
-    get rampartRepairTargets() {
-        const rampartRepairTargets: StructureRampart[] = []
+    _usedPositions: Set<string>
+    get usedPositions() {
+        if (this._usedPositions) return this._usedPositions
 
-        return (this._rampartRepairTargets = rampartRepairTargets)
+        return (this._usedPositions = new Set())
     }
 }

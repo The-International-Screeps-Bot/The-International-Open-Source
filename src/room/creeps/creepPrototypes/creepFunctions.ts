@@ -567,7 +567,7 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 
     let ramparts = this.room.enemyAttackers.length
         ? this.room.communeManager.defensiveRamparts
-        : this.room.structures.rampart
+        : this.room.communeManager.rampartRepairTargets
     for (const structure of ramparts) {
         // If above 90% of max hits
 

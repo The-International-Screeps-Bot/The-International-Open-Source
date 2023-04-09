@@ -491,13 +491,14 @@ export class SpawnRequestsManager {
     private maintainers() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-
                 const generalRepairStructures = this.communeManager.room.roomManager.generalRepairStructures
-                const repairTargets = generalRepairStructures.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
+                const repairTargets = generalRepairStructures.filter(
+                    structure => structure.hitsMax * 0.2 >= structure.hits,
+                )
 
                 // Get ramparts below their max hits
 
-                const repairRamparts = this.communeManager.room.structures.rampart.filter(
+                const repairRamparts = this.communeManager.rampartRepairTargets.filter(
                     rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits,
                 )
 
@@ -528,7 +529,6 @@ export class SpawnRequestsManager {
                 let partsMultiplier = 1
 
                 for (const structure of repairTargets) {
-
                     partsMultiplier += decayCosts[structure.structureType]
                 }
 
@@ -540,7 +540,7 @@ export class SpawnRequestsManager {
 
                 if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
                     if (
-                        repairRamparts.length / this.communeManager.room.structures.rampart.length < 0.2 &&
+                        repairRamparts.length <= 0 &&
                         !this.communeManager.room.totalEnemyCombatStrength.melee &&
                         !this.communeManager.room.totalEnemyCombatStrength.ranged &&
                         !this.communeManager.room.totalEnemyCombatStrength.dismantle
@@ -1436,7 +1436,6 @@ export class SpawnRequestsManager {
 
                     let maxCreeps = 0
                     for (const packedPositions of Memory.rooms[requestName].CSHP) {
-
                         maxCreeps += packedPositions.length
                     }
 
