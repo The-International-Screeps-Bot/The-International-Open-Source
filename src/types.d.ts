@@ -853,6 +853,11 @@ declare global {
         chantIndex: number
 
         /**
+         * the tick of the last holistic configuration opperation
+         */
+        lastConfig: number
+
+        /**
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
         constructionSites: { [ID: string]: number }

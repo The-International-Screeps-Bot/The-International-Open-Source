@@ -225,7 +225,7 @@ export class RoomVisualsManager {
 
     private internationalGeneralDataVisuals(y: number) {
         const headers: any[] = [
-            'estimatedIncome',
+            'est. income',
             'commune harvest',
             'remote harvest',
             'upgrade',
@@ -233,6 +233,7 @@ export class RoomVisualsManager {
             'repair other',
             'barricade repair',
             'spawn util',
+            'last config',
         ]
 
         const data: any[][] = [[]]
@@ -271,6 +272,7 @@ export class RoomVisualsManager {
             totalRepairOther.toFixed(2),
             totalBarricadeRepair.toFixed(2),
             totalSpawn.toFixed(2),
+            Game.time - Memory.lastConfig,
         )
 
         const height = 3 + data.length

@@ -53,6 +53,7 @@ class ConfigManager {
 
         Memory.ID = 0
         Memory.chantIndex = 0
+        Memory.lastConfig = Game.time
         Memory.constructionSites = {}
         Memory.players = {}
         Memory.claimRequests = {}
