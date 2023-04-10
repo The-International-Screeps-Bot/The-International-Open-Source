@@ -15,7 +15,7 @@ export class HaulerNeedManager {
         this.controllerNeed()
 
         room.haulerNeed += findCarryPartsRequired(
-            room.memory.MP.length / packedPosLength + 3,
+            room.memory.MPa.length / packedPosLength + 3,
             room.mineralHarvestStrength * 1.1,
         )
         room.haulerNeed += room.structures.lab.length

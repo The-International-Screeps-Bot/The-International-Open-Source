@@ -1101,7 +1101,7 @@ export class CommunePlanner {
         const mineralPos = this.room.roomManager.mineral.pos
         this.setBasePlansXY(mineralPos.x, mineralPos.y, STRUCTURE_EXTRACTOR, 6)
 
-        this.mineralHarvestPositions.filter(pos => {
+        this.mineralHarvestPositions = this.mineralHarvestPositions.filter(pos => {
             return getRange(closestMineralHarvestPos, pos) <= 1
         })
 

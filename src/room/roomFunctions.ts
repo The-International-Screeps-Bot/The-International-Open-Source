@@ -710,7 +710,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Add the room's name to the scoutingRoom's remotes list
 
-        scoutingRoom.memory.remotes.push(this.name)
+        Memory.rooms[scoutingRoom.name].remotes.push(this.name)
 
         roomMemory.T = 'remote'
         return roomMemory.T
@@ -751,14 +751,14 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     delete this.roomManager._remoteControllerPath
     this.roomManager.remoteControllerPath
 
-    // Add the room's name to the scoutingRoom's remotes list
-
-    scoutingRoom.memory.remotes.push(this.name)
-
     roomMemory.RE = newReservationEfficacy
 
     roomMemory.data = []
     for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
+
+    // Add the room's name to the scoutingRoom's remotes list
+
+    Memory.rooms[scoutingRoom.name].remotes.push(this.name)
 
     // Assign the room's commune as the scoutingRoom
 
@@ -2134,7 +2134,7 @@ Room.prototype.getPartsOfRole = function (role) {
 }
 
 Room.prototype.createClaimRequest = function () {
-    if (this.find(FIND_SOURCES).length !== 2) return false
+    if (this.find(FIND_SOURCES).length < 2) return false
     if (this.memory.PC === false) return false
     if (Memory.claimRequests[this.name]) return false
 
