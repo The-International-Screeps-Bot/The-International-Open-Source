@@ -491,7 +491,6 @@ export class SpawnRequestsManager {
     private maintainers() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-
                 const generalRepairStructures = this.communeManager.room.roomManager.generalRepairStructures
                 const repairTargets = generalRepairStructures.filter(
                     structure => structure.hitsMax * 0.2 >= structure.hits,
@@ -752,11 +751,28 @@ export class SpawnRequestsManager {
                     this.communeManager.room.towerInferiority
                 )
                     return false
+/*
+                // Terminal logic
+                if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
+                    // If we are a funnel target storing structures are sufficiently full, provide x amount per y energy in storage
 
-                // If there is a storage
-
+                    if (
+                        internationalManager.funnelOrder[0] === this.communeManager.room.name &&
+                        this.communeManager.room.resourcesInStoringStructures.energy >=
+                            this.communeManager.room.communeManager.storedEnergyUpgradeThreshold
+                    )
+                        partsMultiplier = Math.pow(
+                            (this.communeManager.room.resourcesInStoringStructures.energy -
+                                this.communeManager.room.communeManager.storedEnergyUpgradeThreshold * 0.5) /
+                                (6000 + this.communeManager.room.controller.level * 2000),
+                            2,
+                        )
+                    // Otherwise, set partsMultiplier to 0
+                    else partsMultiplier = 0
+                } */
+                // Storage logic
                 if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
-                    // If the storage is sufficiently full, provide x amount per y energy in storage
+                    // If storing structures are sufficiently full, provide x amount per y energy in storage
 
                     if (
                         this.communeManager.room.resourcesInStoringStructures.energy >=
@@ -1263,9 +1279,10 @@ export class SpawnRequestsManager {
                             (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
                     }
 
-                    const rangedAttackAmount = Math.max(Math.floor(
-                        minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
-                    ), 1)
+                    const rangedAttackAmount = Math.max(
+                        Math.floor(minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])),
+                        1,
+                    )
 
                     let minHealCost = 0
 

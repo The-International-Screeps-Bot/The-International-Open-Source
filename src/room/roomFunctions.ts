@@ -301,7 +301,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoidStationaryPositions is requested
 
                 if (opts.avoidStationaryPositions) {
-
                     for (const index in room.find(FIND_SOURCES)) {
                         // Loop through each position of harvestPositions, have creeps prefer to avoid
 
@@ -2135,42 +2134,27 @@ Room.prototype.getPartsOfRole = function (role) {
 
 Room.prototype.createClaimRequest = function () {
     if (this.find(FIND_SOURCES).length < 2) return false
-    if (this.memory.PC === false) return false
     if (Memory.claimRequests[this.name]) return false
 
-    const result = this.roomManager.communePlanner.preTickRun()
-    if (result === RESULT_FAIL) {
-        this.memory.PC = false
-        return false
-    }
+    const planningCompleted = Memory.rooms[this.name].PC
+    if (planningCompleted === false) return false
 
-    if (result !== RESULT_SUCCESS) {
+    if (planningCompleted !== true) {
+        const result = this.roomManager.communePlanner.preTickRun()
+        if (result === RESULT_FAIL) {
+            this.memory.PC = false
+            return false
+        }
 
-        return false
+        if (result !== RESULT_SUCCESS) {
+            return false
+        }
     }
 
     const request = (Memory.claimRequests[this.name] = {
         data: [0],
     })
-    /*
-    let score = 0
 
-    // Prefer communes not too close and not too far from the commune
-
-    const closestClaimTypeName = findClosestClaimType(this.name)
-    const closestCommuneRange = Game.map.getRoomLinearDistance(closestClaimTypeName, this.name)
-    score += Math.abs(prefferedCommuneRange - closestCommuneRange)
-
-    score += this.sourcePaths[0].length / 10
-    score += this.sourcePaths[1].length / 10
-    score += this.upgradePathLength / 10
-
-    const stampAnchors = this.roomManager.stampAnchors
-    if (stampAnchors) score += stampAnchors.rampart.length / 10
-    score += this.findSwampPlainsRatio() * 10
-
-    request.data[ClaimRequestData.score] = score
- */
     return true
 }
 
@@ -2342,11 +2326,18 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     })
 }
 
-Room.prototype.findStructureAtCoord = function <T extends Structure>(coord: Coord, conditions: (structure: T) => boolean) {
+Room.prototype.findStructureAtCoord = function <T extends Structure>(
+    coord: Coord,
+    conditions: (structure: T) => boolean,
+) {
     return this.findStructureAtXY(coord.x, coord.y, conditions)
 }
 
-Room.prototype.findStructureAtXY = function <T extends Structure>(x: number, y: number, conditions: (structure: T) => boolean) {
+Room.prototype.findStructureAtXY = function <T extends Structure>(
+    x: number,
+    y: number,
+    conditions: (structure: T) => boolean,
+) {
     const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
     if (!structureIDs) return false
 
@@ -2358,11 +2349,18 @@ Room.prototype.findStructureAtXY = function <T extends Structure>(x: number, y: 
     return false
 }
 
-Room.prototype.findCSiteAtCoord = function <T extends ConstructionSite>(coord: Coord, conditions: (cSite: T) => boolean) {
+Room.prototype.findCSiteAtCoord = function <T extends ConstructionSite>(
+    coord: Coord,
+    conditions: (cSite: T) => boolean,
+) {
     return this.findCSiteAtXY(coord.x, coord.y, conditions)
 }
 
-Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(x: number, y: number, conditions: (cSite: T) => boolean) {
+Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
+    x: number,
+    y: number,
+    conditions: (cSite: T) => boolean,
+) {
     const cSiteIDs = this.cSiteCoords.get(packXYAsCoord(x, y))
     if (!cSiteIDs) return false
 

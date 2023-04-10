@@ -423,9 +423,11 @@ export class InternationalManager {
      */
     get funnelOrder() {
         if (this._funnelOrder) return this._funnelOrder
+        
+        // organize RCLs 1-7
 
         const communesByLevel: { [level: string]: [string, number][] } = {}
-        for (let i = 0; i < 8; i++) communesByLevel[i] = []
+        for (let i = 1; i < 8; i++) communesByLevel[i] = []
 
         for (const roomName of global.communes) {
             const controller = Game.rooms[roomName].controller
