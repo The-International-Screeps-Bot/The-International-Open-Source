@@ -1,4 +1,4 @@
-import { customColors, PlayerData, roomDimensions, safemodeTargets } from 'international/constants'
+import { customColors, PlayerMemoryKeys, roomDimensions, safemodeTargets } from 'international/constants'
 import { playerManager } from 'international/players'
 import { allyManager } from 'international/simpleAllies'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -266,15 +266,13 @@ export class CombatManager {
             let player = Memory.players[playerName]
 
             if (!player) {
-                player = Memory.players[playerName] = {
-                    data: [0],
-                }
+                player = Memory.players[playerName] = {}
             }
 
-            player.data[PlayerData.offensiveThreat] = Math.max(threat, player.data[PlayerData.offensiveThreat])
-            player.data[PlayerData.hate] = Math.max(threat, player.data[PlayerData.hate])
+            player[PlayerMemoryKeys.offensiveThreat] = Math.max(threat, player[PlayerMemoryKeys.offensiveThreat])
+            player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
 
-            player.data[PlayerData.lastAttack] = 0
+            player[PlayerMemoryKeys.lastAttack] = 0
         }
 
         const roomMemory = Memory.rooms[room.name]

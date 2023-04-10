@@ -9,7 +9,7 @@ import {
     maxRampartGroupSize,
     maxRemoteRoomDistance,
     customColors,
-    PlayerData,
+    PlayerMemoryKeys,
     prefferedCommuneRange,
     RemoteData,
     roomDimensions,
@@ -774,10 +774,11 @@ Room.prototype.scoutEnemyRoom = function () {
     let player = Memory.players[playerName]
     if (!player) {
         player = Memory.players[playerName] = {
-            data: [0],
+            [PlayerMemoryKeys.offensiveThreat]: 0,
+            [PlayerMemoryKeys.defensiveStrength]: 0,
+            [PlayerMemoryKeys.hate]: 0,
+            [PlayerMemoryKeys.lastAttack]: Infinity,
         }
-
-        for (const key in PlayerData) player.data[parseInt(key)] = 0
     }
 
     // General
@@ -800,9 +801,9 @@ Room.prototype.scoutEnemyRoom = function () {
     threat = Math.floor(threat)
 
     roomMemory.OS = threat
-    Memory.players[playerName].data[PlayerData.offensiveThreat] = Math.max(
+    Memory.players[playerName][PlayerMemoryKeys.offensiveThreat] = Math.max(
         threat,
-        player.data[PlayerData.offensiveThreat],
+        player[PlayerMemoryKeys.offensiveThreat],
     )
 
     // Defensive threat
@@ -833,9 +834,9 @@ Room.prototype.scoutEnemyRoom = function () {
     threat = Math.floor(threat)
 
     roomMemory.DS = threat
-    Memory.players[playerName].data[PlayerData.defensiveStrength] = Math.max(
+    Memory.players[playerName][PlayerMemoryKeys.defensiveStrength] = Math.max(
         threat,
-        player.data[PlayerData.defensiveStrength],
+        player[PlayerMemoryKeys.defensiveStrength],
     )
 
     // Combat request creation

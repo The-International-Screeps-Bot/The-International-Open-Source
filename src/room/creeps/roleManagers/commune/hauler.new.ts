@@ -1,4 +1,4 @@
-export class HaulerManager {
+class HaulerManager {
 
     role: CreepRoles = 'hauler'
 
@@ -16,3 +16,5 @@ export class HaulerManager {
         creep.runRoomLogisticsRequestsAdvanced()
     }
 }
+
+export const haulerManager = new HaulerManager()

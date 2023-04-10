@@ -830,10 +830,6 @@ declare global {
         | 'highway'
         | 'intersection'
 
-    interface PlayerInfo {
-        data: number[]
-    }
-
     interface ShardVisionMemory {
         shards?: { [shardName: string]: number }
         lastSeen: number
@@ -877,7 +873,7 @@ declare global {
 
         stats: Partial<Stats>
 
-        players: { [playerName: string]: Partial<PlayerInfo> }
+        players: { [playerName: string]: Partial<PlayerMemory> }
 
         masterPlan: { resources?: { [key in ResourceConstant]?: number } }
 
@@ -1513,267 +1509,6 @@ declare global {
         needs: number[]
     }
 
-    interface RoomMemory {
-        /**
-         * A packed representation of the center of the fastFiller
-         */
-        anchor: number
-
-        /**
-         * Commune Sources
-         */
-        CSIDs: Id<Source>[]
-
-        /**
-         * Remote Sources
-         */
-        RSIDs: Id<Source>[]
-
-        /**
-         * Base Plans
-         */
-        BPs: string
-
-        /**
-         * Rampart Plans
-         */
-        RPs: string
-
-        /**
-         * Type of a room that generally describes properties of the room
-         */
-        T: RoomTypes
-
-        /**f
-         * A set of names of remotes controlled by this room
-         */
-        remotes: string[]
-
-        /**
-         * The ID of the mineral
-         */
-        MID: Id<Mineral>
-
-        /**
-         * Commune Name
-         */
-        CN: string
-
-        /**
-         * Reservation Efficacy, the path distance from the remote's sources to its commune
-         */
-        RE: number
-
-        /**
-         * abandoned, true if a commune is to be unclaimed ASAP
-         */
-        Ab: boolean
-
-        /**
-         * A list of needs the remote wants met
-         */
-        data: number[]
-
-        /**
-         * The room owner
-         */
-        owner: string
-
-        /**
-         * The controller's level
-         */
-        level: number
-
-        powerEnabled: boolean
-
-        /**
-         * Wether the room has a terminal
-         */
-        terminal: boolean
-
-        /**
-         * The number of towers in the room
-         */
-        towers: number
-
-        /**
-         * The amount of stored energy in the room
-         */
-        energy: number
-
-        /**
-         * A set of roomNames that portals in this room go to
-         */
-        portalsTo: string[]
-
-        /**
-         * Last Scouted Tick, the last tick the room was scouted at
-         */
-        LST: number | undefined
-
-        /**
-         * The room name of the commune's claim target
-         */
-        claimRequest: string
-
-        /**
-         * The room names of the requests this room is responding to
-         */
-        combatRequests: string[]
-
-        /**
-         * The room names of the requests this room is responding to
-         */
-        haulRequests: string[]
-
-        /**
-         * Nuke Request, the name of request the room is responding to
-         */
-        NR: string
-
-        /**
-         * The room name of the room's ally creep target
-         */
-        allyCreepRequest: string
-
-        CSTID: Id<ConstructionSite>
-
-        /**
-         * Stamp Anchors
-         */
-        SA: PackedStampAnchors
-
-        powerBanks: { [roomName: string]: number[] }
-
-        deposits: Record<Id<Deposit>, DepositRecord>
-
-        /**
-         * Planning Completed, Wether or not commune planning has been completed for the room. If false, the room is not a valid claim target
-         */
-        PC: boolean
-
-        /**
-         * Remote Planned, wether or not remote planning has been completed for the room
-         */
-        RP: boolean
-
-        /**
-         * Remote Stamp Anchors
-         */
-        RSA: Partial<Record<RemoteStampTypes, string>>
-
-        /**
-         * Commune Source Harvest Positions, packed positions around sources where harvesters can sit
-         */
-        CSHP: string[]
-
-        /**
-         * Remote Source Harvest Positions, packed positions around sources where harvesters can sit
-         */
-        RSHP: string[]
-
-        /**
-         * Commune source Paths
-         */
-        CSPs: string[]
-
-        /**
-         * Remote source Paths
-         */
-        RSPs: string[]
-
-        /**
-         * Mineral Path
-         */
-        MPa: string
-
-        /**
-         * Remote Controller Path
-         */
-        RCPa: string
-
-        /**
-         * Mineral Positions, packed positions around the mineral where harvesters can sit
-         */
-        MP: string
-
-        /**
-         * Remote Controller Positions, packed positions around the controller where reservers and downgraders can sit
-         */
-        RCP: string
-
-        /**
-         * Center Upgrade Position
-         */
-        CUP: string
-
-        /**
-         * Upgrade Positions, packed positions around the upgrade structure where upgraders can sit
-         */
-        UPs: string
-
-        /**
-         * Upgrade Path
-         */
-        UP: string
-
-        /**
-         * Defensive Strength
-         */
-        DS: number
-
-        /**
-         * Offensive Strength
-         */
-        OS: number
-
-        /**
-         * Attack Threat, how much a commune is concerned about enemy attackers
-         */
-        AT: number
-
-        /**
-         * Last Attack Tick, how many ticks have passed since the last attack
-         */
-        LAT: number
-
-        /**
-         * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage
-         */
-        MHC: number
-
-        /**
-         * Hauler Update, how many ticks ago the hauler size was updated
-         */
-        HU: number
-
-        /**
-         * Greatest Room Controller Level
-         */
-        GRCL: number
-
-        /**
-         * The score for claim evaluation
-         */
-        S: number
-        /**
-         * The dynamic score for claim evaluation
-         */
-        DyS: number
-
-        hasTerminal: boolean
-
-        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
-        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
-
-        marketData: {
-            [RESOURCE_ENERGY]?: number
-            sellAvg?: { [key in ResourceConstant]?: number }
-            buyAvg?: { [key in ResourceConstant]?: number }
-            aquire?: { [key in ResourceConstant]?: number }
-        }
-    }
-
     interface IdealSquadMembers {}
 
     interface CreepFunctions {
@@ -2147,175 +1882,6 @@ declare global {
         readonly idealSquadMembers: IdealSquadMembers
     }
 
-    /*
-    interface CreepMemory {
-        0: boolean // preferRoads
-        1: number // sourceIndex
-        2: boolean // dying
-    }
-    */
-
-    interface CreepMemoryTemplate {
-        /**
-         * Task Room Name, the name of the room the creep is trying to perform a task in
-         */
-        TRN: string
-    }
-
-    interface CreepMemory extends CreepMemoryTemplate {
-        /**
-         * Wether the creep is old enough to need a replacement
-         */
-        D: boolean
-
-        /**
-         * The Source Index of recorded sources in the room
-         */
-        SI: number
-
-        /**
-         * The creep's packed coord for a designated target
-         */
-        PC: string
-
-        /**
-         * Last Cache, the last time a path was cached in memory
-         */
-        LC: number
-
-        /**
-         * A packed pos list desciring where the creep neeeds to move to get to its goal
-         */
-        P: string
-
-        /**
-         * Goal Pos, the position the creep is or has tried to path to
-         */
-        GP: string
-
-        /**
-         * Used Path, completed usage of the packed for a specified GoalPos
-         */
-        UP: string
-
-        /**
-         * Whether the creep is intended to move on its own or not
-         */
-        getPulled: boolean
-
-        /**
-         * The target for which the creep should repair
-         */
-        repairTarget: Id<Structure<BuildableStructureConstant>>
-
-        /**
-         * Scout Target, the name of the room the scout is trying to scout
-         */
-        scT: string
-
-        /**
-         * Sign Target, the name of the room the scout is trying to sign
-         */
-        siT: string
-
-        /**
-         * Remote Name of the room the creep is remoting for
-         */
-        RN: string
-
-        /**
-         * The target ID of the task (for hubHaulers)
-         */
-        taskTarget: Id<Creep | AnyStoreStructure>
-
-        /**
-         * Room Logistics Requests
-         */
-        RLRs: CreepRoomLogisticsRequest[]
-
-        /**
-         * The target for which the creep should dismantle
-         */
-        dismantleTarget: Id<Structure>
-
-        /**
-         * Wether or not the creep Needs Resources
-         */
-        NR: boolean
-
-        /**
-         * Roads, wether or not the creep should use roads
-         */
-        R: boolean
-
-        /**
-         * The rampart repair quota the creep currently has decided on
-         */
-        quota: number
-
-        /**
-         * Squad Size of the squad the creep is attempting to form
-         */
-        SS: number | undefined
-
-        /**
-         * Squad type
-         */
-        ST: 'duo' | 'quad' | 'dynamic'
-
-        /**
-         * Squad Type the combat method the creep's squad is attempting
-         */
-        SCT: 'rangedAttack' | 'attack' | 'dismantle'
-
-        /**
-         * Squad Formed, wether the creep has joined a squad or not
-         */
-        SF: boolean
-
-        /**
-         * Squad Member Names
-         */
-        SMNs: string[]
-
-        /**
-         * Quad Bulldoze Targets
-         */
-        QBTIDs: Id<Structure>[]
-
-        /**
-         * Combat Request Name, the name of the room the creep should do combat in
-         */
-        CRN?: string
-
-        /**
-         * Haul Request Name, the name of the room the creep should do hauling for
-         */
-        HRN?: string
-
-        /**
-         * Recycle Target, the spawn ID the creep is going to recycle
-         */
-        RecT: Id<StructureSpawn | StructureContainer> | undefined
-
-        /**
-         * Ticks Waited for an arbitrary event
-         */
-        TW: number
-
-        /**
-         * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
-         */
-        ROS: boolean
-
-        /**
-         * Rampart ID, the ID of the rampart the creep is trying to sit under
-         */
-        RID: Id<StructureRampart>
-    }
-
-    // PowerCreeps
-
     interface PowerCreep extends CreepFunctions, CreepProperties {
         /**
          * Wether the creep has used a power this tick
@@ -2325,28 +1891,6 @@ declare global {
         _powerCooldowns: Partial<Map<PowerConstant, number>>
 
         readonly powerCooldowns: Partial<Map<PowerConstant, number>>
-    }
-
-    interface PowerCreepMemory extends CreepMemoryTemplate {
-        /**
-         * Commune Name
-         */
-        CN: string
-
-        /**
-         * Task name, the method for which the creep is trying to run inter tick
-         */
-        TN: keyof Operator
-
-        /**
-         * Task target ID, the ID of the target the creep is targeting for its task
-         */
-        TTID: Id<Structure | Source>
-
-        /**
-         * Power Type
-         */
-        PT: PowerConstant
     }
 
     // Structures
@@ -2495,6 +2039,462 @@ declare global {
     interface Source {
         communeIndex: number | undefined
         remoteIndex: number | undefined
+    }
+
+    // Memory value types
+
+    interface RoomMemory {
+        /**
+         * A packed representation of the center of the fastFiller
+         */
+        anchor: number
+
+        /**
+         * Commune Sources
+         */
+        CSIDs: Id<Source>[]
+
+        /**
+         * Remote Sources
+         */
+        RSIDs: Id<Source>[]
+
+        /**
+         * Base Plans
+         */
+        BPs: string
+
+        /**
+         * Rampart Plans
+         */
+        RPs: string
+
+        /**
+         * Type of a room that generally describes properties of the room
+         */
+        T: RoomTypes
+
+        /**f
+         * A set of names of remotes controlled by this room
+         */
+        remotes: string[]
+
+        /**
+         * The ID of the mineral
+         */
+        MID: Id<Mineral>
+
+        /**
+         * Commune Name
+         */
+        CN: string
+
+        /**
+         * Reservation Efficacy, the path distance from the remote's sources to its commune
+         */
+        RE: number
+
+        /**
+         * abandoned, true if a commune is to be unclaimed ASAP
+         */
+        Ab: boolean
+
+        /**
+         * A list of needs the remote wants met
+         */
+        data: number[]
+
+        /**
+         * The room owner
+         */
+        owner: string
+
+        /**
+         * The controller's level
+         */
+        level: number
+
+        powerEnabled: boolean
+
+        /**
+         * Wether the room has a terminal
+         */
+        terminal: boolean
+
+        /**
+         * The number of towers in the room
+         */
+        towers: number
+
+        /**
+         * The amount of stored energy in the room
+         */
+        energy: number
+
+        /**
+         * A set of roomNames that portals in this room go to
+         */
+        portalsTo: string[]
+
+        /**
+         * Last Scouted Tick, the last tick the room was scouted at
+         */
+        LST: number | undefined
+
+        /**
+         * The room name of the commune's claim target
+         */
+        claimRequest: string
+
+        /**
+         * The room names of the requests this room is responding to
+         */
+        combatRequests: string[]
+
+        /**
+         * The room names of the requests this room is responding to
+         */
+        haulRequests: string[]
+
+        /**
+         * Nuke Request, the name of request the room is responding to
+         */
+        NR: string
+
+        /**
+         * The room name of the room's ally creep target
+         */
+        allyCreepRequest: string
+
+        CSTID: Id<ConstructionSite>
+
+        /**
+         * Stamp Anchors
+         */
+        SA: PackedStampAnchors
+
+        powerBanks: { [roomName: string]: number[] }
+
+        deposits: Record<Id<Deposit>, DepositRecord>
+
+        /**
+         * Planning Completed, Wether or not commune planning has been completed for the room. If false, the room is not a valid claim target
+         */
+        PC: boolean
+
+        /**
+         * Remote Planned, wether or not remote planning has been completed for the room
+         */
+        RP: boolean
+
+        /**
+         * Remote Stamp Anchors
+         */
+        RSA: Partial<Record<RemoteStampTypes, string>>
+
+        /**
+         * Commune Source Harvest Positions, packed positions around sources where harvesters can sit
+         */
+        CSHP: string[]
+
+        /**
+         * Remote Source Harvest Positions, packed positions around sources where harvesters can sit
+         */
+        RSHP: string[]
+
+        /**
+         * Commune source Paths
+         */
+        CSPs: string[]
+
+        /**
+         * Remote source Paths
+         */
+        RSPs: string[]
+
+        /**
+         * Mineral Path
+         */
+        MPa: string
+
+        /**
+         * Remote Controller Path
+         */
+        RCPa: string
+
+        /**
+         * Mineral Positions, packed positions around the mineral where harvesters can sit
+         */
+        MP: string
+
+        /**
+         * Remote Controller Positions, packed positions around the controller where reservers and downgraders can sit
+         */
+        RCP: string
+
+        /**
+         * Center Upgrade Position
+         */
+        CUP: string
+
+        /**
+         * Upgrade Positions, packed positions around the upgrade structure where upgraders can sit
+         */
+        UPs: string
+
+        /**
+         * Upgrade Path
+         */
+        UP: string
+
+        /**
+         * Defensive Strength
+         */
+        DS: number
+
+        /**
+         * Offensive Strength
+         */
+        OS: number
+
+        /**
+         * Attack Threat, how much a commune is concerned about enemy attackers
+         */
+        AT: number
+
+        /**
+         * Last Attack Tick, how many ticks have passed since the last attack
+         */
+        LAT: number
+
+        /**
+         * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage
+         */
+        MHC: number
+
+        /**
+         * Hauler Update, how many ticks ago the hauler size was updated
+         */
+        HU: number
+
+        /**
+         * Greatest Room Controller Level
+         */
+        GRCL: number
+
+        /**
+         * The score for claim evaluation
+         */
+        S: number
+        /**
+         * The dynamic score for claim evaluation
+         */
+        DyS: number
+
+        hasTerminal: boolean
+
+        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
+
+        marketData: {
+            [RESOURCE_ENERGY]?: number
+            sellAvg?: { [key in ResourceConstant]?: number }
+            buyAvg?: { [key in ResourceConstant]?: number }
+            aquire?: { [key in ResourceConstant]?: number }
+        }
+    }
+
+    interface PlayerMemory {
+        0: number // offensiveThreat
+        1: number // defensiveStrength
+        2: number // hate
+        3: number // lastAttack
+    }
+
+    interface CreepMemory {
+        0: boolean // preferRoads
+        1: number // sourceIndex
+        2: boolean // dying
+        3: string // packedCoord
+        4: string // path
+        5: string // goalPos
+        6: string // usedPathForGoalPos
+        7: string // lastCache
+        8: Id<Structure<BuildableStructureConstant>> // structureTarget
+        9: string // remote
+        10: string // scoutTarget
+        11: string // signTarget
+        12: CreepRoomLogisticsRequest[] // roomLogisticsRequests
+        13: boolean // needsResources
+        14: number // squadSize
+        15: 'duo' | 'quad' | 'dynamic' // squadType
+        16: 'rangedAttack' | 'attack' | 'dismantle' // squadCombatType
+        17: boolean // squadIsFormed
+        18: Creep[] // squadMembers
+        19: Id<Structure>[] // quadBuilldozeTargets
+        20: string // hauLRequest
+        21: number // ticksWaite
+        22: Id<StructureSpawn | StructureContainer> | undefined // recycleTarget
+        23: boolean // rampartOnlyShoving
+        24: Id<StructureRampart> // rampartTarget
+        25: string // taskRoom
+    }
+
+    interface CreepMemoryTemplate {
+        /**
+         * Task Room Name, the name of the room the creep is trying to perform a task in
+         */
+        TRN: string
+    }
+
+    interface CreepMemory extends CreepMemoryTemplate {
+        /**
+         * Wether the creep is old enough to need a replacement
+         */
+        D: boolean
+
+        /**
+         * The Source Index of recorded sources in the room
+         */
+        SI: number
+
+        /**
+         * The creep's packed coord for a designated target
+         */
+        PC: string
+
+        /**
+         * Last Cache, the last time a path was cached in memory
+         */
+        LC: number
+
+        /**
+         * A packed pos list desciring where the creep neeeds to move to get to its goal
+         */
+        P: string
+
+        /**
+         * Goal Pos, the position the creep is or has tried to path to
+         */
+        GP: string
+
+        /**
+         * Used Path, completed usage of the packed for a specified GoalPos
+         */
+        UP: string
+
+        /**
+         * Whether the creep is intended to move on its own or not
+         */
+        getPulled: boolean
+
+        /**
+         * The target for which the creep should repair
+         */
+        repairTarget: Id<Structure<BuildableStructureConstant>>
+
+        /**
+         * Scout Target, the name of the room the scout is trying to scout
+         */
+        scT: string
+
+        /**
+         * Sign Target, the name of the room the scout is trying to sign
+         */
+        siT: string
+
+        /**
+         * Remote Name of the room the creep is remoting for
+         */
+        RN: string
+
+        /**
+         * Room Logistics Requests
+         */
+        RLRs: CreepRoomLogisticsRequest[]
+
+        /**
+         * The target for which the creep should dismantle
+         */
+        dismantleTarget: Id<Structure>
+
+        /**
+         * Wether or not the creep Needs Resources
+         */
+        NR: boolean
+
+        /**
+         * Roads, wether or not the creep should use roads
+         */
+        R: boolean
+
+        /**
+         * Squad Size of the squad the creep is attempting to form
+         */
+        SS: number | undefined
+
+        /**
+         * Squad type
+         */
+        ST: 'duo' | 'quad' | 'dynamic'
+
+        /**
+         * Squad Type the combat method the creep's squad is attempting
+         */
+        SCT: 'rangedAttack' | 'attack' | 'dismantle'
+
+        /**
+         * Squad Formed, wether the creep has joined a squad or not
+         */
+        SF: boolean
+
+        /**
+         * Squad Member Names
+         */
+        SMNs: string[]
+
+        /**
+         * Quad Bulldoze Targets
+         */
+        QBTIDs: Id<Structure>[]
+
+        /**
+         * Combat Request Name, the name of the room the creep should do combat in
+         */
+        CRN?: string
+
+        /**
+         * Haul Request Name, the name of the room the creep should do hauling for
+         */
+        HRN?: string
+
+        /**
+         * Recycle Target, the spawn ID the creep is going to recycle
+         */
+        RecT: Id<StructureSpawn | StructureContainer> | undefined
+
+        /**
+         * Ticks Waited for an arbitrary event
+         */
+        TW: number
+
+        /**
+         * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
+         */
+        ROS: boolean
+
+        /**
+         * Rampart ID, the ID of the rampart the creep is trying to sit under
+         */
+        RID: Id<StructureRampart>
+    }
+
+    interface PowerCreepMemory {
+       0: string // commune
+       1: keyof Operator // task
+       2: Id<Structure | Source> // taskTarget
+       3: PowerConstant // taskPower
+       4: string // taskRoom
     }
 
     // Global

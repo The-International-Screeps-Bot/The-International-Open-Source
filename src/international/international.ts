@@ -1,4 +1,3 @@
-import { allyManager } from 'international/simpleAllies'
 import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomTick } from './utils'
 
 import {
@@ -423,7 +422,7 @@ export class InternationalManager {
      */
     get funnelOrder() {
         if (this._funnelOrder) return this._funnelOrder
-        
+
         // organize RCLs 1-7
 
         const communesByLevel: { [level: string]: [string, number][] } = {}

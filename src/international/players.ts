@@ -1,8 +1,8 @@
 import { isNumber } from 'lodash'
-import { PlayerData } from './constants'
+import { PlayerMemoryKeys } from './constants'
 import { randomTick } from './utils'
 
-class PlayerManager {
+export class PlayerManager {
     /**
      * The highest offensive threat of known players
      */
@@ -20,13 +20,13 @@ class PlayerManager {
 
             // Reduce hate over time
 
-            if (player.data[PlayerData.hate] > 0) player.data[PlayerData.hate] *= 0.9999
+            if (player[PlayerMemoryKeys.hate] > 0) player[PlayerMemoryKeys.hate] *= 0.9999
 
             // So long as the player has attacked at some pount, record it
 
-            player.data[PlayerData.lastAttack] += 1
+            player[PlayerMemoryKeys.lastAttack] += 1
 
-            const threat = player.data[PlayerData.offensiveThreat]
+            const threat = player[PlayerMemoryKeys.offensiveThreat]
             if (threat <= this.highestThreat) continue
 
             this.highestThreat = threat
@@ -41,7 +41,7 @@ class PlayerManager {
         if (this._playersByHate) return this._playersByHate
 
         this._playersByHate = Object.keys(Memory.players).sort((a, b) => {
-            return Memory.players[a].data[PlayerData.hate] - Memory.players[b].data[PlayerData.hate]
+            return Memory.players[a][PlayerMemoryKeys.hate] - Memory.players[b][PlayerMemoryKeys.hate]
         })
 
         return this._playersByHate

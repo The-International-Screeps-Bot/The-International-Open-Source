@@ -827,29 +827,66 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
     },
 }
 
-export enum PlayerData {
-    /**
-     * Generally how good their offense is
-     */
-    offensiveThreat,
-    /**
-     * Generally how good their defense is
-     */
-    defensiveStrength,
-    /**
-     * How much we want them dead
-     */
-    hate,
-    /**
-     * The last time we were attacked by them
-     */
-    lastAttack,
+export enum PlayerMemoryKeys {
+        /**
+         * Generally how good their offense is
+         */
+        offensiveThreat = 0,
+        /**
+         * Generally how good their defense is
+         */
+        defensiveStrength = 1,
+        /**
+         * How much we want them dead
+         */
+        hate = 2,
+        /**
+         * The last time we were attacked by them
+         */
+        lastAttack = 3,
 }
 
-export enum CreepMemoryData {
+export enum CreepMemoryKeys {
     preferRoads = 0,
     sourceIndex = 1,
     dying = 2,
+    packedCoord = 3,
+    path = 4,
+    goalPos = 5,
+    usedPathForGoalPos = 6,
+    lastCache = 7,
+    structureTarget = 8,
+    remote = 9,
+    scoutTarget = 10,
+    signTarget = 11,
+    roomLogisticsRequests = 12,
+    needsResources = 13,
+    squadSize = 14,
+    squadType = 15,
+    squadCombatType = 16,
+    isSquadFormed = 17,
+    squadMembers = 18,
+    quadBulldozeTargets = 19,
+    haulRequest = 20,
+    ticksWaited = 21,
+    recycleTarget = 22,
+    rampartOnlyShoving = 23,
+    rampartTarget = 24,
+    taskRoom = 25,
+}
+
+export enum PowerCreepMemoryKeys {
+    commune = 0,
+    /**
+     * The name of the method queued for operation
+     */
+    task = 1,
+    taskTarget = 2,
+    /**
+     * The type of power the creep should use
+     */
+    taskPower = 3,
+    taskRoom = 4,
 }
 
 export enum RemoteData {

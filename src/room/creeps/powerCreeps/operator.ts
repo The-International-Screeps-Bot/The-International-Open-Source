@@ -1,4 +1,4 @@
-import { RESULT_FAIL, customColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS } from 'international/constants'
+import { RESULT_FAIL, customColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS, PowerCreepMemoryKeys } from 'international/constants'
 import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class Operator extends PowerCreep {
@@ -12,18 +12,18 @@ export class Operator extends PowerCreep {
     }
 
     managePowerTask?() {
-        if (!this.memory.TTID) return
+        if (!this.memory[PowerCreepMemoryKeys.taskTarget]) return
 
-        const taskTarget = findObjectWithID(this.memory.TTID)
+        const taskTarget = findObjectWithID(this.memory[PowerCreepMemoryKeys.taskTarget])
         if (!taskTarget) {
-            delete this.memory.TTID
+            delete this.memory[PowerCreepMemoryKeys.taskTarget]
             return
         }
 
         // Don't have the taskTarget thinking it needs a new task
 
         taskTarget.reservePowers
-        taskTarget._reservePowers.add(this.memory.PT)
+        taskTarget._reservePowers.add(this.memory[PowerCreepMemoryKeys.taskPower])
     }
 
     endTickManager() {}
@@ -31,12 +31,12 @@ export class Operator extends PowerCreep {
     // Basic tasks
 
     runTask?() {
-        if (!this.memory.TN && !this.findTask()) return RESULT_FAIL
+        if (!this.memory[PowerCreepMemoryKeys.task] && !this.findTask()) return RESULT_FAIL
 
-        const taskResult = (this as any)[this.memory.TN]()
+        const taskResult = (this as any)[this.memory[PowerCreepMemoryKeys.task]]()
         if (!taskResult) return taskResult === RESULT_FAIL
 
-        delete this.memory.TN
+        delete this.memory[PowerCreepMemoryKeys.task]
         return RESULT_SUCCESS
     }
 
@@ -52,7 +52,7 @@ export class Operator extends PowerCreep {
 
         if (!this.room.powerSpawn) return false
 
-        this.memory.TN = 'advancedRenew'
+        this.memory[PowerCreepMemoryKeys.task] = 'advancedRenew'
         return true
     }
 
@@ -86,7 +86,7 @@ export class Operator extends PowerCreep {
 
         if (controller.isPowerEnabled) return false
 
-        this.memory.TN = 'advancedEnablePower'
+        this.memory[PowerCreepMemoryKeys.task] = 'advancedEnablePower'
         return true
     }
 
@@ -122,7 +122,7 @@ export class Operator extends PowerCreep {
 
         if (power.cooldown) return false
 
-        this.memory.TN = 'advancedGenerateOps'
+        this.memory[PowerCreepMemoryKeys.task] = 'advancedGenerateOps'
         return true
     }
 
@@ -139,7 +139,7 @@ export class Operator extends PowerCreep {
     // Complex power tasks
 
     findPowerTask?() {
-        if (this.memory.TTID) return findObjectWithID(this.memory.TTID)
+        if (this.memory[PowerCreepMemoryKeys.taskTarget]) return findObjectWithID(this.memory[PowerCreepMemoryKeys.taskTarget])
 
         const task = this.findNewBestPowerTask()
         if (!task) return RESULT_FAIL
@@ -148,10 +148,10 @@ export class Operator extends PowerCreep {
 
         const taskTarget = findObjectWithID(task.targetID)
         taskTarget.reservePowers
-        taskTarget._reservePowers.add(this.memory.PT)
+        taskTarget._reservePowers.add(this.memory[PowerCreepMemoryKeys.taskPower])
 
-        this.memory.TTID = task.targetID
-        this.memory.PT = task.powerType
+        this.memory[PowerCreepMemoryKeys.taskTarget] = task.targetID
+        this.memory[PowerCreepMemoryKeys.taskPower] = task.powerType
         delete this.room.powerTasks[task.taskID]
 
         return findObjectWithID(task.targetID)
@@ -201,7 +201,7 @@ export class Operator extends PowerCreep {
 
         // We aren't in range, get closer
         customLog('TRY TASK', taskTarget)
-        const minRange = (POWER_INFO[this.memory.PT] as any).range
+        const minRange = (POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]] as any).range
         if (minRange && getRange(this.pos, taskTarget.pos) > minRange) {
             this.createMoveRequest({
                 origin: this.pos,
@@ -214,27 +214,27 @@ export class Operator extends PowerCreep {
 
         if (this.powered) return RESULT_FAIL
 
-        const effect = taskTarget.effectsData.get(this.memory.PT)
+        const effect = taskTarget.effectsData.get(this.memory[PowerCreepMemoryKeys.taskPower])
         if (effect && effect.ticksRemaining > 0) return RESULT_FAIL
-        /* if (this.usePower(this.memory.PT, taskTarget) !== OK) return RESULT_FAIL */
+        /* if (this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget) !== OK) return RESULT_FAIL */
 
-        this.usePower(this.memory.PT, taskTarget)
+        this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget)
 
         // We did the power
         customLog('WE DID THE POWA', taskTarget)
 
         // Assume the power consumed ops if it does so
 
-        const ops = (POWER_INFO[this.memory.PT] as any).ops
+        const ops = (POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]] as any).ops
         if (ops) this.nextStore.ops -= ops
 
         this.powered = true
-        delete this.memory.TTID
+        delete this.memory[PowerCreepMemoryKeys.taskTarget]
 
         // Define the cooldown so we don't assume the creep can still do this power immediately
 
         this.powerCooldowns
-        this._powerCooldowns.set(this.memory.PT, POWER_INFO[this.memory.PT].cooldown)
+        this._powerCooldowns.set(this.memory[PowerCreepMemoryKeys.taskPower], POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]].cooldown)
 
         return RESULT_SUCCESS
     }

@@ -1,4 +1,3 @@
-import { allyManager } from 'international/simpleAllies'
 import {
     AllyCreepRequestData,
     antifaRoles,

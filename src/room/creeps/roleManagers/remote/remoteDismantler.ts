@@ -1,4 +1,4 @@
-import { RemoteData } from 'international/constants'
+import { CreepMemoryKeys, RemoteData } from 'international/constants'
 import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
