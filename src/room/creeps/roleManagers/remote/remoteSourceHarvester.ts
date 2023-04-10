@@ -310,7 +310,7 @@ export class RemoteHarvester extends Creep {
             creep.message = creep.memory.RN
 
             const sourcePos = unpackPosList(Memory.rooms[creep.memory.RN].RSHP[creep.memory.SI])[0]
-
+            console.log('reverse of null roomName', creep.memory.RN)
             creep.createMoveRequestByPath(
                 {
                     origin: creep.pos,

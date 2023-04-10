@@ -13,7 +13,12 @@ class RespawnManager {
     private hasRespawned(): boolean {
         if (Game.time === 0) return true
 
-        if (Object.keys(Game.creeps).length > 0) return false
+        // Make sure there are no creeps
+
+        for (const key in Game.creeps) {
+
+            return false
+        }
 
         const roomNames = Object.keys(Game.rooms)
         if (roomNames.length > 1) return false
