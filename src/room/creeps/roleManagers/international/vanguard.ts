@@ -1,4 +1,4 @@
-import { ClaimRequestData } from 'international/constants'
+import { ClaimRequestKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -15,7 +15,7 @@ export class Vanguard extends Creep {
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return
 
-        request.data[ClaimRequestData.vanguard] -= this.parts.work
+        request[ClaimRequestKeys.vanguard] -= this.parts.work
     }
 
     /**
@@ -147,7 +147,7 @@ export class Vanguard extends Creep {
             }) === 'unpathable'
         ) {
             const request = Memory.claimRequests[this.memory.TRN]
-            if (request) request.data[ClaimRequestData.abandon] = 20000
+            if (request) request[ClaimRequestKeys.abandon] = 20000
         }
     }
 

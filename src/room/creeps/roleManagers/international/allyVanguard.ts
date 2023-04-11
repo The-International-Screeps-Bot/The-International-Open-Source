@@ -1,4 +1,4 @@
-import { AllyCreepRequestData } from 'international/constants'
+import { AllyCreepRequestKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -8,7 +8,7 @@ export class AllyVanguard extends Creep {
 
         if (!request) return
 
-        request.data[AllyCreepRequestData.allyVanguard] -= this.parts.work
+        request[AllyCreepRequestKeys.allyVanguard] -= this.parts.work
     }
 
     findRemote?(): boolean {
@@ -203,7 +203,7 @@ export class AllyVanguard extends Creep {
                 }) === 'unpathable'
             ) {
                 const request = Memory.claimRequests[creep.memory.TRN]
-                if (request) request.data[AllyCreepRequestData.abandon] = 20000
+                if (request) request[AllyCreepRequestKeys.abandon] = 20000
             }
         }
     }

@@ -2,7 +2,7 @@ import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomTick } from '.
 
 import {
     cacheAmountModifier,
-    ClaimRequestData,
+    ClaimRequestKeys,
     CPUBucketCapacity,
     mmoShardNames,
     customColors,
@@ -352,9 +352,7 @@ export class InternationalManager {
         if (this._claimRequestsByScore) return this._claimRequestsByScore
 
         return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
-            (a, b) =>
-                Memory.rooms[a].S -
-                Memory.rooms[b].S
+            (a, b) => Memory.rooms[a].S - Memory.rooms[b].S,
         ))
     }
 
@@ -410,8 +408,6 @@ export class InternationalManager {
 
         this._compoundPriority = {}
 
-
-
         return this._compoundPriority
     }
 
@@ -452,21 +448,19 @@ export class InternationalManager {
 
     _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
     get resourcesInStoringStructures() {
-
         if (this._resourcesInStoringStructures) return this._resourcesInStoringStructures
 
         this._resourcesInStoringStructures = {}
 
         for (const roomName of global.communes) {
-
             const room = Game.rooms[roomName]
             const resources = room.resourcesInStoringStructures
 
             for (const key in resources) {
-
                 const resource = key as unknown as ResourceConstant
 
-                if (!this._resourcesInStoringStructures[resource]) this._resourcesInStoringStructures[resource] = resources[resource]
+                if (!this._resourcesInStoringStructures[resource])
+                    this._resourcesInStoringStructures[resource] = resources[resource]
                 this._resourcesInStoringStructures[resource] = resources[resource]
             }
         }
@@ -478,7 +472,7 @@ export class InternationalManager {
     get maxCSitesPerRoom() {
         if (this._maxCSitesPerRoom) return this._maxCSitesPerRoom
 
-        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / global.communes.size, 20), 3);
+        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / global.communes.size, 20), 3)
     }
 }
 

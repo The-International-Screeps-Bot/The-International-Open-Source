@@ -1,4 +1,4 @@
-import { ClaimRequestData } from 'international/constants'
+import { ClaimRequestKeys } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -11,7 +11,7 @@ export class Claimer extends Creep {
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return
 
-        request.data[ClaimRequestData.claimer] -= 1
+        request[ClaimRequestKeys.claimer] -= 1
     }
 
     /**
@@ -86,7 +86,7 @@ export class Claimer extends Creep {
                 }) === 'unpathable'
             ) {
                 const request = Memory.claimRequests[creep.memory.TRN]
-                if (request) request.data[ClaimRequestData.abandon] = 20000
+                if (request) request[ClaimRequestKeys.abandon] = 20000
             }
         }
     }

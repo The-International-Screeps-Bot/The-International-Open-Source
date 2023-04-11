@@ -1,4 +1,4 @@
-import { CombatRequestData, customColors } from 'international/constants'
+import { CombatRequestKeys, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -80,7 +80,7 @@ export class CombatRequestManager {
         // If there are threats to our hegemony, temporarily abandon the request
         /*
         if (requestRoom.enemyAttackers.length > 0) {
-            request.data[CombatRequestData.abandon] = 1500
+            request[CombatRequestKeys.abandon] = 1500
 
             room.memory.combatRequests.splice(index, 1)
             delete request.responder
@@ -91,7 +91,7 @@ export class CombatRequestManager {
         // If there is a controller and it's in safemode, abandon until it ends
 
         if (requestRoom.controller && requestRoom.controller.safeMode) {
-            request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
+            request[CombatRequestKeys.abandon] = requestRoom.controller.safeMode
 
             this.manageAbandonment(requestName, index)
             return
@@ -118,7 +118,7 @@ export class CombatRequestManager {
             for (const structure of structures) totalHits += structure.hits
 
             if (structures.length > 0)
-                request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+                request[CombatRequestKeys.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
         }
  */
         // If there are threats to our hegemony, temporarily abandon the request
@@ -128,7 +128,7 @@ export class CombatRequestManager {
         )
 
         if (threateningAttacker) {
-            request.data[CombatRequestData.abandon] = 1500
+            request[CombatRequestKeys.abandon] = 1500
 
             room.memory.combatRequests.splice(index, 1)
             delete request.responder
@@ -138,8 +138,8 @@ export class CombatRequestManager {
         // If there are no enemyCreeps, delete the combatRequest
 
         if (!requestRoom.enemyCreeps.length) {
-            request.data[CombatRequestData.abandon] = 1500
-            request.data[CombatRequestData.abandonments] += 1
+            request[CombatRequestKeys.abandon] = 1500
+            request[CombatRequestKeys.abandonments] += 1
             this.manageAbandonment(requestName, index)
             return
         }
@@ -152,33 +152,30 @@ export class CombatRequestManager {
         if (!requestRoom) return
 
         if (requestRoom.controller && requestRoom.controller.safeMode) {
-            request.data[CombatRequestData.abandon] = requestRoom.controller.safeMode
+            request[CombatRequestKeys.abandon] = requestRoom.controller.safeMode
 
             this.manageAbandonment(requestName, index)
             return
         }
 
         for (const enemyCreep of requestRoom.enemyAttackers) {
-            if (enemyCreep.combatStrength.ranged > request.data[CombatRequestData.minRangedHeal] * 4)
-                request.data[CombatRequestData.minRangedHeal] = enemyCreep.combatStrength.ranged + 1
+            if (enemyCreep.combatStrength.ranged > request[CombatRequestKeys.minRangedHeal] * 4)
+                request[CombatRequestKeys.minRangedHeal] = enemyCreep.combatStrength.ranged + 1
 
-            if (
-                enemyCreep.combatStrength.heal >
-                request.data[CombatRequestData.minDamage] * enemyCreep.defenceStrength * 4
-            )
-                request.data[CombatRequestData.minDamage] = enemyCreep.combatStrength.heal + 1
+            if (enemyCreep.combatStrength.heal > request[CombatRequestKeys.minDamage] * enemyCreep.defenceStrength * 4)
+                request[CombatRequestKeys.minDamage] = enemyCreep.combatStrength.heal + 1
         }
 
         if (!requestRoom.enemyDamageThreat) {
-            request.data[CombatRequestData.inactionTimer] -= 1
+            request[CombatRequestKeys.inactionTimer] -= 1
             this.manageInaction(requestName, index)
-        } else request.data[CombatRequestData.inactionTimer] = request.data[CombatRequestData.inactionTimerMax]
+        } else request[CombatRequestKeys.inactionTimer] = request[CombatRequestKeys.inactionTimerMax]
     }
 
     private manageInaction(requestName: string, index: number) {
         const request = Memory.combatRequests[requestName]
 
-        if (request.data[CombatRequestData.inactionTimer] <= 0) {
+        if (request[CombatRequestKeys.inactionTimer] <= 0) {
             this.communeManager.deleteCombatRequest(requestName, index)
             return
         }
@@ -187,14 +184,14 @@ export class CombatRequestManager {
     private manageAbandonment(requestName: string, index: number) {
         const request = Memory.combatRequests[requestName]
 
-        if (request.data[CombatRequestData.abandonments] >= 3) {
+        if (request[CombatRequestKeys.abandonments] >= 3) {
             // Delete the request
 
             this.communeManager.deleteCombatRequest(requestName, index)
             return
         }
 
-        if (request.data[CombatRequestData.abandon] > 0) {
+        if (request[CombatRequestKeys.abandon] > 0) {
             // Stop responding to the request
 
             this.communeManager.room.memory.combatRequests.splice(index, 1)

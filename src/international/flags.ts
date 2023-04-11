@@ -189,6 +189,10 @@ class FlagManager {
             flag.setColor(COLOR_RED)
             return
         }
+        if (roomMemory.PC !== true) {
+            flag.setColor(COLOR_RED)
+            return
+        }
 
         if (communeName) {
             const communeMemory = Memory.rooms[communeName]
@@ -198,7 +202,7 @@ class FlagManager {
             }
         }
 
-        global.claim(roomName, communeName, score);
+        global.claim(roomName, communeName, score)
 
         flag.remove()
     }
@@ -223,6 +227,9 @@ class FlagManager {
         const roomName = flagNameParts[1] || flag.pos.roomName
         const communeName = flagNameParts[2] || undefined
         const type: CombatRequestTypes = flagNameParts[3] as CombatRequestTypes || "attack"
+
+        flag.setColor(COLOR_RED)
+        return
 
         if (communeName) {
             if (!Memory.rooms[communeName]) {

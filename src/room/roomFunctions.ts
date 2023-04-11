@@ -1,7 +1,7 @@
 import {
     allStructureTypes,
-    ClaimRequestData,
-    CombatRequestData,
+    ClaimRequestKeys,
+    CombatRequestKeys,
     defaultPlainCost,
     defaultSwampCost,
     impassibleStructureTypes,
@@ -937,8 +937,8 @@ Room.prototype.createAttackCombatRequest = function (opts) {
         if (!opts) return
 
         for (const key in opts) {
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-                opts[key as keyof typeof CombatRequestData]
+            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
+                opts[key as keyof typeof CombatRequestKeys]
         }
 
         return
@@ -956,17 +956,17 @@ Room.prototype.createAttackCombatRequest = function (opts) {
         data: [0],
     }
 
-    for (const key in CombatRequestData) request.data[key] = 0
+    for (const key in CombatRequestKeys) request.data[key] = 0
 
-    request.data[CombatRequestData.minDamage] = 10
-    request.data[CombatRequestData.minMeleeHeal] = 10
-    request.data[CombatRequestData.minRangedHeal] = 10
-    request.data[CombatRequestData.quadQuota] = 1
+    request[CombatRequestKeys.minDamage] = 10
+    request[CombatRequestKeys.minMeleeHeal] = 10
+    request[CombatRequestKeys.minRangedHeal] = 10
+    request[CombatRequestKeys.quadQuota] = 1
 
     if (opts) {
         for (const key in opts) {
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-                opts[key as keyof typeof CombatRequestData]
+            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
+                opts[key as keyof typeof CombatRequestKeys]
         }
         return
     }
@@ -982,8 +982,8 @@ Room.prototype.createHarassCombatRequest = function (opts) {
         if (!opts) return
 
         for (const key in opts) {
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-                opts[key as keyof typeof CombatRequestData]
+            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
+                opts[key as keyof typeof CombatRequestKeys]
         }
 
         return
@@ -998,16 +998,16 @@ Room.prototype.createHarassCombatRequest = function (opts) {
         data: [0],
     }
 
-    for (const key in CombatRequestData) request.data[key] = 0
+    for (const key in CombatRequestKeys) request.data[key] = 0
 
-    request.data[CombatRequestData.minDamage] = 10
-    request.data[CombatRequestData.minMeleeHeal] = 10
-    request.data[CombatRequestData.minRangedHeal] = 10
+    request[CombatRequestKeys.minDamage] = 10
+    request[CombatRequestKeys.minMeleeHeal] = 10
+    request[CombatRequestKeys.minRangedHeal] = 10
 
     if (opts) {
         for (const key in opts) {
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-                opts[key as keyof typeof CombatRequestData]
+            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
+                opts[key as keyof typeof CombatRequestKeys]
         }
         return
     }
@@ -1019,7 +1019,7 @@ Room.prototype.createHarassCombatRequest = function (opts) {
     for (const structure of structures) totalHits += structure.hits
 
     if (structures.length > 0)
-        request.data[CombatRequestData.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
+        request[CombatRequestKeys.dismantle] = Math.min(Math.ceil(totalHits / DISMANTLE_POWER / 5000), 20)
  */
 }
 
@@ -1031,8 +1031,8 @@ Room.prototype.createDefendCombatRequest = function (opts) {
         if (!opts) return
 
         for (const key in opts) {
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-                opts[key as keyof typeof CombatRequestData]
+            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
+                opts[key as keyof typeof CombatRequestKeys]
         }
 
         return
@@ -1043,22 +1043,22 @@ Room.prototype.createDefendCombatRequest = function (opts) {
         data: [0],
     }
 
-    for (const key in CombatRequestData) request.data[key] = 0
+    for (const key in CombatRequestKeys) request.data[key] = 0
 
-    request.data[CombatRequestData.inactionTimer] = 0
-    request.data[CombatRequestData.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
+    request[CombatRequestKeys.inactionTimer] = 0
+    request[CombatRequestKeys.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
 
     if (opts) {
         for (const key in opts) {
-            request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-                opts[key as keyof typeof CombatRequestData]
+            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
+                opts[key as keyof typeof CombatRequestKeys]
         }
         return
     }
 
-    request.data[CombatRequestData.minDamage] = 40
-    request.data[CombatRequestData.minMeleeHeal] = 10
-    request.data[CombatRequestData.minRangedHeal] = 10
+    request[CombatRequestKeys.minDamage] = 40
+    request[CombatRequestKeys.minMeleeHeal] = 10
+    request[CombatRequestKeys.minRangedHeal] = 10
 }
 
 Room.prototype.distanceTransform = function (

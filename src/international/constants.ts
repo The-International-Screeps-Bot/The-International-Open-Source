@@ -889,6 +889,72 @@ export enum PowerCreepMemoryKeys {
     taskRoom = 4,
 }
 
+export enum ClaimRequestKeys {
+    claimer = 0,
+    vanguard = 1,
+    abandon = 2,
+    responder = 3,
+}
+
+export enum HaulRequestKeys {
+    type = 0,
+    distance = 1,
+    timer = 2,
+    priority = 3,
+    abandon = 4,
+    responder = 5,
+}
+
+export enum NukeRequestKeys {
+    x = 0,
+    y = 1,
+    respond = 2,
+    priority = 3,
+}
+
+export enum AllyCreepRequestKeys {
+    allyVanguard = 0,
+    abandon = 1,
+    responder = 2,
+}
+
+export enum DepositRequestKeys {
+    depositHarvester = 0,
+    depositHauler = 1,
+    abandon = 2,
+    responder = 3,
+    /**
+     * The type of resource the deposit provides
+     */
+    type = 4,
+}
+
+export enum CombatRequestKeys {
+    abandon = 0,
+    rangedAttack = 1,
+    attack = 2,
+    dismantle = 3,
+    downgrade = 4,
+    minDamage = 5,
+    minMeleeHeal = 6,
+    minRangedHeal = 7,
+    maxTowerDamage = 8,
+    quads = 9,
+    priority = 10,
+    quadQuota = 11,
+    inactionTimerMax = 12,
+    inactionTimer = 13,
+    maxThreat = 14,
+    abandonments = 15,
+    /**
+     * The type of attack request
+     */
+    type = 16,
+    responder = 17,
+}
+
+// Move this into roomMemory
+
 export enum RemoteData {
     remoteSourceHarvester0,
     remoteSourceHarvester1,
@@ -913,54 +979,10 @@ export enum RemoteData {
     maxSourceIncome1
 }
 
-export enum ClaimRequestData {
-    claimer,
-    vanguard,
-    minDamage,
-    minHeal,
-    abandon,
-}
-
-export enum CombatRequestData {
-    abandon,
-    rangedAttack,
-    attack,
-    dismantle,
-    downgrade,
-    minDamage,
-    minMeleeHeal,
-    minRangedHeal,
-    maxTowerDamage,
-    quads,
-    priority,
-    quadQuota,
-    inactionTimerMax,
-    inactionTimer,
-    maxThreat,
-    abandonments,
-}
-
-export enum HaulRequestData {
-    transfer,
-    distance,
-    timer,
-    priority,
-    abandon,
-}
-
-export enum NukeRequestData {
-    x,
-    y,
-}
-
-export enum AllyCreepRequestData {
-    allyVanguard,
-    abandon,
-}
-
-export enum DepositNeeds {
-    depositHarvester,
-    depositHauler,
+export enum PowerRequestKeys {
+    target = 0,
+    type = 1,
+    cooldown = 2,
 }
 
 export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [

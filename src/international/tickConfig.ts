@@ -1,9 +1,9 @@
 import {
-    AllyCreepRequestData,
+    AllyCreepRequestKeys,
     antifaRoles,
     chant,
-    ClaimRequestData,
-    CombatRequestData,
+    ClaimRequestKeys,
+    CombatRequestKeys,
     creepRoles,
     haulerUpdateDefault,
     HaulRequestData,
@@ -123,12 +123,12 @@ class TickConfig {
 
             if (!request) continue
 
-            if (request.data[ClaimRequestData.abandon] > 0) {
-                request.data[ClaimRequestData.abandon] -= 1
+            if (request[ClaimRequestKeys.abandon] > 0) {
+                request[ClaimRequestKeys.abandon] -= 1
                 continue
             }
 
-            delete request.data[ClaimRequestData.abandon]
+            delete request[ClaimRequestKeys.abandon]
 
             if (request.responder && global.communes.has(request.responder)) continue
 
@@ -146,7 +146,7 @@ class TickConfig {
             if (type !== 'neutral' && type !== 'commune') {
                 // Delete the request
 
-                Memory.claimRequests[roomName].data[ClaimRequestData.abandon] = 20000
+                Memory.claimRequests[roomName][ClaimRequestKeys.abandon] = 20000
                 continue
             }
 
@@ -165,7 +165,7 @@ class TickConfig {
                     },
                 }) > maxClaimRequestDistance
             ) {
-                Memory.claimRequests[roomName].data[ClaimRequestData.abandon] = 20000
+                Memory.claimRequests[roomName][ClaimRequestKeys.abandon] = 20000
                 continue
             }
 
@@ -185,12 +185,12 @@ class TickConfig {
         for (const roomName in Memory.allyCreepRequests) {
             const request = Memory.allyCreepRequests[roomName]
 
-            if (request.data[AllyCreepRequestData.abandon] > 0) {
-                request.data[AllyCreepRequestData.abandon] -= 1
+            if (request[AllyCreepRequestKeys.abandon] > 0) {
+                request[AllyCreepRequestKeys.abandon] -= 1
                 continue
             }
 
-            request.data[AllyCreepRequestData.abandon] = undefined
+            request[AllyCreepRequestKeys.abandon] = undefined
 
             if (request.responder) continue
 
@@ -222,7 +222,7 @@ class TickConfig {
                     },
                 }) > maxRange
             ) {
-                request.data[AllyCreepRequestData.abandon] = 20000
+                request[AllyCreepRequestKeys.abandon] = 20000
                 continue
             }
 
@@ -238,16 +238,16 @@ class TickConfig {
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
 
-            if (request.data[CombatRequestData.abandon]) request.data[CombatRequestData.abandon] -= 1
+            if (request[CombatRequestKeys.abandon]) request[CombatRequestKeys.abandon] -= 1
 
             if (request.responder) {
                 internationalManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
-                request.data[CombatRequestData.quads] = 0
+                request[CombatRequestKeys.quads] = 0
                 continue
             }
 
-            if (request.data[CombatRequestData.abandon]) continue
+            if (request[CombatRequestKeys.abandon]) continue
 
             // Filter communes that don't have the combatRequest target already
 
@@ -268,27 +268,23 @@ class TickConfig {
                 if (room.storage && room.controller.level >= 4) {
                     if (room.memory.combatRequests.length + 1 >= room.communeManager.maxCombatRequests) continue
                 } else {
-                    if (room.memory.combatRequests.length + 1 >= room.communeManager.estimatedEnergyIncome / 10) continue
+                    if (room.memory.combatRequests.length + 1 >= room.communeManager.estimatedEnergyIncome / 10)
+                        continue
                 }
 
                 // Ensure we can afford the creeps required
 
                 const minRangedAttackCost = room.communeManager.findMinRangedAttackCost(
-                    request.data[CombatRequestData.minDamage],
+                    request[CombatRequestKeys.minDamage],
                 )
                 const minMeleeHealCost = room.communeManager.findMinHealCost(
-                    request.data[CombatRequestData.minMeleeHeal] +
-                        (request.data[CombatRequestData.maxTowerDamage] || 0),
+                    request[CombatRequestKeys.minMeleeHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
                 )
-                const minRangedHealCost = room.communeManager.findMinHealCost(
-                    request.data[CombatRequestData.minRangedHeal],
-                )
+                const minRangedHealCost = room.communeManager.findMinHealCost(request[CombatRequestKeys.minRangedHeal])
 
                 if (minRangedAttackCost + minRangedHealCost > room.energyCapacityAvailable) continue
 
-                const minAttackCost = room.communeManager.findMinMeleeAttackCost(
-                    request.data[CombatRequestData.minDamage],
-                )
+                const minAttackCost = room.communeManager.findMinMeleeAttackCost(request[CombatRequestKeys.minDamage])
                 if (minAttackCost > room.energyCapacityAvailable) continue
 
                 communes.push(roomName)
@@ -309,7 +305,7 @@ class TickConfig {
                     },
                 }) > maxCombatDistance
             ) {
-                request.data[CombatRequestData.abandon] = 20000
+                request[CombatRequestKeys.abandon] = 20000
                 continue
             }
 

@@ -1,5 +1,5 @@
 import {
-    CombatRequestData,
+    CombatRequestKeys,
     customColors,
     quadAttackMemberOffsets,
     rangedMassAttackMultiplierByRange,
@@ -199,7 +199,7 @@ export class Quad {
         this.sortMembersByCoord()
 
         if (Memory.combatRequests[this.leader.memory.CRN])
-            Memory.combatRequests[this.leader.memory.CRN].data[CombatRequestData.quads] += 1
+            Memory.combatRequests[this.leader.memory.CRN][CombatRequestKeys.quads] += 1
     }
 
     sortMembersByCoord() {
@@ -291,7 +291,13 @@ export class Quad {
                     this.findMinRange(enemyCreep.pos) <= 4 &&
                     (enemyCreep.combatStrength.ranged || enemyCreep.combatStrength.melee),
             )
-            if (nearbyThreat && !this.leader.room.findStructureAtCoord(nearbyThreat.pos, (structure) => structure.structureType === STRUCTURE_RAMPART)) {
+            if (
+                nearbyThreat &&
+                !this.leader.room.findStructureAtCoord(
+                    nearbyThreat.pos,
+                    structure => structure.structureType === STRUCTURE_RAMPART,
+                )
+            ) {
                 this.target = nearbyThreat
                 this.advancedTransform()
             }

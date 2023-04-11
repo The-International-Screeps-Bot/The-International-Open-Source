@@ -1,4 +1,4 @@
-import { customColors, HaulRequestData, CombatRequestData } from 'international/constants'
+import { customColors, HaulRequestData, CombatRequestKeys } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -92,7 +92,7 @@ export class HaulRequestManager {
         // If there are threats to our hegemony, temporarily abandon the request
         /*
         if (requestRoom.enemyAttackers.length > 0) {
-            request.data[CombatRequestData.abandon] = 1500
+            request[CombatRequestKeys.abandon] = 1500
 
             room.memory.combatRequests.splice(index, 1)
             delete request.responder

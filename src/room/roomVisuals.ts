@@ -1,6 +1,6 @@
 import {
-    ClaimRequestData,
-    CombatRequestData,
+    ClaimRequestKeys,
+    CombatRequestKeys,
     HaulRequestData,
     customColors,
     NORMAL,
@@ -202,7 +202,6 @@ export class RoomVisualsManager {
     }
 
     private dataVisuals() {
-
         if (!Memory.dataVisuals) return
 
         if (!global.communes.has(this.roomManager.room.name)) return
@@ -211,7 +210,6 @@ export class RoomVisualsManager {
     }
 
     public internationalDataVisuals() {
-
         this.internationalAllyBuildRequestsDataVisuals(
             this.internationalAllyCombatRequestsDataVisuals(
                 this.internationalAllyResourceRequestsDataVisuals(
@@ -315,7 +313,7 @@ export class RoomVisualsManager {
 
             if (!request.responder) continue
 
-            const row: any[] = [requestName, 'default', request.responder, request.data[ClaimRequestData.abandon]]
+            const row: any[] = [requestName, 'default', request.responder, request[ClaimRequestKeys.abandon]]
             data.push(row)
         }
 
@@ -324,12 +322,7 @@ export class RoomVisualsManager {
 
             if (request.T !== 'defend' && !request.responder) continue
 
-            const row: any[] = [
-                requestName,
-                request.T,
-                request.responder || 'none',
-                request.data[CombatRequestData.abandon],
-            ]
+            const row: any[] = [requestName, request.T, request.responder || 'none', request[CombatRequestKeys.abandon]]
             data.push(row)
         }
 
@@ -426,7 +419,6 @@ export class RoomVisualsManager {
 
         const requests = allyManager.allyRequests.resource
         for (const ID in requests) {
-
             const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.resource) continue
 
@@ -472,7 +464,6 @@ export class RoomVisualsManager {
 
         const requests = allyManager.allyRequests.defense
         for (const ID in requests) {
-
             const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.attack && request.requestType !== AllyRequestTypes.defense)
                 continue
@@ -526,7 +517,6 @@ export class RoomVisualsManager {
 
         const requests = allyManager.allyRequests.build
         for (const ID in requests) {
-
             const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.build) continue
 

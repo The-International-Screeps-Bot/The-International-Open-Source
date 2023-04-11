@@ -1,4 +1,4 @@
-import { ClaimRequestData, customColors } from 'international/constants'
+import { ClaimRequestKeys, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -20,14 +20,13 @@ export class ClaimRequestManager {
 
         let request = Memory.claimRequests[room.name]
         if (request) {
-
             Memory.rooms[room.name].S = -1
             return
         }
 
-        request = (Memory.claimRequests[room.name] = {
+        request = Memory.claimRequests[room.name] = {
             data: [0],
-        })
+        }
 
         Memory.rooms[room.name].S = -1
     }
@@ -58,7 +57,6 @@ export class ClaimRequestManager {
 
         const type = Memory.rooms[requestName].T
         if (type !== 'neutral' && type !== 'commune' && type !== 'remote') {
-
             // Delete the request so long as the new type isn't ally
 
             this.stopResponse(type !== 'ally')
@@ -74,28 +72,25 @@ export class ClaimRequestManager {
 
         // If the request has been abandoned, have the commune abandon it too
 
-        if (request.data[ClaimRequestData.abandon] > 0) {
-
+        if (request[ClaimRequestKeys.abandon] > 0) {
             this.stopResponse()
             return
         }
 
         if (room.energyCapacityAvailable < 650) {
-
             this.stopResponse()
             return
         }
 
         const requestRoom = Game.rooms[requestName]
         if (!requestRoom || !requestRoom.controller.my) {
-            request.data[ClaimRequestData.claimer] = 1
+            request[ClaimRequestKeys.claimer] = 1
             return
         }
 
         // If there is a spawn and we own it
 
         if (requestRoom.structures.spawn.length && requestRoom.structures.spawn.find(spawn => spawn.my)) {
-
             this.delete()
             return
         }
@@ -110,10 +105,10 @@ export class ClaimRequestManager {
             return
         }
 
-        request.data[ClaimRequestData.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
+        request[ClaimRequestKeys.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
 
-        request.data[ClaimRequestData.minDamage] = 0
-        request.data[ClaimRequestData.minHeal] = 0
+        request[ClaimRequestKeys.minDamage] = 0
+        request[ClaimRequestKeys.minHeal] = 0
 
         if (!requestRoom.controller.safeMode) {
             // Increase the defenderNeed according to the enemy attackers' combined strength
@@ -121,19 +116,18 @@ export class ClaimRequestManager {
             for (const enemyCreep of requestRoom.enemyAttackers) {
                 if (enemyCreep.owner.username === 'Invader') continue
 
-                request.data[ClaimRequestData.minDamage] += enemyCreep.combatStrength.heal
-                request.data[ClaimRequestData.minHeal] += enemyCreep.combatStrength.ranged
+                request[ClaimRequestKeys.minDamage] += enemyCreep.combatStrength.heal
+                request[ClaimRequestKeys.minHeal] += enemyCreep.combatStrength.ranged
             }
 
             // Decrease the defenderNeed according to ally combined strength
 
             for (const allyCreep of requestRoom.allyCreeps) {
-                request.data[ClaimRequestData.minDamage] -= allyCreep.combatStrength.heal
-                request.data[ClaimRequestData.minHeal] -= allyCreep.combatStrength.ranged
+                request[ClaimRequestKeys.minDamage] -= allyCreep.combatStrength.heal
+                request[ClaimRequestKeys.minHeal] -= allyCreep.combatStrength.ranged
             }
 
-            if (request.data[ClaimRequestData.minDamage] > 0 || request.data[ClaimRequestData.minHeal] > 0)
-                this.abandon()
+            if (request[ClaimRequestKeys.minDamage] > 0 || request[ClaimRequestKeys.minHeal] > 0) this.abandon()
         }
 
         // If CPU logging is enabled, log the CPU used by this manager
@@ -169,27 +163,27 @@ export class ClaimRequestManager {
     }
 
     private abandon(abandonTime: number = 20000) {
-
         const roomMemory = this.communeManager.room.memory
         const request = Memory.claimRequests[roomMemory.claimRequest]
 
         this.deleteCombat()
 
-        request.data[ClaimRequestData.abandon] = abandonTime
+        request[ClaimRequestKeys.abandon] = abandonTime
         delete request.responder
         delete roomMemory.claimRequest
     }
 
     private deleteCombat() {
-
         const claimRequestName = this.communeManager.room.memory.claimRequest
         const combatRequest = Memory.combatRequests[claimRequestName]
         if (!combatRequest) return
 
         if (combatRequest.responder) {
-
             const combatRequestResponder = Game.rooms[combatRequest.responder]
-            combatRequestResponder.communeManager.deleteCombatRequest(combatRequest.responder, combatRequestResponder.memory.combatRequests.indexOf(claimRequestName))
+            combatRequestResponder.communeManager.deleteCombatRequest(
+                combatRequest.responder,
+                combatRequestResponder.memory.combatRequests.indexOf(claimRequestName),
+            )
             return
         }
 

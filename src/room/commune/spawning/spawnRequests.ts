@@ -1,7 +1,7 @@
 import {
-    AllyCreepRequestData,
-    ClaimRequestData,
-    CombatRequestData,
+    AllyCreepRequestKeys,
+    ClaimRequestKeys,
+    CombatRequestKeys,
     containerUpkeepCost,
     customColors,
     rampartUpkeepCost,
@@ -751,7 +751,7 @@ export class SpawnRequestsManager {
                     this.communeManager.room.towerInferiority
                 )
                     return false
-/*
+                /*
                 // Terminal logic
                 if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
                     // If we are a funnel target storing structures are sufficiently full, provide x amount per y energy in storage
@@ -1429,7 +1429,7 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (request.data[ClaimRequestData.claimer] <= 0) return false
+                    if (request[ClaimRequestKeys.claimer] <= 0) return false
 
                     return {
                         role: 'claimer',
@@ -1450,7 +1450,7 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (request.data[ClaimRequestData.vanguard] <= 0) return false
+                    if (request[ClaimRequestKeys.vanguard] <= 0) return false
 
                     let maxCreeps = 0
                     for (const packedPositions of Memory.rooms[requestName].CSHP) {
@@ -1461,7 +1461,7 @@ export class SpawnRequestsManager {
                         role: 'vanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                        partsMultiplier: request.data[ClaimRequestData.vanguard],
+                        partsMultiplier: request[ClaimRequestKeys.vanguard],
                         maxCreeps,
                         minCost: 250,
                         priority: 8.2,
@@ -1487,13 +1487,13 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 // If there is no vanguard need
 
-                if (allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard] <= 0) return false
+                if (allyCreepRequestNeeds[AllyCreepRequestKeys.allyVanguard] <= 0) return false
 
                 return {
                     role: 'allyVanguard',
                     defaultParts: [],
                     extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                    partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
+                    partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestKeys.allyVanguard],
                     minCost: 250,
                     priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
                     memoryAdditions: {
@@ -1542,37 +1542,37 @@ export class SpawnRequestsManager {
 
             if (!request) continue
 
-            if (request.data[CombatRequestData.abandon] > 0) continue
+            if (request[CombatRequestKeys.abandon] > 0) continue
 
             priority -= 0.01
 
             //
 
             const minRangedAttackCost = this.communeManager.room.communeManager.findMinRangedAttackCost(
-                request.data[CombatRequestData.minDamage],
+                request[CombatRequestKeys.minDamage],
             )
             const rangedAttackAmount = Math.floor(
                 minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
             )
 
             const minAttackCost = this.communeManager.room.communeManager.findMinMeleeAttackCost(
-                request.data[CombatRequestData.minDamage],
+                request[CombatRequestKeys.minDamage],
             )
             const attackAmount = Math.floor(minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]))
 
             const minMeleeHealCost = this.communeManager.room.communeManager.findMinHealCost(
-                request.data[CombatRequestData.minMeleeHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
+                request[CombatRequestKeys.minMeleeHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
             )
             const meleeHealAmount = Math.floor(minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
             const minRangedHealCost = this.communeManager.room.communeManager.findMinHealCost(
-                request.data[CombatRequestData.minRangedHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
+                request[CombatRequestKeys.minRangedHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
             )
             const rangedHealAmount = Math.floor(minRangedHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
             const minDismantleCost =
-                request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
-                    request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
+                request[CombatRequestKeys.dismantle] * BODYPART_COST[WORK] +
+                    request[CombatRequestKeys.dismantle] * BODYPART_COST[MOVE] || 0
 
             if (request.T === 'attack' || request.T === 'defend') {
                 if (
@@ -1591,8 +1591,7 @@ export class SpawnRequestsManager {
                     ((): SpawnRequestArgs | false => {
                         // We currently have enough quads
 
-                        if (request.data[CombatRequestData.quads] >= request.data[CombatRequestData.quadQuota])
-                            return false
+                        if (request[CombatRequestKeys.quads] >= request[CombatRequestKeys.quadQuota]) return false
 
                         const role = 'antifaRangedAttacker'
 
@@ -1647,7 +1646,7 @@ export class SpawnRequestsManager {
 
                         if (
                             this.communeManager.room.squadRequests.size <
-                            (request.data[CombatRequestData.quads] + 1) * 4 - 2
+                            (request[CombatRequestKeys.quads] + 1) * 4 - 2
                         ) {
                             for (let i = 0; i < rangedAttackAmount + tradeAmount; i++) {
                                 extraParts.push(RANGED_ATTACK, MOVE)
@@ -1679,7 +1678,7 @@ export class SpawnRequestsManager {
                             minCost,
                             priority,
                             spawnGroup,
-                            minCreeps: request.data[CombatRequestData.quadQuota] * 4,
+                            minCreeps: request[CombatRequestKeys.quadQuota] * 4,
                             memoryAdditions: {
                                 CRN: requestName,
                                 SS: 4,
@@ -1748,7 +1747,7 @@ export class SpawnRequestsManager {
                     const minCost = minDismantleCost
                     let extraParts: BodyPartConstant[] = []
 
-                    const workAmount = request.data[CombatRequestData.dismantle]
+                    const workAmount = request[CombatRequestKeys.dismantle]
 
                     for (let i = 0; i < workAmount; i++) {
                         extraParts.push(WORK, MOVE)

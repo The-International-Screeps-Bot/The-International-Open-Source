@@ -2,7 +2,7 @@ import { CommuneManager } from './room/commune/commune'
 import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
-import { CombatRequestData } from 'international/constants'
+import { CombatRequestKeys } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
@@ -449,33 +449,6 @@ declare global {
         conditions?(request: RoomLogisticsRequest): any
     }
 
-    interface CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: RoomLogisticsRequestTypes
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-        /**
-         * The Resource Type involved
-         */
-        RT: ResourceConstant
-        /**
-         * The Amount of resources involved
-         */
-        A: number
-        /**
-         * Only Full, if they want a responder only if fully filled
-         */
-        OF?: boolean
-        /**
-         * No reserve, if the creep shouldn't interact with the reserveStore of the target
-         */
-        NR?: boolean
-    }
-
     interface PowerTask {
         taskID: string
         targetID: Id<Structure | Source>
@@ -483,64 +456,6 @@ declare global {
         packedCoord: string
         cooldown: number
         priority: number
-    }
-
-    interface PackedPowerTask {
-        /**
-         * Target ID
-         */
-        TID: Id<Structure | Source>
-        /**
-         * Power Type
-         */
-        PT: PowerConstant
-        /**
-         * Cooldown
-         */
-        C: number
-    }
-
-    type CombatRequestTypes = 'attack' | 'harass' | 'defend'
-
-    interface ClaimRequest {
-        /**
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface NukeRequest {
-        /**
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface AllyCreepRequest {
-        /**
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface CombatRequest {
-        /**
-         * The Type of attack request
-         */
-        T: CombatRequestTypes
-        /**request
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface HaulRequest {
-        data: number[]
-        responder?: string
     }
 
     interface ControllerLevel {
@@ -861,15 +776,15 @@ declare global {
         /**
          *
          */
-        claimRequests: { [roomName: string]: ClaimRequest }
+        claimRequests: { [roomName: string]: Partial<ClaimRequest> }
 
-        combatRequests: { [roomName: string]: CombatRequest }
+        combatRequests: { [roomName: string]: Partial<CombatRequest> }
 
-        haulRequests: { [roomName: string]: HaulRequest }
+        haulRequests: { [roomName: string]: Partial<HaulRequest> }
 
-        nukeRequests: { [roomName: string]: NukeRequest }
+        nukeRequests: { [roomName: string]: Partial<NukeRequest> }
 
-        allyCreepRequests: { [roomName: string]: AllyCreepRequest }
+        allyCreepRequests: { [roomName: string]: Partial<AllyCreepRequest> }
 
         stats: Partial<Stats>
 
@@ -1112,11 +1027,11 @@ declare global {
 
         makeRemote(scoutingRoom: Room): boolean
 
-        createAttackCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
+        createAttackCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>): void
 
-        createHarassCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
+        createHarassCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>): void
 
-        createDefendCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
+        createDefendCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -2311,6 +2226,99 @@ declare global {
         3: number // lastAttack
     }
 
+    interface ClaimRequest {
+        0: number // claimer
+        1: number // vanguard
+        2: number // abandon
+        3: string // responder
+    }
+
+    type CombatRequestTypes = 'attack' | 'harass' | 'defend'
+
+    interface CombatRequest {
+        0: number // abandon
+        1: number // rangedAttack
+        2: number // attack
+        3: number // dismantle
+        4: number // downgrade
+        5: number // minDamage
+        6: number // minMeleeHeal
+        7: number // minRangedHeal
+        8: number // maxTowerDamage
+        9: number // quads
+        10: number // priority
+        11: number // quadQuota
+        12: number // inactionTimerMax
+        13: number // inactionTimer
+        14: number // maxThreat
+        15: number // abandonments
+        16: string // type
+        17: string // responder
+    }
+
+    interface NukeRequest {
+        0: number // y
+        1: number // x
+        2: string // responder
+        3: number // priority
+    }
+
+    interface AllyCreepRequest {
+        0: number // allyVanguard
+        1: number // abandon
+        2: string // responder
+    }
+
+    interface HaulRequest {
+        0: 'transfer' | 'withdraw' // type
+        1: number // distance
+        2: number // timer
+        3: number // priority
+        4: number // abandon
+        5: string // responder
+    }
+
+    interface DepositRequest {
+        0: number // depositHarvester
+        1: number // depositHauler
+        2: number // abandon
+        3: string // responder
+        4: DepositConstant // type
+    }
+
+    interface PowerRequest {
+        0: Id<Structure | Source> // target
+        1: PowerConstant // type
+        2: number // cooldown
+    }
+
+    interface CreepRoomLogisticsRequest {
+        /**
+         * The Type of logistic task
+         */
+        T: RoomLogisticsRequestTypes
+        /**
+         * Target ID
+         */
+        TID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
+        /**
+         * The Resource Type involved
+         */
+        RT: ResourceConstant
+        /**
+         * The Amount of resources involved
+         */
+        A: number
+        /**
+         * Only Full, if they want a responder only if fully filled
+         */
+        OF?: boolean
+        /**
+         * No reserve, if the creep shouldn't interact with the reserveStore of the target
+         */
+        NR?: boolean
+    }
+
     interface CreepMemory {
         0: boolean // preferRoads
         1: number // sourceIndex
@@ -2490,11 +2498,11 @@ declare global {
     }
 
     interface PowerCreepMemory {
-       0: string // commune
-       1: keyof Operator // task
-       2: Id<Structure | Source> // taskTarget
-       3: PowerConstant // taskPower
-       4: string // taskRoom
+        0: string // commune
+        1: keyof Operator // task
+        2: Id<Structure | Source> // taskTarget
+        3: PowerConstant // taskPower
+        4: string // taskRoom
     }
 
     // Global
@@ -2589,7 +2597,7 @@ declare global {
             combat(
                 requestName: string,
                 type: CombatRequestTypes,
-                opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>,
+                opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>,
                 communeName?: string,
             ): string
 
