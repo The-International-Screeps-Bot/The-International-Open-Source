@@ -1,4 +1,4 @@
-import { ClaimRequestKeys, customColors } from 'international/constants'
+import { ClaimRequestKeys, CombatRequestKeys, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -24,9 +24,7 @@ export class ClaimRequestManager {
             return
         }
 
-        request = Memory.claimRequests[room.name] = {
-            data: [0],
-        }
+        request = Memory.claimRequests[room.name] = {}
 
         Memory.rooms[room.name].S = -1
     }
@@ -106,7 +104,7 @@ export class ClaimRequestManager {
         }
 
         request[ClaimRequestKeys.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
-
+/*
         request[ClaimRequestKeys.minDamage] = 0
         request[ClaimRequestKeys.minHeal] = 0
 
@@ -128,7 +126,7 @@ export class ClaimRequestManager {
             }
 
             if (request[ClaimRequestKeys.minDamage] > 0 || request[ClaimRequestKeys.minHeal] > 0) this.abandon()
-        }
+        } */
 
         // If CPU logging is enabled, log the CPU used by this manager
 
@@ -149,7 +147,7 @@ export class ClaimRequestManager {
 
         if (deleteCombat) this.deleteCombat()
 
-        delete request.responder
+        delete request[ClaimRequestKeys.responder]
         delete roomMemory.claimRequest
     }
 
@@ -169,7 +167,7 @@ export class ClaimRequestManager {
         this.deleteCombat()
 
         request[ClaimRequestKeys.abandon] = abandonTime
-        delete request.responder
+        delete request[ClaimRequestKeys.responder]
         delete roomMemory.claimRequest
     }
 
@@ -178,10 +176,10 @@ export class ClaimRequestManager {
         const combatRequest = Memory.combatRequests[claimRequestName]
         if (!combatRequest) return
 
-        if (combatRequest.responder) {
-            const combatRequestResponder = Game.rooms[combatRequest.responder]
+        if (combatRequest[CombatRequestKeys.responder]) {
+            const combatRequestResponder = Game.rooms[combatRequest[CombatRequestKeys.responder]]
             combatRequestResponder.communeManager.deleteCombatRequest(
-                combatRequest.responder,
+                combatRequest[CombatRequestKeys.responder],
                 combatRequestResponder.memory.combatRequests.indexOf(claimRequestName),
             )
             return

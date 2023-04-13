@@ -1,4 +1,4 @@
-import { allowedSquadCombinations, antifaRoles, customColors } from 'international/constants'
+import { CombatRequestKeys, allowedSquadCombinations, antifaRoles, customColors } from 'international/constants'
 import { customLog, findClosestObject, getRangeXY, isCoordExit, isXYExit } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { Duo } from './duo'
@@ -70,7 +70,7 @@ export class Antifa extends Creep {
 
         if (!this.findSquad()) {
             const request = Memory.combatRequests[this.memory.CRN]
-            if (request && request.responder === this.room.name) this.activeRenew()
+            if (request && request[CombatRequestKeys.responder] === this.room.name) this.activeRenew()
             return true
         }
 

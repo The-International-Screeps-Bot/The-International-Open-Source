@@ -118,10 +118,10 @@ class AllyManager {
      * To call before any requests are made. Configures some required values
      */
     tickConfig() {
-        if (!Memory.allyTrading) return
 
         this.myRequests = []
 
+        if (!Memory.allyTrading) return
         if (!Memory.allyPlayers.length) return
 
         this.currentAlly = Memory.allyPlayers[Game.time % Memory.allyPlayers.length]

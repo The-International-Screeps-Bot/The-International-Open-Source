@@ -1,4 +1,4 @@
-import { customColors, PlayerMemoryKeys, roomDimensions, safemodeTargets } from 'international/constants'
+import { CombatRequestKeys, customColors, PlayerMemoryKeys, roomDimensions, safemodeTargets } from 'international/constants'
 import { playerManager } from 'international/players'
 import { allyManager } from 'international/simpleAllies'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -212,11 +212,11 @@ export class CombatManager {
         // There is tower inferiority, make a defend request
 
         room.createDefendCombatRequest({
-            minDamage,
-            minMeleeHeal,
-            minRangedHeal,
-            quadQuota: 1,
-            inactionTimerMax: onlyInvader ? 1 : undefined,
+            [CombatRequestKeys.minDamage]: minDamage,
+            [CombatRequestKeys.minMeleeHeal]: minMeleeHeal,
+            [CombatRequestKeys.minRangedHeal]: minRangedHeal,
+            [CombatRequestKeys.quadQuota]: 1,
+            [CombatRequestKeys.inactionTimerMax]: onlyInvader ? 1 : undefined,
         })
 
         if (Memory.allyPlayers) {

@@ -842,8 +842,8 @@ Room.prototype.scoutEnemyRoom = function () {
     // Combat request creation
 
     this.createAttackCombatRequest({
-        maxTowerDamage: Math.ceil(this.structures.tower.length * TOWER_POWER_ATTACK * 1.1),
-        minDamage: 50,
+        [CombatRequestKeys.maxTowerDamage]: Math.ceil(this.structures.tower.length * TOWER_POWER_ATTACK * 1.1),
+        [CombatRequestKeys.minDamage]: 50,
     })
 
     roomMemory.T = 'enemy'
@@ -932,15 +932,11 @@ Room.prototype.createAttackCombatRequest = function (opts) {
 
     let request = Memory.combatRequests[this.name]
     if (request) {
-        if (request.T !== 'attack') return
+        if (request[CombatRequestKeys.type] !== 'attack') return
 
         if (!opts) return
 
-        for (const key in opts) {
-            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
-                opts[key as keyof typeof CombatRequestKeys]
-        }
-
+        Object.assign(request, opts)
         return
     }
 
@@ -952,11 +948,8 @@ Room.prototype.createAttackCombatRequest = function (opts) {
     if (Memory.nonAggressionPlayers.includes(this.memory.owner)) return
 
     request = Memory.combatRequests[this.name] = {
-        T: 'attack',
-        data: [0],
+        [CombatRequestKeys.type]: 'attack',
     }
-
-    for (const key in CombatRequestKeys) request.data[key] = 0
 
     request[CombatRequestKeys.minDamage] = 10
     request[CombatRequestKeys.minMeleeHeal] = 10
@@ -964,10 +957,8 @@ Room.prototype.createAttackCombatRequest = function (opts) {
     request[CombatRequestKeys.quadQuota] = 1
 
     if (opts) {
-        for (const key in opts) {
-            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
-                opts[key as keyof typeof CombatRequestKeys]
-        }
+
+        Object.assign(request, opts)
         return
     }
 }
@@ -977,15 +968,11 @@ Room.prototype.createHarassCombatRequest = function (opts) {
 
     let request = Memory.combatRequests[this.name]
     if (request) {
-        if (request.T !== 'harass') return
+        if (request[CombatRequestKeys.type] !== 'harass') return
 
         if (!opts) return
 
-        for (const key in opts) {
-            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
-                opts[key as keyof typeof CombatRequestKeys]
-        }
-
+        Object.assign(request, opts)
         return
     }
 
@@ -994,21 +981,15 @@ Room.prototype.createHarassCombatRequest = function (opts) {
     if (this.enemyAttackers.length > 0) return
 
     request = Memory.combatRequests[this.name] = {
-        T: 'harass',
-        data: [0],
+        [CombatRequestKeys.type]: 'harass',
     }
-
-    for (const key in CombatRequestKeys) request.data[key] = 0
 
     request[CombatRequestKeys.minDamage] = 10
     request[CombatRequestKeys.minMeleeHeal] = 10
     request[CombatRequestKeys.minRangedHeal] = 10
 
     if (opts) {
-        for (const key in opts) {
-            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
-                opts[key as keyof typeof CombatRequestKeys]
-        }
+        Object.assign(request, opts)
         return
     }
 
@@ -1026,33 +1007,23 @@ Room.prototype.createHarassCombatRequest = function (opts) {
 Room.prototype.createDefendCombatRequest = function (opts) {
     let request = Memory.combatRequests[this.name]
     if (request) {
-        if (request.T !== 'defend') return
+        if (request[CombatRequestKeys.type] !== 'defend') return
 
         if (!opts) return
 
-        for (const key in opts) {
-            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
-                opts[key as keyof typeof CombatRequestKeys]
-        }
-
+        Object.assign(request, opts)
         return
     }
 
     request = Memory.combatRequests[this.name] = {
-        T: 'defend',
-        data: [0],
+        [CombatRequestKeys.type]: 'defend',
     }
-
-    for (const key in CombatRequestKeys) request.data[key] = 0
 
     request[CombatRequestKeys.inactionTimer] = 0
     request[CombatRequestKeys.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
 
     if (opts) {
-        for (const key in opts) {
-            request[CombatRequestKeys[key as keyof typeof CombatRequestKeys]] =
-                opts[key as keyof typeof CombatRequestKeys]
-        }
+        Object.assign(request, opts)
         return
     }
 
@@ -2152,9 +2123,7 @@ Room.prototype.createClaimRequest = function () {
         }
     }
 
-    const request = (Memory.claimRequests[this.name] = {
-        data: [0],
-    })
+    const request = (Memory.claimRequests[this.name] = {})
 
     return true
 }

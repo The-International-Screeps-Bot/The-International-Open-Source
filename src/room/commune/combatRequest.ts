@@ -30,7 +30,7 @@ export class CombatRequestManager {
             // We have no way to make creeps
 
             if (!room.structures.spawn.length) {
-                delete request.responder
+                delete request[CombatRequestKeys.responder]
                 room.memory.combatRequests.splice(index, 1)
                 continue
             }
@@ -38,11 +38,11 @@ export class CombatRequestManager {
             // We don't have enough energy to respond to the request
 
             if (!this.canKeepRequest()) {
-                delete request.responder
+                delete request[CombatRequestKeys.responder]
                 room.memory.combatRequests.splice(index, 1)
             }
 
-            this[`${request.T}Request`](requestName, index)
+            this[`${request[CombatRequestKeys.type]}Request`](requestName, index)
         }
 
         // If CPU logging is enabled, log the CPU used by this manager
@@ -131,7 +131,7 @@ export class CombatRequestManager {
             request[CombatRequestKeys.abandon] = 1500
 
             room.memory.combatRequests.splice(index, 1)
-            delete request.responder
+            delete request[CombatRequestKeys.responder]
             return
         }
 
@@ -195,7 +195,7 @@ export class CombatRequestManager {
             // Stop responding to the request
 
             this.communeManager.room.memory.combatRequests.splice(index, 1)
-            delete request.responder
+            delete request[CombatRequestKeys.responder]
             return
         }
     }

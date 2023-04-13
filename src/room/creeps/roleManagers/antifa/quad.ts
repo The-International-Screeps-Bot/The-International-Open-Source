@@ -840,7 +840,7 @@ export class Quad {
     bulldoze() {
         const request = Memory.combatRequests[this.leader.memory.CRN]
         if (!request) return false
-        if (request.T === 'defend') return false
+        if (request[CombatRequestKeys.type] === 'defend') return false
 
         let bulldozeTarget: Structure
         this.leader.memory.QBTIDs = []
@@ -893,7 +893,7 @@ export class Quad {
     rangedAttackStructures() {
         const request = Memory.combatRequests[this.leader.memory.CRN]
         if (!request) return false
-        if (request.T === 'defend') return false
+        if (request[CombatRequestKeys.type] === 'defend') return false
 
         const structures = this.leader.room.combatStructureTargets
 

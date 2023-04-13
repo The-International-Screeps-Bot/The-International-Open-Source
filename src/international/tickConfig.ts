@@ -6,7 +6,7 @@ import {
     CombatRequestKeys,
     creepRoles,
     haulerUpdateDefault,
-    HaulRequestData,
+    HaulRequestKeys,
     maxClaimRequestDistance,
     maxCombatDistance,
     maxHaulDistance,
@@ -98,7 +98,7 @@ class TickConfig {
         // Subtract the number of claimRequests with responders
 
         for (const roomName in Memory.claimRequests) {
-            if (!Memory.claimRequests[roomName].responder) continue
+            if (!Memory.claimRequests[roomName][ClaimRequestKeys.responder]) continue
 
             reservedGCL -= 1
         }
@@ -130,7 +130,8 @@ class TickConfig {
 
             delete request[ClaimRequestKeys.abandon]
 
-            if (request.responder && global.communes.has(request.responder)) continue
+            if (request[ClaimRequestKeys.responder] && global.communes.has(request[ClaimRequestKeys.responder]))
+                continue
 
             if (!Memory.autoClaim) continue
 
@@ -172,7 +173,7 @@ class TickConfig {
             // Otherwise assign the request to the room, and record as such in Memory
 
             Memory.rooms[communeName].claimRequest = roomName
-            Memory.claimRequests[roomName].responder = communeName
+            Memory.claimRequests[roomName][ClaimRequestKeys.responder] = communeName
 
             reservedGCL -= 1
 
@@ -192,7 +193,7 @@ class TickConfig {
 
             request[AllyCreepRequestKeys.abandon] = undefined
 
-            if (request.responder) continue
+            if (request[AllyCreepRequestKeys.responder]) continue
 
             const communes = []
 
@@ -229,7 +230,7 @@ class TickConfig {
             // Otherwise assign the request to the room, and record as such in Memory
 
             Memory.rooms[communeName].allyCreepRequest = roomName
-            request.responder = communeName
+            request[AllyCreepRequestKeys.responder] = communeName
         }
     }
     private configCombatRequests() {
@@ -240,7 +241,7 @@ class TickConfig {
 
             if (request[CombatRequestKeys.abandon]) request[CombatRequestKeys.abandon] -= 1
 
-            if (request.responder) {
+            if (request[CombatRequestKeys.responder]) {
                 internationalManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
                 request[CombatRequestKeys.quads] = 0
@@ -312,7 +313,7 @@ class TickConfig {
             // Otherwise assign the request to the room, and record as such in Memory
 
             Memory.rooms[communeName].combatRequests.push(requestName)
-            request.responder = communeName
+            request[CombatRequestKeys.responder] = communeName
 
             internationalManager.creepsByCombatRequest[requestName] = {}
             for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
@@ -325,9 +326,9 @@ class TickConfig {
         for (const requestName in Memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
 
-            if (request.data[HaulRequestData.abandon]) request.data[HaulRequestData.abandon] -= 1
+            if (request[HaulRequestKeys.abandon]) request[HaulRequestKeys.abandon] -= 1
 
-            if (request.responder) {
+            if (request[HaulRequestKeys.responder]) {
                 internationalManager.creepsByHaulRequest[requestName] = []
                 continue
             }
@@ -371,14 +372,14 @@ class TickConfig {
                     },
                 }) > maxHaulDistance
             ) {
-                request.data[HaulRequestData.abandon] = 20000
+                request[HaulRequestKeys.abandon] = 20000
                 continue
             }
 
             // Otherwise assign the request to the room, and record as such in Memory
 
             Memory.rooms[communeName].haulRequests.push(requestName)
-            request.responder = communeName
+            request[HaulRequestKeys.responder] = communeName
 
             internationalManager.creepsByHaulRequest[requestName] = []
         }

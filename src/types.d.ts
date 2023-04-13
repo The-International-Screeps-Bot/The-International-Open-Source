@@ -2,7 +2,7 @@ import { CommuneManager } from './room/commune/commune'
 import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
-import { CombatRequestKeys } from 'international/constants'
+import { CombatRequestKeys, CreepMemoryKeys } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
@@ -1027,11 +1027,11 @@ declare global {
 
         makeRemote(scoutingRoom: Room): boolean
 
-        createAttackCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>): void
+        createAttackCombatRequest(opts?: Partial<CombatRequest>): void
 
-        createHarassCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>): void
+        createHarassCombatRequest(opts?: Partial<CombatRequest>): void
 
-        createDefendCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>): void
+        createDefendCombatRequest(opts?: Partial<CombatRequest>): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -1959,10 +1959,11 @@ declare global {
     // Memory value types
 
     interface RoomMemory {
-        /**
-         * A packed representation of the center of the fastFiller
-         */
-        anchor: number
+        0: RoomTypes // types
+        1: Id<Source>[] // communeSources
+    }
+
+    interface RoomMemory {
 
         /**
          * Commune Sources
@@ -2252,7 +2253,7 @@ declare global {
         13: number // inactionTimer
         14: number // maxThreat
         15: number // abandonments
-        16: string // type
+        16: CombatRequestTypes // type
         17: string // responder
     }
 
@@ -2320,32 +2321,32 @@ declare global {
     }
 
     interface CreepMemory {
-        0: boolean // preferRoads
-        1: number // sourceIndex
-        2: boolean // dying
-        3: string // packedCoord
-        4: string // path
-        5: string // goalPos
-        6: string // usedPathForGoalPos
-        7: string // lastCache
-        8: Id<Structure<BuildableStructureConstant>> // structureTarget
-        9: string // remote
-        10: string // scoutTarget
-        11: string // signTarget
-        12: CreepRoomLogisticsRequest[] // roomLogisticsRequests
-        13: boolean // needsResources
-        14: number // squadSize
-        15: 'duo' | 'quad' | 'dynamic' // squadType
-        16: 'rangedAttack' | 'attack' | 'dismantle' // squadCombatType
-        17: boolean // squadIsFormed
-        18: Creep[] // squadMembers
-        19: Id<Structure>[] // quadBuilldozeTargets
-        20: string // hauLRequest
-        21: number // ticksWaite
-        22: Id<StructureSpawn | StructureContainer> | undefined // recycleTarget
-        23: boolean // rampartOnlyShoving
-        24: Id<StructureRampart> // rampartTarget
-        25: string // taskRoom
+        [CreepMemoryKeys.preferRoads]: boolean
+        [CreepMemoryKeys.sourceIndex]: number
+        [CreepMemoryKeys.dying]: boolean
+        [CreepMemoryKeys.packedCoord]: string
+        [CreepMemoryKeys.path]: string
+        [CreepMemoryKeys.goalPos]: string
+        [CreepMemoryKeys.usedPathForGoalPos]: string
+        [CreepMemoryKeys.lastCache]: string // lastCache
+        [CreepMemoryKeys.structureTarget]: Id<Structure<BuildableStructureConstant>>
+        [CreepMemoryKeys.remote]: string
+        [CreepMemoryKeys.scoutTarget]: string
+        [CreepMemoryKeys.signTarget]: string
+        [CreepMemoryKeys.roomLogisticsRequests]: CreepRoomLogisticsRequest[]
+        [CreepMemoryKeys.needsResources]: boolean
+        [CreepMemoryKeys.squadSize]: number
+        [CreepMemoryKeys.squadType]: 'duo' | 'quad' | 'dynamic'
+        [CreepMemoryKeys.squadCombatType]: 'rangedAttack' | 'attack' | 'dismantle'
+        [CreepMemoryKeys.isSquadFormed]: boolean
+        [CreepMemoryKeys.squadMembers]: Creep[]
+        [CreepMemoryKeys.quadBulldozeTargets]: Id<Structure>[]
+        [CreepMemoryKeys.haulRequest]: string
+        [CreepMemoryKeys.ticksWaited]: number
+        [CreepMemoryKeys.recycleTarget]: Id<StructureSpawn | StructureContainer> | undefined
+        [CreepMemoryKeys.rampartOnlyShoving]: boolean
+        [CreepMemoryKeys.rampartTarget]: Id<StructureRampart>
+        [CreepMemoryKeys.taskRoom]: string
     }
 
     interface CreepMemoryTemplate {

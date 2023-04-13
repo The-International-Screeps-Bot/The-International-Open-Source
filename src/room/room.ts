@@ -59,8 +59,7 @@ export class RoomManager {
 
     room: Room
 
-    public update(room: Room) {
-        this.room = room
+    update(room: Room) {
 
         delete this._usedControllerCoords
         delete this._generalRepairStructures
@@ -68,10 +67,7 @@ export class RoomManager {
         if (randomTick()) {
             delete this._nukeTargetCoords
         }
-    }
 
-    preTickRun() {
-        const { room } = this
         const roomMemory = room.memory
 
         // If it hasn't been scouted for 100~ ticks
@@ -144,7 +140,12 @@ export class RoomManager {
         room.communeManager.preTickRun()
     }
 
-    public run() {
+    preTickRun() {
+
+
+    }
+
+    run() {
         if (this.room.memory.T === 'remote') {
             this.containerManager.runRemote()
             this.droppedResourceManager.runRemote()

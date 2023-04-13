@@ -145,16 +145,13 @@ export class CommuneManager {
         delete this._storingStructures
         delete this._maxCombatRequests
         delete this._rampartRepairTargets
+        delete this._defensiveRamparts
 
         if (randomTick()) {
             delete this._maxUpgradeStrength
             delete this._minRampartHits
             delete this._upgradeStructure
         }
-    }
-
-    preTickRun() {
-        const { room } = this
 
         const roomMemory = Memory.rooms[room.name]
 
@@ -204,16 +201,6 @@ export class CommuneManager {
 
         room.usedRampartIDs = new Map()
 
-        this.room.roomManager.communePlanner.preTickRun()
-        if (!roomMemory.PC) return
-        this.constructionManager.preTickRun()
-        this.observerManager.preTickRun()
-        this.terminalManager.preTickRun()
-        this.remotesManager.preTickRun()
-        this.haulRequestManager.preTickRun()
-        this.sourceManager.preTickRun()
-        this.claimRequestManager.preTickRun()
-
         room.creepsOfRemote = {}
 
         for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
@@ -237,8 +224,23 @@ export class CommuneManager {
         room.defenderEnemyTargetsWithDamage = new Map()
         room.defenderEnemyTargetsWithDefender = new Map()
 
-        if (this.room.terminal && this.room.controller.level >= 6)
-            internationalManager.terminalCommunes.push(this.room.name)
+        if (room.terminal && room.controller.level >= 6)
+            internationalManager.terminalCommunes.push(room.name)
+    }
+
+    preTickRun() {
+
+        const roomMemory = Memory.rooms[this.room.name]
+
+        this.room.roomManager.communePlanner.preTickRun()
+        if (!roomMemory.PC) return
+        this.constructionManager.preTickRun()
+        this.observerManager.preTickRun()
+        this.terminalManager.preTickRun()
+        this.remotesManager.preTickRun()
+        this.haulRequestManager.preTickRun()
+        this.sourceManager.preTickRun()
+        this.claimRequestManager.preTickRun()
     }
 
     public run() {

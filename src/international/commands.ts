@@ -211,18 +211,12 @@ global.combat = function (requestName, type, opts, communeName) {
         })
     }
 
-    const request = Memory.combatRequests[requestName]
+    let request = Memory.combatRequests[requestName]
 
     request[CombatRequestKeys.abandon] = 0
     request[CombatRequestKeys.inactionTimer] = 0
 
-    for (const key in opts) {
-        request["0"] = 1
-        const newKey = key as unknown as keyof CombatRequest
-        const val = CombatRequestKeys[key] as unknown as keyof CombatRequest
-        request[val] = 1
-        request[CombatRequestKeys[key] as unknown as keyof CombatRequest] = opts[key as keyof typeof CombatRequestKeys]
-    }
+    Object.assign(request, opts)
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]

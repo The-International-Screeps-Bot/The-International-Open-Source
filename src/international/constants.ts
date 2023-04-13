@@ -846,55 +846,14 @@ export enum PlayerMemoryKeys {
         lastAttack = 3,
 }
 
-export enum CreepMemoryKeys {
-    preferRoads = 0,
-    sourceIndex = 1,
-    dying = 2,
-    packedCoord = 3,
-    path = 4,
-    goalPos = 5,
-    usedPathForGoalPos = 6,
-    lastCache = 7,
-    structureTarget = 8,
-    remote = 9,
-    scoutTarget = 10,
-    signTarget = 11,
-    roomLogisticsRequests = 12,
-    needsResources = 13,
-    squadSize = 14,
-    squadType = 15,
-    squadCombatType = 16,
-    isSquadFormed = 17,
-    squadMembers = 18,
-    quadBulldozeTargets = 19,
-    haulRequest = 20,
-    ticksWaited = 21,
-    recycleTarget = 22,
-    rampartOnlyShoving = 23,
-    rampartTarget = 24,
-    taskRoom = 25,
-}
-
-export enum PowerCreepMemoryKeys {
-    commune = 0,
-    /**
-     * The name of the method queued for operation
-     */
-    task = 1,
-    taskTarget = 2,
-    /**
-     * The type of power the creep should use
-     */
-    taskPower = 3,
-    taskRoom = 4,
-}
-
 export enum ClaimRequestKeys {
     claimer = 0,
     vanguard = 1,
     abandon = 2,
     responder = 3,
 }
+
+
 
 export enum HaulRequestKeys {
     type = 0,
@@ -904,7 +863,25 @@ export enum HaulRequestKeys {
     abandon = 4,
     responder = 5,
 }
+/*
+interface T {
+    type: 0,
+    distance: 1,
+    timer: 2,
+    priority: 3,
+    abandon: 4,
+    responder: 5,
+}
 
+export const HaulRequestKeys: T = {
+    type: 0,
+    distance: 1,
+    timer: 2,
+    priority: 3,
+    abandon: 4,
+    responder: 5,
+}
+ */
 export enum NukeRequestKeys {
     x = 0,
     y = 1,
@@ -977,6 +954,54 @@ export enum RemoteData {
     active,
     maxSourceIncome0,
     maxSourceIncome1
+}
+
+export enum CreepMemoryKeys {
+    preferRoads = 0,
+    sourceIndex = 1,
+    dying = 2,
+    packedCoord = 3,
+    path = 4,
+    goalPos = 5,
+    usedPathForGoalPos = 6,
+    lastCache = 7,
+    structureTarget = 8,
+    remote = 9,
+    scoutTarget = 10,
+    signTarget = 11,
+    roomLogisticsRequests = 12,
+    needsResources = 13,
+    squadSize = 14,
+    squadType = 15,
+    squadCombatType = 16,
+    isSquadFormed = 17,
+    squadMembers = 18,
+    quadBulldozeTargets = 19,
+    haulRequest = 20,
+    ticksWaited = 21,
+    recycleTarget = 22,
+    rampartOnlyShoving = 23,
+    rampartTarget = 24,
+    taskRoom = 25,
+}
+
+export enum PowerCreepMemoryKeys {
+    commune = 0,
+    /**
+     * The name of the method queued for operation
+     */
+    task = 1,
+    taskTarget = 2,
+    /**
+     * The type of power the creep should use
+     */
+    taskPower = 3,
+    taskRoom = 4,
+}
+
+export enum RoomMemoryKeys {
+    type = 0,
+    communeSources = 1,
 }
 
 export enum PowerRequestKeys {

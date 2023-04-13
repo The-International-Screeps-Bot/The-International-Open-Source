@@ -1479,7 +1479,6 @@ export class SpawnRequestsManager {
         if (!requestName) return
 
         const request = Memory.allyCreepRequests[this.communeManager.room.memory.allyCreepRequest]
-        const allyCreepRequestNeeds = request.data
 
         // Requests for vanguard
 
@@ -1487,13 +1486,13 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 // If there is no vanguard need
 
-                if (allyCreepRequestNeeds[AllyCreepRequestKeys.allyVanguard] <= 0) return false
+                if (request[AllyCreepRequestKeys.allyVanguard] <= 0) return false
 
                 return {
                     role: 'allyVanguard',
                     defaultParts: [],
                     extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                    partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestKeys.allyVanguard],
+                    partsMultiplier: request[AllyCreepRequestKeys.allyVanguard],
                     minCost: 250,
                     priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
                     memoryAdditions: {
@@ -1574,7 +1573,7 @@ export class SpawnRequestsManager {
                 request[CombatRequestKeys.dismantle] * BODYPART_COST[WORK] +
                     request[CombatRequestKeys.dismantle] * BODYPART_COST[MOVE] || 0
 
-            if (request.T === 'attack' || request.T === 'defend') {
+            if (request[CombatRequestKeys.type] === 'attack' || request[CombatRequestKeys.type] === 'defend') {
                 if (
                     minRangedAttackCost + minRangedHealCost > this.communeManager.room.energyCapacityAvailable ||
                     minAttackCost > this.communeManager.room.energyCapacityAvailable ||

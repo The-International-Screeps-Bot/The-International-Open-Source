@@ -165,7 +165,7 @@ export class RemotesManager {
                     | 'remoteSourceHarvester0'
                     | 'remoteSourceHarvester1'
                 const income = (data[RemoteData[sourceHarvesterRole]] = Math.min(
-                    data[RemoteData[sourceHarvesterRole]],
+                    data[RemoteData[sourceHarvesterRole]] * HARVEST_POWER,
                     data[RemoteData[`maxSourceIncome${sourceIndex as 0 | 1}`]],
                 ))
 

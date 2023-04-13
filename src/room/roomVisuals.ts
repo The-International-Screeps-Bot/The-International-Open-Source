@@ -1,7 +1,7 @@
 import {
     ClaimRequestKeys,
     CombatRequestKeys,
-    HaulRequestData,
+    HaulRequestKeys,
     customColors,
     NORMAL,
     PROTECTED,
@@ -311,31 +311,31 @@ export class RoomVisualsManager {
         for (const requestName in Memory.claimRequests) {
             const request = Memory.claimRequests[requestName]
 
-            if (!request.responder) continue
+            if (!request[ClaimRequestKeys.responder]) continue
 
-            const row: any[] = [requestName, 'default', request.responder, request[ClaimRequestKeys.abandon]]
+            const row: any[] = [requestName, 'default', request[ClaimRequestKeys.responder], request[ClaimRequestKeys.abandon]]
             data.push(row)
         }
 
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
 
-            if (request.T !== 'defend' && !request.responder) continue
+            if (request[CombatRequestKeys.type] !== 'defend' && !request[CombatRequestKeys.responder]) continue
 
-            const row: any[] = [requestName, request.T, request.responder || 'none', request[CombatRequestKeys.abandon]]
+            const row: any[] = [requestName, request[CombatRequestKeys.type], request[CombatRequestKeys.responder] || 'none', request[CombatRequestKeys.abandon]]
             data.push(row)
         }
 
         for (const requestName in Memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
 
-            if (!request.responder) continue
+            if (!request[HaulRequestKeys.responder]) continue
 
             const row: any[] = [
                 requestName,
-                request.data[HaulRequestData.transfer] ? 'transfer' : 'withdraw',
-                request.responder,
-                request.data[HaulRequestData.abandon],
+                request[HaulRequestKeys.type],
+                request[HaulRequestKeys.responder],
+                request[HaulRequestKeys.abandon],
             ]
             data.push(row)
         }
