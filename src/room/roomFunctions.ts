@@ -876,11 +876,12 @@ Room.prototype.basicScout = function () {
         return this.scoutEnemyRoom()
     }
 
+    this.createClaimRequest()
+
     // No controller owner
 
     if (this.scoutRemote()) return this.memory.T
 
-    this.createClaimRequest()
     return (this.memory.T = 'neutral')
 }
 
@@ -915,11 +916,12 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
             return this.scoutEnemyRoom()
         }
 
+        this.createClaimRequest()
+
         // No controlller owner
 
         if (this.scoutRemote(scoutingRoom)) return this.memory.T
 
-        this.createClaimRequest()
         return (this.memory.T = 'neutral')
     }
 
