@@ -411,7 +411,7 @@ export class RoomManager {
         for (let index in this.room.find(FIND_SOURCES)) {
             const path = this.room.advancedFindPath({
                 origin: sourceHarvestPositions[index][0],
-                goals: [{ pos: anchor, range: 3 }],
+                goals: [{ pos: anchor, range: 4 }],
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
                 weightStructurePlans: true,
@@ -419,6 +419,11 @@ export class RoomManager {
             })
 
             sourcePaths.push(path)
+        }
+        for (const index in sourcePaths) {
+
+            const path = sourcePaths[index]
+            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name)
         }
 
         this.room.memory.RSPs = sourcePaths.map(path => packPosList(path))
@@ -469,11 +474,11 @@ export class RoomManager {
             return (
                 this.room.advancedFindPath({
                     origin: a,
-                    goals: [{ pos: anchor, range: 3 }],
+                    goals: [{ pos: anchor, range: 4 }],
                 }).length -
                 this.room.advancedFindPath({
                     origin: b,
-                    goals: [{ pos: anchor, range: 3 }],
+                    goals: [{ pos: anchor, range: 4 }],
                 }).length
             )
         })
@@ -577,11 +582,11 @@ export class RoomManager {
             return (
                 this.room.advancedFindPath({
                     origin: a,
-                    goals: [{ pos: anchor, range: 3 }],
+                    goals: [{ pos: anchor, range: 4 }],
                 }).length -
                 this.room.advancedFindPath({
                     origin: b,
-                    goals: [{ pos: anchor, range: 3 }],
+                    goals: [{ pos: anchor, range: 4 }],
                 }).length
             )
         })
@@ -636,12 +641,13 @@ export class RoomManager {
 
         const path = this.room.advancedFindPath({
             origin: this.remoteControllerPositions[0],
-            goals: [{ pos: anchor, range: 3 }],
+            goals: [{ pos: anchor, range: 4 }],
             typeWeights: remoteTypeWeights,
             plainCost: defaultRoadPlanningPlainCost,
             weightStructurePlans: true,
             avoidStationaryPositions: true,
         })
+        if (!path.length) throw Error('No remote controller path for ' + this.room.name)
 
         this.room.memory.RCPa = packPosList(path)
         return (this._remoteControllerPath = path)

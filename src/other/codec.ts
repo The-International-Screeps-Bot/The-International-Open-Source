@@ -97,6 +97,7 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
  * Reverse the encoded coordList
  */
 export function reversePosList(coordList: string) {
+
     return coordList
         .match(/.{1,3}/g)
         .reverse()

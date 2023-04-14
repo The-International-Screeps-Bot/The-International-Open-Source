@@ -3072,6 +3072,14 @@ export class CommunePlanner {
         score += (CONTROLLER_STRUCTURES.tower[8] * TOWER_POWER_ATTACK - this.bestTowerScore) / 100
         score += this.RCLPlannedStructureTypes[STRUCTURE_ROAD].structures / 100
 
+        // We want more exits
+
+        score += 6 * 4
+        for (const key in Game.map.describeExits(this.room.name)) {
+
+            score -= 6
+        }
+
         this.score = score
     }
     private record() {

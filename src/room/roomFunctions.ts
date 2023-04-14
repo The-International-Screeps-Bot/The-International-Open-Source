@@ -702,6 +702,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         delete this.roomManager._remoteControllerPath
         this.roomManager.remoteControllerPath
 
+        if (!roomMemory.RSPs.length) throw Error('No RSPs for ' + this.name)
+        if (!roomMemory.RCPa.length) throw Error('No RCPa for ' + this.name)
+
         roomMemory.RE = newReservationEfficacy
 
         roomMemory.data = []
