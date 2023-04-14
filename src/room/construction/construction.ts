@@ -25,6 +25,7 @@ const noOverlapDestroyStructures: Set<StructureConstant> = new Set([STRUCTURE_SP
 export class ConstructionManager {
     communeManager: CommuneManager
     room: Room
+    placedSites: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -46,6 +47,7 @@ export class ConstructionManager {
         if (this.room.myCreeps.builder.length) {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length <= 2) return
         }
+
 /*
         // If there are no builders, just run every 50 ticks
         else if (!randomTick(50)) return
@@ -58,55 +60,22 @@ export class ConstructionManager {
 
         if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= internationalManager.maxCSitesPerRoom) return
 
+        this.placedSites = 0
+
         const RCL = this.room.controller.level
-        let placedSites = 0
-        const maxSites = internationalManager.maxCSitesPerRoom
-        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+        const maxCSites = internationalManager.maxCSitesPerRoom
 
-        for (const packedCoord in basePlans.map) {
-            if (placedSites >= maxSites) return
-
-            const coord = unpackCoord(packedCoord)
-            const coordData = basePlans.map[packedCoord]
-
-            for (let i = 0; i < coordData.length; i++) {
-                const data = coordData[i]
-                if (data.minRCL > RCL) continue
-
-                const structureIDs = this.room.structureCoords.get(packCoord(coord))
-                if (structureIDs) {
-                    let skip = false
-
-                    for (const ID of structureIDs) {
-                        const structure = findObjectWithID(ID)
-
-                        if (structure.structureType === data.structureType) {
-                            skip = true
-                            break
-                        }
-                        if (noOverlapDestroyStructures.has(structure.structureType)) continue
-
-                        structure.destroy()
-
-                        skip = true
-                        break
-                    }
-
-                    if (skip) break
-                }
-
-                this.room.createConstructionSite(coord.x, coord.y, data.structureType)
-                placedSites += 1
-                break
-            }
-        }
+        this.placeRamparts(RCL, maxCSites)
+        this.placeBase(RCL, maxCSites)
+    }
+    private placeRamparts(RCL: number, maxCSites: number) {
 
         if ((this.room.storage || this.room.terminal) && this.room.resourcesInStoringStructures.energy < 30000) return
 
         const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
 
         for (const packedCoord in rampartPlans.map) {
-            if (placedSites >= maxSites) return
+            if (this.placedSites >= maxCSites) return
 
             const coord = unpackCoord(packedCoord)
             const data = rampartPlans.map[packedCoord]
@@ -120,7 +89,7 @@ export class ConstructionManager {
                 if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
-                placedSites += 1
+                this.placedSites += 1
                 continue
             }
 
@@ -128,12 +97,62 @@ export class ConstructionManager {
                 if (Memory.rooms[this.room.name].AT < this.communeManager.minThreatRampartsThreshold) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
-                placedSites += 1
+                this.placedSites += 1
                 continue
             }
 
             this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
-            placedSites += 1
+            this.placedSites += 1
+        }
+
+        if (this.placedSites >= maxCSites) return
+    }
+    private placeBase(RCL: number, maxCSites: number) {
+
+        if (this.placedSites >= maxCSites) return
+
+        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+
+        for (let placeRCL = 1; placeRCL <= placeRCL; placeRCL++) {
+
+            for (const packedCoord in basePlans.map) {
+                if (this.placedSites >= maxCSites) return
+
+                const coord = unpackCoord(packedCoord)
+                const coordData = basePlans.map[packedCoord]
+
+                for (let i = 0; i < coordData.length; i++) {
+                    const data = coordData[i]
+                    if (data.minRCL > placeRCL) continue
+                    if (data.minRCL > RCL) continue
+
+                    const structureIDs = this.room.structureCoords.get(packCoord(coord))
+                    if (structureIDs) {
+                        let skip = false
+
+                        for (const ID of structureIDs) {
+                            const structure = findObjectWithID(ID)
+
+                            if (structure.structureType === data.structureType) {
+                                skip = true
+                                break
+                            }
+                            if (noOverlapDestroyStructures.has(structure.structureType)) continue
+
+                            structure.destroy()
+
+                            skip = true
+                            break
+                        }
+
+                        if (skip) break
+                    }
+
+                    this.room.createConstructionSite(coord.x, coord.y, data.structureType)
+                    this.placedSites += 1
+                    break
+                }
+            }
         }
     }
     public visualize() {
