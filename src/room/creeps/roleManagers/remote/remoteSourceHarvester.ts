@@ -1,4 +1,4 @@
-import { RemoteData, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { packedPosLength, RemoteData, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,
@@ -25,7 +25,7 @@ export class RemoteHarvester extends Creep {
         if (this.memory.RN) {
             if (
                 this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RSPs[this.memory.SI].length
+                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RSPs[this.memory.SI].length / packedPosLength
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false

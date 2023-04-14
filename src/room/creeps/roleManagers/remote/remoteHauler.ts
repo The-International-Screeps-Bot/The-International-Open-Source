@@ -19,10 +19,19 @@ export class RemoteHauler extends Creep {
         // Stop if creep is spawning
 
         if (this.spawning) return false
-
+/*
         // If the creep's remaining ticks are more than the estimated spawn time, inform false
 
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
+ */
+
+        if (this.memory.RN) {
+            if (
+                this.ticksToLive >
+                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RSPs[this.memory.SI].length / packedPosLength
+            )
+                return false
+        } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
         // Record creep as isDying
 

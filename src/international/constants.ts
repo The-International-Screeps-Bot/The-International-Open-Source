@@ -863,25 +863,7 @@ export enum HaulRequestKeys {
     abandon = 4,
     responder = 5,
 }
-/*
-interface T {
-    type: 0,
-    distance: 1,
-    timer: 2,
-    priority: 3,
-    abandon: 4,
-    responder: 5,
-}
 
-export const HaulRequestKeys: T = {
-    type: 0,
-    distance: 1,
-    timer: 2,
-    priority: 3,
-    abandon: 4,
-    responder: 5,
-}
- */
 export enum NukeRequestKeys {
     x = 0,
     y = 1,

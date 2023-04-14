@@ -2,7 +2,7 @@ import { CommuneManager } from './room/commune/commune'
 import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
-import { CombatRequestKeys, CreepMemoryKeys } from 'international/constants'
+import { AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys, CreepMemoryKeys, DepositRequestKeys, HaulRequestKeys, NukeRequestKeys, PlayerMemoryKeys, PowerCreepMemoryKeys, PowerRequestKeys } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
@@ -2006,7 +2006,7 @@ declare global {
         CN: string
 
         /**
-         * Reservation Efficacy, the path distance from the remote's sources to its commune
+         * Reservation Efficacy, the path distance from the remote's controller to its commune
          */
         RE: number
 
@@ -2221,76 +2221,76 @@ declare global {
     }
 
     interface PlayerMemory {
-        0: number // offensiveThreat
-        1: number // defensiveStrength
-        2: number // hate
-        3: number // lastAttack
+        [PlayerMemoryKeys.offensiveThreat]: number
+        [PlayerMemoryKeys.defensiveStrength]: number
+        [PlayerMemoryKeys.hate]: number
+        [PlayerMemoryKeys.lastAttack]: number
     }
 
     interface ClaimRequest {
-        0: number // claimer
-        1: number // vanguard
-        2: number // abandon
-        3: string // responder
+        [ClaimRequestKeys.claimer]: number
+        [ClaimRequestKeys.vanguard]: number
+        [ClaimRequestKeys.abandon]: number
+        [ClaimRequestKeys.responder]: string
     }
 
     type CombatRequestTypes = 'attack' | 'harass' | 'defend'
 
     interface CombatRequest {
-        0: number // abandon
-        1: number // rangedAttack
-        2: number // attack
-        3: number // dismantle
-        4: number // downgrade
-        5: number // minDamage
-        6: number // minMeleeHeal
-        7: number // minRangedHeal
-        8: number // maxTowerDamage
-        9: number // quads
-        10: number // priority
-        11: number // quadQuota
-        12: number // inactionTimerMax
-        13: number // inactionTimer
-        14: number // maxThreat
-        15: number // abandonments
-        16: CombatRequestTypes // type
-        17: string // responder
+        [CombatRequestKeys.abandon]: number
+        [CombatRequestKeys.rangedAttack]: number
+        [CombatRequestKeys.abandon]: number
+        [CombatRequestKeys.dismantle]: number
+        [CombatRequestKeys.downgrade]: number
+        [CombatRequestKeys.minDamage]: number
+        [CombatRequestKeys.minMeleeHeal]: number
+        [CombatRequestKeys.minRangedHeal]: number
+        [CombatRequestKeys.maxTowerDamage]: number
+        [CombatRequestKeys.quads]: number
+        [CombatRequestKeys.priority]: number
+        [CombatRequestKeys.quadQuota]: number
+        [CombatRequestKeys.inactionTimerMax]: number
+        [CombatRequestKeys.inactionTimer]: number
+        [CombatRequestKeys.maxThreat]: number
+        [CombatRequestKeys.abandonments]: number
+        [CombatRequestKeys.type]: CombatRequestTypes
+        [CombatRequestKeys.responder]: string
     }
 
     interface NukeRequest {
-        0: number // y
-        1: number // x
-        2: string // responder
-        3: number // priority
+        [NukeRequestKeys.y]: number
+        [NukeRequestKeys.x]: number
+        [NukeRequestKeys.respond]: string
+        [NukeRequestKeys.priority]: number
     }
 
     interface AllyCreepRequest {
-        0: number // allyVanguard
-        1: number // abandon
-        2: string // responder
+        [AllyCreepRequestKeys.allyVanguard]: number
+        [AllyCreepRequestKeys.abandon]: number
+        [AllyCreepRequestKeys.responder]: string
     }
 
     interface HaulRequest {
-        0: 'transfer' | 'withdraw' // type
-        1: number // distance
-        2: number // timer
-        3: number // priority
-        4: number // abandon
-        5: string // responder
+        [HaulRequestKeys.type]: 'transfer' | 'withdraw'
+        [HaulRequestKeys.distance]: number
+        [HaulRequestKeys.timer]: number
+        [HaulRequestKeys.priority]: number
+        [HaulRequestKeys.abandon]: number
+        [HaulRequestKeys.responder]: string
     }
 
     interface DepositRequest {
-        0: number // depositHarvester
-        1: number // depositHauler
-        2: number // abandon
-        3: string // responder
-        4: DepositConstant // type
+        [DepositRequestKeys.depositHarvester]: number
+        [DepositRequestKeys.depositHauler]: number
+        [DepositRequestKeys.abandon]: number
+        [DepositRequestKeys.responder]: string
+        [DepositRequestKeys.type]: DepositConstant
     }
 
     interface PowerRequest {
-        0: Id<Structure | Source> // target
-        1: PowerConstant // type
-        2: number // cooldown
+        [PowerRequestKeys.target]: Id<Structure | Source>
+        [PowerRequestKeys.type]: PowerConstant
+        [PowerRequestKeys.cooldown]: number
     }
 
     interface CreepRoomLogisticsRequest {
@@ -2499,11 +2499,11 @@ declare global {
     }
 
     interface PowerCreepMemory {
-        0: string // commune
-        1: keyof Operator // task
-        2: Id<Structure | Source> // taskTarget
-        3: PowerConstant // taskPower
-        4: string // taskRoom
+        [PowerCreepMemoryKeys.commune]: string
+        [PowerCreepMemoryKeys.task]: keyof Operator
+        [PowerCreepMemoryKeys.taskTarget]: Id<Structure | Source>
+        [PowerCreepMemoryKeys.taskPower]: PowerConstant
+        [PowerCreepMemoryKeys.taskRoom]: string
     }
 
     // Global
