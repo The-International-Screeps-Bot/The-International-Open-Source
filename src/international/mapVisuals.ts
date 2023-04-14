@@ -39,6 +39,32 @@ class MapVisualsManager {
                     },
                 )
 
+                // Spawn usage
+                const spawnUsage = `${
+                    Memory.stats.rooms[roomName].su ? Math.floor(Memory.stats.rooms[roomName].su * 100).toFixed(0) : 0
+                }%`
+                Game.map.visual.text(`${spawnUsage}`, new RoomPosition(48, 40, roomName), {
+                    align: 'right',
+                    fontSize: 4,
+                })
+
+                // RCL
+                const rclProgress =
+                    Game.rooms[roomName].controller.level === 8
+                        ? ''
+                        : ` @${(
+                              (100 * Game.rooms[roomName].controller.progress) /
+                              Game.rooms[roomName].controller.progressTotal
+                          ).toFixed(0)}%`
+                Game.map.visual.text(
+                    `${Game.rooms[roomName].controller.level.toString()}${rclProgress}`,
+                    new RoomPosition(48, 45, roomName),
+                    {
+                        align: 'right',
+                        fontSize: 4,
+                    },
+                )
+
                 if (roomMemory.claimRequest) {
                     Game.map.visual.line(
                         anchor || new RoomPosition(25, 25, roomName),
