@@ -139,7 +139,6 @@ export class CommuneManager {
     }
 
     public update(room: Room) {
-        this.room = room
 
         delete this._minStoredEnergy
         delete this._storingStructures
@@ -153,6 +152,7 @@ export class CommuneManager {
             delete this._upgradeStructure
         }
 
+        this.room = room
         const roomMemory = Memory.rooms[room.name]
 
         // If we should abandon the room

@@ -68,6 +68,7 @@ export class RoomManager {
             delete this._nukeTargetCoords
         }
 
+        this.room = room
         const roomMemory = room.memory
 
         // If it hasn't been scouted for 100~ ticks
