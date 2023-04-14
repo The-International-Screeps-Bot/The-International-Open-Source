@@ -2232,6 +2232,7 @@ declare global {
         [ClaimRequestKeys.vanguard]: number
         [ClaimRequestKeys.abandon]: number
         [ClaimRequestKeys.responder]: string
+        [ClaimRequestKeys.priority]: number
     }
 
     type CombatRequestTypes = 'attack' | 'harass' | 'defend'
@@ -2357,15 +2358,6 @@ declare global {
     }
 
     interface CreepMemory extends CreepMemoryTemplate {
-        /**
-         * Wether the creep is old enough to need a replacement
-         */
-        D: boolean
-
-        /**
-         * The Source Index of recorded sources in the room
-         */
-        SI: number
 
         /**
          * The creep's packed coord for a designated target

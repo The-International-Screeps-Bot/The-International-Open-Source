@@ -19,6 +19,7 @@ import {
     RESULT_NO_ACTION,
     RESULT_STOP,
     storingStructureTypesSet,
+    CreepMemoryKeys,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -441,7 +442,6 @@ Creep.prototype.builderGetEnergy = function () {
 }
 
 Creep.prototype.advancedBuildCSite = function (cSite) {
-
     this.actionCoord = cSite.pos
 
     // If the cSite is out of range
@@ -631,7 +631,7 @@ Creep.prototype.findSourceIndex = function () {
 
     this.message = 'FOSN'
 
-    if (this.memory.SI !== undefined) return true
+    if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined) return true
 
     let creepThreshold = 1
 
@@ -648,7 +648,7 @@ Creep.prototype.findSourceIndex = function () {
                     room.creepsOfSource[i].length >
                 0
             ) {
-                this.memory.SI = i
+                this.memory[CreepMemoryKeys.sourceIndex] = i
                 return true
             }
         }
@@ -666,7 +666,7 @@ Creep.prototype.findCommuneSourceIndex = function () {
 
     this.message = 'FOSN'
 
-    if (this.memory.SI !== undefined) return true
+    if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined) return true
 
     let creepThreshold = 1
 
@@ -685,7 +685,7 @@ Creep.prototype.findCommuneSourceIndex = function () {
                     room.creepsOfSource[index].length >
                 0
             ) {
-                this.memory.SI = index
+                this.memory[CreepMemoryKeys.sourceIndex] = index
                 return true
             }
         }
@@ -703,7 +703,7 @@ Creep.prototype.findRemoteSourceIndex = function () {
 
     this.message = 'FOSN'
 
-    if (this.memory.SI !== undefined) return true
+    if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined) return true
 
     let creepThreshold = 1
 
@@ -722,7 +722,7 @@ Creep.prototype.findRemoteSourceIndex = function () {
                     room.creepsOfSource[index].length >
                 0
             ) {
-                this.memory.SI = index
+                this.memory[CreepMemoryKeys.sourceIndex] = index
                 return true
             }
         }

@@ -7,6 +7,7 @@ import {
     remoteTypeWeights,
     roomDimensions,
     defaultStructureTypesByBuildPriority,
+    CreepMemoryKeys,
 } from 'international/constants'
 import {
     createPosMap,
@@ -543,7 +544,7 @@ const roomAdditions = {
                     // If the creep is isDying, iterate
 
                     if (creep.isDying()) continue
-                    if (creep.memory.SI === undefined) continue
+                    if (creep.memory[CreepMemoryKeys.sourceIndex] === undefined) continue
                     if (!creep.memory.PC) continue
 
                     // If the creep has a packedHarvestPos, record it in usedHarvestPositions

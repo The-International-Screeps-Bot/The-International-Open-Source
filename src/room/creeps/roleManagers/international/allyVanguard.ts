@@ -1,4 +1,4 @@
-import { AllyCreepRequestKeys } from 'international/constants'
+import { AllyCreepRequestKeys, CreepMemoryKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -63,7 +63,7 @@ export class AllyVanguard extends Creep {
 
         if (!this.findSourceIndex()) return
 
-        const sourceIndex = this.memory.SI
+        const sourceIndex = this.memory[CreepMemoryKeys.sourceIndex]
 
         // Try to move to source. If creep moved then iterate
 
@@ -90,7 +90,7 @@ export class AllyVanguard extends Creep {
 
         if (!this.findSourceIndex()) return true
 
-        const sourceIndex = this.memory.SI
+        const sourceIndex = this.memory[CreepMemoryKeys.sourceIndex]
 
         // Try to move to source. If creep moved then iterate
 
@@ -109,7 +109,7 @@ export class AllyVanguard extends Creep {
     travelToSource?(sourceIndex: number): boolean {
         this.message = '🚬'
 
-        const harvestPos = this.findSourceHarvestPos(this.memory.SI)
+        const harvestPos = this.findSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false

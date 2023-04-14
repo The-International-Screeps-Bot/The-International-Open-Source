@@ -831,85 +831,84 @@ export enum PlayerMemoryKeys {
         /**
          * Generally how good their offense is
          */
-        offensiveThreat = 0,
+        offensiveThreat,
         /**
          * Generally how good their defense is
          */
-        defensiveStrength = 1,
+        defensiveStrength,
         /**
          * How much we want them dead
          */
-        hate = 2,
+        hate,
         /**
          * The last time we were attacked by them
          */
-        lastAttack = 3,
+        lastAttack,
 }
 
 export enum ClaimRequestKeys {
-    claimer = 0,
-    vanguard = 1,
-    abandon = 2,
-    responder = 3,
+    claimer,
+    vanguard,
+    abandon,
+    responder,
+    priority,
 }
 
-
-
 export enum HaulRequestKeys {
-    type = 0,
-    distance = 1,
-    timer = 2,
-    priority = 3,
-    abandon = 4,
-    responder = 5,
+    type,
+    distance,
+    timer,
+    priority,
+    abandon,
+    responder,
 }
 
 export enum NukeRequestKeys {
-    x = 0,
-    y = 1,
-    respond = 2,
-    priority = 3,
+    x,
+    y,
+    respond,
+    priority,
 }
 
 export enum AllyCreepRequestKeys {
-    allyVanguard = 0,
-    abandon = 1,
-    responder = 2,
+    allyVanguard,
+    abandon,
+    responder,
 }
 
 export enum DepositRequestKeys {
-    depositHarvester = 0,
-    depositHauler = 1,
-    abandon = 2,
-    responder = 3,
+    depositHarvester,
+    depositHauler,
+    abandon,
+    responder,
     /**
      * The type of resource the deposit provides
      */
-    type = 4,
+    type,
 }
 
 export enum CombatRequestKeys {
-    abandon = 0,
-    rangedAttack = 1,
-    attack = 2,
-    dismantle = 3,
-    downgrade = 4,
-    minDamage = 5,
-    minMeleeHeal = 6,
-    minRangedHeal = 7,
-    maxTowerDamage = 8,
-    quads = 9,
-    priority = 10,
-    quadQuota = 11,
-    inactionTimerMax = 12,
-    inactionTimer = 13,
-    maxThreat = 14,
-    abandonments = 15,
+    abandon,
+    rangedAttack,
+    attack,
+    dismantle,
+    downgrade,
+    minDamage,
+    minMeleeHeal,
+    minRangedHeal,
+    maxTowerDamage,
+    quads,
+    priority,
+    quadQuota,
+    inactionTimerMax,
+    inactionTimer,
+    maxThreat,
+    abandonments,
     /**
      * The type of attack request
      */
-    type = 16,
-    responder = 17,
+    type,
+    responder,
 }
 
 // Move this into roomMemory
@@ -939,57 +938,59 @@ export enum RemoteData {
 }
 
 export enum CreepMemoryKeys {
-    preferRoads = 0,
-    sourceIndex = 1,
-    dying = 2,
-    packedCoord = 3,
-    path = 4,
-    goalPos = 5,
-    usedPathForGoalPos = 6,
-    lastCache = 7,
-    structureTarget = 8,
-    remote = 9,
-    scoutTarget = 10,
-    signTarget = 11,
-    roomLogisticsRequests = 12,
-    needsResources = 13,
-    squadSize = 14,
-    squadType = 15,
-    squadCombatType = 16,
-    isSquadFormed = 17,
-    squadMembers = 18,
-    quadBulldozeTargets = 19,
-    haulRequest = 20,
-    ticksWaited = 21,
-    recycleTarget = 22,
-    rampartOnlyShoving = 23,
-    rampartTarget = 24,
-    taskRoom = 25,
+    preferRoads,
+    sourceIndex,
+    dying,
+    packedCoord,
+    path,
+    goalPos,
+    usedPathForGoalPos,
+    lastCache,
+    structureTarget,
+    remote,
+    scoutTarget,
+    signTarget,
+    roomLogisticsRequests,
+    needsResources,
+    squadSize,
+    squadType,
+    squadCombatType,
+    isSquadFormed,
+    squadMembers,
+    quadBulldozeTargets,
+    haulRequest,
+    ticksWaited,
+    recycleTarget,
+    rampartOnlyShoving,
+    rampartTarget,
+    taskRoom,
 }
 
 export enum PowerCreepMemoryKeys {
-    commune = 0,
+    commune,
     /**
      * The name of the method queued for operation
      */
-    task = 1,
-    taskTarget = 2,
+    task,
+    taskTarget,
     /**
      * The type of power the creep should use
      */
-    taskPower = 3,
-    taskRoom = 4,
-}
-
-export enum RoomMemoryKeys {
-    type = 0,
-    communeSources = 1,
+    taskPower,
+    taskRoom,
 }
 
 export enum PowerRequestKeys {
-    target = 0,
-    type = 1,
-    cooldown = 2,
+    target,
+    type,
+    cooldown,
+}
+
+export enum RoomMemoryKeys {
+    type,
+    communeSources,
+    score,
+    dynamicScore,
 }
 
 export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [

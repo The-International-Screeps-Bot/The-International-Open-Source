@@ -9,6 +9,7 @@ import {
     roomDimensions,
     TrafficPriorities,
     packedPosLength,
+    CreepMemoryKeys,
 } from 'international/constants'
 import { internationalManager } from 'international/international'
 import {
@@ -724,7 +725,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             if (
                 this.memory.RN !== creepAtPos.memory.RN ||
-                this.memory.SI !== creepAtPos.memory.SI ||
+                this.memory[CreepMemoryKeys.sourceIndex] !== creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
                     TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
             ) {

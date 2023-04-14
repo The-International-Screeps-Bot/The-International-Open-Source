@@ -1,4 +1,11 @@
-import { packedPosLength, RESULT_ACTION, RESULT_FAIL, RESULT_NO_ACTION, RESULT_SUCCESS } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    packedPosLength,
+    RESULT_ACTION,
+    RESULT_FAIL,
+    RESULT_NO_ACTION,
+    RESULT_SUCCESS,
+} from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import {
     customLog,
@@ -25,7 +32,8 @@ export class SourceHarvester extends Creep {
 
         if (
             this.ticksToLive >
-            this.body.length * CREEP_SPAWN_TIME + this.room.memory.CSPs[this.memory.SI].length / packedPosLength
+            this.body.length * CREEP_SPAWN_TIME +
+                this.room.memory.CSPs[this.memory[CreepMemoryKeys.sourceIndex]].length / packedPosLength
         )
             return false
 
@@ -37,9 +45,10 @@ export class SourceHarvester extends Creep {
     preTickManager() {
         const { room } = this
 
-        if (this.memory.SI !== undefined && !this.isDying()) room.creepsOfSource[this.memory.SI].push(this.name)
+        if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined && !this.isDying())
+            room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
 
-        const source = this.room.roomManager.communeSources[this.memory.SI]
+        const source = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
 
         if (getRange(this.pos, source.pos) <= 1) {
             this.advancedHarvestSource(source)
@@ -53,10 +62,10 @@ export class SourceHarvester extends Creep {
 
         // Unpack the harvestPos
 
-        const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
+        const harvestPos = this.findCommuneSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
         if (!harvestPos) return RESULT_FAIL
 
-        this.actionCoord = this.room.roomManager.communeSources[this.memory.SI].pos
+        this.actionCoord = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]].pos
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
@@ -68,12 +77,12 @@ export class SourceHarvester extends Creep {
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.message = `⏩${this.memory.SI}`
+        this.message = `⏩${this.memory[CreepMemoryKeys.sourceIndex]}`
 
         // The packed path is meant for the closest harvest pos, so change loose usage based on the harvestPos
-/*
+        /*
         const targetsClosestHarvestPos =
-            this.memory.PC === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory.SI][0])
+            this.memory.PC === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory[CreepMemoryKeys.sourceIndex]][0])
  */
         this.createMoveRequestByPath(
             {
@@ -87,7 +96,7 @@ export class SourceHarvester extends Creep {
                 avoidEnemyRanges: true,
             },
             {
-                packedPath: reversePosList(this.room.memory.CSPs[this.memory.SI]),
+                packedPath: reversePosList(this.room.memory.CSPs[this.memory[CreepMemoryKeys.sourceIndex]]),
                 /* loose: !!targetsClosestHarvestPos, */
             },
         )
@@ -134,7 +143,7 @@ export class SourceHarvester extends Creep {
 
         // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-        const sourceLink = room.sourceLinks[this.memory.SI]
+        const sourceLink = room.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
         if (!sourceLink) return false
 
         // Try to transfer to the sourceLink and inform true
@@ -145,15 +154,13 @@ export class SourceHarvester extends Creep {
     maintainContainer?(sourceContainer: StructureContainer): boolean {
         if (this.worked) return false
         if (!sourceContainer) {
-
             if (this.nextStore.energy < this.parts.work) {
-
                 if (this.movedResource) return false
 
                 const result = this.runRoomLogisticsRequestAdvanced({
                     resourceTypes: new Set([RESOURCE_ENERGY]),
                     types: new Set(['withdraw', 'pickup', 'offer']),
-                    conditions: (request) => {
+                    conditions: request => {
                         getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                     },
                 })
@@ -178,13 +185,12 @@ export class SourceHarvester extends Creep {
         // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
         if (this.nextStore.energy < workPartCount) {
-
             if (this.movedResource) return false
 
             const result = this.runRoomLogisticsRequestAdvanced({
                 resourceTypes: new Set([RESOURCE_ENERGY]),
                 types: new Set(['withdraw', 'pickup', 'offer']),
-                conditions: (request) => {
+                conditions: request => {
                     getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                 },
             })
@@ -225,10 +231,10 @@ export class SourceHarvester extends Creep {
     }
 
     transferToNearbyCreep?(): boolean {
-        const sourceContainer = this.room.sourceContainers[this.memory.SI]
+        const sourceContainer = this.room.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]]
         if (sourceContainer) return false
 
-        const sourceLink = this.room.sourceLinks[this.memory.SI]
+        const sourceLink = this.room.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
         if (sourceLink && sourceLink.RCLActionable) return false
 
         // If the creep isn't full enough to justify a request
@@ -249,7 +255,7 @@ export class SourceHarvester extends Creep {
 
         // Try to repair the sourceContainer
 
-        this.maintainContainer(this.room.sourceContainers[this.memory.SI])
+        this.maintainContainer(this.room.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]])
 
         if (this.transferToNearbyCreep()) return
     }

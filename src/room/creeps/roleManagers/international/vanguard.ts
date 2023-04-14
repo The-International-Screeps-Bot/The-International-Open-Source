@@ -1,4 +1,4 @@
-import { ClaimRequestKeys } from 'international/constants'
+import { ClaimRequestKeys, CreepMemoryKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -10,7 +10,8 @@ export class Vanguard extends Creep {
     preTickManager() {
         if (this.isDying()) return
 
-        if (this.memory.SI !== undefined) this.room.creepsOfSource[this.memory.SI].push(this.name)
+        if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined)
+            this.room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
 
         const request = Memory.claimRequests[this.memory.TRN]
         if (!request) return
@@ -26,7 +27,7 @@ export class Vanguard extends Creep {
 
         this.message = '🚬'
 
-        const harvestPos = this.findCommuneSourceHarvestPos(this.memory.SI)
+        const harvestPos = this.findCommuneSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
@@ -111,7 +112,7 @@ export class Vanguard extends Creep {
 
                 if (!this.findCommuneSourceIndex()) return
 
-                const sourceIndex = this.memory.SI
+                const sourceIndex = this.memory[CreepMemoryKeys.sourceIndex]
 
                 // Try to move to source. If creep moved then iterate
 
@@ -123,7 +124,7 @@ export class Vanguard extends Creep {
                 return
             }
 
-            delete this.memory.SI
+            delete this.memory[CreepMemoryKeys.sourceIndex]
             delete this.memory.PC
 
             if (this.upgradeRoom()) return

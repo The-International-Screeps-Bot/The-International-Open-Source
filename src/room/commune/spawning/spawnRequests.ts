@@ -12,6 +12,7 @@ import {
     roadUpkeepCost,
     packedPosLength,
     decayCosts,
+    CreepMemoryKeys,
 } from 'international/constants'
 import {
     customLog,
@@ -115,7 +116,7 @@ export class SpawnRequestsManager {
                             priority,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 R: true,
                             },
                         }
@@ -132,7 +133,7 @@ export class SpawnRequestsManager {
                             priority,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 R: true,
                             },
                         }
@@ -149,7 +150,7 @@ export class SpawnRequestsManager {
                             priority,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 R: true,
                             },
                         }
@@ -166,7 +167,7 @@ export class SpawnRequestsManager {
                             priority,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 R: true,
                             },
                         }
@@ -183,7 +184,7 @@ export class SpawnRequestsManager {
                             priority,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 R: true,
                             },
                         }
@@ -203,7 +204,7 @@ export class SpawnRequestsManager {
                         priority,
                         spawnGroup: spawnGroup,
                         memoryAdditions: {
-                            SI: sourceIndex,
+                            [CreepMemoryKeys.sourceIndex]: sourceIndex,
                             R: true,
                         },
                     }
@@ -1080,7 +1081,7 @@ export class SpawnRequestsManager {
                             priority,
                             memoryAdditions: {
                                 R: true,
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 RN: remoteName,
                             },
                         }
@@ -1103,7 +1104,7 @@ export class SpawnRequestsManager {
                             priority,
                             memoryAdditions: {
                                 R: true,
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 RN: remoteName,
                             },
                         }
@@ -1124,7 +1125,7 @@ export class SpawnRequestsManager {
                             priority,
                             memoryAdditions: {
                                 R: true,
-                                SI: sourceIndex,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 RN: remoteName,
                             },
                         }
@@ -1144,7 +1145,7 @@ export class SpawnRequestsManager {
                         priority,
                         memoryAdditions: {
                             R: true,
-                            SI: sourceIndex,
+                            [CreepMemoryKeys.sourceIndex]: sourceIndex,
                             RN: remoteName,
                         },
                     }
