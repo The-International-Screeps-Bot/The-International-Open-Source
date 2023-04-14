@@ -1,8 +1,14 @@
-interface FeatureFlagConfig {
-    [key: string]: boolean
+export enum Feature {
+    testFeatureEnabled,
+    testFeatureDisabled,
 }
 
-class FeatureFlags {
+interface FeatureFlagConfig {
+    [Feature.testFeatureEnabled]: boolean
+    [Feature.testFeatureDisabled]: boolean
+}
+
+export class FeatureFlagManager {
     private readonly flags: FeatureFlagConfig // An object to hold the flag configuration
 
     constructor(config: FeatureFlagConfig) {
@@ -10,14 +16,17 @@ class FeatureFlags {
     }
 
     // Method to check if a feature flag is turned on
-    isFlagOn(flag: string): boolean {
+    isFlagOn(flag: Feature): boolean {
         return this.flags[flag] ?? false // Return the flag value if it exists, otherwise return false
     }
 
     // Method to check if a combination of feature flags are turned on
-    areFlagsOn(flags: string[]): boolean {
+    areFlagsOn(flags: Feature[]): boolean {
         return flags.every(flag => this.isFlagOn(flag)) // Check if every flag in the array is turned on
     }
 }
 
-export const FeatureFlag = new FeatureFlags({})
+export const FeatureFlags = new FeatureFlagManager({
+    [Feature.testFeatureEnabled]: false,
+    [Feature.testFeatureDisabled]: false,
+})
