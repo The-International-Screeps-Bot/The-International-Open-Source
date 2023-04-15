@@ -115,8 +115,8 @@ class MapVisualsManager {
                 if (commune) {
                     const possibleReservation = commune.energyCapacityAvailable >= 650
 
-                    for (const sourceIndex in roomMemory.RSPs) {
-                        const positions = unpackPosList(roomMemory.RSPs[sourceIndex])
+                    for (const sourceIndex in roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
+                        const positions = unpackPosList(roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
 
                         // Draw a line from the center of the remote to the best harvest pos
 
@@ -133,7 +133,7 @@ class MapVisualsManager {
                             Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]])
 
                         Game.map.visual.text(
-                            `⛏️${income},🚶‍♀️${roomMemory.RSPs[sourceIndex].length}`,
+                            `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length}`,
                             new RoomPosition(positions[0].x, positions[0].y, roomName),
                             {
                                 align: 'center',
@@ -157,7 +157,7 @@ class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory.PC === false) {
+            if (roomMemory[RoomMemoryKeys.planningCompleted] === false) {
                 Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
                     stroke: customColors.red,
                     strokeWidth: 2,
@@ -194,7 +194,7 @@ class MapVisualsManager {
     }
     private test(roomName: string, roomMemory: RoomMemory) {
         /*
-        Game.map.visual.text((Game.time - roomMemory.LST).toString(), new RoomPosition(2, 40, roomName), {
+        Game.map.visual.text((Game.time - roomMemory[RoomMemoryKeys.lastScout]).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
         })

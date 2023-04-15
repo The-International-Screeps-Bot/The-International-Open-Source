@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    RoomMemoryKeys,
     adjacentOffsets,
     creepRoles,
     customColors,
@@ -82,7 +83,7 @@ export class RoomManager {
 
         // If it hasn't been scouted for 100~ ticks
 
-        if (Game.time - roomMemory.LST > Math.floor(Math.random() * 200)) {
+        if (Game.time - roomMemory[RoomMemoryKeys.lastScout] > Math.floor(Math.random() * 200)) {
             room.basicScout()
             cleanRoomMemory(room.name)
         }
@@ -184,11 +185,11 @@ export class RoomManager {
     get mineral() {
         if (this._mineral) return this._mineral
 
-        const mineralID = Memory.rooms[this.room.name].MID
+        const mineralID = Memory.rooms[this.room.name][RoomMemoryKeys.mineral]
         if (mineralID) return findObjectWithID(mineralID)
 
         const mineral = this.room.find(FIND_MINERALS)[0]
-        Memory.rooms[this.room.name].MID = mineral.id
+        Memory.rooms[this.room.name][RoomMemoryKeys.mineral] = mineral.id
 
         return (this._mineral = mineral)
     }
@@ -214,7 +215,7 @@ export class RoomManager {
     get stampAnchors() {
         if (this._stampAnchors !== undefined) return this._stampAnchors
 
-        const packedStampAnchors = this.room.memory.SA
+        const packedStampAnchors = this.room.memory[RoomMemoryKeys.nukeRequest]
         if (!packedStampAnchors) return false
 
         return (this._stampAnchors = unpackStampAnchors(packedStampAnchors))
@@ -227,7 +228,7 @@ export class RoomManager {
     get communeSources() {
         if (this._communeSources) return this._communeSources
 
-        const sourceIDs = this.room.memory.CSIDs
+        const sourceIDs = this.room.memory[RoomMemoryKeys.communeSources]
         if (sourceIDs) {
             this._communeSources = []
 
@@ -252,7 +253,7 @@ export class RoomManager {
     get remoteSources() {
         if (this._remoteSources) return this._remoteSources
 
-        const sourceIDs = this.room.memory.RSIDs
+        const sourceIDs = this.room.memory[RoomMemoryKeys.RSIDs]
         if (sourceIDs) {
             this._remoteSources = []
 
@@ -287,7 +288,7 @@ export class RoomManager {
             )
         })
 
-        this.room.memory.RSIDs = sources.map(source => source.id)
+        this.room.memory[RoomMemoryKeys.RSIDs] = sources.map(source => source.id)
         return (this._remoteSources = sources)
     }
 
@@ -317,7 +318,7 @@ export class RoomManager {
     get communeSourceHarvestPositions() {
         if (this._communeSourceHarvestPositions) return this._communeSourceHarvestPositions
 
-        const packedSourceHarvestPositions = this.room.memory.CSHP
+        const packedSourceHarvestPositions = this.room.memory[RoomMemoryKeys.communeSourceHarvestPositions]
 
         if (packedSourceHarvestPositions) {
             return (this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
@@ -333,7 +334,7 @@ export class RoomManager {
     get remoteSourceHarvestPositions() {
         if (this._remoteSourceHarvestPositions) return this._remoteSourceHarvestPositions
 
-        const packedSourceHarvestPositions = this.room.memory.RSHP
+        const packedSourceHarvestPositions = this.room.memory[RoomMemoryKeys.remoteSourceHarvestPositions]
         if (packedSourceHarvestPositions) {
             return (this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
                 unpackPosList(positions),
@@ -380,7 +381,9 @@ export class RoomManager {
             sourceHarvestPositions.push(positions)
         }
 
-        this.room.memory.RSHP = sourceHarvestPositions.map(positions => packPosList(positions))
+        this.room.memory[RoomMemoryKeys.remoteSourceHarvestPositions] = sourceHarvestPositions.map(positions =>
+            packPosList(positions),
+        )
         return (this._remoteSourceHarvestPositions = sourceHarvestPositions)
     }
 
@@ -388,7 +391,7 @@ export class RoomManager {
     get communeSourcePaths() {
         if (this._communeSourcePaths) return this._communeSourcePaths
 
-        const packedSourcePaths = this.room.memory.CSPs
+        const packedSourcePaths = this.room.memory[RoomMemoryKeys.communeSourcePaths]
         if (packedSourcePaths) {
             return (this._communeSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
         }
@@ -401,7 +404,7 @@ export class RoomManager {
     get remoteSourcePaths() {
         if (this._remoteSourcePaths) return this._remoteSourcePaths
 
-        const packedSourcePaths = this.room.memory.RSPs
+        const packedSourcePaths = this.room.memory[RoomMemoryKeys.remoteSourcePaths]
         if (packedSourcePaths) {
             return (this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
         }
@@ -431,7 +434,7 @@ export class RoomManager {
             if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name)
         }
 
-        this.room.memory.RSPs = sourcePaths.map(path => packPosList(path))
+        this.room.memory[RoomMemoryKeys.remoteSourcePaths] = sourcePaths.map(path => packPosList(path))
         return (this._remoteSourcePaths = sourcePaths)
     }
 
@@ -439,7 +442,7 @@ export class RoomManager {
     get centerUpgradePos() {
         if (this._centerUpgradePos) return this._centerUpgradePos
 
-        const packedPos = this.room.memory.CUP
+        const packedPos = this.room.memory[RoomMemoryKeys.centerUpgradePos]
         if (packedPos) {
             return (this._centerUpgradePos = unpackPos(packedPos))
         }
@@ -503,7 +506,7 @@ export class RoomManager {
     get mineralHarvestPositions() {
         if (this._mineralHarvestPositions) return this._mineralHarvestPositions
 
-        const packedPositions = this.room.memory.MP
+        const packedPositions = this.room.memory[RoomMemoryKeys.mineralPositions]
         if (packedPositions) {
             return (this._mineralHarvestPositions = unpackPosList(packedPositions))
         }
@@ -526,7 +529,7 @@ export class RoomManager {
             const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(
                 structures.road,
             )
-            const basePlans = BasePlans.unpack(this.room.memory.BPs)
+            const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
             const RCL = this.room.controller.level
 
             for (const structure of relevantStructures) {
@@ -558,7 +561,7 @@ export class RoomManager {
         if (this._remoteControllerPositions) return this._remoteControllerPositions
 
         const roomMemory = Memory.rooms[this.room.name]
-        const packedRemoteControllerPositions = roomMemory.RCP
+        const packedRemoteControllerPositions = roomMemory[RoomMemoryKeys.remoteControllerPositions]
         if (packedRemoteControllerPositions) {
             return (this._remoteControllerPositions = unpackPosList(packedRemoteControllerPositions))
         }
@@ -596,7 +599,7 @@ export class RoomManager {
             )
         })
 
-        this.room.memory.RCP = packPosList(positions)
+        this.room.memory[RoomMemoryKeys.remoteControllerPositions] = packPosList(positions)
         return (this._remoteControllerPositions = positions)
     }
 
@@ -633,7 +636,7 @@ export class RoomManager {
     get remoteControllerPath() {
         if (this._remoteControllerPath) return this._remoteControllerPath
 
-        const packedPath = this.room.memory.RCPa
+        const packedPath = this.room.memory[RoomMemoryKeys.remoteControllerPath]
         if (packedPath) {
             return (this._remoteControllerPath = unpackPosList(packedPath))
         }
@@ -654,7 +657,7 @@ export class RoomManager {
         })
         if (!path.length) throw Error('No remote controller path for ' + this.room.name)
 
-        this.room.memory.RCPa = packPosList(path)
+        this.room.memory[RoomMemoryKeys.remoteControllerPath] = packPosList(path)
         return (this._remoteControllerPath = path)
     }
 

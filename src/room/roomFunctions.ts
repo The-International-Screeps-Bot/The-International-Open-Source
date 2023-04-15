@@ -22,6 +22,7 @@ import {
     adjacentOffsets,
     RESULT_SUCCESS,
     CreepMemoryKeys,
+    RoomMemoryKeys,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -166,7 +167,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             const roomMemory = Memory.rooms[roomName]
 
             if (roomMemory.T === 'commune') {
-                const basePlans = BasePlans.unpack(roomMemory.BPs)
+                const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
 
                 for (const packedCoord in basePlans.map) {
                     const coordData = basePlans.map[packedCoord]
@@ -189,7 +190,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
             } else if (roomMemory.T === 'remote') {
-                for (const packedPath of roomMemory.RSPs) {
+                for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
                     const path = unpackPosList(packedPath)
 
                     for (const pos of path) {
@@ -684,44 +685,46 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Generate new important positions
 
-        delete roomMemory.RSIDs
+        delete roomMemory[RoomMemoryKeys.RSIDs]
         delete this.roomManager._remoteSources
         this.roomManager.remoteSources
 
-        delete roomMemory.RSHP
+        delete roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]
         delete this.roomManager._remoteSourceHarvestPositions
         this.roomManager.remoteSourceHarvestPositions
 
-        delete roomMemory.RSPs
+        delete roomMemory[RoomMemoryKeys.remoteSourcePaths]
         delete this.roomManager._remoteSourcePaths
         this.roomManager.remoteSourcePaths
 
-        delete roomMemory.RCP
+        delete roomMemory[RoomMemoryKeys.remoteControllerPositions]
         delete this.roomManager._remoteControllerPositions
         this.roomManager.remoteControllerPositions
 
-        delete roomMemory.RCPa
+        delete roomMemory[RoomMemoryKeys.remoteControllerPath]
         delete this.roomManager._remoteControllerPath
         this.roomManager.remoteControllerPath
 
-        if (!roomMemory.RSPs.length) throw Error('No RSPs for ' + this.name)
-        if (!roomMemory.RCPa.length) throw Error('No RCPa for ' + this.name)
+        if (!roomMemory[RoomMemoryKeys.remoteSourcePaths].length) throw Error('No RSPs for ' + this.name)
+        if (!roomMemory[RoomMemoryKeys.remoteControllerPath].length) throw Error('No RCPa for ' + this.name)
 
-        roomMemory.RE = newReservationEfficacy
+        roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
         roomMemory.data = []
         for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
 
         // Add the room's name to the scoutingRoom's remotes list
 
-        Memory.rooms[scoutingRoom.name].remotes.push(this.name)
+        Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
 
         roomMemory.T = 'remote'
         return roomMemory.T
     }
 
     const currentRemoteEfficacy =
-        roomMemory.RSPs.reduce((sum, el) => sum + el.length, 0) / roomMemory.RSPs.length + roomMemory.RE
+        roomMemory[RoomMemoryKeys.remoteSourcePaths].reduce((sum, el) => sum + el.length, 0) /
+            roomMemory[RoomMemoryKeys.remoteSourcePaths].length +
+        roomMemory[RoomMemoryKeys.reservationEfficacy]
     const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
 
     // If the new average source efficacy is above the current, stop
@@ -735,34 +738,34 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // Generate new important positions
 
-    delete roomMemory.RSIDs
+    delete roomMemory[RoomMemoryKeys.RSIDs]
     delete this.roomManager._remoteSources
     this.roomManager.remoteSources
 
-    delete roomMemory.RSHP
+    delete roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]
     delete this.roomManager._remoteSourceHarvestPositions
     this.roomManager.remoteSourceHarvestPositions
 
-    delete roomMemory.RSPs
+    delete roomMemory[RoomMemoryKeys.remoteSourcePaths]
     delete this.roomManager._remoteSourcePaths
     this.roomManager.remoteSourcePaths
 
-    delete roomMemory.RCP
+    delete roomMemory[RoomMemoryKeys.remoteControllerPositions]
     delete this.roomManager._remoteControllerPositions
     this.roomManager.remoteControllerPositions
 
-    delete roomMemory.RCPa
+    delete roomMemory[RoomMemoryKeys.remoteControllerPath]
     delete this.roomManager._remoteControllerPath
     this.roomManager.remoteControllerPath
 
-    roomMemory.RE = newReservationEfficacy
+    roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
     roomMemory.data = []
     for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
 
     // Add the room's name to the scoutingRoom's remotes list
 
-    Memory.rooms[scoutingRoom.name].remotes.push(this.name)
+    Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
 
     // Assign the room's commune as the scoutingRoom
 
@@ -791,7 +794,7 @@ Room.prototype.scoutEnemyRoom = function () {
     const level = controller.level
     roomMemory.level = level
 
-    roomMemory.powerEnabled = controller.isPowerEnabled
+    roomMemory[RoomMemoryKeys.powerEnabled] = controller.isPowerEnabled
 
     // Offensive threat
 
@@ -805,7 +808,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     threat = Math.floor(threat)
 
-    roomMemory.OS = threat
+    roomMemory[RoomMemoryKeys.offensiveStrength] = threat
     Memory.players[playerName][PlayerMemoryKeys.offensiveThreat] = Math.max(
         threat,
         player[PlayerMemoryKeys.offensiveThreat],
@@ -838,7 +841,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     threat = Math.floor(threat)
 
-    roomMemory.DS = threat
+    roomMemory[RoomMemoryKeys.defensiveStrength] = threat
     Memory.players[playerName][PlayerMemoryKeys.defensiveStrength] = Math.max(
         threat,
         player[PlayerMemoryKeys.defensiveStrength],
@@ -860,7 +863,7 @@ Room.prototype.basicScout = function () {
 
     // Record that the room was scouted this tick
 
-    this.memory.LST = Game.time
+    this.memory[RoomMemoryKeys.lastScout] = Game.time
 
     if (!controller) return this.memory.T
 
@@ -895,7 +898,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
     // Record that the room was scouted this tick
 
-    this.memory.LST = Game.time
+    this.memory[RoomMemoryKeys.lastScout] = Game.time
 
     if (constantRoomTypes.has(this.memory.T)) return this.memory.T
     if (this.scoutByRoomName()) return this.memory.T
@@ -1856,7 +1859,7 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        this.memory.CSTID = anchor.findClosestByPath(cSitesOfType, {
+        this.memory[RoomMemoryKeys.constructionSiteTarget] = anchor.findClosestByPath(cSitesOfType, {
             ignoreCreeps: true,
             ignoreDestructibleStructures: true,
             ignoreRoads: true,
@@ -2116,13 +2119,13 @@ Room.prototype.createClaimRequest = function () {
 
     findDynamicScore(this.name)
 
-    const planningCompleted = Memory.rooms[this.name].PC
+    const planningCompleted = Memory.rooms[this.name][RoomMemoryKeys.planningCompleted]
     if (planningCompleted === false) return false
 
     if (planningCompleted !== true) {
         const result = this.roomManager.communePlanner.preTickRun()
         if (result === RESULT_FAIL) {
-            this.memory.PC = false
+            this.memory[RoomMemoryKeys.planningCompleted] = false
             return false
         }
 

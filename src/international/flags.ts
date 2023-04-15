@@ -15,7 +15,7 @@ class FlagManager {
     /**
      * Tricks typescript into accepting the dynamic function call in run()
      */
-    public doNothing(flagName: string, flagNameParts: string[]) { }
+    public doNothing(flagName: string, flagNameParts: string[]) {}
 
     private internationalDataVisuals(flagName: string, flagNameParts: string[]) {
         const flag = Game.flags[flagName]
@@ -41,26 +41,24 @@ class FlagManager {
 
         flag.setColor(COLOR_GREEN)
 
-        const headers: any[] = [
-            'sender',
-            '',
-            'receiver',
-            'resource',
-            'amount',
-            'ticks since',
-        ]
+        const headers: any[] = ['sender', '', 'receiver', 'resource', 'amount', 'ticks since']
 
         const data: any[][] = []
 
         for (const transaction of Game.market.incomingTransactions) {
-
             const roomFromMemory = Memory.rooms[transaction.from]
             const roomToMemory = Memory.rooms[transaction.to]
 
             data.push([
-                transaction.from + ' (' + (roomFromMemory.T === 'commune' ? Memory.me : (roomFromMemory.owner || 'unknown')) + ')',
+                transaction.from +
+                    ' (' +
+                    (roomFromMemory.T === 'commune' ? Memory.me : roomFromMemory.owner || 'unknown') +
+                    ')',
                 '-->',
-                transaction.to + ' (' + (roomToMemory.T === 'commune' ? Memory.me : (roomToMemory.owner || 'unknown')) + ')',
+                transaction.to +
+                    ' (' +
+                    (roomToMemory.T === 'commune' ? Memory.me : roomToMemory.owner || 'unknown') +
+                    ')',
                 transaction.resourceType,
                 transaction.amount,
                 Game.time - transaction.time,
@@ -106,26 +104,24 @@ class FlagManager {
 
         flag.setColor(COLOR_GREEN)
 
-        const headers: any[] = [
-            'sender',
-            '',
-            'receiver',
-            'resource',
-            'amount',
-            'ticks since'
-        ]
+        const headers: any[] = ['sender', '', 'receiver', 'resource', 'amount', 'ticks since']
 
         const data: any[][] = []
 
         for (const transaction of Game.market.outgoingTransactions) {
-
             const roomFromMemory = Memory.rooms[transaction.from]
             const roomToMemory = Memory.rooms[transaction.to]
 
             data.push([
-                transaction.from + ' (' + (roomFromMemory.T === 'commune' ? Memory.me : (roomFromMemory.owner || 'unknown')) + ')',
+                transaction.from +
+                    ' (' +
+                    (roomFromMemory.T === 'commune' ? Memory.me : roomFromMemory.owner || 'unknown') +
+                    ')',
                 '-->',
-                transaction.to + ' (' + (roomToMemory.T === 'commune' ? Memory.me : (roomToMemory.owner || 'unknown')) + ')',
+                transaction.to +
+                    ' (' +
+                    (roomToMemory.T === 'commune' ? Memory.me : roomToMemory.owner || 'unknown') +
+                    ')',
                 transaction.resourceType,
                 transaction.amount,
                 Game.time - transaction.time,
@@ -175,7 +171,7 @@ class FlagManager {
         }
 
         flag.remove()
-        roomMemory.Ab = true
+        roomMemory[RoomMemoryKeys.abandoned] = true
     }
 
     private claim(flagName: string, flagNameParts: string[]) {
@@ -189,7 +185,7 @@ class FlagManager {
             flag.setColor(COLOR_RED)
             return
         }
-        if (roomMemory.PC !== true) {
+        if (roomMemory[RoomMemoryKeys.planningCompleted] !== true) {
             flag.setColor(COLOR_RED)
             return
         }
@@ -226,7 +222,7 @@ class FlagManager {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const communeName = flagNameParts[2] || undefined
-        const type: CombatRequestTypes = flagNameParts[3] as CombatRequestTypes || "attack"
+        const type: CombatRequestTypes = (flagNameParts[3] as CombatRequestTypes) || 'attack'
 
         flag.setColor(COLOR_RED)
         return
@@ -242,17 +238,17 @@ class FlagManager {
     }
 
     private attack(flagName: string, flagNameParts: string[]) {
-        flagNameParts.push("attack");
+        flagNameParts.push('attack')
         this.combat(flagName, flagNameParts)
     }
 
     private harass(flagName: string, flagNameParts: string[]) {
-        flagNameParts.push("harass");
+        flagNameParts.push('harass')
         this.combat(flagName, flagNameParts)
     }
 
     private defend(flagName: string, flagNameParts: string[]) {
-        flagNameParts.push("defend");
+        flagNameParts.push('defend')
         this.combat(flagName, flagNameParts)
     }
 

@@ -56,7 +56,7 @@ export class Scout extends Creep {
 
             // If the room has memory and a LST
 
-            if (Memory.rooms[roomName] && Memory.rooms[roomName].LST) {
+            if (Memory.rooms[roomName] && Memory.rooms[roomName][RoomMemoryKeys.lastScout]) {
                 // Add it to scoutedRooms and iterate
 
                 this.scoutedRooms.push(roomName)
@@ -93,7 +93,7 @@ export class Scout extends Creep {
         let lowestLastScoutTick = Infinity
 
         for (const roomName of this.scoutedRooms) {
-            const lastScoutTick = Memory.rooms[roomName].LST
+            const lastScoutTick = Memory.rooms[roomName][RoomMemoryKeys.lastScout]
             if (lastScoutTick > lowestLastScoutTick) continue
 
             lowestLastScoutTick = lastScoutTick
@@ -127,11 +127,11 @@ export class Scout extends Creep {
         // Filter deposits that haven't been assigned a commune and are viable
 
         const unAssignedDeposits = deposits.filter(function (deposit) {
-            return !communeMemory.deposits[deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
+            return !communeMemory[RoomMemoryKeys.deposits][deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
         })
 
         for (const deposit of unAssignedDeposits)
-            communeMemory.deposits[deposit.id] = {
+            communeMemory[RoomMemoryKeys.deposits][deposit.id] = {
                 decay: deposit.ticksToDecay,
                 needs: [1, 1],
             }
@@ -273,7 +273,7 @@ export class Scout extends Creep {
                     roomMemory = (Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]] as Partial<RoomMemory>) = {}
 
                 roomMemory.T = 'neutral'
-                roomMemory.LST = Game.time
+                roomMemory[RoomMemoryKeys.lastScout] = Game.time
 
                 delete creep.memory[CreepMemoryKeys.scoutTarget]
             }

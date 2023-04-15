@@ -15,7 +15,7 @@ export class NukerManager {
 
     run() {
         const roomMemory = Memory.rooms[this.communeManager.room.name]
-        const requestName = roomMemory.NR
+        const requestName = roomMemory[RoomMemoryKeys.nukeRequest]
         if (!requestName) return
 
         if (!this.nuker) {

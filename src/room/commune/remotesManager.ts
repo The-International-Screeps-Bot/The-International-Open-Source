@@ -22,10 +22,10 @@ export class RemotesManager {
 
         // Loop through the commune's remote names
 
-        for (let index = room.memory.remotes.length - 1; index >= 0; index -= 1) {
+        for (let index = room.memory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {
             // Get the name of the remote using the index
 
-            const remoteName = room.memory.remotes[index]
+            const remoteName = room.memory[RoomMemoryKeys.remotes][index]
 
             const remoteMemory = Memory.rooms[remoteName]
 
@@ -101,7 +101,11 @@ export class RemotesManager {
 
                 // If the reservation isn't soon to run out, relative to the room's sourceEfficacy average
 
-                if (isReserved && remote.controller.reservation.ticksToEnd >= Math.min(remoteMemory.RE * 5, 2500))
+                if (
+                    isReserved &&
+                    remote.controller.reservation.ticksToEnd >=
+                        Math.min(remoteMemory[RoomMemoryKeys.reservationEfficacy] * 5, 2500)
+                )
                     remoteMemory.data[RemoteData.remoteReserver] = 0
             }
 
@@ -147,20 +151,23 @@ export class RemotesManager {
     public run() {
         // Loop through the commune's remote names
 
-        for (const remoteName of this.communeManager.room.memory.remotes) {
+        for (const remoteName of this.communeManager.room.memory[RoomMemoryKeys.remotes]) {
             const remoteMemory = Memory.rooms[remoteName]
             const data = remoteMemory.data
 
             if (data[RemoteData.abandon]) continue
-/*
+            /*
             const remote = Game.rooms[remoteName]
             const isReserved =
                 remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
  */
             // Loop through each index of sourceEfficacies
 
-            for (let sourceIndex = 0; sourceIndex < remoteMemory.RSPs.length; sourceIndex += 1) {
-
+            for (
+                let sourceIndex = 0;
+                sourceIndex < remoteMemory[RoomMemoryKeys.remoteSourcePaths].length;
+                sourceIndex += 1
+            ) {
                 const sourceHarvesterRole = `remoteSourceHarvester${sourceIndex as 0 | 1}` as
                     | 'remoteSourceHarvester0'
                     | 'remoteSourceHarvester1'
@@ -172,7 +179,7 @@ export class RemotesManager {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory.data[RemoteData[`remoteHauler${sourceIndex as 0 | 1}`]] += findCarryPartsRequired(
-                    remoteMemory.RSPs[sourceIndex].length / packedPosLength,
+                    remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength,
                     income,
                 )
             }
@@ -187,10 +194,10 @@ export class RemotesManager {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        for (let index in remoteMemory.RSIDs) {
+        for (let index in remoteMemory[RoomMemoryKeys.RSIDs]) {
             const pathRoomNames: Set<string> = new Set()
 
-            for (const pos of unpackPosList(remoteMemory.RSPs[index])) {
+            for (const pos of unpackPosList(remoteMemory[RoomMemoryKeys.remoteSourcePaths][index])) {
                 const roomName = pos.roomName
 
                 if (pathRoomNames.has(roomName)) continue

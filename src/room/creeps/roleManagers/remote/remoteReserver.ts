@@ -15,7 +15,8 @@ export class RemoteReserver extends Creep {
         if (this.memory[CreepMemoryKeys.remote]) {
             if (
                 this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory[CreepMemoryKeys.remote]].RE
+                this.body.length * CREEP_SPAWN_TIME +
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.reservationEfficacy]
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -124,7 +125,9 @@ export class RemoteReserver extends Creep {
                 ],
             },
             {
-                packedPath: reversePosList(Memory.rooms[this.memory[CreepMemoryKeys.remote]].RCPa),
+                packedPath: reversePosList(
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteControllerPath],
+                ),
                 remoteName: this.memory[CreepMemoryKeys.remote],
             },
         )
@@ -137,7 +140,9 @@ export class RemoteReserver extends Creep {
     }
 
     outsideRemote?() {
-        const remoteControllerPositions = unpackPosList(Memory.rooms[this.memory[CreepMemoryKeys.remote]].RCP)
+        const remoteControllerPositions = unpackPosList(
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteControllerPositions],
+        )
 
         this.createMoveRequestByPath(
             {
@@ -150,7 +155,9 @@ export class RemoteReserver extends Creep {
                 ],
             },
             {
-                packedPath: reversePosList(Memory.rooms[this.memory[CreepMemoryKeys.remote]].RCPa),
+                packedPath: reversePosList(
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteControllerPath],
+                ),
                 remoteName: this.memory[CreepMemoryKeys.remote],
             },
         )

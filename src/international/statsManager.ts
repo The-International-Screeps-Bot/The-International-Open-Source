@@ -250,7 +250,7 @@ export class StatsManager {
         const each250Ticks = Game.time % 250 === 0
 
         Object.entries(global.roomStats.remote)
-            .filter(([roomName]) => roomMemory.remotes.includes(roomName))
+            .filter(([roomName]) => roomMemory[RoomMemoryKeys.remotes].includes(roomName))
             .forEach(([remoteRoomName, remoteRoomStats]) => {
                 if (globalCommuneStats[RoomStatNamesEnum.GameTime] === Game.time) {
                     globalCommuneStats[RoomStatNamesEnum.RemoteCount] += 1

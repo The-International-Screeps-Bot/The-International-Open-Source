@@ -152,7 +152,8 @@ global.destroyCommuneStructures = function (types?) {
 
 global.claim = function (requestName, communeName, score = 0) {
     if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
-    if (Memory.rooms[requestName].PC !== true) return 'Planning not completed for ' + requestName
+    if (Memory.rooms[requestName][RoomMemoryKeys.planningCompleted] !== true)
+        return 'Planning not completed for ' + requestName
 
     if (!Memory.claimRequests[requestName]) {
         Memory.claimRequests[requestName] = {
@@ -276,7 +277,7 @@ global.deleteBasePlans = function (roomName) {
     const room = Game.rooms[roomName]
     if (!room) return 'No vision in ' + roomName
 
-    delete room.memory.PC
+    delete room.memory[RoomMemoryKeys.planningCompleted]
 
     return 'Deleted base plans for ' + roomName
 }

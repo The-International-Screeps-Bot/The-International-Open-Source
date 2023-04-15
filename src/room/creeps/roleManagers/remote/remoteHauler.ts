@@ -29,8 +29,9 @@ export class RemoteHauler extends Creep {
             if (
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
-                    Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[this.memory[CreepMemoryKeys.sourceIndex]]
-                        .length /
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
+                        this.memory[CreepMemoryKeys.sourceIndex]
+                    ].length /
                         packedPosLength
             )
                 return false
@@ -200,7 +201,7 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath:
-                        Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[
+                        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
                             this.memory[CreepMemoryKeys.sourceIndex]
                         ],
                     remoteName: this.memory[CreepMemoryKeys.remote],
@@ -213,7 +214,9 @@ export class RemoteHauler extends Creep {
         // We aren't in the remote, go to the source
 
         const sourceHarvestPos = unpackPosList(
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSHP[this.memory[CreepMemoryKeys.sourceIndex]],
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions][
+                this.memory[CreepMemoryKeys.sourceIndex]
+            ],
         )[0]
 
         this.message += this.memory[CreepMemoryKeys.remote]
@@ -239,7 +242,9 @@ export class RemoteHauler extends Creep {
             },
             {
                 packedPath: reversePosList(
-                    Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[this.memory[CreepMemoryKeys.sourceIndex]],
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
+                        this.memory[CreepMemoryKeys.sourceIndex]
+                    ],
                 ),
                 remoteName: this.memory[CreepMemoryKeys.remote],
             },
@@ -267,7 +272,9 @@ export class RemoteHauler extends Creep {
         })
 
         const sourceHarvestPos = unpackPosList(
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSHP[this.memory[CreepMemoryKeys.sourceIndex]],
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions][
+                this.memory[CreepMemoryKeys.sourceIndex]
+            ],
         )[0]
 
         // We aren't next to the source
@@ -288,7 +295,7 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath: reversePosList(
-                        Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[
+                        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
                             this.memory[CreepMemoryKeys.sourceIndex]
                         ],
                     ),
@@ -324,7 +331,9 @@ export class RemoteHauler extends Creep {
             this.message += this.memory[CreepMemoryKeys.remote]
 
             const sourceHarvestPos = unpackPosList(
-                Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSHP[this.memory[CreepMemoryKeys.sourceIndex]],
+                Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions][
+                    this.memory[CreepMemoryKeys.sourceIndex]
+                ],
             )[0]
 
             this.createMoveRequestByPath(
@@ -347,7 +356,7 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath: reversePosList(
-                        Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[
+                        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
                             this.memory[CreepMemoryKeys.sourceIndex]
                         ],
                     ),
@@ -383,7 +392,9 @@ export class RemoteHauler extends Creep {
             },
             {
                 packedPath:
-                    Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[this.memory[CreepMemoryKeys.sourceIndex]],
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
+                        this.memory[CreepMemoryKeys.sourceIndex]
+                    ],
                 loose: true,
             },
         )
@@ -502,7 +513,11 @@ export class RemoteHauler extends Creep {
     relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
 
-        if (!this.moveRequest && (!this.memory[CreepMemoryKeys.path] || this.memory[CreepMemoryKeys.path].length / packedPosLength < 2)) return
+        if (
+            !this.moveRequest &&
+            (!this.memory[CreepMemoryKeys.path] || this.memory[CreepMemoryKeys.path].length / packedPosLength < 2)
+        )
+            return
         if (this.movedResource) return
         if (!this.nextStore.energy) return
 
@@ -518,7 +533,9 @@ export class RemoteHauler extends Creep {
         )
             return
 
-        const moveCoord = this.moveRequest ? unpackCoord(this.moveRequest) : unpackPosList(this.memory[CreepMemoryKeys.path])[1]
+        const moveCoord = this.moveRequest
+            ? unpackCoord(this.moveRequest)
+            : unpackPosList(this.memory[CreepMemoryKeys.path])[1]
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)
@@ -539,10 +556,10 @@ export class RemoteHauler extends Creep {
             // The 1.1 is to add some margin for the return trip
             if (
                 Memory.rooms[this.memory[CreepMemoryKeys.remote]] &&
-                Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSHP &&
-                Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs.length > this.memory[CreepMemoryKeys.sourceIndex] + 1
+                Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions] &&
+                Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths].length > this.memory[CreepMemoryKeys.sourceIndex] + 1
             )
-                returnTripTime = Memory.rooms[this.memory[CreepMemoryKeys.remote]].RSPs[this.memory[CreepMemoryKeys.sourceIndex]].length * 1.1
+                returnTripTime = Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][this.memory[CreepMemoryKeys.sourceIndex]].length * 1.1
         }
         if (this.ticksToLive <= returnTripTime) this.room.visual.text('🕒', this.pos)
          */

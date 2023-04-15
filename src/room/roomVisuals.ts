@@ -182,11 +182,11 @@ export class RoomVisualsManager {
     private cSiteTargetVisuals() {
         // If there is not a CSTID, stop
 
-        if (!this.roomManager.room.memory.CSTID) return
+        if (!this.roomManager.room.memory[RoomMemoryKeys.constructionSiteTarget]) return
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = findObjectWithID(this.roomManager.room.memory.CSTID)
+        const constructionTarget = findObjectWithID(this.roomManager.room.memory[RoomMemoryKeys.constructionSiteTarget])
 
         // If the constructionTarget exists, show visuals for it
 
@@ -196,7 +196,7 @@ export class RoomVisualsManager {
     private baseVisuals() {
         if (!Memory.baseVisuals) return
 
-        if (!this.roomManager.room.memory.PC) return
+        if (!this.roomManager.room.memory[RoomMemoryKeys.planningCompleted]) return
 
         this.roomManager.room.communeManager.constructionManager.visualize()
     }
@@ -313,7 +313,12 @@ export class RoomVisualsManager {
 
             if (!request[ClaimRequestKeys.responder]) continue
 
-            const row: any[] = [requestName, 'default', request[ClaimRequestKeys.responder], request[ClaimRequestKeys.abandon]]
+            const row: any[] = [
+                requestName,
+                'default',
+                request[ClaimRequestKeys.responder],
+                request[ClaimRequestKeys.abandon],
+            ]
             data.push(row)
         }
 
@@ -322,7 +327,12 @@ export class RoomVisualsManager {
 
             if (request[CombatRequestKeys.type] !== 'defend' && !request[CombatRequestKeys.responder]) continue
 
-            const row: any[] = [requestName, request[CombatRequestKeys.type], request[CombatRequestKeys.responder] || 'none', request[CombatRequestKeys.abandon]]
+            const row: any[] = [
+                requestName,
+                request[CombatRequestKeys.type],
+                request[CombatRequestKeys.responder] || 'none',
+                request[CombatRequestKeys.abandon],
+            ]
             data.push(row)
         }
 
@@ -637,7 +647,7 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            row.push(remoteMemory.RSPs[sourceIndex].length / packedPosLength)
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
             row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
             row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
             row.push(remoteData[RemoteData.remoteReserver])

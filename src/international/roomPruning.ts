@@ -1,4 +1,4 @@
-import { randomIntRange } from "./utils"
+import { randomIntRange } from './utils'
 
 class RoomPruningManager {
     sleepTime = randomIntRange(50000, 100000)
@@ -16,17 +16,15 @@ class RoomPruningManager {
         let highestScoreCommuneName: string
 
         for (const roomName of global.communes) {
-
             const room = Game.rooms[roomName]
 
             if (room.controller.level < 8) {
-
                 this.lastAttempt = Game.time
                 return
             }
 
             const roomMemory = Memory.rooms[roomName]
-            const score = roomMemory.S + roomMemory.DySc
+            const score = roomMemory.S + roomMemory[RoomMemoryKeys.dynamicScore]
 
             if (score <= highestScore) continue
 
@@ -43,9 +41,8 @@ class RoomPruningManager {
         for (const )
         */
 
-        Memory.rooms[highestScoreCommuneName].Ab = true
+        Memory.rooms[highestScoreCommuneName][RoomMemoryKeys.abandoned] = true
     }
 }
-
 
 export const roomPruningManager = new RoomPruningManager()

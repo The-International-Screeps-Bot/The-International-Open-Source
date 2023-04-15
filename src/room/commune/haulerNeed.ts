@@ -15,7 +15,7 @@ export class HaulerNeedManager {
         this.controllerNeed()
 
         room.haulerNeed += findCarryPartsRequired(
-            room.memory.MPa.length / packedPosLength + 3,
+            room.memory[RoomMemoryKeys.mineralPath].length / packedPosLength + 3,
             room.mineralHarvestStrength * 1.1,
         )
         room.haulerNeed += room.structures.lab.length
@@ -73,7 +73,10 @@ export class HaulerNeedManager {
         // There is a viable controllerContainer
 
         if (room.controllerContainer) {
-            room.haulerNeed += findCarryPartsRequired(room.memory.UP.length / packedPosLength + 3, room.upgradeStrength * 1.1)
+            room.haulerNeed += findCarryPartsRequired(
+                room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
+                room.upgradeStrength * 1.1,
+            )
             return
         }
 
@@ -84,7 +87,10 @@ export class HaulerNeedManager {
             room.controllerLink.RCLActionable &&
             (!room.hubLink || !room.hubLink.RCLActionable)
         ) {
-            room.haulerNeed += findCarryPartsRequired(room.memory.UP.length / packedPosLength + 3, room.upgradeStrength * 1.1)
+            room.haulerNeed += findCarryPartsRequired(
+                room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
+                room.upgradeStrength * 1.1,
+            )
             return
         }
     }

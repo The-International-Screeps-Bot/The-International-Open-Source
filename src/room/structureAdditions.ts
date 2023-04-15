@@ -4,13 +4,14 @@ Object.defineProperties(Structure.prototype, {
      * Improved by MarvinTMB / Carson
      */
     RCLActionable: {
-         get() {
+        get() {
             if (this._RCLActionable !== undefined) return this._RCLActionable
 
-            if (!this.room.controller) return this._RCLActionable = true
-            if (Memory.rooms[this.room.name].GRCL === this.room.controller.level) return this._RCLActionable = true
+            if (!this.room.controller) return (this._RCLActionable = true)
+            if (Memory.rooms[this.room.name][RoomMemoryKeys.greatestRCL] === this.room.controller.level)
+                return (this._RCLActionable = true)
 
-            return this._RCLActionable = this.isActive()
-         }
+            return (this._RCLActionable = this.isActive())
+        },
     },
 } as PropertyDescriptorMap & ThisType<Structure>)

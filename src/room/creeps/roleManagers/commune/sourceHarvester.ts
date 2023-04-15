@@ -33,7 +33,8 @@ export class SourceHarvester extends Creep {
         if (
             this.ticksToLive >
             this.body.length * CREEP_SPAWN_TIME +
-                this.room.memory.CSPs[this.memory[CreepMemoryKeys.sourceIndex]].length / packedPosLength
+                this.room.memory[RoomMemoryKeys.communeSourcePaths][this.memory[CreepMemoryKeys.sourceIndex]].length /
+                    packedPosLength
         )
             return false
 
@@ -96,7 +97,9 @@ export class SourceHarvester extends Creep {
                 avoidEnemyRanges: true,
             },
             {
-                packedPath: reversePosList(this.room.memory.CSPs[this.memory[CreepMemoryKeys.sourceIndex]]),
+                packedPath: reversePosList(
+                    this.room.memory[RoomMemoryKeys.communeSourcePaths][this.memory[CreepMemoryKeys.sourceIndex]],
+                ),
                 /* loose: !!targetsClosestHarvestPos, */
             },
         )

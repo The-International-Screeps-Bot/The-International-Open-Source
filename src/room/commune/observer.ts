@@ -55,7 +55,7 @@ export class ObserverManager {
                 } else {
                     score =
                         Game.time -
-                        (Memory.rooms[roomName].LST || 0) +
+                        (Memory.rooms[roomName][RoomMemoryKeys.lastScout] || 0) +
                         (OBSERVER_RANGE - Game.map.getRoomLinearDistance(roomName, this.communeManager.room.name)) * 10
                 }
 

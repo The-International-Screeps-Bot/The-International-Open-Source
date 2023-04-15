@@ -836,7 +836,7 @@ export enum PlayerMemoryKeys {
         /**
          * The last time we were attacked by them
          */
-        lastAttack,
+        lastAttacked,
 }
 
 export enum ClaimRequestKeys {
@@ -992,9 +992,90 @@ export enum PowerRequestKeys {
 
 export enum RoomMemoryKeys {
     type,
+    lastScout,
+
+
+    // Types specific
+
+    owner,
+    RCL,
+    powerEnabled,
+    constructionSiteTarget,
+    stampAnchors,
     communeSources,
+    communeSourceHarvestPositions,
+    communeSourcePaths,
+    mineralPath,
+    mineralPositions,
+    centerUpgradePos,
+    upgradePositions,
+    upgradePath,
+    basePlans,
+    rampartPlans,
+    mineral,
     score,
     dynamicScore,
+    dynamicScoreUpdate,
+    communePlanned,
+
+    // Commune
+
+    remotes,
+    powerBanks,
+    deposits,
+    claimRequest,
+    combatRequests,
+    haulRequests,
+    nukeRequest,
+    allyCreepRequest,
+    threatened,
+    lastAttacked,
+    minHaulerCost,
+    minHaulerCostUpdate,
+    greatestRCL,
+    abandoned,
+    marketData,
+    factoryProduct,
+    factoryUsableResources,
+
+    // Remote
+
+    commune,
+    maxSourceIncome,
+    remoteHarvesters,
+    remoteHaulers,
+    remoteReserver,
+    remoteCoreAttacker,
+    remoteBuilder,
+    remoteDismantler,
+    abandon,
+    use,
+    enemyReserved,
+    invaderCore,
+    disableCachedPaths,
+    remotePlanned,
+    remoteStampAnchors,
+    reservationEfficacy,
+    remoteControllerPath,
+    remoteControllerPositions,
+    remoteSources,
+    remoteSourceHarvestPositions,
+    remoteSourcePaths,
+
+    // Ally
+
+
+    // Enemy
+
+    terminal,
+    towers,
+    energy,
+    defensiveStrength,
+    offensiveStrength,
+
+    // Highway
+
+    portalsTo,
 }
 
 export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [

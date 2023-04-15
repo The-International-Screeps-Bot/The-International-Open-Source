@@ -2,7 +2,20 @@ import { CommuneManager } from './room/commune/commune'
 import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
-import { AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys, CreepMemoryKeys, CreepRoomLogisticsRequestKeys, DepositRequestKeys, HaulRequestKeys, NukeRequestKeys, PlayerMemoryKeys, PowerCreepMemoryKeys, PowerRequestKeys } from 'international/constants'
+import {
+    AllyCreepRequestKeys,
+    ClaimRequestKeys,
+    CombatRequestKeys,
+    CreepMemoryKeys,
+    CreepRoomLogisticsRequestKeys,
+    DepositRequestKeys,
+    HaulRequestKeys,
+    NukeRequestKeys,
+    PlayerMemoryKeys,
+    PowerCreepMemoryKeys,
+    PowerRequestKeys,
+    RoomMemoryKeys,
+} from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
@@ -1959,71 +1972,110 @@ declare global {
     // Memory value types
 
     interface RoomMemory {
-        0: RoomTypes // types
-        1: Id<Source>[] // communeSources
+        [RoomMemoryKeys.type]: RoomTypes
+        [RoomMemoryKeys.lastScout]: number
+
+        // Types specific
+
+        [RoomMemoryKeys.owner]: string
+        [RoomMemoryKeys.RCL]: number
+        [RoomMemoryKeys.powerEnabled]: boolean
+        [RoomMemoryKeys.constructionSiteTarget]: Id<ConstructionSite>
+        [RoomMemoryKeys.stampAnchors]: PackedStampAnchors
+        [RoomMemoryKeys.communeSources]: Id<Source>[]
+        [RoomMemoryKeys.communeSourceHarvestPositions]: string[]
+        [RoomMemoryKeys.communeSourcePaths]: string[]
+        [RoomMemoryKeys.mineralPath]: string
+        [RoomMemoryKeys.mineralPositions]: string
+        [RoomMemoryKeys.centerUpgradePos]: string
+        [RoomMemoryKeys.upgradePositions]: string
+        [RoomMemoryKeys.upgradePath]: string
+        [RoomMemoryKeys.basePlans]: string
+        [RoomMemoryKeys.rampartPlans]: string
+        [RoomMemoryKeys.mineral]: Id<Mineral>
+        [RoomMemoryKeys.score]: number
+        [RoomMemoryKeys.dynamicScore]: number
+        [RoomMemoryKeys.communePlanned]: boolean
+
+        // Commune
+
+        [RoomMemoryKeys.remotes]: string[]
+        [RoomMemoryKeys.powerBanks]: { [roomName: string]: number[] }
+        [RoomMemoryKeys.deposits]: Record<Id<Deposit>, DepositRecord>
+        [RoomMemoryKeys.claimRequest]: string
+        [RoomMemoryKeys.combatRequests]: string[]
+        [RoomMemoryKeys.haulRequests]: string[]
+        [RoomMemoryKeys.nukeRequest]: string
+        [RoomMemoryKeys.allyCreepRequest]: string
+        [RoomMemoryKeys.threatened]: number
+        [RoomMemoryKeys.lastAttacked]: number
+        [RoomMemoryKeys.minHaulerCost]: number
+        [RoomMemoryKeys.minHaulerCostUpdate]: number
+        [RoomMemoryKeys.greatestRCL]: number
+        [RoomMemoryKeys.abandoned]: boolean
+        [RoomMemoryKeys.marketData]: {
+            [RESOURCE_ENERGY]?: number
+            sellAvg?: { [key in ResourceConstant]?: number }
+            buyAvg?: { [key in ResourceConstant]?: number }
+            aquire?: { [key in ResourceConstant]?: number }
+        }
+        [RoomMemoryKeys.factoryProduct]: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+        [RoomMemoryKeys.factoryUsableResources]: (
+            | CommodityConstant
+            | MineralConstant
+            | RESOURCE_GHODIUM
+            | RESOURCE_ENERGY
+        )[]
+
+        // Remote
+
+        [RoomMemoryKeys.commune]: string
+        [RoomMemoryKeys.maxSourceIncome]: number[]
+        [RoomMemoryKeys.remoteHarvesters]: number[]
+        [RoomMemoryKeys.remoteHaulers]: number[]
+        [RoomMemoryKeys.remoteReserver]: number
+        [RoomMemoryKeys.remoteCoreAttacker]: number
+        [RoomMemoryKeys.remoteBuilder]: number
+        [RoomMemoryKeys.remoteDismantler]: number
+        [RoomMemoryKeys.abandon]: number
+        [RoomMemoryKeys.use]: boolean
+        [RoomMemoryKeys.enemyReserved]: boolean
+        [RoomMemoryKeys.invaderCore]: number
+        [RoomMemoryKeys.disableCachedPaths]: boolean
+        [RoomMemoryKeys.remotePlanned]: boolean
+        [RoomMemoryKeys.remoteStampAnchors]: PackedStampAnchors
+        [RoomMemoryKeys.reservationEfficacy]: number
+        [RoomMemoryKeys.remoteControllerPath]: string
+        [RoomMemoryKeys.remoteControllerPositions]: string
+        [RoomMemoryKeys.remoteSources]: Id<Source>[]
+        [RoomMemoryKeys.remoteSourceHarvestPositions]: string[]
+        [RoomMemoryKeys.remoteSourcePaths]: string[]
+
+        // Ally
+
+        // Enemy
+
+        [RoomMemoryKeys.terminal]: boolean
+        [RoomMemoryKeys.towers]: number
+        [RoomMemoryKeys.energy]: number
+        [RoomMemoryKeys.defensiveStrength]: number
+        [RoomMemoryKeys.offensiveStrength]: number
+
+        // Highway
+
+        [RoomMemoryKeys.portalsTo]: string[]
     }
 
     interface RoomMemory {
-
-        /**
-         * Dynamic Score
-         */
-        DySc: number
-
-        /**
-         * Dynamic Score Update
-         */
-        DSUp: number
-
-        /**
-         * Commune Sources
-         */
-        CSIDs: Id<Source>[]
-
-        /**
-         * Remote Sources
-         */
-        RSIDs: Id<Source>[]
-
-        /**
-         * Base Plans
-         */
-        BPs: string
-
-        /**
-         * Rampart Plans
-         */
-        RPs: string
-
         /**
          * Type of a room that generally describes properties of the room
          */
         T: RoomTypes
 
-        /**f
-         * A set of names of remotes controlled by this room
-         */
-        remotes: string[]
-
-        /**
-         * The ID of the mineral
-         */
-        MID: Id<Mineral>
-
         /**
          * Commune Name
          */
         CN: string
-
-        /**
-         * Reservation Efficacy, the path distance from the remote's controller to its commune
-         */
-        RE: number
-
-        /**
-         * abandoned, true if a commune is to be unclaimed ASAP
-         */
-        Ab: boolean
 
         /**
          * A list of needs the remote wants met
@@ -2039,8 +2091,6 @@ declare global {
          * The controller's level
          */
         level: number
-
-        powerEnabled: boolean
 
         /**
          * Wether the room has a terminal
@@ -2058,16 +2108,6 @@ declare global {
         energy: number
 
         /**
-         * A set of roomNames that portals in this room go to
-         */
-        portalsTo: string[]
-
-        /**
-         * Last Scouted Tick, the last tick the room was scouted at
-         */
-        LST: number | undefined
-
-        /**
          * The room name of the commune's claim target
          */
         claimRequest: string
@@ -2083,139 +2123,14 @@ declare global {
         haulRequests: string[]
 
         /**
-         * Nuke Request, the name of request the room is responding to
-         */
-        NR: string
-
-        /**
          * The room name of the room's ally creep target
          */
         allyCreepRequest: string
-
-        CSTID: Id<ConstructionSite>
-
-        /**
-         * Stamp Anchors
-         */
-        SA: PackedStampAnchors
-
-        powerBanks: { [roomName: string]: number[] }
-
-        deposits: Record<Id<Deposit>, DepositRecord>
-
-        /**
-         * Planning Completed, Wether or not commune planning has been completed for the room. If false, the room is not a valid claim target
-         */
-        PC: boolean
-
-        /**
-         * Remote Planned, wether or not remote planning has been completed for the room
-         */
-        RP: boolean
-
-        /**
-         * Remote Stamp Anchors
-         */
-        RSA: Partial<Record<RemoteStampTypes, string>>
-
-        /**
-         * Commune Source Harvest Positions, packed positions around sources where harvesters can sit
-         */
-        CSHP: string[]
-
-        /**
-         * Remote Source Harvest Positions, packed positions around sources where harvesters can sit
-         */
-        RSHP: string[]
-
-        /**
-         * Commune source Paths
-         */
-        CSPs: string[]
-
-        /**
-         * Remote source Paths
-         */
-        RSPs: string[]
-
-        /**
-         * Mineral Path
-         */
-        MPa: string
-
-        /**
-         * Remote Controller Path
-         */
-        RCPa: string
-
-        /**
-         * Mineral Positions, packed positions around the mineral where harvesters can sit
-         */
-        MP: string
-
-        /**
-         * Remote Controller Positions, packed positions around the controller where reservers and downgraders can sit
-         */
-        RCP: string
-
-        /**
-         * Center Upgrade Position
-         */
-        CUP: string
-
-        /**
-         * Upgrade Positions, packed positions around the upgrade structure where upgraders can sit
-         */
-        UPs: string
-
-        /**
-         * Upgrade Path
-         */
-        UP: string
-
-        /**
-         * Defensive Strength
-         */
-        DS: number
-
-        /**
-         * Offensive Strength
-         */
-        OS: number
-
-        /**
-         * Attack Threat, how much a commune is concerned about enemy attackers
-         */
-        AT: number
-
-        /**
-         * Last Attack Tick, how many ticks have passed since the last attack
-         */
-        LAT: number
-
-        /**
-         * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage
-         */
-        MHC: number
-
-        /**
-         * Hauler Update, how many ticks ago the hauler size was updated
-         */
-        HU: number
-
-        /**
-         * Greatest Room Controller Level
-         */
-        GRCL: number
 
         /**
          * The score for claim evaluation
          */
         S: number
-        /**
-         * The dynamic score for claim evaluation
-         */
-        DyS: number
 
         hasTerminal: boolean
 
@@ -2234,7 +2149,7 @@ declare global {
         [PlayerMemoryKeys.offensiveThreat]: number
         [PlayerMemoryKeys.defensiveStrength]: number
         [PlayerMemoryKeys.hate]: number
-        [PlayerMemoryKeys.lastAttack]: number
+        [PlayerMemoryKeys.lastAttacked]: number
     }
 
     interface ClaimRequest {

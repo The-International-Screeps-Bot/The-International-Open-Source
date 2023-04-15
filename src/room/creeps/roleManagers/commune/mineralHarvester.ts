@@ -32,7 +32,7 @@ export class MineralHarvester extends Creep {
                     avoidEnemyRanges: true,
                 },
                 {
-                    packedPath: reversePosList(this.room.memory.MPa),
+                    packedPath: reversePosList(this.room.memory[RoomMemoryKeys.mineralPath]),
                     loose: true,
                 },
             )
@@ -75,7 +75,6 @@ export class MineralHarvester extends Creep {
 
             const mineralContainer = room.mineralContainer
             if (mineralContainer && creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()) {
-
                 creep.transfer(mineralContainer, mineral.mineralType)
             }
         }

@@ -9,41 +9,26 @@ export class HaulerSizeManager {
     }
 
     run() {
-
         const roomMemory = Memory.rooms[this.communeManager.room.name]
 
         // If there is no Hauler Size
 
-        if (roomMemory.MHC === undefined) {
-
-            // We have multiple communes, start at max possible cost
-
-            if (global.communes.size > 1) {
-
-                roomMemory.HU = haulerUpdateDefault
-                roomMemory.MHC = this.communeManager.room.energyCapacityAvailable
-                return
-            }
-
+        if (roomMemory[RoomMemoryKeys.minHaulerCost] === undefined) {
             // Make the cost the smallest possible
 
-            roomMemory.MHC = BODYPART_COST[CARRY] + BODYPART_COST[MOVE]
+            roomMemory[RoomMemoryKeys.minHaulerCost] = BODYPART_COST[CARRY] + BODYPART_COST[MOVE]
 
             this.updateMinHaulerCost()
             return
         }
 
-        roomMemory.HU -= 1
-        if (roomMemory.HU > 0) return
+        if (Game.time - roomMemory[RoomMemoryKeys.minHaulerCostUpdate] < haulerUpdateDefault) return
 
         this.updateMinHaulerCost()
     }
 
     private updateMinHaulerCost() {
-
         const roomMemory = Memory.rooms[this.communeManager.room.name]
-
-        roomMemory.HU = haulerUpdateDefault
 
         const avgCPUUsagePercent = (Memory.stats.cpu.usage || 20) / Game.cpu.limit
         const newMinHaulerCost =
@@ -55,9 +40,11 @@ export class HaulerSizeManager {
             BODYPART_COST[CARRY]
 
         let diff
-        if (newMinHaulerCost < roomMemory.MHC) diff = (newMinHaulerCost - roomMemory.MHC) / 2
-        else diff = newMinHaulerCost - roomMemory.MHC
+        if (newMinHaulerCost < roomMemory[RoomMemoryKeys.minHaulerCost])
+            diff = (newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost]) / 2
+        else diff = newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost]
 
-        roomMemory.MHC += Math.floor(diff)
+        roomMemory[RoomMemoryKeys.minHaulerCost] += Math.floor(diff)
+        roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time
     }
 }

@@ -1,4 +1,10 @@
-import { CombatRequestKeys, customColors, PlayerMemoryKeys, roomDimensions, safemodeTargets } from 'international/constants'
+import {
+    CombatRequestKeys,
+    customColors,
+    PlayerMemoryKeys,
+    roomDimensions,
+    safemodeTargets,
+} from 'international/constants'
 import { playerManager } from 'international/players'
 import { allyManager } from 'international/simpleAllies'
 import { globalStatsUpdater } from 'international/statsManager'
@@ -115,7 +121,7 @@ export class CombatManager {
 
             // Wait some pseudo-random time before publicizing ramparts
 
-            if (room.memory.LAT < randomIntRange(100, 150)) return
+            if (room.memory[RoomMemoryKeys.lastAttacked] < randomIntRange(100, 150)) return
 
             // Publicize at most 10 ramparts per tick, to avoid too many intents
 
@@ -278,14 +284,18 @@ export class CombatManager {
         const roomMemory = Memory.rooms[room.name]
 
         if (this.totalThreat > 0) {
-            roomMemory.AT = Math.max(roomMemory.AT, this.totalThreat, playerManager.highestThreat / 2)
-            roomMemory.LAT = 0
+            roomMemory[RoomMemoryKeys.threatened] = Math.max(
+                roomMemory[RoomMemoryKeys.threatened],
+                this.totalThreat,
+                playerManager.highestThreat / 2,
+            )
+            roomMemory[RoomMemoryKeys.lastAttacked] = 0
         }
 
         // Reduce attack threat over time
 
-        if (roomMemory.AT > 0) roomMemory.AT *= 0.99999
+        if (roomMemory[RoomMemoryKeys.threatened] > 0) roomMemory[RoomMemoryKeys.threatened] *= 0.99999
 
-        roomMemory.LAT += 1
+        roomMemory[RoomMemoryKeys.lastAttacked] += 1
     }
 }

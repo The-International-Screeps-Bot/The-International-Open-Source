@@ -67,15 +67,13 @@ class MigrationManager {
             Memory.simpleAlliesSegment = settings.simpleAlliesSegment
 
             for (const roomName in Game.rooms) {
-
                 const room = Game.rooms[roomName]
 
                 if (!room.controller) continue
 
                 if (!room.controller.my) continue
 
-                for (const remoteName of room.memory.remotes) {
-
+                for (const remoteName of room.memory[RoomMemoryKeys.remotes]) {
                     Memory.rooms[remoteName].CN = room.name
                 }
             }
@@ -83,62 +81,52 @@ class MigrationManager {
             Memory.breakingVersion = 86
         }
         if (Memory.breakingVersion === 86) {
-
             Memory.players = {}
 
             Memory.breakingVersion += 1
         }
         if (Memory.breakingVersion === 87) {
-
             for (const roomName in Game.rooms) {
-
                 const room = Game.rooms[roomName]
 
                 if (!room.controller) continue
 
                 if (!room.controller.my) continue
 
-                for (const remoteName of room.memory.remotes) {
-
+                for (const remoteName of room.memory[RoomMemoryKeys.remotes]) {
                     const remoteMemory = Memory.rooms[remoteName]
 
                     delete remoteMemory.CN
                     remoteMemory.T = 'neutral'
                 }
 
-                room.memory.remotes = []
+                room.memory[RoomMemoryKeys.remotes] = []
             }
 
             Memory.breakingVersion += 1
         }
         if (Memory.breakingVersion === 88) {
-
             for (const creepName in Memory.powerCreeps) {
-
                 Memory.powerCreeps[creepName] = {} as any
             }
 
             Memory.breakingVersion += 1
         }
         if (Memory.breakingVersion === 89) {
-
             global.killCreeps()
             Memory.breakingVersion += 1
         }
         if (Memory.breakingVersion === 92) {
-
             global.killCreeps()
             Memory.breakingVersion += 1
         }
         if (Memory.breakingVersion === 95) {
-
             Memory.haulRequests = {}
             Memory.nukeRequests = {}
             Memory.breakingVersion += 1
         }
 
         if (Memory.breakingVersion < settings.breakingVersion) {
-
             global.killCreeps()
             global.clearMemory()
             global.removeCSites()

@@ -869,6 +869,6 @@ export function findDynamicScore(roomName: string) {
     dynamicScore += allyScore
 
     const roomMemory = Memory.rooms[roomName]
-    roomMemory.DySc = dynamicScore
-    roomMemory.DSUp = Game.time
+    roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
+    roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 }

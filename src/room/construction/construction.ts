@@ -34,7 +34,7 @@ export class ConstructionManager {
     preTickRun() {
         this.room = this.communeManager.room
 
-        if (!this.room.memory.PC) return
+        if (!this.room.memory[RoomMemoryKeys.planningCompleted]) return
 
         /* this.visualize() */
 
@@ -48,7 +48,7 @@ export class ConstructionManager {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length <= 2) return
         }
 
-/*
+        /*
         // If there are no builders, just run every 50 ticks
         else if (!randomTick(50)) return
  */
@@ -69,10 +69,9 @@ export class ConstructionManager {
         this.placeBase(RCL, maxCSites)
     }
     private placeRamparts(RCL: number, maxCSites: number) {
-
         if ((this.room.storage || this.room.terminal) && this.room.resourcesInStoringStructures.energy < 30000) return
 
-        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
+        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const packedCoord in rampartPlans.map) {
             if (this.placedSites >= maxCSites) return
@@ -94,7 +93,11 @@ export class ConstructionManager {
             }
 
             if (data.buildForThreat) {
-                if (Memory.rooms[this.room.name].AT < this.communeManager.minThreatRampartsThreshold) continue
+                if (
+                    Memory.rooms[this.room.name][RoomMemoryKeys.threatened] <
+                    this.communeManager.minThreatRampartsThreshold
+                )
+                    continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
                 this.placedSites += 1
@@ -108,13 +111,11 @@ export class ConstructionManager {
         if (this.placedSites >= maxCSites) return
     }
     private placeBase(RCL: number, maxCSites: number) {
-
         if (this.placedSites >= maxCSites) return
 
-        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+        const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
         for (let placeRCL = 1; placeRCL <= placeRCL; placeRCL++) {
-
             for (const packedCoord in basePlans.map) {
                 if (this.placedSites >= maxCSites) return
 
@@ -157,7 +158,7 @@ export class ConstructionManager {
     }
     public visualize() {
         const RCL = /* this.room.controller.level */ 8
-        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+        const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
         for (const packedCoord in basePlans.map) {
             const coord = unpackCoord(packedCoord)
@@ -173,7 +174,7 @@ export class ConstructionManager {
             }
         }
 
-        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
+        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const packedCoord in rampartPlans.map) {
             const coord = unpackCoord(packedCoord)
@@ -203,7 +204,7 @@ export class ConstructionManager {
         if (!randomTick(100)) return
 
         const structures = this.room.structures
-        const basePlans = BasePlans.unpack(this.room.memory.BPs)
+        const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
         for (const structureType of generalMigrationStructures) {
             for (const structure of structures[structureType]) {
@@ -250,7 +251,7 @@ export class ConstructionManager {
             misplacedSpawns[i].destroy()
         }
         /*
-        const rampartPlans = RampartPlans.unpack(this.room.memory.RPs)
+        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const structure of structures.rampart) {
             const packedCoord = packCoord(structure.pos)

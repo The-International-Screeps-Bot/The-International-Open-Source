@@ -492,7 +492,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // If there is no construction target ID
 
-    if (!room.memory.CSTID) {
+    if (!room.memory[RoomMemoryKeys.constructionSiteTarget]) {
         // Try to find a construction target. If none are found, stop
 
         room.findAllyCSiteTargetID(this)
@@ -500,7 +500,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Convert the construction target ID into a game object
 
-    let cSiteTarget = findObjectWithID(room.memory.CSTID)
+    let cSiteTarget = findObjectWithID(room.memory[RoomMemoryKeys.constructionSiteTarget])
 
     // If there is no construction target
 
@@ -512,7 +512,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Convert the construction target ID into a game object, stopping if it's undefined
 
-    cSiteTarget = findObjectWithID(room.memory.CSTID)
+    cSiteTarget = findObjectWithID(room.memory[RoomMemoryKeys.constructionSiteTarget])
 
     // Stop if the cSite is undefined
 
@@ -1804,7 +1804,8 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     if (target instanceof Resource) {
         this.pickup(target)
 
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
+        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
+            request[CreepRoomLogisticsRequestKeys.amount]
         target.nextAmount -= request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
@@ -1812,10 +1813,19 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     }
 
     if (request[CreepRoomLogisticsRequestKeys.type] === 'transfer') {
-        if (this.transfer(target as AnyStoreStructure | Creep, request[CreepRoomLogisticsRequestKeys.resourceType], request[CreepRoomLogisticsRequestKeys.amount]) !== OK) return RESULT_FAIL
+        if (
+            this.transfer(
+                target as AnyStoreStructure | Creep,
+                request[CreepRoomLogisticsRequestKeys.resourceType],
+                request[CreepRoomLogisticsRequestKeys.amount],
+            ) !== OK
+        )
+            return RESULT_FAIL
 
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -= request[CreepRoomLogisticsRequestKeys.amount]
-        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
+        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
+            request[CreepRoomLogisticsRequestKeys.amount]
+        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
+            request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
         return RESULT_SUCCESS
@@ -1826,19 +1836,36 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     // Creeps need to transfer to each other
 
     if (target instanceof Creep) {
-        if (target.transfer(this, request[CreepRoomLogisticsRequestKeys.resourceType], request[CreepRoomLogisticsRequestKeys.amount]) !== OK) return RESULT_FAIL
+        if (
+            target.transfer(
+                this,
+                request[CreepRoomLogisticsRequestKeys.resourceType],
+                request[CreepRoomLogisticsRequestKeys.amount],
+            ) !== OK
+        )
+            return RESULT_FAIL
 
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
-        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -= request[CreepRoomLogisticsRequestKeys.amount]
+        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
+            request[CreepRoomLogisticsRequestKeys.amount]
+        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
+            request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
         return RESULT_SUCCESS
     }
 
-    if (this.withdraw(target, request[CreepRoomLogisticsRequestKeys.resourceType], request[CreepRoomLogisticsRequestKeys.amount]) !== OK) return RESULT_FAIL
+    if (
+        this.withdraw(
+            target,
+            request[CreepRoomLogisticsRequestKeys.resourceType],
+            request[CreepRoomLogisticsRequestKeys.amount],
+        ) !== OK
+    )
+        return RESULT_FAIL
 
     this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -= request[CreepRoomLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
+        request[CreepRoomLogisticsRequestKeys.amount]
 
     this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return RESULT_SUCCESS
@@ -1880,7 +1907,8 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     if (target instanceof Resource) {
         this.pickup(target)
 
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
+        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
+            request[CreepRoomLogisticsRequestKeys.amount]
         target.nextAmount -= request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
@@ -1888,10 +1916,19 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     }
 
     if (request[CreepRoomLogisticsRequestKeys.type] === 'transfer') {
-        if (this.transfer(target as AnyStoreStructure | Creep, request[CreepRoomLogisticsRequestKeys.resourceType], request[CreepRoomLogisticsRequestKeys.amount]) !== OK) return RESULT_FAIL
+        if (
+            this.transfer(
+                target as AnyStoreStructure | Creep,
+                request[CreepRoomLogisticsRequestKeys.resourceType],
+                request[CreepRoomLogisticsRequestKeys.amount],
+            ) !== OK
+        )
+            return RESULT_FAIL
 
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -= request[CreepRoomLogisticsRequestKeys.amount]
-        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
+        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
+            request[CreepRoomLogisticsRequestKeys.amount]
+        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
+            request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
         return RESULT_SUCCESS
@@ -1902,19 +1939,36 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     // Creeps need to transfer to each other
 
     if (target instanceof Creep) {
-        if (target.transfer(this, request[CreepRoomLogisticsRequestKeys.resourceType], request[CreepRoomLogisticsRequestKeys.amount]) !== OK) return RESULT_FAIL
+        if (
+            target.transfer(
+                this,
+                request[CreepRoomLogisticsRequestKeys.resourceType],
+                request[CreepRoomLogisticsRequestKeys.amount],
+            ) !== OK
+        )
+            return RESULT_FAIL
 
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
-        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -= request[CreepRoomLogisticsRequestKeys.amount]
+        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
+            request[CreepRoomLogisticsRequestKeys.amount]
+        target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
+            request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
         return RESULT_SUCCESS
     }
 
-    if (this.withdraw(target, request[CreepRoomLogisticsRequestKeys.resourceType], request[CreepRoomLogisticsRequestKeys.amount]) !== OK) return RESULT_FAIL
+    if (
+        this.withdraw(
+            target,
+            request[CreepRoomLogisticsRequestKeys.resourceType],
+            request[CreepRoomLogisticsRequestKeys.amount],
+        ) !== OK
+    )
+        return RESULT_FAIL
 
     this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] += request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -= request[CreepRoomLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
+        request[CreepRoomLogisticsRequestKeys.amount]
 
     this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return RESULT_SUCCESS

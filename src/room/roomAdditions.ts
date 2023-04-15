@@ -267,8 +267,8 @@ const roomAdditions = {
     },
     cSiteTarget: {
         get() {
-            if (this.memory.CSTID) {
-                const cSiteTarget = findObjectWithID(this.memory.CSTID)
+            if (this.memory[RoomMemoryKeys.constructionSiteTarget]) {
+                const cSiteTarget = findObjectWithID(this.memory[RoomMemoryKeys.constructionSiteTarget])
                 if (cSiteTarget) return cSiteTarget
             }
 
@@ -311,7 +311,7 @@ const roomAdditions = {
 
                 if (!target) target = findClosestObject(searchAnchor, cSitesOfType)
 
-                this.memory.CSTID = target.id
+                this.memory[RoomMemoryKeys.constructionSiteTarget] = target.id
                 return target
             }
 
@@ -709,16 +709,18 @@ const roomAdditions = {
 
             // Filter rooms that have some sourceEfficacies recorded
 
-            this._remoteNamesBySourceEfficacy = this.memory.remotes.filter(function (roomName) {
-                return Memory.rooms[roomName].RSPs.length
+            this._remoteNamesBySourceEfficacy = this.memory[RoomMemoryKeys.remotes].filter(function (roomName) {
+                return Memory.rooms[roomName][RoomMemoryKeys.remoteSourcePaths].length
             })
 
             // Sort the remotes based on the average source efficacy
 
             return this._remoteNamesBySourceEfficacy.sort(function (a1, b1) {
                 return (
-                    Memory.rooms[a1].RSPs.reduce((a2, b2) => a2 + b2.length, 0) / Memory.rooms[a1].RSPs.length -
-                    Memory.rooms[b1].RSPs.reduce((a2, b2) => a2 + b2.length, 0) / Memory.rooms[b1].RSPs.length
+                    Memory.rooms[a1][RoomMemoryKeys.remoteSourcePaths].reduce((a2, b2) => a2 + b2.length, 0) /
+                        Memory.rooms[a1][RoomMemoryKeys.remoteSourcePaths].length -
+                    Memory.rooms[b1][RoomMemoryKeys.remoteSourcePaths].reduce((a2, b2) => a2 + b2.length, 0) /
+                        Memory.rooms[b1][RoomMemoryKeys.remoteSourcePaths].length
                 )
             })
         },
@@ -729,10 +731,10 @@ const roomAdditions = {
 
             this._remoteSourceIndexesByEfficacy = []
 
-            for (const remoteName of this.memory.remotes) {
+            for (const remoteName of this.memory[RoomMemoryKeys.remotes]) {
                 const remoteMemory = Memory.rooms[remoteName]
 
-                for (let sourceIndex = 0; sourceIndex < remoteMemory.RSIDs.length; sourceIndex++) {
+                for (let sourceIndex = 0; sourceIndex < remoteMemory[RoomMemoryKeys.RSIDs].length; sourceIndex++) {
                     this._remoteSourceIndexesByEfficacy.push(remoteName + ' ' + sourceIndex)
                 }
             }
@@ -742,8 +744,8 @@ const roomAdditions = {
                 const bSplit = b.split(' ')
 
                 return (
-                    Memory.rooms[aSplit[0]].RSPs[parseInt(aSplit[1])].length -
-                    Memory.rooms[bSplit[0]].RSPs[parseInt(bSplit[1])].length
+                    Memory.rooms[aSplit[0]][RoomMemoryKeys.remoteSourcePaths][parseInt(aSplit[1])].length -
+                    Memory.rooms[bSplit[0]][RoomMemoryKeys.remoteSourcePaths][parseInt(bSplit[1])].length
                 )
             })
         },
@@ -825,7 +827,6 @@ const roomAdditions = {
                 }
 
                 if (links.length === this.global.sourceLinks.length) {
-
                     return (this._sourceLinks = links)
                 }
             }

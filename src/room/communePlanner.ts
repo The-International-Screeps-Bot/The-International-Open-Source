@@ -23,6 +23,7 @@ import {
     allStructureTypes,
     buildableStructureTypes,
     structureTypesToProtectSet,
+    RoomMemoryKeys,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -271,7 +272,7 @@ export class CommunePlanner {
     preTickRun() {
         this.room = this.roomManager.room
 
-        if (this.room.memory.PC !== undefined) return RESULT_NO_ACTION
+        if (this.room.memory[RoomMemoryKeys.planningCompleted] !== undefined) return RESULT_NO_ACTION
 
         // Stop if there isn't sufficient CPU
 
@@ -973,7 +974,7 @@ export class CommunePlanner {
                 this.baseCoords[packedCoord] = 0
                 sourceHarvestPositions[i].push(adjPos)
             }
-/*
+            /*
             // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
             // Loop through each pos index
 
@@ -2063,7 +2064,7 @@ export class CommunePlanner {
         })
     }
     private findStorageCoord(structureCoords: Coord[]): [Coord, number] {
-/*
+        /*
         for (let i = 0; i < structureCoords.length; i++) {
             const coord = structureCoords[i]
 
@@ -3076,7 +3077,6 @@ export class CommunePlanner {
 
         score += 6 * 4
         for (const key in Game.map.describeExits(this.room.name)) {
-
             score -= 6
         }
 
@@ -3169,17 +3169,17 @@ export class CommunePlanner {
         const roomMemory = Memory.rooms[this.room.name]
 
         roomMemory.S = plan.score
-        roomMemory.BPs = plan.basePlans
-        roomMemory.RPs = plan.rampartPlans
+        roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
+        roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans
         roomMemory.SA = plan.stampAnchors
-        roomMemory.CSIDs = plan.communeSources
-        roomMemory.CSHP = plan.sourceHarvestPositions
-        roomMemory.CSPs = plan.sourcePaths
-        roomMemory.MP = plan.mineralHarvestPositions
-        roomMemory.MPa = plan.mineralPath
-        roomMemory.CUP = plan.centerUpgradePos
-        roomMemory.UP = plan.upgradePath
-        roomMemory.PC = true
+        roomMemory[RoomMemoryKeys.communeSources] = plan.communeSources
+        roomMemory[RoomMemoryKeys.communeSourceHarvestPositions] = plan.sourceHarvestPositions
+        roomMemory[RoomMemoryKeys.communeSourcePaths] = plan.sourcePaths
+        roomMemory[RoomMemoryKeys.mineralPositions] = plan.mineralHarvestPositions
+        roomMemory[RoomMemoryKeys.mineralPath] = plan.mineralPath
+        roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
+        roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
+        roomMemory[RoomMemoryKeys.planningCompleted] = true
     }
     private visualizeGrid() {
         for (let x = 0; x < roomDimensions; x++) {

@@ -236,7 +236,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier / 2,
                         minCost: 150,
-                        maxCostPerCreep: this.communeManager.room.memory.MHC,
+                        maxCostPerCreep: this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -250,7 +250,7 @@ export class SpawnRequestsManager {
                     extraParts: [CARRY, MOVE],
                     partsMultiplier,
                     minCost: 100,
-                    maxCostPerCreep: this.communeManager.room.memory.MHC,
+                    maxCostPerCreep: this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
                     priority,
                     memoryAdditions: {},
                 }
@@ -1047,8 +1047,9 @@ export class SpawnRequestsManager {
             const data = Memory.rooms[remoteName].data
             const remote = Game.rooms[remoteName]
 
-            const sourcePositionsAmount = remoteMemory.RSHP[sourceIndex].length / packedPosLength
-            const sourcePathLength = remoteMemory.RSPs[sourceIndex].length
+            const sourcePositionsAmount =
+                remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length / packedPosLength
+            const sourcePathLength = remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length
 
             const sourceHarvesterRole = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
                 | 'remoteSourceHarvester0'
@@ -1167,7 +1168,7 @@ export class SpawnRequestsManager {
                     // If all RCL 3 extensions are built
                     if (this.spawnEnergyCapacity >= 800) {
 
-                        const cost = Math.floor(this.communeManager.room.memory.MHC / 150) * 150
+                        const cost = Math.floor(this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost] / 150) * 150
 
                             return {
                                 defaultParts: [],
@@ -1184,7 +1185,7 @@ export class SpawnRequestsManager {
                     }
                     */
 
-                    const cost = Math.floor(this.communeManager.room.memory.MHC / 100) * 100
+                    const cost = Math.floor(this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost] / 100) * 100
 
                     return {
                         role,
@@ -1253,7 +1254,7 @@ export class SpawnRequestsManager {
                         extraParts: [MOVE, CLAIM],
                         partsMultiplier: remoteData[RemoteData.remoteReserver],
                         spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteReserver,
-                        maxCreeps: remoteMemory.RCP.length / packedPosLength,
+                        maxCreeps: remoteMemory[RoomMemoryKeys.remoteControllerPositions].length / packedPosLength,
                         minCost: cost,
                         priority: this.minRemotePriority + 0.1,
                         memoryAdditions: {
@@ -1454,7 +1455,9 @@ export class SpawnRequestsManager {
                     if (request[ClaimRequestKeys.vanguard] <= 0) return false
 
                     let maxCreeps = 0
-                    for (const packedPositions of Memory.rooms[requestName].CSHP) {
+                    for (const packedPositions of Memory.rooms[requestName][
+                        RoomMemoryKeys.communeSourceHarvestPositions
+                    ]) {
                         maxCreeps += packedPositions.length
                     }
 
@@ -1522,7 +1525,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, MOVE],
                         partsMultiplier: 100,
                         minCost: 100,
-                        maxCostPerCreep: this.communeManager.room.memory.MHC,
+                        maxCostPerCreep: this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.haulRequest]: requestName,
