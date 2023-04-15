@@ -217,11 +217,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
+        const maxRooms = opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size;
         const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
             plainCost: opts.plainCost,
             swampCost: opts.swampCost,
-            maxRooms: opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size,
-            maxOps: 100000,
+            maxRooms,
+            maxOps: Math.min(100000, (1 + maxRooms) * 500),
             heuristicWeight: 1,
             flee: opts.flee,
 
@@ -459,7 +460,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         // If the pathFindResult is incomplete, inform an empty array
 
         if (pathFinderResult.incomplete) {
-            customLog('Incomplete Path', `${pathFinderResult.path}, ${JSON.stringify(opts.goals)}`, {
+            customLog('Incomplete Path', `${opts.origin}, ${opts.goals[0].pos}~${opts.goals[0].range} (+${opts.goals.length - 1})`, {
                 textColor: customColors.white,
                 bgColor: customColors.red,
             })
