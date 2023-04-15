@@ -1,48 +1,328 @@
+export enum PlayerMemoryKeys {
+    /**
+     * Generally how good their offense is
+     */
+    offensiveThreat,
+    /**
+     * Generally how good their defense is
+     */
+    defensiveStrength,
+    /**
+     * How much we want them dead
+     */
+    hate,
+    /**
+     * The last time we were attacked by them
+     */
+    lastAttacked,
+}
+
+export enum ClaimRequestKeys {
+    claimer,
+    vanguard,
+    abandon,
+    responder,
+    priority,
+}
+
+export enum HaulRequestKeys {
+    type,
+    distance,
+    timer,
+    priority,
+    abandon,
+    responder,
+}
+
+export enum NukeRequestKeys {
+    x,
+    y,
+    respond,
+    priority,
+}
+
+export enum AllyCreepRequestKeys {
+    allyVanguard,
+    abandon,
+    responder,
+}
+
+export enum DepositRequestKeys {
+    depositHarvester,
+    depositHauler,
+    abandon,
+    responder,
+    /**
+     * The type of resource the deposit provides
+     */
+    type,
+}
+
+export enum CombatRequestKeys {
+    abandon,
+    rangedAttack,
+    attack,
+    dismantle,
+    downgrade,
+    minDamage,
+    minMeleeHeal,
+    minRangedHeal,
+    maxTowerDamage,
+    quads,
+    priority,
+    quadQuota,
+    inactionTimerMax,
+    inactionTimer,
+    maxThreat,
+    abandonments,
+    /**
+     * The type of attack request
+     */
+    type,
+    responder,
+}
+
+// Move this into roomMemory
+
+export enum RemoteData {
+    remoteSourceHarvester0,
+    remoteSourceHarvester1,
+    remoteHauler0,
+    remoteHauler1,
+    remoteReserver,
+    remoteCoreAttacker,
+    remoteBuilder,
+    remoteDismantler,
+    minDamage,
+    minHeal,
+    enemyReserved,
+    invaderCore,
+    abandon,
+    onlyInvader,
+    disableCachedPaths,
+    /**
+     * Wether or not we are
+     */
+    active,
+    maxSourceIncome0,
+    maxSourceIncome1,
+}
+
+export enum CreepRoomLogisticsRequestKeys {
+    type,
+    target,
+    resourceType,
+    amount,
+    onlyFull,
+    noReserve,
+}
+
+export enum CreepMemoryKeys {
+    preferRoads,
+    sourceIndex,
+    dying,
+    packedCoord,
+    path,
+    goalPos,
+    usedPathForGoal,
+    lastCache,
+    structureTarget,
+    remote,
+    scoutTarget,
+    signTarget,
+    roomLogisticsRequests,
+    needsResources,
+    squadSize,
+    squadType,
+    squadCombatType,
+    isSquadFormed,
+    squadMembers,
+    quadBulldozeTargets,
+    haulRequest,
+    ticksWaited,
+    recycleTarget,
+    rampartOnlyShoving,
+    rampartTarget,
+    taskRoom,
+    getPulled,
+    combatRequest,
+}
+
+export enum PowerCreepMemoryKeys {
+    commune,
+    /**
+     * The name of the method queued for operation
+     */
+    task,
+    taskTarget,
+    /**
+     * The type of power the creep should use
+     */
+    taskPower,
+    taskRoom,
+}
+
+export enum PowerRequestKeys {
+    target,
+    type,
+    cooldown,
+}
+
+export enum RoomMemoryKeys {
+    type,
+    lastScout,
+
+    // Types specific
+
+    owner,
+    RCL,
+    powerEnabled,
+    constructionSiteTarget,
+    stampAnchors,
+    communeSources,
+    communeSourceHarvestPositions,
+    communeSourcePaths,
+    mineralPath,
+    mineralPositions,
+    centerUpgradePos,
+    upgradePositions,
+    upgradePath,
+    basePlans,
+    rampartPlans,
+    mineral,
+    score,
+    dynamicScore,
+    dynamicScoreUpdate,
+    communePlanned,
+
+    // Commune
+
+    remotes,
+    powerBanks,
+    deposits,
+    claimRequest,
+    combatRequests,
+    haulRequests,
+    nukeRequest,
+    allyCreepRequest,
+    threatened,
+    lastAttacked,
+    minHaulerCost,
+    minHaulerCostUpdate,
+    greatestRCL,
+    abandoned,
+    marketData,
+    factoryProduct,
+    factoryUsableResources,
+
+    // Remote
+
+    commune,
+    maxSourceIncome,
+    remoteHarvesters,
+    remoteHaulers,
+    remoteReserver,
+    remoteCoreAttacker,
+    remoteBuilder,
+    remoteDismantler,
+    abandon,
+    use,
+    enemyReserved,
+    invaderCore,
+    disableCachedPaths,
+    remotePlanned,
+    remoteStampAnchors,
+    reservationEfficacy,
+    remoteControllerPath,
+    remoteControllerPositions,
+    remoteSources,
+    remoteSourceHarvestPositions,
+    remoteSourcePaths,
+
+    // Ally
+
+    // Enemy
+
+    terminal,
+    towers,
+    energy,
+    defensiveStrength,
+    offensiveThreat,
+
+    // Highway
+
+    portalsTo,
+}
+
 // General
 
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
-    'remotes',
-    'deposits',
-    'powerBanks',
-    'PC',
-    'MHC',
-    'HU',
-    'AT',
-    'LAT',
-    'Ab',
-    'S',
+    RoomMemoryKeys.remotes,
+    RoomMemoryKeys.deposits,
+    RoomMemoryKeys.powerBanks,
+    RoomMemoryKeys.communePlanned,
+    RoomMemoryKeys.minHaulerCost,
+    RoomMemoryKeys.minHaulerCostUpdate,
+    RoomMemoryKeys.threatened,
+    RoomMemoryKeys.lastAttacked,
+    RoomMemoryKeys.abandoned,
+    RoomMemoryKeys.score,
+    RoomMemoryKeys.dynamicScore,
+    RoomMemoryKeys.dynamicScoreUpdate,
 
-    'CN',
-    'RE',
-    'data',
+    RoomMemoryKeys.commune,
+    RoomMemoryKeys.reservationEfficacy,
 
-    'owner',
-    'level',
+    RoomMemoryKeys.owner,
+    RoomMemoryKeys.RCL,
 
-    'powerEnabled',
-    'towers',
-    'hasTerminal',
-    'energy',
-    'OS',
-    'DS',
+    RoomMemoryKeys.powerEnabled,
+    RoomMemoryKeys.towers,
+    RoomMemoryKeys.terminal,
+    RoomMemoryKeys.energy,
+    RoomMemoryKeys.offensiveThreat,
+    RoomMemoryKeys.defensiveStrength,
 
-    'portalsTo',
+    RoomMemoryKeys.portalsTo,
 ])
 
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
-    commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT', 'Ab', 'S']),
-    remote: new Set(['CN', 'RE', 'data', 'PC']),
-    ally: new Set(['owner', 'level', 'PC']),
-    allyRemote: new Set(['owner', 'PC']),
-    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'PC', 'OS', 'DS']),
-    enemyRemote: new Set(['owner', 'PC']),
-    neutral: new Set(['PC']),
-    keeper: new Set(['owner']),
-    keeperCenter: new Set(['owner']),
+    commune: new Set([
+        RoomMemoryKeys.remotes,
+        RoomMemoryKeys.deposits,
+        RoomMemoryKeys.powerBanks,
+        RoomMemoryKeys.communePlanned,
+        RoomMemoryKeys.minHaulerCost,
+        RoomMemoryKeys.minHaulerCostUpdate,
+        RoomMemoryKeys.threatened,
+        RoomMemoryKeys.lastAttacked,
+        RoomMemoryKeys.abandoned,
+        RoomMemoryKeys.score,
+        RoomMemoryKeys.dynamicScore,
+        RoomMemoryKeys.dynamicScoreUpdate,
+    ]),
+    remote: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.reservationEfficacy, RoomMemoryKeys.communePlanned]),
+    ally: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL, RoomMemoryKeys.communePlanned]),
+    allyRemote: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
+    enemy: new Set([
+        RoomMemoryKeys.owner,
+        RoomMemoryKeys.RCL,
+        RoomMemoryKeys.powerEnabled,
+        RoomMemoryKeys.towers,
+        RoomMemoryKeys.terminal,
+        RoomMemoryKeys.energy,
+        RoomMemoryKeys.communePlanned,
+        RoomMemoryKeys.offensiveThreat,
+        RoomMemoryKeys.defensiveStrength,
+    ]),
+    enemyRemote: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
+    neutral: new Set([RoomMemoryKeys.communePlanned]),
+    keeper: new Set([RoomMemoryKeys.owner]),
+    keeperCenter: new Set([RoomMemoryKeys.owner]),
     highway: new Set([]),
-    intersection: new Set(['portalsTo']),
+    intersection: new Set([RoomMemoryKeys.portalsTo]),
 }
 
 export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
@@ -818,264 +1098,6 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-}
-
-export enum PlayerMemoryKeys {
-        /**
-         * Generally how good their offense is
-         */
-        offensiveThreat,
-        /**
-         * Generally how good their defense is
-         */
-        defensiveStrength,
-        /**
-         * How much we want them dead
-         */
-        hate,
-        /**
-         * The last time we were attacked by them
-         */
-        lastAttacked,
-}
-
-export enum ClaimRequestKeys {
-    claimer,
-    vanguard,
-    abandon,
-    responder,
-    priority,
-}
-
-export enum HaulRequestKeys {
-    type,
-    distance,
-    timer,
-    priority,
-    abandon,
-    responder,
-}
-
-export enum NukeRequestKeys {
-    x,
-    y,
-    respond,
-    priority,
-}
-
-export enum AllyCreepRequestKeys {
-    allyVanguard,
-    abandon,
-    responder,
-}
-
-export enum DepositRequestKeys {
-    depositHarvester,
-    depositHauler,
-    abandon,
-    responder,
-    /**
-     * The type of resource the deposit provides
-     */
-    type,
-}
-
-export enum CombatRequestKeys {
-    abandon,
-    rangedAttack,
-    attack,
-    dismantle,
-    downgrade,
-    minDamage,
-    minMeleeHeal,
-    minRangedHeal,
-    maxTowerDamage,
-    quads,
-    priority,
-    quadQuota,
-    inactionTimerMax,
-    inactionTimer,
-    maxThreat,
-    abandonments,
-    /**
-     * The type of attack request
-     */
-    type,
-    responder,
-}
-
-// Move this into roomMemory
-
-export enum RemoteData {
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
-    remoteHauler0,
-    remoteHauler1,
-    remoteReserver,
-    remoteCoreAttacker,
-    remoteBuilder,
-    remoteDismantler,
-    minDamage,
-    minHeal,
-    enemyReserved,
-    invaderCore,
-    abandon,
-    onlyInvader,
-    disableCachedPaths,
-    /**
-     * Wether or not we are
-     */
-    active,
-    maxSourceIncome0,
-    maxSourceIncome1
-}
-
-export enum CreepRoomLogisticsRequestKeys {
-    type,
-    target,
-    resourceType,
-    amount,
-    onlyFull,
-    noReserve,
-}
-
-export enum CreepMemoryKeys {
-    preferRoads,
-    sourceIndex,
-    dying,
-    packedCoord,
-    path,
-    goalPos,
-    usedPathForGoal,
-    lastCache,
-    structureTarget,
-    remote,
-    scoutTarget,
-    signTarget,
-    roomLogisticsRequests,
-    needsResources,
-    squadSize,
-    squadType,
-    squadCombatType,
-    isSquadFormed,
-    squadMembers,
-    quadBulldozeTargets,
-    haulRequest,
-    ticksWaited,
-    recycleTarget,
-    rampartOnlyShoving,
-    rampartTarget,
-    taskRoom,
-    getPulled,
-    combatRequest,
-}
-
-export enum PowerCreepMemoryKeys {
-    commune,
-    /**
-     * The name of the method queued for operation
-     */
-    task,
-    taskTarget,
-    /**
-     * The type of power the creep should use
-     */
-    taskPower,
-    taskRoom,
-}
-
-export enum PowerRequestKeys {
-    target,
-    type,
-    cooldown,
-}
-
-export enum RoomMemoryKeys {
-    type,
-    lastScout,
-
-
-    // Types specific
-
-    owner,
-    RCL,
-    powerEnabled,
-    constructionSiteTarget,
-    stampAnchors,
-    communeSources,
-    communeSourceHarvestPositions,
-    communeSourcePaths,
-    mineralPath,
-    mineralPositions,
-    centerUpgradePos,
-    upgradePositions,
-    upgradePath,
-    basePlans,
-    rampartPlans,
-    mineral,
-    score,
-    dynamicScore,
-    dynamicScoreUpdate,
-    communePlanned,
-
-    // Commune
-
-    remotes,
-    powerBanks,
-    deposits,
-    claimRequest,
-    combatRequests,
-    haulRequests,
-    nukeRequest,
-    allyCreepRequest,
-    threatened,
-    lastAttacked,
-    minHaulerCost,
-    minHaulerCostUpdate,
-    greatestRCL,
-    abandoned,
-    marketData,
-    factoryProduct,
-    factoryUsableResources,
-
-    // Remote
-
-    commune,
-    maxSourceIncome,
-    remoteHarvesters,
-    remoteHaulers,
-    remoteReserver,
-    remoteCoreAttacker,
-    remoteBuilder,
-    remoteDismantler,
-    abandon,
-    use,
-    enemyReserved,
-    invaderCore,
-    disableCachedPaths,
-    remotePlanned,
-    remoteStampAnchors,
-    reservationEfficacy,
-    remoteControllerPath,
-    remoteControllerPositions,
-    remoteSources,
-    remoteSourceHarvestPositions,
-    remoteSourcePaths,
-
-    // Ally
-
-
-    // Enemy
-
-    terminal,
-    towers,
-    energy,
-    defensiveStrength,
-    offensiveStrength,
-
-    // Highway
-
-    portalsTo,
 }
 
 export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [

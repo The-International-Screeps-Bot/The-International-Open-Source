@@ -95,12 +95,12 @@ export interface Settings {
     creepSay: boolean
 
     /**
-     * Wether or not creeps should chant the glory of the union
+     * Wether or not creeps should chant slogans
      */
     creepChant: boolean
 
     /**
-     * The public segment number (0-100) that you and your allies are using
+     * The public segment number (0-99) that you and your allies are using
      */
     simpleAlliesSegment: number
     /**

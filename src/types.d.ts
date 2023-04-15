@@ -2060,7 +2060,7 @@ declare global {
         [RoomMemoryKeys.towers]: number
         [RoomMemoryKeys.energy]: number
         [RoomMemoryKeys.defensiveStrength]: number
-        [RoomMemoryKeys.offensiveStrength]: number
+        [RoomMemoryKeys.offensiveThreat]: number
 
         // Highway
 

@@ -205,7 +205,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
-        const maxRooms = opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size;
+        const maxRooms = opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size
         const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
             plainCost: opts.plainCost,
             swampCost: opts.swampCost,
@@ -445,10 +445,14 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         // If the pathFindResult is incomplete, inform an empty array
 
         if (pathFinderResult.incomplete) {
-            customLog('Incomplete Path', `${opts.origin}, ${opts.goals[0].pos}~${opts.goals[0].range} (+${opts.goals.length - 1})`, {
-                textColor: customColors.white,
-                bgColor: customColors.red,
-            })
+            customLog(
+                'Incomplete Path',
+                `${opts.origin}, ${opts.goals[0].pos}~${opts.goals[0].range} (+${opts.goals.length - 1})`,
+                {
+                    textColor: customColors.white,
+                    bgColor: customColors.red,
+                },
+            )
 
             room.pathVisual(pathFinderResult.path, 'red')
             room.errorVisual(opts.origin)
@@ -809,7 +813,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     threat = Math.floor(threat)
 
-    roomMemory[RoomMemoryKeys.offensiveStrength] = threat
+    roomMemory[RoomMemoryKeys.offensiveThreat] = threat
     Memory.players[playerName][PlayerMemoryKeys.offensiveThreat] = Math.max(
         threat,
         player[PlayerMemoryKeys.offensiveThreat],
