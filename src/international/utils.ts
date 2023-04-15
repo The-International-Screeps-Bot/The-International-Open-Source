@@ -11,6 +11,7 @@ import {
     dynamicScoreRoomRange,
     maxControllerLevel,
     preferredCommuneRange,
+    RoomMemoryKeys,
 } from './constants'
 
 /**

@@ -5,6 +5,7 @@ import {
     RemoteData,
     remoteTypeWeights,
     packedPosLength,
+    RoomMemoryKeys,
 } from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomRange, randomTick } from 'international/utils'
 import { unpackPosList } from 'other/codec'
@@ -194,7 +195,7 @@ export class RemotesManager {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        for (let index in remoteMemory[RoomMemoryKeys.RSIDs]) {
+        for (let index in remoteMemory[RoomMemoryKeys.remoteSources]) {
             const pathRoomNames: Set<string> = new Set()
 
             for (const pos of unpackPosList(remoteMemory[RoomMemoryKeys.remoteSourcePaths][index])) {

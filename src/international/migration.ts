@@ -1,3 +1,4 @@
+import { RoomMemoryKeys } from './constants'
 import { settings } from './settings'
 
 /**

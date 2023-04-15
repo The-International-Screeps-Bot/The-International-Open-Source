@@ -1,4 +1,4 @@
-import { allStructureTypes, AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys } from './constants'
+import { allStructureTypes, AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys, RoomMemoryKeys } from './constants'
 import { Settings, settings } from './settings'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
@@ -152,7 +152,7 @@ global.destroyCommuneStructures = function (types?) {
 
 global.claim = function (requestName, communeName, score = 0) {
     if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
-    if (Memory.rooms[requestName][RoomMemoryKeys.planningCompleted] !== true)
+    if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== true)
         return 'Planning not completed for ' + requestName
 
     if (!Memory.claimRequests[requestName]) {
@@ -277,7 +277,7 @@ global.deleteBasePlans = function (roomName) {
     const room = Game.rooms[roomName]
     if (!room) return 'No vision in ' + roomName
 
-    delete room.memory[RoomMemoryKeys.planningCompleted]
+    delete room.memory[RoomMemoryKeys.communePlanned]
 
     return 'Deleted base plans for ' + roomName
 }

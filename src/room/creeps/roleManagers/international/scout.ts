@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, communeSign, nonCommuneSigns } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys, communeSign, nonCommuneSigns } from 'international/constants'
 import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
 import { partial } from 'lodash'
 

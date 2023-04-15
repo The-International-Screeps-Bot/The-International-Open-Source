@@ -24,7 +24,7 @@ export class PlayerManager {
 
             // So long as the player has attacked at some pount, record it
 
-            player[PlayerMemoryKeys.lastAttack] += 1
+            player[PlayerMemoryKeys.lastAttacked] += 1
 
             const threat = player[PlayerMemoryKeys.offensiveThreat]
             if (threat <= this.highestThreat) continue

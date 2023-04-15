@@ -1,4 +1,4 @@
-import { packedPosLength, stamps } from 'international/constants'
+import { RoomMemoryKeys, packedPosLength, stamps } from 'international/constants'
 import { customLog, findCarryPartsRequired } from 'international/utils'
 import { CommuneManager } from './commune'
 

@@ -1,4 +1,4 @@
-import { RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { getRangeXY, getRange } from 'international/utils'
 import { reversePosList, unpackPos } from 'other/codec'

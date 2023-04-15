@@ -1,5 +1,5 @@
 import { unpackPosList } from 'other/codec'
-import { customColors, remoteHarvesterRoles, RemoteData, ClaimRequestKeys } from './constants'
+import { customColors, remoteHarvesterRoles, RemoteData, ClaimRequestKeys, RoomMemoryKeys } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
 import { globalStatsUpdater } from './statsManager'
@@ -157,7 +157,7 @@ class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory[RoomMemoryKeys.planningCompleted] === false) {
+            if (roomMemory[RoomMemoryKeys.communePlanned] === false) {
                 Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
                     stroke: customColors.red,
                     strokeWidth: 2,

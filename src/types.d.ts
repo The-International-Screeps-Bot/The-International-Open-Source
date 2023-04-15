@@ -1995,6 +1995,7 @@ declare global {
         [RoomMemoryKeys.mineral]: Id<Mineral>
         [RoomMemoryKeys.score]: number
         [RoomMemoryKeys.dynamicScore]: number
+        [RoomMemoryKeys.dynamicScoreUpdate]: number
         [RoomMemoryKeys.communePlanned]: boolean
 
         // Commune

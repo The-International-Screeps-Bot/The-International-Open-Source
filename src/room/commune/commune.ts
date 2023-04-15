@@ -41,6 +41,7 @@ import {
     packedPosLength,
     structureTypesToProtectSet,
     buildableStructuresSet,
+    RoomMemoryKeys,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -126,7 +127,7 @@ export class CommuneManager {
 
         this.observerManager = new ObserverManager(this)
         this.terminalManager = new TerminalManager(this)
-        this[RoomMemoryKeys.remotes]Manager = new RemotesManager(this)
+        this.remotesManager = new RemotesManager(this)
         this.haulerSizeManager = new HaulerSizeManager(this)
 
         this.claimRequestManager = new ClaimRequestManager(this)
@@ -229,18 +230,18 @@ export class CommuneManager {
         const roomMemory = Memory.rooms[this.room.name]
 
         this.room.roomManager.communePlanner.preTickRun()
-        if (!roomMemory[RoomMemoryKeys.planningCompleted]) return
+        if (!roomMemory[RoomMemoryKeys.communePlanned]) return
         this.constructionManager.preTickRun()
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()
-        this[RoomMemoryKeys.remotes]Manager.preTickRun()
+        this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
         this.claimRequestManager.preTickRun()
     }
 
     public run() {
-        if (!this.room.memory[RoomMemoryKeys.planningCompleted]) return
+        if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
         this.combatManager.run()
         this.towerManager.run()
@@ -255,7 +256,7 @@ export class CommuneManager {
         this.haulRequestManager.run()
 
         this.sourceManager.run()
-        this[RoomMemoryKeys.remotes]Manager.run()
+        this.remotesManager.run()
         this.haulerNeedManager.run()
 
         this.spawningStructuresManager.createRoomLogisticsRequests()

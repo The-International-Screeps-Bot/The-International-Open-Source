@@ -21,6 +21,7 @@ import {
     storingStructureTypesSet,
     CreepMemoryKeys,
     CreepRoomLogisticsRequestKeys,
+    RoomMemoryKeys,
 } from 'international/constants'
 import {
     areCoordsEqual,

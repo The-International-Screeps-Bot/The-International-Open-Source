@@ -1,4 +1,4 @@
-import { NukeRequestKeys, RESULT_ACTION, RESULT_NO_ACTION } from 'international/constants'
+import { NukeRequestKeys, RESULT_ACTION, RESULT_NO_ACTION, RoomMemoryKeys } from 'international/constants'
 import { scalePriority } from 'international/utils'
 import { CommuneManager } from './commune'
 

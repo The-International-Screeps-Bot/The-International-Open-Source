@@ -1,5 +1,5 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { customColors } from './constants'
+import { RoomMemoryKeys, customColors } from './constants'
 import { internationalManager } from './international'
 
 class FlagManager {
@@ -185,7 +185,7 @@ class FlagManager {
             flag.setColor(COLOR_RED)
             return
         }
-        if (roomMemory[RoomMemoryKeys.planningCompleted] !== true) {
+        if (roomMemory[RoomMemoryKeys.communePlanned] !== true) {
             flag.setColor(COLOR_RED)
             return
         }

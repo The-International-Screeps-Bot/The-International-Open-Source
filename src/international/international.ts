@@ -7,6 +7,7 @@ import {
     mmoShardNames,
     customColors,
     roomDimensions,
+    RoomMemoryKeys,
 } from './constants'
 
 /**

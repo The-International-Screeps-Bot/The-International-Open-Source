@@ -685,7 +685,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Generate new important positions
 
-        delete roomMemory[RoomMemoryKeys.RSIDs]
+        delete roomMemory[RoomMemoryKeys.remoteSources]
         delete this.roomManager._remoteSources
         this.roomManager.remoteSources
 
@@ -738,7 +738,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // Generate new important positions
 
-    delete roomMemory[RoomMemoryKeys.RSIDs]
+    delete roomMemory[RoomMemoryKeys.remoteSources]
     delete this.roomManager._remoteSources
     this.roomManager.remoteSources
 
@@ -785,7 +785,7 @@ Room.prototype.scoutEnemyRoom = function () {
             [PlayerMemoryKeys.offensiveThreat]: 0,
             [PlayerMemoryKeys.defensiveStrength]: 0,
             [PlayerMemoryKeys.hate]: 0,
-            [PlayerMemoryKeys.lastAttack]: Infinity,
+            [PlayerMemoryKeys.lastAttacked]: Infinity,
         }
     }
 
@@ -2119,13 +2119,13 @@ Room.prototype.createClaimRequest = function () {
 
     findDynamicScore(this.name)
 
-    const planningCompleted = Memory.rooms[this.name][RoomMemoryKeys.planningCompleted]
-    if (planningCompleted === false) return false
+    const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
+    if (communePlanned === false) return false
 
-    if (planningCompleted !== true) {
+    if (communePlanned !== true) {
         const result = this.roomManager.communePlanner.preTickRun()
         if (result === RESULT_FAIL) {
-            this.memory[RoomMemoryKeys.planningCompleted] = false
+            this.memory[RoomMemoryKeys.communePlanned] = false
             return false
         }
 

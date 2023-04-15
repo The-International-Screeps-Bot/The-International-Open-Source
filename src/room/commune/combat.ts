@@ -3,6 +3,7 @@ import {
     customColors,
     PlayerMemoryKeys,
     roomDimensions,
+    RoomMemoryKeys,
     safemodeTargets,
 } from 'international/constants'
 import { playerManager } from 'international/players'
@@ -278,7 +279,7 @@ export class CombatManager {
             player[PlayerMemoryKeys.offensiveThreat] = Math.max(threat, player[PlayerMemoryKeys.offensiveThreat])
             player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
 
-            player[PlayerMemoryKeys.lastAttack] = 0
+            player[PlayerMemoryKeys.lastAttacked] = 0
         }
 
         const roomMemory = Memory.rooms[room.name]

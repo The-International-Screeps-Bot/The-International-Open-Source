@@ -215,7 +215,7 @@ export class RoomManager {
     get stampAnchors() {
         if (this._stampAnchors !== undefined) return this._stampAnchors
 
-        const packedStampAnchors = this.room.memory[RoomMemoryKeys.nukeRequest]
+        const packedStampAnchors = this.room.memory[RoomMemoryKeys.stampAnchors]
         if (!packedStampAnchors) return false
 
         return (this._stampAnchors = unpackStampAnchors(packedStampAnchors))
@@ -253,7 +253,7 @@ export class RoomManager {
     get remoteSources() {
         if (this._remoteSources) return this._remoteSources
 
-        const sourceIDs = this.room.memory[RoomMemoryKeys.RSIDs]
+        const sourceIDs = this.room.memory[RoomMemoryKeys.remoteSources]
         if (sourceIDs) {
             this._remoteSources = []
 
@@ -288,7 +288,7 @@ export class RoomManager {
             )
         })
 
-        this.room.memory[RoomMemoryKeys.RSIDs] = sources.map(source => source.id)
+        this.room.memory[RoomMemoryKeys.remoteSources] = sources.map(source => source.id)
         return (this._remoteSources = sources)
     }
 

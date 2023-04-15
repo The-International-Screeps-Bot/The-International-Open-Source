@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, customColors, packedPosLength, relayOffsets, RemoteData } from 'international/constants'
+import { CreepMemoryKeys, customColors, packedPosLength, relayOffsets, RemoteData, RoomMemoryKeys } from 'international/constants'
 import {
     customLog,
     findClosestObject,

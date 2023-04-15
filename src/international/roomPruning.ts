@@ -1,3 +1,4 @@
+import { RoomMemoryKeys } from './constants'
 import { randomIntRange } from './utils'
 
 class RoomPruningManager {

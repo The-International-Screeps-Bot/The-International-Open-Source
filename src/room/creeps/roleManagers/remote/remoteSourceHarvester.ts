@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, packedPosLength, RemoteData, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { CreepMemoryKeys, packedPosLength, RemoteData, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,

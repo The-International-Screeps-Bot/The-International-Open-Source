@@ -1,4 +1,4 @@
-import { customColors, InternationalStatNamesEnum, RoomStatNamesEnum } from './constants'
+import { customColors, InternationalStatNamesEnum, RoomMemoryKeys, RoomStatNamesEnum } from './constants'
 import { customLog } from './utils'
 
 const CPUUsers: CpuUsers = {

@@ -14,6 +14,7 @@ import {
     powerCreepClassNames,
     remoteRoles,
     stamps,
+    RoomMemoryKeys,
 } from './constants'
 import {
     advancedFindDistance,

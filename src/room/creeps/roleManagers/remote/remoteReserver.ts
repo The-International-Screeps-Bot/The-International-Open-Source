@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RemoteData, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { CreepMemoryKeys, RemoteData, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
 import { packCoord, reversePosList, unpackCoordAsPos, unpackPosList } from 'other/codec'
 

@@ -272,7 +272,7 @@ export class CommunePlanner {
     preTickRun() {
         this.room = this.roomManager.room
 
-        if (this.room.memory[RoomMemoryKeys.planningCompleted] !== undefined) return RESULT_NO_ACTION
+        if (this.room.memory[RoomMemoryKeys.communePlanned] !== undefined) return RESULT_NO_ACTION
 
         // Stop if there isn't sufficient CPU
 
@@ -3171,7 +3171,7 @@ export class CommunePlanner {
         roomMemory.S = plan.score
         roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
         roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans
-        roomMemory.SA = plan.stampAnchors
+        roomMemory[RoomMemoryKeys.stampAnchors] = plan.stampAnchors
         roomMemory[RoomMemoryKeys.communeSources] = plan.communeSources
         roomMemory[RoomMemoryKeys.communeSourceHarvestPositions] = plan.sourceHarvestPositions
         roomMemory[RoomMemoryKeys.communeSourcePaths] = plan.sourcePaths
@@ -3179,7 +3179,7 @@ export class CommunePlanner {
         roomMemory[RoomMemoryKeys.mineralPath] = plan.mineralPath
         roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
         roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
-        roomMemory[RoomMemoryKeys.planningCompleted] = true
+        roomMemory[RoomMemoryKeys.communePlanned] = true
     }
     private visualizeGrid() {
         for (let x = 0; x < roomDimensions; x++) {

@@ -8,6 +8,7 @@ import {
     roomDimensions,
     defaultStructureTypesByBuildPriority,
     CreepMemoryKeys,
+    RoomMemoryKeys,
 } from 'international/constants'
 import {
     createPosMap,
@@ -734,7 +735,11 @@ const roomAdditions = {
             for (const remoteName of this.memory[RoomMemoryKeys.remotes]) {
                 const remoteMemory = Memory.rooms[remoteName]
 
-                for (let sourceIndex = 0; sourceIndex < remoteMemory[RoomMemoryKeys.RSIDs].length; sourceIndex++) {
+                for (
+                    let sourceIndex = 0;
+                    sourceIndex < remoteMemory[RoomMemoryKeys.remoteSources].length;
+                    sourceIndex++
+                ) {
                     this._remoteSourceIndexesByEfficacy.push(remoteName + ' ' + sourceIndex)
                 }
             }

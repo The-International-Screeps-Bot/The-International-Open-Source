@@ -5,6 +5,7 @@ import {
     RESULT_FAIL,
     RESULT_NO_ACTION,
     RESULT_SUCCESS,
+    RoomMemoryKeys,
 } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import {

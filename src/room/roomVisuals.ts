@@ -9,6 +9,7 @@ import {
     roomDimensions,
     stamps,
     packedPosLength,
+    RoomMemoryKeys,
 } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
@@ -196,7 +197,7 @@ export class RoomVisualsManager {
     private baseVisuals() {
         if (!Memory.baseVisuals) return
 
-        if (!this.roomManager.room.memory[RoomMemoryKeys.planningCompleted]) return
+        if (!this.roomManager.room.memory[RoomMemoryKeys.communePlanned]) return
 
         this.roomManager.room.communeManager.constructionManager.visualize()
     }

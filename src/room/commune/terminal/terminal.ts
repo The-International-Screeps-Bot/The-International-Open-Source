@@ -1629,7 +1629,7 @@ export class TerminalManager {
             [key in ORDER_BUY | ORDER_SELL]?: { [key in ResourceConstant | InterShardResourceConstant]?: Order[] }
         } = { [ORDER_SELL]: {}, [ORDER_BUY]: {} }
 
-        for (let resource of [..[RoomMemoryKeys.reservationEfficacy]SOURCES_ALL, ...INTERSHARD_RESOURCES]) {
+        for (let resource of [...RESOURCES_ALL, ...INTERSHARD_RESOURCES]) {
             result[ORDER_SELL][resource] = []
             result[ORDER_BUY][resource] = []
         }

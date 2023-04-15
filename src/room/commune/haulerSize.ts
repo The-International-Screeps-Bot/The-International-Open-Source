@@ -1,4 +1,4 @@
-import { CPUBucketCapacity, haulerUpdateDefault } from 'international/constants'
+import { CPUBucketCapacity, RoomMemoryKeys, haulerUpdateDefault } from 'international/constants'
 import { CommuneManager } from './commune'
 
 export class HaulerSizeManager {

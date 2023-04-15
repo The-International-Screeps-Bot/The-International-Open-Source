@@ -13,6 +13,7 @@ import {
     packedPosLength,
     decayCosts,
     CreepMemoryKeys,
+    RoomMemoryKeys,
 } from 'international/constants'
 import {
     customLog,

@@ -1,4 +1,9 @@
-import { buildableStructuresSet, buildableStructureTypes, structureTypesToProtectSet } from 'international/constants'
+import {
+    buildableStructuresSet,
+    buildableStructureTypes,
+    RoomMemoryKeys,
+    structureTypesToProtectSet,
+} from 'international/constants'
 import { customLog, findObjectWithID, packAsNum, randomTick } from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
@@ -34,7 +39,7 @@ export class ConstructionManager {
     preTickRun() {
         this.room = this.communeManager.room
 
-        if (!this.room.memory[RoomMemoryKeys.planningCompleted]) return
+        if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
         /* this.visualize() */
 
@@ -115,7 +120,7 @@ export class ConstructionManager {
 
         const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
-        for (let placeRCL = 1; placeRCL <= placeRCL; placeRCL++) {
+        for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
             for (const packedCoord in basePlans.map) {
                 if (this.placedSites >= maxCSites) return
 
