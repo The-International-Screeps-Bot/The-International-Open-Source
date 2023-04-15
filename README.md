@@ -69,7 +69,7 @@ To begin, you need to decide what branch to use. Main is generally old but stabl
 
 Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in the screeps.json file. This reduces cpu usage, and compiles the code so it can be run by Screeps while we develop using folders and typescript.
 
-First, rename example.screeps.json to screeps.json and fill in the required information for each environment you want to run the bot in.
+First, rename `screeps.json.example` to `screeps.json` and fill in the required information for each environment you want to run the bot in. Or if you want ot use the [screeps unified credentials file](https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md), rename `.screeps.yaml.example` to `.screeps.yaml` and fill it.
 
 To then run the bot, use the command `npm run push-mmo` replacing mmo with the environment you want to compile to. This wiil initially compile to the environment, as well as automatically compiling and pushing to the environment on code changes.
 
