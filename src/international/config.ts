@@ -46,6 +46,7 @@ class ConfigManager {
                 ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
                 : false
         Memory.creepSay = settings.creepSay
+        Memory.creepChant = settings.creepChant
         Memory.simpleAlliesSegment = settings.simpleAlliesSegment
         Memory.structureMigration = settings.structureMigration
 

@@ -63,7 +63,7 @@ export class EndTickCreepManager {
      * If enabled and there is a chant this tick, have a random creeps that isn't on an exit say the chant
      */
     private runChant() {
-        if (!Memory.creepSay) return
+        if (!Memory.creepChant) return
 
         const currentChant = chant[Memory.chantIndex]
         if (!currentChant) return
