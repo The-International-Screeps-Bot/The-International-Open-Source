@@ -8,6 +8,9 @@ import {
     roomTypeProperties,
     roomTypes,
     allStructureTypes,
+    dynamicScoreRoomRange,
+    maxControllerLevel,
+    preferredCommuneRange,
 } from './constants'
 
 /**
@@ -791,4 +794,81 @@ export function findRangeFromExit(coord: Coord) {
  */
 export function splitStringAt(string: string, index: number) {
     return [string.slice(0, index), string.slice(index)]
+}
+
+export function findHighestScore<T>(iter: T[], f: (val: T) => number): number {
+    let highestScore = 0
+
+    for (const val of iter) {
+        const score = f(val)
+        if (score <= highestScore) continue
+
+        highestScore = score
+    }
+
+    return highestScore
+}
+
+export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
+    let lowestScore = 0
+
+    for (const val of iter) {
+        const score = f(val)
+        if (score <= lowestScore) continue
+
+        lowestScore = score
+    }
+
+    return lowestScore
+}
+
+export function findDynamicScore(roomName: string) {
+    let dynamicScore = 0
+
+    let closestEnemy = 0
+    let communeScore = 0
+    let allyScore = 0
+
+    const roomCoord = makeRoomCoord(roomName)
+    forRoomNamesAroundRangeXY(roomCoord.x, roomCoord.y, dynamicScoreRoomRange, (x, y) => {
+        const searchRoomName = roomNameFromRoomXY(x, y)
+        const searchRoomMemory = Memory.rooms[searchRoomName]
+
+        if (searchRoomMemory.T === 'enemy') {
+            const score = advancedFindDistance(roomName, searchRoomName)
+            if (score <= closestEnemy) return
+
+            closestEnemy = score
+            return
+        }
+
+        if (searchRoomMemory.T === 'commune') {
+            const searchRoom = Game.rooms[searchRoomName]
+            const score =
+                (advancedFindDistance(roomName, searchRoomName) % 5) +
+                (maxControllerLevel - searchRoom.controller.level)
+            if (score <= communeScore) return
+
+            communeScore = score
+            return
+        }
+
+        if (searchRoomMemory.T === 'ally') {
+            const score =
+                Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
+                (searchRoomMemory.level || 0) * 0.3
+            if (score <= allyScore) return
+
+            allyScore = score
+            return
+        }
+    })
+
+    dynamicScore += Math.floor(Math.pow(dynamicScoreRoomRange - closestEnemy, 1.5))
+    dynamicScore += Math.floor(communeScore * 3)
+    dynamicScore += allyScore
+
+    const roomMemory = Memory.rooms[roomName]
+    roomMemory.DySc = dynamicScore
+    roomMemory.DSUp = Game.time
 }

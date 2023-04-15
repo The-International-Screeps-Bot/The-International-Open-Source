@@ -3,19 +3,28 @@ import {
     creepRoles,
     customColors,
     defaultRoadPlanningPlainCost,
+    dynamicScoreRoomRange,
+    maxControllerLevel,
     powerCreepClassNames,
+    preferredCommuneRange,
     remoteTypeWeights,
     roomDimensions,
     roomTypesUsedForStats,
 } from 'international/constants'
 import {
+    advancedFindDistance,
     cleanRoomMemory,
     customLog,
     findObjectWithID,
     forAdjacentCoords,
     forCoordsInRange,
+    forRoomNamesAroundRangeXY,
+    getRangeXY,
+    makeRoomCoord,
     packAsNum,
     randomTick,
+    roomNameFromRoomCoord,
+    roomNameFromRoomXY,
 } from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
@@ -60,7 +69,6 @@ export class RoomManager {
     room: Room
 
     update(room: Room) {
-
         delete this._usedControllerCoords
         delete this._generalRepairStructures
 
@@ -141,10 +149,7 @@ export class RoomManager {
         room.communeManager.preTickRun()
     }
 
-    preTickRun() {
-
-
-    }
+    preTickRun() {}
 
     run() {
         if (this.room.memory.T === 'remote') {
@@ -421,7 +426,6 @@ export class RoomManager {
             sourcePaths.push(path)
         }
         for (const index in sourcePaths) {
-
             const path = sourcePaths[index]
             if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name)
         }

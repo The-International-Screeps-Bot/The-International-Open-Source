@@ -1966,6 +1966,16 @@ declare global {
     interface RoomMemory {
 
         /**
+         * Dynamic Score
+         */
+        DySc: number
+
+        /**
+         * Dynamic Score Update
+         */
+        DSUp: number
+
+        /**
          * Commune Sources
          */
         CSIDs: Id<Source>[]

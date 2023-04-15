@@ -1,4 +1,4 @@
-import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomTick } from './utils'
+import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomRange, randomTick } from './utils'
 
 import {
     cacheAmountModifier,
@@ -352,7 +352,7 @@ export class InternationalManager {
         if (this._claimRequestsByScore) return this._claimRequestsByScore
 
         return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
-            (a, b) => Memory.rooms[a].S - Memory.rooms[b].S,
+            (a, b) => (Memory.rooms[a].S + Memory.rooms[a].DySc) - (Memory.rooms[b].S + Memory.rooms[b].DySc),
         ))
     }
 

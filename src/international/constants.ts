@@ -1041,7 +1041,6 @@ export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
 
 export const CPUBucketRenewThreshold = 5000
-export const prefferedCommuneRange = 6
 
 /**
  * Roles that should attempt relaying
@@ -1406,3 +1405,7 @@ export const decayCosts: Partial<{ [key in BuildableStructureConstant]: number }
     [STRUCTURE_ROAD]: roadUpkeepCost,
     [STRUCTURE_CONTAINER]: containerUpkeepCost,
 }
+
+export const dynamicScoreRoomRange = 8
+export const maxControllerLevel = 8
+export const preferredCommuneRange = 5.5

@@ -22,6 +22,8 @@ import {
     customLog,
     findCarryPartsRequired,
     findClosestRoomName,
+    findDynamicScore,
+    randomRange,
     randomTick,
 } from './utils'
 import { internationalManager, InternationalManager } from './international'
@@ -114,6 +116,16 @@ class TickConfig {
             if (!room.structures.spawn.length) continue
 
             communesForResponding.push(roomName)
+        }
+
+        // Update dynamicScores if necessary
+
+        for (const roomName in Memory.claimRequests) {
+
+            const roomMemory = Memory.rooms[roomName]
+            if (Game.time - roomMemory.DSUp < randomRange(10000, 20000)) continue
+
+            findDynamicScore(roomName)
         }
 
         // Assign and abandon claimRequests, in order of score

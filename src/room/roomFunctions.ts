@@ -10,7 +10,6 @@ import {
     maxRemoteRoomDistance,
     customColors,
     PlayerMemoryKeys,
-    prefferedCommuneRange,
     RemoteData,
     roomDimensions,
     roomTypeProperties,
@@ -34,6 +33,7 @@ import {
     findClosestCommuneName,
     findCoordsInsideRect,
     findObjectWithID,
+    findDynamicScore,
     getRangeXY,
     isNearRoomEdge,
     newID,
@@ -962,7 +962,6 @@ Room.prototype.createAttackCombatRequest = function (opts) {
     request[CombatRequestKeys.quadQuota] = 1
 
     if (opts) {
-
         Object.assign(request, opts)
         return
     }
@@ -2112,6 +2111,8 @@ Room.prototype.getPartsOfRole = function (role) {
 Room.prototype.createClaimRequest = function () {
     if (this.find(FIND_SOURCES).length < 2) return false
     if (Memory.claimRequests[this.name]) return false
+
+    findDynamicScore(this.name)
 
     const planningCompleted = Memory.rooms[this.name].PC
     if (planningCompleted === false) return false
