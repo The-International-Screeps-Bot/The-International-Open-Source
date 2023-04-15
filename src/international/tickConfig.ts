@@ -66,7 +66,7 @@ class TickConfig {
 
         // Chant logic
 
-        if (Memory.creepSay) {
+        if (Memory.creepChant) {
             if (Memory.chantIndex >= chant.length - 1) Memory.chantIndex = 0
             else Memory.chantIndex += 1
         }

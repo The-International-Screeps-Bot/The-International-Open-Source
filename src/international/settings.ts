@@ -95,6 +95,11 @@ export interface Settings {
     creepSay: boolean
 
     /**
+     * Wether or not creeps should chant the glory of the union
+     */
+    creepChant: boolean
+
+    /**
      * The public segment number (0-100) that you and your allies are using
      */
     simpleAlliesSegment: number
@@ -142,6 +147,7 @@ export const settings: Settings = {
     marketUsage: true,
     logging: false,
     creepSay: true,
+    creepChant: true,
     simpleAlliesSegment: 90,
     errorExporting: true,
     structureMigration: false,
