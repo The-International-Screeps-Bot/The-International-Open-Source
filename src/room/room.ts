@@ -1,4 +1,5 @@
 import {
+    CreepMemoryKeys,
     adjacentOffsets,
     creepRoles,
     customColors,
@@ -617,7 +618,7 @@ export class RoomManager {
 
             if (creep.isDying()) continue
 
-            const packedCoord = creep.memory.PC
+            const packedCoord = creep.memory[CreepMemoryKeys.packedCoord]
             if (!packedCoord) continue
 
             // The creep has a packedPos

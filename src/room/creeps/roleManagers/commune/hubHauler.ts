@@ -1,4 +1,4 @@
-import { linkReceiveTreshold, linkSendThreshold, powerSpawnRefillThreshold } from 'international/constants'
+import { CreepMemoryKeys, linkReceiveTreshold, linkSendThreshold, powerSpawnRefillThreshold } from 'international/constants'
 import { findObjectWithID, getRange, unpackNumAsPos } from 'international/utils'
 
 //import { HubHauler } from '../../creepClasses'
@@ -30,7 +30,7 @@ export class HubHauler extends Creep {
      * @returns If a reservation was made or not
      */
     createCreepRoomLogisticsRequests?(): void {
-        if (this.memory.RLRs.length) return
+        if (this.memory[CreepMemoryKeys.roomLogisticsRequests].length) return
 
         const { room } = this
         const { storage } = room
@@ -518,7 +518,7 @@ export class HubHauler extends Creep {
             /*
             // If the creep has no reservations but is full
 
-            if (!creep.memory.RLRs.length && creep.store.getFreeCapacity() === 0) {
+            if (!creep.memory[CreepMemoryKeys.roomLogisticsRequests].length && creep.store.getFreeCapacity() === 0) {
 
                 for (const key in creep.store) {
                     const resourceType = key as ResourceConstant

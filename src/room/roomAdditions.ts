@@ -545,11 +545,11 @@ const roomAdditions = {
 
                     if (creep.isDying()) continue
                     if (creep.memory[CreepMemoryKeys.sourceIndex] === undefined) continue
-                    if (!creep.memory.PC) continue
+                    if (!creep.memory[CreepMemoryKeys.packedCoord]) continue
 
                     // If the creep has a packedHarvestPos, record it in usedHarvestPositions
 
-                    this._usedSourceHarvestCoords.add(creep.memory.PC)
+                    this._usedSourceHarvestCoords.add(creep.memory[CreepMemoryKeys.packedCoord])
                 }
             }
 
@@ -571,7 +571,7 @@ const roomAdditions = {
 
                 if (creep.isDying()) continue
 
-                const packedCoord = creep.memory.PC
+                const packedCoord = creep.memory[CreepMemoryKeys.packedCoord]
                 if (!packedCoord) continue
 
                 // The creep has a packedPos
@@ -606,11 +606,11 @@ const roomAdditions = {
 
                 if (creep.isDying()) continue
 
-                if (!creep.memory.PC) continue
+                if (!creep.memory[CreepMemoryKeys.packedCoord]) continue
 
                 // The creep has a packedPos
 
-                this._usedMineralCoords.add(creep.memory.PC)
+                this._usedMineralCoords.add(creep.memory[CreepMemoryKeys.packedCoord])
             }
 
             return this._usedMineralCoords
@@ -692,7 +692,7 @@ const roomAdditions = {
 
                 if (creep.isDying()) continue
 
-                const packedCoord = creep.memory.PC
+                const packedCoord = creep.memory[CreepMemoryKeys.packedCoord]
                 if (!packedCoord) continue
 
                 // The creep has a packedPos

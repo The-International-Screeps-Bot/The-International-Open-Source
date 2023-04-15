@@ -1,4 +1,4 @@
-import { creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
+import { CreepMemoryKeys, creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
 import { customLog, estimateTowerDamage, getRangeXY, getRange, isXYExit } from 'international/utils'
 import { profiler } from 'other/profiler'
 
@@ -235,10 +235,10 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._idealSquadMembers) return this._idealSquadMembers
 
-            if (this.memory.SS === 2) {
+            if (this.memory[CreepMemoryKeys.squadSize] === 2) {
             }
 
-            if (this.memory.SS === 4) {
+            if (this.memory[CreepMemoryKeys.squadSize] === 4) {
             }
 
             // Dynamic

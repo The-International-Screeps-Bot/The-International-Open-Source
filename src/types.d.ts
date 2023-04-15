@@ -2,7 +2,7 @@ import { CommuneManager } from './room/commune/commune'
 import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
-import { AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys, CreepMemoryKeys, DepositRequestKeys, HaulRequestKeys, NukeRequestKeys, PlayerMemoryKeys, PowerCreepMemoryKeys, PowerRequestKeys } from 'international/constants'
+import { AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys, CreepMemoryKeys, CreepRoomLogisticsRequestKeys, DepositRequestKeys, HaulRequestKeys, NukeRequestKeys, PlayerMemoryKeys, PowerCreepMemoryKeys, PowerRequestKeys } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
@@ -2305,30 +2305,12 @@ declare global {
     }
 
     interface CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: RoomLogisticsRequestTypes
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-        /**
-         * The Resource Type involved
-         */
-        RT: ResourceConstant
-        /**
-         * The Amount of resources involved
-         */
-        A: number
-        /**
-         * Only Full, if they want a responder only if fully filled
-         */
-        OF?: boolean
-        /**
-         * No reserve, if the creep shouldn't interact with the reserveStore of the target
-         */
-        NR?: boolean
+        [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
+        [CreepRoomLogisticsRequestKeys.target]: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
+        [CreepRoomLogisticsRequestKeys.resourceType]: ResourceConstant
+        [CreepRoomLogisticsRequestKeys.amount]: number
+        [CreepRoomLogisticsRequestKeys.onlyFull]?: boolean
+        [CreepRoomLogisticsRequestKeys.noReserve]?: boolean
     }
 
     interface CreepMemory {
@@ -2338,8 +2320,8 @@ declare global {
         [CreepMemoryKeys.packedCoord]: string
         [CreepMemoryKeys.path]: string
         [CreepMemoryKeys.goalPos]: string
-        [CreepMemoryKeys.usedPathForGoalPos]: string
-        [CreepMemoryKeys.lastCache]: string // lastCache
+        [CreepMemoryKeys.usedPathForGoal]: string
+        [CreepMemoryKeys.lastCache]: number
         [CreepMemoryKeys.structureTarget]: Id<Structure<BuildableStructureConstant>>
         [CreepMemoryKeys.remote]: string
         [CreepMemoryKeys.scoutTarget]: string
@@ -2350,7 +2332,7 @@ declare global {
         [CreepMemoryKeys.squadType]: 'duo' | 'quad' | 'dynamic'
         [CreepMemoryKeys.squadCombatType]: 'rangedAttack' | 'attack' | 'dismantle'
         [CreepMemoryKeys.isSquadFormed]: boolean
-        [CreepMemoryKeys.squadMembers]: Creep[]
+        [CreepMemoryKeys.squadMembers]: string[]
         [CreepMemoryKeys.quadBulldozeTargets]: Id<Structure>[]
         [CreepMemoryKeys.haulRequest]: string
         [CreepMemoryKeys.ticksWaited]: number
@@ -2358,146 +2340,8 @@ declare global {
         [CreepMemoryKeys.rampartOnlyShoving]: boolean
         [CreepMemoryKeys.rampartTarget]: Id<StructureRampart>
         [CreepMemoryKeys.taskRoom]: string
-    }
-
-    interface CreepMemoryTemplate {
-        /**
-         * Task Room Name, the name of the room the creep is trying to perform a task in
-         */
-        TRN: string
-    }
-
-    interface CreepMemory extends CreepMemoryTemplate {
-
-        /**
-         * The creep's packed coord for a designated target
-         */
-        PC: string
-
-        /**
-         * Last Cache, the last time a path was cached in memory
-         */
-        LC: number
-
-        /**
-         * A packed pos list desciring where the creep neeeds to move to get to its goal
-         */
-        P: string
-
-        /**
-         * Goal Pos, the position the creep is or has tried to path to
-         */
-        GP: string
-
-        /**
-         * Used Path, completed usage of the packed for a specified GoalPos
-         */
-        UP: string
-
-        /**
-         * Whether the creep is intended to move on its own or not
-         */
-        getPulled: boolean
-
-        /**
-         * The target for which the creep should repair
-         */
-        repairTarget: Id<Structure<BuildableStructureConstant>>
-
-        /**
-         * Scout Target, the name of the room the scout is trying to scout
-         */
-        scT: string
-
-        /**
-         * Sign Target, the name of the room the scout is trying to sign
-         */
-        siT: string
-
-        /**
-         * Remote Name of the room the creep is remoting for
-         */
-        RN: string
-
-        /**
-         * Room Logistics Requests
-         */
-        RLRs: CreepRoomLogisticsRequest[]
-
-        /**
-         * The target for which the creep should dismantle
-         */
-        dismantleTarget: Id<Structure>
-
-        /**
-         * Wether or not the creep Needs Resources
-         */
-        NR: boolean
-
-        /**
-         * Roads, wether or not the creep should use roads
-         */
-        R: boolean
-
-        /**
-         * Squad Size of the squad the creep is attempting to form
-         */
-        SS: number | undefined
-
-        /**
-         * Squad type
-         */
-        ST: 'duo' | 'quad' | 'dynamic'
-
-        /**
-         * Squad Type the combat method the creep's squad is attempting
-         */
-        SCT: 'rangedAttack' | 'attack' | 'dismantle'
-
-        /**
-         * Squad Formed, wether the creep has joined a squad or not
-         */
-        SF: boolean
-
-        /**
-         * Squad Member Names
-         */
-        SMNs: string[]
-
-        /**
-         * Quad Bulldoze Targets
-         */
-        QBTIDs: Id<Structure>[]
-
-        /**
-         * Combat Request Name, the name of the room the creep should do combat in
-         */
-        CRN?: string
-
-        /**
-         * Haul Request Name, the name of the room the creep should do hauling for
-         */
-        HRN?: string
-
-        /**
-         * Recycle Target, the spawn ID the creep is going to recycle
-         */
-        RecT: Id<StructureSpawn | StructureContainer> | undefined
-
-        /**
-         * Ticks Waited for an arbitrary event
-         */
-        TW: number
-
-        /**
-         * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
-         */
-        ROS: boolean
-
-        /**
-         * Rampart ID, the ID of the rampart the creep is trying to sit under
-         */
-        RID: Id<StructureRampart>
+        [CreepMemoryKeys.getPulled]: boolean
+        [CreepMemoryKeys.combatRequest]: string
     }
 
     interface PowerCreepMemory {

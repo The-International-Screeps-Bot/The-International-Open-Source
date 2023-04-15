@@ -1,4 +1,4 @@
-import { communeSign, nonCommuneSigns } from 'international/constants'
+import { CreepMemoryKeys, communeSign, nonCommuneSigns } from 'international/constants'
 import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
 import { partial } from 'lodash'
 
@@ -11,21 +11,21 @@ export class Scout extends Creep {
     }
 
     preTickManager() {
-        if (!this.memory.scT) return
+        if (!this.memory[CreepMemoryKeys.scoutTarget]) return
 
-        this.commune.scoutTargets.add(this.memory.scT)
+        this.commune.scoutTargets.add(this.memory[CreepMemoryKeys.scoutTarget])
     }
 
     /**
      * Finds a room name for the scout to target
      */
     findScoutTarget?(): boolean {
-        if (this.memory.scT) return true
+        if (this.memory[CreepMemoryKeys.scoutTarget]) return true
 
         const scoutTarget = this.findBestScoutTarget()
         if (!scoutTarget) return false
 
-        this.commune.scoutTargets.add(this.memory.scT)
+        this.commune.scoutTargets.add(this.memory[CreepMemoryKeys.scoutTarget])
         return true
     }
 
@@ -82,10 +82,10 @@ export class Scout extends Creep {
                 if (range > lowestRange) continue
 
                 lowestRange = range
-                this.memory.scT = roomName
+                this.memory[CreepMemoryKeys.scoutTarget] = roomName
             }
 
-            return this.memory.scT
+            return this.memory[CreepMemoryKeys.scoutTarget]
         }
 
         // Find the room scouted longest ago
@@ -97,10 +97,10 @@ export class Scout extends Creep {
             if (lastScoutTick > lowestLastScoutTick) continue
 
             lowestLastScoutTick = lastScoutTick
-            this.memory.scT = roomName
+            this.memory[CreepMemoryKeys.scoutTarget] = roomName
         }
 
-        return this.memory.scT
+        return this.memory[CreepMemoryKeys.scoutTarget]
     }
 
     // THIS SHOULD BE A ROOM FUNCTION BASED OFF Room.advancedScout
@@ -147,7 +147,7 @@ export class Scout extends Creep {
 
         if (!controller) return true
 
-        if (room.name !== this.memory.siT) return true
+        if (room.name !== this.memory[CreepMemoryKeys.signTarget]) return true
 
         this.message = '🔤'
 
@@ -224,7 +224,7 @@ export class Scout extends Creep {
 
             // If the creep is in the scoutTarget
 
-            if (creep.memory.scT === room.name) {
+            if (creep.memory[CreepMemoryKeys.scoutTarget] === room.name) {
                 creep.message = '👁️'
 
                 // Get information about the room
@@ -237,7 +237,7 @@ export class Scout extends Creep {
 
                 // And delete the creep's scoutTarget
 
-                delete creep.memory.scT
+                delete creep.memory[CreepMemoryKeys.scoutTarget]
             }
 
             // If there is no scoutTarget, find one
@@ -246,11 +246,11 @@ export class Scout extends Creep {
 
             // Say the scoutTarget
 
-            creep.message = `🔭${creep.memory.scT.toString()}`
+            creep.message = `🔭${creep.memory[CreepMemoryKeys.scoutTarget].toString()}`
 
             if (!creep.advancedSignController()) continue
 
-            creep.memory.siT = creep.memory.scT
+            creep.memory[CreepMemoryKeys.signTarget] = creep.memory[CreepMemoryKeys.scoutTarget]
 
             // Try to go to the scoutTarget
 
@@ -259,7 +259,7 @@ export class Scout extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.memory.scT),
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.scoutTarget]),
                             range: 25,
                         },
                     ],
@@ -268,13 +268,14 @@ export class Scout extends Creep {
                     swampCost: 1,
                 }) === 'unpathable'
             ) {
-                let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory.scT]
-                if (!roomMemory) roomMemory = (Memory.rooms[creep.memory.scT] as Partial<RoomMemory>) = {}
+                let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]]
+                if (!roomMemory)
+                    roomMemory = (Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]] as Partial<RoomMemory>) = {}
 
                 roomMemory.T = 'neutral'
                 roomMemory.LST = Game.time
 
-                delete creep.memory.scT
+                delete creep.memory[CreepMemoryKeys.scoutTarget]
             }
         }
     }

@@ -73,7 +73,7 @@ export class SourceHarvester extends Creep {
 
         // If the creep's movement type is pull
 
-        if (this.memory.getPulled) return RESULT_NO_ACTION
+        if (this.memory[CreepMemoryKeys.getPulled]) return RESULT_NO_ACTION
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -82,7 +82,7 @@ export class SourceHarvester extends Creep {
         // The packed path is meant for the closest harvest pos, so change loose usage based on the harvestPos
         /*
         const targetsClosestHarvestPos =
-            this.memory.PC === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory[CreepMemoryKeys.sourceIndex]][0])
+            this.memory[CreepMemoryKeys.packedCoord] === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory[CreepMemoryKeys.sourceIndex]][0])
  */
         this.createMoveRequestByPath(
             {

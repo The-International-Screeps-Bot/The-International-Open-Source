@@ -4,7 +4,7 @@ import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
     preTickManager() {
-        const request = Memory.claimRequests[this.memory.TRN]
+        const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
 
         if (!request) return
 
@@ -12,7 +12,7 @@ export class AllyVanguard extends Creep {
     }
 
     findRemote?(): boolean {
-        if (this.memory.RN) return true
+        if (this.memory[CreepMemoryKeys.remote]) return true
 
         const { room } = this
 
@@ -35,7 +35,7 @@ export class AllyVanguard extends Creep {
             )
                 continue
 
-            this.memory.RN = roomName
+            this.memory[CreepMemoryKeys.remote] = roomName
             return true
         }
 
@@ -49,10 +49,10 @@ export class AllyVanguard extends Creep {
 
         if (!this.findRemote()) return
 
-        if (room.name !== this.memory.RN) {
+        if (room.name !== this.memory[CreepMemoryKeys.remote]) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory.RN), range: 25 }],
+                goals: [{ pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.remote]), range: 25 }],
                 avoidEnemyRanges: true,
             })
 
@@ -140,7 +140,7 @@ export class AllyVanguard extends Creep {
         const { room } = this
 
         if (this.needsResources()) {
-            if (this.memory.RN) {
+            if (this.memory[CreepMemoryKeys.remote]) {
                 this.getEnergyFromRemote()
                 return
             }
@@ -152,10 +152,10 @@ export class AllyVanguard extends Creep {
             return
         }
 
-        if (room.name !== this.memory.TRN) {
+        if (room.name !== this.memory[CreepMemoryKeys.taskRoom]) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
+                goals: [{ pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
                 avoidEnemyRanges: true,
             })
 
@@ -177,11 +177,14 @@ export class AllyVanguard extends Creep {
 
             const creep: AllyVanguard = Game.creeps[creepName]
 
-            const request = creep.memory.TRN
+            const request = creep.memory[CreepMemoryKeys.taskRoom]
 
             creep.message = request
 
-            if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
+            if (
+                room.name === request ||
+                (creep.memory[CreepMemoryKeys.remote] && room.name === creep.memory[CreepMemoryKeys.remote])
+            ) {
                 creep.buildRoom()
                 continue
             }
@@ -193,7 +196,7 @@ export class AllyVanguard extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
                     avoidEnemyRanges: true,
                     typeWeights: {
                         enemy: Infinity,
@@ -202,7 +205,7 @@ export class AllyVanguard extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[creep.memory.TRN]
+                const request = Memory.claimRequests[creep.memory[CreepMemoryKeys.taskRoom]]
                 if (request) request[AllyCreepRequestKeys.abandon] = 20000
             }
         }

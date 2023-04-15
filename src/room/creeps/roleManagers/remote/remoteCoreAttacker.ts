@@ -1,4 +1,4 @@
-import { customColors, RemoteData } from 'international/constants'
+import { CreepMemoryKeys, customColors, RemoteData } from 'international/constants'
 import { getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
@@ -30,19 +30,20 @@ export class RemoteCoreAttacker extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData[role]] -= 1
 
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]])
+            commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]][role].push(this.name)
     }
 
     hasValidRemote?() {
-        if (!this.memory.RN) return false
+        if (!this.memory[CreepMemoryKeys.remote]) return false
 
-        const remoteMemory = Memory.rooms[this.memory.RN]
+        const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
         if (remoteMemory.T !== 'remote') return false
         if (remoteMemory.CN !== this.commune.name) return false
@@ -72,7 +73,7 @@ export class RemoteCoreAttacker extends Creep {
 
             // Otherwise assign the remote to the creep and inform true
 
-            this.memory.RN = roomName
+            this.memory[CreepMemoryKeys.remote] = roomName
             roomMemory.data[RemoteData[role]] -= 1
 
             return true
@@ -153,14 +154,14 @@ export class RemoteCoreAttacker extends Creep {
                 continue
             }
 
-            creep.message = creep.memory.RN
+            creep.message = creep.memory[CreepMemoryKeys.remote]
 
             if (creep.advancedAttackCores()) continue
 
             // If the creep is its remote
 
-            if (room.name === creep.memory.RN) {
-                delete creep.memory.RN
+            if (room.name === creep.memory[CreepMemoryKeys.remote]) {
+                delete creep.memory[CreepMemoryKeys.remote]
                 continue
             }
 
@@ -170,7 +171,7 @@ export class RemoteCoreAttacker extends Creep {
                 origin: creep.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.remote]),
                         range: 25,
                     },
                 ],

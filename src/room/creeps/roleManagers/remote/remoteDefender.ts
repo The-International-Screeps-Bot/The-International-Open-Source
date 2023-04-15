@@ -1,4 +1,4 @@
-import { RemoteData } from 'international/constants'
+import { CreepMemoryKeys, RemoteData } from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -22,16 +22,16 @@ export class RemoteDefender extends Creep {
 
         const role = this.role as 'remoteDefender'
 
-        if (Memory.rooms[this.memory.RN].T !== 'remote') {
-            delete this.memory.RN
+        if (Memory.rooms[this.memory[CreepMemoryKeys.remote]].T !== 'remote') {
+            delete this.memory[CreepMemoryKeys.remote]
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory.RN].CN !== this.commune.name) {
+        else if (Memory.rooms[this.memory[CreepMemoryKeys.remote]].CN !== this.commune.name) {
             // Delete it from memory and try to find a new one
 
-            delete this.memory.RN
+            delete this.memory[CreepMemoryKeys.remote]
             if (!this.findRemote()) return
         }
 
@@ -39,14 +39,15 @@ export class RemoteDefender extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData.minDamage] -= this.combatStrength.ranged
-        Memory.rooms[this.memory.RN].data[RemoteData.minHeal] -= this.combatStrength.heal
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData.minDamage] -= this.combatStrength.ranged
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData.minHeal] -= this.combatStrength.heal
 
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]])
+            commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]][role].push(this.name)
     }
 
     /**
@@ -57,7 +58,7 @@ export class RemoteDefender extends Creep {
 
         // If the creep already has a remote, inform true
 
-        if (creep.memory.RN) return true
+        if (creep.memory[CreepMemoryKeys.remote]) return true
 
         // Get remotes by their efficacy
 
@@ -78,7 +79,7 @@ export class RemoteDefender extends Creep {
 
             // Otherwise assign the remote to the creep and inform true
 
-            creep.memory.RN = roomName
+            creep.memory[CreepMemoryKeys.remote] = roomName
             roomMemory.data[RemoteData.minDamage] -= creep.combatStrength.ranged
             roomMemory.data[RemoteData.minHeal] -= creep.combatStrength.heal
 
@@ -282,25 +283,25 @@ export class RemoteDefender extends Creep {
                 continue
             }
 
-            creep.message = creep.memory.RN
+            creep.message = creep.memory[CreepMemoryKeys.remote]
 
             // Try to attack enemyAttackers, iterating if there are none or one was attacked
 
             if (creep.advancedAttackEnemies()) {
-                delete creep.memory.TW
+                delete creep.memory[CreepMemoryKeys.ticksWaited]
                 continue
             }
 
             // If the creep is in its remote
 
-            if (room.name === creep.memory.RN) {
-                if (!creep.memory.TW) creep.memory.TW = 0
-                else creep.memory.TW += 1
+            if (room.name === creep.memory[CreepMemoryKeys.remote]) {
+                if (!creep.memory[CreepMemoryKeys.ticksWaited]) creep.memory[CreepMemoryKeys.ticksWaited] = 0
+                else creep.memory[CreepMemoryKeys.ticksWaited] += 1
 
                 // If a random range of time has passed, find a new remote
 
-                if (creep.memory.TW > randomIntRange(20, 100)) {
-                    delete creep.memory.RN
+                if (creep.memory[CreepMemoryKeys.ticksWaited] > randomIntRange(20, 100)) {
+                    delete creep.memory[CreepMemoryKeys.remote]
 
                     if (creep.moveRequest) continue
 
@@ -316,7 +317,7 @@ export class RemoteDefender extends Creep {
                 origin: creep.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.remote]),
                         range: 25,
                     },
                 ],

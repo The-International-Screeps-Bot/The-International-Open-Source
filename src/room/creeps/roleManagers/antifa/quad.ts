@@ -1,5 +1,6 @@
 import {
     CombatRequestKeys,
+    CreepMemoryKeys,
     customColors,
     quadAttackMemberOffsets,
     rangedMassAttackMultiplierByRange,
@@ -198,8 +199,8 @@ export class Quad {
 
         this.sortMembersByCoord()
 
-        if (Memory.combatRequests[this.leader.memory.CRN])
-            Memory.combatRequests[this.leader.memory.CRN][CombatRequestKeys.quads] += 1
+        if (Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]])
+            Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]][CombatRequestKeys.quads] += 1
     }
 
     sortMembersByCoord() {
@@ -249,7 +250,7 @@ export class Quad {
         this.createMoveRequest({
             goals: [
                 {
-                    pos: new RoomPosition(25, 25, this.leader.memory.CRN),
+                    pos: new RoomPosition(25, 25, this.leader.memory[CreepMemoryKeys.combatRequest]),
                     range: 25,
                 },
             ],
@@ -265,7 +266,7 @@ export class Quad {
     }
 
     runCombatRoom() {
-        if (this.leader.room.name !== this.leader.memory.CRN) return false
+        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest]) return false
         /*
         if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
@@ -283,7 +284,7 @@ export class Quad {
     }
 
     runCombat() {
-        if (this.leader.memory.SCT === 'rangedAttack') {
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
             this.passiveRangedAttack()
 
             const nearbyThreat = this.leader.room.enemyAttackers.find(
@@ -309,7 +310,7 @@ export class Quad {
             if (this.advancedRangedAttack()) return true
             return false
         }
-        if (this.leader.memory.SCT === 'attack') {
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') {
             if (this.advancedAttack()) return false
         }
 
@@ -418,7 +419,7 @@ export class Quad {
             this.leader = newLeader
 
             for (const member of this.members) {
-                member.memory.SMNs = this.memberNames
+                member.memory[CreepMemoryKeys.squadMembers] = this.memberNames
             }
         }
 
@@ -503,7 +504,7 @@ export class Quad {
 
         const range = getRangeXY(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
 
-        if (this.leader.memory.SCT === 'rangedAttack') {
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
             score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
 
             return score
@@ -511,7 +512,7 @@ export class Quad {
 
         if (range > 1) return score
 
-        if (this.leader.memory.SCT === 'attack') {
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') {
             score += member.combatStrength.melee
             return score
         }
@@ -527,7 +528,7 @@ export class Quad {
         if (!this.target) return false
 
         const memberTransforms: string[] = []
-        const transformableMemberNames = new Set(this.leader.memory.SMNs)
+        const transformableMemberNames = new Set(this.leader.memory[CreepMemoryKeys.squadMembers])
 
         for (let i = 0; i < quadAttackMemberOffsets.length; i++) {
             const coord = {
@@ -560,7 +561,7 @@ export class Quad {
         const nonNullMemberTransforms = memberTransforms.filter(name => name)
 
         for (const member of this.members) {
-            member.memory.SMNs = nonNullMemberTransforms
+            member.memory[CreepMemoryKeys.squadMembers] = nonNullMemberTransforms
         }
         return true
     }
@@ -838,13 +839,13 @@ export class Quad {
     }
 
     bulldoze() {
-        const request = Memory.combatRequests[this.leader.memory.CRN]
+        const request = Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]]
         if (!request) return false
         if (request[CombatRequestKeys.type] === 'defend') return false
 
         let bulldozeTarget: Structure
-        this.leader.memory.QBTIDs = []
-        let quadBulldozeTargetIDs = this.leader.memory.QBTIDs || []
+        this.leader.memory[CreepMemoryKeys.quadBulldozeTargets] = []
+        let quadBulldozeTargetIDs = this.leader.memory[CreepMemoryKeys.quadBulldozeTargets] || []
 
         for (let i = 0; i < quadBulldozeTargetIDs.length; i++) {
             const ID = quadBulldozeTargetIDs[i]
@@ -891,7 +892,7 @@ export class Quad {
     }
 
     rangedAttackStructures() {
-        const request = Memory.combatRequests[this.leader.memory.CRN]
+        const request = Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]]
         if (!request) return false
         if (request[CombatRequestKeys.type] === 'defend') return false
 

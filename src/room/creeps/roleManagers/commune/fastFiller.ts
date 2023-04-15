@@ -1,3 +1,4 @@
+import { CreepMemoryKeys } from 'international/constants'
 import { findClosestPos, getRangeXY, getRange } from 'international/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 
@@ -31,7 +32,7 @@ export class FastFiller extends Creep {
 
         // Stop if the creep already has a packedFastFillerPos
 
-        if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
+        if (this.memory[CreepMemoryKeys.packedCoord]) return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
 
         // Get usedFastFillerPositions
 
@@ -45,7 +46,7 @@ export class FastFiller extends Creep {
         const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
         const packedCoord = packCoord(fastFillerPos)
 
-        this.memory.PC = packedCoord
+        this.memory[CreepMemoryKeys.packedCoord] = packedCoord
         room._usedFastFillerCoords.add(packedCoord)
 
         return fastFillerPos

@@ -1,4 +1,4 @@
-import { ClaimRequestKeys } from 'international/constants'
+import { ClaimRequestKeys, CreepMemoryKeys } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -8,7 +8,7 @@ export class Claimer extends Creep {
     preTickManager() {
         if (this.isDying()) return
 
-        const request = Memory.claimRequests[this.memory.TRN]
+        const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
         if (!request) return
 
         request[ClaimRequestKeys.claimer] -= 1
@@ -62,9 +62,9 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            creep.message = creep.memory.TRN
+            creep.message = creep.memory[CreepMemoryKeys.taskRoom]
 
-            if (room.name === creep.memory.TRN) {
+            if (room.name === creep.memory[CreepMemoryKeys.taskRoom]) {
                 creep.claimRoom()
                 continue
             }
@@ -74,7 +74,7 @@ export class Claimer extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    goals: [{ pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: creep.parts.move >= 5 ? 1 : undefined,
@@ -85,7 +85,7 @@ export class Claimer extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[creep.memory.TRN]
+                const request = Memory.claimRequests[creep.memory[CreepMemoryKeys.taskRoom]]
                 if (request) request[ClaimRequestKeys.abandon] = 20000
             }
         }

@@ -160,13 +160,6 @@ export const chant = [
     'your',
     'chains!',
     undefined,
-    'Read',
-    'Das',
-    'Kapital',
-    'on',
-    'marxists',
-    '.org',
-    undefined,
 ]
 
 export const roomDimensions = 50
@@ -937,6 +930,15 @@ export enum RemoteData {
     maxSourceIncome1
 }
 
+export enum CreepRoomLogisticsRequestKeys {
+    type,
+    target,
+    resourceType,
+    amount,
+    onlyFull,
+    noReserve,
+}
+
 export enum CreepMemoryKeys {
     preferRoads,
     sourceIndex,
@@ -944,7 +946,7 @@ export enum CreepMemoryKeys {
     packedCoord,
     path,
     goalPos,
-    usedPathForGoalPos,
+    usedPathForGoal,
     lastCache,
     structureTarget,
     remote,
@@ -964,6 +966,8 @@ export enum CreepMemoryKeys {
     rampartOnlyShoving,
     rampartTarget,
     taskRoom,
+    getPulled,
+    combatRequest,
 }
 
 export enum PowerCreepMemoryKeys {

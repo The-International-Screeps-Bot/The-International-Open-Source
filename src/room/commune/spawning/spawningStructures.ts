@@ -1,4 +1,4 @@
-import { customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
+import { CreepMemoryKeys, customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
 import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, getRange, newID } from 'international/utils'
@@ -42,9 +42,9 @@ export class SpawningStructuresManager {
                 creep.manageSpawning(spawn)
                 creep.spawnID = spawn.id
 
-                if (spawn.spawning.remainingTime <= 2 && creep.memory.P && creep.memory.P.length) {
+                if (spawn.spawning.remainingTime <= 2 && creep.memory[CreepMemoryKeys.path] && creep.memory[CreepMemoryKeys.path].length) {
 
-                    creep.assignMoveRequest(unpackPosList(creep.memory.P)[0])
+                    creep.assignMoveRequest(unpackPosList(creep.memory[CreepMemoryKeys.path])[0])
                 }
 
                 this.activeSpawns.push(spawn)

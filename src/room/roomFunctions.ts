@@ -21,6 +21,7 @@ import {
     RESULT_NO_ACTION,
     adjacentOffsets,
     RESULT_SUCCESS,
+    CreepMemoryKeys,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -289,11 +290,12 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (
                     opts.creep &&
-                    (!opts.creep.memory.SMNs || opts.creep.memory.SMNs.length < 3) &&
+                    (!opts.creep.memory[CreepMemoryKeys.squadMembers] ||
+                        opts.creep.memory[CreepMemoryKeys.squadMembers].length < 3) &&
                     (!opts.weightStructures || !opts.weightStructures.road)
                 ) {
                     let roadCost = 1
-                    if (!opts.creep.memory.R) roadCost = opts.plainCost
+                    if (!opts.creep.memory[CreepMemoryKeys.preferRoads]) roadCost = opts.plainCost
 
                     for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
                 }
@@ -998,7 +1000,7 @@ Room.prototype.createHarassCombatRequest = function (opts) {
     }
 
     /*
-    const structures = this.dismantleTargets
+    const structures = this[CreepMemoryKeys.structureTarget]s
 
     let totalHits = 0
     for (const structure of structures) totalHits += structure.hits

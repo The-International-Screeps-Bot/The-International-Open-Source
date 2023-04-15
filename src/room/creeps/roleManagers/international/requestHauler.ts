@@ -1,3 +1,4 @@
+import { CreepMemoryKeys } from 'international/constants'
 import { internationalManager } from 'international/international'
 
 export class RequestHauler extends Creep {
@@ -6,8 +7,8 @@ export class RequestHauler extends Creep {
     }
 
     preTickManager() {
-        if (Memory.haulRequests[this.memory.HRN]) {
-            internationalManager.creepsByHaulRequest[this.memory.HRN].push(this.name)
+        if (Memory.haulRequests[this.memory[CreepMemoryKeys.haulRequest]]) {
+            internationalManager.creepsByHaulRequest[this.memory[CreepMemoryKeys.haulRequest]].push(this.name)
         }
     }
 

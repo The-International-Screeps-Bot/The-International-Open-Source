@@ -30,19 +30,20 @@ export class RemoteDismantler extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData[role]] -= 1
 
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]])
+            commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]][role].push(this.name)
     }
 
     hasValidRemote?() {
-        if (!this.memory.RN) return false
+        if (!this.memory[CreepMemoryKeys.remote]) return false
 
-        const remoteMemory = Memory.rooms[this.memory.RN]
+        const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
         if (remoteMemory.T !== 'remote') return false
         if (remoteMemory.CN !== this.commune.name) return false
@@ -73,7 +74,7 @@ export class RemoteDismantler extends Creep {
 
             // Otherwise assign the remote to the creep and inform true
 
-            this.memory.RN = roomName
+            this.memory[CreepMemoryKeys.remote] = roomName
             roomMemory.data[RemoteData[role]] -= 1
 
             return true
@@ -100,8 +101,8 @@ export class RemoteDismantler extends Creep {
         let target
         let range
 
-        if (this.memory.dismantleTarget) {
-            target = findObjectWithID(this.memory.dismantleTarget)
+        if (this.memory[CreepMemoryKeys.structureTarget]) {
+            target = findObjectWithID(this.memory[CreepMemoryKeys.structureTarget])
 
             if (target) {
                 range = getRangeXY(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
@@ -148,7 +149,7 @@ export class RemoteDismantler extends Creep {
                 return true
             }
 
-            this.memory.dismantleTarget = target.id
+            this.memory[CreepMemoryKeys.structureTarget] = target.id as Id<Structure<BuildableStructureConstant>>
 
             this.dismantle(target)
             return true
@@ -191,11 +192,11 @@ export class RemoteDismantler extends Creep {
                 continue
             }
 
-            creep.message = creep.memory.RN
+            creep.message = creep.memory[CreepMemoryKeys.remote]
 
             // If the creep is its remote
 
-            if (room.name === creep.memory.RN) {
+            if (room.name === creep.memory[CreepMemoryKeys.remote]) {
                 if (creep.advancedDismantle()) continue
                 continue
             }
@@ -206,7 +207,7 @@ export class RemoteDismantler extends Creep {
                 origin: creep.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
+                        pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.remote]),
                         range: 25,
                     },
                 ],

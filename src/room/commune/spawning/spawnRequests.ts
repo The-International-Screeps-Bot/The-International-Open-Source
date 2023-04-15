@@ -117,7 +117,7 @@ export class SpawnRequestsManager {
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -134,7 +134,7 @@ export class SpawnRequestsManager {
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -151,7 +151,7 @@ export class SpawnRequestsManager {
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -168,7 +168,7 @@ export class SpawnRequestsManager {
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -185,7 +185,7 @@ export class SpawnRequestsManager {
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -205,7 +205,7 @@ export class SpawnRequestsManager {
                         spawnGroup: spawnGroup,
                         memoryAdditions: {
                             [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 })(),
@@ -239,7 +239,7 @@ export class SpawnRequestsManager {
                         maxCostPerCreep: this.communeManager.room.memory.MHC,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -282,7 +282,7 @@ export class SpawnRequestsManager {
                     minCost,
                     priority: 10 + this.communeManager.room.creepsFromRoom.mineralHarvester.length,
                     memoryAdditions: {
-                        R: true,
+                        [CreepMemoryKeys.preferRoads]: true,
                     },
                 }
             })(),
@@ -581,7 +581,7 @@ export class SpawnRequestsManager {
                         minCost: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -655,7 +655,7 @@ export class SpawnRequestsManager {
                         minCost: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -672,7 +672,7 @@ export class SpawnRequestsManager {
                         minCost: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -689,7 +689,7 @@ export class SpawnRequestsManager {
                         minCost: 250,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -709,7 +709,7 @@ export class SpawnRequestsManager {
                         minCost: 250,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -724,7 +724,7 @@ export class SpawnRequestsManager {
                     minCost: 300,
                     priority,
                     memoryAdditions: {
-                        R: true,
+                        [CreepMemoryKeys.preferRoads]: true,
                     },
                 }
             })(),
@@ -859,7 +859,7 @@ export class SpawnRequestsManager {
                             minCost: 300,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -904,7 +904,7 @@ export class SpawnRequestsManager {
                             minCost: 200,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -932,7 +932,7 @@ export class SpawnRequestsManager {
                             minCost: 250,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -962,7 +962,7 @@ export class SpawnRequestsManager {
                             minCost: 250,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -989,7 +989,7 @@ export class SpawnRequestsManager {
                         minCost: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -1014,7 +1014,7 @@ export class SpawnRequestsManager {
                         minCost: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
@@ -1080,9 +1080,9 @@ export class SpawnRequestsManager {
                             minCost: 200,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                RN: remoteName,
+                                [CreepMemoryKeys.remote]: remoteName,
                             },
                         }
                     }
@@ -1103,9 +1103,9 @@ export class SpawnRequestsManager {
                             minCost: 300,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                RN: remoteName,
+                                [CreepMemoryKeys.remote]: remoteName,
                             },
                         }
                     }
@@ -1124,9 +1124,9 @@ export class SpawnRequestsManager {
                             minCost: 300,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                                RN: remoteName,
+                                [CreepMemoryKeys.remote]: remoteName,
                             },
                         }
                     }
@@ -1144,9 +1144,9 @@ export class SpawnRequestsManager {
                         minCost: 300,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                             [CreepMemoryKeys.sourceIndex]: sourceIndex,
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
@@ -1178,7 +1178,7 @@ export class SpawnRequestsManager {
                                 maxCostPerCreep: cost,
                                 priority,
                                 memoryAdditions: {
-                                    R: true,
+                                    [CreepMemoryKeys.preferRoads]: true,
                                 },
                             }
                     }
@@ -1257,7 +1257,7 @@ export class SpawnRequestsManager {
                         minCost: cost,
                         priority: this.minRemotePriority + 0.1,
                         memoryAdditions: {
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
@@ -1354,7 +1354,7 @@ export class SpawnRequestsManager {
                         minCost: cost * extraParts.length,
                         priority: this.minRemotePriority - 2,
                         memoryAdditions: {
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
@@ -1392,7 +1392,7 @@ export class SpawnRequestsManager {
                         minCost: cost * 2,
                         priority: this.minRemotePriority - 1,
                         memoryAdditions: {
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
@@ -1441,7 +1441,7 @@ export class SpawnRequestsManager {
                         minCost: 650,
                         priority: 8.1,
                         memoryAdditions: {
-                            TRN: requestName,
+                            [CreepMemoryKeys.taskRoom]: requestName,
                         },
                     }
                 })(),
@@ -1467,7 +1467,7 @@ export class SpawnRequestsManager {
                         minCost: 250,
                         priority: 8.2,
                         memoryAdditions: {
-                            TRN: requestName,
+                            [CreepMemoryKeys.taskRoom]: requestName,
                         },
                     }
                 })(),
@@ -1497,7 +1497,7 @@ export class SpawnRequestsManager {
                     minCost: 250,
                     priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
                     memoryAdditions: {
-                        TRN: requestName,
+                        [CreepMemoryKeys.taskRoom]: requestName,
                     },
                 }
             })(),
@@ -1525,7 +1525,7 @@ export class SpawnRequestsManager {
                         maxCostPerCreep: this.communeManager.room.memory.MHC,
                         priority,
                         memoryAdditions: {
-                            HRN: requestName,
+                            [CreepMemoryKeys.haulRequest]: requestName,
                         },
                     }
                 })(),
@@ -1680,10 +1680,10 @@ export class SpawnRequestsManager {
                             spawnGroup,
                             minCreeps: request[CombatRequestKeys.quadQuota] * 4,
                             memoryAdditions: {
-                                CRN: requestName,
-                                SS: 4,
-                                ST: 'quad',
-                                SCT: 'rangedAttack',
+                                [CreepMemoryKeys.combatRequest]: requestName,
+                                [CreepMemoryKeys.squadSize]: 4,
+                                [CreepMemoryKeys.squadType]: 'quad',
+                                [CreepMemoryKeys.squadCombatType]: 'rangedAttack',
                             },
                         }
                     })(),

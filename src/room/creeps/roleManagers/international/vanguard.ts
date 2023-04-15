@@ -13,7 +13,7 @@ export class Vanguard extends Creep {
         if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined)
             this.room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
 
-        const request = Memory.claimRequests[this.memory.TRN]
+        const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
         if (!request) return
 
         request[ClaimRequestKeys.vanguard] -= this.parts.work
@@ -104,9 +104,9 @@ export class Vanguard extends Creep {
     }
 
     run?() {
-        this.message = this.memory.TRN
+        this.message = this.memory[CreepMemoryKeys.taskRoom]
 
-        if (this.room.name === this.memory.TRN || !this.memory.TRN) {
+        if (this.room.name === this.memory[CreepMemoryKeys.taskRoom] || !this.memory[CreepMemoryKeys.taskRoom]) {
             if (this.needsResources()) {
                 // Define the creep's sourceName
 
@@ -125,7 +125,7 @@ export class Vanguard extends Creep {
             }
 
             delete this.memory[CreepMemoryKeys.sourceIndex]
-            delete this.memory.PC
+            delete this.memory[CreepMemoryKeys.packedCoord]
 
             if (this.upgradeRoom()) return
             if (this.repairRampart()) return
@@ -138,7 +138,7 @@ export class Vanguard extends Creep {
         if (
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
+                goals: [{ pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
                 avoidEnemyRanges: true,
                 typeWeights: {
                     enemy: Infinity,
@@ -147,7 +147,7 @@ export class Vanguard extends Creep {
                 },
             }) === 'unpathable'
         ) {
-            const request = Memory.claimRequests[this.memory.TRN]
+            const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
             if (request) request[ClaimRequestKeys.abandon] = 20000
         }
     }

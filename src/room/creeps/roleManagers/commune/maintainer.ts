@@ -1,4 +1,4 @@
-import { RESULT_FAIL, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, RESULT_FAIL, roomDimensions } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'international/utils'
 import { packCoord } from 'other/codec'
@@ -16,7 +16,7 @@ export class Maintainer extends Creep {
         const { room } = this
 
         if (this.needsResources()) {
-            delete this.memory.repairTarget
+            delete this.memory[CreepMemoryKeys.structureTarget]
 
             this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['withdraw', 'offer', 'pickup']),
@@ -87,7 +87,7 @@ export class Maintainer extends Creep {
 
         // Otherwise we need a new target
 
-        delete this.memory.repairTarget
+        delete this.memory[CreepMemoryKeys.structureTarget]
 
         // Find a target next tick, we can't do more
 
@@ -124,7 +124,10 @@ export class Maintainer extends Creep {
         const workPartCount = this.parts.work
 
         const structure = this.room.roomManager.generalRepairStructures.find(structure => {
-            return getRange(structure.pos, this.pos) <= 3 && structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+            return (
+                getRange(structure.pos, this.pos) <= 3 &&
+                structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER
+            )
         })
         if (!structure) return false
 

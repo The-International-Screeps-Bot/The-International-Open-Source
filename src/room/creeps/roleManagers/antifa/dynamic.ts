@@ -1,4 +1,4 @@
-import { customColors, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, customColors, roomDimensions } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
@@ -78,7 +78,7 @@ export class Dynamic {
             origin: this.leader.pos,
             goals: [
                 {
-                    pos: new RoomPosition(25, 25, this.leader.memory.CRN),
+                    pos: new RoomPosition(25, 25, this.leader.memory[CreepMemoryKeys.combatRequest]),
                     range: 25,
                 },
             ],
@@ -94,7 +94,7 @@ export class Dynamic {
     }
 
     runCombatRoom() {
-        if (this.leader.room.name !== this.leader.memory.CRN) return false
+        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest]) return false
 
         if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
@@ -110,8 +110,8 @@ export class Dynamic {
 
     runCombat() {
         /*
-        if (this.leader.memory.SCT === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.leader.memory.SCT === 'attack') return this.advancedAttack()
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') return this.advancedRangedAttack()
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') return this.advancedAttack()
         return this.advancedDismantle()
          */
     }

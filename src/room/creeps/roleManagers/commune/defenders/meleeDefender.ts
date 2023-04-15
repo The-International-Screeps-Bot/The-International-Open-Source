@@ -1,4 +1,4 @@
-import { impassibleStructureTypes, customColors } from 'international/constants'
+import { impassibleStructureTypes, customColors, CreepMemoryKeys } from 'international/constants'
 import {
     areCoordsEqual,
     customLog,
@@ -41,10 +41,10 @@ export class MeleeDefender extends Creep {
             } else room.defenderEnemyTargetsWithDefender.get(enemyCreep.id).push(this.id)
         }
 
-        if (this.memory.RID) {
-            const rampart = findObjectWithID(this.memory.RID)
+        if (this.memory[CreepMemoryKeys.rampartTarget]) {
+            const rampart = findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
             if (!rampart || rampart.hits < 3000) {
-                delete this.memory.RID
+                delete this.memory[CreepMemoryKeys.rampartTarget]
                 return
             }
 
@@ -108,9 +108,10 @@ export class MeleeDefender extends Creep {
     findRampart?() {
         const { room } = this
 
-        if (this.memory.RID && !randomTick(10)) return findObjectWithID(this.memory.RID)
+        if (this.memory[CreepMemoryKeys.rampartTarget] && !randomTick(10))
+            return findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
 
-        const currentRampart = findObjectWithID(this.memory.RID)
+        const currentRampart = findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
 
         const enemyAttackers = room.enemyAttackers
 
@@ -136,7 +137,7 @@ export class MeleeDefender extends Creep {
             let score = getRangeEucXY(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
             if (currentRampart && getRange(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
-            score += getRange(rampart.pos, room.roomManager.anchor || {x:25,y:25}) * 0.01
+            score += getRange(rampart.pos, room.roomManager.anchor || { x: 25, y: 25 }) * 0.01
 
             if (score >= bestScore) continue
 
@@ -149,10 +150,10 @@ export class MeleeDefender extends Creep {
         const creepIDUsingRampart = room.usedRampartIDs.get(bestRampart.id)
         if (creepIDUsingRampart) {
             const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
-            delete creepUsingRampart.memory.RID
+            delete creepUsingRampart.memory[CreepMemoryKeys.rampartTarget]
         }
 
-        this.memory.RID = bestRampart.id
+        this.memory[CreepMemoryKeys.rampartTarget] = bestRampart.id
         room.usedRampartIDs.set(bestRampart.id, this.id)
         return bestRampart
     }
@@ -165,7 +166,7 @@ export class MeleeDefender extends Creep {
         const rampart = this.findRampart()
         if (!rampart) return this.defendWithoutRamparts(enemyCreeps)
 
-        this.memory.ROS = true
+        this.memory[CreepMemoryKeys.rampartOnlyShoving] = true
 
         // Attack the enemyAttacker
 
@@ -216,7 +217,7 @@ export class MeleeDefender extends Creep {
 
             if (creep.spawning) continue
 
-            delete creep.memory.ROS
+            delete creep.memory[CreepMemoryKeys.rampartOnlyShoving]
 
             creep.advancedDefend()
         }
