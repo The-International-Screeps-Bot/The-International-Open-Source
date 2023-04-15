@@ -21,3 +21,5 @@ push.log
 /.VSCodeCounter
 tmp-test-server
 coverage
+.envrc
+.screeps.yaml

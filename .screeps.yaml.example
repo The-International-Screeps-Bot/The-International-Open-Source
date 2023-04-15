@@ -1,0 +1,11 @@
+servers:
+  main:
+    host: screeps.com
+    secure: true
+    token: "00000000-0a0a-0a00-000a-a0000a0000a0"
+  local:
+    host: 127.0.0.1
+    port: 21025
+    secure: false
+    email": "your username (case sensitive!)"
+    password": "your password"
