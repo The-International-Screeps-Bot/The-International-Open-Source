@@ -110,7 +110,8 @@ function originalLoop() {
         endTickManager.run()
     })
 }
-const outOfBucket = () => {
+
+function outOfBucket() {
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         textColor: customColors.white,
         bgColor: customColors.red,
@@ -119,7 +120,6 @@ const outOfBucket = () => {
 }
 
 export const loop = ErrorMapper.wrapLoop(originalLoop)
-// export const loop = originalLoop
 
 // Profiler decs
 
@@ -132,6 +132,6 @@ profiler.registerClass(FactoryManager, 'FactoryManager')
 profiler.registerFN(originalLoop, 'loop')
 
 for (const creepClass of new Set(Object.values(creepClasses))) {
-    profiler.registerClass(creepClass, creepClass + '')
+    profiler.registerClass(creepClass, creepClass.constructor.name)
 }
 profiler.registerFN(outOfBucket, 'outOfBucket')

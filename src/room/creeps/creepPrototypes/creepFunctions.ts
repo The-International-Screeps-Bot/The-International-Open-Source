@@ -3,7 +3,6 @@ import {
     cacheAmountModifier,
     communeSign,
     CPUBucketCapacity,
-    CPUBucketRenewThreshold,
     defaultCreepSwampCost,
     defaultPlainCost,
     impassibleStructureTypes,
@@ -988,7 +987,6 @@ Creep.prototype.activeRenew = function () {
 
     // If there is insufficient CPU to renew, inform false
 
-    if (Game.cpu.bucket < CPUBucketRenewThreshold) return
     if (!room.myCreeps.fastFiller.length) return
     if (this.isDying()) return
 
@@ -1023,7 +1021,6 @@ Creep.prototype.passiveRenew = function () {
 
     // If there is insufficient CPU to renew, inform false
 
-    if (Game.cpu.bucket < CPUBucketRenewThreshold) return
     if (!room.myCreeps.fastFiller.length) return
     if (this.isDying()) return
 

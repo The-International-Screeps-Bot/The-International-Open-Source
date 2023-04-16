@@ -2027,7 +2027,7 @@ declare global {
 
         [RoomMemoryKeys.commune]: string
         [RoomMemoryKeys.maxSourceIncome]: number[]
-        [RoomMemoryKeys.remoteHarvesters]: number[]
+        [RoomMemoryKeys.remoteSourceHarvesters]: number[]
         [RoomMemoryKeys.remoteHaulers]: number[]
         [RoomMemoryKeys.remoteReserver]: number
         [RoomMemoryKeys.remoteCoreAttacker]: number

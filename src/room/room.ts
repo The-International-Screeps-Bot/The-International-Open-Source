@@ -442,7 +442,7 @@ export class RoomManager {
 
     _upgradePositions: RoomPosition[]
     get upgradePositions() {
-        /* if (this._upgradePositions) return this._upgradePositions */
+        if (this._upgradePositions) return this._upgradePositions
 
         // Get the center upgrade pos, stopping if it's undefined
 

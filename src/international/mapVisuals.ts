@@ -1,4 +1,4 @@
-import { unpackPosAt } from 'other/codec'
+import { unpackPosAt, unpackPosList } from 'other/codec'
 import { customColors, remoteHarvesterRoles, ClaimRequestKeys, RoomMemoryKeys } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
@@ -113,28 +113,26 @@ class MapVisualsManager {
                 if (!anchor) throw Error('No anchor for mapVisuals remote ' + roomName)
 
                 if (commune) {
-                    const possibleReservation = commune.energyCapacityAvailable >= 650
-
                     for (const sourceIndex in roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
-                        const position = unpackPosAt(roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
+                        const path = unpackPosList(roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
 
-                        // Draw a line from the center of the remote to the best harvest pos
-
-                        Game.map.visual.line(position, anchor || new RoomPosition(25, 25, commune.name), {
-                            color: customColors.yellow,
-                            width: 1.2,
+                        Game.map.visual.poly(path, {
+                            stroke: customColors.yellow,
+                            strokeWidth: 1.2,
                             opacity: 0.3,
                         })
 
                         // Get the income based on the reservation of the room and remoteHarvester need
 
-                        const income =
-                            (possibleReservation ? 10 : 5) -
-                            Math.floor(roomMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex])
+                        const income = Math.min(
+                            roomMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] * HARVEST_POWER,
+                            roomMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
+                        )
 
+                        const pos = path[0]
                         Game.map.visual.text(
                             `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length}`,
-                            new RoomPosition(position.x, position.y, roomName),
+                            new RoomPosition(pos.x, pos.y, roomName),
                             {
                                 align: 'center',
                                 fontSize: 5,

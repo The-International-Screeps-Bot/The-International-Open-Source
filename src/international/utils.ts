@@ -684,6 +684,7 @@ export function forRoomNamesAroundRangeXY(
     for (let x = startX - range; x <= startX + range; x += 1) {
         for (let y = startY - range; y <= startY + range; y += 1) {
             if (startX === x && startY === y) continue
+
             f(x, y)
         }
     }
@@ -833,6 +834,7 @@ export function findDynamicScore(roomName: string) {
     forRoomNamesAroundRangeXY(roomCoord.x, roomCoord.y, dynamicScoreRoomRange, (x, y) => {
         const searchRoomName = roomNameFromRoomXY(x, y)
         const searchRoomMemory = Memory.rooms[searchRoomName]
+        if (!searchRoomMemory) return
 
         if (searchRoomMemory[RoomMemoryKeys.type] === 'enemy') {
             const score = advancedFindDistance(roomName, searchRoomName)
@@ -845,7 +847,7 @@ export function findDynamicScore(roomName: string) {
         if (searchRoomMemory[RoomMemoryKeys.type] === 'commune') {
             const searchRoom = Game.rooms[searchRoomName]
             const score =
-                (advancedFindDistance(roomName, searchRoomName) % 5) +
+                Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
                 (maxControllerLevel - searchRoom.controller.level)
             if (score <= communeScore) return
 

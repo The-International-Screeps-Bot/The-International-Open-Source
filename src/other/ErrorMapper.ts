@@ -2,7 +2,6 @@
 import { SourceMapConsumer } from 'source-map'
 import ErrorExporter from './ErrorExporter'
 import { settings } from '../international/settings'
-import { CPUBucketRenewThreshold } from 'international/constants'
 export class ErrorMapper {
     // Cache consumer
     private static _consumer?: SourceMapConsumer
@@ -83,7 +82,7 @@ export class ErrorMapper {
                         const message = `Source maps don't work in the simulator - displaying original error`
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${message}<br>${_.escape(e.stack)}</p>`)
-                    } else if (Game.cpu.bucket < CPUBucketRenewThreshold) {
+                    } else if (Game.cpu.bucket < Game.cpu.tickLimit) {
                         const message = `Out of CPU - displaying original error`
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${message}<br>${_.escape(e.stack)}</p>`)

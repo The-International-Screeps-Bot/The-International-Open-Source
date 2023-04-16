@@ -649,7 +649,7 @@ export class RoomVisualsManager {
             row.push(remoteName)
             row.push(sourceIndex)
             row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
-            row.push(remoteMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
             row.push(remoteMemory[RoomMemoryKeys.abandon])

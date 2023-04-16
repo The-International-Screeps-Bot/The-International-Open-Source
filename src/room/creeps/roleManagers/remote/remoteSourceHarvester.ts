@@ -26,10 +26,10 @@ export class RemoteHarvester extends Creep {
             if (
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
-                Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
-                    this.memory[CreepMemoryKeys.sourceIndex]
-                ].length /
-                packedPosLength
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
+                        this.memory[CreepMemoryKeys.sourceIndex]
+                    ].length /
+                        packedPosLength
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -60,7 +60,7 @@ export class RemoteHarvester extends Creep {
 
         // Record response
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHarvesters][
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvesters][
             this.memory[CreepMemoryKeys.sourceIndex]
         ] += this.parts.work
     }
@@ -90,7 +90,8 @@ export class RemoteHarvester extends Creep {
 
             // If there is no need
 
-            if (remoteMemory[RoomMemoryKeys.remoteHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] <= 0)
+                continue
 
             this.assignRemote(remoteName)
             return true
@@ -104,13 +105,13 @@ export class RemoteHarvester extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] +=
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteSourceHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] +=
             this.parts.work
     }
 
     removeRemote?() {
         if (!this.isDying()) {
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHarvesters][
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvesters][
                 this.memory[CreepMemoryKeys.sourceIndex]
             ] -= this.parts.work
         }
@@ -263,7 +264,7 @@ export class RemoteHarvester extends Creep {
             {
                 packedPath: reversePosList(
                     Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
-                    this.memory[CreepMemoryKeys.sourceIndex]
+                        this.memory[CreepMemoryKeys.sourceIndex]
                     ],
                 ),
                 remoteName: this.memory[CreepMemoryKeys.remote],
@@ -318,7 +319,7 @@ export class RemoteHarvester extends Creep {
 
             const sourcePos = unpackPosAt(
                 Memory.rooms[creep.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions][
-                creep.memory[CreepMemoryKeys.sourceIndex]
+                    creep.memory[CreepMemoryKeys.sourceIndex]
                 ],
             )
             console.log('reverse of null roomName', creep.memory[CreepMemoryKeys.remote])
@@ -344,7 +345,7 @@ export class RemoteHarvester extends Creep {
                 {
                     packedPath: reversePosList(
                         Memory.rooms[creep.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
-                        creep.memory[CreepMemoryKeys.sourceIndex]
+                            creep.memory[CreepMemoryKeys.sourceIndex]
                         ],
                     ),
                     remoteName: creep.memory[CreepMemoryKeys.remote],

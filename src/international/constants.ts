@@ -193,7 +193,7 @@ export enum RoomMemoryKeys {
 
     commune,
     maxSourceIncome,
-    remoteHarvesters,
+    remoteSourceHarvesters,
     remoteHaulers,
     remoteReserver,
     remoteCoreAttacker,
@@ -223,7 +223,7 @@ export enum RoomMemoryKeys {
     defensiveStrength,
     offensiveThreat,
 
-    // Highway
+    // Intersection
 
     portalsTo,
 }
@@ -261,6 +261,19 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
 
     RoomMemoryKeys.portalsTo,
 ])
+
+enum RoomTypes {
+    commune,
+    remote,
+    ally,
+    allyRemote,
+    enemy,
+    enemyRemote,
+    keeper,
+    keeperCenter,
+    highway,
+    intersection,
+}
 
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     commune: new Set([
@@ -1120,8 +1133,6 @@ export enum RemoteHaulerRolesBySourceIndex {
 
 export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
-
-export const CPUBucketRenewThreshold = 5000
 
 /**
  * Roles that should attempt relaying

@@ -734,6 +734,7 @@ export class SpawnRequestsManager {
     private controllerUpgraders() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
+
                 let partsMultiplier = 1
                 let maxCreeps = this.communeManager.room.roomManager.upgradePositions.length - 1
 
@@ -752,6 +753,7 @@ export class SpawnRequestsManager {
                     this.communeManager.room.towerInferiority
                 )
                     return false
+
                 /*
                 // Terminal logic
                 if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
@@ -771,6 +773,7 @@ export class SpawnRequestsManager {
                     // Otherwise, set partsMultiplier to 0
                     else partsMultiplier = 0
                 } */
+
                 // Storage logic
                 if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
                     // If storing structures are sufficiently full, provide x amount per y energy in storage
@@ -805,6 +808,7 @@ export class SpawnRequestsManager {
                 // If the controllerContainer or controllerLink exists
 
                 const upgradeStructure = this.communeManager.upgradeStructure
+
                 if (upgradeStructure) {
                     // If the controller is level 8
 
@@ -1060,7 +1064,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const partsMultiplier =
                         remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] -
-                        remoteMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex]
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
                     const role = sourceHarvesterRole
@@ -1228,7 +1232,7 @@ export class SpawnRequestsManager {
                     // If there are insufficient harvesters for the remote's sources
 
                     if (
-                        remoteMemory[RoomMemoryKeys.remoteHarvesters].reduce(
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvesters].reduce(
                             (partialSum, val) => partialSum + val,
                             0,
                         ) === 0

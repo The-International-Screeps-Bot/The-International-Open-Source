@@ -722,6 +722,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
+        roomMemory[RoomMemoryKeys.maxSourceIncome] = []
+        roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
+        roomMemory[RoomMemoryKeys.remoteHaulers] = []
+
         // Add the room's name to the scoutingRoom's remotes list
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
@@ -768,6 +772,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     this.roomManager.remoteControllerPath
 
     roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
+
+    roomMemory[RoomMemoryKeys.maxSourceIncome] = []
+    roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
+    roomMemory[RoomMemoryKeys.remoteHaulers] = []
 
     // Add the room's name to the scoutingRoom's remotes list
 

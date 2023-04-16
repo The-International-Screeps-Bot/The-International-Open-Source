@@ -26,7 +26,6 @@ export class RemotesManager {
             // Get the name of the remote using the index
 
             const remoteName = room.memory[RoomMemoryKeys.remotes][index]
-
             const remoteMemory = Memory.rooms[remoteName]
 
             // If the room isn't a remote, remove it from the remotes array
@@ -75,9 +74,9 @@ export class RemotesManager {
                 }
             }
 
-            for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
+            for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME
-                remoteMemory[RoomMemoryKeys.remoteHarvesters][i] = 0
+                remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][i] = 0
                 remoteMemory[RoomMemoryKeys.remoteHaulers][i] = 0
             }
             remoteMemory[RoomMemoryKeys.remoteReserver] = 5
@@ -95,7 +94,7 @@ export class RemotesManager {
             if (possibleReservation) {
                 // We can potentially double our income
 
-                for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
+                for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] *= 2
                 }
 
@@ -168,7 +167,7 @@ export class RemotesManager {
                 sourceIndex += 1
             ) {
                 const income = Math.min(
-                    remoteMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex] * HARVEST_POWER,
+                    remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] * HARVEST_POWER,
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
                 )
 
