@@ -2,7 +2,7 @@ import { CreepMemoryKeys, customColors, offsetsByDirection, partsByPriority, par
 import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, getRange, newID } from 'international/utils'
-import { unpackPosList } from 'other/codec'
+import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
 import './spawnRequests'
@@ -44,7 +44,7 @@ export class SpawningStructuresManager {
 
                 if (spawn.spawning.remainingTime <= 2 && creep.memory[CreepMemoryKeys.path] && creep.memory[CreepMemoryKeys.path].length) {
 
-                    creep.assignMoveRequest(unpackPosList(creep.memory[CreepMemoryKeys.path])[0])
+                    creep.assignMoveRequest(unpackPosAt(creep.memory[CreepMemoryKeys.path]))
                 }
 
                 this.activeSpawns.push(spawn)
@@ -676,5 +676,5 @@ export class SpawningStructuresManager {
         }
     }
 
-    private testRequests() {}
+    private testRequests() { }
 }

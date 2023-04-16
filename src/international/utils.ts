@@ -872,3 +872,13 @@ export function findDynamicScore(roomName: string) {
     roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
     roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 }
+
+/**
+ * Sorts an array in place. This method mutates the array and returns a reference to the same array.
+ * Like `array.sort((a, b) => score(a)-score(b))` but with cache
+*/
+export function sortBy<T>(array: T[], score: (t: T) => number, reversed?: true): T[] {
+    const reverseSign = reversed ? -1 : 1
+    const cache = new Map(array.map(t => [t, score(t) * reverseSign]))
+    return array.sort((a, b) => cache.get(a) - cache.get(b))
+}

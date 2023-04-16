@@ -44,8 +44,7 @@ class HandleSpawning {
         if (!spawnShardFlag) return false
 
         const roomNames = ['E72N14', 'E74N7', 'E69N17, E68N17', 'E71N18', 'E69N19']
-        const spawns = Object.values(Game.spawns).filter(s => roomNames.includes(s.room.name))
-        const spawn = spawns.filter(s => s.spawning === null)[0]
+        const spawn = Object.values(Game.spawns).find(s => roomNames.includes(s.room.name) && s.spawning === null)
         if (!spawn) return false
 
         const spawnResult = spawn.spawnCreep([MOVE], `${shardTarget}-${Game.time}`)

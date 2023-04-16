@@ -1,4 +1,4 @@
-import { unpackPosList } from 'other/codec'
+import { unpackPosAt } from 'other/codec'
 import { customColors, remoteHarvesterRoles, ClaimRequestKeys, RoomMemoryKeys } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
@@ -116,11 +116,11 @@ class MapVisualsManager {
                     const possibleReservation = commune.energyCapacityAvailable >= 650
 
                     for (const sourceIndex in roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
-                        const positions = unpackPosList(roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
+                        const position = unpackPosAt(roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
 
                         // Draw a line from the center of the remote to the best harvest pos
 
-                        Game.map.visual.line(positions[0], anchor || new RoomPosition(25, 25, commune.name), {
+                        Game.map.visual.line(position, anchor || new RoomPosition(25, 25, commune.name), {
                             color: customColors.yellow,
                             width: 1.2,
                             opacity: 0.3,
@@ -134,7 +134,7 @@ class MapVisualsManager {
 
                         Game.map.visual.text(
                             `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length}`,
-                            new RoomPosition(positions[0].x, positions[0].y, roomName),
+                            new RoomPosition(position.x, position.y, roomName),
                             {
                                 align: 'center',
                                 fontSize: 5,
