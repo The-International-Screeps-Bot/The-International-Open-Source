@@ -15,6 +15,7 @@ import {
     PowerCreepMemoryKeys,
     PowerRequestKeys,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -744,20 +745,7 @@ declare global {
         CPUUsers: CpuUsers
     }
 
-    type StatsRoomTypes = 'commune' | 'remote'
-
-    type RoomTypes =
-        | 'commune'
-        | 'remote'
-        | 'ally'
-        | 'allyRemote'
-        | 'enemy'
-        | 'enemyRemote'
-        | 'neutral'
-        | 'keeper'
-        | 'keeperCenter'
-        | 'highway'
-        | 'intersection'
+    type StatsRoomTypes = RoomTypes.commune | RoomTypes.remote
 
     interface ShardVisionMemory {
         shards?: { [shardName: string]: number }
@@ -1021,22 +1009,22 @@ declare global {
          */
         deleteTask(taskID: any, responder: boolean): void
 
-        scoutByRoomName(): RoomTypes | false
+        scoutByRoomName(): number | false
 
-        scoutRemote(scoutingRoom?: Room): RoomTypes | false
-        scoutEnemyReservedRemote(): RoomTypes | false
-        scoutEnemyUnreservedRemote(): RoomTypes | false
-        scoutMyRemote(scoutingRoom: Room): RoomTypes | false
+        scoutRemote(scoutingRoom?: Room): number | false
+        scoutEnemyReservedRemote(): number | false
+        scoutEnemyUnreservedRemote(): number | false
+        scoutMyRemote(scoutingRoom: Room): number | false
 
-        scoutEnemyRoom(): RoomTypes
+        scoutEnemyRoom(): number
 
-        basicScout(): RoomTypes
+        basicScout(): number
 
         /**
          * Finds the type of a room and initializes its custom properties
          * @param scoutingRoom The room that is performing the scout operation
          */
-        advancedScout(scoutingRoom: Room): RoomTypes
+        advancedScout(scoutingRoom: Room): number
 
         makeRemote(scoutingRoom: Room): boolean
 
@@ -1967,7 +1955,7 @@ declare global {
     // Memory value types
 
     interface RoomMemory {
-        [RoomMemoryKeys.type]: RoomTypes
+        [RoomMemoryKeys.type]: number
         [RoomMemoryKeys.lastScout]: number
 
         // Types specific

@@ -1,4 +1,4 @@
-import { RoomMemoryKeys } from './constants'
+import { RoomMemoryKeys, RoomTypes } from './constants'
 import { settings } from './settings'
 
 /**
@@ -13,7 +13,7 @@ class MigrationManager {
 
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName][RoomMemoryKeys.type]
-                if (type === 'commune' || type === 'remote') {
+                if (type === RoomTypes.commune || type === RoomTypes.remote) {
                     if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
 
                     delete Memory.rooms[roomName]
@@ -28,7 +28,7 @@ class MigrationManager {
 
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName][RoomMemoryKeys.type]
-                if (type === 'commune' || type === 'remote') {
+                if (type === RoomTypes.commune || type === RoomTypes.remote) {
                     if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
 
                     delete Memory.rooms[roomName]
@@ -43,7 +43,7 @@ class MigrationManager {
 
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName][RoomMemoryKeys.type]
-                if (type === 'commune' || type === 'remote') {
+                if (type === RoomTypes.commune || type === RoomTypes.remote) {
                     if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
 
                     delete Memory.rooms[roomName]
@@ -98,7 +98,7 @@ class MigrationManager {
                     const remoteMemory = Memory.rooms[remoteName]
 
                     delete remoteMemory[RoomMemoryKeys.commune]
-                    remoteMemory[RoomMemoryKeys.type] = 'neutral'
+                    remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
                 }
 
                 room.memory[RoomMemoryKeys.remotes] = []

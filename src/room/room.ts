@@ -1,6 +1,7 @@
 import {
     CreepMemoryKeys,
     RoomMemoryKeys,
+    RoomTypes,
     adjacentOffsets,
     creepRoles,
     customColors,
@@ -126,15 +127,15 @@ export class RoomManager {
             pickup: {},
         }
 
-        if (roomMemory[RoomMemoryKeys.type] === 'remote') return
+        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) return
 
         // Check if the room is a commune
 
         if (!room.controller) return
 
         if (!room.controller.my) {
-            if (roomMemory[RoomMemoryKeys.type] === 'commune') {
-                roomMemory[RoomMemoryKeys.type] = 'neutral'
+            if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
+                roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 
                 room.basicScout()
                 cleanRoomMemory(room.name)
@@ -158,7 +159,7 @@ export class RoomManager {
     preTickRun() {}
 
     run() {
-        if (this.room.memory[RoomMemoryKeys.type] === 'remote') {
+        if (this.room.memory[RoomMemoryKeys.type] === RoomTypes.remote) {
             this.containerManager.runRemote()
             this.droppedResourceManager.runRemote()
             this.tombstoneManager.runRemote()
@@ -279,10 +280,14 @@ export class RoomManager {
 
         const sources = this.room.find(FIND_SOURCES)
 
-        sortBy(sources, ({ pos }) => this.room.advancedFindPath({
-            origin: pos,
-            goals: [{ pos: anchor, range: 3 }],
-        }).length)
+        sortBy(
+            sources,
+            ({ pos }) =>
+                this.room.advancedFindPath({
+                    origin: pos,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length,
+        )
 
         this.room.memory[RoomMemoryKeys.remoteSources] = sources.map(source => source.id)
         return (this._remoteSources = sources)
@@ -361,10 +366,14 @@ export class RoomManager {
                 positions.push(pos)
             }
 
-            sortBy(positions, origin => this.room.advancedFindPath({
-                origin,
-                goals: [{ pos: anchor, range: 3 }],
-            }).length)
+            sortBy(
+                positions,
+                origin =>
+                    this.room.advancedFindPath({
+                        origin,
+                        goals: [{ pos: anchor, range: 3 }],
+                    }).length,
+            )
 
             sourceHarvestPositions.push(positions)
         }
@@ -466,10 +475,14 @@ export class RoomManager {
             positions.push(adjPos)
         }
 
-        sortBy(positions, origin => this.room.advancedFindPath({
-            origin,
-            goals: [{ pos: anchor, range: 4 }],
-        }).length)
+        sortBy(
+            positions,
+            origin =>
+                this.room.advancedFindPath({
+                    origin,
+                    goals: [{ pos: anchor, range: 4 }],
+                }).length,
+        )
 
         // Make the closest pos the last to be chosen
 
@@ -504,7 +517,7 @@ export class RoomManager {
         const generalRepairStructures: (StructureContainer | StructureRoad)[] = []
 
         const roomType = this.room.memory[RoomMemoryKeys.type]
-        if (roomType === 'commune') {
+        if (roomType === RoomTypes.commune) {
             const structures = this.room.structures
             const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(
                 structures.road,
@@ -527,7 +540,7 @@ export class RoomManager {
 
             return (this._generalRepairStructures = generalRepairStructures)
         }
-        if (roomType === 'remote') {
+        if (roomType === RoomTypes.remote) {
             return (this._generalRepairStructures = generalRepairStructures)
         }
 
@@ -566,10 +579,14 @@ export class RoomManager {
             positions.push(adjPos)
         }
 
-        sortBy(positions, origin => this.room.advancedFindPath({
-            origin,
-            goals: [{ pos: anchor, range: 4 }],
-        }).length)
+        sortBy(
+            positions,
+            origin =>
+                this.room.advancedFindPath({
+                    origin,
+                    goals: [{ pos: anchor, range: 4 }],
+                }).length,
+        )
 
         this.room.memory[RoomMemoryKeys.remoteControllerPositions] = packPosList(positions)
         return (this._remoteControllerPositions = positions)
@@ -697,13 +714,11 @@ export class RoomManager {
     _sourceLinkIDs: Id<StructureLink>[]
     _sourceLinks: StructureLink[]
     get sourceLinks() {
-
         if (this._sourceLinks) return this._sourceLinks
 
         const links: StructureLink[] = []
 
         if (this._sourceLinkIDs) {
-
             for (const ID of this._sourceLinkIDs) {
                 const link = findObjectWithID(ID)
                 if (!link) break

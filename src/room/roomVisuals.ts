@@ -9,6 +9,7 @@ import {
     stamps,
     packedPosLength,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
@@ -197,7 +198,7 @@ export class RoomVisualsManager {
         if (!Memory.baseVisuals) return
 
         const roomMemory = Memory.rooms[this.roomManager.room.name]
-        if (roomMemory[RoomMemoryKeys.type] !== 'commune') return
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return
         if (!roomMemory[RoomMemoryKeys.communePlanned]) return
 
         this.roomManager.room.communeManager.constructionManager.visualize()
@@ -635,7 +636,15 @@ export class RoomVisualsManager {
     requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
-        const headers: any[] = ['remote', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']
+        const headers: any[] = [
+            RoomTypes.remote,
+            'sourceIndex',
+            'efficacy',
+            'harvester',
+            'hauler',
+            'reserver',
+            'abandoned',
+        ]
         const data: any[][] = []
 
         for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {

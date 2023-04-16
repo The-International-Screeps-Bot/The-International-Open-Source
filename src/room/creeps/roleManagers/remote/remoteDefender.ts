@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys, RoomTypes } from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -22,7 +22,7 @@ export class RemoteDefender extends Creep {
 
         const role = this.role as 'remoteDefender'
 
-        if (Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.type] !== 'remote') {
+        if (Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.type] !== RoomTypes.remote) {
             delete this.memory[CreepMemoryKeys.remote]
             if (!this.findRemote()) return
         }

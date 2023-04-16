@@ -1,5 +1,5 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { RoomMemoryKeys, customColors } from './constants'
+import { RoomMemoryKeys, RoomTypes, customColors } from './constants'
 import { internationalManager } from './international'
 
 class FlagManager {
@@ -52,14 +52,14 @@ class FlagManager {
             data.push([
                 transaction.from +
                     ' (' +
-                    (roomFromMemory[RoomMemoryKeys.type] === 'commune'
+                    (roomFromMemory[RoomMemoryKeys.type] === RoomTypes.commune
                         ? Memory.me
                         : roomFromMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
                 '-->',
                 transaction.to +
                     ' (' +
-                    (roomToMemory[RoomMemoryKeys.type] === 'commune'
+                    (roomToMemory[RoomMemoryKeys.type] === RoomTypes.commune
                         ? Memory.me
                         : roomToMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
@@ -119,14 +119,14 @@ class FlagManager {
             data.push([
                 transaction.from +
                     ' (' +
-                    (roomFromMemory[RoomMemoryKeys.type] === 'commune'
+                    (roomFromMemory[RoomMemoryKeys.type] === RoomTypes.commune
                         ? Memory.me
                         : roomFromMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
                 '-->',
                 transaction.to +
                     ' (' +
-                    (roomToMemory[RoomMemoryKeys.type] === 'commune'
+                    (roomToMemory[RoomMemoryKeys.type] === RoomTypes.commune
                         ? Memory.me
                         : roomToMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
@@ -173,7 +173,7 @@ class FlagManager {
             return
         }
 
-        if (roomMemory[RoomMemoryKeys.type] !== 'commune') {
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) {
             flag.setColor(COLOR_RED)
             return
         }

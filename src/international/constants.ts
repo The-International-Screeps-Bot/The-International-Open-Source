@@ -262,11 +262,12 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.portalsTo,
 ])
 
-enum RoomTypes {
+export enum RoomTypes {
     commune,
     remote,
     ally,
     allyRemote,
+    neutral,
     enemy,
     enemyRemote,
     keeper,
@@ -275,8 +276,8 @@ enum RoomTypes {
     intersection,
 }
 
-export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
-    commune: new Set([
+export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
+    [RoomTypes.commune]: new Set([
         RoomMemoryKeys.remotes,
         RoomMemoryKeys.deposits,
         RoomMemoryKeys.powerBanks,
@@ -290,10 +291,10 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.dynamicScore,
         RoomMemoryKeys.dynamicScoreUpdate,
     ]),
-    remote: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.reservationEfficacy, RoomMemoryKeys.communePlanned]),
-    ally: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL, RoomMemoryKeys.communePlanned]),
-    allyRemote: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
-    enemy: new Set([
+    [RoomTypes.remote]: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.reservationEfficacy, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.enemy]: new Set([
         RoomMemoryKeys.owner,
         RoomMemoryKeys.RCL,
         RoomMemoryKeys.powerEnabled,
@@ -304,17 +305,22 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.offensiveThreat,
         RoomMemoryKeys.defensiveStrength,
     ]),
-    enemyRemote: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
-    neutral: new Set([RoomMemoryKeys.communePlanned]),
-    keeper: new Set([RoomMemoryKeys.owner]),
-    keeperCenter: new Set([RoomMemoryKeys.owner]),
-    highway: new Set([]),
-    intersection: new Set([RoomMemoryKeys.portalsTo]),
+    [RoomTypes.enemyRemote]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.neutral]: new Set([RoomMemoryKeys.communePlanned]),
+    [RoomTypes.keeper]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.keeperCenter]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.highway]: new Set([]),
+    [RoomTypes.intersection]: new Set([RoomMemoryKeys.portalsTo]),
 }
 
-export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
+export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set([
+    RoomTypes.keeper,
+    RoomTypes.keeperCenter,
+    RoomTypes.highway,
+    RoomTypes.intersection,
+])
 
-export const roomTypesUsedForStats = ['commune', 'remote']
+export const roomTypesUsedForStats = [RoomTypes.commune, RoomTypes.remote]
 
 export const creepRoles: CreepRoles[] = [
     'sourceHarvester',
@@ -1333,12 +1339,12 @@ export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [
 
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
 
-export const remoteTypeWeights: Partial<{ [key in RoomTypes]: number }> = {
-    keeper: Infinity,
-    enemy: Infinity,
-    enemyRemote: Infinity,
-    ally: Infinity,
-    allyRemote: Infinity,
+export const remoteTypeWeights: Partial<{ [key: string]: number }> = {
+    [RoomTypes.keeper]: Infinity,
+    [RoomTypes.enemy]: Infinity,
+    [RoomTypes.enemyRemote]: Infinity,
+    [RoomTypes.ally]: Infinity,
+    [RoomTypes.allyRemote]: Infinity,
 }
 
 export const maxClaimRequestDistance = 10

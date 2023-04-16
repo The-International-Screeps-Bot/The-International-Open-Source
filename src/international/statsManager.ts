@@ -1,4 +1,4 @@
-import { customColors, InternationalStatNamesEnum, RoomMemoryKeys, RoomStatNamesEnum } from './constants'
+import { customColors, InternationalStatNamesEnum, RoomMemoryKeys, RoomStatNamesEnum, RoomTypes } from './constants'
 import { customLog } from './utils'
 
 const CPUUsers: CpuUsers = {
@@ -90,7 +90,7 @@ function GetRemoteStatsName(name: RoomCommuneStatNames): RoomStatNames {
 }
 
 export class StatsManager {
-    roomConfig(roomName: string, roomType: string) {
+    roomConfig(roomName: string, roomType: number) {
         const remoteLevel1: Partial<RoomStats> = {
             [RoomStatNamesEnum.RemoteEnergyStored]: 0,
             [RoomStatNamesEnum.GameTime]: 0,
@@ -168,7 +168,7 @@ export class StatsManager {
         }
         const roomStats = Memory.roomStats
         let stats = undefined
-        if (roomType === 'commune') {
+        if (roomType === RoomTypes.commune) {
             switch (roomStats) {
                 case 1:
                     stats = communeLevel1
@@ -189,7 +189,7 @@ export class StatsManager {
             }
 
             if (stats) {
-                global.roomStats.commune[roomName] = stats
+                global.roomStats[RoomTypes.commune][roomName] = stats
                 if (!Memory.stats.rooms[roomName]) Memory.stats.rooms[roomName] = stats
             }
             return
@@ -214,21 +214,21 @@ export class StatsManager {
             }
         }
 
-        if (stats) global.roomStats.remote[roomName] = stats
+        if (stats) global.roomStats[RoomTypes.remote][roomName] = stats
     }
 
-    roomPreTick(roomName: string, roomType: RoomTypes) {
+    roomPreTick(roomName: string, roomType: number) {
         this.roomConfig(roomName, roomType)
     }
 
-    roomEndTick(roomName: string, roomType: RoomTypes) {
-        if (roomType === 'commune') {
-            const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
+    roomEndTick(roomName: string, roomType: number) {
+        if (roomType === RoomTypes.commune) {
+            const globalStats = global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats
             if (globalStats) {
                 globalStats[RoomStatNamesEnum.GameTime] = Game.time
             }
-        } else if (roomType === 'remote') {
-            const globalStats = global.roomStats.remote[roomName] as RoomStats
+        } else if (roomType === RoomTypes.remote) {
+            const globalStats = global.roomStats[RoomTypes.remote][roomName] as RoomStats
             if (globalStats) {
                 globalStats[RoomStatNamesEnum.GameTime] = Game.time
             }
@@ -238,7 +238,7 @@ export class StatsManager {
     roomCommuneFinalEndTick(roomName: string, room?: Room, forceUpdate: boolean = false) {
         const roomMemory = Memory.rooms[roomName]
         const roomStats = Memory.stats.rooms[roomName]
-        const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
+        const globalCommuneStats = global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
             customLog('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
@@ -249,7 +249,7 @@ export class StatsManager {
         }
         const each250Ticks = Game.time % 250 === 0
 
-        Object.entries(global.roomStats.remote)
+        Object.entries(global.roomStats[RoomTypes.remote])
             .filter(([roomName]) => roomMemory[RoomMemoryKeys.remotes].includes(roomName))
             .forEach(([remoteRoomName, remoteRoomStats]) => {
                 if (globalCommuneStats[RoomStatNamesEnum.GameTime] === Game.time) {
@@ -402,14 +402,14 @@ export class StatsManager {
             CPUUsers,
         }
 
-        global.roomStats = { commune: {}, remote: {} }
+        global.roomStats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
         global.CPUUsers = CPUUsers
         this.internationalEndTick()
     }
 
     internationalPreTick() {
         global.CPUUsers = CPUUsers
-        global.roomStats = { commune: {}, remote: {} }
+        global.roomStats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
     }
 
     internationalEndTick() {
@@ -448,7 +448,7 @@ export class StatsManager {
             level: Game.gpl.level,
         }
 
-        const globalRoomKeys = Object.keys(global.roomStats.commune)
+        const globalRoomKeys = Object.keys(global.roomStats[RoomTypes.commune])
         const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
         globalRoomKeys.forEach(roomName => {
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
@@ -456,7 +456,7 @@ export class StatsManager {
 
         notCheckedCommuneRooms.forEach(roomName => {
             const roomType = Memory.rooms[roomName][RoomMemoryKeys.type]
-            if (roomType === 'commune') {
+            if (roomType === RoomTypes.commune) {
                 this.roomConfig(roomName, roomType)
                 this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName], true)
             } else {
@@ -543,9 +543,9 @@ export const globalStatsUpdater = function (
     const roomStatName = name as RoomStatNames
     const updateStats = GetLevelOfStatName(roomStatName) > 0
     if (updateStats && global.roomStats) {
-        if (global.roomStats.commune[roomName])
-            (global.roomStats.commune[roomName] as RoomCommuneStats)[roomStatName] += value
-        else if (global.roomStats.remote[roomName])
-            (global.roomStats.remote[roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
+        if (global.roomStats[RoomTypes.commune][roomName])
+            (global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats)[roomStatName] += value
+        else if (global.roomStats[RoomTypes.remote][roomName])
+            (global.roomStats[RoomTypes.remote][roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
     }
 }

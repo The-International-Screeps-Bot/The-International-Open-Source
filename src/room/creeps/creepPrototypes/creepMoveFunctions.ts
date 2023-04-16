@@ -10,6 +10,7 @@ import {
     packedPosLength,
     CreepMemoryKeys,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import { internationalManager } from 'international/international'
 import {
@@ -106,7 +107,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             for (const roomName of roomNames) {
                 const roomMemory = Memory.rooms[roomName]
 
-                if (Memory.rooms[roomName][RoomMemoryKeys.type] !== 'remote') continue
+                if (Memory.rooms[roomName][RoomMemoryKeys.type] !== RoomTypes.remote) continue
                 if (!roomMemory[RoomMemoryKeys.abandon]) continue
 
                 // The room is unsafe, don't use cached paths
@@ -199,7 +200,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             for (const roomName of roomNames) {
                 const roomMemory = Memory.rooms[roomName]
 
-                if (Memory.rooms[roomName][RoomMemoryKeys.type] !== 'remote') continue
+                if (Memory.rooms[roomName][RoomMemoryKeys.type] !== RoomTypes.remote) continue
                 if (!roomMemory[RoomMemoryKeys.abandon]) continue
 
                 // The room is unsafe, don't use cached paths

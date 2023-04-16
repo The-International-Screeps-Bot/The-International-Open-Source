@@ -15,6 +15,7 @@ import {
     remoteRoles,
     stamps,
     RoomMemoryKeys,
+    RoomTypes,
 } from './constants'
 import {
     advancedFindDistance,
@@ -156,7 +157,7 @@ class TickConfig {
 
             const type = Memory.rooms[roomName][RoomMemoryKeys.type]
 
-            if (type !== 'neutral' && type !== 'commune') {
+            if (type !== RoomTypes.neutral && type !== RoomTypes.commune) {
                 // Delete the request
 
                 Memory.claimRequests[roomName][ClaimRequestKeys.abandon] = 20000

@@ -1,4 +1,4 @@
-import { RoomMemoryKeys, customColors, roomTypesUsedForStats } from '../international/constants'
+import { RoomMemoryKeys, RoomTypes, customColors, roomTypesUsedForStats } from '../international/constants'
 
 import './roomFunctions'
 
@@ -34,7 +34,7 @@ export function roomsManager() {
 
         // If the room is a commune, run its specific manager
 
-        if (room.memory[RoomMemoryKeys.type] === 'commune') room.communeManager.run()
+        if (room.memory[RoomMemoryKeys.type] === RoomTypes.commune) room.communeManager.run()
         else room.roomManager.run()
 
         // Log room stats

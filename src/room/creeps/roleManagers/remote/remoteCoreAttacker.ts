@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, customColors, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, customColors, RoomMemoryKeys, RoomTypes } from 'international/constants'
 import { getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
@@ -45,7 +45,7 @@ export class RemoteCoreAttacker extends Creep {
 
         const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
-        if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
+        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
         if (remoteMemory[RoomMemoryKeys.abandon]) return false
 

@@ -5,6 +5,7 @@ import {
     remoteTypeWeights,
     packedPosLength,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import { advancedFindDistance, customLog, findCarryPartsRequired, randomRange, randomTick } from 'international/utils'
 import { unpackPosList } from 'other/codec'
@@ -30,7 +31,10 @@ export class RemotesManager {
 
             // If the room isn't a remote, remove it from the remotes array
 
-            if (remoteMemory[RoomMemoryKeys.type] !== 'remote' || remoteMemory[RoomMemoryKeys.commune] !== room.name) {
+            if (
+                remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote ||
+                remoteMemory[RoomMemoryKeys.commune] !== room.name
+            ) {
                 this.communeManager.removeRemote(remoteName, index)
                 continue
             }

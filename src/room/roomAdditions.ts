@@ -9,6 +9,7 @@ import {
     defaultStructureTypesByBuildPriority,
     CreepMemoryKeys,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import {
     createPosMap,
@@ -43,7 +44,7 @@ const roomAdditions = {
 
             // If commune, only avoid ally creeps
 
-            if (this.memory[RoomMemoryKeys.type] === 'commune') {
+            if (this.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                     filter: creep => !Memory.allyPlayers.includes(creep.owner.username),
                 }))
@@ -64,7 +65,7 @@ const roomAdditions = {
 
             // If commune, only avoid ally creeps
 
-            if (this.memory[RoomMemoryKeys.type] === 'commune') {
+            if (this.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 return (this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
                     return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work + creep.parts.heal > 0
                 }))
@@ -724,7 +725,7 @@ const roomAdditions = {
             const sourceContainers: StructureContainer[] = []
 
             const roomType = this.memory[RoomMemoryKeys.type]
-            if (roomType === 'commune') {
+            if (roomType === RoomTypes.commune) {
                 const positions = this.roomManager.communeSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
                     const structure = this.findStructureAtCoord(
@@ -735,7 +736,7 @@ const roomAdditions = {
 
                     sourceContainers.push(structure as StructureContainer)
                 }
-            } else if (roomType === 'remote') {
+            } else if (roomType === RoomTypes.remote) {
                 const positions = this.roomManager.remoteSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
                     const structure = this.findStructureAtCoord(
@@ -1509,7 +1510,7 @@ const roomAdditions = {
         get() {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
-            if (this.memory[RoomMemoryKeys.type] === 'remote') return (this._advancedLogistics = true)
+            if (this.memory[RoomMemoryKeys.type] === RoomTypes.remote) return (this._advancedLogistics = true)
 
             // So long as we have some sort of storing structure
 

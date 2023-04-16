@@ -42,6 +42,7 @@ import {
     structureTypesToProtectSet,
     buildableStructuresSet,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -159,7 +160,7 @@ export class CommuneManager {
 
         if (roomMemory[RoomMemoryKeys.abandoned]) {
             room.controller.unclaim()
-            roomMemory[RoomMemoryKeys.type] = 'neutral'
+            roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
             cleanRoomMemory(room.name)
 
             for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
@@ -168,7 +169,7 @@ export class CommuneManager {
             return
         }
 
-        roomMemory[RoomMemoryKeys.type] = 'commune'
+        roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
         global.communes.add(room.name)
         this.preTickTest()
 
@@ -327,7 +328,7 @@ export class CommuneManager {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        remoteMemory[RoomMemoryKeys.type] = 'neutral'
+        remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
         cleanRoomMemory(remoteName)
     }
 

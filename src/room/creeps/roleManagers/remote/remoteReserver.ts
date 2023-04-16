@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys, RoomTypes } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
 import { packCoord, reversePosList, unpackCoordAsPos, unpackPosList } from 'other/codec'
 
@@ -29,7 +29,7 @@ export class RemoteReserver extends Creep {
 
         const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
-        if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
+        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
         if (remoteMemory[RoomMemoryKeys.abandon]) return false
 

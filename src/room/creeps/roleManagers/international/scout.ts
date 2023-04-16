@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomMemoryKeys, communeSign, nonCommuneSigns } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys, RoomTypes, communeSign, nonCommuneSigns } from 'international/constants'
 import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
 import { partial } from 'lodash'
 
@@ -108,7 +108,7 @@ export class Scout extends Creep {
     recordDeposits?(): void {
         const { room } = this
 
-        if (room.memory[RoomMemoryKeys.type] != 'highway') return
+        if (room.memory[RoomMemoryKeys.type] != RoomTypes.highway) return
 
         // Make sure the room has a commune
 
@@ -157,13 +157,14 @@ export class Scout extends Creep {
 
         // If the room is owned by an enemy or an ally
 
-        if (room.memory[RoomMemoryKeys.type] === 'ally' || room.memory[RoomMemoryKeys.type] === 'enemy') return true
+        if (room.memory[RoomMemoryKeys.type] === RoomTypes.ally || room.memory[RoomMemoryKeys.type] === RoomTypes.enemy)
+            return true
 
         if (controller.reservation && controller.reservation.username !== Memory.me) return true
 
         // If the room is a commune
 
-        if (room.memory[RoomMemoryKeys.type] === 'commune') {
+        if (room.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
             // If the room already has a correct sign
 
             if (controller.sign && communeSign.startsWith(controller.sign.text)) return true
@@ -272,7 +273,7 @@ export class Scout extends Creep {
                 if (!roomMemory)
                     roomMemory = (Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]] as Partial<RoomMemory>) = {}
 
-                roomMemory[RoomMemoryKeys.type] = 'neutral'
+                roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
                 roomMemory[RoomMemoryKeys.lastScout] = Game.time
 
                 delete creep.memory[CreepMemoryKeys.scoutTarget]

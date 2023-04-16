@@ -1,4 +1,4 @@
-import { ClaimRequestKeys, CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
+import { ClaimRequestKeys, CombatRequestKeys, RoomMemoryKeys, RoomTypes, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -54,10 +54,10 @@ export class ClaimRequestManager {
         }
 
         const type = Memory.rooms[requestName][RoomMemoryKeys.type]
-        if (type !== 'neutral' && type !== 'commune' && type !== 'remote') {
+        if (type !== RoomTypes.neutral && type !== RoomTypes.commune && type !== RoomTypes.remote) {
             // Delete the request so long as the new type isn't ally
 
-            this.stopResponse(type !== 'ally')
+            this.stopResponse(type !== RoomTypes.ally)
             return
         }
 

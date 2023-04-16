@@ -22,6 +22,7 @@ import {
     RESULT_SUCCESS,
     CreepMemoryKeys,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -114,7 +115,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 /* console.log(roomName) */
                 if (
                     opts.avoidAbandonedRemotes &&
-                    roomMemory[RoomMemoryKeys.type] === 'remote' &&
+                    roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
                     roomMemory[RoomMemoryKeys.abandon]
                 )
                     return Infinity
@@ -170,7 +171,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         for (const roomName of allowedRoomNames) {
             const roomMemory = Memory.rooms[roomName]
 
-            if (roomMemory[RoomMemoryKeys.type] === 'commune') {
+            if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
 
                 for (const packedCoord in basePlans.map) {
@@ -193,7 +194,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                         opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
                 }
-            } else if (roomMemory[RoomMemoryKeys.type] === 'remote') {
+            } else if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
                 for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
                     const path = unpackPosList(packedPath)
 
@@ -503,11 +504,11 @@ Room.prototype.scoutByRoomName = function () {
 
     // Use the numbers to deduce some room types - cheaply!
 
-    if (EW % 10 === 0 && NS % 10 === 0) return (this.memory[RoomMemoryKeys.type] = 'intersection')
-    if (EW % 10 === 0 || NS % 10 === 0) return (this.memory[RoomMemoryKeys.type] = 'highway')
-    if (EW % 5 === 0 && NS % 5 === 0) return (this.memory[RoomMemoryKeys.type] = 'keeperCenter')
+    if (EW % 10 === 0 && NS % 10 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.intersection)
+    if (EW % 10 === 0 || NS % 10 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.highway)
+    if (EW % 5 === 0 && NS % 5 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeperCenter)
     if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1)
-        return (this.memory[RoomMemoryKeys.type] = 'keeper')
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeper)
 
     return false
 }
@@ -542,13 +543,13 @@ Room.prototype.scoutEnemyReservedRemote = function () {
 
     if (!Memory.allyPlayers.includes(controller.reservation.username)) {
         this.memory[RoomMemoryKeys.owner] = controller.reservation.username
-        return (this.memory[RoomMemoryKeys.type] = 'enemyRemote')
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
     }
 
     // Otherwise if the room is reserved by an ally
 
     this.memory[RoomMemoryKeys.owner] = controller.reservation.username
-    return (this.memory[RoomMemoryKeys.type] = 'allyRemote')
+    return (this.memory[RoomMemoryKeys.type] = RoomTypes.allyRemote)
 }
 
 Room.prototype.scoutEnemyUnreservedRemote = function () {
@@ -584,7 +585,7 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
                 // Set type to allyRemote and stop
 
                 this.memory[RoomMemoryKeys.owner] = creep.owner.username
-                return (this.memory[RoomMemoryKeys.type] = 'allyRemote')
+                return (this.memory[RoomMemoryKeys.type] = RoomTypes.allyRemote)
             }
 
             // If the creep is not owned by an ally
@@ -596,7 +597,7 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
             /* room.createAttackCombatRequest() */
             this.createHarassCombatRequest()
 
-            return (this.memory[RoomMemoryKeys.type] = 'enemyRemote')
+            return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
         }
     }
 
@@ -605,12 +606,18 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
     const roomMemory = Memory.rooms[this.name]
-    if (roomMemory[RoomMemoryKeys.type] === 'remote' && !global.communes.has(roomMemory[RoomMemoryKeys.commune]))
-        roomMemory[RoomMemoryKeys.type] = 'neutral'
+    if (
+        roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
+        !global.communes.has(roomMemory[RoomMemoryKeys.commune])
+    )
+        roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 
     // If the room is already a remote of the scoutingRoom
 
-    if (roomMemory[RoomMemoryKeys.type] === 'remote' && scoutingRoom.name === roomMemory[RoomMemoryKeys.commune])
+    if (
+        roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
+        scoutingRoom.name === roomMemory[RoomMemoryKeys.commune]
+    )
         return roomMemory[RoomMemoryKeys.type]
 
     let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
@@ -690,7 +697,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // If the room isn't already a remote
 
-    if (roomMemory[RoomMemoryKeys.type] !== 'remote') {
+    if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) {
         // Assign the room's commune as the scoutingRoom
 
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
@@ -730,7 +737,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
 
-        roomMemory[RoomMemoryKeys.type] = 'remote'
+        roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
         return roomMemory[RoomMemoryKeys.type]
     }
 
@@ -746,7 +753,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // Make neutral so we don't have type value issues
 
-    roomMemory[RoomMemoryKeys.type] = 'neutral'
+    roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
     cleanRoomMemory(this.name)
 
     // Generate new important positions
@@ -868,7 +875,7 @@ Room.prototype.scoutEnemyRoom = function () {
         [CombatRequestKeys.minDamage]: 50,
     })
 
-    roomMemory[RoomMemoryKeys.type] = 'enemy'
+    roomMemory[RoomMemoryKeys.type] = RoomTypes.enemy
     return roomMemory[RoomMemoryKeys.type]
 }
 
@@ -893,7 +900,7 @@ Room.prototype.basicScout = function () {
 
         // If the controller is owned by an ally
 
-        if (Memory.allyPlayers.includes(owner)) return (this.memory[RoomMemoryKeys.type] = 'ally')
+        if (Memory.allyPlayers.includes(owner)) return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
 
         return this.scoutEnemyRoom()
     }
@@ -904,7 +911,7 @@ Room.prototype.basicScout = function () {
 
     if (this.scoutRemote()) return this.memory[RoomMemoryKeys.type]
 
-    return (this.memory[RoomMemoryKeys.type] = 'neutral')
+    return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
 }
 
 Room.prototype.advancedScout = function (scoutingRoom: Room) {
@@ -933,7 +940,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (Memory.allyPlayers.includes(owner)) return (this.memory[RoomMemoryKeys.type] = 'ally')
+            if (Memory.allyPlayers.includes(owner)) return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
 
             return this.scoutEnemyRoom()
         }
@@ -944,7 +951,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
         if (this.scoutRemote(scoutingRoom)) return this.memory[RoomMemoryKeys.type]
 
-        return (this.memory[RoomMemoryKeys.type] = 'neutral')
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
     }
 
     return this.memory[RoomMemoryKeys.type]

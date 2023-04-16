@@ -1,5 +1,5 @@
 import { unpackPosAt, unpackPosList } from 'other/codec'
-import { customColors, remoteHarvesterRoles, ClaimRequestKeys, RoomMemoryKeys } from './constants'
+import { customColors, remoteHarvesterRoles, ClaimRequestKeys, RoomMemoryKeys, RoomTypes } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
 import { globalStatsUpdater } from './statsManager'
@@ -16,14 +16,14 @@ class MapVisualsManager {
 
             // Room type
 
-            Game.map.visual.text(roomMemory[RoomMemoryKeys.type], new RoomPosition(2, 45, roomName), {
+            Game.map.visual.text(roomMemory[RoomMemoryKeys.type].toString(), new RoomPosition(2, 45, roomName), {
                 align: 'left',
                 fontSize: 5,
             })
 
             this.test(roomName, roomMemory)
 
-            if (roomMemory[RoomMemoryKeys.type] === 'commune') {
+            if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 const room = Game.rooms[roomName]
                 if (!room) continue
 
@@ -106,7 +106,7 @@ class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory[RoomMemoryKeys.type] === 'remote') {
+            if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
                 const commune = Game.rooms[roomMemory[RoomMemoryKeys.commune]]
 
                 const anchor = commune.roomManager.anchor

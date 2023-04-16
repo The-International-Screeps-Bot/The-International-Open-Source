@@ -11,6 +11,7 @@ import {
     maxControllerLevel,
     preferredCommuneRange,
     RoomMemoryKeys,
+    RoomTypes,
 } from './constants'
 
 /**
@@ -212,7 +213,7 @@ export function advancedFindDistance(
                 return 50
             }
 
-            if (opts.avoidAbandonedRemotes && roomMemory[RoomMemoryKeys.type] === 'remote') {
+            if (opts.avoidAbandonedRemotes && roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
                 if (roomMemory[RoomMemoryKeys.abandon]) {
                     return 30
                 }
@@ -836,7 +837,7 @@ export function findDynamicScore(roomName: string) {
         const searchRoomMemory = Memory.rooms[searchRoomName]
         if (!searchRoomMemory) return
 
-        if (searchRoomMemory[RoomMemoryKeys.type] === 'enemy') {
+        if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.enemy) {
             const score = advancedFindDistance(roomName, searchRoomName)
             if (score <= closestEnemy) return
 
@@ -844,7 +845,7 @@ export function findDynamicScore(roomName: string) {
             return
         }
 
-        if (searchRoomMemory[RoomMemoryKeys.type] === 'commune') {
+        if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
             const searchRoom = Game.rooms[searchRoomName]
             const score =
                 Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
@@ -855,7 +856,7 @@ export function findDynamicScore(roomName: string) {
             return
         }
 
-        if (searchRoomMemory[RoomMemoryKeys.type] === 'ally') {
+        if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.ally) {
             const score =
                 Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
                 (searchRoomMemory[RoomMemoryKeys.RCL] || 0) * 0.3
@@ -878,7 +879,7 @@ export function findDynamicScore(roomName: string) {
 /**
  * Sorts an array in place. This method mutates the array and returns a reference to the same array.
  * Like `array.sort((a, b) => score(a)-score(b))` but with cache
-*/
+ */
 export function sortBy<T>(array: T[], score: (t: T) => number, reversed?: true): T[] {
     const reverseSign = reversed ? -1 : 1
     const cache = new Map(array.map(t => [t, score(t) * reverseSign]))

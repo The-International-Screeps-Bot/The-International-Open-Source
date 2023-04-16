@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys, RoomTypes } from 'international/constants'
 import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
@@ -45,7 +45,7 @@ export class RemoteDismantler extends Creep {
 
         const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
-        if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
+        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
         if (remoteMemory[RoomMemoryKeys.abandon]) return false
 
