@@ -1,5 +1,3 @@
-import { featureFlagConfig } from './settings'
-
 export enum Feature {
     // just for jest testing
     testFeatureEnabled,
@@ -30,6 +28,13 @@ export class FeatureFlagManager {
     areFlagsOn(flags: Feature[]): boolean {
         return flags.every(flag => this.isFlagOn(flag)) // Check if every flag in the array is turned on
     }
+}
+
+export const featureFlagConfig: FeatureFlagConfig = {
+    [Feature.testFeatureEnabled]: false, // do not change!
+    [Feature.testFeatureDisabled]: false, // do not change!
+    // Enable creeps with WORK part(s) to dismantle blocking walls if they are stuck
+    [Feature.dismantleBlockingWalls]: true,
 }
 
 export const FeatureFlags = new FeatureFlagManager(featureFlagConfig)

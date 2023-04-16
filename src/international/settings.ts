@@ -1,5 +1,3 @@
-import { Feature, FeatureFlagConfig } from './featureFlags'
-
 export interface Settings {
     /**
      * The current breaking version of the bot
@@ -153,11 +151,4 @@ export const settings: Settings = {
     simpleAlliesSegment: 90,
     errorExporting: true,
     structureMigration: false,
-}
-
-export const featureFlagConfig: FeatureFlagConfig = {
-    [Feature.testFeatureEnabled]: false, // do not change!
-    [Feature.testFeatureDisabled]: false, // do not change!
-    // Enable creeps with WORK part(s) to dismantle blocking walls if they are stuck
-    [Feature.dismantleBlockingWalls]: true,
 }
