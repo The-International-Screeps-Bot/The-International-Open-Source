@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RemoteData, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
@@ -30,7 +30,7 @@ export class RemoteDismantler extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData[role]] -= 1
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys[role]] -= 1
 
         const commune = this.commune
 
@@ -47,7 +47,7 @@ export class RemoteDismantler extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory.data[RemoteData.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandon]) return false
 
         return true
     }
@@ -70,12 +70,12 @@ export class RemoteDismantler extends Creep {
 
         for (const roomName of remoteNamesByEfficacy) {
             const roomMemory = Memory.rooms[roomName]
-            if (roomMemory.data[RemoteData[role]] <= 0) continue
+            if (roomMemory[RoomMemoryKeys[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true
 
             this.memory[CreepMemoryKeys.remote] = roomName
-            roomMemory.data[RemoteData[role]] -= 1
+            roomMemory[RoomMemoryKeys[role]] -= 1
 
             return true
         }

@@ -2065,14 +2065,6 @@ declare global {
         [RoomMemoryKeys.portalsTo]: string[]
     }
 
-    interface RoomMemory {
-
-        /**
-         * A list of needs the remote wants met
-         */
-        data: number[]
-    }
-
     interface PlayerMemory {
         [PlayerMemoryKeys.offensiveThreat]: number
         [PlayerMemoryKeys.defensiveStrength]: number

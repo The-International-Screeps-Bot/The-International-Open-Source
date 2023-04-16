@@ -10,7 +10,6 @@ import {
     maxRemoteRoomDistance,
     customColors,
     PlayerMemoryKeys,
-    RemoteData,
     roomDimensions,
     roomTypeProperties,
     roomTypes,
@@ -116,7 +115,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 if (
                     opts.avoidAbandonedRemotes &&
                     roomMemory[RoomMemoryKeys.type] === 'remote' &&
-                    roomMemory.data[RemoteData.abandon]
+                    roomMemory[RoomMemoryKeys.abandon]
                 )
                     return Infinity
 
@@ -723,9 +722,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
-        roomMemory.data = []
-        for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
-
         // Add the room's name to the scoutingRoom's remotes list
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
@@ -772,9 +768,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     this.roomManager.remoteControllerPath
 
     roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
-
-    roomMemory.data = []
-    for (const key in RemoteData) roomMemory.data[parseInt(key)] = 0
 
     // Add the room's name to the scoutingRoom's remotes list
 

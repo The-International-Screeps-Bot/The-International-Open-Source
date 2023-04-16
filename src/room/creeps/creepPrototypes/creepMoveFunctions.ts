@@ -5,7 +5,6 @@ import {
     impassibleStructureTypesSet,
     customColors,
     offsetsByDirection,
-    RemoteData,
     roomDimensions,
     TrafficPriorities,
     packedPosLength,
@@ -108,7 +107,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
                 const roomMemory = Memory.rooms[roomName]
 
                 if (Memory.rooms[roomName][RoomMemoryKeys.type] !== 'remote') continue
-                if (!roomMemory.data[RemoteData.abandon]) continue
+                if (!roomMemory[RoomMemoryKeys.abandon]) continue
 
                 // The room is unsafe, don't use cached paths
 
@@ -201,7 +200,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
                 const roomMemory = Memory.rooms[roomName]
 
                 if (Memory.rooms[roomName][RoomMemoryKeys.type] !== 'remote') continue
-                if (!roomMemory.data[RemoteData.abandon]) continue
+                if (!roomMemory[RoomMemoryKeys.abandon]) continue
 
                 // The room is unsafe, don't use cached paths
 

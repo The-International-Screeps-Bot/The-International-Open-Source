@@ -5,7 +5,6 @@ import {
     containerUpkeepCost,
     customColors,
     rampartUpkeepCost,
-    RemoteData,
     remoteHarvesterRoles,
     RemoteHarvesterRolesBySourceIndex,
     remoteHaulerRoles,
@@ -1045,7 +1044,6 @@ export class SpawnRequestsManager {
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
             const remoteMemory = Memory.rooms[remoteName]
-            const data = Memory.rooms[remoteName].data
             const remote = Game.rooms[remoteName]
 
             const sourcePositionsAmount =
@@ -1061,8 +1059,8 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     const partsMultiplier =
-                        data[RemoteData[`maxSourceIncome${sourceIndex as 0 | 1}`]] -
-                        data[RemoteData[sourceHarvesterRole]]
+                        remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] -
+                        remoteMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
                     const role = sourceHarvesterRole
@@ -1157,7 +1155,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     const role = 'remoteHauler'
-                    const partsMultiplier = data[RemoteData[`${role}${sourceIndex as 0 | 1}`]]
+                    const partsMultiplier = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
 
                     if (partsMultiplier <= 0) return false
 
@@ -1211,16 +1209,13 @@ export class SpawnRequestsManager {
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
             const remoteName = remoteNamesByEfficacy[index]
             const remoteMemory = Memory.rooms[remoteName]
-            const remoteData = remoteMemory.data
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 
             const totalRemoteNeed =
-                Math.max(remoteData[RemoteData.remoteReserver], 0) +
-                Math.max(remoteData[RemoteData.remoteCoreAttacker], 0) +
-                Math.max(remoteData[RemoteData.remoteDismantler], 0) +
-                Math.max(remoteData[RemoteData.minDamage], 0) +
-                Math.max(remoteData[RemoteData.minHeal], 0)
+                Math.max(remoteMemory[RoomMemoryKeys.remoteReserver], 0) +
+                Math.max(remoteMemory[RoomMemoryKeys.remoteCoreAttacker], 0) +
+                Math.max(remoteMemory[RoomMemoryKeys.remoteDismantler], 0)
 
             // If there is a need for any econ creep, inform the index
 
@@ -1233,9 +1228,10 @@ export class SpawnRequestsManager {
                     // If there are insufficient harvesters for the remote's sources
 
                     if (
-                        remoteData[RemoteData.remoteSourceHarvester0] +
-                            remoteData[RemoteData.remoteSourceHarvester1] ===
-                        0
+                        remoteMemory[RoomMemoryKeys.remoteHarvesters].reduce(
+                            (partialSum, val) => partialSum + val,
+                            0,
+                        ) === 0
                     )
                         return false
 
@@ -1247,13 +1243,13 @@ export class SpawnRequestsManager {
 
                     // If there are no data for this.communeManager.room this.communeManager.room, inform false
 
-                    if (remoteData[RemoteData.remoteReserver] <= 0) return false
+                    if (remoteMemory[RoomMemoryKeys.remoteReserver] <= 0) return false
 
                     return {
                         role: 'remoteReserver',
                         defaultParts: [],
                         extraParts: [MOVE, CLAIM],
-                        partsMultiplier: remoteData[RemoteData.remoteReserver],
+                        partsMultiplier: remoteMemory[RoomMemoryKeys.remoteReserver],
                         spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteReserver,
                         maxCreeps: remoteMemory[RoomMemoryKeys.remoteControllerPositions].length / packedPosLength,
                         minCost: cost,
@@ -1266,7 +1262,7 @@ export class SpawnRequestsManager {
             )
 
             // Construct requests for remoteDefenders
-
+            /*
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     // If there are no related data
@@ -1298,13 +1294,13 @@ export class SpawnRequestsManager {
                     const healAmount = Math.floor(minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
                     if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                        Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandon] = randomRange(1000, 1500)
                         return false
                     }
 
                     const minCost = minRangedAttackCost + minHealCost
                     if (minCost > this.spawnEnergyCapacity) {
-                        Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandon] = randomRange(1000, 1500)
                         return false
                     }
 
@@ -1330,7 +1326,7 @@ export class SpawnRequestsManager {
                         memoryAdditions: {},
                     }
                 })(),
-            )
+            ) */
 
             // Construct requests for remoteCoreAttackers
 
@@ -1338,7 +1334,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     // If there are no related data
 
-                    if (remoteData[RemoteData.remoteCoreAttacker] <= 0) return false
+                    if (remoteMemory[RoomMemoryKeys.remoteCoreAttacker] <= 0) return false
 
                     // Define the minCost and strength
 
@@ -1368,16 +1364,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     // If there are no related data
 
-                    if (remoteData[RemoteData.remoteDismantler] <= 0) return false
-
-                    // If there are insufficient harvesters for the remote's sources
-
-                    if (
-                        remoteData[RemoteData.remoteSourceHarvester0] +
-                            remoteData[RemoteData.remoteSourceHarvester1] ===
-                        0
-                    )
-                        return false
+                    if (remoteMemory[RoomMemoryKeys.remoteDismantler] <= 0) return false
 
                     // Define the minCost and strength
 

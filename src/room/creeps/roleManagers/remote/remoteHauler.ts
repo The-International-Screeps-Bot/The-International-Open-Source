@@ -1,11 +1,4 @@
-import {
-    CreepMemoryKeys,
-    customColors,
-    packedPosLength,
-    relayOffsets,
-    RemoteData,
-    RoomMemoryKeys,
-} from 'international/constants'
+import { CreepMemoryKeys, customColors, packedPosLength, relayOffsets, RoomMemoryKeys } from 'international/constants'
 import {
     customLog,
     findClosestObject,
@@ -56,8 +49,8 @@ export class RemoteHauler extends Creep {
         if (!this.findRemote()) return
         if (this.isDying()) return
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[
-            RemoteData[`remoteHauler${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHaulers][
+            this.memory[CreepMemoryKeys.sourceIndex]
         ] -= this.parts.carry
     }
 
@@ -68,7 +61,7 @@ export class RemoteHauler extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory.data[RemoteData.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandon]) return false
 
         return true
     }
@@ -87,7 +80,7 @@ export class RemoteHauler extends Creep {
 
             // If there is no need
 
-            if (remoteMemory.data[RemoteData[`remoteHauler${sourceIndex}`]] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] <= 0) continue
 
             this.assignRemote(remoteName, sourceIndex)
             return true
@@ -102,14 +95,20 @@ export class RemoteHauler extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[remoteName].data[RemoteData[`remoteHauler${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]] -=
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteHaulers][this.memory[CreepMemoryKeys.sourceIndex]] -=
             this.parts.carry
     }
 
     removeRemote?() {
-        if (!this.isDying && Memory.rooms[this.memory[CreepMemoryKeys.remote]].data) {
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[
-                RemoteData[`remoteHauler${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]
+        if (
+            !this.isDying &&
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHaulers][
+                this.memory[CreepMemoryKeys.sourceIndex]
+            ]
+        ) {
+            ;[RoomMemoryKeys.remoteHaulers][this.memory[CreepMemoryKeys.sourceIndex]]
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHaulers][
+                this.memory[CreepMemoryKeys.sourceIndex]
             ] += this.parts.carry
         }
 

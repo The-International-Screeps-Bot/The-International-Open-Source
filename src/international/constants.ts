@@ -82,32 +82,6 @@ export enum CombatRequestKeys {
     responder,
 }
 
-// Move this into roomMemory
-
-export enum RemoteData {
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
-    remoteHauler0,
-    remoteHauler1,
-    remoteReserver,
-    remoteCoreAttacker,
-    remoteBuilder,
-    remoteDismantler,
-    minDamage,
-    minHeal,
-    enemyReserved,
-    invaderCore,
-    abandon,
-    onlyInvader,
-    disableCachedPaths,
-    /**
-     * Wether or not we are
-     */
-    active,
-    maxSourceIncome0,
-    maxSourceIncome1,
-}
-
 export enum CreepRoomLogisticsRequestKeys {
     type,
     target,

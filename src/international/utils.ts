@@ -3,7 +3,6 @@ import {
     mmoShardNames,
     customColors,
     offsetsByDirection,
-    RemoteData,
     roomDimensions,
     roomTypeProperties,
     roomTypes,
@@ -214,8 +213,7 @@ export function advancedFindDistance(
             }
 
             if (opts.avoidAbandonedRemotes && roomMemory[RoomMemoryKeys.type] === 'remote') {
-                if (!roomMemory.data) return 30
-                if (roomMemory.data[RemoteData.abandon]) {
+                if (roomMemory[RoomMemoryKeys.abandon]) {
                     return 30
                 }
             }
@@ -614,13 +612,13 @@ export function cleanRoomMemory(roomName: string) {
     for (const key in roomMemory) {
         // Iterate if key is not part of roomTypeProperties
 
-        if (!roomTypeProperties.has(key as keyof RoomMemory)) continue
+        if (!roomTypeProperties.has(key as unknown as keyof RoomMemory)) continue
 
         // Iterate if key is part of this roomType's properties
 
-        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as keyof RoomMemory)) continue
+        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as unknown as keyof RoomMemory)) continue
 
-        delete roomMemory[key as keyof RoomMemory]
+        delete roomMemory[key as unknown as keyof RoomMemory]
     }
 }
 

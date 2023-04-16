@@ -1,11 +1,4 @@
-import {
-    CreepMemoryKeys,
-    RemoteData,
-    RESULT_ACTION,
-    RESULT_FAIL,
-    RESULT_SUCCESS,
-    RoomMemoryKeys,
-} from 'international/constants'
+import { CreepMemoryKeys, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
 import { packCoord, reversePosList, unpackCoordAsPos, unpackPosList } from 'other/codec'
 
@@ -38,7 +31,7 @@ export class RemoteReserver extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory.data[RemoteData.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandon]) return false
 
         return true
     }
@@ -56,10 +49,10 @@ export class RemoteReserver extends Creep {
         for (const roomName of remoteNamesByEfficacy) {
             roomMemory = Memory.rooms[roomName]
 
-            if (roomMemory.data[RemoteData.remoteReserver] <= 0) continue
+            if (roomMemory[RoomMemoryKeys.remoteReserver] <= 0) continue
 
             this.memory[CreepMemoryKeys.remote] = roomName
-            roomMemory.data[RemoteData.remoteReserver] -= 1
+            roomMemory[RoomMemoryKeys.remoteReserver] -= 1
 
             return true
         }
@@ -83,7 +76,7 @@ export class RemoteReserver extends Creep {
 
         // Reduce remote need
 
-        Memory.rooms[remoteName].data[RemoteData[role]] -= this.parts.claim
+        Memory.rooms[remoteName][RoomMemoryKeys[role]] -= this.parts.claim
 
         const commune = this.commune
 

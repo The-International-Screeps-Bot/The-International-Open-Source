@@ -1,11 +1,4 @@
-import {
-    CreepMemoryKeys,
-    packedPosLength,
-    RemoteData,
-    RESULT_FAIL,
-    RESULT_SUCCESS,
-    RoomMemoryKeys,
-} from 'international/constants'
+import { CreepMemoryKeys, packedPosLength, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,
@@ -67,8 +60,8 @@ export class RemoteHarvester extends Creep {
 
         // Record response
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[
-            RemoteData[`remoteSourceHarvester${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHarvesters][
+            this.memory[CreepMemoryKeys.sourceIndex]
         ] += this.parts.work
     }
 
@@ -79,7 +72,7 @@ export class RemoteHarvester extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory.data[RemoteData.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandon]) return false
 
         return true
     }
@@ -97,12 +90,7 @@ export class RemoteHarvester extends Creep {
 
             // If there is no need
 
-            if (
-                remoteMemory.data[
-                    RemoteData[`remoteSourceHarvester${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]
-                ] <= 0
-            )
-                continue
+            if (remoteMemory[RoomMemoryKeys.remoteHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] <= 0) continue
 
             this.assignRemote(remoteName)
             return true
@@ -116,15 +104,14 @@ export class RemoteHarvester extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[remoteName].data[
-            RemoteData[`remoteSourceHarvester${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]
-        ] += this.parts.work
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] +=
+            this.parts.work
     }
 
     removeRemote?() {
         if (!this.isDying()) {
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[
-                RemoteData[`remoteSourceHarvester${this.memory[CreepMemoryKeys.sourceIndex] as 0 | 1}`]
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHarvesters][
+                this.memory[CreepMemoryKeys.sourceIndex]
             ] -= this.parts.work
         }
 

@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RemoteData, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys } from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -36,12 +36,12 @@ export class RemoteDefender extends Creep {
         }
 
         if (this.isDying()) return
-
+        /*
         // Reduce remote need
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData.minDamage] -= this.combatStrength.ranged
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]].data[RemoteData.minHeal] -= this.combatStrength.heal
-
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.minDamage] -= this.combatStrength.ranged
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.minHeal] -= this.combatStrength.heal
+ */
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
@@ -74,15 +74,15 @@ export class RemoteDefender extends Creep {
             roomMemory = Memory.rooms[roomName]
 
             // If the needs of this remote are met, iterate
-
-            if (roomMemory.data[RemoteData.minDamage] + roomMemory.data[RemoteData.minHeal] <= 0) continue
+            /*
+            if (roomMemory[RoomMemoryKeys.minDamage] + roomMemory[RoomMemoryKeys.minHeal] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true
 
             creep.memory[CreepMemoryKeys.remote] = roomName
-            roomMemory.data[RemoteData.minDamage] -= creep.combatStrength.ranged
-            roomMemory.data[RemoteData.minHeal] -= creep.combatStrength.heal
-
+            roomMemory[RoomMemoryKeys.minDamage] -= creep.combatStrength.ranged
+            roomMemory[RoomMemoryKeys.minHeal] -= creep.combatStrength.heal
+ */
             return true
         }
 

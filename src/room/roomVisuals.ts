@@ -5,7 +5,6 @@ import {
     customColors,
     NORMAL,
     PROTECTED,
-    RemoteData,
     roomDimensions,
     stamps,
     packedPosLength,
@@ -644,17 +643,16 @@ export class RoomVisualsManager {
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const remoteMemory = Memory.rooms[remoteName]
-            const remoteData = remoteMemory.data
 
             const row: any[] = []
 
             row.push(remoteName)
             row.push(sourceIndex)
             row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
-            row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
-            row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
-            row.push(remoteData[RemoteData.remoteReserver])
-            row.push(remoteData[RemoteData.abandon])
+            row.push(remoteMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
+            row.push(remoteMemory[RoomMemoryKeys.abandon])
 
             data.push(row)
         }

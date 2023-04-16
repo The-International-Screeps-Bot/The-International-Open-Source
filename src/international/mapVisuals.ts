@@ -1,5 +1,5 @@
 import { unpackPosList } from 'other/codec'
-import { customColors, remoteHarvesterRoles, RemoteData, ClaimRequestKeys, RoomMemoryKeys } from './constants'
+import { customColors, remoteHarvesterRoles, ClaimRequestKeys, RoomMemoryKeys } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
 import { globalStatsUpdater } from './statsManager'
@@ -130,7 +130,7 @@ class MapVisualsManager {
 
                         const income =
                             (possibleReservation ? 10 : 5) -
-                            Math.floor(roomMemory.data[RemoteData[remoteHarvesterRoles[sourceIndex]]])
+                            Math.floor(roomMemory[RoomMemoryKeys.remoteHarvesters][sourceIndex])
 
                         Game.map.visual.text(
                             `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length}`,
@@ -143,9 +143,9 @@ class MapVisualsManager {
                     }
                 }
 
-                if (roomMemory.data[RemoteData.abandon]) {
+                if (roomMemory[RoomMemoryKeys.abandon]) {
                     Game.map.visual.text(
-                        `❌${roomMemory.data[RemoteData.abandon].toString()}`,
+                        `❌${roomMemory[RoomMemoryKeys.abandon].toString()}`,
                         new RoomPosition(2, 16, roomName),
                         {
                             align: 'left',
