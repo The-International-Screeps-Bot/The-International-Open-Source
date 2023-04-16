@@ -1,7 +1,6 @@
 import {
     defaultCreepSwampCost,
     defaultPlainCost,
-    impassibleStructureTypes,
     impassibleStructureTypesSet,
     customColors,
     offsetsByDirection,
@@ -15,13 +14,9 @@ import { internationalManager } from 'international/international'
 import {
     areCoordsEqual,
     arePositionsEqual,
-    customLog,
-    findAdjacentCoordsToCoord,
     findObjectWithID,
-    getRangeXY,
-    getRangeEuc,
-    getRangeEucXY,
     getRange,
+    getRangeEuc,
     isCoordExit,
 } from 'international/utils'
 import {
@@ -34,6 +29,7 @@ import {
     unpackPos,
     unpackPosList,
 } from 'other/codec'
+import { Feature, FeatureFlags } from '../../../international/featureFlags'
 
 PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
     // Inform true if there is no path
@@ -593,7 +589,22 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     if (!room.moveRequests[this.moveRequest]) return false
 
-    if (this.move(this.pos.getDirectionTo(unpackCoordAsPos(this.moveRequest, room.name))) !== OK) return false
+    const targetPosition = unpackCoordAsPos(this.moveRequest, room.name)
+    const direction = this.pos.getDirectionTo(targetPosition)
+    const moveResult = this.move(direction)
+    if (moveResult !== OK) {
+        if (FeatureFlags.isFlagOn(Feature.dismantleBlockingWalls)) this.tryDismantleBlockage(targetPosition)
+        return false
+    }
+    if (moveResult === OK) {
+        // If the creep is moving into a wall, try to dismantle it (if that feature is enabled)
+        if (FeatureFlags.isFlagOn(Feature.dismantleBlockingWalls)) {
+            const wall = this.room
+                .lookForAt('structure', targetPosition.x, targetPosition.y)
+                .find(s => s.structureType === STRUCTURE_WALL && !this.room.controller.my)
+            if (wall) this.tryDismantleBlockage(targetPosition, wall)
+        }
+    }
 
     if (Memory.roomVisuals)
         room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
@@ -678,7 +689,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
         for (let index = queue.length - 1; index >= 0; index--)
             // Have the creep run its moveRequesat
-
             (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
 
         return
@@ -942,5 +952,20 @@ PowerCreep.prototype.avoidEnemyThreatCoords = Creep.prototype.avoidEnemyThreatCo
         flee: true,
     })
 
+    return true
+}
+
+PowerCreep.prototype.tryDismantleBlockage = Creep.prototype.tryDismantleBlockage = function (
+    pos: RoomPosition,
+    structure?: Structure,
+): boolean {
+    // TODO: hacky workaround for stuck creeps
+    if (!structure) {
+        structure = this.room
+            .lookForAt('structure', pos.x, pos.y)
+            .find(s => s.structureType === STRUCTURE_WALL && !this.room.controller.my)
+        if (!structure) return false
+    }
+    this.dismantle(structure)
     return true
 }

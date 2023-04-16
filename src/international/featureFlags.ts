@@ -1,11 +1,17 @@
+import { featureFlagConfig } from './settings'
+
 export enum Feature {
+    // just for jest testing
     testFeatureEnabled,
     testFeatureDisabled,
+    // enables creeps with WORK part(s) to dismantle blocking walls if they are stuck
+    dismantleBlockingWalls,
 }
 
-interface FeatureFlagConfig {
+export interface FeatureFlagConfig {
     [Feature.testFeatureEnabled]: boolean
     [Feature.testFeatureDisabled]: boolean
+    [Feature.dismantleBlockingWalls]: boolean
 }
 
 export class FeatureFlagManager {
@@ -26,7 +32,4 @@ export class FeatureFlagManager {
     }
 }
 
-export const FeatureFlags = new FeatureFlagManager({
-    [Feature.testFeatureEnabled]: false,
-    [Feature.testFeatureDisabled]: false,
-})
+export const FeatureFlags = new FeatureFlagManager(featureFlagConfig)

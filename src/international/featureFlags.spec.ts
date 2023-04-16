@@ -1,16 +1,11 @@
-import { Feature, FeatureFlagManager } from './featureFlags'
+import { Feature, FeatureFlags } from './featureFlags'
 
 describe('Feature Flags', () => {
-    const featureFlagInstance = new FeatureFlagManager({
-        [Feature.testFeatureEnabled]: true,
-        [Feature.testFeatureDisabled]: false,
-    })
-
     it('should return false when checking if a feature flag is turned on', () => {
-        expect(featureFlagInstance.isFlagOn(Feature.testFeatureDisabled)).toBe(false)
+        expect(FeatureFlags.isFlagOn(Feature.testFeatureDisabled)).toBe(false)
     })
 
     it('should return true when checking if a feature flag is turned on', () => {
-        expect(featureFlagInstance.isFlagOn(Feature.testFeatureEnabled)).toBe(true)
+        expect(FeatureFlags.isFlagOn(Feature.testFeatureEnabled)).toBe(true)
     })
 })

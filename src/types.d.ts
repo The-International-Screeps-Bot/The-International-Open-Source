@@ -1566,6 +1566,11 @@ declare global {
          * Attack nearby enemies without moving
          */
         passiveRangedAttack(): boolean
+
+        /**
+         * Tries to dismantle a constructed wall at the targeted position
+         */
+        tryDismantleBlockage(pos: RoomPosition, structure?: Structure): boolean
     }
 
     interface CreepProperties {
