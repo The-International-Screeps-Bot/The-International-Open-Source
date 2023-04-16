@@ -159,7 +159,7 @@ export class InternationalManager {
             return
         }
 
-        const myPixelOrder = _.filter(Game.market.orders, o => o.type == 'sell' && o.resourceType == PIXEL)[0]
+        const myPixelOrder = _.find(Game.market.orders, o => o.type == 'sell' && o.resourceType == PIXEL)
 
         const sellOrder = this.getSellOrder(PIXEL, Infinity)
         let price: number

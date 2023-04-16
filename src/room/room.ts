@@ -29,6 +29,7 @@ import {
     randomTick,
     roomNameFromRoomCoord,
     roomNameFromRoomXY,
+    sortBy,
 } from 'international/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
@@ -278,18 +279,10 @@ export class RoomManager {
 
         const sources = this.room.find(FIND_SOURCES)
 
-        sources.sort((a, b) => {
-            return (
-                this.room.advancedFindPath({
-                    origin: a.pos,
-                    goals: [{ pos: anchor, range: 3 }],
-                }).length -
-                this.room.advancedFindPath({
-                    origin: b.pos,
-                    goals: [{ pos: anchor, range: 3 }],
-                }).length
-            )
-        })
+        sortBy(sources, ({ pos }) => this.room.advancedFindPath({
+            origin: pos,
+            goals: [{ pos: anchor, range: 3 }],
+        }).length)
 
         this.room.memory[RoomMemoryKeys.remoteSources] = sources.map(source => source.id)
         return (this._remoteSources = sources)
@@ -368,18 +361,10 @@ export class RoomManager {
                 positions.push(pos)
             }
 
-            positions.sort((a, b) => {
-                return (
-                    this.room.advancedFindPath({
-                        origin: a,
-                        goals: [{ pos: anchor, range: 3 }],
-                    }).length -
-                    this.room.advancedFindPath({
-                        origin: b,
-                        goals: [{ pos: anchor, range: 3 }],
-                    }).length
-                )
-            })
+            sortBy(positions, origin => this.room.advancedFindPath({
+                origin,
+                goals: [{ pos: anchor, range: 3 }],
+            }).length)
 
             sourceHarvestPositions.push(positions)
         }
@@ -481,18 +466,10 @@ export class RoomManager {
             positions.push(adjPos)
         }
 
-        positions.sort((a, b) => {
-            return (
-                this.room.advancedFindPath({
-                    origin: a,
-                    goals: [{ pos: anchor, range: 4 }],
-                }).length -
-                this.room.advancedFindPath({
-                    origin: b,
-                    goals: [{ pos: anchor, range: 4 }],
-                }).length
-            )
-        })
+        sortBy(positions, origin => this.room.advancedFindPath({
+            origin,
+            goals: [{ pos: anchor, range: 4 }],
+        }).length)
 
         // Make the closest pos the last to be chosen
 
@@ -589,18 +566,10 @@ export class RoomManager {
             positions.push(adjPos)
         }
 
-        positions.sort((a, b) => {
-            return (
-                this.room.advancedFindPath({
-                    origin: a,
-                    goals: [{ pos: anchor, range: 4 }],
-                }).length -
-                this.room.advancedFindPath({
-                    origin: b,
-                    goals: [{ pos: anchor, range: 4 }],
-                }).length
-            )
-        })
+        sortBy(positions, origin => this.room.advancedFindPath({
+            origin,
+            goals: [{ pos: anchor, range: 4 }],
+        }).length)
 
         this.room.memory[RoomMemoryKeys.remoteControllerPositions] = packPosList(positions)
         return (this._remoteControllerPositions = positions)

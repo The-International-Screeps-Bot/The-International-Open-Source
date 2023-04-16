@@ -242,6 +242,14 @@ export function unpackPosList(chars: string) {
     }
     return posList
 }
+/**
+ * Unpacks a single RoomPosition of a list stored as a Base32768 string.
+ */
+export function unpackPosAt(chars: string, index = 0) {
+    if (chars.length < packedPosLength * (index + 1)) return undefined
+
+    return unpackPos(chars.slice(packedPosLength * index, packedPosLength * (index + 1)))
+}
 
 /**
  * Pack a planned cord for base building

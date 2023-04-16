@@ -51,6 +51,7 @@ import {
     forCoordsAroundRange,
     randomIntRange,
     estimateTowerDamage,
+    sortBy,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import {
@@ -915,32 +916,17 @@ export class CommunePlanner {
             this.room.name,
         )
         const sources = this.room.find(FIND_SOURCES)
-        sources.sort((a, b) => {
-            return (
-                this.room.advancedFindPath({
-                    origin: a.pos,
-                    goals: [
-                        {
-                            pos: fastFillerPos,
-                            range: 3,
-                        },
-                    ],
-                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                    plainCost: defaultRoadPlanningPlainCost,
-                }).length -
-                this.room.advancedFindPath({
-                    origin: b.pos,
-                    goals: [
-                        {
-                            pos: fastFillerPos,
-                            range: 3,
-                        },
-                    ],
-                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                    plainCost: defaultRoadPlanningPlainCost,
-                }).length
-            )
-        })
+        sortBy(sources, ({ pos }) => this.room.advancedFindPath({
+            origin: pos,
+            goals: [
+                {
+                    pos: fastFillerPos,
+                    range: 3,
+                },
+            ],
+            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost,
+        }).length)
 
         for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
             const packedCoord = packAsNum(coord)
@@ -984,32 +970,17 @@ export class CommunePlanner {
                 sourceHarvestPositions.splice(j, 1)
             }
  */
-            sourceHarvestPositions[i].sort((a, b) => {
-                return (
-                    this.room.advancedFindPath({
-                        origin: a,
-                        goals: [
-                            {
-                                pos: fastFillerAnchor,
-                                range: 3,
-                            },
-                        ],
-                        weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                        plainCost: defaultRoadPlanningPlainCost,
-                    }).length -
-                    this.room.advancedFindPath({
-                        origin: b,
-                        goals: [
-                            {
-                                pos: fastFillerAnchor,
-                                range: 3,
-                            },
-                        ],
-                        weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                        plainCost: defaultRoadPlanningPlainCost,
-                    }).length
-                )
-            })
+            sortBy(sourceHarvestPositions[i], origin => this.room.advancedFindPath({
+                origin,
+                goals: [
+                    {
+                        pos: fastFillerAnchor,
+                        range: 3,
+                    },
+                ],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost,
+            }).length)
 
             const closestHarvestPos = sourceHarvestPositions[i][0]
 
@@ -1052,32 +1023,17 @@ export class CommunePlanner {
 
         const goal = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
-        this.mineralHarvestPositions.sort((a, b) => {
-            return (
-                this.room.advancedFindPath({
-                    origin: a,
-                    goals: [
-                        {
-                            pos: goal,
-                            range: 3,
-                        },
-                    ],
-                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                    plainCost: defaultRoadPlanningPlainCost,
-                }).length -
-                this.room.advancedFindPath({
-                    origin: b,
-                    goals: [
-                        {
-                            pos: goal,
-                            range: 3,
-                        },
-                    ],
-                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                    plainCost: defaultRoadPlanningPlainCost,
-                }).length
-            )
-        })
+        sortBy(this.mineralHarvestPositions, origin => this.room.advancedFindPath({
+            origin,
+            goals: [
+                {
+                    pos: goal,
+                    range: 3,
+                },
+            ],
+            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+            plainCost: defaultRoadPlanningPlainCost,
+        }).length)
 
         const path = this.room.advancedFindPath({
             origin: this.mineralHarvestPositions[0],
@@ -1801,68 +1757,34 @@ export class CommunePlanner {
 
                 const fastFillerPos = new RoomPosition(stampAnchor.x, stampAnchor.y, this.room.name)
                 const sources = this.room.find(FIND_SOURCES)
-                sources.sort((a, b) => {
-                    return (
-                        this.room.advancedFindPath({
-                            origin: a.pos,
-                            goals: [
-                                {
-                                    pos: fastFillerPos,
-                                    range: 3,
-                                },
-                            ],
-                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                            plainCost: defaultRoadPlanningPlainCost,
-                        }).length -
-                        this.room.advancedFindPath({
-                            origin: b.pos,
-                            goals: [
-                                {
-                                    pos: fastFillerPos,
-                                    range: 3,
-                                },
-                            ],
-                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                            plainCost: defaultRoadPlanningPlainCost,
-                        }).length
-                    )
-                })
+                sortBy(sources, ({ pos }) => this.room.advancedFindPath({
+                    origin: pos,
+                    goals: [
+                        {
+                            pos: fastFillerPos,
+                            range: 3,
+                        },
+                    ],
+                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost,
+                }).length)
 
                 const fastFillerCoords = structures.empty
-                fastFillerCoords.sort((a, b) => {
-                    return (
-                        this.room.advancedFindPath({
-                            origin: new RoomPosition(
-                                a.x + stampAnchor.x - stampOffset,
-                                a.y + stampAnchor.y - stampOffset,
-                                this.room.name,
-                            ),
-                            goals: [
-                                {
-                                    pos: sources[0].pos,
-                                    range: 1,
-                                },
-                            ],
-                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                            plainCost: defaultRoadPlanningPlainCost,
-                        }).length -
-                        this.room.advancedFindPath({
-                            origin: new RoomPosition(
-                                b.x + stampAnchor.x - stampOffset,
-                                b.y + stampAnchor.y - stampOffset,
-                                this.room.name,
-                            ),
-                            goals: [
-                                {
-                                    pos: sources[0].pos,
-                                    range: 1,
-                                },
-                            ],
-                            weightCoordMaps: [this.diagonalCoords, this.roadCoords],
-                            plainCost: defaultRoadPlanningPlainCost,
-                        }).length
-                    )
-                })
+                sortBy(fastFillerCoords, ({ x, y }) => this.room.advancedFindPath({
+                    origin: new RoomPosition(
+                        x + stampAnchor.x - stampOffset,
+                        y + stampAnchor.y - stampOffset,
+                        this.room.name,
+                    ),
+                    goals: [
+                        {
+                            pos: sources[0].pos,
+                            range: 1,
+                        },
+                    ],
+                    weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost,
+                }).length)
 
                 let containerMinRCL = 1
                 const containerCoords = [...structures.container]
@@ -2036,8 +1958,8 @@ export class CommunePlanner {
                 this.baseCoords[packAsNum(coord)] = 255
                 this.roadCoords[packAsNum(coord)] = 255
 
-                //
-                ;[coord, i] = findClosestCoord(this.room.controller.pos, structureCoords)
+                    //
+                    ;[coord, i] = findClosestCoord(this.room.controller.pos, structureCoords)
                 structureCoords.splice(i, 1)
                 this.setBasePlansXY(coord.x, coord.y, STRUCTURE_LINK, 5)
                 this.baseCoords[packAsNum(coord)] = 255
@@ -2153,32 +2075,17 @@ export class CommunePlanner {
 
                 const goal = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
 
-                this.outputLabCoords.sort((a, b) => {
-                    return (
-                        this.room.advancedFindPath({
-                            origin: new RoomPosition(a.x, a.y, this.room.name),
-                            goals: [
-                                {
-                                    pos: goal,
-                                    range: 3,
-                                },
-                            ],
-                            weightCoordMaps: [this.gridCoords, this.roadCoords],
-                            plainCost: defaultRoadPlanningPlainCost,
-                        }).length -
-                        this.room.advancedFindPath({
-                            origin: new RoomPosition(b.x, b.y, this.room.name),
-                            goals: [
-                                {
-                                    pos: goal,
-                                    range: 3,
-                                },
-                            ],
-                            weightCoordMaps: [this.gridCoords, this.roadCoords],
-                            plainCost: defaultRoadPlanningPlainCost,
-                        }).length
-                    )
-                })
+                sortBy(this.outputLabCoords, ({ x, y }) => this.room.advancedFindPath({
+                    origin: new RoomPosition(x, y, this.room.name),
+                    goals: [
+                        {
+                            pos: goal,
+                            range: 3,
+                        },
+                    ],
+                    weightCoordMaps: [this.gridCoords, this.roadCoords],
+                    plainCost: defaultRoadPlanningPlainCost,
+                }).length)
 
                 for (const coord of this.outputLabCoords) {
                     this.setBasePlansXY(coord.x, coord.y, STRUCTURE_LAB)
