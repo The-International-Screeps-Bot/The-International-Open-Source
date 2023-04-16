@@ -369,6 +369,7 @@ export class StatsManager {
         Memory.stats = {
             lastReset: 0,
             tickLength: 0,
+            lastTick: 0,
             lastTickTimestamp: 0,
             resources: {
                 pixels: 0,
@@ -419,6 +420,7 @@ export class StatsManager {
         Memory.stats.lastReset = global.lastReset
         Memory.stats.tickLength = timestamp - Memory.stats.lastTickTimestamp
         Memory.stats.lastTickTimestamp = timestamp
+        Memory.stats.lastTick = Game.time
         Memory.stats.constructionSiteCount = global.constructionSitesCount || 0
 
         Memory.stats.resources = {
