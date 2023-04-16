@@ -213,7 +213,7 @@ export function advancedFindDistance(
                 return 50
             }
 
-            if (opts.avoidAbandonedRemotes && roomMemory.T === 'remote') {
+            if (opts.avoidAbandonedRemotes && roomMemory[RoomMemoryKeys.type] === 'remote') {
                 if (!roomMemory.data) return 30
                 if (roomMemory.data[RemoteData.abandon]) {
                     return 30
@@ -226,7 +226,8 @@ export function advancedFindDistance(
 
             // If the type is in typeWeights, inform the weight for the type
 
-            if (opts.typeWeights && opts.typeWeights[roomMemory.T]) return opts.typeWeights[roomMemory.T]
+            if (opts.typeWeights && opts.typeWeights[roomMemory[RoomMemoryKeys.type]])
+                return opts.typeWeights[roomMemory[RoomMemoryKeys.type]]
 
             return 1
         },
@@ -617,7 +618,7 @@ export function cleanRoomMemory(roomName: string) {
 
         // Iterate if key is part of this roomType's properties
 
-        if (roomTypes[roomMemory.T].has(key as keyof RoomMemory)) continue
+        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as keyof RoomMemory)) continue
 
         delete roomMemory[key as keyof RoomMemory]
     }
@@ -835,7 +836,7 @@ export function findDynamicScore(roomName: string) {
         const searchRoomName = roomNameFromRoomXY(x, y)
         const searchRoomMemory = Memory.rooms[searchRoomName]
 
-        if (searchRoomMemory.T === 'enemy') {
+        if (searchRoomMemory[RoomMemoryKeys.type] === 'enemy') {
             const score = advancedFindDistance(roomName, searchRoomName)
             if (score <= closestEnemy) return
 
@@ -843,7 +844,7 @@ export function findDynamicScore(roomName: string) {
             return
         }
 
-        if (searchRoomMemory.T === 'commune') {
+        if (searchRoomMemory[RoomMemoryKeys.type] === 'commune') {
             const searchRoom = Game.rooms[searchRoomName]
             const score =
                 (advancedFindDistance(roomName, searchRoomName) % 5) +
@@ -854,10 +855,10 @@ export function findDynamicScore(roomName: string) {
             return
         }
 
-        if (searchRoomMemory.T === 'ally') {
+        if (searchRoomMemory[RoomMemoryKeys.type] === 'ally') {
             const score =
                 Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
-                (searchRoomMemory.level || 0) * 0.3
+                (searchRoomMemory[RoomMemoryKeys.RCL] || 0) * 0.3
             if (score <= allyScore) return
 
             allyScore = score

@@ -1,4 +1,4 @@
-import { ClaimRequestKeys, CombatRequestKeys, customColors } from 'international/constants'
+import { ClaimRequestKeys, CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -20,19 +20,19 @@ export class ClaimRequestManager {
 
         let request = Memory.claimRequests[room.name]
         if (request) {
-            Memory.rooms[room.name].S = -1
+            Memory.rooms[room.name][RoomMemoryKeys.score] = -1
             return
         }
 
         request = Memory.claimRequests[room.name] = {}
 
-        Memory.rooms[room.name].S = -1
+        Memory.rooms[room.name][RoomMemoryKeys.score] = -1
     }
 
     public run() {
         const { room } = this.communeManager
 
-        const requestName = room.memory.claimRequest
+        const requestName = room.memory[RoomMemoryKeys.claimRequest]
         if (!requestName) return
 
         // If CPU logging is enabled, get the CPU used at the start
@@ -44,7 +44,7 @@ export class ClaimRequestManager {
         // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
 
         if (!request) {
-            delete room.memory.claimRequest
+            delete room.memory[RoomMemoryKeys.claimRequest]
             return
         }
 
@@ -53,7 +53,7 @@ export class ClaimRequestManager {
             return
         }
 
-        const type = Memory.rooms[requestName].T
+        const type = Memory.rooms[requestName][RoomMemoryKeys.type]
         if (type !== 'neutral' && type !== 'commune' && type !== 'remote') {
             // Delete the request so long as the new type isn't ally
 
@@ -104,7 +104,7 @@ export class ClaimRequestManager {
         }
 
         request[ClaimRequestKeys.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
-/*
+        /*
         request[ClaimRequestKeys.minDamage] = 0
         request[ClaimRequestKeys.minHeal] = 0
 
@@ -143,12 +143,12 @@ export class ClaimRequestManager {
 
     private stopResponse(deleteCombat?: boolean) {
         const roomMemory = this.communeManager.room.memory
-        const request = Memory.claimRequests[roomMemory.claimRequest]
+        const request = Memory.claimRequests[roomMemory[RoomMemoryKeys.claimRequest]]
 
         if (deleteCombat) this.deleteCombat()
 
         delete request[ClaimRequestKeys.responder]
-        delete roomMemory.claimRequest
+        delete roomMemory[RoomMemoryKeys.claimRequest]
     }
 
     private delete() {
@@ -156,23 +156,23 @@ export class ClaimRequestManager {
 
         this.deleteCombat()
 
-        delete Memory.claimRequests[roomMemory.claimRequest]
-        delete roomMemory.claimRequest
+        delete Memory.claimRequests[roomMemory[RoomMemoryKeys.claimRequest]]
+        delete roomMemory[RoomMemoryKeys.claimRequest]
     }
 
     private abandon(abandonTime: number = 20000) {
         const roomMemory = this.communeManager.room.memory
-        const request = Memory.claimRequests[roomMemory.claimRequest]
+        const request = Memory.claimRequests[roomMemory[RoomMemoryKeys.claimRequest]]
 
         this.deleteCombat()
 
         request[ClaimRequestKeys.abandon] = abandonTime
         delete request[ClaimRequestKeys.responder]
-        delete roomMemory.claimRequest
+        delete roomMemory[RoomMemoryKeys.claimRequest]
     }
 
     private deleteCombat() {
-        const claimRequestName = this.communeManager.room.memory.claimRequest
+        const claimRequestName = this.communeManager.room.memory[RoomMemoryKeys.claimRequest]
         const combatRequest = Memory.combatRequests[claimRequestName]
         if (!combatRequest) return
 
@@ -180,7 +180,7 @@ export class ClaimRequestManager {
             const combatRequestResponder = Game.rooms[combatRequest[CombatRequestKeys.responder]]
             combatRequestResponder.communeManager.deleteCombatRequest(
                 combatRequest[CombatRequestKeys.responder],
-                combatRequestResponder.memory.combatRequests.indexOf(claimRequestName),
+                combatRequestResponder.memory[RoomMemoryKeys.combatRequests].indexOf(claimRequestName),
             )
             return
         }

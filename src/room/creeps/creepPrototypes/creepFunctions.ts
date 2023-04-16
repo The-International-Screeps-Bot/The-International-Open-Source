@@ -389,7 +389,7 @@ Creep.prototype.advancedUpgradeController = function () {
 }
 
 Creep.prototype.advancedBuild = function () {
-    const cSiteTarget = this.room.cSiteTarget
+    const cSiteTarget = this.room.roomManager.cSiteTarget
     if (!cSiteTarget) return RESULT_FAIL
 
     // Try to run catch every situation of results

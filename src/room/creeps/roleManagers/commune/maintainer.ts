@@ -146,7 +146,7 @@ export class Maintainer extends Creep {
     }
 
     run?() {
-        const cSiteTarget = this.room.cSiteTarget
+        const cSiteTarget = this.room.roomManager.cSiteTarget
         if (cSiteTarget && cSiteTarget.structureType === STRUCTURE_SPAWN) {
             this.advancedBuild()
 

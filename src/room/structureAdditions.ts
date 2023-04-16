@@ -1,3 +1,5 @@
+import { RoomMemoryKeys } from "international/constants"
+
 Object.defineProperties(Structure.prototype, {
     /**
      * Credits to Tigga for the foundation

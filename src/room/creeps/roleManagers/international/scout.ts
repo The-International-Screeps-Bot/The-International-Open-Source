@@ -108,19 +108,19 @@ export class Scout extends Creep {
     recordDeposits?(): void {
         const { room } = this
 
-        if (room.memory.T != 'highway') return
+        if (room.memory[RoomMemoryKeys.type] != 'highway') return
 
         // Make sure the room has a commune
 
-        if (room.memory.CN) {
-            if (!global.communes.has(room.memory.CN)) {
-                room.memory.CN = findClosestCommuneName(room.name)
+        if (room.memory[RoomMemoryKeys.commune]) {
+            if (!global.communes.has(room.memory[RoomMemoryKeys.commune])) {
+                room.memory[RoomMemoryKeys.commune] = findClosestCommuneName(room.name)
             }
         } else {
-            room.memory.CN = findClosestCommuneName(room.name)
+            room.memory[RoomMemoryKeys.commune] = findClosestCommuneName(room.name)
         }
 
-        const communeMemory = Memory.rooms[room.memory.CN]
+        const communeMemory = Memory.rooms[room.memory[RoomMemoryKeys.commune]]
 
         const deposits = room.find(FIND_DEPOSITS)
 
@@ -157,13 +157,13 @@ export class Scout extends Creep {
 
         // If the room is owned by an enemy or an ally
 
-        if (room.memory.T === 'ally' || room.memory.T === 'enemy') return true
+        if (room.memory[RoomMemoryKeys.type] === 'ally' || room.memory[RoomMemoryKeys.type] === 'enemy') return true
 
         if (controller.reservation && controller.reservation.username !== Memory.me) return true
 
         // If the room is a commune
 
-        if (room.memory.T === 'commune') {
+        if (room.memory[RoomMemoryKeys.type] === 'commune') {
             // If the room already has a correct sign
 
             if (controller.sign && communeSign.startsWith(controller.sign.text)) return true
@@ -272,7 +272,7 @@ export class Scout extends Creep {
                 if (!roomMemory)
                     roomMemory = (Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]] as Partial<RoomMemory>) = {}
 
-                roomMemory.T = 'neutral'
+                roomMemory[RoomMemoryKeys.type] = 'neutral'
                 roomMemory[RoomMemoryKeys.lastScout] = Game.time
 
                 delete creep.memory[CreepMemoryKeys.scoutTarget]

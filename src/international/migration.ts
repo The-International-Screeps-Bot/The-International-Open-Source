@@ -12,7 +12,7 @@ class MigrationManager {
             global.killCreeps()
 
             for (const roomName in Memory.rooms) {
-                const type = Memory.rooms[roomName].T
+                const type = Memory.rooms[roomName][RoomMemoryKeys.type]
                 if (type === 'commune' || type === 'remote') {
                     if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
 
@@ -27,7 +27,7 @@ class MigrationManager {
             global.killCreeps()
 
             for (const roomName in Memory.rooms) {
-                const type = Memory.rooms[roomName].T
+                const type = Memory.rooms[roomName][RoomMemoryKeys.type]
                 if (type === 'commune' || type === 'remote') {
                     if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
 
@@ -42,7 +42,7 @@ class MigrationManager {
             global.killCreeps()
 
             for (const roomName in Memory.rooms) {
-                const type = Memory.rooms[roomName].T
+                const type = Memory.rooms[roomName][RoomMemoryKeys.type]
                 if (type === 'commune' || type === 'remote') {
                     if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
 
@@ -75,7 +75,7 @@ class MigrationManager {
                 if (!room.controller.my) continue
 
                 for (const remoteName of room.memory[RoomMemoryKeys.remotes]) {
-                    Memory.rooms[remoteName].CN = room.name
+                    Memory.rooms[remoteName][RoomMemoryKeys.commune] = room.name
                 }
             }
 
@@ -97,8 +97,8 @@ class MigrationManager {
                 for (const remoteName of room.memory[RoomMemoryKeys.remotes]) {
                     const remoteMemory = Memory.rooms[remoteName]
 
-                    delete remoteMemory.CN
-                    remoteMemory.T = 'neutral'
+                    delete remoteMemory[RoomMemoryKeys.commune]
+                    remoteMemory[RoomMemoryKeys.type] = 'neutral'
                 }
 
                 room.memory[RoomMemoryKeys.remotes] = []

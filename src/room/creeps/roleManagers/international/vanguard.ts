@@ -129,7 +129,7 @@ export class Vanguard extends Creep {
 
             if (this.upgradeRoom()) return
             if (this.repairRampart()) return
-            if (this.room.cSiteTarget && this.advancedBuildCSite(this.room.cSiteTarget)) return
+            if (this.room.roomManager.cSiteTarget && this.advancedBuildCSite(this.room.roomManager.cSiteTarget)) return
             return
         }
 

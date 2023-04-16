@@ -1,4 +1,4 @@
-import { AllyCreepRequestKeys, CreepMemoryKeys } from 'international/constants'
+import { AllyCreepRequestKeys, CreepMemoryKeys, RoomMemoryKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -27,11 +27,11 @@ export class AllyVanguard extends Creep {
 
             if (
                 !roomMemory ||
-                roomMemory.T === 'enemy' ||
-                roomMemory.T === 'enemyRemote' ||
-                roomMemory.T === 'keeper' ||
-                roomMemory.T === 'ally' ||
-                roomMemory.T === 'allyRemote'
+                roomMemory[RoomMemoryKeys.type] === 'enemy' ||
+                roomMemory[RoomMemoryKeys.type] === 'enemyRemote' ||
+                roomMemory[RoomMemoryKeys.type] === 'keeper' ||
+                roomMemory[RoomMemoryKeys.type] === 'ally' ||
+                roomMemory[RoomMemoryKeys.type] === 'allyRemote'
             )
                 continue
 

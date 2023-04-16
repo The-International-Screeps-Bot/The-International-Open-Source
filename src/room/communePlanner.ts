@@ -3006,7 +3006,7 @@ export class CommunePlanner {
             if (this.unprotectedCoords[packAsNum(this.sourceHarvestPositions[sourceIndex][0])] === 255) {
                 unprotectedSources += 1
             }
-            this.shield(this.sourceHarvestPositions[sourceIndex][0], 4)
+            this.shield(this.sourceHarvestPositions[sourceIndex][0], 4, false)
         }
 
         // Protect position of
@@ -3168,7 +3168,7 @@ export class CommunePlanner {
         const plan = this.planAttempts[this.findBestPlanIndex()]
         const roomMemory = Memory.rooms[this.room.name]
 
-        roomMemory.S = plan.score
+        roomMemory[RoomMemoryKeys.score] = plan.score
         roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
         roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans
         roomMemory[RoomMemoryKeys.stampAnchors] = plan.stampAnchors

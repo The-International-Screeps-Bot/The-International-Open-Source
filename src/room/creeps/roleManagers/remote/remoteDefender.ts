@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RemoteData } from 'international/constants'
+import { CreepMemoryKeys, RemoteData, RoomMemoryKeys } from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -22,13 +22,13 @@ export class RemoteDefender extends Creep {
 
         const role = this.role as 'remoteDefender'
 
-        if (Memory.rooms[this.memory[CreepMemoryKeys.remote]].T !== 'remote') {
+        if (Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.type] !== 'remote') {
             delete this.memory[CreepMemoryKeys.remote]
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory[CreepMemoryKeys.remote]].CN !== this.commune.name) {
+        else if (Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.commune] !== this.commune.name) {
             // Delete it from memory and try to find a new one
 
             delete this.memory[CreepMemoryKeys.remote]

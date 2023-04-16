@@ -1,4 +1,4 @@
-import { customColors, HaulRequestKeys, CombatRequestKeys } from 'international/constants'
+import { customColors, HaulRequestKeys, CombatRequestKeys, RoomMemoryKeys } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -14,8 +14,8 @@ export class HaulRequestManager {
     public preTickRun() {
         const { room } = this.communeManager
         return
-        for (let index = 0; index < room.memory.haulRequests.length; index++) {
-            const requestName = room.memory.haulRequests[index]
+        for (let index = 0; index < room.memory[RoomMemoryKeys.haulRequests].length; index++) {
+            const requestName = room.memory[RoomMemoryKeys.haulRequests][index]
             const request = Memory.haulRequests[requestName]
 
             if (
@@ -23,7 +23,7 @@ export class HaulRequestManager {
                 !room.structures.spawn.length ||
                 room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy
             ) {
-                this.communeManager.room.memory.haulRequests.splice(index, 1)
+                this.communeManager.room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 continue
             }
 
@@ -31,7 +31,7 @@ export class HaulRequestManager {
 
             if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
                 delete Memory.haulRequests[requestName]
-                room.memory.haulRequests.splice(index, 1)
+                room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 delete request[HaulRequestKeys.responder]
                 return
             }
@@ -53,12 +53,12 @@ export class HaulRequestManager {
         return
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-        for (let index = 0; index < room.memory.haulRequests.length; index++) {
-            const requestName = room.memory.haulRequests[index]
+        for (let index = 0; index < room.memory[RoomMemoryKeys.haulRequests].length; index++) {
+            const requestName = room.memory[RoomMemoryKeys.haulRequests][index]
             const request = Memory.haulRequests[requestName]
 
             if (!request) {
-                this.communeManager.room.memory.haulRequests.splice(index, 1)
+                this.communeManager.room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 continue
             }
 
@@ -66,7 +66,7 @@ export class HaulRequestManager {
 
             if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
                 delete Memory.haulRequests[requestName]
-                room.memory.haulRequests.splice(index, 1)
+                room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 delete request[HaulRequestKeys.responder]
                 return
             }
@@ -110,7 +110,7 @@ export class HaulRequestManager {
         if (requestRoom.controller && requestRoom.controller.safeMode) {
             request[HaulRequestKeys.abandon] = requestRoom.controller.safeMode
 
-            room.memory.haulRequests.splice(index, 1)
+            room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
             delete request[HaulRequestKeys.responder]
         }
 
@@ -118,7 +118,7 @@ export class HaulRequestManager {
 
         if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
             delete Memory.haulRequests[requestName]
-            room.memory.haulRequests.splice(index, 1)
+            room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
             delete request[HaulRequestKeys.responder]
             return
         }

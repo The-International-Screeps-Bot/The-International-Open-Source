@@ -1424,8 +1424,8 @@ export class SpawnRequestsManager {
     }
 
     private claimRequestRoles() {
-        if (this.communeManager.room.memory.claimRequest) {
-            const requestName = this.communeManager.room.memory.claimRequest
+        if (this.communeManager.room.memory[RoomMemoryKeys.claimRequest]) {
+            const requestName = this.communeManager.room.memory[RoomMemoryKeys.claimRequest]
             const request = Memory.claimRequests[requestName]
 
             // Construct requests for claimers
@@ -1480,10 +1480,10 @@ export class SpawnRequestsManager {
     }
 
     private allyVanguard() {
-        const requestName = this.communeManager.room.memory.allyCreepRequest
+        const requestName = this.communeManager.room.memory[RoomMemoryKeys.allyCreepRequest]
         if (!requestName) return
 
-        const request = Memory.allyCreepRequests[this.communeManager.room.memory.allyCreepRequest]
+        const request = Memory.allyCreepRequests[requestName]
 
         // Requests for vanguard
 
@@ -1509,7 +1509,7 @@ export class SpawnRequestsManager {
     }
 
     private requestHauler() {
-        for (const requestName of this.communeManager.room.memory.haulRequests) {
+        for (const requestName of this.communeManager.room.memory[RoomMemoryKeys.haulRequests]) {
             const request = Memory.haulRequests[requestName]
             if (!request) continue
 
@@ -1540,8 +1540,8 @@ export class SpawnRequestsManager {
     private antifa() {
         let priority = this.minRemotePriority
 
-        for (let i = this.communeManager.room.memory.combatRequests.length - 1; i >= 0; i -= 1) {
-            const requestName = Memory.rooms[this.communeManager.room.name].combatRequests[i]
+        for (let i = this.communeManager.room.memory[RoomMemoryKeys.combatRequests].length - 1; i >= 0; i -= 1) {
+            const requestName = Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.combatRequests][i]
             const request = Memory.combatRequests[requestName]
 
             if (!request) continue

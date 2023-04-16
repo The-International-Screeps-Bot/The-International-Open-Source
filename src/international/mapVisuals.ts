@@ -16,14 +16,14 @@ class MapVisualsManager {
 
             // Room type
 
-            Game.map.visual.text(roomMemory.T, new RoomPosition(2, 45, roomName), {
+            Game.map.visual.text(roomMemory[RoomMemoryKeys.type], new RoomPosition(2, 45, roomName), {
                 align: 'left',
                 fontSize: 5,
             })
 
             this.test(roomName, roomMemory)
 
-            if (roomMemory.T === 'commune') {
+            if (roomMemory[RoomMemoryKeys.type] === 'commune') {
                 const room = Game.rooms[roomName]
                 if (!room) continue
 
@@ -65,10 +65,10 @@ class MapVisualsManager {
                     },
                 )
 
-                if (roomMemory.claimRequest) {
+                if (roomMemory[RoomMemoryKeys.claimRequest]) {
                     Game.map.visual.line(
                         anchor || new RoomPosition(25, 25, roomName),
-                        new RoomPosition(25, 25, roomMemory.claimRequest),
+                        new RoomPosition(25, 25, roomMemory[RoomMemoryKeys.claimRequest]),
                         {
                             color: customColors.lightBlue,
                             width: 1.2,
@@ -77,10 +77,10 @@ class MapVisualsManager {
                     )
                 }
 
-                if (roomMemory.allyCreepRequest) {
+                if (roomMemory[RoomMemoryKeys.allyCreepRequest]) {
                     Game.map.visual.line(
                         anchor || new RoomPosition(25, 25, roomName),
-                        new RoomPosition(25, 25, roomMemory.allyCreepRequest),
+                        new RoomPosition(25, 25, roomMemory[RoomMemoryKeys.allyCreepRequest]),
                         {
                             color: customColors.green,
                             width: 1.2,
@@ -89,8 +89,8 @@ class MapVisualsManager {
                     )
                 }
 
-                if (roomMemory.combatRequests.length) {
-                    for (const requestName of roomMemory.combatRequests) {
+                if (roomMemory[RoomMemoryKeys.combatRequests].length) {
+                    for (const requestName of roomMemory[RoomMemoryKeys.combatRequests]) {
                         Game.map.visual.line(
                             anchor || new RoomPosition(25, 25, roomName),
                             new RoomPosition(25, 25, requestName),
@@ -106,8 +106,8 @@ class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory.T === 'remote') {
-                const commune = Game.rooms[roomMemory.CN]
+            if (roomMemory[RoomMemoryKeys.type] === 'remote') {
+                const commune = Game.rooms[roomMemory[RoomMemoryKeys.commune]]
 
                 const anchor = commune.roomManager.anchor
                 if (!anchor) throw Error('No anchor for mapVisuals remote ' + roomName)
@@ -172,7 +172,7 @@ class MapVisualsManager {
     private claimRequests() {
         for (const roomName in Memory.claimRequests) {
             Game.map.visual.text(
-                `💵${(Memory.rooms[roomName].S || -1).toFixed(2)}`,
+                `💵${(Memory.rooms[roomName][RoomMemoryKeys.score] || -1).toFixed(2)}`,
                 new RoomPosition(2, 24, roomName),
                 {
                     align: 'left',

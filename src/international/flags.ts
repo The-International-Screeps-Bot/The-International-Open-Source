@@ -52,12 +52,16 @@ class FlagManager {
             data.push([
                 transaction.from +
                     ' (' +
-                    (roomFromMemory.T === 'commune' ? Memory.me : roomFromMemory.owner || 'unknown') +
+                    (roomFromMemory[RoomMemoryKeys.type] === 'commune'
+                        ? Memory.me
+                        : roomFromMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
                 '-->',
                 transaction.to +
                     ' (' +
-                    (roomToMemory.T === 'commune' ? Memory.me : roomToMemory.owner || 'unknown') +
+                    (roomToMemory[RoomMemoryKeys.type] === 'commune'
+                        ? Memory.me
+                        : roomToMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
                 transaction.resourceType,
                 transaction.amount,
@@ -115,12 +119,16 @@ class FlagManager {
             data.push([
                 transaction.from +
                     ' (' +
-                    (roomFromMemory.T === 'commune' ? Memory.me : roomFromMemory.owner || 'unknown') +
+                    (roomFromMemory[RoomMemoryKeys.type] === 'commune'
+                        ? Memory.me
+                        : roomFromMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
                 '-->',
                 transaction.to +
                     ' (' +
-                    (roomToMemory.T === 'commune' ? Memory.me : roomToMemory.owner || 'unknown') +
+                    (roomToMemory[RoomMemoryKeys.type] === 'commune'
+                        ? Memory.me
+                        : roomToMemory[RoomMemoryKeys.owner] || 'unknown') +
                     ')',
                 transaction.resourceType,
                 transaction.amount,
@@ -165,7 +173,7 @@ class FlagManager {
             return
         }
 
-        if (roomMemory.T !== 'commune') {
+        if (roomMemory[RoomMemoryKeys.type] !== 'commune') {
             flag.setColor(COLOR_RED)
             return
         }

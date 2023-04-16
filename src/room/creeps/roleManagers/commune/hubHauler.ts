@@ -1,4 +1,10 @@
-import { CreepMemoryKeys, linkReceiveTreshold, linkSendThreshold, powerSpawnRefillThreshold } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    RoomMemoryKeys,
+    linkReceiveTreshold,
+    linkSendThreshold,
+    powerSpawnRefillThreshold,
+} from 'international/constants'
 import { findObjectWithID, getRange, unpackNumAsPos } from 'international/utils'
 
 //import { HubHauler } from '../../creepClasses'
@@ -288,7 +294,7 @@ export class HubHauler extends Creep {
         for (let resource in factory.store) {
             //if it's needed for production, we need it.
             if (
-                room.memory.factoryUsableResources.includes(
+                room.memory[RoomMemoryKeys.factoryUsableResources].includes(
                     resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
                 )
             )
@@ -298,7 +304,8 @@ export class HubHauler extends Creep {
             if (resource == RESOURCE_BATTERY) continue
 
             //We don't want to remove the output if there's less then a full creep's worth.
-            if (resource == room.memory.factoryProduct && factory.store[resource] < this.freeNextStore) continue
+            if (resource == room.memory[RoomMemoryKeys.factoryProduct] && factory.store[resource] < this.freeNextStore)
+                continue
 
             //I'm favoring the terminal here because it's likely going to get sold, or shipped out in late game.
             let target
@@ -365,8 +372,8 @@ export class HubHauler extends Creep {
 
         if (factory.freeNextStore < this.store.getCapacity()) return false
 
-        if (room.memory.factoryProduct && room.memory.factoryUsableResources) {
-            for (let resource of room.memory.factoryUsableResources) {
+        if (room.memory[RoomMemoryKeys.factoryProduct] && room.memory[RoomMemoryKeys.factoryUsableResources]) {
+            for (let resource of room.memory[RoomMemoryKeys.factoryUsableResources]) {
                 //If there's enough of the component, for now it's just checking for 1000, but 1000 of a T3 resource is a lot, 1000 of a mineral isn't much...
 
                 if (factory.store[resource] >= 1000) continue

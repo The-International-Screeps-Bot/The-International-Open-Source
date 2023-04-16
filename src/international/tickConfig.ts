@@ -109,7 +109,7 @@ class TickConfig {
         const communesForResponding = []
 
         for (const roomName of global.communes) {
-            if (Memory.rooms[roomName].claimRequest) continue
+            if (Memory.rooms[roomName][RoomMemoryKeys.claimRequest]) continue
 
             if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
 
@@ -154,7 +154,7 @@ class TickConfig {
 
             // If the requested room is no longer neutral
 
-            const type = Memory.rooms[roomName].T
+            const type = Memory.rooms[roomName][RoomMemoryKeys.type]
 
             if (type !== 'neutral' && type !== 'commune') {
                 // Delete the request
@@ -184,7 +184,7 @@ class TickConfig {
 
             // Otherwise assign the request to the room, and record as such in Memory
 
-            Memory.rooms[communeName].claimRequest = roomName
+            Memory.rooms[communeName][RoomMemoryKeys.claimRequest] = roomName
             Memory.claimRequests[roomName][ClaimRequestKeys.responder] = communeName
 
             reservedGCL -= 1
@@ -210,7 +210,7 @@ class TickConfig {
             const communes = []
 
             for (const roomName of global.communes) {
-                if (Memory.rooms[roomName].allyCreepRequest) continue
+                if (Memory.rooms[roomName][RoomMemoryKeys.allyCreepRequest]) continue
 
                 const room = Game.rooms[roomName]
                 if (!room.structures.spawn.length) continue
@@ -241,7 +241,7 @@ class TickConfig {
 
             // Otherwise assign the request to the room, and record as such in Memory
 
-            Memory.rooms[communeName].allyCreepRequest = roomName
+            Memory.rooms[communeName][RoomMemoryKeys.allyCreepRequest] = roomName
             request[AllyCreepRequestKeys.responder] = communeName
         }
     }
@@ -279,9 +279,13 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-                    if (room.memory.combatRequests.length + 1 >= room.communeManager.maxCombatRequests) continue
+                    if (room.memory[RoomMemoryKeys.combatRequests].length + 1 >= room.communeManager.maxCombatRequests)
+                        continue
                 } else {
-                    if (room.memory.combatRequests.length + 1 >= room.communeManager.estimatedEnergyIncome / 10)
+                    if (
+                        room.memory[RoomMemoryKeys.combatRequests].length + 1 >=
+                        room.communeManager.estimatedEnergyIncome / 10
+                    )
                         continue
                 }
 
@@ -324,7 +328,7 @@ class TickConfig {
 
             // Otherwise assign the request to the room, and record as such in Memory
 
-            Memory.rooms[communeName].combatRequests.push(requestName)
+            Memory.rooms[communeName][RoomMemoryKeys.combatRequests].push(requestName)
             request[CombatRequestKeys.responder] = communeName
 
             internationalManager.creepsByCombatRequest[requestName] = {}
@@ -350,7 +354,7 @@ class TickConfig {
             const communes = []
 
             for (const roomName of global.communes) {
-                if (Memory.rooms[roomName].haulRequests.includes(requestName)) continue
+                if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) continue
 
                 const room = Game.rooms[roomName]
                 if (!room.structures.spawn.length) continue
@@ -362,7 +366,7 @@ class TickConfig {
 
                 if (
                     room.resourcesInStoringStructures.energy / (20000 + room.controller.level * 1000) <
-                    room.memory.haulRequests.length
+                    room.memory[RoomMemoryKeys.haulRequests].length
                 )
                     continue
 
@@ -390,7 +394,7 @@ class TickConfig {
 
             // Otherwise assign the request to the room, and record as such in Memory
 
-            Memory.rooms[communeName].haulRequests.push(requestName)
+            Memory.rooms[communeName][RoomMemoryKeys.haulRequests].push(requestName)
             request[HaulRequestKeys.responder] = communeName
 
             internationalManager.creepsByHaulRequest[requestName] = []

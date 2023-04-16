@@ -453,7 +453,7 @@ export class StatsManager {
         })
 
         notCheckedCommuneRooms.forEach(roomName => {
-            const roomType = Memory.rooms[roomName].T
+            const roomType = Memory.rooms[roomName][RoomMemoryKeys.type]
             if (roomType === 'commune') {
                 this.roomConfig(roomName, roomType)
                 this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName], true)

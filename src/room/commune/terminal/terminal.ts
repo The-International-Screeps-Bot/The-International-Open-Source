@@ -1,4 +1,4 @@
-import { minerals, RESULT_ACTION, RESULT_NO_ACTION, terminalResourceTargets } from 'international/constants'
+import { minerals, RESULT_ACTION, RESULT_NO_ACTION, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
 import { customLog, findLargestTransactionAmount, newID, roundToDecimals } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequest, AllyRequestTypes } from 'international/simpleAllies'
@@ -820,7 +820,8 @@ export class TerminalManager {
 
     updateBuyAvg(energyPrice: number) {
         if (Game.time % 10 == 0) {
-            if (!this.room.memory.marketData.buyAvg) this.room.memory.marketData.buyAvg = {}
+            if (!this.room.memory[RoomMemoryKeys.marketData].buyAvg)
+                this.room.memory[RoomMemoryKeys.marketData].buyAvg = {}
 
             let resourceToTrackBuy = [
                 RESOURCE_METAL,
@@ -836,29 +837,32 @@ export class TerminalManager {
                 let bestBuy = this.getBestBuy(resource, energyPrice)
 
                 if (bestBuy) {
-                    if (!this.room.memory.marketData.buyAvg[resource])
-                        this.room.memory.marketData.buyAvg[resource] = bestBuy.adjCost
+                    if (!this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource])
+                        this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] = bestBuy.adjCost
                     else
-                        this.room.memory.marketData.buyAvg[resource] =
-                            this.room.memory.marketData.buyAvg[resource] * 0.98 + bestBuy.adjCost * 0.02
+                        this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] =
+                            this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 0.98 + bestBuy.adjCost * 0.02
                 } else {
                     //If we're not seeing people buying an item, let the price drift down slowly, so this number doesn't stay high.
-                    this.room.memory.marketData.buyAvg[resource] = this.room.memory.marketData.buyAvg[resource] * 0.995
+                    this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] =
+                        this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 0.995
 
                     //If the data is messed up somehow (either zero or null, force it to a low value)
-                    if (!this.room.memory.marketData.buyAvg[resource]) this.room.memory.marketData.buyAvg[resource] = 0
+                    if (!this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource])
+                        this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] = 0
                 }
             }
 
             let marketData = loadLocalMarketMemory()
-            marketData[this.room.name] = this.room.memory.marketData
+            marketData[this.room.name] = this.room.memory[RoomMemoryKeys.marketData]
             storeLocalMarketMemory(marketData)
         }
     }
 
     updateSellAvg(energyPrice: number) {
         if (Game.time % 10 == 0) {
-            if (!this.room.memory.marketData.sellAvg) this.room.memory.marketData.sellAvg = {}
+            if (!this.room.memory[RoomMemoryKeys.marketData].sellAvg)
+                this.room.memory[RoomMemoryKeys.marketData].sellAvg = {}
 
             let resourceToTrackSell: ResourceConstant[] = [
                 RESOURCE_ZYNTHIUM_KEANITE,
@@ -888,32 +892,33 @@ export class TerminalManager {
                         continue
                     }
 
-                    if (!this.room.memory.marketData.sellAvg[resource])
-                        this.room.memory.marketData.sellAvg[resource] = bestSell.adjCost
+                    if (!this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource])
+                        this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] = bestSell.adjCost
                     else
-                        this.room.memory.marketData.sellAvg[resource] =
-                            this.room.memory.marketData.sellAvg[resource] * 0.995 + bestSell.adjCost * 0.005
+                        this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] =
+                            this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] * 0.995 +
+                            bestSell.adjCost * 0.005
                 } else {
                     //If we're not seeing the item for sale, let the price drift up slowly, so this number doesn't stay too low.
-                    this.room.memory.marketData.sellAvg[resource] =
-                        this.room.memory.marketData.sellAvg[resource] * 1.005
+                    this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] =
+                        this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] * 1.005
 
                     //If the data is messed up somehow (either zero or null, force it to a high value)
-                    if (!this.room.memory.marketData.sellAvg[resource])
-                        this.room.memory.marketData.sellAvg[resource] = 99999999
+                    if (!this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource])
+                        this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] = 99999999
                 }
             }
 
             //Now create the aquireCost tables, which is the cost to get it, either by buying the resource itself, or buying the inputs.
-            this.room.memory.marketData.aquire = {}
+            this.room.memory[RoomMemoryKeys.marketData].aquire = {}
             for (let resource of [...(_.keys(COMMODITIES) as ResourceConstant[])]) {
                 if (resource == RESOURCE_ENERGY) continue
-                this.room.memory.marketData.aquire[resource] = null
+                this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = null
             }
             //Step 1: Energy
-            this.room.memory.marketData.aquire[RESOURCE_ENERGY] = Math.min(
-                this.room.memory.marketData[RESOURCE_ENERGY],
-                (this.room.memory.marketData.sellAvg[RESOURCE_BATTERY] *
+            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] = Math.min(
+                this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY],
+                (this.room.memory[RoomMemoryKeys.marketData].sellAvg[RESOURCE_BATTERY] *
                     COMMODITIES[RESOURCE_ENERGY].components[RESOURCE_BATTERY]) /
                     COMMODITIES[RESOURCE_ENERGY].amount,
             )
@@ -948,10 +953,10 @@ export class TerminalManager {
                                 | RESOURCE_GHODIUM
                         ]
                     if (comp == RESOURCE_ENERGY) {
-                        buildCost += this.room.memory.marketData.aquire[RESOURCE_ENERGY] * amount
+                        buildCost += this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] * amount
                     } else {
                         buildCost +=
-                            this.room.memory.marketData.sellAvg[
+                            this.room.memory[RoomMemoryKeys.marketData].sellAvg[
                                 comp as
                                     | DepositConstant
                                     | CommodityConstant
@@ -961,8 +966,8 @@ export class TerminalManager {
                             ] * amount
                     }
                 }
-                this.room.memory.marketData.aquire[resource] = Math.min(
-                    this.room.memory.marketData.sellAvg[resource],
+                this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = Math.min(
+                    this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource],
                     buildCost / COMMODITIES[resource].amount,
                 )
             }
@@ -973,29 +978,29 @@ export class TerminalManager {
                 switch (resource) {
                     case RESOURCE_ZYNTHIUM_KEANITE:
                         buildCost =
-                            this.room.memory.marketData.aquire[RESOURCE_ZYNTHIUM] +
-                            this.room.memory.marketData.aquire[RESOURCE_KEANIUM]
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ZYNTHIUM] +
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_KEANIUM]
                         break
                     case RESOURCE_UTRIUM_LEMERGITE:
                         buildCost =
-                            this.room.memory.marketData.aquire[RESOURCE_UTRIUM] +
-                            this.room.memory.marketData.aquire[RESOURCE_LEMERGIUM]
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_UTRIUM] +
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_LEMERGIUM]
                         break
                     case RESOURCE_HYDROXIDE:
                         buildCost =
-                            this.room.memory.marketData.aquire[RESOURCE_OXYGEN] +
-                            this.room.memory.marketData.aquire[RESOURCE_HYDROGEN]
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_OXYGEN] +
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_HYDROGEN]
                         break
                 }
-                this.room.memory.marketData.aquire[resource] = Math.min(
-                    this.room.memory.marketData.sellAvg[resource],
+                this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = Math.min(
+                    this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource],
                     buildCost,
                 )
             }
             //Now calculate G, and GMelt, including the possibility of reacting it.
             let gReactionCost =
-                this.room.memory.marketData.aquire[RESOURCE_ZYNTHIUM_KEANITE] +
-                this.room.memory.marketData.aquire[RESOURCE_UTRIUM_LEMERGITE]
+                this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ZYNTHIUM_KEANITE] +
+                this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_UTRIUM_LEMERGITE]
             for (let resource of [RESOURCE_GHODIUM, RESOURCE_GHODIUM_MELT]) {
                 let buildCost = 0
                 for (let comp in COMMODITIES[resource].components) {
@@ -1009,12 +1014,12 @@ export class TerminalManager {
                                 | RESOURCE_GHODIUM
                         ]
                     if (comp == RESOURCE_ENERGY) {
-                        buildCost += this.room.memory.marketData.aquire[RESOURCE_ENERGY] * amount
+                        buildCost += this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] * amount
                     } else if (comp == RESOURCE_GHODIUM) {
                         buildCost += gReactionCost * amount
                     } else {
                         buildCost +=
-                            this.room.memory.marketData.sellAvg[
+                            this.room.memory[RoomMemoryKeys.marketData].sellAvg[
                                 comp as
                                     | DepositConstant
                                     | CommodityConstant
@@ -1024,25 +1029,25 @@ export class TerminalManager {
                             ] * amount
                     }
                 }
-                this.room.memory.marketData.aquire[resource] = Math.min(
-                    this.room.memory.marketData.sellAvg[resource],
+                this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = Math.min(
+                    this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource],
                     buildCost / COMMODITIES[resource].amount,
                 )
                 if (resource == RESOURCE_GHODIUM)
-                    this.room.memory.marketData.aquire[resource] = Math.min(
-                        this.room.memory.marketData.aquire[resource],
+                    this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = Math.min(
+                        this.room.memory[RoomMemoryKeys.marketData].aquire[resource],
                         gReactionCost,
                     )
             }
 
             for (let resource of [RESOURCE_METAL, RESOURCE_BIOMASS, RESOURCE_SILICON, RESOURCE_MIST]) {
-                let priceToUse = this.room.memory.marketData.sellAvg[resource]
+                let priceToUse = this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource]
                 if (priceToUse === undefined || priceToUse === null || priceToUse >= 99999999) {
-                    this.room.memory.marketData.buyAvg
-                        ? (priceToUse = this.room.memory.marketData.buyAvg[resource] * 1.5)
+                    this.room.memory[RoomMemoryKeys.marketData].buyAvg
+                        ? (priceToUse = this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 1.5)
                         : 99999999
                 }
-                this.room.memory.marketData.aquire[resource] = priceToUse
+                this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = priceToUse
             }
             let didWork = true
             while (didWork) {
@@ -1057,7 +1062,7 @@ export class TerminalManager {
                 ]) {
                     //This is handled erlier in the code.
                     if (resource == RESOURCE_ENERGY) continue
-                    if (this.room.memory.marketData.aquire[resource]) continue
+                    if (this.room.memory[RoomMemoryKeys.marketData].aquire[resource]) continue
                     let buildCost = 0
                     for (let comp in COMMODITIES[resource].components) {
                         let amount =
@@ -1071,7 +1076,7 @@ export class TerminalManager {
                             ]
                         //This will go to undefined if we don't have an aquire cost set.
                         buildCost +=
-                            this.room.memory.marketData.aquire[
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[
                                 comp as
                                     | DepositConstant
                                     | CommodityConstant
@@ -1081,17 +1086,17 @@ export class TerminalManager {
                             ] * amount
                     }
                     if (buildCost) {
-                        this.room.memory.marketData.aquire[resource] = Math.min(
-                            this.room.memory.marketData.sellAvg[resource] || 99999999,
+                        this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = Math.min(
+                            this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] || 99999999,
                             buildCost / COMMODITIES[resource].amount,
                         )
-                        if (this.room.memory.marketData.aquire[resource]) didWork = true
+                        if (this.room.memory[RoomMemoryKeys.marketData].aquire[resource]) didWork = true
                     }
                 }
             }
 
             let marketData = loadLocalMarketMemory()
-            marketData[this.room.name] = this.room.memory.marketData
+            marketData[this.room.name] = this.room.memory[RoomMemoryKeys.marketData]
             storeLocalMarketMemory(marketData)
         }
     }
@@ -1122,7 +1127,7 @@ export class TerminalManager {
 
         if (this.terminal.cooldown > 0) return
 
-        let energyPrice = this.room.memory.marketData[RESOURCE_ENERGY]
+        let energyPrice = this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY]
 
         let targetEnergyLevel = 200000
         let totalBetweenStorageAndTerminal =
@@ -1227,7 +1232,7 @@ export class TerminalManager {
             //Check to see what we want to buy...
             //if(this.tryBuyingStuff([RESOURCE_CATALYST, RESOURCE_HYDROGEN, RESOURCE_ZYNTHIUM_KEANITE], energyPrice)) return;
             //let xshard = JSON.parse(InterShardMemory.getRemote("shard2")).market["W21N9"];
-            //if(xshard.buyAvg[RESOURCE_PURIFIER] > 2 * this.room.memory.marketData.aquire[RESOURCE_PURIFIER]) {
+            //if(xshard.buyAvg[RESOURCE_PURIFIER] > 2 * this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_PURIFIER]) {
             //    if(this.tryBuyingStuff([RESOURCE_CATALYST], energyPrice, 1.7)) return;
             //}
         }
@@ -1251,7 +1256,7 @@ export class TerminalManager {
 
             let rate = 1
 
-            let avg = this.room.memory.marketData.sellAvg[resource]
+            let avg = this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource]
             if (bestSell.adjCost > price) {
                 // if(avg * rate < bestSell.adjCost) {
                 //console.log("not buying : " + resource + " " + JSON.stringify(bestSell) + " avg*rate:" + avg * rate + " amount:" + amountToBuy + "  adj:" + bestSell.adjCost);
@@ -1480,7 +1485,7 @@ export class TerminalManager {
 
                 if (rateOverride) rate = rateOverride
 
-                let avg = this.room.memory.marketData.sellAvg[resource]
+                let avg = this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource]
                 if (avg * rate < bestSell.adjCost) {
                     console.log(
                         'not buying : ' +
@@ -1561,7 +1566,7 @@ export class TerminalManager {
             //If this is an item with a high margin, we don't care if we're selling it dirt cheap.
             if (importedResourceCosts[resource] && importedResourceCosts[resource] > bestBuy.adjCost) continue
 
-            let avg = this.room.memory.marketData.buyAvg[resource]
+            let avg = this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource]
             if (avg * multiplier > bestBuy.adjCost) {
                 //if(this.room.name == "W21N9") console.log("not selling : " + resource + " " + JSON.stringify(bestBuy) + " avg:" + avg + " amount:" + amount + "  adj:" + bestBuy.adjCost);
                 continue
@@ -1677,17 +1682,17 @@ export class TerminalManager {
 
         if (bestSell && bestOrder && Game.time % 10 == 0) {
             let avg = (bestSell.adjCost + bestOrder.adjPrice) / 2
-            if (!this.room.memory.marketData) this.room.memory.marketData = {}
+            if (!this.room.memory[RoomMemoryKeys.marketData]) this.room.memory[RoomMemoryKeys.marketData] = {}
 
-            if (!this.room.memory.marketData[RESOURCE_ENERGY]) {
-                this.room.memory.marketData[RESOURCE_ENERGY] = avg
+            if (!this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY]) {
+                this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] = avg
             } else {
-                this.room.memory.marketData[RESOURCE_ENERGY] =
-                    this.room.memory.marketData[RESOURCE_ENERGY] * 0.995 + avg * 0.005
+                this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] =
+                    this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] * 0.995 + avg * 0.005
             }
         }
 
-        let energyPrice = this.room.memory.marketData[RESOURCE_ENERGY]
+        let energyPrice = this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY]
         this.updateSellAvg(energyPrice)
         this.updateBuyAvg(energyPrice)
         //this.useTerminal(bestOrder)

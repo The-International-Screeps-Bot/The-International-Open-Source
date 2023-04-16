@@ -7,7 +7,7 @@ export class Builder extends Creep {
     }
 
     preTickManager() {
-        if (!this.room.cSiteTarget) return
+        if (!this.room.roomManager.cSiteTarget) return
         if (!this.room.communeManager.buildersMakeRequests) return
         if (this.usedReserveStore > this.store.getCapacity() * 0.5) return
 

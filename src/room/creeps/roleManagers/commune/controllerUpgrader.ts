@@ -1,4 +1,4 @@
-import { packedPosLength } from 'international/constants'
+import { RoomMemoryKeys, packedPosLength } from 'international/constants'
 
 export class ControllerUpgrader extends Creep {
     constructor(creepID: Id<Creep>) {

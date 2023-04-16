@@ -1,4 +1,11 @@
-import { CreepMemoryKeys, packedPosLength, RemoteData, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    packedPosLength,
+    RemoteData,
+    RESULT_FAIL,
+    RESULT_SUCCESS,
+    RoomMemoryKeys,
+} from 'international/constants'
 import {
     customLog,
     findCarryPartsRequired,
@@ -70,8 +77,8 @@ export class RemoteHarvester extends Creep {
 
         const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
-        if (remoteMemory.T !== 'remote') return false
-        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
+        if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
         if (remoteMemory.data[RemoteData.abandon]) return false
 
         return true

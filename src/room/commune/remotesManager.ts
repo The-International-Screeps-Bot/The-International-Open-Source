@@ -32,7 +32,7 @@ export class RemotesManager {
 
             // If the room isn't a remote, remove it from the remotes array
 
-            if (remoteMemory.T !== 'remote' || remoteMemory.CN !== room.name) {
+            if (remoteMemory[RoomMemoryKeys.type] !== 'remote' || remoteMemory[RoomMemoryKeys.commune] !== room.name) {
                 this.communeManager.removeRemote(remoteName, index)
                 continue
             }
@@ -206,7 +206,11 @@ export class RemotesManager {
 
                 // See if the room has a valid type and isn't abandoned
 
-                if (remoteTypeWeights[remoteMemory.T] !== Infinity && !remoteMemory.data[RemoteData.abandon]) continue
+                if (
+                    remoteTypeWeights[remoteMemory[RoomMemoryKeys.type]] !== Infinity &&
+                    !remoteMemory.data[RemoteData.abandon]
+                )
+                    continue
 
                 remoteMemory.data[RemoteData.disableCachedPaths] = 1
                 return

@@ -1,5 +1,6 @@
 import { customLog, makeRoomCoord, randomTick, roomNameFromRoomXY } from 'international/utils'
 import { CommuneManager } from './commune'
+import { RoomMemoryKeys } from 'international/constants'
 
 export class ObserverManager {
     communeManager: CommuneManager

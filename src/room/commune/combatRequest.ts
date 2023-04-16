@@ -1,4 +1,4 @@
-import { CombatRequestKeys, customColors } from 'international/constants'
+import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -16,14 +16,14 @@ export class CombatRequestManager {
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-        for (let index = room.memory.combatRequests.length - 1; index >= 0; index -= 1) {
-            const requestName = room.memory.combatRequests[index]
+        for (let index = room.memory[RoomMemoryKeys.combatRequests].length - 1; index >= 0; index -= 1) {
+            const requestName = room.memory[RoomMemoryKeys.combatRequests][index]
             const request = Memory.combatRequests[requestName]
 
             // The request has been deleted by soemthing else
 
             if (!request) {
-                room.memory.combatRequests.splice(index, 1)
+                room.memory[RoomMemoryKeys.combatRequests].splice(index, 1)
                 continue
             }
 
@@ -31,7 +31,7 @@ export class CombatRequestManager {
 
             if (!room.structures.spawn.length) {
                 delete request[CombatRequestKeys.responder]
-                room.memory.combatRequests.splice(index, 1)
+                room.memory[RoomMemoryKeys.combatRequests].splice(index, 1)
                 continue
             }
 
@@ -39,7 +39,7 @@ export class CombatRequestManager {
 
             if (!this.canKeepRequest()) {
                 delete request[CombatRequestKeys.responder]
-                room.memory.combatRequests.splice(index, 1)
+                room.memory[RoomMemoryKeys.combatRequests].splice(index, 1)
             }
 
             this[`${request[CombatRequestKeys.type]}Request`](requestName, index)
@@ -64,10 +64,10 @@ export class CombatRequestManager {
         // Ensure we aren't responding to too many requests for our energy level
 
         if (room.storage && room.controller.level >= 4) {
-            if (room.memory.combatRequests.length >= room.communeManager.maxCombatRequests) return false
+            if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.maxCombatRequests) return false
         }
 
-        if (room.memory.combatRequests.length >= room.communeManager.estimatedEnergyIncome / 10) return false
+        if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.estimatedEnergyIncome / 10) return false
         return true
     }
 
@@ -130,7 +130,7 @@ export class CombatRequestManager {
         if (threateningAttacker) {
             request[CombatRequestKeys.abandon] = 1500
 
-            room.memory.combatRequests.splice(index, 1)
+            room.memory[RoomMemoryKeys.combatRequests].splice(index, 1)
             delete request[CombatRequestKeys.responder]
             return
         }
@@ -194,7 +194,7 @@ export class CombatRequestManager {
         if (request[CombatRequestKeys.abandon] > 0) {
             // Stop responding to the request
 
-            this.communeManager.room.memory.combatRequests.splice(index, 1)
+            this.communeManager.room.memory[RoomMemoryKeys.combatRequests].splice(index, 1)
             delete request[CombatRequestKeys.responder]
             return
         }

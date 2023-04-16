@@ -43,7 +43,7 @@ const roomAdditions = {
 
             // If commune, only avoid ally creeps
 
-            if (this.memory.T === 'commune') {
+            if (this.memory[RoomMemoryKeys.type] === 'commune') {
                 return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                     filter: creep => !Memory.allyPlayers.includes(creep.owner.username),
                 }))
@@ -64,7 +64,7 @@ const roomAdditions = {
 
             // If commune, only avoid ally creeps
 
-            if (this.memory.T === 'commune') {
+            if (this.memory[RoomMemoryKeys.type] === 'commune') {
                 return (this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
                     return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work + creep.parts.heal > 0
                 }))
@@ -264,59 +264,6 @@ const roomAdditions = {
             for (const cSite of this.find(FIND_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
 
             return this._cSites
-        },
-    },
-    cSiteTarget: {
-        get() {
-            if (this.memory[RoomMemoryKeys.constructionSiteTarget]) {
-                const cSiteTarget = findObjectWithID(this.memory[RoomMemoryKeys.constructionSiteTarget])
-                if (cSiteTarget) return cSiteTarget
-            }
-
-            if (!this.find(FIND_MY_CONSTRUCTION_SITES).length) return false
-
-            let totalX = 0
-            let totalY = 0
-            let count = 1
-
-            const anchor = this.roomManager.anchor
-            if (anchor) {
-                totalX += anchor.x
-                totalY += anchor.y
-            } else {
-                totalX += 25
-                totalX += 25
-            }
-
-            for (const creepName of this.myCreeps.builder) {
-                const pos = Game.creeps[creepName].pos
-
-                totalX += pos.x
-                totalY += pos.y
-                count += 1
-            }
-
-            const searchAnchor = new RoomPosition(Math.floor(totalX / count), Math.floor(totalY / count), this.name)
-
-            // Loop through structuretypes of the build priority
-
-            for (const structureType of defaultStructureTypesByBuildPriority) {
-                const cSitesOfType = this.cSites[structureType]
-                if (!cSitesOfType.length) continue
-
-                let target = searchAnchor.findClosestByPath(cSitesOfType, {
-                    ignoreCreeps: true,
-                    ignoreDestructibleStructures: true,
-                    range: 3,
-                })
-
-                if (!target) target = findClosestObject(searchAnchor, cSitesOfType)
-
-                this.memory[RoomMemoryKeys.constructionSiteTarget] = target.id
-                return target
-            }
-
-            return false
         },
     },
     enemyCSites: {
@@ -776,7 +723,7 @@ const roomAdditions = {
 
             const sourceContainers: StructureContainer[] = []
 
-            const roomType = this.memory.T
+            const roomType = this.memory[RoomMemoryKeys.type]
             if (roomType === 'commune') {
                 const positions = this.roomManager.communeSourceHarvestPositions
                 for (let i = 0; i < positions.length; i++) {
@@ -1610,7 +1557,7 @@ const roomAdditions = {
         get() {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
-            if (this.memory.T === 'remote') return (this._advancedLogistics = true)
+            if (this.memory[RoomMemoryKeys.type] === 'remote') return (this._advancedLogistics = true)
 
             // So long as we have some sort of storing structure
 

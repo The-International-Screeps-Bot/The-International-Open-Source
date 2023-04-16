@@ -1,6 +1,21 @@
+import { RoomMemoryKeys } from 'international/constants'
 import { CommuneManager } from './commune'
 
-const BASE_RESOURCES = ['energy', 'H', 'O', 'U', 'L', 'K', 'Z', 'X', 'G', RESOURCE_BIOMASS, RESOURCE_METAL, RESOURCE_SILICON, RESOURCE_MIST]
+const BASE_RESOURCES = [
+    'energy',
+    'H',
+    'O',
+    'U',
+    'L',
+    'K',
+    'Z',
+    'X',
+    'G',
+    RESOURCE_BIOMASS,
+    RESOURCE_METAL,
+    RESOURCE_SILICON,
+    RESOURCE_MIST,
+]
 
 export class FactoryManager {
     commune: CommuneManager
@@ -63,23 +78,23 @@ export class FactoryManager {
 
     updateUsableResources() {
         if (!this.getProduct()) {
-            this.commune.room.memory.factoryUsableResources = []
+            this.commune.room.memory[RoomMemoryKeys.factoryUsableResources] = []
             return
         }
 
         //This should probably be smarter, and use the known production quantity to know if it needs to recurse
         //  Into the items.  Ex: If we have a bunch of U_Bars in storare, we don't need U on this list.
         //  But for now, it asks for it.
-        this.commune.room.memory.factoryUsableResources = this.allComponents(this.getProduct())
+        this.commune.room.memory[RoomMemoryKeys.factoryUsableResources] = this.allComponents(this.getProduct())
     }
 
     setProduct(product: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM) {
-        this.commune.room.memory.factoryProduct = product
+        this.commune.room.memory[RoomMemoryKeys.factoryProduct] = product
         this.updateUsableResources()
     }
 
     getProduct() {
-        return this.commune.room.memory.factoryProduct
+        return this.commune.room.memory[RoomMemoryKeys.factoryProduct]
     }
 
     haveAllMaterials(resource: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM): boolean {

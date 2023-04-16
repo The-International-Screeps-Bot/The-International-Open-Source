@@ -1294,8 +1294,6 @@ declare global {
         _allyCSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>>
         readonly allyCSitesByType: Record<StructureConstant, ConstructionSite[]>
 
-        readonly cSiteTarget: ConstructionSite | undefined
-
         _spawningStructures: SpawningStructures
         readonly spawningStructures: SpawningStructures
 
@@ -2068,82 +2066,11 @@ declare global {
     }
 
     interface RoomMemory {
-        /**
-         * Type of a room that generally describes properties of the room
-         */
-        T: RoomTypes
-
-        /**
-         * Commune Name
-         */
-        CN: string
 
         /**
          * A list of needs the remote wants met
          */
         data: number[]
-
-        /**
-         * The room owner
-         */
-        owner: string
-
-        /**
-         * The controller's level
-         */
-        level: number
-
-        /**
-         * Wether the room has a terminal
-         */
-        terminal: boolean
-
-        /**
-         * The number of towers in the room
-         */
-        towers: number
-
-        /**
-         * The amount of stored energy in the room
-         */
-        energy: number
-
-        /**
-         * The room name of the commune's claim target
-         */
-        claimRequest: string
-
-        /**
-         * The room names of the requests this room is responding to
-         */
-        combatRequests: string[]
-
-        /**
-         * The room names of the requests this room is responding to
-         */
-        haulRequests: string[]
-
-        /**
-         * The room name of the room's ally creep target
-         */
-        allyCreepRequest: string
-
-        /**
-         * The score for claim evaluation
-         */
-        S: number
-
-        hasTerminal: boolean
-
-        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
-        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
-
-        marketData: {
-            [RESOURCE_ENERGY]?: number
-            sellAvg?: { [key in ResourceConstant]?: number }
-            buyAvg?: { [key in ResourceConstant]?: number }
-            aquire?: { [key in ResourceConstant]?: number }
-        }
     }
 
     interface PlayerMemory {

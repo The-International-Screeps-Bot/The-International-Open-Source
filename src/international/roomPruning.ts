@@ -25,7 +25,7 @@ class RoomPruningManager {
             }
 
             const roomMemory = Memory.rooms[roomName]
-            const score = roomMemory.S + roomMemory[RoomMemoryKeys.dynamicScore]
+            const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
 
             if (score <= highestScore) continue
 

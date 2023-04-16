@@ -157,9 +157,9 @@ export class CommuneManager {
 
         // If we should abandon the room
 
-        if (room.memory[RoomMemoryKeys.abandoned]) {
+        if (roomMemory[RoomMemoryKeys.abandoned]) {
             room.controller.unclaim()
-            roomMemory.T = 'neutral'
+            roomMemory[RoomMemoryKeys.type] = 'neutral'
             cleanRoomMemory(room.name)
 
             for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
@@ -168,7 +168,7 @@ export class CommuneManager {
             return
         }
 
-        room.memory.T = 'commune'
+        roomMemory[RoomMemoryKeys.type] = 'commune'
         global.communes.add(room.name)
         this.preTickTest()
 
@@ -177,10 +177,11 @@ export class CommuneManager {
             else if (room.controller.progress > room.controller.progressTotal || room.find(FIND_MY_STRUCTURES).length) {
                 roomMemory[RoomMemoryKeys.greatestRCL] = 8
             } else roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
-        } else if (room.controller.level > roomMemory[RoomMemoryKeys.greatestRCL]) roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
+        } else if (room.controller.level > roomMemory[RoomMemoryKeys.greatestRCL])
+            roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
 
-        if (!room.memory.combatRequests) room.memory.combatRequests = []
-        if (!room.memory.haulRequests) room.memory.haulRequests = []
+        if (!roomMemory[RoomMemoryKeys.combatRequests]) roomMemory[RoomMemoryKeys.combatRequests] = []
+        if (!roomMemory[RoomMemoryKeys.haulRequests]) roomMemory[RoomMemoryKeys.haulRequests] = []
 
         room.spawnRequestsArgs = []
         room.upgradeStrength = 0
@@ -195,15 +196,15 @@ export class CommuneManager {
         this.nextSpawnEnergyAvailable = room.energyAvailable
         this.estimatedEnergyIncome = 0
 
-        if (!room.memory[RoomMemoryKeys.remotes]) room.memory[RoomMemoryKeys.remotes] = []
+        if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
         if (roomMemory[RoomMemoryKeys.threatened] == undefined) roomMemory[RoomMemoryKeys.threatened] = 0
 
         room.usedRampartIDs = new Map()
 
         room.creepsOfRemote = {}
 
-        for (let index = room.memory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {
-            const remoteName = room.memory[RoomMemoryKeys.remotes][index]
+        for (let index = roomMemory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {
+            const remoteName = roomMemory[RoomMemoryKeys.remotes][index]
             room.creepsOfRemote[remoteName] = {}
             for (const role of remoteRoles) room.creepsOfRemote[remoteName][role] = []
         }
@@ -217,7 +218,7 @@ export class CommuneManager {
 
         room.scoutTargets = new Set()
 
-        if (!room.memory[RoomMemoryKeys.deposits]) room.memory[RoomMemoryKeys.deposits] = {}
+        if (!roomMemory[RoomMemoryKeys.deposits]) roomMemory[RoomMemoryKeys.deposits] = {}
 
         room.attackingDefenderIDs = new Set()
         room.defenderEnemyTargetsWithDamage = new Map()
@@ -318,15 +319,15 @@ export class CommuneManager {
 
     public deleteCombatRequest(requestName: string, index: number) {
         delete Memory.combatRequests[requestName]
-        this.room.memory.combatRequests.splice(index, 1)
+        Memory.rooms[this.room.name][RoomMemoryKeys.combatRequests].splice(index, 1)
     }
 
     public removeRemote(remoteName: string, index: number) {
-        this.room.memory[RoomMemoryKeys.remotes].splice(index, 1)
+        Memory.rooms[this.room.name][RoomMemoryKeys.remotes].splice(index, 1)
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        remoteMemory.T = 'neutral'
+        remoteMemory[RoomMemoryKeys.type] = 'neutral'
         cleanRoomMemory(remoteName)
     }
 
@@ -374,7 +375,8 @@ export class CommuneManager {
 
         // Consider the controller level to an exponent and this room's attack threat
 
-        this._minStoredEnergy = Math.pow(this.room.controller.level * 6000, 1.06) + this.room.memory[RoomMemoryKeys.threatened] * 20
+        this._minStoredEnergy =
+            Math.pow(this.room.controller.level * 6000, 1.06) + this.room.memory[RoomMemoryKeys.threatened] * 20
 
         // If there is a next RCL, Take away some minimum based on how close we are to the next RCL
 
@@ -402,7 +404,10 @@ export class CommuneManager {
 
         return (this._minRampartHits =
             Math.min(
-                Math.floor(Math.pow((level - 3) * 50, 2.5) + this.room.memory[RoomMemoryKeys.threatened] * 5 * Math.pow(level, 2)),
+                Math.floor(
+                    Math.pow((level - 3) * 50, 2.5) +
+                        this.room.memory[RoomMemoryKeys.threatened] * 5 * Math.pow(level, 2),
+                ),
                 RAMPART_HITS_MAX[level] * 0.9,
             ) || 20000)
     }
@@ -467,7 +472,8 @@ export class CommuneManager {
 
         if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
             return (this._maxUpgradeStrength =
-                upgradeStructure.store.getCapacity() / (4 + this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength))
+                upgradeStructure.store.getCapacity() /
+                (4 + this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength))
         }
 
         // Link

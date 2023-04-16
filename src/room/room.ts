@@ -5,6 +5,7 @@ import {
     creepRoles,
     customColors,
     defaultRoadPlanningPlainCost,
+    defaultStructureTypesByBuildPriority,
     dynamicScoreRoomRange,
     maxControllerLevel,
     powerCreepClassNames,
@@ -17,6 +18,7 @@ import {
     advancedFindDistance,
     cleanRoomMemory,
     customLog,
+    findClosestObject,
     findObjectWithID,
     forAdjacentCoords,
     forCoordsInRange,
@@ -88,7 +90,7 @@ export class RoomManager {
             cleanRoomMemory(room.name)
         }
 
-        const roomType = roomMemory.T
+        const roomType = roomMemory[RoomMemoryKeys.type]
         if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
             statsManager.roomPreTick(room.name, roomType)
 
@@ -122,15 +124,15 @@ export class RoomManager {
             pickup: {},
         }
 
-        if (roomMemory.T === 'remote') return
+        if (roomMemory[RoomMemoryKeys.type] === 'remote') return
 
         // Check if the room is a commune
 
         if (!room.controller) return
 
         if (!room.controller.my) {
-            if (roomMemory.T === 'commune') {
-                roomMemory.T = 'neutral'
+            if (roomMemory[RoomMemoryKeys.type] === 'commune') {
+                roomMemory[RoomMemoryKeys.type] = 'neutral'
 
                 room.basicScout()
                 cleanRoomMemory(room.name)
@@ -154,7 +156,7 @@ export class RoomManager {
     preTickRun() {}
 
     run() {
-        if (this.room.memory.T === 'remote') {
+        if (this.room.memory[RoomMemoryKeys.type] === 'remote') {
             this.containerManager.runRemote()
             this.droppedResourceManager.runRemote()
             this.tombstoneManager.runRemote()
@@ -267,7 +269,7 @@ export class RoomManager {
             return this._remoteSources
         }
 
-        const commune = Game.rooms[this.room.memory.CN]
+        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
         if (!commune) throw Error('No commune for remote source harvest positions ' + this.room.name)
 
         const anchor = commune.roomManager.anchor
@@ -341,7 +343,7 @@ export class RoomManager {
             ))
         }
 
-        const commune = Game.rooms[this.room.memory.CN]
+        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
         if (!commune) throw Error('No commune for remote source harvest positions ' + this.room.name)
 
         const anchor = commune.roomManager.anchor
@@ -409,7 +411,7 @@ export class RoomManager {
             return (this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
         }
 
-        const commune = Game.rooms[this.room.memory.CN]
+        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
         if (!commune) throw Error('No commune for remote source harvest paths ' + this.room.name)
 
         const anchor = commune.roomManager.anchor
@@ -523,7 +525,7 @@ export class RoomManager {
 
         const generalRepairStructures: (StructureContainer | StructureRoad)[] = []
 
-        const roomType = this.room.memory.T
+        const roomType = this.room.memory[RoomMemoryKeys.type]
         if (roomType === 'commune') {
             const structures = this.room.structures
             const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(
@@ -569,7 +571,7 @@ export class RoomManager {
         this._remoteControllerPositions = []
         const positions: RoomPosition[] = []
 
-        const commune = Game.rooms[roomMemory.CN]
+        const commune = Game.rooms[roomMemory[RoomMemoryKeys.commune]]
         if (!commune) throw Error('No commune for remote controller positions ' + this.room.name)
 
         const anchor = commune.roomManager.anchor
@@ -641,7 +643,7 @@ export class RoomManager {
             return (this._remoteControllerPath = unpackPosList(packedPath))
         }
 
-        const commune = Game.rooms[this.room.memory.CN]
+        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
         if (!commune) throw Error('No commune for remote controller path ' + this.room.name)
 
         const anchor = commune.roomManager.anchor
@@ -666,5 +668,59 @@ export class RoomManager {
         if (this._usedPositions) return this._usedPositions
 
         return (this._usedPositions = new Set())
+    }
+
+    get cSiteTarget() {
+        const roomMemory = Memory.rooms[this.room.name]
+        if (roomMemory[RoomMemoryKeys.constructionSiteTarget]) {
+            const cSiteTarget = findObjectWithID(roomMemory[RoomMemoryKeys.constructionSiteTarget])
+            if (cSiteTarget) return cSiteTarget
+        }
+
+        if (!this.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
+
+        let totalX = 0
+        let totalY = 0
+        let count = 1
+
+        const anchor = this.anchor
+        if (anchor) {
+            totalX += anchor.x
+            totalY += anchor.y
+        } else {
+            totalX += 25
+            totalX += 25
+        }
+
+        for (const creepName of this.room.myCreeps.builder) {
+            const pos = Game.creeps[creepName].pos
+
+            totalX += pos.x
+            totalY += pos.y
+            count += 1
+        }
+
+        const searchAnchor = new RoomPosition(Math.floor(totalX / count), Math.floor(totalY / count), this.room.name)
+        const cSites = this.room.cSites
+
+        // Loop through structuretypes of the build priority
+
+        for (const structureType of defaultStructureTypesByBuildPriority) {
+            const cSitesOfType = cSites[structureType]
+            if (!cSitesOfType.length) continue
+
+            let target = searchAnchor.findClosestByPath(cSitesOfType, {
+                ignoreCreeps: true,
+                ignoreDestructibleStructures: true,
+                range: 3,
+            })
+
+            if (!target) target = findClosestObject(searchAnchor, cSitesOfType)
+
+            roomMemory[RoomMemoryKeys.constructionSiteTarget] = target.id
+            return target
+        }
+
+        return false
     }
 }

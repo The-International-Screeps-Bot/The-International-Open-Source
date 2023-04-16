@@ -197,7 +197,9 @@ export class RoomVisualsManager {
     private baseVisuals() {
         if (!Memory.baseVisuals) return
 
-        if (!this.roomManager.room.memory[RoomMemoryKeys.communePlanned]) return
+        const roomMemory = Memory.rooms[this.roomManager.room.name]
+        if (roomMemory[RoomMemoryKeys.type] !== 'commune') return
+        if (!roomMemory[RoomMemoryKeys.communePlanned]) return
 
         this.roomManager.room.communeManager.constructionManager.visualize()
     }

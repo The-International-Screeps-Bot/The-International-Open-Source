@@ -1,4 +1,11 @@
-import { CreepMemoryKeys, customColors, packedPosLength, relayOffsets, RemoteData, RoomMemoryKeys } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    customColors,
+    packedPosLength,
+    relayOffsets,
+    RemoteData,
+    RoomMemoryKeys,
+} from 'international/constants'
 import {
     customLog,
     findClosestObject,
@@ -59,8 +66,8 @@ export class RemoteHauler extends Creep {
 
         const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
-        if (remoteMemory.T !== 'remote') return false
-        if (remoteMemory.CN !== this.commune.name) return false
+        if (remoteMemory[RoomMemoryKeys.type] !== 'remote') return false
+        if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
         if (remoteMemory.data[RemoteData.abandon]) return false
 
         return true
