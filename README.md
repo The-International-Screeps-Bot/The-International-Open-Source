@@ -29,13 +29,11 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 [Grafana board](http://pandascreeps.com)
 
-[Progress board](https://trello.com/b/l6Min9hr/typescript-international-screeps-bot)
-
 [Videos](https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C)
 
 [MarvinTMB's screeps profile](https://screeps.com/a/#!/profile/MarvinTMB)
 
-[Issues](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues)
+[Plans and bugs](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues)
 
 [Wiki](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki)
 
@@ -43,7 +41,7 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 Please read the about section before installing and using this bot.
 
-First you'll want to download or fork the repository.
+First you'll want to download or fork the repository. Start by selecting a branch: Main is more stable but is often behind on features and improvements, while Development has more bugs, features and optimizations.
 
 ### NPM
 
@@ -51,7 +49,18 @@ Ensure you have downloaded [Node](https://nodejs.org/en/)
 
 **Make sure your node version is below 17.0.0**
 
-When in the project folder (not src), you'll want to install the devDependencies - and if you don't have it, node - like so:
+You can check your node version with:
+
+```powershell
+node -v
+```
+If your node version is too recent, you can change it with NVM:
+
+Linux/MacOS [nvm](https://github.com/nvm-sh/nvm)
+
+Windows [nvm-windows](https://github.com/coreybutler/nvm-windows)
+
+After making sure you have correct node version go to the project folder (not in src), you'll want to install the dependencies like so:
 
 ```powershell
 npm i
@@ -81,13 +90,13 @@ Soon to be added again when PandaMaster fixes the new ScreepsPlus replacement si
 
 ### Private server
 
-To run the bot on an performance checking server, run `npm run server` and check out `localhost:21025` (server) and `localhost:3000` (grafana) in your browser.
+To run the bot on an performance checking server, run `npm run server` and check out `localhost:21025` (server) and `localhost:3000` (grafana) in your browser. Alternatives with in-depth instructions can be found at [Using a Private Server](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki/Using-a-private-server)
 
-For the performance server users its always RoomName as email and password is `password`.
+For the performance server users, its always RoomName as email and password is `password`.
 
 If you'd like to use rollup to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
 
-I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client ) to watch your private server run from the comfort of your browser.
+I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client) to watch your private server run from the comfort of your browser.
 
 ## Contribution
 
@@ -97,7 +106,7 @@ If you want to join us in development for this bot, please join our [discord ser
 
 **Please use the development branch for pull requests, commits, etc.**
 
-An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO for their essential contribution to this project.
+An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO, SimplyAlex, shu for their essential contribution to this project.
 
 ## Support
 
