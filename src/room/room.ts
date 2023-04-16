@@ -75,6 +75,7 @@ export class RoomManager {
     update(room: Room) {
         delete this._usedControllerCoords
         delete this._generalRepairStructures
+        delete this._sourceLinks
 
         if (randomTick()) {
             delete this._nukeTargetCoords
@@ -722,5 +723,44 @@ export class RoomManager {
         }
 
         return false
+    }
+
+    _sourceLinkIDs: Id<StructureLink>[]
+    _sourceLinks: StructureLink[]
+    get sourceLinks() {
+
+        if (this._sourceLinks) return this._sourceLinks
+
+        const links: StructureLink[] = []
+
+        if (this._sourceLinkIDs) {
+
+            for (const ID of this._sourceLinkIDs) {
+                const link = findObjectWithID(ID)
+                if (!link) break
+
+                links.push(link)
+            }
+
+            if (links.length === this._sourceLinkIDs.length) {
+                return (this._sourceLinks = links)
+            }
+        }
+
+        for (const positions of this.sourceHarvestPositions) {
+            const anchor = positions[0]
+            const structure = this.room.findStructureInRange(
+                anchor,
+                1,
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as false | StructureLink
+
+            if (!structure) continue
+
+            links.push(structure)
+        }
+
+        this._sourceLinkIDs = links.map(link => link.id)
+        return (this._sourceLinks = links)
     }
 }

@@ -764,54 +764,6 @@ const roomAdditions = {
             return (this._sourceContainers = sourceContainers)
         },
     },
-    sourceLinks: {
-        get() {
-            if (this._sourceLinks) return this._sourceLinks
-
-            if (this.global.sourceLinks) {
-                const links = []
-
-                for (const ID of this.global.sourceLinks) {
-                    const link = findObjectWithID(ID)
-                    if (!link) break
-
-                    links.push(link)
-                }
-
-                if (links.length === this.global.sourceLinks.length) {
-                    return (this._sourceLinks = links)
-                }
-            }
-
-            this.global.sourceLinks = []
-            const links = []
-
-            for (const positions of this.roomManager.sourceHarvestPositions) {
-                const anchor = positions[0]
-
-                const adjacentStructures = this.lookForAtArea(
-                    LOOK_STRUCTURES,
-                    anchor.y - 1,
-                    anchor.x - 1,
-                    anchor.y + 1,
-                    anchor.x + 1,
-                    true,
-                )
-
-                for (const posData of adjacentStructures) {
-                    const structure = posData.structure as StructureLink
-
-                    if (structure.structureType !== STRUCTURE_LINK) continue
-
-                    this.global.sourceLinks.push(structure.id)
-                    links.push(structure)
-                    break
-                }
-            }
-
-            return (this._sourceLinks = links)
-        },
-    },
     fastFillerContainerLeft: {
         get() {
             if (this._fastFillerContainerLeft !== undefined) return this._fastFillerContainerLeft

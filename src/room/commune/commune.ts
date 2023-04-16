@@ -479,7 +479,7 @@ export class CommuneManager {
         // Link
 
         const hubLink = this.room.hubLink
-        const sourceLinks = this.room.sourceLinks
+        const sourceLinks = this.room.roomManager.sourceLinks
 
         // If there are transfer links, max out partMultiplier to their ability
 

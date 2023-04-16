@@ -869,7 +869,6 @@ declare global {
 
         // Links
 
-        sourceLinks: Id<StructureLink>[]
         controllerLink: Id<StructureLink> | undefined
         fastFillerLink: Id<StructureLink> | undefined
         hubLink: Id<StructureLink> | undefined
@@ -1345,9 +1344,6 @@ declare global {
 
         _sourceContainers: StructureContainer[]
         readonly sourceContainers: StructureContainer[]
-
-        _sourceLinks: StructureLink[]
-        readonly sourceLinks: StructureLink[]
 
         _fastFillerContainerLeft: StructureContainer | false
         readonly fastFillerContainerLeft: StructureContainer | undefined

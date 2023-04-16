@@ -21,7 +21,7 @@ export class LinkManager {
     }
 
     private sourcesToReceivers() {
-        const sourceLinks = this.communeManager.room.sourceLinks
+        const sourceLinks = this.communeManager.room.roomManager.sourceLinks
         if (!sourceLinks.length) return
 
         let receiverLinks = [
