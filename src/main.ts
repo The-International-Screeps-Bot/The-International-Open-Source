@@ -28,8 +28,8 @@ import './room/creeps/creepAdditions'
 // Other
 
 import { memHack } from 'other/memHack'
-import { customLog, tryErrorMapped } from 'international/utils'
-import { customColors, TrafficPriorities } from 'international/constants'
+import { customLog } from 'international/utils'
+import { CPUMaxPerTick, customColors } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
 import { configManager } from './international/config'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
@@ -60,12 +60,8 @@ import { endTickManager } from './international/endTickManager'
 
 function originalLoop() {
     profiler.wrap((): void => {
-        if (Game.cpu.bucket < Math.max(Game.cpu.limit, 100)) {
-            customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-                textColor: customColors.white,
-                bgColor: customColors.red,
-            })
-            console.log(global.logs)
+        if (Game.cpu.bucket < CPUMaxPerTick) {
+            outOfBucket()
             return
         }
 
@@ -114,6 +110,13 @@ function originalLoop() {
         endTickManager.run()
     })
 }
+const outOfBucket = () => {
+    customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+        textColor: customColors.white,
+        bgColor: customColors.red,
+    })
+    console.log(Memory.logging ? global.logs : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`)
+}
 
 export const loop = ErrorMapper.wrapLoop(originalLoop)
 // export const loop = originalLoop
@@ -131,3 +134,4 @@ profiler.registerFN(originalLoop, 'loop')
 for (const creepClass of new Set(Object.values(creepClasses))) {
     profiler.registerClass(creepClass, creepClass + '')
 }
+profiler.registerFN(outOfBucket, 'outOfBucket')
