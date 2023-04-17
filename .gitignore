@@ -23,3 +23,5 @@ tmp-test-server
 coverage
 .envrc
 .screeps.yaml
+
+.idea/
