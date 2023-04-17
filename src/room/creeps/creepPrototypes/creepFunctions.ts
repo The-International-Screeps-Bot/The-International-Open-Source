@@ -241,14 +241,14 @@ Creep.prototype.advancedUpgradeController = function () {
     let controllerStructure: StructureLink | StructureContainer | undefined = room.controllerContainer
 
     const controllerLink = room.controllerLink
-    // console.log('structure', controllerStructure, this.name)
+
     if (!controllerStructure && controllerLink && controllerLink.RCLActionable) controllerStructure = controllerLink
 
     // If there is a controllerContainer
 
     if (controllerStructure) {
         const upgradePos = this.findUpgradePos()
-        // console.log('pos', upgradePos, this.name)
+
         if (!upgradePos) return false
 
         if (getRange(this.pos, upgradePos) > 0) {

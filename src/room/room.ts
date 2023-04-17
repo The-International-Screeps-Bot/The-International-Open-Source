@@ -423,7 +423,7 @@ export class RoomManager {
                 weightStructurePlans: true,
                 avoidStationaryPositions: true,
             })
-
+            console.log(index, path)
             sourcePaths.push(path)
         }
         for (const index in sourcePaths) {
