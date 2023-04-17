@@ -354,9 +354,10 @@ export class InternationalManager {
 
         return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
             (a, b) =>
-                Memory.rooms[a][RoomMemoryKeys.score] +
-                Memory.rooms[a][RoomMemoryKeys.dynamicScore] -
-                (Memory.rooms[b][RoomMemoryKeys.score] + Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
+                (Memory.claimRequests[a][ClaimRequestKeys.priority] ??
+                    Memory.rooms[a][RoomMemoryKeys.score] + Memory.rooms[a][RoomMemoryKeys.dynamicScore]) -
+                (Memory.claimRequests[b][ClaimRequestKeys.priority] ??
+                    Memory.rooms[b][RoomMemoryKeys.score] + Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
         ))
     }
 

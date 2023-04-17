@@ -20,13 +20,13 @@ export class ClaimRequestManager {
 
         let request = Memory.claimRequests[room.name]
         if (request) {
-            Memory.rooms[room.name][RoomMemoryKeys.score] = -1
+            request[ClaimRequestKeys.priority] = 0
             return
         }
 
-        request = Memory.claimRequests[room.name] = {}
-
-        Memory.rooms[room.name][RoomMemoryKeys.score] = -1
+        request = Memory.claimRequests[room.name] = {
+            [ClaimRequestKeys.priority]: 0
+        }
     }
 
     public run() {

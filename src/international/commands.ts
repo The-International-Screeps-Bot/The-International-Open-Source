@@ -150,7 +150,7 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (requestName, communeName, score = 0) {
+global.claim = function (requestName, communeName, priority = 0) {
     if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
     if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== true)
         return 'Planning not completed for ' + requestName
@@ -163,7 +163,7 @@ global.claim = function (requestName, communeName, score = 0) {
 
     const request = Memory.claimRequests[requestName]
 
-    Memory.rooms[requestName][RoomMemoryKeys.score] = score
+    request[ClaimRequestKeys.priority] = priority
     request[ClaimRequestKeys.abandon] = 0
 
     if (communeName) {

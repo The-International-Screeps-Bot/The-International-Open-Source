@@ -184,8 +184,11 @@ class MapVisualsManager {
     private claimRequests() {
         for (const roomName in Memory.claimRequests) {
 
+            const priority = Memory.claimRequests[roomName][ClaimRequestKeys.priority]
+            const preference = priority !== undefined ? priority.toString() : `💵${Memory.rooms[roomName][RoomMemoryKeys.score]}+${Memory.rooms[roomName][RoomMemoryKeys.dynamicScore]}`
+
             Game.map.visual.text(
-                `💵${Memory.rooms[roomName][RoomMemoryKeys.score]}+${Memory.rooms[roomName][RoomMemoryKeys.dynamicScore]}`,
+                preference,
                 new RoomPosition(2, 24, roomName),
                 {
                     align: 'left',
