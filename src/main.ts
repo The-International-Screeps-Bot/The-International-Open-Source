@@ -132,6 +132,6 @@ profiler.registerClass(FactoryManager, 'FactoryManager')
 profiler.registerFN(originalLoop, 'loop')
 
 for (const creepClass of new Set(Object.values(creepClasses))) {
-    profiler.registerClass(creepClass, creepClass.constructor.name)
+    profiler.registerClass(creepClass, creepClass.toString().match(/ (\w+)/)[1])
 }
 profiler.registerFN(outOfBucket, 'outOfBucket')
