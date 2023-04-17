@@ -22,7 +22,7 @@ If you have specific questions or want to discuss the bot, please join our disco
 [![Discord link](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/5QubDsB786)
 
 ![Screenshot 2022-08-08 221219](https://user-images.githubusercontent.com/48334001/183549645-07cd2907-2e2f-443f-bcba-b70bce5fa28d.png)
-![Map view with visuals](images/visuals.png)
+![map visuals](https://user-images.githubusercontent.com/48334001/232357947-7febd5e6-da7a-4f4f-b3fe-92bad7bb9005.png)
 ![Information panel](images/grafana.png)
 
 ## Progress and Design
