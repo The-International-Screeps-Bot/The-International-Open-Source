@@ -7,5 +7,10 @@ servers:
     host: 127.0.0.1
     port: 21025
     secure: false
-    email": "your username (case sensitive!)"
+    username: "your username (case sensitive!)"
     password": "your password"
+  perf:
+    host: 127.0.0.1
+    username: "W1N1"
+    password: "password"
+
