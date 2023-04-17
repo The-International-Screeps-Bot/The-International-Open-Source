@@ -80,7 +80,7 @@ Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a
 
 First, rename `.screeps.yaml.example` to `.screeps.yaml` and fill in the required information for each environment you want to run the bot in. For the official server, replace the `token` with an [API token](https://docs.screeps.com/auth-tokens.html) for your account. On private servers, edit *(or copy and rename)* the `pserver` section with `host` set to your server domain or IP then complete `username` and `password` with your credentials on this server. For more information about this file, check the [screeps unified credentials file](https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md) spec.
 
-To then run the bot, use the command `npm run push-mmo` replacing mmo with the environment you want to compile to. This wiil initially compile to the environment, as well as automatically compiling and pushing to the environment on code changes.
+To then run the bot, use the command `npm run set-dest mmo` replacing mmo with the environment you want to compile to then `npm run push`. This will compile the bot, as well as pushing to the environment. Using `npm run watch` will automatically compile and push on code changes.
 
 For more information, please go to the [wiki](https://github.com/CarsonBurke/The-International-Screeps-Bot/wiki/Usage)
 
