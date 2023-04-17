@@ -1,5 +1,4 @@
 import {
-    remoteHarvesterRoles,
     remoteRoles,
     maxRemoteRoomDistance,
     remoteTypeWeights,

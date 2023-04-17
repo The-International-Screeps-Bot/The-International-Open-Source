@@ -11,6 +11,7 @@ import {
 } from 'international/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { RemoteHauler } from './remoteHauler'
+import { indexOf } from 'lodash'
 
 export class RemoteHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -44,12 +45,14 @@ export class RemoteHarvester extends Creep {
 
         if (!this.findRemote()) return
 
-        // Add the creep to creepsOfRemote relative to its remote
+        const creepMemory = Memory.creeps[this.name]
+        const remoteName = creepMemory[CreepMemoryKeys.remote]
+        const sourceIndex = creepMemory[CreepMemoryKeys.sourceIndex]
 
-        if (this.memory[CreepMemoryKeys.remote] === this.room.name) {
-            if (!this.isDying()) this.room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
+        if (remoteName === this.room.name) {
+            if (!this.isDying()) this.room.creepsOfSource[sourceIndex].push(this.name)
 
-            const source = this.room.roomManager.remoteSources[this.memory[CreepMemoryKeys.sourceIndex]]
+            const source = this.room.roomManager.remoteSources[sourceIndex]
 
             if (getRange(this.pos, source.pos) <= 1) {
                 this.advancedHarvestSource(source)
@@ -60,9 +63,8 @@ export class RemoteHarvester extends Creep {
 
         // Record response
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvesters][
-            this.memory[CreepMemoryKeys.sourceIndex]
-        ] += this.parts.work
+        this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].push(this.name)
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] += this.parts.work
     }
 
     hasValidRemote?() {
@@ -86,38 +88,50 @@ export class RemoteHarvester extends Creep {
         for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
+            const sourceIndex = parseInt(splitRemoteInfo[1])
             const remoteMemory = Memory.rooms[remoteName]
 
-            // If there is no need
-
-            if (remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] <= 0)
+            if (remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions].length / packedPosLength >= this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].length) continue
+            if (remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] <= 0)
                 continue
 
-            this.assignRemote(remoteName)
+            this.assignRemote(remoteName, sourceIndex)
             return true
         }
 
         return false
     }
 
-    assignRemote?(remoteName: string) {
-        this.memory[CreepMemoryKeys.remote] = remoteName
+    assignRemote?(remoteName: string, sourceIndex: number) {
+        const creepMemory = Memory.creeps[this.name]
+        creepMemory[CreepMemoryKeys.remote] = remoteName
+        creepMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
+
+        delete creepMemory[CreepMemoryKeys.packedCoord]
 
         if (this.isDying()) return
 
+        this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].push(this.name)
         Memory.rooms[remoteName][RoomMemoryKeys.remoteSourceHarvesters][this.memory[CreepMemoryKeys.sourceIndex]] +=
             this.parts.work
     }
 
     removeRemote?() {
+
+        const creepMemory = Memory.creeps[this.name]
+
+
         if (!this.isDying()) {
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvesters][
+
+            const remoteName = creepMemory[CreepMemoryKeys.remote]
+
+            Memory.rooms[remoteName][RoomMemoryKeys.remoteSourceHarvesters][
                 this.memory[CreepMemoryKeys.sourceIndex]
             ] -= this.parts.work
         }
 
-        delete this.memory[CreepMemoryKeys.remote]
-        delete this.memory[CreepMemoryKeys.packedCoord]
+        delete creepMemory[CreepMemoryKeys.remote]
+        delete creepMemory[CreepMemoryKeys.packedCoord]
     }
 
     remoteActions?() {

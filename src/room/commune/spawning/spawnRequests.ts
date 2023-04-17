@@ -5,9 +5,7 @@ import {
     containerUpkeepCost,
     customColors,
     rampartUpkeepCost,
-    remoteHarvesterRoles,
     RemoteHarvesterRolesBySourceIndex,
-    remoteHaulerRoles,
     roadUpkeepCost,
     packedPosLength,
     decayCosts,
@@ -1048,15 +1046,10 @@ export class SpawnRequestsManager {
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
             const remoteMemory = Memory.rooms[remoteName]
-            const remote = Game.rooms[remoteName]
 
             const sourcePositionsAmount =
                 remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length / packedPosLength
             const sourcePathLength = remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length
-
-            const sourceHarvesterRole = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
-                | 'remoteSourceHarvester0'
-                | 'remoteSourceHarvester1'
 
             // Construct requests for remoteSourceHarvester0s
 
@@ -1067,8 +1060,9 @@ export class SpawnRequestsManager {
                         remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
-                    const role = sourceHarvesterRole
+                    const role = 'remoteSourceHarvester'
                     const priority = this.minRemotePriority + 1 + sourcePathLength / 100
+                    const spawnGroup = this.communeManager.remoteSourceHarvesters[remoteName][sourceIndex]
 
                     if (this.spawnEnergyCapacity >= 950) {
                         return {
@@ -1076,7 +1070,7 @@ export class SpawnRequestsManager {
                             defaultParts: [CARRY],
                             extraParts: [WORK, MOVE],
                             partsMultiplier,
-                            spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                            spawnGroup,
                             threshold: 0.1,
                             minCreeps: 1,
                             maxCreeps: sourcePositionsAmount,
@@ -1099,7 +1093,7 @@ export class SpawnRequestsManager {
                             defaultParts: [CARRY],
                             extraParts: [WORK, WORK, MOVE],
                             partsMultiplier: Math.ceil(partsMultiplier / 2),
-                            spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                            spawnGroup,
                             threshold: 0.1,
                             minCreeps: undefined,
                             maxCreeps: sourcePositionsAmount,
@@ -1120,7 +1114,7 @@ export class SpawnRequestsManager {
                             defaultParts: [CARRY],
                             extraParts: [WORK, WORK, MOVE, WORK, MOVE],
                             partsMultiplier: Math.floor(partsMultiplier / 2),
-                            spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                            spawnGroup,
                             threshold: 0.1,
                             minCreeps: undefined,
                             maxCreeps: sourcePositionsAmount,
@@ -1140,7 +1134,7 @@ export class SpawnRequestsManager {
                         defaultParts: [CARRY],
                         extraParts: [WORK, WORK, MOVE],
                         partsMultiplier: Math.ceil(partsMultiplier / 2),
-                        spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                        spawnGroup,
                         threshold: 0.1,
                         minCreeps: undefined,
                         maxCreeps: sourcePositionsAmount,

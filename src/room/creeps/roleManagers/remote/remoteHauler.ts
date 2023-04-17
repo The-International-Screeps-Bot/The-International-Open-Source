@@ -43,23 +43,27 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
-        if (!this.memory[CreepMemoryKeys.remote]) return
+
+        const creepMemory = Memory.creeps[this.name]
+        const remoteName = creepMemory[CreepMemoryKeys.remote]
+        if (!remoteName) return
+
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
         if (this.isDying()) return
 
-        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHaulers][
-            this.memory[CreepMemoryKeys.sourceIndex]
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteHaulers][
+            creepMemory[CreepMemoryKeys.sourceIndex]
         ] -= this.parts.carry
     }
 
     hasValidRemote?() {
-        if (!this.memory[CreepMemoryKeys.remote]) return false
+        const remoteName = Memory.creeps[this.name][CreepMemoryKeys.remote]
+        if (!remoteName) return false
 
-        const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
+        const remoteMemory = Memory.rooms[remoteName]
 
-        if (remoteMemory) return false
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
         if (remoteMemory[RoomMemoryKeys.abandon]) return false

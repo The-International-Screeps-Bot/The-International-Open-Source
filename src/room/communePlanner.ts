@@ -2987,7 +2987,7 @@ export class CommunePlanner {
             score -= 6
         }
 
-        this.score = score
+        this.score = Math.round(score)
     }
     private record() {
         this.recording = true

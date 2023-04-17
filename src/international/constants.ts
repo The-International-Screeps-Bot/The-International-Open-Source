@@ -334,8 +334,7 @@ export const creepRoles: CreepRoles[] = [
     'fastFiller',
     'meleeDefender',
     'rangedDefender',
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
+    'remoteSourceHarvester',
     'remoteHauler',
     'remoteReserver',
     'remoteDefender',
@@ -361,8 +360,7 @@ export const roomLogisticsRoles: Set<CreepRoles> = new Set([
     'builder',
     'maintainer',
     'controllerUpgrader',
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
+    'remoteSourceHarvester',
     'remoteHauler',
     'hubHauler',
     'allyVanguard',
@@ -379,8 +377,7 @@ export enum TrafficPriorities {
     fastFiller,
     sourceHarvester,
     mineralHarvester,
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
+    remoteSourceHarvester,
     remoteReserver,
     remoteDismantler,
     remoteCoreAttacker,
@@ -1093,13 +1090,6 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
     },
 }
 
-export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
-]
-
-export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = ['remoteHauler0', 'remoteHauler1']
-
 export const antifaRoles: (
     | 'antifaRangedAttacker'
     | 'antifaAttacker'
@@ -1112,15 +1102,13 @@ export const antifaRoles: (
  * Roles for which to provide spawnGroups for based on their shared remoteName
  */
 export const remoteRoles: (
-    | 'remoteSourceHarvester0'
-    | 'remoteSourceHarvester1'
+    /* | 'remoteSourceHarvester' */
     | 'remoteReserver'
     | 'remoteDefender'
     | 'remoteCoreAttacker'
     | 'remoteDismantler'
 )[] = [
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
+    /* 'remoteSourceHarvester', */
     'remoteReserver',
     'remoteDefender',
     'remoteCoreAttacker',

@@ -112,6 +112,10 @@ export class CommuneManager {
     room: Room
     nextSpawnEnergyAvailable: number
     estimatedEnergyIncome: number
+    /**
+     * Organized by remote and sourceIndex
+     */
+    remoteSourceHarvesters: { [remote: string]: string[][] }
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
@@ -203,11 +207,17 @@ export class CommuneManager {
         room.usedRampartIDs = new Map()
 
         room.creepsOfRemote = {}
+        this.remoteSourceHarvesters = {}
 
         for (let index = roomMemory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {
             const remoteName = roomMemory[RoomMemoryKeys.remotes][index]
+            const remoteMemory = Memory.rooms[remoteName]
+
             room.creepsOfRemote[remoteName] = {}
             for (const role of remoteRoles) room.creepsOfRemote[remoteName][role] = []
+
+            this.remoteSourceHarvesters[remoteName] = []
+            for (const index in remoteMemory[RoomMemoryKeys.remoteSources]) this.remoteSourceHarvesters[remoteName].push([])
         }
 
         // For each role, construct an array for creepsFromRoom

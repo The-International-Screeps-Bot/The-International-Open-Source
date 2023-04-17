@@ -1,5 +1,5 @@
 import { unpackPosAt, unpackPosList } from 'other/codec'
-import { customColors, remoteHarvesterRoles, ClaimRequestKeys, RoomMemoryKeys, RoomTypes } from './constants'
+import { customColors, ClaimRequestKeys, RoomMemoryKeys, RoomTypes, roomDimensions, packedPosLength } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
 import { globalStatsUpdater } from './statsManager'
@@ -14,9 +14,12 @@ class MapVisualsManager {
         for (const roomName in Memory.rooms) {
             const roomMemory = Memory.rooms[roomName]
 
+            const type = roomMemory[RoomMemoryKeys.type]
+            if (!type) continue
+
             // Room type
 
-            Game.map.visual.text(roomMemory[RoomMemoryKeys.type].toString(), new RoomPosition(2, 45, roomName), {
+            Game.map.visual.text('Type: ' + roomMemory[RoomMemoryKeys.type].toString(), new RoomPosition(2, 45, roomName), {
                 align: 'left',
                 fontSize: 5,
             })
@@ -130,14 +133,25 @@ class MapVisualsManager {
                         )
 
                         const pos = path[0]
+                        const remoteSourceHarvesters = commune.communeManager.remoteSourceHarvesters[roomName][sourceIndex].length
+                        const maxRemoteSourceHarvesters = roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length / packedPosLength
+
                         Game.map.visual.text(
-                            `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length}`,
+                            `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length},${remoteSourceHarvesters}/${maxRemoteSourceHarvesters}`,
                             new RoomPosition(pos.x, pos.y, roomName),
                             {
                                 align: 'center',
-                                fontSize: 5,
+                                fontSize: 4,
                             },
                         )
+
+                        const sourceHarvestPositions = unpackPosList(roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex])
+                        for (const pos of sourceHarvestPositions) {
+
+                            Game.map.visual.rect(pos, 1, 1, {
+                                fill: customColors.yellow,
+                            })
+                        }
                     }
                 }
 
@@ -169,8 +183,9 @@ class MapVisualsManager {
     }
     private claimRequests() {
         for (const roomName in Memory.claimRequests) {
+
             Game.map.visual.text(
-                `💵${(Memory.rooms[roomName][RoomMemoryKeys.score] || -1).toFixed(2)}`,
+                `💵${Memory.rooms[roomName][RoomMemoryKeys.score]}+${Memory.rooms[roomName][RoomMemoryKeys.dynamicScore]}`,
                 new RoomPosition(2, 24, roomName),
                 {
                     align: 'left',
