@@ -731,7 +731,7 @@ export class RoomManager {
             }
         }
 
-        for (const positions of this.sourceHarvestPositions) {
+        for (const positions of this.communeSourceHarvestPositions) {
             const anchor = positions[0]
             const structure = this.room.findStructureInRange(
                 anchor,
