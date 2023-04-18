@@ -11,11 +11,11 @@ let cfg
 const dest = process.env.DEST
 if (!dest) {
     console.log('No destination specified - code will be compiled but not uploaded')
-} else if ((cfg = (JSON.parse(readFileSync('screeps.json', { encoding: 'utf8' })) || {})[dest]) == null) {
+} else {
     cfg = (yaml.parse(readFileSync('.screeps.yaml', { encoding: 'utf8' })).servers || {})[dest]
     if (cfg == null) throw new Error('Invalid upload destination')
     cfg.hostname = cfg.host
-    cfg.port = cfg.port || 443
+    cfg.port = cfg.port || (cfg.secure ? 443 : 21025)
     cfg.host = `${cfg.host}:${cfg.port}`
     cfg.email = cfg.username
     cfg.protocol = cfg.secure ? 'https' : 'http'
