@@ -81,7 +81,7 @@ export class WorkRequestManager {
         }
 
         const requestRoom = Game.rooms[requestName]
-        if (!requestRoom || !requestRoom.controller.my) {
+        if (!request[WorkRequestKeys.forAlly] && (!requestRoom || !requestRoom.controller.my)) {
             request[WorkRequestKeys.claimer] = 1
             return
         }
@@ -103,7 +103,12 @@ export class WorkRequestManager {
             return
         }
 
-        request[WorkRequestKeys.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
+        if (request[WorkRequestKeys.forAlly]) {
+            request[WorkRequestKeys.allyVanguard] = requestRoom.structures.spawn.length ? 0 : 20
+        } else {
+            request[WorkRequestKeys.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
+        }
+
         /*
         request[WorkRequestKeys.minDamage] = 0
         request[WorkRequestKeys.minHeal] = 0
