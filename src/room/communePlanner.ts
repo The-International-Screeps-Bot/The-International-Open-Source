@@ -2630,6 +2630,9 @@ export class CommunePlanner {
             })
         }
 
+        this.room.visualizeCoordMap(unprotectedCoords)
+        return
+
         this.stampAnchors.minCutRampart = this.stampAnchors.minCutRampart.concat(addedMinCutRamparts)
         this.unprotectedCoords = unprotectedCoords
     }

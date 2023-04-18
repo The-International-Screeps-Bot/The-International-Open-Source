@@ -2087,7 +2087,7 @@ declare global {
     interface NukeRequest {
         [NukeRequestKeys.y]: number
         [NukeRequestKeys.x]: number
-        [responder]: string
+        [NukeRequestKeys.responder]: string
         [NukeRequestKeys.priority]: number
     }
 
