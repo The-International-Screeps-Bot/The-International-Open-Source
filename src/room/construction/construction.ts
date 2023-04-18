@@ -74,8 +74,8 @@ export class ConstructionManager {
         this.placeBase(RCL, maxCSites)
     }
     private placeRamparts(RCL: number, maxCSites: number) {
-        if ((this.room.storage || this.room.terminal) && this.room.resourcesInStoringStructures.energy < 30000) return
 
+        const placeMincut = ((this.room.storage && this.room.controller.level >= 4) || (this.room.terminal && this.room.controller.level >= 6)) && this.room.resourcesInStoringStructures.energy > 20000
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const packedCoord in rampartPlans.map) {
@@ -87,7 +87,15 @@ export class ConstructionManager {
 
             if (this.room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART))
                 continue
-            if (data.coversStructure && !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) continue
+            if (data.coversStructure) {
+
+                if (!this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) continue
+            }
+            else if (!placeMincut) {
+
+                continue
+            }
+
 
             if (data.buildForNuke) {
                 if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
@@ -127,10 +135,16 @@ export class ConstructionManager {
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
 
-                for (let i = 0; i < coordData.length; i++) {
+                let bestData: BasePlanCoord | undefined
+                let bestDataMinRCL: number = 0
+
+                for (let i = coordData.length; i >= 0; i--) {
                     const data = coordData[i]
                     if (data.minRCL > placeRCL) continue
                     if (data.minRCL > RCL) continue
+
+                    bestData = data
+                    bestDataMinRCL = data.minRCL
 
                     const structureIDs = this.room.structureCoords.get(packCoord(coord))
                     if (structureIDs) {

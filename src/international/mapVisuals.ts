@@ -178,7 +178,7 @@ class MapVisualsManager {
                 continue
             }
         }
-
+        
         this.claimRequests()
     }
     private claimRequests() {

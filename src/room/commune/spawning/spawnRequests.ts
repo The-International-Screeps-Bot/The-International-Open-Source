@@ -733,6 +733,15 @@ export class SpawnRequestsManager {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
 
+                // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
+
+                if (
+                    this.communeManager.room.controller.ticksToDowngrade >
+                        this.communeManager.controllerDowngradeUpgradeThreshold &&
+                    (this.communeManager.room.towerInferiority || this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length)
+                )
+                    return false
+
                 let partsMultiplier = 1
                 let maxCreeps = this.communeManager.room.roomManager.upgradePositions.length - 1
 
@@ -742,15 +751,6 @@ export class SpawnRequestsManager {
                 if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
                     priority = this.minRemotePriority + 0.5
                 } else priority = this.minRemotePriority - 1
-
-                // If there are enemyAttackers and the controller isn't soon to downgrade
-
-                if (
-                    this.communeManager.room.controller.ticksToDowngrade >
-                        this.communeManager.controllerDowngradeUpgradeThreshold &&
-                    this.communeManager.room.towerInferiority
-                )
-                    return false
 
                 /*
                 // Terminal logic
@@ -795,10 +795,6 @@ export class SpawnRequestsManager {
                 }
 
                 partsMultiplier = Math.min(partsMultiplier, this.communeManager.maxUpgradeStrength)
-
-                // If there are construction sites of my ownership in the this.communeManager.room, set multiplier to 1
-
-                if (this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
 
                 const threshold = 0.05
                 const role = 'controllerUpgrader'
