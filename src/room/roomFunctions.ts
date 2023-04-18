@@ -1,6 +1,6 @@
 import {
     allStructureTypes,
-    ClaimRequestKeys,
+    WorkRequestKeys,
     CombatRequestKeys,
     defaultPlainCost,
     defaultSwampCost,
@@ -905,7 +905,7 @@ Room.prototype.basicScout = function () {
         return this.scoutEnemyRoom()
     }
 
-    this.createClaimRequest()
+    this.createWorkRequest()
 
     // No controller owner
 
@@ -945,7 +945,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
             return this.scoutEnemyRoom()
         }
 
-        this.createClaimRequest()
+        this.createWorkRequest()
 
         // No controlller owner
 
@@ -2134,9 +2134,9 @@ Room.prototype.getPartsOfRole = function (role) {
     return this.partsOfRoles[role]
 }
 
-Room.prototype.createClaimRequest = function () {
+Room.prototype.createWorkRequest = function () {
     if (this.find(FIND_SOURCES).length < 2) return false
-    if (Memory.claimRequests[this.name]) return false
+    if (Memory.workRequests[this.name]) return false
 
     findDynamicScore(this.name)
 
@@ -2155,7 +2155,7 @@ Room.prototype.createClaimRequest = function () {
         }
     }
 
-    const request = (Memory.claimRequests[this.name] = {})
+    const request = (Memory.workRequests[this.name] = {})
 
     return true
 }

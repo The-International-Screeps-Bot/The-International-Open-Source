@@ -47,7 +47,7 @@ function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
         case RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage:
         case RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage:
         case RoomStatNamesEnum.AllyCreepRequestManangerCPUUsage:
-        case RoomStatNamesEnum.ClaimRequestManagerCPUUsage:
+        case RoomStatNamesEnum.WorkRequestManagerCPUUsage:
         case RoomStatNamesEnum.TowerManagerCPUUsage:
         case RoomStatNamesEnum.SpawnManagerCPUUsage:
         case RoomStatNamesEnum.CombatRequestManagerCPUUsage:
@@ -155,7 +155,7 @@ export class StatsManager {
             [RoomStatNamesEnum.PowerRoleManagerPerCreepCPUUsage]: 0,
             [RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]: 0,
             [RoomStatNamesEnum.AllyCreepRequestManangerCPUUsage]: 0,
-            [RoomStatNamesEnum.ClaimRequestManagerCPUUsage]: 0,
+            [RoomStatNamesEnum.WorkRequestManagerCPUUsage]: 0,
             [RoomStatNamesEnum.TowerManagerCPUUsage]: 0,
             [RoomStatNamesEnum.SpawnManagerCPUUsage]: 0,
             [RoomStatNamesEnum.CombatRequestManagerCPUUsage]: 0,

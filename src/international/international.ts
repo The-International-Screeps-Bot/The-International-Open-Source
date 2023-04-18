@@ -2,7 +2,7 @@ import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomRange, randomT
 
 import {
     cacheAmountModifier,
-    ClaimRequestKeys,
+    WorkRequestKeys,
     CPUBucketCapacity,
     mmoShardNames,
     customColors,
@@ -55,7 +55,7 @@ export class InternationalManager {
         delete this._myOrders
         delete this._orders
         delete this._myOrdersCount
-        delete this._claimRequestsByScore
+        delete this._workRequestsByScore
         delete this._defaultMinCacheAmount
         delete this.internationalDataVisuals
 
@@ -347,16 +347,16 @@ export class InternationalManager {
         return (this._myOrdersCount = Object.keys(Game.market.orders).length)
     }
 
-    _claimRequestsByScore: (string | undefined)[]
+    _workRequestsByScore: (string | undefined)[]
 
-    get claimRequestsByScore(): (string | undefined)[] {
-        if (this._claimRequestsByScore) return this._claimRequestsByScore
+    get workRequestsByScore(): (string | undefined)[] {
+        if (this._workRequestsByScore) return this._workRequestsByScore
 
-        return (this._claimRequestsByScore = Object.keys(Memory.claimRequests).sort(
+        return (this._workRequestsByScore = Object.keys(Memory.workRequests).sort(
             (a, b) =>
-                (Memory.claimRequests[a][ClaimRequestKeys.priority] ??
+                (Memory.workRequests[a][WorkRequestKeys.priority] ??
                     Memory.rooms[a][RoomMemoryKeys.score] + Memory.rooms[a][RoomMemoryKeys.dynamicScore]) -
-                (Memory.claimRequests[b][ClaimRequestKeys.priority] ??
+                (Memory.workRequests[b][WorkRequestKeys.priority] ??
                     Memory.rooms[b][RoomMemoryKeys.score] + Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
         ))
     }

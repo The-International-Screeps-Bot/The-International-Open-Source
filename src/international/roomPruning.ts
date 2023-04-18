@@ -33,10 +33,10 @@ class RoomPruningManager {
             highestScoreCommuneName = roomName
         }
 
-        // Find the lowest scoring claimRequest that is also lower than the highest scoring commune
+        // Find the lowest scoring workRequest that is also lower than the highest scoring commune
 
         let lowestScore = 0
-        let lowestScoreClaimRequestName: string
+        let lowestScoreWorkRequestName: string
 
         /*
         for (const )

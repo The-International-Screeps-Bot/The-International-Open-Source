@@ -1,4 +1,4 @@
-import { ClaimRequestKeys, CreepMemoryKeys } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -13,10 +13,10 @@ export class Vanguard extends Creep {
         if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined)
             this.room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
 
-        const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
         if (!request) return
 
-        request[ClaimRequestKeys.vanguard] -= this.parts.work
+        request[WorkRequestKeys.vanguard] -= this.parts.work
     }
 
     /**
@@ -147,8 +147,8 @@ export class Vanguard extends Creep {
                 },
             }) === 'unpathable'
         ) {
-            const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
-            if (request) request[ClaimRequestKeys.abandon] = 20000
+            const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
+            if (request) request[WorkRequestKeys.abandon] = 20000
         }
     }
 

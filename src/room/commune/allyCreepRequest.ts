@@ -29,7 +29,7 @@ export class AllyCreepRequestManager {
 
         const request = Memory.allyCreepRequests[requestName]
 
-        // If the claimRequest doesn't exist anymore somehow, stop trying to do anything with it
+        // If the workRequest doesn't exist anymore somehow, stop trying to do anything with it
 
         if (!request) {
             delete room.memory[RoomMemoryKeys.allyCreepRequest]
@@ -48,7 +48,9 @@ export class AllyCreepRequestManager {
             requestRoom.controller.owner &&
             !Memory.allyPlayers.includes(requestRoom.controller.owner.username)
         ) {
-            Memory.allyCreepRequests[room.memory[RoomMemoryKeys.allyCreepRequest]][AllyCreepRequestKeys.allyVanguard] += 1
+            Memory.allyCreepRequests[room.memory[RoomMemoryKeys.allyCreepRequest]][
+                AllyCreepRequestKeys.allyVanguard
+            ] += 1
             return
         }
 
@@ -63,7 +65,9 @@ export class AllyCreepRequestManager {
 
         if (requestRoom.enemyCreeps.length) {
             Memory.allyCreepRequests[room.memory[RoomMemoryKeys.allyCreepRequest]][AllyCreepRequestKeys.abandon] = 20000
-            Memory.allyCreepRequests[room.memory[RoomMemoryKeys.allyCreepRequest]][AllyCreepRequestKeys.allyVanguard] = 0
+            Memory.allyCreepRequests[room.memory[RoomMemoryKeys.allyCreepRequest]][
+                AllyCreepRequestKeys.allyVanguard
+            ] = 0
 
             delete room.memory[RoomMemoryKeys.allyCreepRequest]
         }

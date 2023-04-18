@@ -2,12 +2,12 @@ import {
     AllyCreepRequestKeys,
     antifaRoles,
     chant,
-    ClaimRequestKeys,
+    WorkRequestKeys,
     CombatRequestKeys,
     creepRoles,
     haulerUpdateDefault,
     HaulRequestKeys,
-    maxClaimRequestDistance,
+    maxWorkRequestDistance,
     maxCombatDistance,
     maxHaulDistance,
     customColors,
@@ -44,7 +44,7 @@ class TickConfig {
         this.configGeneral()
         statsManager.internationalPreTick()
         this.configRooms()
-        this.configClaimRequests()
+        this.configWorkRequests()
         this.configAllyCreepRequests()
         this.configCombatRequests()
         this.configHaulRequests()
@@ -96,13 +96,13 @@ class TickConfig {
         }
     }
 
-    private configClaimRequests() {
+    private configWorkRequests() {
         let reservedGCL = Game.gcl.level - global.communes.size
 
-        // Subtract the number of claimRequests with responders
+        // Subtract the number of workRequests with responders
 
-        for (const roomName in Memory.claimRequests) {
-            if (!Memory.claimRequests[roomName][ClaimRequestKeys.responder]) continue
+        for (const roomName in Memory.workRequests) {
+            if (!Memory.workRequests[roomName][WorkRequestKeys.responder]) continue
 
             reservedGCL -= 1
         }
@@ -110,7 +110,7 @@ class TickConfig {
         const communesForResponding = []
 
         for (const roomName of global.communes) {
-            if (Memory.rooms[roomName][RoomMemoryKeys.claimRequest]) continue
+            if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) continue
 
             if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
 
@@ -122,29 +122,28 @@ class TickConfig {
 
         // Update dynamicScores if necessary
 
-        for (const roomName in Memory.claimRequests) {
+        for (const roomName in Memory.workRequests) {
             const roomMemory = Memory.rooms[roomName]
             if (Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] < randomRange(10000, 20000)) continue
 
             findDynamicScore(roomName)
         }
 
-        // Assign and abandon claimRequests, in order of score
+        // Assign and abandon workRequests, in order of score
 
-        for (const roomName of internationalManager.claimRequestsByScore) {
-            const request = Memory.claimRequests[roomName]
+        for (const roomName of internationalManager.workRequestsByScore) {
+            const request = Memory.workRequests[roomName]
 
             if (!request) continue
 
-            if (request[ClaimRequestKeys.abandon] > 0) {
-                request[ClaimRequestKeys.abandon] -= 1
+            if (request[WorkRequestKeys.abandon] > 0) {
+                request[WorkRequestKeys.abandon] -= 1
                 continue
             }
 
-            delete request[ClaimRequestKeys.abandon]
+            delete request[WorkRequestKeys.abandon]
 
-            if (request[ClaimRequestKeys.responder] && global.communes.has(request[ClaimRequestKeys.responder]))
-                continue
+            if (request[WorkRequestKeys.responder] && global.communes.has(request[WorkRequestKeys.responder])) continue
 
             if (!Memory.autoClaim) continue
 
@@ -160,7 +159,7 @@ class TickConfig {
             if (type !== RoomTypes.neutral && type !== RoomTypes.commune) {
                 // Delete the request
 
-                Memory.claimRequests[roomName][ClaimRequestKeys.abandon] = 20000
+                Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
                 continue
             }
 
@@ -170,23 +169,23 @@ class TickConfig {
             // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
 
             if (
-                Game.map.getRoomLinearDistance(communeName, roomName) > maxClaimRequestDistance ||
+                Game.map.getRoomLinearDistance(communeName, roomName) > maxWorkRequestDistance ||
                 advancedFindDistance(communeName, roomName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
                         ally: Infinity,
                     },
-                }) > maxClaimRequestDistance
+                }) > maxWorkRequestDistance
             ) {
-                Memory.claimRequests[roomName][ClaimRequestKeys.abandon] = 20000
+                Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
                 continue
             }
 
             // Otherwise assign the request to the room, and record as such in Memory
 
-            Memory.rooms[communeName][RoomMemoryKeys.claimRequest] = roomName
-            Memory.claimRequests[roomName][ClaimRequestKeys.responder] = communeName
+            Memory.rooms[communeName][RoomMemoryKeys.workRequest] = roomName
+            Memory.workRequests[roomName][WorkRequestKeys.responder] = communeName
 
             reservedGCL -= 1
 

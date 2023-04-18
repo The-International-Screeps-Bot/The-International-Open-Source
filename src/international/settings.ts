@@ -60,7 +60,7 @@ export interface Settings {
     pixelGeneration: boolean
 
     /**
-     * Wether the bot should automatically respond to claimRequests
+     * Wether the bot should automatically respond to workRequests
      */
     autoClaim: boolean
 
@@ -114,7 +114,6 @@ export interface Settings {
 }
 
 export const settings: Settings = {
-
     // Increment to induce migrations which can be controlled with the migration manager
 
     breakingVersion: 97,

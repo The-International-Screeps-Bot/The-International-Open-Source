@@ -57,7 +57,7 @@ class ConfigManager {
         Memory.lastConfig = Game.time
         Memory.constructionSites = {}
         Memory.players = {}
-        Memory.claimRequests = {}
+        Memory.workRequests = {}
         Memory.combatRequests = {}
         Memory.haulRequests = {}
         Memory.nukeRequests = {}

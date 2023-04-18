@@ -4,7 +4,7 @@ import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
     preTickManager() {
-        const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
 
         if (!request) return
 
@@ -134,7 +134,7 @@ export class AllyVanguard extends Creep {
     }
 
     /**
-     * Builds a spawn in the creep's commune claimRequest
+     * Builds a spawn in the creep's commune workRequest
      */
     buildRoom?(): void {
         const { room } = this
@@ -205,7 +205,7 @@ export class AllyVanguard extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[creep.memory[CreepMemoryKeys.taskRoom]]
+                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
                 if (request) request[AllyCreepRequestKeys.abandon] = 20000
             }
         }

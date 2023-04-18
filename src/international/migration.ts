@@ -14,7 +14,7 @@ class MigrationManager {
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName][RoomMemoryKeys.type]
                 if (type === RoomTypes.commune || type === RoomTypes.remote) {
-                    if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
+                    if (Memory.workRequests[roomName]) delete Memory.workRequests[roomName]
 
                     delete Memory.rooms[roomName]
                     continue
@@ -29,7 +29,7 @@ class MigrationManager {
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName][RoomMemoryKeys.type]
                 if (type === RoomTypes.commune || type === RoomTypes.remote) {
-                    if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
+                    if (Memory.workRequests[roomName]) delete Memory.workRequests[roomName]
 
                     delete Memory.rooms[roomName]
                     continue
@@ -44,7 +44,7 @@ class MigrationManager {
             for (const roomName in Memory.rooms) {
                 const type = Memory.rooms[roomName][RoomMemoryKeys.type]
                 if (type === RoomTypes.commune || type === RoomTypes.remote) {
-                    if (Memory.claimRequests[roomName]) delete Memory.claimRequests[roomName]
+                    if (Memory.workRequests[roomName]) delete Memory.workRequests[roomName]
 
                     delete Memory.rooms[roomName]
                     continue

@@ -4,7 +4,7 @@ import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import {
     AllyCreepRequestKeys,
-    ClaimRequestKeys,
+    WorkRequestKeys,
     CombatRequestKeys,
     CreepMemoryKeys,
     CreepRoomLogisticsRequestKeys,
@@ -777,7 +777,7 @@ declare global {
         /**
          *
          */
-        claimRequests: { [roomName: string]: Partial<ClaimRequest> }
+        workRequests: { [roomName: string]: Partial<WorkRequest> }
 
         combatRequests: { [roomName: string]: Partial<CombatRequest> }
 
@@ -1155,13 +1155,13 @@ declare global {
 
         getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>
 
-        createClaimRequest(): boolean
+        createWorkRequest(): boolean
 
         findSwampPlainsRatio(): number
 
         // General roomFunctions
 
-        claimRequestManager(): void
+        workRequestManager(): void
         combatRequestManager(): void
 
         allyCreepRequestManager(): void
@@ -1985,7 +1985,7 @@ declare global {
         [RoomMemoryKeys.remotes]: string[]
         [RoomMemoryKeys.powerBanks]: { [roomName: string]: number[] }
         [RoomMemoryKeys.deposits]: Record<Id<Deposit>, DepositRecord>
-        [RoomMemoryKeys.claimRequest]: string
+        [RoomMemoryKeys.workRequest]: string
         [RoomMemoryKeys.combatRequests]: string[]
         [RoomMemoryKeys.haulRequests]: string[]
         [RoomMemoryKeys.nukeRequest]: string
@@ -2056,12 +2056,12 @@ declare global {
         [PlayerMemoryKeys.lastAttacked]: number
     }
 
-    interface ClaimRequest {
-        [ClaimRequestKeys.claimer]: number
-        [ClaimRequestKeys.vanguard]: number
-        [ClaimRequestKeys.abandon]: number
-        [ClaimRequestKeys.responder]: string
-        [ClaimRequestKeys.priority]: number
+    interface WorkRequest {
+        [WorkRequestKeys.claimer]: number
+        [WorkRequestKeys.vanguard]: number
+        [WorkRequestKeys.abandon]: number
+        [WorkRequestKeys.responder]: string
+        [WorkRequestKeys.priority]: number
     }
 
     type CombatRequestTypes = 'attack' | 'harass' | 'defend'
@@ -2244,18 +2244,18 @@ declare global {
 
             /**
              * Responds, or if needed, creates, a claim request for a specified room, by a specified room
-             * @param requestName The roomName of the claimRequest to respond to
-             * @param commune The commune to respond to the claimRequest
+             * @param requestName The roomName of the workRequest to respond to
+             * @param commune The commune to respond to the workRequest
              */
             claim(requestName: string, communeName?: string, score?: number): string
 
             /**
-             * Deletes claimRequests for a specified room, if there are any
-             * @param roomName The roomName of the claimRequest to delete
+             * Deletes workRequests for a specified room, if there are any
+             * @param roomName The roomName of the workRequest to delete
              */
-            deleteClaimRequest(roomName: string): string
+            deleteWorkRequest(roomName: string): string
 
-            deleteClaimRequests(): string
+            deleteWorkRequests(): string
 
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room

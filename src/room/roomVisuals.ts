@@ -1,5 +1,5 @@
 import {
-    ClaimRequestKeys,
+    WorkRequestKeys,
     CombatRequestKeys,
     HaulRequestKeys,
     customColors,
@@ -311,16 +311,16 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        for (const requestName in Memory.claimRequests) {
-            const request = Memory.claimRequests[requestName]
+        for (const requestName in Memory.workRequests) {
+            const request = Memory.workRequests[requestName]
 
-            if (!request[ClaimRequestKeys.responder]) continue
+            if (!request[WorkRequestKeys.responder]) continue
 
             const row: any[] = [
                 requestName,
                 'default',
-                request[ClaimRequestKeys.responder],
-                request[ClaimRequestKeys.abandon],
+                request[WorkRequestKeys.responder],
+                request[WorkRequestKeys.abandon],
             ]
             data.push(row)
         }

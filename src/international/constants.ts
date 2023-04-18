@@ -17,7 +17,7 @@ export enum PlayerMemoryKeys {
     lastAttacked,
 }
 
-export enum ClaimRequestKeys {
+export enum WorkRequestKeys {
     claimer,
     vanguard,
     abandon,
@@ -174,7 +174,7 @@ export enum RoomMemoryKeys {
     remotes,
     powerBanks,
     deposits,
-    claimRequest,
+    workRequest,
     combatRequests,
     haulRequests,
     nukeRequest,
@@ -291,7 +291,11 @@ export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.dynamicScore,
         RoomMemoryKeys.dynamicScoreUpdate,
     ]),
-    [RoomTypes.remote]: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.reservationEfficacy, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.remote]: new Set([
+        RoomMemoryKeys.commune,
+        RoomMemoryKeys.reservationEfficacy,
+        RoomMemoryKeys.communePlanned,
+    ]),
     [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL, RoomMemoryKeys.communePlanned]),
     [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
     [RoomTypes.enemy]: new Set([
@@ -1101,13 +1105,8 @@ export const antifaRoles: (
 /**
  * Roles for which to provide spawnGroups for based on their shared remoteName
  */
-export const remoteRoles: (
-    /* | 'remoteSourceHarvester' */
-    | 'remoteReserver'
-    | 'remoteDefender'
-    | 'remoteCoreAttacker'
-    | 'remoteDismantler'
-)[] = [
+export const remoteRoles: /* | 'remoteSourceHarvester' */
+('remoteReserver' | 'remoteDefender' | 'remoteCoreAttacker' | 'remoteDismantler')[] = [
     /* 'remoteSourceHarvester', */
     'remoteReserver',
     'remoteDefender',
@@ -1335,7 +1334,7 @@ export const remoteTypeWeights: Partial<{ [key: string]: number }> = {
     [RoomTypes.allyRemote]: Infinity,
 }
 
-export const maxClaimRequestDistance = 10
+export const maxWorkRequestDistance = 10
 export const maxCombatDistance = 20
 export const maxHaulDistance = 15
 
@@ -1386,7 +1385,7 @@ export enum RoomStatNamesEnum {
     PowerCreepCount = 'pcc',
     SpawnUsagePercentage = 'su',
     AllyCreepRequestManangerCPUUsage = 'acrmcu',
-    ClaimRequestManagerCPUUsage = 'clrmcu',
+    WorkRequestManagerCPUUsage = 'clrmcu',
     TowerManagerCPUUsage = 'tmcu',
     SpawnManagerCPUUsage = 'smcu',
     CombatRequestManagerCPUUsage = 'cormcu',

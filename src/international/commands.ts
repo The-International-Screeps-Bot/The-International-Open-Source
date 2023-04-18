@@ -1,4 +1,10 @@
-import { allStructureTypes, AllyCreepRequestKeys, ClaimRequestKeys, CombatRequestKeys, RoomMemoryKeys } from './constants'
+import {
+    allStructureTypes,
+    AllyCreepRequestKeys,
+    WorkRequestKeys,
+    CombatRequestKeys,
+    RoomMemoryKeys,
+} from './constants'
 import { Settings, settings } from './settings'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
@@ -155,51 +161,53 @@ global.claim = function (requestName, communeName, priority = 0) {
     if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== true)
         return 'Planning not completed for ' + requestName
 
-    if (!Memory.claimRequests[requestName]) {
-        Memory.claimRequests[requestName] = {
-            [ClaimRequestKeys.responder]: communeName,
+    if (!Memory.workRequests[requestName]) {
+        Memory.workRequests[requestName] = {
+            [WorkRequestKeys.responder]: communeName,
         }
     }
 
-    const request = Memory.claimRequests[requestName]
+    const request = Memory.workRequests[requestName]
 
-    request[ClaimRequestKeys.priority] = priority
-    request[ClaimRequestKeys.abandon] = 0
+    request[WorkRequestKeys.priority] = priority
+    request[WorkRequestKeys.abandon] = 0
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        if (roomMemory[RoomMemoryKeys.claimRequest]) delete Memory.claimRequests[roomMemory[RoomMemoryKeys.claimRequest]][ClaimRequestKeys.responder]
+        if (roomMemory[RoomMemoryKeys.workRequest])
+            delete Memory.workRequests[roomMemory[RoomMemoryKeys.workRequest]][WorkRequestKeys.responder]
 
-        roomMemory[RoomMemoryKeys.claimRequest] = requestName
-        request[ClaimRequestKeys.responder] = communeName
+        roomMemory[RoomMemoryKeys.workRequest] = requestName
+        request[WorkRequestKeys.responder] = communeName
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`
+    return `${communeName ? `${communeName} is responding to the` : `created`} workRequest for ${requestName}`
 }
 
-global.deleteClaimRequest = function (roomName) {
-    const request = Memory.claimRequests[roomName]
+global.deleteWorkRequest = function (roomName) {
+    const request = Memory.workRequests[roomName]
     if (!request) return `There is so claim request for ${roomName}`
 
-    if (request[ClaimRequestKeys.responder]) {
-        delete Memory.rooms[request[ClaimRequestKeys.responder]][RoomMemoryKeys.claimRequest]
+    if (request[WorkRequestKeys.responder]) {
+        delete Memory.rooms[request[WorkRequestKeys.responder]][RoomMemoryKeys.workRequest]
     }
 
-    delete Memory.claimRequests[roomName]
+    delete Memory.workRequests[roomName]
     return `Deleted claim request for ${roomName}`
 }
 
-global.deleteClaimRequests = function () {
+global.deleteWorkRequests = function () {
     let deleteCount = 0
 
-    for (const requestName in Memory.claimRequests) {
-        const request = Memory.claimRequests[requestName]
+    for (const requestName in Memory.workRequests) {
+        const request = Memory.workRequests[requestName]
 
         deleteCount += 1
-        if (request[ClaimRequestKeys.responder]) delete Memory.rooms[request[ClaimRequestKeys.responder]][RoomMemoryKeys.claimRequest]
-        delete Memory.claimRequests[requestName]
+        if (request[WorkRequestKeys.responder])
+            delete Memory.rooms[request[WorkRequestKeys.responder]][RoomMemoryKeys.workRequest]
+        delete Memory.workRequests[requestName]
     }
 
     return `Deleted ${deleteCount} claim requests`
@@ -238,7 +246,10 @@ global.deleteCombatRequest = function (requestName) {
 
     const responder = request[CombatRequestKeys.responder]
     if (responder)
-        Memory.rooms[responder][RoomMemoryKeys.combatRequests].splice(Memory.rooms[responder][RoomMemoryKeys.combatRequests].indexOf(requestName), 1)
+        Memory.rooms[responder][RoomMemoryKeys.combatRequests].splice(
+            Memory.rooms[responder][RoomMemoryKeys.combatRequests].indexOf(requestName),
+            1,
+        )
 
     delete Memory.combatRequests[requestName]
 

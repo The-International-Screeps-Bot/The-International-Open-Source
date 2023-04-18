@@ -1,6 +1,6 @@
 import {
     AllyCreepRequestKeys,
-    ClaimRequestKeys,
+    WorkRequestKeys,
     CombatRequestKeys,
     containerUpkeepCost,
     customColors,
@@ -53,7 +53,7 @@ export class SpawnRequestsManager {
         this.remoteSourceRoles()
         this.generalRemoteRoles()
         this.scout()
-        this.claimRequestRoles()
+        this.workRequestRoles()
         this.allyVanguard()
         this.requestHauler()
         this.antifa()
@@ -101,7 +101,7 @@ export class SpawnRequestsManager {
                         for (let i = 1; i <= workAmount; i++) {
                             defaultParts.push(WORK)
                             if (i % 2 === 0) defaultParts.push(MOVE)
-                            if (i + 1 % 5 === 0) defaultParts.push(CARRY)
+                            if (i + (1 % 5) === 0) defaultParts.push(CARRY)
                         }
 
                         return {
@@ -732,13 +732,13 @@ export class SpawnRequestsManager {
     private controllerUpgraders() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-
                 // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 
                 if (
                     this.communeManager.room.controller.ticksToDowngrade >
                         this.communeManager.controllerDowngradeUpgradeThreshold &&
-                    (this.communeManager.room.towerInferiority || this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length)
+                    (this.communeManager.room.towerInferiority ||
+                        this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length)
                 )
                     return false
 
@@ -1404,16 +1404,16 @@ export class SpawnRequestsManager {
         )
     }
 
-    private claimRequestRoles() {
-        if (this.communeManager.room.memory[RoomMemoryKeys.claimRequest]) {
-            const requestName = this.communeManager.room.memory[RoomMemoryKeys.claimRequest]
-            const request = Memory.claimRequests[requestName]
+    private workRequestRoles() {
+        if (this.communeManager.room.memory[RoomMemoryKeys.workRequest]) {
+            const requestName = this.communeManager.room.memory[RoomMemoryKeys.workRequest]
+            const request = Memory.workRequests[requestName]
 
             // Construct requests for claimers
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (request[ClaimRequestKeys.claimer] <= 0) return false
+                    if (request[WorkRequestKeys.claimer] <= 0) return false
 
                     return {
                         role: 'claimer',
@@ -1434,7 +1434,7 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (request[ClaimRequestKeys.vanguard] <= 0) return false
+                    if (request[WorkRequestKeys.vanguard] <= 0) return false
 
                     let maxCreeps = 0
                     for (const packedPositions of Memory.rooms[requestName][
@@ -1447,7 +1447,7 @@ export class SpawnRequestsManager {
                         role: 'vanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                        partsMultiplier: request[ClaimRequestKeys.vanguard],
+                        partsMultiplier: request[WorkRequestKeys.vanguard],
                         maxCreeps,
                         minCost: 250,
                         priority: 8.2,

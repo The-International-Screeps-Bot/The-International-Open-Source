@@ -27,7 +27,7 @@ import './spawning/spawningStructures'
 
 import './combat'
 import './allyCreepRequest'
-import './claimRequest'
+import './workRequest'
 import './combatRequest'
 import {
     creepRoles,
@@ -52,7 +52,7 @@ import { RoomVisualsManager } from '../roomVisuals'
 import { EndTickCreepManager } from '../creeps/endTickCreepManager'
 import { CreepRoleManager } from '../creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
-import { ClaimRequestManager } from './claimRequest'
+import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
 import { AllyCreepRequestManager } from './allyCreepRequest'
 import { PowerSpawningStructuresManager } from './powerSpawn'
@@ -99,7 +99,7 @@ export class CommuneManager {
     remotesManager: RemotesManager
     haulerSizeManager: HaulerSizeManager
 
-    claimRequestManager: ClaimRequestManager
+    workRequestManager: WorkRequestManager
     combatRequestManager: CombatRequestManager
     allyCreepRequestManager: AllyCreepRequestManager
     haulRequestManager: HaulRequestManager
@@ -135,7 +135,7 @@ export class CommuneManager {
         this.remotesManager = new RemotesManager(this)
         this.haulerSizeManager = new HaulerSizeManager(this)
 
-        this.claimRequestManager = new ClaimRequestManager(this)
+        this.workRequestManager = new WorkRequestManager(this)
         this.combatRequestManager = new CombatRequestManager(this)
         this.allyCreepRequestManager = new AllyCreepRequestManager(this)
         this.haulRequestManager = new HaulRequestManager(this)
@@ -217,7 +217,8 @@ export class CommuneManager {
             for (const role of remoteRoles) room.creepsOfRemote[remoteName][role] = []
 
             this.remoteSourceHarvesters[remoteName] = []
-            for (const index in remoteMemory[RoomMemoryKeys.remoteSources]) this.remoteSourceHarvesters[remoteName].push([])
+            for (const index in remoteMemory[RoomMemoryKeys.remoteSources])
+                this.remoteSourceHarvesters[remoteName].push([])
         }
 
         // For each role, construct an array for creepsFromRoom
@@ -249,7 +250,7 @@ export class CommuneManager {
         this.remotesManager.preTickRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
-        this.claimRequestManager.preTickRun()
+        this.workRequestManager.preTickRun()
     }
 
     public run() {
@@ -262,7 +263,7 @@ export class CommuneManager {
 
         this.terminalManager.run()
 
-        this.claimRequestManager.run()
+        this.workRequestManager.run()
         this.combatRequestManager.run()
         this.allyCreepRequestManager.run()
         this.haulRequestManager.run()

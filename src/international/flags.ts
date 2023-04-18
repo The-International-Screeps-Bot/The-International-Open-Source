@@ -221,7 +221,7 @@ class FlagManager {
             return
         }
 
-        global.deleteClaimRequest(roomName)
+        global.deleteWorkRequest(roomName)
 
         flag.remove()
     }

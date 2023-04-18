@@ -1,4 +1,4 @@
-import { ClaimRequestKeys, CreepMemoryKeys } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -8,14 +8,14 @@ export class Claimer extends Creep {
     preTickManager() {
         if (this.isDying()) return
 
-        const request = Memory.claimRequests[this.memory[CreepMemoryKeys.taskRoom]]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
         if (!request) return
 
-        request[ClaimRequestKeys.claimer] -= 1
+        request[WorkRequestKeys.claimer] -= 1
     }
 
     /**
-     * Claims a room specified in the creep's commune claimRequest
+     * Claims a room specified in the creep's commune workRequest
      */
     claimRoom?(): void {
         const creep = this
@@ -85,8 +85,8 @@ export class Claimer extends Creep {
                     },
                 }) === 'unpathable'
             ) {
-                const request = Memory.claimRequests[creep.memory[CreepMemoryKeys.taskRoom]]
-                if (request) request[ClaimRequestKeys.abandon] = 20000
+                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
+                if (request) request[WorkRequestKeys.abandon] = 20000
             }
         }
     }

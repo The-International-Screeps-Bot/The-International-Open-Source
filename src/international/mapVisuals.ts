@@ -1,5 +1,5 @@
 import { unpackPosAt, unpackPosList } from 'other/codec'
-import { customColors, ClaimRequestKeys, RoomMemoryKeys, RoomTypes, roomDimensions, packedPosLength } from './constants'
+import { customColors, WorkRequestKeys, RoomMemoryKeys, RoomTypes, roomDimensions, packedPosLength } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
 import { globalStatsUpdater } from './statsManager'
@@ -19,10 +19,14 @@ class MapVisualsManager {
 
             // Room type
 
-            Game.map.visual.text('Type: ' + roomMemory[RoomMemoryKeys.type].toString(), new RoomPosition(2, 45, roomName), {
-                align: 'left',
-                fontSize: 5,
-            })
+            Game.map.visual.text(
+                'Type: ' + roomMemory[RoomMemoryKeys.type].toString(),
+                new RoomPosition(2, 45, roomName),
+                {
+                    align: 'left',
+                    fontSize: 5,
+                },
+            )
 
             this.test(roomName, roomMemory)
 
@@ -68,10 +72,10 @@ class MapVisualsManager {
                     },
                 )
 
-                if (roomMemory[RoomMemoryKeys.claimRequest]) {
+                if (roomMemory[RoomMemoryKeys.workRequest]) {
                     Game.map.visual.line(
                         anchor || new RoomPosition(25, 25, roomName),
-                        new RoomPosition(25, 25, roomMemory[RoomMemoryKeys.claimRequest]),
+                        new RoomPosition(25, 25, roomMemory[RoomMemoryKeys.workRequest]),
                         {
                             color: customColors.lightBlue,
                             width: 1.2,
@@ -133,11 +137,16 @@ class MapVisualsManager {
                         )
 
                         const pos = path[0]
-                        const remoteSourceHarvesters = commune.communeManager.remoteSourceHarvesters[roomName][sourceIndex].length
-                        const maxRemoteSourceHarvesters = roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length / packedPosLength
+                        const remoteSourceHarvesters =
+                            commune.communeManager.remoteSourceHarvesters[roomName][sourceIndex].length
+                        const maxRemoteSourceHarvesters =
+                            roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
+                            packedPosLength
 
                         Game.map.visual.text(
-                            `⛏️${income},🚶‍♀️${roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length},${remoteSourceHarvesters}/${maxRemoteSourceHarvesters}`,
+                            `⛏️${income},🚶‍♀️${
+                                roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length
+                            },${remoteSourceHarvesters}/${maxRemoteSourceHarvesters}`,
                             new RoomPosition(pos.x, pos.y, roomName),
                             {
                                 align: 'center',
@@ -145,9 +154,10 @@ class MapVisualsManager {
                             },
                         )
 
-                        const sourceHarvestPositions = unpackPosList(roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex])
+                        const sourceHarvestPositions = unpackPosList(
+                            roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex],
+                        )
                         for (const pos of sourceHarvestPositions) {
-
                             Game.map.visual.rect(pos, 1, 1, {
                                 fill: customColors.yellow,
                             })
@@ -178,27 +188,27 @@ class MapVisualsManager {
                 continue
             }
         }
-        
-        this.claimRequests()
+
+        this.workRequests()
     }
-    private claimRequests() {
-        for (const roomName in Memory.claimRequests) {
+    private workRequests() {
+        for (const roomName in Memory.workRequests) {
+            const priority = Memory.workRequests[roomName][WorkRequestKeys.priority]
+            const preference =
+                priority !== undefined
+                    ? priority.toString()
+                    : `💵${Memory.rooms[roomName][RoomMemoryKeys.score]}+${
+                          Memory.rooms[roomName][RoomMemoryKeys.dynamicScore]
+                      }`
 
-            const priority = Memory.claimRequests[roomName][ClaimRequestKeys.priority]
-            const preference = priority !== undefined ? priority.toString() : `💵${Memory.rooms[roomName][RoomMemoryKeys.score]}+${Memory.rooms[roomName][RoomMemoryKeys.dynamicScore]}`
+            Game.map.visual.text(preference, new RoomPosition(2, 24, roomName), {
+                align: 'left',
+                fontSize: 8,
+            })
 
-            Game.map.visual.text(
-                preference,
-                new RoomPosition(2, 24, roomName),
-                {
-                    align: 'left',
-                    fontSize: 8,
-                },
-            )
-
-            if (Memory.claimRequests[roomName][ClaimRequestKeys.abandon]) {
+            if (Memory.workRequests[roomName][WorkRequestKeys.abandon]) {
                 Game.map.visual.text(
-                    `❌${Memory.claimRequests[roomName][ClaimRequestKeys.abandon].toString()}`,
+                    `❌${Memory.workRequests[roomName][WorkRequestKeys.abandon].toString()}`,
                     new RoomPosition(2, 16, roomName),
                     {
                         align: 'left',
