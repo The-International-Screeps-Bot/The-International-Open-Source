@@ -135,16 +135,10 @@ export class ConstructionManager {
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
 
-                let bestData: BasePlanCoord | undefined
-                let bestDataMinRCL: number = 0
-
                 for (let i = coordData.length; i >= 0; i--) {
                     const data = coordData[i]
                     if (data.minRCL > placeRCL) continue
                     if (data.minRCL > RCL) continue
-
-                    bestData = data
-                    bestDataMinRCL = data.minRCL
 
                     const structureIDs = this.room.structureCoords.get(packCoord(coord))
                     if (structureIDs) {
