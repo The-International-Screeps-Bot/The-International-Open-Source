@@ -137,8 +137,8 @@ export class ConstructionManager {
 
                 for (let i = coordData.length - 1; i >= 0; i--) {
                     const data = coordData[i]
-                    if (data.minRCL > placeRCL) continue
                     if (data.minRCL > RCL) continue
+                    if (data.minRCL > placeRCL) break
 
                     const structureIDs = this.room.structureCoords.get(packCoord(coord))
                     if (structureIDs) {
