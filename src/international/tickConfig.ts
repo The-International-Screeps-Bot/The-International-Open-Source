@@ -1,5 +1,4 @@
 import {
-    AllyCreepRequestKeys,
     antifaRoles,
     chant,
     WorkRequestKeys,
@@ -45,7 +44,6 @@ class TickConfig {
         statsManager.internationalPreTick()
         this.configRooms()
         this.configWorkRequests()
-        this.configAllyCreepRequests()
         this.configCombatRequests()
         this.configHaulRequests()
 
@@ -190,59 +188,6 @@ class TickConfig {
             reservedGCL -= 1
 
             communesForResponding.splice(indexOf(communesForResponding, communeName), 1)
-        }
-    }
-    private configAllyCreepRequests() {
-        // Decrease abandonment for abandoned allyCreepRequests, and find those that aren't abandon responders
-
-        for (const roomName in Memory.allyCreepRequests) {
-            const request = Memory.allyCreepRequests[roomName]
-
-            if (request[AllyCreepRequestKeys.abandon] > 0) {
-                request[AllyCreepRequestKeys.abandon] -= 1
-                continue
-            }
-
-            request[AllyCreepRequestKeys.abandon] = undefined
-
-            if (request[AllyCreepRequestKeys.responder]) continue
-
-            const communes = []
-
-            for (const roomName of global.communes) {
-                if (Memory.rooms[roomName][RoomMemoryKeys.allyCreepRequest]) continue
-
-                const room = Game.rooms[roomName]
-                if (!room.structures.spawn.length) continue
-
-                communes.push(roomName)
-            }
-
-            const communeName = findClosestRoomName(roomName, communes)
-            if (!communeName) continue
-
-            const maxRange = 20
-
-            // Run a more simple and less expensive check, then a more complex and expensive to confirm
-
-            if (
-                Game.map.getRoomLinearDistance(communeName, roomName) > maxRange ||
-                advancedFindDistance(communeName, roomName, {
-                    typeWeights: {
-                        keeper: Infinity,
-                        enemy: Infinity,
-                        ally: Infinity,
-                    },
-                }) > maxRange
-            ) {
-                request[AllyCreepRequestKeys.abandon] = 20000
-                continue
-            }
-
-            // Otherwise assign the request to the room, and record as such in Memory
-
-            Memory.rooms[communeName][RoomMemoryKeys.allyCreepRequest] = roomName
-            request[AllyCreepRequestKeys.responder] = communeName
         }
     }
     private configCombatRequests() {

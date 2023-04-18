@@ -84,18 +84,6 @@ class MapVisualsManager {
                     )
                 }
 
-                if (roomMemory[RoomMemoryKeys.allyCreepRequest]) {
-                    Game.map.visual.line(
-                        anchor || new RoomPosition(25, 25, roomName),
-                        new RoomPosition(25, 25, roomMemory[RoomMemoryKeys.allyCreepRequest]),
-                        {
-                            color: customColors.green,
-                            width: 1.2,
-                            opacity: 0.3,
-                        },
-                    )
-                }
-
                 if (roomMemory[RoomMemoryKeys.combatRequests].length) {
                     for (const requestName of roomMemory[RoomMemoryKeys.combatRequests]) {
                         Game.map.visual.line(

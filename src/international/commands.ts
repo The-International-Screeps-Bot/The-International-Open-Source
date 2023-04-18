@@ -1,6 +1,5 @@
 import {
     allStructureTypes,
-    AllyCreepRequestKeys,
     WorkRequestKeys,
     CombatRequestKeys,
     RoomMemoryKeys,
@@ -255,28 +254,6 @@ global.deleteCombatRequest = function (requestName) {
 
     return `deleted combatRequest for ${requestName}`
 }
-
-global.allyCreepRequest = function (requestName, communeName?) {
-    if (!Memory.allyCreepRequests[requestName]) {
-        Memory.allyCreepRequests[requestName] = {
-            [AllyCreepRequestKeys.responder]: communeName,
-        }
-    }
-
-    const request = Memory.allyCreepRequests[requestName]
-
-    request[AllyCreepRequestKeys.abandon] = 0
-
-    if (communeName) {
-        const roomMemory = Memory.rooms[communeName]
-        if (!roomMemory) return `No memory for ${communeName}`
-
-        roomMemory[RoomMemoryKeys.allyCreepRequest] = requestName
-    }
-
-    return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${requestName}`
-}
-global.ACR = global.allyCreepRequest
 
 global.deleteBasePlans = function (roomName) {
     if (!roomName) {

@@ -23,6 +23,9 @@ export enum WorkRequestKeys {
     abandon,
     responder,
     priority,
+    allyVanguard,
+    forAlly,
+    hauler,
 }
 
 export enum HaulRequestKeys {
@@ -37,14 +40,8 @@ export enum HaulRequestKeys {
 export enum NukeRequestKeys {
     x,
     y,
-    respond,
-    priority,
-}
-
-export enum AllyCreepRequestKeys {
-    allyVanguard,
-    abandon,
     responder,
+    priority,
 }
 
 export enum DepositRequestKeys {
@@ -178,7 +175,6 @@ export enum RoomMemoryKeys {
     combatRequests,
     haulRequests,
     nukeRequest,
-    allyCreepRequest,
     threatened,
     lastAttacked,
     minHaulerCost,

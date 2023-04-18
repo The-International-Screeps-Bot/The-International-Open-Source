@@ -3,7 +3,6 @@ import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
 import {
-    AllyCreepRequestKeys,
     WorkRequestKeys,
     CombatRequestKeys,
     CreepMemoryKeys,
@@ -785,8 +784,6 @@ declare global {
 
         nukeRequests: { [roomName: string]: Partial<NukeRequest> }
 
-        allyCreepRequests: { [roomName: string]: Partial<AllyCreepRequest> }
-
         stats: Partial<Stats>
 
         players: { [playerName: string]: Partial<PlayerMemory> }
@@ -1163,8 +1160,6 @@ declare global {
 
         workRequestManager(): void
         combatRequestManager(): void
-
-        allyCreepRequestManager(): void
 
         trafficManager(): void
 
@@ -1989,7 +1984,6 @@ declare global {
         [RoomMemoryKeys.combatRequests]: string[]
         [RoomMemoryKeys.haulRequests]: string[]
         [RoomMemoryKeys.nukeRequest]: string
-        [RoomMemoryKeys.allyCreepRequest]: string
         [RoomMemoryKeys.threatened]: number
         [RoomMemoryKeys.lastAttacked]: number
         [RoomMemoryKeys.minHaulerCost]: number
@@ -2062,6 +2056,9 @@ declare global {
         [WorkRequestKeys.abandon]: number
         [WorkRequestKeys.responder]: string
         [WorkRequestKeys.priority]: number
+        [WorkRequestKeys.allyVanguard]: number
+        [WorkRequestKeys.forAlly]: boolean
+        [WorkRequestKeys.hauler]: boolean
     }
 
     type CombatRequestTypes = 'attack' | 'harass' | 'defend'
@@ -2090,14 +2087,8 @@ declare global {
     interface NukeRequest {
         [NukeRequestKeys.y]: number
         [NukeRequestKeys.x]: number
-        [NukeRequestKeys.respond]: string
+        [responder]: string
         [NukeRequestKeys.priority]: number
-    }
-
-    interface AllyCreepRequest {
-        [AllyCreepRequestKeys.allyVanguard]: number
-        [AllyCreepRequestKeys.abandon]: number
-        [AllyCreepRequestKeys.responder]: string
     }
 
     interface HaulRequest {
@@ -2271,11 +2262,6 @@ declare global {
              * Deletes combatRequests for a specified room, if there are any
              */
             deleteCombatRequest(requestName: string): string
-
-            /**
-             * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune
-             */
-            allyCreepRequest(requestName: string, communeName?: string): string
 
             deleteBasePlans(roomName?: string): string
 

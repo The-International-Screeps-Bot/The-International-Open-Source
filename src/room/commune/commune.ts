@@ -26,7 +26,6 @@ import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
 
 import './combat'
-import './allyCreepRequest'
 import './workRequest'
 import './combatRequest'
 import {
@@ -54,7 +53,6 @@ import { CreepRoleManager } from '../creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
-import { AllyCreepRequestManager } from './allyCreepRequest'
 import { PowerSpawningStructuresManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
@@ -101,7 +99,6 @@ export class CommuneManager {
 
     workRequestManager: WorkRequestManager
     combatRequestManager: CombatRequestManager
-    allyCreepRequestManager: AllyCreepRequestManager
     haulRequestManager: HaulRequestManager
     haulerNeedManager: HaulerNeedManager
 
@@ -137,7 +134,6 @@ export class CommuneManager {
 
         this.workRequestManager = new WorkRequestManager(this)
         this.combatRequestManager = new CombatRequestManager(this)
-        this.allyCreepRequestManager = new AllyCreepRequestManager(this)
         this.haulRequestManager = new HaulRequestManager(this)
         this.haulerNeedManager = new HaulerNeedManager(this)
 
@@ -265,7 +261,6 @@ export class CommuneManager {
 
         this.workRequestManager.run()
         this.combatRequestManager.run()
-        this.allyCreepRequestManager.run()
         this.haulRequestManager.run()
 
         this.sourceManager.run()

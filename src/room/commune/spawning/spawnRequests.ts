@@ -1,5 +1,4 @@
 import {
-    AllyCreepRequestKeys,
     WorkRequestKeys,
     CombatRequestKeys,
     containerUpkeepCost,
@@ -54,7 +53,6 @@ export class SpawnRequestsManager {
         this.generalRemoteRoles()
         this.scout()
         this.workRequestRoles()
-        this.allyVanguard()
         this.requestHauler()
         this.antifa()
 
@@ -1457,36 +1455,29 @@ export class SpawnRequestsManager {
                     }
                 })(),
             )
+
+            // allyVanguard
+
+            this.rawSpawnRequestsArgs.push(
+                ((): SpawnRequestArgs | false => {
+                    // If there is no vanguard need
+
+                    if (request[WorkRequestKeys.allyVanguard] <= 0) return false
+
+                    return {
+                        role: 'allyVanguard',
+                        defaultParts: [],
+                        extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
+                        partsMultiplier: request[WorkRequestKeys.allyVanguard],
+                        minCost: 250,
+                        priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
+                        memoryAdditions: {
+                            [CreepMemoryKeys.taskRoom]: requestName,
+                        },
+                    }
+                })(),
+            )
         }
-    }
-
-    private allyVanguard() {
-        const requestName = this.communeManager.room.memory[RoomMemoryKeys.allyCreepRequest]
-        if (!requestName) return
-
-        const request = Memory.allyCreepRequests[requestName]
-
-        // Requests for vanguard
-
-        this.rawSpawnRequestsArgs.push(
-            ((): SpawnRequestArgs | false => {
-                // If there is no vanguard need
-
-                if (request[AllyCreepRequestKeys.allyVanguard] <= 0) return false
-
-                return {
-                    role: 'allyVanguard',
-                    defaultParts: [],
-                    extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                    partsMultiplier: request[AllyCreepRequestKeys.allyVanguard],
-                    minCost: 250,
-                    priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
-                    memoryAdditions: {
-                        [CreepMemoryKeys.taskRoom]: requestName,
-                    },
-                }
-            })(),
-        )
     }
 
     private requestHauler() {

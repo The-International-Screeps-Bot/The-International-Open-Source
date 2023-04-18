@@ -1,4 +1,4 @@
-import { AllyCreepRequestKeys, CreepMemoryKeys, RoomMemoryKeys, RoomTypes } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, RoomMemoryKeys, RoomTypes } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -8,7 +8,7 @@ export class AllyVanguard extends Creep {
 
         if (!request) return
 
-        request[AllyCreepRequestKeys.allyVanguard] -= this.parts.work
+        request[WorkRequestKeys.allyVanguard] -= this.parts.work
     }
 
     findRemote?(): boolean {
@@ -206,7 +206,7 @@ export class AllyVanguard extends Creep {
                 }) === 'unpathable'
             ) {
                 const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
-                if (request) request[AllyCreepRequestKeys.abandon] = 20000
+                if (request) request[WorkRequestKeys.abandon] = 20000
             }
         }
     }
