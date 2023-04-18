@@ -135,7 +135,7 @@ export class ConstructionManager {
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
 
-                for (let i = coordData.length; i >= 0; i--) {
+                for (let i = coordData.length - 1; i >= 0; i--) {
                     const data = coordData[i]
                     if (data.minRCL > placeRCL) continue
                     if (data.minRCL > RCL) continue
