@@ -50,7 +50,7 @@ export class ConstructionManager {
         // If there are builders and enough cSites, stop
 
         if (this.room.myCreeps.builder.length) {
-            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length <= 2) return
+            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
         }
 
         /*
@@ -135,7 +135,7 @@ export class ConstructionManager {
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
 
-                for (let i = coordData.length - 1; i >= 0; i--) {
+                for (let i = 0; i < coordData.length; i++) {
                     const data = coordData[i]
                     if (data.minRCL > RCL) continue
                     if (data.minRCL > placeRCL) break
