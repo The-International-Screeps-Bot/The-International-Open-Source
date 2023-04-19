@@ -12,7 +12,6 @@ const dest = process.env.DEST
 if (!dest) {
     console.log('No destination specified - code will be compiled but not uploaded')
 } else {
-    console.log('Using destination:', dest)
     cfg = (yaml.parse(readFileSync('.screeps.yaml', { encoding: 'utf8' })).servers || {})[dest]
     if (cfg == null) throw new Error('Invalid upload destination')
     cfg.hostname = cfg.host
