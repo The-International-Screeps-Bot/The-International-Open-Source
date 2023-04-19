@@ -48,6 +48,9 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 
 export class RoomManager {
+
+    // sub managers
+
     communePlanner: CommunePlanner
     containerManager: ContainerManager
     droppedResourceManager: DroppedResourceManager
@@ -73,11 +76,13 @@ export class RoomManager {
     }
 
     room: Room
+    usedStationaryCoords: Set<string> = new Set()
 
     update(room: Room) {
         delete this._usedControllerCoords
         delete this._generalRepairStructures
         delete this._sourceLinks
+        if (this.usedStationaryCoords.size > 0) this.usedStationaryCoords.clear()
 
         if (randomTick()) {
             delete this._nukeTargetCoords

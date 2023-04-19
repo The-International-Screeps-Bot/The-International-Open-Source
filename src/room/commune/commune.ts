@@ -622,10 +622,6 @@ export class CommuneManager {
         return (this._defensiveRamparts = ramparts)
     }
 
-    get minThreatRampartsThreshold() {
-        return 20000
-    }
-
     _rampartRepairTargets: StructureRampart[]
     get rampartRepairTargets() {
         const rampartRepairTargets: StructureRampart[] = []
@@ -644,7 +640,7 @@ export class CommuneManager {
 
                 rampartRepairTargets.push(structure)
             } else if (data.buildForThreat) {
-                if (Memory.rooms[this.room.name][RoomMemoryKeys.threatened] < this.minThreatRampartsThreshold) continue
+                if (!this.needsSecondMincutLayer) continue
                 rampartRepairTargets.push(structure)
             }
 
@@ -652,5 +648,12 @@ export class CommuneManager {
         }
 
         return (this._rampartRepairTargets = rampartRepairTargets)
+    }
+
+    get needsSecondMincutLayer() {
+        return (
+            Memory.rooms[this.room.name][RoomMemoryKeys.threatened] >
+            Math.floor(Math.pow(this.room.controller.level, 1.1) * 1000)
+        )
     }
 }

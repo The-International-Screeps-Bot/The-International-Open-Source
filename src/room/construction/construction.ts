@@ -107,8 +107,7 @@ export class ConstructionManager {
 
             if (data.buildForThreat) {
                 if (
-                    Memory.rooms[this.room.name][RoomMemoryKeys.threatened] <
-                    this.communeManager.minThreatRampartsThreshold
+                    !this.communeManager.needsSecondMincutLayer
                 )
                     continue
 
