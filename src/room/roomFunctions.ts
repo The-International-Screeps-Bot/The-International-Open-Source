@@ -281,9 +281,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             const packedCoord = parseInt(index)
 
                             if (coordMap[packedCoord] === 0) continue
-                            if (cm._bits[packedCoord] === 255) continue
 
                             const coord = unpackNumAsCoord(packedCoord)
+                            if (cm.get(coord.x, coord.y) === 255) continue
+
                             cm.set(coord.x, coord.y, coordMap[packedCoord])
                         }
                     }

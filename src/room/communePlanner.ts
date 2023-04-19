@@ -357,13 +357,15 @@ export class CommunePlanner {
         this.runMinCut()
         this.groupMinCutCoords()
         this.findUnprotectedCoords()
+        this.planSourceStructures()
+        // Run for a second time to account for any failed source structures
+        this.planGridCoords()
         this.onboardingRamparts()
         this.findOutsideMinCut()
         this.findInsideMinCut()
         this.towers()
         this.towerPaths()
         this.mineral()
-        this.planSourceStructures()
         this.generalShield()
         this.visualizeCurrentPlan()
         /* this.visualizeCurrentPlan()
@@ -1107,8 +1109,11 @@ export class CommunePlanner {
 
             for (let j = this.sourceStructureCoords[i].length - 1; j >= 0; j--) {
                 const coord = this.sourceStructureCoords[i][j]
-                if (this.minCutCoords.has(packAsNum(coord))) {
+                const packedCoord = packAsNum(coord)
+
+                if (this.minCutCoords.has(packedCoord)) {
                     this.sourceStructureCoords[i].splice(j, 1)
+                    this.roadCoords[packedCoord] = 0
                     continue
                 }
 
@@ -2630,9 +2635,6 @@ export class CommunePlanner {
             })
         }
 
-        this.room.visualizeCoordMap(unprotectedCoords)
-        return
-
         this.stampAnchors.minCutRampart = this.stampAnchors.minCutRampart.concat(addedMinCutRamparts)
         this.unprotectedCoords = unprotectedCoords
     }
@@ -2654,6 +2656,7 @@ export class CommunePlanner {
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })
+
 
             // Construct the onboardingIndex
 
@@ -2880,7 +2883,7 @@ export class CommunePlanner {
                         range: 2,
                     },
                 ],
-                weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords, this.unprotectedCoords],
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })
