@@ -61,11 +61,7 @@ export class RemoteHarvester extends Creep {
         if (remoteName === this.room.name) {
             if (!this.isDying()) this.room.creepsOfSource[sourceIndex].push(this.name)
 
-            const source = this.room.roomManager.remoteSources[sourceIndex]
-
-            if (getRange(this.pos, source.pos) <= 1) {
-                this.advancedHarvestSource(source)
-            }
+            this.remoteActions()
         }
 
         if (this.isDying()) return
@@ -145,13 +141,24 @@ export class RemoteHarvester extends Creep {
     remoteActions?() {
         // Try to move to source
 
-        if (this.travelToSource(this.memory[CreepMemoryKeys.sourceIndex]) !== RESULT_SUCCESS) return
+        const sourceIndex = Memory.creeps[this.name][CreepMemoryKeys.sourceIndex]
+        if (this.travelToSource(sourceIndex) !== RESULT_SUCCESS) return
 
-        const container = this.room.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]]
+        // Make sure we're a bit ahead source regen time
+/*
+        const sourcee = this.room.roomManager.remoteSources[this.memory[CreepMemoryKeys.sourceIndex]]
+
+        this.room.visual.text((sourcee.energy * ENERGY_REGEN_TIME).toString() + ', ' + (sourcee.ticksToRegeneration * 0.9 * sourcee.energyCapacity).toString(), this.pos)
+ */
+
+        const container = this.room.sourceContainers[sourceIndex]
         if (container) {
             // Repair or build the container if we're ahead on source regen
 
             if (this.maintainContainer(container) === RESULT_ACTION) return
+
+            const source = this.room.roomManager.remoteSources[sourceIndex]
+            this.advancedHarvestSource(source)
 
             // Give our energy to the container so it doesn't drop on the ground
 
@@ -165,6 +172,9 @@ export class RemoteHarvester extends Creep {
         // There is no container
 
         if (this.buildContainer() === RESULT_ACTION) return
+
+        const source = this.room.roomManager.remoteSources[sourceIndex]
+        this.advancedHarvestSource(source)
 
         // Stop, we don't have enough energy to justify a request
 
@@ -193,11 +203,10 @@ export class RemoteHarvester extends Creep {
     }
 
     maintainContainer(container: StructureContainer): number {
-
         // Make sure we're a bit ahead source regen time
 
         const source = this.room.roomManager.remoteSources[this.memory[CreepMemoryKeys.sourceIndex]]
-        if (source.energy * ENERGY_REGEN_TIME > source.ticksToRegeneration * 0.9 * source.energyCapacity)
+        if (source.energy * ENERGY_REGEN_TIME > source.ticksToRegeneration * source.energyCapacity * 0.9)
             return RESULT_NO_ACTION
 
         // Ensure we have enough energy to use all work parts
@@ -219,6 +228,12 @@ export class RemoteHarvester extends Creep {
         // Don't build new remote containers until we can reserve the room
 
         if (this.commune.energyCapacityAvailable < 650) return RESULT_NO_ACTION
+
+        // Make sure we're a bit ahead source regen time
+
+        const source = this.room.roomManager.remoteSources[this.memory[CreepMemoryKeys.sourceIndex]]
+        if (source.energy * ENERGY_REGEN_TIME > source.ticksToRegeneration * source.energyCapacity * 0.9)
+            return RESULT_NO_ACTION
 
         // Find an existing container construction site
 
@@ -328,7 +343,7 @@ export class RemoteHarvester extends Creep {
             // If the creep needs resources
 
             if (room.name === creep.memory[CreepMemoryKeys.remote]) {
-                creep.remoteActions()
+                /* creep.remoteActions() */
                 continue
             }
 

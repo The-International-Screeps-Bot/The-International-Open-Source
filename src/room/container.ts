@@ -54,6 +54,9 @@ export class ContainerManager {
 
     private runSourceContainers() {
         for (const container of this.roomManager.room.sourceContainers) {
+
+            if (!container) continue
+
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
                 type: 'withdraw',

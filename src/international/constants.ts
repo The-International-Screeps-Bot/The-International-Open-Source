@@ -1,3 +1,5 @@
+import { packCoord } from "other/codec"
+
 export enum PlayerMemoryKeys {
     /**
      * Generally how good their offense is
@@ -1307,6 +1309,7 @@ export const quadAttackMemberOffsets = [
         y: 0,
     },
 ]
+export const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
 export const RESULT_FAIL = 0
 export const RESULT_SUCCESS = 1

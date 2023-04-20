@@ -130,7 +130,6 @@ const roomAdditions = {
                     for (const ID of this.global.allStructureIDs) {
                         const structure = findObjectWithID(ID)
                         if (!structure) {
-
                             change = true
                             break
                         }
@@ -212,7 +211,6 @@ const roomAdditions = {
                     for (const ID of this.global.allCSiteIDs) {
                         const cSite = findObjectWithID(ID)
                         if (!cSite) {
-
                             change = true
                             break
                         }
@@ -467,13 +465,14 @@ const roomAdditions = {
 
             this._combatStructureTargets = []
 
-            if (this.controller && (this.controller.my || this.controller.reservation))
-                return this._combatStructureTargets
+            if (this.controller) {
+                if (this.controller.my || this.controller.reservation) return this._combatStructureTargets
 
-            if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
-                return this._combatStructureTargets
-            if (this.controller.reservation && Memory.allyPlayers.includes(this.controller.reservation.username))
-                return this._combatStructureTargets
+                if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
+                    return this._combatStructureTargets
+                if (this.controller.reservation && Memory.allyPlayers.includes(this.controller.reservation.username))
+                    return this._combatStructureTargets
+            }
 
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
             this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.tower)
@@ -744,7 +743,7 @@ const roomAdditions = {
                     )
                     if (!structure) continue
 
-                    sourceContainers.push(structure as StructureContainer)
+                    sourceContainers[i] = structure as StructureContainer
                 }
             } else if (roomType === RoomTypes.remote) {
                 const positions = this.roomManager.remoteSourceHarvestPositions
@@ -755,7 +754,7 @@ const roomAdditions = {
                     )
                     if (!structure) continue
 
-                    sourceContainers.push(structure as StructureContainer)
+                    sourceContainers[i] = structure as StructureContainer
                 }
             } else {
                 const positions = this.roomManager.sourceHarvestPositions
@@ -766,7 +765,7 @@ const roomAdditions = {
                     )
                     if (!structure) continue
 
-                    sourceContainers.push(structure as StructureContainer)
+                    sourceContainers[i] = structure as StructureContainer
                 }
             }
 

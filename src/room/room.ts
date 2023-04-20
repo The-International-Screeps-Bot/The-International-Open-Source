@@ -48,7 +48,6 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 
 export class RoomManager {
-
     // sub managers
 
     communePlanner: CommunePlanner
@@ -81,6 +80,9 @@ export class RoomManager {
     update(room: Room) {
         delete this._usedControllerCoords
         delete this._generalRepairStructures
+        delete this._communeSources
+        delete this._remoteSources
+        delete this._mineral
         delete this._sourceLinks
         if (this.usedStationaryCoords.size > 0) this.usedStationaryCoords.clear()
 
@@ -736,8 +738,9 @@ export class RoomManager {
             }
         }
 
-        for (const positions of this.communeSourceHarvestPositions) {
-            const anchor = positions[0]
+        const positions = this.communeSourceHarvestPositions
+        for (let i = 0; i < positions.length; i++) {
+            const anchor = positions[i][0]
             const structure = this.room.findStructureInRange(
                 anchor,
                 1,
@@ -746,10 +749,10 @@ export class RoomManager {
 
             if (!structure) continue
 
-            links.push(structure)
+            links[i] = structure
         }
 
-        this._sourceLinkIDs = links.map(link => link.id)
+        if (links.length === positions.length) this._sourceLinkIDs = links.map(link => link.id)
         return (this._sourceLinks = links)
     }
 }

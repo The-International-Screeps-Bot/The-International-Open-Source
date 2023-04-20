@@ -2,6 +2,7 @@ import {
     CombatRequestKeys,
     CreepMemoryKeys,
     customColors,
+    packedQuadAttackMemberOffsets,
     quadAttackMemberOffsets,
     rangedMassAttackMultiplierByRange,
     roomDimensions,
@@ -20,6 +21,8 @@ import {
     isCoordExit,
     isXYExit,
     packAsNum,
+    findHighestScore,
+    sortBy,
 } from 'international/utils'
 import { find, transform } from 'lodash'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
@@ -240,6 +243,7 @@ export class Quad {
             this.passiveRangedAttack()
             return
         }
+        /* else this.advancedTransform() */
 
         this.leader.message = 'IF'
 
@@ -499,9 +503,9 @@ export class Quad {
 
     private scoreMemberTransform(memberName: string, coord: Coord) {
         const member = Game.creeps[memberName]
-
         let score = (1 - member.defenceStrength) * 5000
-
+        const range = getRangeXY(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
+        /*
         const range = getRangeXY(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
 
         if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
@@ -511,57 +515,99 @@ export class Quad {
         }
 
         if (range > 1) return score
+ */
+
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
+            score += member.combatStrength.ranged
+            return score / range
+        }
 
         if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') {
             score += member.combatStrength.melee
-            return score
+            return score / range
         }
 
         // Dismantle type
 
         score += member.combatStrength.dismantle
-        return score
+        return score / range
     }
 
+    /**
+     * Loop through every offset
+     * Loop through each offset and find the member which has the highest score on it
+     * Score each offset's sum of member scores, identifying the best offset
+     * implement offset
+     */
     private advancedTransform(): boolean {
         if (!this.willMove) return false
         if (!this.target) return false
 
-        const memberTransforms: string[] = []
-        const transformableMemberNames = new Set(this.leader.memory[CreepMemoryKeys.squadMembers])
-
-        for (let i = 0; i < quadAttackMemberOffsets.length; i++) {
-            const coord = {
-                x: this.leader.pos.x + quadAttackMemberOffsets[i].x,
-                y: this.leader.pos.y + quadAttackMemberOffsets[i].y,
-            }
-
-            let bestScore = 0
-            let bestMember: Antifa | undefined
-
-            for (const memberName of transformableMemberNames) {
-                const member = Game.creeps[memberName]
-
-                const score = this.scoreMemberTransform(memberName, coord)
-                if (score <= bestScore) continue
-
-                bestScore = score
-                bestMember = member
-            }
-            if (!bestMember) break
-
-            transformableMemberNames.delete(bestMember.name)
-            memberTransforms[i] = bestMember.name
-
-            if (areCoordsEqual(bestMember.pos, coord)) continue
-
-            bestMember.assignMoveRequest(coord)
-        }
-
-        const nonNullMemberTransforms = memberTransforms.filter(name => name)
+        let bestTransform: string[]
+        let bestScore = 0
 
         for (const member of this.members) {
-            member.memory[CreepMemoryKeys.squadMembers] = nonNullMemberTransforms
+            bestScore += this.scoreMemberTransform(member.name, member.pos)
+        }
+
+        const originalScore = bestScore
+
+        for (let i = 0; i < Math.min(quadAttackMemberOffsets.length, this.memberNames.length); i++) {
+            const transform: string[] = []
+            const memberNames = new Set(this.memberNames)
+            let score = 0
+
+            const packedOffsets = sortBy(
+                Array.from(packedQuadAttackMemberOffsets).splice(0, this.memberNames.length),
+                packedOffset => {
+                    const offset = unpackCoord(packedOffset)
+                    const coord = {
+                        x: this.leader.pos.x + offset.x,
+                        y: this.leader.pos.y + offset.y,
+                    }
+
+                    return getRange(this.target.pos, coord)
+                },
+            )
+
+            for (const packedOffset of packedOffsets) {
+                const coord = unpackCoord(packedOffset)
+                const j = packedQuadAttackMemberOffsets.indexOf(packedOffset)
+
+                let bestMemberScore = -1
+                let bestMemberName: string
+
+                for (const memberName of memberNames) {
+                    const memberScore = this.scoreMemberTransform(memberName, coord)
+                    if (memberScore <= bestMemberScore) continue
+
+                    bestMemberScore = memberScore
+                    bestMemberName = memberName
+                }
+                console.log('score add', bestMemberScore)
+                score += bestMemberScore
+                memberNames.delete(bestMemberName)
+                transform[j] = bestMemberName
+                console.log('transform', transform, bestMemberName)
+            }
+            console.log('score', score)
+            if (score <= bestScore) continue
+
+            bestScore = score
+            bestTransform = transform
+        }
+        console.log('final', originalScore, bestScore)
+        if (originalScore === bestScore) return false
+
+        for (let i = 0; i < bestTransform.length; i++) {
+            const memberName = bestTransform[i]
+            const goal = {
+                x: quadAttackMemberOffsets[i].x + this.leader.pos.x,
+                y: quadAttackMemberOffsets[i].y + this.leader.pos.y,
+            }
+
+            Game.creeps[memberName].assignMoveRequest(goal)
+            Memory.creeps[memberName][CreepMemoryKeys.squadMembers] = bestTransform
         }
         return true
     }
