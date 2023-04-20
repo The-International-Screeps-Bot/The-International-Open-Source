@@ -125,15 +125,20 @@ const roomAdditions = {
 
                 if (newAllStructures.length === this.global.allStructureIDs.length) {
                     const allStructures: Structure[] = []
+                    let change: true | undefined
 
                     for (const ID of this.global.allStructureIDs) {
                         const structure = findObjectWithID(ID)
-                        if (!structure) break
+                        if (!structure) {
+
+                            change = true
+                            break
+                        }
 
                         allStructures.push(structure)
                     }
 
-                    if (allStructures.length === this.global.allStructureIDs.length) {
+                    if (!change && allStructures.length === this.global.allStructureIDs.length) {
                         return (this._structureUpdate = false)
                     }
                 }
@@ -202,15 +207,20 @@ const roomAdditions = {
 
                 if (newAllCSites.length === this.global.allCSiteIDs.length) {
                     const allCSites: ConstructionSite[] = []
+                    let change: true | undefined
 
                     for (const ID of this.global.allCSiteIDs) {
                         const cSite = findObjectWithID(ID)
-                        if (!cSite) break
+                        if (!cSite) {
+
+                            change = true
+                            break
+                        }
 
                         allCSites.push(cSite)
                     }
 
-                    if (allCSites.length === this.global.allCSiteIDs.length) {
+                    if (!change && allCSites.length === this.global.allCSiteIDs.length) {
                         return (this._cSiteUpdate = false)
                     }
                 }
