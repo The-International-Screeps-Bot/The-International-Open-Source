@@ -503,6 +503,7 @@ export class CommuneManager {
         for (let i = 0; i < sourceLinks.length; i++) {
             const sourceLink = sourceLinks[i]
 
+            if (!sourceLink) continue
             if (!sourceLink.RCLActionable) continue
 
             const range = getRange(sourceLink.pos, upgradeStructure.pos)

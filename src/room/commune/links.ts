@@ -22,7 +22,7 @@ export class LinkManager {
 
     private sourcesToReceivers() {
         const sourceLinks = this.communeManager.room.roomManager.sourceLinks
-        if (!sourceLinks.length) return
+        if (!sourceLinks.filter(link => link).length) return
 
         let receiverLinks = [
             this.communeManager.room.fastFillerLink,
@@ -35,6 +35,7 @@ export class LinkManager {
         // Loop through each sourceLink
 
         for (const sourceLink of sourceLinks) {
+            if (!sourceLink) continue
             // If the link is not nearly full, iterate
 
             if (sourceLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > sourceLink.store.energy) continue
