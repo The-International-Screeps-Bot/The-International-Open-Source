@@ -561,15 +561,13 @@ export class Quad {
 
         let bestTransform: string[]
         let bestScore = 0
-        console.log('transform start ===================================')
+
         for (const member of this.members) {
             bestScore += this.scoreMemberTransform(member.name, member.pos)
-            console.log('og score add', this.scoreMemberTransform(member.name, member.pos).toFixed(2))
         }
 
         const originalScore = bestScore
-        console.log('og score', originalScore.toFixed(2))
-        this.leader.room.visual.text('og ' + originalScore.toFixed(2), this.leader.pos.x + 1.5, this.leader.pos.y)
+
         for (let i = 0; i < Math.min(quadAttackMemberOffsets.length, this.memberNames.length); i++) {
             const transform: string[] = []
             const memberNames = new Set(this.memberNames)
@@ -594,7 +592,7 @@ export class Quad {
                     x: this.leader.pos.x + offset.x,
                     y: this.leader.pos.y + offset.y,
                 }
-                console.log('coord', coord.x, coord.y)
+
                 const j = packedQuadAttackMemberOffsets.indexOf(packedOffset)
 
                 let bestMemberScore = -1
@@ -607,22 +605,20 @@ export class Quad {
                     bestMemberScore = memberScore
                     bestMemberName = memberName
                 }
-                console.log('score add', bestMemberScore.toFixed(2))
+
                 score += bestMemberScore
                 memberNames.delete(bestMemberName)
                 transform[j] = bestMemberName
             }
-            console.log('end score', score.toFixed(2))
-            this.leader.room.visual.text(score.toFixed(2), this.leader.pos.x + 1.5, this.leader.pos.y + 1 + i)
 
             if (score <= bestScore) continue
 
             bestScore = score
             bestTransform = transform
         }
-        this.leader.room.visual.text('final', this.leader.pos.x, this.leader.pos.y + 1)
+
         if (originalScore === bestScore) return false
-        this.leader.room.visual.text('success', this.leader.pos.x + 1, this.leader.pos.y)
+
         for (let i = 0; i < bestTransform.length; i++) {
             const memberName = bestTransform[i]
             const goal = {
