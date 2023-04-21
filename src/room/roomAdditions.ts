@@ -987,8 +987,8 @@ const roomAdditions = {
             const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
             this._quadCostMatrix = new PathFinder.CostMatrix()
 
-            const roadCoods = new Set()
-            for (const road of this.structures.road) roadCoods.add(packCoord(road.pos))
+            const roadCoords = new Set()
+            for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
 
             // Avoid not my creeps
 
@@ -1043,25 +1043,25 @@ const roomAdditions = {
 
             let y = 0
             for (x = 0; x < roomDimensions; x += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 100)
 
             // Configure x and loop through left exits
 
             x = 0
             for (y = 0; y < roomDimensions; y += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 100)
 
             // Configure y and loop through bottom exits
 
             y = roomDimensions - 1
             for (x = 0; x < roomDimensions; x += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 100)
 
             // Configure x and loop through right exits
 
             x = roomDimensions - 1
             for (y = 0; y < roomDimensions; y += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 100)
 
             const terrainCM = this.getTerrain()
 
@@ -1091,21 +1091,23 @@ const roomAdditions = {
                     let largestValue = terrainCoords[packXYAsNum(x, y)]
 
                     for (const coord of offsetCoords) {
+
                         let coordValue = terrainCoords[packAsNum(coord)]
-                        if (!coordValue || coordValue < 254) continue
+                        if (!coordValue || coordValue < 255) continue
 
-                        if (roadCoods.has(packCoord(coord))) coordValue = 0
+                        if (roadCoords.has(packCoord(coord))) coordValue = 0
+                        if (coordValue <= largestValue) continue
 
-                        largestValue = Math.max(largestValue, coordValue)
+                        largestValue = coordValue
                     }
 
-                    if (largestValue >= 254) {
-                        this._quadCostMatrix.set(x, y, 254)
+                    if (largestValue >= 50) {
+                        this._quadCostMatrix.set(x, y, 50)
 
                         this._quadCostMatrix.set(
                             x,
                             y,
-                            Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 254)),
+                            Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 50)),
                         )
                         continue
                     }
@@ -1114,8 +1116,9 @@ const roomAdditions = {
 
                     for (const coord of offsetCoords) {
                         const value = terrainCM.get(coord.x, coord.y)
+                        if (!value) continue
 
-                        if (roadCoods.has(packCoord(coord))) continue
+                        if (roadCoords.has(packCoord(coord))) continue
                         if (value !== TERRAIN_MASK_SWAMP) continue
 
                         largestValue = defaultSwampCost * 2
@@ -1129,7 +1132,7 @@ const roomAdditions = {
                 }
             }
 
-            /* this.visualizeCostMatrix(this._quadCostMatrix, true) */
+            /* this.visualizeCostMatrix(this._quadCostMatrix) */
 
             return this._quadCostMatrix
         },
@@ -1141,8 +1144,8 @@ const roomAdditions = {
             const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
             this._quadBulldozeCostMatrix = new PathFinder.CostMatrix()
 
-            const roadCoods = new Set()
-            for (const road of this.structures.road) roadCoods.add(packCoord(road.pos))
+            const roadCoords = new Set()
+            for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
 
             // Avoid not my creeps
             /*
@@ -1160,7 +1163,7 @@ const roomAdditions = {
 
                 // Otherwise set the rampart's pos as impassible
 
-                terrainCoords[packAsNum(rampart.pos)] = 254 /* rampart.hits / (rampart.hitsMax / 200) */
+                terrainCoords[packAsNum(rampart.pos)] = 50 /* rampart.hits / (rampart.hitsMax / 200) */
             }
 
             // Loop through structureTypes of impassibleStructureTypes
@@ -1191,25 +1194,25 @@ const roomAdditions = {
 
             let y = 0
             for (x = 0; x < roomDimensions; x += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 50)
 
             // Configure x and loop through left exits
 
             x = 0
             for (y = 0; y < roomDimensions; y += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 50)
 
             // Configure y and loop through bottom exits
 
             y = roomDimensions - 1
             for (x = 0; x < roomDimensions; x += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 50)
 
             // Configure x and loop through right exits
 
             x = roomDimensions - 1
             for (y = 0; y < roomDimensions; y += 1)
-                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 254)
+                terrainCoords[packXYAsNum(x, y)] = Math.max(terrainCoords[packXYAsNum(x, y)], 50)
 
             const terrainCM = this.getTerrain()
 
@@ -1240,20 +1243,21 @@ const roomAdditions = {
 
                     for (const coord of offsetCoords) {
                         let coordValue = terrainCoords[packAsNum(coord)]
-                        if (!coordValue || coordValue < 254) continue
+                        if (!coordValue || coordValue < 255) continue
 
-                        if (roadCoods.has(packCoord(coord))) coordValue = 0
+                        if (roadCoords.has(packCoord(coord))) coordValue = 0
+                        if (coordValue <= largestValue) continue
 
-                        largestValue = Math.max(largestValue, coordValue)
+                        largestValue = coordValue
                     }
 
-                    if (largestValue >= 254) {
-                        this._quadBulldozeCostMatrix.set(x, y, 254)
+                    if (largestValue >= 50) {
+                        this._quadBulldozeCostMatrix.set(x, y, 50)
 
                         this._quadBulldozeCostMatrix.set(
                             x,
                             y,
-                            Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 254)),
+                            Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 50)),
                         )
                         continue
                     }
@@ -1261,9 +1265,11 @@ const roomAdditions = {
                     largestValue = 0
 
                     for (const coord of offsetCoords) {
-                        const value = terrainCM.get(coord.x, coord.y)
 
-                        if (roadCoods.has(packCoord(coord))) continue
+                        const value = terrainCM.get(coord.x, coord.y)
+                        if (value === undefined) continue
+
+                        if (roadCoords.has(packCoord(coord))) continue
                         if (value !== TERRAIN_MASK_SWAMP) continue
 
                         largestValue = defaultSwampCost * 2

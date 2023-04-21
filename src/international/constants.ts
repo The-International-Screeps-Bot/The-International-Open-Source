@@ -119,6 +119,7 @@ export enum CreepMemoryKeys {
     taskRoom,
     getPulled,
     combatRequest,
+    flee,
 }
 
 export enum PowerCreepMemoryKeys {

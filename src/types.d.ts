@@ -1490,7 +1490,7 @@ declare global {
         /**
          *
          */
-        needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean
+        needsNewPath(path: RoomPosition[] | undefined, opts: MoveRequestOpts): boolean
 
         /**
          *
@@ -2152,6 +2152,10 @@ declare global {
         [CreepMemoryKeys.taskRoom]: string
         [CreepMemoryKeys.getPulled]: boolean
         [CreepMemoryKeys.combatRequest]: string
+        /**
+         * Wether the creep is/was trying to flee for their designated
+         */
+        [CreepMemoryKeys.flee]: boolean
     }
 
     interface PowerCreepMemory {

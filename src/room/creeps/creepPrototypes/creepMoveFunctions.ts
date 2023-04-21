@@ -36,7 +36,7 @@ import {
     unpackPosList,
 } from 'other/codec'
 
-PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goalPos, cacheAmount, path) {
+PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (path, opts) {
     // Inform true if there is no path
 
     if (!path) return true
@@ -49,21 +49,23 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (goa
 
     // Inform true if there is no lastCache value in the creep's memory
 
-    if (!this.memory[CreepMemoryKeys.lastCache]) return true
+    const creepMemory = Memory.creeps[this.name]
+    if (!creepMemory[CreepMemoryKeys.lastCache]) return true
+    if (creepMemory[CreepMemoryKeys.flee] !== opts.flee) return true
 
     // Inform true if the path is out of caching time
 
-    if (this.memory[CreepMemoryKeys.lastCache] + cacheAmount <= Game.time) return true
+    if (creepMemory[CreepMemoryKeys.lastCache] + opts.cacheAmount <= Game.time) return true
 
     // Inform true if the path isn't in the same room as the creep
 
     if (path[0].roomName !== this.room.name) return true
 
-    if (!this.memory[CreepMemoryKeys.goalPos]) return true
+    if (!creepMemory[CreepMemoryKeys.goalPos]) return true
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!areCoordsEqual(unpackPos(this.memory[CreepMemoryKeys.goalPos]), goalPos)) return true
+    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), opts.goals[0].pos)) return true
 
     // If next pos in the path is not in range, inform true
 
@@ -265,10 +267,12 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     let path: RoomPosition[]
     if (this.spawning) path = []
 
+    const creepMemory = Memory.creeps[this.name]
+
     // If there is a path in the creep's memory and it isn't spawning
 
-    if (this.memory[CreepMemoryKeys.path] && !this.spawning) {
-        path = unpackPosList(this.memory[CreepMemoryKeys.path])
+    if (creepMemory[CreepMemoryKeys.path] && !this.spawning) {
+        path = unpackPosList(creepMemory[CreepMemoryKeys.path])
 
         // So long as the creep isn't standing on the first position in the path, and the pos is worth going on
 
@@ -281,11 +285,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     // See if the creep needs a new path
 
-    const needsNewPathResult = this.needsNewPath(opts.goals[0].pos, opts.cacheAmount, path)
-
-    // If the creep need a new path, make one
-
-    if (needsNewPathResult) {
+    if (this.needsNewPath(path, opts)) {
         // Assign the creep to the opts
 
         opts.creep = this
@@ -299,7 +299,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         if (!room.controller || !room.controller.safeMode) opts.avoidNotMyCreeps = true
 
-        if (this.memory[CreepMemoryKeys.preferRoads]) {
+        if (creepMemory[CreepMemoryKeys.preferRoads]) {
             if (!opts.plainCost) opts.plainCost = defaultPlainCost * 2
             if (!opts.swampCost) opts.swampCost = defaultCreepSwampCost * 2
         }
@@ -315,7 +315,8 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         // Set the lastCache to the current tick
 
-        this.memory[CreepMemoryKeys.lastCache] = Game.time
+        creepMemory[CreepMemoryKeys.lastCache] = Game.time
+        creepMemory[CreepMemoryKeys.flee] = opts.flee
 
         // Show that a new path has been created
 
@@ -358,7 +359,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
                 color: customColors.lightBlue,
                 opacity: 0.3,
             })
-        delete this.memory[CreepMemoryKeys.lastCache]
+        delete creepMemory[CreepMemoryKeys.lastCache]
     }
 
     // Set the creep's pathOpts to reflect this moveRequest's opts
@@ -367,11 +368,11 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     // Assign the goal's pos to the creep's goalPos
 
-    this.memory[CreepMemoryKeys.goalPos] = packPos(opts.goals[0].pos)
+    creepMemory[CreepMemoryKeys.goalPos] = packPos(opts.goals[0].pos)
 
     // Set the path in the creep's memory
 
-    this.memory[CreepMemoryKeys.path] = packPosList(path)
+    creepMemory[CreepMemoryKeys.path] = packPosList(path)
 
     if (this.spawning) {
         const spawn = findObjectWithID(this.spawnID)
