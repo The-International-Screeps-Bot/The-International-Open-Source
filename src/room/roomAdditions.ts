@@ -880,15 +880,12 @@ const roomAdditions = {
             if (this._controllerLink !== undefined) return this._controllerLink
 
             if (this.global.controllerLink) {
-                const container = findObjectWithID(this.global.controllerLink)
-
-                if (container) return container
+                const structure = findObjectWithID(this.global.controllerLink)
+                if (structure) return structure
             }
 
-            const centerUpgradePos = this.roomManager.centerUpgradePos
-
             const structure = this.findStructureAtCoord(
-                centerUpgradePos,
+                this.roomManager.centerUpgradePos,
                 structure => structure.structureType === STRUCTURE_LINK,
             ) as StructureLink | false
             this._controllerLink = structure

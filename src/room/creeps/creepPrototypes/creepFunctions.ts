@@ -267,7 +267,7 @@ Creep.prototype.advancedUpgradeController = function () {
             this.message += '➡️'
         }
 
-        this.actionCoord = room.controller.pos
+        this.actionCoord = room.roomManager.centerUpgradePos
 
         const workPartCount = this.parts.work
         const controllerRange = getRange(this.pos, room.controller.pos)
