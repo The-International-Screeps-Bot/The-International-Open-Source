@@ -1182,8 +1182,6 @@ export class CommunePlanner {
         if (!centerUpgradePos) return RESULT_FAIL
 
         const packedCoord = packAsNum(centerUpgradePos)
-        this.roadCoords[packedCoord] = 255
-        this.baseCoords[packedCoord] = 255
         this.setBasePlansXY(centerUpgradePos.x, centerUpgradePos.y, STRUCTURE_CONTAINER, 2)
         this.setBasePlansXY(centerUpgradePos.x, centerUpgradePos.y, STRUCTURE_LINK)
 
@@ -1192,6 +1190,9 @@ export class CommunePlanner {
             this.baseCoords[packedAdjCoord] = 255
             this.roadCoords[packedAdjCoord] = 20
         })
+
+        this.roadCoords[packedCoord] = 255
+        this.baseCoords[packedCoord] = 255
 
         this.centerUpgradePos = centerUpgradePos
         return RESULT_SUCCESS

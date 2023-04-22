@@ -75,7 +75,6 @@ export class RoomManager {
     }
 
     room: Room
-    usedStationaryCoords: Set<string> = new Set()
 
     update(room: Room) {
         delete this._usedControllerCoords
@@ -84,7 +83,7 @@ export class RoomManager {
         delete this._remoteSources
         delete this._mineral
         delete this._sourceLinks
-        if (this.usedStationaryCoords.size > 0) this.usedStationaryCoords.clear()
+        delete this._usedStationaryCoords
 
         if (randomTick()) {
             delete this._nukeTargetCoords
@@ -754,5 +753,11 @@ export class RoomManager {
 
         if (links.length === positions.length) this._sourceLinkIDs = links.map(link => link.id)
         return (this._sourceLinks = links)
+    }
+
+    _usedStationaryCoords: Set<string>
+    get usedStationaryCoords() {
+
+        return (this._usedStationaryCoords = new Set())
     }
 }
