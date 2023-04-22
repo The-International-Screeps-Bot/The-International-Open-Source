@@ -21,6 +21,8 @@ import {
     randomIntRange,
     randomTick,
     unpackNumAsCoord,
+    findLowestScore,
+    roundToDecimals,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -42,6 +44,7 @@ import {
     buildableStructuresSet,
     RoomMemoryKeys,
     RoomTypes,
+    rampartUpkeepCost,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -151,6 +154,7 @@ export class CommuneManager {
             delete this._maxUpgradeStrength
             delete this._minRampartHits
             delete this._upgradeStructure
+            delete this._storedEnergyBuildThreshold
         }
 
         this.room = room
@@ -395,11 +399,23 @@ export class CommuneManager {
     }
 
     get storedEnergyUpgradeThreshold() {
-        return this.minStoredEnergy * 1.3
+        return Math.floor(this.minStoredEnergy * 1.3)
     }
 
+    _storedEnergyBuildThreshold: number
     get storedEnergyBuildThreshold() {
-        return this.minStoredEnergy * 1.2
+
+        this._storedEnergyBuildThreshold = Math.floor(Math.min(1000 + findLowestScore(
+            this.room.find(FIND_MY_CONSTRUCTION_SITES),
+            cSite => cSite.progressTotal - cSite.progress,
+        ) * 10, this.minStoredEnergy * 1.2))
+
+        return this._storedEnergyBuildThreshold
+    }
+
+    get rampartsMaintenanceCost() {
+
+        return roundToDecimals(this.room.structures.rampart.length * rampartUpkeepCost, 2)
     }
 
     _minRampartHits: number

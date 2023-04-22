@@ -209,7 +209,7 @@ export class RoomVisualsManager {
 
         if (!global.communes.has(this.roomManager.room.name)) return
 
-        this.remoteDataVisuals(this.generalDataVisuals(1))
+        this.remoteDataVisuals(this.statDataVisuals(this.generalDataVisuals(1)))
     }
 
     public internationalDataVisuals() {
@@ -573,33 +573,25 @@ export class RoomVisualsManager {
             'energy',
             'minEnergy',
             'minRampartHits',
-            'estimatedIncome',
-            'CHarvest',
-            'RHarvest',
-            'upgrade',
-            'build',
-            'rep Other',
-            'rep barricade',
+            'threatened',
+            'last attacked',
+            'upgrade thresh',
+            'build thresh',
             'inferiority',
-            'spawn util',
         ]
 
-        const roomStats = Memory.stats.rooms[this.roomManager.room.name]
+        const roomMemory = Memory.rooms[this.roomManager.room.name]
 
         const data: any[][] = [
             [
                 this.roomManager.room.resourcesInStoringStructures.energy || 0,
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
-                this.roomManager.room.communeManager.estimatedEnergyIncome,
-                roomStats.eih.toFixed(2),
-                roomStats.reih.toFixed(2),
-                roomStats.eou.toFixed(2),
-                roomStats.eob.toFixed(2),
-                roomStats.eoro.toFixed(2),
-                roomStats.eorwr.toFixed(2),
+                roomMemory[RoomMemoryKeys.threatened].toFixed(2),
+                roomMemory[RoomMemoryKeys.lastAttacked],
+                this.roomManager.room.communeManager.storedEnergyUpgradeThreshold,
+                this.roomManager.room.communeManager.storedEnergyBuildThreshold,
                 this.roomManager.room.towerInferiority || 'false',
-                Math.floor(roomStats.su * 100) + '%',
             ],
         ]
 
@@ -633,11 +625,71 @@ export class RoomVisualsManager {
         return y + height
     }
 
+    statDataVisuals(y: number) {
+
+        const headers: any[] = [
+            'estimatedIncome',
+            'CHarvest',
+            'RHarvest',
+            'upgrade',
+            'build',
+            'rep Other',
+            'rep barricade',
+            'barricades cost',
+            'spawn util',
+        ]
+
+        const roomStats = Memory.stats.rooms[this.roomManager.room.name]
+
+        const data: any[][] = [
+            [
+                this.roomManager.room.communeManager.estimatedEnergyIncome,
+                roomStats.eih.toFixed(2),
+                roomStats.reih.toFixed(2),
+                roomStats.eou.toFixed(2),
+                roomStats.eob.toFixed(2),
+                roomStats.eoro.toFixed(2),
+                roomStats.eorwr.toFixed(2),
+                this.roomManager.room.communeManager.rampartsMaintenanceCost,
+                (roomStats.su * 100).toFixed(2) + '%',
+            ],
+        ]
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Stats',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
     requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
         const headers: any[] = [
-            RoomTypes.remote,
+            'room',
             'sourceIndex',
             'efficacy',
             'harvester',
@@ -657,11 +709,12 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
+            if (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex]) row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
+            else row.push('undefined')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
-            row.push(remoteMemory[RoomMemoryKeys.abandon])
+            row.push(remoteMemory[RoomMemoryKeys.abandon] || 0)
 
             data.push(row)
         }

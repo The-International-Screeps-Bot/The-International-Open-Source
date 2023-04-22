@@ -308,7 +308,7 @@ export class Quad {
 
             const nearbyThreat = this.leader.room.enemyAttackers.find(
                 enemyCreep =>
-                    this.findMinRange(enemyCreep.pos) <= 5 &&
+                    this.findMinRange(enemyCreep.pos) <= 6 &&
                     (enemyCreep.combatStrength.ranged || enemyCreep.combatStrength.melee),
             )
             if (
