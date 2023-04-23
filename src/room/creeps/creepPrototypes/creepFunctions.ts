@@ -240,7 +240,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
     let controllerStructure: StructureLink | StructureContainer | undefined = room.controllerContainer
 
-    const controllerLink = room.controllerLink
+    const controllerLink = room.communeManager.controllerLink
 
     if (!controllerStructure && controllerLink && controllerLink.RCLActionable) controllerStructure = controllerLink
 

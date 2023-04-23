@@ -196,7 +196,7 @@ export class HubHauler extends Creep {
 
         // If the controllerLink is less than x% full
 
-        const { controllerLink } = room
+        const { controllerLink } = room.communeManager
         if (
             controllerLink &&
             controllerLink.store.getCapacity(RESOURCE_ENERGY) *
@@ -248,7 +248,7 @@ export class HubHauler extends Creep {
 
         if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy) return false
 
-        const { controllerLink } = room
+        const { controllerLink } = room.communeManager
         const { fastFillerLink } = room
 
         // If a link is less than x% full

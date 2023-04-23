@@ -172,6 +172,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             const roomMemory = Memory.rooms[roomName]
 
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
+
+                // Weight structures
+
                 const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
 
                 for (const packedCoord in basePlans.map) {
@@ -185,6 +188,55 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
+                // Weight potential and actual stationary positions
+
+                for (const index in room.find(FIND_SOURCES)) {
+                    // Loop through each position of harvestPositions, have creeps prefer to avoid
+
+                    for (const pos of room.roomManager.sourceHarvestPositions[index]) {
+                        const packedCoord = packCoord(pos)
+
+                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                    }
+                }
+
+                if (room.roomManager.anchor) {
+                    // The last upgrade position should be the deliver pos, which we want to weight normal
+
+                    for (const pos of room.roomManager.upgradePositions) {
+                        const packedCoord = packCoord(pos)
+
+                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                    }
+
+                    for (const pos of room.roomManager.mineralHarvestPositions) {
+                        const packedCoord = packCoord(pos)
+
+                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                    }
+
+                    const stampAnchors = room.roomManager.stampAnchors
+                    if (stampAnchors) {
+                        const packedCoord = packCoord(stampAnchors.hub[0])
+
+                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                    }
+
+                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+                    for (const pos of room.fastFillerPositions) {
+                        const packedCoord = packCoord(pos)
+
+                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                    }
+                }
+
+                /*
                 const room = Game.rooms[roomName]
                 opts.weightCoords[roomName][packCoord(room.roomManager.centerUpgradePos)] = 255
 
@@ -194,6 +246,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                         opts.weightCoords[pos.roomName][packCoord(pos)] = 1
                     }
                 }
+ */
             } else if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
                 for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
                     const path = unpackPosList(packedPath)
@@ -210,7 +263,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
     // Construct path
 
     function generatePath() {
-
         const maxRooms = opts.maxRooms ? Math.min(allowedRoomNames.size, opts.maxRooms) : allowedRoomNames.size
         const pathFinderResult = PathFinder.search(opts.origin, opts.goals, {
             plainCost: opts.plainCost,
@@ -312,10 +364,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 // If avoidStationaryPositions is requested
 
                 if (opts.avoidStationaryPositions) {
-                    for (const index in room.find(FIND_SOURCES)) {
-                        // Loop through each position of harvestPositions, have creeps prefer to avoid
-
-                        for (const pos of room.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 20)
+                    for (const packedCoord of room.usedSourceHarvestCoords) {
+                        const coord = unpackCoord(packedCoord)
+                        cm.set(coord.x, coord.y, 20)
                     }
 
                     if (room.roomManager.anchor) {
@@ -326,7 +377,10 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                             cm.set(coord.x, coord.y, 20)
                         }
 
-                        for (const pos of room.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 20)
+                        for (const packedCoord of room.usedMineralCoords) {
+                            const coord = unpackCoord(packedCoord)
+                            cm.set(coord.x, coord.y, 20)
+                        }
 
                         const stampAnchors = room.roomManager.stampAnchors
                         if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 20)
@@ -454,7 +508,9 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
         if (pathFinderResult.incomplete) {
             customLog(
                 'Incomplete Path',
-                `${opts.origin} -> ${opts.goals[0].pos} range: ${opts.goals[0].range} goals: ${opts.goals.length - 1} path: ${pathFinderResult.path.length}`,
+                `${opts.origin} -> ${opts.goals[0].pos} range: ${opts.goals[0].range} goals: ${
+                    opts.goals.length - 1
+                } path: ${pathFinderResult.path.length}`,
                 {
                     textColor: customColors.white,
                     bgColor: customColors.red,

@@ -21,13 +21,13 @@ export class LinkManager {
     }
 
     private sourcesToReceivers() {
-        const sourceLinks = this.communeManager.room.roomManager.sourceLinks
+        const sourceLinks = this.communeManager.room.communeManager.sourceLinks
         if (!sourceLinks.filter(link => link).length) return
 
         let receiverLinks = [
             this.communeManager.room.fastFillerLink,
             this.communeManager.room.hubLink,
-            this.communeManager.room.controllerLink,
+            this.communeManager.controllerLink,
         ].filter(link => link)
 
         if (!receiverLinks.length) return
@@ -87,7 +87,7 @@ export class LinkManager {
     }
 
     private hubToController() {
-        const controllerLink = this.communeManager.room.controllerLink
+        const controllerLink = this.communeManager.controllerLink
         if (!controllerLink) return
 
         const hubLink = this.communeManager.room.hubLink
@@ -123,7 +123,7 @@ export class LinkManager {
     }
 
     private createControllerLinkRoomLogisticsRequest() {
-        const controllerLink = this.communeManager.room.controllerLink
+        const controllerLink = this.communeManager.controllerLink
         if (!controllerLink) return
 
         // If we have suffient energy

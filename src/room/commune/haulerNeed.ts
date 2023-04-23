@@ -40,7 +40,7 @@ export class HaulerNeedManager {
 
         if (room.hubLink && room.hubLink.RCLActionable) {
             for (let index in room.find(FIND_SOURCES)) {
-                const sourceLink = room.roomManager.sourceLinks[index]
+                const sourceLink = room.communeManager.sourceLinks[index]
                 if (sourceLink && sourceLink.RCLActionable) continue
 
                 room.haulerNeed += findCarryPartsRequired(
@@ -55,7 +55,7 @@ export class HaulerNeedManager {
         // No valid hubLink
 
         for (let index in room.find(FIND_SOURCES)) {
-            const sourceLink = room.roomManager.sourceLinks[index]
+            const sourceLink = room.communeManager.sourceLinks[index]
             if (sourceLink && sourceLink.RCLActionable) continue
 
             room.haulerNeed += findCarryPartsRequired(
@@ -83,8 +83,8 @@ export class HaulerNeedManager {
         // There is a viable controllerLink but we need to haul to it
 
         if (
-            room.controllerLink &&
-            room.controllerLink.RCLActionable &&
+            this.communeManager.controllerLink &&
+            this.communeManager.controllerLink.RCLActionable &&
             (!room.hubLink || !room.hubLink.RCLActionable)
         ) {
             room.haulerNeed += findCarryPartsRequired(

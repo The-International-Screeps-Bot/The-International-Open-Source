@@ -147,7 +147,7 @@ export class SourceHarvester extends Creep {
 
         // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-        const sourceLink = room.roomManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
+        const sourceLink = room.communeManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
         if (!sourceLink) return false
 
         // Try to transfer to the sourceLink and inform true
@@ -238,7 +238,7 @@ export class SourceHarvester extends Creep {
         const sourceContainer = this.room.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]]
         if (sourceContainer) return false
 
-        const sourceLink = this.room.roomManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
+        const sourceLink = this.room.communeManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
         if (sourceLink && sourceLink.RCLActionable) return false
 
         // If the creep isn't full enough to justify a request

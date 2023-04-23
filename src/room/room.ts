@@ -82,7 +82,6 @@ export class RoomManager {
         delete this._communeSources
         delete this._remoteSources
         delete this._mineral
-        delete this._sourceLinks
         delete this._usedStationaryCoords
 
         if (randomTick()) {
@@ -445,7 +444,7 @@ export class RoomManager {
     get centerUpgradePos() {
         if (this._centerUpgradePos) return this._centerUpgradePos
 
-        const packedPos = this.room.memory[RoomMemoryKeys.centerUpgradePos]
+        const packedPos = Memory.rooms[this.room.name][RoomMemoryKeys.centerUpgradePos]
         if (packedPos) {
             return (this._centerUpgradePos = unpackPos(packedPos))
         }
@@ -715,44 +714,6 @@ export class RoomManager {
         }
 
         return false
-    }
-
-    _sourceLinkIDs: Id<StructureLink>[]
-    _sourceLinks: StructureLink[]
-    get sourceLinks() {
-        if (this._sourceLinks) return this._sourceLinks
-
-        const links: StructureLink[] = []
-
-        if (this._sourceLinkIDs) {
-            for (const ID of this._sourceLinkIDs) {
-                const link = findObjectWithID(ID)
-                if (!link) break
-
-                links.push(link)
-            }
-
-            if (links.length === this._sourceLinkIDs.length) {
-                return (this._sourceLinks = links)
-            }
-        }
-
-        const positions = this.communeSourceHarvestPositions
-        for (let i = 0; i < positions.length; i++) {
-            const anchor = positions[i][0]
-            const structure = this.room.findStructureInRange(
-                anchor,
-                1,
-                structure => structure.structureType === STRUCTURE_LINK,
-            ) as false | StructureLink
-
-            if (!structure) continue
-
-            links[i] = structure
-        }
-
-        if (links.length === positions.length) this._sourceLinkIDs = links.map(link => link.id)
-        return (this._sourceLinks = links)
     }
 
     _usedStationaryCoords: Set<string>

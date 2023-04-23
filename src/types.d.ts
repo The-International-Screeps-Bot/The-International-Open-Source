@@ -1342,9 +1342,6 @@ declare global {
 
         // Links
 
-        _controllerLink: StructureLink | false
-        readonly controllerLink: StructureLink | false
-
         _fastFillerLink: StructureLink | false
         readonly fastFillerLink: StructureLink | false
 

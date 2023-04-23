@@ -537,7 +537,8 @@ const roomAdditions = {
                 this._usedUpgradeCoords.add(packedCoord)
             }
 
-            if (this.controllerLink) this._usedUpgradeCoords.add(packCoord(this.controllerLink.pos))
+            const controllerLink = this.communeManager.controllerLink
+            if (controllerLink) this._usedUpgradeCoords.add(packCoord(controllerLink.pos))
             /*
             for (const packedCoord of this._usedUpgradeCoords) {
 
@@ -873,27 +874,6 @@ const roomAdditions = {
 
             this.global.mineralContainer = structure.id as Id<StructureContainer>
             return this._mineralContainer
-        },
-    },
-    controllerLink: {
-        get() {
-            if (this._controllerLink !== undefined) return this._controllerLink
-
-            if (this.global.controllerLink) {
-                const structure = findObjectWithID(this.global.controllerLink)
-                if (structure) return structure
-            }
-
-            const structure = this.findStructureAtCoord(
-                this.roomManager.centerUpgradePos,
-                structure => structure.structureType === STRUCTURE_LINK,
-            ) as StructureLink | false
-            this._controllerLink = structure
-
-            if (!structure) return false
-
-            this.global.controllerLink = structure.id as Id<StructureLink>
-            return this._controllerLink
         },
     },
     fastFillerLink: {
@@ -1546,10 +1526,10 @@ const roomAdditions = {
 
             for (const road of this.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
-            for (const index in this.find(FIND_SOURCES)) {
-                // Loop through each position of harvestPositions, have creeps prefer to avoid
+            for (const packedCoord of this.usedSourceHarvestCoords) {
 
-                for (const pos of this.roomManager.sourceHarvestPositions[index]) cm.set(pos.x, pos.y, 20)
+                const coord = unpackCoord(packedCoord)
+                cm.set(coord.x, coord.y, 20)
             }
 
             if (this.roomManager.anchor) {
@@ -1560,7 +1540,10 @@ const roomAdditions = {
                     cm.set(coord.x, coord.y, 20)
                 }
 
-                for (const pos of this.roomManager.mineralHarvestPositions) cm.set(pos.x, pos.y, 20)
+                for (const packedCoord of this.usedMineralCoords) {
+                    const coord = unpackCoord(packedCoord)
+                    cm.set(coord.x, coord.y, 20)
+                }
 
                 const stampAnchors = this.roomManager.stampAnchors
                 if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 20)

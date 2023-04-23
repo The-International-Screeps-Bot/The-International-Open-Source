@@ -149,6 +149,8 @@ export class CommuneManager {
         delete this._maxCombatRequests
         delete this._rampartRepairTargets
         delete this._defensiveRamparts
+        delete this._sourceLinks
+        delete this._controllerLink
 
         if (randomTick()) {
             delete this._maxUpgradeStrength
@@ -308,6 +310,7 @@ export class CommuneManager {
     }
 
     private test() {
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -502,7 +505,7 @@ export class CommuneManager {
         // Link
 
         const hubLink = this.room.hubLink
-        const sourceLinks = this.room.roomManager.sourceLinks
+        const sourceLinks = this.sourceLinks
 
         // If there are transfer links, max out partMultiplier to their ability
 
@@ -556,7 +559,7 @@ export class CommuneManager {
 
         // We can use links
 
-        const controllerLink = this.room.controllerLink
+        const controllerLink = this.controllerLink
         if (!controllerLink || !controllerLink.RCLActionable) return false
 
         const hubLink = this.room.hubLink
@@ -672,5 +675,65 @@ export class CommuneManager {
             Memory.rooms[this.room.name][RoomMemoryKeys.threatened] >
             Math.floor(Math.pow(this.room.controller.level, 1.1) * 1000)
         )
+    }
+
+    _sourceLinkIDs: Id<StructureLink>[]
+    _sourceLinks: StructureLink[]
+    get sourceLinks() {
+        if (this._sourceLinks) return this._sourceLinks
+
+        const links: StructureLink[] = []
+
+        if (this._sourceLinkIDs) {
+            for (const ID of this._sourceLinkIDs) {
+                const link = findObjectWithID(ID)
+                if (!link) break
+
+                links.push(link)
+            }
+
+            if (links.length === this._sourceLinkIDs.length) {
+                return (this._sourceLinks = links)
+            }
+        }
+
+        const positions = this.room.roomManager.communeSourceHarvestPositions
+        for (let i = 0; i < positions.length; i++) {
+            const anchor = positions[i][0]
+            const structure = this.room.findStructureInRange(
+                anchor,
+                1,
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as false | StructureLink
+
+            if (!structure) continue
+
+            links[i] = structure
+        }
+
+        if (links.length === positions.length) this._sourceLinkIDs = links.map(link => link.id)
+        return (this._sourceLinks = links)
+    }
+
+    _controllerLinkID: Id<StructureLink>
+    _controllerLink: StructureLink | false
+    get controllerLink() {
+        if (this._controllerLink !== undefined) return this._controllerLink
+
+        if (this._controllerLinkID) {
+            const structure = findObjectWithID(this._controllerLinkID)
+            if (structure) return structure
+        }
+
+        const structure = this.room.findStructureAtCoord(
+            this.room.roomManager.centerUpgradePos,
+            structure => structure.structureType === STRUCTURE_LINK,
+        ) as StructureLink | false
+        this._controllerLink = structure
+
+        if (!structure) return false
+
+        this._controllerLinkID = structure.id
+        return this._controllerLink
     }
 }
