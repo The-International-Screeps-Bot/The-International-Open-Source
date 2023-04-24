@@ -354,7 +354,7 @@ export class RemoteHarvester extends Creep {
                     creep.memory[CreepMemoryKeys.sourceIndex]
                 ],
             )
-            console.log('reverse of null roomName', creep.memory[CreepMemoryKeys.remote])
+            console.log('reverse of null remote roomName', creep.memory[CreepMemoryKeys.remote])
             creep.createMoveRequestByPath(
                 {
                     origin: creep.pos,

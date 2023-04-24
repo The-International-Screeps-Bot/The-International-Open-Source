@@ -290,6 +290,17 @@ declare global {
         heal: number
     }
 
+    interface FindClosestPos {
+        coordMap: CoordMap
+        sources: Coord[]
+        targetCondition(coord: Coord): boolean
+        /**
+         * Wether or not to attempt a cardinal flood
+         */
+        cardinalFlood?: boolean
+        visuals?: boolean
+    }
+
     interface FindClosestPosOfValueOpts {
         coordMap: CoordMap
         startCoords: Coord[]
@@ -1071,6 +1082,11 @@ declare global {
          * Gets ranges from for each position from a certain point
          */
         floodFill(seeds: Coord[], coordMap: CoordMap, visuals?: boolean): CoordMap
+
+        /**
+         * Flood fills a room until it finds one of a set of positions
+         */
+        findClosestPos(opts: FindClosestPos): RoomPosition | false
 
         /**
          * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified

@@ -537,8 +537,10 @@ const roomAdditions = {
                 this._usedUpgradeCoords.add(packedCoord)
             }
 
-            const controllerLink = this.communeManager.controllerLink
-            if (controllerLink) this._usedUpgradeCoords.add(packCoord(controllerLink.pos))
+            if (this.communeManager) {
+                const controllerLink = this.communeManager.controllerLink
+                if (controllerLink) this._usedUpgradeCoords.add(packCoord(controllerLink.pos))
+            }
             /*
             for (const packedCoord of this._usedUpgradeCoords) {
 
@@ -1068,7 +1070,6 @@ const roomAdditions = {
                     let largestValue = terrainCoords[packXYAsNum(x, y)]
 
                     for (const coord of offsetCoords) {
-
                         let coordValue = terrainCoords[packAsNum(coord)]
                         if (!coordValue || coordValue < 255) continue
 
@@ -1242,7 +1243,6 @@ const roomAdditions = {
                     largestValue = 0
 
                     for (const coord of offsetCoords) {
-
                         const value = terrainCM.get(coord.x, coord.y)
                         if (value === undefined) continue
 
@@ -1527,7 +1527,6 @@ const roomAdditions = {
             for (const road of this.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
             for (const packedCoord of this.usedSourceHarvestCoords) {
-
                 const coord = unpackCoord(packedCoord)
                 cm.set(coord.x, coord.y, 20)
             }

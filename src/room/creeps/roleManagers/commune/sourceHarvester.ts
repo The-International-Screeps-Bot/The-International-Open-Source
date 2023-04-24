@@ -81,11 +81,8 @@ export class SourceHarvester extends Creep {
 
         this.message = `⏩${this.memory[CreepMemoryKeys.sourceIndex]}`
 
-        // The packed path is meant for the closest harvest pos, so change loose usage based on the harvestPos
-        /*
-        const targetsClosestHarvestPos =
-            this.memory[CreepMemoryKeys.packedCoord] === packCoord(this.room.roomManager.communeSourceHarvestPositions[this.memory[CreepMemoryKeys.sourceIndex]][0])
- */
+        console.log('reverse of null commune roomName', this.room.name)
+
         this.createMoveRequestByPath(
             {
                 origin: this.pos,
@@ -101,7 +98,6 @@ export class SourceHarvester extends Creep {
                 packedPath: reversePosList(
                     this.room.memory[RoomMemoryKeys.communeSourcePaths][this.memory[CreepMemoryKeys.sourceIndex]],
                 ),
-                /* loose: !!targetsClosestHarvestPos, */
             },
         )
 
