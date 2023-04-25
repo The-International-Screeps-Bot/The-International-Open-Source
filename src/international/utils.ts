@@ -847,6 +847,8 @@ export function findDynamicScore(roomName: string) {
 
         if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
             const searchRoom = Game.rooms[searchRoomName]
+            if (!searchRoom) return
+
             const score =
                 Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
                 (maxControllerLevel - searchRoom.controller.level)
