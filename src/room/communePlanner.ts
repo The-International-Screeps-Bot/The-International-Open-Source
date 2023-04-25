@@ -994,6 +994,12 @@ export class CommunePlanner {
 
             const closestHarvestPos = sourceHarvestPositions[i][0]
 
+            if (!closestHarvestPos) {
+
+                throw Error('no closest harvest pos '  + this.room.name)
+                return
+            }
+
             this.setBasePlansXY(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_CONTAINER, 3)
             const packedCoord = packAsNum(closestHarvestPos)
             this.roadCoords[packedCoord] = 20
@@ -1105,7 +1111,7 @@ export class CommunePlanner {
                 plainCost: defaultRoadPlanningPlainCost * 2,
                 swampCost: defaultSwampCost * 2,
             })
-
+/*
             // Temporary fix
 
             if (!path.length) {
@@ -1113,7 +1119,7 @@ export class CommunePlanner {
                 this.room.visualizeCoordMap(this.baseCoords)
                 return
             }
-
+ */
             for (const pos of path) {
                 avoidCoords.add(packAsNum(pos))
                 this.room.coordVisual(pos.x, pos.y)
@@ -1960,24 +1966,25 @@ export class CommunePlanner {
             closestSource = source
         }
 
-        let origin: RoomPosition
+        let pathOrigin: RoomPosition
         if (getRange(fastFillerPos, this.centerUpgradePos) >= 10) {
-            origin = this.centerUpgradePos
+            pathOrigin = this.centerUpgradePos
         } else {
-            origin = closestSource.pos
+            pathOrigin = closestSource.pos
         }
 
         const path = this.room.advancedFindPath({
-            origin,
+            origin: pathOrigin,
             goals: [{ pos: fastFillerPos, range: 3 }],
             weightCoordMaps: [this.roadCoords],
             plainCost: defaultRoadPlanningPlainCost,
         })
+        const origin = path[path.length - 1] || pathOrigin
 
         this.planStamps({
             stampType: 'hub',
             count: 1,
-            startCoords: [path[path.length - 1]],
+            startCoords: [origin],
             dynamic: true,
             weighted: true,
             dynamicWeight: this.reverseExitFlood,
