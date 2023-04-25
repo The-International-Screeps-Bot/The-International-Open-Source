@@ -1083,20 +1083,57 @@ export class CommunePlanner {
 
         this.stampAnchors.sourceExtension = []
 
-        const sourceStructureCoords: Coord[][] = []
-        const packedSourceStructureCoords: Set<number> = new Set()
+        const fastFillerAnchor = new RoomPosition(
+            this.stampAnchors.fastFiller[0].x,
+            this.stampAnchors.fastFiller[0].y,
+            this.room.name,
+        )
+        const avoidCoords: Set<number> = new Set()
 
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
             const closestHarvestPos = this.sourceHarvestPositions[i][0]
+
+            const path = this.room.advancedFindPath({
+                origin: closestHarvestPos,
+                goals: [
+                    {
+                        pos: fastFillerAnchor,
+                        range: 3,
+                    },
+                ],
+                weightCoordMaps: [this.diagonalCoords, this.roadCoords],
+                plainCost: defaultRoadPlanningPlainCost * 2,
+                swampCost: defaultSwampCost * 2,
+            })
+
+            // Temporary fix
+
+            if (!path.length) {
+
+                this.room.visualizeCoordMap(this.baseCoords)
+                return
+            }
+
+            for (const pos of path) {
+                avoidCoords.add(packAsNum(pos))
+                this.room.coordVisual(pos.x, pos.y)
+            }
+        }
+
+        const sourceStructureCoords: Coord[][] = []
+
+        for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
+            const closestHarvestPos = this.sourceHarvestPositions[i][0]
+
             sourceStructureCoords.push([])
 
             forAdjacentCoords(closestHarvestPos, adjCoord => {
                 const packedAdjCoord = packAsNum(adjCoord)
+
+                if (avoidCoords.has(packedAdjCoord)) return
                 if (this.baseCoords[packedAdjCoord] === 255) return
                 if (this.roadCoords[packedAdjCoord] > 0) return
-                if (packedSourceStructureCoords.has(packedAdjCoord)) return
 
-                packedSourceStructureCoords.add(packedAdjCoord)
                 sourceStructureCoords[i].push(adjCoord)
                 this.baseCoords[packedAdjCoord] = 255
                 this.roadCoords[packedAdjCoord] = 255
@@ -1162,8 +1199,8 @@ export class CommunePlanner {
             this.setBasePlansXY(coord.x, coord.y, STRUCTURE_LINK)
         }
 
-        this.stampAnchors.sourceLink = sourceLinkCoords
         this.stampAnchors.sourceExtension = sourceExtensionCoords
+        this.stampAnchors.sourceLink = sourceLinkCoords
     }
     private findCenterUpgradePos() {
         if (this.centerUpgradePos) return false
@@ -1185,13 +1222,11 @@ export class CommunePlanner {
             })
 
             if (score > bestScore) {
-
                 bestCoords = new Set([packedCoord])
                 bestScore = score
                 return
             }
             if (score === bestScore) {
-
                 bestCoords.add(packedCoord)
                 return
             }
@@ -1202,8 +1237,7 @@ export class CommunePlanner {
         const centerUpgradePos = this.room.findClosestPos({
             coordMap: this.roadCoords,
             sources: [this.stampAnchors.fastFiller[0]],
-            targetCondition: (coord) => {
-
+            targetCondition: coord => {
                 return bestCoords.has(packAsNum(coord))
             },
         })

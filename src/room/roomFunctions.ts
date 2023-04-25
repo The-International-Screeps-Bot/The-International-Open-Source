@@ -92,7 +92,7 @@ Room.prototype.targetVisual = function (coord1, coord2, visualize = Memory.roomV
  * @returns An array of RoomPositions
  */
 Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
-    const room = this
+    const originRoom = this
 
     opts.plainCost = opts.plainCost || defaultPlainCost
     opts.swampCost = opts.swampCost || defaultSwampCost
@@ -173,6 +173,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
             const roomMemory = Memory.rooms[roomName]
 
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
+
                 // Weight structures
 
                 const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
@@ -188,65 +189,57 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                     }
                 }
 
-                // Weight potential and actual stationary positions
+                const weightRoom = Game.rooms[roomName]
+                if (weightRoom) {
 
-                for (const index in room.find(FIND_SOURCES)) {
-                    // Loop through each position of harvestPositions, have creeps prefer to avoid
+                    // Weight potential and actual stationary positions
 
-                    for (const pos of room.roomManager.sourceHarvestPositions[index]) {
-                        const packedCoord = packCoord(pos)
+                    for (const index in weightRoom.find(FIND_SOURCES)) {
+                        // Loop through each position of harvestPositions, have creeps prefer to avoid
 
-                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
-                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                        for (const pos of weightRoom.roomManager.sourceHarvestPositions[index]) {
+                            const packedCoord = packCoord(pos)
+
+                            const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                            opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                        }
+                    }
+
+                    if (weightRoom.roomManager.anchor) {
+                        // The last upgrade position should be the deliver pos, which we want to weight normal
+
+                        for (const pos of weightRoom.roomManager.upgradePositions) {
+                            const packedCoord = packCoord(pos)
+
+                            const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                            opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                        }
+
+                        for (const pos of weightRoom.roomManager.mineralHarvestPositions) {
+                            const packedCoord = packCoord(pos)
+
+                            const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                            opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                        }
+
+                        const stampAnchors = weightRoom.roomManager.stampAnchors
+                        if (stampAnchors) {
+                            const packedCoord = packCoord(stampAnchors.hub[0])
+
+                            const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                            opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                        }
+
+                        // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+                        for (const pos of weightRoom.fastFillerPositions) {
+                            const packedCoord = packCoord(pos)
+
+                            const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
+                            opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                        }
                     }
                 }
-
-                if (room.roomManager.anchor) {
-                    // The last upgrade position should be the deliver pos, which we want to weight normal
-
-                    for (const pos of room.roomManager.upgradePositions) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
-                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-
-                    for (const pos of room.roomManager.mineralHarvestPositions) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
-                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-
-                    const stampAnchors = room.roomManager.stampAnchors
-                    if (stampAnchors) {
-                        const packedCoord = packCoord(stampAnchors.hub[0])
-
-                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
-                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-
-                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-                    for (const pos of room.fastFillerPositions) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = opts.weightCoords[roomName][packedCoord] || 0
-                        opts.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-                }
-
-                /*
-                const room = Game.rooms[roomName]
-                opts.weightCoords[roomName][packCoord(room.roomManager.centerUpgradePos)] = 255
-
-                for (const path of room.roomManager.communeSourcePaths) {
-                    for (const pos of path) {
-                        if (!opts.weightCoords[pos.roomName]) opts.weightCoords[pos.roomName] = {}
-                        opts.weightCoords[pos.roomName][packCoord(pos)] = 1
-                    }
-                }
- */
             } else if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
                 for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
                     const path = unpackPosList(packedPath)
@@ -313,8 +306,6 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 }
 
                 if (opts.weightCostMatrix) return cm
-
-                /* if (room) room.visualizeCostMatrix(cm) */
 
                 // Weight positions
 
@@ -517,8 +508,8 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
                 },
             )
 
-            room.pathVisual(pathFinderResult.path, 'red')
-            room.errorVisual(opts.origin)
+            originRoom.pathVisual(pathFinderResult.path, 'red')
+            originRoom.errorVisual(opts.origin)
 
             let lastPos = opts.origin
 
@@ -527,7 +518,7 @@ Room.prototype.advancedFindPath = function (opts: PathOpts): RoomPosition[] {
 
                 if (lastPos.roomName !== goal.pos.roomName) continue
 
-                room.visual.line(lastPos, goal.pos, {
+                originRoom.visual.line(lastPos, goal.pos, {
                     color: customColors.red,
                     width: 0.15,
                     opacity: 0.3,
@@ -724,6 +715,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             weightStructurePlans: true,
         })
 
+        if (!path.length) return roomMemory[RoomMemoryKeys.type]
+
         // Stop if there is a source inefficient enough
 
         if (path.length > 300) return roomMemory[RoomMemoryKeys.type]
@@ -752,6 +745,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             allyRemote: Infinity,
         },
     }).length
+
+    if (!newReservationEfficacy) return roomMemory[RoomMemoryKeys.type]
 
     // If the room isn't already a remote
 
