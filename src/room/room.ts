@@ -46,6 +46,7 @@ import { RuinManager } from './ruins'
 import { packCoord, packPosList, unpackCoord, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
+import { customFindPath } from 'international/customPathFinder'
 
 export class RoomManager {
     // sub managers
@@ -288,7 +289,7 @@ export class RoomManager {
         sortBy(
             sources,
             ({ pos }) =>
-                this.room.advancedFindPath({
+                customFindPath({
                     origin: pos,
                     goals: [{ pos: anchor, range: 3 }],
                 }).length,
@@ -374,7 +375,7 @@ export class RoomManager {
             sortBy(
                 positions,
                 origin =>
-                    this.room.advancedFindPath({
+                    customFindPath({
                         origin,
                         goals: [{ pos: anchor, range: 3 }],
                     }).length,
@@ -420,7 +421,7 @@ export class RoomManager {
         const sourcePaths: RoomPosition[][] = []
         const sourceHarvestPositions = this.remoteSourceHarvestPositions
         for (let index in this.room.find(FIND_SOURCES)) {
-            const path = this.room.advancedFindPath({
+            const path = customFindPath({
                 origin: sourceHarvestPositions[index][0],
                 goals: [{ pos: anchor, range: 4 }],
                 typeWeights: remoteTypeWeights,
@@ -483,7 +484,7 @@ export class RoomManager {
         sortBy(
             positions,
             origin =>
-                this.room.advancedFindPath({
+                customFindPath({
                     origin,
                     goals: [{ pos: anchor, range: 4 }],
                 }).length,
@@ -587,7 +588,7 @@ export class RoomManager {
         sortBy(
             positions,
             origin =>
-                this.room.advancedFindPath({
+                customFindPath({
                     origin,
                     goals: [{ pos: anchor, range: 4 }],
                 }).length,
@@ -641,7 +642,7 @@ export class RoomManager {
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
 
-        const path = this.room.advancedFindPath({
+        const path = customFindPath({
             origin: this.remoteControllerPositions[0],
             goals: [{ pos: anchor, range: 4 }],
             typeWeights: remoteTypeWeights,
@@ -718,7 +719,6 @@ export class RoomManager {
 
     _usedStationaryCoords: Set<string>
     get usedStationaryCoords() {
-
         return (this._usedStationaryCoords = new Set())
     }
 }

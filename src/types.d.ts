@@ -201,7 +201,7 @@ declare global {
         range: number
     }
 
-    interface PathOpts {
+    interface CustomPathFinderArgs {
         /**
          * Not required when pathing for creeps
          */
@@ -331,7 +331,7 @@ declare global {
         asymOffset: number
     }
 
-    interface MoveRequestOpts extends PathOpts {
+    interface MoveRequestOpts extends CustomPathFinderArgs {
         cacheAmount?: number
     }
 
@@ -1007,11 +1007,6 @@ declare global {
         targetVisual(coord1: Coord, coord2: Coord, visualize?: boolean): void
 
         /**
-         * Generates a path between two positions
-         */
-        advancedFindPath(opts: PathOpts): RoomPosition[]
-
-        /**
          * Tries to delete a task with the provided ID and response state
          */
         deleteTask(taskID: any, responder: boolean): void
@@ -1583,7 +1578,7 @@ declare global {
         /**
          * The creep's opts when trying to make a moveRequest intra tick
          */
-        pathOpts: PathOpts
+        pathOpts: CustomPathFinderArgs
 
         /**
          * Wether the creep is allowed accept room logistics requests that require delivery

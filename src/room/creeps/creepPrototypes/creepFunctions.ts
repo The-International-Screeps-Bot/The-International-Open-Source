@@ -54,6 +54,7 @@ import {
 } from 'other/codec'
 import { creepClasses } from '../creepClasses'
 import { globalStatsUpdater } from 'international/statsManager'
+import { customFindPath } from 'international/customPathFinder'
 
 Creep.prototype.preTickManager = function () {}
 
@@ -1245,7 +1246,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
     if (this.memory[CreepMemoryKeys.quadBulldozeTargets] && this.memory[CreepMemoryKeys.quadBulldozeTargets].length)
         return this.memory[CreepMemoryKeys.quadBulldozeTargets]
 
-    const path = this.room.advancedFindPath({
+    const path = customFindPath({
         origin: this.pos,
         goals: [
             {

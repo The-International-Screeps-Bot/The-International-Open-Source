@@ -12,6 +12,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
+import { customFindPath } from 'international/customPathFinder'
 import { internationalManager } from 'international/international'
 import {
     areCoordsEqual,
@@ -306,7 +307,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         // Generate a new path
 
-        path = room.advancedFindPath(opts)
+        path = customFindPath(opts)
         if (!path.length) return 'unpathable'
 
         // Limit the path's length to the cacheAmount
