@@ -2147,6 +2147,7 @@ Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
 
     for (const ID of cSiteIDs) {
         const cSite = findObjectWithID(ID) as T
+        console.log('findCSite', cSite, ID)
         if (conditions(cSite)) return cSite
     }
 

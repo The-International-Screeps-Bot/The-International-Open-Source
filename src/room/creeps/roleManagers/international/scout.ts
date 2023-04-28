@@ -167,7 +167,7 @@ export class Scout extends Creep {
         if (room.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
             // If the room already has a correct sign
 
-            if (controller.sign && communeSign.startsWith(controller.sign.text)) return true
+            if (controller.sign && controller.sign.text === communeSign) return true
 
             // Otherwise assign the signMessage the commune sign
 

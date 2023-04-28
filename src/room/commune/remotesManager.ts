@@ -28,6 +28,15 @@ export class RemotesManager {
             const remoteName = room.memory[RoomMemoryKeys.remotes][index]
             const remoteMemory = Memory.rooms[remoteName]
 
+            // Reset values to avoid error
+
+            for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
+                remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
+                remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][i] = 0
+                remoteMemory[RoomMemoryKeys.remoteHaulers][i] = 0
+            }
+            remoteMemory[RoomMemoryKeys.remoteReserver] = 0
+
             // If the room isn't a remote, remove it from the remotes array
 
             if (
@@ -79,8 +88,6 @@ export class RemotesManager {
 
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME
-                remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][i] = 0
-                remoteMemory[RoomMemoryKeys.remoteHaulers][i] = 0
             }
             remoteMemory[RoomMemoryKeys.remoteReserver] = 5
 
@@ -140,12 +147,13 @@ export class RemotesManager {
                 remoteMemory[RoomMemoryKeys.remoteDismantler] = Math.min(remote.dismantleTargets.length, 1)
             }
 
-            // If the remote is assumed to be reserved by an enemy or to be an invader core
+            // If the remote is assumed to be reserved by an enemy or an invader core
 
             if (remoteMemory[RoomMemoryKeys.enemyReserved] || remoteMemory[RoomMemoryKeys.invaderCore]) {
                 for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
                 }
+                remoteMemory[RoomMemoryKeys.remoteReserver] = 0
             }
         }
     }
@@ -157,6 +165,7 @@ export class RemotesManager {
             const remoteMemory = Memory.rooms[remoteName]
 
             if (remoteMemory[RoomMemoryKeys.abandon]) continue
+
             /*
             const remote = Game.rooms[remoteName]
             const isReserved =
@@ -169,6 +178,9 @@ export class RemotesManager {
                 sourceIndex < remoteMemory[RoomMemoryKeys.remoteSourcePaths].length;
                 sourceIndex += 1
             ) {
+
+                if (remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] === 0) continue
+
                 const income = Math.min(
                     remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] * HARVEST_POWER,
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
