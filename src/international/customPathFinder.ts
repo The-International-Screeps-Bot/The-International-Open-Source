@@ -21,10 +21,19 @@ export function customFindPath(args: CustomPathFinderArgs) {
 }
 
 function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
+
+    /**
+     * Room names for goals that have already been searched and thus don't require another one
+     */
+    const searchedGoalRoomNames: Set<string> = new Set()
+
     for (const goal of args.goals) {
         // If the goal is in the same room as the origin
 
         if (args.origin.roomName === goal.pos.roomName) continue
+
+        if (searchedGoalRoomNames.has(goal.pos.roomName)) continue
+        searchedGoalRoomNames.add(goal.pos.roomName)
 
         function weightRoom(roomName: string) {
             const roomMemory = Memory.rooms[roomName]
@@ -32,7 +41,6 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
                 if (roomName === goal.pos.roomName) return 1
                 return Infinity
             }
-            /* console.log(roomName) */
             if (
                 args.avoidAbandonedRemotes &&
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
