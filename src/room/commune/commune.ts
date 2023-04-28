@@ -164,7 +164,7 @@ export class CommuneManager {
 
         // If we should abandon the room
 
-        if (roomMemory[RoomMemoryKeys.abandoned]) {
+        if (roomMemory[RoomMemoryKeys.abandoned] === true) {
             room.controller.unclaim()
             roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
             cleanRoomMemory(room.name)
