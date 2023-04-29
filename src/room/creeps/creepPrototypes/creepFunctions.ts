@@ -1024,6 +1024,7 @@ Creep.prototype.passiveRenew = function () {
 
     // If there is insufficient CPU to renew, inform false
 
+    if (this.body.length > 10) return
     if (!room.myCreeps.fastFiller.length) return
     if (this.isDying()) return
 
