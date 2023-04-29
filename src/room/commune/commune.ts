@@ -677,22 +677,22 @@ export class CommuneManager {
         )
     }
 
-    _sourceLinkIDs: Id<StructureLink>[]
+    sourceLinkIDs: Id<StructureLink>[]
     _sourceLinks: StructureLink[]
     get sourceLinks() {
         if (this._sourceLinks) return this._sourceLinks
 
         const links: StructureLink[] = []
 
-        if (this._sourceLinkIDs) {
-            for (const ID of this._sourceLinkIDs) {
+        if (this.sourceLinkIDs) {
+            for (const ID of this.sourceLinkIDs) {
                 const link = findObjectWithID(ID)
                 if (!link) break
 
                 links.push(link)
             }
 
-            if (links.length === this._sourceLinkIDs.length) {
+            if (links.length === this.sourceLinkIDs.length) {
                 return (this._sourceLinks = links)
             }
         }
@@ -711,7 +711,7 @@ export class CommuneManager {
             links[i] = structure
         }
 
-        if (links.length === positions.length) this._sourceLinkIDs = links.map(link => link.id)
+        if (links.length === positions.length) this.sourceLinkIDs = links.map(link => link.id)
         return (this._sourceLinks = links)
     }
 

@@ -857,12 +857,6 @@ declare global {
         controllerContainer: Id<StructureContainer> | undefined
         mineralContainer: Id<StructureContainer> | undefined
 
-        allStructureIDs: Id<Structure>[]
-        allCSiteIDs: Id<ConstructionSite>[]
-
-        structureCoords: Map<string, Id<Structure>[]>
-        cSiteCoords: Map<string, Id<ConstructionSite>[]>
-
         // Links
 
         controllerLink: Id<StructureLink> | undefined
@@ -1263,20 +1257,6 @@ declare global {
         readonly allyDamagedCreeps: Creep[]
 
         // Buildings
-
-        _structureUpdate: boolean
-        readonly structureUpdate: boolean
-        readonly structureCoords: Map<string, Id<Structure>[]>
-
-        _structures: Partial<OrganizedStructures>
-        readonly structures: OrganizedStructures
-
-        _cSiteUpdate: boolean
-        readonly cSiteUpdate: boolean
-        readonly cSiteCoords: Map<string, Id<ConstructionSite>[]>
-
-        _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
-        readonly cSites: Record<StructureConstant, ConstructionSite[]>
 
         _enemyCSites: ConstructionSite[]
         readonly enemyCSites: ConstructionSite[]

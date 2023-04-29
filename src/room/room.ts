@@ -3,6 +3,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     adjacentOffsets,
+    allStructureTypes,
     creepRoles,
     customColors,
     defaultRoadPlanningPlainCost,
@@ -78,6 +79,8 @@ export class RoomManager {
     room: Room
 
     update(room: Room) {
+        delete this.checkedStructureUpdate
+        delete this.checkedCSiteUpdate
         delete this._usedControllerCoords
         delete this._generalRepairStructures
         delete this._communeSources
@@ -720,5 +723,164 @@ export class RoomManager {
     _usedStationaryCoords: Set<string>
     get usedStationaryCoords() {
         return (this._usedStationaryCoords = new Set())
+    }
+
+    allStructureIDs: Id<Structure<StructureConstant>>[]
+    checkedStructureUpdate: boolean
+    get structureUpdate() {
+        if (this.checkedStructureUpdate === true) return false
+
+        let newAllStructures: Structure[]
+
+        if (this.allStructureIDs) {
+            newAllStructures = this.room.find(FIND_STRUCTURES)
+
+            if (newAllStructures.length === this.allStructureIDs.length) {
+                const allStructures: Structure[] = []
+                let change: true | undefined
+
+                for (const ID of this.allStructureIDs) {
+                    const structure = findObjectWithID(ID)
+                    if (!structure) {
+                        change = true
+                        break
+                    }
+
+                    allStructures.push(structure)
+                }
+
+                if (!change && allStructures.length === this.allStructureIDs.length) {
+                    return (this.checkedStructureUpdate = false)
+                }
+            }
+        }
+
+        // Structures have been added, destroyed or aren't yet initialized
+
+        delete this._structureCoords
+
+        if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
+
+        this.allStructureIDs = newAllStructures.map(structure => structure.id)
+        return (this.checkedStructureUpdate = true)
+    }
+
+    _structureCoords: Map<string, Id<Structure<StructureConstant>>[]>
+    get structureCoords() {
+        if (this._structureCoords && !this.structureUpdate) return this._structureCoords
+
+        // Construct storage of structures based on structureType
+
+        const structureCoords: Map<string, Id<Structure<StructureConstant>>[]> = new Map()
+
+        // Group structures by structureType
+
+        for (const structure of this.room.find(FIND_STRUCTURES)) {
+            const packedCoord = packCoord(structure.pos)
+
+            const coordStructureIDs = structureCoords.get(packedCoord)
+            if (!coordStructureIDs) {
+                structureCoords.set(packedCoord, [structure.id])
+                continue
+            }
+            coordStructureIDs.push(structure.id)
+        }
+
+        this._structureCoords = structureCoords
+        return this._structureCoords
+    }
+
+    _structures: Partial<OrganizedStructures>
+    get structures() {
+        if (this._structures) return this._structures
+
+        this._structures = {}
+        for (const structureType of allStructureTypes) this._structures[structureType] = []
+
+        // Group structures by structureType
+
+        for (const structure of this.room.find(FIND_STRUCTURES))
+            this._structures[structure.structureType].push(structure as any)
+
+        return this._structures
+    }
+
+    cSiteIDs: Id<ConstructionSite<BuildableStructureConstant>>[]
+    checkedCSiteUpdate: boolean
+    get cSiteUpdate() {
+        if (this.checkedCSiteUpdate === true) return false
+
+        let newAllCSites: ConstructionSite[]
+
+        if (this.cSiteIDs) {
+            newAllCSites = this.room.find(FIND_CONSTRUCTION_SITES)
+
+            if (newAllCSites.length === this.cSiteIDs.length) {
+                const allCSites: ConstructionSite[] = []
+                let change: true | undefined
+
+                for (const ID of this.cSiteIDs) {
+                    const cSite = findObjectWithID(ID)
+                    if (!cSite) {
+                        change = true
+                        break
+                    }
+
+                    allCSites.push(cSite)
+                }
+
+                if (!change && allCSites.length === this.cSiteIDs.length) {
+                    return (this.checkedCSiteUpdate = false)
+                }
+            }
+        }
+
+        // construction sites have been added, destroyed or aren't yet initialized
+
+        delete this._cSiteCoords
+
+        if (!newAllCSites) newAllCSites = this.room.find(FIND_CONSTRUCTION_SITES)
+
+        this.cSiteIDs = newAllCSites.map(cSite => cSite.id)
+        return (this.checkedCSiteUpdate = true)
+    }
+
+    _cSiteCoords: Map<string, Id<ConstructionSite<BuildableStructureConstant>>[]>
+    get cSiteCoords() {
+        if (this._cSiteCoords && !this.cSiteUpdate) return this._cSiteCoords
+
+        // Construct storage of structures based on structureType
+
+        const cSiteCoords: Map<string, Id<ConstructionSite<BuildableStructureConstant>>[]> = new Map()
+
+        // Group structures by structureType
+
+        for (const cSite of this.room.find(FIND_CONSTRUCTION_SITES)) {
+            const packedCoord = packCoord(cSite.pos)
+
+            const coordStructureIDs = cSiteCoords.get(packedCoord)
+            if (!coordStructureIDs) {
+                cSiteCoords.set(packedCoord, [cSite.id])
+                continue
+            }
+            coordStructureIDs.push(cSite.id)
+        }
+
+        this._cSiteCoords = cSiteCoords
+        return this._cSiteCoords
+    }
+
+    _cSites: Partial<Record<StructureConstant, ConstructionSite<BuildableStructureConstant>[]>>
+    get cSites() {
+        if (this._cSites) return this._cSites
+
+        this._cSites = {}
+        for (const structureType of allStructureTypes) this._cSites[structureType] = []
+
+        // Group structures by structureType
+
+        for (const cSite of this.room.find(FIND_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
+
+        return this._cSites
     }
 }
