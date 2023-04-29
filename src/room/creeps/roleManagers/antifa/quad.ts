@@ -94,7 +94,7 @@ export class Quad {
     get hits() {
         if (this._hits !== undefined) return this._hits
 
-        return (this._hits = findHighestScore(this.members, (member) => member.hits))
+        return (this._hits = findHighestScore(this.members, member => member.hits))
     }
 
     _enemyThreatDataRanged: EnemyThreatData
@@ -112,7 +112,6 @@ export class Quad {
         }
 
         for (const enemyCreep of this.leader.room.enemyAttackers) {
-
             // Plus one to account for non-leader squad members
 
             if (getRange(enemyCreep.pos, this.leader.pos) > rangedFleeRange + 1) continue
@@ -150,7 +149,8 @@ export class Quad {
             // Melee
 
             squadDeathSpeed =
-                (enemyRanged + enemyCreep.combatStrength.melee) * this.defenceStrength - this.combatStrength.heal / this.hits
+                (enemyRanged + enemyCreep.combatStrength.melee) * this.defenceStrength -
+                this.combatStrength.heal / this.hits
             enemyDeathSpeed = this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
 
             if (squadDeathSpeed > enemyDeathSpeed) {
@@ -173,7 +173,7 @@ export class Quad {
                 continue
             }
         }
-/*
+        /*
         for (let x = 0; x < roomDimensions; x++) {
             for (let y = 0; y < roomDimensions; y++) {
                 const weight = this._enemyThreatDataRanged.coords[packXYAsNum(x, y)]
@@ -678,7 +678,7 @@ export class Quad {
         if (!controller.owner) return false
         if (controller.owner.username === Memory.me) return false
         if (Memory.allyPlayers.includes(controller.owner.username)) return false
-        if (!this.leader.room.structures.tower.length) return false
+        if (!this.leader.room.roomManager.structures.tower.length) return false
 
         return true
     }
@@ -926,8 +926,8 @@ export class Quad {
 
         if (!bulldozeTarget) {
             let bulldozeTargets: Structure[] = []
-            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn)
-            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.tower)
+            bulldozeTargets = bulldozeTargets.concat(this.leader.room.roomManager.structures.spawn)
+            bulldozeTargets = bulldozeTargets.concat(this.leader.room.roomManager.structures.tower)
 
             if (!bulldozeTargets.length) return false
 

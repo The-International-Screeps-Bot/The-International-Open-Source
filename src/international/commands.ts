@@ -1,9 +1,4 @@
-import {
-    allStructureTypes,
-    WorkRequestKeys,
-    CombatRequestKeys,
-    RoomMemoryKeys,
-} from './constants'
+import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys } from './constants'
 import { Settings, settings } from './settings'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
@@ -40,7 +35,7 @@ global.killCreeps = function (roles?) {
 
         if (!room.controller || !room.controller.my) continue
 
-        for (const spawn of room.structures.spawn) {
+        for (const spawn of room.roomManager.structures.spawn) {
             if (!spawn.spawning) continue
 
             // If there are specific role requirements and the creep doesn't meet them
@@ -103,7 +98,7 @@ global.destroyStructures = function (roomName, types?) {
 
         // Get the structures of the type and destroy
 
-        const structures = room.structures[structureType]
+        const structures = room.roomManager.structures[structureType]
         for (const structure of structures) {
             if (structure.destroy() === OK) destroyedStructureCount += 1
         }
@@ -137,7 +132,7 @@ global.destroyCommuneStructures = function (types?) {
 
             // Get the structures of the type
 
-            const structures = room.structures[structureType]
+            const structures = room.roomManager.structures[structureType]
 
             // Loop through the structures
 

@@ -16,7 +16,7 @@ export class ObserverManager {
 
         if (!randomTick()) return
 
-        this.observer = this.communeManager.room.structures.observer[0]
+        this.observer = this.communeManager.room.roomManager.structures.observer[0]
         if (!this.observer) return
 
         this.findScoutTarget()

@@ -113,7 +113,7 @@ class TickConfig {
             if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
 
             const room = Game.rooms[roomName]
-            if (!room.structures.spawn.length) continue
+            if (!room.roomManager.structures.spawn.length) continue
 
             communesForResponding.push(roomName)
         }
@@ -219,7 +219,7 @@ class TickConfig {
                 if (requestName === roomName) continue
 
                 const room = Game.rooms[roomName]
-                if (!room.structures.spawn.length) continue
+                if (!room.roomManager.structures.spawn.length) continue
 
                 // Ensure we aren't responding to too many requests for our energy level
 
@@ -302,7 +302,7 @@ class TickConfig {
                 if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) continue
 
                 const room = Game.rooms[roomName]
-                if (!room.structures.spawn.length) continue
+                if (!room.roomManager.structures.spawn.length) continue
 
                 // Ensure we aren't responding to too many requests for our energy level
 

@@ -29,7 +29,7 @@ export class CombatRequestManager {
 
             // We have no way to make creeps
 
-            if (!room.structures.spawn.length) {
+            if (!room.roomManager.structures.spawn.length) {
                 delete request[CombatRequestKeys.responder]
                 room.memory[RoomMemoryKeys.combatRequests].splice(index, 1)
                 continue
@@ -67,7 +67,8 @@ export class CombatRequestManager {
             if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.maxCombatRequests) return false
         }
 
-        if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.estimatedEnergyIncome / 10) return false
+        if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.estimatedEnergyIncome / 10)
+            return false
         return true
     }
 

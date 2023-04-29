@@ -21,7 +21,6 @@ export function customFindPath(args: CustomPathFinderArgs) {
 }
 
 function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
-
     /**
      * Room names for goals that have already been searched and thus don't require another one
      */
@@ -276,7 +275,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 let roadCost = 1
                 if (!args.creep.memory[CreepMemoryKeys.preferRoads]) roadCost = args.plainCost
 
-                for (const road of room.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
+                for (const road of room.roomManager.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
             }
 
             // If avoidStationaryPositions is requested
@@ -319,11 +318,11 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                 const structureType = key as StructureConstant
 
-                for (const structure of room.structures[structureType])
+                for (const structure of room.roomManager.structures[structureType])
                     cm.set(structure.pos.x, structure.pos.y, args.weightStructures[structureType])
             }
 
-            for (const portal of room.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+            for (const portal of room.roomManager.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
 
             // Loop trough each construction site belonging to an ally
 
@@ -355,7 +354,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             // If avoiding structures that can't be walked on is enabled
 
             if (args.avoidImpassibleStructures) {
-                for (const rampart of room.structures.rampart) {
+                for (const rampart of room.roomManager.structures.rampart) {
                     // If the rampart is mine
 
                     if (rampart.my) {
@@ -382,13 +381,13 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 // Loop through structureTypes of impassibleStructureTypes
 
                 for (const structureType of impassibleStructureTypes) {
-                    for (const structure of room.structures[structureType]) {
+                    for (const structure of room.roomManager.structures[structureType]) {
                         // Set pos as impassible
 
                         cm.set(structure.pos.x, structure.pos.y, 255)
                     }
 
-                    for (const cSite of room.cSites[structureType]) {
+                    for (const cSite of room.roomManager.cSites[structureType]) {
                         // Set pos as impassible
 
                         cm.set(cSite.pos.x, cSite.pos.y, 255)

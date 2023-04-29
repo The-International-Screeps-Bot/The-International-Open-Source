@@ -165,7 +165,7 @@ export class LabManager {
 
         // We need at least 3 labs to opperate
 
-        const labs = this.communeManager.room.structures.lab
+        const labs = this.communeManager.room.roomManager.structures.lab
         if (labs.length < 3) return this._inputLabs
 
         // We need a storage or terminal
@@ -229,7 +229,7 @@ export class LabManager {
 
         let boostingLabs = Object.values(this.labsByBoost)
 
-        return (this._outputLabs = this.communeManager.room.structures.lab.filter(
+        return (this._outputLabs = this.communeManager.room.roomManager.structures.lab.filter(
             lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
         ))
     }
@@ -256,7 +256,7 @@ export class LabManager {
         const labId = this.labsByBoost[boost]
         if (!labId) return false
 
-        const lab = this.communeManager.room.structures.lab.find(lab => lab.id == labId)
+        const lab = this.communeManager.room.roomManager.structures.lab.find(lab => lab.id == labId)
 
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return false
@@ -296,7 +296,7 @@ export class LabManager {
         const labId = this.labsByBoost[boost]
         if (!labId) return true
 
-        const lab = this.communeManager.room.structures.lab.find(lab => lab.id == labId)
+        const lab = this.communeManager.room.roomManager.structures.lab.find(lab => lab.id == labId)
 
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return true
@@ -400,7 +400,7 @@ export class LabManager {
                 // Otherwise grab a lab that's not the input labs, and not a boosting lab
 
                 let boostingLabs = Object.values(this.labsByBoost)
-                let freelabs = this.communeManager.room.structures.lab.filter(
+                let freelabs = this.communeManager.room.roomManager.structures.lab.filter(
                     lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
                 )
 
@@ -596,7 +596,7 @@ export class LabManager {
 
         let amount = this.communeManager.room.resourcesInStoringStructures[resource] || 0
 
-        for (const lab of this.communeManager.room.structures.lab) {
+        for (const lab of this.communeManager.room.roomManager.structures.lab) {
             if (lab.mineralType !== resource) continue
             amount += lab.mineralAmount
         }
@@ -885,7 +885,7 @@ export class LabManager {
         if (this.labsByBoost) {
             for (const compound in this.labsByBoost) {
                 const labId = this.labsByBoost[compound as MineralBoostConstant]
-                const lab = this.communeManager.room.structures.lab.find(lab => lab.id == labId)
+                const lab = this.communeManager.room.roomManager.structures.lab.find(lab => lab.id == labId)
                 if (this.setupBoosterLab(creep, lab, compound as MineralBoostConstant)) return
             }
         }

@@ -1,4 +1,4 @@
-import { packCoord } from "other/codec"
+import { packCoord } from 'other/codec'
 
 export enum PlayerMemoryKeys {
     /**
@@ -794,7 +794,7 @@ export const allResources = new Set(RESOURCES_ALL)
 export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: ResourceTarget }> = {
     [RESOURCE_BATTERY]: {
         conditions: function (communeManager) {
-            return communeManager.room.structures.factory.length
+            return communeManager.room.roomManager.structures.factory.length
         },
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.005
@@ -937,7 +937,7 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
     },
     [RESOURCE_POWER]: {
         conditions: function (communeManager) {
-            return communeManager.room.structures.powerSpawn.length
+            return communeManager.room.roomManager.structures.powerSpawn.length
         },
         min: function (communeManager) {
             return communeManager.storingStructuresCapacity * 0.002

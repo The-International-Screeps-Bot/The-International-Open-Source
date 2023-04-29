@@ -1,4 +1,11 @@
-import { CreepMemoryKeys, creepRoles, dismantleBoosts, dismantleBoostsSet, roomDimensions, towerPowers } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    creepRoles,
+    dismantleBoosts,
+    dismantleBoostsSet,
+    roomDimensions,
+    towerPowers,
+} from 'international/constants'
 import { customLog, estimateTowerDamage, getRangeXY, getRange, isXYExit } from 'international/utils'
 import { profiler } from 'other/profiler'
 
@@ -337,7 +344,7 @@ const additions = {
 
             this._grossTowerDamage = 0
 
-            for (const tower of this.room.structures.tower) {
+            for (const tower of this.room.roomManager.structures.tower) {
                 if (!tower.RCLActionable) continue
                 if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
 

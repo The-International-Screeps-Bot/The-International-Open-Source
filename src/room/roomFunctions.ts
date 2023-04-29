@@ -127,8 +127,8 @@ Room.prototype.scoutEnemyReservedRemote = function () {
     // If there are roads or containers or sources harvested, inform false
 
     if (
-        !this.structures.road &&
-        !this.structures.container &&
+        !this.roomManager.structures.road &&
+        !this.roomManager.structures.container &&
         !this.find(FIND_SOURCES, {
             filter: source => source.ticksToRegeneration > 0,
         })
@@ -423,9 +423,9 @@ Room.prototype.scoutEnemyRoom = function () {
 
     threat += Math.pow(level, 2)
 
-    threat += this.structures.spawn.length * 50
-    threat += this.structures.nuker.length * 300
-    threat += Math.pow(this.structures.lab.length * 10000, 0.4)
+    threat += this.roomManager.structures.spawn.length * 50
+    threat += this.roomManager.structures.nuker.length * 300
+    threat += Math.pow(this.roomManager.structures.lab.length * 10000, 0.4)
 
     threat = Math.floor(threat)
 
@@ -444,13 +444,13 @@ Room.prototype.scoutEnemyRoom = function () {
     roomMemory[RoomMemoryKeys.energy] = energy
     threat += Math.pow(energy, 0.5)
 
-    const ramparts = this.structures.rampart
+    const ramparts = this.roomManager.structures.rampart
     const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
 
     threat += Math.pow(avgRampartHits, 0.5)
-    threat += this.structures.spawn.length * 100
-    threat += this.structures.tower.length * 300
-    threat += Math.pow(this.structures.extension.length * 400, 0.8)
+    threat += this.roomManager.structures.spawn.length * 100
+    threat += this.roomManager.structures.tower.length * 300
+    threat += Math.pow(this.roomManager.structures.extension.length * 400, 0.8)
 
     const hasTerminal = this.terminal !== undefined
 
@@ -471,7 +471,9 @@ Room.prototype.scoutEnemyRoom = function () {
     // Combat request creation
 
     this.createAttackCombatRequest({
-        [CombatRequestKeys.maxTowerDamage]: Math.ceil(this.structures.tower.length * TOWER_POWER_ATTACK * 1.1),
+        [CombatRequestKeys.maxTowerDamage]: Math.ceil(
+            this.roomManager.structures.tower.length * TOWER_POWER_ATTACK * 1.1,
+        ),
         [CombatRequestKeys.minDamage]: 50,
     })
 
@@ -978,7 +980,6 @@ Room.prototype.findClosestPos = function (opts) {
                 // Loop through adjacent positions
 
                 for (const coord2 of adjacentCoords) {
-
                     if (!doesCoordExist(coord2)) continue
 
                     // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1072,19 +1073,17 @@ Room.prototype.findClosestPos = function (opts) {
         }
 
         if (opts.visuals) {
-            for (const coord of nextGeneration)
-                {
+            for (const coord of nextGeneration) {
+                this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
+                    font: 0.5,
+                    color: customColors.yellow,
+                })
 
-                    this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
-                        font: 0.5,
-                        color: customColors.yellow,
-                    })
-
-                    this.visual.text(depth.toString(), coord.x, coord.y + 0.5, {
-                        font: 0.5,
-                        color: customColors.green,
-                    })
-                }
+                this.visual.text(depth.toString(), coord.x, coord.y + 0.5, {
+                    font: 0.5,
+                    color: customColors.green,
+                })
+            }
         }
 
         // Set this gen to next gen
@@ -2119,7 +2118,7 @@ Room.prototype.findStructureAtXY = function <T extends Structure>(
     y: number,
     conditions: (structure: T) => boolean,
 ) {
-    const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
+    const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
     if (!structureIDs) return false
 
     for (const ID of structureIDs) {
@@ -2142,7 +2141,7 @@ Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
     y: number,
     conditions: (cSite: T) => boolean,
 ) {
-    const cSiteIDs = this.cSiteCoords.get(packXYAsCoord(x, y))
+    const cSiteIDs = this.roomManager.cSiteCoords.get(packXYAsCoord(x, y))
     if (!cSiteIDs) return false
 
     for (const ID of cSiteIDs) {
@@ -2169,7 +2168,7 @@ Room.prototype.findStructureInsideRect = function <T extends Structure>(
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
+            const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
             if (!structureIDs) continue
 
             structureID = structureIDs.find(structureID => {
@@ -2196,7 +2195,7 @@ Room.prototype.findStructureInRange = function <T extends Structure>(
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            const structureIDs = this.structureCoords.get(packXYAsCoord(x, y))
+            const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
             if (!structureIDs) continue
 
             structureID = structureIDs.find(structureID => {

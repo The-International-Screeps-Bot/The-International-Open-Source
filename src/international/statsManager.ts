@@ -291,7 +291,7 @@ export class StatsManager {
             globalCommuneStats[RoomStatNamesEnum.TotalCreepCount] = room.creepsFromRoomAmount
             globalCommuneStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
 
-            const spawns = room.structures.spawn
+            const spawns = room.roomManager.structures.spawn
             if (spawns.length > 0)
                 globalCommuneStats.su =
                     spawns.reduce(

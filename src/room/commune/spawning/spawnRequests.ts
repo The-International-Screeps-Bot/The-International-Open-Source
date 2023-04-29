@@ -258,7 +258,7 @@ export class SpawnRequestsManager {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 if (this.communeManager.room.controller.level < 6) return false
-                if (!this.communeManager.room.structures.extractor.length) return false
+                if (!this.communeManager.room.roomManager.structures.extractor.length) return false
                 if (!this.communeManager.room.mineralContainer) return false
                 if (!this.communeManager.room.storage) return false
                 if (this.communeManager.room.resourcesInStoringStructures.energy < 40000) return false
@@ -294,7 +294,8 @@ export class SpawnRequestsManager {
                 // There is no hubLink and another link, or no terminal
 
                 if (
-                    (!this.communeManager.room.hubLink || this.communeManager.room.structures.link.length < 2) &&
+                    (!this.communeManager.room.hubLink ||
+                        this.communeManager.room.roomManager.structures.link.length < 2) &&
                     (!this.communeManager.room.terminal || !this.communeManager.room.terminal.RCLActionable)
                 )
                     return false
@@ -375,7 +376,7 @@ export class SpawnRequestsManager {
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
                         requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
-                        if (!this.communeManager.room.structures.tower.length) {
+                        if (!this.communeManager.room.roomManager.structures.tower.length) {
                             requiredStrength +=
                                 this.communeManager.room.totalEnemyCombatStrength.melee +
                                 this.communeManager.room.totalEnemyCombatStrength.ranged
@@ -436,7 +437,7 @@ export class SpawnRequestsManager {
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
                         requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
-                        if (!this.communeManager.room.structures.tower.length) {
+                        if (!this.communeManager.room.roomManager.structures.tower.length) {
                             requiredStrength +=
                                 this.communeManager.room.totalEnemyCombatStrength.melee +
                                 this.communeManager.room.totalEnemyCombatStrength.ranged
@@ -1385,7 +1386,7 @@ export class SpawnRequestsManager {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 let minCreeps: number
-                if (this.communeManager.room.structures.observer.length) minCreeps = 1
+                if (this.communeManager.room.roomManager.structures.observer.length) minCreeps = 1
                 else minCreeps = 2
 
                 return {

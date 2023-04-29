@@ -10,7 +10,7 @@ export class NukerManager {
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
-        this.nuker = this.communeManager.room.structures.nuker[0]
+        this.nuker = this.communeManager.room.roomManager.structures.nuker[0]
     }
 
     run() {

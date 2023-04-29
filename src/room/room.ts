@@ -527,7 +527,7 @@ export class RoomManager {
 
         const roomType = this.room.memory[RoomMemoryKeys.type]
         if (roomType === RoomTypes.commune) {
-            const structures = this.room.structures
+            const structures = this.structures
             const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(
                 structures.road,
             )
@@ -697,7 +697,7 @@ export class RoomManager {
         }
 
         const searchAnchor = new RoomPosition(Math.floor(totalX / count), Math.floor(totalY / count), this.room.name)
-        const cSites = this.room.cSites
+        const cSites = this.cSites
 
         // Loop through structuretypes of the build priority
 

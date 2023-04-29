@@ -137,7 +137,7 @@ export class RoomVisualsManager {
     private spawnVisuals() {
         // Get the spawns in the room
 
-        const spawns = this.roomManager.room.structures.spawn
+        const spawns = this.roomManager.room.roomManager.structures.spawn
 
         // Loop through them
 
@@ -626,7 +626,6 @@ export class RoomVisualsManager {
     }
 
     statDataVisuals(y: number) {
-
         const headers: any[] = [
             'estimatedIncome',
             'CHarvest',
@@ -688,15 +687,7 @@ export class RoomVisualsManager {
     requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
-        const headers: any[] = [
-            'room',
-            'sourceIndex',
-            'efficacy',
-            'harvester',
-            'hauler',
-            'reserver',
-            'abandoned',
-        ]
+        const headers: any[] = ['room', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']
         const data: any[][] = []
 
         for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {
@@ -709,7 +700,8 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            if (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex]) row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
+            if (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
+                row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
             else row.push('undefined')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])

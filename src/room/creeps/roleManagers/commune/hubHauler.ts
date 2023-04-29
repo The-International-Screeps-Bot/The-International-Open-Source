@@ -76,7 +76,7 @@ export class HubHauler extends Creep {
     factoryEnergyOverfillTransfer?(): boolean {
         const { room } = this
         const { storage } = room
-        const factory = room.structures.factory[0]
+        const factory = room.roomManager.structures.factory[0]
 
         if (!storage || !factory) return false
 
@@ -288,7 +288,7 @@ export class HubHauler extends Creep {
         const { storage } = room
         const { terminal } = room
 
-        const factory = room.structures.factory[0]
+        const factory = room.roomManager.structures.factory[0]
         if (!factory) return false
 
         for (let resource in factory.store) {
@@ -365,7 +365,7 @@ export class HubHauler extends Creep {
 
         if (!storage && !terminal) return false
 
-        const factory = room.structures.factory[0]
+        const factory = room.roomManager.structures.factory[0]
         if (!factory) return false
 
         // If there is not enough free store in the factory
@@ -429,7 +429,7 @@ export class HubHauler extends Creep {
      */
     reservePowerSpawnTransferPower?(): boolean {
         const { room } = this
-        const powerSpawn = room.structures.powerSpawn[0]
+        const powerSpawn = room.roomManager.structures.powerSpawn[0]
         const resource = RESOURCE_POWER
 
         if (!powerSpawn) return false
@@ -471,7 +471,7 @@ export class HubHauler extends Creep {
      */
     reservePowerSpawnTransferEnergy?(): boolean {
         const { room } = this
-        const powerSpawn = room.structures.powerSpawn[0]
+        const powerSpawn = room.roomManager.structures.powerSpawn[0]
         const resource = RESOURCE_ENERGY
 
         if (!powerSpawn) return false

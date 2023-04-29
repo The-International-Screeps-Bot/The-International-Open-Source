@@ -26,7 +26,7 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const towers = this.communeManager.room.structures.tower.filter(tower => tower.RCLActionable)
+        const towers = this.communeManager.room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
             this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
             return
@@ -139,7 +139,6 @@ export class TowerManager {
      * Maybe we can mess up healing
      */
     scatterShot() {
-
         if (this.actionableTowerIDs.length <= 1) return
         if (!randomTick(200)) return
 
@@ -231,8 +230,8 @@ export class TowerManager {
     }
 
     findGeneralRepairTargets() {
-        let structures: Structure[] = this.communeManager.room.structures.spawn
-        structures = structures.concat(this.communeManager.room.structures.tower)
+        let structures: Structure[] = this.communeManager.room.roomManager.structures.spawn
+        structures = structures.concat(this.communeManager.room.roomManager.structures.tower)
 
         return structures
     }
@@ -262,13 +261,13 @@ export class TowerManager {
     private createPowerTasks() {
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
-        for (const tower of this.communeManager.room.structures.tower) {
+        for (const tower of this.communeManager.room.roomManager.structures.tower) {
             this.communeManager.room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
         }
     }
 
     private createRoomLogisticsRequests() {
-        for (const structure of this.communeManager.room.structures.tower) {
+        for (const structure of this.communeManager.room.roomManager.structures.tower) {
             // If don't have enough energy, request more
 
             if (structure.usedReserveStore < structure.store.getCapacity(RESOURCE_ENERGY) * 0.8) {
@@ -282,9 +281,7 @@ export class TowerManager {
 
             // If there are no attackers and the tower has some energy, make offer request
 
-            if (
-                structure.usedReserveStore > structure.store.getCapacity(RESOURCE_ENERGY) * 0.5
-            ) {
+            if (structure.usedReserveStore > structure.store.getCapacity(RESOURCE_ENERGY) * 0.5) {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
                     maxAmount: structure.usedReserveStore - 100,

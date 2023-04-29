@@ -25,7 +25,7 @@ export class FactoryManager {
     }
 
     run() {
-        this.factory = this.commune.room.structures.factory[0]
+        this.factory = this.commune.room.roomManager.structures.factory[0]
 
         if (!this.factory) return
         if (this.factory.cooldown > 0) return

@@ -16,7 +16,7 @@ export class WorkRequestManager {
 
         // create a workRequest if needed
 
-        if (room.structures.spawn.length) return
+        if (room.roomManager.structures.spawn.length) return
 
         let request = Memory.workRequests[room.name]
         if (request) {
@@ -48,7 +48,7 @@ export class WorkRequestManager {
             return
         }
 
-        if (!room.structures.spawn.length) {
+        if (!room.roomManager.structures.spawn.length) {
             this.stopResponse(true)
             return
         }
@@ -88,14 +88,17 @@ export class WorkRequestManager {
 
         // If there is a spawn and we own it
 
-        if (requestRoom.structures.spawn.length && requestRoom.structures.spawn.find(spawn => spawn.my)) {
+        if (
+            requestRoom.roomManager.structures.spawn.length &&
+            requestRoom.roomManager.structures.spawn.find(spawn => spawn.my)
+        ) {
             this.delete()
             return
         }
 
         // If there is an invader core
 
-        const invaderCores = requestRoom.structures.invaderCore
+        const invaderCores = requestRoom.roomManager.structures.invaderCore
         if (invaderCores.length) {
             // Abandon for the core's remaining existance plus the estimated reservation time
 
@@ -104,9 +107,9 @@ export class WorkRequestManager {
         }
 
         if (request[WorkRequestKeys.forAlly]) {
-            request[WorkRequestKeys.allyVanguard] = requestRoom.structures.spawn.length ? 0 : 20
+            request[WorkRequestKeys.allyVanguard] = requestRoom.roomManager.structures.spawn.length ? 0 : 20
         } else {
-            request[WorkRequestKeys.vanguard] = requestRoom.structures.spawn.length ? 0 : 20
+            request[WorkRequestKeys.vanguard] = requestRoom.roomManager.structures.spawn.length ? 0 : 20
         }
 
         /*

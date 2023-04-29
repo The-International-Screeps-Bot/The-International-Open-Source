@@ -74,8 +74,10 @@ export class ConstructionManager {
         this.placeBase(RCL, maxCSites)
     }
     private placeRamparts(RCL: number, maxCSites: number) {
-
-        const placeMincut = ((this.room.storage && this.room.controller.level >= 4) || (this.room.terminal && this.room.controller.level >= 6)) && this.room.resourcesInStoringStructures.energy > 20000
+        const placeMincut =
+            ((this.room.storage && this.room.controller.level >= 4) ||
+                (this.room.terminal && this.room.controller.level >= 6)) &&
+            this.room.resourcesInStoringStructures.energy > 20000
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const packedCoord in rampartPlans.map) {
@@ -88,14 +90,10 @@ export class ConstructionManager {
             if (this.room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART))
                 continue
             if (data.coversStructure) {
-
                 if (!this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) continue
-            }
-            else if (!placeMincut) {
-
+            } else if (!placeMincut) {
                 continue
             }
-
 
             if (data.buildForNuke) {
                 if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
@@ -106,10 +104,7 @@ export class ConstructionManager {
             }
 
             if (data.buildForThreat) {
-                if (
-                    !this.communeManager.needsSecondMincutLayer
-                )
-                    continue
+                if (!this.communeManager.needsSecondMincutLayer) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
                 this.placedSites += 1
@@ -139,7 +134,7 @@ export class ConstructionManager {
                     if (data.minRCL > RCL) continue
                     if (data.minRCL > placeRCL) break
 
-                    const structureIDs = this.room.structureCoords.get(packCoord(coord))
+                    const structureIDs = this.room.roomManager.structureCoords.get(packCoord(coord))
                     if (structureIDs) {
                         let skip = false
 
@@ -215,7 +210,7 @@ export class ConstructionManager {
         if (!Memory.structureMigration) return
         if (!randomTick(100)) return
 
-        const structures = this.room.structures
+        const structures = this.room.roomManager.structures
         const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
         for (const structureType of generalMigrationStructures) {

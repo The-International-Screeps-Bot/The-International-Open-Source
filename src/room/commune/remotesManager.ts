@@ -139,8 +139,8 @@ export class RemotesManager {
                 // If the controller is not reserved or is by us
                 else remoteMemory[RoomMemoryKeys.enemyReserved] = false
 
-                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] = remote.structures.invaderCore.length * 8
-                remoteMemory[RoomMemoryKeys.invaderCore] = remote.structures.invaderCore.length
+                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] = remote.roomManager.structures.invaderCore.length * 8
+                remoteMemory[RoomMemoryKeys.invaderCore] = remote.roomManager.structures.invaderCore.length
 
                 // Create need if there are any structures that need to be removed
 
@@ -178,7 +178,6 @@ export class RemotesManager {
                 sourceIndex < remoteMemory[RoomMemoryKeys.remoteSourcePaths].length;
                 sourceIndex += 1
             ) {
-
                 if (remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] === 0) continue
 
                 const income = Math.min(

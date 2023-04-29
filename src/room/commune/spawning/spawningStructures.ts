@@ -1,4 +1,10 @@
-import { CreepMemoryKeys, customColors, offsetsByDirection, partsByPriority, partsByPriorityPartType } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    customColors,
+    offsetsByDirection,
+    partsByPriority,
+    partsByPriorityPartType,
+} from 'international/constants'
 import { internationalManager } from 'international/international'
 import { globalStatsUpdater } from 'international/statsManager'
 import { customLog, getRange, newID } from 'international/utils'
@@ -24,7 +30,7 @@ export class SpawningStructuresManager {
      * Assign spawnIDs to creeps
      */
     public organizeSpawns() {
-        const spawns = this.communeManager.room.structures.spawn
+        const spawns = this.communeManager.room.roomManager.structures.spawn
         if (!spawns.length) return
 
         // Find spawns that are and aren't spawning
@@ -33,7 +39,6 @@ export class SpawningStructuresManager {
         this.activeSpawns = []
 
         for (const spawn of spawns) {
-
             if (spawn.renewed) continue
             if (!spawn.RCLActionable) continue
 
@@ -42,8 +47,11 @@ export class SpawningStructuresManager {
                 creep.manageSpawning(spawn)
                 creep.spawnID = spawn.id
 
-                if (spawn.spawning.remainingTime <= 2 && creep.memory[CreepMemoryKeys.path] && creep.memory[CreepMemoryKeys.path].length) {
-
+                if (
+                    spawn.spawning.remainingTime <= 2 &&
+                    creep.memory[CreepMemoryKeys.path] &&
+                    creep.memory[CreepMemoryKeys.path].length
+                ) {
                     creep.assignMoveRequest(unpackPosAt(creep.memory[CreepMemoryKeys.path]))
                 }
 
@@ -61,7 +69,7 @@ export class SpawningStructuresManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        if (!this.communeManager.room.structures.spawn.length) return
+        if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
         this.runSpawning()
         this.test()
@@ -676,5 +684,5 @@ export class SpawningStructuresManager {
         }
     }
 
-    private testRequests() { }
+    private testRequests() {}
 }

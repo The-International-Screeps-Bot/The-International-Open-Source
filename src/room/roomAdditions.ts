@@ -114,167 +114,6 @@ const roomAdditions = {
             }))
         },
     },
-    structureUpdate: {
-        get() {
-            if (this._structureUpdate !== undefined) return this._structureUpdate
-
-            let newAllStructures: Structure[]
-
-            if (this.global.allStructureIDs) {
-                newAllStructures = this.find(FIND_STRUCTURES)
-
-                if (newAllStructures.length === this.global.allStructureIDs.length) {
-                    const allStructures: Structure[] = []
-                    let change: true | undefined
-
-                    for (const ID of this.global.allStructureIDs) {
-                        const structure = findObjectWithID(ID)
-                        if (!structure) {
-                            change = true
-                            break
-                        }
-
-                        allStructures.push(structure)
-                    }
-
-                    if (!change && allStructures.length === this.global.allStructureIDs.length) {
-                        return (this._structureUpdate = false)
-                    }
-                }
-            }
-
-            // Structures have been built, destroyed or aren't yet initialized
-
-            if (!newAllStructures) newAllStructures = this.find(FIND_STRUCTURES)
-            const newAllStructureIDs: Id<Structure>[] = []
-
-            for (const structure of newAllStructures) {
-                newAllStructureIDs.push(structure.id)
-            }
-
-            this.global.allStructureIDs = newAllStructureIDs
-            return (this._structureUpdate = true)
-        },
-    },
-    structureCoords: {
-        get() {
-            if (this.global.structureCoords && !this.structureUpdate) return this.global.structureCoords
-
-            // Construct storage of structures based on structureType
-
-            this.global.structureCoords = new Map()
-
-            // Group structures by structureType
-
-            for (const structure of this.find(FIND_STRUCTURES)) {
-                const packedCoord = packCoord(structure.pos)
-
-                const coordStructureIDs = this.global.structureCoords.get(packedCoord)
-                if (!coordStructureIDs) {
-                    this.global.structureCoords.set(packedCoord, [structure.id])
-                    continue
-                }
-                coordStructureIDs.push(structure.id)
-            }
-
-            return this.global.structureCoords
-        },
-    },
-    structures: {
-        get() {
-            if (this._structures) return this._structures
-
-            this._structures = {}
-            for (const structureType of allStructureTypes) this._structures[structureType] = []
-
-            // Group structures by structureType
-
-            for (const structure of this.find(FIND_STRUCTURES))
-                this._structures[structure.structureType].push(structure as any)
-
-            return this._structures
-        },
-    },
-    allCSites: {
-        get() {
-            if (this._cSiteUpdate !== undefined) return this._cSiteUpdate
-
-            let newAllCSites: ConstructionSite[]
-
-            if (this.global.allCSiteIDs) {
-                newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
-
-                if (newAllCSites.length === this.global.allCSiteIDs.length) {
-                    const allCSites: ConstructionSite[] = []
-                    let change: true | undefined
-
-                    for (const ID of this.global.allCSiteIDs) {
-                        const cSite = findObjectWithID(ID)
-                        if (!cSite) {
-                            change = true
-                            break
-                        }
-
-                        allCSites.push(cSite)
-                    }
-
-                    if (!change && allCSites.length === this.global.allCSiteIDs.length) {
-                        return (this._cSiteUpdate = false)
-                    }
-                }
-            }
-
-            // Structures have been built, destroyed or aren't yet initialized
-
-            if (!newAllCSites) newAllCSites = this.find(FIND_CONSTRUCTION_SITES)
-            const newAllStructureIDs: Id<ConstructionSite>[] = []
-
-            for (const cSite of newAllCSites) {
-                newAllStructureIDs.push(cSite.id)
-            }
-
-            this.global.allCSiteIDs = newAllStructureIDs
-            return (this._cSiteUpdate = true)
-        },
-    },
-    cSiteCoords: {
-        get() {
-            if (this.global.cSiteCoords && !this.cSiteUpdate) return this.global.cSiteCoords
-
-            // Construct storage of structures based on structureType
-
-            this.global.cSiteCoords = new Map()
-
-            // Group structures by structureType
-
-            for (const cSite of this.find(FIND_CONSTRUCTION_SITES)) {
-                const packedCoord = packCoord(cSite.pos)
-
-                const coordStructureIDs = this.global.cSiteCoords.get(packedCoord)
-                if (!coordStructureIDs) {
-                    this.global.cSiteCoords.set(packedCoord, [cSite.id])
-                    continue
-                }
-                coordStructureIDs.push(cSite.id)
-            }
-
-            return this.global.cSiteCoords
-        },
-    },
-    cSites: {
-        get() {
-            if (this._cSites) return this._cSites
-
-            this._cSites = {}
-            for (const structureType of allStructureTypes) this._cSites[structureType] = []
-
-            // Group structures by structureType
-
-            for (const cSite of this.find(FIND_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
-
-            return this._cSites
-        },
-    },
     enemyCSites: {
         get() {
             if (this._enemyCSites) return this._enemyCSites
@@ -319,9 +158,10 @@ const roomAdditions = {
             const anchor = this.roomManager.anchor
             if (!anchor) throw Error('No anchor for spawning structures ' + this.name)
 
-            this._spawningStructures = [...this.structures.spawn, ...this.structures.extension].filter(
-                structure => structure.RCLActionable,
-            )
+            this._spawningStructures = [
+                ...this.roomManager.structures.spawn,
+                ...this.roomManager.structures.extension,
+            ].filter(structure => structure.RCLActionable)
 
             return this._spawningStructures
         },
@@ -474,15 +314,17 @@ const roomAdditions = {
                     return this._combatStructureTargets
             }
 
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.spawn)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.tower)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.extension)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.storage)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.terminal)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.powerSpawn)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.factory)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.nuker)
-            this._combatStructureTargets = this._combatStructureTargets.concat(this.structures.observer)
+            const structures = this.roomManager.structures
+
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.spawn)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.tower)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.extension)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.storage)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.terminal)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.powerSpawn)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.factory)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.nuker)
+            this._combatStructureTargets = this._combatStructureTargets.concat(structures.observer)
 
             return this._combatStructureTargets
         },
@@ -610,7 +452,7 @@ const roomAdditions = {
                 // Check coords around the fast filler pos for relevant structures
 
                 for (const coord of adjacentCoords) {
-                    const structuresAtCoord = this.structureCoords.get(packCoord(coord))
+                    const structuresAtCoord = this.roomManager.structureCoords.get(packCoord(coord))
                     if (!structuresAtCoord) continue
 
                     for (const ID of structuresAtCoord) {
@@ -954,7 +796,7 @@ const roomAdditions = {
         get() {
             if (this._actionableWalls) return this._actionableWalls
 
-            return (this._actionableWalls = this.structures.constructedWall.filter(function (structure) {
+            return (this._actionableWalls = this.roomManager.structures.constructedWall.filter(function (structure) {
                 return structure.hits
             }))
         },
@@ -967,7 +809,7 @@ const roomAdditions = {
             this._quadCostMatrix = new PathFinder.CostMatrix()
 
             const roadCoords = new Set()
-            for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
+            for (const road of this.roomManager.structures.road) roadCoords.add(packCoord(road.pos))
 
             // Avoid not my creeps
 
@@ -978,7 +820,7 @@ const roomAdditions = {
 
             // Avoid impassible structures
 
-            for (const rampart of this.structures.rampart) {
+            for (const rampart of this.roomManager.structures.rampart) {
                 // If the rampart is mine
 
                 if (rampart.my) continue
@@ -995,13 +837,13 @@ const roomAdditions = {
             // Loop through structureTypes of impassibleStructureTypes
 
             for (const structureType of impassibleStructureTypes) {
-                for (const structure of this.structures[structureType]) {
+                for (const structure of this.roomManager.structures[structureType]) {
                     // Set pos as impassible
 
                     terrainCoords[packAsNum(structure.pos)] = 255
                 }
 
-                for (const cSite of this.cSites[structureType]) {
+                for (const cSite of this.roomManager.cSites[structureType]) {
                     // Set pos as impassible
 
                     terrainCoords[packAsNum(cSite.pos)] = 255
@@ -1010,7 +852,7 @@ const roomAdditions = {
 
             //
 
-            for (const portal of this.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
+            for (const portal of this.roomManager.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
 
             // Loop trough each construction site belonging to an ally
 
@@ -1123,7 +965,7 @@ const roomAdditions = {
             this._quadBulldozeCostMatrix = new PathFinder.CostMatrix()
 
             const roadCoords = new Set()
-            for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
+            for (const road of this.roomManager.structures.road) roadCoords.add(packCoord(road.pos))
 
             // Avoid not my creeps
             /*
@@ -1134,7 +976,7 @@ const roomAdditions = {
  */
             // Avoid impassible structures
 
-            for (const rampart of this.structures.rampart) {
+            for (const rampart of this.roomManager.structures.rampart) {
                 // If the rampart is mine
 
                 if (rampart.my) continue
@@ -1147,11 +989,11 @@ const roomAdditions = {
             // Loop through structureTypes of impassibleStructureTypes
 
             for (const structureType of impassibleStructureTypes) {
-                for (const structure of this.structures[structureType]) {
+                for (const structure of this.roomManager.structures[structureType]) {
                     terrainCoords[packAsNum(structure.pos)] = 10 /* structure.hits / (structure.hitsMax / 10) */
                 }
 
-                for (const cSite of this.cSites[structureType]) {
+                for (const cSite of this.roomManager.cSites[structureType]) {
                     // Set pos as impassible
 
                     terrainCoords[packAsNum(cSite.pos)] = 255
@@ -1160,7 +1002,7 @@ const roomAdditions = {
 
             //
 
-            for (const portal of this.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
+            for (const portal of this.roomManager.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
 
             // Loop trough each construction site belonging to an ally
 
@@ -1269,7 +1111,7 @@ const roomAdditions = {
         get() {
             if (this._enemyDamageThreat !== undefined) return this._enemyDamageThreat
 
-            if (this.controller && !this.controller.my && this.structures.tower.length)
+            if (this.controller && !this.controller.my && this.roomManager.structures.tower.length)
                 return (this._enemyDamageThreat = true)
 
             for (const enemyAttacker of this.enemyAttackers) {
@@ -1333,7 +1175,7 @@ const roomAdditions = {
                 for (const coord of coords) this._enemyThreatCoords.add(packCoord(coord))
             }
 
-            for (const rampart of this.structures.rampart) {
+            for (const rampart of this.roomManager.structures.rampart) {
                 if (!rampart.my) continue
                 if (rampart.hits < 3000) continue
 
@@ -1393,28 +1235,28 @@ const roomAdditions = {
         get() {
             if (this._factory !== undefined) return this._factory
 
-            return (this._factory = this.structures.factory[0])
+            return (this._factory = this.roomManager.structures.factory[0])
         },
     },
     powerSpawn: {
         get() {
             if (this._powerSpawn !== undefined) return this._powerSpawn
 
-            return (this._powerSpawn = this.structures.powerSpawn[0])
+            return (this._powerSpawn = this.roomManager.structures.powerSpawn[0])
         },
     },
     nuker: {
         get() {
             if (this._nuker !== undefined) return this._nuker
 
-            return (this._nuker = this.structures.nuker[0])
+            return (this._nuker = this.roomManager.structures.nuker[0])
         },
     },
     observer: {
         get() {
             if (this._observer !== undefined) return this._observer
 
-            return (this._observer = this.structures.observer[0])
+            return (this._observer = this.roomManager.structures.observer[0])
         },
     },
     resourcesInStoringStructures: {
@@ -1524,7 +1366,7 @@ const roomAdditions = {
  */
             const cm = new PathFinder.CostMatrix()
 
-            for (const road of this.structures.road) cm.set(road.pos.x, road.pos.y, 1)
+            for (const road of this.roomManager.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
             for (const packedCoord of this.usedSourceHarvestCoords) {
                 const coord = unpackCoord(packedCoord)
@@ -1555,7 +1397,7 @@ const roomAdditions = {
                 }
             }
 
-            for (const portal of this.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+            for (const portal of this.roomManager.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
 
             // Loop trough each construction site belonging to an ally
 
@@ -1577,7 +1419,7 @@ const roomAdditions = {
                 for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
             }
 
-            for (const rampart of this.structures.rampart) {
+            for (const rampart of this.roomManager.structures.rampart) {
                 // If the rampart is mine
 
                 if (rampart.my) continue
@@ -1595,13 +1437,13 @@ const roomAdditions = {
             // Loop through structureTypes of impassibleStructureTypes
 
             for (const structureType of impassibleStructureTypes) {
-                for (const structure of this.structures[structureType]) {
+                for (const structure of this.roomManager.structures[structureType]) {
                     // Set pos as impassible
 
                     cm.set(structure.pos.x, structure.pos.y, 255)
                 }
 
-                for (const cSite of this.cSites[structureType]) {
+                for (const cSite of this.roomManager.cSites[structureType]) {
                     // Set pos as impassible
 
                     cm.set(cSite.pos.x, cSite.pos.y, 255)

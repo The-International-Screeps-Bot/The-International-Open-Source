@@ -36,7 +36,7 @@ export class HaulerSizeManager {
                 Math.max(Math.pow(avgCPUUsagePercent, 1.3) - 0.4, 0) *
                     Math.min(this.communeManager.room.energyCapacityAvailable / BODYPART_COST.move, MAX_CREEP_SIZE),
             ) +
-                this.communeManager.room.structures.spawn.length * 2) *
+                this.communeManager.room.roomManager.structures.spawn.length * 2) *
             BODYPART_COST[CARRY]
 
         let diff

@@ -1,4 +1,10 @@
-import { minerals, RESULT_ACTION, RESULT_NO_ACTION, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
+import {
+    minerals,
+    RESULT_ACTION,
+    RESULT_NO_ACTION,
+    RoomMemoryKeys,
+    terminalResourceTargets,
+} from 'international/constants'
 import { customLog, findLargestTransactionAmount, newID, roundToDecimals } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequest, AllyRequestTypes } from 'international/simpleAllies'
@@ -345,7 +351,7 @@ export class TerminalManager {
         return (
             (room.terminal.store[resource] || 0) +
             (room.storage.store[resource] || 0) +
-            (room.structures.factory ? room.structures.factory[0].store[resource] || 0 : 0)
+            (room.roomManager.structures.factory ? room.roomManager.structures.factory[0].store[resource] || 0 : 0)
         )
     }
 

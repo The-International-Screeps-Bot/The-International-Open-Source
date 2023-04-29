@@ -71,8 +71,8 @@ export class Vanguard extends Creep {
     }
 
     repairRampart?() {
-        if (this.room.cSites.rampart.length) {
-            const cSite = this.room.cSites.rampart[0]
+        if (this.room.roomManager.cSites.rampart.length) {
+            const cSite = this.room.roomManager.cSites.rampart[0]
 
             if (getRange(this.pos, cSite.pos) > 3) {
                 this.createMoveRequest({
@@ -87,7 +87,7 @@ export class Vanguard extends Creep {
             return true
         }
 
-        const rampartTarget = this.room.structures.rampart.find(rampart => rampart.hits < 20000)
+        const rampartTarget = this.room.roomManager.structures.rampart.find(rampart => rampart.hits < 20000)
         if (!rampartTarget) return false
 
         if (getRange(this.pos, rampartTarget.pos) > 3) {

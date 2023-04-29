@@ -904,7 +904,7 @@ Creep.prototype.hasNonEnergyResource = function () {
 Creep.prototype.findRecycleTarget = function () {
     const { room } = this
 
-    const spawns = room.structures.spawn.filter(spawn => spawn.RCLActionable)
+    const spawns = room.roomManager.structures.spawn.filter(spawn => spawn.RCLActionable)
 
     if (!spawns.length) return false
 
@@ -967,7 +967,7 @@ Creep.prototype.advancedRecycle = function () {
     this.message = '♻️ C'
 
     if (range === 0) {
-        const spawn = findClosestObject(this.pos, room.structures.spawn)
+        const spawn = findClosestObject(this.pos, room.roomManager.structures.spawn)
 
         return spawn.recycleCreep(this) === OK
     }
@@ -996,7 +996,7 @@ Creep.prototype.activeRenew = function () {
     const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
     if (CREEP_LIFE_TIME - this.ticksToLive < Math.floor(600 / this.body.length)) return
 
-    const spawns = room.structures.spawn.filter(spawn => !spawn.renewed && !spawn.spawning)
+    const spawns = room.roomManager.structures.spawn.filter(spawn => !spawn.renewed && !spawn.spawning)
     if (!spawns.length) return
 
     const spawn = findClosestObject(this.pos, spawns)
@@ -1032,7 +1032,7 @@ Creep.prototype.passiveRenew = function () {
 
     // Get the room's spawns, stopping if there are none
 
-    const spawns = room.structures.spawn
+    const spawns = room.roomManager.structures.spawn
 
     // Get a spawn in range of 1, informing false if there are none
 

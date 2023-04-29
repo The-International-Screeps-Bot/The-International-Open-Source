@@ -93,7 +93,7 @@ export class CombatManager {
 
             if (!(attackTarget instanceof Structure)) continue
 
-            const structuresAtCoord = room.structureCoords.get(packCoord(attackTarget.pos))
+            const structuresAtCoord = room.roomManager.structureCoords.get(packCoord(attackTarget.pos))
             if (
                 structuresAtCoord &&
                 structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)
@@ -128,7 +128,7 @@ export class CombatManager {
 
             let intents = 0
 
-            for (const rampart of room.structures.rampart) {
+            for (const rampart of room.roomManager.structures.rampart) {
                 if (intents >= 10) return
 
                 // If the rampart is public
@@ -146,7 +146,7 @@ export class CombatManager {
 
         // If there are enemyAttackers, privitize all ramparts that are public
 
-        for (const rampart of room.structures.rampart) if (rampart.isPublic) rampart.setPublic(false)
+        for (const rampart of room.roomManager.structures.rampart) if (rampart.isPublic) rampart.setPublic(false)
     }
 
     private assignDefenceTargets() {

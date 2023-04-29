@@ -20,7 +20,7 @@ export class HaulRequestManager {
 
             if (
                 !request ||
-                !room.structures.spawn.length ||
+                !room.roomManager.structures.spawn.length ||
                 room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy
             ) {
                 this.communeManager.room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)

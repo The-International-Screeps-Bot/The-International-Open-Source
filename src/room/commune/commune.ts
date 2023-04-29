@@ -310,7 +310,6 @@ export class CommuneManager {
     }
 
     private test() {
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -407,18 +406,23 @@ export class CommuneManager {
 
     _storedEnergyBuildThreshold: number
     get storedEnergyBuildThreshold() {
-
-        this._storedEnergyBuildThreshold = Math.floor(Math.min(1000 + findLowestScore(
-            this.room.find(FIND_MY_CONSTRUCTION_SITES),
-            cSite => cSite.progressTotal - cSite.progress,
-        ) * 10, this.minStoredEnergy * 1.2))
+        this._storedEnergyBuildThreshold = Math.floor(
+            Math.min(
+                1000 +
+                    findLowestScore(
+                        this.room.find(FIND_MY_CONSTRUCTION_SITES),
+                        cSite => cSite.progressTotal - cSite.progress,
+                    ) *
+                        10,
+                this.minStoredEnergy * 1.2,
+            ),
+        )
 
         return this._storedEnergyBuildThreshold
     }
 
     get rampartsMaintenanceCost() {
-
-        return roundToDecimals(this.room.structures.rampart.length * rampartUpkeepCost, 2)
+        return roundToDecimals(this.room.roomManager.structures.rampart.length * rampartUpkeepCost, 2)
     }
 
     _minRampartHits: number
@@ -633,7 +637,7 @@ export class CommuneManager {
 
         const minCutCoords = new Set(stampAnchors.minCutRampart.map(coord => packCoord(coord)))
 
-        for (const structure of this.room.structures.rampart) {
+        for (const structure of this.room.roomManager.structures.rampart) {
             if (!minCutCoords.has(packCoord(structure.pos))) continue
 
             ramparts.push(structure)
@@ -647,7 +651,7 @@ export class CommuneManager {
         const rampartRepairTargets: StructureRampart[] = []
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
-        for (const structure of this.room.structures.rampart) {
+        for (const structure of this.room.roomManager.structures.rampart) {
             const data = rampartPlans.map[packCoord(structure.pos)]
             if (!data) continue
 

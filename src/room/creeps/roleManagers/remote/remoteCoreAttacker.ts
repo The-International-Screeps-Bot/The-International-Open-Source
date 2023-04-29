@@ -92,11 +92,11 @@ export class RemoteCoreAttacker extends Creep {
 
         // If there are no cores
 
-        if (!room.structures.invaderCore.length) return false
+        if (!room.roomManager.structures.invaderCore.length) return false
 
         // Find the closest core
 
-        const closestCore = room.structures.invaderCore[0]
+        const closestCore = room.roomManager.structures.invaderCore[0]
 
         // If the creep at the core
 

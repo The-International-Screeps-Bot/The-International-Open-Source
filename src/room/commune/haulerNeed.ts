@@ -18,14 +18,15 @@ export class HaulerNeedManager {
             room.memory[RoomMemoryKeys.mineralPath].length / packedPosLength + 3,
             room.mineralHarvestStrength * 1.1,
         )
-        room.haulerNeed += room.structures.lab.length
+        room.haulerNeed += room.roomManager.structures.lab.length
 
-        const extensions = room.structures.extension.length - stamps.fastFiller.structures.extension.length
+        const extensions =
+            room.roomManager.structures.extension.length - stamps.fastFiller.structures.extension.length
         if (extensions > 0) {
-            room.structures.extension.length / (room.towerInferiority ? 1.5 : 4)
+            room.roomManager.structures.extension.length / (room.towerInferiority ? 1.5 : 4)
         }
 
-        /* room.haulerNeed += room.structures.extension.length / 10 */
+        /* room.haulerNeed += room.roomManager.structures.extension.length / 10 */
 
         if ((room.controller.level >= 4 && room.storage) || (room.terminal && room.controller.level >= 6)) {
             room.haulerNeed += Memory.stats.rooms[room.name].eosp / 10

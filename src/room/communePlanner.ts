@@ -1167,7 +1167,6 @@ export class CommunePlanner {
                 const packedCoord = packAsNum(coord)
 
                 if (this.minCutCoords.has(packedCoord)) {
-
                     this.roadCoords[packedCoord] = 0
                     continue
                 }
@@ -1191,10 +1190,8 @@ export class CommunePlanner {
             this.roadCoords[packedCoord] = 255
 
             for (const coord of this.sourceStructureCoords[i]) {
-
                 const packedCoord = packAsNum(coord)
                 if (this.minCutCoords.has(packedCoord)) {
-
                     this.roadCoords[packedCoord] = 0
                     continue
                 }
