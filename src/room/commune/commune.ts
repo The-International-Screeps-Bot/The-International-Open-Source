@@ -447,12 +447,12 @@ export class CommuneManager {
     get storingStructures() {
         if (this._storingStructures) return this._storingStructures
 
-        this._storingStructures = []
+        const storingStructures: (StructureStorage | StructureTerminal)[] = []
 
-        if (this.room.storage) this._storingStructures.push(this.room.storage)
-        if (this.room.terminal) this._storingStructures.push(this.room.terminal)
+        if (this.room.storage) storingStructures.push(this.room.storage)
+        if (this.room.terminal) storingStructures.push(this.room.terminal)
 
-        return this._storingStructures
+        return this._storingStructures = storingStructures
     }
 
     get storingStructuresCapacity() {

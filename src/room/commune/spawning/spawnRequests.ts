@@ -504,10 +504,7 @@ export class SpawnRequestsManager {
 
                 if (
                     !repairRamparts.length &&
-                    !repairTargets.length &&
-                    !this.communeManager.room.totalEnemyCombatStrength.melee &&
-                    !this.communeManager.room.totalEnemyCombatStrength.ranged &&
-                    !this.communeManager.room.totalEnemyCombatStrength.dismantle
+                    !repairTargets.length
                 )
                     return false
 

@@ -408,10 +408,12 @@ Creep.prototype.builderGetEnergy = function () {
     if (this.room.communeManager.buildersMakeRequests) return RESULT_SUCCESS
     if (!this.needsResources()) return RESULT_NO_ACTION
 
-    if (
-        (this.room.storage && this.room.controller.level >= 4) ||
-        (this.room.terminal && this.room.controller.level >= 6)
-    ) {
+    if (this.room.communeManager && this.room.communeManager.storingStructures.length) {
+        if (this.room.resourcesInStoringStructures.energy < 1000) {
+
+            return RESULT_NO_ACTION
+        }
+
         this.runRoomLogisticsRequestsAdvanced({
             types: new Set(['withdraw', 'offer', 'pickup']),
             resourceTypes: new Set([RESOURCE_ENERGY]),

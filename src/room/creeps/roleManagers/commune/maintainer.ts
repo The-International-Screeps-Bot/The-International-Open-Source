@@ -12,10 +12,24 @@ export class Maintainer extends Creep {
         this.avoidEnemyThreatCoords()
     }
 
+    hasSufficientStoredEnergy?() {
+
+        if (!this.room.communeManager.storingStructures.length) return true
+
+        if (this.room.resourcesInStoringStructures.energy < 1000) {
+
+            return false
+        }
+
+        return true
+    }
+
     advancedMaintain?(): boolean {
         const { room } = this
 
         if (this.needsResources()) {
+            if (!this.hasSufficientStoredEnergy()) return false
+
             delete this.memory[CreepMemoryKeys.structureTarget]
 
             this.runRoomLogisticsRequestsAdvanced({
