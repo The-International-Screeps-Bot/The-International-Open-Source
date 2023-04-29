@@ -1,5 +1,5 @@
 import { customColors, towerPowers } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import {
     customLog,
     estimateTowerDamage,
@@ -56,7 +56,7 @@ export class TowerManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'tmcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            updateStat(room.name, statName, cpuUsed)
         }
     }
 
@@ -219,7 +219,7 @@ export class TowerManager {
             const target = repairTargets[repairTargets.length - 1]
             if (tower.repair(target) !== OK) continue
 
-            globalStatsUpdater(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
+            updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
 
             repairTargets.pop()
 

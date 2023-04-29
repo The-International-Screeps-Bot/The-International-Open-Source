@@ -1,5 +1,5 @@
 import { CreepMemoryKeys, RESULT_FAIL, roomDimensions } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -13,11 +13,9 @@ export class Maintainer extends Creep {
     }
 
     hasSufficientStoredEnergy?() {
-
         if (!this.room.communeManager.storingStructures.length) return true
 
         if (this.room.resourcesInStoringStructures.energy < 1000) {
-
             return false
         }
 
@@ -82,10 +80,10 @@ export class Maintainer extends Creep {
         )
 
         if (repairTarget.structureType === STRUCTURE_RAMPART || repairTarget.structureType === STRUCTURE_WALL) {
-            globalStatsUpdater(this.room.name, 'eorwr', energySpentOnRepairs)
+            updateStat(this.room.name, 'eorwr', energySpentOnRepairs)
             this.message = `🧱${energySpentOnRepairs * REPAIR_POWER}`
         } else {
-            globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
+            updateStat(this.room.name, 'eoro', energySpentOnRepairs)
             this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
         }
 

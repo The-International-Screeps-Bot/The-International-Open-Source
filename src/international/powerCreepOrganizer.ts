@@ -4,7 +4,7 @@ import { customLog } from './utils'
 import { internationalManager, InternationalManager } from './international'
 import { packCoord } from 'other/codec'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
-import { globalStatsUpdater } from './statsManager'
+import { updateStat } from './statsManager'
 
 class PowerCreepOrganizer {
     constructor() {}
@@ -35,7 +35,7 @@ class PowerCreepOrganizer {
                 bgColor: customColors.lightBlue,
             })
             const statName: InternationalStatNames = 'pccu'
-            globalStatsUpdater('', statName, cpuUsed, true)
+            updateStat('', statName, cpuUsed, true)
         }
     }
 

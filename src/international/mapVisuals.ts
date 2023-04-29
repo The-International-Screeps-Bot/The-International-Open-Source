@@ -2,7 +2,7 @@ import { unpackPosAt, unpackPosList } from 'other/codec'
 import { customColors, WorkRequestKeys, RoomMemoryKeys, RoomTypes, roomDimensions, packedPosLength } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
-import { globalStatsUpdater } from './statsManager'
+import { updateStat } from './statsManager'
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled

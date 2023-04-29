@@ -2,7 +2,7 @@ import { WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys, RoomTypes, customCo
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 
 export class WorkRequestManager {
     communeManager: CommuneManager
@@ -145,7 +145,7 @@ export class WorkRequestManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'clrmcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            updateStat(room.name, statName, cpuUsed)
         }
     }
 

@@ -530,22 +530,26 @@ export class StatsManager {
 }
 
 export const statsManager = new StatsManager()
-export const globalStatsUpdater = function (
-    roomName: string,
-    name: string,
-    value: number,
-    nonRoomStat: boolean = false,
-) {
+
+export const updateStat = function (roomName: string, name: string, value: number, nonRoomStat: boolean = false) {
     if (nonRoomStat) {
         global.CPUUsers[name as InternationalStatNamesEnum] = value
         return
     }
+
+    if (!global.roomStats) return
+
     const roomStatName = name as RoomStatNames
     const updateStats = GetLevelOfStatName(roomStatName) > 0
-    if (updateStats && global.roomStats) {
-        if (global.roomStats[RoomTypes.commune][roomName])
-            (global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats)[roomStatName] += value
-        else if (global.roomStats[RoomTypes.remote][roomName])
-            (global.roomStats[RoomTypes.remote][roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
+
+    if (!updateStats) return
+
+    if (global.roomStats[RoomTypes.commune][roomName]) {
+
+        (global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats)[roomStatName] += value
+    }
+    else if (global.roomStats[RoomTypes.remote][roomName]) {
+
+        (global.roomStats[RoomTypes.remote][roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
     }
 }

@@ -9,7 +9,7 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import './roomVisuals'
 import { createPosMap, customLog } from 'international/utils'
-import { globalStatsUpdater, statsManager } from 'international/statsManager'
+import { updateStat, statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
@@ -44,7 +44,7 @@ export function roomsManager() {
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - roomCPUStart
             logMessage += `, CPU: ${cpuUsed.toFixed(2)}`
-            globalStatsUpdater(roomName, statName, cpuUsed)
+            updateStat(roomName, statName, cpuUsed)
         }
         customLog(room.name + ' ' + roomType, logMessage, {
             textColor: customColors.white,
@@ -65,6 +65,6 @@ export function roomsManager() {
             superPosition: 1,
         })
         const statName: InternationalStatNames = 'roomcu'
-        globalStatsUpdater('', statName, cpuUsed, true)
+        updateStat('', statName, cpuUsed, true)
     }
 }

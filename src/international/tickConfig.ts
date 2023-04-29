@@ -28,7 +28,7 @@ import {
     randomTick,
 } from './utils'
 import { internationalManager, InternationalManager } from './international'
-import { globalStatsUpdater, statsManager } from './statsManager'
+import { updateStat, statsManager } from './statsManager'
 import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
@@ -54,7 +54,7 @@ class TickConfig {
                 bgColor: customColors.lightBlue,
             })
             const statName: InternationalStatNames = 'tccu'
-            globalStatsUpdater('', statName, cpuUsed, true)
+            updateStat('', statName, cpuUsed, true)
         }
     }
 

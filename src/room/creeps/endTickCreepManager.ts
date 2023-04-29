@@ -1,5 +1,5 @@
 import { chant, customColors, powerCreepClassNames } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { customLog, randomRange, randomTick } from 'international/utils'
 import { RoomManager } from '../room'
 
@@ -55,7 +55,7 @@ export class EndTickCreepManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'etcmcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            updateStat(room.name, statName, cpuUsed)
         }
     }
 

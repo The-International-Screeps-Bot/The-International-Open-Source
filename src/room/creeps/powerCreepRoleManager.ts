@@ -1,5 +1,5 @@
 import { customColors, powerCreepClassNames } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { customLog } from 'international/utils'
 import { RoomManager } from 'room/room'
 import { Operator } from './powerCreeps/operator'
@@ -36,8 +36,8 @@ export class PowerCreepRoleManager {
             })
             const statName: RoomCommuneStatNames = 'prmcu'
             const statName2: RoomCommuneStatNames = 'prmpccu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
-            globalStatsUpdater(room.name, statName2, cpuUsed2)
+            updateStat(room.name, statName, cpuUsed)
+            updateStat(room.name, statName2, cpuUsed2)
         }
     }
 

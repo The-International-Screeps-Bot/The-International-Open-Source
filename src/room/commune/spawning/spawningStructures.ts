@@ -6,7 +6,7 @@ import {
     partsByPriorityPartType,
 } from 'international/constants'
 import { internationalManager } from 'international/international'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { customLog, getRange, newID } from 'international/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
@@ -81,7 +81,7 @@ export class SpawningStructuresManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'smcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            updateStat(room.name, statName, cpuUsed)
         }
     }
 
@@ -175,7 +175,7 @@ export class SpawningStructuresManager {
         // Record in stats the costs
 
         this.communeManager.nextSpawnEnergyAvailable -= request.cost
-        globalStatsUpdater(this.communeManager.room.name, 'eosp', request.cost)
+        updateStat(this.communeManager.room.name, 'eosp', request.cost)
 
         // Decrease the spawnIndex
 

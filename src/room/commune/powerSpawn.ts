@@ -1,4 +1,4 @@
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { CommuneManager } from './commune'
 import { customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
@@ -27,7 +27,7 @@ export class PowerSpawningStructuresManager {
 
         const result = this.powerSpawn.processPower()
 
-        if (result === OK) globalStatsUpdater(this.powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
+        if (result === OK) updateStat(this.powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
     }
 
     /**

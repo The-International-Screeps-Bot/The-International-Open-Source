@@ -53,7 +53,7 @@ import {
     unpackPosList,
 } from 'other/codec'
 import { creepClasses } from '../creepClasses'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { customFindPath } from 'international/customPathFinder'
 
 Creep.prototype.preTickManager = function () {}
@@ -196,7 +196,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
     this.nextStore.energy += energyHarvested
     this.commune.communeManager.estimatedEnergyIncome += energyHarvested
 
-    globalStatsUpdater(this.room.name, 'eih', energyHarvested)
+    updateStat(this.room.name, 'eih', energyHarvested)
 
     this.message = `⛏️` + energyHarvested
     return true
@@ -279,7 +279,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
-                globalStatsUpdater(this.room.name, 'eou', controlPoints)
+                updateStat(this.room.name, 'eou', controlPoints)
                 this.message += `🔋${controlPoints}`
             }
         }
@@ -308,7 +308,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
                     // Add control points to total controlPoints counter and say the success
 
-                    globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
+                    updateStat(this.room.name, 'eoro', energySpentOnRepairs)
                     this.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
                 }
             }
@@ -375,7 +375,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
         const energySpentOnUpgrades = Math.min(this.nextStore.energy, this.parts.work * UPGRADE_CONTROLLER_POWER)
 
-        globalStatsUpdater(this.room.name, 'eou', energySpentOnUpgrades)
+        updateStat(this.room.name, 'eou', energySpentOnUpgrades)
         this.message = `🔋${energySpentOnUpgrades}`
 
         // Inform true
@@ -410,7 +410,6 @@ Creep.prototype.builderGetEnergy = function () {
 
     if (this.room.communeManager && this.room.communeManager.storingStructures.length) {
         if (this.room.resourcesInStoringStructures.energy < 1000) {
-
             return RESULT_NO_ACTION
         }
 
@@ -484,7 +483,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
     // Add control points to total controlPoints counter and say the success
 
-    globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
+    updateStat(this.room.name, 'eob', energySpentOnConstruction)
     this.message = `🚧 ` + energySpentOnConstruction
 
     return RESULT_SUCCESS
@@ -561,7 +560,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
         // Add control points to total controlPoints counter and say the success
 
-        globalStatsUpdater(this.room.name, 'eob', energySpentOnConstruction)
+        updateStat(this.room.name, 'eob', energySpentOnConstruction)
         this.message = `🚧${energySpentOnConstruction}`
 
         // Inform true
@@ -1014,7 +1013,7 @@ Creep.prototype.activeRenew = function () {
 
     const result = spawn.renewCreep(this)
     if (result === OK) {
-        globalStatsUpdater(this.room.name, 'eosp', energyCost)
+        updateStat(this.room.name, 'eosp', energyCost)
         spawn.renewed = true
     }
 }
@@ -1050,7 +1049,7 @@ Creep.prototype.passiveRenew = function () {
 
     const result = spawn.renewCreep(this)
     if (result === OK) {
-        globalStatsUpdater(this.room.name, 'eosp', energyCost)
+        updateStat(this.room.name, 'eosp', energyCost)
         spawn.renewed = true
     }
 }

@@ -177,7 +177,6 @@ export class CommuneManager {
 
         roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
         global.communes.add(room.name)
-        this.preTickTest()
 
         if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
             if (global.communes.size <= 1) roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
@@ -242,10 +241,13 @@ export class CommuneManager {
     }
 
     preTickRun() {
-        const roomMemory = Memory.rooms[this.room.name]
+        this.preTickTest()
 
         this.room.roomManager.communePlanner.preTickRun()
+
+        const roomMemory = Memory.rooms[this.room.name]
         if (!roomMemory[RoomMemoryKeys.communePlanned]) return
+        
         this.constructionManager.preTickRun()
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()

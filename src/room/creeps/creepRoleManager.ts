@@ -4,7 +4,7 @@ import './creepPrototypes/creepMoveFunctions'
 import { creepRoles, customColors } from 'international/constants'
 import { customLog } from 'international/utils'
 import { RoomManager } from 'room/room'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { creepClasses } from './creepClasses'
 
 export class CreepRoleManager {
@@ -39,8 +39,8 @@ export class CreepRoleManager {
             })
             const statName: RoomCommuneStatNames = 'rolmcu'
             const statName2: RoomCommuneStatNames = 'rolmpccu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
-            globalStatsUpdater(room.name, statName2, cpuUsed2)
+            updateStat(room.name, statName, cpuUsed)
+            updateStat(room.name, statName2, cpuUsed2)
         }
     }
 

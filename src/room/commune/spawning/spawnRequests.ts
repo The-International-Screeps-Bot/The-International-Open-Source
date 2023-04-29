@@ -22,7 +22,7 @@ import {
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { packPos, unpackPosList } from 'other/codec'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 
 export class SpawnRequestsManager {
@@ -502,11 +502,7 @@ export class SpawnRequestsManager {
 
                 // If there are no ramparts or repair targets
 
-                if (
-                    !repairRamparts.length &&
-                    !repairTargets.length
-                )
-                    return false
+                if (!repairRamparts.length && !repairTargets.length) return false
 
                 let priority: number
 

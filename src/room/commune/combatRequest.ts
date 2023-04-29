@@ -2,7 +2,7 @@ import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/c
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 
 export class CombatRequestManager {
     communeManager: CommuneManager
@@ -54,7 +54,7 @@ export class CombatRequestManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'cormcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            updateStat(room.name, statName, cpuUsed)
         }
     }
 

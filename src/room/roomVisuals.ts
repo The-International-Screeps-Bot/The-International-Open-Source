@@ -11,7 +11,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
@@ -44,7 +44,7 @@ export class RoomVisualsManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'rvmcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
+            updateStat(room.name, statName, cpuUsed)
         }
     }
 

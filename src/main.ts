@@ -42,7 +42,7 @@ import ExecutePandaMasterCode from './other/PandaMaster/Execute'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
-import { globalStatsUpdater } from 'international/statsManager'
+import { StatsManager, updateStat } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import { profiler } from 'other/profiler'
 import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
@@ -57,6 +57,14 @@ import { creepClasses } from 'room/creeps/creepClasses'
 import { constructionSiteManager } from './international/constructionSiteManager'
 import { mapVisualsManager } from './international/mapVisuals'
 import { endTickManager } from './international/endTickManager'
+import { CommunePlanner } from 'room/communePlanner'
+import { RoomManager } from 'room/room'
+import { ObserverManager } from 'room/commune/observer'
+import { RemotesManager } from 'room/commune/remotesManager'
+import { HaulRequestManager } from 'room/commune/haulRequestManager'
+import { SourceManager } from 'room/commune/sourceManager'
+import { WorkRequestManager } from 'room/commune/workRequest'
+import { ConstructionManager } from 'room/construction/construction'
 
 function originalLoop() {
     profiler.wrap((): void => {
@@ -96,7 +104,7 @@ function originalLoop() {
                 bgColor: customColors.lightBlue,
             })
             const statName: InternationalStatNames = 'imcu'
-            globalStatsUpdater('', statName, cpuUsed, true)
+            updateStat('', statName, cpuUsed, true)
         }
 
         roomsManager()
@@ -124,11 +132,21 @@ export const loop = ErrorMapper.wrapLoop(originalLoop)
 // Profiler decs
 
 profiler.registerClass(CommuneManager, 'CommuneManager')
+profiler.registerClass(RoomManager, 'RoomManager')
 profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
 profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
 profiler.registerClass(TerminalManager, 'TerminalManager')
 profiler.registerClass(LabManager, 'LabManager')
 profiler.registerClass(FactoryManager, 'FactoryManager')
+profiler.registerClass(StatsManager, 'StatsManager')
+profiler.registerClass(CommunePlanner, 'CommunePlanner')
+profiler.registerClass(ConstructionManager, 'ConstructionManager')
+profiler.registerClass(ObserverManager, 'ObserverManager')
+profiler.registerClass(RemotesManager, 'RemotesManager')
+profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
+profiler.registerClass(SourceManager, 'SourceManager')
+profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
+profiler.registerFN(updateStat, 'updateStat')
 profiler.registerFN(originalLoop, 'loop')
 
 for (const creepClass of new Set(Object.values(creepClasses))) {

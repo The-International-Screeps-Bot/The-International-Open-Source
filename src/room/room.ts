@@ -103,8 +103,10 @@ export class RoomManager {
         }
 
         const roomType = roomMemory[RoomMemoryKeys.type]
-        if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
+        if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)) {
+
             statsManager.roomPreTick(room.name, roomType)
+        }
 
         room.moveRequests = {}
         room.creepPositions = {}

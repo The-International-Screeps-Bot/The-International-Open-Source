@@ -8,7 +8,7 @@ import {
 } from 'international/constants'
 import { playerManager } from 'international/players'
 import { allyManager } from 'international/simpleAllies'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import {
     customLog,
     findObjectWithID,
@@ -50,7 +50,7 @@ export class CombatManager {
                 bgColor: customColors.lightBlue,
             })
             const statName: RoomCommuneStatNames = 'dmcu'
-            globalStatsUpdater(this.communeManager.room.name, statName, cpuUsed)
+            updateStat(this.communeManager.room.name, statName, cpuUsed)
         }
     }
 

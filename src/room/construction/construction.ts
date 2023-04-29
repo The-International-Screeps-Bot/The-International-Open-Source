@@ -31,6 +31,7 @@ export class ConstructionManager {
     communeManager: CommuneManager
     room: Room
     placedSites: number
+    lastRun: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -52,11 +53,11 @@ export class ConstructionManager {
         if (this.room.myCreeps.builder.length) {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
         }
+        // If there are no builders, just run every few ticks
+        else if (this.lastRun + 100 > Game.time) return
 
-        /*
-        // If there are no builders, just run every 50 ticks
-        else if (!randomTick(50)) return
- */
+        this.lastRun = Game.time
+
         // If the construction site count is at its limit, stop
 
         if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
@@ -77,7 +78,7 @@ export class ConstructionManager {
         const placeMincut =
             ((this.room.storage && this.room.controller.level >= 4) ||
                 (this.room.terminal && this.room.controller.level >= 6)) &&
-            this.room.resourcesInStoringStructures.energy > 20000
+            this.room.resourcesInStoringStructures.energy > 1000
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const packedCoord in rampartPlans.map) {

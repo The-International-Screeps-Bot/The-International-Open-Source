@@ -1,5 +1,5 @@
 import { RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
+import { updateStat } from 'international/statsManager'
 import { getRangeXY, getRange } from 'international/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 
@@ -48,7 +48,7 @@ export class MineralHarvester extends Creep {
 
         const mineralsHarvested = Math.min(this.parts.work * HARVEST_MINERAL_POWER, mineral.mineralAmount)
         this.reserveStore[mineral.mineralType] += mineralsHarvested
-        globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
+        updateStat(this.room.name, 'mh', mineralsHarvested)
 
         this.message = `⛏️${mineralsHarvested}`
         return RESULT_SUCCESS

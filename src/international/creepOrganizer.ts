@@ -3,7 +3,7 @@ import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
 import { customLog } from './utils'
 import { internationalManager, InternationalManager } from './international'
 import { packCoord } from 'other/codec'
-import { globalStatsUpdater } from './statsManager'
+import { updateStat } from './statsManager'
 
 class CreepOrganizer {
     constructor() {}
@@ -26,7 +26,7 @@ class CreepOrganizer {
                 bgColor: customColors.lightBlue,
             })
             const statName: InternationalStatNames = 'cocu'
-            globalStatsUpdater('', statName, cpuUsed, true)
+            updateStat('', statName, cpuUsed, true)
         }
     }
 
