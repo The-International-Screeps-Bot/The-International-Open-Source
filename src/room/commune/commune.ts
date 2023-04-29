@@ -247,7 +247,7 @@ export class CommuneManager {
 
         const roomMemory = Memory.rooms[this.room.name]
         if (!roomMemory[RoomMemoryKeys.communePlanned]) return
-        
+
         this.constructionManager.preTickRun()
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()
@@ -679,7 +679,7 @@ export class CommuneManager {
     get needsSecondMincutLayer() {
         return (
             Memory.rooms[this.room.name][RoomMemoryKeys.threatened] >
-            Math.floor(Math.pow(this.room.controller.level, 1.1) * 1000)
+            Math.floor(Math.pow(this.room.controller.level, 1.25) * 600)
         )
     }
 
