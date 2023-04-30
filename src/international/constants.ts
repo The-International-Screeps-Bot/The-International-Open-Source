@@ -120,6 +120,7 @@ export enum CreepMemoryKeys {
     getPulled,
     combatRequest,
     flee,
+    squadMoveType,
 }
 
 export enum PowerCreepMemoryKeys {
@@ -1267,21 +1268,41 @@ export const relayOffsets = {
     ],
 }
 
-const allowedSquadCombinations: { [squadSize: string]: Partial<Record<CreepRoles, Set<CreepRoles>>> } = {
-    2: {
-        antifaRangedAttacker: new Set(['antifaRangedAttacker']),
-        antifaAttacker: new Set(['antifaHealer']),
-        antifaDismantler: new Set(['antifaHealer']),
-        antifaHealer: new Set(['antifaAttacker', 'antifaDismantler']),
+export const squadQuotas: Partial<{
+    [key in SquadTypes]: Partial<{ [key in CreepRoles]: Partial<{ [key in CreepRoles]: number }> }>
+}> = {
+    duo: {
+        antifaAttacker: {
+            antifaAttacker: 1,
+            antifaHealer: 1,
+        },
+        antifaDismantler: {
+            antifaDismantler: 1,
+            antifaHealer: 1,
+        },
     },
-    4: {
-        antifaRangedAttacker: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
-        antifaAttacker: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
-        antifaDismantler: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
+    quad: {
+        antifaRangedAttacker: {
+            antifaRangedAttacker: 4,
+        },
+        antifaAttacker: {
+            antifaAttacker: 1,
+            antifaHealer: 3,
+        },
+        antifaDismantler: {
+            antifaDismantler: 1,
+            antifaHealer: 3,
+        },
+    },
+    dynamic: {
+        antifaRangedAttacker: {
+            antifaAttacker: 1,
+            antifaHealer: 1,
+            antifaRangedAttacker: 1,
+            antifaDismantler: 1,
+        },
     },
 }
-
-export { allowedSquadCombinations }
 
 export const defaultPlainCost = 1
 export const defaultRoadPlanningPlainCost = 3

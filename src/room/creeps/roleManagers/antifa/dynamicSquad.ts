@@ -6,51 +6,30 @@ import { Antifa } from './antifa'
  * A squad of a semi-dynamic size
  * Accepts at most 1 of each: antifaRangedAttacker, antifaAttacker, antifaHealer, antifaDismantler
  */
-export class Dynamic {
+export class DynamicSquad {
+    /**
+     *
+     */
+    moveType: SquadMoveTypes
     /**
      * All squad members, where index 0 is the leader
      */
     members: Antifa[] = []
+    memberNames: string[] = []
     leader: Antifa
-
-    _combatStrength: CombatStrength
-
-    get combatStrength() {
-        if (this._combatStrength) return this._combatStrength
-
-        this._combatStrength = {
-            dismantle: 0,
-            melee: 0,
-            ranged: 0,
-            heal: 0,
-        }
-
-        for (const member of this.members) {
-            for (const key in this._combatStrength) {
-                const combatType = key as keyof CombatStrength
-
-                this._combatStrength[combatType] = member.combatStrength[combatType]
-            }
-        }
-
-        return this._combatStrength
-    }
-
-    get canMove() {
-        for (const member of this.members) if (!member.canMove) return false
-        return true
-    }
 
     constructor(memberNames: string[]) {
         for (let i = 0; i < memberNames.length; i++) {
             const member = Game.creeps[memberNames[i]]
             this.members.push(member)
+            memberNames.push(member.name)
 
             member.squad = this
             member.squadRan = true
         }
 
         this.leader = this.members[0]
+        this.moveType = this.leader.memory[CreepMemoryKeys.squadMoveType]
 
         // Ensure the leader is the one with melee parts, if the quad is melee
 
@@ -179,4 +158,40 @@ export class Dynamic {
     }
 
     private advancedHeal() {}
+
+    setMoveType(type: SquadMoveTypes) {
+
+        this.moveType = type
+        for (const memberName of this.memberNames) {
+
+            Memory.creeps[memberName][CreepMemoryKeys.squadMoveType] = type
+        }
+    }
+
+    _combatStrength: CombatStrength
+    get combatStrength() {
+        if (this._combatStrength) return this._combatStrength
+
+        this._combatStrength = {
+            dismantle: 0,
+            melee: 0,
+            ranged: 0,
+            heal: 0,
+        }
+
+        for (const member of this.members) {
+            for (const key in this._combatStrength) {
+                const combatType = key as keyof CombatStrength
+
+                this._combatStrength[combatType] = member.combatStrength[combatType]
+            }
+        }
+
+        return this._combatStrength
+    }
+
+    get canMove() {
+        for (const member of this.members) if (!member.canMove) return false
+        return true
+    }
 }

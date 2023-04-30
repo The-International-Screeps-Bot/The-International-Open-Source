@@ -1654,6 +1654,7 @@ export class SpawnRequestsManager {
                                 [CreepMemoryKeys.squadSize]: 4,
                                 [CreepMemoryKeys.squadType]: 'quad',
                                 [CreepMemoryKeys.squadCombatType]: 'rangedAttack',
+                                [CreepMemoryKeys.squadMoveType]: 'attack',
                             },
                         }
                     })(),

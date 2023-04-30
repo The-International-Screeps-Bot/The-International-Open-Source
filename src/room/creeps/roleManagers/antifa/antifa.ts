@@ -1,4 +1,4 @@
-import { CombatRequestKeys, CreepMemoryKeys, allowedSquadCombinations, antifaRoles, customColors } from 'international/constants'
+import { CombatRequestKeys, CreepMemoryKeys, antifaRoles, customColors, squadQuotas } from 'international/constants'
 import { customLog, findClosestObject, getRangeXY, isCoordExit, isXYExit } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { Duo } from './duo'
@@ -61,18 +61,23 @@ export class Antifa extends Creep {
     }
 
     runSquad?() {
+
+        const creepMemory = Memory.creeps[this.name]
+
         // The creep should be single
 
-        if (!this.memory[CreepMemoryKeys.squadSize]) return false
-        if (this.memory[CreepMemoryKeys.isSquadFormed] && this.memory[CreepMemoryKeys.squadMembers].length === 1)
+        if (!creepMemory[CreepMemoryKeys.squadSize]) return false
+        if (creepMemory[CreepMemoryKeys.isSquadFormed] && creepMemory[CreepMemoryKeys.squadMembers].length === 1)
             return false
+        if (!squadQuotas[creepMemory[CreepMemoryKeys.squadType]][this.role]) return false
+
 
         // The squad has already been run
 
         if (this.squadRan) return true
 
         if (!this.findSquad()) {
-            const request = Memory.combatRequests[this.memory[CreepMemoryKeys.combatRequest]]
+            const request = Memory.combatRequests[creepMemory[CreepMemoryKeys.combatRequest]]
             if (request && request[CombatRequestKeys.responder] === this.room.name) this.activeRenew()
             return true
         }
@@ -86,12 +91,14 @@ export class Antifa extends Creep {
      */
     findSquad?() {
         if (this.squad) return true
-        if (this.memory[CreepMemoryKeys.isSquadFormed]) {
+
+        const creepMemory = Memory.creeps[this.name]
+        if (creepMemory[CreepMemoryKeys.isSquadFormed]) {
             const memberNames: string[] = []
 
             // Filter out dead members
 
-            for (const memberName of this.memory[CreepMemoryKeys.squadMembers]) {
+            for (const memberName of creepMemory[CreepMemoryKeys.squadMembers]) {
                 if (!Game.creeps[memberName]) continue
 
                 memberNames.push(memberName)
@@ -111,6 +118,9 @@ export class Antifa extends Creep {
             return true
         }
 
+        const squadQuota: Partial<{[key in CreepRoles]: number }> = squadQuotas[creepMemory[CreepMemoryKeys.squadType]][this.role]
+        squadQuota[this.role] -= 1
+
         // The squad is not yet formed
 
         for (const requestingCreepName of this.room.squadRequests) {
@@ -122,28 +132,28 @@ export class Antifa extends Creep {
             // All members must be trying to make the same type of squad
 
             if (
-                this.memory[CreepMemoryKeys.squadCombatType] !== requestingCreep.memory[CreepMemoryKeys.squadCombatType]
+                creepMemory[CreepMemoryKeys.squadCombatType] !== Memory.creeps[requestingCreep.name][CreepMemoryKeys.squadCombatType]
             )
                 continue
 
-            // If the creep is allowed to join the other leader
+            if (!squadQuota[requestingCreep.role]) continue
 
-            if (!allowedSquadCombinations[this.memory[CreepMemoryKeys.squadSize]][this.role].has(requestingCreep.role)) continue
-
-            this.memory[CreepMemoryKeys.squadMembers].push(requestingCreepName)
+            creepMemory[CreepMemoryKeys.squadMembers].push(requestingCreepName)
 
             // We've found enough members
 
-            if (this.memory[CreepMemoryKeys.squadMembers].length === this.memory[CreepMemoryKeys.squadSize]) break
+            if (creepMemory[CreepMemoryKeys.squadMembers].length === creepMemory[CreepMemoryKeys.squadSize]) break
+
+            squadQuota[requestingCreep.role] -= 1
         }
 
         // We weren't able to find enough members to form the squad we wanted
 
-        if (this.memory[CreepMemoryKeys.squadMembers].length !== this.memory[CreepMemoryKeys.squadSize]) return false
+        if (creepMemory[CreepMemoryKeys.squadMembers].length !== creepMemory[CreepMemoryKeys.squadSize]) return false
 
         const memberNames: string[] = []
 
-        for (const memberName of this.memory[CreepMemoryKeys.squadMembers]) {
+        for (const memberName of creepMemory[CreepMemoryKeys.squadMembers]) {
             // We don't need others to think we need a squad when we have one now
 
             this.room.squadRequests.delete(memberName)
@@ -151,7 +161,7 @@ export class Antifa extends Creep {
             // Tell each member important squad info so each can take over as leader
 
             const memberMemory = Memory.creeps[memberName]
-            memberMemory[CreepMemoryKeys.squadMembers] = this.memory[CreepMemoryKeys.squadMembers]
+            memberMemory[CreepMemoryKeys.squadMembers] = creepMemory[CreepMemoryKeys.squadMembers]
             memberMemory[CreepMemoryKeys.isSquadFormed] = true
 
             memberNames.push(memberName)

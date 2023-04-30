@@ -65,6 +65,7 @@ import { HaulRequestManager } from 'room/commune/haulRequestManager'
 import { SourceManager } from 'room/commune/sourceManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
+import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 
 function originalLoop() {
     profiler.wrap((): void => {
@@ -146,6 +147,9 @@ profiler.registerClass(RemotesManager, 'RemotesManager')
 profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
 profiler.registerClass(SourceManager, 'SourceManager')
 profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
+profiler.registerClass(Quad, 'Quad')
+profiler.registerClass(DynamicSquad, 'DynamicSquad')
+profiler.registerClass(Duo, 'Duo')
 profiler.registerFN(updateStat, 'updateStat')
 profiler.registerFN(originalLoop, 'loop')
 

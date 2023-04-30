@@ -298,9 +298,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // If the room isn't already a remote
 
     if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) {
-        // Assign the room's commune as the scoutingRoom
-
-        roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
 
         // Generate new important positions
 
@@ -314,7 +311,11 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         delete roomMemory[RoomMemoryKeys.remoteSourcePaths]
         delete this.roomManager._remoteSourcePaths
-        this.roomManager.remoteSourcePaths
+        const remoteSourcePaths = this.roomManager.remoteSourcePaths
+        for (const path of remoteSourcePaths) {
+
+            if (!path.length) return roomMemory[RoomMemoryKeys.type]
+        }
 
         delete roomMemory[RoomMemoryKeys.remoteControllerPositions]
         delete this.roomManager._remoteControllerPositions
@@ -336,6 +337,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         // Add the room's name to the scoutingRoom's remotes list
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
+
+        // Assign the room's commune as the scoutingRoom
+
+        roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
 
         roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
         return roomMemory[RoomMemoryKeys.type]
@@ -368,7 +373,11 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     delete roomMemory[RoomMemoryKeys.remoteSourcePaths]
     delete this.roomManager._remoteSourcePaths
-    this.roomManager.remoteSourcePaths
+    const remoteSourcePaths = this.roomManager.remoteSourcePaths
+    for (const path of remoteSourcePaths) {
+
+        if (!path.length) return roomMemory[RoomMemoryKeys.type]
+    }
 
     delete roomMemory[RoomMemoryKeys.remoteControllerPositions]
     delete this.roomManager._remoteControllerPositions
@@ -392,6 +401,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
 
+    roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
     return roomMemory[RoomMemoryKeys.type]
 }
 
@@ -2146,7 +2156,7 @@ Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
 
     for (const ID of cSiteIDs) {
         const cSite = findObjectWithID(ID) as T
-        console.log('findCSite', cSite, ID)
+        /* console.log('findCSite', cSite, ID) */
         if (conditions(cSite)) return cSite
     }
 

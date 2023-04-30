@@ -9,34 +9,6 @@ export class Duo {
     members: Antifa[] = []
     leader: Antifa
 
-    _combatStrength: CombatStrength
-
-    get combatStrength() {
-        if (this._combatStrength) return this._combatStrength
-
-        this._combatStrength = {
-            dismantle: 0,
-            melee: 0,
-            ranged: 0,
-            heal: 0,
-        }
-
-        for (const member of this.members) {
-            for (const key in this._combatStrength) {
-                const combatType = key as keyof CombatStrength
-
-                this._combatStrength[combatType] = member.combatStrength[combatType]
-            }
-        }
-
-        return this._combatStrength
-    }
-
-    get canMove() {
-        for (const member of this.members) if (!member.canMove) return false
-        return true
-    }
-
     constructor(memberNames: string[]) {
         for (let i = 0; i < memberNames.length; i++) {
             const member = Game.creeps[memberNames[i]]
@@ -555,5 +527,32 @@ export class Duo {
         }
 
         this.members[1].heal(this.leader)
+    }
+
+    _combatStrength: CombatStrength
+    get combatStrength() {
+        if (this._combatStrength) return this._combatStrength
+
+        this._combatStrength = {
+            dismantle: 0,
+            melee: 0,
+            ranged: 0,
+            heal: 0,
+        }
+
+        for (const member of this.members) {
+            for (const key in this._combatStrength) {
+                const combatType = key as keyof CombatStrength
+
+                this._combatStrength[combatType] = member.combatStrength[combatType]
+            }
+        }
+
+        return this._combatStrength
+    }
+
+    get canMove() {
+        for (const member of this.members) if (!member.canMove) return false
+        return true
     }
 }

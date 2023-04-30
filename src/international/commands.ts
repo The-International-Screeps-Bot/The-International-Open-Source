@@ -35,7 +35,9 @@ global.killCreeps = function (roles?) {
 
         if (!room.controller || !room.controller.my) continue
 
-        for (const spawn of room.roomManager.structures.spawn) {
+        for (const spawnName in Game.spawns) {
+
+            const spawn = Game.spawns[spawnName]
             if (!spawn.spawning) continue
 
             // If there are specific role requirements and the creep doesn't meet them

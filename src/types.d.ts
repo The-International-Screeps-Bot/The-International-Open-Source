@@ -19,7 +19,7 @@ import {
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settings'
-import { Dynamic } from 'room/creeps/roleManagers/antifa/dynamic'
+import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { BasePlans } from 'room/construction/basePlans'
 
 declare global {
@@ -90,6 +90,10 @@ declare global {
         min(communeManager?: CommuneManager): number
         max(communeManager?: CommuneManager): number
     }
+
+    type SquadTypes = 'duo' | 'quad' | 'dynamic'
+    type SquadCombatTypes = 'rangedAttack' | 'attack' | 'dismantle'
+    type SquadMoveTypes = 'transport' | 'attack'
 
     type RemoteStampTypes = 'road' | 'container'
 
@@ -1646,7 +1650,7 @@ declare global {
         /**
          * The squad the creep belongs to
          */
-        squad: Duo | Quad | Dynamic | undefined
+        squad: Duo | Quad | DynamicSquad | undefined
 
         /**
          * Wether the squad has ran yet
@@ -2127,8 +2131,8 @@ declare global {
         [CreepMemoryKeys.roomLogisticsRequests]: CreepRoomLogisticsRequest[]
         [CreepMemoryKeys.needsResources]: boolean
         [CreepMemoryKeys.squadSize]: number
-        [CreepMemoryKeys.squadType]: 'duo' | 'quad' | 'dynamic'
-        [CreepMemoryKeys.squadCombatType]: 'rangedAttack' | 'attack' | 'dismantle'
+        [CreepMemoryKeys.squadType]: SquadTypes
+        [CreepMemoryKeys.squadCombatType]: SquadCombatTypes
         [CreepMemoryKeys.isSquadFormed]: boolean
         [CreepMemoryKeys.squadMembers]: string[]
         [CreepMemoryKeys.quadBulldozeTargets]: Id<Structure>[]
@@ -2144,6 +2148,7 @@ declare global {
          * Wether the creep is/was trying to flee for their designated
          */
         [CreepMemoryKeys.flee]: boolean
+        [CreepMemoryKeys.squadMoveType]: SquadMoveTypes
     }
 
     interface PowerCreepMemory {

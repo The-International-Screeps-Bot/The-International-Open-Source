@@ -45,7 +45,7 @@ export class Quad {
     /**
      *
      */
-    type: 'transport' | 'attack'
+    moveType: SquadMoveTypes
     /**
      * All squad members, where index 0 is the leader
      */
@@ -61,148 +61,6 @@ export class Quad {
 
     target: Structure | Creep
 
-    _combatStrength: CombatStrength
-    get combatStrength() {
-        if (this._combatStrength) return this._combatStrength
-
-        this._combatStrength = {
-            dismantle: 0,
-            melee: 0,
-            ranged: 0,
-            heal: 0,
-        }
-
-        for (const member of this.members) {
-            for (const key in this._combatStrength) {
-                const combatType = key as keyof CombatStrength
-
-                this._combatStrength[combatType] = member.combatStrength[combatType]
-            }
-        }
-
-        return this._combatStrength
-    }
-
-    _defenceStrength: number
-    get defenceStrength() {
-        if (this._defenceStrength !== undefined) return this._defenceStrength
-
-        return (this._defenceStrength = findHighestScore(this.members, member => member.defenceStrength))
-    }
-
-    _hits: number
-    get hits() {
-        if (this._hits !== undefined) return this._hits
-
-        return (this._hits = findHighestScore(this.members, member => member.hits))
-    }
-
-    _enemyThreatDataRanged: EnemyThreatData
-
-    /**
-     * Score identifies speed of death. Lower values are better
-     * Be scared of enemies we can die faster from
-     */
-    get enemyThreatDataRanged() {
-        if (this._enemyThreatDataRanged) return this._enemyThreatDataRanged
-
-        this._enemyThreatDataRanged = {
-            coords: new Uint8Array(2500),
-            goals: [],
-        }
-
-        for (const enemyCreep of this.leader.room.enemyAttackers) {
-            // Plus one to account for non-leader squad members
-
-            if (getRange(enemyCreep.pos, this.leader.pos) > rangedFleeRange + 1) continue
-
-            const enemyRanged = enemyCreep.combatStrength.ranged
-            const enemyHeal = enemyCreep.combatStrength.heal
-            const enemyDefence = enemyCreep.defenceStrength
-            const enemyHits = enemyCreep.hits
-
-            // Ranged
-
-            let squadDeathSpeed = enemyRanged * this.defenceStrength - this.combatStrength.heal / this.hits
-            let enemyDeathSpeed = this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
-
-            if (squadDeathSpeed > enemyDeathSpeed) {
-                forCoordsInRange(enemyCreep.pos, rangedFleeRange, coord => {
-                    const packedCoord = packAsNum(coord)
-                    const currentValue = this._enemyThreatDataRanged.coords[packedCoord]
-                    if (currentValue === 255) return
-
-                    if (getRange(enemyCreep.pos, coord) < rangedFleeRange) {
-                        this._enemyThreatDataRanged.coords[packedCoord] = 255
-                    } else {
-                        this._enemyThreatDataRanged.coords[packedCoord] = 1
-                    }
-                })
-
-                this._enemyThreatDataRanged.goals.push({
-                    pos: enemyCreep.pos,
-                    range: 10,
-                })
-                continue
-            }
-
-            // Melee
-
-            squadDeathSpeed =
-                (enemyRanged + enemyCreep.combatStrength.melee) * this.defenceStrength -
-                this.combatStrength.heal / this.hits
-            enemyDeathSpeed = this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
-
-            if (squadDeathSpeed > enemyDeathSpeed) {
-                forCoordsInRange(enemyCreep.pos, meleeFleeRange, coord => {
-                    const packedCoord = packAsNum(coord)
-                    const currentValue = this._enemyThreatDataRanged.coords[packedCoord]
-                    if (currentValue === 255) return
-
-                    if (getRange(enemyCreep.pos, coord) < meleeFleeRange) {
-                        this._enemyThreatDataRanged.coords[packedCoord] = 255
-                    } else {
-                        this._enemyThreatDataRanged.coords[packedCoord] = 1
-                    }
-                })
-
-                this._enemyThreatDataRanged.goals.push({
-                    pos: enemyCreep.pos,
-                    range: 10,
-                })
-                continue
-            }
-        }
-        /*
-        for (let x = 0; x < roomDimensions; x++) {
-            for (let y = 0; y < roomDimensions; y++) {
-                const weight = this._enemyThreatDataRanged.coords[packXYAsNum(x, y)]
-                if (weight === 0) continue
-
-                let color = weight === 255 ? customColors.red : customColors.yellow
-                this.leader.room.visual.circle(x, y, { fill: color })
-            }
-        }
- */
-        return this._enemyThreatDataRanged
-    }
-
-    get canMove() {
-        for (const member of this.members) {
-            if (!member.canMove) return false
-        }
-        return true
-    }
-
-    get willMove() {
-        for (const member of this.members) {
-            if (!member.canMove) return false
-            if (member.moveRequest) return false
-        }
-
-        return true
-    }
-
     constructor(memberNames: string[]) {
         for (const memberName of memberNames) {
             const member = Game.creeps[memberName]
@@ -214,6 +72,7 @@ export class Quad {
         }
 
         this.leader = this.members[0]
+        this.moveType = this.leader.memory[CreepMemoryKeys.squadMoveType]
 
         this.sortMembersByCoord()
 
@@ -248,7 +107,7 @@ export class Quad {
     }
 
     run() {
-        this.leader.message = this.type
+        this.leader.message = this.moveType
 
         this.passiveHealQuad()
 
@@ -359,7 +218,7 @@ export class Quad {
 
         let inFormation = true
 
-        if (this.type === 'transport') {
+        if (this.moveType === 'transport') {
             let lastMember = this.leader
 
             for (let i = 1; i < this.members.length; i++) {
@@ -466,7 +325,7 @@ export class Quad {
             return false
         }
 
-        if (this.type === 'transport') {
+        if (this.moveType === 'transport') {
             if (!moveLeader.createMoveRequest(opts)) return false
 
             let lastMember = moveLeader
@@ -1041,5 +900,156 @@ export class Quad {
         }
 
         return minRange
+    }
+
+    setMoveType(type: SquadMoveTypes) {
+
+        this.moveType = type
+        for (const memberName of this.memberNames) {
+
+            Memory.creeps[memberName][CreepMemoryKeys.squadMoveType] = type
+        }
+    }
+
+    _combatStrength: CombatStrength
+    get combatStrength() {
+        if (this._combatStrength) return this._combatStrength
+
+        this._combatStrength = {
+            dismantle: 0,
+            melee: 0,
+            ranged: 0,
+            heal: 0,
+        }
+
+        for (const member of this.members) {
+            for (const key in this._combatStrength) {
+                const combatType = key as keyof CombatStrength
+
+                this._combatStrength[combatType] = member.combatStrength[combatType]
+            }
+        }
+
+        return this._combatStrength
+    }
+
+    _defenceStrength: number
+    get defenceStrength() {
+        if (this._defenceStrength !== undefined) return this._defenceStrength
+
+        return (this._defenceStrength = findHighestScore(this.members, member => member.defenceStrength))
+    }
+
+    _hits: number
+    get hits() {
+        if (this._hits !== undefined) return this._hits
+
+        return (this._hits = findHighestScore(this.members, member => member.hits))
+    }
+
+    _enemyThreatDataRanged: EnemyThreatData
+
+    /**
+     * Score identifies speed of death. Lower values are better
+     * Be scared of enemies we can die faster from
+     */
+    get enemyThreatDataRanged() {
+        if (this._enemyThreatDataRanged) return this._enemyThreatDataRanged
+
+        this._enemyThreatDataRanged = {
+            coords: new Uint8Array(2500),
+            goals: [],
+        }
+
+        for (const enemyCreep of this.leader.room.enemyAttackers) {
+            // Plus one to account for non-leader squad members
+
+            if (getRange(enemyCreep.pos, this.leader.pos) > rangedFleeRange + 1) continue
+
+            const enemyRanged = enemyCreep.combatStrength.ranged
+            const enemyHeal = enemyCreep.combatStrength.heal
+            const enemyDefence = enemyCreep.defenceStrength
+            const enemyHits = enemyCreep.hits
+
+            // Ranged
+
+            let squadDeathSpeed = enemyRanged * this.defenceStrength - this.combatStrength.heal / this.hits
+            let enemyDeathSpeed = this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
+
+            if (squadDeathSpeed > enemyDeathSpeed) {
+                forCoordsInRange(enemyCreep.pos, rangedFleeRange, coord => {
+                    const packedCoord = packAsNum(coord)
+                    const currentValue = this._enemyThreatDataRanged.coords[packedCoord]
+                    if (currentValue === 255) return
+
+                    if (getRange(enemyCreep.pos, coord) < rangedFleeRange) {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 255
+                    } else {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 1
+                    }
+                })
+
+                this._enemyThreatDataRanged.goals.push({
+                    pos: enemyCreep.pos,
+                    range: 10,
+                })
+                continue
+            }
+
+            // Melee
+
+            squadDeathSpeed =
+                (enemyRanged + enemyCreep.combatStrength.melee) * this.defenceStrength -
+                this.combatStrength.heal / this.hits
+            enemyDeathSpeed = this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
+
+            if (squadDeathSpeed > enemyDeathSpeed) {
+                forCoordsInRange(enemyCreep.pos, meleeFleeRange, coord => {
+                    const packedCoord = packAsNum(coord)
+                    const currentValue = this._enemyThreatDataRanged.coords[packedCoord]
+                    if (currentValue === 255) return
+
+                    if (getRange(enemyCreep.pos, coord) < meleeFleeRange) {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 255
+                    } else {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 1
+                    }
+                })
+
+                this._enemyThreatDataRanged.goals.push({
+                    pos: enemyCreep.pos,
+                    range: 10,
+                })
+                continue
+            }
+        }
+        /*
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                const weight = this._enemyThreatDataRanged.coords[packXYAsNum(x, y)]
+                if (weight === 0) continue
+
+                let color = weight === 255 ? customColors.red : customColors.yellow
+                this.leader.room.visual.circle(x, y, { fill: color })
+            }
+        }
+ */
+        return this._enemyThreatDataRanged
+    }
+
+    get canMove() {
+        for (const member of this.members) {
+            if (!member.canMove) return false
+        }
+        return true
+    }
+
+    get willMove() {
+        for (const member of this.members) {
+            if (!member.canMove) return false
+            if (member.moveRequest) return false
+        }
+
+        return true
     }
 }
