@@ -87,6 +87,10 @@ export class RoomManager {
         delete this._remoteSources
         delete this._mineral
         delete this._usedStationaryCoords
+        delete this.checkedStructureUpdate
+        delete this.checkedCSiteUpdate
+        delete this._structures
+        delete this._cSites
 
         if (randomTick()) {
             delete this._nukeTargetCoords
@@ -164,10 +168,15 @@ export class RoomManager {
         // new commune planner
 
         room.communeManager.update(room)
-        room.communeManager.preTickRun()
     }
 
-    preTickRun() {}
+    preTickRun() {
+
+        if (this.room.communeManager) {
+
+            this.room.communeManager.preTickRun()
+        }
+    }
 
     run() {
         if (this.room.memory[RoomMemoryKeys.type] === RoomTypes.remote) {

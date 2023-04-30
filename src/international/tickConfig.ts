@@ -46,6 +46,7 @@ class TickConfig {
         this.configWorkRequests()
         this.configCombatRequests()
         this.configHaulRequests()
+        this.runRooms()
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
@@ -90,6 +91,13 @@ class TickConfig {
             }
 
             room.roomManager.update(room)
+        }
+    }
+
+    private runRooms() {
+
+        for (const roomName in Game.rooms) {
+            const room = Game.rooms[roomName]
             room.roomManager.preTickRun()
         }
     }

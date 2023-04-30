@@ -30,11 +30,12 @@ export function roomsManager() {
         // Get the room using the roomName
 
         const room = Game.rooms[roomName]
-        const roomType = room.memory[RoomMemoryKeys.type]
+        const roomMemory = Memory.rooms[room.name]
+        const roomType = roomMemory[RoomMemoryKeys.type]
 
         // If the room is a commune, run its specific manager
 
-        if (room.memory[RoomMemoryKeys.type] === RoomTypes.commune) room.communeManager.run()
+        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) room.communeManager.run()
         else room.roomManager.run()
 
         // Log room stats
