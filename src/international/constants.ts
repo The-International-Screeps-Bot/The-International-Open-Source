@@ -401,9 +401,11 @@ export enum TrafficPriorities {
     antifaRangedAttacker,
 }
 
+export const version = `v2.${Memory.breakingVersion}.0`
+
 // Set of messages to randomly apply to commune rooms
 
-export const communeSign = `A commune of the proletariat. Bourgeoisie not welcome here! v2.${Memory.breakingVersion}`
+export const communeSign = 'A commune of the proletariat. Bourgeoisie not welcome here!' + version
 
 // Set of messages to randomly apply to non-commune rooms
 
