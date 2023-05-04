@@ -81,8 +81,6 @@ export class SourceHarvester extends Creep {
 
         this.message = `⏩${this.memory[CreepMemoryKeys.sourceIndex]}`
 
-        console.log('reverse of null commune roomName', this.room.name)
-
         this.createMoveRequestByPath(
             {
                 origin: this.pos,

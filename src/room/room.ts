@@ -44,7 +44,7 @@ import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinManager } from './ruins'
-import { packCoord, packPosList, unpackCoord, unpackPos, unpackPosList, unpackStampAnchors } from 'other/codec'
+import { packCoord, packPosList, unpackCoord, unpackPos, unpackPosAt, unpackPosList, unpackStampAnchors } from 'other/codec'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { customFindPath } from 'international/customPathFinder'
@@ -108,7 +108,6 @@ export class RoomManager {
 
         const roomType = roomMemory[RoomMemoryKeys.type]
         if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)) {
-
             statsManager.roomPreTick(room.name, roomType)
         }
 
@@ -171,9 +170,7 @@ export class RoomManager {
     }
 
     preTickRun() {
-
         if (this.room.communeManager) {
-
             this.room.communeManager.preTickRun()
         }
     }
@@ -190,6 +187,140 @@ export class RoomManager {
         this.powerCreepRoleManager.run()
         this.endTickCreepManager.run()
         this.roomVisualsManager.run()
+    }
+
+    findRemoteSources(commune: Room) {
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
+
+        const sources = this.room.find(FIND_SOURCES)
+
+        sortBy(
+            sources,
+            ({ pos }) =>
+                customFindPath({
+                    origin: pos,
+                    goals: [{ pos: anchor, range: 3 }],
+                }).length,
+        )
+
+        return sources.map(source => source.id)
+    }
+
+    findRemoteSourceHarvestPositions(commune: Room, packedRemoteSources: Id<Source>[]) {
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
+
+        const terrain = this.room.getTerrain()
+        const sourceHarvestPositions: RoomPosition[][] = []
+
+        for (const sourceID of packedRemoteSources) {
+            const source = findObjectWithID(sourceID)
+            const positions = []
+
+            // Loop through each pos
+
+            for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
+                // Iterate if terrain for pos is a wall
+
+                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
+
+                // Add pos to harvestPositions
+
+                positions.push(pos)
+            }
+
+            sortBy(
+                positions,
+                origin =>
+                    customFindPath({
+                        origin,
+                        goals: [{ pos: anchor, range: 3 }],
+                    }).length,
+            )
+
+            sourceHarvestPositions.push(positions)
+        }
+
+        return sourceHarvestPositions.map(positions => packPosList(positions))
+    }
+
+    findRemoteSourcePaths(commune: Room, packedRemoteSourceHarvestPositions: string[]) {
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote source harvest paths' + this.room.name)
+
+        const sourcePaths: RoomPosition[][] = []
+
+        for (const positions of packedRemoteSourceHarvestPositions) {
+            const origin = unpackPosAt(positions, 0)
+            const path = customFindPath({
+                origin,
+                goals: [{ pos: anchor, range: 4 }],
+                typeWeights: remoteTypeWeights,
+                plainCost: defaultRoadPlanningPlainCost,
+                weightStructurePlans: true,
+                avoidStationaryPositions: true,
+            })
+
+            sourcePaths.push(path)
+        }
+        for (const index in sourcePaths) {
+            const path = sourcePaths[index]
+            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name)
+        }
+
+        return sourcePaths.map(path => packPosList(path))
+    }
+
+    findRemoteControllerPositions(commune: Room) {
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('no anchor found for controller positions ' + this.room.name)
+
+        const positions: RoomPosition[] = []
+        const controllerPos = this.room.controller.pos
+        const terrain = this.room.getTerrain()
+
+        for (let offset of adjacentOffsets) {
+            const adjPos = new RoomPosition(offset.x + controllerPos.x, offset.y + controllerPos.y, this.room.name)
+
+            if (terrain.get(adjPos.x, adjPos.y) === TERRAIN_MASK_WALL) continue
+
+            positions.push(adjPos)
+        }
+
+        sortBy(
+            positions,
+            origin =>
+                customFindPath({
+                    origin,
+                    goals: [{ pos: anchor, range: 4 }],
+                }).length,
+        )
+
+        return packPosList(positions)
+    }
+
+    findRemoteControllerPath(commune: Room, packedRemoteControllerPositions: string) {
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
+
+        const origin = unpackPosAt(packedRemoteControllerPositions, 0)
+        const path = customFindPath({
+            origin,
+            goals: [{ pos: anchor, range: 4 }],
+            typeWeights: remoteTypeWeights,
+            plainCost: defaultRoadPlanningPlainCost,
+            weightStructurePlans: true,
+            avoidStationaryPositions: true,
+        })
+        if (!path.length) throw Error('No remote controller path for ' + this.room.name)
+
+        return packPosList(path)
     }
 
     _anchor: RoomPosition
@@ -292,25 +423,7 @@ export class RoomManager {
             return this._remoteSources
         }
 
-        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
-        if (!commune) throw Error('No commune for remote source harvest positions ' + this.room.name)
-
-        const anchor = commune.roomManager.anchor
-        if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
-
-        const sources = this.room.find(FIND_SOURCES)
-
-        sortBy(
-            sources,
-            ({ pos }) =>
-                customFindPath({
-                    origin: pos,
-                    goals: [{ pos: anchor, range: 3 }],
-                }).length,
-        )
-
-        this.room.memory[RoomMemoryKeys.remoteSources] = sources.map(source => source.id)
-        return (this._remoteSources = sources)
+        throw Error('No remote sources ' + this.room.name)
     }
 
     _sourceHarvestPositions: RoomPosition[][]
@@ -362,46 +475,7 @@ export class RoomManager {
             ))
         }
 
-        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
-        if (!commune) throw Error('No commune for remote source harvest positions ' + this.room.name)
-
-        const anchor = commune.roomManager.anchor
-        if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
-
-        const terrain = this.room.getTerrain()
-        const sourceHarvestPositions: RoomPosition[][] = []
-
-        for (const source of this.remoteSources) {
-            const positions = []
-
-            // Loop through each pos
-
-            for (const pos of this.room.findAdjacentPositions(source.pos.x, source.pos.y)) {
-                // Iterate if terrain for pos is a wall
-
-                if (terrain.get(pos.x, pos.y) === TERRAIN_MASK_WALL) continue
-
-                // Add pos to harvestPositions
-
-                positions.push(pos)
-            }
-
-            sortBy(
-                positions,
-                origin =>
-                    customFindPath({
-                        origin,
-                        goals: [{ pos: anchor, range: 3 }],
-                    }).length,
-            )
-
-            sourceHarvestPositions.push(positions)
-        }
-
-        this.room.memory[RoomMemoryKeys.remoteSourceHarvestPositions] = sourceHarvestPositions.map(positions =>
-            packPosList(positions),
-        )
-        return (this._remoteSourceHarvestPositions = sourceHarvestPositions)
+        throw Error('No remote source harvest positions ' + this.room.name)
     }
 
     _communeSourcePaths: RoomPosition[][]
@@ -426,33 +500,7 @@ export class RoomManager {
             return (this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
         }
 
-        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
-        if (!commune) throw Error('No commune for remote source harvest paths ' + this.room.name)
-
-        const anchor = commune.roomManager.anchor
-        if (!anchor) throw Error('No anchor for remote source harvest paths' + this.room.name)
-
-        const sourcePaths: RoomPosition[][] = []
-        const sourceHarvestPositions = this.remoteSourceHarvestPositions
-        for (let index in this.room.find(FIND_SOURCES)) {
-            const path = customFindPath({
-                origin: sourceHarvestPositions[index][0],
-                goals: [{ pos: anchor, range: 4 }],
-                typeWeights: remoteTypeWeights,
-                plainCost: defaultRoadPlanningPlainCost,
-                weightStructurePlans: true,
-                avoidStationaryPositions: true,
-            })
-            console.log(index, path)
-            sourcePaths.push(path)
-        }
-        for (const index in sourcePaths) {
-            const path = sourcePaths[index]
-            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name)
-        }
-
-        this.room.memory[RoomMemoryKeys.remoteSourcePaths] = sourcePaths.map(path => packPosList(path))
-        return (this._remoteSourcePaths = sourcePaths)
+        throw Error('No remote source paths ' + this.room.name)
     }
 
     _centerUpgradePos: RoomPosition
@@ -579,37 +627,7 @@ export class RoomManager {
             return (this._remoteControllerPositions = unpackPosList(packedRemoteControllerPositions))
         }
 
-        this._remoteControllerPositions = []
-        const positions: RoomPosition[] = []
-
-        const commune = Game.rooms[roomMemory[RoomMemoryKeys.commune]]
-        if (!commune) throw Error('No commune for remote controller positions ' + this.room.name)
-
-        const anchor = commune.roomManager.anchor
-        if (!anchor) throw Error('no anchor found for controller positions ' + this.room.name)
-
-        const controllerPos = this.room.controller.pos
-        const terrain = this.room.getTerrain()
-
-        for (let offset of adjacentOffsets) {
-            const adjPos = new RoomPosition(offset.x + controllerPos.x, offset.y + controllerPos.y, this.room.name)
-
-            if (terrain.get(adjPos.x, adjPos.y) === TERRAIN_MASK_WALL) continue
-
-            positions.push(adjPos)
-        }
-
-        sortBy(
-            positions,
-            origin =>
-                customFindPath({
-                    origin,
-                    goals: [{ pos: anchor, range: 4 }],
-                }).length,
-        )
-
-        this.room.memory[RoomMemoryKeys.remoteControllerPositions] = packPosList(positions)
-        return (this._remoteControllerPositions = positions)
+        throw Error('No remote controller positions ' + this.room.name)
     }
 
     _usedControllerCoords: Set<string>
@@ -650,24 +668,7 @@ export class RoomManager {
             return (this._remoteControllerPath = unpackPosList(packedPath))
         }
 
-        const commune = Game.rooms[this.room.memory[RoomMemoryKeys.commune]]
-        if (!commune) throw Error('No commune for remote controller path ' + this.room.name)
-
-        const anchor = commune.roomManager.anchor
-        if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
-
-        const path = customFindPath({
-            origin: this.remoteControllerPositions[0],
-            goals: [{ pos: anchor, range: 4 }],
-            typeWeights: remoteTypeWeights,
-            plainCost: defaultRoadPlanningPlainCost,
-            weightStructurePlans: true,
-            avoidStationaryPositions: true,
-        })
-        if (!path.length) throw Error('No remote controller path for ' + this.room.name)
-
-        this.room.memory[RoomMemoryKeys.remoteControllerPath] = packPosList(path)
-        return (this._remoteControllerPath = path)
+        throw Error('No remote controller path ' + this.room.name)
     }
 
     _usedPositions: Set<string>

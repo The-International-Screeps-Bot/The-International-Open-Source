@@ -298,35 +298,28 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // If the room isn't already a remote
 
     if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) {
-
         // Generate new important positions
 
-        delete roomMemory[RoomMemoryKeys.remoteSources]
-        delete this.roomManager._remoteSources
-        this.roomManager.remoteSources
-
-        delete roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]
-        delete this.roomManager._remoteSourceHarvestPositions
-        this.roomManager.remoteSourceHarvestPositions
-
-        delete roomMemory[RoomMemoryKeys.remoteSourcePaths]
-        delete this.roomManager._remoteSourcePaths
-        const remoteSourcePaths = this.roomManager.remoteSourcePaths
-        for (const path of remoteSourcePaths) {
-
-            if (!path.length) return roomMemory[RoomMemoryKeys.type]
+        const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
+        const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
+        const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(scoutingRoom, packedRemoteSourceHarvestPositions)
+        for (const packedPath of packedRemoteSourcePaths) {
+            if (!packedPath.length) {
+                console.log('No remote source paths for ' + this.name)
+                throw Error('No remote source paths for ' + this.name)
+                return roomMemory[RoomMemoryKeys.type]
+            }
         }
+        console.log('remote work 2 check', packedRemoteSourcePaths)
+        const packedRemoteControllerPositions = this.roomManager.findRemoteControllerPositions(scoutingRoom)
+        const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(scoutingRoom, packedRemoteControllerPositions)
+        if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
 
-        delete roomMemory[RoomMemoryKeys.remoteControllerPositions]
-        delete this.roomManager._remoteControllerPositions
-        this.roomManager.remoteControllerPositions
-
-        delete roomMemory[RoomMemoryKeys.remoteControllerPath]
-        delete this.roomManager._remoteControllerPath
-        this.roomManager.remoteControllerPath
-
-        if (!roomMemory[RoomMemoryKeys.remoteSourcePaths].length) throw Error('No RSPs for ' + this.name)
-        if (!roomMemory[RoomMemoryKeys.remoteControllerPath].length) throw Error('No RCPa for ' + this.name)
+        roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
+        roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
+        roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
+        roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
+        roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
 
         roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
@@ -337,12 +330,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         // Add the room's name to the scoutingRoom's remotes list
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
-
-        // Assign the room's commune as the scoutingRoom
-
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
-
         roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
+        console.log('remote paths', roomMemory[RoomMemoryKeys.remoteSourcePaths])
         return roomMemory[RoomMemoryKeys.type]
     }
 
@@ -356,36 +346,27 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     if (newRemoteEfficacy >= currentRemoteEfficacy) return roomMemory[RoomMemoryKeys.type]
 
-    // Make neutral so we don't have type value issues
-
-    roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-    cleanRoomMemory(this.name)
-
     // Generate new important positions
 
-    delete roomMemory[RoomMemoryKeys.remoteSources]
-    delete this.roomManager._remoteSources
-    this.roomManager.remoteSources
-
-    delete roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]
-    delete this.roomManager._remoteSourceHarvestPositions
-    this.roomManager.remoteSourceHarvestPositions
-
-    delete roomMemory[RoomMemoryKeys.remoteSourcePaths]
-    delete this.roomManager._remoteSourcePaths
-    const remoteSourcePaths = this.roomManager.remoteSourcePaths
-    for (const path of remoteSourcePaths) {
-
-        if (!path.length) return roomMemory[RoomMemoryKeys.type]
+    const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
+    const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
+    const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(scoutingRoom, packedRemoteSourceHarvestPositions)
+    for (const packedPath of packedRemoteSourcePaths) {
+        if (!packedPath.length) {
+            throw Error('No remote source paths for ' + this.name)
+            return roomMemory[RoomMemoryKeys.type]
+        }
     }
 
-    delete roomMemory[RoomMemoryKeys.remoteControllerPositions]
-    delete this.roomManager._remoteControllerPositions
-    this.roomManager.remoteControllerPositions
+    const packedRemoteControllerPositions = this.roomManager.findRemoteControllerPositions(scoutingRoom)
+    const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(scoutingRoom, packedRemoteControllerPositions)
+    if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
 
-    delete roomMemory[RoomMemoryKeys.remoteControllerPath]
-    delete this.roomManager._remoteControllerPath
-    this.roomManager.remoteControllerPath
+    roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
+    roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
+    roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
+    roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
+    roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
 
     roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
@@ -396,12 +377,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // Add the room's name to the scoutingRoom's remotes list
 
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
-
-    // Assign the room's commune as the scoutingRoom
-
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
-
     roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
+
     return roomMemory[RoomMemoryKeys.type]
 }
 
