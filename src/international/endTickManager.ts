@@ -15,7 +15,7 @@ class EndTickManager {
         if (!Memory.logging) return
 
         // Fill up the console with empty logs
-        /* for (let i = 0; i < 99; i += 1) console.log() */
+        for (let i = 0; i < 99; i += 1) console.log()
 
         customLog('General data', '⬇️')
         customLog('Creeps total', Object.values(Game.creeps).length, { superPosition: 1 })
