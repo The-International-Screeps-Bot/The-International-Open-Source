@@ -121,7 +121,7 @@ export class RemotesManager {
             if (remote) {
                 /*
                 remoteMemory[RoomMemoryKeys.minDamage] = 0
-                remoteMemory[RoomMemoryKeys.minHeal] = 0
+                remoteMemory[RoomMemory\google-sheets\flowchartKeys.minHeal] = 0
 
                 // Increase the defenderNeed according to the enemy attackers' combined strength
 

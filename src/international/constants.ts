@@ -403,7 +403,7 @@ export enum TrafficPriorities {
 
 // Set of messages to randomly apply to commune rooms
 
-export const communeSign = `A commune of the proletariat. Bourgeoisie not welcome here! v${Memory.breakingVersion}`
+export const communeSign = `A commune of the proletariat. Bourgeoisie not welcome here! v2.${Memory.breakingVersion}`
 
 // Set of messages to randomly apply to non-commune rooms
 
