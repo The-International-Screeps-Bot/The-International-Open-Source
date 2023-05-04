@@ -132,6 +132,14 @@ export class RemotesManager {
                     remoteMemory[RoomMemoryKeys.minHeal] += enemyCreep.combatStrength.ranged
                 } */
 
+                // Temporary measure while DynamicSquads are in progress
+
+                if (remote.enemyAttackers) {
+
+                    remoteMemory[RoomMemoryKeys.abandon] = randomRange(1000, 1500)
+                    continue
+                }
+
                 // If the controller is reserved and not by me
 
                 if (remote.controller.reservation && remote.controller.reservation.username !== Memory.me)
