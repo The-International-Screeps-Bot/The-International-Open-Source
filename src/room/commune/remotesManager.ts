@@ -134,7 +134,7 @@ export class RemotesManager {
 
                 // Temporary measure while DynamicSquads are in progress
 
-                if (remote.enemyAttackers) {
+                if (remote.enemyAttackers.length) {
 
                     remoteMemory[RoomMemoryKeys.abandon] = randomRange(1000, 1500)
                     continue
