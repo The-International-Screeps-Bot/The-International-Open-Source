@@ -258,7 +258,7 @@ export class RoomManager {
             const origin = unpackPosAt(positions, 0)
             const path = customFindPath({
                 origin,
-                goals: [{ pos: anchor, range: 4 }],
+                goals: [{ pos: anchor, range: 3 }],
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
                 weightStructurePlans: true,
@@ -269,7 +269,7 @@ export class RoomManager {
         }
         for (const index in sourcePaths) {
             const path = sourcePaths[index]
-            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name)
+            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + sourcePaths)
         }
 
         return sourcePaths.map(path => packPosList(path))
@@ -297,7 +297,7 @@ export class RoomManager {
             origin =>
                 customFindPath({
                     origin,
-                    goals: [{ pos: anchor, range: 4 }],
+                    goals: [{ pos: anchor, range: 3 }],
                 }).length,
         )
 
@@ -312,7 +312,7 @@ export class RoomManager {
         const origin = unpackPosAt(packedRemoteControllerPositions, 0)
         const path = customFindPath({
             origin,
-            goals: [{ pos: anchor, range: 4 }],
+            goals: [{ pos: anchor, range: 3 }],
             typeWeights: remoteTypeWeights,
             plainCost: defaultRoadPlanningPlainCost,
             weightStructurePlans: true,
