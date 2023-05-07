@@ -16,4 +16,4 @@ servers:
     username: "W1N1"
     password: "password"
     branch: "default"
-
+# add your own servers
