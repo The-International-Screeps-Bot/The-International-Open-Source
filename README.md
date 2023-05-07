@@ -1,5 +1,5 @@
 <div align="center">
-  
+
 <img src="https://user-images.githubusercontent.com/48334001/189508568-fb2c91e5-e348-48c7-87ec-6626a81e1330.png" align="center">
 </div>
 
@@ -54,6 +54,7 @@ You can check your node version with:
 ```powershell
 node -v
 ```
+
 If your node version is too recent, you can change it with NVM:
 
 Linux/MacOS [nvm](https://github.com/nvm-sh/nvm)
@@ -76,11 +77,15 @@ Secondly, DO NOT USE THIS BOT TO BULLY. Do not attack noobs, taking their remote
 
 To begin, you need to decide what branch to use. Main is generally old but stable, while Development is less stable but more up to date. If you want to find bugs or test new features, Development is for you.
 
-Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in the screeps.json file. This reduces cpu usage, and compiles the code so it can be run by Screeps while we develop using folders and typescript.
+Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in `.screeps.yaml` file (see below if you don't have one yet). This compiles the code so it can be run by Screeps while we develop using folders and typescript.
 
 First, rename `.screeps.yaml.example` to `.screeps.yaml` and fill in the required information for each environment you want to run the bot in. For the official server, replace the `token` with an [API token](https://docs.screeps.com/auth-tokens.html) for your account. On private servers, edit *(or copy and rename)* the `pserver` section with `host` set to your server domain or IP then complete `username` and `password` with your credentials on this server. For more information about this file, check the [screeps unified credentials file](https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md) spec.
 
-To then run the bot, use the command `npm run set-dest mmo` replacing mmo with the environment you want to compile to then `npm run push`. This will compile the bot, as well as pushing to the environment. Using `npm run watch` will automatically compile and push on code changes.
+Running `rollup -c` will compile your code and do a "dry run", preparing the code for upload but not actually pushing it. Running `rollup -c --environment DEST:mmo` will compile your code, and then upload it to a screeps server using the `mmo` config from `.screeps.yaml`.
+
+You can use `-cw` instead of `-c` to automatically re-run when your source code changes - for example, `rollup -cw --environment DEST:main` will automatically upload your code to the `mmo` configuration every time your code is changed.
+
+Finally, there are also NPM scripts that serve as aliases for these commands in `package.json` for IDE integration. Running `npm run push-mmo` is equivalent to `rollup -c --environment DEST:mmo`, and `npm run watch-pserver` is equivalent to `rollup -cw --dest pserver`.
 
 For more information, please go to the [wiki](https://github.com/CarsonBurke/The-International-Screeps-Bot/wiki/Usage)
 

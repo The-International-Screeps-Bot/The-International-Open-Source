@@ -1,4 +1,11 @@
-import { CreepMemoryKeys, customColors, packedPosLength, relayOffsets, RoomMemoryKeys, RoomTypes } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    customColors,
+    packedPosLength,
+    relayOffsets,
+    RoomMemoryKeys,
+    RoomTypes,
+} from 'international/constants'
 import {
     customLog,
     findClosestObject,
@@ -43,7 +50,6 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
-
         const creepMemory = Memory.creeps[this.name]
         const remoteName = creepMemory[CreepMemoryKeys.remote]
         if (!remoteName) return
@@ -53,9 +59,8 @@ export class RemoteHauler extends Creep {
         if (!this.findRemote()) return
         if (this.isDying()) return
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteHaulers][
-            creepMemory[CreepMemoryKeys.sourceIndex]
-        ] -= this.parts.carry
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteHaulers][creepMemory[CreepMemoryKeys.sourceIndex]] -=
+            this.parts.carry
     }
 
     hasValidRemote?() {
@@ -269,6 +274,40 @@ export class RemoteHauler extends Creep {
      * @returns If the creep no longer needs energy
      */
     getRemoteSourceResources?() {
+        const creepMemory = Memory.creeps[this.name]
+        const sourceHarvestPos = unpackPosAt(
+            Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceHarvestPositions][
+                creepMemory[CreepMemoryKeys.sourceIndex]
+            ],
+        )
+
+        // If we're ready to take on a request by the source or we already have one, perform it
+
+        const isBySourceHarvestPos = getRange(this.pos, sourceHarvestPos) <= 1
+        if (
+            isBySourceHarvestPos ||
+            creepMemory[CreepMemoryKeys.roomLogisticsRequests].length > 0
+        ) {
+            this.runRoomLogisticsRequestsAdvanced({
+                types: new Set(['pickup', 'withdraw']),
+                resourceTypes: new Set([RESOURCE_ENERGY]),
+                conditions: request => {
+                    // If the target is near the creep or source
+
+                    const targetPos = findObjectWithID(request.targetID).pos
+                    return (
+                        getRange(targetPos, this.pos) <= 1 ||
+                        getRange(
+                            sourceHarvestPos,
+                            this.room.roomManager.remoteSources[creepMemory[CreepMemoryKeys.sourceIndex]].pos,
+                        ) <= 1
+                    )
+                },
+            })
+
+            if (!this.needsResources()) return true
+        }
+
         // Fulfill requests near the hauler
 
         this.runRoomLogisticsRequestsAdvanced({
@@ -282,17 +321,11 @@ export class RemoteHauler extends Creep {
             },
         })
 
-        const sourceHarvestPos = unpackPosAt(
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions][
-                this.memory[CreepMemoryKeys.sourceIndex]
-            ],
-        )
+        if (!this.needsResources()) return true
 
-        // We aren't next to the source
+        // We aren't by the sourceHarvestPos, get adjacent to it
 
-        if (getRange(this.pos, sourceHarvestPos) > 1) {
-            if (!this.needsResources()) return true
-
+        if (!isBySourceHarvestPos) {
             this.createMoveRequestByPath(
                 {
                     origin: this.pos,
@@ -306,11 +339,11 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath: reversePosList(
-                        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourcePaths][
-                            this.memory[CreepMemoryKeys.sourceIndex]
+                        Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourcePaths][
+                            creepMemory[CreepMemoryKeys.sourceIndex]
                         ],
                     ),
-                    remoteName: this.memory[CreepMemoryKeys.remote],
+                    remoteName: this.room.name,
                 },
             )
 
