@@ -686,6 +686,7 @@ export class CommuneManager {
     sourceLinkIDs: Id<StructureLink>[]
     _sourceLinks: StructureLink[]
     get sourceLinks() {
+
         if (this._sourceLinks) return this._sourceLinks
 
         const links: StructureLink[] = []
@@ -703,6 +704,24 @@ export class CommuneManager {
             }
         }
 
+        const stampAnchors = this.room.roomManager.stampAnchors
+        if (!stampAnchors) return this._sourceLinks = []
+
+        let definedLinks = 0
+
+        for (let i = 0; i < stampAnchors.sourceLink.length; i++) {
+
+            const structure = this.room.findStructureAtCoord(
+                stampAnchors.sourceLink[i],
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as false | StructureLink
+
+            if (!structure) continue
+
+            links[i] = structure
+            definedLinks += 1
+        }
+/*
         const positions = this.room.roomManager.communeSourceHarvestPositions
         for (let i = 0; i < positions.length; i++) {
             const anchor = positions[i][0]
@@ -716,8 +735,8 @@ export class CommuneManager {
 
             links[i] = structure
         }
-
-        if (links.length === positions.length) this.sourceLinkIDs = links.map(link => link.id)
+ */
+        if (definedLinks === stampAnchors.sourceLink.length) this.sourceLinkIDs = links.map(link => link.id)
         return (this._sourceLinks = links)
     }
 

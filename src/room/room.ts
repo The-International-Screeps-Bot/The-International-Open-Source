@@ -269,7 +269,7 @@ export class RoomManager {
         }
         for (const index in sourcePaths) {
             const path = sourcePaths[index]
-            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + sourcePaths)
+            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + JSON.stringify(sourcePaths))
         }
 
         return sourcePaths.map(path => packPosList(path))
