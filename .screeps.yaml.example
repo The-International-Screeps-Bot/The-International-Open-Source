@@ -3,17 +3,14 @@ servers:
     host: screeps.com
     secure: true
     token: "00000000-0a0a-0a00-000a-a0000a0000a0"
-    branch: "default"
   pserver:
     host: 127.0.0.1
     port: 21025
     secure: false
     username: "your username (case sensitive!)"
     password: "your password"
-    branch: "default"
   perf:
     host: 127.0.0.1
     username: "W1N1"
     password: "password"
-    branch: "default"
 # add your own servers
