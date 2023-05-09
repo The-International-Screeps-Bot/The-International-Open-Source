@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, customColors, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, customColors, roomDimensions, squadQuotas } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
@@ -16,19 +16,28 @@ export class DynamicSquad {
      */
     members: Antifa[] = []
     memberNames: string[] = []
+    membersByType: Partial<{[role in CreepRoles]: string[] }>
     leader: Antifa
 
     constructor(memberNames: string[]) {
+
+
+        this.membersByType = {}
+        for (const role in squadQuotas.dynamic.antifaRangedAttacker) {
+
+            this.membersByType[role as CreepRoles] = []
+        }
+
         for (let i = 0; i < memberNames.length; i++) {
             const member = Game.creeps[memberNames[i]]
             this.members.push(member)
             memberNames.push(member.name)
+            this.membersByType[member.role].push(member.name)
 
             member.squad = this
             member.squadRan = true
         }
 
-        this.leader = this.members[0]
         this.moveType = this.leader.memory[CreepMemoryKeys.squadMoveType]
 
         // Ensure the leader is the one with melee parts, if the quad is melee
@@ -88,11 +97,36 @@ export class DynamicSquad {
     }
 
     runCombat() {
-        /*
-        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') return this.advancedAttack()
-        return this.advancedDismantle()
-         */
+
+        this.runCombatAttackDuo()
+        this.runCombatRangedHeal()
+        this.runCombatDismantler()
+    }
+
+    runCombatAttackDuo() {
+
+        const attacker = this.membersByType.antifaAttacker[0]
+        if (!attacker) return
+        const healer = this.membersByType.antifaHealer[0]
+        if (!healer) return
+
+
+    }
+
+    runCombatRangedHeal() {
+
+        const creep = this.membersByType.antifaRangedAttacker[0]
+        if (!creep) return
+
+
+    }
+
+    runCombatDismantler() {
+
+        const creep = this.membersByType.antifaDismantler[0]
+        if (!creep) return
+
+
     }
 
     getInFormation() {
