@@ -105,9 +105,30 @@ export class DynamicSquad {
 
     combatAttackDuoGetInFormation(attacker: Creep, healer: Creep) {
 
-        if (getRange(attacker.pos, healer.pos) > 1) {
+        const range = getRange(attacker.pos, healer.pos)
 
-            
+        if (range > 1) {
+
+            if (range > 2) {
+
+                attacker.createMoveRequest({
+                    goals: [
+                        {
+                            pos: healer.pos,
+                            range: 1,
+                        },
+                    ],
+                })
+            }
+
+            healer.createMoveRequest({
+                goals: [
+                    {
+                        pos: attacker.pos,
+                        range: 1,
+                    },
+                ],
+            })
             return RESULT_ACTION
         }
 
@@ -135,15 +156,57 @@ export class DynamicSquad {
 
         const creep = Game.creeps[creepName]
 
+
     }
 
     runCombatDismantler() {
 
         const creepName = this.membersByType.antifaDismantler[0]
-        if (!creepName) return
+        if (!creepName) return false
 
         const creep = Game.creeps[creepName]
 
+        // Avoid targets we can't dismantle
+
+        const structures = creep.room.combatStructureTargets
+
+        if (!structures.length) return false
+
+        let structure = findClosestObject(creep.pos, structures)
+        if (Memory.roomVisuals)
+            creep.room.visual.line(creep.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+
+        if (getRange(creep.pos, structure.pos) > 1) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [{ pos: structure.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        if (creep.dismantle(structure) !== OK) return false
+
+        // See if the structure is destroyed next tick
+
+        structure.nextHits -= creep.parts.work * DISMANTLE_POWER
+        if (structure.nextHits > 0) return true
+
+        // Try to find a new structure to preemptively move to
+
+        structures.splice(structures.indexOf(structure), 1)
+        if (!structures.length) return true
+
+        structure = findClosestObject(creep.pos, structures)
+
+        if (getRange(creep.pos, structure.pos) > 1) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [{ pos: structure.pos, range: 1 }],
+            })
+        }
+
+        return true
     }
 
     getInFormation() {
