@@ -301,8 +301,14 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         // Generate new important positions
 
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
-        const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
-        const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(scoutingRoom, packedRemoteSourceHarvestPositions)
+        const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
+            scoutingRoom,
+            packedRemoteSources,
+        )
+        const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
+            scoutingRoom,
+            packedRemoteSourceHarvestPositions,
+        )
         for (const packedPath of packedRemoteSourcePaths) {
             if (!packedPath.length) {
                 console.log('No remote source paths for ' + this.name)
@@ -312,7 +318,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         }
         console.log('remote work 2 check', packedRemoteSourcePaths)
         const packedRemoteControllerPositions = this.roomManager.findRemoteControllerPositions(scoutingRoom)
-        const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(scoutingRoom, packedRemoteControllerPositions)
+        const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
+            scoutingRoom,
+            packedRemoteControllerPositions,
+        )
         if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
 
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
@@ -349,8 +358,14 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // Generate new important positions
 
     const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
-    const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
-    const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(scoutingRoom, packedRemoteSourceHarvestPositions)
+    const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
+        scoutingRoom,
+        packedRemoteSources,
+    )
+    const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
+        scoutingRoom,
+        packedRemoteSourceHarvestPositions,
+    )
     for (const packedPath of packedRemoteSourcePaths) {
         if (!packedPath.length) {
             throw Error('No remote source paths for ' + this.name)
@@ -359,7 +374,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     }
 
     const packedRemoteControllerPositions = this.roomManager.findRemoteControllerPositions(scoutingRoom)
-    const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(scoutingRoom, packedRemoteControllerPositions)
+    const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
+        scoutingRoom,
+        packedRemoteControllerPositions,
+    )
     if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
 
     roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
@@ -2036,7 +2054,11 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
     // We can only handle energy until we have a storage or terminal
-    else if (args.resourceType !== RESOURCE_ENERGY && !this.advancedLogistics) return RESULT_FAIL
+    else if (
+        args.resourceType !== RESOURCE_ENERGY &&
+        (!this.storage || this.controller.level < 4 || !this.terminal || this.controller.level < 6)
+    )
+        return RESULT_FAIL
 
     let amount: number
 

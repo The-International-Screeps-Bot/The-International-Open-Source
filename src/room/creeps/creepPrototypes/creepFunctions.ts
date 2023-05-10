@@ -1419,6 +1419,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
                 request.amount +
                 (request.income ? getRange(findObjectWithID(request.targetID).pos, this.pos) * request.income : 0)
  */
+
             // Customizable conditions
 
             if (args) {

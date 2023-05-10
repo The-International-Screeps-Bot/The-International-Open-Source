@@ -446,13 +446,16 @@ export class CommuneManager {
 
     _storingStructures: (StructureStorage | StructureTerminal)[]
 
+    /**
+     * Storing structures - storage or teirmal - filtered to be defined and RCL active
+     */
     get storingStructures() {
         if (this._storingStructures) return this._storingStructures
 
         const storingStructures: (StructureStorage | StructureTerminal)[] = []
 
-        if (this.room.storage) storingStructures.push(this.room.storage)
-        if (this.room.terminal) storingStructures.push(this.room.terminal)
+        if (this.room.storage && this.room.controller.level >= 4) storingStructures.push(this.room.storage)
+        if (this.room.terminal && this.room.controller.level >= 6) storingStructures.push(this.room.terminal)
 
         return this._storingStructures = storingStructures
     }

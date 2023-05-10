@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, customColors, roomDimensions, squadQuotas } from 'international/constants'
+import { CreepMemoryKeys, RESULT_ACTION, RESULT_SUCCESS, customColors, roomDimensions, squadQuotas } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
@@ -103,29 +103,46 @@ export class DynamicSquad {
         this.runCombatDismantler()
     }
 
+    combatAttackDuoGetInFormation(attacker: Creep, healer: Creep) {
+
+        if (getRange(attacker.pos, healer.pos) > 1) {
+
+            
+            return RESULT_ACTION
+        }
+
+        return RESULT_SUCCESS
+    }
+
     runCombatAttackDuo() {
 
-        const attacker = this.membersByType.antifaAttacker[0]
-        if (!attacker) return
-        const healer = this.membersByType.antifaHealer[0]
-        if (!healer) return
+        const attackerName = this.membersByType.antifaAttacker[0]
+        if (!attackerName) return
 
+        const healerName = this.membersByType.antifaHealer[0]
+        if (!healerName) return
 
+        const attacker = Game.creeps[attackerName]
+        const healer = Game.creeps[healerName]
+
+        this.combatAttackDuoGetInFormation(attacker, healer)
     }
 
     runCombatRangedHeal() {
 
-        const creep = this.membersByType.antifaRangedAttacker[0]
-        if (!creep) return
+        const creepName = this.membersByType.antifaRangedAttacker[0]
+        if (!creepName) return
 
+        const creep = Game.creeps[creepName]
 
     }
 
     runCombatDismantler() {
 
-        const creep = this.membersByType.antifaDismantler[0]
-        if (!creep) return
+        const creepName = this.membersByType.antifaDismantler[0]
+        if (!creepName) return
 
+        const creep = Game.creeps[creepName]
 
     }
 
