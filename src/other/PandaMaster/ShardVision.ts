@@ -29,7 +29,7 @@ function saveShardVisionMemory(shardVision: ShardVisionMemory) {
     InterShardMemory.setLocal(JSON.stringify(segment))
 }
 
-const secondsAddition = 1000 * 60 * 60
+const secondsAddition = 15 * 60 * 1000
 
 class HandleSpawning {
     private _shardNames: string[]
@@ -151,9 +151,9 @@ export default class GetShardVision {
                 }
 
                 if (this.isMyShard(shardName)) {
-                    if (!loggedOrders && Game.time % 100 === 0) {
+                    if (!loggedOrders && Game.time % 50 === 0) {
                         console.log(JSON.stringify(Game.market.getAllOrders()))
-                        if (Game.time % 1000 === 0) {
+                        if (Game.time % 500 === 0) {
                             console.log(JSON.stringify(Game.market.getHistory()))
                         }
                         loggedOrders = true
