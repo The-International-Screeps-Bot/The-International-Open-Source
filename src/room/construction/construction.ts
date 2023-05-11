@@ -1,6 +1,8 @@
 import {
     buildableStructuresSet,
     buildableStructureTypes,
+    RESULT_ACTION,
+    RESULT_NO_ACTION,
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
@@ -44,6 +46,7 @@ export class ConstructionManager {
 
         /* this.visualize() */
 
+        if (this.clearEnemyStructures() === RESULT_ACTION) return
         this.place()
         this.migrate()
     }
@@ -269,5 +272,29 @@ export class ConstructionManager {
 
             structure.destroy()
         } */
+    }
+
+    /**
+     * If it hasn't yet been done for this room, check for and destroy any structures owned by another player
+     */
+    private clearEnemyStructures() {
+
+        const roomMemory = Memory.rooms[this.room.name]
+        if (roomMemory[RoomMemoryKeys.clearedEnemyStructures]) return RESULT_NO_ACTION
+
+        const structures = this.room.roomManager.structures
+        for (const structureType in structures) {
+
+            for (const structure of structures[structureType as StructureConstant]) {
+
+                if (!(structure as OwnedStructure).owner) continue
+                if ((structure as OwnedStructure).owner.username !== Memory.me) continue
+
+                structure.destroy()
+            }
+        }
+
+        roomMemory[RoomMemoryKeys.clearedEnemyStructures] = true
+        return RESULT_ACTION
     }
 }

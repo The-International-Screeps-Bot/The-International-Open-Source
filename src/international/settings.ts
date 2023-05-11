@@ -116,7 +116,7 @@ export interface Settings {
 export const settings: Settings = {
     // Increment to induce migrations which can be controlled with the migration manager
 
-    breakingVersion: 100,
+    breakingVersion: 101,
 
     // Default values, do not change. Instead modify clones in memory
 

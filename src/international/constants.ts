@@ -212,6 +212,7 @@ export enum RoomMemoryKeys {
     remoteSources,
     remoteSourceHarvestPositions,
     remoteSourcePaths,
+    clearedEnemyStructures,
 
     // Ally
 
@@ -245,6 +246,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.score,
     RoomMemoryKeys.dynamicScore,
     RoomMemoryKeys.dynamicScoreUpdate,
+    RoomMemoryKeys.clearedEnemyStructures,
 
     RoomMemoryKeys.commune,
     RoomMemoryKeys.reservationEfficacy,
@@ -290,6 +292,7 @@ export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.score,
         RoomMemoryKeys.dynamicScore,
         RoomMemoryKeys.dynamicScoreUpdate,
+        RoomMemoryKeys.clearedEnemyStructures,
     ]),
     [RoomTypes.remote]: new Set([
         RoomMemoryKeys.commune,
