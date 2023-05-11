@@ -288,7 +288,7 @@ export class ConstructionManager {
             for (const structure of structures[structureType as StructureConstant]) {
 
                 if (!(structure as OwnedStructure).owner) continue
-                if ((structure as OwnedStructure).owner.username !== Memory.me) continue
+                if ((structure as OwnedStructure).owner.username === Memory.me) continue
 
                 structure.destroy()
             }
