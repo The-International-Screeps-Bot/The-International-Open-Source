@@ -29,13 +29,15 @@ function saveShardVisionMemory(shardVision: ShardVisionMemory) {
     InterShardMemory.setLocal(JSON.stringify(segment))
 }
 
-const secondsAddition = 15 * 60 * 1000
+const secondsAddition = 60 * 60 * 1000
 
 class HandleSpawning {
     private _shardNames: string[]
     private _shardVisionMemory: ShardVisionMemory
-    constructor(shardNames: string[]) {
+    private _creepsCount: number = 0
+    constructor(shardNames: string[], creepCount: number) {
         this._shardNames = shardNames
+        this._creepsCount = creepCount
         this._shardVisionMemory = loadShardVisionMemory(shardNames, this._shardNames[0])
     }
 
@@ -51,19 +53,16 @@ class HandleSpawning {
         return spawnResult === OK
     }
 
-    public spawnCreepIfNeeded() {
-        this._shardVisionMemory.lastSeen = Date.now() + secondsAddition
+    public spawnCreepIfNeeded(shardName: string) {
+        if (this._creepsCount > 0) this._shardVisionMemory.lastSeen = Date.now() + secondsAddition
 
-        for (let i = 0; i < this._shardNames.length; i++) {
-            const shardName = this._shardNames[i]
-            const shardMemory = loadShardVisionMemory(this._shardNames, shardName)
-            if (Math.max(this._shardVisionMemory.shards[shardName], shardMemory.lastSeen) < Date.now()) {
-                const spawnResult = this.spawnCreep(shardName)
-                if (spawnResult) {
-                    this._shardVisionMemory.shards[shardName] = Date.now() + secondsAddition
-                    saveShardVisionMemory(this._shardVisionMemory)
-                    return true
-                }
+        const shardMemory = loadShardVisionMemory(this._shardNames, shardName)
+        if (Math.max(this._shardVisionMemory.shards[shardName], shardMemory.lastSeen) < Date.now()) {
+            const spawnResult = this.spawnCreep('shard0')
+            if (spawnResult) {
+                this._shardVisionMemory.shards[shardName] = Date.now() + secondsAddition
+                saveShardVisionMemory(this._shardVisionMemory)
+                return true
             }
         }
         return false
@@ -92,20 +91,22 @@ export default class GetShardVision {
 
     public Handle(): void {
         if (!this._shardNames.includes(Game.shard.name)) return
+        let spawnedCreep = false
 
         const roomNames: { [roomName: string]: string[] } = {}
-        this._shardNames.forEach((shardName, index): void => {
-            if (index === 0) {
-                const handleSpawning = new HandleSpawning(this._shardNames)
-                if (handleSpawning.spawnCreepIfNeeded()) {
+        this._shardNames.forEach((shardName): void => {
+            const creeps = Object.values(Game.creeps).filter(c => c.name.includes(shardName))
+            if (Game.shard.name === this._shardNames[0]) {
+                const handleSpawning = new HandleSpawning(this._shardNames, creeps.length)
+                if (!spawnedCreep && handleSpawning.spawnCreepIfNeeded(shardName)) {
                     customLog(`Spawning ShardVision Creep for ${shardName}!`, shardName)
+                    spawnedCreep = true
                 }
             }
             let loggedOrders = false
 
-            if (this.isMyShard(shardName) && this._shardNames[0] !== shardName) HandleSpawning.saveLastSeen(shardName)
+            if (this.isMyShard(shardName) && creeps.length > 0) HandleSpawning.saveLastSeen(shardName)
 
-            const creeps = Object.values(Game.creeps).filter(c => c.name.includes(shardName))
             creeps.forEach(creep => {
                 Game.map.visual.text(shardName, creep.pos, { backgroundColor: '#000000', opacity: 1, fontSize: 4 })
                 if (!roomNames[creep.room.name]) roomNames[creep.room.name] = [shardName]
@@ -151,7 +152,7 @@ export default class GetShardVision {
                 }
 
                 if (this.isMyShard(shardName)) {
-                    if (!loggedOrders && Game.time % 50 === 0) {
+                    if (!loggedOrders && Game.time % 100 === 0) {
                         console.log(JSON.stringify(Game.market.getAllOrders()))
                         if (Game.time % 500 === 0) {
                             console.log(JSON.stringify(Game.market.getHistory()))
