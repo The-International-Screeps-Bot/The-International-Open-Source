@@ -724,21 +724,7 @@ export class CommuneManager {
             links[i] = structure
             definedLinks += 1
         }
-/*
-        const positions = this.room.roomManager.communeSourceHarvestPositions
-        for (let i = 0; i < positions.length; i++) {
-            const anchor = positions[i][0]
-            const structure = this.room.findStructureInRange(
-                anchor,
-                1,
-                structure => structure.structureType === STRUCTURE_LINK,
-            ) as false | StructureLink
 
-            if (!structure) continue
-
-            links[i] = structure
-        }
- */
         if (definedLinks === stampAnchors.sourceLink.length) this.sourceLinkIDs = links.map(link => link.id)
         return (this._sourceLinks = links)
     }

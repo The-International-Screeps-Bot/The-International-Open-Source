@@ -99,7 +99,7 @@ export class DynamicSquad {
     runCombat() {
 
         this.runCombatAttackDuo()
-        this.runCombatRangedHeal()
+        this.runCombatRangedAttacker()
         this.runCombatDismantler()
     }
 
@@ -149,14 +149,178 @@ export class DynamicSquad {
         this.combatAttackDuoGetInFormation(attacker, healer)
     }
 
-    runCombatRangedHeal() {
+    runCombatRangedAttacker() {
 
         const creepName = this.membersByType.antifaRangedAttacker[0]
-        if (!creepName) return
+        if (!creepName) return false
 
         const creep = Game.creeps[creepName]
 
+        let enemyAttackers = creep.room.enemyAttackers.filter(function (enemyAttacker) {
+            return !enemyAttacker.isOnExit
+        })
 
+        if (!enemyAttackers.length) enemyAttackers = creep.room.enemyAttackers
+
+        // If there are none
+
+        if (!enemyAttackers.length) {
+            let enemyCreeps = creep.room.enemyCreeps.filter(function (enemyAttacker) {
+                return !enemyAttacker.isOnExit
+            })
+
+            if (!enemyCreeps.length) enemyCreeps = creep.room.enemyCreeps
+
+            if (!enemyCreeps.length) {
+                if (creep.aggressiveHeal()) return true
+                return this.rangedAttackStructures(creep)
+            }
+
+            // Heal nearby creeps
+
+            if (creep.passiveHeal()) return true
+
+            creep.message = 'EC'
+
+            const enemyCreep = findClosestObject(creep.pos, enemyCreeps)
+            if (Memory.roomVisuals)
+                creep.room.visual.line(creep.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
+
+            // Get the range between the creeps
+
+            const range = getRangeXY(creep.pos.x, enemyCreep.pos.x, creep.pos.y, enemyCreep.pos.y)
+
+            // If the range is more than 1
+
+            if (range > 1) {
+                creep.rangedAttack(enemyCreep)
+
+                // Have the create a moveRequest to the enemyAttacker and inform true
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: enemyCreep.pos, range: 1 }],
+                })
+
+                return true
+            }
+
+            creep.rangedMassAttack()
+            if (enemyCreep.canMove && !enemyCreep.isOnExit) creep.assignMoveRequest(enemyCreep.pos)
+            return true
+        }
+
+        // Otherwise, get the closest enemyAttacker
+
+        const enemyAttacker = findClosestObject(creep.pos, enemyAttackers)
+        if (Memory.roomVisuals)
+            creep.room.visual.line(creep.pos, enemyAttacker.pos, { color: customColors.green, opacity: 0.3 })
+
+        // Get the range between the creeps
+
+        const range = getRangeXY(creep.pos.x, enemyAttacker.pos.x, creep.pos.y, enemyAttacker.pos.y)
+
+        // If it's more than range 3
+
+        if (range > 3) {
+            // Heal nearby creeps
+
+            creep.passiveHeal()
+
+            // Make a moveRequest to it and inform true
+
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        creep.message = 'AEA'
+
+        // Have the creep pre-heal itself
+
+        creep.heal(creep)
+
+        if (range === 1) creep.rangedMassAttack()
+        else creep.rangedAttack(enemyAttacker)
+
+        // If the creep has less heal power than the enemyAttacker's attack power
+
+        if (creep.combatStrength.heal < enemyAttacker.combatStrength.ranged) {
+            if (range === 3) return true
+
+            // If too close
+
+            if (range <= 2) {
+                // Have the creep flee
+
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [{ pos: enemyAttacker.pos, range: 1 }],
+                    flee: true,
+                })
+            }
+
+            return true
+        }
+
+        if (range > 1) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [{ pos: enemyAttacker.pos, range: 1 }],
+            })
+
+            return true
+        }
+
+        if (enemyAttacker.canMove) creep.assignMoveRequest(enemyAttacker.pos)
+        return true
+    }
+
+    rangedAttackStructures?(creep: Creep) {
+        creep.message = 'RAS'
+
+        const structures = creep.room.combatStructureTargets
+
+        if (!structures.length) return false
+
+        let structure = findClosestObject(creep.pos, structures)
+        if (Memory.roomVisuals)
+            creep.room.visual.line(creep.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+
+        if (getRangeXY(creep.pos.x, structure.pos.x, creep.pos.y, structure.pos.y) > 3) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [{ pos: structure.pos, range: 3 }],
+            })
+
+            return false
+        }
+
+        if (creep.rangedAttack(structure) !== OK) return false
+
+        // See if the structure is destroyed next tick
+
+        structure.nextHits -= creep.parts.ranged_attack * RANGED_ATTACK_POWER
+        if (structure.nextHits > 0) return true
+
+        // Try to find a new structure to preemptively move to
+
+        structures.splice(structures.indexOf(structure), 1)
+        if (!structures.length) return true
+
+        structure = findClosestObject(creep.pos, structures)
+
+        if (getRangeXY(creep.pos.x, structure.pos.y, creep.pos.y, structure.pos.y) > 3) {
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [{ pos: structure.pos, range: 3 }],
+            })
+        }
+
+        return true
     }
 
     runCombatDismantler() {
