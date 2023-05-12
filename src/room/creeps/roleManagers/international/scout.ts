@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomMemoryKeys, RoomTypes, communeSign, nonCommuneSigns } from 'international/constants'
+import { CreepMemoryKeys, RESULT_FAIL, RoomMemoryKeys, RoomTypes, communeSign, nonCommuneSigns } from 'international/constants'
 import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
 import { partial } from 'lodash'
 
@@ -197,7 +197,7 @@ export class Scout extends Creep {
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) === 'unpathable'
+                }) === RESULT_FAIL
             )
                 return true
 
@@ -267,7 +267,7 @@ export class Scout extends Creep {
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) === 'unpathable'
+                }) === RESULT_FAIL
             ) {
                 let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]]
                 if (!roomMemory)

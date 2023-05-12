@@ -471,6 +471,10 @@ export class RemoteHauler extends Creep {
         creepAtPos.nextStore.energy += nextEnergy
  */
 
+        customLog('thisEnergy', this.store.energy)
+        customLog('creepAtPos Energy', creepAtPos.freeNextStore)
+        customLog('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
+
         const nextEnergy = Math.min(this.store.energy, creepAtPos.freeNextStore)
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy

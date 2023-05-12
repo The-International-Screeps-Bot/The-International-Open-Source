@@ -1,4 +1,4 @@
-import { WorkRequestKeys, CreepMemoryKeys, RoomMemoryKeys, RoomTypes } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, RoomMemoryKeys, RoomTypes, RESULT_FAIL } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -203,7 +203,7 @@ export class AllyVanguard extends Creep {
                         ally: Infinity,
                         keeper: Infinity,
                     },
-                }) === 'unpathable'
+                }) === RESULT_FAIL
             ) {
                 const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
                 if (request) request[WorkRequestKeys.abandon] = 20000

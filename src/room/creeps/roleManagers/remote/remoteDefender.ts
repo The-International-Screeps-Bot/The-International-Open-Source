@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomMemoryKeys, RoomTypes } from 'international/constants'
+import { CreepMemoryKeys, RESULT_FAIL, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -313,22 +313,23 @@ export class RemoteDefender extends Creep {
 
             // Otherwise, create a moveRequest to its remote
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.remote]),
-                        range: 25,
-                    },
-                ],
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-            })
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.remote]),
+                            range: 25,
+                        },
+                    ],
+                    typeWeights: remoteTypeWeights,
+                }) === RESULT_FAIL
+            ) {
+
+
+                Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                delete creep.memory[CreepMemoryKeys.remote]
+            }
         }
     }
 }
