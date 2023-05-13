@@ -107,20 +107,6 @@ export class SpawningStructuresManager {
     private runSpawnRequest(index: number): false | void {
         const request = this.spawnRequests[index]
 
-        if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
-            customLog(
-                'Failed to spawn',
-                `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${request.cost} / ${
-                    this.communeManager.nextSpawnEnergyAvailable
-                }, body: ${JSON.stringify(request.bodyPartCounts)}`,
-                {
-                    textColor: customColors.white,
-                    bgColor: customColors.red,
-                },
-            )
-            return false
-        }
-
         // We're trying to build a creep larger than this room can spawn
         // If this is ran then there is a bug in spawnRequest creation
 
@@ -136,6 +122,20 @@ export class SpawningStructuresManager {
                 },
             )
 
+            return false
+        }
+
+        if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
+            customLog(
+                'Failed to spawn',
+                `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
+                    this.communeManager.nextSpawnEnergyAvailable
+                } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
+                {
+                    textColor: customColors.white,
+                    bgColor: customColors.red,
+                },
+            )
             return false
         }
 
@@ -189,7 +189,9 @@ export class SpawningStructuresManager {
         request.body = []
 
         if (request.role === 'hauler' || request.role === 'remoteHauler') {
-            const ratio = (request.bodyPartCounts[CARRY] + request.bodyPartCounts[WORK]) / request.bodyPartCounts[MOVE]
+            const ratio =
+                (request.bodyPartCounts[CARRY] + request.bodyPartCounts[WORK]) /
+                request.bodyPartCounts[MOVE]
 
             for (let i = -1; i < request.bodyPartCounts[CARRY] - 1; i++) {
                 request.body.push(CARRY)
@@ -258,7 +260,8 @@ export class SpawningStructuresManager {
         }
 
         const anchor = this.communeManager.room.roomManager.anchor
-        if (!anchor) throw Error('No anchor for spawning structures ' + this.communeManager.room.name)
+        if (!anchor)
+            throw Error('No anchor for spawning structures ' + this.communeManager.room.name)
 
         // Sort by distance from the first pos in the path
 
@@ -338,13 +341,18 @@ export class SpawningStructuresManager {
     private spawnRequestIndividually(args: SpawnRequestArgs) {
         // Get the maxCostPerCreep
 
-        const maxCostPerCreep = Math.max(this.findMaxCostPerCreep(args.maxCostPerCreep), args.minCost)
+        const maxCostPerCreep = Math.max(
+            this.findMaxCostPerCreep(args.maxCostPerCreep),
+            args.minCost,
+        )
 
         // So long as minCreeps is more than the current number of creeps
 
         while (
             args.minCreeps >
-            (args.spawnGroup ? args.spawnGroup.length : this.communeManager.room.creepsFromRoom[args.role].length)
+            (args.spawnGroup
+                ? args.spawnGroup.length
+                : this.communeManager.room.creepsFromRoom[args.role].length)
         ) {
             // Construct important imformation for the spawnRequest
 
@@ -481,7 +489,10 @@ export class SpawningStructuresManager {
     private spawnRequestByGroup(args: SpawnRequestArgs) {
         // Get the maxCostPerCreep
 
-        const maxCostPerCreep = Math.max(this.findMaxCostPerCreep(args.maxCostPerCreep), args.minCost)
+        const maxCostPerCreep = Math.max(
+            this.findMaxCostPerCreep(args.maxCostPerCreep),
+            args.minCost,
+        )
 
         // Find the totalExtraParts using the partsMultiplier
 
@@ -493,7 +504,8 @@ export class SpawningStructuresManager {
 
         // Loop through creep names of the requested role
 
-        for (const creepName of args.spawnGroup || this.communeManager.room.creepsFromRoom[args.role]) {
+        for (const creepName of args.spawnGroup ||
+            this.communeManager.room.creepsFromRoom[args.role]) {
             const creep = Game.creeps[creepName]
 
             // Take away the amount of parts the creep with the name has from totalExtraParts

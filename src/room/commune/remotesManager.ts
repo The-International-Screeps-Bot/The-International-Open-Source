@@ -152,12 +152,12 @@ export class RemotesManager {
 
                 // Create need if there are any structures that need to be removed
 
-                remoteMemory[RoomMemoryKeys.remoteDismantler] = Math.min(remote.dismantleTargets.length, 1)
+                remoteMemory[RoomMemoryKeys.remoteDismantler] = Math.min(remote.dismantleTargets.length, 8)
             }
 
             // If the remote is assumed to be reserved by an enemy or an invader core
 
-            if (remoteMemory[RoomMemoryKeys.enemyReserved] || remoteMemory[RoomMemoryKeys.invaderCore]) {
+            if (remoteMemory[RoomMemoryKeys.enemyReserved] || remoteMemory[RoomMemoryKeys.invaderCore] || remoteMemory[RoomMemoryKeys.remoteDismantler]) {
                 for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
                 }
