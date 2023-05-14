@@ -214,7 +214,7 @@ declare global {
         /**
          * room types as keys to weight based on properties
          */
-        typeWeights?: { [weight: string]: number }
+        typeWeights?: Partial<{ [key in RoomTypes]: number }>
         plainCost?: number
         swampCost?: number
         maxRooms?: number

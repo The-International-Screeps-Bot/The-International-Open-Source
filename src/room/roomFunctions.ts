@@ -252,11 +252,11 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             origin: source.pos,
             goals: [{ pos: anchor, range: 4 }],
             typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                enemyRemote: Infinity,
-                allyRemote: Infinity,
+                [RoomTypes.enemy]: Infinity,
+                [RoomTypes.ally]: Infinity,
+                [RoomTypes.keeper]: Infinity,
+                [RoomTypes.enemyRemote]: Infinity,
+                [RoomTypes.allyRemote]: Infinity,
             },
             plainCost: defaultPlainCost,
             weightStructurePlans: true,
@@ -285,11 +285,11 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         origin: this.controller.pos,
         goals: [{ pos: anchor, range: 4 }],
         typeWeights: {
-            enemy: Infinity,
-            ally: Infinity,
-            keeper: Infinity,
-            enemyRemote: Infinity,
-            allyRemote: Infinity,
+            [RoomTypes.enemy]: Infinity,
+            [RoomTypes.ally]: Infinity,
+            [RoomTypes.keeper]: Infinity,
+            [RoomTypes.enemyRemote]: Infinity,
+            [RoomTypes.allyRemote]: Infinity,
         },
     }).length
 

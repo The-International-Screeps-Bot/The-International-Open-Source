@@ -1,4 +1,4 @@
-import { WorkRequestKeys, CreepMemoryKeys, RESULT_FAIL } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, RESULT_FAIL, RoomTypes } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -79,9 +79,9 @@ export class Claimer extends Creep {
                     plainCost: 1,
                     swampCost: creep.parts.move >= 5 ? 1 : undefined,
                     typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.keeper]: Infinity,
                     },
                 }) === RESULT_FAIL
             ) {

@@ -1,4 +1,4 @@
-import { CombatRequestKeys, CreepMemoryKeys, antifaRoles, customColors, squadQuotas } from 'international/constants'
+import { CombatRequestKeys, CreepMemoryKeys, RoomTypes, antifaRoles, customColors, squadQuotas } from 'international/constants'
 import { customLog, findClosestObject, getRangeXY, isCoordExit, isXYExit } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { Duo } from './duo'
@@ -210,9 +210,9 @@ export class Antifa extends Creep {
                     },
                 ],
                 typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
+                    [RoomTypes.enemy]: Infinity,
+                    [RoomTypes.ally]: Infinity,
+                    [RoomTypes.keeper]: Infinity,
                 },
             })
             return
@@ -231,9 +231,9 @@ export class Antifa extends Creep {
                 },
             ],
             typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
+                [RoomTypes.enemy]: Infinity,
+                [RoomTypes.ally]: Infinity,
+                [RoomTypes.keeper]: Infinity,
             },
         })
     }

@@ -53,8 +53,8 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
 
             // If the type is in typeWeights, inform the weight for the type
 
-            if (args.typeWeights && args.typeWeights[roomMemory[RoomMemoryKeys.type]])
-                return args.typeWeights[roomMemory[RoomMemoryKeys.type]]
+            if (args.typeWeights && args.typeWeights[roomMemory[RoomMemoryKeys.type] as 0])
+                return args.typeWeights[roomMemory[RoomMemoryKeys.type] as 0]
 
             return 1
         }

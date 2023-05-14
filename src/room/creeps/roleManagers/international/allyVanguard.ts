@@ -199,9 +199,9 @@ export class AllyVanguard extends Creep {
                     goals: [{ pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
                     avoidEnemyRanges: true,
                     typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.keeper]: Infinity,
                     },
                 }) === RESULT_FAIL
             ) {

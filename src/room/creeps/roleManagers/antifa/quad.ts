@@ -3,6 +3,7 @@ import {
     CreepMemoryKeys,
     RESULT_ACTION,
     RESULT_NO_ACTION,
+    RoomTypes,
     customColors,
     packedQuadAttackMemberOffsets,
     quadAttackMemberOffsets,
@@ -133,12 +134,12 @@ export class Quad {
                 },
             ],
             typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: 5,
-                enemyRemote: 5,
-                allyRemote: 5,
-                neutral: 2,
+                [RoomTypes.enemy]: Infinity,
+                [RoomTypes.ally]: Infinity,
+                [RoomTypes.keeper]: 5,
+                [RoomTypes.enemyRemote]: 5,
+                [RoomTypes.allyRemote]: 5,
+                [RoomTypes.neutral]: 2,
             },
         })
     }

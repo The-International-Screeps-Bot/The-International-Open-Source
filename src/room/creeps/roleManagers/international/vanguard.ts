@@ -1,4 +1,4 @@
-import { WorkRequestKeys, CreepMemoryKeys, RESULT_FAIL } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, RESULT_FAIL, RoomTypes } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -141,9 +141,9 @@ export class Vanguard extends Creep {
                 goals: [{ pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
                 avoidEnemyRanges: true,
                 typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
+                    [RoomTypes.enemy]: Infinity,
+                    [RoomTypes.ally]: Infinity,
+                    [RoomTypes.keeper]: Infinity,
                 },
             }) === RESULT_FAIL
         ) {

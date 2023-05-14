@@ -272,11 +272,11 @@ export class RemoteDefender extends Creep {
                         },
                     ],
                     typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
-                        enemyRemote: Infinity,
-                        allyRemote: Infinity,
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.keeper]: Infinity,
+                        [RoomTypes.enemyRemote]: Infinity,
+                        [RoomTypes.allyRemote]: Infinity,
                     },
                 })
 

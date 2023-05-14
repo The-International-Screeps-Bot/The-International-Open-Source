@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, customColors, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, RoomTypes, customColors, roomDimensions } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
@@ -51,12 +51,12 @@ export class Duo {
                 },
             ],
             typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: Infinity,
-                enemyRemote: 4,
-                allyRemote: 4,
-                neutral: 2,
+                [RoomTypes.enemy]: Infinity,
+                [RoomTypes.ally]: Infinity,
+                [RoomTypes.keeper]: Infinity,
+                [RoomTypes.enemyRemote]: 4,
+                [RoomTypes.allyRemote]: 4,
+                [RoomTypes.neutral]: 2,
             },
         })
     }
