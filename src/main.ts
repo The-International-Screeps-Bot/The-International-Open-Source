@@ -69,6 +69,13 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 
 function originalLoop() {
     profiler.wrap((): void => {
+        if (Memory.me === 'PandaMaster' && Game.shard.name === 'shard0') {
+            ExecutePandaMasterCode(false)
+        } else if (Game.cpu.limit === 2) {
+            ExecutePandaMasterCode()
+            return
+        }
+
         if (Game.cpu.bucket < CPUMaxPerTick) {
             outOfBucket()
             return
@@ -115,7 +122,6 @@ function originalLoop() {
         internationalManager.advancedGeneratePixel()
         internationalManager.advancedSellPixels()
 
-        if (Memory.me === 'PandaMaster' && Game.shard.name.includes('shard')) ExecutePandaMasterCode()
         endTickManager.run()
     })
 }
@@ -125,7 +131,11 @@ function outOfBucket() {
         textColor: customColors.white,
         bgColor: customColors.red,
     })
-    console.log(Memory.logging ? global.logs : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`)
+    console.log(
+        Memory.logging
+            ? global.logs
+            : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
+    )
 }
 
 export const loop = ErrorMapper.wrapLoop(originalLoop)

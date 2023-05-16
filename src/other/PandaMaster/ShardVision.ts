@@ -3,14 +3,17 @@
 import { customLog } from 'international/utils'
 
 function isMemorySetup(memory: ShardVisionMemory, mainShard: string): boolean {
-    if (Game.shard.name === mainShard) return memory.shards !== undefined && memory.lastSeen !== undefined
+    if (Game.shard.name === mainShard)
+        return memory.shards !== undefined && memory.lastSeen !== undefined
     return memory.lastSeen !== undefined
 }
 
 function loadShardVisionMemory(shardNames: string[], shardId: string): ShardVisionMemory {
     let segment = JSON.parse(InterShardMemory.getRemote(shardId) || '{}')
     const defaultObject: ShardVisionMemory = { lastSeen: 0 }
-    if (!isMemorySetup(segment.shardVision || {}, shardNames.length > 0 ? shardNames[0] : shardId)) {
+    if (
+        !isMemorySetup(segment.shardVision || {}, shardNames.length > 0 ? shardNames[0] : shardId)
+    ) {
         if (Game.shard.name === shardNames[0]) {
             defaultObject.shards = {}
             for (let i = 0; i < shardNames.length; i++) {
@@ -46,7 +49,9 @@ class HandleSpawning {
         if (!spawnShardFlag) return false
 
         const roomNames = ['E72N14', 'E74N7', 'E69N17, E68N17', 'E71N18', 'E69N19']
-        const spawn = Object.values(Game.spawns).find(s => roomNames.includes(s.room.name) && s.spawning === null)
+        const spawn = Object.values(Game.spawns).find(
+            s => roomNames.includes(s.room.name) && s.spawning === null,
+        )
         if (!spawn) return false
 
         const spawnResult = spawn.spawnCreep([MOVE], `${shardTarget}-${Game.time}`)
@@ -57,7 +62,9 @@ class HandleSpawning {
         if (this._creepsCount > 0) this._shardVisionMemory.lastSeen = Date.now() + secondsAddition
 
         const shardMemory = loadShardVisionMemory(this._shardNames, shardName)
-        if (Math.max(this._shardVisionMemory.shards[shardName], shardMemory.lastSeen) < Date.now()) {
+        if (
+            Math.max(this._shardVisionMemory.shards[shardName], shardMemory.lastSeen) < Date.now()
+        ) {
             const spawnResult = this.spawnCreep('shard0')
             if (spawnResult) {
                 this._shardVisionMemory.shards[shardName] = Date.now() + secondsAddition
@@ -105,12 +112,18 @@ export default class GetShardVision {
             }
             let loggedOrders = false
 
-            if (this.isMyShard(shardName) && creeps.length > 0) HandleSpawning.saveLastSeen(shardName)
+            if (this.isMyShard(shardName) && creeps.length > 0)
+                HandleSpawning.saveLastSeen(shardName)
 
             creeps.forEach(creep => {
-                Game.map.visual.text(shardName, creep.pos, { backgroundColor: '#000000', opacity: 1, fontSize: 4 })
+                Game.map.visual.text(shardName, creep.pos, {
+                    backgroundColor: '#000000',
+                    opacity: 1,
+                    fontSize: 4,
+                })
                 if (!roomNames[creep.room.name]) roomNames[creep.room.name] = [shardName]
-                else if (!roomNames[creep.room.name].includes(shardName)) roomNames[creep.room.name].push(shardName)
+                else if (!roomNames[creep.room.name].includes(shardName))
+                    roomNames[creep.room.name].push(shardName)
                 // * If main shard isn't shard3 or shard0
                 // * Ask PandaMaster to modify this code!
                 // if (Game.shard.name === this._mainShard && shardName === this._mainShard) {
@@ -151,15 +164,15 @@ export default class GetShardVision {
                     }
                 }
 
-                if (this.isMyShard(shardName)) {
-                    if (!loggedOrders && Game.time % 100 === 0) {
-                        console.log(JSON.stringify(Game.market.getAllOrders()))
-                        if (Game.time % 500 === 0) {
-                            console.log(JSON.stringify(Game.market.getHistory()))
-                        }
-                        loggedOrders = true
-                    }
-                }
+                // if (this.isMyShard(shardName)) {
+                //     if (!loggedOrders && Game.time % 100 === 0) {
+                //         console.log(JSON.stringify(Game.market.getAllOrders()))
+                //         if (Game.time % 500 === 0) {
+                //             console.log(JSON.stringify(Game.market.getHistory()))
+                //         }
+                //         loggedOrders = true
+                //     }
+                // }
                 creep.say(shardName)
             })
         })
@@ -172,5 +185,15 @@ export default class GetShardVision {
                 opacity: 1,
             })
         })
+    }
+
+    static HandleShard() {
+        //https://screeps.com/a/#!/room/shard1-2-3/W0N0
+        if (Game.time % 100 === 0) {
+            console.log(JSON.stringify(Game.market.getAllOrders()))
+            if (Game.time % 500 === 0) {
+                console.log(JSON.stringify(Game.market.getHistory()))
+            }
+        }
     }
 }
