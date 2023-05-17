@@ -192,11 +192,12 @@ export class RemoteDismantler extends Creep {
                 continue
             }
 
-            creep.message = creep.memory[CreepMemoryKeys.remote]
+            const creepMemory = Memory.creeps[creep.name]
+            creep.message = creepMemory[CreepMemoryKeys.remote]
 
             // If the creep is its remote
 
-            if (room.name === creep.memory[CreepMemoryKeys.remote]) {
+            if (room.name === creepMemory[CreepMemoryKeys.remote]) {
                 if (creep.advancedDismantle()) continue
                 continue
             }
@@ -206,7 +207,7 @@ export class RemoteDismantler extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.remote]),
+                            pos: new RoomPosition(25, 25, creepMemory[CreepMemoryKeys.remote]),
                             range: 25,
                         },
                     ],
@@ -215,9 +216,8 @@ export class RemoteDismantler extends Creep {
                 }) === RESULT_FAIL
             ) {
 
-
-                Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
-                delete creep.memory[CreepMemoryKeys.remote]
+                Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                delete creepMemory[CreepMemoryKeys.remote]
             }
         }
     }

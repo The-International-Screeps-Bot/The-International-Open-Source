@@ -163,7 +163,7 @@ export class RemoteBuilder extends Creep {
 
             // If the creep needs resources
 
-            const creepMemory = Memory.creeps[this.name]
+            const creepMemory = Memory.creeps[creep.name]
             if (room.name === creepMemory[CreepMemoryKeys.remote]) {
                 creep.remoteActions()
                 continue

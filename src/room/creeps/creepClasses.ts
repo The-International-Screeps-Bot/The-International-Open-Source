@@ -21,6 +21,7 @@ import { RemoteReserver } from './roleManagers/remote/remoteReserver'
 import { RequestHauler } from './roleManagers/international/requestHauler'
 import { RangedDefender } from './roleManagers/commune/defenders/rangedDefender'
 import { profiler } from 'other/profiler'
+import { RemoteBuilder } from './roleManagers/remote/remoteBuilder'
 
 export const creepClasses: { [key in CreepRoles]: any } = {
     sourceHarvester: SourceHarvester,
@@ -40,6 +41,7 @@ export const creepClasses: { [key in CreepRoles]: any } = {
     remoteDefender: RemoteDefender,
     remoteCoreAttacker: RemoteCoreAttacker,
     remoteDismantler: RemoteDismantler,
+    remoteBuilder: RemoteBuilder,
     scout: Scout,
     claimer: Claimer,
     vanguard: Vanguard,

@@ -156,6 +156,7 @@ declare global {
         | 'remoteDefender'
         | 'remoteCoreAttacker'
         | 'remoteDismantler'
+        | 'remoteBuilder'
         | 'scout'
         | 'claimer'
         | 'vanguard'
