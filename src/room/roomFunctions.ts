@@ -324,6 +324,25 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         )
         if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
 
+        roomMemory[RoomMemoryKeys.roads] = []
+        roomMemory[RoomMemoryKeys.roadsQuota] = []
+
+        let sourceIndex = 0
+        for (const packedPath of packedRemoteSourcePaths) {
+
+            roomMemory[RoomMemoryKeys.roads][sourceIndex] = 0
+            roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] = 0
+
+            const positions = unpackPosList(packedPath)
+
+            for (const pos of positions) {
+
+                if (pos.roomName !== this.name) break
+
+                roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] += 1
+            }
+        }
+
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
         roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
         roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
