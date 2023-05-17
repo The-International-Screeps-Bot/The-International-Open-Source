@@ -2020,6 +2020,9 @@ declare global {
         [RoomMemoryKeys.remoteSourceHarvestPositions]: string[]
         [RoomMemoryKeys.remoteSourcePaths]: string[]
         [RoomMemoryKeys.clearedEnemyStructures]: boolean
+        [RoomMemoryKeys.lastStructureCheck]: number
+        [RoomMemoryKeys.roadsQuota]: number[]
+        [RoomMemoryKeys.roads]: number[]
 
         // Ally
 

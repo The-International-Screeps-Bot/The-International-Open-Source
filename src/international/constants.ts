@@ -213,6 +213,9 @@ export enum RoomMemoryKeys {
     remoteSourceHarvestPositions,
     remoteSourcePaths,
     clearedEnemyStructures,
+    lastStructureCheck,
+    roadsQuota,
+    roads,
 
     // Ally
 
