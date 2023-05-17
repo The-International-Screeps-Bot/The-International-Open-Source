@@ -1,6 +1,8 @@
 class HaulerManager {
 
     role: CreepRoles = 'hauler'
+    // Allows for the pattern: instance.manager.run(instance)
+    manager = this
 
     run(room: Room) {
 
