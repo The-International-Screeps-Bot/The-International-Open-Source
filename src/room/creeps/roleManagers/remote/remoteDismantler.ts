@@ -21,12 +21,17 @@ export class RemoteDismantler extends Creep {
     }
 
     preTickManager() {
-        if (!this.findRemote()) return
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
+        if (!this.findRemote()) return
 
-        const role = this.role as 'remoteDismantler'
+        this.assignRemote()
+    }
+
+    assignRemote?() {
 
         if (this.isDying()) return
+
+        const role = this.role as 'remoteDismantler'
 
         // Reduce remote need
 
@@ -58,12 +63,9 @@ export class RemoteDismantler extends Creep {
     findRemote?() {
         if (this.hasValidRemote()) return true
 
-        // Otherwise, get the creep's role
+        const creepMemory = Memory.creeps[this.name]
 
         const role = 'remoteDismantler'
-
-        // Get remotes by their efficacy
-
         const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
         // Loop through each remote name
@@ -74,8 +76,8 @@ export class RemoteDismantler extends Creep {
 
             // Otherwise assign the remote to the creep and inform true
 
-            this.memory[CreepMemoryKeys.remote] = roomName
-            roomMemory[RoomMemoryKeys[role]] -= 1
+            creepMemory[CreepMemoryKeys.remote] = roomName
+            this.assignRemote()
 
             return true
         }

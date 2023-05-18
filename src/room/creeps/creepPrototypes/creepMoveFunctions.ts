@@ -311,7 +311,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         // Generate a new path
 
         path = customFindPath(opts)
-        if (!path.length) return RESULT_FAIL
+        if (!path.length && !this.spawning) return RESULT_FAIL
 
         // Limit the path's length to the cacheAmount
 
@@ -343,7 +343,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     // Stop if there are no positions left in the path
 
-    if (!path.length) return RESULT_FAIL
+    if (!path.length && !this.spawning) return RESULT_FAIL
 
     // If visuals are enabled, visualize the path
 
