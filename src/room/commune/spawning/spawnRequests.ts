@@ -227,7 +227,7 @@ export class SpawnRequestsManager {
 
                 // If all RCL 3 extensions are built
 
-                if (this.spawnEnergyCapacity >= 800) {
+                if (this.communeManager.hasSufficientRoads()) {
                     return {
                         role,
                         defaultParts: [],
@@ -581,7 +581,7 @@ export class SpawnRequestsManager {
 
                 // If all RCL 3 extensions are build
 
-                if (this.spawnEnergyCapacity >= 800) {
+                if (this.communeManager.hasSufficientRoads()) {
                     return {
                         role,
                         defaultParts: [],
@@ -691,7 +691,7 @@ export class SpawnRequestsManager {
                     }
                 }
 
-                // If all RCL 3 extensions are build
+                // If almost all RCL 3 extensions are build
 
                 if (this.spawnEnergyCapacity >= 550) {
                     return {
@@ -764,6 +764,22 @@ export class SpawnRequestsManager {
                     this.communeManager.room.controller.ticksToDowngrade <=
                     this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
+
+                    if (this.communeManager.hasSufficientRoads()) {
+
+                        return {
+                            role,
+                            defaultParts: [CARRY, WORK, MOVE],
+                            extraParts: [],
+                            partsMultiplier: 1,
+                            threshold,
+                            minCreeps: 1,
+                            minCost: 200,
+                            priority,
+                            memoryAdditions: {},
+                        }
+                    }
+
                     return {
                         role,
                         defaultParts: [CARRY, MOVE, WORK, MOVE],
@@ -771,7 +787,7 @@ export class SpawnRequestsManager {
                         partsMultiplier: 1,
                         threshold,
                         minCreeps: 1,
-                        minCost: 200,
+                        minCost: 250,
                         priority,
                         memoryAdditions: {},
                     }

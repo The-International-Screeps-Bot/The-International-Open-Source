@@ -66,7 +66,13 @@ import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
-import { packCoord, packXYAsCoord, unpackCoord, unpackPosList, unpackStampAnchors } from 'other/codec'
+import {
+    packCoord,
+    packXYAsCoord,
+    unpackCoord,
+    unpackPosList,
+    unpackStampAnchors,
+} from 'other/codec'
 import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
 import { DroppedResourceManager } from 'room/droppedResources'
@@ -180,14 +186,19 @@ export class CommuneManager {
         global.communes.add(room.name)
 
         if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
-            if (global.communes.size <= 1) roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
-            else if (room.controller.progress > room.controller.progressTotal || room.find(FIND_MY_STRUCTURES).length) {
+            if (global.communes.size <= 1)
+                roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
+            else if (
+                room.controller.progress > room.controller.progressTotal ||
+                room.find(FIND_MY_STRUCTURES).length
+            ) {
                 roomMemory[RoomMemoryKeys.greatestRCL] = 8
             } else roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
         } else if (room.controller.level > roomMemory[RoomMemoryKeys.greatestRCL])
             roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
 
-        if (!roomMemory[RoomMemoryKeys.combatRequests]) roomMemory[RoomMemoryKeys.combatRequests] = []
+        if (!roomMemory[RoomMemoryKeys.combatRequests])
+            roomMemory[RoomMemoryKeys.combatRequests] = []
         if (!roomMemory[RoomMemoryKeys.haulRequests]) roomMemory[RoomMemoryKeys.haulRequests] = []
 
         room.spawnRequestsArgs = []
@@ -204,7 +215,8 @@ export class CommuneManager {
         this.estimatedEnergyIncome = 0
 
         if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
-        if (roomMemory[RoomMemoryKeys.threatened] == undefined) roomMemory[RoomMemoryKeys.threatened] = 0
+        if (roomMemory[RoomMemoryKeys.threatened] == undefined)
+            roomMemory[RoomMemoryKeys.threatened] = 0
 
         room.usedRampartIDs = new Map()
 
@@ -238,7 +250,8 @@ export class CommuneManager {
         room.defenderEnemyTargetsWithDamage = new Map()
         room.defenderEnemyTargetsWithDefender = new Map()
 
-        if (room.terminal && room.controller.level >= 6) internationalManager.terminalCommunes.push(room.name)
+        if (room.terminal && room.controller.level >= 6)
+            internationalManager.terminalCommunes.push(room.name)
     }
 
     preTickRun() {
@@ -313,7 +326,6 @@ export class CommuneManager {
     }
 
     private test() {
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -359,7 +371,8 @@ export class CommuneManager {
 
     public findMinMeleeAttackCost(minDamage: number = 30) {
         const rawCost =
-            (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] + (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+            (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+            (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
@@ -369,7 +382,9 @@ export class CommuneManager {
      * Finds how expensive it will be to provide enough heal parts to withstand attacks
      */
     public findMinHealCost(minHeal: number = 12) {
-        const rawCost = (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] + (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
+        const rawCost =
+            (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] +
+            (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[HEAL] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
@@ -393,13 +408,17 @@ export class CommuneManager {
         // Consider the controller level to an exponent and this room's attack threat
 
         this._minStoredEnergy =
-            Math.pow(this.room.controller.level * 6000, 1.06) + this.room.memory[RoomMemoryKeys.threatened] * 20
+            Math.pow(this.room.controller.level * 6000, 1.06) +
+            this.room.memory[RoomMemoryKeys.threatened] * 20
 
         // If there is a next RCL, Take away some minimum based on how close we are to the next RCL
 
         const RClCost = this.room.controller.progressTotal
         if (RClCost) {
-            this._minStoredEnergy -= Math.pow((Math.min(this.room.controller.progress, RClCost) / RClCost) * 20, 3.35)
+            this._minStoredEnergy -= Math.pow(
+                (Math.min(this.room.controller.progress, RClCost) / RClCost) * 20,
+                3.35,
+            )
         }
         return (this._minStoredEnergy = Math.floor(this._minStoredEnergy))
     }
@@ -426,7 +445,10 @@ export class CommuneManager {
     }
 
     get rampartsMaintenanceCost() {
-        return roundToDecimals(this.room.roomManager.structures.rampart.length * rampartUpkeepCost, 2)
+        return roundToDecimals(
+            this.room.roomManager.structures.rampart.length * rampartUpkeepCost,
+            2,
+        )
     }
 
     _minRampartHits: number
@@ -456,10 +478,12 @@ export class CommuneManager {
 
         const storingStructures: (StructureStorage | StructureTerminal)[] = []
 
-        if (this.room.storage && this.room.controller.level >= 4) storingStructures.push(this.room.storage)
-        if (this.room.terminal && this.room.controller.level >= 6) storingStructures.push(this.room.terminal)
+        if (this.room.storage && this.room.controller.level >= 4)
+            storingStructures.push(this.room.storage)
+        if (this.room.terminal && this.room.controller.level >= 6)
+            storingStructures.push(this.room.terminal)
 
-        return this._storingStructures = storingStructures
+        return (this._storingStructures = storingStructures)
     }
 
     get storingStructuresCapacity() {
@@ -481,7 +505,8 @@ export class CommuneManager {
             (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
             (5000 + this.room.controller.level * 1000)) */
         return (this._maxCombatRequests =
-            this.room.resourcesInStoringStructures.energy / (10000 + this.room.controller.level * 3000))
+            this.room.resourcesInStoringStructures.energy /
+            (10000 + this.room.controller.level * 3000))
     }
 
     /**
@@ -540,7 +565,8 @@ export class CommuneManager {
 
             // Increase strength by throughput
 
-            this._maxUpgradeStrength += findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
+            this._maxUpgradeStrength +=
+                findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
         }
 
         return this._maxUpgradeStrength
@@ -551,6 +577,21 @@ export class CommuneManager {
      */
     findNudeMaxUpgradeStrength() {
         return (this._maxUpgradeStrength = 100)
+    }
+
+    /**
+     * Informs wether we have sufficient roads compared to the roadQuota for our RCL
+     */
+    hasSufficientRoads() {
+        const roomMemory = Memory.rooms[this.room.name]
+        const RCL = this.room.controller.level
+        // Try one RCL below, though propagate to the present RCL if there is no roadQuota for the previous RCL
+        const roadQuota =
+            roomMemory[RoomMemoryKeys.roadQuota][RCL - 1] ||
+            roomMemory[RoomMemoryKeys.roadQuota][RCL]
+        if (roadQuota === 0) return false
+
+        return this.room.roomManager.structures.road.length >= roadQuota * 0.9
     }
 
     _upgradeStructure: AnyStoreStructure | false
@@ -663,7 +704,10 @@ export class CommuneManager {
             if (!data) continue
 
             if (data.minRCL > this.room.controller.level) continue
-            if (data.coversStructure && !this.room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet))
+            if (
+                data.coversStructure &&
+                !this.room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
+            )
                 continue
 
             if (data.buildForNuke) {
@@ -691,7 +735,6 @@ export class CommuneManager {
     sourceLinkIDs: Id<StructureLink>[]
     _sourceLinks: StructureLink[]
     get sourceLinks() {
-
         if (this._sourceLinks) return this._sourceLinks
 
         const links: StructureLink[] = []
@@ -710,12 +753,11 @@ export class CommuneManager {
         }
 
         const stampAnchors = this.room.roomManager.stampAnchors
-        if (!stampAnchors) return this._sourceLinks = []
+        if (!stampAnchors) return (this._sourceLinks = [])
 
         let definedLinks = 0
 
         for (let i = 0; i < stampAnchors.sourceLink.length; i++) {
-
             const structure = this.room.findStructureAtCoord(
                 stampAnchors.sourceLink[i],
                 structure => structure.structureType === STRUCTURE_LINK,
@@ -727,7 +769,8 @@ export class CommuneManager {
             definedLinks += 1
         }
 
-        if (definedLinks === stampAnchors.sourceLink.length) this.sourceLinkIDs = links.map(link => link.id)
+        if (definedLinks === stampAnchors.sourceLink.length)
+            this.sourceLinkIDs = links.map(link => link.id)
         return (this._sourceLinks = links)
     }
 
