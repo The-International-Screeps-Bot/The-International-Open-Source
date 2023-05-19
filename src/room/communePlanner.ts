@@ -210,6 +210,10 @@ export class CommunePlanner {
     groupedMinCutCoords: Coord[][]
     RCLPlannedStructureTypes: Partial<{ [key in BuildableStructureConstant]: RCLPlannedStructureType }>
     /**
+     * Quotas for roads per RCL
+     */
+    roadQuota: number[]
+    /**
      * The preference towards a plan attempt. Lower score is better
      */
     score: number
@@ -322,6 +326,12 @@ export class CommunePlanner {
                     minRCL: 1,
                 }
             }
+            this.roadQuota = []
+            for (let level = 0; level < 8; level += 1) {
+
+                this.roadQuota.push(0)
+            }
+
             this.score = 0
         }
         /*
@@ -368,6 +378,7 @@ export class CommunePlanner {
         this.towerPaths()
         this.mineral()
         this.generalShield()
+        this.findRoadQuota()
         this.visualizeCurrentPlan()
         /* this.visualizeCurrentPlan()
         return RESULT_SUCCESS */
@@ -3045,6 +3056,23 @@ export class CommunePlanner {
         this.unprotectedSources = unprotectedSources
         this.generalShielded = true
     }
+    private findRoadQuota() {
+
+        for (const packedCoord in this.basePlans.map) {
+
+            const coordData = this.basePlans.map[packedCoord]
+
+            for (let i = 0; i < coordData.length; i++) {
+                const data = coordData[i]
+                if (data.structureType !== STRUCTURE_ROAD) continue
+
+                for (let rcl = data.minRCL - 1; rcl < 8; rcl += 1) {
+
+                    this.roadQuota[rcl] += 1
+                }
+            }
+        }
+    }
     private findScore() {
         if (this.score) return
 
@@ -3090,6 +3118,7 @@ export class CommunePlanner {
             stampAnchors: packStampAnchors(this.stampAnchors),
             basePlans: this.basePlans.pack(),
             rampartPlans: this.rampartPlans.pack(),
+            roadQuota: this.roadQuota,
             communeSources: this.communeSources.map(source => source.id),
             sourceHarvestPositions: this.sourceHarvestPositions.map(positions => packPosList(positions)),
             sourcePaths: this.sourcePaths.map(path => packPosList(path)),
@@ -3172,6 +3201,7 @@ export class CommunePlanner {
         roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
         roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans
         roomMemory[RoomMemoryKeys.stampAnchors] = plan.stampAnchors
+        roomMemory[RoomMemoryKeys.roadQuota] = plan.roadQuota
         roomMemory[RoomMemoryKeys.communeSources] = plan.communeSources
         roomMemory[RoomMemoryKeys.communeSourceHarvestPositions] = plan.sourceHarvestPositions
         roomMemory[RoomMemoryKeys.communeSourcePaths] = plan.sourcePaths

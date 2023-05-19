@@ -314,8 +314,6 @@ export class CommuneManager {
 
     private test() {
 
-        findDynamicScore(this.room.name)
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*

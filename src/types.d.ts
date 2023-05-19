@@ -274,6 +274,7 @@ declare global {
         stampAnchors: PackedStampAnchors
         basePlans: string
         rampartPlans: string
+        roadQuota: number[]
         communeSources: Id<Source>[]
         sourceHarvestPositions: string[]
         sourcePaths: string[]
@@ -1952,6 +1953,7 @@ declare global {
         [RoomMemoryKeys.powerEnabled]: boolean
         [RoomMemoryKeys.constructionSiteTarget]: Id<ConstructionSite>
         [RoomMemoryKeys.stampAnchors]: PackedStampAnchors
+        [RoomMemoryKeys.roadQuota]: number[]
         [RoomMemoryKeys.communeSources]: Id<Source>[]
         [RoomMemoryKeys.communeSourceHarvestPositions]: string[]
         [RoomMemoryKeys.communeSourcePaths]: string[]

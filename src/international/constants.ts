@@ -168,6 +168,7 @@ export enum RoomMemoryKeys {
     powerEnabled,
     constructionSiteTarget,
     stampAnchors,
+    roadQuota,
     communeSources,
     communeSourceHarvestPositions,
     communeSourcePaths,
