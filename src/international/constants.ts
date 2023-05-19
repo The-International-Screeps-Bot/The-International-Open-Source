@@ -143,6 +143,20 @@ export enum PowerRequestKeys {
     cooldown,
 }
 
+export enum RoomTypes {
+    commune,
+    remote,
+    ally,
+    allyRemote,
+    neutral,
+    enemy,
+    enemyRemote,
+    keeper,
+    keeperCenter,
+    highway,
+    intersection,
+}
+
 export enum RoomMemoryKeys {
     type,
     lastScout,
@@ -266,20 +280,6 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
 
     RoomMemoryKeys.portalsTo,
 ])
-
-export enum RoomTypes {
-    commune,
-    remote,
-    ally,
-    allyRemote,
-    neutral,
-    enemy,
-    enemyRemote,
-    keeper,
-    keeperCenter,
-    highway,
-    intersection,
-}
 
 export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
     [RoomTypes.commune]: new Set([

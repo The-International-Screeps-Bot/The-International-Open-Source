@@ -1183,6 +1183,7 @@ export class SpawnRequestsManager {
             // Add up econ data for this.communeManager.room this.communeManager.room
 
             const totalRemoteNeed =
+                Math.max(remoteMemory[RoomMemoryKeys.remoteBuilder], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteReserver], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteCoreAttacker], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteDismantler], 0)
@@ -1195,6 +1196,12 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
+                    return false
+
+                    // If there are no data for this.communeManager.room this.communeManager.room, inform false
+
+                    if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) return false
+
                     // If there are insufficient harvesters for the remote's sources
 
                     if (
@@ -1205,15 +1212,48 @@ export class SpawnRequestsManager {
                     )
                         return false
 
+                    return {
+                        role: 'remoteBuilder',
+                        defaultParts: [],
+                        extraParts: [WORK, MOVE, CARRY, MOVE],
+                        partsMultiplier: remoteMemory[RoomMemoryKeys.remoteBuilder],
+                        spawnGroup:
+                            this.communeManager.room.creepsOfRemote[remoteName].remoteBuilder,
+                        maxCreeps:
+                            remoteMemory[RoomMemoryKeys.remoteControllerPositions].length /
+                            packedPosLength,
+                        minCost: 250,
+                        priority: this.minRemotePriority + 0.1,
+                        memoryAdditions: {
+                            [CreepMemoryKeys.remote]: remoteName,
+                        },
+                    }
+                })(),
+            )
+
+            // Construct requests for remoteReservers
+
+            this.rawSpawnRequestsArgs.push(
+                ((): SpawnRequestArgs | false => {
+                    // If there are no data for this.communeManager.room this.communeManager.room, inform false
+
+                    if (remoteMemory[RoomMemoryKeys.remoteReserver] <= 0) return false
+
                     let cost = 650
 
                     // If there isn't enough this.spawnEnergyCapacity to spawn a remoteReserver, inform false
 
                     if (this.spawnEnergyCapacity < cost) return false
 
-                    // If there are no data for this.communeManager.room this.communeManager.room, inform false
+                    // If there are insufficient harvesters for the remote's sources
 
-                    if (remoteMemory[RoomMemoryKeys.remoteReserver] <= 0) return false
+                    if (
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvesters].reduce(
+                            (partialSum, val) => partialSum + val,
+                            0,
+                        ) === 0
+                    )
+                        return false
 
                     return {
                         role: 'remoteReserver',

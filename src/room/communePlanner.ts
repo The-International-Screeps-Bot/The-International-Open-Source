@@ -996,6 +996,7 @@ export class CommunePlanner {
             const closestHarvestPos = sourceHarvestPositions[i][0]
 
             if (!closestHarvestPos) {
+                console.log(sourceHarvestPositions)
                 throw Error('no closest harvest pos ' + this.room.name)
                 return
             }

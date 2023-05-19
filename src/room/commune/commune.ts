@@ -23,6 +23,7 @@ import {
     unpackNumAsCoord,
     findLowestScore,
     roundToDecimals,
+    findDynamicScore,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -312,6 +313,9 @@ export class CommuneManager {
     }
 
     private test() {
+
+        findDynamicScore(this.room.name)
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*

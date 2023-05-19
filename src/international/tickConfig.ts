@@ -129,7 +129,7 @@ class TickConfig {
 
         for (const roomName in Memory.workRequests) {
             const roomMemory = Memory.rooms[roomName]
-            if (Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] < randomRange(10000, 20000)) continue
+            if (Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] < randomRange(19000, 20000)) continue
 
             findDynamicScore(roomName)
         }
