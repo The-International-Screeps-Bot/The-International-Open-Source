@@ -184,12 +184,10 @@ export class RemoteCoreAttacker extends Creep {
 
             creep.message = remoteName
 
-            if (creep.advancedAttackCores()) continue
-
             // If the creep is its remote
 
             if (room.name === remoteName) {
-                delete Memory.creeps[this.name][CreepMemoryKeys.remote]
+                if (creep.advancedAttackCores()) continue
                 continue
             }
 
@@ -209,8 +207,7 @@ export class RemoteCoreAttacker extends Creep {
                 }) === RESULT_FAIL
             ) {
 
-
-                Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
                 creep.removeRemote()
             }
         }

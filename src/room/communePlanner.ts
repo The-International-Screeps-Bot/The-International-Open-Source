@@ -1015,7 +1015,14 @@ export class CommunePlanner {
             this.setBasePlansXY(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_CONTAINER, 3)
             const packedCoord = packAsNum(closestHarvestPos)
             this.roadCoords[packedCoord] = 20
-            this.baseCoords[packedCoord] = 255
+        }
+
+        for (const index in sourceHarvestPositions) {
+
+            for (const pos of sourceHarvestPositions[index]) {
+
+                this.baseCoords[packAsNum(pos)] = 255
+            }
         }
 
         for (const i in this.communeSources) {

@@ -327,7 +327,7 @@ export class RemoteDefender extends Creep {
             ) {
 
 
-                Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
                 delete creep.memory[CreepMemoryKeys.remote]
             }
         }
