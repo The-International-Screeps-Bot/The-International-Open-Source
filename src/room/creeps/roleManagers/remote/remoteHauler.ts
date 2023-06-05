@@ -17,7 +17,7 @@ import {
     randomTick,
 } from 'international/utils'
 import { indexOf } from 'lodash'
-import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
+import { packCoord, reversePosList, unpackCoord, unpackPos, unpackPosAt } from 'other/codec'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { Hauler } from '../commune/hauler'
 
@@ -479,6 +479,9 @@ export class RemoteHauler extends Creep {
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy
 
+        customLog('this needs res', this.needsResources())
+        customLog('creepAtPos need res', creepAtPos.needsResources())
+
         // Stop previously attempted moveRequests as they do not account for a relay
 
         delete this.moveRequest
@@ -514,6 +517,10 @@ export class RemoteHauler extends Creep {
             }
         }
         */
+
+        if (this.moveRequest) this.room.targetVisual(this.pos, unpackCoord(this.moveRequest), true)
+        if (creepAtPos.moveRequest) creepAtPos.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
+
         return true
     }
 

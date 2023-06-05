@@ -601,6 +601,8 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     if (this.move(this.pos.getDirectionTo(unpackCoordAsPos(this.moveRequest, room.name))) !== OK) return false
 
+    this.room.roomManager.runMoveRequestOrder += 1
+
     if (Memory.roomVisuals)
         room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
             fill: customColors.lightBlue,
@@ -635,6 +637,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         this.moved = 'moved'
         return
     }
+
+    this.room.roomManager.recurseMoveRequestOrder += 1
 
     queue.push(this.name)
 

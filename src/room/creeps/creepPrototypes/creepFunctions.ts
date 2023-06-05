@@ -39,6 +39,7 @@ import {
     unpackNumAsCoord,
     getRange,
     randomTick,
+    arePositionsEqual,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { any, pick, random, repeat } from 'lodash'
@@ -248,24 +249,28 @@ Creep.prototype.advancedUpgradeController = function () {
     // If there is a controllerContainer
 
     if (controllerStructure) {
-        const upgradePos = this.findUpgradePos()
 
-        if (!upgradePos) return false
+        // If we're not on a viable upgrade pos
+        if (!this.room.roomManager.upgradePositions.find(pos => arePositionsEqual(this.pos, pos) && !this.room.usedUpgradeCoords.has(packCoord(pos)))) {
 
-        if (getRange(this.pos, upgradePos) > 0) {
-            this.createMoveRequest({
-                origin: this.pos,
-                goals: [
-                    {
-                        pos: upgradePos,
-                        range: 0,
-                    },
-                ],
-                avoidEnemyRanges: true,
-                weightCostMatrix: 'defaultCostMatrix',
-            })
+            const upgradePos = this.findUpgradePos()
+            if (!upgradePos) return false
 
-            this.message += '➡️'
+            if (getRange(this.pos, upgradePos) > 0) {
+                this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: upgradePos,
+                            range: 0,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    weightCostMatrix: 'defaultCostMatrix',
+                })
+
+                this.message += '➡️'
+            }
         }
 
         this.actionCoord = room.roomManager.centerUpgradePos

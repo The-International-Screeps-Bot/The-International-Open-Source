@@ -816,7 +816,7 @@ export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
 
     for (const val of iter) {
         const score = f(val)
-        if (score <= lowestScore) continue
+        if (score >= lowestScore) continue
 
         lowestScore = score
     }

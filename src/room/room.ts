@@ -77,6 +77,14 @@ export class RoomManager {
     }
 
     room: Room
+    /**
+     * Incremental order of recursive move request attempts
+     */
+    recurseMoveRequestOrder = 0
+    /**
+     * Incremental order of move request runs
+     */
+    runMoveRequestOrder = 0
 
     update(room: Room) {
         delete this.checkedStructureUpdate
@@ -269,7 +277,7 @@ export class RoomManager {
         }
         for (const index in sourcePaths) {
             const path = sourcePaths[index]
-            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + JSON.stringify(sourcePaths))
+            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + JSON.stringify(sourcePaths) + ', ' + packedRemoteSourceHarvestPositions)
         }
 
         return sourcePaths.map(path => packPosList(path))
