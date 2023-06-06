@@ -179,7 +179,14 @@ export class Quad {
             ) {
                 this.target = nearbyThreat
                 this.target.room.targetVisual(this.leader.pos, this.target.pos, true)
-                if (this.findMinRange(nearbyThreat.pos) > 4) this.advancedTransform()
+
+                // If we are not threatened, try to transform optimally
+
+                const enemyThreatCoords = this.enemyThreatDataRanged.coords
+                if (!this.members.find(member => enemyThreatCoords[packAsNum(member.pos)])) {
+
+                    this.advancedTransform()
+                }
             }
 
             if (this.rangedKite() === RESULT_ACTION) return true
