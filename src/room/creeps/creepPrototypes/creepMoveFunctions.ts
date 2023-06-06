@@ -469,6 +469,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
             const creepAtPos = Game.creeps[creepAtPosName]
             if (creepAtPos.fatigue > 0) continue
             if (creepAtPos.moved) continue
+            if (creepAtPos.moveRequest) continue
             if (!this.getActiveBodyparts(MOVE)) continue
         }
 

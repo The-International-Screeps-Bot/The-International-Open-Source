@@ -51,7 +51,9 @@ export class Claimer extends Creep {
 
         // Otherwise, claim the controller. If the successful, remove claimerNeed
 
-        creep.claimController(room.controller)
+        if (!creep.claimController(room.controller)) return
+
+        // We claimed the controller
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {
@@ -74,7 +76,12 @@ export class Claimer extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]),
+                            range: 25,
+                        },
+                    ],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: creep.parts.move >= 5 ? 1 : undefined,
