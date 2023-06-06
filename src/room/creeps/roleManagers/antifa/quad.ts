@@ -30,7 +30,6 @@ import {
     forCoordsInRange,
     packXYAsNum,
 } from 'international/utils'
-import { find, transform } from 'lodash'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { Antifa } from './antifa'
 
@@ -180,7 +179,7 @@ export class Quad {
             ) {
                 this.target = nearbyThreat
                 this.target.room.targetVisual(this.leader.pos, this.target.pos, true)
-                this.advancedTransform()
+                if (this.findMinRange(nearbyThreat.pos) > 4) this.advancedTransform()
             }
 
             if (this.rangedKite() === RESULT_ACTION) return true

@@ -701,12 +701,22 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     const creepAtPos = Game.creeps[creepNameAtPos] || Game.powerCreeps[creepNameAtPos]
 
+    // if creepAtPos is fatigued it is useless to us
+
+    if ((creepAtPos as Creep).fatigue > 0) {
+
+        delete room.moveRequests[this.moved]
+        delete this.moveRequest
+        return
+    }
+
     // We're spawning, just get us space to move into
 
     if (this.spawning) {
         if (creepAtPos.shove(new Set([packedCoord]))) {
             this.moved = this.moveRequest
-            delete room.moveRequests[this.moveRequest]
+            delete room.moveRequests[this.moved]
+            delete this.moveRequest
         }
 
         if (Memory.roomVisuals) {
@@ -779,10 +789,12 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
         // Otherwise, loop through each index of the queue
 
-        for (let index = queue.length - 1; index >= 0; index--)
+        for (let index = queue.length - 1; index >= 0; index--) {
+
             // Have the creep run its moveRequest
 
             (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+        }
 
         // loop through each index of the queue, drawing visuals
 
@@ -830,6 +842,10 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                     opacity: 0.2,
                 })
 
+            // Culprit for relay issues?
+
+            this.room.visual.text('R', this.pos)
+
             // Have the creep move to its moveRequest
 
             this.runMoveRequest()
@@ -868,8 +884,10 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
 
+        // Swap if creep has higher priority than creepAtPos
+
         if (
-            !(creepAtPos instanceof PowerCreep) &&
+            creepAtPos instanceof PowerCreep ||
             TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
                 TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
         ) {
@@ -880,6 +898,10 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 })
 
             this.runMoveRequest()
+
+            // Potential culprit for relay bug
+
+            this.room.visual.text('P', this.pos)
 
             // Have the creepAtPos move to the creep and inform true
 
@@ -915,11 +937,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         return
     }
 
-    // Otherwise if creepAtPos is fatigued, stop
-
-    if (!(creepAtPos instanceof PowerCreep) && creepAtPos.fatigue > 0) return
-
-    // Otherwise the creepAtPos has no moveRequest
+    // Otherwise the creepAtPos has no moveRequest, try to shove
 
     if (creepAtPos.shove(new Set([packedCoord]))) {
         this.room.visual.text('S', creepAtPos.pos)
@@ -933,11 +951,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             opacity: 0.2,
         })
 
-    // Have the creep move to its moveRequest
+    // Run creep's moveRequest, trading places with creepAtPos
 
     this.runMoveRequest()
-
-    // Have the creepAtPos move to the creep and inform true
 
     creepAtPos.moveRequest = packedCoord
     room.moveRequests[packedCoord] = [creepAtPos.name]
