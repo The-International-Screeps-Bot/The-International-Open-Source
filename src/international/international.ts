@@ -159,7 +159,10 @@ export class InternationalManager {
             return
         }
 
-        const myPixelOrder = _.find(Game.market.orders, o => o.type == 'sell' && o.resourceType == PIXEL)
+        const myPixelOrder = _.find(
+            Game.market.orders,
+            o => o.type == 'sell' && o.resourceType == PIXEL,
+        )
 
         const sellOrder = this.getSellOrder(PIXEL, Infinity)
         let price: number
@@ -173,7 +176,10 @@ export class InternationalManager {
         if (myPixelOrder) {
             if (Game.time % 100 == 0) {
                 if (myPixelOrder.remainingAmount < Game.resources[PIXEL]) {
-                    Game.market.extendOrder(myPixelOrder.id, Game.resources[PIXEL] - myPixelOrder.remainingAmount)
+                    Game.market.extendOrder(
+                        myPixelOrder.id,
+                        Game.resources[PIXEL] - myPixelOrder.remainingAmount,
+                    )
                     return
                 } else {
                     if (myPixelOrder.price == price) return
@@ -220,7 +226,8 @@ export class InternationalManager {
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                global.terrainCoords[roomName][packXYAsNum(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
+                global.terrainCoords[roomName][packXYAsNum(x, y)] =
+                    terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
             }
         }
 
@@ -243,7 +250,9 @@ export class InternationalManager {
      * My outgoing orders organized by room, order type and resourceType
      */
     _myOrders: {
-        [roomName: string]: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
+        [roomName: string]: Partial<
+            Record<string, Partial<Record<MarketResourceConstant, Order[]>>>
+        >
     }
 
     /**
@@ -355,9 +364,11 @@ export class InternationalManager {
         return (this._workRequestsByScore = Object.keys(Memory.workRequests).sort(
             (a, b) =>
                 (Memory.workRequests[a][WorkRequestKeys.priority] ??
-                    Memory.rooms[a][RoomMemoryKeys.score] + Memory.rooms[a][RoomMemoryKeys.dynamicScore]) -
+                    Memory.rooms[a][RoomMemoryKeys.score] +
+                        Memory.rooms[a][RoomMemoryKeys.dynamicScore]) -
                 (Memory.workRequests[b][WorkRequestKeys.priority] ??
-                    Memory.rooms[b][RoomMemoryKeys.score] + Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
+                    Memory.rooms[b][RoomMemoryKeys.score] +
+                        Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
         ))
     }
 
@@ -368,7 +379,8 @@ export class InternationalManager {
 
         const avgCPUUsagePercent = Memory.stats.cpu.usage / Game.cpu.limit
 
-        return (this._defaultMinCacheAmount = Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1)
+        return (this._defaultMinCacheAmount =
+            Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1)
     }
 
     _marketIsFunctional: number
@@ -424,31 +436,35 @@ export class InternationalManager {
     get funnelOrder() {
         if (this._funnelOrder) return this._funnelOrder
 
+        let funnelOrder: string[] = []
+
         // organize RCLs 1-7
 
         const communesByLevel: { [level: string]: [string, number][] } = {}
-        for (let i = 1; i < 8; i++) communesByLevel[i] = []
+        for (let i = 6; i < 8; i++) communesByLevel[i] = []
 
         for (const roomName of global.communes) {
-            const controller = Game.rooms[roomName].controller
-            communesByLevel[controller.level].push([roomName, controller.progressTotal / controller.progress])
+            const room = Game.rooms[roomName]
+            if (!room.terminal) continue
+
+            const controller = room.controller
+            communesByLevel[controller.level].push([
+                roomName,
+                controller.progressTotal / controller.progress,
+            ])
         }
 
-        for (const key in communesByLevel) {
-            const level = key as unknown as number
+        for (const level in communesByLevel) {
+            // Sort by score
+
+            communesByLevel[level].sort((a, b) => {
+                return a[1] - b[1]
+            })
+
+            funnelOrder = funnelOrder.concat(communesByLevel[level].map(tuple => tuple[0]))
         }
 
-        this._funnelOrder = Array.from(global.communes).sort((a, b) => {
-            const controllerA = Game.rooms[a].controller
-            const controllerB = Game.rooms[b].controller
-            return (
-                controllerA.level +
-                controllerA.progressTotal / controllerA.progress -
-                (controllerB.level + controllerB.progressTotal / controllerB.progress)
-            )
-        })
-
-        return this._funnelOrder
+        return (this._funnelOrder = funnelOrder)
     }
 
     _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>

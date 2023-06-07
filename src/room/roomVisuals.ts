@@ -17,6 +17,7 @@ import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
 import { internationalManager } from 'international/international'
+import { playerManager } from 'international/players'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -71,7 +72,8 @@ export class RoomVisualsManager {
             if (this.roomManager.room.controller.level < 8)
                 this.roomManager.room.visual.text(
                     `%${(
-                        (this.roomManager.room.controller.progress / this.roomManager.room.controller.progressTotal) *
+                        (this.roomManager.room.controller.progress /
+                            this.roomManager.room.controller.progressTotal) *
                         100
                     ).toFixed(2)}`,
                     this.roomManager.room.controller.pos.x,
@@ -110,7 +112,11 @@ export class RoomVisualsManager {
                     return customColors.lightBlue
                 }
 
-                if (Memory.allyPlayers.includes(this.roomManager.room.controller.reservation.username)) {
+                if (
+                    Memory.allyPlayers.includes(
+                        this.roomManager.room.controller.reservation.username,
+                    )
+                ) {
                     return customColors.green
                 }
 
@@ -187,7 +193,9 @@ export class RoomVisualsManager {
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = findObjectWithID(this.roomManager.room.memory[RoomMemoryKeys.constructionSiteTarget])
+        const constructionTarget = findObjectWithID(
+            this.roomManager.room.memory[RoomMemoryKeys.constructionSiteTarget],
+        )
 
         // If the constructionTarget exists, show visuals for it
 
@@ -217,7 +225,11 @@ export class RoomVisualsManager {
             this.internationalAllyCombatRequestsDataVisuals(
                 this.internationalAllyResourceRequestsDataVisuals(
                     this.internationalRequestsDataVisuals(
-                        this.internationalTerminalRequestsDataVisuals(this.internationalGeneralDataVisuals(1)),
+                        this.internationalTerminalRequestsDataVisuals(
+                            this.internationalStatDataVisuals(
+                                this.internationalGeneralDataVisuals(1),
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -225,6 +237,47 @@ export class RoomVisualsManager {
     }
 
     private internationalGeneralDataVisuals(y: number) {
+        const headers: any[] = [
+            'funnelOrder',
+            'highestThreat',
+            'minCredits',
+            'last config']
+
+        const data: any[][] = [[]]
+
+        data[0].push(internationalManager.funnelOrder.slice(0, 3), playerManager.highestThreat, internationalManager.minCredits, Game.time - Memory.lastConfig)
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'International',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalStatDataVisuals(y: number) {
         const headers: any[] = [
             'est. income',
             'commune harvest',
@@ -234,7 +287,6 @@ export class RoomVisualsManager {
             'repair other',
             'barricade repair',
             'spawn util',
-            'last config',
         ]
 
         const data: any[][] = [[]]
@@ -273,7 +325,6 @@ export class RoomVisualsManager {
             totalRepairOther.toFixed(2),
             totalBarricadeRepair.toFixed(2),
             totalSpawn.toFixed(2),
-            Game.time - Memory.lastConfig,
         )
 
         const height = 3 + data.length
@@ -328,7 +379,11 @@ export class RoomVisualsManager {
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
 
-            if (request[CombatRequestKeys.type] !== 'defend' && !request[CombatRequestKeys.responder]) continue
+            if (
+                request[CombatRequestKeys.type] !== 'defend' &&
+                !request[CombatRequestKeys.responder]
+            )
+                continue
 
             const row: any[] = [
                 requestName,
@@ -391,7 +446,12 @@ export class RoomVisualsManager {
         for (const ID in internationalManager.terminalRequests) {
             const request = internationalManager.terminalRequests[ID]
 
-            const row: any[] = [request.roomName, request.resource, request.amount, request.priority]
+            const row: any[] = [
+                request.roomName,
+                request.resource,
+                request.amount,
+                request.priority,
+            ]
             data.push(row)
         }
 
@@ -435,7 +495,12 @@ export class RoomVisualsManager {
             const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.resource) continue
 
-            const row: any[] = [request.roomName, request.resourceType, request.maxAmount, request.priority.toFixed(2)]
+            const row: any[] = [
+                request.roomName,
+                request.resourceType,
+                request.maxAmount,
+                request.priority.toFixed(2),
+            ]
             data.push(row)
             continue
         }
@@ -471,14 +536,24 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'type', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
+        const headers: any[] = [
+            'room',
+            'type',
+            'minDamage',
+            'minMeleeHeal',
+            'minRangedHeal',
+            'priority',
+        ]
 
         const data: any[][] = []
 
         const requests = allyManager.allyRequests.defense
         for (const ID in requests) {
             const request = requests[ID]
-            if (request.requestType !== AllyRequestTypes.attack && request.requestType !== AllyRequestTypes.defense)
+            if (
+                request.requestType !== AllyRequestTypes.attack &&
+                request.requestType !== AllyRequestTypes.defense
+            )
                 continue
 
             const row: any[] = [
@@ -687,7 +762,15 @@ export class RoomVisualsManager {
     requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
-        const headers: any[] = ['room', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']
+        const headers: any[] = [
+            'room',
+            'sourceIndex',
+            'efficacy',
+            'harvester',
+            'hauler',
+            'reserver',
+            'abandoned',
+        ]
         const data: any[][] = []
 
         for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {
@@ -701,7 +784,10 @@ export class RoomVisualsManager {
             row.push(remoteName)
             row.push(sourceIndex)
             if (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
-                row.push(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength)
+                row.push(
+                    remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
+                        packedPosLength,
+                )
             else row.push('undefined')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
