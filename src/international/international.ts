@@ -431,7 +431,7 @@ export class InternationalManager {
     _funnelOrder: string[]
 
     /**
-     * Commune names sorted by
+     * Commune names sorted by funnel priority
      */
     get funnelOrder() {
         if (this._funnelOrder) return this._funnelOrder

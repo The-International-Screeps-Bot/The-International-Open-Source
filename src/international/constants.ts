@@ -1,4 +1,5 @@
 import { packCoord } from 'other/codec'
+import { internationalManager } from './international'
 
 export enum PlayerMemoryKeys {
     /**
@@ -815,6 +816,11 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
     [RESOURCE_ENERGY]: {
         min: function (communeManager) {
             if (communeManager.room.controller.level < 8) {
+
+                if (internationalManager.funnelOrder[0] === communeManager.room.name) {
+
+                    return communeManager.storedEnergyUpgradeThreshold * 2
+                }
                 return communeManager.storedEnergyUpgradeThreshold * 1.2
             }
 
