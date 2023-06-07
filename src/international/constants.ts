@@ -221,7 +221,6 @@ export enum RoomMemoryKeys {
     disableCachedPaths,
     remotePlanned,
     remoteStampAnchors,
-    reservationEfficacy,
     remoteControllerPath,
     remoteControllerPositions,
     remoteSources,
@@ -267,7 +266,6 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.clearedEnemyStructures,
 
     RoomMemoryKeys.commune,
-    RoomMemoryKeys.reservationEfficacy,
 
     RoomMemoryKeys.owner,
     RoomMemoryKeys.RCL,
@@ -300,7 +298,6 @@ export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
     ]),
     [RoomTypes.remote]: new Set([
         RoomMemoryKeys.commune,
-        RoomMemoryKeys.reservationEfficacy,
         RoomMemoryKeys.communePlanned,
     ]),
     [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL, RoomMemoryKeys.communePlanned]),

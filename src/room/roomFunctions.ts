@@ -23,6 +23,7 @@ import {
     CreepMemoryKeys,
     RoomMemoryKeys,
     RoomTypes,
+    packedPosLength,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -47,7 +48,14 @@ import {
     doesCoordExist,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
-import { packCoord, packXYAsCoord, unpackCoord, unpackCoordAsPos, unpackPos, unpackPosList } from 'other/codec'
+import {
+    packCoord,
+    packXYAsCoord,
+    unpackCoord,
+    unpackCoordAsPos,
+    unpackPos,
+    unpackPosList,
+} from 'other/codec'
 import { posix } from 'path'
 import { BasePlans } from './construction/basePlans'
 import { customFindPath } from 'international/customPathFinder'
@@ -85,7 +93,10 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
 Room.prototype.targetVisual = function (coord1, coord2, visualize = Memory.roomVisuals) {
     if (!visualize) return
 
-    this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, { color: customColors.green, opacity: 0.3 })
+    this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
+        color: customColors.green,
+        opacity: 0.3,
+    })
 }
 
 Room.prototype.scoutByRoomName = function () {
@@ -100,9 +111,12 @@ Room.prototype.scoutByRoomName = function () {
 
     // Use the numbers to deduce some room types - cheaply!
 
-    if (EW % 10 === 0 && NS % 10 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.intersection)
-    if (EW % 10 === 0 || NS % 10 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.highway)
-    if (EW % 5 === 0 && NS % 5 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeperCenter)
+    if (EW % 10 === 0 && NS % 10 === 0)
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.intersection)
+    if (EW % 10 === 0 || NS % 10 === 0)
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.highway)
+    if (EW % 5 === 0 && NS % 5 === 0)
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeperCenter)
     if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1)
         return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeper)
 
@@ -239,7 +253,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     const anchor = scoutingRoom.roomManager.anchor
     if (!anchor) return roomMemory[RoomMemoryKeys.type]
-
+/*
     const newSourceEfficacies = []
     let newSourceEfficaciesTotal = 0
 
@@ -272,7 +286,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         for (const pos of path) {
             newSourceEfficacy +=
-                internationalManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] === TERRAIN_MASK_SWAMP
+                internationalManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] ===
+                TERRAIN_MASK_SWAMP
                     ? defaultSwampCost
                     : 1
         }
@@ -294,62 +309,60 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     }).length
 
     if (!newReservationEfficacy) return roomMemory[RoomMemoryKeys.type]
+ */
+    // If already a remote, apply special considerations
 
-    // If the room isn't already a remote
-
-    if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) {
+    if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
         // Generate new important positions
 
+        let newCost = 0
+
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
-        const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
-            scoutingRoom,
-            packedRemoteSources,
-        )
+        const packedRemoteSourceHarvestPositions =
+            this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
         const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
             scoutingRoom,
             packedRemoteSourceHarvestPositions,
         )
         for (const packedPath of packedRemoteSourcePaths) {
+            newCost += packedPath.length * packedPosLength
             if (!packedPath.length) {
-                console.log('No remote source paths for ' + this.name)
                 throw Error('No remote source paths for ' + this.name)
                 return roomMemory[RoomMemoryKeys.type]
             }
         }
-        console.log('remote work 2 check', packedRemoteSourcePaths)
-        const packedRemoteControllerPositions = this.roomManager.findRemoteControllerPositions(scoutingRoom)
+
+        const packedRemoteControllerPositions =
+            this.roomManager.findRemoteControllerPositions(scoutingRoom)
         const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
             scoutingRoom,
             packedRemoteControllerPositions,
         )
-        if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
+        if (!packedRemoteControllerPath.length)
+            throw Error('No remote controller path for ' + this.name)
 
-        roomMemory[RoomMemoryKeys.roads] = []
-        roomMemory[RoomMemoryKeys.roadsQuota] = []
+            newCost += packedRemoteControllerPath.length * packedPosLength
 
-        let sourceIndex = 0
-        for (const packedPath of packedRemoteSourcePaths) {
+        // Compare new, potential efficiency, to old efficiency
 
-            roomMemory[RoomMemoryKeys.roads][sourceIndex] = 0
-            roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] = 0
-
-            const positions = unpackPosList(packedPath)
-
-            for (const pos of positions) {
-
-                if (pos.roomName !== this.name) break
-
-                roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] += 1
-            }
+        let currentCost = 0
+        for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
+            currentCost += packedPath.length * packedPosLength
         }
+        currentCost +=
+            roomMemory[RoomMemoryKeys.remoteControllerPath].length * packedPosLength
+
+        if (newCost >= currentCost) {
+            return roomMemory[RoomMemoryKeys.type]
+        }
+
+        // Successful remote value generation, now assign them
 
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
         roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
         roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
         roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
         roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
-
-        roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
         roomMemory[RoomMemoryKeys.maxSourceIncome] = []
         roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
@@ -360,19 +373,11 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
         roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
-        console.log('remote paths', roomMemory[RoomMemoryKeys.remoteSourcePaths])
+
         return roomMemory[RoomMemoryKeys.type]
     }
 
-    const currentRemoteEfficacy =
-        roomMemory[RoomMemoryKeys.remoteSourcePaths].reduce((sum, el) => sum + el.length, 0) /
-            roomMemory[RoomMemoryKeys.remoteSourcePaths].length +
-        roomMemory[RoomMemoryKeys.reservationEfficacy]
-    const newRemoteEfficacy = newSourceEfficaciesTotal / newSourceEfficacies.length + newReservationEfficacy
-
-    // If the new average source efficacy is above the current, stop
-
-    if (newRemoteEfficacy >= currentRemoteEfficacy) return roomMemory[RoomMemoryKeys.type]
+    // The room is not a remote
 
     // Generate new important positions
 
@@ -387,25 +392,43 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     )
     for (const packedPath of packedRemoteSourcePaths) {
         if (!packedPath.length) {
+            console.log('No remote source paths for ' + this.name)
             throw Error('No remote source paths for ' + this.name)
             return roomMemory[RoomMemoryKeys.type]
         }
     }
-
-    const packedRemoteControllerPositions = this.roomManager.findRemoteControllerPositions(scoutingRoom)
+    console.log('remote work 2 check', packedRemoteSourcePaths)
+    const packedRemoteControllerPositions =
+        this.roomManager.findRemoteControllerPositions(scoutingRoom)
     const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
         scoutingRoom,
         packedRemoteControllerPositions,
     )
-    if (!packedRemoteControllerPath.length) throw Error('No remote controller path for ' + this.name)
+    if (!packedRemoteControllerPath.length)
+        throw Error('No remote controller path for ' + this.name)
+
+    roomMemory[RoomMemoryKeys.roads] = []
+    roomMemory[RoomMemoryKeys.roadsQuota] = []
+
+    let sourceIndex = 0
+    for (const packedPath of packedRemoteSourcePaths) {
+        roomMemory[RoomMemoryKeys.roads][sourceIndex] = 0
+        roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] = 0
+
+        const positions = unpackPosList(packedPath)
+
+        for (const pos of positions) {
+            if (pos.roomName !== this.name) break
+
+            roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] += 1
+        }
+    }
 
     roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
     roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
     roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
     roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
     roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
-
-    roomMemory[RoomMemoryKeys.reservationEfficacy] = newReservationEfficacy
 
     roomMemory[RoomMemoryKeys.maxSourceIncome] = []
     roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
@@ -470,7 +493,8 @@ Room.prototype.scoutEnemyRoom = function () {
     threat += Math.pow(energy, 0.5)
 
     const ramparts = this.roomManager.structures.rampart
-    const avgRampartHits = ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
+    const avgRampartHits =
+        ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
 
     threat += Math.pow(avgRampartHits, 0.5)
     threat += this.roomManager.structures.spawn.length * 100
@@ -527,7 +551,8 @@ Room.prototype.basicScout = function () {
 
         // If the controller is owned by an ally
 
-        if (Memory.allyPlayers.includes(owner)) return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+        if (Memory.allyPlayers.includes(owner))
+            return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
 
         return this.scoutEnemyRoom()
     }
@@ -548,7 +573,8 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
     this.memory[RoomMemoryKeys.lastScout] = Game.time
 
-    if (constantRoomTypes.has(this.memory[RoomMemoryKeys.type])) return this.memory[RoomMemoryKeys.type]
+    if (constantRoomTypes.has(this.memory[RoomMemoryKeys.type]))
+        return this.memory[RoomMemoryKeys.type]
     if (this.scoutByRoomName()) return this.memory[RoomMemoryKeys.type]
 
     // If there is a controller
@@ -567,7 +593,8 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (Memory.allyPlayers.includes(owner)) return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+            if (Memory.allyPlayers.includes(owner))
+                return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
 
             return this.scoutEnemyRoom()
         }
@@ -600,7 +627,9 @@ Room.prototype.createAttackCombatRequest = function (opts) {
 
     if (
         !this.enemyCreeps.length &&
-        !this.find(FIND_HOSTILE_STRUCTURES).find(structure => structure.structureType !== STRUCTURE_CONTROLLER)
+        !this.find(FIND_HOSTILE_STRUCTURES).find(
+            structure => structure.structureType !== STRUCTURE_CONTROLLER,
+        )
     )
         return
     if (Memory.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
@@ -677,7 +706,10 @@ Room.prototype.createDefendCombatRequest = function (opts) {
     }
 
     request[CombatRequestKeys.inactionTimer] = 0
-    request[CombatRequestKeys.inactionTimerMax] = randomRange(5000, 5000 + Math.floor(Math.random() * 5000))
+    request[CombatRequestKeys.inactionTimerMax] = randomRange(
+        5000,
+        5000 + Math.floor(Math.random() * 5000),
+    )
 
     if (opts) {
         Object.assign(request, opts)
@@ -702,7 +734,8 @@ Room.prototype.distanceTransform = function (
 
     const distanceCoords = new Uint8Array(2500)
 
-    if (!initialCoords) initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+    if (!initialCoords)
+        initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -797,7 +830,8 @@ Room.prototype.diagonalDistanceTransform = function (
 
     const distanceCoords = new Uint8Array(2500)
 
-    if (!initialCoords) initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+    if (!initialCoords)
+        initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -822,7 +856,10 @@ Room.prototype.diagonalDistanceTransform = function (
 
             packedCoord = packXYAsNum(x, y)
 
-            distanceCoords[packedCoord] = Math.min(Math.min(top, left) + 1, distanceCoords[packedCoord])
+            distanceCoords[packedCoord] = Math.min(
+                Math.min(top, left) + 1,
+                distanceCoords[packedCoord],
+            )
         }
     }
 
@@ -838,7 +875,10 @@ Room.prototype.diagonalDistanceTransform = function (
 
             packedCoord = packXYAsNum(x, y)
 
-            distanceCoords[packedCoord] = Math.min(Math.min(bottom, right) + 1, distanceCoords[packedCoord])
+            distanceCoords[packedCoord] = Math.min(
+                Math.min(bottom, right) + 1,
+                distanceCoords[packedCoord],
+            )
         }
     }
 
@@ -979,7 +1019,8 @@ Room.prototype.findClosestPos = function (opts) {
             for (const coord of thisGeneration) {
                 // If the pos can be an anchor, inform it
 
-                if (opts.targetCondition(coord)) return new RoomPosition(coord.x, coord.y, this.name)
+                if (opts.targetCondition(coord))
+                    return new RoomPosition(coord.x, coord.y, this.name)
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
@@ -1034,11 +1075,17 @@ Room.prototype.findClosestPos = function (opts) {
             for (const coord of thisGeneration) {
                 // If the pos can be an anchor, inform it
 
-                if (opts.targetCondition(coord)) return new RoomPosition(coord.x, coord.y, this.name)
+                if (opts.targetCondition(coord))
+                    return new RoomPosition(coord.x, coord.y, this.name)
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentCoords = findCoordsInsideRect(coord.x - 1, coord.y - 1, coord.x + 1, coord.y + 1)
+                const adjacentCoords = findCoordsInsideRect(
+                    coord.x - 1,
+                    coord.y - 1,
+                    coord.x + 1,
+                    coord.y + 1,
+                )
 
                 // Loop through adjacent positions
 
@@ -1072,11 +1119,17 @@ Room.prototype.findClosestPos = function (opts) {
             for (const coord of thisGeneration) {
                 // If the pos can be an anchor, inform it
 
-                if (opts.targetCondition(coord)) return new RoomPosition(coord.x, coord.y, this.name)
+                if (opts.targetCondition(coord))
+                    return new RoomPosition(coord.x, coord.y, this.name)
 
                 // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentCoords = findCoordsInsideRect(coord.x - 1, coord.y - 1, coord.x + 1, coord.y + 1)
+                const adjacentCoords = findCoordsInsideRect(
+                    coord.x - 1,
+                    coord.y - 1,
+                    coord.x + 1,
+                    coord.y + 1,
+                )
                 // Loop through adjacent positions
 
                 for (const coord2 of adjacentCoords) {
@@ -1181,7 +1234,12 @@ Room.prototype.findClosestPosOfValue = function (opts) {
 
         // Loop through adjacent positions
 
-        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+        for (const coord2 of findCoordsInsideRect(
+            coord1.x - 1,
+            coord1.y - 1,
+            coord1.x + 1,
+            coord1.y + 1,
+        )) {
             // If the adjacentPos isn't a roadPosition, iterate
 
             if (opts.roadCoords[packAsNum(coord2)] !== 1) continue
@@ -1227,7 +1285,8 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1, i)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1, i))
+                        return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
@@ -1255,7 +1314,12 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                     for (const coord2 of adjacentCoords) {
                         // Iterate if the pos doesn't map onto a room
 
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        if (
+                            coord2.x < 0 ||
+                            coord2.x >= roomDimensions ||
+                            coord2.y < 0 ||
+                            coord2.y >= roomDimensions
+                        )
                             continue
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1285,18 +1349,29 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1, i)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1, i))
+                        return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    const adjacentCoords = findCoordsInsideRect(
+                        coord1.x - 1,
+                        coord1.y - 1,
+                        coord1.x + 1,
+                        coord1.y + 1,
+                    )
 
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
                         // Iterate if the pos doesn't map onto a room
 
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        if (
+                            coord2.x < 0 ||
+                            coord2.x >= roomDimensions ||
+                            coord2.y < 0 ||
+                            coord2.y >= roomDimensions
+                        )
                             continue
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1326,17 +1401,28 @@ Room.prototype.findClosestPosOfValue = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1, i)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1, i))
+                        return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    const adjacentCoords = findCoordsInsideRect(
+                        coord1.x - 1,
+                        coord1.y - 1,
+                        coord1.x + 1,
+                        coord1.y + 1,
+                    )
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
                         // Iterate if the pos doesn't map onto a room
 
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        if (
+                            coord2.x < 0 ||
+                            coord2.x >= roomDimensions ||
+                            coord2.y < 0 ||
+                            coord2.y >= roomDimensions
+                        )
                             continue
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1427,7 +1513,12 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
 
         // Loop through adjacent positions
 
-        for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+        for (const coord2 of findCoordsInsideRect(
+            coord1.x - 1,
+            coord1.y - 1,
+            coord1.x + 1,
+            coord1.y + 1,
+        )) {
             // If the adjacentPos isn't a roadPosition, iterate
 
             if (opts.roadCoords[packAsNum(coord2)] !== 1) continue
@@ -1472,7 +1563,8 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1))
+                        return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
@@ -1500,7 +1592,12 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                     for (const coord2 of adjacentCoords) {
                         // Iterate if the pos doesn't map onto a room
 
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        if (
+                            coord2.x < 0 ||
+                            coord2.x >= roomDimensions ||
+                            coord2.y < 0 ||
+                            coord2.y >= roomDimensions
+                        )
                             continue
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1530,18 +1627,29 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1))
+                        return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    const adjacentCoords = findCoordsInsideRect(
+                        coord1.x - 1,
+                        coord1.y - 1,
+                        coord1.x + 1,
+                        coord1.y + 1,
+                    )
 
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
                         // Iterate if the pos doesn't map onto a room
 
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        if (
+                            coord2.x < 0 ||
+                            coord2.x >= roomDimensions ||
+                            coord2.y < 0 ||
+                            coord2.y >= roomDimensions
+                        )
                             continue
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1571,17 +1679,28 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
                 for (const coord1 of thisGeneration) {
                     // If the pos can be an anchor, inform it
 
-                    if (isViableAnchor(coord1)) return new RoomPosition(coord1.x, coord1.y, room.name)
+                    if (isViableAnchor(coord1))
+                        return new RoomPosition(coord1.x, coord1.y, room.name)
 
                     // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                    const adjacentCoords = findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)
+                    const adjacentCoords = findCoordsInsideRect(
+                        coord1.x - 1,
+                        coord1.y - 1,
+                        coord1.x + 1,
+                        coord1.y + 1,
+                    )
                     // Loop through adjacent positions
 
                     for (const coord2 of adjacentCoords) {
                         // Iterate if the pos doesn't map onto a room
 
-                        if (coord2.x < 0 || coord2.x >= roomDimensions || coord2.y < 0 || coord2.y >= roomDimensions)
+                        if (
+                            coord2.x < 0 ||
+                            coord2.x >= roomDimensions ||
+                            coord2.y < 0 ||
+                            coord2.y >= roomDimensions
+                        )
                             continue
 
                         // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1683,12 +1802,15 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        this.memory[RoomMemoryKeys.constructionSiteTarget] = anchor.findClosestByPath(cSitesOfType, {
-            ignoreCreeps: true,
-            ignoreDestructibleStructures: true,
-            ignoreRoads: true,
-            range: 3,
-        }).id
+        this.memory[RoomMemoryKeys.constructionSiteTarget] = anchor.findClosestByPath(
+            cSitesOfType,
+            {
+                ignoreCreeps: true,
+                ignoreDestructibleStructures: true,
+                ignoreRoads: true,
+                range: 3,
+            },
+        ).id
         return true
     }
 
@@ -1749,7 +1871,12 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
 
             // Loop through adjacent positions
 
-            for (const coord2 of findCoordsInsideRect(coord1.x - 1, coord1.y - 1, coord1.x + 1, coord1.y + 1)) {
+            for (const coord2 of findCoordsInsideRect(
+                coord1.x - 1,
+                coord1.y - 1,
+                coord1.x + 1,
+                coord1.y + 1,
+            )) {
                 const packedCoord2 = packAsNum(coord2)
 
                 // Iterate if the adjacent pos has been visited or isn't a tile
@@ -1838,7 +1965,9 @@ Room.prototype.groupRampartPositions = function (rampartPositions) {
 
                     // Add it to the next gen and this group
 
-                    groupedPositions[groupIndex].push(new RoomPosition(adjacentPos.x, adjacentPos.y, room.name))
+                    groupedPositions[groupIndex].push(
+                        new RoomPosition(adjacentPos.x, adjacentPos.y, room.name),
+                    )
 
                     groupSize += 1
                     nextGeneration.push(adjacentPos)
@@ -2061,7 +2190,10 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
     if (!this.storage) return this.terminal
     if (!this.terminal) return this.storage
 
-    if (this.storage.store.getUsedCapacity(resourceType) * 3 > this.terminal.store.getUsedCapacity(resourceType))
+    if (
+        this.storage.store.getUsedCapacity(resourceType) * 3 >
+        this.terminal.store.getUsedCapacity(resourceType)
+    )
         return this.storage
     return this.terminal
 }
@@ -2088,7 +2220,10 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
         if (amount < 1) return RESULT_FAIL
     } else if (args.type === 'transfer') {
-        if (args.target.reserveStore[args.resourceType] >= args.target.store.getCapacity(args.resourceType))
+        if (
+            args.target.reserveStore[args.resourceType] >=
+            args.target.store.getCapacity(args.resourceType)
+        )
             return RESULT_FAIL
 
         amount = args.target.freeReserveStoreOf(args.resourceType)

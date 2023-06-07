@@ -1,6 +1,6 @@
-import { CreepMemoryKeys, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys, RoomTypes } from 'international/constants'
+import { CreepMemoryKeys, RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys, RoomTypes, packedPosLength } from 'international/constants'
 import { getRange, randomTick } from 'international/utils'
-import { packCoord, reversePosList, unpackCoordAsPos, unpackPosList } from 'other/codec'
+import { packCoord, reversePosList, unpackCoordAsPos, unpackPosAt, unpackPosList } from 'other/codec'
 
 export class RemoteReserver extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -16,7 +16,7 @@ export class RemoteReserver extends Creep {
             if (
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
-                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.reservationEfficacy]
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteControllerPath].length / packedPosLength
             )
                 return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
@@ -111,7 +111,6 @@ export class RemoteReserver extends Creep {
         if (!usePos) return RESULT_FAIL
 
         this.actionCoord = this.room.controller.pos
-
         if (getRange(this.pos, usePos) === 0) return RESULT_SUCCESS
 
         this.createMoveRequestByPath(
@@ -135,21 +134,20 @@ export class RemoteReserver extends Creep {
         return RESULT_ACTION
     }
 
-    inRemote?() {
+    runRemote?() {
         if (this.travelToController() !== RESULT_SUCCESS) return
     }
 
     outsideRemote?() {
-        const remoteControllerPositions = unpackPosList(
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteControllerPositions],
-        )
+
+        const controllerPos = unpackPosAt(Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][RoomMemoryKeys.remoteControllerPositions], 0)
 
         this.createMoveRequestByPath(
             {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: remoteControllerPositions[0],
+                        pos: controllerPos,
                         range: 0,
                     },
                 ],
@@ -202,7 +200,7 @@ export class RemoteReserver extends Creep {
             // If the creep is in the remote
 
             if (room.name === creep.memory[CreepMemoryKeys.remote]) {
-                creep.inRemote()
+                creep.runRemote()
                 continue
             }
 

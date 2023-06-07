@@ -2016,7 +2016,6 @@ declare global {
         [RoomMemoryKeys.disableCachedPaths]: boolean
         [RoomMemoryKeys.remotePlanned]: boolean
         [RoomMemoryKeys.remoteStampAnchors]: PackedStampAnchors
-        [RoomMemoryKeys.reservationEfficacy]: number
         [RoomMemoryKeys.remoteControllerPath]: string
         [RoomMemoryKeys.remoteControllerPositions]: string
         [RoomMemoryKeys.remoteSources]: Id<Source>[]
