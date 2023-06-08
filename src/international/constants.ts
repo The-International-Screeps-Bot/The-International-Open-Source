@@ -1,5 +1,6 @@
 import { packCoord } from 'other/codec'
 import { internationalManager } from './international'
+import { settings } from './settings'
 
 export enum PlayerMemoryKeys {
     /**
@@ -408,7 +409,7 @@ export enum TrafficPriorities {
     antifaRangedAttacker,
 }
 
-export const version = `v2.${Memory.breakingVersion}.0`
+export const version = `v2.${settings.breakingVersion}.0`
 
 // Set of messages to randomly apply to commune rooms
 
