@@ -44,11 +44,10 @@ export class RemoteReserver extends Creep {
 
         const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
 
-        let roomMemory
-
         for (const roomName of remoteNamesByEfficacy) {
-            roomMemory = Memory.rooms[roomName]
+            const roomMemory = Memory.rooms[roomName]
 
+            if (roomMemory[RoomMemoryKeys.abandon] > 0) continue
             if (roomMemory[RoomMemoryKeys.remoteReserver] <= 0) continue
 
             this.memory[CreepMemoryKeys.remote] = roomName

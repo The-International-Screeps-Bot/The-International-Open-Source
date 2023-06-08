@@ -769,6 +769,7 @@ export class RoomVisualsManager {
             'harvester',
             'hauler',
             'reserver',
+            'coreAttacker',
             'abandoned',
         ]
         const data: any[][] = []
@@ -792,6 +793,7 @@ export class RoomVisualsManager {
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
+            row.push(remoteMemory[RoomMemoryKeys.remoteCoreAttacker] || 0)
             row.push(remoteMemory[RoomMemoryKeys.abandon] || 0)
 
             data.push(row)

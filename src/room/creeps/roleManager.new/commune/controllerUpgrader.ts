@@ -2,7 +2,7 @@ import { RoomMemoryKeys, packedPosLength } from 'international/constants'
 
 export class ControllerUpgraderManager {
 
-    role: CreepRoles = 'hauler'
+    role: CreepRoles = 'controllerUpgrader'
     // Allows for the pattern: instance.manager.run(instance)
     manager = this
 

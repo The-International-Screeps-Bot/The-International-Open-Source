@@ -113,7 +113,7 @@ export class RemotesManager {
                 if (
                     isReserved &&
                     remote.controller.reservation.ticksToEnd >=
-                        Math.min(remoteMemory[RoomMemoryKeys.reservationEfficacy] * 5, 2500)
+                        Math.min(remoteMemory[RoomMemoryKeys.remoteControllerPath].length * packedPosLength * 5, 2500)
                 )
                     remoteMemory[RoomMemoryKeys.remoteReserver] = 0
             }

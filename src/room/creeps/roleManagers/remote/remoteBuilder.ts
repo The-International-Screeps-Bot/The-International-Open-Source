@@ -88,6 +88,7 @@ export class RemoteBuilder extends Creep {
             const remoteName = splitRemoteInfo[0]
             const remoteMemory = Memory.rooms[remoteName]
 
+            if (remoteMemory[RoomMemoryKeys.abandon] > 0) continue
             if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) continue
 
             this.assignRemote(remoteName)
