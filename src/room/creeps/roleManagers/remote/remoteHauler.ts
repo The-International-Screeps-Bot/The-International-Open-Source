@@ -90,7 +90,6 @@ export class RemoteHauler extends Creep {
 
             // If there is no need
 
-            if (remoteMemory[RoomMemoryKeys.abandon] > 0) continue
             if (remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] <= 0) continue
 
             this.assignRemote(remoteName, sourceIndex)

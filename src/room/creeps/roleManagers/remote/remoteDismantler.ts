@@ -73,7 +73,6 @@ export class RemoteDismantler extends Creep {
         for (const roomName of remoteNamesByEfficacy) {
             const roomMemory = Memory.rooms[roomName]
 
-            if (roomMemory[RoomMemoryKeys.abandon] > 0) continue
             if (roomMemory[RoomMemoryKeys[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true

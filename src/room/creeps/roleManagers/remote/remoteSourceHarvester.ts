@@ -96,7 +96,6 @@ export class RemoteHarvester extends Creep {
             const sourceIndex = parseInt(splitRemoteInfo[1])
             const remoteMemory = Memory.rooms[remoteName]
 
-            if (remoteMemory[RoomMemoryKeys.abandon] > 0) continue
             if (
                 remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions].length / packedPosLength >=
                 this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].length
