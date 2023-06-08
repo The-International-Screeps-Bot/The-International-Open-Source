@@ -747,11 +747,11 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 return
             }
 
-            if (
+            if (!this.isOnExit && (
                 this.memory[CreepMemoryKeys.remote] !== creepAtPos.memory[CreepMemoryKeys.remote] ||
                 this.memory[CreepMemoryKeys.sourceIndex] !== creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
                 TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
             ) {
                 // Have the creep move to its moveRequest
 
@@ -889,9 +889,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         // Swap if creep has higher priority than creepAtPos
 
         if (
-            creepAtPos instanceof PowerCreep ||
+            !this.isOnExit && (creepAtPos instanceof PowerCreep ||
             TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -954,6 +954,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         this.runMoveRequest()
         return
     }
+
+    if (this.isOnExit) return
 
     if (Memory.roomVisuals)
         room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
