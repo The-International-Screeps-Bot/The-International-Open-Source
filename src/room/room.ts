@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    RESULT_FAIL,
     RoomMemoryKeys,
     RoomTypes,
     adjacentOffsets,
@@ -276,11 +277,12 @@ export class RoomManager {
 
             sourcePaths.push(path)
         }
+/*
         for (const index in sourcePaths) {
             const path = sourcePaths[index]
             if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + JSON.stringify(sourcePaths) + ', ' + packedRemoteSourceHarvestPositions)
         }
-
+ */
         return sourcePaths.map(path => packPosList(path))
     }
 

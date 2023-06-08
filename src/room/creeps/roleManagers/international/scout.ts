@@ -221,7 +221,7 @@ export class Scout extends Creep {
             )
                 return true
 
-            this.message = this.moveRequest.toString()
+                this.message = this.moveRequest
 
             return false
         }

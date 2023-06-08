@@ -253,7 +253,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     const anchor = scoutingRoom.roomManager.anchor
     if (!anchor) return roomMemory[RoomMemoryKeys.type]
-/*
+    /*
     const newSourceEfficacies = []
     let newSourceEfficaciesTotal = 0
 
@@ -324,10 +324,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             scoutingRoom,
             packedRemoteSourceHarvestPositions,
         )
+
         for (const packedPath of packedRemoteSourcePaths) {
             newCost += packedPath.length * packedPosLength
             if (!packedPath.length) {
-                throw Error('No remote source paths for ' + this.name)
                 return roomMemory[RoomMemoryKeys.type]
             }
         }
@@ -341,7 +341,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         if (!packedRemoteControllerPath.length)
             throw Error('No remote controller path for ' + this.name)
 
-            newCost += packedRemoteControllerPath.length * packedPosLength
+        newCost += packedRemoteControllerPath.length * packedPosLength
 
         // Compare new, potential efficiency, to old efficiency
 
@@ -349,8 +349,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
             currentCost += packedPath.length * packedPosLength
         }
-        currentCost +=
-            roomMemory[RoomMemoryKeys.remoteControllerPath].length * packedPosLength
+        currentCost += roomMemory[RoomMemoryKeys.remoteControllerPath].length * packedPosLength
 
         if (newCost >= currentCost) {
             return roomMemory[RoomMemoryKeys.type]
@@ -392,12 +391,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     )
     for (const packedPath of packedRemoteSourcePaths) {
         if (!packedPath.length) {
-
-            throw Error('No remote source paths for ' + this.name)
             return roomMemory[RoomMemoryKeys.type]
         }
     }
-    console.log('remote work 2 check', packedRemoteSourcePaths)
+
     const packedRemoteControllerPositions =
         this.roomManager.findRemoteControllerPositions(scoutingRoom)
     const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(

@@ -1,6 +1,8 @@
 import { BasePlans } from 'room/construction/basePlans'
 import {
     CreepMemoryKeys,
+    RESULT_FAIL,
+    RESULT_SUCCESS,
     RoomMemoryKeys,
     RoomTypes,
     customColors,
@@ -15,7 +17,7 @@ import { customLog, unpackNumAsCoord } from './utils'
 export function customFindPath(args: CustomPathFinderArgs) {
     const allowedRoomNames = new Set([args.origin.roomName])
 
-    generateRoute(args, allowedRoomNames)
+    if (generateRoute(args, allowedRoomNames) === RESULT_FAIL) return []
     weightStructurePlans(args, allowedRoomNames)
     return generatePath(args, allowedRoomNames)
 }
@@ -69,12 +71,7 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
 
         // If a route can't be found
 
-        if (route === ERR_NO_PATH) {
-
-            throw Error('COULD NOT FIND ROUTE' + ', ' + args.origin + ' -> ' + goal.pos)
-            continue
-        }
-        if (!route.find(data => data.room === goal.pos.roomName)) throw Error('route failed')
+        if (route === ERR_NO_PATH) return RESULT_FAIL
 
         for (const roomRoute of route) {
             allowedRoomNames.add(roomRoute.room)
@@ -83,12 +80,15 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
             for (const exit in exits) {
                 const roomName = exits[exit as ExitKey]
 
-                if (weightRoom(roomName) > 1) continue
+                if (allowedRoomNames.has(roomName)) continue
+                if (weightRoom(roomName) === Infinity) continue
 
                 allowedRoomNames.add(roomName)
             }
         }
     }
+
+    return RESULT_SUCCESS
 }
 
 function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
