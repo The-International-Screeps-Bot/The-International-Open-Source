@@ -69,7 +69,12 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
 
         // If a route can't be found
 
-        if (route === ERR_NO_PATH) continue
+        if (route === ERR_NO_PATH) {
+
+            throw Error('COULD NOT FIND ROUTE' + ', ' + args.origin + ' -> ' + goal.pos)
+            continue
+        }
+        if (!route.find(data => data.room === goal.pos.roomName)) throw Error('route failed')
 
         for (const roomRoute of route) {
             allowedRoomNames.add(roomRoute.room)
@@ -414,6 +419,16 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 }
             }
 
+            if (roomName === 'W37S1' || roomName === 'W32N2') {
+                console.log(roomName, args.maxRooms ? Math.min(allowedRoomNames.size, args.maxRooms) : allowedRoomNames.size, Array.from(allowedRoomNames), args.goals[0].pos)
+                for (let x = 0; x < roomDimensions; x += 1) {
+                    for (let y = 0; y < roomDimensions; y += 1) {
+
+                        new RoomVisual(roomName).text(cm.get(x, y).toString(),x, y )
+                    }
+                }
+            }
+
             // Inform the CostMatrix
 
             return cm
@@ -426,8 +441,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
         customLog(
             'Incomplete Path',
             `${args.origin} -> ${args.goals[0].pos} range: ${args.goals[0].range} goals: ${
-                args.goals.length - 1
-            } path: ${pathFinderResult.path.length}`,
+                args.goals.length
+            } path len: ${pathFinderResult.path.length} allowed: ${Array.from(allowedRoomNames)}`,
             {
                 textColor: customColors.white,
                 bgColor: customColors.red,

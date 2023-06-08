@@ -1,4 +1,11 @@
-import { CreepMemoryKeys, RESULT_FAIL, RoomMemoryKeys, RoomTypes, communeSign, nonCommuneSigns } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    RESULT_FAIL,
+    RoomMemoryKeys,
+    RoomTypes,
+    communeSign,
+    nonCommuneSigns,
+} from 'international/constants'
 import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
 import { partial } from 'lodash'
 
@@ -52,7 +59,11 @@ export class Scout extends Creep {
 
             // Iterate if the room statuses aren't the same
 
-            if (Game.map.getRoomStatus(roomName).status !== Game.map.getRoomStatus(this.room.name).status) continue
+            if (
+                Game.map.getRoomStatus(roomName).status !==
+                Game.map.getRoomStatus(this.room.name).status
+            )
+                continue
 
             // If the room has memory and a LST
 
@@ -141,13 +152,19 @@ export class Scout extends Creep {
      * Tries to sign a room's controller depending on the situation
      */
     advancedSignController?(): boolean {
-        const { room } = this
 
-        const { controller } = room
-
+        const { controller } = this.room
         if (!controller) return true
 
-        if (room.name !== this.memory[CreepMemoryKeys.signTarget]) return true
+        const roomMemory = Memory.rooms[this.room.name]
+
+        // If the room isn't a commune or our scoutTarget, skip it
+
+        if (
+            roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune &&
+            this.room.name !== this.memory[CreepMemoryKeys.signTarget]
+        )
+            return true
 
         this.message = '🔤'
 
@@ -157,14 +174,17 @@ export class Scout extends Creep {
 
         // If the room is owned by an enemy or an ally
 
-        if (room.memory[RoomMemoryKeys.type] === RoomTypes.ally || room.memory[RoomMemoryKeys.type] === RoomTypes.enemy)
+        if (
+            roomMemory[RoomMemoryKeys.type] === RoomTypes.ally ||
+            roomMemory[RoomMemoryKeys.type] === RoomTypes.enemy
+        )
             return true
 
         if (controller.reservation && controller.reservation.username !== Memory.me) return true
 
         // If the room is a commune
 
-        if (room.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
+        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
             // If the room already has a correct sign
 
             if (controller.sign && controller.sign.text === communeSign) return true
@@ -193,7 +213,7 @@ export class Scout extends Creep {
             if (
                 this.createMoveRequest({
                     origin: this.pos,
-                    goals: [{ pos: room.controller.pos, range: 1 }],
+                    goals: [{ pos: this.room.controller.pos, range: 1 }],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
@@ -208,7 +228,7 @@ export class Scout extends Creep {
 
         // Otherwise Try to sign the controller, informing the result
 
-        return this.signController(room.controller, signMessage) === OK
+        return this.signController(this.room.controller, signMessage) === OK
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {
@@ -260,7 +280,11 @@ export class Scout extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.scoutTarget]),
+                            pos: new RoomPosition(
+                                25,
+                                25,
+                                creep.memory[CreepMemoryKeys.scoutTarget],
+                            ),
                             range: 25,
                         },
                     ],
@@ -269,9 +293,12 @@ export class Scout extends Creep {
                     swampCost: 1,
                 }) === RESULT_FAIL
             ) {
-                let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]]
+                let roomMemory: Partial<RoomMemory> =
+                    Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]]
                 if (!roomMemory)
-                    roomMemory = (Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]] as Partial<RoomMemory>) = {}
+                    roomMemory = (Memory.rooms[
+                        creep.memory[CreepMemoryKeys.scoutTarget]
+                    ] as Partial<RoomMemory>) = {}
 
                 roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
                 roomMemory[RoomMemoryKeys.lastScout] = Game.time

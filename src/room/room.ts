@@ -184,6 +184,7 @@ export class RoomManager {
     }
 
     run() {
+        if (this.room.communeManager) this.room.communeManager.run()
         if (this.room.memory[RoomMemoryKeys.type] === RoomTypes.remote) {
             this.containerManager.runRemote()
             this.droppedResourceManager.runRemote()

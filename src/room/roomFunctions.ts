@@ -392,7 +392,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     )
     for (const packedPath of packedRemoteSourcePaths) {
         if (!packedPath.length) {
-            console.log('No remote source paths for ' + this.name)
+
             throw Error('No remote source paths for ' + this.name)
             return roomMemory[RoomMemoryKeys.type]
         }

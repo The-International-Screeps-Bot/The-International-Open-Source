@@ -382,7 +382,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     if (this.spawning) {
         const spawn = findObjectWithID(this.spawnID)
-
+        console.log('accessed spawnID', this.name, this.spawnID)
         // Ensure we aren't using the default direction
 
         if (spawn.spawning.directions) return RESULT_SUCCESS

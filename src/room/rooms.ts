@@ -35,8 +35,7 @@ export function roomsManager() {
 
         // If the room is a commune, run its specific manager
 
-        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) room.communeManager.run()
-        else room.roomManager.run()
+        room.roomManager.run()
 
         // Log room stats
 
