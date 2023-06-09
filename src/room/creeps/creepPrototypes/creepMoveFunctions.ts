@@ -750,8 +750,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             if (!this.isOnExit && (
                 this.memory[CreepMemoryKeys.remote] !== creepAtPos.memory[CreepMemoryKeys.remote] ||
                 this.memory[CreepMemoryKeys.sourceIndex] !== creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
-                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
+                TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
             ) {
                 // Have the creep move to its moveRequest
 
@@ -868,8 +868,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             if (
                 !(creepAtPos instanceof PowerCreep) &&
-                TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0)
+                TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0)
             ) {
                 this.runMoveRequest()
 
@@ -890,8 +890,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
         if (
             !this.isOnExit && (creepAtPos instanceof PowerCreep ||
-            TrafficPriorities[this.role] + (this.freeStore() === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeStore() === 0 ? 0.1 : 0))
+            TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
+                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {

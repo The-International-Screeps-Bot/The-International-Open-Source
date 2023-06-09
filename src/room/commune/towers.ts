@@ -28,7 +28,7 @@ export class TowerManager {
 
         const towers = this.communeManager.room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
-            this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
+            this.communeManager.room.towerInferiority = this.communeManager.room.enemyCreeps.length > 0
             return
         }
 
