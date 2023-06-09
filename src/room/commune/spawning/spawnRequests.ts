@@ -361,7 +361,6 @@ export class SpawnRequestsManager {
     }
 
     private defenders() {
-        const { enemyAttackers } = this.communeManager.room
 
         // Construct requests for meleeDefenders
 
@@ -371,6 +370,8 @@ export class SpawnRequestsManager {
             const minPriority = 6
             const maxPriority = this.minRemotePriority - 1
 
+            const { enemyCreeps } = this.communeManager.room
+
             // Melee defender
 
             this.rawSpawnRequestsArgs.push(
@@ -379,7 +380,7 @@ export class SpawnRequestsManager {
 
                     if (
                         this.communeManager.room.myCreeps[role].length * 1.75 >
-                        enemyAttackers.length
+                        enemyCreeps.length
                     )
                         return false
 
@@ -444,7 +445,7 @@ export class SpawnRequestsManager {
 
                     if (
                         this.communeManager.room.myCreeps[role].length * 1.75 >
-                        enemyAttackers.length
+                        enemyCreeps.length
                     )
                         return false
 
