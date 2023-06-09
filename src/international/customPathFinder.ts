@@ -419,16 +419,6 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 }
             }
 
-            if (roomName === 'W37S1' || roomName === 'W32N2') {
-                console.log(roomName, args.maxRooms ? Math.min(allowedRoomNames.size, args.maxRooms) : allowedRoomNames.size, Array.from(allowedRoomNames), args.goals[0].pos)
-                for (let x = 0; x < roomDimensions; x += 1) {
-                    for (let y = 0; y < roomDimensions; y += 1) {
-
-                        new RoomVisual(roomName).text(cm.get(x, y).toString(),x, y )
-                    }
-                }
-            }
-
             // Inform the CostMatrix
 
             return cm
