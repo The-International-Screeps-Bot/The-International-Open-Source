@@ -283,7 +283,7 @@ Creep.prototype.advancedUpgradeController = function () {
                 this.nextStore.energy -= workPartCount
 
                 const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
-                customLog('run upgrade', this.name)
+
                 updateStat(this.room.name, 'eou', controlPoints)
                 this.message += `🔋${controlPoints}`
             }

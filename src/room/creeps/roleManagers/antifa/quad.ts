@@ -136,8 +136,8 @@ export class Quad {
                 [RoomTypes.enemy]: Infinity,
                 [RoomTypes.ally]: 2,
                 [RoomTypes.keeper]: 5,
-                [RoomTypes.enemyRemote]: 5,
-                [RoomTypes.allyRemote]: 5,
+                [RoomTypes.enemyRemote]: 3,
+                [RoomTypes.allyRemote]: 3,
                 [RoomTypes.neutral]: 2,
             },
         })

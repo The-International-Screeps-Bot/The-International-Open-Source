@@ -25,6 +25,7 @@ import {
     findFunctionCPU,
     areCoordsEqual,
     getRange,
+    findHighestScore,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { profiler } from 'other/profiler'
@@ -974,16 +975,20 @@ const roomAdditions = {
 
             for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) terrainCoords[packAsNum(creep.pos)] = 255
  */
-            // Avoid impassible structures
 
-            for (const rampart of this.roomManager.structures.rampart) {
+            const ramparts = this.roomManager.structures.rampart
+            const constructedWalls = this.roomManager.structures.constructedWall
+            const barricades = [...ramparts, ...constructedWalls]
+            const highestBarricadeHits = findHighestScore(barricades, (structure) => structure.hits)
+
+            for (const structure of ramparts) {
                 // If the rampart is mine
 
-                if (rampart.my) continue
+                if (structure.my) continue
 
                 // Otherwise set the rampart's pos as impassible
 
-                terrainCoords[packAsNum(rampart.pos)] = 50 /* rampart.hits / (rampart.hitsMax / 200) */
+                terrainCoords[packAsNum(structure.pos)] = Math.floor((highestBarricadeHits - structure.hits) / highestBarricadeHits * 254)
             }
 
             // Loop through structureTypes of impassibleStructureTypes
@@ -998,6 +1003,13 @@ const roomAdditions = {
 
                     terrainCoords[packAsNum(cSite.pos)] = 255
                 }
+            }
+
+            for (const structure of constructedWalls) {
+
+                // Otherwise set the rampart's pos as impassible
+
+                terrainCoords[packAsNum(structure.pos)] = Math.floor((highestBarricadeHits - structure.hits) / highestBarricadeHits * 254)
             }
 
             //
