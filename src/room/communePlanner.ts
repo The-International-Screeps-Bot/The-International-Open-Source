@@ -1962,7 +1962,7 @@ export class CommunePlanner {
 
                         // It's not our first room, have a rampart planned to build the spawn under
 
-                        if (i === 0 && !this.roomManager.isFirstRoom()) {
+                        if (i === 0 && !this.roomManager.isStartRoom()) {
                             this.setRampartPlansXY(
                                 properCoord.x,
                                 properCoord.y,
@@ -3369,6 +3369,15 @@ export class CommunePlanner {
                 this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
                 continue
             }
+
+            if (rampartPlans.get(packedCoord).buildForThreat) {
+                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
+                    opacity: 0.2,
+                    fill: customColors.lightBlue,
+                })
+                continue
+            }
+
             this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.5 })
         }
 

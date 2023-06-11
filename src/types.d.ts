@@ -2191,6 +2191,10 @@ declare global {
          * A tuple for commanding to Wait until the designated tick to perform an specified action
          */
         [CreepMemoryKeys.sleep]: [number, SleepFor]
+        /**
+         * An ambigious target the creep is after, probably for target locking
+         */
+        [CreepMemoryKeys.targetID]: Id<Structure | Creep | PowerCreep | Tombstone | Ruin>
     }
 
     interface PowerCreepMemory {

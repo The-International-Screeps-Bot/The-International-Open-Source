@@ -926,7 +926,7 @@ export function findDynamicScore(roomName: string) {
     })
 
     dynamicScore += Math.round(Math.pow(closestEnemy, -0.8) * 25)
-    dynamicScore += Math.round(communeScore * 3)
+    dynamicScore += Math.round(communeScore * 5)
     dynamicScore += allyScore
 
     const roomMemory = Memory.rooms[roomName]

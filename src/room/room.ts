@@ -45,7 +45,15 @@ import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinManager } from './ruins'
-import { packCoord, packPosList, unpackCoord, unpackPos, unpackPosAt, unpackPosList, unpackStampAnchors } from 'other/codec'
+import {
+    packCoord,
+    packPosList,
+    unpackCoord,
+    unpackPos,
+    unpackPosAt,
+    unpackPosList,
+    unpackStampAnchors,
+} from 'other/codec'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { customFindPath } from 'international/customPathFinder'
@@ -185,9 +193,7 @@ export class RoomManager {
     }
 
     run() {
-
         if (this.room.communeManager) {
-
             this.room.communeManager.run()
             return
         }
@@ -206,7 +212,6 @@ export class RoomManager {
     }
 
     findRemoteSources(commune: Room) {
-
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
 
@@ -225,7 +230,6 @@ export class RoomManager {
     }
 
     findRemoteSourceHarvestPositions(commune: Room, packedRemoteSources: Id<Source>[]) {
-
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
 
@@ -264,7 +268,6 @@ export class RoomManager {
     }
 
     findRemoteSourcePaths(commune: Room, packedRemoteSourceHarvestPositions: string[]) {
-
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote source harvest paths' + this.room.name)
 
@@ -283,7 +286,7 @@ export class RoomManager {
 
             sourcePaths.push(path)
         }
-/*
+        /*
         for (const index in sourcePaths) {
             const path = sourcePaths[index]
             if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + JSON.stringify(sourcePaths) + ', ' + packedRemoteSourceHarvestPositions)
@@ -293,7 +296,6 @@ export class RoomManager {
     }
 
     findRemoteControllerPositions(commune: Room) {
-
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('no anchor found for controller positions ' + this.room.name)
 
@@ -302,7 +304,11 @@ export class RoomManager {
         const terrain = this.room.getTerrain()
 
         for (let offset of adjacentOffsets) {
-            const adjPos = new RoomPosition(offset.x + controllerPos.x, offset.y + controllerPos.y, this.room.name)
+            const adjPos = new RoomPosition(
+                offset.x + controllerPos.x,
+                offset.y + controllerPos.y,
+                this.room.name,
+            )
 
             if (terrain.get(adjPos.x, adjPos.y) === TERRAIN_MASK_WALL) continue
 
@@ -322,7 +328,6 @@ export class RoomManager {
     }
 
     findRemoteControllerPath(commune: Room, packedRemoteControllerPositions: string) {
-
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
 
@@ -340,7 +345,7 @@ export class RoomManager {
         return packPosList(path)
     }
 
-    isFirstRoom() {
+    isStartRoom() {
         return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
     }
 
@@ -473,11 +478,12 @@ export class RoomManager {
     get communeSourceHarvestPositions() {
         if (this._communeSourceHarvestPositions) return this._communeSourceHarvestPositions
 
-        const packedSourceHarvestPositions = this.room.memory[RoomMemoryKeys.communeSourceHarvestPositions]
+        const packedSourceHarvestPositions =
+            this.room.memory[RoomMemoryKeys.communeSourceHarvestPositions]
 
         if (packedSourceHarvestPositions) {
-            return (this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
-                unpackPosList(positions),
+            return (this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(
+                positions => unpackPosList(positions),
             ))
         }
 
@@ -489,10 +495,11 @@ export class RoomManager {
     get remoteSourceHarvestPositions() {
         if (this._remoteSourceHarvestPositions) return this._remoteSourceHarvestPositions
 
-        const packedSourceHarvestPositions = this.room.memory[RoomMemoryKeys.remoteSourceHarvestPositions]
+        const packedSourceHarvestPositions =
+            this.room.memory[RoomMemoryKeys.remoteSourceHarvestPositions]
         if (packedSourceHarvestPositions) {
-            return (this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
-                unpackPosList(positions),
+            return (this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(
+                positions => unpackPosList(positions),
             ))
         }
 
@@ -505,7 +512,9 @@ export class RoomManager {
 
         const packedSourcePaths = this.room.memory[RoomMemoryKeys.communeSourcePaths]
         if (packedSourcePaths) {
-            return (this._communeSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
+            return (this._communeSourcePaths = packedSourcePaths.map(positions =>
+                unpackPosList(positions),
+            ))
         }
 
         throw Error('No commune source paths ' + this.room.name)
@@ -518,7 +527,9 @@ export class RoomManager {
 
         const packedSourcePaths = this.room.memory[RoomMemoryKeys.remoteSourcePaths]
         if (packedSourcePaths) {
-            return (this._remoteSourcePaths = packedSourcePaths.map(positions => unpackPosList(positions)))
+            return (this._remoteSourcePaths = packedSourcePaths.map(positions =>
+                unpackPosList(positions),
+            ))
         }
 
         throw Error('No remote source paths ' + this.room.name)
@@ -608,9 +619,9 @@ export class RoomManager {
         const roomType = this.room.memory[RoomMemoryKeys.type]
         if (roomType === RoomTypes.commune) {
             const structures = this.structures
-            const relevantStructures = (structures.container as (StructureContainer | StructureRoad)[]).concat(
-                structures.road,
-            )
+            const relevantStructures = (
+                structures.container as (StructureContainer | StructureRoad)[]
+            ).concat(structures.road)
             const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
             const RCL = this.room.controller.level
 
@@ -645,7 +656,9 @@ export class RoomManager {
         const roomMemory = Memory.rooms[this.room.name]
         const packedRemoteControllerPositions = roomMemory[RoomMemoryKeys.remoteControllerPositions]
         if (packedRemoteControllerPositions) {
-            return (this._remoteControllerPositions = unpackPosList(packedRemoteControllerPositions))
+            return (this._remoteControllerPositions = unpackPosList(
+                packedRemoteControllerPositions,
+            ))
         }
 
         throw Error('No remote controller positions ' + this.room.name)
@@ -729,7 +742,11 @@ export class RoomManager {
             count += 1
         }
 
-        const searchAnchor = new RoomPosition(Math.floor(totalX / count), Math.floor(totalY / count), this.room.name)
+        const searchAnchor = new RoomPosition(
+            Math.floor(totalX / count),
+            Math.floor(totalY / count),
+            this.room.name,
+        )
         const cSites = this.cSites
 
         // Loop through structuretypes of the build priority
@@ -884,7 +901,8 @@ export class RoomManager {
 
         // Construct storage of structures based on structureType
 
-        const cSiteCoords: Map<string, Id<ConstructionSite<BuildableStructureConstant>>[]> = new Map()
+        const cSiteCoords: Map<string, Id<ConstructionSite<BuildableStructureConstant>>[]> =
+            new Map()
 
         // Group structures by structureType
 
@@ -912,7 +930,8 @@ export class RoomManager {
 
         // Group structures by structureType
 
-        for (const cSite of this.room.find(FIND_CONSTRUCTION_SITES)) this._cSites[cSite.structureType].push(cSite)
+        for (const cSite of this.room.find(FIND_CONSTRUCTION_SITES))
+            this._cSites[cSite.structureType].push(cSite)
 
         return this._cSites
     }

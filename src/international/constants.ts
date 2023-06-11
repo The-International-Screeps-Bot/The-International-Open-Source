@@ -130,6 +130,7 @@ export enum CreepMemoryKeys {
     flee,
     squadMoveType,
     sleep,
+    targetID,
 }
 
 export enum PowerCreepMemoryKeys {

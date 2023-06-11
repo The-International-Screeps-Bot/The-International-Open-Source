@@ -1,12 +1,13 @@
 import {
     buildableStructuresSet,
     buildableStructureTypes,
+    customColors,
     RESULT_ACTION,
     RESULT_NO_ACTION,
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
-import { customLog, findObjectWithID, packAsNum, randomTick } from 'international/utils'
+import { customLog, findObjectWithID, packAsNum, randomIntRange, randomTick } from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
@@ -27,13 +28,16 @@ const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
 ]
-const noOverlapDestroyStructures: Set<StructureConstant> = new Set([STRUCTURE_SPAWN, STRUCTURE_RAMPART])
+const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
+    STRUCTURE_SPAWN,
+    STRUCTURE_RAMPART,
+])
 
 export class ConstructionManager {
     communeManager: CommuneManager
     room: Room
     placedSites: number
-    lastRun: number
+    lastRun = Game.time
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -44,7 +48,7 @@ export class ConstructionManager {
 
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
         // If it's not our first room, wait until RCL 2 before begining construction efforts
-        if (this.room.controller.level < 2 && !this.room.roomManager.isFirstRoom()) return
+        if (this.room.controller.level < 2 && !this.room.roomManager.isStartRoom()) return
 
         /* this.visualize() */
 
@@ -59,7 +63,7 @@ export class ConstructionManager {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
         }
         // If there are no builders, just run every few ticks
-        else if (this.lastRun + 100 > Game.time) return
+        /* else if (this.lastRun && this.lastRun + randomIntRange(20, 100) > Game.time) return */
 
         this.lastRun = Game.time
 
@@ -69,7 +73,11 @@ export class ConstructionManager {
 
         // If there are enough construction sites
 
-        if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= internationalManager.maxCSitesPerRoom) return
+        if (
+            this.room.find(FIND_MY_CONSTRUCTION_SITES).length >=
+            internationalManager.maxCSitesPerRoom
+        )
+            return
 
         this.placedSites = 0
 
@@ -80,10 +88,6 @@ export class ConstructionManager {
         this.placeBase(RCL, maxCSites)
     }
     private placeRamparts(RCL: number, maxCSites: number) {
-        const placeMincut =
-            ((this.room.storage && this.room.controller.level >= 4) ||
-                (this.room.terminal && this.room.controller.level >= 6)) &&
-            this.room.resourcesInStoringStructures.energy > 1000
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
 
         for (const packedCoord in rampartPlans.map) {
@@ -93,12 +97,15 @@ export class ConstructionManager {
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
 
-            if (this.room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART))
+            if (
+                this.room.findStructureAtCoord(
+                    coord,
+                    structure => structure.structureType === STRUCTURE_RAMPART,
+                )
+            )
                 continue
             if (data.coversStructure) {
                 if (!this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) continue
-            } else if (!placeMincut) {
-                continue
             }
 
             if (data.buildForNuke) {
@@ -182,7 +189,7 @@ export class ConstructionManager {
                 if (data.minRCL > RCL) continue
 
                 this.room.visual.structure(coord.x, coord.y, data.structureType)
-                this.room.visual.text(data.minRCL.toString(), coord.x, coord.y)
+                this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, { font: 0.4 })
                 break
             }
         }
@@ -194,15 +201,26 @@ export class ConstructionManager {
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
 
-            /* this.room.visual.text(data.minRCL.toString(), coord.x, coord.y) */
+            this.room.visual.text(data.minRCL.toString(), coord.x, coord.y + 0.25, { font: 0.4 })
 
             if (data.buildForNuke) {
-                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2, fill: 'yellow' })
+                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
+                    opacity: 0.2,
+                    fill: 'yellow',
+                })
                 continue
             }
 
             if (data.buildForThreat) {
                 this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
+                continue
+            }
+
+            if (data.coversStructure) {
+                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
+                    opacity: 0.2,
+                    fill: customColors.lightBlue,
+                })
                 continue
             }
 
@@ -280,15 +298,12 @@ export class ConstructionManager {
      * If it hasn't yet been done for this room, check for and destroy any structures owned by another player
      */
     private clearEnemyStructures() {
-
         const roomMemory = Memory.rooms[this.room.name]
         if (roomMemory[RoomMemoryKeys.clearedEnemyStructures]) return RESULT_NO_ACTION
 
         const structures = this.room.roomManager.structures
         for (const structureType in structures) {
-
             for (const structure of structures[structureType as StructureConstant]) {
-
                 if (!(structure as OwnedStructure).owner) continue
                 if ((structure as OwnedStructure).owner.username === Memory.me) continue
 

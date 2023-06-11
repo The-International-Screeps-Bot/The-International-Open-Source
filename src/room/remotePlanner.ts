@@ -269,7 +269,7 @@ export class RemotePlanner {
         return this._reverseExitFlood
     }
 
-    get isFirstRoom() {
+    get isStartRoom() {
         return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
     }
 
@@ -1956,7 +1956,7 @@ export class RemotePlanner {
 
                         // It's not our first room, have a rampart planned to build the spawn under
 
-                        if (i === 0 && !this.isFirstRoom) {
+                        if (i === 0 && !this.isStartRoom) {
                             this.setRampartPlansXY(
                                 properCoord.x,
                                 properCoord.y,
