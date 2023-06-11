@@ -6,7 +6,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
-import { getRangeXY, randomTick } from 'international/utils'
+import { getRangeXY, randomIntRange, randomTick } from 'international/utils'
 
 export class RemoteCoreAttacker extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -156,6 +156,13 @@ export class RemoteCoreAttacker extends Creep {
         for (const creepName of creepsOfRole) {
             const creep: RemoteCoreAttacker = Game.creeps[creepName]
 
+            const creepMemory = Memory.creeps[creep.name]
+            if (creepMemory[CreepMemoryKeys.sleep][1] === 'any' && creepMemory[CreepMemoryKeys.sleep][0] > Game.time) {
+
+                creep.message = '😴'
+                continue
+            }
+
             // Try to find a remote
 
             const remoteName = creep.findRemote()
@@ -174,7 +181,7 @@ export class RemoteCoreAttacker extends Creep {
 
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-                creep.createMoveRequest({
+                if (creep.createMoveRequest({
                     origin: creep.pos,
                     goals: [
                         {
@@ -182,7 +189,12 @@ export class RemoteCoreAttacker extends Creep {
                             range: 4,
                         },
                     ],
-                })
+                    typeWeights: remoteTypeWeights,
+                    avoidAbandonedRemotes: true,
+                }) === RESULT_FAIL) {
+
+                    creepMemory[CreepMemoryKeys.sleep] = [Game.time + randomIntRange(10, 50), 'any']
+                }
 
                 continue
             }

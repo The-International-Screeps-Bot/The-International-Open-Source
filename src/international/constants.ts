@@ -96,6 +96,8 @@ export enum CreepRoomLogisticsRequestKeys {
     noReserve,
 }
 
+export type SleepFor = 'any' | 'noMove'
+
 export enum CreepMemoryKeys {
     preferRoads,
     sourceIndex,
@@ -127,6 +129,7 @@ export enum CreepMemoryKeys {
     combatRequest,
     flee,
     squadMoveType,
+    sleep,
 }
 
 export enum PowerCreepMemoryKeys {

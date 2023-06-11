@@ -15,6 +15,7 @@ import {
     PowerRequestKeys,
     RoomMemoryKeys,
     RoomTypes,
+    SleepFor,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -199,7 +200,12 @@ declare global {
         buildForThreat: number
     }
 
-    type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
+    type QuadTransformTypes =
+        | 'none'
+        | 'rotateLeft'
+        | 'rotateRight'
+        | 'tradeHorizontal'
+        | 'tradeVertical'
 
     interface PathGoal {
         pos: RoomPosition
@@ -976,7 +982,9 @@ declare global {
          */
         squadRequests: Set<string>
 
-        roomLogisticsRequests: { [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest } }
+        roomLogisticsRequests: {
+            [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
+        }
         powerTasks: { [ID: string]: PowerTask }
 
         attackingDefenderIDs: Set<Id<Creep>>
@@ -1153,13 +1161,19 @@ declare global {
 
         coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
-        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask | false
+        createPowerTask(
+            target: Structure | Source,
+            powerType: PowerConstant,
+            priority: number,
+        ): PowerTask | false
 
         highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
 
         createRoomLogisticsRequest(args: CreateRoomLogisticsRequestArgs): void
 
-        partsOfRoles: Partial<{ [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }> }>
+        partsOfRoles: Partial<{
+            [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }>
+        }>
 
         getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>
 
@@ -1212,11 +1226,25 @@ declare global {
 
         communeConstructionPlacement(): void
 
-        findStructureAtCoord<T extends Structure>(coord: Coord, conditions: (structure: T) => boolean): T | false
-        findStructureAtXY<T extends Structure>(x: number, y: number, conditions: (structure: T) => boolean): T | false
+        findStructureAtCoord<T extends Structure>(
+            coord: Coord,
+            conditions: (structure: T) => boolean,
+        ): T | false
+        findStructureAtXY<T extends Structure>(
+            x: number,
+            y: number,
+            conditions: (structure: T) => boolean,
+        ): T | false
 
-        findCSiteAtCoord<T extends ConstructionSite>(coord: Coord, conditions: (cSite: T) => boolean): T | false
-        findCSiteAtXY<T extends ConstructionSite>(x: number, y: number, conditions: (cSite: T) => boolean): T | false
+        findCSiteAtCoord<T extends ConstructionSite>(
+            coord: Coord,
+            conditions: (cSite: T) => boolean,
+        ): T | false
+        findCSiteAtXY<T extends ConstructionSite>(
+            x: number,
+            y: number,
+            conditions: (cSite: T) => boolean,
+        ): T | false
 
         findStructureInsideRect<T extends Structure>(
             x1: number,
@@ -1419,7 +1447,11 @@ declare global {
 
         advancedPickup(target: Resource): boolean
 
-        advancedTransfer(target: Creep | AnyStoreStructure, resourceType?: ResourceConstant, amount?: number): boolean
+        advancedTransfer(
+            target: Creep | AnyStoreStructure,
+            resourceType?: ResourceConstant,
+            amount?: number,
+        ): boolean
 
         advancedWithdraw(
             target: Creep | AnyStoreStructure | Tombstone | Ruin,
@@ -1678,9 +1710,16 @@ declare global {
 
         roomLogisticsRequestManager(): void
 
-        findRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
-        findRoomLogisticsRequestTypes(args?: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
-        canAcceptRoomLogisticsRequest(requestType: RoomLogisticsRequestTypes, requestID: string): boolean
+        findRoomLogisticsRequest(
+            args?: findNewRoomLogisticsRequestArgs,
+        ): CreepRoomLogisticsRequest | 0
+        findRoomLogisticsRequestTypes(
+            args?: findNewRoomLogisticsRequestArgs,
+        ): Set<RoomLogisticsRequestTypes>
+        canAcceptRoomLogisticsRequest(
+            requestType: RoomLogisticsRequestTypes,
+            requestID: string,
+        ): boolean
         createBackupStoringStructuresRoomLogisticsRequest(
             types?: Set<RoomLogisticsRequestTypes>,
             resourceTypes?: Set<ResourceConstant>,
@@ -1977,7 +2016,11 @@ declare global {
             buyAvg?: { [key in ResourceConstant]?: number }
             aquire?: { [key in ResourceConstant]?: number }
         }
-        [RoomMemoryKeys.factoryProduct]: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+        [RoomMemoryKeys.factoryProduct]:
+            | CommodityConstant
+            | MineralConstant
+            | RESOURCE_ENERGY
+            | RESOURCE_GHODIUM
         [RoomMemoryKeys.factoryUsableResources]: (
             | CommodityConstant
             | MineralConstant
@@ -2101,7 +2144,9 @@ declare global {
 
     interface CreepRoomLogisticsRequest {
         [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
-        [CreepRoomLogisticsRequestKeys.target]: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
+        [CreepRoomLogisticsRequestKeys.target]: Id<
+            AnyStoreStructure | Creep | Tombstone | Ruin | Resource
+        >
         [CreepRoomLogisticsRequestKeys.resourceType]: ResourceConstant
         [CreepRoomLogisticsRequestKeys.amount]: number
         [CreepRoomLogisticsRequestKeys.onlyFull]?: boolean
@@ -2142,6 +2187,10 @@ declare global {
          */
         [CreepMemoryKeys.flee]: boolean
         [CreepMemoryKeys.squadMoveType]: SquadMoveTypes
+        /**
+         * A tuple for commanding to Wait until the designated tick to perform an specified action
+         */
+        [CreepMemoryKeys.sleep]: [number, SleepFor]
     }
 
     interface PowerCreepMemory {
@@ -2175,7 +2224,11 @@ declare global {
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: Partial<RoomStats | RoomCommuneStats> } }
+            roomStats: {
+                [roomType in StatsRoomTypes]: {
+                    [roomName: string]: Partial<RoomStats | RoomCommuneStats>
+                }
+            }
             CPUUsers: CpuUsers
 
             terrainCoords: { [roomName: string]: CoordMap }

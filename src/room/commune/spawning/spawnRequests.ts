@@ -31,6 +31,10 @@ export class SpawnRequestsManager {
     rawSpawnRequestsArgs: (SpawnRequestArgs | false)[]
     spawnEnergyCapacity: number
     minRemotePriority = 9
+    /**
+     * The min priority to be placed after active remotes
+     */
+    activeRemotePriority = 0
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -42,6 +46,8 @@ export class SpawnRequestsManager {
 
         this.sourceHarvester()
         this.hauler()
+        this.remoteSourceRoles()
+        this.generalRemoteRoles()
         this.mineralHarvester()
         this.hubHauler()
         this.fastFiller()
@@ -49,8 +55,6 @@ export class SpawnRequestsManager {
         this.maintainers()
         this.builders()
         this.controllerUpgraders()
-        this.remoteSourceRoles()
-        this.generalRemoteRoles()
         this.scout()
         this.workRequestRoles()
         this.requestHauler()
@@ -280,7 +284,7 @@ export class SpawnRequestsManager {
                     partsMultiplier: 4,
                     minCreeps: this.communeManager.room.roomManager.mineralHarvestPositions.length,
                     minCost,
-                    priority: 10 + this.communeManager.room.creepsFromRoom.mineralHarvester.length,
+                    priority: this.activeRemotePriority + 1,
                     memoryAdditions: {
                         [CreepMemoryKeys.preferRoads]: true,
                     },
@@ -524,7 +528,7 @@ export class SpawnRequestsManager {
                         this.minRemotePriority - 0.5,
                     )
                 } else {
-                    priority = this.minRemotePriority + 0.5
+                    priority = this.activeRemotePriority
                 }
 
                 // Construct the partsMultiplier
@@ -615,7 +619,7 @@ export class SpawnRequestsManager {
 
                 if (!this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
-                const priority = this.minRemotePriority + 0.5
+                const priority = this.activeRemotePriority + .1
                 let partsMultiplier = 0
 
                 // If there is an active storage
@@ -746,18 +750,14 @@ export class SpawnRequestsManager {
                 const role = 'controllerUpgrader'
 
                 // If there is a storage, prefer needed remote creeps over upgraders
-                let priority: number
-                if (
-                    this.communeManager.room.storage &&
-                    this.communeManager.room.controller.level >= 4
-                ) {
-                    priority = this.minRemotePriority + 0.5
-                } else priority = this.minRemotePriority - 1
 
                 if (
                     this.communeManager.room.controller.ticksToDowngrade <=
                     this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
+
+                    const priority = 5
+
                     if (this.communeManager.hasSufficientRoads()) {
                         return {
                             role,
@@ -784,6 +784,8 @@ export class SpawnRequestsManager {
                         memoryAdditions: {},
                     }
                 }
+
+                const priority = this.activeRemotePriority + .2
 
                 // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 
@@ -1014,7 +1016,11 @@ export class SpawnRequestsManager {
      * Spawn for roles that are per-source
      */
     private remoteSourceRoles() {
+        let priorityIncrement = 0
+
         for (const remoteInfo of this.communeManager.room.remoteSourceIndexesByEfficacy) {
+            priorityIncrement += 1
+
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
@@ -1024,8 +1030,9 @@ export class SpawnRequestsManager {
             const sourcePositionsAmount =
                 remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
                 packedPosLength
-            const sourcePathLength =
-                remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length
+
+            const remoteHaulerNeed = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
+            const harvesterPriority = this.minRemotePriority + priorityIncrement + (remoteHaulerNeed > 0 ? 1 : 100)
 
             // Construct requests for remoteSourceHarvester0s
 
@@ -1037,7 +1044,7 @@ export class SpawnRequestsManager {
                     if (partsMultiplier <= 0) return false
 
                     const role = 'remoteSourceHarvester'
-                    const priority = this.minRemotePriority + 1 + sourcePathLength / 100
+                    const priority = harvesterPriority
                     const spawnGroup =
                         this.communeManager.remoteSourceHarvesters[remoteName][sourceIndex]
 
@@ -1130,13 +1137,15 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     const role = 'remoteHauler'
-                    const partsMultiplier = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
 
+                    const partsMultiplier = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
-                    // Higher priority than remote harvesters
+                    this.activeRemotePriority = Math.max(this.activeRemotePriority, harvesterPriority + .1)
 
-                    const priority = this.minRemotePriority /* + 1 */ + sourcePathLength / 100
+                    // Lower priority - more preference - than remote harvesters
+
+                    const priority = this.minRemotePriority + priorityIncrement
 
                     /*
                     // If all RCL 3 extensions are built
@@ -1263,6 +1272,9 @@ export class SpawnRequestsManager {
                     )
                         return false
 
+                    const priority = this.minRemotePriority + 0.1
+                    this.activeRemotePriority = Math.max(this.activeRemotePriority, priority + .1)
+
                     return {
                         role: 'remoteReserver',
                         defaultParts: [],
@@ -1274,7 +1286,7 @@ export class SpawnRequestsManager {
                             remoteMemory[RoomMemoryKeys.remoteControllerPositions].length /
                             packedPosLength,
                         minCost: cost,
-                        priority: this.minRemotePriority + 0.1,
+                        priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.remote]: remoteName,
                         },
@@ -1426,7 +1438,7 @@ export class SpawnRequestsManager {
                     partsMultiplier: 1,
                     minCreeps,
                     minCost: 50,
-                    priority: 5,
+                    priority: this.activeRemotePriority + .3,
                     memoryAdditions: {},
                 }
             })(),
