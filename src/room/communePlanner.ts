@@ -352,6 +352,7 @@ export class CommunePlanner {
         delete this.baseCoords
         return RESULT_NO_ACTION
  */
+
         this.avoidSources()
         this.avoidMineral()
         if (this.fastFiller() === RESULT_FAIL) return RESULT_FAIL
@@ -388,7 +389,6 @@ export class CommunePlanner {
         return RESULT_SUCCESS */
         this.findScore()
         this.record()
-
         return RESULT_ACTION
     }
     /**
@@ -2999,10 +2999,12 @@ export class CommunePlanner {
             const towerOptions = Array.from(this.insideMinCut)
             const towerCoords: TowerDamageCoord[] = []
             const damageMap = new Uint32Array(roomDimensions * roomDimensions)
+            const limit = Math.min(CONTROLLER_STRUCTURES.tower[8], towerOptions.length)
 
-            for (let towers = 0; towers < CONTROLLER_STRUCTURES.tower[8]; towers++) {
+            for (let towers = 0; towers < limit; towers++) {
                 const index = randomIntRange(0, towerOptions.length)
                 const packedCoord = towerOptions[index]
+
                 towerOptions.splice(index, 1)
 
                 const coord = unpackNumAsCoord(packedCoord) as TowerDamageCoord

@@ -715,11 +715,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // We're spawning, just get us space to move into
 
     if (this.spawning) {
-        if (creepAtPos.shove(new Set([packedCoord]))) {
-            this.moved = this.moveRequest
-            delete room.moveRequests[this.moved]
-            delete this.moveRequest
-        }
 
         if (Memory.roomVisuals) {
             const moved = unpackCoord(this.moveRequest)
@@ -728,6 +723,12 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 fill: customColors.pink,
                 opacity: 0.7,
             })
+        }
+
+        if (creepAtPos.shove(new Set([packedCoord]))) {
+            this.moved = this.moveRequest
+            delete room.moveRequests[this.moved]
+            delete this.moveRequest
         }
 
         return
