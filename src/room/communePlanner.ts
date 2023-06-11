@@ -50,7 +50,6 @@ import {
     unpackNumAsPos,
     forCoordsAroundRange,
     randomIntRange,
-    estimateTowerDamage,
     sortBy,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
@@ -72,6 +71,7 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { minCutToExit } from './construction/minCut'
 import { customFindPath } from 'international/customPathFinder'
+import { towerFunctions } from './commune/towers'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 8
@@ -208,7 +208,9 @@ export class CommunePlanner {
     fastFillerStartCoords: Coord[]
     minCutCoords: Set<number>
     groupedMinCutCoords: Coord[][]
-    RCLPlannedStructureTypes: Partial<{ [key in BuildableStructureConstant]: RCLPlannedStructureType }>
+    RCLPlannedStructureTypes: Partial<{
+        [key in BuildableStructureConstant]: RCLPlannedStructureType
+    }>
     /**
      * Quotas for roads per RCL
      */
@@ -288,7 +290,10 @@ export class CommunePlanner {
 
         // Planning is complete, choose the best one
 
-        if (this.fastFillerStartCoords && this.planAttempts.length === this.fastFillerStartCoords.length) {
+        if (
+            this.fastFillerStartCoords &&
+            this.planAttempts.length === this.fastFillerStartCoords.length
+        ) {
             /* this.visualizeBestPlan() */
             this.choosePlan()
             return RESULT_SUCCESS
@@ -328,7 +333,6 @@ export class CommunePlanner {
             }
             this.roadQuota = []
             for (let level = 0; level < 8; level += 1) {
-
                 this.roadQuota.push(0)
             }
 
@@ -391,13 +395,20 @@ export class CommunePlanner {
      *
      * @returns the minRCL
      */
-    private setBasePlansXY(x: number, y: number, structureType: BuildableStructureConstant, minRCL?: number) {
+    private setBasePlansXY(
+        x: number,
+        y: number,
+        structureType: BuildableStructureConstant,
+        minRCL?: number,
+    ) {
         this.RCLPlannedStructureTypes[structureType].structures += 1
 
         if (minRCL === undefined) {
             while (
                 this.RCLPlannedStructureTypes[structureType].structures >
-                CONTROLLER_STRUCTURES[structureType][this.RCLPlannedStructureTypes[structureType].minRCL]
+                CONTROLLER_STRUCTURES[structureType][
+                    this.RCLPlannedStructureTypes[structureType].minRCL
+                ]
             ) {
                 this.RCLPlannedStructureTypes[structureType].minRCL += 1
             }
@@ -532,7 +543,8 @@ export class CommunePlanner {
                 const relY = y - anchor.y
 
                 // Check if the cell is part of a diagonal line
-                if (Math.abs(relX - 3 * relY) % 2 !== 0 && Math.abs(relX + 3 * relY) % 2 !== 0) continue
+                if (Math.abs(relX - 3 * relY) % 2 !== 0 && Math.abs(relX + 3 * relY) % 2 !== 0)
+                    continue
 
                 const packedCoord = packXYAsNum(x, y)
 
@@ -563,7 +575,11 @@ export class CommunePlanner {
                 const relY = y - anchor.y
 
                 // Check if the cell is part of a diagonal line
-                if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0) continue
+                if (
+                    Math.abs(relX - 3 * relY) % gridSize !== 0 &&
+                    Math.abs(relX + 3 * relY) % gridSize !== 0
+                )
+                    continue
 
                 gridCoordsArray.push({ x, y })
 
@@ -611,7 +627,10 @@ export class CommunePlanner {
                         const relY = adjCoord.y - anchor.y
 
                         // Check if the cell is part of a diagonal line
-                        if (Math.abs(relX - 3 * relY) % gridSize !== 0 && Math.abs(relX + 3 * relY) % gridSize !== 0)
+                        if (
+                            Math.abs(relX - 3 * relY) % gridSize !== 0 &&
+                            Math.abs(relX + 3 * relY) % gridSize !== 0
+                        )
                             continue
 
                         groupSize += 1
@@ -661,7 +680,10 @@ export class CommunePlanner {
 
             // If the path failed, delete all members of the group
 
-            if (!path.length && !gridGroups[leaderCoord.index].find(coord => getRange(coord, anchor) <= 3)) {
+            if (
+                !path.length &&
+                !gridGroups[leaderCoord.index].find(coord => getRange(coord, anchor) <= 3)
+            ) {
                 for (const coord of gridGroups[leaderCoord.index]) {
                     this.gridCoords[packAsNum(coord)] = 0
                 }
@@ -850,7 +872,8 @@ export class CommunePlanner {
             }
 
             const packedAdjCoord = packAsNum(adjCoord)
-            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0) continue
+            if (this.roadCoords[packedAdjCoord] !== 1 && this.gridCoords[packedAdjCoord] === 0)
+                continue
 
             cardinalRoads += 1
         }
@@ -910,7 +933,11 @@ export class CommunePlanner {
         const mineralPos = this.room.roomManager.mineral.pos
 
         for (const offset of adjacentOffsets) {
-            const adjPos = new RoomPosition(offset.x + mineralPos.x, offset.y + mineralPos.y, this.room.name)
+            const adjPos = new RoomPosition(
+                offset.x + mineralPos.x,
+                offset.y + mineralPos.y,
+                this.room.name,
+            )
 
             const packedCoord = packAsNum(adjPos)
             if (this.terrainCoords[packedCoord] === 255) continue
@@ -969,7 +996,11 @@ export class CommunePlanner {
 
             const sourcePos = this.communeSources[i].pos
             for (const offset of adjacentOffsets) {
-                const adjPos = new RoomPosition(offset.x + sourcePos.x, offset.y + sourcePos.y, this.room.name)
+                const adjPos = new RoomPosition(
+                    offset.x + sourcePos.x,
+                    offset.y + sourcePos.y,
+                    this.room.name,
+                )
                 const packedCoord = packAsNum(adjPos)
 
                 if (this.terrainCoords[packedCoord] === 255) continue
@@ -1018,9 +1049,7 @@ export class CommunePlanner {
         }
 
         for (const index in sourceHarvestPositions) {
-
             for (const pos of sourceHarvestPositions[index]) {
-
                 this.baseCoords[packAsNum(pos)] = 255
             }
         }
@@ -1056,7 +1085,11 @@ export class CommunePlanner {
     private mineral() {
         if (this.mineralPath) return
 
-        const goal = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const goal = new RoomPosition(
+            this.stampAnchors.hub[0].x,
+            this.stampAnchors.hub[0].y,
+            this.room.name,
+        )
 
         sortBy(
             this.mineralHarvestPositions,
@@ -1089,7 +1122,12 @@ export class CommunePlanner {
 
         const closestMineralHarvestPos = this.mineralHarvestPositions[0]
 
-        this.setBasePlansXY(closestMineralHarvestPos.x, closestMineralHarvestPos.y, STRUCTURE_CONTAINER, 6)
+        this.setBasePlansXY(
+            closestMineralHarvestPos.x,
+            closestMineralHarvestPos.y,
+            STRUCTURE_CONTAINER,
+            6,
+        )
         const packedCoord = packAsNum(closestMineralHarvestPos)
         this.roadCoords[packedCoord] = 20
         this.baseCoords[packedCoord] = 255
@@ -1164,7 +1202,9 @@ export class CommunePlanner {
                 this.roadCoords[packedAdjCoord] = 255
             })
 
-            this.stampAnchors.sourceExtension = this.stampAnchors.sourceExtension.concat(sourceStructureCoords[i])
+            this.stampAnchors.sourceExtension = this.stampAnchors.sourceExtension.concat(
+                sourceStructureCoords[i],
+            )
             this.stampAnchors.sourceExtension.pop()
         }
 
@@ -1655,7 +1695,8 @@ export class CommunePlanner {
 
                     nextGeneration.push(adjCoord)
 
-                    const adjCostFromOrigin = (fromOrigin[packedAdjCoord] = coordCostFromOrigin + dynamicDistanceWeight)
+                    const adjCostFromOrigin = (fromOrigin[packedAdjCoord] =
+                        coordCostFromOrigin + dynamicDistanceWeight)
                     const adjCoordCost = args.dynamicWeight[packedAdjCoord] + adjCostFromOrigin
 
                     if (adjCoordCost < lowestNextGenCost) lowestNextGenCost = adjCoordCost
@@ -1932,7 +1973,14 @@ export class CommunePlanner {
                         // It's not our first room, have a rampart planned to build the spawn under
 
                         if (i === 0 && !this.isFirstRoom) {
-                            this.setRampartPlansXY(properCoord.x, properCoord.y, 2, false, false, false)
+                            this.setRampartPlansXY(
+                                properCoord.x,
+                                properCoord.y,
+                                2,
+                                false,
+                                false,
+                                false,
+                            )
                         }
 
                         spawnCoords.splice(j, 1)
@@ -1948,7 +1996,12 @@ export class CommunePlanner {
                             y: structureCoord.y + stampAnchor.y - stampOffset,
                         }
                         const packedCoord = packAsNum(properCoord)
-                        this.setBasePlansXY(properCoord.x, properCoord.y, STRUCTURE_CONTAINER, containerMinRCL)
+                        this.setBasePlansXY(
+                            properCoord.x,
+                            properCoord.y,
+                            STRUCTURE_CONTAINER,
+                            containerMinRCL,
+                        )
                         this.baseCoords[packedCoord] = 255
                         this.roadCoords[packedCoord] = 255
 
@@ -2180,7 +2233,11 @@ export class CommunePlanner {
                 this.baseCoords[packAsNum(this.inputLab2Coord)] = 255
                 this.roadCoords[packAsNum(this.inputLab2Coord)] = 255
 
-                const goal = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+                const goal = new RoomPosition(
+                    this.stampAnchors.hub[0].x,
+                    this.stampAnchors.hub[0].y,
+                    this.room.name,
+                )
 
                 sortBy(
                     this.outputLabCoords,
@@ -2237,7 +2294,11 @@ export class CommunePlanner {
     private gridExtensionSourcePaths() {
         if (this.sourcePaths) return
 
-        const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const hubAnchorPos = new RoomPosition(
+            this.stampAnchors.hub[0].x,
+            this.stampAnchors.hub[0].y,
+            this.room.name,
+        )
 
         for (let i = this.stampAnchors.gridExtension.length - 1; i >= 0; i -= 5) {
             const coord = this.stampAnchors.gridExtension[i]
@@ -2422,7 +2483,11 @@ export class CommunePlanner {
             }
         }
 
-        const hubAnchor = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const hubAnchor = new RoomPosition(
+            this.stampAnchors.hub[0].x,
+            this.stampAnchors.hub[0].y,
+            this.room.name,
+        )
         const fastFillerAnchor = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
             this.stampAnchors.fastFiller[0].y,
@@ -2624,7 +2689,9 @@ export class CommunePlanner {
 
                         // Add it to the next gen and this group
 
-                        groupedMinCutCoords[groupIndex].push(new RoomPosition(adjCoord.x, adjCoord.y, this.room.name))
+                        groupedMinCutCoords[groupIndex].push(
+                            new RoomPosition(adjCoord.x, adjCoord.y, this.room.name),
+                        )
 
                         groupSize += 1
                         nextGeneration.push(adjCoord)
@@ -2699,11 +2766,17 @@ export class CommunePlanner {
                         const currentWeight = unprotectedCoords[packedAdjCoord2]
 
                         if (this.roadCoords[packedAdjCoord2] === 1) {
-                            unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight * 0.5, currentWeight)
+                            unprotectedCoords[packedAdjCoord2] = Math.max(
+                                unprotectedCoordWeight * 0.5,
+                                currentWeight,
+                            )
                             continue
                         }
 
-                        unprotectedCoords[packedAdjCoord2] = Math.max(unprotectedCoordWeight, currentWeight)
+                        unprotectedCoords[packedAdjCoord2] = Math.max(
+                            unprotectedCoordWeight,
+                            currentWeight,
+                        )
                     }
                 }
             }
@@ -2741,14 +2814,19 @@ export class CommunePlanner {
             })
         }
 
-        this.stampAnchors.minCutRampart = this.stampAnchors.minCutRampart.concat(addedMinCutRamparts)
+        this.stampAnchors.minCutRampart =
+            this.stampAnchors.minCutRampart.concat(addedMinCutRamparts)
         this.unprotectedCoords = unprotectedCoords
     }
     private onboardingRamparts() {
         if (this.stampAnchors.onboardingRampart.length) return
 
         const onboardingCoords: Set<number> = new Set()
-        const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const hubAnchorPos = new RoomPosition(
+            this.stampAnchors.hub[0].x,
+            this.stampAnchors.hub[0].y,
+            this.room.name,
+        )
 
         for (const group of this.groupedMinCutCoords) {
             const [closestCoord] = findClosestCoord(hubAnchorPos, group)
@@ -2781,7 +2859,8 @@ export class CommunePlanner {
 
                 // If there are already rampart plans at this pos
 
-                if (this.minCutCoords.has(packedCoord) && !onboardingCoords.has(packedCoord)) continue
+                if (this.minCutCoords.has(packedCoord) && !onboardingCoords.has(packedCoord))
+                    continue
 
                 // Record the coord
 
@@ -2930,7 +3009,10 @@ export class CommunePlanner {
                 let minIndividualDamage = Infinity
 
                 for (const packedCoord of this.outsideMinCut) {
-                    const damage = estimateTowerDamage(coord, unpackNumAsCoord(packedCoord))
+                    const damage = towerFunctions.estimateRangeDamage(
+                        coord,
+                        unpackNumAsCoord(packedCoord),
+                    )
                     damageMap[packedCoord] += damage
 
                     if (damage >= minIndividualDamage) continue
@@ -2975,7 +3057,11 @@ export class CommunePlanner {
     private towerPaths() {
         if (this.finishedTowerPaths) return
 
-        const hubAnchorPos = new RoomPosition(this.stampAnchors.hub[0].x, this.stampAnchors.hub[0].y, this.room.name)
+        const hubAnchorPos = new RoomPosition(
+            this.stampAnchors.hub[0].x,
+            this.stampAnchors.hub[0].y,
+            this.room.name,
+        )
 
         for (const coord of this.bestTowerCoords) {
             const minRCL = this.basePlans.getXY(coord.x, coord.y)[0].minRCL
@@ -3021,7 +3107,10 @@ export class CommunePlanner {
         for (const coord of this.stampAnchors.sourceExtension) this.shield(coord, 4)
         for (const coord of this.stampAnchors.sourceLink) this.shield(coord, 4)
         for (const sourceIndex in this.sourceHarvestPositions) {
-            if (this.unprotectedCoords[packAsNum(this.sourceHarvestPositions[sourceIndex][0])] === 255) {
+            if (
+                this.unprotectedCoords[packAsNum(this.sourceHarvestPositions[sourceIndex][0])] ===
+                255
+            ) {
                 unprotectedSources += 1
             }
             this.shield(this.sourceHarvestPositions[sourceIndex][0], 4, false)
@@ -3064,9 +3153,7 @@ export class CommunePlanner {
         this.generalShielded = true
     }
     private findRoadQuota() {
-
         for (const packedCoord in this.basePlans.map) {
-
             const coordData = this.basePlans.map[packedCoord]
 
             for (let i = 0; i < coordData.length; i++) {
@@ -3074,7 +3161,6 @@ export class CommunePlanner {
                 if (data.structureType !== STRUCTURE_ROAD) continue
 
                 for (let rcl = data.minRCL - 1; rcl < 8; rcl += 1) {
-
                     this.roadQuota[rcl] += 1
                 }
             }
@@ -3127,7 +3213,9 @@ export class CommunePlanner {
             rampartPlans: this.rampartPlans.pack(),
             roadQuota: this.roadQuota,
             communeSources: this.communeSources.map(source => source.id),
-            sourceHarvestPositions: this.sourceHarvestPositions.map(positions => packPosList(positions)),
+            sourceHarvestPositions: this.sourceHarvestPositions.map(positions =>
+                packPosList(positions),
+            ),
             sourcePaths: this.sourcePaths.map(path => packPosList(path)),
             mineralHarvestPositions: packPosList(this.mineralHarvestPositions),
             mineralPath: packPosList(this.mineralPath),
@@ -3297,7 +3385,11 @@ export class CommunePlanner {
 
         const stampAnchors = unpackStampAnchors(plan.stampAnchors)
 
-        this.room.visual.text('Attempt: ' + (planIndex + 1), stampAnchors.fastFiller[0].x, stampAnchors.fastFiller[0].y)
+        this.room.visual.text(
+            'Attempt: ' + (planIndex + 1),
+            stampAnchors.fastFiller[0].x,
+            stampAnchors.fastFiller[0].y,
+        )
     }
     private visualizeCurrentPlan() {
         for (const packedCoord in this.basePlans.map) {

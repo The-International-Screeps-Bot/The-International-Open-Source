@@ -1832,14 +1832,6 @@ declare global {
         hasHadResourcesMoved: boolean
     }
 
-    interface StructureTower {
-        estimateDamageGross(targetCoord: Coord): number
-        /**
-         * Accounts for enemy defence and macro heal
-         */
-        estimateDamageNet(target: Creep): number
-    }
-
     interface StructureTerminal {
         intended: boolean
     }

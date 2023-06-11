@@ -752,22 +752,6 @@ export function roundTo(num: number, decimals: number) {
     return parseFloat(num.toFixed(decimals))
 }
 
-export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
-    let damage = TOWER_POWER_ATTACK
-
-    let range = getRange(coord1, coord2)
-
-    if (range > TOWER_OPTIMAL_RANGE) {
-        if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
-
-        damage -=
-            (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
-            (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
-    }
-
-    return Math.floor(damage)
-}
-
 /**
  * Ripped from @external https://github.com/Mirroar/hivemind
  * Runs a callback within a try/catch block while using the ErrorMapper to trace error

@@ -2,9 +2,9 @@ import { PlayerMemoryKeys, customColors, towerPowers } from 'international/const
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
-    estimateTowerDamage,
     findObjectWithID,
     findWeightedRangeFromExit,
+    getRange,
     isXYInBorder,
     randomTick,
     scalePriority,
@@ -134,7 +134,7 @@ export class TowerManager {
 
             this.actionableTowerIDs.splice(i, 1)
 
-            const hits = (attackTarget.reserveHits -= tower.estimateDamageNet(attackTarget))
+            const hits = (attackTarget.reserveHits -= towerFunctions.estimateDamageNet(tower, attackTarget))
             if (hits <= 0) return true
         }
 
@@ -161,7 +161,7 @@ export class TowerManager {
             if (tower.attack(attackTarget) !== OK) continue
 
             this.actionableTowerIDs.splice(i, 1)
-            attackTarget.reserveHits -= tower.estimateDamageNet(attackTarget)
+            attackTarget.reserveHits -= towerFunctions.estimateDamageNet(tower, attackTarget)
 
             if (targetIndex >= enemyCreeps.length - 1) {
                 targetIndex = 0
@@ -306,23 +306,43 @@ export class TowerManager {
     }
 }
 
-StructureTower.prototype.estimateDamageGross = function (targetCoord) {
-    let damage = estimateTowerDamage(this.pos, targetCoord)
+export const towerFunctions = {
+    /**
+     * Estimate the damage a normal tower would do over a given distance. Does not account for effects
+     */
+    estimateRangeDamage: function (origin: Coord, goal: Coord) {
+        let damage = TOWER_POWER_ATTACK
 
-    for (const powerType of towerPowers) {
-        const effect = this.effectsData.get(powerType) as PowerEffect
-        if (!effect) continue
+        let range = getRange(origin, goal)
 
-        damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
+        if (range > TOWER_OPTIMAL_RANGE) {
+            if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
+
+            damage -=
+                (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
+                (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
+        }
+
+        return Math.floor(damage)
+    },
+    estimateDamageGross: function (tower: StructureTower, targetCoord: Coord) {
+        let damage = this.estimateRangeDamage(tower.pos, targetCoord)
+
+        for (const powerType of towerPowers) {
+            const effect = tower.effectsData.get(powerType) as PowerEffect
+            if (!effect) continue
+
+            damage *= Math.floor(POWER_INFO[powerType].effect[effect.level - 1])
+        }
+
+        return Math.floor(damage)
+    },
+    estimateDamageNet: function (tower: StructureTower, target: Creep) {
+        let damage = towerFunctions.estimateDamageGross(tower, target.pos)
+        damage *= target.defenceStrength
+
+        damage -= target.macroHealStrength
+        return Math.floor(damage)
     }
 
-    return Math.floor(damage)
-}
-
-StructureTower.prototype.estimateDamageNet = function (target) {
-    let damage = this.estimateDamageGross(target.pos)
-    damage *= target.defenceStrength
-
-    damage -= target.macroHealStrength
-    return Math.floor(damage)
 }
