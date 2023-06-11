@@ -301,7 +301,7 @@ export class RemoteHauler extends Creep {
                     return (
                         getRange(targetPos, this.pos) <= 1 ||
                         getRange(
-                            sourceHarvestPos,
+                            targetPos,
                             this.room.roomManager.remoteSources[creepMemory[CreepMemoryKeys.sourceIndex]].pos,
                         ) <= 1
                     )
