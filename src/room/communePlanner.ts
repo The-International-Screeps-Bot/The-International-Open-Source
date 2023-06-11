@@ -918,7 +918,6 @@ export class CommunePlanner {
         for (const source of this.room.find(FIND_SOURCES)) {
             forAdjacentCoords(source.pos, adjCoord => {
                 const packedCoord = packAsNum(adjCoord)
-                if (this.terrainCoords[packedCoord] === 255) return
 
                 this.baseCoords[packedCoord] = 255
             })
@@ -1006,9 +1005,9 @@ export class CommunePlanner {
                 if (this.terrainCoords[packedCoord] === 255) continue
                 if (this.baseCoords[packedCoord] !== 255) continue
 
-                this.baseCoords[packedCoord] = 0
                 sourceHarvestPositions[i].push(adjPos)
             }
+
             /*
             // Remove source harvest positions overlapping with upgrade positions or other source harvest positions
             // Loop through each pos index
@@ -1019,6 +1018,7 @@ export class CommunePlanner {
                 sourceHarvestPositions.splice(j, 1)
             }
  */
+
             sortBy(
                 sourceHarvestPositions[i],
                 origin =>
@@ -1046,12 +1046,6 @@ export class CommunePlanner {
             this.setBasePlansXY(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_CONTAINER, 3)
             const packedCoord = packAsNum(closestHarvestPos)
             this.roadCoords[packedCoord] = 20
-        }
-
-        for (const index in sourceHarvestPositions) {
-            for (const pos of sourceHarvestPositions[index]) {
-                this.baseCoords[packAsNum(pos)] = 255
-            }
         }
 
         for (const i in this.communeSources) {
