@@ -2,20 +2,22 @@ import { creepRoles } from 'international/constants'
 import { internationalManager } from 'international/international'
 import { customLog, newID } from 'international/utils'
 
-StructureSpawn.prototype.testSpawn = function (spawnRequest, ID) {
-    return this.spawnCreep(spawnRequest.body, ID.toString(), { dryRun: true })
-}
+export const spawnFunctions = {
+    testSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
 
-StructureSpawn.prototype.advancedSpawn = function (spawnRequest, ID) {
-    spawnRequest.extraOpts.energyStructures = this.room.spawningStructuresByPriority
+        return spawn.spawnCreep(spawnRequest.body, requestID.toString(), { dryRun: true })
+    },
+    advancedSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
+        spawnRequest.extraOpts.energyStructures = spawn.room.spawningStructuresByPriority
 
-    const creepName = [
-        creepRoles.indexOf(spawnRequest.role),
-        spawnRequest.cost,
-        this.room.name,
-        spawnRequest.defaultParts,
-        ID,
-    ].join('_')
+        const creepName = [
+            creepRoles.indexOf(spawnRequest.role),
+            spawnRequest.cost,
+            spawn.room.name,
+            spawnRequest.defaultParts,
+            requestID,
+        ].join('_')
 
-    return this.spawnCreep(spawnRequest.body, creepName, spawnRequest.extraOpts)
+        return spawn.spawnCreep(spawnRequest.body, creepName, spawnRequest.extraOpts)
+    }
 }

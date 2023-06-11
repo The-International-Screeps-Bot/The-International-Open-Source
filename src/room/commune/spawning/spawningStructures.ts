@@ -12,6 +12,7 @@ import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
 import './spawnRequests'
+import { spawnFunctions } from './spawn'
 
 export class SpawningStructuresManager {
     communeManager: CommuneManager
@@ -151,7 +152,7 @@ export class SpawningStructuresManager {
 
         // See if creep can be spawned
 
-        const testSpawnResult = spawn.testSpawn(request, ID)
+        const testSpawnResult = spawnFunctions.testSpawn(spawn, request, ID)
 
         // If creep can't be spawned
 
@@ -173,7 +174,7 @@ export class SpawningStructuresManager {
         // Spawn the creep for real
 
         request.extraOpts.directions = this.findDirections(spawn.pos)
-        spawn.advancedSpawn(request, ID)
+        spawnFunctions.advancedSpawn(spawn, request, ID)
 
         // Record in stats the costs
 

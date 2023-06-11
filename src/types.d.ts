@@ -1817,12 +1817,6 @@ declare global {
          * Wether the structure has been transfered or withdrawn from
          */
         hasHadResourcesMoved: boolean
-
-        // Functions
-
-        testSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
-
-        advancedSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
     }
 
     interface StructureExtension {

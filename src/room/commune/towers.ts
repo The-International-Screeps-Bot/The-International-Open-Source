@@ -27,9 +27,12 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const towers = this.communeManager.room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
+        const towers = this.communeManager.room.roomManager.structures.tower.filter(
+            tower => tower.RCLActionable,
+        )
         if (!towers.length) {
-            this.communeManager.room.towerInferiority = this.communeManager.room.enemyCreeps.length > 0
+            this.communeManager.room.towerInferiority =
+                this.communeManager.room.enemyCreeps.length > 0
             return
         }
 
@@ -84,8 +87,9 @@ export class TowerManager {
                     continue
                 }
             } else {
-
-                const playerMemory = Memory.players[enemyCreep.owner.username] || playerManager.initPlayer(enemyCreep.owner.username)
+                const playerMemory =
+                    Memory.players[enemyCreep.owner.username] ||
+                    playerManager.initPlayer(enemyCreep.owner.username)
                 const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
                 if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) {
@@ -115,7 +119,8 @@ export class TowerManager {
 
     attackEnemyCreeps() {
         if (this.communeManager.room.flags.disableTowerAttacks) {
-            this.communeManager.room.towerInferiority = this.communeManager.room.enemyAttackers.length > 0
+            this.communeManager.room.towerInferiority =
+                this.communeManager.room.enemyAttackers.length > 0
             return true
         }
 
@@ -134,7 +139,10 @@ export class TowerManager {
 
             this.actionableTowerIDs.splice(i, 1)
 
-            const hits = (attackTarget.reserveHits -= towerFunctions.estimateDamageNet(tower, attackTarget))
+            const hits = (attackTarget.reserveHits -= towerFunctions.estimateDamageNet(
+                tower,
+                attackTarget,
+            ))
             if (hits <= 0) return true
         }
 
@@ -282,7 +290,11 @@ export class TowerManager {
                     target: structure,
                     type: 'transfer',
                     priority:
-                        3 + scalePriority(structure.store.getCapacity(RESOURCE_ENERGY), structure.reserveStore.energy),
+                        3 +
+                        scalePriority(
+                            structure.store.getCapacity(RESOURCE_ENERGY),
+                            structure.reserveStore.energy,
+                        ),
                 })
             }
 
@@ -338,11 +350,10 @@ export const towerFunctions = {
         return Math.floor(damage)
     },
     estimateDamageNet: function (tower: StructureTower, target: Creep) {
-        let damage = towerFunctions.estimateDamageGross(tower, target.pos)
+        let damage = this.estimateDamageGross(tower, target.pos)
         damage *= target.defenceStrength
 
         damage -= target.macroHealStrength
         return Math.floor(damage)
-    }
-
+    },
 }

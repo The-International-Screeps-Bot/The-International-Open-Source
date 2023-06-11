@@ -9,13 +9,14 @@ import {
 import { customLog, getRangeXY, getRange, isXYExit } from 'international/utils'
 import { profiler } from 'other/profiler'
 import { towerFunctions } from 'room/commune/towers'
+import { creepFunctions } from './creepFunctions'
 
 Object.defineProperties(Creep.prototype, {
     nameData: {
         get() {
             if (this._nameData) return this._nameData
 
-            return (this._nameData = this.name.split('_'))
+            return (this._nameData = creepFunctions.expandDecryptedName(this.name))
         },
     },
     role: {
@@ -63,16 +64,20 @@ Object.defineProperties(Creep.prototype, {
                 switch (part.type) {
                     case RANGED_ATTACK:
                         this._strength +=
-                            RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
+                            RANGED_ATTACK_POWER *
+                            (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
                         break
                     case ATTACK:
-                        this._strength += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
+                        this._strength +=
+                            ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
                         break
                     case HEAL:
-                        this._strength += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+                        this._strength +=
+                            HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
                         break
                     case TOUGH:
-                        this._strength += 1 + 5 / (part.boost ? BOOSTS[part.type][part.boost].damage : 1)
+                        this._strength +=
+                            1 + 5 / (part.boost ? BOOSTS[part.type][part.boost].damage : 1)
                         break
                     default:
                         this._strength += 1
@@ -95,7 +100,14 @@ Object.defineProperties(Creep.prototype, {
             let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
             let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
 
-            const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+            const adjacentCreeps = this.room.lookForAtArea(
+                LOOK_CREEPS,
+                top,
+                left,
+                bottom,
+                right,
+                true,
+            )
 
             // Calculate combined heal to this creep of adjacent creeps
 
@@ -140,9 +152,12 @@ Object.defineProperties(Creep.prototype, {
 
             this._upgradeStrength = this.parts.work
 
-            if (this.boosts.XGH2O > 0) return (this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController)
-            else if (this.boosts.GH2O > 0) return (this._upgradeStrength *= BOOSTS.upgrade.GH2O.upgradeController)
-            else if (this.boosts.GH > 0) return (this._upgradeStrength *= BOOSTS.upgrade.GH.upgradeController)
+            if (this.boosts.XGH2O > 0)
+                return (this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController)
+            else if (this.boosts.GH2O > 0)
+                return (this._upgradeStrength *= BOOSTS.upgrade.GH2O.upgradeController)
+            else if (this.boosts.GH > 0)
+                return (this._upgradeStrength *= BOOSTS.upgrade.GH.upgradeController)
 
             return this._upgradeStrength
         },
@@ -167,23 +182,28 @@ Object.defineProperties(Creep.prototype, {
 
                     this._combatStrength.dismantle +=
                         DISMANTLE_POWER *
-                        (part.boost && dismantleBoosts.includes(boost) ? BOOSTS[part.type][boost].dismantle : 1)
+                        (part.boost && dismantleBoosts.includes(boost)
+                            ? BOOSTS[part.type][boost].dismantle
+                            : 1)
                     continue
                 }
 
                 if (part.type === ATTACK) {
-                    this._combatStrength.melee += ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
+                    this._combatStrength.melee +=
+                        ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].attack : 1)
                     continue
                 }
 
                 if (part.type === RANGED_ATTACK) {
                     this._combatStrength.ranged +=
-                        RANGED_ATTACK_POWER * (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
+                        RANGED_ATTACK_POWER *
+                        (part.boost ? BOOSTS[part.type][part.boost].rangedAttack : 1)
                     continue
                 }
 
                 if (part.type === HEAL) {
-                    this._combatStrength.heal += HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
+                    this._combatStrength.heal +=
+                        HEAL_POWER * (part.boost ? BOOSTS[part.type][part.boost].heal : 1)
                 }
             }
 
@@ -272,7 +292,14 @@ Object.defineProperties(PowerCreep.prototype, {
 
             // Find adjacent creeps
 
-            const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
+            const adjacentCreeps = this.room.lookForAtArea(
+                LOOK_CREEPS,
+                top,
+                left,
+                bottom,
+                right,
+                true,
+            )
 
             // Loop through each adjacentCreep this creep
 
