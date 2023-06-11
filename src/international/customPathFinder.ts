@@ -192,7 +192,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
         plainCost: args.plainCost,
         swampCost: args.swampCost,
         maxRooms,
-        maxOps: Math.min(100000, (1 + maxRooms) * 500),
+        maxOps: Math.min(100000, (1 + maxRooms) * 2000),
         heuristicWeight: 1,
         flee: args.flee,
 

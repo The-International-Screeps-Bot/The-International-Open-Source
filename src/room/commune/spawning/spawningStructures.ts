@@ -32,7 +32,6 @@ export class SpawningStructuresManager {
      */
     public organizeSpawns() {
         const spawns = this.communeManager.room.roomManager.structures.spawn
-        console.log('spawns:', 'real:', this.communeManager.room.find(FIND_MY_SPAWNS), 'hostile:', this.communeManager.room.find(FIND_HOSTILE_SPAWNS))
         if (!spawns.length) return
 
         // Find spawns that are and aren't spawning
@@ -41,7 +40,7 @@ export class SpawningStructuresManager {
         this.activeSpawns = []
 
         for (const spawn of spawns) {
-            console.log('spawn', spawn.id)
+
             if (spawn.renewed) continue
             if (!spawn.RCLActionable) continue
 
@@ -49,7 +48,6 @@ export class SpawningStructuresManager {
                 const creep = Game.creeps[spawn.spawning.name]
                 creep.manageSpawning(spawn)
                 creep.spawnID = spawn.id
-                console.log('assigned spawnID', creep.name, spawn.id)
 
                 if (
                     spawn.spawning.remainingTime <= 2 &&
