@@ -40,7 +40,7 @@ export class PlayerManager {
             [PlayerMemoryKeys.defensiveStrength]: 0,
             [PlayerMemoryKeys.hate]: 0,
             [PlayerMemoryKeys.lastAttacked]: Infinity,
-            [PlayerMemoryKeys.rangeFromExitWeight]: 1,
+            [PlayerMemoryKeys.rangeFromExitWeight]: 0.5,
         }
     }
 

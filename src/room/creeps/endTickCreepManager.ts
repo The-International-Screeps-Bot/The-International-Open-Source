@@ -1,7 +1,14 @@
-import { chant, customColors, powerCreepClassNames } from 'international/constants'
+import {
+    chant,
+    customColors,
+    enemyDieChants,
+    friendlyDieChants,
+    powerCreepClassNames,
+} from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog, randomRange, randomTick } from 'international/utils'
+import { customLog, forCoordsInRange, randomOf, randomRange, randomTick } from 'international/utils'
 import { RoomManager } from '../room'
+import { packCoord } from 'other/codec'
 
 export class EndTickCreepManager {
     roomManager: RoomManager
@@ -78,6 +85,42 @@ export class EndTickCreepManager {
         )
         if (!creeps.length) return
 
-        creeps[Math.floor(Math.random() * creeps.length)].say(currentChant, true)
+        const usedNames = this.runDeadChant()
+
+        creeps.filter(creep => !usedNames.has(creep.name))
+        if (!creeps.length) return
+
+        randomOf(creeps).say(currentChant, true)
+    }
+
+    private runDeadChant() {
+        const usedNames: Set<string> = new Set()
+
+        const tombstones = this.roomManager.room.find(FIND_TOMBSTONES, {
+            filter: tombstone => tombstone.deathTime + 3 > Game.time,
+        })
+        if (tombstones.length) {
+            for (const tombstone of tombstones) {
+                let chant: string
+                if (
+                    tombstone.creep.owner.username === Memory.me ||
+                    Memory.allyPlayers.includes(tombstone.creep.owner.username)
+                ) {
+                    chant = randomOf(friendlyDieChants)
+                } else {
+                    chant = randomOf(enemyDieChants)
+                }
+
+                forCoordsInRange(tombstone.pos, 4, coord => {
+                    const creepName = this.roomManager.room.creepPositions[packCoord(coord)]
+                    if (!creepName) return
+
+                    usedNames.add(creepName)
+                    Game.creeps[creepName].say(chant, true)
+                })
+            }
+        }
+
+        return usedNames
     }
 }

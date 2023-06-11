@@ -302,11 +302,12 @@ export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.dynamicScoreUpdate,
         RoomMemoryKeys.clearedEnemyStructures,
     ]),
-    [RoomTypes.remote]: new Set([
-        RoomMemoryKeys.commune,
+    [RoomTypes.remote]: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.ally]: new Set([
+        RoomMemoryKeys.owner,
+        RoomMemoryKeys.RCL,
         RoomMemoryKeys.communePlanned,
     ]),
-    [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL, RoomMemoryKeys.communePlanned]),
     [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
     [RoomTypes.enemy]: new Set([
         RoomMemoryKeys.owner,
@@ -449,6 +450,14 @@ export const chant = [
     'chains!',
     undefined,
 ]
+/**
+ * What to say when one of our creeps dies
+ */
+export const friendlyDieChants = ['✊', '🛠️']
+/**
+ * What to say an enemy creep dies
+ */
+export const enemyDieChants = ['☮️', '❤️']
 
 export const roomDimensions = 50
 
@@ -494,7 +503,9 @@ export const buildableStructureTypes: BuildableStructureConstant[] = [
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
 ]
-export const buildableStructuresSet: Set<BuildableStructureConstant> = new Set(buildableStructureTypes)
+export const buildableStructuresSet: Set<BuildableStructureConstant> = new Set(
+    buildableStructureTypes,
+)
 
 export const impassibleStructureTypes: StructureConstant[] = [
     STRUCTURE_SPAWN,
@@ -551,7 +562,10 @@ export const structureTypesToProtect: StructureConstant[] = [
 ]
 export const structureTypesToProtectSet = new Set(structureTypesToProtect)
 
-export const storingStructureTypesSet: Set<StructureConstant> = new Set([STRUCTURE_STORAGE, STRUCTURE_TERMINAL])
+export const storingStructureTypesSet: Set<StructureConstant> = new Set([
+    STRUCTURE_STORAGE,
+    STRUCTURE_TERMINAL,
+])
 
 export const customColors = {
     white: '#ffffff',
@@ -799,7 +813,11 @@ export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_CATALYST,
 ]
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
-export const dismantleBoosts = [RESOURCE_ZYNTHIUM_HYDRIDE, RESOURCE_ZYNTHIUM_ACID, RESOURCE_CATALYZED_ZYNTHIUM_ACID]
+export const dismantleBoosts = [
+    RESOURCE_ZYNTHIUM_HYDRIDE,
+    RESOURCE_ZYNTHIUM_ACID,
+    RESOURCE_CATALYZED_ZYNTHIUM_ACID,
+]
 export const dismantleBoostsSet = new Set(dismantleBoosts)
 export const allResources = new Set(RESOURCES_ALL)
 
@@ -821,9 +839,7 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
     [RESOURCE_ENERGY]: {
         min: function (communeManager) {
             if (communeManager.room.controller.level < 8) {
-
                 if (internationalManager.funnelOrder[0] === communeManager.room.name) {
-
                     return communeManager.storedEnergyUpgradeThreshold * 2
                 }
                 return communeManager.storedEnergyUpgradeThreshold * 1.2
@@ -1119,7 +1135,13 @@ export const antifaRoles: (
     | 'antifaHealer'
     | 'antifaDismantler'
     | 'antifaDowngrader'
-)[] = ['antifaRangedAttacker', 'antifaAttacker', 'antifaHealer', 'antifaDismantler', 'antifaDowngrader']
+)[] = [
+    'antifaRangedAttacker',
+    'antifaAttacker',
+    'antifaHealer',
+    'antifaDismantler',
+    'antifaDowngrader',
+]
 
 /**
  * Roles for which to provide spawnGroups for based on their shared remoteName
@@ -1362,7 +1384,17 @@ export const RESULT_NO_ACTION = 3
 export const RESULT_STOP = 4
 
 export const maxRemoteRoomDistance = 5
-export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
+export const offsetsByDirection = [
+    ,
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1],
+]
 
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
 

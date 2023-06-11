@@ -151,6 +151,6 @@ export const settings: Settings = {
     creepSay: true,
     creepChant: true,
     simpleAlliesSegment: 90,
-    errorExporting: true,
+    errorExporting: false,
     structureMigration: false,
 }

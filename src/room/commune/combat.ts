@@ -194,8 +194,8 @@ export class CombatManager {
                 if (damage <= 0) continue
             } else {
 
-                const playerMemory = Memory.players[enemyCreep.owner.username]
-                const weight = playerMemory ? playerMemory[PlayerMemoryKeys.rangeFromExitWeight] : 1
+                const playerMemory = Memory.players[enemyCreep.owner.username] || playerManager.initPlayer(enemyCreep.owner.username)
+                const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
                 if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) continue
             }

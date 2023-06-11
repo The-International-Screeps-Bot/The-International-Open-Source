@@ -959,3 +959,8 @@ export function sortBy<T>(array: T[], score: (t: T) => number, reversed?: true):
     const cache = new Map(array.map(t => [t, score(t) * reverseSign]))
     return array.sort((a, b) => cache.get(a) - cache.get(b))
 }
+
+export function randomOf<T>(array: T[]): T {
+
+    return array[Math.floor(Math.random() * array.length)]
+}

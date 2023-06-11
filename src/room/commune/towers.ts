@@ -11,6 +11,7 @@ import {
 } from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
+import { playerManager } from 'international/players'
 
 export class TowerManager {
     communeManager: CommuneManager
@@ -84,8 +85,8 @@ export class TowerManager {
                 }
             } else {
 
-                const playerMemory = Memory.players[enemyCreep.owner.username]
-                const weight = playerMemory ? playerMemory[PlayerMemoryKeys.rangeFromExitWeight] : 1
+                const playerMemory = Memory.players[enemyCreep.owner.username] || playerManager.initPlayer(enemyCreep.owner.username)
+                const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
                 if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) {
                     if (room.towerInferiority) continue
