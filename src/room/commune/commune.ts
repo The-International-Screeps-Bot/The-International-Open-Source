@@ -22,7 +22,7 @@ import {
     randomTick,
     unpackNumAsCoord,
     findLowestScore,
-    roundToDecimals,
+    roundTo,
     findDynamicScore,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
@@ -445,10 +445,7 @@ export class CommuneManager {
     }
 
     get rampartsMaintenanceCost() {
-        return roundToDecimals(
-            this.room.roomManager.structures.rampart.length * rampartUpkeepCost,
-            2,
-        )
+        return roundTo(this.room.roomManager.structures.rampart.length * rampartUpkeepCost, 2)
     }
 
     _minRampartHits: number

@@ -2046,6 +2046,7 @@ declare global {
         [PlayerMemoryKeys.defensiveStrength]: number
         [PlayerMemoryKeys.hate]: number
         [PlayerMemoryKeys.lastAttacked]: number
+        [PlayerMemoryKeys.rangeFromExitWeight]: number
     }
 
     interface WorkRequest {

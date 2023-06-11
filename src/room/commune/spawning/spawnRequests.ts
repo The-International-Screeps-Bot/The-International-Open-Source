@@ -18,7 +18,7 @@ import {
     getRangeXY,
     getRange,
     randomRange,
-    roundToDecimals,
+    roundTo,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { packPos, unpackPosList } from 'other/codec'
@@ -361,7 +361,6 @@ export class SpawnRequestsManager {
     }
 
     private defenders() {
-
         // Construct requests for meleeDefenders
 
         if (this.communeManager.room.towerInferiority) {
@@ -378,10 +377,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'meleeDefender'
 
-                    if (
-                        this.communeManager.room.myCreeps[role].length * 1.75 >
-                        enemyCreeps.length
-                    )
+                    if (this.communeManager.room.myCreeps[role].length * 1.75 > enemyCreeps.length)
                         return false
 
                     // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
@@ -443,10 +439,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'rangedDefender'
 
-                    if (
-                        this.communeManager.room.myCreeps[role].length * 1.75 >
-                        enemyCreeps.length
-                    )
+                    if (this.communeManager.room.myCreeps[role].length * 1.75 > enemyCreeps.length)
                         return false
 
                     // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
@@ -765,9 +758,7 @@ export class SpawnRequestsManager {
                     this.communeManager.room.controller.ticksToDowngrade <=
                     this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
-
                     if (this.communeManager.hasSufficientRoads()) {
-
                         return {
                             role,
                             defaultParts: [CARRY, WORK, MOVE],

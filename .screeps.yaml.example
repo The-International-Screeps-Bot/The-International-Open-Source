@@ -2,8 +2,13 @@ servers:
   mmo:
     host: screeps.com
     secure: true
-    token: "00000000-0a0a-0a00-000a-a0000a0000a0"
+    token: "YOUR TOKEN https://screeps.com/season/#!/account/auth-tokens"
     branch: "default"
+  season:
+    host: screeps.com
+    secure: true
+    token: 'YOUR TOKEN https://screeps.com/season/#!/account/auth-tokens'
+    path: /season
   pserver:
     host: 127.0.0.1
     port: 21025

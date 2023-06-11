@@ -5,7 +5,7 @@ import {
     RoomMemoryKeys,
     terminalResourceTargets,
 } from 'international/constants'
-import { customLog, findLargestTransactionAmount, newID, roundToDecimals } from 'international/utils'
+import { customLog, findLargestTransactionAmount, newID, roundTo } from 'international/utils'
 import './marketFunctions'
 import { allyManager, AllyRequest, AllyRequestTypes } from 'international/simpleAllies'
 import { internationalManager } from 'international/international'
@@ -68,16 +68,21 @@ export class TerminalManager {
             const resourceTarget = terminalResourceTargets[resource]
             let targetAmount = resourceTarget.min(this.communeManager)
             if (targetAmount <= 0) continue
-            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
+            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager))
+                continue
 
             // We have enough
 
-            const storedResourceAmount = this.communeManager.room.resourcesInStoringStructures[resource] || 0
+            const storedResourceAmount =
+                this.communeManager.room.resourcesInStoringStructures[resource] || 0
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)
-            const priority = roundToDecimals(1 - storedResourceAmount / targetAmount, 2)
-            const amount = Math.min(targetAmount - storedResourceAmount, terminal.store.getFreeCapacity())
+            const priority = roundTo(1 - storedResourceAmount / targetAmount, 2)
+            const amount = Math.min(
+                targetAmount - storedResourceAmount,
+                terminal.store.getFreeCapacity(),
+            )
 
             // If we have allies to trade with, alternate requesting eveyr tick
 
@@ -160,7 +165,8 @@ export class TerminalManager {
  */
     findBestTerminalRequest(): [TerminalRequest, number] {
         const budget = Math.min(
-            this.communeManager.room.resourcesInStoringStructures.energy - this.communeManager.minStoredEnergy,
+            this.communeManager.room.resourcesInStoringStructures.energy -
+                this.communeManager.minStoredEnergy,
             this.communeManager.room.terminal.store[RESOURCE_ENERGY],
         )
 
@@ -190,7 +196,8 @@ export class TerminalManager {
             if (newAmount / request.amount < 0.25) continue
 
             const score =
-                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
+                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) +
+                request.priority * 100
             if (score >= lowestScore) continue
 
             amount = newAmount
@@ -204,13 +211,21 @@ export class TerminalManager {
     private respondToTerminalRequests() {
         // We don't have enough energy to help other rooms
 
-        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy)
+        if (
+            this.communeManager.room.resourcesInStoringStructures.energy <
+            this.communeManager.minStoredEnergy
+        )
             return false
 
         const [request, amount] = this.findBestTerminalRequest()
         if (!request) return false
 
-        this.communeManager.room.terminal.send(request.resource, amount, request.roomName, 'Terminal request')
+        this.communeManager.room.terminal.send(
+            request.resource,
+            amount,
+            request.roomName,
+            'Terminal request',
+        )
         delete internationalManager.terminalRequests[request.ID]
         this.communeManager.room.terminal.intended = true
         return true
@@ -218,7 +233,8 @@ export class TerminalManager {
 
     private findBestAllyRequest(): [AllyRequest, number] {
         const budget = Math.min(
-            this.communeManager.room.resourcesInStoringStructures.energy - this.communeManager.minStoredEnergy,
+            this.communeManager.room.resourcesInStoringStructures.energy -
+                this.communeManager.minStoredEnergy,
             this.communeManager.room.terminal.store[RESOURCE_ENERGY],
         )
 
@@ -240,7 +256,8 @@ export class TerminalManager {
                 Math.min(
                     request.maxAmount,
                     this.communeManager.room.resourcesInStoringStructures[request.resourceType] -
-                        terminalResourceTargets[request.resourceType]?.min(this.communeManager) || 0,
+                        terminalResourceTargets[request.resourceType]?.min(this.communeManager) ||
+                        0,
                 ),
                 this.communeManager.room.name,
                 request.roomName,
@@ -248,7 +265,8 @@ export class TerminalManager {
             if (newAmount / request.maxAmount < 0.25) continue
 
             const score =
-                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) + request.priority * 100
+                Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) +
+                request.priority * 100
             if (score >= lowestScore) continue
 
             amount = newAmount
@@ -264,13 +282,21 @@ export class TerminalManager {
 
         // We don't have enough energy to help other rooms
 
-        if (this.communeManager.room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy)
+        if (
+            this.communeManager.room.resourcesInStoringStructures.energy <
+            this.communeManager.minStoredEnergy
+        )
             return false
 
         const [request, amount] = this.findBestAllyRequest()
         if (!request) return RESULT_NO_ACTION
 
-        this.communeManager.room.terminal.send(request.resourceType, amount, request.roomName, 'Ally request')
+        this.communeManager.room.terminal.send(
+            request.resourceType,
+            amount,
+            request.roomName,
+            'Ally request',
+        )
         this.communeManager.room.terminal.intended = true
 
         // Remove the request so other rooms don't try to respond to it
@@ -286,7 +312,8 @@ export class TerminalManager {
         for (const key in terminalResourceTargets) {
             const resource = key as ResourceConstant
             const resourceTarget = terminalResourceTargets[resource]
-            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager)) continue
+            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager))
+                continue
 
             let min = resourceTarget.min(this.communeManager)
 
@@ -334,7 +361,8 @@ export class TerminalManager {
             this.doTransfers()
         }
 
-        if (this.room.name != 'W17N16' && this.room.name != 'W21N9' && this.room.name != 'W21N8') return
+        if (this.room.name != 'W17N16' && this.room.name != 'W21N9' && this.room.name != 'W21N8')
+            return
         //This should be below the isTradingPossible check, but that doesn't use the correct
         //  logic.  It needs to use the same work queue that the creep does.
         if (!this.isTradingPossible()) return
@@ -351,7 +379,9 @@ export class TerminalManager {
         return (
             (room.terminal.store[resource] || 0) +
             (room.storage.store[resource] || 0) +
-            (room.roomManager.structures.factory ? room.roomManager.structures.factory[0].store[resource] || 0 : 0)
+            (room.roomManager.structures.factory
+                ? room.roomManager.structures.factory[0].store[resource] || 0
+                : 0)
         )
     }
 
@@ -369,7 +399,9 @@ export class TerminalManager {
 
                 let result = this.terminal.send(resource, transferAmount, room)
                 if (result != OK) {
-                    console.log(`Error ${result} in transfer from ${this.room.name} to ${room}. ${resource}`)
+                    console.log(
+                        `Error ${result} in transfer from ${this.room.name} to ${room}. ${resource}`,
+                    )
                 } else return true
             }
         }
@@ -410,7 +442,9 @@ export class TerminalManager {
                         rm.name != 'W19N15' &&
                         rm.name != 'W15N18',
                 ),
-                room => (room.terminal.store[RESOURCE_ENERGY] || 0) + (room.storage.store[RESOURCE_ENERGY] || 0),
+                room =>
+                    (room.terminal.store[RESOURCE_ENERGY] || 0) +
+                    (room.storage.store[RESOURCE_ENERGY] || 0),
                 //The TS @type for _min is wrong, it'll return infinity, if there's no results.
             ) as Room | number
             let lowestRoom = result === Infinity ? null : (result as Room)
@@ -425,7 +459,11 @@ export class TerminalManager {
             ) {
                 console.log('LowTransfer to: ' + lowestRoom.name)
                 let amountToTransfer = Math.min(this.terminal.store[RESOURCE_ENERGY], 50000)
-                let transactionCost = Game.market.calcTransactionCost(1000, this.room.name, lowestRoom.name)
+                let transactionCost = Game.market.calcTransactionCost(
+                    1000,
+                    this.room.name,
+                    lowestRoom.name,
+                )
                 //The rounding is slightly off, so don't transfer all the energy, just 99% of it...
                 amountToTransfer = (1000 / (1000 + transactionCost)) * amountToTransfer * 0.99
                 let result = this.terminal.send(RESOURCE_ENERGY, amountToTransfer, lowestRoom.name)
@@ -437,9 +475,18 @@ export class TerminalManager {
         }
 
         if (this.room.name == 'W19N15') {
-            for (let resource of [RESOURCE_MIST, RESOURCE_WIRE, RESOURCE_CONDENSATE, RESOURCE_CELL]) {
+            for (let resource of [
+                RESOURCE_MIST,
+                RESOURCE_WIRE,
+                RESOURCE_CONDENSATE,
+                RESOURCE_CELL,
+            ]) {
                 if (this.terminal.store[resource] > 100) {
-                    let result = this.terminal.send(resource, this.terminal.store[resource], 'W17N16')
+                    let result = this.terminal.send(
+                        resource,
+                        this.terminal.store[resource],
+                        'W17N16',
+                    )
                     if (result != OK) {
                         console.log('Error in transfer.  ' + result + resource)
                     }
@@ -475,7 +522,11 @@ export class TerminalManager {
             this.room.name != 'W18N16' &&
             this.room.name != 'W15N18'
         ) {
-            let result = this.terminal.send(RESOURCE_CONCENTRATE, this.terminal.store[RESOURCE_CONCENTRATE], 'W15N18')
+            let result = this.terminal.send(
+                RESOURCE_CONCENTRATE,
+                this.terminal.store[RESOURCE_CONCENTRATE],
+                'W15N18',
+            )
             if (result != OK) {
                 console.log('Error in transfer.  ' + result + RESOURCE_CONCENTRATE)
             }
@@ -522,7 +573,8 @@ export class TerminalManager {
         }
 
         if (
-            this.amountInRoom(RESOURCE_CONCENTRATE) > this.amountInRoom(RESOURCE_CONCENTRATE, 'W18N16') * 2 &&
+            this.amountInRoom(RESOURCE_CONCENTRATE) >
+                this.amountInRoom(RESOURCE_CONCENTRATE, 'W18N16') * 2 &&
             this.room.name != 'W18N16' &&
             this.terminal.store[RESOURCE_CONCENTRATE]
         ) {
@@ -541,7 +593,8 @@ export class TerminalManager {
             return result == OK
         }
         if (
-            this.amountInRoom(RESOURCE_CONCENTRATE) > this.amountInRoom(RESOURCE_CONCENTRATE, 'W15N18') * 2 &&
+            this.amountInRoom(RESOURCE_CONCENTRATE) >
+                this.amountInRoom(RESOURCE_CONCENTRATE, 'W15N18') * 2 &&
             this.room.name != 'W15N18' &&
             this.terminal.store[RESOURCE_CONCENTRATE]
         ) {
@@ -561,7 +614,8 @@ export class TerminalManager {
         }
 
         if (
-            this.amountInRoom(RESOURCE_EXTRACT) > this.amountInRoom(RESOURCE_EXTRACT, 'W18N16') * 2 &&
+            this.amountInRoom(RESOURCE_EXTRACT) >
+                this.amountInRoom(RESOURCE_EXTRACT, 'W18N16') * 2 &&
             this.room.name != 'W18N16' &&
             this.terminal.store[RESOURCE_EXTRACT]
         ) {
@@ -581,7 +635,8 @@ export class TerminalManager {
         }
 
         if (
-            this.amountInRoom(RESOURCE_KEANIUM_BAR) > this.amountInRoom(RESOURCE_KEANIUM_BAR, 'W17N16') * 2 &&
+            this.amountInRoom(RESOURCE_KEANIUM_BAR) >
+                this.amountInRoom(RESOURCE_KEANIUM_BAR, 'W17N16') * 2 &&
             this.room.name != 'W17N16' &&
             this.terminal.store[RESOURCE_KEANIUM_BAR]
         ) {
@@ -601,7 +656,8 @@ export class TerminalManager {
         }
 
         if (
-            this.amountInRoom(RESOURCE_REDUCTANT) > this.amountInRoom(RESOURCE_REDUCTANT, 'W17N16') * 2 &&
+            this.amountInRoom(RESOURCE_REDUCTANT) >
+                this.amountInRoom(RESOURCE_REDUCTANT, 'W17N16') * 2 &&
             this.room.name != 'W17N16' &&
             this.terminal.store[RESOURCE_REDUCTANT]
         ) {
@@ -621,7 +677,8 @@ export class TerminalManager {
         }
 
         if (
-            this.amountInRoom(RESOURCE_REDUCTANT) > this.amountInRoom(RESOURCE_REDUCTANT, 'W15N18') * 2 &&
+            this.amountInRoom(RESOURCE_REDUCTANT) >
+                this.amountInRoom(RESOURCE_REDUCTANT, 'W15N18') * 2 &&
             this.room.name != 'W15N18' &&
             this.terminal.store[RESOURCE_REDUCTANT]
         ) {
@@ -641,7 +698,8 @@ export class TerminalManager {
         }
 
         if (
-            this.amountInRoom(RESOURCE_REDUCTANT) > this.amountInRoom(RESOURCE_REDUCTANT, 'W18N16') * 2 &&
+            this.amountInRoom(RESOURCE_REDUCTANT) >
+                this.amountInRoom(RESOURCE_REDUCTANT, 'W18N16') * 2 &&
             this.room.name != 'W18N16' &&
             this.terminal.store[RESOURCE_REDUCTANT]
         ) {
@@ -670,7 +728,10 @@ export class TerminalManager {
                 if (this.terminal.store[resource] > 0) {
                     let result = this.terminal.send(
                         resource,
-                        Math.min(this.terminal.store[resource], this.terminal.store[RESOURCE_ENERGY]),
+                        Math.min(
+                            this.terminal.store[resource],
+                            this.terminal.store[RESOURCE_ENERGY],
+                        ),
                         'W17N16',
                     )
                     if (result != OK) {
@@ -689,24 +750,37 @@ export class TerminalManager {
         if (!this.room.terminal.store[resource]) return false
 
         let result = _.min(
-            rooms.map(rm => Game.rooms[rm]).filter(rm => rm.terminal && rm.storage && rm != this.room),
+            rooms
+                .map(rm => Game.rooms[rm])
+                .filter(rm => rm.terminal && rm.storage && rm != this.room),
             rm => (rm.storage.store[resource] || 0) + (rm.terminal.store[resource] || 0),
         ) as Room | number
         let neediestRoom = result === Infinity ? null : (result as Room)
         if (neediestRoom != null) {
-            let amount = Math.min(this.terminal.store[resource], this.terminal.store[RESOURCE_ENERGY])
+            let amount = Math.min(
+                this.terminal.store[resource],
+                this.terminal.store[RESOURCE_ENERGY],
+            )
 
             //Don't send all of the resource, only send 1/3 of the colonly's total assets (if there's 2 rooms) to each room, this way the lower rooms
             //Get a decent chance at the resources.
             if (rooms.length > 1)
-                amount = Math.min(amount, Math.ceil((Memory.masterPlan.resources[resource] || 0) / (rooms.length + 1)))
+                amount = Math.min(
+                    amount,
+                    Math.ceil((Memory.masterPlan.resources[resource] || 0) / (rooms.length + 1)),
+                )
 
             //If the current room needs the resource as well, use totally different logic.  Send half the difference between this room and the other
             if (rooms.includes(this.room.name)) {
-                if (this.amountInRoom(resource) / 2 < this.amountInRoom(resource, neediestRoom.name)) return false
+                if (
+                    this.amountInRoom(resource) / 2 <
+                    this.amountInRoom(resource, neediestRoom.name)
+                )
+                    return false
 
                 amount = Math.min(
-                    (this.amountInRoom(resource) - this.amountInRoom(resource, neediestRoom.name)) / 2,
+                    (this.amountInRoom(resource) - this.amountInRoom(resource, neediestRoom.name)) /
+                        2,
                     this.terminal.store[resource],
                     this.terminal.store[RESOURCE_ENERGY],
                 )
@@ -716,7 +790,9 @@ export class TerminalManager {
             let result = this.terminal.send(resource, amount, neediestRoom.name)
             //console.log(`Sending all ${resource} from ${this.room.name} to ${neediestRoom.name}.`)
             if (result != OK) {
-                console.log(`sendAllToRooms: Error ${result} in ${resource} transfer from ${this.room.name}.`)
+                console.log(
+                    `sendAllToRooms: Error ${result} in ${resource} transfer from ${this.room.name}.`,
+                )
             }
             return result == OK
         }
@@ -754,14 +830,21 @@ export class TerminalManager {
     balanceResourceToRCL8Rooms(resources: ResourceConstant[]): boolean {
         let possibleRooms = _.filter(
             Game.rooms,
-            rm => rm.controller && rm.controller.my && rm.controller.level == 8 && rm.terminal && rm != this.room,
+            rm =>
+                rm.controller &&
+                rm.controller.my &&
+                rm.controller.level == 8 &&
+                rm.terminal &&
+                rm != this.room,
         )
         for (let resource of resources) {
-            let thisRoomAmount = (this.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
+            let thisRoomAmount =
+                (this.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
             if (thisRoomAmount === 0) continue
             for (let targetRoom of possibleRooms) {
                 let targetRoomAmount =
-                    (targetRoom.terminal.store[resource] || 0) + (targetRoom.storage.store[resource] || 0)
+                    (targetRoom.terminal.store[resource] || 0) +
+                    (targetRoom.storage.store[resource] || 0)
                 if (thisRoomAmount > targetRoomAmount * 2) {
                     let amount = Math.min(
                         thisRoomAmount / 2,
@@ -792,7 +875,12 @@ export class TerminalManager {
                         remainingAmount: order.remainingAmount,
                         adjCost:
                             order.price +
-                            (energyPrice * Game.market.calcTransactionCost(1000, this.room.name, order.roomName)) /
+                            (energyPrice *
+                                Game.market.calcTransactionCost(
+                                    1000,
+                                    this.room.name,
+                                    order.roomName,
+                                )) /
                                 1000,
                         origPrice: order.price,
                     }),
@@ -814,7 +902,12 @@ export class TerminalManager {
                         remainingAmount: order.remainingAmount,
                         adjCost:
                             order.price -
-                            (energyPrice * Game.market.calcTransactionCost(1000, this.room.name, order.roomName)) /
+                            (energyPrice *
+                                Game.market.calcTransactionCost(
+                                    1000,
+                                    this.room.name,
+                                    order.roomName,
+                                )) /
                                 1000,
                         origPrice: order.price,
                     }),
@@ -844,10 +937,12 @@ export class TerminalManager {
 
                 if (bestBuy) {
                     if (!this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource])
-                        this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] = bestBuy.adjCost
+                        this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] =
+                            bestBuy.adjCost
                     else
                         this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] =
-                            this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 0.98 + bestBuy.adjCost * 0.02
+                            this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 0.98 +
+                            bestBuy.adjCost * 0.02
                 } else {
                     //If we're not seeing people buying an item, let the price drift down slowly, so this number doesn't stay high.
                     this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] =
@@ -899,7 +994,8 @@ export class TerminalManager {
                     }
 
                     if (!this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource])
-                        this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] = bestSell.adjCost
+                        this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] =
+                            bestSell.adjCost
                     else
                         this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] =
                             this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] * 0.995 +
@@ -959,7 +1055,9 @@ export class TerminalManager {
                                 | RESOURCE_GHODIUM
                         ]
                     if (comp == RESOURCE_ENERGY) {
-                        buildCost += this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] * amount
+                        buildCost +=
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] *
+                            amount
                     } else {
                         buildCost +=
                             this.room.memory[RoomMemoryKeys.marketData].sellAvg[
@@ -979,7 +1077,11 @@ export class TerminalManager {
             }
 
             //Now setup ZK, UL, and OH, since it's all the same logic.
-            for (let resource of [RESOURCE_ZYNTHIUM_KEANITE, RESOURCE_UTRIUM_LEMERGITE, RESOURCE_HYDROXIDE]) {
+            for (let resource of [
+                RESOURCE_ZYNTHIUM_KEANITE,
+                RESOURCE_UTRIUM_LEMERGITE,
+                RESOURCE_HYDROXIDE,
+            ]) {
                 let buildCost = 0
                 switch (resource) {
                     case RESOURCE_ZYNTHIUM_KEANITE:
@@ -1020,7 +1122,9 @@ export class TerminalManager {
                                 | RESOURCE_GHODIUM
                         ]
                     if (comp == RESOURCE_ENERGY) {
-                        buildCost += this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] * amount
+                        buildCost +=
+                            this.room.memory[RoomMemoryKeys.marketData].aquire[RESOURCE_ENERGY] *
+                            amount
                     } else if (comp == RESOURCE_GHODIUM) {
                         buildCost += gReactionCost * amount
                     } else {
@@ -1046,11 +1150,17 @@ export class TerminalManager {
                     )
             }
 
-            for (let resource of [RESOURCE_METAL, RESOURCE_BIOMASS, RESOURCE_SILICON, RESOURCE_MIST]) {
+            for (let resource of [
+                RESOURCE_METAL,
+                RESOURCE_BIOMASS,
+                RESOURCE_SILICON,
+                RESOURCE_MIST,
+            ]) {
                 let priceToUse = this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource]
                 if (priceToUse === undefined || priceToUse === null || priceToUse >= 99999999) {
                     this.room.memory[RoomMemoryKeys.marketData].buyAvg
-                        ? (priceToUse = this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 1.5)
+                        ? (priceToUse =
+                              this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource] * 1.5)
                         : 99999999
                 }
                 this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = priceToUse
@@ -1093,10 +1203,12 @@ export class TerminalManager {
                     }
                     if (buildCost) {
                         this.room.memory[RoomMemoryKeys.marketData].aquire[resource] = Math.min(
-                            this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] || 99999999,
+                            this.room.memory[RoomMemoryKeys.marketData].sellAvg[resource] ||
+                                99999999,
                             buildCost / COMMODITIES[resource].amount,
                         )
-                        if (this.room.memory[RoomMemoryKeys.marketData].aquire[resource]) didWork = true
+                        if (this.room.memory[RoomMemoryKeys.marketData].aquire[resource])
+                            didWork = true
                     }
                 }
             }
@@ -1122,10 +1234,30 @@ export class TerminalManager {
 
             let purchaseTarget = [
                 //{ valuePrice: 4.8, targetAmount: 200000, orderSize: 20000, resource: RESOURCE_ENERGY },
-                { valuePrice: 1.8, targetAmount: 20000, orderSize: 2000, resource: RESOURCE_HYDROGEN },
-                { valuePrice: 10, targetAmount: 20000, orderSize: 2000, resource: RESOURCE_REDUCTANT },
-                { valuePrice: 0.7, targetAmount: 10000, orderSize: 2000, resource: RESOURCE_ZYNTHIUM },
-                { valuePrice: 0.8, targetAmount: 10000, orderSize: 2000, resource: RESOURCE_KEANIUM },
+                {
+                    valuePrice: 1.8,
+                    targetAmount: 20000,
+                    orderSize: 2000,
+                    resource: RESOURCE_HYDROGEN,
+                },
+                {
+                    valuePrice: 10,
+                    targetAmount: 20000,
+                    orderSize: 2000,
+                    resource: RESOURCE_REDUCTANT,
+                },
+                {
+                    valuePrice: 0.7,
+                    targetAmount: 10000,
+                    orderSize: 2000,
+                    resource: RESOURCE_ZYNTHIUM,
+                },
+                {
+                    valuePrice: 0.8,
+                    targetAmount: 10000,
+                    orderSize: 2000,
+                    resource: RESOURCE_KEANIUM,
+                },
             ]
             this.extendBuyOrders(purchaseTarget)
         }
@@ -1137,7 +1269,8 @@ export class TerminalManager {
 
         let targetEnergyLevel = 200000
         let totalBetweenStorageAndTerminal =
-            (this.terminal.store[RESOURCE_ENERGY] || 0) + (this.room.storage.store[RESOURCE_ENERGY] || 0)
+            (this.terminal.store[RESOURCE_ENERGY] || 0) +
+            (this.room.storage.store[RESOURCE_ENERGY] || 0)
 
         if (totalBetweenStorageAndTerminal < targetEnergyLevel) {
             let amountToBuy = targetEnergyLevel - totalBetweenStorageAndTerminal
@@ -1183,7 +1316,8 @@ export class TerminalManager {
             amountToTrade = Math.floor(amountToTrade / 2)
 
             //If we have a lot of energy, be more agressive in selling.  If we're low, be less aggressive.
-            let baseEnergy = this.terminal.store[RESOURCE_ENERGY] + this.room.storage.store[RESOURCE_ENERGY]
+            let baseEnergy =
+                this.terminal.store[RESOURCE_ENERGY] + this.room.storage.store[RESOURCE_ENERGY]
             let sellMultiplier = 1.2
             if (baseEnergy > 150000) sellMultiplier = 1.1
             if (baseEnergy > 250000) sellMultiplier = 1.05
@@ -1192,9 +1326,18 @@ export class TerminalManager {
 
             if (Game.shard.name == 'shard3') sellMultiplier = sellMultiplier * 2
 
-            if (bestEnergySellOrder && bestEnergySellOrder.adjPrice > energyPrice * sellMultiplier) {
-                console.log('selling ' + JSON.stringify(bestEnergySellOrder) + ' qty: ' + amountToTrade)
-                let result = Game.market.deal(bestEnergySellOrder.orderId, amountToTrade, this.room.name)
+            if (
+                bestEnergySellOrder &&
+                bestEnergySellOrder.adjPrice > energyPrice * sellMultiplier
+            ) {
+                console.log(
+                    'selling ' + JSON.stringify(bestEnergySellOrder) + ' qty: ' + amountToTrade,
+                )
+                let result = Game.market.deal(
+                    bestEnergySellOrder.orderId,
+                    amountToTrade,
+                    this.room.name,
+                )
                 if (result != 0) console.log(result)
             }
         }
@@ -1245,7 +1388,8 @@ export class TerminalManager {
     }
 
     buyAt(resource: ResourceConstant, price: number, energyPrice: number) {
-        let amountOnHand = (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
+        let amountOnHand =
+            (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
         let targetAmount = 10000
         let epislon = Math.ceil(targetAmount / 10)
 
@@ -1258,7 +1402,10 @@ export class TerminalManager {
             amountToBuy += epislon
 
             //Don't run the terminal out of energy.
-            amountToBuy = Math.min(amountToBuy, Math.floor(this.terminal.store[RESOURCE_ENERGY] / 2))
+            amountToBuy = Math.min(
+                amountToBuy,
+                Math.floor(this.terminal.store[RESOURCE_ENERGY] / 2),
+            )
 
             let rate = 1
 
@@ -1315,14 +1462,19 @@ export class TerminalManager {
         return false
     }
 
-    extendSellOrders(sellTarget: { resource: ResourceConstant; sellPast: number; orderSize: number }[]) {
+    extendSellOrders(
+        sellTarget: { resource: ResourceConstant; sellPast: number; orderSize: number }[],
+    ) {
         for (let thisTarget of sellTarget) {
             let resource = thisTarget.resource
             //Keep the sales order up.  The trader will deal with loading it every now and then.
             let sellOrder = _.head(
                 _.filter(
                     _.values(Game.market.orders) as Order[],
-                    ord => ord.resourceType == resource && ord.roomName == this.room.name && ord.type == ORDER_SELL,
+                    ord =>
+                        ord.resourceType == resource &&
+                        ord.roomName == this.room.name &&
+                        ord.type == ORDER_SELL,
                 ),
             )
             if (!sellOrder) continue
@@ -1330,9 +1482,14 @@ export class TerminalManager {
             let totalBetweenStorageAndTerminal =
                 (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
 
-            let targetOrderSize = Math.min(totalBetweenStorageAndTerminal - thisTarget.sellPast, thisTarget.orderSize)
+            let targetOrderSize = Math.min(
+                totalBetweenStorageAndTerminal - thisTarget.sellPast,
+                thisTarget.orderSize,
+            )
 
-            let amountToAdjust = Math.min(targetOrderSize, totalBetweenStorageAndTerminal) - sellOrder.remainingAmount
+            let amountToAdjust =
+                Math.min(targetOrderSize, totalBetweenStorageAndTerminal) -
+                sellOrder.remainingAmount
             if (amountToAdjust > 0) {
                 let result = Game.market.extendOrder(sellOrder.id, amountToAdjust)
                 if (result != OK) {
@@ -1351,11 +1508,19 @@ export class TerminalManager {
     }
 
     extendBuyOrders(
-        purchaseTarget: { resource: ResourceConstant; valuePrice: number; orderSize: number; targetAmount: number }[],
+        purchaseTarget: {
+            resource: ResourceConstant
+            valuePrice: number
+            orderSize: number
+            targetAmount: number
+        }[],
     ) {
         for (let thisTarget of purchaseTarget) {
             let targetOrderPrice = thisTarget.valuePrice
-            let result = _.min(this.dataCache[ORDER_BUY][thisTarget.resource], ord => -ord.price) as Order | number
+            let result = _.min(
+                this.dataCache[ORDER_BUY][thisTarget.resource],
+                ord => -ord.price,
+            ) as Order | number
             let highestOrder = result === Infinity ? null : (result as Order)
             if (highestOrder) targetOrderPrice = Math.min(thisTarget.valuePrice, highestOrder.price)
 
@@ -1412,8 +1577,12 @@ export class TerminalManager {
             }
 
             //Amount to adjust also needs to leave some room in the terminal as well.
-            let amountToAdjust = thisTarget.targetAmount - totalBetweenStorageAndTerminal - buyOrder.remainingAmount
-            amountToAdjust = Math.min(amountToAdjust, thisTarget.orderSize - buyOrder.remainingAmount)
+            let amountToAdjust =
+                thisTarget.targetAmount - totalBetweenStorageAndTerminal - buyOrder.remainingAmount
+            amountToAdjust = Math.min(
+                amountToAdjust,
+                thisTarget.orderSize - buyOrder.remainingAmount,
+            )
 
             //Only do the adjustment if it's more then 5% of the max.  This is to keep down the spam in the transaction history.
             if (amountToAdjust < thisTarget.orderSize * 0.05) continue
@@ -1444,11 +1613,16 @@ export class TerminalManager {
         }
     }
 
-    tryBuyingStuff(resourcesToDirectBuy: ResourceConstant[], energyPrice: number, rateOverride: number) {
+    tryBuyingStuff(
+        resourcesToDirectBuy: ResourceConstant[],
+        energyPrice: number,
+        rateOverride: number,
+    ) {
         for (let resource of resourcesToDirectBuy) {
             let totalBetweenStorageAndTerminal =
                 (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
-            let amountOnHand = (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
+            let amountOnHand =
+                (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
             let targetAmount = 10000
             let epislon = Math.ceil(targetAmount / 10)
 
@@ -1461,7 +1635,10 @@ export class TerminalManager {
                 amountToBuy += epislon
 
                 //Don't run the terminal out of energy.
-                amountToBuy = Math.min(amountToBuy, Math.floor(this.terminal.store[RESOURCE_ENERGY] / 2))
+                amountToBuy = Math.min(
+                    amountToBuy,
+                    Math.floor(this.terminal.store[RESOURCE_ENERGY] / 2),
+                )
 
                 let rate = 1
 
@@ -1472,10 +1649,18 @@ export class TerminalManager {
                 //Exclude the level 0 commodities, because they are things like L and L_bars which behave much more normally.
                 if (
                     (COMMODITIES[
-                        resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY
+                        resource as
+                            | CommodityConstant
+                            | MineralConstant
+                            | RESOURCE_GHODIUM
+                            | RESOURCE_ENERGY
                     ] &&
                         COMMODITIES[
-                            resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY
+                            resource as
+                                | CommodityConstant
+                                | MineralConstant
+                                | RESOURCE_GHODIUM
+                                | RESOURCE_ENERGY
                         ].level > 0) ||
                     //When we're working with commodities, margins are thin, prices are high.
                     resource == RESOURCE_METAL ||
@@ -1542,7 +1727,8 @@ export class TerminalManager {
 
         //Sell off resources we're making for a profit...
         for (let resource of resources) {
-            let amountOnHand = (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
+            let amountOnHand =
+                (this.room.terminal.store[resource] || 0) + (this.room.storage.store[resource] || 0)
 
             let amount = this.room.terminal.store[resource]
 
@@ -1570,7 +1756,11 @@ export class TerminalManager {
             if (amountOnHand > 15000) multiplier = 0.9
 
             //If this is an item with a high margin, we don't care if we're selling it dirt cheap.
-            if (importedResourceCosts[resource] && importedResourceCosts[resource] > bestBuy.adjCost) continue
+            if (
+                importedResourceCosts[resource] &&
+                importedResourceCosts[resource] > bestBuy.adjCost
+            )
+                continue
 
             let avg = this.room.memory[RoomMemoryKeys.marketData].buyAvg[resource]
             if (avg * multiplier > bestBuy.adjCost) {
@@ -1633,11 +1823,15 @@ export class TerminalManager {
     }
 
     dataCache: {
-        [key in ORDER_BUY | ORDER_SELL]?: { [key in ResourceConstant | InterShardResourceConstant]?: Order[] }
+        [key in ORDER_BUY | ORDER_SELL]?: {
+            [key in ResourceConstant | InterShardResourceConstant]?: Order[]
+        }
     }
     buildDataCache(): void {
         const result: {
-            [key in ORDER_BUY | ORDER_SELL]?: { [key in ResourceConstant | InterShardResourceConstant]?: Order[] }
+            [key in ORDER_BUY | ORDER_SELL]?: {
+                [key in ResourceConstant | InterShardResourceConstant]?: Order[]
+            }
         } = { [ORDER_SELL]: {}, [ORDER_BUY]: {} }
 
         for (let resource of [...RESOURCES_ALL, ...INTERSHARD_RESOURCES]) {
@@ -1661,7 +1855,9 @@ export class TerminalManager {
                     remainingAmount: order.remainingAmount,
                     adjCost:
                         order.price /
-                        (1 - Game.market.calcTransactionCost(1000, this.room.name, order.roomName) / 1000),
+                        (1 -
+                            Game.market.calcTransactionCost(1000, this.room.name, order.roomName) /
+                                1000),
                     origPrice: order.price,
                 })),
                 function (o) {
@@ -1677,7 +1873,9 @@ export class TerminalManager {
                     remainingAmount: order.remainingAmount,
                     adjPrice:
                         order.price -
-                        1.4 * (Game.market.calcTransactionCost(1000, this.room.name, order.roomName) / 1000),
+                        1.4 *
+                            (Game.market.calcTransactionCost(1000, this.room.name, order.roomName) /
+                                1000),
                     origPrice: order.price,
                 })),
                 function (o) {
@@ -1688,13 +1886,15 @@ export class TerminalManager {
 
         if (bestSell && bestOrder && Game.time % 10 == 0) {
             let avg = (bestSell.adjCost + bestOrder.adjPrice) / 2
-            if (!this.room.memory[RoomMemoryKeys.marketData]) this.room.memory[RoomMemoryKeys.marketData] = {}
+            if (!this.room.memory[RoomMemoryKeys.marketData])
+                this.room.memory[RoomMemoryKeys.marketData] = {}
 
             if (!this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY]) {
                 this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] = avg
             } else {
                 this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] =
-                    this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] * 0.995 + avg * 0.005
+                    this.room.memory[RoomMemoryKeys.marketData][RESOURCE_ENERGY] * 0.995 +
+                    avg * 0.005
             }
         }
 

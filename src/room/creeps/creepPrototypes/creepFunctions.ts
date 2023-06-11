@@ -1820,14 +1820,19 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     }
 
     if (request[CreepRoomLogisticsRequestKeys.type] === 'transfer') {
-        if (
-            this.transfer(
-                target as AnyStoreStructure | Creep,
-                request[CreepRoomLogisticsRequestKeys.resourceType],
-                request[CreepRoomLogisticsRequestKeys.amount],
-            ) !== OK
+
+        this.room.visual.text('hi', this.pos)
+
+        const result = this.transfer(
+            target as AnyStoreStructure | Creep,
+            request[CreepRoomLogisticsRequestKeys.resourceType],
+            request[CreepRoomLogisticsRequestKeys.amount],
         )
+        if (result !== OK) {
+
+            this.room.visual.text(result.toString(), this.pos)
             return RESULT_FAIL
+        }
 
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
             request[CreepRoomLogisticsRequestKeys.amount]

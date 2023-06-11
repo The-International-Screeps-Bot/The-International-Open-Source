@@ -59,6 +59,7 @@ import {
 import { posix } from 'path'
 import { BasePlans } from './construction/basePlans'
 import { customFindPath } from 'international/customPathFinder'
+import { playerManager } from 'international/players'
 
 /**
     @param pos1 pos of the object performing the action
@@ -447,12 +448,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     let player = Memory.players[playerName]
     if (!player) {
-        player = Memory.players[playerName] = {
-            [PlayerMemoryKeys.offensiveThreat]: 0,
-            [PlayerMemoryKeys.defensiveStrength]: 0,
-            [PlayerMemoryKeys.hate]: 0,
-            [PlayerMemoryKeys.lastAttacked]: Infinity,
-        }
+        player = playerManager.initPlayer(playerName)
     }
 
     // General
@@ -2246,6 +2242,11 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     /* this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
     /* if (args.type === 'transfer') this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
     /* if (args.type === 'offer') {
+
+        this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
+        this.visual.text(args.priority.toString(), args.target.pos)
+    } */
+    /* if (args.type === 'transfer') {
 
         this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
         this.visual.text(args.priority.toString(), args.target.pos)

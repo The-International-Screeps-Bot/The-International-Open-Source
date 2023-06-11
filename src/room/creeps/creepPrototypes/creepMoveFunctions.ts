@@ -848,6 +848,16 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             this.room.visual.text('R', this.pos)
 
+            for (const creep of [this, creepAtPos] as Creep[]) {
+
+                if (creep.role !== 'remoteReserver') continue
+
+                this.room.visual.poly(unpackPosList(creepAtPos.memory[CreepMemoryKeys.path]))
+                break
+            }
+
+            this.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
+
             // Have the creep move to its moveRequest
 
             this.runMoveRequest()
@@ -903,7 +913,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             // Potential culprit for relay bug
 
-            this.room.visual.text('P', this.pos)
+            /* this.room.visual.text('P', this.pos) */
 /*
             for (const creep of [this, creepAtPos] as Creep[]) {
 

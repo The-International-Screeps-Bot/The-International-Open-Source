@@ -281,6 +281,9 @@ export class RemoteHauler extends Creep {
             ],
         )
 
+        this.room.targetVisual(sourceHarvestPos,
+            this.room.roomManager.remoteSources[creepMemory[CreepMemoryKeys.sourceIndex]].pos, true)
+
         // If we're ready to take on a request by the source or we already have one, perform it
 
         const isBySourceHarvestPos = getRange(this.pos, sourceHarvestPos) <= 1

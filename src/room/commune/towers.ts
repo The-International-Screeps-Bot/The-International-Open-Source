@@ -1,10 +1,10 @@
-import { customColors, towerPowers } from 'international/constants'
+import { PlayerMemoryKeys, customColors, towerPowers } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
     estimateTowerDamage,
     findObjectWithID,
-    findRangeFromExit,
+    findWeightedRangeFromExit,
     isXYInBorder,
     randomTick,
     scalePriority,
@@ -82,11 +82,17 @@ export class TowerManager {
                     this.createPowerTasks()
                     continue
                 }
-            } else if (damage * findRangeFromExit(enemyCreep.pos) < enemyCreep.hits) {
-                if (room.towerInferiority) continue
-                room.towerInferiority = true
-                this.createPowerTasks()
-                continue
+            } else {
+
+                const playerMemory = Memory.players[enemyCreep.owner.username]
+                const weight = playerMemory ? playerMemory[PlayerMemoryKeys.rangeFromExitWeight] : 1
+
+                if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) {
+                    if (room.towerInferiority) continue
+                    room.towerInferiority = true
+                    this.createPowerTasks()
+                    continue
+                }
             }
 
             if (damage < highestDamage) continue

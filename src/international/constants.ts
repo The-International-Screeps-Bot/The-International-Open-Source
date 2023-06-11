@@ -19,6 +19,10 @@ export enum PlayerMemoryKeys {
      * The last time we were attacked by them
      */
     lastAttacked,
+    /**
+     * the positive, non-zero value for which to weight enemy exit retreat threat
+     */
+    rangeFromExitWeight,
 }
 
 export enum WorkRequestKeys {

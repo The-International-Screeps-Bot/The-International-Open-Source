@@ -33,6 +33,17 @@ export class PlayerManager {
         }
     }
 
+    initPlayer(playerName: string) {
+
+        return Memory.players[playerName] = {
+            [PlayerMemoryKeys.offensiveThreat]: 0,
+            [PlayerMemoryKeys.defensiveStrength]: 0,
+            [PlayerMemoryKeys.hate]: 0,
+            [PlayerMemoryKeys.lastAttacked]: Infinity,
+            [PlayerMemoryKeys.rangeFromExitWeight]: 1,
+        }
+    }
+
     /**
      * Player names sorted from most hated to least
      */

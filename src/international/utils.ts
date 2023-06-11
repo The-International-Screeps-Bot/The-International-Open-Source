@@ -91,7 +91,8 @@ export function findCoordsInRangeXY(startX: number, startY: number, range: numbe
         for (let y = startY - range; y <= startY + range; y += 1) {
             // Iterate if the pos doesn't map onto a room
 
-            if (startX < 0 || startX >= roomDimensions || startY < 0 || startY >= roomDimensions) continue
+            if (startX < 0 || startX >= roomDimensions || startY < 0 || startY >= roomDimensions)
+                continue
 
             // Otherwise pass the x and y to positions
 
@@ -173,7 +174,9 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
         opts.bgColor
     }; margin-left: ${
         (opts.superPosition ?? 0) * 8
-    }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${opts.textColor};'>${title}:</div>`
+    }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${
+        opts.textColor
+    };'>${title}:</div>`
 
     // Create the content
 
@@ -213,7 +216,10 @@ export function advancedFindDistance(
                 return 50
             }
 
-            if (opts.avoidAbandonedRemotes && roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
+            if (
+                opts.avoidAbandonedRemotes &&
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.remote
+            ) {
                 if (roomMemory[RoomMemoryKeys.abandon]) {
                     return 30
                 }
@@ -286,7 +292,10 @@ export function getRange(coord1: Coord, coord2: Coord) {
 /**
  * Finds the closest object with a position to a given target, by range (Half Manhattan)
  */
-export function findClosestObject<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+export function findClosestObject<T extends _HasRoomPosition>(
+    target: RoomPosition | Coord,
+    objects: T[],
+) {
     let minRange = Infinity
     let closest = undefined
 
@@ -331,7 +340,10 @@ export function findClosestObjectInRange<T extends _HasRoomPosition>(
 /**
  * Finds the closest position to a given target (Half Manhattan)
  */
-export function findClosestCoord(target: RoomPosition | Coord, positions: Coord[]): [Coord, number] {
+export function findClosestCoord(
+    target: RoomPosition | Coord,
+    positions: Coord[],
+): [Coord, number] {
     let minRange = Infinity
     let closestI = 0
 
@@ -383,7 +395,10 @@ export function getRangeEuc(coord1: Coord, coord2: Coord) {
 /**
  * Finds the closest object with a position to a given target (Euclidean)
  */
-export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+export function findClosestObjectEuc<T extends _HasRoomPosition>(
+    target: RoomPosition | Coord,
+    objects: T[],
+) {
     let minRange = Infinity
     let closest = undefined
 
@@ -402,7 +417,10 @@ export function findClosestObjectEuc<T extends _HasRoomPosition>(target: RoomPos
 /**
  * Finds the closest object with a position to a given target (Euclidean)
  */
-export function findFurthestObjectEuc<T extends _HasRoomPosition>(target: RoomPosition | Coord, objects: T[]) {
+export function findFurthestObjectEuc<T extends _HasRoomPosition>(
+    target: RoomPosition | Coord,
+    objects: T[],
+) {
     let maxRange = Infinity
     let furthest = undefined
 
@@ -421,7 +439,10 @@ export function findFurthestObjectEuc<T extends _HasRoomPosition>(target: RoomPo
 /**
  * Finds the closest position to a given target (Euclidean)
  */
-export function findClosestPosEuc<T extends RoomPosition | Coord>(target: RoomPosition | Coord, positions: T[]) {
+export function findClosestPosEuc<T extends RoomPosition | Coord>(
+    target: RoomPosition | Coord,
+    positions: T[],
+) {
     let minRange = Infinity
     let closest = undefined
 
@@ -491,7 +512,11 @@ export function unpackNumAsCoord(packedCoord: number) {
 export function unpackNumAsPos(packedPos: number, roomName: string) {
     // Inform an unpacked RoomPosition
 
-    return new RoomPosition(Math.floor(packedPos / roomDimensions), Math.floor(packedPos % roomDimensions), roomName)
+    return new RoomPosition(
+        Math.floor(packedPos / roomDimensions),
+        Math.floor(packedPos % roomDimensions),
+        roomName,
+    )
 }
 
 export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPos: number) {
@@ -518,7 +543,12 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
  * @param roomName2
  * @returns
  */
-export function findLargestTransactionAmount(budget: number, amount: number, roomName1: string, roomName2: string) {
+export function findLargestTransactionAmount(
+    budget: number,
+    amount: number,
+    roomName1: string,
+    roomName2: string,
+) {
     budget = Math.max(budget, 1)
 
     // So long as the the transactions cost is more than the budget
@@ -545,13 +575,17 @@ export function findClosestCommuneName(roomName: string) {
     }
 
     return communesNotThis.sort(
-        (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
+        (a, b) =>
+            Game.map.getRoomLinearDistance(roomName, a) -
+            Game.map.getRoomLinearDistance(roomName, b),
     )[0]
 }
 
 export function findClosestClaimType(roomName: string) {
     return Array.from(global.communes).sort(
-        (a, b) => Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
+        (a, b) =>
+            Game.map.getRoomLinearDistance(roomName, a) -
+            Game.map.getRoomLinearDistance(roomName, b),
     )[0]
 }
 
@@ -591,7 +625,12 @@ export function isXYExit(x: number, y: number) {
 }
 
 export function isCoordExit(coord: Coord) {
-    return coord.x <= 0 || coord.x >= roomDimensions - 1 || coord.y <= 0 || coord.y >= roomDimensions - 1
+    return (
+        coord.x <= 0 ||
+        coord.x >= roomDimensions - 1 ||
+        coord.y <= 0 ||
+        coord.y >= roomDimensions - 1
+    )
 }
 
 export function randomTick(max: number = 20) {
@@ -617,7 +656,8 @@ export function cleanRoomMemory(roomName: string) {
 
         // Iterate if key is part of this roomType's properties
 
-        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as unknown as keyof RoomMemory)) continue
+        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as unknown as keyof RoomMemory))
+            continue
 
         delete roomMemory[key as unknown as keyof RoomMemory]
     }
@@ -635,7 +675,12 @@ export function isNearRoomEdge(coord: Coord, minRange: number) {
  * Increases priority as a percentage of capacity used
  * @param reverse Decreases priority as a percentage of capacity used
  */
-export function scalePriority(capacity: number, amount: number, multiplier: number = 1, reverse?: boolean) {
+export function scalePriority(
+    capacity: number,
+    amount: number,
+    multiplier: number = 1,
+    reverse?: boolean,
+) {
     if (reverse) {
         return (1 - amount / capacity) * multiplier
     }
@@ -655,7 +700,9 @@ export function makeRoomCoord(roomName: string) {
 }
 
 export function roomNameFromRoomXY(x: number, y: number) {
-    return (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
+    return (
+        (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
+    )
 }
 
 export function roomNameFromRoomCoord(roomCoord: RoomCoord) {
@@ -696,10 +743,12 @@ export function isXYInRoom(x: number, y: number) {
 }
 
 export function isXYInBorder(x: number, y: number, inset: number) {
-    return x > inset && x < roomDimensions - 1 - inset && y > inset && y < roomDimensions - 1 - inset
+    return (
+        x > inset && x < roomDimensions - 1 - inset && y > inset && y < roomDimensions - 1 - inset
+    )
 }
 
-export function roundToDecimals(num: number, decimals: number) {
+export function roundTo(num: number, decimals: number) {
     return parseFloat(num.toFixed(decimals))
 }
 
@@ -711,7 +760,9 @@ export function estimateTowerDamage(coord1: Coord, coord2: Coord) {
     if (range > TOWER_OPTIMAL_RANGE) {
         if (range > TOWER_FALLOFF_RANGE) range = TOWER_FALLOFF_RANGE
 
-        damage -= (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
+        damage -=
+            (damage * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE)) /
+            (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE)
     }
 
     return Math.floor(damage)
@@ -792,6 +843,17 @@ export function findRangeFromExit(coord: Coord) {
 }
 
 /**
+ * Finds the weighted range of a coord from an exit, where the weight effects values
+ */
+export function findWeightedRangeFromExit(coord: Coord, weight: number) {
+    const dx = Math.min(coord.x, roomDimensions - 1 - coord.x)
+    const dy = Math.min(coord.y, roomDimensions - 1 - coord.y)
+    const weightedRange = Math.pow(Math.min(dx, dy), weight)
+
+    return roundTo(weightedRange, 2)
+}
+
+/**
  * @example splitAt('foo, 1), // ["f", "oo"]
  */
 export function splitStringAt(string: string, index: number) {
@@ -850,7 +912,12 @@ export function findDynamicScore(roomName: string) {
             if (!searchRoom) return
 
             const score =
-                Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
+                Math.pow(
+                    Math.abs(
+                        advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
+                    ),
+                    1.5,
+                ) +
                 (maxControllerLevel - searchRoom.controller.level)
             if (score <= communeScore) return
 
@@ -860,7 +927,12 @@ export function findDynamicScore(roomName: string) {
 
         if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.ally) {
             const score =
-                Math.pow(Math.abs(advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange), 1.5) +
+                Math.pow(
+                    Math.abs(
+                        advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
+                    ),
+                    1.5,
+                ) +
                 (searchRoomMemory[RoomMemoryKeys.RCL] || 0) * 0.3
             if (score <= allyScore) return
 

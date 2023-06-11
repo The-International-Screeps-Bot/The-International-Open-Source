@@ -81,6 +81,11 @@ export class SourceHarvester extends Creep {
 
         this.message = `⏩${this.memory[CreepMemoryKeys.sourceIndex]}`
 
+        if (!this.room.memory[RoomMemoryKeys.communeSourcePaths][this.memory[CreepMemoryKeys.sourceIndex]]) {
+
+            throw Error('no path for sourceHarvester ' + this.room.name)
+        }
+
         this.createMoveRequestByPath(
             {
                 origin: this.pos,

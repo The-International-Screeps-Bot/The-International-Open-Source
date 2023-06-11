@@ -12,7 +12,7 @@ import { updateStat } from 'international/statsManager'
 import {
     customLog,
     findObjectWithID,
-    findRangeFromExit,
+    findWeightedRangeFromExit,
     getRange,
     isXYInBorder,
     randomIntRange,
@@ -192,7 +192,13 @@ export class CombatManager {
 
             if (enemyCreep.owner.username === 'Invader') {
                 if (damage <= 0) continue
-            } else if (damage * findRangeFromExit(enemyCreep.pos) < enemyCreep.hits) continue
+            } else {
+
+                const playerMemory = Memory.players[enemyCreep.owner.username]
+                const weight = playerMemory ? playerMemory[PlayerMemoryKeys.rangeFromExitWeight] : 1
+
+                if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) continue
+            }
 
             room.towerAttackTarget = enemyCreep
         }
@@ -273,12 +279,11 @@ export class CombatManager {
             let player = Memory.players[playerName]
 
             if (!player) {
-                player = Memory.players[playerName] = {}
+                player = playerManager.initPlayer(playerName)
             }
 
             player[PlayerMemoryKeys.offensiveThreat] = Math.max(threat, player[PlayerMemoryKeys.offensiveThreat])
             player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
-
             player[PlayerMemoryKeys.lastAttacked] = 0
         }
 
