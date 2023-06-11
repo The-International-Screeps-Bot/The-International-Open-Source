@@ -340,6 +340,10 @@ export class RoomManager {
         return packPosList(path)
     }
 
+    isFirstRoom() {
+        return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
+    }
+
     _anchor: RoomPosition
     get anchor() {
         if (this._anchor !== undefined) return this._anchor

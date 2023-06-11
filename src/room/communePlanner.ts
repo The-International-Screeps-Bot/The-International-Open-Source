@@ -273,10 +273,6 @@ export class CommunePlanner {
         return this._reverseExitFlood
     }
 
-    get isFirstRoom() {
-        return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
-    }
-
     preTickRun() {
         this.room = this.roomManager.room
 
@@ -1966,7 +1962,7 @@ export class CommunePlanner {
 
                         // It's not our first room, have a rampart planned to build the spawn under
 
-                        if (i === 0 && !this.isFirstRoom) {
+                        if (i === 0 && !this.roomManager.isFirstRoom()) {
                             this.setRampartPlansXY(
                                 properCoord.x,
                                 properCoord.y,
