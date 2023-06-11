@@ -28,6 +28,8 @@ import {
     getRangeEucXY,
     getRange,
     isCoordExit,
+    forCoordsAroundRange,
+    forAdjacentCoords,
 } from 'international/utils'
 import {
     packCoord,
@@ -69,7 +71,8 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (pat
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), opts.goals[0].pos)) return true
+    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), opts.goals[0].pos))
+        return true
 
     // If next pos in the path is not in range, inform true
 
@@ -147,7 +150,10 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 }
  */
 
-PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (opts, pathOpts) {
+PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (
+    opts,
+    pathOpts,
+) {
     // Stop if the we know the creep won't move
 
     if (this.moveRequest) return RESULT_NO_ACTION
@@ -173,13 +179,19 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (Memory.roomVisuals) {
         this.room.targetVisual(this.pos, opts.goals[0].pos, true)
 
-        this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
+        this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
+            font: 0.4,
+        })
         this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y + 0.5)
     }
 
     this.room.visual.text((posIndex || -1).toString(), this.pos)
 
-    if (!isOnLastPos && posIndex !== -1 && this.memory[CreepMemoryKeys.usedPathForGoal] !== packedGoalPos) {
+    if (
+        !isOnLastPos &&
+        posIndex !== -1 &&
+        this.memory[CreepMemoryKeys.usedPathForGoal] !== packedGoalPos
+    ) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const path = unpackPosList(packedPath)
 
@@ -441,73 +453,64 @@ PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = fun
         : (room.moveRequests[packedCoord] = [this.name])
 }
 
-PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function (avoidPackedCoords, targetCoord) {
+PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function (
+    avoidPackedCoords,
+    targetCoord,
+) {
     const { room } = this
-
-    const { x } = this.pos
-    const { y } = this.pos
-
-    const adjacentPackedCoords = [
-        packXYAsCoord(x - 1, y - 1),
-        packXYAsCoord(x - 1, y),
-        packXYAsCoord(x - 1, y + 1),
-        packXYAsCoord(x, y - 1),
-        packXYAsCoord(x, y + 1),
-        packXYAsCoord(x + 1, y - 1),
-        packXYAsCoord(x + 1, y + 1),
-        packXYAsCoord(x + 1, y - 1),
-    ]
+    const terrain = room.getTerrain()
 
     let shoveCoord: Coord
     let lowestScore = Infinity
 
-    const terrain = room.getTerrain()
-
-    for (let index = 0; index < adjacentPackedCoords.length; index++) {
-        const packedCoord = adjacentPackedCoords[index]
+    forAdjacentCoords(this.pos, coord => {
+        const packedCoord = packCoord(coord)
 
         const creepAtPosName = room.creepPositions[packedCoord]
         if (creepAtPosName) {
             const creepAtPos = Game.creeps[creepAtPosName]
-            if (creepAtPos.fatigue > 0) continue
-            if (creepAtPos.moved) continue
-            if (creepAtPos.moveRequest) continue
-            if (!this.getActiveBodyparts(MOVE)) continue
+            if (creepAtPos.fatigue > 0) return
+            if (creepAtPos.moved) return
+            if (creepAtPos.moveRequest) return
+            if (!this.getActiveBodyparts(MOVE)) return
         }
 
         /*
         if (room.creepPositions[packedCoord]) continue
         if (room.powerCreepPositions[packedCoord]) continue
  */
-        if (avoidPackedCoords.has(packedCoord)) continue
+        if (avoidPackedCoords.has(packedCoord)) return
 
-        const coord = unpackCoord(packedCoord)
-        if (isCoordExit(coord)) continue
+        if (isCoordExit(coord)) return
 
         const terrainType = terrain.get(coord.x, coord.y)
-        if (terrainType === TERRAIN_MASK_WALL) continue
+        if (terrainType === TERRAIN_MASK_WALL) return
 
         let score: number
         if (targetCoord) {
             score = getRangeEuc(coord, targetCoord)
             if (terrainType === TERRAIN_MASK_SWAMP) score += 1
-            if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord]) score += 1
+            if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord])
+                score += 1
 
             if (Memory.roomVisuals) this.room.visual.text(score.toString(), coord.x, coord.y)
-            if (score >= lowestScore) continue
+            if (score >= lowestScore) return
         }
 
         // If the coord isn't safe to stand on
 
-        if (room.enemyThreatCoords.has(packedCoord)) continue
+        if (room.enemyThreatCoords.has(packedCoord)) return
 
-        if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue
+        if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) return
 
         if (
             this.memory[CreepMemoryKeys.rampartOnlyShoving] &&
-            !room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART)
+            !room.findStructureAtCoord(
+                coord,
+                structure => structure.structureType === STRUCTURE_RAMPART,
+            )
         )
-            continue
+        return
 
         let hasImpassibleStructure
 
@@ -520,18 +523,11 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
             }
         }
 
-        if (hasImpassibleStructure) continue
+        if (hasImpassibleStructure) return
 
-        if (targetCoord) {
-            lowestScore = score
-            shoveCoord = coord
-            continue
-        }
-
-        // There is no goalCoord, use this coord
-
-        return shoveCoord
-    }
+        lowestScore = score
+        shoveCoord = coord
+    })
 
     return shoveCoord
 }
@@ -549,7 +545,8 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (avoidPackedCoords
     if (!shoveCoord) return false
 
     const packedShoveCoord = packCoord(shoveCoord)
-    const creepAtPosName = room.creepPositions[packedShoveCoord] || room.powerCreepPositions[packedShoveCoord]
+    const creepAtPosName =
+        room.creepPositions[packedShoveCoord] || room.powerCreepPositions[packedShoveCoord]
 
     // If there is a creep make sure we aren't overlapping with other shoves
 
@@ -602,7 +599,8 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     if (!room.moveRequests[this.moveRequest]) return false
 
-    if (this.move(this.pos.getDirectionTo(unpackCoordAsPos(this.moveRequest, room.name))) !== OK) return false
+    if (this.move(this.pos.getDirectionTo(unpackCoordAsPos(this.moveRequest, room.name))) !== OK)
+        return false
 
     this.room.roomManager.runMoveRequestOrder += 1
 
@@ -632,7 +630,9 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
     return true
 }
 
-PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = function (queue = []) {
+PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = function (
+    queue = [],
+) {
     const { room } = this
 
     if (!this.moveRequest) return
@@ -647,7 +647,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
     // Try to find the name of the creep at pos
 
-    const creepNameAtPos = room.creepPositions[this.moveRequest] || room.powerCreepPositions[this.moveRequest]
+    const creepNameAtPos =
+        room.creepPositions[this.moveRequest] || room.powerCreepPositions[this.moveRequest]
 
     // If there is no creep at the pos
 
@@ -706,7 +707,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // if creepAtPos is fatigued it is useless to us
 
     if ((creepAtPos as Creep).fatigue > 0) {
-
         delete room.moveRequests[this.moved]
         delete this.moveRequest
         return
@@ -715,7 +715,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // We're spawning, just get us space to move into
 
     if (this.spawning) {
-
         if (Memory.roomVisuals) {
             const moved = unpackCoord(this.moveRequest)
 
@@ -726,6 +725,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         }
 
         if (creepAtPos.shove(new Set([packedCoord]))) {
+            this.room.errorVisual(unpackCoord(this.moveRequest))
+
             this.moved = this.moveRequest
             delete room.moveRequests[this.moved]
             delete this.moveRequest
@@ -748,11 +749,15 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 return
             }
 
-            if (!this.isOnExit && (
-                this.memory[CreepMemoryKeys.remote] !== creepAtPos.memory[CreepMemoryKeys.remote] ||
-                this.memory[CreepMemoryKeys.sourceIndex] !== creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
-                TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
+            if (
+                !this.isOnExit &&
+                (this.memory[CreepMemoryKeys.remote] !==
+                    creepAtPos.memory[CreepMemoryKeys.remote] ||
+                    this.memory[CreepMemoryKeys.sourceIndex] !==
+                        creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
+                    TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
+                        TrafficPriorities[creepAtPos.role] +
+                            (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
             ) {
                 // Have the creep move to its moveRequest
 
@@ -793,10 +798,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         // Otherwise, loop through each index of the queue
 
         for (let index = queue.length - 1; index >= 0; index--) {
-
             // Have the creep run its moveRequest
 
-            (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+            ;(Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
         }
 
         // loop through each index of the queue, drawing visuals
@@ -850,7 +854,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             this.room.visual.text('R', this.pos)
 
             for (const creep of [this, creepAtPos] as Creep[]) {
-
                 if (creep.role !== 'remoteReserver') continue
 
                 this.room.visual.poly(unpackPosList(creepAtPos.memory[CreepMemoryKeys.path]))
@@ -900,9 +903,10 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         // Swap if creep has higher priority than creepAtPos
 
         if (
-            !this.isOnExit && (creepAtPos instanceof PowerCreep ||
-            TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
-                TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
+            !this.isOnExit &&
+            (creepAtPos instanceof PowerCreep ||
+                TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
+                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -915,7 +919,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             // Potential culprit for relay bug
 
             /* this.room.visual.text('P', this.pos) */
-/*
+            /*
             for (const creep of [this, creepAtPos] as Creep[]) {
 
                 if (creep.role !== 'remoteReserver') continue
