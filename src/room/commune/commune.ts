@@ -204,12 +204,6 @@ export class CommuneManager {
         room.spawnRequestsArgs = []
         room.upgradeStrength = 0
         room.mineralHarvestStrength = 0
-        room.roomLogisticsRequests = {
-            transfer: {},
-            withdraw: {},
-            offer: {},
-            pickup: {},
-        }
         room.haulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
         this.estimatedEnergyIncome = 0
@@ -273,6 +267,11 @@ export class CommuneManager {
 
     public run() {
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
+
+        if (this.room.controller.owner.username === 'DefaultO') {
+
+            this.room.controller.unclaim()
+        }
 
         this.combatManager.run()
         this.towerManager.run()
