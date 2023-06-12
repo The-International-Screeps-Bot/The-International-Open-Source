@@ -268,11 +268,6 @@ export class CommuneManager {
     public run() {
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
-        if (this.room.controller.owner.username === 'DefaultO') {
-
-            this.room.controller.unclaim()
-        }
-
         this.combatManager.run()
         this.towerManager.run()
         this.combatManager.manageThreat()
