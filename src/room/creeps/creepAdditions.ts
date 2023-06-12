@@ -16,7 +16,7 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._nameData) return this._nameData
 
-            return (this._nameData = creepFunctions.expandDecryptedName(this.name))
+            return (this._nameData = creepFunctions.expandName(this.name))
         },
     },
     role: {
