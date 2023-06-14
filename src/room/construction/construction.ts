@@ -48,11 +48,12 @@ export class ConstructionManager {
 
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
         // If it's not our first room, wait until RCL 2 before begining construction efforts
-        if (this.room.controller.level < 2 && !this.room.roomManager.isStartRoom()) return
+        if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
 
         /* this.visualize() */
 
         if (this.clearEnemyStructures() === RESULT_ACTION) return
+
         this.place()
         this.migrate()
     }
@@ -63,7 +64,7 @@ export class ConstructionManager {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
         }
         // If there are no builders, just run every few ticks
-        /* else if (this.lastRun && this.lastRun + randomIntRange(20, 100) > Game.time) return */
+        else if (this.room.controller.level !== 1 && this.lastRun && this.lastRun + randomIntRange(20, 100) > Game.time) return
 
         this.lastRun = Game.time
 

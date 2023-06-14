@@ -688,12 +688,12 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             }
         }
 
-        // Otherwise, loop through each index of the queue
+        // Have each member of the queue run its moveRequest
 
-        for (let index = queue.length - 1; index >= 0; index--)
-            // Have the creep run its moveRequesat
+        for (let index = queue.length - 1; index >= 0; index--) {
 
             (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+        }
 
         return
     }
@@ -749,8 +749,10 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 return
             }
 
+            // Don't allow swapping in the wait queue if we are in a commune
+
             if (
-                !this.isOnExit &&
+                Memory.rooms[this.room.name][RoomMemoryKeys.type] !== RoomTypes.commune &&
                 (this.memory[CreepMemoryKeys.remote] !==
                     creepAtPos.memory[CreepMemoryKeys.remote] ||
                     this.memory[CreepMemoryKeys.sourceIndex] !==
@@ -840,7 +842,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
 
-        // If the creep's pos and the creepAtPos's moveRequests are aligned
+        // If the creepAtPos wants to move to creep
 
         if (packedCoord === creepAtPos.moveRequest) {
             if (Memory.roomVisuals)
