@@ -13,6 +13,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from './constants'
+import { internationalManager } from './international'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -929,7 +930,13 @@ export function findDynamicScore(roomName: string) {
     dynamicScore += Math.round(communeScore * 5)
     dynamicScore += allyScore
 
+    // Prefer minerals with below average communes
+
     const roomMemory = Memory.rooms[roomName]
+    const mineralType = roomMemory[RoomMemoryKeys.mineralType]
+    const mineralScore = internationalManager.mineralCommunes[mineralType] - internationalManager.avgCommunesPerMineral
+    dynamicScore += mineralScore * 40
+
     roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
     roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 }

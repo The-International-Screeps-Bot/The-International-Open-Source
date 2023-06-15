@@ -1,4 +1,4 @@
-import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomRange, randomTick } from './utils'
+import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomRange, randomTick, roundTo } from './utils'
 
 import {
     cacheAmountModifier,
@@ -34,9 +34,9 @@ export class InternationalManager {
     terminalCommunes: string[]
 
     /**
-     * The number of minerals in communes
+     * The aggregate number of each mineral in our communes
      */
-    mineralCommunes: { [key in MineralConstant]: number }
+    mineralCommunes: Partial<{ [key in MineralConstant]: number }>
 
     /**
      * Updates values to be present for this tick
@@ -51,6 +51,10 @@ export class InternationalManager {
         this.tickID = 0
         this.customCreepIDs = []
         this.customCreepIDIndex = 0
+        this.mineralCommunes = {}
+        for (const mineralType of MINERALS) {
+            this.mineralCommunes[mineralType] = 0
+        }
 
         delete this._myOrders
         delete this._orders
@@ -60,7 +64,6 @@ export class InternationalManager {
         delete this.internationalDataVisuals
 
         if (randomTick()) {
-            delete this._mineralPriority
             delete this._funnelOrder
             delete this._minCredits
             delete this._resourcesInStoringStructures
@@ -399,24 +402,17 @@ export class InternationalManager {
         return (this._maxCommunes = Math.round(Game.cpu.limit / 10))
     }
 
-    /**
-     * The priority for claiming new rooms, for each mineral
-     */
-    _mineralPriority: Partial<{ [key in MineralConstant]: number }>
+    _avgCommunesPerMineral: number
+    get avgCommunesPerMineral() {
+        let sum = 0
 
-    /**
-     * The priority for claiming new rooms, for each mineral
-     */
-    get mineralPriority() {
-        if (this._mineralPriority) return this._mineralPriority
+        for (const mineralType in this.mineralCommunes) {
 
-        this._mineralPriority = {}
-
-        for (const resource of MINERALS) {
-            this._mineralPriority[resource] = this.mineralCommunes[resource]
+            sum += this.mineralCommunes[mineralType as MineralConstant]
         }
 
-        return this._mineralPriority
+        const avg = roundTo(sum / MINERALS.length, 2)
+        return this._avgCommunesPerMineral = avg
     }
 
     _compoundPriority: Partial<{ [key in MineralCompoundConstant]: number }>

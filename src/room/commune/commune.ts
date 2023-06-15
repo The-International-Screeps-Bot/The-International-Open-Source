@@ -246,6 +246,8 @@ export class CommuneManager {
 
         if (room.terminal && room.controller.level >= 6)
             internationalManager.terminalCommunes.push(room.name)
+
+        internationalManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
     }
 
     preTickRun() {

@@ -191,6 +191,7 @@ export enum RoomMemoryKeys {
     basePlans,
     rampartPlans,
     mineral,
+    mineralType,
     score,
     dynamicScore,
     dynamicScoreUpdate,

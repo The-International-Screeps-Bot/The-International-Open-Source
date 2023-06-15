@@ -1990,6 +1990,7 @@ declare global {
         [RoomMemoryKeys.basePlans]: string
         [RoomMemoryKeys.rampartPlans]: string
         [RoomMemoryKeys.mineral]: Id<Mineral>
+        [RoomMemoryKeys.mineralType]: MineralConstant
         [RoomMemoryKeys.score]: number
         [RoomMemoryKeys.dynamicScore]: number
         [RoomMemoryKeys.dynamicScoreUpdate]: number
