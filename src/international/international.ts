@@ -447,7 +447,9 @@ export class InternationalManager {
             const room = Game.rooms[roomName]
             if (!room.terminal) continue
 
-            const controller = room.controller
+            const { controller } = room
+            if (!communesByLevel[controller.level]) continue
+
             communesByLevel[controller.level].push([
                 roomName,
                 controller.progressTotal / controller.progress,
