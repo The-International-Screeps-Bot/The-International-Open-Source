@@ -35,7 +35,6 @@ export class RemoteCoreAttacker extends Creep {
     }
 
     assignRemote?() {
-
         if (this.isDying()) return
 
         const role = this.role as 'remoteCoreAttacker'
@@ -64,7 +63,6 @@ export class RemoteCoreAttacker extends Creep {
             remoteMemory[RoomMemoryKeys.commune] !== this.commune.name ||
             remoteMemory[RoomMemoryKeys.abandon]
         ) {
-
             this.removeRemote()
             return false
         }
@@ -73,10 +71,11 @@ export class RemoteCoreAttacker extends Creep {
     }
 
     removeRemote?() {
-
         const creepMemory = Memory.creeps[this.name]
 
-        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys[this.role as 'remoteCoreAttacker']] += 1
+        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
+            RoomMemoryKeys[this.role as 'remoteCoreAttacker']
+        ] += 1
         delete creepMemory[CreepMemoryKeys.remote]
     }
 
@@ -121,7 +120,6 @@ export class RemoteCoreAttacker extends Creep {
         // If there are no cores
 
         if (!room.roomManager.structures.invaderCore.length) {
-
             this.removeRemote()
             return false
         }
@@ -157,8 +155,10 @@ export class RemoteCoreAttacker extends Creep {
             const creep: RemoteCoreAttacker = Game.creeps[creepName]
 
             const creepMemory = Memory.creeps[creep.name]
-            if (creepMemory[CreepMemoryKeys.sleep][0] === 'any' && creepMemory[CreepMemoryKeys.sleep][1] > Game.time) {
-
+            if (
+                creepMemory[CreepMemoryKeys.sleepFor] === 'any' &&
+                creepMemory[CreepMemoryKeys.sleepTime] > Game.time
+            ) {
                 creep.message = '😴'
                 continue
             }
@@ -181,19 +181,21 @@ export class RemoteCoreAttacker extends Creep {
 
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
-                if (creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: anchor,
-                            range: 4,
-                        },
-                    ],
-                    typeWeights: remoteTypeWeights,
-                    avoidAbandonedRemotes: true,
-                }) === RESULT_FAIL) {
-
-                    creepMemory[CreepMemoryKeys.sleep] = ['any', Game.time + randomIntRange(10, 50)]
+                if (
+                    creep.createMoveRequest({
+                        origin: creep.pos,
+                        goals: [
+                            {
+                                pos: anchor,
+                                range: 4,
+                            },
+                        ],
+                        typeWeights: remoteTypeWeights,
+                        avoidAbandonedRemotes: true,
+                    }) === RESULT_FAIL
+                ) {
+                    creepMemory[CreepMemoryKeys.sleepFor] = 'any'
+                    creepMemory[CreepMemoryKeys.sleepTime] = Game.time + randomIntRange(10, 50)
                 }
 
                 continue
@@ -223,8 +225,9 @@ export class RemoteCoreAttacker extends Creep {
                     avoidAbandonedRemotes: true,
                 }) === RESULT_FAIL
             ) {
-
-                Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][
+                    RoomMemoryKeys.abandon
+                ] = 1500
                 creep.removeRemote()
             }
         }

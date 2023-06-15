@@ -2188,9 +2188,10 @@ declare global {
         [CreepMemoryKeys.flee]: boolean
         [CreepMemoryKeys.squadMoveType]: SquadMoveTypes
         /**
-         * A tuple for commanding to Wait until the designated tick to perform an specified action
+         * A command to wait until the designated tick to perform an specified action
          */
-        [CreepMemoryKeys.sleep]: [SleepFor, number]
+        [CreepMemoryKeys.sleepFor]: SleepFor
+        [CreepMemoryKeys.sleepTime]: number
         /**
          * An ambigious target the creep is after, probably for target locking
          */
