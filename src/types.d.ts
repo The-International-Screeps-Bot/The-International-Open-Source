@@ -2190,7 +2190,7 @@ declare global {
         /**
          * A tuple for commanding to Wait until the designated tick to perform an specified action
          */
-        [CreepMemoryKeys.sleep]: [number, SleepFor]
+        [CreepMemoryKeys.sleep]: [SleepFor, number]
         /**
          * An ambigious target the creep is after, probably for target locking
          */

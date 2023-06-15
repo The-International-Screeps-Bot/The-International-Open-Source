@@ -3,6 +3,7 @@ import {
     customColors,
     packedPosLength,
     relayOffsets,
+    RESULT_FAIL,
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
@@ -15,6 +16,7 @@ import {
     getRangeXY,
     getRange,
     randomTick,
+    randomIntRange,
 } from 'international/utils'
 import { indexOf } from 'lodash'
 import { packCoord, reversePosList, unpackCoord, unpackPos, unpackPosAt } from 'other/codec'
@@ -153,11 +155,30 @@ export class RemoteHauler extends Creep {
  */
 
     getResources?() {
+
         // Try to find a remote
 
         if (!this.findRemote()) {
             this.message = '❌ Remote'
-            this.room.visual.text('❌', this.pos)
+
+            if (this.room.name !== this.commune.name) {
+
+                const anchor = this.commune.roomManager.anchor
+                if (!anchor) throw Error('no anchor for remoteHarvester')
+
+                if (this.createMoveRequest({
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: anchor,
+                            range: 25,
+                        },
+                    ],
+                }) === RESULT_FAIL) {
+
+                    Memory.creeps[this.name][CreepMemoryKeys.sleep] = ['any', Game.time + randomIntRange(10, 50)]
+                }
+            }
 
             // If the room is the creep's commune
             /*
@@ -623,6 +644,15 @@ export class RemoteHauler extends Creep {
         }
         if (this.ticksToLive <= returnTripTime) this.room.visual.text('🕒', this.pos)
          */
+
+        const creepMemory = Memory.creeps[this.name]
+
+        if (creepMemory[CreepMemoryKeys.sleep][0] === 'any' && creepMemory[CreepMemoryKeys.sleep][1] > Game.time) {
+
+            this.message = '😴'
+            return
+        }
+
         if (this.needsResources() /*  && this.ticksToLive > returnTripTime */) {
             this.getResources()
             return

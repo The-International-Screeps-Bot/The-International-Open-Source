@@ -157,7 +157,7 @@ export class RemoteCoreAttacker extends Creep {
             const creep: RemoteCoreAttacker = Game.creeps[creepName]
 
             const creepMemory = Memory.creeps[creep.name]
-            if (creepMemory[CreepMemoryKeys.sleep][1] === 'any' && creepMemory[CreepMemoryKeys.sleep][0] > Game.time) {
+            if (creepMemory[CreepMemoryKeys.sleep][0] === 'any' && creepMemory[CreepMemoryKeys.sleep][1] > Game.time) {
 
                 creep.message = '😴'
                 continue
@@ -193,7 +193,7 @@ export class RemoteCoreAttacker extends Creep {
                     avoidAbandonedRemotes: true,
                 }) === RESULT_FAIL) {
 
-                    creepMemory[CreepMemoryKeys.sleep] = [Game.time + randomIntRange(10, 50), 'any']
+                    creepMemory[CreepMemoryKeys.sleep] = ['any', Game.time + randomIntRange(10, 50)]
                 }
 
                 continue

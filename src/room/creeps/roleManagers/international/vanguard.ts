@@ -78,28 +78,30 @@ export class Vanguard extends Creep {
         return true
     }
 
-    repairRampart?() {
+    findRampartTarget?() {
+
         const creepMemory = Memory.creeps[this.name]
         if (creepMemory[CreepMemoryKeys.targetID]) {
 
             const rampartTarget = Game.getObjectById(creepMemory[CreepMemoryKeys.targetID]) as StructureRampart
             if (rampartTarget && rampartTarget instanceof StructureRampart) {
 
-                this.repair(rampartTarget)
-
-                if (this.store.energy - this.parts.work * REPAIR_POWER * REPAIR_COST <= 0) {
-                    delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
-                }
-
-                return true
+                return rampartTarget
             }
         }
 
         const rampartTarget = this.room.roomManager.structures.rampart.find(
             rampart => rampart.hits < 20000,
         )
+
+        return rampartTarget
+    }
+
+    repairRampart?() {
+        const rampartTarget = this.findRampartTarget()
         if (!rampartTarget) return false
 
+        const creepMemory = Memory.creeps[this.name]
         creepMemory[CreepMemoryKeys.targetID] = rampartTarget.id
 
         if (getRange(this.pos, rampartTarget.pos) > 3) {
@@ -114,7 +116,7 @@ export class Vanguard extends Creep {
         this.repair(rampartTarget)
 
         if (this.store.energy - this.parts.work * REPAIR_POWER * REPAIR_COST <= 0) {
-            delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
+            delete creepMemory[CreepMemoryKeys.targetID]
         }
         return true
     }
