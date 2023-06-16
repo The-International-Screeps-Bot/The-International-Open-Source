@@ -117,6 +117,8 @@ export class RemoteHarvester extends Creep {
 
         delete creepMemory[CreepMemoryKeys.packedCoord]
 
+        if (this.store.energy) this.drop(RESOURCE_ENERGY, this.store.energy)
+
         if (this.isDying()) return
 
         this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].push(this.name)

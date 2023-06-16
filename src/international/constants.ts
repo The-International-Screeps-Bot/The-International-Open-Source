@@ -809,7 +809,7 @@ export const stamps: Record<StampTypes, Stamp> = {
 }
 export const stampKeys = Object.keys(stamps) as StampTypes[]
 
-export const minerals: Partial<ResourceConstant[]> = [
+export const minerals: Partial<MineralConstant[]> = [
     RESOURCE_HYDROGEN,
     RESOURCE_OXYGEN,
     RESOURCE_UTRIUM,

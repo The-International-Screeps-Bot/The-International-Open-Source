@@ -8,6 +8,7 @@ import {
     customColors,
     roomDimensions,
     RoomMemoryKeys,
+    minerals,
 } from './constants'
 
 /**
@@ -52,7 +53,7 @@ export class InternationalManager {
         this.customCreepIDs = []
         this.customCreepIDIndex = 0
         this.mineralCommunes = {}
-        for (const mineralType of MINERALS) {
+        for (const mineralType of minerals) {
             this.mineralCommunes[mineralType] = 0
         }
 
@@ -411,7 +412,7 @@ export class InternationalManager {
             sum += this.mineralCommunes[mineralType as MineralConstant]
         }
 
-        const avg = roundTo(sum / MINERALS.length, 2)
+        const avg = roundTo(sum / minerals.length, 2)
         return this._avgCommunesPerMineral = avg
     }
 
