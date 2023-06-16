@@ -218,10 +218,10 @@ export class SpawnRequestsManager {
     private hauler() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                const priority = Math.min(
+                const priority = 0/* Math.min(
                     0.5 + this.communeManager.room.creepsFromRoom.hauler.length / 2,
                     this.minRemotePriority - 2,
-                )
+                ) */
 
                 // Construct the required carry parts
 

@@ -8,7 +8,7 @@ export class PlayerManager {
     /**
      * The highest offensive threat of known players
      */
-    highestThreat: number = 0
+    highestThreat: number
 
     constructor() {}
 
