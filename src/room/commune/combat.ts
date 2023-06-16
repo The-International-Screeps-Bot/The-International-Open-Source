@@ -304,7 +304,7 @@ export class CombatManager {
         roomMemory[RoomMemoryKeys.threatened] = Math.max(
             roomMemory[RoomMemoryKeys.threatened],
             this.totalThreat,
-            playerManager.highestThreat / 2,
+            playerManager.highestThreat / 3,
         )
         roomMemory[RoomMemoryKeys.lastAttacked] = 0
 

@@ -721,7 +721,7 @@ export class CommuneManager {
     get needsSecondMincutLayer() {
         return (
             Memory.rooms[this.room.name][RoomMemoryKeys.threatened] >
-            Math.floor(Math.pow(this.room.controller.level, 1.25) * 600)
+            Math.floor(Math.pow(this.room.controller.level * 30, 1.63))
         )
     }
 
