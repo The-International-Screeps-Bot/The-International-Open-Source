@@ -34,7 +34,7 @@ export class SpawnRequestsManager {
     /**
      * The min priority to be placed after active remotes
      */
-    activeRemotePriority = 0
+    activeRemotePriority = this.minRemotePriority
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager

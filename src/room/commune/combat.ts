@@ -93,7 +93,9 @@ export class CombatManager {
 
             if (!(attackTarget instanceof Structure)) continue
 
-            const structuresAtCoord = room.roomManager.structureCoords.get(packCoord(attackTarget.pos))
+            const structuresAtCoord = room.roomManager.structureCoords.get(
+                packCoord(attackTarget.pos),
+            )
             if (
                 structuresAtCoord &&
                 structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)
@@ -146,7 +148,8 @@ export class CombatManager {
 
         // If there are enemyAttackers, privitize all ramparts that are public
 
-        for (const rampart of room.roomManager.structures.rampart) if (rampart.isPublic) rampart.setPublic(false)
+        for (const rampart of room.roomManager.structures.rampart)
+            if (rampart.isPublic) rampart.setPublic(false)
     }
 
     private assignDefenceTargets() {
@@ -156,7 +159,9 @@ export class CombatManager {
 
         // Sort by estimated percent health change
 
-        const defenderEnemyTargetsByDamage = Array.from(room.defenderEnemyTargetsWithDefender.keys()).sort((a, b) => {
+        const defenderEnemyTargetsByDamage = Array.from(
+            room.defenderEnemyTargetsWithDefender.keys(),
+        ).sort((a, b) => {
             const creepA = findObjectWithID(a)
             const creepB = findObjectWithID(b)
 
@@ -188,16 +193,20 @@ export class CombatManager {
             if (room.towerAttackTarget) continue
 
             const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
-            room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, { font: 0.3 })
+            room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, {
+                font: 0.3,
+            })
 
             if (enemyCreep.owner.username === 'Invader') {
                 if (damage <= 0) continue
             } else {
-
-                const playerMemory = Memory.players[enemyCreep.owner.username] || playerManager.initPlayer(enemyCreep.owner.username)
+                const playerMemory =
+                    Memory.players[enemyCreep.owner.username] ||
+                    playerManager.initPlayer(enemyCreep.owner.username)
                 const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
-                if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) continue
+                if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits)
+                    continue
             }
 
             room.towerAttackTarget = enemyCreep
@@ -282,25 +291,27 @@ export class CombatManager {
                 player = playerManager.initPlayer(playerName)
             }
 
-            player[PlayerMemoryKeys.offensiveThreat] = Math.max(threat, player[PlayerMemoryKeys.offensiveThreat])
+            player[PlayerMemoryKeys.offensiveThreat] = Math.max(
+                threat,
+                player[PlayerMemoryKeys.offensiveThreat],
+            )
             player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
             player[PlayerMemoryKeys.lastAttacked] = 0
         }
 
         const roomMemory = Memory.rooms[room.name]
 
-        if (this.totalThreat > 0) {
-            roomMemory[RoomMemoryKeys.threatened] = Math.max(
-                roomMemory[RoomMemoryKeys.threatened],
-                this.totalThreat,
-                playerManager.highestThreat / 2,
-            )
-            roomMemory[RoomMemoryKeys.lastAttacked] = 0
-        }
+        roomMemory[RoomMemoryKeys.threatened] = Math.max(
+            roomMemory[RoomMemoryKeys.threatened],
+            this.totalThreat,
+            playerManager.highestThreat / 2,
+        )
+        roomMemory[RoomMemoryKeys.lastAttacked] = 0
 
         // Reduce attack threat over time
 
-        if (roomMemory[RoomMemoryKeys.threatened] > 0) roomMemory[RoomMemoryKeys.threatened] *= 0.99999
+        if (roomMemory[RoomMemoryKeys.threatened] > 0)
+            roomMemory[RoomMemoryKeys.threatened] *= 0.99999
 
         roomMemory[RoomMemoryKeys.lastAttacked] += 1
     }

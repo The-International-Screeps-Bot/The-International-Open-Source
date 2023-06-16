@@ -242,6 +242,7 @@ export enum RoomMemoryKeys {
     lastStructureCheck,
     roadsQuota,
     roads,
+    remoteSourceCredit,
 
     // Ally
 
@@ -266,7 +267,6 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.remotes,
     RoomMemoryKeys.deposits,
     RoomMemoryKeys.powerBanks,
-    RoomMemoryKeys.communePlanned,
     RoomMemoryKeys.minHaulerCost,
     RoomMemoryKeys.minHaulerCostUpdate,
     RoomMemoryKeys.threatened,
@@ -278,6 +278,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.clearedEnemyStructures,
 
     RoomMemoryKeys.commune,
+    RoomMemoryKeys.remoteSourceCredit,
 
     RoomMemoryKeys.owner,
     RoomMemoryKeys.RCL,
@@ -292,12 +293,11 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.portalsTo,
 ])
 
-export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
+export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     [RoomTypes.commune]: new Set([
         RoomMemoryKeys.remotes,
         RoomMemoryKeys.deposits,
         RoomMemoryKeys.powerBanks,
-        RoomMemoryKeys.communePlanned,
         RoomMemoryKeys.minHaulerCost,
         RoomMemoryKeys.minHaulerCostUpdate,
         RoomMemoryKeys.threatened,
@@ -308,13 +308,15 @@ export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.dynamicScoreUpdate,
         RoomMemoryKeys.clearedEnemyStructures,
     ]),
-    [RoomTypes.remote]: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.remote]: new Set([
+        RoomMemoryKeys.commune,
+        RoomMemoryKeys.remoteSourceCredit,
+    ]),
     [RoomTypes.ally]: new Set([
         RoomMemoryKeys.owner,
         RoomMemoryKeys.RCL,
-        RoomMemoryKeys.communePlanned,
     ]),
-    [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
+    [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.enemy]: new Set([
         RoomMemoryKeys.owner,
         RoomMemoryKeys.RCL,
@@ -322,12 +324,11 @@ export const roomTypes: Record<number, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.towers,
         RoomMemoryKeys.terminal,
         RoomMemoryKeys.energy,
-        RoomMemoryKeys.communePlanned,
         RoomMemoryKeys.offensiveThreat,
         RoomMemoryKeys.defensiveStrength,
     ]),
-    [RoomTypes.enemyRemote]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.communePlanned]),
-    [RoomTypes.neutral]: new Set([RoomMemoryKeys.communePlanned]),
+    [RoomTypes.enemyRemote]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.neutral]: new Set([]),
     [RoomTypes.keeper]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.keeperCenter]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.highway]: new Set([]),

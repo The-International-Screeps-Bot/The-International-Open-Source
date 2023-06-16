@@ -1968,7 +1968,7 @@ declare global {
     // Memory value types
 
     interface RoomMemory {
-        [RoomMemoryKeys.type]: number
+        [RoomMemoryKeys.type]: RoomTypes
         [RoomMemoryKeys.lastScout]: number
 
         // Types specific
@@ -2055,6 +2055,7 @@ declare global {
         [RoomMemoryKeys.lastStructureCheck]: number
         [RoomMemoryKeys.roadsQuota]: number[]
         [RoomMemoryKeys.roads]: number[]
+        [RoomMemoryKeys.remoteSourceCredit]: number[]
 
         // Ally
 
