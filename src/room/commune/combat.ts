@@ -25,7 +25,7 @@ import { CommuneManager } from './commune'
 export class CombatManager {
     communeManager: CommuneManager
 
-    totalThreat: number
+    presentThreat: number
     threatByPlayers: Map<string, number>
 
     constructor(communeManager: CommuneManager) {
@@ -246,8 +246,8 @@ export class CombatManager {
         }
     }
 
-    private calculateThreat() {
-        this.totalThreat = 0
+    private findPresentThreat() {
+        this.presentThreat = 0
         this.threatByPlayers = new Map()
 
         const { room } = this.communeManager
@@ -264,7 +264,7 @@ export class CombatManager {
             threat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
 
             threat = Math.floor(threat)
-            this.totalThreat += threat
+            this.presentThreat += threat
 
             const playerName = enemyCreep.owner.username
             if (playerName === 'Invader') continue
@@ -282,34 +282,40 @@ export class CombatManager {
     manageThreat() {
         const { room } = this.communeManager
 
-        this.calculateThreat()
-
-        for (const [playerName, threat] of this.threatByPlayers) {
-            let player = Memory.players[playerName]
-
-            if (!player) {
-                player = playerManager.initPlayer(playerName)
-            }
-
-            player[PlayerMemoryKeys.offensiveThreat] = Math.max(
-                threat,
-                player[PlayerMemoryKeys.offensiveThreat],
-            )
-            player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
-            player[PlayerMemoryKeys.lastAttacked] = 0
-        }
+        this.findPresentThreat()
 
         const roomMemory = Memory.rooms[room.name]
 
         roomMemory[RoomMemoryKeys.threatened] = Math.max(
             roomMemory[RoomMemoryKeys.threatened],
-            this.totalThreat,
+            this.presentThreat,
             playerManager.highestThreat / 3,
         )
-        roomMemory[RoomMemoryKeys.lastAttacked] = 0
+
+        if (this.presentThreat) {
+
+            for (const [playerName, threat] of this.threatByPlayers) {
+                let player = Memory.players[playerName]
+
+                if (!player) {
+                    player = playerManager.initPlayer(playerName)
+                }
+
+                player[PlayerMemoryKeys.offensiveThreat] = Math.max(
+                    threat,
+                    player[PlayerMemoryKeys.offensiveThreat],
+                )
+                player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
+                player[PlayerMemoryKeys.lastAttacked] = 0
+            }
+
+            roomMemory[RoomMemoryKeys.lastAttacked] = 0
+            return
+        }
+
+        // There is no present threat
 
         // Reduce attack threat over time
-
         if (roomMemory[RoomMemoryKeys.threatened] > 0)
             roomMemory[RoomMemoryKeys.threatened] *= 0.99999
 
