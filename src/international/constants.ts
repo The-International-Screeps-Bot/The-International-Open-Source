@@ -25,6 +25,12 @@ export enum PlayerMemoryKeys {
     rangeFromExitWeight,
 }
 
+export const playerDecayKeys = new Set([
+    PlayerMemoryKeys.offensiveThreat,
+    PlayerMemoryKeys.defensiveStrength,
+    PlayerMemoryKeys.hate,
+])
+
 export enum WorkRequestKeys {
     claimer,
     vanguard,
@@ -308,14 +314,8 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.dynamicScoreUpdate,
         RoomMemoryKeys.clearedEnemyStructures,
     ]),
-    [RoomTypes.remote]: new Set([
-        RoomMemoryKeys.commune,
-        RoomMemoryKeys.remoteSourceCredit,
-    ]),
-    [RoomTypes.ally]: new Set([
-        RoomMemoryKeys.owner,
-        RoomMemoryKeys.RCL,
-    ]),
+    [RoomTypes.remote]: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.remoteSourceCredit]),
+    [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL]),
     [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.enemy]: new Set([
         RoomMemoryKeys.owner,
@@ -1573,3 +1573,4 @@ export const decayCosts: Partial<{ [key in BuildableStructureConstant]: number }
 export const dynamicScoreRoomRange = 8
 export const maxControllerLevel = 8
 export const preferredCommuneRange = 5.5
+export const defaultDataDecay = 0.99999

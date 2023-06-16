@@ -638,6 +638,11 @@ export function randomTick(max: number = 20) {
     return Game.time % Math.floor(Math.random() * max) === 0
 }
 
+export function randomChance(number: number = 10) {
+
+    return Math.floor(Math.random() * number) === number
+}
+
 export function randomRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min)
 }

@@ -1,6 +1,8 @@
 import { isNumber } from 'lodash'
-import { PlayerMemoryKeys } from './constants'
+import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from './constants'
 import { randomTick } from './utils'
+
+const sleepFor = 10
 
 export class PlayerManager {
     /**
@@ -11,16 +13,21 @@ export class PlayerManager {
     constructor() {}
 
     run() {
-        if (randomTick(20)) return
+        if (this.sleeping(sleepFor)) return
 
         this.highestThreat = 0
 
         for (const playerName in Memory.players) {
             const player = Memory.players[playerName]
 
-            // Reduce hate over time
+            // Decay specified values over time
 
-            if (player[PlayerMemoryKeys.hate] > 0) player[PlayerMemoryKeys.hate] *= 0.9999
+            for (const key of playerDecayKeys) {
+
+                if (player[key] < 1) continue
+
+                player[key] *= defaultDataDecay * sleepFor
+            }
 
             // So long as the player has attacked at some pount, record it
 
@@ -64,6 +71,21 @@ export class PlayerManager {
 
     }
  */
+
+    sleepUntil: number
+
+    /**
+     * @param sleepFor the number of ticks to sleep for
+     * @returns Wether we are sleeping or not
+     */
+    private sleeping(sleepFor: number) {
+
+        if (!this.sleepUntil) return true
+        if (Game.time < this.sleepUntil) return true
+
+        this.sleepUntil = Game.time + sleepFor
+        return true
+    }
 }
 
 export const playerManager = new PlayerManager()

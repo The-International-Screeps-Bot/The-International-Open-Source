@@ -1,6 +1,7 @@
 import {
     CombatRequestKeys,
     customColors,
+    defaultDataDecay,
     PlayerMemoryKeys,
     roomDimensions,
     RoomMemoryKeys,
@@ -317,7 +318,7 @@ export class CombatManager {
 
         // Reduce attack threat over time
         if (roomMemory[RoomMemoryKeys.threatened] > 0)
-            roomMemory[RoomMemoryKeys.threatened] *= 0.99999
+            roomMemory[RoomMemoryKeys.threatened] *= defaultDataDecay
 
         roomMemory[RoomMemoryKeys.lastAttacked] += 1
     }
