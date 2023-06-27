@@ -1702,9 +1702,9 @@ declare global {
         spawnID: Id<StructureSpawn>
 
         /**
-         * The key and change to a value the creep opperated this tick
+         * The change to a value the creep opperated this tick
          */
-        dataChange: {[key: string]: number}
+        dataChange: number
 
         // Creep Functions
 

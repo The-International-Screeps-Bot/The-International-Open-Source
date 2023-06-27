@@ -399,6 +399,19 @@ export const roomLogisticsRoles: Set<CreepRoles> = new Set([
     'allyVanguard',
 ])
 
+export const communeCreepRoles: Set<CreepRoles> = new Set([
+    'sourceHarvester',
+    'hauler',
+    'builder',
+    'maintainer',
+    'controllerUpgrader',
+    'hubHauler',
+    'fastFiller',
+    'mineralHarvester',
+    'meleeDefender',
+    'rangedDefender',
+])
+
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
 
 export enum TrafficPriorities {

@@ -12,6 +12,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     Result,
+    communeCreepRoles,
 } from 'international/constants'
 import { customFindPath } from 'international/customPathFinder'
 import { internationalManager } from 'international/international'
@@ -508,7 +509,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
                 structure => structure.structureType === STRUCTURE_RAMPART,
             )
         )
-        return
+            return
 
         let hasImpassibleStructure
 
@@ -689,8 +690,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         // Have each member of the queue run its moveRequest
 
         for (let index = queue.length - 1; index >= 0; index--) {
-
-            (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+            ;(Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
         }
 
         return
@@ -750,7 +750,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             // Don't allow swapping in the wait queue if we are in a commune
 
             if (
-                Memory.rooms[this.room.name][RoomMemoryKeys.type] !== RoomTypes.commune &&
+                (!this.isOnExit || !communeCreepRoles.has(creepAtPos.role)) &&
                 (this.memory[CreepMemoryKeys.remote] !==
                     creepAtPos.memory[CreepMemoryKeys.remote] ||
                     this.memory[CreepMemoryKeys.sourceIndex] !==
@@ -903,7 +903,9 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         // Swap if creep has higher priority than creepAtPos
 
         if (
-            !this.isOnExit &&
+            (!this.isOnExit ||
+                creepAtPos instanceof PowerCreep ||
+                !communeCreepRoles.has(creepAtPos.role)) &&
             (creepAtPos instanceof PowerCreep ||
                 TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
                     TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))

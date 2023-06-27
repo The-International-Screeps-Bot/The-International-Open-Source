@@ -48,24 +48,29 @@ export class RemoteHarvester extends Creep {
 
     preTickManager(): void {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) {
-
             this.suicide()
             return
         }
 
-        if (!this.findRemote()) return
-
         const creepMemory = Memory.creeps[this.name]
-        const remoteName = creepMemory[CreepMemoryKeys.remote]
-        const sourceIndex = creepMemory[CreepMemoryKeys.sourceIndex]
 
-        if (remoteName === this.room.name) {
-            if (!this.isDying()) this.room.creepsOfSource[sourceIndex].push(this.name)
-
-            this.remoteActions()
+        if (!this.hasValidRemote()) {
+            this.removeRemote()
+            return
         }
 
+        // We do have a valid remote
+
         this.applyRemote()
+        // Make sure we are in the remote
+        if (creepMemory[CreepMemoryKeys.remote] !== this.room.name) return
+        if (!this.isDying()) {
+            this.room.creepsOfSource[creepMemory[CreepMemoryKeys.sourceIndex]].push(this.name)
+        }
+
+        this.remoteActions()
+
+        return
     }
 
     hasValidRemote?() {
@@ -144,12 +149,8 @@ export class RemoteHarvester extends Creep {
 
         // We probably need to account for how harvesters can harvest a source fully
 
-        if (
-            remoteMemory[RoomMemoryKeys.hasContainer][sourceIndex]
-        ) {
-
+        if (remoteMemory[RoomMemoryKeys.hasContainer][sourceIndex]) {
             if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] < CONTAINER_CAPACITY) {
-
                 const creditChange = Math.min(
                     Math.min(
                         remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
@@ -162,7 +163,6 @@ export class RemoteHarvester extends Creep {
         }
         // There is no container for the source
         else {
-
             const creditChange = Math.min(
                 Math.min(
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
@@ -185,7 +185,7 @@ export class RemoteHarvester extends Creep {
 
     removeRemote?() {
         const creepMemory = Memory.creeps[this.name]
-
+        /*
         if (!this.isDying()) {
             const remoteName = creepMemory[CreepMemoryKeys.remote]
 
@@ -193,7 +193,7 @@ export class RemoteHarvester extends Creep {
                 this.memory[CreepMemoryKeys.sourceIndex]
             ] -= this.parts.work
         }
-
+ */
         delete creepMemory[CreepMemoryKeys.remote]
         delete creepMemory[CreepMemoryKeys.packedCoord]
     }

@@ -72,6 +72,7 @@ import { towerFunctions } from './commune/towers'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 8
+const towerDistanceWeight = 25
 
 interface PlanStampsArgs {
     stampType: StampTypes
@@ -2474,6 +2475,9 @@ export class CommunePlanner {
             }
         }
 
+        // the controllerStructure would be impassible when the link is built
+        cm.set(this.centerUpgradePos.x, this.centerUpgradePos.y, 255)
+
         const hubAnchor = new RoomPosition(
             this.stampAnchors.hub[0].x,
             this.stampAnchors.hub[0].y,
@@ -3030,13 +3034,24 @@ export class CommunePlanner {
 
             if (minDamage <= this.bestTowerScore) continue
 
-            this.bestTowerScore = minDamage = minDamage
+            this.bestTowerScore = minDamage
             this.bestTowerCoords = towerCoords
         }
 
         // Make sure we plan and path for the best towers first
 
-        this.bestTowerCoords.sort((a, b) => a.minDamage - b.minDamage).reverse()
+        const hubAnchor = this.stampAnchors.hub[0]
+
+        // Weight by distance and damage - prefer closer and higher damage towers to be built first
+
+        this.bestTowerCoords
+            .sort(
+                (a, b) =>
+                    a.minDamage +
+                    getRange(a, hubAnchor) * towerDistanceWeight -
+                    (b.minDamage + getRange(b, hubAnchor) * towerDistanceWeight),
+            )
+            .reverse()
 
         for (const coord of this.bestTowerCoords) {
             this.setBasePlansXY(coord.x, coord.y, STRUCTURE_TOWER)
@@ -3110,7 +3125,7 @@ export class CommunePlanner {
             this.shield(this.sourceHarvestPositions[sourceIndex][0], 4, false)
         }
 
-        // Protect position of
+        // Protect upgrade structure
 
         this.shield(this.centerUpgradePos, 4)
 
@@ -3135,7 +3150,15 @@ export class CommunePlanner {
                 if (this.rampartPlans.getXY(coord.x, coord.y)) continue
 
                 const isProtected = this.unprotectedCoords[packedNumCoord] === 0
-                this.setRampartPlansXY(coord.x, coord.y, data.minRCL, true, isProtected, false, true)
+                this.setRampartPlansXY(
+                    coord.x,
+                    coord.y,
+                    data.minRCL,
+                    true,
+                    isProtected,
+                    false,
+                    true,
+                )
 
                 this.stampAnchors.shieldRampart.push(coord)
                 this.rampartCoords[packedNumCoord] = 1

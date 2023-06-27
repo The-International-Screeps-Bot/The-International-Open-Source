@@ -97,11 +97,9 @@ export class MeleeDefender extends Creep {
             return true
         }
 
-        // Otherwise attack
+        // Try to follow the enemy
 
-        /* this.attack(enemyCreep) */
-
-        if (enemyCreep.canMove) this.assignMoveRequest(enemyCreep.pos)
+        if (enemyCreep.canMove && !enemyCreep.isOnExit) this.assignMoveRequest(enemyCreep.pos)
         return true
     }
 
