@@ -235,6 +235,13 @@ export class RemotesManager {
         for (const remoteName of this.communeManager.room.memory[RoomMemoryKeys.remotes]) {
             const remoteMemory = Memory.rooms[remoteName]
 
+            for (const sourceIndex in remoteMemory[RoomMemoryKeys.remoteSources]) {
+                // If there was no change in credits, move the values closer to 0 by a %
+                if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] <= 0) {
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] *= 0.999
+                }
+            }
+
             if (remoteMemory[RoomMemoryKeys.abandon]) continue
 
             /*
@@ -245,13 +252,6 @@ export class RemotesManager {
             // Loop through each index of sourceEfficacies
 
             for (const sourceIndex in remoteMemory[RoomMemoryKeys.remoteSources]) {
-
-                // If there was no change in credits, move the values closer to 0 by a %
-                if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] <= 0) {
-
-                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] *= .999
-                }
-
                 if (remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] === 0) continue
 
                 const income = Math.min(
