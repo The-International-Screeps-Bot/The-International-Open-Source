@@ -1,4 +1,4 @@
-import { RESULT_ACTION, RESULT_FAIL, RESULT_SUCCESS, RoomMemoryKeys } from 'international/constants'
+import { Result, RoomMemoryKeys } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import { getRangeXY, getRange } from 'international/utils'
 import { reversePosList, unpackPos } from 'other/codec'
@@ -14,7 +14,7 @@ export class MineralHarvester extends Creep {
         // Unpack the creep's packedHarvestPos
 
         const harvestPos = this.findMineralHarvestPos()
-        if (!harvestPos) return RESULT_FAIL
+        if (!harvestPos) return Result.fail
 
         this.actionCoord = this.room.roomManager.mineral.pos
 
@@ -37,12 +37,12 @@ export class MineralHarvester extends Creep {
                 },
             )
 
-            return RESULT_ACTION
+            return Result.action
         }
 
         // Harvest the mineral, informing the result if it didn't succeed
 
-        if (this.harvest(mineral) !== OK) return RESULT_FAIL
+        if (this.harvest(mineral) !== OK) return Result.fail
 
         // Find amount of minerals harvested and record it in data
 
@@ -51,7 +51,7 @@ export class MineralHarvester extends Creep {
         updateStat(this.room.name, 'mh', mineralsHarvested)
 
         this.message = `⛏️${mineralsHarvested}`
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     constructor(creepID: Id<Creep>) {
@@ -71,7 +71,7 @@ export class MineralHarvester extends Creep {
                 continue
             }
 
-            if (creep.advancedHarvestMineral(mineral) !== RESULT_SUCCESS) continue
+            if (creep.advancedHarvestMineral(mineral) !== Result.success) continue
 
             const mineralContainer = room.mineralContainer
             if (mineralContainer && creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()) {

@@ -3,7 +3,7 @@ import {
     customColors,
     packedPosLength,
     relayOffsets,
-    RESULT_FAIL,
+    Result,
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
@@ -33,14 +33,15 @@ export class RemoteHauler extends Creep {
 
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
  */
+        const creepMemory = Memory.creeps[this.name]
 
-        if (this.memory[CreepMemoryKeys.remote]) {
+        if (creepMemory[CreepMemoryKeys.remote]) {
             if (
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
-                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                    Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
                         RoomMemoryKeys.remoteSourcePaths
-                    ][this.memory[CreepMemoryKeys.sourceIndex]].length /
+                    ][creepMemory[CreepMemoryKeys.sourceIndex]].length /
                         packedPosLength
             )
                 return false
@@ -52,6 +53,9 @@ export class RemoteHauler extends Creep {
     }
 
     preTickManager() {
+
+        this.commune.communeManager.haulerCarryParts += this.parts.carry
+
         const creepMemory = Memory.creeps[this.name]
         const remoteName = creepMemory[CreepMemoryKeys.remote]
         if (!remoteName) return
@@ -59,11 +63,8 @@ export class RemoteHauler extends Creep {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
 
         if (!this.findRemote()) return
-        if (this.isDying()) return
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteHaulers][
-            creepMemory[CreepMemoryKeys.sourceIndex]
-        ] -= this.parts.carry
+        this.applyRemote()
     }
 
     hasValidRemote?() {
@@ -91,10 +92,13 @@ export class RemoteHauler extends Creep {
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const remoteMemory = Memory.rooms[remoteName]
 
-            // If there is no need
 
-            if (remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] <= 0) continue
+            // If we have the free space (don't waste it)
+            if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] - remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] < this.freeNextStore) {
 
+                continue
+            }
+            this.room.visual.text((this.freeNextStore + remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex]).toString(), this.pos.x, this.pos.y + 0.5)
             this.assignRemote(remoteName, sourceIndex)
             return true
         }
@@ -103,31 +107,39 @@ export class RemoteHauler extends Creep {
     }
 
     assignRemote?(remoteName: string, sourceIndex: 0 | 1) {
-        this.memory[CreepMemoryKeys.remote] = remoteName
-        this.memory[CreepMemoryKeys.sourceIndex] = sourceIndex
 
+        const creepMemory = Memory.creeps[this.name]
+
+        creepMemory[CreepMemoryKeys.remote] = remoteName
+        creepMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
+
+        this.applyRemote()
+    }
+
+    applyRemote?() {
         if (this.isDying()) return
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteHaulers][
-            this.memory[CreepMemoryKeys.sourceIndex]
-        ] -= this.parts.carry
+        const creepMemory = Memory.creeps[this.name]
+
+        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceCreditReservation][
+            creepMemory[CreepMemoryKeys.sourceIndex]
+        ] += this.freeNextStore
     }
 
     removeRemote?() {
+
+        const creepMemory = Memory.creeps[this.name]
+
         if (
-            !this.isDying &&
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHaulers][
-                this.memory[CreepMemoryKeys.sourceIndex]
-            ]
+            !this.isDying
         ) {
-            ;[RoomMemoryKeys.remoteHaulers][this.memory[CreepMemoryKeys.sourceIndex]]
-            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteHaulers][
-                this.memory[CreepMemoryKeys.sourceIndex]
-            ] += this.parts.carry
+            Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceCreditReservation][
+                creepMemory[CreepMemoryKeys.sourceIndex]
+            ] -= this.freeNextStore
         }
 
-        delete this.memory[CreepMemoryKeys.remote]
-        delete this.memory[CreepMemoryKeys.sourceIndex]
+        delete creepMemory[CreepMemoryKeys.remote]
+        delete creepMemory[CreepMemoryKeys.sourceIndex]
     }
 
     /*
@@ -157,7 +169,6 @@ export class RemoteHauler extends Creep {
  */
 
     getResources?() {
-
         const creepMemory = Memory.creeps[this.name]
 
         // Try to find a remote
@@ -178,7 +189,7 @@ export class RemoteHauler extends Creep {
                                 range: 25,
                             },
                         ],
-                    }) === RESULT_FAIL
+                    }) === Result.fail
                 ) {
                     creepMemory[CreepMemoryKeys.sleepFor] = 'any'
                     creepMemory[CreepMemoryKeys.sleepTime] = Game.time + randomIntRange(10, 50)
@@ -311,6 +322,9 @@ export class RemoteHauler extends Creep {
 
         const isBySourceHarvestPos = getRange(this.pos, sourceHarvestPos) <= 1
         if (isBySourceHarvestPos || creepMemory[CreepMemoryKeys.roomLogisticsRequests].length > 0) {
+
+            const freeNextStoreInitial = this.freeNextStore
+
             this.runRoomLogisticsRequestsAdvanced({
                 types: new Set(['pickup', 'withdraw']),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
@@ -329,6 +343,16 @@ export class RemoteHauler extends Creep {
                     )
                 },
             })
+
+            // remove fulfilled reserved source credit from source credit
+
+            // Should be a negative number, as we should have more used store than before
+            const freeNextStoreDifference = this.freeNextStore - freeNextStoreInitial
+            if (freeNextStoreDifference !== 0) {
+
+                Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceCredit][creepMemory[CreepMemoryKeys.sourceIndex]] += freeNextStoreDifference
+                Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceCreditReservation][creepMemory[CreepMemoryKeys.sourceIndex]] += freeNextStoreDifference
+            }
 
             if (!this.needsResources()) return true
         }
@@ -393,8 +417,10 @@ export class RemoteHauler extends Creep {
                 resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 
+            // We haven't emptied ourselves yet
             if (!this.needsResources()) return true
 
+            this.removeRemote()
             if (!this.findRemote()) return false
 
             this.message += this.memory[CreepMemoryKeys.remote]

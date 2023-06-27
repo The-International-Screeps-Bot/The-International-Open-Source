@@ -11,9 +11,7 @@ import {
     CreepMemoryKeys,
     RoomMemoryKeys,
     RoomTypes,
-    RESULT_NO_ACTION,
-    RESULT_FAIL,
-    RESULT_SUCCESS,
+    Result,
 } from 'international/constants'
 import { customFindPath } from 'international/customPathFinder'
 import { internationalManager } from 'international/international'
@@ -156,12 +154,12 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 ) {
     // Stop if the we know the creep won't move
 
-    if (this.moveRequest) return RESULT_NO_ACTION
-    if (this.moved) return RESULT_NO_ACTION
-    if (this.fatigue > 0) return RESULT_NO_ACTION
+    if (this.moveRequest) return Result.noAction
+    if (this.moved) return Result.noAction
+    if (this.fatigue > 0) return Result.noAction
     if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
         this.moved = 'moved'
-        return RESULT_NO_ACTION
+        return Result.noAction
     }
 
     if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
@@ -205,7 +203,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
             this.memory[CreepMemoryKeys.path] = packedPath
             this.moved = 'moved'
-            return RESULT_SUCCESS
+            return Result.success
         }
 
         // If we have a remote, avoid abandoned remotes
@@ -233,7 +231,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
         this.memory[CreepMemoryKeys.path] = packedPath
         this.assignMoveRequest(path[0])
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     if (isOnLastPos || this.memory[CreepMemoryKeys.usedPathForGoal]) {
@@ -267,12 +265,12 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     // Stop if the we know the creep won't move
 
-    if (this.moveRequest) return RESULT_NO_ACTION
-    if (this.moved) return RESULT_NO_ACTION
-    if (this.fatigue > 0) return RESULT_NO_ACTION
+    if (this.moveRequest) return Result.noAction
+    if (this.moved) return Result.noAction
+    if (this.fatigue > 0) return Result.noAction
     if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
         this.moved = 'moved'
-        return RESULT_NO_ACTION
+        return Result.noAction
     }
     /*
     if (this.spawning) return false
@@ -325,7 +323,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         // Generate a new path
 
         path = customFindPath(opts)
-        if (!path.length && !this.spawning) return RESULT_FAIL
+        if (!path.length && !this.spawning) return Result.fail
 
         // Limit the path's length to the cacheAmount
 
@@ -357,7 +355,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     // Stop if there are no positions left in the path
 
-    if (!path.length && !this.spawning) return RESULT_FAIL
+    if (!path.length && !this.spawning) return Result.fail
 
     // If visuals are enabled, visualize the path
 
@@ -397,7 +395,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         console.log('accessed spawnID', this.name, this.spawnID)
         // Ensure we aren't using the default direction
 
-        if (spawn.spawning.directions) return RESULT_SUCCESS
+        if (spawn.spawning.directions) return Result.success
 
         const adjacentCoords: Coord[] = []
 
@@ -428,18 +426,18 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         }
 
         spawn.spawning.setDirections(directions)
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     if (path[0].roomName !== this.room.name) {
         this.moved = 'moved'
-        return RESULT_SUCCESS
+        return Result.success
     }
     this.assignMoveRequest(path[0])
 
     // Inform success
 
-    return RESULT_SUCCESS
+    return Result.success
 }
 
 PowerCreep.prototype.assignMoveRequest = Creep.prototype.assignMoveRequest = function (coord) {

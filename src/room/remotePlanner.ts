@@ -11,12 +11,9 @@ import {
     stamps,
     TO_EXIT,
     UNWALKABLE,
-    RESULT_SUCCESS,
-    RESULT_FAIL,
+    Result,
     cardinalOffsets,
     adjacentOffsets,
-    RESULT_NO_ACTION,
-    RESULT_ACTION,
     defaultMinCutDepth,
     minOnboardingRamparts,
     defaultSwampCost,
@@ -276,11 +273,11 @@ export class RemotePlanner {
     preTickRun() {
         this.room = this.roomManager.room
 
-        if (this.room.memory[RoomMemoryKeys.communePlanned] !== undefined) return RESULT_NO_ACTION
+        if (this.room.memory[RoomMemoryKeys.communePlanned] !== undefined) return Result.noAction
 
         // Stop if there isn't sufficient CPU
 
-        if (Game.cpu.bucket < CPUMaxPerTick) return RESULT_NO_ACTION
+        if (Game.cpu.bucket < CPUMaxPerTick) return Result.noAction
 
         if (this.recording) this.record()
 
@@ -292,7 +289,7 @@ export class RemotePlanner {
         ) {
             /* this.visualizeBestPlan() */
             this.choosePlan()
-            return RESULT_SUCCESS
+            return Result.success
         }
 
         // Initial configuration
@@ -341,15 +338,15 @@ export class RemotePlanner {
         const unpacked = BasePlans.unpack(packedPlans)
         customLog('UNPACKED', JSON.stringify(unpacked.map))
         delete this.baseCoords
-        return RESULT_NO_ACTION
+        return Result.noAction
  */
         this.avoidSources()
         this.avoidMineral()
-        if (this.fastFiller() === RESULT_FAIL) return RESULT_FAIL
+        if (this.fastFiller() === Result.fail) return Result.fail
         this.postFastFillerConfig()
         this.generateGrid()
         /* this.pruneFastFillerRoads() */
-        if (this.findCenterUpgradePos() === RESULT_FAIL) return RESULT_FAIL
+        if (this.findCenterUpgradePos() === Result.fail) return Result.fail
         this.findSourceHarvestPositions()
         this.hub()
         this.labs()
@@ -375,11 +372,11 @@ export class RemotePlanner {
         this.generalShield()
         this.visualizeCurrentPlan()
         /* this.visualizeCurrentPlan()
-        return RESULT_SUCCESS */
+        return Result.success */
         this.findScore()
         this.record()
 
-        return RESULT_ACTION
+        return Result.action
     }
     /**
      *
@@ -834,7 +831,7 @@ export class RemotePlanner {
     /**
      *
      * @param coord
-     * @returns RESULT_ACTION if the road should be removed
+     * @returns Result.action if the road should be removed
      */
     private fastFillerPruneRoadCoord(coord: Coord) {
         let adjSpawn: boolean
@@ -851,7 +848,7 @@ export class RemotePlanner {
             if (coordData[0].structureType === STRUCTURE_SPAWN) adjSpawn = true
         })
 
-        if (adjSpawn) return RESULT_NO_ACTION
+        if (adjSpawn) return Result.noAction
 
         let cardinalRoads = 0
 
@@ -868,8 +865,8 @@ export class RemotePlanner {
             cardinalRoads += 1
         }
 
-        if (cardinalRoads >= 3) return RESULT_ACTION
-        return RESULT_NO_ACTION
+        if (cardinalRoads >= 3) return Result.action
+        return Result.noAction
     }
     /**
      * Has some issues, is disabled
@@ -890,7 +887,7 @@ export class RemotePlanner {
             const packedCoord = packAsNum(coord)
             if (this.roadCoords[packedCoord] !== 1) continue
 
-            if (this.fastFillerPruneRoadCoord(coord) === RESULT_ACTION) {
+            if (this.fastFillerPruneRoadCoord(coord) === Result.action) {
                 this.roadCoords[packedCoord] = 0
                 continue
             }
@@ -1285,7 +1282,7 @@ export class RemotePlanner {
             }
         })
 
-        if (!bestCoords.size) return RESULT_FAIL
+        if (!bestCoords.size) return Result.fail
 
         const centerUpgradePos = this.room.findClosestPos({
             coordMap: this.roadCoords,
@@ -1295,7 +1292,7 @@ export class RemotePlanner {
             },
         })
 
-        if (!centerUpgradePos) return RESULT_FAIL
+        if (!centerUpgradePos) return Result.fail
 
         const packedCoord = packAsNum(centerUpgradePos)
         this.setBasePlansXY(centerUpgradePos.x, centerUpgradePos.y, STRUCTURE_CONTAINER, 2)
@@ -1311,7 +1308,7 @@ export class RemotePlanner {
         this.baseCoords[packedCoord] = 255
 
         this.centerUpgradePos = centerUpgradePos
-        return RESULT_SUCCESS
+        return Result.success
     }
     private planGridCoords() {
         if (this.plannedGridCoords) return
@@ -1390,7 +1387,7 @@ export class RemotePlanner {
                         conditions: args.conditions,
                         dynamicWeight: args.dynamicWeight,
                     })
-                    if (!stampAnchor) return RESULT_FAIL
+                    if (!stampAnchor) return Result.fail
 
                     args.consequence(stampAnchor)
                     this.stampAnchors[args.stampType].push(stampAnchor)
@@ -1402,7 +1399,7 @@ export class RemotePlanner {
                     startCoords: args.startCoords,
                     conditions: args.conditions,
                 })
-                if (!stampAnchor) return RESULT_FAIL
+                if (!stampAnchor) return Result.fail
 
                 args.consequence(stampAnchor)
                 this.stampAnchors[args.stampType].push(stampAnchor)
@@ -1424,13 +1421,13 @@ export class RemotePlanner {
                 cardinalFlood: args.cardinalFlood,
                 coordMap: distanceCoords,
             })
-            if (!stampAnchor) return RESULT_FAIL
+            if (!stampAnchor) return Result.fail
 
             args.consequence(stampAnchor)
             this.stampAnchors[args.stampType].push(stampAnchor)
         }
 
-        return RESULT_SUCCESS
+        return Result.success
     }
     private findStampAnchor(args: FindStampAnchorArgs) {
         let visitedCoords = new Uint8Array(2500)
@@ -1843,7 +1840,7 @@ export class RemotePlanner {
         return this.fastFillerStartCoords[this.planAttempts.length]
     }
     private fastFiller() {
-        if (this.stampAnchors.fastFiller.length) return RESULT_NO_ACTION
+        if (this.stampAnchors.fastFiller.length) return Result.noAction
 
         for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
             this.baseCoords[packAsNum(coord)] = 255

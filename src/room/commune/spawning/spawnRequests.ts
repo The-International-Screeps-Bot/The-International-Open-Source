@@ -34,7 +34,7 @@ export class SpawnRequestsManager {
     /**
      * The min priority to be placed after active remotes
      */
-    activeRemotePriority = this.minRemotePriority
+    activeRemotePriority: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -43,6 +43,7 @@ export class SpawnRequestsManager {
     run() {
         this.rawSpawnRequestsArgs = []
         this.spawnEnergyCapacity = this.communeManager.room.energyCapacityAvailable
+        this.activeRemotePriority = this.minRemotePriority
 
         this.sourceHarvester()
         this.hauler()
@@ -218,10 +219,7 @@ export class SpawnRequestsManager {
     private hauler() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                const priority = 0/* Math.min(
-                    0.5 + this.communeManager.room.creepsFromRoom.hauler.length / 2,
-                    this.minRemotePriority - 2,
-                ) */
+                const priority = 0.5
 
                 // Construct the required carry parts
 
@@ -1138,7 +1136,8 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'remoteHauler'
 
-                    const partsMultiplier = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
+                    const partsMultiplier = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] - this.communeManager.haulerCarryParts
+                    this.communeManager.haulerCarryParts -= remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
                     this.activeRemotePriority = Math.max(this.activeRemotePriority, harvesterPriority + .1)

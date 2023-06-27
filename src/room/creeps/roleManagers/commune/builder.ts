@@ -1,4 +1,4 @@
-import { RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { Result } from 'international/constants'
 import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class Builder extends Creep {
@@ -17,12 +17,12 @@ export class Builder extends Creep {
         this.room.roomManager.room.createRoomLogisticsRequest({
             target: this,
             type: 'transfer',
-            priority: 8,
+            priority: 100,
         })
     }
 
     run?() {
-        if (this.advancedBuild() === RESULT_FAIL) this.advancedRecycle()
+        if (this.advancedBuild() === Result.fail) this.advancedRecycle()
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {

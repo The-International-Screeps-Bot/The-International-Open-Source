@@ -81,7 +81,7 @@ export class MeleeDefender extends Creep {
     defendWithoutRamparts?(enemyCreeps: Creep[]) {
         // Get the closest enemyAttacker
 
-        const enemyCreep = findClosestObject(this.pos, enemyCreeps)
+        const enemyCreep = findClosestObject(this.pos, enemyCreeps) || findClosestObject(this.pos, this.room.enemyCreeps)
 
         if (Memory.roomVisuals)
             this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })

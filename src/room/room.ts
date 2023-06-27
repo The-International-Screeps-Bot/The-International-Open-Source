@@ -1,6 +1,6 @@
 import {
     CreepMemoryKeys,
-    RESULT_FAIL,
+    Result,
     RoomMemoryKeys,
     RoomTypes,
     adjacentOffsets,
@@ -346,7 +346,7 @@ export class RoomManager {
     }
 
     isStartRoom() {
-        return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
+        return global.communes.size === 1 && this.room.controller.my && this.room.controller.safeMode && global.communes.has(this.room.name)
     }
 
     _anchor: RoomPosition

@@ -81,7 +81,7 @@ import { profiler } from 'other/profiler'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
-import { encode } from 'base32768'
+import { decode, encode } from 'base32768'
 import { BasePlans } from '../construction/basePlans'
 import { internationalManager } from 'international/international'
 import { ConstructionManager } from 'room/construction/construction'
@@ -123,6 +123,11 @@ export class CommuneManager {
      * Organized by remote and sourceIndex
      */
     remoteSourceHarvesters: { [remote: string]: string[][] }
+    /**
+     * The total amount of carry parts for hauler and remoteHaulers
+     */
+    haulerCarryParts: number
+
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
@@ -215,6 +220,7 @@ export class CommuneManager {
         room.usedRampartIDs = new Map()
 
         room.creepsOfRemote = {}
+        this.haulerCarryParts = 0
         this.remoteSourceHarvesters = {}
 
         for (let index = roomMemory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {
@@ -311,6 +317,7 @@ export class CommuneManager {
     }
 
     private preTickTest() {
+
         return
 
         let CPUUsed = Game.cpu.getUsed()

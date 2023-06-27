@@ -1,4 +1,4 @@
-import { RESULT_FAIL, customColors, RESULT_NO_ACTION, RESULT_ACTION, RESULT_SUCCESS, PowerCreepMemoryKeys } from 'international/constants'
+import { Result, customColors, PowerCreepMemoryKeys } from 'international/constants'
 import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class Operator extends PowerCreep {
@@ -31,13 +31,13 @@ export class Operator extends PowerCreep {
     // Basic tasks
 
     runTask?() {
-        if (!this.memory[PowerCreepMemoryKeys.task] && !this.findTask()) return RESULT_FAIL
+        if (!this.memory[PowerCreepMemoryKeys.task] && !this.findTask()) return Result.fail
 
         const taskResult = (this as any)[this.memory[PowerCreepMemoryKeys.task]]()
-        if (!taskResult) return taskResult === RESULT_FAIL
+        if (!taskResult) return taskResult === Result.fail
 
         delete this.memory[PowerCreepMemoryKeys.task]
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     findTask?() {
@@ -58,7 +58,7 @@ export class Operator extends PowerCreep {
 
     advancedRenew?() {
         const powerSpawn = this.room.powerSpawn
-        if (!powerSpawn) return RESULT_FAIL
+        if (!powerSpawn) return Result.fail
 
         const minRange = 1
         if (getRange(this.pos, powerSpawn.pos) > minRange) {
@@ -92,7 +92,7 @@ export class Operator extends PowerCreep {
 
     advancedEnablePower?() {
         const { controller } = this.room
-        if (!controller || controller.isPowerEnabled) return RESULT_NO_ACTION
+        if (!controller || controller.isPowerEnabled) return Result.noAction
 
         const minRange = 1
         if (getRange(this.pos, controller.pos) > minRange) {
@@ -107,11 +107,11 @@ export class Operator extends PowerCreep {
                 avoidEnemyRanges: true,
             })
 
-            return RESULT_ACTION
+            return Result.action
         }
 
         this.enableRoom(controller)
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     findGenerateOpsTask?() {
@@ -142,7 +142,7 @@ export class Operator extends PowerCreep {
         if (this.memory[PowerCreepMemoryKeys.taskTarget]) return findObjectWithID(this.memory[PowerCreepMemoryKeys.taskTarget])
 
         const task = this.findNewBestPowerTask()
-        if (!task) return RESULT_FAIL
+        if (!task) return Result.fail
 
         customLog('FIND TASK', findObjectWithID(task.targetID))
 
@@ -197,7 +197,7 @@ export class Operator extends PowerCreep {
 
     runPowerTask?() {
         const taskTarget = this.findPowerTask()
-        if (!taskTarget) return RESULT_FAIL
+        if (!taskTarget) return Result.fail
 
         // We aren't in range, get closer
         customLog('TRY TASK', taskTarget)
@@ -207,16 +207,16 @@ export class Operator extends PowerCreep {
                 origin: this.pos,
                 goals: [{ pos: taskTarget.pos, range: minRange }],
             })
-            return RESULT_ACTION
+            return Result.action
         }
 
         // We can't or failed the power
 
-        if (this.powered) return RESULT_FAIL
+        if (this.powered) return Result.fail
 
         const effect = taskTarget.effectsData.get(this.memory[PowerCreepMemoryKeys.taskPower])
-        if (effect && effect.ticksRemaining > 0) return RESULT_FAIL
-        /* if (this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget) !== OK) return RESULT_FAIL */
+        if (effect && effect.ticksRemaining > 0) return Result.fail
+        /* if (this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget) !== OK) return Result.fail */
 
         this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget)
 
@@ -236,7 +236,7 @@ export class Operator extends PowerCreep {
         this.powerCooldowns
         this._powerCooldowns.set(this.memory[PowerCreepMemoryKeys.taskPower], POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]].cooldown)
 
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     static operatorManager(room: Room, creepsOfRole: string[]) {
@@ -248,7 +248,7 @@ export class Operator extends PowerCreep {
             const creep: Operator = Game.powerCreeps[creepName]
 
             if (creep.runTask()) continue
-            if (creep.runPowerTask() === RESULT_SUCCESS) creep.runPowerTask()
+            if (creep.runPowerTask() === Result.success) creep.runPowerTask()
         }
     }
 }

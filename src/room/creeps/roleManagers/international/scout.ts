@@ -1,6 +1,6 @@
 import {
     CreepMemoryKeys,
-    RESULT_FAIL,
+    Result,
     RoomMemoryKeys,
     RoomTypes,
     communeSign,
@@ -217,7 +217,7 @@ export class Scout extends Creep {
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) === RESULT_FAIL
+                }) === Result.fail
             )
                 return true
 
@@ -291,7 +291,7 @@ export class Scout extends Creep {
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) === RESULT_FAIL
+                }) === Result.fail
             ) {
                 let roomMemory: Partial<RoomMemory> =
                     Memory.rooms[creep.memory[CreepMemoryKeys.scoutTarget]]

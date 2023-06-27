@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RESULT_ACTION, RESULT_SUCCESS, RoomTypes, customColors, roomDimensions, squadQuotas } from 'international/constants'
+import { CreepMemoryKeys, Result, RoomTypes, customColors, roomDimensions, squadQuotas } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
@@ -129,10 +129,10 @@ export class DynamicSquad {
                     },
                 ],
             })
-            return RESULT_ACTION
+            return Result.action
         }
 
-        return RESULT_SUCCESS
+        return Result.success
     }
 
     runCombatAttackDuo() {

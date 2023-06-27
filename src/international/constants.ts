@@ -249,6 +249,9 @@ export enum RoomMemoryKeys {
     roadsQuota,
     roads,
     remoteSourceCredit,
+    remoteSourceCreditChange,
+    remoteSourceCreditReservation,
+    hasContainer,
 
     // Ally
 
@@ -285,6 +288,8 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
 
     RoomMemoryKeys.commune,
     RoomMemoryKeys.remoteSourceCredit,
+    RoomMemoryKeys.remoteSourceCreditChange,
+    RoomMemoryKeys.remoteSourceCreditReservation,
 
     RoomMemoryKeys.owner,
     RoomMemoryKeys.RCL,
@@ -314,7 +319,12 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.dynamicScoreUpdate,
         RoomMemoryKeys.clearedEnemyStructures,
     ]),
-    [RoomTypes.remote]: new Set([RoomMemoryKeys.commune, RoomMemoryKeys.remoteSourceCredit]),
+    [RoomTypes.remote]: new Set([
+        RoomMemoryKeys.commune,
+        RoomMemoryKeys.remoteSourceCredit,
+        RoomMemoryKeys.remoteSourceCreditChange,
+        RoomMemoryKeys.remoteSourceCreditReservation,
+    ]),
     [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL]),
     [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.enemy]: new Set([
@@ -1062,7 +1072,7 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
-    [RESOURCE_UTRIUM_HYDRIDE]: {
+    [RESOURCE_UTRIUM_OXIDE]: {
         min: function (communeManager) {
             return 0
         },
@@ -1200,6 +1210,7 @@ export const safemodeTargets: StructureConstant[] = [
     STRUCTURE_STORAGE,
     STRUCTURE_TERMINAL,
 ]
+export const safemodeTargetsSet = new Set(safemodeTargets)
 
 /**
  * The number of ticks to wait between hauler size updates
@@ -1381,14 +1392,13 @@ export const quadAttackMemberOffsets = [
 ]
 export const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
-export const RESULT_FAIL = 0
-export const RESULT_SUCCESS = 1
-export const RESULT_ACTION = 2
-export const RESULT_NO_ACTION = 3
-/**
- * Wether there was success or fail is irrelevant. Stop future action
- */
-export const RESULT_STOP = 4
+export enum Result {
+    fail,
+    success,
+    action,
+    noAction,
+    stop,
+}
 
 export const maxRemoteRoomDistance = 5
 export const offsetsByDirection = [

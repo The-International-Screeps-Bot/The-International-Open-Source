@@ -5,8 +5,15 @@ import {
     packedPosLength,
     RoomMemoryKeys,
     RoomTypes,
+    defaultDataDecay,
 } from 'international/constants'
-import { advancedFindDistance, customLog, findCarryPartsRequired, randomRange, randomTick } from 'international/utils'
+import {
+    advancedFindDistance,
+    customLog,
+    findCarryPartsRequired,
+    randomRange,
+    randomTick,
+} from 'international/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -34,6 +41,9 @@ export class RemotesManager {
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
                 remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][i] = 0
                 remoteMemory[RoomMemoryKeys.remoteHaulers][i] = 0
+
+                remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][i] = 0
+                remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][i] = 0
             }
             remoteMemory[RoomMemoryKeys.remoteReserver] = 0
 
@@ -49,7 +59,10 @@ export class RemotesManager {
 
             // The room is closed or is now a respawn or novice zone
 
-            if (Game.map.getRoomStatus(remoteName).status !== Game.map.getRoomStatus(room.name).status) {
+            if (
+                Game.map.getRoomStatus(remoteName).status !==
+                Game.map.getRoomStatus(room.name).status
+            ) {
                 this.communeManager.removeRemote(remoteName, index)
                 continue
             }
@@ -87,7 +100,8 @@ export class RemotesManager {
             }
 
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
-                remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME
+                remoteMemory[RoomMemoryKeys.maxSourceIncome][i] =
+                    SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME
             }
             remoteMemory[RoomMemoryKeys.remoteReserver] = 5
 
@@ -97,7 +111,9 @@ export class RemotesManager {
 
             const possibleReservation = room.energyCapacityAvailable >= 650
             const isReserved =
-                remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
+                remote &&
+                remote.controller.reservation &&
+                remote.controller.reservation.username === Memory.me
 
             // If the remote is reserved
 
@@ -113,7 +129,12 @@ export class RemotesManager {
                 if (
                     isReserved &&
                     remote.controller.reservation.ticksToEnd >=
-                        Math.min(remoteMemory[RoomMemoryKeys.remoteControllerPath].length * packedPosLength * 5, 2500)
+                        Math.min(
+                            remoteMemory[RoomMemoryKeys.remoteControllerPath].length *
+                                packedPosLength *
+                                5,
+                            2500,
+                        )
                 )
                     remoteMemory[RoomMemoryKeys.remoteReserver] = 0
             }
@@ -132,32 +153,74 @@ export class RemotesManager {
                     remoteMemory[RoomMemoryKeys.minHeal] += enemyCreep.combatStrength.ranged
                 } */
 
+                // Record if we have or don't have a source container for each source
+
+                const sourceContainers = remote.sourceContainers
+                for (const i in sourceContainers) {
+                    remoteMemory[RoomMemoryKeys.hasContainer][i] = !!sourceContainers
+                }
+
                 // Temporary measure while DynamicSquads are in progress
 
                 if (remote.enemyAttackers.length) {
-
                     remoteMemory[RoomMemoryKeys.abandon] = randomRange(1000, 1500)
                     continue
                 }
 
                 // If the controller is reserved and not by me
 
-                if (remote.controller.reservation && remote.controller.reservation.username !== Memory.me)
+                if (
+                    remote.controller.reservation &&
+                    remote.controller.reservation.username !== Memory.me
+                )
                     remoteMemory[RoomMemoryKeys.enemyReserved] = true
                 // If the controller is not reserved or is by us
                 else remoteMemory[RoomMemoryKeys.enemyReserved] = false
 
-                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] = remote.roomManager.structures.invaderCore.length * 8
-                remoteMemory[RoomMemoryKeys.invaderCore] = remote.roomManager.structures.invaderCore.length
+                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] =
+                    remote.roomManager.structures.invaderCore.length * 8
+                remoteMemory[RoomMemoryKeys.invaderCore] =
+                    remote.roomManager.structures.invaderCore.length
 
                 // Create need if there are any structures that need to be removed
 
-                remoteMemory[RoomMemoryKeys.remoteDismantler] = Math.min(remote.dismantleTargets.length, 8)
+                remoteMemory[RoomMemoryKeys.remoteDismantler] = Math.min(
+                    remote.dismantleTargets.length,
+                    8,
+                )
+            }
+
+            for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
+                const hasContainer = remoteMemory[RoomMemoryKeys.hasContainer][i]
+                if (hasContainer) {
+                    const creditChange = CONTAINER_DECAY / (CONTAINER_DECAY_TIME * REPAIR_POWER)
+                    if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] > 0) {
+                        remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] -= creditChange
+                    }
+                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][i] -= creditChange
+                    remoteMemory[RoomMemoryKeys.maxSourceIncome][i] -= creditChange
+                    continue
+                }
+
+                // We don't have a container
+
+                const creditChange = Math.ceil(
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] / ENERGY_DECAY,
+                )
+                if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] > 0) {
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] -= creditChange
+                }
+                remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][i] -= creditChange
+                remoteMemory[RoomMemoryKeys.maxSourceIncome][i] -= creditChange
             }
 
             // If the remote is assumed to be reserved by an enemy or an invader core
 
-            if (remoteMemory[RoomMemoryKeys.enemyReserved] || remoteMemory[RoomMemoryKeys.invaderCore] || remoteMemory[RoomMemoryKeys.remoteDismantler]) {
+            if (
+                (remoteMemory[RoomMemoryKeys.enemyReserved] &&
+                    remoteMemory[RoomMemoryKeys.invaderCore]) ||
+                remoteMemory[RoomMemoryKeys.remoteDismantler]
+            ) {
                 for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
                 }
@@ -181,22 +244,27 @@ export class RemotesManager {
  */
             // Loop through each index of sourceEfficacies
 
-            for (
-                let sourceIndex = 0;
-                sourceIndex < remoteMemory[RoomMemoryKeys.remoteSourcePaths].length;
-                sourceIndex += 1
-            ) {
+            for (const sourceIndex in remoteMemory[RoomMemoryKeys.remoteSources]) {
+
+                // If there was no change in credits, move the values closer to 0 by a %
+                if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] <= 0) {
+
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] *= .999
+                }
+
                 if (remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] === 0) continue
 
                 const income = Math.min(
-                    remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] * HARVEST_POWER,
+                    // Make sure we ignore negative credit changes
+                    Math.max(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex], 0),
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
                 )
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] += findCarryPartsRequired(
-                    remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength,
+                    remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
+                        packedPosLength,
                     income,
                 )
             }
@@ -214,7 +282,9 @@ export class RemotesManager {
         for (let index in remoteMemory[RoomMemoryKeys.remoteSources]) {
             const pathRoomNames: Set<string> = new Set()
 
-            for (const pos of unpackPosList(remoteMemory[RoomMemoryKeys.remoteSourcePaths][index])) {
+            for (const pos of unpackPosList(
+                remoteMemory[RoomMemoryKeys.remoteSourcePaths][index],
+            )) {
                 const roomName = pos.roomName
 
                 if (pathRoomNames.has(roomName)) continue

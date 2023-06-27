@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RESULT_FAIL, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
+import { CreepMemoryKeys, Result, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
 import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
@@ -216,7 +216,7 @@ export class RemoteDismantler extends Creep {
                     ],
                     typeWeights: remoteTypeWeights,
                     avoidAbandonedRemotes: true,
-                }) === RESULT_FAIL
+                }) === Result.fail
             ) {
 
                 Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500

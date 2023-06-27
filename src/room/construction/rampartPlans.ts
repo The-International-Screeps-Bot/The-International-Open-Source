@@ -28,6 +28,7 @@ export class RampartPlans {
         const plans = new RampartPlans()
 
         for (let i = 0; i < packedMap.length; i += 5) {
+
             const data = decode(packedMap[i + 2] + packedMap[i + 3] + packedMap[i + 4])
 
             plans.map[packedMap[i] + packedMap[i + 1]] = {
@@ -35,6 +36,7 @@ export class RampartPlans {
                 coversStructure: data[1],
                 buildForNuke: data[2],
                 buildForThreat: data[3],
+                needsStoringStructure: data[4],
             }
         }
 

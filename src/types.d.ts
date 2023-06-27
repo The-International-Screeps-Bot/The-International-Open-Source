@@ -16,6 +16,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     SleepFor,
+    Result,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -187,17 +188,21 @@ declare global {
     interface RampartPlanCoord {
         minRCL: number
         /**
-         * Flase or truthy number
+         * A boolean integer
          */
         coversStructure: number
         /**
-         * Flase or truthy number
+         * A boolean integer
          */
         buildForNuke: number
         /**
-         * Flase or truthy number
+         * A boolean integer
          */
         buildForThreat: number
+        /**
+         * A boolean integer
+         */
+        needsStoringStructure: number
     }
 
     type QuadTransformTypes =
@@ -1696,6 +1701,11 @@ declare global {
          */
         spawnID: Id<StructureSpawn>
 
+        /**
+         * The key and change to a value the creep opperated this tick
+         */
+        dataChange: {[key: string]: number}
+
         // Creep Functions
 
         activeRenew(): void
@@ -1730,10 +1740,10 @@ declare global {
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
-        runRoomLogisticsRequestAdvanced(args?: findNewRoomLogisticsRequestArgs): number
+        runRoomLogisticsRequestAdvanced(args?: findNewRoomLogisticsRequestArgs): Result
         runRoomLogisticsRequestsAdvanced(args?: findNewRoomLogisticsRequestArgs): boolean
 
-        runRoomLogisticsRequest(): number
+        runRoomLogisticsRequest(): Result
         runRoomLogisticsRequests(): boolean
 
         findCreepRoomLogisticsRequestAmount(
@@ -2056,6 +2066,9 @@ declare global {
         [RoomMemoryKeys.roadsQuota]: number[]
         [RoomMemoryKeys.roads]: number[]
         [RoomMemoryKeys.remoteSourceCredit]: number[]
+        [RoomMemoryKeys.remoteSourceCreditChange]: number[]
+        [RoomMemoryKeys.remoteSourceCreditReservation]: number[]
+        [RoomMemoryKeys.hasContainer]: boolean[]
 
         // Ally
 

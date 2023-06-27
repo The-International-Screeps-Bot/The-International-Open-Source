@@ -98,14 +98,14 @@ export class RangedDefender extends Creep {
     defendWithoutRamparts?(enemyCreeps: Creep[]) {
         // Get the closest enemyAttacker
 
-        const enemyCreep = findClosestObject(this.pos, enemyCreeps)
+        const enemyCreep = findClosestObject(this.pos, enemyCreeps) || findClosestObject(this.pos, this.room.enemyCreeps)
 
         if (Memory.roomVisuals)
             this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
 
         // If out of range, move to
 
-        if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 3) {
+        if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 2) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({

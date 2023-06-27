@@ -768,6 +768,9 @@ export class RoomVisualsManager {
             'efficacy',
             'harvester',
             'hauler',
+            'credit',
+            'creditChange',
+            'creditReserved',
             'reserver',
             'coreAttacker',
             'abandoned',
@@ -792,9 +795,12 @@ export class RoomVisualsManager {
             else row.push('undefined')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
-            row.push(remoteMemory[RoomMemoryKeys.remoteCoreAttacker] || 0)
-            row.push(remoteMemory[RoomMemoryKeys.abandon] || 0)
+            row.push(remoteMemory[RoomMemoryKeys.remoteCoreAttacker] || remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '')
+            row.push(remoteMemory[RoomMemoryKeys.abandon] || remoteMemory[RoomMemoryKeys.abandon] + '')
 
             data.push(row)
         }

@@ -1,4 +1,4 @@
-import { NukeRequestKeys, RESULT_ACTION, RESULT_NO_ACTION, RoomMemoryKeys } from 'international/constants'
+import { NukeRequestKeys, Result, RoomMemoryKeys } from 'international/constants'
 import { scalePriority } from 'international/utils'
 import { CommuneManager } from './commune'
 
@@ -22,14 +22,14 @@ export class NukerManager {
             return
         }
 
-        if (this.createRoomLogisticsRequests() === RESULT_ACTION) return
+        if (this.createRoomLogisticsRequests() === Result.action) return
 
         const request = Memory.nukeRequests[requestName]
         this.nuker.launchNuke(new RoomPosition(request[NukeRequestKeys.x], request[NukeRequestKeys.y], requestName))
     }
 
     private createRoomLogisticsRequests() {
-        let result = RESULT_NO_ACTION
+        let result = Result.noAction
 
         for (const resource of nukerResources) {
             if (this.nuker.freeReserveStoreOf(resource) <= 0) continue
@@ -40,7 +40,7 @@ export class NukerManager {
                 priority: 100,
             })
 
-            result = RESULT_ACTION
+            result = Result.action
         }
 
         return result

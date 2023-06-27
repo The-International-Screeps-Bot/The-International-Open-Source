@@ -1,7 +1,6 @@
 import {
     minerals,
-    RESULT_ACTION,
-    RESULT_NO_ACTION,
+    Result,
     RoomMemoryKeys,
     terminalResourceTargets,
 } from 'international/constants'
@@ -278,7 +277,7 @@ export class TerminalManager {
     }
 
     private respondToAllyRequests() {
-        if (!Memory.allyTrading) return RESULT_NO_ACTION
+        if (!Memory.allyTrading) return Result.noAction
 
         // We don't have enough energy to help other rooms
 
@@ -289,7 +288,7 @@ export class TerminalManager {
             return false
 
         const [request, amount] = this.findBestAllyRequest()
-        if (!request) return RESULT_NO_ACTION
+        if (!request) return Result.noAction
 
         this.communeManager.room.terminal.send(
             request.resourceType,
@@ -302,7 +301,7 @@ export class TerminalManager {
         // Remove the request so other rooms don't try to respond to it
 
         delete allyManager._allyRequests.resource[request.ID]
-        return RESULT_ACTION
+        return Result.action
     }
 
     private manageResources() {

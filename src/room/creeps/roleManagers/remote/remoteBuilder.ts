@@ -1,10 +1,7 @@
 import {
     CreepMemoryKeys,
     packedPosLength,
-    RESULT_ACTION,
-    RESULT_FAIL,
-    RESULT_NO_ACTION,
-    RESULT_SUCCESS,
+    Result,
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'

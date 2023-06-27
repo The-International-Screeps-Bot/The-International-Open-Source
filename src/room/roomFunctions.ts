@@ -16,10 +16,8 @@ import {
     constantRoomTypes,
     stamps,
     defaultStructureTypesByBuildPriority,
-    RESULT_FAIL,
-    RESULT_NO_ACTION,
+    Result,
     adjacentOffsets,
-    RESULT_SUCCESS,
     CreepMemoryKeys,
     RoomMemoryKeys,
     RoomTypes,
@@ -367,6 +365,18 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.maxSourceIncome] = []
         roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
         roomMemory[RoomMemoryKeys.remoteHaulers] = []
+        roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
+        roomMemory[RoomMemoryKeys.hasContainer] = []
+
+        for (const i in packedRemoteSources) {
+
+            roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
+            roomMemory[RoomMemoryKeys.hasContainer][i] = false
+        }
+        roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
+        roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
+        roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
+        roomMemory[RoomMemoryKeys.abandon] = 0
 
         // Add the room's name to the scoutingRoom's remotes list
 
@@ -431,6 +441,18 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.maxSourceIncome] = []
     roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
     roomMemory[RoomMemoryKeys.remoteHaulers] = []
+    roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
+    roomMemory[RoomMemoryKeys.hasContainer] = []
+
+    for (const i in packedRemoteSources) {
+
+        roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
+        roomMemory[RoomMemoryKeys.hasContainer][i] = false
+    }
+    roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
+    roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
+    roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
+    roomMemory[RoomMemoryKeys.abandon] = 0
 
     // Add the room's name to the scoutingRoom's remotes list
 
@@ -2070,12 +2092,12 @@ Room.prototype.createWorkRequest = function () {
 
     if (communePlanned !== true) {
         const result = this.roomManager.communePlanner.preTickRun()
-        if (result === RESULT_FAIL) {
+        if (result === Result.fail) {
             this.memory[RoomMemoryKeys.communePlanned] = false
             return false
         }
 
-        if (result !== RESULT_SUCCESS) {
+        if (result !== Result.success) {
             return false
         }
     }
@@ -2194,7 +2216,7 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 Room.prototype.createRoomLogisticsRequest = function (args) {
     // Don't make requests when there is nobody to respond
 
-    if (!this.myCreepsAmount) return RESULT_NO_ACTION
+    if (!this.myCreepsAmount) return Result.noAction
 
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
     // We can only handle energy until we have a storage or terminal
@@ -2202,7 +2224,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         args.resourceType !== RESOURCE_ENERGY &&
         (!this.storage || this.controller.level < 4 || !this.terminal || this.controller.level < 6)
     )
-        return RESULT_FAIL
+        return Result.fail
 
     let amount: number
 
@@ -2211,13 +2233,13 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     if (args.target instanceof Resource) {
         amount = (args.target as Resource).reserveAmount
 
-        if (amount < 1) return RESULT_FAIL
+        if (amount < 1) return Result.fail
     } else if (args.type === 'transfer') {
         if (
             args.target.reserveStore[args.resourceType] >=
             args.target.store.getCapacity(args.resourceType)
         )
-            return RESULT_FAIL
+            return Result.fail
 
         amount = args.target.freeReserveStoreOf(args.resourceType)
         /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
@@ -2229,7 +2251,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
         // We don't have enough resources to make a request
 
-        if (amount < 1) return RESULT_FAIL
+        if (amount < 1) return Result.fail
 
         if (args.maxAmount) amount = Math.min(amount, Math.round(args.maxAmount))
     }

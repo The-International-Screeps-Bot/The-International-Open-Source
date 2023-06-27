@@ -1,4 +1,4 @@
-import { WorkRequestKeys, CreepMemoryKeys, RESULT_FAIL, RoomTypes } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -90,7 +90,7 @@ export class Claimer extends Creep {
                         [RoomTypes.ally]: Infinity,
                         [RoomTypes.keeper]: Infinity,
                     },
-                }) === RESULT_FAIL
+                }) === Result.fail
             ) {
                 const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
                 if (request) request[WorkRequestKeys.abandon] = 20000

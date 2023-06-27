@@ -1,10 +1,7 @@
 import {
     CreepMemoryKeys,
     packedPosLength,
-    RESULT_ACTION,
-    RESULT_FAIL,
-    RESULT_NO_ACTION,
-    RESULT_SUCCESS,
+    Result,
     RoomMemoryKeys,
 } from 'international/constants'
 import { updateStat } from 'international/statsManager'
@@ -65,17 +62,17 @@ export class SourceHarvester extends Creep {
         // Unpack the harvestPos
 
         const harvestPos = this.findCommuneSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
-        if (!harvestPos) return RESULT_FAIL
+        if (!harvestPos) return Result.fail
 
         this.actionCoord = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]].pos
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRange(this.pos, harvestPos) === 0) return RESULT_SUCCESS
+        if (getRange(this.pos, harvestPos) === 0) return Result.success
 
         // If the creep's movement type is pull
 
-        if (this.memory[CreepMemoryKeys.getPulled]) return RESULT_NO_ACTION
+        if (this.memory[CreepMemoryKeys.getPulled]) return Result.noAction
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -104,7 +101,7 @@ export class SourceHarvester extends Creep {
             },
         )
 
-        return RESULT_ACTION
+        return Result.action
     }
 
     transferToSourceStructures?(): boolean {
@@ -167,7 +164,7 @@ export class SourceHarvester extends Creep {
                         getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                     },
                 })
-                if (result !== RESULT_SUCCESS) return false
+                if (result !== Result.success) return false
             }
 
             const cSite = this.room.findCSiteAtCoord(this.pos, cSite => cSite.structureType === STRUCTURE_CONTAINER)
@@ -197,7 +194,7 @@ export class SourceHarvester extends Creep {
                     getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                 },
             })
-            if (result !== RESULT_SUCCESS) return false
+            if (result !== Result.success) return false
         }
 
         // Try to repair the target
@@ -253,7 +250,7 @@ export class SourceHarvester extends Creep {
     }
 
     run?() {
-        if (this.travelToSource() !== RESULT_SUCCESS) return
+        if (this.travelToSource() !== Result.success) return
         if (this.transferToSourceStructures()) return
 
         // Try to repair the sourceContainer

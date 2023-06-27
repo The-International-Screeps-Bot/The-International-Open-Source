@@ -287,8 +287,9 @@ export function unpackBasePlanCoords(packedPlanCoords: string) {
  * Pack a planned cord for base building
  */
 export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
+
     return encode(
-        new Uint8Array([planCoord.minRCL, planCoord.coversStructure, planCoord.buildForNuke, planCoord.buildForThreat]),
+        new Uint8Array(Object.values(planCoord)),
     )
 }
 
@@ -297,7 +298,7 @@ export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
  */
 export function unpackRampartPlanCoord(chars: string): RampartPlanCoord {
     const coord = decode(chars)
-    return { minRCL: coord[0], coversStructure: coord[1], buildForNuke: coord[2], buildForThreat: coord[3] }
+    return { minRCL: coord[0], coversStructure: coord[1], buildForNuke: coord[2], buildForThreat: coord[3], needsStoringStructure: coord[4] }
 }
 
 export function packStampAnchors(stampAnchors: StampAnchors) {

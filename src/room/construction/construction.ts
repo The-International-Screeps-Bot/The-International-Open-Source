@@ -2,8 +2,7 @@ import {
     buildableStructuresSet,
     buildableStructureTypes,
     customColors,
-    RESULT_ACTION,
-    RESULT_NO_ACTION,
+    Result,
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
@@ -52,7 +51,7 @@ export class ConstructionManager {
 
         /* this.visualize() */
 
-        if (this.clearEnemyStructures() === RESULT_ACTION) return
+        if (this.clearEnemyStructures() === Result.action) return
 
         this.place()
         this.migrate()
@@ -90,6 +89,7 @@ export class ConstructionManager {
     }
     private placeRamparts(RCL: number, maxCSites: number) {
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
+        const hasStoringStructure = !!this.room.communeManager.storingStructures.length
 
         for (const packedCoord in rampartPlans.map) {
             if (this.placedSites >= maxCSites) return
@@ -97,6 +97,8 @@ export class ConstructionManager {
             const coord = unpackCoord(packedCoord)
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
+            // Ensure we have a storing structure if it is a requirement
+            if (data.needsStoringStructure && !hasStoringStructure) continue
 
             if (
                 this.room.findStructureAtCoord(
@@ -300,7 +302,7 @@ export class ConstructionManager {
      */
     private clearEnemyStructures() {
         const roomMemory = Memory.rooms[this.room.name]
-        if (roomMemory[RoomMemoryKeys.clearedEnemyStructures]) return RESULT_NO_ACTION
+        if (roomMemory[RoomMemoryKeys.clearedEnemyStructures]) return Result.noAction
 
         const structures = this.room.roomManager.structures
         for (const structureType in structures) {
@@ -313,6 +315,6 @@ export class ConstructionManager {
         }
 
         roomMemory[RoomMemoryKeys.clearedEnemyStructures] = true
-        return RESULT_ACTION
+        return Result.action
     }
 }

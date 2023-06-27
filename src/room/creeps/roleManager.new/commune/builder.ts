@@ -1,4 +1,4 @@
-import { RESULT_FAIL, RESULT_SUCCESS } from 'international/constants'
+import { Result, } from 'international/constants'
 import { customLog, findObjectWithID, getRange } from 'international/utils'
 
 export class BuilderManager {
@@ -38,7 +38,7 @@ export class BuilderManager {
 
     private runCreep(creep: Creep) {
 
-        if (creep.advancedBuild() === RESULT_FAIL) {
+        if (creep.advancedBuild() === Result.fail) {
 
             creep.advancedRecycle()
         }

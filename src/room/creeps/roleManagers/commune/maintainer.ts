@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RESULT_FAIL, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, Result, roomDimensions } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'international/utils'
 import { packCoord } from 'other/codec'
@@ -166,7 +166,7 @@ export class Maintainer extends Creep {
         }
         /*
         const rampartCSite = this.room.find(FIND_MY_CONSTRUCTION_SITES).find(site => site.structureType === STRUCTURE_RAMPART)
-        if (rampartCSite && this.advancedBuildCSite(rampartCSite) !== RESULT_FAIL) return
+        if (rampartCSite && this.advancedBuildCSite(rampartCSite) !== Result.fail) return
         */
         if (this.advancedMaintain()) return
         if (this.maintainNearby()) return

@@ -2,7 +2,7 @@ import {
     CreepMemoryKeys,
     customColors,
     remoteTypeWeights,
-    RESULT_FAIL,
+    Result,
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
@@ -192,7 +192,7 @@ export class RemoteCoreAttacker extends Creep {
                         ],
                         typeWeights: remoteTypeWeights,
                         avoidAbandonedRemotes: true,
-                    }) === RESULT_FAIL
+                    }) === Result.fail
                 ) {
                     creepMemory[CreepMemoryKeys.sleepFor] = 'any'
                     creepMemory[CreepMemoryKeys.sleepTime] = Game.time + randomIntRange(10, 50)
@@ -223,7 +223,7 @@ export class RemoteCoreAttacker extends Creep {
                     ],
                     typeWeights: remoteTypeWeights,
                     avoidAbandonedRemotes: true,
-                }) === RESULT_FAIL
+                }) === Result.fail
             ) {
                 Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][
                     RoomMemoryKeys.abandon

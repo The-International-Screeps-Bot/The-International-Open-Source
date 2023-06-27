@@ -1,8 +1,7 @@
 import {
     CombatRequestKeys,
     CreepMemoryKeys,
-    RESULT_ACTION,
-    RESULT_NO_ACTION,
+    Result,
     RoomTypes,
     customColors,
     packedQuadAttackMemberOffsets,
@@ -189,7 +188,7 @@ export class Quad {
                 }
             }
 
-            if (this.rangedKite() === RESULT_ACTION) return true
+            if (this.rangedKite() === Result.action) return true
 
             if (this.bulldoze()) return true
             if (this.rangedAttackStructures()) return true
@@ -861,7 +860,7 @@ export class Quad {
     }
 
     rangedKite() {
-        if (!this.willMove) return RESULT_NO_ACTION
+        if (!this.willMove) return Result.noAction
 
         const enemyThreatDataRanged = this.enemyThreatDataRanged
         let stay: undefined | true
@@ -885,17 +884,17 @@ export class Quad {
                 /* member, */
             )
             this.leader.room.visual.text('kited', this.leader.pos)
-            return RESULT_ACTION
+            return Result.action
         }
 
         // We don't want to flee but we shouldn't move
 
         if (stay) {
             this.leader.room.visual.text('stay', this.leader.pos)
-            return RESULT_ACTION
+            return Result.action
         }
 
-        return RESULT_NO_ACTION
+        return Result.noAction
     }
 
     findMinRange(coord: Coord) {

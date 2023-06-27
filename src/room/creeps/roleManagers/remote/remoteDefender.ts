@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RESULT_FAIL, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
+import { CreepMemoryKeys, Result, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -323,7 +323,7 @@ export class RemoteDefender extends Creep {
                         },
                     ],
                     typeWeights: remoteTypeWeights,
-                }) === RESULT_FAIL
+                }) === Result.fail
             ) {
 
 
