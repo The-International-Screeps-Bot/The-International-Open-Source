@@ -765,15 +765,15 @@ export class RoomVisualsManager {
         const headers: any[] = [
             'room',
             'sourceIndex',
-            'efficacy',
-            'harvester',
+            '📈',
+            '⚡⛏️',
             'hauler',
-            'credit',
-            'creditChange',
-            'creditReserved',
+            '⚡',
+            'Δ⚡',
+            '⚡Reserved',
             'reserver',
             'coreAttacker',
-            'abandoned',
+            '❌',
         ]
         const data: any[][] = []
 
@@ -782,7 +782,7 @@ export class RoomVisualsManager {
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const remoteMemory = Memory.rooms[remoteName]
-
+            console.log(remoteName, sourceIndex)
             const row: any[] = []
 
             row.push(remoteName)
@@ -796,8 +796,8 @@ export class RoomVisualsManager {
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex])
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] + '/' + Math.round(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength * remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex]))
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
             row.push(remoteMemory[RoomMemoryKeys.remoteCoreAttacker] || remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '')
             row.push(remoteMemory[RoomMemoryKeys.abandon] || remoteMemory[RoomMemoryKeys.abandon] + '')

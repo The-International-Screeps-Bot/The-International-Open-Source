@@ -74,9 +74,10 @@ export class RemoteHarvester extends Creep {
     }
 
     hasValidRemote?() {
-        if (!this.memory[CreepMemoryKeys.remote]) return false
+        const creepMemory = Memory.creeps[this.name]
+        if (!creepMemory[CreepMemoryKeys.remote]) return false
 
-        const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
+        const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
 
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
@@ -137,20 +138,36 @@ export class RemoteHarvester extends Creep {
 
         }
  */
-        const totalCreditChange = Math.min(
-            // Dont allow negative credit change
-            Math.max(
-                remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] +
-                    workParts * HARVEST_POWER,
-                0,
-            ),
-            remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
-        )
+        if (this.room.name === creepMemory[CreepMemoryKeys.remote]) {
+            const totalCreditChange = Math.min(
+                // Dont allow negative credit change
+                Math.max(
+                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] +
+                        workParts * HARVEST_POWER,
+                    0,
+                ),
+                remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
+            )
 
-        // We probably need to account for how harvesters can harvest a source fully
+            // We probably need to account for how harvesters can harvest a source fully
 
-        if (remoteMemory[RoomMemoryKeys.hasContainer][sourceIndex]) {
-            if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] < CONTAINER_CAPACITY) {
+            if (remoteMemory[RoomMemoryKeys.hasContainer][sourceIndex]) {
+                if (
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] <
+                    CONTAINER_CAPACITY
+                ) {
+                    const creditChange = Math.min(
+                        Math.min(
+                            remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
+                            workParts * HARVEST_POWER,
+                        ),
+                        totalCreditChange,
+                    )
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] += creditChange
+                }
+            }
+            // There is no container for the source
+            else {
                 const creditChange = Math.min(
                     Math.min(
                         remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
@@ -160,20 +177,9 @@ export class RemoteHarvester extends Creep {
                 )
                 remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] += creditChange
             }
-        }
-        // There is no container for the source
-        else {
-            const creditChange = Math.min(
-                Math.min(
-                    remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
-                    workParts * HARVEST_POWER,
-                ),
-                totalCreditChange,
-            )
-            remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] += creditChange
-        }
 
-        remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] = totalCreditChange
+            remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] = totalCreditChange
+        }
 
         if (this.isDying()) return
 

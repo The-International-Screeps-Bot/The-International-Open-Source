@@ -11,7 +11,7 @@ import {
     roomDimensions,
 } from './constants'
 import { packCoord, unpackCoord, unpackPosList } from 'other/codec'
-import { customLog, unpackNumAsCoord } from './utils'
+import { customLog, unpackNumAsCoord, visualizePath } from './utils'
 
 export function customFindPath(args: CustomPathFinderArgs) {
     const allowedRoomNames = new Set([args.origin.roomName])
@@ -438,7 +438,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             },
         )
 
-        originRoom.pathVisual(pathFinderResult.path, 'red')
+        visualizePath(pathFinderResult.path, customColors.red)
         originRoom.errorVisual(args.origin)
 
         let lastPos = args.origin

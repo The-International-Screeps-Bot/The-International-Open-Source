@@ -29,6 +29,7 @@ import {
     isCoordExit,
     forCoordsAroundRange,
     forAdjacentCoords,
+    visualizePath,
 } from 'international/utils'
 import {
     packCoord,
@@ -193,6 +194,8 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     ) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const path = unpackPosList(packedPath)
+
+        visualizePath(path)
 
         this.room.targetVisual(this.pos, path[0])
 
@@ -362,14 +365,14 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     if (Memory.roomVisuals)
         path.length > 1
-            ? room.pathVisual(path, 'lightBlue')
+            ? visualizePath(path, customColors.lightBlue)
             : room.visual.line(this.pos, path[0], {
                   color: customColors.lightBlue,
                   opacity: 0.3,
               })
 
     if (path.length > 1) {
-        if (Memory.roomVisuals) room.pathVisual(path, 'lightBlue')
+        if (Memory.roomVisuals) visualizePath(path, customColors.lightBlue)
     } else {
         if (Memory.roomVisuals)
             room.visual.line(this.pos, path[0], {
@@ -848,20 +851,13 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                     fill: customColors.teal,
                     opacity: 0.2,
                 })
-
+/*
             // Culprit for relay issues?
 
             this.room.visual.text('R', this.pos)
 
-            for (const creep of [this, creepAtPos] as Creep[]) {
-                if (creep.role !== 'remoteReserver') continue
-
-                this.room.visual.poly(unpackPosList(creepAtPos.memory[CreepMemoryKeys.path]))
-                break
-            }
-
             this.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
-
+ */
             // Have the creep move to its moveRequest
 
             this.runMoveRequest()

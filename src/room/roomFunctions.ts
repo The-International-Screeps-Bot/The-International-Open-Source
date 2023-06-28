@@ -325,7 +325,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         )
 
         for (const packedPath of packedRemoteSourcePaths) {
-            newCost += packedPath.length * packedPosLength
+            newCost += packedPath.length / packedPosLength
             if (!packedPath.length) {
                 return roomMemory[RoomMemoryKeys.type]
             }
@@ -340,15 +340,15 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         if (!packedRemoteControllerPath.length)
             throw Error('No remote controller path for ' + this.name)
 
-        newCost += packedRemoteControllerPath.length * packedPosLength
+        newCost += packedRemoteControllerPath.length / packedPosLength
 
         // Compare new, potential efficiency, to old efficiency
 
         let currentCost = 0
         for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
-            currentCost += packedPath.length * packedPosLength
+            currentCost += packedPath.length / packedPosLength
         }
-        currentCost += roomMemory[RoomMemoryKeys.remoteControllerPath].length * packedPosLength
+        currentCost += roomMemory[RoomMemoryKeys.remoteControllerPath].length / packedPosLength
 
         if (newCost >= currentCost) {
             return roomMemory[RoomMemoryKeys.type]
@@ -1754,33 +1754,6 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
     // Inform false if no value was found
 
     return false
-}
-
-Room.prototype.pathVisual = function (path, color, visualize = Memory.roomVisuals) {
-    if (!visualize) return
-
-    if (!path.length) return
-
-    // Filter only positions in the path that are in the path's starting room
-
-    const currentRoomName = path[0].roomName
-
-    for (let index = 0; index < path.length; index += 1) {
-        const pos = path[index]
-
-        if (pos.roomName === currentRoomName) continue
-
-        path.splice(index, path.length - 1)
-        break
-    }
-
-    // Generate the visual
-
-    this.visual.poly(path, {
-        stroke: customColors[color],
-        strokeWidth: 0.15,
-        opacity: 0.3,
-    })
 }
 
 Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {

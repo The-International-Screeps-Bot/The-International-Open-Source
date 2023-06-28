@@ -1106,11 +1106,6 @@ declare global {
          */
         findClosestPosOfValueAsym(opts: FindClosestPosOfValueOptsAsym): RoomPosition | false
 
-        /**
-         *
-         */
-        pathVisual(path: RoomPosition[], color: keyof Colors, visualize?: boolean): void
-
         errorVisual(coord: Coord, visualize?: boolean): void
 
         /**

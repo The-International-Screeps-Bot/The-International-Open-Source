@@ -960,3 +960,18 @@ export function randomOf<T>(array: T[]): T {
 
     return array[Math.floor(Math.random() * array.length)]
 }
+
+export function visualizePath(path: RoomPosition[], color: string = customColors.yellow) {
+
+    for (let i = 0; i < path.length; i++) {
+        const nextPos = path[i + 1]
+        if (!nextPos) break
+        const pos = path[i]
+        if (nextPos.roomName !== pos.roomName) continue
+
+        new RoomVisual(pos.roomName).line(pos, nextPos, {
+            color,
+            opacity: 0.2,
+        })
+    }
+}

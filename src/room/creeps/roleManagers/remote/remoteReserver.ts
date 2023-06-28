@@ -47,6 +47,7 @@ export class RemoteReserver extends Creep {
 
         if (!this.hasValidRemote()) {
             this.removeRemote()
+            return
         }
 
         // We have a valid remote
@@ -63,7 +64,9 @@ export class RemoteReserver extends Creep {
 
         const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
         for (const remoteName of remoteNamesByEfficacy) {
-            if (Memory.rooms[remoteName][RoomMemoryKeys.remoteReserver] <= 0) continue
+            const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
+            if (remoteMemory[RoomMemoryKeys.abandon]) continue
+            if (remoteMemory[RoomMemoryKeys.remoteReserver] <= 0) continue
 
             this.assignRemote(remoteName)
             return true
@@ -73,9 +76,10 @@ export class RemoteReserver extends Creep {
     }
 
     hasValidRemote?() {
-        if (!this.memory[CreepMemoryKeys.remote]) return false
+        const creepMemory = Memory.creeps[this.name]
+        if (!creepMemory[CreepMemoryKeys.remote]) return false
 
-        const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
+        const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
 
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
