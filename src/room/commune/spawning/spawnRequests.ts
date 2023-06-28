@@ -1024,10 +1024,8 @@ export class SpawnRequestsManager {
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
             const remoteMemory = Memory.rooms[remoteName]
-
-            const sourcePositionsAmount =
-                remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
-                packedPosLength
+            if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
+            if (remoteMemory[RoomMemoryKeys.abandoned]) continue
 /*
             const remoteHaulerNeed = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
             const harvesterPriority = this.minRemotePriority + priorityIncrement + (remoteHaulerNeed > 0 ? 1 : 100)
@@ -1048,6 +1046,9 @@ export class SpawnRequestsManager {
                     const priority = harvesterPriority
                     const spawnGroup =
                         this.communeManager.remoteSourceHarvesters[remoteName][sourceIndex]
+                    const sourcePositionsAmount =
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
+                        packedPosLength
 
                     if (this.spawnEnergyCapacity >= 950) {
                         return {

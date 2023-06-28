@@ -89,11 +89,14 @@ export class RemoteHarvester extends Creep {
 
     isRemoteValid?(remoteName: string, sourceIndex: number) {
         const remoteMemory = Memory.rooms[remoteName]
+
         if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
         if (remoteMemory[RoomMemoryKeys.abandoned]) return false
+        // Make sure there are enough harvest positions for us
         if (
-            remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions].length / packedPosLength >=
-            this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].length
+            this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].length >=
+            remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length / packedPosLength
+
         )
             return false
         if (remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] <= 0) return false

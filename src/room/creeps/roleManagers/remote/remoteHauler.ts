@@ -116,7 +116,7 @@ export class RemoteHauler extends Creep {
                 (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
                     packedPosLength) *
                     remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
-            )
+            ) * 2
         ) {
             return false
         }

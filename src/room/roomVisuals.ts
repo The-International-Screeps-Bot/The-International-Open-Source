@@ -797,7 +797,7 @@ export class RoomVisualsManager {
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] + '/' + Math.round(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength * remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex]))
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] + '/' + Math.round(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength * remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex]) * 2)
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
             row.push(remoteMemory[RoomMemoryKeys.remoteCoreAttacker] || remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '')
             row.push(remoteMemory[RoomMemoryKeys.abandon] || remoteMemory[RoomMemoryKeys.abandon] + '')

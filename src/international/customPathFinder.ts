@@ -188,14 +188,13 @@ function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<
             }
 
             // Prefer to avoid all potential reservation positions
-            for (const packedPositions of roomMemory[RoomMemoryKeys.remoteControllerPositions]) {
-                const positions = unpackPosList(packedPositions)
 
-                for (const pos of positions) {
-                    const packedCoord = packCoord(pos)
-                    const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                    args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                }
+            const positions = unpackPosList(roomMemory[RoomMemoryKeys.remoteControllerPositions])
+
+            for (const pos of positions) {
+                const packedCoord = packCoord(pos)
+                const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+                args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
             }
         }
     }
