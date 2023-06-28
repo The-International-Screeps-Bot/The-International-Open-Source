@@ -637,6 +637,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 ) {
     const { room } = this
 
+    if (this.spawning) return
     if (!this.moveRequest) return
     if (!room.moveRequests[this.moveRequest]) {
         this.moved = 'moved'
@@ -655,7 +656,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
-        if (this.spawning) {
+/*         if (this.spawning) {
             this.moved = this.moveRequest
             delete room.moveRequests[this.moveRequest]
 
@@ -669,7 +670,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             }
             return
         }
-
+ */
         // loop through each index of the queue, drawing visuals
 
         if (Memory.roomVisuals) {
@@ -700,19 +701,19 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     }
 
     const packedCoord = packCoord(this.pos)
-
     // Get the creepAtPos with the name
-
     const creepAtPos = Game.creeps[creepNameAtPos] || Game.powerCreeps[creepNameAtPos]
 
     // if creepAtPos is fatigued it is useless to us
 
     if ((creepAtPos as Creep).fatigue > 0) {
+        this.moved = 'wait'
+
         delete room.moveRequests[this.moved]
         delete this.moveRequest
         return
     }
-
+/*
     // We're spawning, just get us space to move into
 
     if (this.spawning) {
@@ -735,7 +736,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
         return
     }
-
+ */
     if (creepAtPos.moved) {
         if (creepAtPos.moved === 'moved') {
             delete this.moveRequest

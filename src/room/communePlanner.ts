@@ -3047,9 +3047,9 @@ export class CommunePlanner {
         this.bestTowerCoords
             .sort(
                 (a, b) =>
-                    a.minDamage +
+                    a.minDamage -
                     getRange(a, hubAnchor) * towerDistanceWeight -
-                    (b.minDamage + getRange(b, hubAnchor) * towerDistanceWeight),
+                    (b.minDamage - getRange(b, hubAnchor) * towerDistanceWeight),
             )
             .reverse()
 
