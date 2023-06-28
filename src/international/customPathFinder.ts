@@ -10,7 +10,7 @@ import {
     impassibleStructureTypes,
     roomDimensions,
 } from './constants'
-import { packCoord, unpackCoord, unpackPosList } from 'other/codec'
+import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
 import { customLog, unpackNumAsCoord, visualizePath } from './utils'
 
 export function customFindPath(args: CustomPathFinderArgs) {
@@ -177,6 +177,26 @@ function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<
                     args.weightCoords[pos.roomName][packCoord(pos)] = 1
                 }
             }
+
+            // Prefer to avoid the best source harvest pos
+            for (const packedPositions of roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]) {
+                const positions = unpackPosList(packedPositions)
+                const packedCoord = packCoord(positions[positions.length - 1])
+
+                const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+                args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+            }
+
+            // Prefer to avoid all potential reservation positions
+            for (const packedPositions of roomMemory[RoomMemoryKeys.remoteControllerPositions]) {
+                const positions = unpackPosList(packedPositions)
+
+                for (const pos of positions) {
+                    const packedCoord = packCoord(pos)
+                    const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+                    args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+                }
+            }
         }
     }
 }
@@ -186,7 +206,9 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
     args.swampCost = args.swampCost || defaultSwampCost
 
     const originRoom: undefined | Room = Game.rooms[args.origin.roomName]
-    const maxRooms = args.maxRooms ? Math.min(allowedRoomNames.size, args.maxRooms) : allowedRoomNames.size
+    const maxRooms = args.maxRooms
+        ? Math.min(allowedRoomNames.size, args.maxRooms)
+        : allowedRoomNames.size
     const pathFinderResult = PathFinder.search(args.origin, args.goals, {
         plainCost: args.plainCost,
         swampCost: args.swampCost,
@@ -279,7 +301,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 let roadCost = 1
                 if (!args.creep.memory[CreepMemoryKeys.preferRoads]) roadCost = args.plainCost
 
-                for (const road of room.roomManager.structures.road) cm.set(road.pos.x, road.pos.y, roadCost)
+                for (const road of room.roomManager.structures.road)
+                    cm.set(road.pos.x, road.pos.y, roadCost)
             }
 
             // If avoidStationaryPositions is requested
@@ -326,7 +349,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                     cm.set(structure.pos.x, structure.pos.y, args.weightStructures[structureType])
             }
 
-            for (const portal of room.roomManager.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+            for (const portal of room.roomManager.structures.portal)
+                cm.set(portal.pos.x, portal.pos.y, 255)
 
             // Loop trough each construction site belonging to an ally
 
@@ -352,7 +376,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
                 for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
-                for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
+                for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS))
+                    cm.set(creep.pos.x, creep.pos.y, 255)
             }
 
             // If avoiding structures that can't be walked on is enabled
@@ -375,7 +400,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                     // If the rampart is public and owned by an ally
                     // We don't want to try to walk through enemy public ramparts as it could trick our pathing
 
-                    if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username)) continue
+                    if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username))
+                        continue
 
                     // Otherwise set the rampart's pos as impassible
 
