@@ -315,4 +315,9 @@ export class RemotesManager {
 
         remoteMemory[RoomMemoryKeys.abandon] = abandonment
     }
+
+    private recurseAbandonment(remoteName: string) {
+
+        
+    }
 }

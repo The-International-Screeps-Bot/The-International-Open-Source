@@ -490,7 +490,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         let score: number
         if (targetCoord) {
-            score = getRangeEuc(coord, targetCoord)
+            score = getRangeEuc(coord, targetCoord) * 3
             if (terrainType === TERRAIN_MASK_SWAMP) score += 1
             if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord])
                 score += 1
