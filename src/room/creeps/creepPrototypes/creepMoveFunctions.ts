@@ -750,7 +750,12 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 return
             }
 
-            // Don't allow swapping in the wait queue if we are in a commune
+            // Don't allow swapping in the queue if we might move a creep out of the commune
+            // Will trade if:
+            // remotes are different
+            // sourceIndexes are different
+            // Traffic priorities are by default different
+            // One is around empty while the other is around full
 
             if (
                 (!this.isOnExit || !communeCreepRoles.has(creepAtPos.role)) &&
@@ -758,9 +763,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                     creepAtPos.memory[CreepMemoryKeys.remote] ||
                     this.memory[CreepMemoryKeys.sourceIndex] !==
                         creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
-                    TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
-                        TrafficPriorities[creepAtPos.role] +
-                            (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
+                    TrafficPriorities[this.role] + (this.needsResources() ? 0 : 0.1) >
+                        TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0 : 0.1))
             ) {
                 // Have the creep move to its moveRequest
 
@@ -851,7 +855,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                     fill: customColors.teal,
                     opacity: 0.2,
                 })
-/*
+            /*
             // Culprit for relay issues?
 
             this.room.visual.text('R', this.pos)
@@ -878,8 +882,8 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             if (
                 !(creepAtPos instanceof PowerCreep) &&
-                TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0)
+                TrafficPriorities[this.role] + (this.needsResources() ? 0 : 0.1) >
+                    TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0 : 0.1)
             ) {
                 this.runMoveRequest()
 
@@ -897,14 +901,13 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
         }
 
         // Swap if creep has higher priority than creepAtPos
-
+/*
         if (
+            !(creepAtPos instanceof PowerCreep) &&
             (!this.isOnExit ||
-                creepAtPos instanceof PowerCreep ||
                 !communeCreepRoles.has(creepAtPos.role)) &&
-            (creepAtPos instanceof PowerCreep ||
-                TrafficPriorities[this.role] + (this.freeNextStore === 0 ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (creepAtPos.freeNextStore === 0 ? 0.1 : 0))
+            (TrafficPriorities[this.role] + (this.needsResources() ? 0 : 0.1) >
+                TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0 : 0.1))
         ) {
             if (Memory.roomVisuals)
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
@@ -914,18 +917,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             this.runMoveRequest()
 
-            // Potential culprit for relay bug
-
-            /* this.room.visual.text('P', this.pos) */
-            /*
-            for (const creep of [this, creepAtPos] as Creep[]) {
-
-                if (creep.role !== 'remoteReserver') continue
-
-                this.room.visual.poly(unpackPosList(this.memory[CreepMemoryKeys.path]))
-                break
-            }
- */
             // Have the creepAtPos move to the creep and inform true
 
             creepAtPos.moveRequest = packedCoord
@@ -933,7 +924,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             creepAtPos.runMoveRequest()
             return
         }
-
+ */
         // If the creepAtPos is in the queue
 
         if (queue.includes(creepAtPos.name)) {

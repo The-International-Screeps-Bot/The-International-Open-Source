@@ -414,6 +414,9 @@ export const communeCreepRoles: Set<CreepRoles> = new Set([
 
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
 
+/**
+ * Which role gets priority in which circumstance. Lowest to highest
+ */
 export enum TrafficPriorities {
     remoteHauler,
     hauler,

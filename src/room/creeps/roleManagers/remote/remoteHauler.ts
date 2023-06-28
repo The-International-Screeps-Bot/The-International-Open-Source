@@ -593,11 +593,13 @@ export class RemoteHauler extends Creep {
         // Trade remotes and sourceIndexes
         // Delete from creepAtPos because it is returning home, not responding to a remote
 
+        const remote = creepMemory[CreepMemoryKeys.remote]
         creepMemory[CreepMemoryKeys.remote] = creepAtPosMemory[CreepMemoryKeys.remote]
-        delete creepAtPosMemory[CreepMemoryKeys.remote]
+        creepAtPosMemory[CreepMemoryKeys.remote] = remote
 
+        const sourceIndex =creepMemory[CreepMemoryKeys.sourceIndex]
         creepMemory[CreepMemoryKeys.sourceIndex] = creepAtPosMemory[CreepMemoryKeys.sourceIndex]
-        delete creepAtPosMemory[CreepMemoryKeys.sourceIndex]
+        creepAtPosMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
 
         //
 
