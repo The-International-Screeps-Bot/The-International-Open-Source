@@ -24,29 +24,33 @@ export class ControllerUpgraderManager {
         return true
     }
 
+    shouldBuild(creep: Creep) {
+        return creep.room.roomManager.cSiteTarget;
+    }
+
     initialRun(room: Room) {
 
         for (const creepName of room.myCreeps[this.role]) {
-
             this.initialRunCreep(Game.creeps[creepName])
         }
     }
 
     private initialRunCreep(creep: Creep) {
-
         creep.room.upgradeStrength += creep.upgradeStrength
     }
 
     run(room: Room) {
 
         for (const creepName of room.myCreeps[this.role]) {
-
             this.runCreep(Game.creeps[creepName])
         }
     }
 
     private runCreep(creep: Creep) {
-
+        if (this.shouldBuild(creep)) {
+            creep.advancedBuild(creep);
+            return;
+        }
         creep.advancedUpgradeController()
     }
 }
