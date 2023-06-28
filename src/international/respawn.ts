@@ -24,7 +24,7 @@ class RespawnManager {
         if (roomNames.length > 1) return false
 
         const room = Game.rooms[roomNames[0]]
-        if (
+        if (!room &&
             !room.controller ||
             !room.controller.my ||
             room.controller.level !== 1 ||
