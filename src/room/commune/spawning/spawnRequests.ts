@@ -1028,9 +1028,12 @@ export class SpawnRequestsManager {
             const sourcePositionsAmount =
                 remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
                 packedPosLength
-
+/*
             const remoteHaulerNeed = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
             const harvesterPriority = this.minRemotePriority + priorityIncrement + (remoteHaulerNeed > 0 ? 1 : 100)
+ */
+
+            const harvesterPriority = this.minRemotePriority + priorityIncrement
 
             // Construct requests for remoteSourceHarvester0s
 

@@ -693,7 +693,13 @@ export class SpawningStructuresManager {
     }
 
     private testArgs() {
+        this.communeManager.spawnRequestsManager.run()
         for (const request of this.communeManager.room.spawnRequestsArgs) {
+            if (request.role === 'remoteSourceHarvester') {
+
+                customLog('SPAWN REQUEST ARGS', request.role + request.memoryAdditions[CreepMemoryKeys.remote] + ', ' + request.priority)
+                continue
+            }
             customLog('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
         }
     }
