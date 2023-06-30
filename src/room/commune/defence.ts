@@ -23,7 +23,7 @@ import {
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
-export class CombatManager {
+export class DefenceManager {
     communeManager: CommuneManager
 
     presentThreat: number
@@ -232,6 +232,9 @@ export class CombatManager {
             if (onlyInvader && enemyCreep.owner.username !== 'Invader') onlyInvader = false
         }
 
+        // If we have towers and it's only invaders, we don't need a defence request
+        if (onlyInvader && room.roomManager.structures.tower.length) return
+
         // There is tower inferiority, make a defend request
 
         room.createDefendCombatRequest({
@@ -294,7 +297,6 @@ export class CombatManager {
         )
 
         if (this.presentThreat) {
-
             for (const [playerName, threat] of this.threatByPlayers) {
                 let player = Memory.players[playerName]
 

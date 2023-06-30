@@ -28,7 +28,7 @@ import {
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
 
-import './combat'
+import './defence'
 import './workRequest'
 import './combatRequest'
 import {
@@ -61,7 +61,7 @@ import { PowerSpawningStructuresManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
 import { TowerManager } from './towers'
-import { CombatManager } from './combat'
+import { DefenceManager } from './defence'
 import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
@@ -91,7 +91,7 @@ import { has } from 'lodash'
 export class CommuneManager {
     // Managers
     constructionManager: ConstructionManager
-    combatManager: CombatManager
+    defenceManager: DefenceManager
 
     towerManager: TowerManager
     storingStructuresManager: StoringStructuresManager
@@ -130,7 +130,7 @@ export class CommuneManager {
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
-        this.combatManager = new CombatManager(this)
+        this.defenceManager = new DefenceManager(this)
 
         this.towerManager = new TowerManager(this)
         this.storingStructuresManager = new StoringStructuresManager(this)
@@ -275,10 +275,10 @@ export class CommuneManager {
     public run() {
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
-        this.combatManager.run()
+        this.defenceManager.run()
         this.towerManager.run()
-        this.combatManager.manageThreat()
-        this.combatManager.manageDefenceRequests()
+        this.defenceManager.manageThreat()
+        this.defenceManager.manageDefenceRequests()
 
         this.terminalManager.run()
 

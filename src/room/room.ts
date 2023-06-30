@@ -162,6 +162,7 @@ export class RoomManager {
 
         // Check if the room is a commune
 
+        if (!room.controller) return
         if (!room.controller.my) {
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral

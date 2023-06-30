@@ -25,7 +25,7 @@ export class ControllerUpgraderManager {
     }
 
     shouldBuild(creep: Creep) {
-        return creep.room.roomManager.cSiteTarget;
+        return !!creep.room.roomManager.cSiteTarget;
     }
 
     initialRun(room: Room) {

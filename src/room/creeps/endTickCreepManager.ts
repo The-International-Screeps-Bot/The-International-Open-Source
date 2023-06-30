@@ -27,7 +27,10 @@ export class EndTickCreepManager {
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-        if (Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune) {
+        if (
+            Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune &&
+            room.communeManager.spawningStructuresManager.activeSpawns
+        ) {
             for (const spawn of room.communeManager.spawningStructuresManager.activeSpawns) {
                 const creep = Game.creeps[spawn.spawning.name]
 

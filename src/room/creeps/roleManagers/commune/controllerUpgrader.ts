@@ -35,6 +35,11 @@ export class ControllerUpgrader extends Creep {
 
             const creep: ControllerUpgrader = Game.creeps[creepName]
 
+            if (creep.room.roomManager.cSiteTarget) {
+                creep.advancedBuild();
+                return;
+            }
+
             creep.advancedUpgradeController()
         }
     }
