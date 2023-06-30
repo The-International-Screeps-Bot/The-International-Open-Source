@@ -75,35 +75,38 @@ export class CombatManager {
 
         // Otherwise if safeMode can be activated
 
-        // Get the previous tick's events
+        // Loop through each safemodeTargets structure
 
-        const eventLog = room.getEventLog()
+        for (const safemodeTarget of safemodeTargets) {
+            for (const structure of room.roomManager.structures[safemodeTarget]) {
+                let expectedHits = structure.hits
 
-        // Loop through each eventItem
+                // Add rampart hits
 
-        for (const eventItem of eventLog) {
-            // If the event wasn't an attack, iterate
+                const rampart = room.findStructureAtCoord(structure.pos, s => s.structureType == STRUCTURE_RAMPART)
+                if (rampart) {
+                    expectedHits += rampart.hits
+                }
 
-            if (eventItem.event !== EVENT_ATTACK) continue
+                // Subtract attackers damages
 
-            // Otherwise get the target of the attack
+                for (const attacker of nonInvaderAttackers) {
+                    // Compute max damage this creeps can deal
 
-            const attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | any>)
+                    const range = structure.pos.getRangeTo(attacker)
+                    const maxCombatStrength = Math.max(
+                        range <= 1 && attacker.combatStrength.melee,
+                        range <= 1 && attacker.combatStrength.dismantle,
+                        range <= 3 && attacker.combatStrength.ranged
+                    )
 
-            // If the attackTarget isn't a structure, iterate
+                    expectedHits -= maxCombatStrength;
 
-            if (!(attackTarget instanceof Structure)) continue
+                    // Can be destroyed
 
-            const structuresAtCoord = room.roomManager.structureCoords.get(
-                packCoord(attackTarget.pos),
-            )
-            if (
-                structuresAtCoord &&
-                structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)
-            )
-                return true
-
-            if (safemodeTargets.includes(attackTarget.structureType)) return true
+                    if (expectedHits <= 0) return true
+                }
+            }
         }
 
         return false
