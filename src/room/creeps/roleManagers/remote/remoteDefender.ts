@@ -1,4 +1,10 @@
-import { CreepMemoryKeys, Result, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    Result,
+    RoomMemoryKeys,
+    RoomTypes,
+    remoteTypeWeights,
+} from 'international/constants'
 import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -22,13 +28,19 @@ export class RemoteDefender extends Creep {
 
         const role = this.role as 'remoteDefender'
 
-        if (Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.type] !== RoomTypes.remote) {
+        if (
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.type] !==
+            RoomTypes.remote
+        ) {
             delete this.memory[CreepMemoryKeys.remote]
             if (!this.findRemote()) return
         }
 
         // If the creep's remote no longer is managed by its commune
-        else if (Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.commune] !== this.commune.name) {
+        else if (
+            Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.commune] !==
+            this.commune.name
+        ) {
             // Delete it from memory and try to find a new one
 
             delete this.memory[CreepMemoryKeys.remote]
@@ -295,7 +307,8 @@ export class RemoteDefender extends Creep {
             // If the creep is in its remote
 
             if (room.name === creep.memory[CreepMemoryKeys.remote]) {
-                if (!creep.memory[CreepMemoryKeys.ticksWaited]) creep.memory[CreepMemoryKeys.ticksWaited] = 0
+                if (!creep.memory[CreepMemoryKeys.ticksWaited])
+                    creep.memory[CreepMemoryKeys.ticksWaited] = 0
                 else creep.memory[CreepMemoryKeys.ticksWaited] += 1
 
                 // If a random range of time has passed, find a new remote
@@ -325,9 +338,9 @@ export class RemoteDefender extends Creep {
                     typeWeights: remoteTypeWeights,
                 }) === Result.fail
             ) {
-
-
-                Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][
+                    RoomMemoryKeys.abandonRemote
+                ] = 1500
                 delete creep.memory[CreepMemoryKeys.remote]
             }
         }

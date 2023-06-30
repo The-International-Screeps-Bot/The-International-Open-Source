@@ -44,7 +44,7 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
             if (
                 args.avoidAbandonedRemotes &&
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-                roomMemory[RoomMemoryKeys.abandon]
+                roomMemory[RoomMemoryKeys.abandonRemote]
             )
                 return Infinity
 

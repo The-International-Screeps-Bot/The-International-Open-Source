@@ -48,7 +48,7 @@ export class ControllerUpgraderManager {
 
     private runCreep(creep: Creep) {
         if (this.shouldBuild(creep)) {
-            creep.advancedBuild(creep);
+            creep.advancedBuild();
             return;
         }
         creep.advancedUpgradeController()

@@ -78,7 +78,6 @@ class TickConfig {
     }
 
     private configRooms() {
-
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
 
@@ -94,7 +93,6 @@ class TickConfig {
     }
 
     private runRooms() {
-
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
             room.roomManager.preTickRun()
@@ -129,7 +127,11 @@ class TickConfig {
 
         for (const roomName in Memory.workRequests) {
             const roomMemory = Memory.rooms[roomName]
-            if (Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] < randomRange(19000, 20000)) continue
+            if (
+                Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] <
+                randomRange(19000, 20000)
+            )
+                continue
 
             findDynamicScore(roomName)
         }
@@ -148,7 +150,11 @@ class TickConfig {
 
             delete request[WorkRequestKeys.abandon]
 
-            if (request[WorkRequestKeys.responder] && global.communes.has(request[WorkRequestKeys.responder])) continue
+            if (
+                request[WorkRequestKeys.responder] &&
+                global.communes.has(request[WorkRequestKeys.responder])
+            )
+                continue
 
             if (!Memory.autoClaim) continue
 
@@ -207,7 +213,8 @@ class TickConfig {
 
             if (request[CombatRequestKeys.responder]) {
                 internationalManager.creepsByCombatRequest[requestName] = {}
-                for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+                for (const role of antifaRoles)
+                    internationalManager.creepsByCombatRequest[requestName][role] = []
                 request[CombatRequestKeys.quads] = 0
                 continue
             }
@@ -231,7 +238,10 @@ class TickConfig {
                 // Ensure we aren't responding to too many requests for our energy level
 
                 if (room.storage && room.controller.level >= 4) {
-                    if (room.memory[RoomMemoryKeys.combatRequests].length + 1 >= room.communeManager.maxCombatRequests)
+                    if (
+                        room.memory[RoomMemoryKeys.combatRequests].length + 1 >=
+                        room.communeManager.maxCombatRequests
+                    )
                         continue
                 } else {
                     if (
@@ -247,13 +257,18 @@ class TickConfig {
                     request[CombatRequestKeys.minDamage],
                 )
                 const minMeleeHealCost = room.communeManager.findMinHealCost(
-                    request[CombatRequestKeys.minMeleeHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
+                    request[CombatRequestKeys.minMeleeHeal] +
+                        (request[CombatRequestKeys.maxTowerDamage] || 0),
                 )
-                const minRangedHealCost = room.communeManager.findMinHealCost(request[CombatRequestKeys.minRangedHeal])
+                const minRangedHealCost = room.communeManager.findMinHealCost(
+                    request[CombatRequestKeys.minRangedHeal],
+                )
 
                 if (minRangedAttackCost + minRangedHealCost > room.energyCapacityAvailable) continue
 
-                const minAttackCost = room.communeManager.findMinMeleeAttackCost(request[CombatRequestKeys.minDamage])
+                const minAttackCost = room.communeManager.findMinMeleeAttackCost(
+                    request[CombatRequestKeys.minDamage],
+                )
                 if (minAttackCost > room.energyCapacityAvailable) continue
 
                 communes.push(roomName)
@@ -284,7 +299,8 @@ class TickConfig {
             request[CombatRequestKeys.responder] = communeName
 
             internationalManager.creepsByCombatRequest[requestName] = {}
-            for (const role of antifaRoles) internationalManager.creepsByCombatRequest[requestName][role] = []
+            for (const role of antifaRoles)
+                internationalManager.creepsByCombatRequest[requestName][role] = []
         }
     }
 
@@ -306,7 +322,8 @@ class TickConfig {
             const communes = []
 
             for (const roomName of global.communes) {
-                if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) continue
+                if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName))
+                    continue
 
                 const room = Game.rooms[roomName]
                 if (!room.roomManager.structures.spawn.length) continue
@@ -317,7 +334,8 @@ class TickConfig {
                 if (!room.storage) continue
 
                 if (
-                    room.resourcesInStoringStructures.energy / (20000 + room.controller.level * 1000) <
+                    room.resourcesInStoringStructures.energy /
+                        (20000 + room.controller.level * 1000) <
                     room.memory[RoomMemoryKeys.haulRequests].length
                 )
                     continue

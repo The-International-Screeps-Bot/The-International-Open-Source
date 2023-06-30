@@ -1,4 +1,10 @@
-import { WorkRequestKeys, CreepMemoryKeys, RoomMemoryKeys, RoomTypes, Result } from 'international/constants'
+import {
+    WorkRequestKeys,
+    CreepMemoryKeys,
+    RoomMemoryKeys,
+    RoomTypes,
+    Result,
+} from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
 import { unpackCoord } from 'other/codec'
 
@@ -52,7 +58,12 @@ export class AllyVanguard extends Creep {
         if (room.name !== this.memory[CreepMemoryKeys.remote]) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.remote]), range: 25 }],
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.remote]),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -155,7 +166,12 @@ export class AllyVanguard extends Creep {
         if (room.name !== this.memory[CreepMemoryKeys.taskRoom]) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -183,7 +199,8 @@ export class AllyVanguard extends Creep {
 
             if (
                 room.name === request ||
-                (creep.memory[CreepMemoryKeys.remote] && room.name === creep.memory[CreepMemoryKeys.remote])
+                (creep.memory[CreepMemoryKeys.remote] &&
+                    room.name === creep.memory[CreepMemoryKeys.remote])
             ) {
                 creep.buildRoom()
                 continue
@@ -196,7 +213,12 @@ export class AllyVanguard extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]), range: 25 }],
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]),
+                            range: 25,
+                        },
+                    ],
                     avoidEnemyRanges: true,
                     typeWeights: {
                         [RoomTypes.enemy]: Infinity,

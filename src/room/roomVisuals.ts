@@ -237,15 +237,16 @@ export class RoomVisualsManager {
     }
 
     private internationalGeneralDataVisuals(y: number) {
-        const headers: any[] = [
-            'funnelOrder',
-            'highestThreat',
-            'minCredits',
-            'last config']
+        const headers: any[] = ['funnelOrder', 'highestThreat', 'minCredits', 'last config']
 
         const data: any[][] = [[]]
 
-        data[0].push(internationalManager.funnelOrder.slice(0, 3), playerManager.highestThreat, internationalManager.minCredits, Game.time - Memory.lastConfig)
+        data[0].push(
+            internationalManager.funnelOrder.slice(0, 3),
+            playerManager.highestThreat,
+            internationalManager.minCredits,
+            Game.time - Memory.lastConfig,
+        )
 
         const height = 3 + data.length
 
@@ -797,10 +798,25 @@ export class RoomVisualsManager {
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] + '/' + Math.round(remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length / packedPosLength * remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex]) * 2)
+            row.push(
+                remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
+                    '/' +
+                    Math.round(
+                        (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
+                            packedPosLength) *
+                            remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
+                    ) *
+                        2,
+            )
             row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
-            row.push(remoteMemory[RoomMemoryKeys.remoteCoreAttacker] || remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '')
-            row.push(remoteMemory[RoomMemoryKeys.abandon] || remoteMemory[RoomMemoryKeys.abandon] + '')
+            row.push(
+                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] ||
+                    remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '',
+            )
+            row.push(
+                remoteMemory[RoomMemoryKeys.abandonRemote] ||
+                    remoteMemory[RoomMemoryKeys.abandonRemote] + '',
+            )
 
             data.push(row)
         }

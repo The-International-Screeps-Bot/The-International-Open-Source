@@ -61,7 +61,7 @@ export class RemoteCoreAttacker extends Creep {
         if (
             remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote ||
             remoteMemory[RoomMemoryKeys.commune] !== this.commune.name ||
-            remoteMemory[RoomMemoryKeys.abandon]
+            remoteMemory[RoomMemoryKeys.abandonRemote]
         ) {
             this.removeRemote()
             return false
@@ -227,7 +227,7 @@ export class RemoteCoreAttacker extends Creep {
                 }) === Result.fail
             ) {
                 Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][
-                    RoomMemoryKeys.abandon
+                    RoomMemoryKeys.abandonRemote
                 ] = 1500
                 creep.removeRemote()
             }

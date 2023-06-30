@@ -42,7 +42,7 @@ class RoomPruningManager {
         for (const )
         */
 
-        Memory.rooms[highestScoreCommuneName][RoomMemoryKeys.abandoned] = true
+        Memory.rooms[highestScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
     }
 }
 

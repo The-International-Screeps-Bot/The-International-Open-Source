@@ -179,7 +179,7 @@ class FlagManager {
         }
 
         flag.remove()
-        roomMemory[RoomMemoryKeys.abandoned] = true
+        roomMemory[RoomMemoryKeys.abandonCommune] = true
     }
 
     private claim(flagName: string, flagNameParts: string[]) {

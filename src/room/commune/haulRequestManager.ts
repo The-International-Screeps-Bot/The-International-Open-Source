@@ -1,4 +1,9 @@
-import { customColors, HaulRequestKeys, CombatRequestKeys, RoomMemoryKeys } from 'international/constants'
+import {
+    customColors,
+    HaulRequestKeys,
+    CombatRequestKeys,
+    RoomMemoryKeys,
+} from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -29,7 +34,10 @@ export class HaulRequestManager {
 
             // The room is closed or is now a respawn or novice zone
 
-            if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
+            if (
+                Game.map.getRoomStatus(requestName).status !==
+                Game.map.getRoomStatus(room.name).status
+            ) {
                 delete Memory.haulRequests[requestName]
                 room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 delete request[HaulRequestKeys.responder]
@@ -41,7 +49,8 @@ export class HaulRequestManager {
 
             const val3 = request[0]
 
-            if (request[HaulRequestKeys.type] === 'transfer') this.preTickTransferRequest(requestName, index)
+            if (request[HaulRequestKeys.type] === 'transfer')
+                this.preTickTransferRequest(requestName, index)
             this.withdrawRequest(requestName, index)
         }
     }
@@ -64,14 +73,18 @@ export class HaulRequestManager {
 
             // The room is closed or is now a respawn or novice zone
 
-            if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
+            if (
+                Game.map.getRoomStatus(requestName).status !==
+                Game.map.getRoomStatus(room.name).status
+            ) {
                 delete Memory.haulRequests[requestName]
                 room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 delete request[HaulRequestKeys.responder]
                 return
             }
 
-            if (request[HaulRequestKeys.type] === 'transfer') this.transferRequest(requestName, index)
+            if (request[HaulRequestKeys.type] === 'transfer')
+                this.transferRequest(requestName, index)
             this.withdrawRequest(requestName, index)
         }
 
@@ -116,7 +129,10 @@ export class HaulRequestManager {
 
         // If there are no enemyCreeps, delete the combatRequest
 
-        if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
+        if (
+            !requestRoom.enemyCreeps.length &&
+            (!requestRoom.controller || !requestRoom.controller.owner)
+        ) {
             delete Memory.haulRequests[requestName]
             room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
             delete request[HaulRequestKeys.responder]

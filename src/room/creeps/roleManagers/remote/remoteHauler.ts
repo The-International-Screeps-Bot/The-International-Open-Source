@@ -76,7 +76,7 @@ export class RemoteHauler extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory[RoomMemoryKeys.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
 
         return true
@@ -106,7 +106,7 @@ export class RemoteHauler extends Creep {
     isRemoteValid?(remoteName: string, sourceIndex: number) {
         const remoteMemory = Memory.rooms[remoteName]
 
-        if (remoteMemory[RoomMemoryKeys.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
 
         // Make sure reservation is below reservation maximum
@@ -116,7 +116,8 @@ export class RemoteHauler extends Creep {
                 (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
                     packedPosLength) *
                     remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
-            ) * 2
+            ) *
+                2
         ) {
             return false
         }
@@ -127,7 +128,6 @@ export class RemoteHauler extends Creep {
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] <
             this.freeNextStore
         ) {
-
             return false
         }
 
@@ -597,7 +597,7 @@ export class RemoteHauler extends Creep {
         creepMemory[CreepMemoryKeys.remote] = creepAtPosMemory[CreepMemoryKeys.remote]
         creepAtPosMemory[CreepMemoryKeys.remote] = remote
 
-        const sourceIndex =creepMemory[CreepMemoryKeys.sourceIndex]
+        const sourceIndex = creepMemory[CreepMemoryKeys.sourceIndex]
         creepMemory[CreepMemoryKeys.sourceIndex] = creepAtPosMemory[CreepMemoryKeys.sourceIndex]
         creepAtPosMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
 

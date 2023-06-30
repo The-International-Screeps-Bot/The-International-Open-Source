@@ -2015,7 +2015,7 @@ declare global {
         [RoomMemoryKeys.minHaulerCost]: number
         [RoomMemoryKeys.minHaulerCostUpdate]: number
         [RoomMemoryKeys.greatestRCL]: number
-        [RoomMemoryKeys.abandoned]: boolean
+        [RoomMemoryKeys.abandonCommune]: boolean
         [RoomMemoryKeys.marketData]: {
             [RESOURCE_ENERGY]?: number
             sellAvg?: { [key in ResourceConstant]?: number }
@@ -2044,7 +2044,7 @@ declare global {
         [RoomMemoryKeys.remoteCoreAttacker]: number
         [RoomMemoryKeys.remoteBuilder]: number
         [RoomMemoryKeys.remoteDismantler]: number
-        [RoomMemoryKeys.abandon]: number
+        [RoomMemoryKeys.abandonRemote]: number
         [RoomMemoryKeys.use]: boolean
         [RoomMemoryKeys.enemyReserved]: boolean
         [RoomMemoryKeys.invaderCore]: number

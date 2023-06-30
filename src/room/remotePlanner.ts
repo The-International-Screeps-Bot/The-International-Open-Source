@@ -458,33 +458,6 @@ export class RemotePlanner {
         planCoord.minRCL = Math.min(planCoord.minRCL, minRCL)
         */
     }
-    private setRampartPlansXY(
-        x: number,
-        y: number,
-        minRCL: number,
-        coversStructure: boolean,
-        buildForNuke: boolean,
-        buildForThreat: boolean,
-    ) {
-        const packedCoord = packXYAsCoord(x, y)
-
-        const coordData = this.rampartPlans.map[packedCoord]
-        if (coordData) {
-            this.rampartPlans.map[packedCoord] = {
-                minRCL: Math.min(coordData.minRCL, minRCL),
-                coversStructure: +coordData.coversStructure /* || +coversStructure */,
-                buildForNuke: +coordData.buildForNuke /* || +buildForNuke */,
-                buildForThreat: +coordData.buildForThreat /* || +buildForThreat */,
-            }
-        }
-
-        this.rampartPlans.map[packedCoord] = {
-            minRCL,
-            coversStructure: +coversStructure,
-            buildForNuke: +buildForNuke,
-            buildForThreat: +buildForThreat,
-        }
-    }
     private recordExits() {
         for (const packedCoord of this.room.exitCoords) {
             const coord = unpackCoord(packedCoord)
@@ -1954,14 +1927,7 @@ export class RemotePlanner {
                         // It's not our first room, have a rampart planned to build the spawn under
 
                         if (i === 0 && !this.isStartRoom) {
-                            this.setRampartPlansXY(
-                                properCoord.x,
-                                properCoord.y,
-                                2,
-                                false,
-                                false,
-                                false,
-                            )
+
                         }
 
                         spawnCoords.splice(j, 1)
@@ -2607,7 +2573,6 @@ export class RemotePlanner {
             this.stampAnchors.minCutRampart.push(coord)
             /* this.roadCoords[packedCoord] = 1
             this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4) */
-            this.setRampartPlansXY(coord.x, coord.y, 4, false, false, false)
         }
         /*
         for (const coord of contigiousProtectionCoords) this.room.coordVisual(coord.x, coord.y)
@@ -2780,7 +2745,6 @@ export class RemotePlanner {
                 if (unprotectedCoords[packedAdjCoord] === 255) return
 
                 if (!this.minCutCoords.has(packedAdjCoord) && getRange(coord, adjCoord) === 1) {
-                    this.setRampartPlansXY(adjCoord.x, adjCoord.y, 4, false, false, true)
                     this.rampartCoords[packedAdjCoord] = 1
 
                     addedMinCutRamparts.push(adjCoord)
@@ -2850,7 +2814,6 @@ export class RemotePlanner {
                 onboardingCoords.add(packedCoord)
                 this.rampartCoords[packedCoord] = 1
 
-                this.setRampartPlansXY(coord.x, coord.y, 4, false, false, forThreat)
 
                 onboardingCount += 1
                 if (forThreat) break
@@ -3073,7 +3036,6 @@ export class RemotePlanner {
         const packedCoord = packAsNum(coord)
         if (this.unprotectedCoords[packedCoord] === 0) return
 
-        this.setRampartPlansXY(coord.x, coord.y, 4, coversStructure, false, false)
         this.stampAnchors.shieldRampart.push(coord)
         this.rampartCoords[packedCoord] = 1
         this.unprotectedCoords[packedCoord] = 0
@@ -3122,7 +3084,6 @@ export class RemotePlanner {
                 if (this.rampartPlans.getXY(coord.x, coord.y)) continue
 
                 const isProtected = this.unprotectedCoords[packedNumCoord] === 0
-                this.setRampartPlansXY(coord.x, coord.y, data.minRCL, true, isProtected, false)
 
                 this.stampAnchors.shieldRampart.push(coord)
                 this.rampartCoords[packedNumCoord] = 1

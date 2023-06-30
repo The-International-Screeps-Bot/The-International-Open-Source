@@ -30,11 +30,7 @@ export class RemoteBuilder extends Creep {
         if (this.spawning) return false
 
         if (this.memory[CreepMemoryKeys.remote]) {
-            if (
-                this.ticksToLive >
-                this.body.length * CREEP_SPAWN_TIME
-            )
-                return false
+            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
         // Record creep as isDying
@@ -51,7 +47,6 @@ export class RemoteBuilder extends Creep {
         const remoteName = creepMemory[CreepMemoryKeys.remote]
 
         if (remoteName === this.room.name) {
-
             this.remoteActions()
         }
 
@@ -69,7 +64,7 @@ export class RemoteBuilder extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory[RoomMemoryKeys.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
 
         return true
     }
@@ -102,8 +97,7 @@ export class RemoteBuilder extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] +=
-            this.parts.work
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] += this.parts.work
     }
 
     removeRemote?() {
@@ -112,18 +106,14 @@ export class RemoteBuilder extends Creep {
         if (!this.isDying()) {
             const remoteName = creepMemory[CreepMemoryKeys.remote]
 
-            Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] -=
-                this.parts.work
+            Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] -= this.parts.work
         }
 
         delete creepMemory[CreepMemoryKeys.remote]
         delete creepMemory[CreepMemoryKeys.packedCoord]
     }
 
-    remoteActions?() {
-
-
-    }
+    remoteActions?() {}
 
     static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
@@ -168,28 +158,24 @@ export class RemoteBuilder extends Creep {
 
             creep.message = creepMemory[CreepMemoryKeys.remote]
 
-
-
-            creep.createMoveRequest(
-                {
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: new RoomPosition(25, 25, creepMemory[CreepMemoryKeys.remote]),
-                            range: 1,
-                        },
-                    ],
-                    avoidEnemyRanges: true,
-                    typeWeights: {
-                        [RoomTypes.enemy]: Infinity,
-                        [RoomTypes.ally]: Infinity,
-                        [RoomTypes.keeper]: Infinity,
-                        [RoomTypes.enemyRemote]: Infinity,
-                        [RoomTypes.allyRemote]: Infinity,
+            creep.createMoveRequest({
+                origin: creep.pos,
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, creepMemory[CreepMemoryKeys.remote]),
+                        range: 1,
                     },
-                    avoidAbandonedRemotes: true,
+                ],
+                avoidEnemyRanges: true,
+                typeWeights: {
+                    [RoomTypes.enemy]: Infinity,
+                    [RoomTypes.ally]: Infinity,
+                    [RoomTypes.keeper]: Infinity,
+                    [RoomTypes.enemyRemote]: Infinity,
+                    [RoomTypes.allyRemote]: Infinity,
                 },
-            )
+                avoidAbandonedRemotes: true,
+            })
         }
     }
 }

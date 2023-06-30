@@ -16,7 +16,11 @@ export class CombatRequestManager {
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
-        for (let index = room.memory[RoomMemoryKeys.combatRequests].length - 1; index >= 0; index -= 1) {
+        for (
+            let index = room.memory[RoomMemoryKeys.combatRequests].length - 1;
+            index >= 0;
+            index -= 1
+        ) {
             const requestName = room.memory[RoomMemoryKeys.combatRequests][index]
             const request = Memory.combatRequests[requestName]
 
@@ -64,10 +68,17 @@ export class CombatRequestManager {
         // Ensure we aren't responding to too many requests for our energy level
 
         if (room.storage && room.controller.level >= 4) {
-            if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.maxCombatRequests) return false
+            if (
+                room.memory[RoomMemoryKeys.combatRequests].length >=
+                room.communeManager.maxCombatRequests
+            )
+                return false
         }
 
-        if (room.memory[RoomMemoryKeys.combatRequests].length >= room.communeManager.estimatedEnergyIncome / 10)
+        if (
+            room.memory[RoomMemoryKeys.combatRequests].length >=
+            room.communeManager.estimatedEnergyIncome / 10
+        )
             return false
         return true
     }
@@ -100,7 +111,10 @@ export class CombatRequestManager {
 
         // If there are no enemyCreeps, delete the combatRequest
 
-        if (!requestRoom.enemyCreeps.length && (!requestRoom.controller || !requestRoom.controller.owner)) {
+        if (
+            !requestRoom.enemyCreeps.length &&
+            (!requestRoom.controller || !requestRoom.controller.owner)
+        ) {
             this.communeManager.deleteCombatRequest(requestName, index)
             return
         }
@@ -163,14 +177,18 @@ export class CombatRequestManager {
             if (enemyCreep.combatStrength.ranged > request[CombatRequestKeys.minRangedHeal] * 4)
                 request[CombatRequestKeys.minRangedHeal] = enemyCreep.combatStrength.ranged + 1
 
-            if (enemyCreep.combatStrength.heal > request[CombatRequestKeys.minDamage] * enemyCreep.defenceStrength * 4)
+            if (
+                enemyCreep.combatStrength.heal >
+                request[CombatRequestKeys.minDamage] * enemyCreep.defenceStrength * 4
+            )
                 request[CombatRequestKeys.minDamage] = enemyCreep.combatStrength.heal + 1
         }
 
         if (!requestRoom.enemyDamageThreat) {
             request[CombatRequestKeys.inactionTimer] -= 1
             this.manageInaction(requestName, index)
-        } else request[CombatRequestKeys.inactionTimer] = request[CombatRequestKeys.inactionTimerMax]
+        } else
+            request[CombatRequestKeys.inactionTimer] = request[CombatRequestKeys.inactionTimerMax]
     }
 
     private manageInaction(requestName: string, index: number) {

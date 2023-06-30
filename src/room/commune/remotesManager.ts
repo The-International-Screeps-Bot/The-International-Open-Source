@@ -67,7 +67,7 @@ export class RemotesManager {
                 continue
             }
 
-            if (remoteMemory[RoomMemoryKeys.abandon] > 0) {
+            if (remoteMemory[RoomMemoryKeys.abandonRemote] > 0) {
                 this.manageAbandonment(remoteName)
                 continue
             }
@@ -83,7 +83,7 @@ export class RemotesManager {
                 })
 
                 if (safeDistance > maxRemoteRoomDistance) {
-                    remoteMemory[RoomMemoryKeys.abandon] = randomRange(1000, 1500)
+                    remoteMemory[RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                     this.manageAbandonment(remoteName)
                     continue
                 }
@@ -93,7 +93,7 @@ export class RemotesManager {
                 })
 
                 if (Math.round(safeDistance * 0.75) > distance) {
-                    remoteMemory[RoomMemoryKeys.abandon] = randomRange(1000, 1500)
+                    remoteMemory[RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                     this.manageAbandonment(remoteName)
                     continue
                 }
@@ -163,7 +163,7 @@ export class RemotesManager {
                 // Temporary measure while DynamicSquads are in progress
 
                 if (remote.enemyAttackers.length) {
-                    remoteMemory[RoomMemoryKeys.abandon] = randomRange(1000, 1500)
+                    remoteMemory[RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                     continue
                 }
 
@@ -242,7 +242,7 @@ export class RemotesManager {
                 }
             }
 
-            if (remoteMemory[RoomMemoryKeys.abandon]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
 
             /*
             const remote = Game.rooms[remoteName]
@@ -294,7 +294,7 @@ export class RemotesManager {
 
                 if (
                     remoteTypeWeights[remoteMemory[RoomMemoryKeys.type]] !== Infinity &&
-                    !remoteMemory[RoomMemoryKeys.abandon]
+                    !remoteMemory[RoomMemoryKeys.abandonRemote]
                 )
                     continue
 
@@ -309,15 +309,12 @@ export class RemotesManager {
     private manageAbandonment(remoteName: string) {
         const remoteMemory = Memory.rooms[remoteName]
 
-        remoteMemory[RoomMemoryKeys.abandon] -= 1
+        remoteMemory[RoomMemoryKeys.abandonRemote] -= 1
 
-        const abandonment = remoteMemory[RoomMemoryKeys.abandon]
+        const abandonment = remoteMemory[RoomMemoryKeys.abandonRemote]
 
-        remoteMemory[RoomMemoryKeys.abandon] = abandonment
+        remoteMemory[RoomMemoryKeys.abandonRemote] = abandonment
     }
 
-    private recurseAbandonment(remoteName: string) {
-
-        
-    }
+    private recurseAbandonment(remoteName: string) {}
 }

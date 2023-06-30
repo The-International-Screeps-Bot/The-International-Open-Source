@@ -217,7 +217,10 @@ export enum RoomMemoryKeys {
     minHaulerCost,
     minHaulerCostUpdate,
     greatestRCL,
-    abandoned,
+    /**
+     * Wether or not we are trying to have the room go from commune to neutral
+     */
+    abandonCommune,
     marketData,
     factoryProduct,
     factoryUsableResources,
@@ -232,7 +235,7 @@ export enum RoomMemoryKeys {
     remoteCoreAttacker,
     remoteBuilder,
     remoteDismantler,
-    abandon,
+    abandonRemote,
     use,
     enemyReserved,
     invaderCore,
@@ -280,7 +283,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.minHaulerCostUpdate,
     RoomMemoryKeys.threatened,
     RoomMemoryKeys.lastAttacked,
-    RoomMemoryKeys.abandoned,
+    RoomMemoryKeys.abandonCommune,
     RoomMemoryKeys.score,
     RoomMemoryKeys.dynamicScore,
     RoomMemoryKeys.dynamicScoreUpdate,
@@ -313,7 +316,7 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.minHaulerCostUpdate,
         RoomMemoryKeys.threatened,
         RoomMemoryKeys.lastAttacked,
-        RoomMemoryKeys.abandoned,
+        RoomMemoryKeys.abandonCommune,
         RoomMemoryKeys.score,
         RoomMemoryKeys.dynamicScore,
         RoomMemoryKeys.dynamicScoreUpdate,

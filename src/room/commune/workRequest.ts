@@ -1,4 +1,10 @@
-import { WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys, RoomTypes, customColors } from 'international/constants'
+import {
+    WorkRequestKeys,
+    CombatRequestKeys,
+    RoomMemoryKeys,
+    RoomTypes,
+    customColors,
+} from 'international/constants'
 import { advancedFindDistance, customLog } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { CommuneManager } from './commune'
@@ -63,7 +69,9 @@ export class WorkRequestManager {
 
         // The room is closed or is now a respawn or novice zone
 
-        if (Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status) {
+        if (
+            Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
+        ) {
             this.delete()
             return
         }
@@ -102,14 +110,21 @@ export class WorkRequestManager {
         if (invaderCores.length) {
             // Abandon for the core's remaining existance plus the estimated reservation time
 
-            this.abandon(invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining + CONTROLLER_RESERVE_MAX)
+            this.abandon(
+                invaderCores[0].effects[EFFECT_COLLAPSE_TIMER].ticksRemaining +
+                    CONTROLLER_RESERVE_MAX,
+            )
             return
         }
 
         if (request[WorkRequestKeys.forAlly]) {
-            request[WorkRequestKeys.allyVanguard] = requestRoom.roomManager.structures.spawn.length ? 0 : 20
+            request[WorkRequestKeys.allyVanguard] = requestRoom.roomManager.structures.spawn.length
+                ? 0
+                : 20
         } else {
-            request[WorkRequestKeys.vanguard] = requestRoom.roomManager.structures.spawn.length ? 0 : 20
+            request[WorkRequestKeys.vanguard] = requestRoom.roomManager.structures.spawn.length
+                ? 0
+                : 20
         }
 
         /*
@@ -133,7 +148,7 @@ export class WorkRequestManager {
                 request[WorkRequestKeys.minHeal] -= allyCreep.combatStrength.ranged
             }
 
-            if (request[WorkRequestKeys.minDamage] > 0 || request[WorkRequestKeys.minHeal] > 0) this.abandon()
+            if (request[WorkRequestKeys.minDamage] > 0 || request[WorkRequestKeys.minHeal] > 0) this.abandonRemote()
         } */
 
         // If CPU logging is enabled, log the CPU used by this manager
@@ -188,7 +203,9 @@ export class WorkRequestManager {
             const combatRequestResponder = Game.rooms[combatRequest[CombatRequestKeys.responder]]
             combatRequestResponder.communeManager.deleteCombatRequest(
                 combatRequest[CombatRequestKeys.responder],
-                combatRequestResponder.memory[RoomMemoryKeys.combatRequests].indexOf(workRequestName),
+                combatRequestResponder.memory[RoomMemoryKeys.combatRequests].indexOf(
+                    workRequestName,
+                ),
             )
             return
         }

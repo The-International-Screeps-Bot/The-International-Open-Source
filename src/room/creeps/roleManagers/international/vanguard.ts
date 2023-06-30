@@ -79,13 +79,12 @@ export class Vanguard extends Creep {
     }
 
     findRampartTarget?() {
-
         const creepMemory = Memory.creeps[this.name]
         if (creepMemory[CreepMemoryKeys.targetID]) {
-
-            const rampartTarget = Game.getObjectById(creepMemory[CreepMemoryKeys.targetID]) as StructureRampart
+            const rampartTarget = Game.getObjectById(
+                creepMemory[CreepMemoryKeys.targetID],
+            ) as StructureRampart
             if (rampartTarget && rampartTarget instanceof StructureRampart) {
-
                 return rampartTarget
             }
         }

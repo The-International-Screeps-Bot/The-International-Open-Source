@@ -1,4 +1,10 @@
-import { CreepMemoryKeys, Result, RoomMemoryKeys, RoomTypes, remoteTypeWeights } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    Result,
+    RoomMemoryKeys,
+    RoomTypes,
+    remoteTypeWeights,
+} from 'international/constants'
 import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
 
 export class RemoteDismantler extends Creep {
@@ -28,7 +34,6 @@ export class RemoteDismantler extends Creep {
     }
 
     assignRemote?() {
-
         if (this.isDying()) return
 
         const role = this.role as 'remoteDismantler'
@@ -52,7 +57,7 @@ export class RemoteDismantler extends Creep {
 
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory[RoomMemoryKeys.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
 
         return true
     }
@@ -152,7 +157,9 @@ export class RemoteDismantler extends Creep {
                 return true
             }
 
-            this.memory[CreepMemoryKeys.structureTarget] = target.id as Id<Structure<BuildableStructureConstant>>
+            this.memory[CreepMemoryKeys.structureTarget] = target.id as Id<
+                Structure<BuildableStructureConstant>
+            >
 
             this.dismantle(target)
             return true
@@ -218,8 +225,9 @@ export class RemoteDismantler extends Creep {
                     avoidAbandonedRemotes: true,
                 }) === Result.fail
             ) {
-
-                Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.abandon] = 1500
+                Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
+                    RoomMemoryKeys.abandonRemote
+                ] = 1500
                 delete creepMemory[CreepMemoryKeys.remote]
             }
         }

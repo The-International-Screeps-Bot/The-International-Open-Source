@@ -221,7 +221,7 @@ export function advancedFindDistance(
                 opts.avoidAbandonedRemotes &&
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.remote
             ) {
-                if (roomMemory[RoomMemoryKeys.abandon]) {
+                if (roomMemory[RoomMemoryKeys.abandonRemote]) {
                     return 30
                 }
             }
@@ -639,7 +639,6 @@ export function randomTick(max: number = 20) {
 }
 
 export function randomChance(number: number = 10) {
-
     return Math.floor(Math.random() * number) === number
 }
 
@@ -906,7 +905,7 @@ export function findDynamicScore(roomName: string) {
                     Math.abs(
                         advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
                     ),
-                    1.5,
+                    1.8,
                 ) +
                 (maxControllerLevel - searchRoom.controller.level)
             if (score <= communeScore) return
@@ -932,14 +931,16 @@ export function findDynamicScore(roomName: string) {
     })
 
     dynamicScore += Math.round(Math.pow(closestEnemy, -0.8) * 25)
-    dynamicScore += Math.round(communeScore * 5)
+    dynamicScore += Math.round(communeScore * 15)
     dynamicScore += allyScore
 
     // Prefer minerals with below average communes
 
     const roomMemory = Memory.rooms[roomName]
     const mineralType = roomMemory[RoomMemoryKeys.mineralType]
-    const mineralScore = internationalManager.mineralCommunes[mineralType] - internationalManager.avgCommunesPerMineral
+    const mineralScore =
+        internationalManager.mineralCommunes[mineralType] -
+        internationalManager.avgCommunesPerMineral
     dynamicScore += mineralScore * 40
 
     roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
@@ -957,11 +958,15 @@ export function sortBy<T>(array: T[], score: (t: T) => number, reversed?: true):
 }
 
 export function randomOf<T>(array: T[]): T {
-
     return array[Math.floor(Math.random() * array.length)]
 }
 
-export function visualizePath(path: RoomPosition[], color: string = customColors.yellow) {
+export function visualizePath(
+    path: RoomPosition[],
+    color: string = customColors.yellow,
+    visualize: boolean = Memory.roomVisuals,
+) {
+    if (!visualize) return
 
     for (let i = 0; i < path.length; i++) {
         const nextPos = path[i + 1]

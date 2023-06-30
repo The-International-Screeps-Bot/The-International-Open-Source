@@ -617,7 +617,7 @@ export class SpawnRequestsManager {
 
                 if (!this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
-                const priority = this.activeRemotePriority + .1
+                const priority = this.activeRemotePriority + 0.1
                 let partsMultiplier = 0
 
                 // If there is an active storage
@@ -753,7 +753,6 @@ export class SpawnRequestsManager {
                     this.communeManager.room.controller.ticksToDowngrade <=
                     this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
-
                     const priority = 5
 
                     if (this.communeManager.hasSufficientRoads()) {
@@ -783,7 +782,7 @@ export class SpawnRequestsManager {
                     }
                 }
 
-                const priority = this.activeRemotePriority + .2
+                const priority = this.activeRemotePriority + 0.2
 
                 // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 
@@ -1025,8 +1024,8 @@ export class SpawnRequestsManager {
 
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
-            if (remoteMemory[RoomMemoryKeys.abandoned]) continue
-/*
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            /*
             const remoteHaulerNeed = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
             const harvesterPriority = this.minRemotePriority + priorityIncrement + (remoteHaulerNeed > 0 ? 1 : 100)
  */
@@ -1047,8 +1046,8 @@ export class SpawnRequestsManager {
                     const spawnGroup =
                         this.communeManager.remoteSourceHarvesters[remoteName][sourceIndex]
                     const sourcePositionsAmount =
-                        remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
-                        packedPosLength
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex]
+                            .length / packedPosLength
 
                     if (this.spawnEnergyCapacity >= 950) {
                         return {
@@ -1140,11 +1139,17 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'remoteHauler'
 
-                    const partsMultiplier = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] - this.communeManager.haulerCarryParts
-                    this.communeManager.haulerCarryParts -= remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
+                    const partsMultiplier =
+                        remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] -
+                        this.communeManager.haulerCarryParts
+                    this.communeManager.haulerCarryParts -=
+                        remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
-                    this.activeRemotePriority = Math.max(this.activeRemotePriority, harvesterPriority + .1)
+                    this.activeRemotePriority = Math.max(
+                        this.activeRemotePriority,
+                        harvesterPriority + 0.1,
+                    )
 
                     // Lower priority - more preference - than remote harvesters
 
@@ -1276,7 +1281,7 @@ export class SpawnRequestsManager {
                         return false
 
                     const priority = this.minRemotePriority + 0.1
-                    this.activeRemotePriority = Math.max(this.activeRemotePriority, priority + .1)
+                    this.activeRemotePriority = Math.max(this.activeRemotePriority, priority + 0.1)
 
                     return {
                         role: 'remoteReserver',
@@ -1330,13 +1335,13 @@ export class SpawnRequestsManager {
                     const healAmount = Math.floor(minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
                     if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                        Memory.rooms[remoteName][RoomMemoryKeys.abandon] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                         return false
                     }
 
                     const minCost = minRangedAttackCost + minHealCost
                     if (minCost > this.spawnEnergyCapacity) {
-                        Memory.rooms[remoteName][RoomMemoryKeys.abandon] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                         return false
                     }
 
@@ -1441,7 +1446,7 @@ export class SpawnRequestsManager {
                     partsMultiplier: 1,
                     minCreeps,
                     minCost: 50,
-                    priority: this.activeRemotePriority + .3,
+                    priority: this.activeRemotePriority + 0.3,
                     memoryAdditions: {},
                 }
             })(),

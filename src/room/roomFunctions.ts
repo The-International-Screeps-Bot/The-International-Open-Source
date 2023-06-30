@@ -215,6 +215,9 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
     const roomMemory = Memory.rooms[this.name]
+
+    // The room is a remote but its commune no longer exists, change to neutral
+
     if (
         roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
         !global.communes.has(roomMemory[RoomMemoryKeys.commune])
@@ -369,14 +372,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.hasContainer] = []
 
         for (const i in packedRemoteSources) {
-
             roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
             roomMemory[RoomMemoryKeys.hasContainer][i] = false
         }
         roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
         roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
         roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
-        roomMemory[RoomMemoryKeys.abandon] = 0
+        roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
         // Add the room's name to the scoutingRoom's remotes list
 
@@ -445,14 +447,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.hasContainer] = []
 
     for (const i in packedRemoteSources) {
-
         roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
         roomMemory[RoomMemoryKeys.hasContainer][i] = false
     }
     roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
     roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
     roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
-    roomMemory[RoomMemoryKeys.abandon] = 0
+    roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
     // Add the room's name to the scoutingRoom's remotes list
 

@@ -1,5 +1,12 @@
 import { unpackPosAt, unpackPosList } from 'other/codec'
-import { customColors, WorkRequestKeys, RoomMemoryKeys, RoomTypes, roomDimensions, packedPosLength } from './constants'
+import {
+    customColors,
+    WorkRequestKeys,
+    RoomMemoryKeys,
+    RoomTypes,
+    roomDimensions,
+    packedPosLength,
+} from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
 import { InternationalManager } from './international'
 import { updateStat } from './statsManager'
@@ -48,7 +55,9 @@ class MapVisualsManager {
 
                 // Spawn usage
                 const spawnUsage = `${
-                    Memory.stats.rooms[roomName].su ? Math.floor(Memory.stats.rooms[roomName].su * 100).toFixed(0) : 0
+                    Memory.stats.rooms[roomName].su
+                        ? Math.floor(Memory.stats.rooms[roomName].su * 100).toFixed(0)
+                        : 0
                 }%`
                 Game.map.visual.text(`${spawnUsage}`, new RoomPosition(48, 40, roomName), {
                     align: 'right',
@@ -109,7 +118,9 @@ class MapVisualsManager {
 
                 if (commune) {
                     for (const sourceIndex in roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
-                        const path = unpackPosList(roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
+                        const path = unpackPosList(
+                            roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex],
+                        )
 
                         Game.map.visual.poly(path, {
                             stroke: customColors.yellow,
@@ -120,16 +131,18 @@ class MapVisualsManager {
                         // Get the income based on the reservation of the room and remoteHarvester need
 
                         const income = Math.min(
-                            roomMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] * HARVEST_POWER,
+                            roomMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] *
+                                HARVEST_POWER,
                             roomMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
                         )
 
                         const pos = path[0]
                         const remoteSourceHarvesters =
-                            commune.communeManager.remoteSourceHarvesters[roomName][sourceIndex].length
+                            commune.communeManager.remoteSourceHarvesters[roomName][sourceIndex]
+                                .length
                         const maxRemoteSourceHarvesters =
-                            roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex].length /
-                            packedPosLength
+                            roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex]
+                                .length / packedPosLength
 
                         Game.map.visual.text(
                             `⛏️${income},🚶‍♀️${
@@ -153,9 +166,9 @@ class MapVisualsManager {
                     }
                 }
 
-                if (roomMemory[RoomMemoryKeys.abandon]) {
+                if (roomMemory[RoomMemoryKeys.abandonRemote]) {
                     Game.map.visual.text(
-                        `❌${roomMemory[RoomMemoryKeys.abandon].toString()}`,
+                        `❌${roomMemory[RoomMemoryKeys.abandonRemote].toString()}`,
                         new RoomPosition(2, 16, roomName),
                         {
                             align: 'left',

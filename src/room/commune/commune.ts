@@ -128,7 +128,6 @@ export class CommuneManager {
      */
     haulerCarryParts: number
 
-
     constructor() {
         this.constructionManager = new ConstructionManager(this)
         this.combatManager = new CombatManager(this)
@@ -176,7 +175,7 @@ export class CommuneManager {
 
         // If we should abandon the room
 
-        if (roomMemory[RoomMemoryKeys.abandoned] === true) {
+        if (roomMemory[RoomMemoryKeys.abandonCommune] === true) {
             room.controller.unclaim()
             roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
             cleanRoomMemory(room.name)
@@ -317,7 +316,6 @@ export class CommuneManager {
     }
 
     private preTickTest() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
