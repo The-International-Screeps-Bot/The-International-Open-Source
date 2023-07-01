@@ -398,18 +398,18 @@ Creep.prototype.advancedBuild = function () {
 
     // Try to run catch every situation of results
 
-    if (this.builderGetEnergy() !== Result.success) return Result.action
+    if (this.builderGetEnergy() === Result.stop) return Result.action
 
     if (this.advancedBuildCSite(cSiteTarget) !== Result.success) return Result.action
 
-    if (this.builderGetEnergy() !== Result.success) return Result.action
+    if (this.builderGetEnergy() === Result.stop) return Result.action
     return Result.success
 }
 
 Creep.prototype.builderGetEnergy = function () {
     // If there is a sufficient storing structure
 
-    if (this.room.communeManager.buildersMakeRequests) return Result.success
+    if (this.room.communeManager.buildersMakeRequests) return Result.noAction
     if (!this.needsResources()) return Result.noAction
 
     if (this.room.communeManager && this.room.communeManager.storingStructures.length) {

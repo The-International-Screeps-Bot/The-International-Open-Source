@@ -825,7 +825,7 @@ export class RoomManager {
 
     _structureCoords: Map<string, Id<Structure<StructureConstant>>[]>
     get structureCoords() {
-        if (this._structureCoords && !this.cSiteUpdate) return this._structureCoords
+        if (this._structureCoords && !this.structureUpdate) return this._structureCoords
 
         // Construct storage of structures based on structureType
 
