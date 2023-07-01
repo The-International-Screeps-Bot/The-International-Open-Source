@@ -234,6 +234,9 @@ Creep.prototype.findUpgradePos = function () {
 Creep.prototype.advancedUpgradeController = function () {
     const { room } = this
 
+    const creepMemory = Memory.creeps[this.name]
+    creepMemory[CreepMemoryKeys.targetID] = room.controller.id
+
     // Assign either the controllerLink or controllerContainer as the controllerStructure
 
     let controllerStructure: StructureLink | StructureContainer | undefined = room.controllerContainer
@@ -322,7 +325,7 @@ Creep.prototype.advancedUpgradeController = function () {
                 this.nextStore.energy += Math.min(this.store.getCapacity(), controllerStructure.nextStore.energy)
                 controllerStructure.nextStore.energy -= this.nextStore.energy
 
-                delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
+                delete creepMemory[CreepMemoryKeys.targetID]
                 this.message += `⚡`
             }
         }
@@ -340,7 +343,7 @@ Creep.prototype.advancedUpgradeController = function () {
 
         if (this.needsResources()) return false
 
-        delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
+        delete creepMemory[CreepMemoryKeys.targetID]
 
         this.createMoveRequest({
             origin: this.pos,

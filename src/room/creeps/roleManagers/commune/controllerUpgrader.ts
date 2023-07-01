@@ -42,13 +42,15 @@ export class ControllerUpgrader extends Creep {
                 room.controller.ticksToDowngrade <
                     room.communeManager.controllerDowngradeUpgradeThreshold
             ) {
+
                 creep.advancedUpgradeController()
+                continue
             }
 
             const cSiteTarget = creep.room.roomManager.cSiteTarget
             if (cSiteTarget) {
                 creep.advancedBuild()
-                return
+                continue
             }
 
             creep.advancedUpgradeController()
