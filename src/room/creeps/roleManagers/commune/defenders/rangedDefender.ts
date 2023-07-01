@@ -105,7 +105,7 @@ export class RangedDefender extends Creep {
 
         // If out of range, move to
 
-        if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 2) {
+        if (getRange(this.pos, enemyCreep.pos) > 2) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({

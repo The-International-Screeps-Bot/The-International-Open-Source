@@ -88,7 +88,7 @@ export class MeleeDefender extends Creep {
 
         // If out of range move to it
 
-        if (getRangeXY(this.pos.x, enemyCreep.pos.x, this.pos.y, enemyCreep.pos.y) > 1) {
+        if (getRange(this.pos, enemyCreep.pos) > 1) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: enemyCreep.pos, range: 1 }],

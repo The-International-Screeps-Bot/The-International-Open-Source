@@ -52,8 +52,6 @@ export class RemoteHarvester extends Creep {
             return
         }
 
-        const creepMemory = Memory.creeps[this.name]
-
         if (!this.hasValidRemote()) {
             this.removeRemote()
             return
@@ -62,12 +60,6 @@ export class RemoteHarvester extends Creep {
         // We do have a valid remote
 
         this.applyRemote()
-        // Make sure we are in the remote
-        if (creepMemory[CreepMemoryKeys.remote] !== this.room.name) return
-        if (!this.isDying()) {
-            this.room.creepsOfSource[creepMemory[CreepMemoryKeys.sourceIndex]].push(this.name)
-        }
-
         this.remoteActions()
 
         return
@@ -99,7 +91,11 @@ export class RemoteHarvester extends Creep {
                 packedPosLength
         )
             return false
-        if (remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] <= 0) return false
+        if (
+            remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] * HARVEST_POWER <=
+            remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex]
+        )
+            return false
 
         return true
     }
@@ -148,8 +144,14 @@ export class RemoteHarvester extends Creep {
         if (!this.spawning) {
 
         }
- */
+        */
         if (this.room.name === creepMemory[CreepMemoryKeys.remote]) {
+            if (!this.isDying()) {
+                this.room.creepsOfSource[creepMemory[CreepMemoryKeys.sourceIndex]].push(this.name)
+            }
+
+            // manage remote needs
+
             const totalCreditChange = Math.min(
                 // Dont allow negative credit change
                 Math.max(
@@ -216,9 +218,14 @@ export class RemoteHarvester extends Creep {
     }
 
     remoteActions?() {
+        const creepMemory = Memory.creeps[this.name]
+
+        // Make sure we are in the remote
+        if (creepMemory[CreepMemoryKeys.remote] !== this.room.name) return
+
         // Try to move to source
 
-        const sourceIndex = Memory.creeps[this.name][CreepMemoryKeys.sourceIndex]
+        const sourceIndex = creepMemory[CreepMemoryKeys.sourceIndex]
         if (this.travelToSource(sourceIndex) !== Result.success) return
 
         // Make sure we're a bit ahead source regen time
@@ -226,7 +233,7 @@ export class RemoteHarvester extends Creep {
         const sourcee = this.room.roomManager.remoteSources[this.memory[CreepMemoryKeys.sourceIndex]]
 
         this.room.visual.text((sourcee.energy * ENERGY_REGEN_TIME).toString() + ', ' + (sourcee.ticksToRegeneration * 0.9 * sourcee.energyCapacity).toString(), this.pos)
- */
+        */
 
         const container = this.room.sourceContainers[sourceIndex]
         if (container) {

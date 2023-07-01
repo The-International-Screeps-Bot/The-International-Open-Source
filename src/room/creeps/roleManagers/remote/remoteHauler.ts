@@ -454,7 +454,7 @@ export class RemoteHauler extends Creep {
 
             // We haven't emptied ourselves yet
             if (!this.needsResources()) return true
-
+            this.removeRemote()
             if (!this.findRemote()) return false
 
             this.message += this.memory[CreepMemoryKeys.remote]
@@ -500,8 +500,6 @@ export class RemoteHauler extends Creep {
 
         const anchor = this.commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remoteHauler ' + this.room.name)
-
-        if (!this.hasValidRemote()) return false
 
         this.createMoveRequestByPath(
             {
