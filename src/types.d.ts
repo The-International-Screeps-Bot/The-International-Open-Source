@@ -885,6 +885,19 @@ declare global {
         defaultCostMatrix: number[]
     }
 
+    interface EnemySquadData {
+        /**
+         * enemy attack + rangedAttack damage
+         */
+        highestMeleeDamage: number
+        highestRangedDamage: number
+        /**
+         * Accounts for defence
+         */
+        highestHeal: number
+        highestDismantle: number
+    }
+
     interface TotalEnemyCombatStrength {
         melee: number
         ranged: number
@@ -1547,7 +1560,7 @@ declare global {
         avoidEnemyThreatCoords(): boolean
 
         /**
-         * Decides if the creep needs to get more resources or not
+         * Decides if the creep needs to get more resources or not. DO NOT USE FOR CREEPS THAT PERFORM MULTIPLE TRANSACTIONS PER TICK
          */
         needsResources(): boolean
 
@@ -1925,14 +1938,19 @@ declare global {
         _nextStore: Partial<CustomStore>
 
         /**
-         * The estimated store values next tick
+         * The estimated store values next tick. Values can be negative
          */
         readonly nextStore: Partial<CustomStore>
 
         _usedNextStore: number
-
+        /**
+         * Can be negative
+         */
         readonly usedNextStore: number
 
+        /**
+         * Can be negative
+         */
         readonly freeNextStore: number
 
         _reserveStore: Partial<CustomStore>

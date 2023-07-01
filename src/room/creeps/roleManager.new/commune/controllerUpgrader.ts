@@ -23,11 +23,12 @@ export class ControllerUpgraderManager {
 
         return true
     }
-
+/*
+// Not good enough, we need to account for downgrading; state machine
     shouldBuild(creep: Creep) {
         return !!creep.room.roomManager.cSiteTarget;
     }
-
+ */
     initialRun(room: Room) {
 
         for (const creepName of room.myCreeps[this.role]) {
@@ -47,10 +48,10 @@ export class ControllerUpgraderManager {
     }
 
     private runCreep(creep: Creep) {
-        if (this.shouldBuild(creep)) {
+/*         if (this.shouldBuild(creep)) {
             creep.advancedBuild();
             return;
-        }
+        } */
         creep.advancedUpgradeController()
     }
 }

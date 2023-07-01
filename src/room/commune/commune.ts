@@ -793,4 +793,22 @@ export class CommuneManager {
         this._controllerLinkID = structure.id
         return this._controllerLink
     }
+
+    _fastFillerSpawnEnergyCapacity: number
+    get fastFillerSpawnEnergyCapacity() {
+        if (this._fastFillerSpawnEnergyCapacity && !this.room.roomManager.structureUpdate)
+            return this._fastFillerSpawnEnergyCapacity
+
+        let fastFillerSpawnEnergyCapacity = 0
+        const anchor = this.room.roomManager.anchor
+        if (!anchor) throw Error('no anchor for fastFillerSpawnEnergyCapacity ' + this.room)
+
+        for (const structure of this.room.spawningStructures) {
+            if (!structure.RCLActionable) continue
+
+            fastFillerSpawnEnergyCapacity += structure.store.getCapacity(RESOURCE_ENERGY)
+        }
+
+        return this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity
+    }
 }

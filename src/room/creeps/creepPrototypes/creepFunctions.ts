@@ -289,8 +289,8 @@ Creep.prototype.advancedUpgradeController = function () {
             // If the controllerStructure is a container and is in need of repair
 
             if (
-                this.nextStore.energy > 0 &&
                 controllerStructure.structureType === STRUCTURE_CONTAINER &&
+                this.nextStore.energy > 0 &&
                 controllerStructure.hitsMax - controllerStructure.hits >= workPartCount * REPAIR_POWER
             ) {
                 // If the repair worked
@@ -314,6 +314,7 @@ Creep.prototype.advancedUpgradeController = function () {
             }
 
             if (controllerStructureRange <= 1 && this.nextStore.energy <= 0) {
+
                 // Withdraw from the controllerContainer, informing false if the withdraw failed
 
                 if (this.withdraw(controllerStructure, RESOURCE_ENERGY) !== OK) return false
@@ -321,6 +322,7 @@ Creep.prototype.advancedUpgradeController = function () {
                 this.nextStore.energy += Math.min(this.store.getCapacity(), controllerStructure.nextStore.energy)
                 controllerStructure.nextStore.energy -= this.nextStore.energy
 
+                delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
                 this.message += `⚡`
             }
         }
@@ -337,6 +339,8 @@ Creep.prototype.advancedUpgradeController = function () {
         })
 
         if (this.needsResources()) return false
+
+        delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
 
         this.createMoveRequest({
             origin: this.pos,
@@ -394,11 +398,11 @@ Creep.prototype.advancedBuild = function () {
 
     // Try to run catch every situation of results
 
-    if (this.builderGetEnergy() === Result.stop) return Result.success
+    if (this.builderGetEnergy() !== Result.success) return Result.action
 
-    this.advancedBuildCSite(cSiteTarget)
+    if (this.advancedBuildCSite(cSiteTarget) !== Result.success) return Result.action
 
-    if (this.builderGetEnergy() === Result.stop) return Result.success
+    if (this.builderGetEnergy() !== Result.success) return Result.action
     return Result.success
 }
 
@@ -885,17 +889,19 @@ Creep.prototype.findMineralHarvestPos = function () {
 }
 
 Creep.prototype.needsResources = function () {
-    // If the creep is empty
 
-    if (this.usedNextStore === 0) return (this.memory[CreepMemoryKeys.needsResources] = true)
+    const creepMemory = Memory.creeps[this.name]
+
+    // If the creep is empty
+    if (this.usedNextStore <= 0) return (creepMemory[CreepMemoryKeys.needsResources] = true)
     // Otherwise if the creep is full
     else if (this.freeNextStore <= 0) {
-        delete this.memory[CreepMemoryKeys.needsResources]
+        delete creepMemory[CreepMemoryKeys.needsResources]
         return false
     } else {
         // Otherwise keep it the same
 
-        return this.memory[CreepMemoryKeys.needsResources]
+        return creepMemory[CreepMemoryKeys.needsResources]
     }
 }
 

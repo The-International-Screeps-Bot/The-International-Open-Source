@@ -13,6 +13,7 @@ import {
     maxControllerLevel,
     powerCreepClassNames,
     preferredCommuneRange,
+    quadAttackMemberOffsets,
     remoteTypeWeights,
     roomDimensions,
     roomTypesUsedForStats,
@@ -343,7 +344,12 @@ export class RoomManager {
     }
 
     isStartRoom() {
-        return global.communes.size === 1 && this.room.controller.my && this.room.controller.safeMode && global.communes.has(this.room.name)
+        return (
+            global.communes.size === 1 &&
+            this.room.controller.my &&
+            this.room.controller.safeMode &&
+            global.communes.has(this.room.name)
+        )
     }
 
     _anchor: RoomPosition
@@ -806,6 +812,11 @@ export class RoomManager {
 
         delete this._structureCoords
 
+        const communeManager = this.room.communeManager
+        if (communeManager) {
+            delete communeManager._fastFillerSpawnEnergyCapacity
+        }
+
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
 
         this.allStructureIDs = newAllStructures.map(structure => structure.id)
@@ -814,7 +825,7 @@ export class RoomManager {
 
     _structureCoords: Map<string, Id<Structure<StructureConstant>>[]>
     get structureCoords() {
-        if (this._structureCoords && !this.structureUpdate) return this._structureCoords
+        if (this._structureCoords && !this.cSiteUpdate) return this._structureCoords
 
         // Construct storage of structures based on structureType
 
@@ -931,5 +942,73 @@ export class RoomManager {
             this._cSites[cSite.structureType].push(cSite)
 
         return this._cSites
+    }
+
+    _enemyCreepPositions: { [packedCoord: string]: Id<Creep> }
+    get enemyCreepPositions() {
+        const enemyCreepPositions: { [packedCoord: string]: Id<Creep> } = {}
+
+        for (const creep of this.room.enemyCreeps) {
+            const packedCoord = packCoord(creep.pos)
+            enemyCreepPositions[packedCoord] = creep.id
+        }
+
+        return (this._enemyCreepPositions = enemyCreepPositions)
+    }
+
+    _enemySquadData: EnemySquadData
+    get enemySquadData() {
+        if (this._enemySquadData) return this._enemySquadData
+
+        const highestEnemySquadData: EnemySquadData = {
+            highestMeleeDamage: 0,
+            highestRangedDamage: 0,
+            highestHeal: 0,
+            highestDismantle: 0,
+        }
+        const enemyCreeps = this.room.enemyCreeps
+        if (!enemyCreeps.length) return this._enemySquadData = highestEnemySquadData
+
+        const enemyCreepIDs = new Set(enemyCreeps.map(creep => creep.id))
+
+        // For each creep, makeup a quad of creep around them
+
+        for (const creepID of enemyCreepIDs) {
+            const creep = findObjectWithID(creepID)
+            const squadData: EnemySquadData = {
+                highestMeleeDamage: 0,
+                highestRangedDamage: 0,
+                highestHeal: 0,
+                highestDismantle: 0,
+            }
+
+            for (const offset of quadAttackMemberOffsets) {
+                const coord = {
+                    x: creep.pos.x + offset.x,
+                    y: creep.pos.y + offset.y,
+                }
+
+                const creepIDAtPos = this.enemyCreepPositions[packCoord(coord)]
+                if (!creepIDAtPos) continue
+
+                const creepAtPos = findObjectWithID(creepIDAtPos)
+                const creepAtPosCombatStrength = creepAtPos.combatStrength
+
+                squadData.highestMeleeDamage += creepAtPosCombatStrength.melee + creepAtPosCombatStrength.ranged
+                squadData.highestRangedDamage += creepAtPosCombatStrength.ranged
+                squadData.highestHeal += creepAtPosCombatStrength.heal
+                squadData.highestDismantle += creepAtPosCombatStrength.dismantle
+            }
+
+            for (let x in squadData) {
+                const key = x as keyof EnemySquadData
+
+                if (squadData[key] <= highestEnemySquadData[key]) continue
+
+                highestEnemySquadData[key] = this.enemySquadData[key]
+            }
+        }
+
+        return this._enemySquadData = highestEnemySquadData
     }
 }

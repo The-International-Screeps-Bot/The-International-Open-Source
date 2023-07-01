@@ -2,8 +2,11 @@ import { PlayerMemoryKeys, customColors, towerPowers } from 'international/const
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
+    findHighestScore,
     findObjectWithID,
     findWeightedRangeFromExit,
+    findWithHighestScore,
+    findWithLowestScore,
     getRange,
     isXYInBorder,
     randomTick,
@@ -12,6 +15,8 @@ import {
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { playerManager } from 'international/players'
+
+const minTowerRampartRepairTreshold = 400
 
 export class TowerManager {
     communeManager: CommuneManager
@@ -42,6 +47,11 @@ export class TowerManager {
             if (tower.nextStore.energy < TOWER_ENERGY_COST) continue
 
             this.actionableTowerIDs.push(tower.id)
+        }
+
+        if (randomTick()) {
+
+            delete this._towerRampartRepairThreshold
         }
 
         this.createRoomLogisticsRequests()
@@ -222,21 +232,39 @@ export class TowerManager {
         })
     }
 
+    private findRampartRepairTarget() {
+
+        const ramparts = this.communeManager.room.roomManager.structures.rampart
+        if (!ramparts.length) return false
+
+        const rampartRepairThreshold = this.rampartRepairTreshold
+        const [score, rampart] = findWithLowestScore(ramparts, (rampart) => {
+
+            let score = rampart.hits
+            // Account for decay amount
+            score += (RAMPART_DECAY_AMOUNT - rampart.ticksToDecay) * RAMPART_DECAY_AMOUNT
+
+            return score
+        })
+
+        // Make sure the rampart is below the treshold
+        if (score > rampartRepairThreshold) return false
+        return rampart
+    }
+
     repairRamparts() {
         if (!this.actionableTowerIDs.length) return false
 
-        const repairTargets = this.findRampartRepairTargets()
-        if (!repairTargets.length) return true
+        const repairTarget = this.findRampartRepairTarget()
+        if (!repairTarget) return false
 
         for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
             const tower = findObjectWithID(this.actionableTowerIDs[i])
 
-            const target = repairTargets[repairTargets.length - 1]
+            const target = repairTarget
             if (tower.repair(target) !== OK) continue
 
             updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
-
-            repairTargets.pop()
 
             this.actionableTowerIDs.splice(i, 1)
         }
@@ -315,6 +343,20 @@ export class TowerManager {
                 })
             }
         }
+    }
+
+    _towerRampartRepairThreshold: number
+    get rampartRepairTreshold() {
+        if (this._towerRampartRepairThreshold) return this._towerRampartRepairThreshold
+
+        let rampartRepairTreshold = minTowerRampartRepairTreshold
+
+        const enemySquadData = this.communeManager.room.roomManager.enemySquadData
+        rampartRepairTreshold += enemySquadData.highestDismantle
+        // Melee damage includes ranged
+        rampartRepairTreshold += enemySquadData.highestMeleeDamage
+
+        return this._towerRampartRepairThreshold = rampartRepairTreshold
     }
 }
 

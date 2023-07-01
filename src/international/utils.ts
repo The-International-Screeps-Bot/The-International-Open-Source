@@ -862,6 +862,21 @@ export function findHighestScore<T>(iter: T[], f: (val: T) => number): number {
     return highestScore
 }
 
+export function findWithHighestScore<T>(iter: T[], f: (val: T) => number): [number, T | undefined] {
+    let highestScore = 0
+    let bestVal: T | undefined
+
+    for (const val of iter) {
+        const score = f(val)
+        if (score <= highestScore) continue
+
+        highestScore = score
+        bestVal = val
+    }
+
+    return [highestScore, bestVal]
+}
+
 export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
     let lowestScore = 0
 
@@ -873,6 +888,21 @@ export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
     }
 
     return lowestScore
+}
+
+export function findWithLowestScore<T>(iter: T[], f: (val: T) => number): [number, T | undefined] {
+    let lowestScore = 0
+    let bestVal: T | undefined
+
+    for (const val of iter) {
+        const score = f(val)
+        if (score >= lowestScore) continue
+
+        lowestScore = score
+        bestVal = val
+    }
+
+    return [lowestScore, bestVal]
 }
 
 export function findDynamicScore(roomName: string) {

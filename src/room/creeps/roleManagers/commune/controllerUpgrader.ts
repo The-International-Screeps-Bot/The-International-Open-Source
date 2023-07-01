@@ -1,4 +1,4 @@
-import { RoomMemoryKeys, packedPosLength } from 'international/constants'
+import { CreepMemoryKeys, RoomMemoryKeys, packedPosLength } from 'international/constants'
 
 export class ControllerUpgrader extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -14,7 +14,8 @@ export class ControllerUpgrader extends Creep {
 
         if (
             this.ticksToLive >
-            this.body.length * CREEP_SPAWN_TIME + this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength
+            this.body.length * CREEP_SPAWN_TIME +
+                this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength
         )
             return false
 
@@ -34,10 +35,20 @@ export class ControllerUpgrader extends Creep {
             // Get the creep using its creepName
 
             const creep: ControllerUpgrader = Game.creeps[creepName]
+            const creepMemory = Memory.creeps[creep.name]
 
-            if (creep.room.roomManager.cSiteTarget) {
-                creep.advancedBuild();
-                return;
+            if (
+                creepMemory[CreepMemoryKeys.targetID] === room.controller.id ||
+                room.controller.ticksToDowngrade <
+                    room.communeManager.controllerDowngradeUpgradeThreshold
+            ) {
+                creep.advancedUpgradeController()
+            }
+
+            const cSiteTarget = creep.room.roomManager.cSiteTarget
+            if (cSiteTarget) {
+                creep.advancedBuild()
+                return
             }
 
             creep.advancedUpgradeController()
