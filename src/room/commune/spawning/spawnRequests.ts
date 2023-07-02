@@ -520,7 +520,11 @@ export class SpawnRequestsManager {
 
                 let priority: number
 
-                if (repairTargets.length || this.communeManager.room.towerInferiority) {
+                if (
+                    repairTargets.length ||
+                    this.communeManager.room.towerInferiority ||
+                    !this.communeManager.storingStructures.length
+                ) {
                     priority = Math.min(
                         6 + this.communeManager.room.creepsFromRoom.maintainer.length * 0.5,
                         this.minRemotePriority - 0.5,
@@ -617,7 +621,13 @@ export class SpawnRequestsManager {
 
                 if (!this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
-                const priority = this.activeRemotePriority + 0.1
+                let priority: number
+                if (this.communeManager.storingStructures.length) {
+                    priority = this.activeRemotePriority + 0.1
+                } else {
+                    priority = this.minRemotePriority - 0.5
+                }
+
                 let partsMultiplier = 0
 
                 // If there is an active storage
@@ -782,7 +792,12 @@ export class SpawnRequestsManager {
                     }
                 }
 
-                const priority = this.activeRemotePriority + 0.2
+                let priority: number
+                if (this.communeManager.storingStructures.length) {
+                    priority = this.activeRemotePriority + 0.2
+                } else {
+                    priority = this.minRemotePriority - 1
+                }
 
                 // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 

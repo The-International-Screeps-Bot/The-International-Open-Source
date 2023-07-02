@@ -878,7 +878,7 @@ export function findWithHighestScore<T>(iter: T[], f: (val: T) => number): [numb
 }
 
 export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
-    let lowestScore = 0
+    let lowestScore = Infinity
 
     for (const val of iter) {
         const score = f(val)
@@ -891,7 +891,7 @@ export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
 }
 
 export function findWithLowestScore<T>(iter: T[], f: (val: T) => number): [number, T | undefined] {
-    let lowestScore = 0
+    let lowestScore = Infinity
     let bestVal: T | undefined
 
     for (const val of iter) {

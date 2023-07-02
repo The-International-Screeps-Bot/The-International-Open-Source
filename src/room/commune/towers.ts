@@ -242,7 +242,7 @@ export class TowerManager {
 
             let score = rampart.hits
             // Account for decay amount
-            score += (RAMPART_DECAY_AMOUNT - rampart.ticksToDecay) * RAMPART_DECAY_AMOUNT
+            score += Math.floor(RAMPART_DECAY_AMOUNT / (RAMPART_DECAY_AMOUNT - rampart.ticksToDecay))
 
             return score
         })
@@ -260,12 +260,9 @@ export class TowerManager {
 
         for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
             const tower = findObjectWithID(this.actionableTowerIDs[i])
-
-            const target = repairTarget
-            if (tower.repair(target) !== OK) continue
+            if (tower.repair(repairTarget) !== OK) continue
 
             updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
-
             this.actionableTowerIDs.splice(i, 1)
         }
 
