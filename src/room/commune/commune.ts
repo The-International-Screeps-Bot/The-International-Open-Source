@@ -162,6 +162,7 @@ export class CommuneManager {
         delete this._defensiveRamparts
         delete this._sourceLinks
         delete this._controllerLink
+        delete this._hasSufficientRoads
 
         if (randomTick()) {
             delete this._maxUpgradeStrength
@@ -337,6 +338,10 @@ export class CommuneManager {
         }
         */
 
+        customLog('sufficient', this.hasSufficientRoads)
+        customLog('present roads', this.room.roomManager.structures.road.length)
+        customLog('road quotas', JSON.stringify(this.room.memory[RoomMemoryKeys.roadQuota]))
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -429,7 +434,6 @@ export class CommuneManager {
      * The amount of energy the room wants to have
      */
     get targetEnergy() {
-
         // Consider the controller level to an exponent and this room's attack threat
 
         this._targetEnergy =
@@ -602,19 +606,26 @@ export class CommuneManager {
         return (this._maxUpgradeStrength = 100)
     }
 
+    _hasSufficientRoads: boolean
     /**
      * Informs wether we have sufficient roads compared to the roadQuota for our RCL
      */
-    hasSufficientRoads() {
-        const roomMemory = Memory.rooms[this.room.name]
-        const RCL = this.room.controller.level
-        // Try one RCL below, though propagate to the present RCL if there is no roadQuota for the previous RCL
-        const roadQuota =
-            roomMemory[RoomMemoryKeys.roadQuota][RCL - 1] ||
-            roomMemory[RoomMemoryKeys.roadQuota][RCL]
-        if (roadQuota === 0) return false
+    get hasSufficientRoads() {
+        /* if (this._hasSufficientRoads !== undefined) return this._hasSufficientRoads */
 
-        return this.room.roomManager.structures.road.length >= roadQuota * 0.9
+        const roomMemory = Memory.rooms[this.room.name]
+        const RCLIndex = this.room.controller.level - 1
+        // Try one RCL below, though propagate to the present RCL if there is no roadQuota for the previous RCL
+        const minRoads =
+            roomMemory[RoomMemoryKeys.roadQuota][RCLIndex - 1] ||
+            roomMemory[RoomMemoryKeys.roadQuota][RCLIndex]
+        if (minRoads === 0) return false
+
+        customLog('quota', minRoads)
+
+        const roads = this.room.roomManager.structures.road.length
+        // Make sure we have 90% of the intended roads amount
+        return (this._hasSufficientRoads = roads >= minRoads * 0.9)
     }
 
     _upgradeStructure: AnyStoreStructure | false
@@ -834,6 +845,6 @@ export class CommuneManager {
             fastFillerSpawnEnergyCapacity += structure.store.getCapacity(RESOURCE_ENERGY)
         }
 
-        return this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity
+        return (this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity)
     }
 }

@@ -229,7 +229,7 @@ export class SpawnRequestsManager {
 
                 // If all RCL 3 extensions are built
 
-                if (this.communeManager.hasSufficientRoads()) {
+                if (this.communeManager.hasSufficientRoads) {
                     return {
                         role,
                         defaultParts: [],
@@ -260,7 +260,6 @@ export class SpawnRequestsManager {
     }
 
     private mineralHarvester() {
-
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 if (this.communeManager.room.controller.level < 6) return false
@@ -582,7 +581,7 @@ export class SpawnRequestsManager {
 
                 // If all RCL 3 extensions are build
 
-                if (this.communeManager.hasSufficientRoads()) {
+                if (this.communeManager.hasSufficientRoads) {
                     return {
                         role,
                         defaultParts: [],
@@ -766,7 +765,7 @@ export class SpawnRequestsManager {
                 ) {
                     const priority = 5
 
-                    if (this.communeManager.hasSufficientRoads()) {
+                    if (this.communeManager.hasSufficientRoads) {
                         return {
                             role,
                             defaultParts: [CARRY, WORK, MOVE],
