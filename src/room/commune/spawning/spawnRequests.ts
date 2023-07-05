@@ -260,6 +260,7 @@ export class SpawnRequestsManager {
     }
 
     private mineralHarvester() {
+
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 if (this.communeManager.room.controller.level < 6) return false

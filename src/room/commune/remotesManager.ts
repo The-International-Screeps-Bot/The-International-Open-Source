@@ -11,11 +11,13 @@ import {
     advancedFindDistance,
     customLog,
     findCarryPartsRequired,
+    findLowestScore,
     randomRange,
     randomTick,
 } from 'international/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
+import { roomUtils } from 'room/roomUtils'
 
 export class RemotesManager {
     communeManager: CommuneManager
@@ -68,36 +70,17 @@ export class RemotesManager {
             }
 
             if (remoteMemory[RoomMemoryKeys.abandonRemote] > 0) {
+
+                if (!remoteMemory[RoomMemoryKeys.recursedAbandonment]) {
+
+                    this.recurseAbandonment(remoteName)
+                }
+
                 this.manageAbandonment(remoteName)
                 continue
             }
 
             this.managePathCacheAllowance(remoteName)
-
-            // Every x ticks ensure enemies haven't blocked off too much of the path
-
-            if (randomTick(100)) {
-                const safeDistance = advancedFindDistance(room.name, remoteName, {
-                    typeWeights: remoteTypeWeights,
-                    avoidAbandonedRemotes: true,
-                })
-
-                if (safeDistance > maxRemoteRoomDistance) {
-                    remoteMemory[RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
-                    this.manageAbandonment(remoteName)
-                    continue
-                }
-
-                const distance = advancedFindDistance(room.name, remoteName, {
-                    typeWeights: remoteTypeWeights,
-                })
-
-                if (Math.round(safeDistance * 0.75) > distance) {
-                    remoteMemory[RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
-                    this.manageAbandonment(remoteName)
-                    continue
-                }
-            }
 
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] =
@@ -162,8 +145,12 @@ export class RemotesManager {
 
                 // Temporary measure while DynamicSquads are in progress
 
-                if (remote.enemyAttackers.length) {
-                    remoteMemory[RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
+                const enemyAttackers = remote.enemyAttackers
+                if (enemyAttackers.length) {
+                    const score = findLowestScore(enemyAttackers, (creep) => {
+                        return creep.ticksToLive
+                    })
+                    roomUtils.abandonRemote(remoteName, randomRange(score, score + 100))
                     continue
                 }
 
@@ -310,11 +297,38 @@ export class RemotesManager {
         const remoteMemory = Memory.rooms[remoteName]
 
         remoteMemory[RoomMemoryKeys.abandonRemote] -= 1
-
-        const abandonment = remoteMemory[RoomMemoryKeys.abandonRemote]
-
-        remoteMemory[RoomMemoryKeys.abandonRemote] = abandonment
     }
 
-    private recurseAbandonment(remoteName: string) {}
+    private isRemoteBlocked(remoteName: string) {
+        const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+            typeWeights: remoteTypeWeights,
+            avoidAbandonedRemotes: true,
+        })
+        if (safeDistance > maxRemoteRoomDistance) return true
+
+        const distance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+            typeWeights: remoteTypeWeights,
+        })
+        if (Math.round(safeDistance * 0.75) > distance) return true
+
+        return false
+    }
+
+    private recurseAbandonment(remoteName: string) {
+        const remoteMemory = Memory.rooms[remoteName]
+
+        for (const remoteName2 of remoteMemory[RoomMemoryKeys.pathsThrough]) {
+            const remoteMemory2 = Memory.rooms[remoteName2]
+            if (
+                remoteMemory2[RoomMemoryKeys.abandonRemote] >=
+                remoteMemory[RoomMemoryKeys.abandonRemote]
+            )
+                continue
+
+            roomUtils.abandonRemote(remoteName2, remoteMemory[RoomMemoryKeys.abandonRemote])
+            this.recurseAbandonment(remoteName2)
+        }
+
+        remoteMemory[RoomMemoryKeys.recursedAbandonment] = true
+    }
 }

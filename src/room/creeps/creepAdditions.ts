@@ -9,14 +9,14 @@ import {
 import { customLog, getRangeXY, getRange, isXYExit } from 'international/utils'
 import { profiler } from 'other/profiler'
 import { towerFunctions } from 'room/commune/towers'
-import { creepFunctions } from './creepFunctions'
+import { creepUtils } from './creepUtils'
 
 Object.defineProperties(Creep.prototype, {
     nameData: {
         get() {
             if (this._nameData) return this._nameData
 
-            return (this._nameData = creepFunctions.expandName(this.name))
+            return (this._nameData = creepUtils.expandName(this.name))
         },
     },
     role: {

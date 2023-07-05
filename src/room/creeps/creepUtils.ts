@@ -1,6 +1,6 @@
 import { creepRoles } from 'international/constants'
 
-export const creepFunctions = {
+export const creepUtils = {
     expandName(creepName: string) {
         return creepName.split('_')
     },

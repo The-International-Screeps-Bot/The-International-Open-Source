@@ -174,9 +174,24 @@ export enum RoomTypes {
     intersection,
 }
 
+export enum DangerTypes {
+    /**
+     * Civilians should avoid getting in enemy ranges, stuff like that
+     */
+    careful,
+    /**
+     * Civilians should to not go in this room
+     */
+    avoid
+}
+
 export enum RoomMemoryKeys {
     type,
     lastScout,
+    /**
+     * Tells (mostly civilians) what to expect, safety wise, from the room
+     */
+    danger,
 
     // Types specific
 
@@ -236,6 +251,7 @@ export enum RoomMemoryKeys {
     remoteBuilder,
     remoteDismantler,
     abandonRemote,
+    recursedAbandonment,
     use,
     enemyReserved,
     invaderCore,
@@ -255,6 +271,10 @@ export enum RoomMemoryKeys {
     remoteSourceCreditChange,
     remoteSourceCreditReservation,
     hasContainer,
+    /**
+     * The names of the rooms the remote has paths through to get to the commune
+     */
+    pathsThrough,
 
     // Ally
 
@@ -293,6 +313,9 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.remoteSourceCredit,
     RoomMemoryKeys.remoteSourceCreditChange,
     RoomMemoryKeys.remoteSourceCreditReservation,
+    RoomMemoryKeys.abandonRemote,
+    RoomMemoryKeys.recursedAbandonment,
+    RoomMemoryKeys.pathsThrough,
 
     RoomMemoryKeys.owner,
     RoomMemoryKeys.RCL,
@@ -327,6 +350,9 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.remoteSourceCredit,
         RoomMemoryKeys.remoteSourceCreditChange,
         RoomMemoryKeys.remoteSourceCreditReservation,
+        RoomMemoryKeys.abandonRemote,
+        RoomMemoryKeys.recursedAbandonment,
+        RoomMemoryKeys.pathsThrough,
     ]),
     [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL]),
     [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner]),

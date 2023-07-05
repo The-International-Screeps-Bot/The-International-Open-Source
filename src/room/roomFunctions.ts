@@ -318,6 +318,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         // Generate new important positions
 
         let newCost = 0
+        const pathsThrough: Set<string> = new Set()
 
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
         const packedRemoteSourceHarvestPositions =
@@ -325,6 +326,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
             scoutingRoom,
             packedRemoteSourceHarvestPositions,
+            pathsThrough,
         )
 
         for (const packedPath of packedRemoteSourcePaths) {
@@ -339,6 +341,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
             scoutingRoom,
             packedRemoteControllerPositions,
+            pathsThrough,
         )
         if (!packedRemoteControllerPath.length)
             throw Error('No remote controller path for ' + this.name)
@@ -364,6 +367,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
         roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
         roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
+        // No reason to have the room or commune in the list - would result is uneeded searches
+        pathsThrough.delete(this.name)
+        pathsThrough.delete(scoutingRoom.name)
+        roomMemory[RoomMemoryKeys.pathsThrough] = Array.from(pathsThrough)
 
         roomMemory[RoomMemoryKeys.maxSourceIncome] = []
         roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
@@ -392,6 +399,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // The room is not a remote
 
     // Generate new important positions
+    const pathsThrough: Set<string> = new Set()
 
     const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
     const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
@@ -401,6 +409,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
         scoutingRoom,
         packedRemoteSourceHarvestPositions,
+        pathsThrough,
     )
     for (const packedPath of packedRemoteSourcePaths) {
         if (!packedPath.length) {
@@ -413,6 +422,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
         scoutingRoom,
         packedRemoteControllerPositions,
+        pathsThrough,
     )
     if (!packedRemoteControllerPath.length)
         throw Error('No remote controller path for ' + this.name)
@@ -439,6 +449,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
     roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
     roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
+    // No reason to have the room or commune in the list - would result is uneeded searches
+    pathsThrough.delete(this.name)
+    pathsThrough.delete(scoutingRoom.name)
+    roomMemory[RoomMemoryKeys.pathsThrough] = Array.from(pathsThrough)
 
     roomMemory[RoomMemoryKeys.maxSourceIncome] = []
     roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []

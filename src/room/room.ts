@@ -265,7 +265,7 @@ export class RoomManager {
         return sourceHarvestPositions.map(positions => packPosList(positions))
     }
 
-    findRemoteSourcePaths(commune: Room, packedRemoteSourceHarvestPositions: string[]) {
+    findRemoteSourcePaths(commune: Room, packedRemoteSourceHarvestPositions: string[], pathsThrough: Set<string>) {
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote source harvest paths' + this.room.name)
 
@@ -281,6 +281,11 @@ export class RoomManager {
                 weightStructurePlans: true,
                 avoidStationaryPositions: true,
             })
+
+            for (const pos of path) {
+
+                pathsThrough.add(pos.roomName)
+            }
 
             sourcePaths.push(path)
         }
@@ -325,7 +330,7 @@ export class RoomManager {
         return packPosList(positions)
     }
 
-    findRemoteControllerPath(commune: Room, packedRemoteControllerPositions: string) {
+    findRemoteControllerPath(commune: Room, packedRemoteControllerPositions: string, pathsThrough: Set<string>) {
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
 
@@ -338,7 +343,11 @@ export class RoomManager {
             weightStructurePlans: true,
             avoidStationaryPositions: true,
         })
-        if (!path.length) throw Error('No remote controller path for ' + this.room.name)
+
+        for (const pos of path) {
+
+            pathsThrough.add(pos.roomName)
+        }
 
         return packPosList(path)
     }

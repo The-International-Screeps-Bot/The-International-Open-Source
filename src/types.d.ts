@@ -17,6 +17,7 @@ import {
     RoomTypes,
     SleepFor,
     Result,
+    DangerTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -1993,6 +1994,7 @@ declare global {
     interface RoomMemory {
         [RoomMemoryKeys.type]: RoomTypes
         [RoomMemoryKeys.lastScout]: number
+        [RoomMemoryKeys.danger]: DangerTypes
 
         // Types specific
 
@@ -2063,6 +2065,7 @@ declare global {
         [RoomMemoryKeys.remoteBuilder]: number
         [RoomMemoryKeys.remoteDismantler]: number
         [RoomMemoryKeys.abandonRemote]: number
+        [RoomMemoryKeys.recursedAbandonment]: boolean
         [RoomMemoryKeys.use]: boolean
         [RoomMemoryKeys.enemyReserved]: boolean
         [RoomMemoryKeys.invaderCore]: number
@@ -2082,6 +2085,7 @@ declare global {
         [RoomMemoryKeys.remoteSourceCreditChange]: number[]
         [RoomMemoryKeys.remoteSourceCreditReservation]: number[]
         [RoomMemoryKeys.hasContainer]: boolean[]
+        [RoomMemoryKeys.pathsThrough]: string[]
 
         // Ally
 
