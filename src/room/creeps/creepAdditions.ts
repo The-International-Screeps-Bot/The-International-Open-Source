@@ -6,7 +6,7 @@ import {
     roomDimensions,
     towerPowers,
 } from 'international/constants'
-import { customLog, getRangeXY, getRange, isXYExit } from 'international/utils'
+import { customLog, getRangeXY, getRange, isXYExit, isExit } from 'international/utils'
 import { profiler } from 'other/profiler'
 import { towerFunctions } from 'room/commune/towers'
 import { creepUtils } from './creepUtils'
@@ -406,9 +406,7 @@ const additions = {
         get() {
             if (this._isOnExit !== undefined) return this._isOnExit
 
-            const { x } = this.pos
-            const { y } = this.pos
-            return isXYExit(x, y)
+            return isExit(this.pos)
         },
     },
     exitTo: {

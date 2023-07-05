@@ -23,7 +23,6 @@ import {
     customLog,
     findCarryPartsRequired,
     findClosestRoomName,
-    findDynamicScore,
     randomRange,
     randomTick,
 } from './utils'
@@ -33,6 +32,7 @@ import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 import { RoomManager } from 'room/room'
+import { roomUtils } from 'room/roomUtils'
 
 class TickConfig {
     public run() {
@@ -133,7 +133,7 @@ class TickConfig {
             )
                 continue
 
-            findDynamicScore(roomName)
+            roomUtils.findDynamicScore(roomName)
         }
 
         // Assign and abandon workRequests, in order of score

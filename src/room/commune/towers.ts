@@ -74,6 +74,11 @@ export class TowerManager {
         }
     }
 
+    private trackEnemySquads() {
+
+        
+    }
+
     findAttackTarget() {
         const { room } = this.communeManager
 

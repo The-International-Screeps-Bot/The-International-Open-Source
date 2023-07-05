@@ -1,5 +1,5 @@
 import { CreepMemoryKeys, RoomTypes, customColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
+import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
 export class Duo {
@@ -46,7 +46,11 @@ export class Duo {
             origin: this.leader.pos,
             goals: [
                 {
-                    pos: new RoomPosition(25, 25, this.leader.memory[CreepMemoryKeys.combatRequest]),
+                    pos: new RoomPosition(
+                        25,
+                        25,
+                        this.leader.memory[CreepMemoryKeys.combatRequest],
+                    ),
                     range: 25,
                 },
             ],
@@ -62,7 +66,8 @@ export class Duo {
     }
 
     runCombatRoom() {
-        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest]) return false
+        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest])
+            return false
 
         if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
@@ -76,8 +81,10 @@ export class Duo {
     }
 
     runCombat() {
-        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') return this.advancedRangedAttack()
-        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') return this.advancedAttack()
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack')
+            return this.advancedRangedAttack()
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack')
+            return this.advancedAttack()
         return this.advancedDismantle()
     }
 
@@ -180,7 +187,12 @@ export class Duo {
 
             // Get the range between the creeps
 
-            const range = getRangeXY(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y)
+            const range = getRangeXY(
+                this.leader.pos.x,
+                enemyCreep.pos.x,
+                this.leader.pos.y,
+                enemyCreep.pos.y,
+            )
 
             // If the range is more than 1
 
@@ -217,7 +229,12 @@ export class Duo {
 
         // Get the range between the creeps
 
-        const range = getRangeXY(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y)
+        const range = getRangeXY(
+            this.leader.pos.x,
+            enemyAttacker.pos.x,
+            this.leader.pos.y,
+            enemyAttacker.pos.y,
+        )
 
         // If the squad is outmatched
 
@@ -291,9 +308,14 @@ export class Duo {
 
         let structure = findClosestObject(this.leader.pos, structures)
         if (Memory.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            this.leader.room.visual.line(this.leader.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
-        if (getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3) {
+        if (
+            getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3
+        ) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -316,7 +338,9 @@ export class Duo {
 
         structure = findClosestObject(this.leader.pos, structures)
 
-        if (getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 3) {
+        if (
+            getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 3
+        ) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 3 }],
@@ -357,7 +381,14 @@ export class Duo {
 
             // If the range is more than 1
 
-            if (getRangeXY(this.leader.pos.x, enemyCreep.pos.x, this.leader.pos.y, enemyCreep.pos.y) > 1) {
+            if (
+                getRangeXY(
+                    this.leader.pos.x,
+                    enemyCreep.pos.x,
+                    this.leader.pos.y,
+                    enemyCreep.pos.y,
+                ) > 1
+            ) {
                 // Have the create a moveRequest to the enemyAttacker and inform true
 
                 this.createMoveRequest({
@@ -386,7 +417,14 @@ export class Duo {
 
         // If the range is more than 1
 
-        if (getRangeXY(this.leader.pos.x, enemyAttacker.pos.x, this.leader.pos.y, enemyAttacker.pos.y) > 1) {
+        if (
+            getRangeXY(
+                this.leader.pos.x,
+                enemyAttacker.pos.x,
+                this.leader.pos.y,
+                enemyAttacker.pos.y,
+            ) > 1
+        ) {
             // Have the create a moveRequest to the enemyAttacker and inform true
 
             this.createMoveRequest({
@@ -415,9 +453,14 @@ export class Duo {
 
         let structure = findClosestObject(this.leader.pos, structures)
         if (Memory.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            this.leader.room.visual.line(this.leader.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
-        if (getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1) {
+        if (
+            getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1
+        ) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -440,7 +483,9 @@ export class Duo {
 
         structure = findClosestObject(this.leader.pos, structures)
 
-        if (getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
+        if (
+            getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1
+        ) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -459,9 +504,14 @@ export class Duo {
 
         let structure = findClosestObject(this.leader.pos, structures)
         if (Memory.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            this.leader.room.visual.line(this.leader.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
-        if (getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1) {
+        if (
+            getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1
+        ) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -484,7 +534,9 @@ export class Duo {
 
         structure = findClosestObject(this.leader.pos, structures)
 
-        if (getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1) {
+        if (
+            getRangeXY(this.leader.pos.x, structure.pos.y, this.leader.pos.y, structure.pos.y) > 1
+        ) {
             this.createMoveRequest({
                 origin: this.leader.pos,
                 goals: [{ pos: structure.pos, range: 1 }],
@@ -499,7 +551,9 @@ export class Duo {
 
         // Filter only enemy construction sites worth stomping
 
-        const enemyCSites = this.leader.room.enemyCSites.filter(cSite => cSite.progress > 0 && !isCoordExit(cSite.pos))
+        const enemyCSites = this.leader.room.enemyCSites.filter(
+            cSite => cSite.progress > 0 && !isExit(cSite.pos),
+        )
 
         if (!enemyCSites.length) return false
 

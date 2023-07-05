@@ -34,7 +34,6 @@ import {
     findClosestCommuneName,
     findCoordsInsideRect,
     findObjectWithID,
-    findDynamicScore,
     getRangeXY,
     isNearRoomEdge,
     newID,
@@ -58,6 +57,7 @@ import { posix } from 'path'
 import { BasePlans } from './construction/basePlans'
 import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
+import { roomUtils } from './roomUtils'
 
 /**
     @param pos1 pos of the object performing the action
@@ -2073,7 +2073,7 @@ Room.prototype.createWorkRequest = function () {
     if (this.find(FIND_SOURCES).length < 2) return false
     if (Memory.workRequests[this.name]) return false
 
-    findDynamicScore(this.name)
+    roomUtils.findDynamicScore(this.name)
 
     const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
     if (communePlanned === false) return false

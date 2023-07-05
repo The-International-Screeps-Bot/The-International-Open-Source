@@ -26,7 +26,7 @@ import {
     getRangeEuc,
     getRangeEucXY,
     getRange,
-    isCoordExit,
+    isExit,
     forCoordsAroundRange,
     forAdjacentCoords,
     visualizePath,
@@ -483,7 +483,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
  */
         if (avoidPackedCoords.has(packedCoord)) return
 
-        if (isCoordExit(coord)) return
+        if (isExit(coord)) return
 
         const terrainType = terrain.get(coord.x, coord.y)
         if (terrainType === TERRAIN_MASK_WALL) return

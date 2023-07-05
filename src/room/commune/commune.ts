@@ -23,7 +23,6 @@ import {
     unpackNumAsCoord,
     findLowestScore,
     roundTo,
-    findDynamicScore,
 } from 'international/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'

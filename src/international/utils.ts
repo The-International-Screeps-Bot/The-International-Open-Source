@@ -622,7 +622,7 @@ export function isXYExit(x: number, y: number) {
     return x <= 0 || x >= roomDimensions - 1 || y <= 0 || y >= roomDimensions - 1
 }
 
-export function isCoordExit(coord: Coord) {
+export function isExit(coord: Coord) {
     return (
         coord.x <= 0 ||
         coord.x >= roomDimensions - 1 ||
@@ -900,78 +900,6 @@ export function findWithLowestScore<T>(iter: T[], f: (val: T) => number): [numbe
     }
 
     return [lowestScore, bestVal]
-}
-
-export function findDynamicScore(roomName: string) {
-    let dynamicScore = 0
-
-    let closestEnemy = 0
-    let communeScore = 0
-    let allyScore = 0
-
-    const roomCoord = makeRoomCoord(roomName)
-    forRoomNamesAroundRangeXY(roomCoord.x, roomCoord.y, dynamicScoreRoomRange, (x, y) => {
-        const searchRoomName = roomNameFromRoomXY(x, y)
-        const searchRoomMemory = Memory.rooms[searchRoomName]
-        if (!searchRoomMemory) return
-
-        if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.enemy) {
-            const score = advancedFindDistance(roomName, searchRoomName)
-            if (score <= closestEnemy) return
-
-            closestEnemy = score
-            return
-        }
-
-        if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
-            const searchRoom = Game.rooms[searchRoomName]
-            if (!searchRoom) return
-
-            const score =
-                Math.pow(
-                    Math.abs(
-                        advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
-                    ),
-                    1.8,
-                ) +
-                (maxControllerLevel - searchRoom.controller.level)
-            if (score <= communeScore) return
-
-            communeScore = score
-            return
-        }
-
-        if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.ally) {
-            const score =
-                Math.pow(
-                    Math.abs(
-                        advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
-                    ),
-                    1.5,
-                ) +
-                (searchRoomMemory[RoomMemoryKeys.RCL] || 0) * 0.3
-            if (score <= allyScore) return
-
-            allyScore = score
-            return
-        }
-    })
-
-    dynamicScore += Math.round(Math.pow(closestEnemy, -0.8) * 25)
-    dynamicScore += Math.round(communeScore * 15)
-    dynamicScore += allyScore
-
-    // Prefer minerals with below average communes
-
-    const roomMemory = Memory.rooms[roomName]
-    const mineralType = roomMemory[RoomMemoryKeys.mineralType]
-    const mineralScore =
-        internationalManager.mineralCommunes[mineralType] -
-        internationalManager.avgCommunesPerMineral
-    dynamicScore += mineralScore * 40
-
-    roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
-    roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 }
 
 /**

@@ -1,5 +1,12 @@
-import { CreepMemoryKeys, Result, RoomTypes, customColors, roomDimensions, squadQuotas } from 'international/constants'
-import { findClosestObject, getRangeXY, getRange, isCoordExit, isXYExit } from 'international/utils'
+import {
+    CreepMemoryKeys,
+    Result,
+    RoomTypes,
+    customColors,
+    roomDimensions,
+    squadQuotas,
+} from 'international/constants'
+import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'international/utils'
 import { Antifa } from './antifa'
 
 /**
@@ -16,15 +23,12 @@ export class DynamicSquad {
      */
     members: Antifa[] = []
     memberNames: string[] = []
-    membersByType: Partial<{[role in CreepRoles]: string[] }>
+    membersByType: Partial<{ [role in CreepRoles]: string[] }>
     leader: Antifa
 
     constructor(memberNames: string[]) {
-
-
         this.membersByType = {}
         for (const role in squadQuotas.dynamic.antifaRangedAttacker) {
-
             this.membersByType[role as CreepRoles] = []
         }
 
@@ -66,7 +70,11 @@ export class DynamicSquad {
             origin: this.leader.pos,
             goals: [
                 {
-                    pos: new RoomPosition(25, 25, this.leader.memory[CreepMemoryKeys.combatRequest]),
+                    pos: new RoomPosition(
+                        25,
+                        25,
+                        this.leader.memory[CreepMemoryKeys.combatRequest],
+                    ),
                     range: 25,
                 },
             ],
@@ -82,7 +90,8 @@ export class DynamicSquad {
     }
 
     runCombatRoom() {
-        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest]) return false
+        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest])
+            return false
 
         if (!this.leader.room.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
@@ -97,20 +106,16 @@ export class DynamicSquad {
     }
 
     runCombat() {
-
         this.runCombatAttackDuo()
         this.runCombatRangedAttacker()
         this.runCombatDismantler()
     }
 
     combatAttackDuoGetInFormation(attacker: Creep, healer: Creep) {
-
         const range = getRange(attacker.pos, healer.pos)
 
         if (range > 1) {
-
             if (range > 2) {
-
                 attacker.createMoveRequest({
                     goals: [
                         {
@@ -136,7 +141,6 @@ export class DynamicSquad {
     }
 
     runCombatAttackDuo() {
-
         const attackerName = this.membersByType.antifaAttacker[0]
         if (!attackerName) return
 
@@ -150,7 +154,6 @@ export class DynamicSquad {
     }
 
     runCombatRangedAttacker() {
-
         const creepName = this.membersByType.antifaRangedAttacker[0]
         if (!creepName) return false
 
@@ -184,7 +187,10 @@ export class DynamicSquad {
 
             const enemyCreep = findClosestObject(creep.pos, enemyCreeps)
             if (Memory.roomVisuals)
-                creep.room.visual.line(creep.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
+                creep.room.visual.line(creep.pos, enemyCreep.pos, {
+                    color: customColors.green,
+                    opacity: 0.3,
+                })
 
             // Get the range between the creeps
 
@@ -214,7 +220,10 @@ export class DynamicSquad {
 
         const enemyAttacker = findClosestObject(creep.pos, enemyAttackers)
         if (Memory.roomVisuals)
-            creep.room.visual.line(creep.pos, enemyAttacker.pos, { color: customColors.green, opacity: 0.3 })
+            creep.room.visual.line(creep.pos, enemyAttacker.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         // Get the range between the creeps
 
@@ -288,7 +297,10 @@ export class DynamicSquad {
 
         let structure = findClosestObject(creep.pos, structures)
         if (Memory.roomVisuals)
-            creep.room.visual.line(creep.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            creep.room.visual.line(creep.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         if (getRangeXY(creep.pos.x, structure.pos.x, creep.pos.y, structure.pos.y) > 3) {
             creep.createMoveRequest({
@@ -324,7 +336,6 @@ export class DynamicSquad {
     }
 
     runCombatDismantler() {
-
         const creepName = this.membersByType.antifaDismantler[0]
         if (!creepName) return false
 
@@ -338,7 +349,10 @@ export class DynamicSquad {
 
         let structure = findClosestObject(creep.pos, structures)
         if (Memory.roomVisuals)
-            creep.room.visual.line(creep.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            creep.room.visual.line(creep.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         if (getRange(creep.pos, structure.pos) > 1) {
             creep.createMoveRequest({
@@ -438,10 +452,8 @@ export class DynamicSquad {
     private advancedHeal() {}
 
     setMoveType(type: SquadMoveTypes) {
-
         this.moveType = type
         for (const memberName of this.memberNames) {
-
             Memory.creeps[memberName][CreepMemoryKeys.squadMoveType] = type
         }
     }

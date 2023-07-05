@@ -1,5 +1,12 @@
-import { CombatRequestKeys, CreepMemoryKeys, RoomTypes, antifaRoles, customColors, squadQuotas } from 'international/constants'
-import { customLog, findClosestObject, getRangeXY, isCoordExit, isXYExit } from 'international/utils'
+import {
+    CombatRequestKeys,
+    CreepMemoryKeys,
+    RoomTypes,
+    antifaRoles,
+    customColors,
+    squadQuotas,
+} from 'international/constants'
+import { customLog, findClosestObject, getRangeXY, isExit, isXYExit } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { Duo } from './duo'
 import { Quad } from './quad'
@@ -11,9 +18,9 @@ export class Antifa extends Creep {
 
     preTickManager() {
         if (internationalManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]])
-            internationalManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]][this.role].push(
-                this.name,
-            )
+            internationalManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]][
+                this.role
+            ].push(this.name)
 
         // We don't want a squad or we already have done
 
@@ -61,16 +68,17 @@ export class Antifa extends Creep {
     }
 
     runSquad?() {
-
         const creepMemory = Memory.creeps[this.name]
 
         // The creep should be single
 
         if (!creepMemory[CreepMemoryKeys.squadSize]) return false
-        if (creepMemory[CreepMemoryKeys.isSquadFormed] && creepMemory[CreepMemoryKeys.squadMembers].length === 1)
+        if (
+            creepMemory[CreepMemoryKeys.isSquadFormed] &&
+            creepMemory[CreepMemoryKeys.squadMembers].length === 1
+        )
             return false
         if (!squadQuotas[creepMemory[CreepMemoryKeys.squadType]][this.role]) return false
-
 
         // The squad has already been run
 
@@ -78,7 +86,8 @@ export class Antifa extends Creep {
 
         if (!this.findSquad()) {
             const request = Memory.combatRequests[creepMemory[CreepMemoryKeys.combatRequest]]
-            if (request && request[CombatRequestKeys.responder] === this.room.name) this.activeRenew()
+            if (request && request[CombatRequestKeys.responder] === this.room.name)
+                this.activeRenew()
             return true
         }
 
@@ -118,7 +127,8 @@ export class Antifa extends Creep {
             return true
         }
 
-        const squadQuota: Partial<{[key in CreepRoles]: number }> = squadQuotas[creepMemory[CreepMemoryKeys.squadType]][this.role]
+        const squadQuota: Partial<{ [key in CreepRoles]: number }> =
+            squadQuotas[creepMemory[CreepMemoryKeys.squadType]][this.role]
         squadQuota[this.role] -= 1
 
         // The squad is not yet formed
@@ -132,7 +142,8 @@ export class Antifa extends Creep {
             // All members must be trying to make the same type of squad
 
             if (
-                creepMemory[CreepMemoryKeys.squadCombatType] !== Memory.creeps[requestingCreep.name][CreepMemoryKeys.squadCombatType]
+                creepMemory[CreepMemoryKeys.squadCombatType] !==
+                Memory.creeps[requestingCreep.name][CreepMemoryKeys.squadCombatType]
             )
                 continue
 
@@ -142,14 +153,22 @@ export class Antifa extends Creep {
 
             // We've found enough members
 
-            if (creepMemory[CreepMemoryKeys.squadMembers].length === creepMemory[CreepMemoryKeys.squadSize]) break
+            if (
+                creepMemory[CreepMemoryKeys.squadMembers].length ===
+                creepMemory[CreepMemoryKeys.squadSize]
+            )
+                break
 
             squadQuota[requestingCreep.role] -= 1
         }
 
         // We weren't able to find enough members to form the squad we wanted
 
-        if (creepMemory[CreepMemoryKeys.squadMembers].length !== creepMemory[CreepMemoryKeys.squadSize]) return false
+        if (
+            creepMemory[CreepMemoryKeys.squadMembers].length !==
+            creepMemory[CreepMemoryKeys.squadSize]
+        )
+            return false
 
         const memberNames: string[] = []
 
@@ -275,7 +294,10 @@ export class Antifa extends Creep {
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             if (Memory.roomVisuals)
-                this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
+                this.room.visual.line(this.pos, enemyCreep.pos, {
+                    color: customColors.green,
+                    opacity: 0.3,
+                })
 
             // Get the range between the creeps
 
@@ -305,7 +327,10 @@ export class Antifa extends Creep {
 
         const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyAttacker.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, enemyAttacker.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         // Get the range between the creeps
 
@@ -379,7 +404,10 @@ export class Antifa extends Creep {
 
         let structure = findClosestObject(this.pos, structures)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         if (getRangeXY(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 3) {
             this.createMoveRequest({
@@ -438,7 +466,10 @@ export class Antifa extends Creep {
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
             if (Memory.roomVisuals)
-                this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
+                this.room.visual.line(this.pos, enemyCreep.pos, {
+                    color: customColors.green,
+                    opacity: 0.3,
+                })
 
             // If the range is more than 1
 
@@ -461,7 +492,10 @@ export class Antifa extends Creep {
 
         const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyAttacker.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, enemyAttacker.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         // If the range is more than 1
 
@@ -493,7 +527,10 @@ export class Antifa extends Creep {
 
         let structure = findClosestObject(this.pos, structures)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         if (getRangeXY(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
@@ -537,7 +574,10 @@ export class Antifa extends Creep {
 
         let structure = findClosestObject(this.pos, structures)
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         if (getRangeXY(this.pos.x, structure.pos.x, this.pos.y, structure.pos.y) > 1) {
             this.createMoveRequest({
@@ -577,7 +617,9 @@ export class Antifa extends Creep {
 
         // Filter only enemy construction sites worth stomping
 
-        const enemyCSites = this.room.enemyCSites.filter(cSite => cSite.progress > 0 && !isCoordExit(cSite.pos))
+        const enemyCSites = this.room.enemyCSites.filter(
+            cSite => cSite.progress > 0 && !isExit(cSite.pos),
+        )
 
         if (!enemyCSites.length) return false
 
