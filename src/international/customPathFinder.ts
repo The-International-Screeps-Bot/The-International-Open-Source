@@ -41,19 +41,14 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
                 if (roomName === goal.pos.roomName) return 1
                 return Infinity
             }
-            if (
-                args.avoidAbandonedRemotes &&
-                roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-                roomMemory[RoomMemoryKeys.abandonRemote]
-            )
-                return Infinity
+
+            // Avoid dangerous rooms if we are told to and the danger is persistent
+            if (args.avoidDanger && roomMemory[RoomMemoryKeys.danger] && roomMemory[RoomMemoryKeys.danger] >= Game.time) return Infinity
 
             // If the goal is in the room
-
             if (roomName === goal.pos.roomName) return 1
 
             // If the type is in typeWeights, inform the weight for the type
-
             if (args.typeWeights && args.typeWeights[roomMemory[RoomMemoryKeys.type] as 0])
                 return args.typeWeights[roomMemory[RoomMemoryKeys.type] as 0]
 

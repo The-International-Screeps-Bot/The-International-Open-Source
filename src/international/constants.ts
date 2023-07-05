@@ -174,22 +174,11 @@ export enum RoomTypes {
     intersection,
 }
 
-export enum DangerTypes {
-    /**
-     * Civilians should avoid getting in enemy ranges, stuff like that
-     */
-    careful,
-    /**
-     * Civilians should to not go in this room
-     */
-    avoid
-}
-
 export enum RoomMemoryKeys {
     type,
     lastScout,
     /**
-     * Tells (mostly civilians) what to expect, safety wise, from the room
+     * Tells (mostly civilians) if the room is safe (non-undefined number) and what tick it will refresh
      */
     danger,
 

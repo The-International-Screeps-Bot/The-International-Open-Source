@@ -192,7 +192,7 @@ export class RemoteCoreAttacker extends Creep {
                             },
                         ],
                         typeWeights: remoteTypeWeights,
-                        avoidAbandonedRemotes: true,
+                        avoidDanger: true,
                     }) === Result.fail
                 ) {
                     creepMemory[CreepMemoryKeys.sleepFor] = 'any'
@@ -223,7 +223,7 @@ export class RemoteCoreAttacker extends Creep {
                         },
                     ],
                     typeWeights: remoteTypeWeights,
-                    avoidAbandonedRemotes: true,
+                    avoidDanger: true,
                 }) === Result.fail
             ) {
                 Memory.rooms[Memory.creeps[creep.name][CreepMemoryKeys.remote]][

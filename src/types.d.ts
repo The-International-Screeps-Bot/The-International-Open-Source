@@ -17,7 +17,6 @@ import {
     RoomTypes,
     SleepFor,
     Result,
-    DangerTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -231,10 +230,15 @@ declare global {
         plainCost?: number
         swampCost?: number
         maxRooms?: number
+        /**
+         * Default is false
+         */
         flee?: boolean
         creep?: Creep
-
-        avoidAbandonedRemotes?: boolean
+        /**
+         * Default is true
+         */
+        avoidDanger?: boolean
 
         weightStructures?: Partial<{ [key in StructureConstant]: number }>
 
@@ -1994,7 +1998,7 @@ declare global {
     interface RoomMemory {
         [RoomMemoryKeys.type]: RoomTypes
         [RoomMemoryKeys.lastScout]: number
-        [RoomMemoryKeys.danger]: DangerTypes
+        [RoomMemoryKeys.danger]?: number
 
         // Types specific
 

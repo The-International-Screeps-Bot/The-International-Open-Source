@@ -324,7 +324,7 @@ export class RemoteHauler extends Creep {
                     [RoomTypes.enemyRemote]: Infinity,
                     [RoomTypes.allyRemote]: Infinity,
                 },
-                avoidAbandonedRemotes: true,
+                avoidDanger: true,
             },
             {
                 packedPath: reversePosList(

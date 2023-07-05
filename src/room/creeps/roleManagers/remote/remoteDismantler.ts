@@ -222,7 +222,7 @@ export class RemoteDismantler extends Creep {
                         },
                     ],
                     typeWeights: remoteTypeWeights,
-                    avoidAbandonedRemotes: true,
+                    avoidDanger: true,
                 }) === Result.fail
             ) {
                 Memory.rooms[creepMemory[CreepMemoryKeys.remote]][

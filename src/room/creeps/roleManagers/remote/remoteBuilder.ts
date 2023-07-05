@@ -174,7 +174,7 @@ export class RemoteBuilder extends Creep {
                     [RoomTypes.enemyRemote]: Infinity,
                     [RoomTypes.allyRemote]: Infinity,
                 },
-                avoidAbandonedRemotes: true,
+                avoidDanger: true,
             })
         }
     }

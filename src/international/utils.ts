@@ -196,7 +196,7 @@ export function newID() {
 
 interface AdvancedFindDistanceOpts {
     typeWeights?: { [key: string]: number }
-    avoidAbandonedRemotes?: boolean
+    avoidDanger?: boolean
 }
 
 /**
@@ -217,10 +217,7 @@ export function advancedFindDistance(
                 return 50
             }
 
-            if (
-                opts.avoidAbandonedRemotes &&
-                roomMemory[RoomMemoryKeys.type] === RoomTypes.remote
-            ) {
+            if (opts.avoidDanger && roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
                 if (roomMemory[RoomMemoryKeys.abandonRemote]) {
                     return 30
                 }

@@ -70,9 +70,7 @@ export class RemotesManager {
             }
 
             if (remoteMemory[RoomMemoryKeys.abandonRemote] > 0) {
-
                 if (!remoteMemory[RoomMemoryKeys.recursedAbandonment]) {
-
                     this.recurseAbandonment(remoteName)
                 }
 
@@ -147,9 +145,10 @@ export class RemotesManager {
 
                 const enemyAttackers = remote.enemyAttackers
                 if (enemyAttackers.length) {
-                    const score = findLowestScore(enemyAttackers, (creep) => {
+                    const score = findLowestScore(enemyAttackers, creep => {
                         return creep.ticksToLive
                     })
+                    remoteMemory[RoomMemoryKeys.danger] = Game.time + randomRange(score, score + 100)
                     roomUtils.abandonRemote(remoteName, randomRange(score, score + 100))
                     continue
                 }
@@ -302,7 +301,7 @@ export class RemotesManager {
     private isRemoteBlocked(remoteName: string) {
         const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
             typeWeights: remoteTypeWeights,
-            avoidAbandonedRemotes: true,
+            avoidDanger: true,
         })
         if (safeDistance > maxRemoteRoomDistance) return true
 
