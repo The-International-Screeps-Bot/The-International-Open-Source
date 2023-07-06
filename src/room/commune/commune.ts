@@ -189,6 +189,8 @@ export class CommuneManager {
         roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
         global.communes.add(room.name)
 
+        if (this.room.controller.safeMode) internationalManager.safemodedCommuneName = this.room.name
+
         if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
             if (global.communes.size <= 1)
                 roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level

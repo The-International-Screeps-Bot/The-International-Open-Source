@@ -40,9 +40,15 @@ export class InternationalManager {
     mineralCommunes: Partial<{ [key in MineralConstant]: number }>
 
     /**
+     * The name of the room that is safemoded, if there is one
+     */
+    safemodedCommuneName: string | undefined
+
+    /**
      * Updates values to be present for this tick
      */
     update() {
+        delete this.safemodedCommuneName
         this.creepsByCombatRequest = {}
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
