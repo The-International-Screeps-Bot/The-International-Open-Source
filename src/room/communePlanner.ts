@@ -355,14 +355,14 @@ export class CommunePlanner {
         /* this.pruneFastFillerRoads() */
         if (this.findCenterUpgradePos() === Result.fail) return Result.fail
         this.findSourceHarvestPositions()
-        this.hub()
-        this.labs()
+        if (this.hub() === Result.fail) return Result.fail
+        if (this.labs() === Result.fail) return Result.fail
         this.sourceStructures()
-        this.gridExtensions()
+        if (this.gridExtensions() === Result.fail) return Result.fail
         this.gridExtensionSourcePaths()
-        this.nuker()
-        this.powerSpawn()
-        this.observer()
+        if (this.nuker() === Result.fail) return Result.fail
+        if (this.powerSpawn() === Result.fail) return Result.fail
+        if (this.observer() === Result.fail) return Result.fail
         this.planGridCoords()
         this.runMinCut()
         this.groupMinCutCoords()
@@ -1856,7 +1856,7 @@ export class CommunePlanner {
             this.baseCoords[packAsNum(coord)] = 255
         }
 
-        const result = this.planStamps({
+        return this.planStamps({
             stampType: 'fastFiller',
             count: 1,
             startCoords: [this.findFastFillerOrigin()],
@@ -2004,8 +2004,6 @@ export class CommunePlanner {
                 }
             },
         })
-
-        return result
     }
     private hub() {
         const fastFillerPos = new RoomPosition(
@@ -2049,7 +2047,7 @@ export class CommunePlanner {
         })
         const origin = path[path.length - 1] || pathOrigin
 
-        this.planStamps({
+        return this.planStamps({
             stampType: 'hub',
             count: 1,
             startCoords: [origin],
@@ -2156,7 +2154,7 @@ export class CommunePlanner {
         return findClosestCoord(this.stampAnchors.fastFiller[0], structureCoords)
     }
     private labs() {
-        this.planStamps({
+        return this.planStamps({
             stampType: 'inputLab',
             count: 1,
             startCoords: [this.stampAnchors.hub[0]],
@@ -2256,7 +2254,7 @@ export class CommunePlanner {
         })
     }
     private gridExtensions() {
-        this.planStamps({
+        return this.planStamps({
             stampType: 'gridExtension',
             count:
                 CONTROLLER_STRUCTURES.extension[8] -
@@ -2368,7 +2366,7 @@ export class CommunePlanner {
         this.sourcePaths = sourcePaths.reverse()
     }
     private observer() {
-        this.planStamps({
+        return this.planStamps({
             stampType: 'observer',
             count: 1,
             startCoords: [this.stampAnchors.hub[0]],
@@ -2393,7 +2391,7 @@ export class CommunePlanner {
         })
     }
     private nuker() {
-        this.planStamps({
+        return this.planStamps({
             stampType: 'nuker',
             count: 1,
             startCoords: [this.stampAnchors.hub[0]],
@@ -2418,7 +2416,7 @@ export class CommunePlanner {
         })
     }
     private powerSpawn() {
-        this.planStamps({
+        return this.planStamps({
             stampType: 'powerSpawn',
             count: 1,
             startCoords: [this.stampAnchors.hub[0]],
