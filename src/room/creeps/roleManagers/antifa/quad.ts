@@ -185,16 +185,22 @@ export class Quad {
             ) {
                 this.target = nearbyThreat
                 this.target.room.targetVisual(this.leader.pos, this.target.pos, true)
-
+                /*
                 // If we are not threatened, try to transform optimally
 
                 const enemyThreatCoords = this.enemyThreatDataRanged.coords
                 if (!this.members.find(member => enemyThreatCoords[packAsNum(member.pos)])) {
                     this.advancedTransform()
                 }
+                */
             }
 
-            if (this.rangedKite() === Result.action) return true
+            const kiteResult = this.rangedKite()
+            if (kiteResult === Result.action) return true
+            if (kiteResult === Result.success) {
+
+                this.advancedTransform()
+            }
 
             if (this.bulldoze()) return true
             if (this.rangedAttackStructures()) return true
@@ -912,7 +918,8 @@ export class Quad {
             return Result.action
         }
 
-        return Result.noAction
+        // There is no need to kite
+        return Result.success
     }
 
     findMinRange(coord: Coord) {

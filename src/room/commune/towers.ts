@@ -76,7 +76,7 @@ export class TowerManager {
 
     private trackEnemySquads() {
 
-        
+
     }
 
     findAttackTarget() {
@@ -231,12 +231,6 @@ export class TowerManager {
         return true
     }
 
-    findRampartRepairTargets() {
-        return this.communeManager.rampartRepairTargets.filter(function (rampart) {
-            return rampart.hits <= RAMPART_DECAY_AMOUNT
-        })
-    }
-
     private findRampartRepairTarget() {
 
         const ramparts = this.communeManager.room.roomManager.structures.rampart
@@ -247,7 +241,7 @@ export class TowerManager {
 
             let score = rampart.hits
             // Account for decay amount
-            score += Math.floor(RAMPART_DECAY_AMOUNT / (RAMPART_DECAY_AMOUNT - rampart.ticksToDecay))
+            score += Math.floor(RAMPART_DECAY_AMOUNT / (RAMPART_DECAY_TIME - rampart.ticksToDecay))
 
             return score
         })
