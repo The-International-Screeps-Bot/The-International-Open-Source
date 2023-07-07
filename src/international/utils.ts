@@ -846,11 +846,12 @@ export function splitStringAt(string: string, index: number) {
     return [string.slice(0, index), string.slice(index)]
 }
 
-export function findHighestScore<T>(iter: T[], f: (val: T) => number): number {
+export function findHighestScore<T>(iter: T[], f: (val: T) => number | false): number {
     let highestScore = 0
 
     for (const val of iter) {
         const score = f(val)
+        if (score === false) continue
         if (score <= highestScore) continue
 
         highestScore = score
@@ -859,12 +860,13 @@ export function findHighestScore<T>(iter: T[], f: (val: T) => number): number {
     return highestScore
 }
 
-export function findWithHighestScore<T>(iter: T[], f: (val: T) => number): [number, T | undefined] {
+export function findWithHighestScore<T>(iter: T[], f: (val: T) => number | false): [number, T | undefined] {
     let highestScore = 0
     let bestVal: T | undefined
 
     for (const val of iter) {
         const score = f(val)
+        if (score === false) continue
         if (score <= highestScore) continue
 
         highestScore = score
@@ -874,11 +876,12 @@ export function findWithHighestScore<T>(iter: T[], f: (val: T) => number): [numb
     return [highestScore, bestVal]
 }
 
-export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
+export function findLowestScore<T>(iter: T[], f: (val: T) => number | false): number {
     let lowestScore = Infinity
 
     for (const val of iter) {
         const score = f(val)
+        if (score === false) continue
         if (score >= lowestScore) continue
 
         lowestScore = score
@@ -887,12 +890,13 @@ export function findLowestScore<T>(iter: T[], f: (val: T) => number): number {
     return lowestScore
 }
 
-export function findWithLowestScore<T>(iter: T[], f: (val: T) => number): [number, T | undefined] {
+export function findWithLowestScore<T>(iter: T[], f: (val: T) => number | false): [number, T | undefined] {
     let lowestScore = Infinity
     let bestVal: T | undefined
 
     for (const val of iter) {
         const score = f(val)
+        if (score === false) continue
         if (score >= lowestScore) continue
 
         lowestScore = score

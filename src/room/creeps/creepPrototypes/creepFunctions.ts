@@ -36,6 +36,7 @@ import {
     getRange,
     randomTick,
     arePositionsEqual,
+    findWithLowestScore,
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { any, pick, random, repeat } from 'lodash'
@@ -582,28 +583,21 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 }
 
 Creep.prototype.findNewRampartRepairTarget = function () {
-    let lowestScore = Infinity
-    let bestTarget
 
-    let ramparts = this.room.enemyAttackers.length
-        ? this.room.communeManager.defensiveRamparts
-        : this.room.communeManager.rampartRepairTargets
-    for (const structure of ramparts) {
-        // If above 90% of max hits
+    const ramparts = this.room.enemyAttackers.length
+    ? this.room.communeManager.defensiveRamparts
+    : this.room.communeManager.rampartRepairTargets
 
-        if (structure.nextHits / structure.hitsMax > 0.9) continue
+    const [score, bestTarget] = findWithLowestScore(ramparts, structure => {
+        if (structure.nextHits / structure.hitsMax > 0.9) return false
 
-        const score = getRange(this.pos, structure.pos) + structure.nextHits / 1000
-
-        if (score >= lowestScore) continue
-
-        lowestScore = score
-        bestTarget = structure
-    }
+        // Score by range and hits
+        return getRange(this.pos, structure.pos) + structure.nextHits / 1000
+    })
 
     if (!bestTarget) return false
 
-    this.memory[CreepMemoryKeys.structureTarget] = bestTarget.id
+    Memory.creeps[this.name][CreepMemoryKeys.structureTarget] = bestTarget.id
     return bestTarget
 }
 

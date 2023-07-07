@@ -22,11 +22,11 @@ export class TowerManager {
     communeManager: CommuneManager
     actionableTowerIDs: Id<StructureTower>[]
 
-    public constructor(communeManager: CommuneManager) {
+    constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
     }
 
-    public run() {
+    run() {
         const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -79,7 +79,7 @@ export class TowerManager {
 
     }
 
-    findAttackTarget() {
+    private findAttackTarget() {
         const { room } = this.communeManager
 
         if (room.towerAttackTarget) return room.towerAttackTarget
@@ -132,7 +132,7 @@ export class TowerManager {
         return room.towerAttackTarget
     }
 
-    attackEnemyCreeps() {
+    private attackEnemyCreeps() {
         if (this.communeManager.room.flags.disableTowerAttacks) {
             this.communeManager.room.towerInferiority =
                 this.communeManager.room.enemyAttackers.length > 0
@@ -214,7 +214,7 @@ export class TowerManager {
         return healTargets.find(creep => !creep.isOnExit)
     }
 
-    healCreeps() {
+    private healCreeps() {
         if (!this.actionableTowerIDs.length) return false
 
         const healTarget = this.findHealTarget()
@@ -233,10 +233,11 @@ export class TowerManager {
 
     private findRampartRepairTarget() {
 
-        const ramparts = this.communeManager.room.roomManager.structures.rampart
-        if (!ramparts.length) return false
+        const { room } = this.communeManager
+        const ramparts = room.enemyAttackers.length
+        ? room.communeManager.defensiveRamparts
+        : room.communeManager.rampartRepairTargets
 
-        const rampartRepairThreshold = this.rampartRepairTreshold
         const [score, rampart] = findWithLowestScore(ramparts, (rampart) => {
 
             let score = rampart.hits
@@ -246,12 +247,14 @@ export class TowerManager {
             return score
         })
 
+        const rampartRepairThreshold = this.rampartRepairTreshold
+
         // Make sure the rampart is below the treshold
         if (score > rampartRepairThreshold) return false
         return rampart
     }
 
-    repairRamparts() {
+    private repairRamparts() {
         if (!this.actionableTowerIDs.length) return false
 
         const repairTarget = this.findRampartRepairTarget()
@@ -268,14 +271,14 @@ export class TowerManager {
         return true
     }
 
-    findGeneralRepairTargets() {
+    private findGeneralRepairTargets() {
         let structures: Structure[] = this.communeManager.room.roomManager.structures.spawn
         structures = structures.concat(this.communeManager.room.roomManager.structures.tower)
 
         return structures
     }
 
-    repairGeneral() {
+    private repairGeneral() {
         if (!this.actionableTowerIDs.length) return false
         if (!randomTick(100)) return true
 
