@@ -323,7 +323,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
         const packedRemoteSourceHarvestPositions =
             this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
-        const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
+        const packedRemoteSourcePaths = this.roomManager.findRemoteSourceFastFillerPaths(
             scoutingRoom,
             packedRemoteSourceHarvestPositions,
             pathsThrough,
@@ -351,7 +351,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         // Compare new, potential efficiency, to old efficiency
 
         let currentCost = 0
-        for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
+        for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
             currentCost += packedPath.length / packedPosLength
         }
         currentCost += roomMemory[RoomMemoryKeys.remoteControllerPath].length / packedPosLength
@@ -364,7 +364,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
         roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
-        roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
+        roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] = packedRemoteSourcePaths
         roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
         roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
         // No reason to have the room or commune in the list - would result is uneeded searches
@@ -406,7 +406,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         scoutingRoom,
         packedRemoteSources,
     )
-    const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
+    const packedRemoteSourcePaths = this.roomManager.findRemoteSourceFastFillerPaths(
         scoutingRoom,
         packedRemoteSourceHarvestPositions,
         pathsThrough,
@@ -446,7 +446,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
     roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
-    roomMemory[RoomMemoryKeys.remoteSourcePaths] = packedRemoteSourcePaths
+    roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] = packedRemoteSourcePaths
     roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
     roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
     // No reason to have the room or commune in the list - would result is uneeded searches

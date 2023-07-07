@@ -148,7 +148,8 @@ export class RemotesManager {
                     const score = findLowestScore(enemyAttackers, creep => {
                         return creep.ticksToLive
                     })
-                    remoteMemory[RoomMemoryKeys.danger] = Game.time + randomRange(score, score + 100)
+                    remoteMemory[RoomMemoryKeys.danger] =
+                        Game.time + randomRange(score, score + 100)
                     roomUtils.abandonRemote(remoteName, randomRange(score, score + 100))
                     continue
                 }
@@ -249,7 +250,7 @@ export class RemotesManager {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] += findCarryPartsRequired(
-                    remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
+                    remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
                         packedPosLength,
                     income,
                 )
@@ -269,7 +270,7 @@ export class RemotesManager {
             const pathRoomNames: Set<string> = new Set()
 
             for (const pos of unpackPosList(
-                remoteMemory[RoomMemoryKeys.remoteSourcePaths][index],
+                remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][index],
             )) {
                 const roomName = pos.roomName
 

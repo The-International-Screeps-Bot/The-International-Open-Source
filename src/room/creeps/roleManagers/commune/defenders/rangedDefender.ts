@@ -1,4 +1,9 @@
-import { impassibleStructureTypes, customColors, rangedMassAttackMultiplierByRange, CreepMemoryKeys } from 'international/constants'
+import {
+    impassibleStructureTypes,
+    customColors,
+    rangedMassAttackMultiplierByRange,
+    CreepMemoryKeys,
+} from 'international/constants'
 import {
     areCoordsEqual,
     findClosestObject,
@@ -27,8 +32,15 @@ export class RangedDefender extends Creep {
 
             const targetDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
             if (!targetDamage) {
-                room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, enemyCreep.netTowerDamage + estimatedDamage)
-            } else room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, targetDamage + estimatedDamage)
+                room.defenderEnemyTargetsWithDamage.set(
+                    enemyCreep.id,
+                    enemyCreep.netTowerDamage + estimatedDamage,
+                )
+            } else
+                room.defenderEnemyTargetsWithDamage.set(
+                    enemyCreep.id,
+                    targetDamage + estimatedDamage,
+                )
 
             //
 
@@ -52,39 +64,19 @@ export class RangedDefender extends Creep {
     advancedDefend?() {
         const { room } = this
 
-        if (this.combatTarget) {
-            this.room.targetVisual(this.pos, this.combatTarget.pos)
-
-            if (!room.towerAttackTarget || this.combatTarget.id !== room.towerAttackTarget.id) {
-                let massDamage = 0
-                for (const enemyCreep of this.room.enemyAttackers) {
-                    const range = getRange(this.pos, enemyCreep.pos)
-                    if (range > 3) continue
-
-                    massDamage +=
-                        RANGED_ATTACK_POWER * rangedMassAttackMultiplierByRange[range] * enemyCreep.defenceStrength
-                }
-
-                if (massDamage >= RANGED_ATTACK_POWER) this.rangedMassAttack()
-                else this.rangedAttack(this.combatTarget)
-            }
-
-            if (getRange(this.pos, this.combatTarget.pos) <= 1) this.rangedMassAttack()
-            else this.rangedAttack(this.combatTarget)
-        }
+        this.advancedRangedAttack()
 
         // Get enemyAttackers in the room, informing false if there are none
 
-        let enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
-            return !enemyAttacker.isOnExit
-        })
+        let enemyCreeps = room.enemyAttackers
 
         if (!enemyCreeps.length) {
-            enemyCreeps = room.enemyAttackers.filter(function (enemyAttacker) {
-                return !enemyAttacker.isOnExit
-            })
+            enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) return
+
+            this.defendWithoutRamparts(enemyCreeps)
+            return
         }
 
         if (!room.enemyDamageThreat || room.controller.safeMode) {
@@ -95,13 +87,42 @@ export class RangedDefender extends Creep {
         this.defendWithRampart()
     }
 
+    advancedRangedAttack?() {
+        if (!this.combatTarget) return
+        this.room.targetVisual(this.pos, this.combatTarget.pos)
+
+        if (!this.room.towerAttackTarget || this.combatTarget.id !== this.room.towerAttackTarget.id) {
+            let massDamage = 0
+            for (const enemyCreep of this.room.enemyAttackers) {
+                const range = getRange(this.pos, enemyCreep.pos)
+                if (range > 3) continue
+
+                massDamage +=
+                    RANGED_ATTACK_POWER *
+                    rangedMassAttackMultiplierByRange[range] *
+                    enemyCreep.defenceStrength
+            }
+
+            if (massDamage >= RANGED_ATTACK_POWER) this.rangedMassAttack()
+            else this.rangedAttack(this.combatTarget)
+        }
+
+        if (getRange(this.pos, this.combatTarget.pos) <= 1) this.rangedMassAttack()
+        else this.rangedAttack(this.combatTarget)
+    }
+
     defendWithoutRamparts?(enemyCreeps: Creep[]) {
         // Get the closest enemyAttacker
 
-        const enemyCreep = findClosestObject(this.pos, enemyCreeps) || findClosestObject(this.pos, this.room.enemyCreeps)
+        const enemyCreep =
+            findClosestObject(this.pos, enemyCreeps) ||
+            findClosestObject(this.pos, this.room.enemyCreeps)
 
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, enemyCreep.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         // If out of range, move to
 
@@ -143,7 +164,8 @@ export class RangedDefender extends Creep {
             if (creepIDUsingRampart && this.id !== creepIDUsingRampart) {
                 const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
                 if (
-                    creepUsingRampart.combatStrength.melee + creepUsingRampart.combatStrength.ranged >=
+                    creepUsingRampart.combatStrength.melee +
+                        creepUsingRampart.combatStrength.ranged >=
                     this.combatStrength.melee + this.combatStrength.ranged
                 )
                     continue
@@ -151,7 +173,12 @@ export class RangedDefender extends Creep {
 
             const closestAttacker = findClosestObjectEuc(rampart.pos, enemyAttackers)
 
-            let score = getRangeEucXY(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
+            let score = getRangeEucXY(
+                rampart.pos.x,
+                closestAttacker.pos.x,
+                rampart.pos.y,
+                closestAttacker.pos.y,
+            )
             if (currentRampart && getRange(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
             score += getRange(rampart.pos, room.roomManager.anchor || { x: 25, y: 25 }) * 0.01
@@ -200,7 +227,9 @@ export class RangedDefender extends Creep {
                 )
  */
 
-            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, { color: customColors.yellow })
+            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, {
+                color: customColors.yellow,
+            })
         }
 
         // If the creep is range 0 to the closestRampart, inform false

@@ -43,7 +43,12 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
             }
 
             // Avoid dangerous rooms if we are told to and the danger is persistent
-            if (args.avoidDanger && roomMemory[RoomMemoryKeys.danger] && roomMemory[RoomMemoryKeys.danger] >= Game.time) return Infinity
+            if (
+                args.avoidDanger &&
+                roomMemory[RoomMemoryKeys.danger] &&
+                roomMemory[RoomMemoryKeys.danger] >= Game.time
+            )
+                return Infinity
 
             // If the goal is in the room
             if (roomName === goal.pos.roomName) return 1
@@ -164,7 +169,7 @@ function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<
                 }
             }
         } else if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
-            for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
+            for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
                 const path = unpackPosList(packedPath)
 
                 for (const pos of path) {

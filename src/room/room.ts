@@ -265,7 +265,11 @@ export class RoomManager {
         return sourceHarvestPositions.map(positions => packPosList(positions))
     }
 
-    findRemoteSourcePaths(commune: Room, packedRemoteSourceHarvestPositions: string[], pathsThrough: Set<string>) {
+    findRemoteSourceFastFillerPaths(
+        commune: Room,
+        packedRemoteSourceHarvestPositions: string[],
+        pathsThrough: Set<string>,
+    ) {
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote source harvest paths' + this.room.name)
 
@@ -283,7 +287,43 @@ export class RoomManager {
             })
 
             for (const pos of path) {
+                pathsThrough.add(pos.roomName)
+            }
 
+            sourcePaths.push(path)
+        }
+        /*
+        for (const index in sourcePaths) {
+            const path = sourcePaths[index]
+            if (!path.length) throw Error('no source path found for index ' + index + ' for ' + this.room.name + ', ' + JSON.stringify(sourcePaths) + ', ' + packedRemoteSourceHarvestPositions)
+        }
+ */
+        return sourcePaths.map(path => packPosList(path))
+    }
+
+    findRemoteSourceHubPaths(
+        commune: Room,
+        packedRemoteSourceHarvestPositions: string[],
+        pathsThrough: Set<string>,
+    ) {
+        const stampAnchors = commune.roomManager.stampAnchors
+        if (!stampAnchors) throw Error('no stampAnchors for ' + commune.name)
+
+        const hubAnchor = new RoomPosition(stampAnchors.hub[0].x, stampAnchors.hub[0].y, commune.name)
+        const sourcePaths: RoomPosition[][] = []
+
+        for (const positions of packedRemoteSourceHarvestPositions) {
+            const origin = unpackPosAt(positions, 0)
+            const path = customFindPath({
+                origin,
+                goals: [{ pos: hubAnchor, range: 1 }],
+                typeWeights: remoteTypeWeights,
+                plainCost: defaultRoadPlanningPlainCost,
+                weightStructurePlans: true,
+                avoidStationaryPositions: true,
+            })
+
+            for (const pos of path) {
                 pathsThrough.add(pos.roomName)
             }
 
@@ -330,7 +370,11 @@ export class RoomManager {
         return packPosList(positions)
     }
 
-    findRemoteControllerPath(commune: Room, packedRemoteControllerPositions: string, pathsThrough: Set<string>) {
+    findRemoteControllerPath(
+        commune: Room,
+        packedRemoteControllerPositions: string,
+        pathsThrough: Set<string>,
+    ) {
         const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
 
@@ -345,7 +389,6 @@ export class RoomManager {
         })
 
         for (const pos of path) {
-
             pathsThrough.add(pos.roomName)
         }
 
@@ -537,7 +580,7 @@ export class RoomManager {
     get remoteSourcePaths() {
         if (this._remoteSourcePaths) return this._remoteSourcePaths
 
-        const packedSourcePaths = this.room.memory[RoomMemoryKeys.remoteSourcePaths]
+        const packedSourcePaths = this.room.memory[RoomMemoryKeys.remoteSourceFastFillerPaths]
         if (packedSourcePaths) {
             return (this._remoteSourcePaths = packedSourcePaths.map(positions =>
                 unpackPosList(positions),
@@ -976,7 +1019,7 @@ export class RoomManager {
             highestDismantle: 0,
         }
         const enemyCreeps = this.room.enemyCreeps
-        if (!enemyCreeps.length) return this._enemySquadData = highestEnemySquadData
+        if (!enemyCreeps.length) return (this._enemySquadData = highestEnemySquadData)
 
         const enemyCreepIDs = new Set(enemyCreeps.map(creep => creep.id))
 
@@ -1003,7 +1046,8 @@ export class RoomManager {
                 const creepAtPos = findObjectWithID(creepIDAtPos)
                 const creepAtPosCombatStrength = creepAtPos.combatStrength
 
-                squadData.highestMeleeDamage += creepAtPosCombatStrength.melee + creepAtPosCombatStrength.ranged
+                squadData.highestMeleeDamage +=
+                    creepAtPosCombatStrength.melee + creepAtPosCombatStrength.ranged
                 squadData.highestRangedDamage += creepAtPosCombatStrength.ranged
                 squadData.highestHeal += creepAtPosCombatStrength.heal
                 squadData.highestDismantle += creepAtPosCombatStrength.dismantle
@@ -1018,6 +1062,6 @@ export class RoomManager {
             }
         }
 
-        return this._enemySquadData = highestEnemySquadData
+        return (this._enemySquadData = highestEnemySquadData)
     }
 }

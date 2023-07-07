@@ -29,7 +29,15 @@ import {
 } from 'international/utils'
 import { internationalManager } from 'international/international'
 import { profiler } from 'other/profiler'
-import { packCoord, packCoordList, packPos, packPosList, packXYAsCoord, unpackCoord, unpackPosList } from 'other/codec'
+import {
+    packCoord,
+    packCoordList,
+    packPos,
+    packPosList,
+    packXYAsCoord,
+    unpackCoord,
+    unpackPosList,
+} from 'other/codec'
 
 const roomAdditions = {
     global: {
@@ -68,7 +76,13 @@ const roomAdditions = {
 
             if (this.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 return (this._enemyAttackers = this.enemyCreeps.filter(function (creep) {
-                    return creep.parts.attack + creep.parts.ranged_attack + creep.parts.work + creep.parts.heal > 0
+                    return (
+                        creep.parts.attack +
+                            creep.parts.ranged_attack +
+                            creep.parts.work +
+                            creep.parts.heal >
+                        0
+                    )
                 }))
             }
 
@@ -143,11 +157,13 @@ const roomAdditions = {
 
             // Make array keys for each structureType
 
-            for (const structureType of allStructureTypes) this._allyCSitesByType[structureType] = []
+            for (const structureType of allStructureTypes)
+                this._allyCSitesByType[structureType] = []
 
             // Group cSites by structureType
 
-            for (const cSite of this.allyCSites) this._allyCSitesByType[cSite.structureType].push(cSite)
+            for (const cSite of this.allyCSites)
+                this._allyCSitesByType[cSite.structureType].push(cSite)
 
             return this._allyCSitesByType
         },
@@ -234,7 +250,12 @@ const roomAdditions = {
 
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
                     structure =>
-                        getRangeXY(structure.pos.x, closestSourcePos.x, structure.pos.y, closestSourcePos.y) > 1,
+                        getRangeXY(
+                            structure.pos.x,
+                            closestSourcePos.x,
+                            structure.pos.y,
+                            closestSourcePos.y,
+                        ) > 1,
                 )
             }
 
@@ -252,7 +273,8 @@ const roomAdditions = {
                     (this.fastFillerContainerLeft && this.fastFillerContainerRight))
             ) {
                 this._spawningStructuresByNeed = this._spawningStructuresByNeed.filter(
-                    structure => getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
+                    structure =>
+                        getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
                 )
             }
 
@@ -307,11 +329,18 @@ const roomAdditions = {
             this._combatStructureTargets = []
 
             if (this.controller) {
-                if (this.controller.my || this.controller.reservation) return this._combatStructureTargets
-
-                if (this.controller.owner && Memory.allyPlayers.includes(this.controller.owner.username))
+                if (this.controller.my || this.controller.reservation)
                     return this._combatStructureTargets
-                if (this.controller.reservation && Memory.allyPlayers.includes(this.controller.reservation.username))
+
+                if (
+                    this.controller.owner &&
+                    Memory.allyPlayers.includes(this.controller.owner.username)
+                )
+                    return this._combatStructureTargets
+                if (
+                    this.controller.reservation &&
+                    Memory.allyPlayers.includes(this.controller.reservation.username)
+                )
                     return this._combatStructureTargets
             }
 
@@ -322,7 +351,9 @@ const roomAdditions = {
             this._combatStructureTargets = this._combatStructureTargets.concat(structures.extension)
             this._combatStructureTargets = this._combatStructureTargets.concat(structures.storage)
             this._combatStructureTargets = this._combatStructureTargets.concat(structures.terminal)
-            this._combatStructureTargets = this._combatStructureTargets.concat(structures.powerSpawn)
+            this._combatStructureTargets = this._combatStructureTargets.concat(
+                structures.powerSpawn,
+            )
             this._combatStructureTargets = this._combatStructureTargets.concat(structures.factory)
             this._combatStructureTargets = this._combatStructureTargets.concat(structures.nuker)
             this._combatStructureTargets = this._combatStructureTargets.concat(structures.observer)
@@ -459,7 +490,8 @@ const roomAdditions = {
                     for (const ID of structuresAtCoord) {
                         const structure = findObjectWithID(ID)
 
-                        if (adjacentStructuresByType[structure.structureType] === undefined) continue
+                        if (adjacentStructuresByType[structure.structureType] === undefined)
+                            continue
 
                         // Increase structure amount for this structureType on the adjacentPos
 
@@ -469,10 +501,18 @@ const roomAdditions = {
 
                 // If there is more than one adjacent extension and container, iterate
 
-                if (adjacentStructuresByType[STRUCTURE_CONTAINER] + adjacentStructuresByType[STRUCTURE_LINK] === 0)
+                if (
+                    adjacentStructuresByType[STRUCTURE_CONTAINER] +
+                        adjacentStructuresByType[STRUCTURE_LINK] ===
+                    0
+                )
                     continue
 
-                if (adjacentStructuresByType[STRUCTURE_SPAWN] + adjacentStructuresByType[STRUCTURE_EXTENSION] === 0)
+                if (
+                    adjacentStructuresByType[STRUCTURE_SPAWN] +
+                        adjacentStructuresByType[STRUCTURE_EXTENSION] ===
+                    0
+                )
                     continue
 
                 this._fastFillerPositions.push(fastFillerPos)
@@ -513,18 +553,26 @@ const roomAdditions = {
 
             // Filter rooms that have some sourceEfficacies recorded
 
-            this._remoteNamesBySourceEfficacy = this.memory[RoomMemoryKeys.remotes].filter(function (roomName) {
-                return Memory.rooms[roomName][RoomMemoryKeys.remoteSourcePaths].length
-            })
+            this._remoteNamesBySourceEfficacy = this.memory[RoomMemoryKeys.remotes].filter(
+                function (roomName) {
+                    return Memory.rooms[roomName][RoomMemoryKeys.remoteSourceFastFillerPaths].length
+                },
+            )
 
             // Sort the remotes based on the average source efficacy
 
             return this._remoteNamesBySourceEfficacy.sort(function (a1, b1) {
                 return (
-                    Memory.rooms[a1][RoomMemoryKeys.remoteSourcePaths].reduce((a2, b2) => a2 + b2.length, 0) /
-                        Memory.rooms[a1][RoomMemoryKeys.remoteSourcePaths].length -
-                    Memory.rooms[b1][RoomMemoryKeys.remoteSourcePaths].reduce((a2, b2) => a2 + b2.length, 0) /
-                        Memory.rooms[b1][RoomMemoryKeys.remoteSourcePaths].length
+                    Memory.rooms[a1][RoomMemoryKeys.remoteSourceFastFillerPaths].reduce(
+                        (a2, b2) => a2 + b2.length,
+                        0,
+                    ) /
+                        Memory.rooms[a1][RoomMemoryKeys.remoteSourceFastFillerPaths].length -
+                    Memory.rooms[b1][RoomMemoryKeys.remoteSourceFastFillerPaths].reduce(
+                        (a2, b2) => a2 + b2.length,
+                        0,
+                    ) /
+                        Memory.rooms[b1][RoomMemoryKeys.remoteSourceFastFillerPaths].length
                 )
             })
         },
@@ -552,8 +600,12 @@ const roomAdditions = {
                 const bSplit = b.split(' ')
 
                 return (
-                    Memory.rooms[aSplit[0]][RoomMemoryKeys.remoteSourcePaths][parseInt(aSplit[1])].length -
-                    Memory.rooms[bSplit[0]][RoomMemoryKeys.remoteSourcePaths][parseInt(bSplit[1])].length
+                    Memory.rooms[aSplit[0]][RoomMemoryKeys.remoteSourceFastFillerPaths][
+                        parseInt(aSplit[1])
+                    ].length -
+                    Memory.rooms[bSplit[0]][RoomMemoryKeys.remoteSourceFastFillerPaths][
+                        parseInt(bSplit[1])
+                    ].length
                 )
             })
         },
@@ -797,9 +849,11 @@ const roomAdditions = {
         get() {
             if (this._actionableWalls) return this._actionableWalls
 
-            return (this._actionableWalls = this.roomManager.structures.constructedWall.filter(function (structure) {
-                return structure.hits
-            }))
+            return (this._actionableWalls = this.roomManager.structures.constructedWall.filter(
+                function (structure) {
+                    return structure.hits
+                },
+            ))
         },
     },
     quadCostMatrix: {
@@ -817,7 +871,8 @@ const roomAdditions = {
             for (const creep of this.enemyCreeps) terrainCoords[packAsNum(creep.pos)] = 255
             for (const creep of this.allyCreeps) terrainCoords[packAsNum(creep.pos)] = 255
 
-            for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) terrainCoords[packAsNum(creep.pos)] = 255
+            for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS))
+                terrainCoords[packAsNum(creep.pos)] = 255
 
             // Avoid impassible structures
 
@@ -853,7 +908,8 @@ const roomAdditions = {
 
             //
 
-            for (const portal of this.roomManager.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
+            for (const portal of this.roomManager.structures.portal)
+                terrainCoords[packAsNum(portal.pos)] = 255
 
             // Loop trough each construction site belonging to an ally
 
@@ -979,7 +1035,7 @@ const roomAdditions = {
             const ramparts = this.roomManager.structures.rampart
             const constructedWalls = this.roomManager.structures.constructedWall
             const barricades = [...ramparts, ...constructedWalls]
-            const highestBarricadeHits = findHighestScore(barricades, (structure) => structure.hits)
+            const highestBarricadeHits = findHighestScore(barricades, structure => structure.hits)
 
             for (const structure of ramparts) {
                 // If the rampart is mine
@@ -988,14 +1044,18 @@ const roomAdditions = {
 
                 // Otherwise set the rampart's pos as impassible
 
-                terrainCoords[packAsNum(structure.pos)] = Math.floor((highestBarricadeHits - structure.hits) / highestBarricadeHits * 254)
+                terrainCoords[packAsNum(structure.pos)] = Math.floor(
+                    ((highestBarricadeHits - structure.hits) / highestBarricadeHits) * 254,
+                )
             }
 
             // Loop through structureTypes of impassibleStructureTypes
 
             for (const structureType of impassibleStructureTypes) {
                 for (const structure of this.roomManager.structures[structureType]) {
-                    terrainCoords[packAsNum(structure.pos)] = 10 /* structure.hits / (structure.hitsMax / 10) */
+                    terrainCoords[
+                        packAsNum(structure.pos)
+                    ] = 10 /* structure.hits / (structure.hitsMax / 10) */
                 }
 
                 for (const cSite of this.roomManager.cSites[structureType]) {
@@ -1006,15 +1066,17 @@ const roomAdditions = {
             }
 
             for (const structure of constructedWalls) {
-
                 // Otherwise set the rampart's pos as impassible
 
-                terrainCoords[packAsNum(structure.pos)] = Math.floor((highestBarricadeHits - structure.hits) / highestBarricadeHits * 254)
+                terrainCoords[packAsNum(structure.pos)] = Math.floor(
+                    ((highestBarricadeHits - structure.hits) / highestBarricadeHits) * 254,
+                )
             }
 
             //
 
-            for (const portal of this.roomManager.structures.portal) terrainCoords[packAsNum(portal.pos)] = 255
+            for (const portal of this.roomManager.structures.portal)
+                terrainCoords[packAsNum(portal.pos)] = 255
 
             // Loop trough each construction site belonging to an ally
 
@@ -1127,7 +1189,8 @@ const roomAdditions = {
                 return (this._enemyDamageThreat = true)
 
             for (const enemyAttacker of this.enemyAttackers) {
-                if (!enemyAttacker.combatStrength.melee && !enemyAttacker.combatStrength.ranged) continue
+                if (!enemyAttacker.combatStrength.melee && !enemyAttacker.combatStrength.ranged)
+                    continue
 
                 return (this._enemyDamageThreat = true)
             }
@@ -1143,7 +1206,8 @@ const roomAdditions = {
 
             // If there is a controller, it's mine, and it's in safemode
 
-            if (this.controller && this.controller.my && this.controller.safeMode) return this._enemyThreatCoords
+            if (this.controller && this.controller.my && this.controller.safeMode)
+                return this._enemyThreatCoords
 
             // If there is no enemy threat
 
@@ -1289,11 +1353,13 @@ const roomAdditions = {
                     const resourceType = key as ResourceConstant
 
                     if (!this._resourcesInStoringStructures[resourceType]) {
-                        this._resourcesInStoringStructures[resourceType] = structure.store[resourceType]
+                        this._resourcesInStoringStructures[resourceType] =
+                            structure.store[resourceType]
                         continue
                     }
 
-                    this._resourcesInStoringStructures[resourceType] += structure.store[resourceType]
+                    this._resourcesInStoringStructures[resourceType] +=
+                        structure.store[resourceType]
                 }
             }
 
@@ -1356,7 +1422,8 @@ const roomAdditions = {
         get() {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
 
-            if (this.memory[RoomMemoryKeys.type] === RoomTypes.remote) return (this._advancedLogistics = true)
+            if (this.memory[RoomMemoryKeys.type] === RoomTypes.remote)
+                return (this._advancedLogistics = true)
 
             // So long as we have some sort of storing structure
 
@@ -1409,7 +1476,8 @@ const roomAdditions = {
                 }
             }
 
-            for (const portal of this.roomManager.structures.portal) cm.set(portal.pos.x, portal.pos.y, 255)
+            for (const portal of this.roomManager.structures.portal)
+                cm.set(portal.pos.x, portal.pos.y, 255)
 
             // Loop trough each construction site belonging to an ally
 
@@ -1428,7 +1496,8 @@ const roomAdditions = {
                 for (const creep of this.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
                 for (const creep of this.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
 
-                for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS)) cm.set(creep.pos.x, creep.pos.y, 255)
+                for (const creep of this.find(FIND_HOSTILE_POWER_CREEPS))
+                    cm.set(creep.pos.x, creep.pos.y, 255)
             }
 
             for (const rampart of this.roomManager.structures.rampart) {
@@ -1439,7 +1508,8 @@ const roomAdditions = {
                 // If the rampart is public and owned by an ally
                 // We don't want to try to walk through enemy public ramparts as it could trick our pathing
 
-                if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username)) continue
+                if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username))
+                    continue
 
                 // Otherwise set the rampart's pos as impassible
 

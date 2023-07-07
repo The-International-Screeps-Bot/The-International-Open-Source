@@ -495,7 +495,7 @@ export class CommuneManager {
     _storingStructures: (StructureStorage | StructureTerminal)[]
 
     /**
-     * Storing structures - storage or teirmal - filtered to be defined and RCL active
+     * Storing structures - storage or teirmal - filtered to for defined and RCL active
      */
     get storingStructures() {
         if (this._storingStructures) return this._storingStructures

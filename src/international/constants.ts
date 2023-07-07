@@ -251,7 +251,8 @@ export enum RoomMemoryKeys {
     remoteControllerPositions,
     remoteSources,
     remoteSourceHarvestPositions,
-    remoteSourcePaths,
+    remoteSourceFastFillerPaths,
+    remoteSourceHubPaths,
     clearedEnemyStructures,
     lastStructureCheck,
     roadsQuota,
@@ -285,6 +286,9 @@ export enum RoomMemoryKeys {
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
+
+    // Commune
+    
     RoomMemoryKeys.remotes,
     RoomMemoryKeys.deposits,
     RoomMemoryKeys.powerBanks,
@@ -298,7 +302,11 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.dynamicScoreUpdate,
     RoomMemoryKeys.clearedEnemyStructures,
 
+    // Remote
+
     RoomMemoryKeys.commune,
+    RoomMemoryKeys.remoteSourceFastFillerPaths,
+    RoomMemoryKeys.remoteSourceHubPaths,
     RoomMemoryKeys.remoteSourceCredit,
     RoomMemoryKeys.remoteSourceCreditChange,
     RoomMemoryKeys.remoteSourceCreditReservation,
@@ -306,8 +314,12 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.recursedAbandonment,
     RoomMemoryKeys.pathsThrough,
 
+    // Ally and Enemy
+
     RoomMemoryKeys.owner,
     RoomMemoryKeys.RCL,
+
+    // Enemy
 
     RoomMemoryKeys.powerEnabled,
     RoomMemoryKeys.towers,
@@ -336,6 +348,8 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     ]),
     [RoomTypes.remote]: new Set([
         RoomMemoryKeys.commune,
+        RoomMemoryKeys.remoteSourceFastFillerPaths,
+        RoomMemoryKeys.remoteSourceHubPaths,
         RoomMemoryKeys.remoteSourceCredit,
         RoomMemoryKeys.remoteSourceCreditChange,
         RoomMemoryKeys.remoteSourceCreditReservation,

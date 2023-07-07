@@ -2080,7 +2080,8 @@ declare global {
         [RoomMemoryKeys.remoteControllerPositions]: string
         [RoomMemoryKeys.remoteSources]: Id<Source>[]
         [RoomMemoryKeys.remoteSourceHarvestPositions]: string[]
-        [RoomMemoryKeys.remoteSourcePaths]: string[]
+        [RoomMemoryKeys.remoteSourceFastFillerPaths]: string[]
+        [RoomMemoryKeys.remoteSourceHubPaths]: string[]
         [RoomMemoryKeys.clearedEnemyStructures]: boolean
         [RoomMemoryKeys.lastStructureCheck]: number
         [RoomMemoryKeys.roadsQuota]: number[]

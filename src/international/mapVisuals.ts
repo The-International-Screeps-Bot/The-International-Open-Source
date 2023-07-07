@@ -117,9 +117,11 @@ class MapVisualsManager {
                 if (!anchor) throw Error('No anchor for mapVisuals remote ' + roomName)
 
                 if (commune) {
-                    for (const sourceIndex in roomMemory[RoomMemoryKeys.remoteSourcePaths]) {
+                    for (const sourceIndex in roomMemory[
+                        RoomMemoryKeys.remoteSourceFastFillerPaths
+                    ]) {
                         const path = unpackPosList(
-                            roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex],
+                            roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex],
                         )
 
                         Game.map.visual.poly(path, {
@@ -146,7 +148,8 @@ class MapVisualsManager {
 
                         Game.map.visual.text(
                             `⛏️${income},🚶‍♀️${
-                                roomMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length
+                                roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex]
+                                    .length
                             },${remoteSourceHarvesters}/${maxRemoteSourceHarvesters}`,
                             new RoomPosition(pos.x, pos.y, roomName),
                             {

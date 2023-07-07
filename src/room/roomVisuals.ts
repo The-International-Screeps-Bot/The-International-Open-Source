@@ -788,9 +788,9 @@ export class RoomVisualsManager {
 
             row.push(remoteName)
             row.push(sourceIndex)
-            if (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex])
+            if (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex])
                 row.push(
-                    remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
+                    remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
                         packedPosLength,
                 )
             else row.push('undefined')
@@ -802,7 +802,8 @@ export class RoomVisualsManager {
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
                     '/' +
                     Math.round(
-                        (remoteMemory[RoomMemoryKeys.remoteSourcePaths][sourceIndex].length /
+                        (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex]
+                            .length /
                             packedPosLength) *
                             remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
                     ) *

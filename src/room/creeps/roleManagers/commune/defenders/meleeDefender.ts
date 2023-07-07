@@ -11,6 +11,7 @@ import {
     getRange,
     randomTick,
     randomVal,
+    getRangeEuc,
 } from 'international/utils'
 import { packCoord } from 'other/codec'
 
@@ -65,9 +66,12 @@ export class MeleeDefender extends Creep {
         let enemyCreeps = room.enemyAttackers
 
         if (!enemyCreeps.length) {
-            enemyCreeps = room.enemyAttackers
+            enemyCreeps = room.enemyCreeps
 
             if (!enemyCreeps.length) return
+
+            this.defendWithoutRamparts(enemyCreeps)
+            return
         }
 
         if (!room.enemyDamageThreat || room.controller.safeMode) {
@@ -106,10 +110,12 @@ export class MeleeDefender extends Creep {
     findRampart?() {
         const { room } = this
 
-        if (this.memory[CreepMemoryKeys.rampartTarget] && !randomTick(10))
-            return findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
+        const creepMemory = Memory.creeps[this.name]
 
-        const currentRampart = findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
+        if (creepMemory[CreepMemoryKeys.rampartTarget] && !randomTick(10))
+            return findObjectWithID(creepMemory[CreepMemoryKeys.rampartTarget])
+
+        const currentRampart = findObjectWithID(creepMemory[CreepMemoryKeys.rampartTarget])
 
         const enemyAttackers = room.enemyAttackers
 
@@ -132,7 +138,7 @@ export class MeleeDefender extends Creep {
 
             const closestAttacker = findClosestObjectEuc(rampart.pos, enemyAttackers)
 
-            let score = getRangeEucXY(rampart.pos.x, closestAttacker.pos.x, rampart.pos.y, closestAttacker.pos.y)
+            let score = getRangeEuc(rampart.pos, closestAttacker.pos)
             if (currentRampart && getRange(rampart.pos, currentRampart.pos) <= 1) score *= 0.5
 
             score += getRange(rampart.pos, room.roomManager.anchor || { x: 25, y: 25 }) * 0.01
@@ -151,7 +157,7 @@ export class MeleeDefender extends Creep {
             delete creepUsingRampart.memory[CreepMemoryKeys.rampartTarget]
         }
 
-        this.memory[CreepMemoryKeys.rampartTarget] = bestRampart.id
+        creepMemory[CreepMemoryKeys.rampartTarget] = bestRampart.id
         room.usedRampartIDs.set(bestRampart.id, this.id)
         return bestRampart
     }
@@ -187,7 +193,7 @@ export class MeleeDefender extends Creep {
 
         // If the creep is range 0 to the closestRampart, inform false
 
-        if (getRangeXY(this.pos.x, rampart.pos.x, this.pos.y, rampart.pos.y) === 0) return false
+        if (getRange(this.pos, rampart.pos) === 0) return false
 
         // Otherwise move to the rampart preffering ramparts and inform true
 
