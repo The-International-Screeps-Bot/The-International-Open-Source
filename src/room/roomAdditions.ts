@@ -27,7 +27,7 @@ import {
     getRange,
     findHighestScore,
 } from 'international/utils'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import { profiler } from 'other/profiler'
 import {
     packCoord,
@@ -860,7 +860,7 @@ const roomAdditions = {
         get() {
             if (this._quadCostMatrix) return this._quadCostMatrix
 
-            const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+            const terrainCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
             this._quadCostMatrix = new PathFinder.CostMatrix()
 
             const roadCoords = new Set()
@@ -1018,7 +1018,7 @@ const roomAdditions = {
         get() {
             if (this._quadBulldozeCostMatrix) return this._quadBulldozeCostMatrix
 
-            const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+            const terrainCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
             this._quadBulldozeCostMatrix = new PathFinder.CostMatrix()
 
             const roadCoords = new Set()

@@ -1,12 +1,18 @@
-import { customColors, InternationalStatNamesEnum, RoomMemoryKeys, RoomStatNamesEnum, RoomTypes } from './constants'
+import {
+    customColors,
+    InternationalStatNamesEnum,
+    RoomMemoryKeys,
+    RoomStatNamesEnum,
+    RoomTypes,
+} from './constants'
 import { customLog } from './utils'
 
 const CPUUsers: CpuUsers = {
-    [InternationalStatNamesEnum.InternationalManagerCPUUsage]: 0,
+    [InternationalStatNamesEnum.CollectiveManagerCPUUsage]: 0,
     [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: 0,
     [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: 0,
     [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: 0,
-    [InternationalStatNamesEnum.TickConfigCPUUsage]: 0,
+    [InternationalStatNamesEnum.TickInitCPUUsage]: 0,
     [InternationalStatNamesEnum.RoomManagerCPUUsage]: 0,
     [InternationalStatNamesEnum.StatsManagerCPUUsage]: 0,
 }
@@ -105,7 +111,6 @@ export class StatsManager {
         const remoteLevel3: Partial<RoomStats> = {
             [RoomStatNamesEnum.RemoteRoomCPUUsage]: 0,
             [RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoomCPUUsage]: 0,
             [RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]: 0,
             [RoomStatNamesEnum.RemoteRoleManagerCPUUsage]: 0,
             [RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]: 0,
@@ -277,8 +282,12 @@ export class StatsManager {
                             remoteRoomStats[RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]
                         globalCommuneStats[RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage] +=
                             remoteRoomStats[RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]
+                        globalCommuneStats[
+                            RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage
+                        ] +=
+                            remoteRoomStats[
+                                RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage
+                            ]
                     }
 
                     if (each250Ticks)
@@ -297,7 +306,9 @@ export class StatsManager {
                     spawns.reduce(
                         (sum, spawn) =>
                             sum +
-                            ((spawn.spawning && spawn.spawning.remainingTime) || spawn.renewed || !spawn.RCLActionable
+                            ((spawn.spawning && spawn.spawning.remainingTime) ||
+                            spawn.renewed ||
+                            !spawn.RCLActionable
                                 ? 1
                                 : 0),
                         0,
@@ -305,18 +316,24 @@ export class StatsManager {
 
             if (each250Ticks || forceUpdate) {
                 if (room.controller && room.controller.my) {
-                    const progressPercentage = room.controller.progress / room.controller.progressTotal
+                    const progressPercentage =
+                        room.controller.progress / room.controller.progressTotal
                     globalCommuneStats.cl =
-                        progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
+                        progressPercentage < 1
+                            ? room.controller.level + progressPercentage
+                            : room.controller.level
                 }
-                globalCommuneStats[RoomStatNamesEnum.EnergyStored] = room.resourcesInStoringStructures.energy
+                globalCommuneStats[RoomStatNamesEnum.EnergyStored] =
+                    room.resourcesInStoringStructures.energy
                 globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
                     room.resourcesInStoringStructures.battery * 10
             } else {
-                globalCommuneStats[RoomStatNamesEnum.EnergyStored] = roomStats[RoomStatNamesEnum.EnergyStored]
+                globalCommuneStats[RoomStatNamesEnum.EnergyStored] =
+                    roomStats[RoomStatNamesEnum.EnergyStored]
                 globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
                     roomStats[RoomStatNamesEnum.BatteriesStoredTimes10]
-                globalCommuneStats[RoomStatNamesEnum.ControllerLevel] = roomStats[RoomStatNamesEnum.ControllerLevel]
+                globalCommuneStats[RoomStatNamesEnum.ControllerLevel] =
+                    roomStats[RoomStatNamesEnum.ControllerLevel]
             }
         }
 
@@ -436,7 +453,8 @@ export class StatsManager {
         }
         Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
         Memory.stats.heapUsage =
-            Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
+            Game.cpu.getHeapStatistics().total_heap_size /
+            Game.cpu.getHeapStatistics().heap_size_limit
         Memory.stats.gcl = {
             progress: Game.gcl.progress,
             progressTotal: Game.gcl.progressTotal,
@@ -449,7 +467,9 @@ export class StatsManager {
         }
 
         const globalRoomKeys = Object.keys(global.roomStats[RoomTypes.commune])
-        const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
+        const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(
+            room => !globalRoomKeys.includes(room),
+        )
         globalRoomKeys.forEach(roomName => {
             this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
         })
@@ -469,9 +489,9 @@ export class StatsManager {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             const CPUUsers = Memory.stats.CPUUsers
             Memory.stats.CPUUsers = {
-                [InternationalStatNamesEnum.InternationalManagerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.InternationalManagerCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.InternationalManagerCPUUsage],
+                [InternationalStatNamesEnum.CollectiveManagerCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.CollectiveManagerCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.CollectiveManagerCPUUsage],
                 ),
                 [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: this.average(
                     CPUUsers[InternationalStatNamesEnum.CreepOrganizerCPUUsage],
@@ -485,9 +505,9 @@ export class StatsManager {
                     CPUUsers[InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage],
                     global.CPUUsers[InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage],
                 ),
-                [InternationalStatNamesEnum.TickConfigCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.TickConfigCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.TickConfigCPUUsage],
+                [InternationalStatNamesEnum.TickInitCPUUsage]: this.average(
+                    CPUUsers[InternationalStatNamesEnum.TickInitCPUUsage],
+                    global.CPUUsers[InternationalStatNamesEnum.TickInitCPUUsage],
                 ),
                 [InternationalStatNamesEnum.RoomManagerCPUUsage]: this.average(
                     CPUUsers[InternationalStatNamesEnum.RoomManagerCPUUsage],
@@ -504,11 +524,11 @@ export class StatsManager {
             })
         } else {
             Memory.stats.CPUUsers = {
-                [InternationalStatNamesEnum.InternationalManagerCPUUsage]: undefined,
+                [InternationalStatNamesEnum.CollectiveManagerCPUUsage]: undefined,
                 [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: undefined,
                 [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: undefined,
                 [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: undefined,
-                [InternationalStatNamesEnum.TickConfigCPUUsage]: undefined,
+                [InternationalStatNamesEnum.TickInitCPUUsage]: undefined,
                 [InternationalStatNamesEnum.RoomManagerCPUUsage]: undefined,
                 [InternationalStatNamesEnum.StatsManagerCPUUsage]: undefined,
             }
@@ -531,7 +551,12 @@ export class StatsManager {
 
 export const statsManager = new StatsManager()
 
-export const updateStat = function (roomName: string, name: string, value: number, nonRoomStat: boolean = false) {
+export const updateStat = function (
+    roomName: string,
+    name: string,
+    value: number,
+    nonRoomStat: boolean = false,
+) {
     if (nonRoomStat) {
         global.CPUUsers[name as InternationalStatNamesEnum] = value
         return
@@ -545,11 +570,10 @@ export const updateStat = function (roomName: string, name: string, value: numbe
     if (!updateStats) return
 
     if (global.roomStats[RoomTypes.commune][roomName]) {
-
-        (global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats)[roomStatName] += value
-    }
-    else if (global.roomStats[RoomTypes.remote][roomName]) {
-
-        (global.roomStats[RoomTypes.remote][roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
+        ;(global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats)[roomStatName] += value
+    } else if (global.roomStats[RoomTypes.remote][roomName]) {
+        ;(global.roomStats[RoomTypes.remote][roomName] as RoomStats)[
+            GetRemoteStatsName(roomStatName)
+        ] += value
     }
 }

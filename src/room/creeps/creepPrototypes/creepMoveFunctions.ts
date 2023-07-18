@@ -15,7 +15,7 @@ import {
     communeCreepRoles,
 } from 'international/constants'
 import { customFindPath } from 'international/customPathFinder'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import {
     areCoordsEqual,
     arePositionsEqual,
@@ -282,7 +282,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     // Assign default opts
 
     if (!opts.origin) opts.origin = this.pos
-    if (!opts.cacheAmount) opts.cacheAmount = internationalManager.defaultMinCacheAmount
+    if (!opts.cacheAmount) opts.cacheAmount = collectiveManager.defaultMinCacheAmount
 
     let path: RoomPosition[]
     if (this.spawning) path = []

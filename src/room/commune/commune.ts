@@ -82,7 +82,7 @@ import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
 import { decode, encode } from 'base32768'
 import { BasePlans } from '../construction/basePlans'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
@@ -191,7 +191,7 @@ export class CommuneManager {
         roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
         global.communes.add(room.name)
 
-        if (this.room.controller.safeMode) internationalManager.safemodedCommuneName = this.room.name
+        if (this.room.controller.safeMode) collectiveManager.safemodedCommuneName = this.room.name
 
         if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
             if (global.communes.size <= 1)
@@ -254,9 +254,9 @@ export class CommuneManager {
         room.defenderEnemyTargetsWithDefender = new Map()
 
         if (room.terminal && room.controller.level >= 6)
-            internationalManager.terminalCommunes.push(room.name)
+            collectiveManager.terminalCommunes.push(room.name)
 
-        internationalManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
+        collectiveManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
     }
 
     preTickRun() {
@@ -320,7 +320,6 @@ export class CommuneManager {
     }
 
     private preTickTest() {
-
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -490,7 +489,9 @@ export class CommuneManager {
             Math.min(
                 Math.floor(
                     Math.pow((level - 3) * 50, 2.5) +
-                        Memory.rooms[this.room.name][RoomMemoryKeys.threatened] * 5 * Math.pow(level, 2),
+                        Memory.rooms[this.room.name][RoomMemoryKeys.threatened] *
+                            5 *
+                            Math.pow(level, 2),
                 ),
                 RAMPART_HITS_MAX[level] * 0.9,
             ) || 20000)
@@ -772,7 +773,6 @@ export class CommuneManager {
 
         // If we have cached links, confirm they are valid and use them
         if (this.sourceLinkIDs) {
-
             const links: (StructureLink | false)[] = []
 
             for (const ID of this.sourceLinkIDs) {
@@ -794,10 +794,13 @@ export class CommuneManager {
         let definedLinks = 0
 
         for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
-
             const closestSourceHarvestPos = positions[0]
 
-            const structure = this.room.findStructureInRange(closestSourceHarvestPos, 1, structure => structure.structureType === STRUCTURE_LINK) as StructureLink | false
+            const structure = this.room.findStructureInRange(
+                closestSourceHarvestPos,
+                1,
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as StructureLink | false
             links.push(structure)
 
             if (!structure) continue
@@ -806,7 +809,7 @@ export class CommuneManager {
         }
 
         if (definedLinks === stampAnchors.sourceLink.length)
-            this.sourceLinkIDs = links.map(link =>  (link as StructureLink).id)
+            this.sourceLinkIDs = links.map(link => (link as StructureLink).id)
         return (this._sourceLinks = links)
     }
 

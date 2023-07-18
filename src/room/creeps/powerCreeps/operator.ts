@@ -26,7 +26,7 @@ export class Operator extends PowerCreep {
         taskTarget._reservePowers.add(this.memory[PowerCreepMemoryKeys.taskPower])
     }
 
-    endTickManager() {}
+    endRun() {}
 
     // Basic tasks
 
@@ -139,7 +139,8 @@ export class Operator extends PowerCreep {
     // Complex power tasks
 
     findPowerTask?() {
-        if (this.memory[PowerCreepMemoryKeys.taskTarget]) return findObjectWithID(this.memory[PowerCreepMemoryKeys.taskTarget])
+        if (this.memory[PowerCreepMemoryKeys.taskTarget])
+            return findObjectWithID(this.memory[PowerCreepMemoryKeys.taskTarget])
 
         const task = this.findNewBestPowerTask()
         if (!task) return Result.fail
@@ -234,7 +235,10 @@ export class Operator extends PowerCreep {
         // Define the cooldown so we don't assume the creep can still do this power immediately
 
         this.powerCooldowns
-        this._powerCooldowns.set(this.memory[PowerCreepMemoryKeys.taskPower], POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]].cooldown)
+        this._powerCooldowns.set(
+            this.memory[PowerCreepMemoryKeys.taskPower],
+            POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]].cooldown,
+        )
 
         return Result.success
     }

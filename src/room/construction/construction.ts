@@ -6,12 +6,18 @@ import {
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
-import { customLog, findObjectWithID, packAsNum, randomIntRange, randomTick } from 'international/utils'
+import {
+    customLog,
+    findObjectWithID,
+    packAsNum,
+    randomIntRange,
+    randomTick,
+} from 'international/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_EXTENSION,
@@ -63,7 +69,12 @@ export class ConstructionManager {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
         }
         // If there are no builders, just run every few ticks
-        else if (this.room.controller.level !== 1 && this.lastRun && this.lastRun + randomIntRange(20, 100) > Game.time) return
+        else if (
+            this.room.controller.level !== 1 &&
+            this.lastRun &&
+            this.lastRun + randomIntRange(20, 100) > Game.time
+        )
+            return
 
         this.lastRun = Game.time
 
@@ -73,16 +84,13 @@ export class ConstructionManager {
 
         // If there are enough construction sites
 
-        if (
-            this.room.find(FIND_MY_CONSTRUCTION_SITES).length >=
-            internationalManager.maxCSitesPerRoom
-        )
+        if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= collectiveManager.maxCSitesPerRoom)
             return
 
         this.placedSites = 0
 
         const RCL = this.room.controller.level
-        const maxCSites = internationalManager.maxCSitesPerRoom
+        const maxCSites = collectiveManager.maxCSitesPerRoom
 
         this.placeRamparts(RCL, maxCSites)
         this.placeBase(RCL, maxCSites)
@@ -192,7 +200,9 @@ export class ConstructionManager {
                 if (data.minRCL > RCL) continue
 
                 this.room.visual.structure(coord.x, coord.y, data.structureType)
-                this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, { font: 0.4 })
+                this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, {
+                    font: 0.4,
+                })
                 break
             }
         }

@@ -3,13 +3,13 @@
 // International
 
 import './international/commands'
-import { internationalManager } from './international/international'
+import { collectiveManager } from './international/collective'
 import './international/config'
-import './international/tickConfig'
+import './international/tickInit'
 import './international/creepOrganizer'
 import './international/constructionSiteManager'
 import './international/mapVisuals'
-import './international/endTickManager'
+import './international/endRun'
 
 // Room
 
@@ -36,13 +36,13 @@ import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migration'
 import { respawnManager } from './international/respawn'
-import { tickConfig } from './international/tickConfig'
-import { allyManager } from 'international/simpleAllies'
+import { tickInit } from './international/tickInit'
+import { allyRequestManager } from 'international/AllyRequests'
 import ExecutePandaMasterCode from './other/PandaMaster/Execute'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
-import { StatsManager, updateStat } from 'international/statsManager'
+import { StatsManager, statsManager, updateStat } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import { profiler } from 'other/profiler'
 import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
@@ -56,7 +56,7 @@ import './room/construction/minCut'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { constructionSiteManager } from './international/constructionSiteManager'
 import { mapVisualsManager } from './international/mapVisuals'
-import { endTickManager } from './international/endTickManager'
+import { endRun } from './international/endTickManager'
 import { CommunePlanner } from 'room/communePlanner'
 import { RoomManager } from 'room/room'
 import { ObserverManager } from 'room/commune/observer'
@@ -83,7 +83,7 @@ function originalLoop() {
 
         memHack.run()
 
-        internationalManager.update()
+        collectiveManager.update()
 
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -94,16 +94,23 @@ function originalLoop() {
         migrationManager.run()
         respawnManager.run()
         configManager.run()
-        allyManager.tickConfig()
+        allyRequestManager.initRun()
         playerManager.run()
-        tickConfig.run()
+        tickInit.run()
+        tickInit.configGeneral()
+        statsManager.internationalPreTick()
+        roomsManager.updateRun()
+        tickInit.configWorkRequests()
+        tickInit.configCombatRequests()
+        tickInit.configHaulRequests()
+        roomsManager.initRun()
         creepOrganizer.run()
         powerCreepOrganizer.run()
 
         roomPruningManager.run()
         flagManager.run()
         constructionSiteManager.run()
-        internationalManager.orderManager()
+        collectiveManager.orderManager()
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
@@ -115,14 +122,14 @@ function originalLoop() {
             updateStat('', statName, cpuUsed, true)
         }
 
-        roomsManager()
+        roomsManager.run()
 
         mapVisualsManager.run()
 
-        internationalManager.advancedGeneratePixel()
-        internationalManager.advancedSellPixels()
+        collectiveManager.advancedGeneratePixel()
+        collectiveManager.advancedSellPixels()
 
-        endTickManager.run()
+        endRun.run()
     })
 }
 

@@ -65,8 +65,14 @@
  */
 
 import { customColors, roomDimensions } from 'international/constants'
-import { internationalManager } from 'international/international'
-import { customLog, findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'international/utils'
+import { collectiveManager } from 'international/collective'
+import {
+    customLog,
+    findCoordsInRangeXY,
+    isXYInBorder,
+    packXYAsNum,
+    unpackNumAsCoord,
+} from 'international/utils'
 
 // the eight surrounding points of a tile
 // note the order here is somehow important, the element i and (i + 4) % 8 should be the opposite direction
@@ -391,7 +397,12 @@ export function minCutToExit(sources: Coord[], costMap: CostMatrix): Coord[] {
             for (let dir = 0; dir < EIGHT_DELTA.length + 1; ++dir) {
                 const [onpidx, rd] = revEdge(opidx, dir)
                 const pidx = onpidx & PT_MASK
-                if (last[onpidx] != -2 && !exit[pidx] && !added[onpidx] && capacityMap[onpidx | (rd << DIR_SHIFT)]) {
+                if (
+                    last[onpidx] != -2 &&
+                    !exit[pidx] &&
+                    !added[onpidx] &&
+                    capacityMap[onpidx | (rd << DIR_SHIFT)]
+                ) {
                     added[onpidx] = 1
                     bfsQ.push(onpidx)
                 }

@@ -26,7 +26,7 @@ import {
     randomRange,
     randomTick,
 } from './utils'
-import { internationalManager, InternationalManager } from './international'
+import { collectiveManager, CollectiveManager } from './collective'
 import { updateStat, statsManager } from './statsManager'
 import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
@@ -34,7 +34,7 @@ import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 import { RoomManager } from 'room/room'
 import { roomUtils } from 'room/roomUtils'
 
-class TickConfig {
+class TickInit {
     public run() {
         // If CPU logging is enabled, get the CPU used at the start
 
@@ -42,11 +42,9 @@ class TickConfig {
 
         this.configGeneral()
         statsManager.internationalPreTick()
-        this.configRooms()
         this.configWorkRequests()
         this.configCombatRequests()
         this.configHaulRequests()
-        this.runRooms()
 
         if (Memory.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
@@ -59,7 +57,7 @@ class TickConfig {
         }
     }
 
-    private configGeneral() {
+    configGeneral() {
         // General
 
         global.communes = new Set()
@@ -77,29 +75,7 @@ class TickConfig {
         global.logs = ``
     }
 
-    private configRooms() {
-        for (const roomName in Game.rooms) {
-            const room = Game.rooms[roomName]
-
-            room.roomManager = global.roomManagers[room.name]
-
-            if (!room.roomManager) {
-                room.roomManager = new RoomManager()
-                global.roomManagers[room.name] = room.roomManager
-            }
-
-            room.roomManager.update(room)
-        }
-    }
-
-    private runRooms() {
-        for (const roomName in Game.rooms) {
-            const room = Game.rooms[roomName]
-            room.roomManager.preTickRun()
-        }
-    }
-
-    private configWorkRequests() {
+    configWorkRequests() {
         let reservedGCL = Game.gcl.level - global.communes.size
 
         // Subtract the number of workRequests with responders
@@ -138,7 +114,7 @@ class TickConfig {
 
         // Assign and abandon workRequests, in order of score
 
-        for (const roomName of internationalManager.workRequestsByScore) {
+        for (const roomName of collectiveManager.workRequestsByScore) {
             const request = Memory.workRequests[roomName]
 
             if (!request) continue
@@ -161,7 +137,7 @@ class TickConfig {
             // If there is not enough reserved GCL to make a new request
 
             if (reservedGCL <= 0) continue
-            if (global.communes.size >= internationalManager.maxCommunes) continue
+            if (global.communes.size >= collectiveManager.maxCommunes) continue
 
             // If the requested room is no longer neutral
 
@@ -203,7 +179,7 @@ class TickConfig {
             communesForResponding.splice(indexOf(communesForResponding, communeName), 1)
         }
     }
-    private configCombatRequests() {
+    configCombatRequests() {
         // Assign and decrease abandon for combatRequests
 
         for (const requestName in Memory.combatRequests) {
@@ -212,9 +188,9 @@ class TickConfig {
             if (request[CombatRequestKeys.abandon]) request[CombatRequestKeys.abandon] -= 1
 
             if (request[CombatRequestKeys.responder]) {
-                internationalManager.creepsByCombatRequest[requestName] = {}
+                collectiveManager.creepsByCombatRequest[requestName] = {}
                 for (const role of antifaRoles)
-                    internationalManager.creepsByCombatRequest[requestName][role] = []
+                    collectiveManager.creepsByCombatRequest[requestName][role] = []
                 request[CombatRequestKeys.quads] = 0
                 continue
             }
@@ -298,13 +274,13 @@ class TickConfig {
             Memory.rooms[communeName][RoomMemoryKeys.combatRequests].push(requestName)
             request[CombatRequestKeys.responder] = communeName
 
-            internationalManager.creepsByCombatRequest[requestName] = {}
+            collectiveManager.creepsByCombatRequest[requestName] = {}
             for (const role of antifaRoles)
-                internationalManager.creepsByCombatRequest[requestName][role] = []
+                collectiveManager.creepsByCombatRequest[requestName][role] = []
         }
     }
 
-    private configHaulRequests() {
+    configHaulRequests() {
         // Assign and decrease abandon for combatRequests
 
         for (const requestName in Memory.haulRequests) {
@@ -313,7 +289,7 @@ class TickConfig {
             if (request[HaulRequestKeys.abandon]) request[HaulRequestKeys.abandon] -= 1
 
             if (request[HaulRequestKeys.responder]) {
-                internationalManager.creepsByHaulRequest[requestName] = []
+                collectiveManager.creepsByHaulRequest[requestName] = []
                 continue
             }
 
@@ -367,9 +343,9 @@ class TickConfig {
             Memory.rooms[communeName][RoomMemoryKeys.haulRequests].push(requestName)
             request[HaulRequestKeys.responder] = communeName
 
-            internationalManager.creepsByHaulRequest[requestName] = []
+            collectiveManager.creepsByHaulRequest[requestName] = []
         }
     }
 }
 
-export const tickConfig = new TickConfig()
+export const tickInit = new TickInit()

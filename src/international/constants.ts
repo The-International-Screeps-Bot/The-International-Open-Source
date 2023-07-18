@@ -1,5 +1,5 @@
 import { packCoord } from 'other/codec'
-import { internationalManager } from './international'
+import { collectiveManager } from './collective'
 import { settings } from './settings'
 
 export enum PlayerMemoryKeys {
@@ -286,9 +286,8 @@ export enum RoomMemoryKeys {
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
-
     // Commune
-    
+
     RoomMemoryKeys.remotes,
     RoomMemoryKeys.deposits,
     RoomMemoryKeys.powerBanks,
@@ -904,7 +903,7 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
     [RESOURCE_ENERGY]: {
         min: function (communeManager) {
             if (communeManager.room.controller.level < 8) {
-                if (internationalManager.funnelOrder[0] === communeManager.room.name) {
+                if (collectiveManager.funnelOrder[0] === communeManager.room.name) {
                     return communeManager.storedEnergyUpgradeThreshold * 2
                 }
                 return communeManager.storedEnergyUpgradeThreshold * 1.2
@@ -1554,11 +1553,11 @@ export enum RoomStatNamesEnum {
 }
 
 export enum InternationalStatNamesEnum {
-    InternationalManagerCPUUsage = 'imcu',
+    CollectiveManagerCPUUsage = 'imcu',
     CreepOrganizerCPUUsage = 'cocu',
     MapVisualsManangerCPUUsage = 'mvmcu',
     PowerCreepOrganizerCPUUsage = 'pccu',
-    TickConfigCPUUsage = 'tccu',
+    TickInitCPUUsage = 'tccu',
     RoomManagerCPUUsage = 'roomcu',
     StatsManagerCPUUsage = 'smcu',
 }

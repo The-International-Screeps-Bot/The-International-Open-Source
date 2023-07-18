@@ -133,7 +133,7 @@ export const creepUtils = {
     },
     repairCommuneStationary(creep: Creep) {
 
-
+        
     },
     repairNearby(creep: Creep) {
         // If the this has no energy, inform false

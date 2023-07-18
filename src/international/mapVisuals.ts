@@ -8,7 +8,7 @@ import {
     packedPosLength,
 } from './constants'
 import { customLog, makeRoomCoord, roomNameFromRoomCoord } from './utils'
-import { InternationalManager } from './international'
+import { CollectiveManager } from './collective'
 import { updateStat } from './statsManager'
 
 /**

@@ -20,7 +20,7 @@ import {
     randomRange,
     roundTo,
 } from 'international/utils'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
 import { updateStat } from 'international/statsManager'
 import { CommuneManager } from '../commune'
@@ -1660,7 +1660,7 @@ export class SpawnRequestsManager {
                         const role = 'antifaRangedAttacker'
 
                         const spawnGroup =
-                            internationalManager.creepsByCombatRequest[requestName][role]
+                            collectiveManager.creepsByCombatRequest[requestName][role]
                         const minCost = minRangedAttackCost + minRangedHealCost
                         const extraParts: BodyPartConstant[] = []
 
@@ -1777,7 +1777,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaRangedAttacker'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
 
@@ -1812,7 +1812,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaDismantler'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minDismantleCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1845,7 +1845,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaAttacker'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minAttackCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1875,7 +1875,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaHealer'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minMeleeHealCost
                     let extraParts: BodyPartConstant[] = []
 

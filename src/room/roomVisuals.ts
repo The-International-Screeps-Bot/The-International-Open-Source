@@ -15,8 +15,8 @@ import { updateStat } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
-import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
-import { internationalManager } from 'international/international'
+import { allyRequestManager, AllyRequestTypes } from 'international/AllyRequests'
+import { collectiveManager } from 'international/collective'
 import { playerManager } from 'international/players'
 
 export class RoomVisualsManager {
@@ -242,9 +242,9 @@ export class RoomVisualsManager {
         const data: any[][] = [[]]
 
         data[0].push(
-            internationalManager.funnelOrder.slice(0, 3),
+            collectiveManager.funnelOrder.slice(0, 3),
             playerManager.highestThreat,
-            internationalManager.minCredits,
+            collectiveManager.minCredits,
             Game.time - Memory.lastConfig,
         )
 
@@ -444,8 +444,8 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        for (const ID in internationalManager.terminalRequests) {
-            const request = internationalManager.terminalRequests[ID]
+        for (const ID in collectiveManager.terminalRequests) {
+            const request = collectiveManager.terminalRequests[ID]
 
             const row: any[] = [
                 request.roomName,
@@ -491,7 +491,7 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        const requests = allyManager.allyRequests.resource
+        const requests = allyRequestManager.allyRequests.resource
         for (const ID in requests) {
             const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.resource) continue
@@ -541,7 +541,7 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        const requests = allyManager.allyRequests.defense
+        const requests = allyRequestManager.allyRequests.defense
         for (const ID in requests) {
             const request = requests[ID]
             if (
@@ -597,7 +597,7 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        const requests = allyManager.allyRequests.build
+        const requests = allyRequestManager.allyRequests.build
         for (const ID in requests) {
             const request = requests[ID]
             if (request.requestType !== AllyRequestTypes.build) continue

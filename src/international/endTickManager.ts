@@ -1,7 +1,7 @@
 import { customColors } from 'international/constants'
 import { customLog, findCPUColor, findFunctionCPU } from 'international/utils'
-import { allyManager } from 'international/simpleAllies'
-import { internationalManager, InternationalManager } from './international'
+import { allyRequestManager } from 'international/AllyRequests'
+import { collectiveManager, CollectiveManager } from './collective'
 import { statsManager } from './statsManager'
 
 /**
@@ -9,7 +9,7 @@ import { statsManager } from './statsManager'
  */
 class EndTickManager {
     run() {
-        allyManager.endTickManager()
+        allyRequestManager.endRun()
         statsManager.internationalEndTick()
 
         if (!Memory.logging) return
@@ -41,4 +41,4 @@ class EndTickManager {
     }
 }
 
-export const endTickManager = new EndTickManager()
+export const endRun = new EndTickManager()

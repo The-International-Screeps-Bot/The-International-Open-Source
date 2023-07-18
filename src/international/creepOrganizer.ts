@@ -1,7 +1,7 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
 import { customLog } from './utils'
-import { internationalManager, InternationalManager } from './international'
+import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { updateStat } from './statsManager'
 
@@ -59,7 +59,7 @@ class CreepOrganizer {
         creep.room.myCreeps[role].push(creepName)
         creep.room.myCreepsAmount += 1
 
-        internationalManager.customCreepIDs[creep.customID] = true
+        collectiveManager.customCreepIDs[creep.customID] = true
 
         // Add the creep's name to the position in its room
 

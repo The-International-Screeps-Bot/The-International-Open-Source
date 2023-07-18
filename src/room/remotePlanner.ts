@@ -49,7 +49,7 @@ import {
     randomIntRange,
     sortBy,
 } from 'international/utils'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import {
     packCoord,
     packPos,
@@ -295,7 +295,7 @@ export class RemotePlanner {
         // Initial configuration
 
         if (!this.terrainCoords) {
-            this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
+            this.terrainCoords = collectiveManager.getTerrainCoords(this.room.name)
             this.planAttempts = []
         }
 
@@ -1927,7 +1927,6 @@ export class RemotePlanner {
                         // It's not our first room, have a rampart planned to build the spawn under
 
                         if (i === 0 && !this.isStartRoom) {
-
                         }
 
                         spawnCoords.splice(j, 1)
@@ -2813,7 +2812,6 @@ export class RemotePlanner {
                 this.basePlans.setXY(coord.x, coord.y, STRUCTURE_ROAD, 4) */
                 onboardingCoords.add(packedCoord)
                 this.rampartCoords[packedCoord] = 1
-
 
                 onboardingCount += 1
                 if (forThreat) break

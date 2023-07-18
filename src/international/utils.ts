@@ -13,7 +13,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from './constants'
-import { internationalManager } from './international'
+import { collectiveManager } from './collective'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -860,7 +860,10 @@ export function findHighestScore<T>(iter: T[], f: (val: T) => number | false): n
     return highestScore
 }
 
-export function findWithHighestScore<T>(iter: T[], f: (val: T) => number | false): [number, T | undefined] {
+export function findWithHighestScore<T>(
+    iter: T[],
+    f: (val: T) => number | false,
+): [number, T | undefined] {
     let highestScore = 0
     let bestVal: T | undefined
 
@@ -890,7 +893,10 @@ export function findLowestScore<T>(iter: T[], f: (val: T) => number | false): nu
     return lowestScore
 }
 
-export function findWithLowestScore<T>(iter: T[], f: (val: T) => number | false): [number, T | undefined] {
+export function findWithLowestScore<T>(
+    iter: T[],
+    f: (val: T) => number | false,
+): [number, T | undefined] {
     let lowestScore = Infinity
     let bestVal: T | undefined
 

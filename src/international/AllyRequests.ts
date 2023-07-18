@@ -1,4 +1,4 @@
-import { internationalManager } from './international'
+import { collectiveManager } from './collective'
 import { customLog } from './utils'
 
 export enum AllyRequestTypes {
@@ -31,7 +31,9 @@ export enum AllyRequestTypes {
      */
     build,
 }
-export const allyRequestTypeKeys = Object.keys(AllyRequestTypes) as unknown as (keyof typeof AllyRequestTypes)[]
+export const allyRequestTypeKeys = Object.keys(
+    AllyRequestTypes,
+) as unknown as (keyof typeof AllyRequestTypes)[]
 
 export interface AllyRequest {
     /**
@@ -76,7 +78,7 @@ export interface CreepCombatData {
 /**
  * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated simpleAlliesSegment before usage
  */
-class AllyManager {
+class AllyRequestManager {
     /**
      * An array of the requests you have made this tick
      */
@@ -89,7 +91,8 @@ class AllyManager {
         if (this._allyRequests) return this._allyRequests
 
         this._allyRequests = {}
-        for (const key in AllyRequestTypes) this._allyRequests[key as keyof typeof AllyRequestTypes] = {}
+        for (const key in AllyRequestTypes)
+            this._allyRequests[key as keyof typeof AllyRequestTypes] = {}
 
         if (!RawMemory.foreignSegment) return this._allyRequests
         if (RawMemory.foreignSegment.username !== this.currentAlly) return this._allyRequests
@@ -105,7 +108,7 @@ class AllyManager {
         // Organize requests by type with keys of ID
 
         for (const request of rawAllyRequests) {
-            const ID = internationalManager.newTickID()
+            const ID = collectiveManager.newTickID()
             request.ID = ID
 
             this._allyRequests[allyRequestTypeKeys[request.requestType]][ID] = request
@@ -117,8 +120,7 @@ class AllyManager {
     /**
      * To call before any requests are made. Configures some required values
      */
-    tickConfig() {
-
+    initRun() {
         this.myRequests = []
 
         if (!Memory.allyTrading) return
@@ -133,7 +135,7 @@ class AllyManager {
     /**
      * To call after requests have been made, to assign requests to the next ally
      */
-    endTickManager() {
+    endRun() {
         if (!Memory.allyTrading) return
 
         // Make sure we don't have too many segments open
@@ -189,7 +191,12 @@ class AllyManager {
         })
     }
 
-    requestResource(roomName: string, resourceType: ResourceConstant, maxAmount: number, priority: number = 0) {
+    requestResource(
+        roomName: string,
+        resourceType: ResourceConstant,
+        maxAmount: number,
+        priority: number = 0,
+    ) {
         this.myRequests.push({
             requestType: AllyRequestTypes.resource,
             resourceType,
@@ -208,4 +215,4 @@ class AllyManager {
     }
 }
 
-export const allyManager = new AllyManager()
+export const allyRequestManager = new AllyRequestManager()

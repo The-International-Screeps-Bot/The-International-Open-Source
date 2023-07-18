@@ -1,13 +1,8 @@
-import {
-    minerals,
-    Result,
-    RoomMemoryKeys,
-    terminalResourceTargets,
-} from 'international/constants'
+import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
 import { customLog, findLargestTransactionAmount, newID, roundTo } from 'international/utils'
 import './marketFunctions'
-import { allyManager, AllyRequest, AllyRequestTypes } from 'international/simpleAllies'
-import { internationalManager } from 'international/international'
+import { allyRequestManager, AllyRequest, AllyRequestTypes } from 'international/AllyRequests'
+import { collectiveManager } from 'international/collective'
 import { CommuneManager } from 'room/commune/commune'
 
 const MAX_TRANSFER = 20000
@@ -85,11 +80,11 @@ export class TerminalManager {
 
             // If we have allies to trade with, alternate requesting eveyr tick
 
-            allyManager.requestResource(room.name, resource, amount, priority)
+            allyRequestManager.requestResource(room.name, resource, amount, priority)
 
             const ID = newID()
 
-            internationalManager.terminalRequests[ID] = {
+            collectiveManager.terminalRequests[ID] = {
                 ID,
                 priority,
                 resource: resource,
@@ -118,7 +113,7 @@ export class TerminalManager {
         // The market is disabled by us or the server
 
         if (!Memory.marketUsage) return
-        if (!internationalManager.marketIsFunctional) return
+        if (!collectiveManager.marketIsFunctional) return
 
         this.manageResources()
     }
@@ -142,7 +137,7 @@ export class TerminalManager {
                 priority = Math.max(Math.min(controller.progress / controller.progressTotal, 0.9), 0.2)
             } else priority = 0.5
 
-            allyManager.requestResource(
+            allyRequestManager.requestResource(
                 room.name,
                 resource,
                 targetAmount * 1.2 - room.resourcesInStoringStructures[resource],
@@ -158,7 +153,7 @@ export class TerminalManager {
 
             if (min > mineralAmount) continue
 
-            allyManager.requestResource(room.name, resource, 7000 - mineralAmount, 0.25)
+            allyRequestManager.requestResource(room.name, resource, 7000 - mineralAmount, 0.25)
         }
     }
  */
@@ -173,8 +168,8 @@ export class TerminalManager {
         let bestRequest: TerminalRequest
         let amount: number
 
-        for (const ID in internationalManager.terminalRequests) {
-            const request = internationalManager.terminalRequests[ID]
+        for (const ID in collectiveManager.terminalRequests) {
+            const request = collectiveManager.terminalRequests[ID]
 
             // Don't respond to requests for this room
 
@@ -225,7 +220,7 @@ export class TerminalManager {
             request.roomName,
             'Terminal request',
         )
-        delete internationalManager.terminalRequests[request.ID]
+        delete collectiveManager.terminalRequests[request.ID]
         this.communeManager.room.terminal.intended = true
         return true
     }
@@ -243,7 +238,7 @@ export class TerminalManager {
 
         // Filter out allyRequests that are requesting resources
 
-        const resourceRequests = allyManager.allyRequests.resource
+        const resourceRequests = allyRequestManager.allyRequests.resource
 
         for (const ID in resourceRequests) {
             const request = resourceRequests[ID]
@@ -300,7 +295,7 @@ export class TerminalManager {
 
         // Remove the request so other rooms don't try to respond to it
 
-        delete allyManager._allyRequests.resource[request.ID]
+        delete allyRequestManager._allyRequests.resource[request.ID]
         return Result.action
     }
 
@@ -319,7 +314,7 @@ export class TerminalManager {
             // We don't have enough
 
             if (terminal.store[resource] < min) {
-                if (Game.market.credits < internationalManager.minCredits) continue
+                if (Game.market.credits < collectiveManager.minCredits) continue
 
                 min *= 1.2
 

@@ -1,10 +1,20 @@
-import { RoomMemoryKeys, RoomTypes, dynamicScoreRoomRange, maxControllerLevel, preferredCommuneRange } from "international/constants"
-import { internationalManager } from "international/international"
-import { advancedFindDistance, forRoomNamesAroundRangeXY, makeRoomCoord, roomNameFromRoomXY } from "international/utils"
+import {
+    RoomMemoryKeys,
+    RoomTypes,
+    dynamicScoreRoomRange,
+    maxControllerLevel,
+    preferredCommuneRange,
+} from 'international/constants'
+import { collectiveManager } from 'international/collective'
+import {
+    advancedFindDistance,
+    forRoomNamesAroundRangeXY,
+    makeRoomCoord,
+    roomNameFromRoomXY,
+} from 'international/utils'
 
 export const roomUtils = {
     abandonRemote(roomName: string, time: number) {
-
         const roomMemory = Memory.rooms[roomName]
 
         if (roomMemory[RoomMemoryKeys.abandonRemote] >= time) return
@@ -76,11 +86,10 @@ export const roomUtils = {
         const roomMemory = Memory.rooms[roomName]
         const mineralType = roomMemory[RoomMemoryKeys.mineralType]
         const mineralScore =
-            internationalManager.mineralCommunes[mineralType] -
-            internationalManager.avgCommunesPerMineral
+            collectiveManager.mineralCommunes[mineralType] - collectiveManager.avgCommunesPerMineral
         dynamicScore += mineralScore * 40
 
         roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
         roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
-    }
+    },
 }

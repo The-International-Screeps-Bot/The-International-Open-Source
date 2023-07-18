@@ -1458,7 +1458,7 @@ declare global {
     interface CreepFunctions {
         preTickManager(): void
 
-        endTickManager(): void
+        endRun(): void
 
         isDying(): boolean
 
@@ -1856,8 +1856,6 @@ declare global {
     // Structures
 
     interface Structure {
-        nextHits: number
-
         // Getters
 
         _RCLActionable: boolean

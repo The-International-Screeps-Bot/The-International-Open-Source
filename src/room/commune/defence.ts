@@ -8,7 +8,7 @@ import {
     safemodeTargets,
 } from 'international/constants'
 import { playerManager } from 'international/players'
-import { allyManager } from 'international/simpleAllies'
+import { allyRequestManager } from 'international/AllyRequests'
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
@@ -22,7 +22,7 @@ import {
 } from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 
 export class DefenceManager {
     communeManager: CommuneManager
@@ -69,8 +69,8 @@ export class DefenceManager {
         if (controller.ticksToDowngrade <= CONTROLLER_DOWNGRADE_SAFEMODE_THRESHOLD) return false
         // If another room is safemoded, make sure that we are a higher level
         if (
-            internationalManager.safemodedCommuneName &&
-            Game.rooms[internationalManager.safemodedCommuneName].controller.level >=
+            collectiveManager.safemodedCommuneName &&
+            Game.rooms[collectiveManager.safemodedCommuneName].controller.level >=
                 this.communeManager.room.controller.level
         )
             return false
@@ -123,9 +123,8 @@ export class DefenceManager {
         if (!this.shouldActivatesSafeMode()) return
 
         // If another room is safemoded and we determined it to be okay: unclaim it so we can safemode
-        if (internationalManager.safemodedCommuneName) {
-
-            const safemodedRoom = Game.rooms[internationalManager.safemodedCommuneName]
+        if (collectiveManager.safemodedCommuneName) {
+            const safemodedRoom = Game.rooms[collectiveManager.safemodedCommuneName]
             safemodedRoom.controller.unclaim()
             // Add a return if we can't unclaim and safemode on the same tick
         }
@@ -135,7 +134,7 @@ export class DefenceManager {
         // Safemode was probably activated
 
         // Record that we safemoded so other communes know
-        internationalManager.safemodedCommuneName = this.communeManager.room.name
+        collectiveManager.safemodedCommuneName = this.communeManager.room.name
     }
 
     private manageRampartPublicity() {
@@ -269,7 +268,7 @@ export class DefenceManager {
         })
 
         if (Memory.allyPlayers) {
-            allyManager.requestDefense(room.name, minDamage, minMeleeHeal, minRangedHeal, 1)
+            allyRequestManager.requestDefense(room.name, minDamage, minMeleeHeal, minRangedHeal, 1)
         }
     }
 

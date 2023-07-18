@@ -1,6 +1,6 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { RoomMemoryKeys, RoomTypes, customColors } from './constants'
-import { internationalManager } from './international'
+import { collectiveManager } from './collective'
 
 class FlagManager {
     run() {

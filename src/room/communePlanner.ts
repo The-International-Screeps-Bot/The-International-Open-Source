@@ -49,7 +49,7 @@ import {
     randomIntRange,
     sortBy,
 } from 'international/utils'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import {
     packCoord,
     packPos,
@@ -239,7 +239,9 @@ export class CommunePlanner {
             this.planAttempts.length === this.fastFillerStartCoords.length
         ) {
             // Filter and make sure we have at least one completed plan, if not, mark the room as failed
-            const planAttempts = this.planAttempts.filter<BasePlanAttempt>((plan): plan is BasePlanAttempt => plan !== false)
+            const planAttempts = this.planAttempts.filter<BasePlanAttempt>(
+                (plan): plan is BasePlanAttempt => plan !== false,
+            )
             if (!planAttempts.length) return Result.fail
 
             /* this.visualizeBestPlan() */
@@ -251,7 +253,7 @@ export class CommunePlanner {
         // Initial configuration
 
         if (!this.terrainCoords) {
-            this.terrainCoords = internationalManager.getTerrainCoords(this.room.name)
+            this.terrainCoords = collectiveManager.getTerrainCoords(this.room.name)
             this.planAttempts = []
         }
 

@@ -5,7 +5,7 @@ import {
     partsByPriority,
     partsByPriorityPartType,
 } from 'international/constants'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import { updateStat } from 'international/statsManager'
 import { customLog, getRange, newID } from 'international/utils'
 import { unpackPosAt } from 'other/codec'
@@ -40,7 +40,6 @@ export class SpawningStructuresManager {
         this.activeSpawns = []
 
         for (const spawn of spawns) {
-
             if (spawn.renewed) continue
             if (!spawn.RCLActionable) continue
 
@@ -146,7 +145,7 @@ export class SpawningStructuresManager {
         // Try to find inactive spawn, if can't, stop the loop
 
         const spawn = this.inactiveSpawns[this.spawnIndex]
-        const ID = internationalManager.newCustomCreepID()
+        const ID = collectiveManager.newCustomCreepID()
 
         // See if creep can be spawned
 
@@ -696,8 +695,13 @@ export class SpawningStructuresManager {
         this.communeManager.spawnRequestsManager.run()
         for (const request of this.communeManager.room.spawnRequestsArgs) {
             if (request.role === 'remoteSourceHarvester') {
-
-                customLog('SPAWN REQUEST ARGS', request.role + request.memoryAdditions[CreepMemoryKeys.remote] + ', ' + request.priority)
+                customLog(
+                    'SPAWN REQUEST ARGS',
+                    request.role +
+                        request.memoryAdditions[CreepMemoryKeys.remote] +
+                        ', ' +
+                        request.priority,
+                )
                 continue
             }
             customLog('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)

@@ -1,4 +1,4 @@
-import { InternationalManager } from './international'
+import { CollectiveManager } from './collective'
 
 /**
  * Tracks and records constructionSites and thier age, deleting old sites
@@ -24,7 +24,6 @@ class ConstructionSiteManager {
             // If the site with the recorded ID doesn't exist, remove it
 
             if (!cSite) {
-
                 delete Memory.constructionSites[cSiteID]
                 continue
             }

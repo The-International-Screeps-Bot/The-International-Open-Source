@@ -1,4 +1,12 @@
-import { createPosMap, customLog, getAvgPrice, packXYAsNum, randomRange, randomTick, roundTo } from './utils'
+import {
+    createPosMap,
+    customLog,
+    getAvgPrice,
+    packXYAsNum,
+    randomRange,
+    randomTick,
+    roundTo,
+} from './utils'
 
 import {
     cacheAmountModifier,
@@ -12,9 +20,9 @@ import {
 } from './constants'
 
 /**
- * Handles pre-roomManager, inter room, and multiple-room related matters
+ * Handles inter room and non-room matters
  */
-export class InternationalManager {
+export class CollectiveManager {
     /**
      * Antifa creeps by combat request name, then by role with an array of creep names
      */
@@ -414,12 +422,11 @@ export class InternationalManager {
         let sum = 0
 
         for (const mineralType in this.mineralCommunes) {
-
             sum += this.mineralCommunes[mineralType as MineralConstant]
         }
 
         const avg = roundTo(sum / minerals.length, 2)
-        return this._avgCommunesPerMineral = avg
+        return (this._avgCommunesPerMineral = avg)
     }
 
     _compoundPriority: Partial<{ [key in MineralCompoundConstant]: number }>
@@ -502,4 +509,4 @@ export class InternationalManager {
     }
 }
 
-export const internationalManager = new InternationalManager()
+export const collectiveManager = new CollectiveManager()

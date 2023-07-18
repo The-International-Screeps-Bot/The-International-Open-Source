@@ -93,7 +93,7 @@ export class EndTickCreepManager {
             for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
                 const creep = Game.powerCreeps[creepName]
 
-                creep.endTickManager()
+                creep.endRun()
                 creep.recurseMoveRequest()
 
                 if (Memory.creepSay && creep.message.length) creep.say(creep.message)
@@ -106,7 +106,7 @@ export class EndTickCreepManager {
             for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
                 const creep = Game.creeps[creepName]
 
-                creep.endTickManager()
+                creep.endRun()
                 creep.recurseMoveRequest()
 
                 if (Memory.creepSay && creep.message.length) creep.say(creep.message)

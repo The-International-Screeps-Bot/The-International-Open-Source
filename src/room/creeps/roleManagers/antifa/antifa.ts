@@ -7,7 +7,7 @@ import {
     squadQuotas,
 } from 'international/constants'
 import { customLog, findClosestObject, getRangeXY, isExit, isXYExit } from 'international/utils'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import { Duo } from './duo'
 import { Quad } from './quad'
 
@@ -17,8 +17,8 @@ export class Antifa extends Creep {
     }
 
     preTickManager() {
-        if (internationalManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]])
-            internationalManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]][
+        if (collectiveManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]])
+            collectiveManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]][
                 this.role
             ].push(this.name)
 

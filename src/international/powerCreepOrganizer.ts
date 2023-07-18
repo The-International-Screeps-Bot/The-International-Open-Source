@@ -1,7 +1,7 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { customColors, remoteRoles } from './constants'
 import { customLog } from './utils'
-import { internationalManager, InternationalManager } from './international'
+import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 import { updateStat } from './statsManager'
@@ -45,7 +45,7 @@ class PowerCreepOrganizer {
         // If the creep isn't spawned
 
         if (!creep.ticksToLive) {
-            internationalManager.unspawnedPowerCreepNames.push(creep.name)
+            collectiveManager.unspawnedPowerCreepNames.push(creep.name)
             return
         }
 

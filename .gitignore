@@ -1,3 +1,8 @@
+# non-public features
+
+collectivizer.ts
+collaborator.ts
+
 # Build
 dist
 logs

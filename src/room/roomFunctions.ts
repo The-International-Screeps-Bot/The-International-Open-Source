@@ -44,7 +44,7 @@ import {
     unpackNumAsPos,
     doesCoordExist,
 } from 'international/utils'
-import { internationalManager } from 'international/international'
+import { collectiveManager } from 'international/collective'
 import {
     packCoord,
     packXYAsCoord,
@@ -288,7 +288,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         for (const pos of path) {
             newSourceEfficacy +=
-                internationalManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] ===
+                collectiveManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] ===
                 TERRAIN_MASK_SWAMP
                     ? defaultSwampCost
                     : 1
@@ -765,7 +765,7 @@ Room.prototype.distanceTransform = function (
     const distanceCoords = new Uint8Array(2500)
 
     if (!initialCoords)
-        initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+        initialCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -861,7 +861,7 @@ Room.prototype.diagonalDistanceTransform = function (
     const distanceCoords = new Uint8Array(2500)
 
     if (!initialCoords)
-        initialCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+        initialCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
 
     let x
     let y
@@ -933,7 +933,7 @@ Room.prototype.floodFill = function (seeds, coordMap, visuals) {
     // Construct a cost matrix for the flood
 
     const floodCoords = new Uint8Array(2500)
-    const terrainCoords = new Uint8Array(internationalManager.getTerrainCoords(this.name))
+    const terrainCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
     const visitedCoords = new Uint8Array(2500)
 
     // Construct values for the flood
@@ -2175,7 +2175,7 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
     const effect = target.effectsData.get(powerType)
     const cooldown = effect ? effect.ticksRemaining : 0
 
-    const ID = internationalManager.newTickID()
+    const ID = collectiveManager.newTickID()
 
     return (this.powerTasks[ID] = {
         taskID: ID,
@@ -2247,7 +2247,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     if (args.priority === undefined) args.priority = 1
     else args.priority = Math.round(args.priority * 100) / 100
 
-    const ID = internationalManager.newTickID()
+    const ID = collectiveManager.newTickID()
     /* this.visual.text(args.priority.toString(), args.target.pos) */
     /* this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
     /* if (args.type === 'transfer') this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
