@@ -1013,7 +1013,6 @@ declare global {
         attackingDefenderIDs: Set<Id<Creep>>
         defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
         defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
-        towerAttackTarget: Creep
 
         upgradeStrength: number
         mineralHarvestStrength: number

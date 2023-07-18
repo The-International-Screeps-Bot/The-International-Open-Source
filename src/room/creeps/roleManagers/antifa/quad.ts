@@ -335,7 +335,7 @@ export class Quad {
 
                 for (const member2 of this.members) {
                     if (member2.name === member1.name) continue
-
+                    member1.room.targetVisual(member1.pos, member2.pos, true)
                     member2.pull(member1)
                 }
             }

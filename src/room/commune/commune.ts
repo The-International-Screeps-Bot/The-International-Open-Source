@@ -126,6 +126,7 @@ export class CommuneManager {
      * The total amount of carry parts for hauler and remoteHaulers
      */
     haulerCarryParts: number
+    towerAttackTarget: Creep
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
@@ -153,7 +154,7 @@ export class CommuneManager {
         this.factoryManager = new FactoryManager(this)
     }
 
-    public update(room: Room) {
+    update(room: Room) {
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
@@ -161,6 +162,7 @@ export class CommuneManager {
         delete this._defensiveRamparts
         delete this._sourceLinks
         delete this._controllerLink
+        delete this.towerAttackTarget
 
         if (randomTick()) {
             delete this._maxUpgradeStrength
@@ -318,6 +320,7 @@ export class CommuneManager {
     }
 
     private preTickTest() {
+
         return
 
         let CPUUsed = Game.cpu.getUsed()
@@ -329,6 +332,7 @@ export class CommuneManager {
     }
 
     private test() {
+        customLog(this.sourceLinks)
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -349,12 +353,12 @@ export class CommuneManager {
         })
     }
 
-    public deleteCombatRequest(requestName: string, index: number) {
+    deleteCombatRequest(requestName: string, index: number) {
         delete Memory.combatRequests[requestName]
         Memory.rooms[this.room.name][RoomMemoryKeys.combatRequests].splice(index, 1)
     }
 
-    public removeRemote(remoteName: string, index: number) {
+    removeRemote(remoteName: string, index: number) {
         Memory.rooms[this.room.name][RoomMemoryKeys.remotes].splice(index, 1)
 
         const remoteMemory = Memory.rooms[remoteName]
@@ -363,7 +367,7 @@ export class CommuneManager {
         cleanRoomMemory(remoteName)
     }
 
-    public findMinRangedAttackCost(minDamage: number = 10) {
+    findMinRangedAttackCost(minDamage: number = 10) {
         const rawCost =
             (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
             (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
@@ -372,7 +376,7 @@ export class CommuneManager {
         return Math.ceil(rawCost / combinedCost) * combinedCost
     }
 
-    public findMinMeleeAttackCost(minDamage: number = 30) {
+    findMinMeleeAttackCost(minDamage: number = 30) {
         const rawCost =
             (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] +
             (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
@@ -384,7 +388,7 @@ export class CommuneManager {
     /**
      * Finds how expensive it will be to provide enough heal parts to withstand attacks
      */
-    public findMinHealCost(minHeal: number = 12) {
+    findMinHealCost(minHeal: number = 12) {
         const rawCost =
             (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] +
             (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
@@ -393,14 +397,14 @@ export class CommuneManager {
         return Math.ceil(rawCost / combinedCost) * combinedCost
     }
 
-    public findMinDismantleCost(minDismantle: number = 0) {
+    findMinDismantleCost(minDismantle: number = 0) {
         const rawCost = minDismantle * BODYPART_COST[WORK] + minDismantle * BODYPART_COST[MOVE]
         const combinedCost = BODYPART_COST[WORK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
     }
 
-    _minStoredEnergy: number
+    private _minStoredEnergy: number
 
     /**
      * The minimum amount of stored energy the room should only use in emergencies
@@ -426,7 +430,7 @@ export class CommuneManager {
         return (this._minStoredEnergy = Math.floor(this._minStoredEnergy))
     }
 
-    _targetEnergy: number
+    private _targetEnergy: number
     /**
      * The amount of energy the room wants to have
      */
@@ -454,7 +458,7 @@ export class CommuneManager {
         return Math.floor(this.minStoredEnergy * 1.3)
     }
 
-    _storedEnergyBuildThreshold: number
+    private _storedEnergyBuildThreshold: number
     get storedEnergyBuildThreshold() {
         this._storedEnergyBuildThreshold = Math.floor(
             Math.min(
@@ -475,7 +479,7 @@ export class CommuneManager {
         return roundTo(this.room.roomManager.structures.rampart.length * rampartUpkeepCost, 2)
     }
 
-    _minRampartHits: number
+    private _minRampartHits: number
 
     get minRampartHits() {
         if (this._minRampartHits !== undefined) return this._minRampartHits
@@ -486,13 +490,13 @@ export class CommuneManager {
             Math.min(
                 Math.floor(
                     Math.pow((level - 3) * 50, 2.5) +
-                        this.room.memory[RoomMemoryKeys.threatened] * 5 * Math.pow(level, 2),
+                        Memory.rooms[this.room.name][RoomMemoryKeys.threatened] * 5 * Math.pow(level, 2),
                 ),
                 RAMPART_HITS_MAX[level] * 0.9,
             ) || 20000)
     }
 
-    _storingStructures: (StructureStorage | StructureTerminal)[]
+    private _storingStructures: (StructureStorage | StructureTerminal)[]
 
     /**
      * Storing structures - storage or teirmal - filtered to for defined and RCL active
@@ -517,7 +521,7 @@ export class CommuneManager {
         return capacity
     }
 
-    _maxCombatRequests: number
+    private _maxCombatRequests: number
 
     /**
      * The largest amount of combat requests the room can respond to
@@ -547,7 +551,7 @@ export class CommuneManager {
         )
     }
 
-    _maxUpgradeStrength: number
+    private _maxUpgradeStrength: number
     get maxUpgradeStrength() {
         if (this._maxUpgradeStrength !== undefined) return this._maxUpgradeStrength
 
@@ -603,7 +607,7 @@ export class CommuneManager {
         return (this._maxUpgradeStrength = 100)
     }
 
-    _hasSufficientRoads: boolean
+    private _hasSufficientRoads: boolean
     /**
      * Informs wether we have sufficient roads compared to the roadQuota for our RCL
      */
@@ -623,7 +627,7 @@ export class CommuneManager {
         return (this._hasSufficientRoads = roads >= minRoads * 0.9)
     }
 
-    _upgradeStructure: AnyStoreStructure | false
+    private _upgradeStructure: AnyStoreStructure | false
     get upgradeStructure() {
         if (this._upgradeStructure !== undefined) return this._upgradeStructure
 
@@ -649,7 +653,7 @@ export class CommuneManager {
         return (this._upgradeStructure = controllerLink)
     }
 
-    _structureTypesByBuildPriority: BuildableStructureConstant[]
+    private _structureTypesByBuildPriority: BuildableStructureConstant[]
     get structureTypesByBuildPriority() {
         if (this._structureTypesByBuildPriority) return this._structureTypesByBuildPriority
 
@@ -703,7 +707,7 @@ export class CommuneManager {
         return Math.floor(CONTROLLER_DOWNGRADE[this.room.controller.level] * 0.75)
     }
 
-    _defensiveRamparts: StructureRampart[]
+    private _defensiveRamparts: StructureRampart[]
     get defensiveRamparts() {
         if (this._defensiveRamparts) return this._defensiveRamparts
 
@@ -723,7 +727,7 @@ export class CommuneManager {
         return (this._defensiveRamparts = ramparts)
     }
 
-    _rampartRepairTargets: StructureRampart[]
+    private _rampartRepairTargets: StructureRampart[]
     get rampartRepairTargets() {
         const rampartRepairTargets: StructureRampart[] = []
         const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
@@ -761,14 +765,16 @@ export class CommuneManager {
         )
     }
 
-    sourceLinkIDs: Id<StructureLink>[]
-    _sourceLinks: StructureLink[]
+    private sourceLinkIDs: Id<StructureLink>[]
+    private _sourceLinks: (StructureLink | false)[]
     get sourceLinks() {
         if (this._sourceLinks) return this._sourceLinks
 
-        const links: StructureLink[] = []
-
+        // If we have cached links, confirm they are valid and use them
         if (this.sourceLinkIDs) {
+
+            const links: (StructureLink | false)[] = []
+
             for (const ID of this.sourceLinkIDs) {
                 const link = findObjectWithID(ID)
                 if (!link) break
@@ -782,34 +788,35 @@ export class CommuneManager {
         }
 
         const stampAnchors = this.room.roomManager.stampAnchors
-        if (!stampAnchors) return (this._sourceLinks = [])
+        if (!stampAnchors) throw Error('no stampAnchors for sourceLinks in ' + this.room.name)
 
+        const links: (StructureLink | false)[] = []
         let definedLinks = 0
 
-        for (let i = 0; i < stampAnchors.sourceLink.length; i++) {
-            const structure = this.room.findStructureAtCoord(
-                stampAnchors.sourceLink[i],
-                structure => structure.structureType === STRUCTURE_LINK,
-            ) as false | StructureLink
+        for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
+
+            const closestSourceHarvestPos = positions[0]
+
+            const structure = this.room.findStructureInRange(closestSourceHarvestPos, 1, structure => structure.structureType === STRUCTURE_LINK) as StructureLink | false
+            links.push(structure)
 
             if (!structure) continue
 
-            links[i] = structure
             definedLinks += 1
         }
 
         if (definedLinks === stampAnchors.sourceLink.length)
-            this.sourceLinkIDs = links.map(link => link.id)
+            this.sourceLinkIDs = links.map(link =>  (link as StructureLink).id)
         return (this._sourceLinks = links)
     }
 
-    _controllerLinkID: Id<StructureLink>
-    _controllerLink: StructureLink | false
+    private controllerLinkID: Id<StructureLink>
+    private _controllerLink: StructureLink | false
     get controllerLink() {
         if (this._controllerLink !== undefined) return this._controllerLink
 
-        if (this._controllerLinkID) {
-            const structure = findObjectWithID(this._controllerLinkID)
+        if (this.controllerLinkID) {
+            const structure = findObjectWithID(this.controllerLinkID)
             if (structure) return structure
         }
 
@@ -821,7 +828,7 @@ export class CommuneManager {
 
         if (!structure) return false
 
-        this._controllerLinkID = structure.id
+        this.controllerLinkID = structure.id
         return this._controllerLink
     }
 

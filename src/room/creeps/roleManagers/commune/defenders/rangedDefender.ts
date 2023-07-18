@@ -18,6 +18,9 @@ import { packCoord } from 'other/codec'
 
 export class RangedDefender extends Creep {
     preTickManager() {
+
+        if (this.spawning) return
+
         const { room } = this
 
         room.attackingDefenderIDs.add(this.id)
@@ -91,7 +94,7 @@ export class RangedDefender extends Creep {
         if (!this.combatTarget) return
         this.room.targetVisual(this.pos, this.combatTarget.pos)
 
-        if (!this.room.towerAttackTarget || this.combatTarget.id !== this.room.towerAttackTarget.id) {
+        if (!this.room.communeManager.towerAttackTarget || this.combatTarget.id !== this.room.communeManager.towerAttackTarget.id) {
             let massDamage = 0
             for (const enemyCreep of this.room.enemyAttackers) {
                 const range = getRange(this.pos, enemyCreep.pos)

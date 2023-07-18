@@ -1,4 +1,10 @@
-import { impassibleStructureTypes, customColors, CreepMemoryKeys } from 'international/constants'
+import {
+    impassibleStructureTypes,
+    customColors,
+    CreepMemoryKeys,
+    PlayerMemoryKeys,
+} from 'international/constants'
+import { playerManager } from 'international/players'
 import {
     areCoordsEqual,
     customLog,
@@ -12,11 +18,14 @@ import {
     randomTick,
     randomVal,
     getRangeEuc,
+    findWeightedRangeFromExit,
 } from 'international/utils'
 import { packCoord } from 'other/codec'
 
 export class MeleeDefender extends Creep {
     preTickManager() {
+        if (this.spawning) return
+
         const { room } = this
 
         room.attackingDefenderIDs.add(this.id)
@@ -85,10 +94,15 @@ export class MeleeDefender extends Creep {
     defendWithoutRamparts?(enemyCreeps: Creep[]) {
         // Get the closest enemyAttacker
 
-        const enemyCreep = findClosestObject(this.pos, enemyCreeps) || findClosestObject(this.pos, this.room.enemyCreeps)
+        const enemyCreep =
+            findClosestObject(this.pos, enemyCreeps) ||
+            findClosestObject(this.pos, this.room.enemyCreeps)
 
         if (Memory.roomVisuals)
-            this.room.visual.line(this.pos, enemyCreep.pos, { color: customColors.green, opacity: 0.3 })
+            this.room.visual.line(this.pos, enemyCreep.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         // If out of range move to it
 
@@ -130,7 +144,8 @@ export class MeleeDefender extends Creep {
             if (creepIDUsingRampart && this.id !== creepIDUsingRampart) {
                 const creepUsingRampart = findObjectWithID(creepIDUsingRampart)
                 if (
-                    creepUsingRampart.combatStrength.melee + creepUsingRampart.combatStrength.ranged >=
+                    creepUsingRampart.combatStrength.melee +
+                        creepUsingRampart.combatStrength.ranged >=
                     this.combatStrength.melee + this.combatStrength.ranged
                 )
                     continue
@@ -188,7 +203,9 @@ export class MeleeDefender extends Creep {
                 )
  */
 
-            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, { color: customColors.yellow })
+            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, {
+                color: customColors.yellow,
+            })
         }
 
         // If the creep is range 0 to the closestRampart, inform false

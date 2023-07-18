@@ -237,7 +237,7 @@ export class RoomVisualsManager {
     }
 
     private internationalGeneralDataVisuals(y: number) {
-        const headers: any[] = ['funnelOrder', 'highestThreat', 'minCredits', 'last config']
+        const headers = ['funnelOrder', 'highestThreat', 'minCredits', 'last config']
 
         const data: any[][] = [[]]
 
@@ -279,7 +279,7 @@ export class RoomVisualsManager {
     }
 
     private internationalStatDataVisuals(y: number) {
-        const headers: any[] = [
+        const headers = [
             'est. income',
             'commune harvest',
             'remote harvest',
@@ -359,7 +359,7 @@ export class RoomVisualsManager {
     }
 
     private internationalRequestsDataVisuals(y: number) {
-        const headers: any[] = ['requestName', 'type', 'responderName', 'abandon']
+        const headers = ['requestName', 'type', 'responderName', 'abandon']
 
         const data: any[][] = []
 
@@ -440,7 +440,7 @@ export class RoomVisualsManager {
     }
 
     private internationalTerminalRequestsDataVisuals(y: number) {
-        const headers: any[] = ['roomName', 'resource', 'amount', 'priority']
+        const headers = ['roomName', 'resource', 'amount', 'priority']
 
         const data: any[][] = []
 
@@ -487,7 +487,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyResourceRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'resource', 'amount', 'priority']
+        const headers = ['room', 'resource', 'amount', 'priority']
 
         const data: any[][] = []
 
@@ -537,14 +537,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
-        const headers: any[] = [
-            'room',
-            'type',
-            'minDamage',
-            'minMeleeHeal',
-            'minRangedHeal',
-            'priority',
-        ]
+        const headers = ['room', 'type', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
 
         const data: any[][] = []
 
@@ -600,7 +593,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyBuildRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'priority']
+        const headers = ['room', 'priority']
 
         const data: any[][] = []
 
@@ -645,7 +638,7 @@ export class RoomVisualsManager {
     }
 
     private generalDataVisuals(y: number) {
-        const headers: any[] = [
+        const headers = [
             'energy',
             'minEnergy',
             'minRampartHits',
@@ -702,7 +695,7 @@ export class RoomVisualsManager {
     }
 
     statDataVisuals(y: number) {
-        const headers: any[] = [
+        const headers = [
             'estimatedIncome',
             'CHarvest',
             'RHarvest',
@@ -763,7 +756,7 @@ export class RoomVisualsManager {
     requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
-        const headers: any[] = [
+        const headers = [
             'room',
             'sourceIndex',
             '📈',

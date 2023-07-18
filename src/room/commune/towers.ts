@@ -81,55 +81,50 @@ export class TowerManager {
 
     private findAttackTarget() {
         const { room } = this.communeManager
+        const enemyCreeps = room.enemyCreeps
 
-        if (room.towerAttackTarget) return room.towerAttackTarget
+        if (!this.communeManager.towerAttackTarget) {
 
-        const attackTargets = room.enemyCreeps
-        if (!attackTargets.length) return false
+            const [score, target] = findWithHighestScore(enemyCreeps, (enemyCreep) => {
 
-        // Find the enemyCreep the towers can hurt the most, declaring tower inferiority if we can't out-damage a creep
+                const damage = enemyCreep.netTowerDamage
 
-        let highestDamage = 1
+                if (enemyCreep.owner.username === 'Invader') {
+                    if (damage <= 0) {
+                        if (room.towerInferiority) return false
+                        room.towerInferiority = true
+                        this.createPowerTasks()
+                        return false
+                    }
+                } else {
+                    const playerMemory =
+                        Memory.players[enemyCreep.owner.username] ||
+                        playerManager.initPlayer(enemyCreep.owner.username)
+                    const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
-        for (const enemyCreep of room.enemyCreeps) {
-            const damage = enemyCreep.netTowerDamage
-
-            if (enemyCreep.owner.username === 'Invader') {
-                if (damage <= 0) {
-                    if (room.towerInferiority) continue
-                    room.towerInferiority = true
-                    this.createPowerTasks()
-                    continue
+                    if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) {
+                        if (room.towerInferiority) return false
+                        room.towerInferiority = true
+                        this.createPowerTasks()
+                        return false
+                    }
                 }
-            } else {
-                const playerMemory =
-                    Memory.players[enemyCreep.owner.username] ||
-                    playerManager.initPlayer(enemyCreep.owner.username)
-                const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
-                if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) {
-                    if (room.towerInferiority) continue
-                    room.towerInferiority = true
-                    this.createPowerTasks()
-                    continue
-                }
-            }
+                return damage
+            })
+            if (!target) return false
 
-            if (damage < highestDamage) continue
-
-            room.towerAttackTarget = enemyCreep
-            highestDamage = damage
+            this.communeManager.towerAttackTarget = target
         }
-        if (!room.towerAttackTarget) return false
 
-        // If we seem to be under attack from a swarm, record that the tower needs help
+        // If we might be under attack from a swarm, record that the tower needs help
 
-        if (attackTargets.length >= 15) {
+        if (enemyCreeps.length >= 15) {
             this.createPowerTasks()
             room.towerInferiority = true
         }
 
-        return room.towerAttackTarget
+        return this.communeManager.towerAttackTarget
     }
 
     private attackEnemyCreeps() {
@@ -138,8 +133,8 @@ export class TowerManager {
                 this.communeManager.room.enemyAttackers.length > 0
             return true
         }
-
         if (!this.actionableTowerIDs.length) return false
+        if (!this.communeManager.room.enemyCreeps.length) return false
 
         const attackTarget = this.findAttackTarget()
         if (!attackTarget) {

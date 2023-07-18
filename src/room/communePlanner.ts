@@ -129,7 +129,7 @@ export class CommunePlanner {
 
     // Holistic
 
-    planAttempts: BasePlanAttempt[]
+    planAttempts: (BasePlanAttempt | false)[]
     planVisualizeIndex: number
     terrainCoords: CoordMap
 
@@ -222,55 +222,6 @@ export class CommunePlanner {
         this.roomManager = roomManager
     }
 
-    _reverseExitFlood: Uint32Array
-    get reverseExitFlood() {
-        if (this._reverseExitFlood) return this._reverseExitFlood
-
-        this._reverseExitFlood = new Uint32Array(2500)
-
-        let visitedCoords = new Uint8Array(2500)
-        for (const coord of this.exitCoords) visitedCoords[packAsNum(coord)] = 1
-
-        let depth = -1
-        let thisGeneration = this.exitCoords
-        let nextGeneration: Coord[]
-
-        while (thisGeneration.length) {
-            nextGeneration = []
-
-            // Iterate through positions of this gen
-
-            for (const coord1 of thisGeneration) {
-                this._reverseExitFlood[packAsNum(coord1)] = depth
-
-                // Add viable adjacent coords to the next generation
-
-                for (const offset of adjacentOffsets) {
-                    const coord2 = {
-                        x: coord1.x + offset.x,
-                        y: coord1.y + offset.y,
-                    }
-
-                    if (!isXYInRoom(coord2.x, coord2.y)) continue
-
-                    if (visitedCoords[packAsNum(coord2)] === 1) continue
-                    visitedCoords[packAsNum(coord2)] = 1
-
-                    if (this.terrainCoords[packAsNum(coord2)] === 255) continue
-
-                    nextGeneration.push(coord2)
-                }
-            }
-
-            // Set up for next generation
-
-            depth -= 1
-            thisGeneration = nextGeneration
-        }
-
-        return this._reverseExitFlood
-    }
-
     preTickRun() {
         this.room = this.roomManager.room
 
@@ -283,13 +234,18 @@ export class CommunePlanner {
         if (this.recording) this.record()
 
         // Planning is complete, choose the best one
-
+        console.log('before', this.room.name, this.planAttempts, typeof this.planAttempts, JSON.stringify(this.planAttempts))
         if (
             this.fastFillerStartCoords &&
             this.planAttempts.length === this.fastFillerStartCoords.length
         ) {
+            // Filter and make sure we have at least one completed plan, if not, mark the room as failed
+            const planAttempts = this.planAttempts.filter<BasePlanAttempt>((plan): plan is BasePlanAttempt => plan !== false)
+            if (!planAttempts.length) return Result.fail
+            console.log('resulting plans', JSON.stringify(this.planAttempts))
             /* this.visualizeBestPlan() */
-            this.choosePlan()
+            this.choosePlan(planAttempts)
+            console.log('finished plan', this.room.memory[RoomMemoryKeys.communePlanned])
             return Result.success
         }
 
@@ -346,23 +302,55 @@ export class CommunePlanner {
         delete this.baseCoords
         return Result.noAction
  */
-
+        console.log('before failed?', this.room.name, this.planAttempts, JSON.stringify(this.planAttempts))
         this.avoidSources()
         this.avoidMineral()
-        if (this.fastFiller() === Result.fail) return Result.fail
+        if (this.fastFiller() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
         this.postFastFillerConfig()
         this.generateGrid()
         /* this.pruneFastFillerRoads() */
-        if (this.findCenterUpgradePos() === Result.fail) return Result.fail
+        if (this.findCenterUpgradePos() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
         this.findSourceHarvestPositions()
-        if (this.hub() === Result.fail) return Result.fail
-        if (this.labs() === Result.fail) return Result.fail
+        if (this.hub() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
+        if (this.labs() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
         this.sourceStructures()
-        if (this.gridExtensions() === Result.fail) return Result.fail
+        if (this.gridExtensions() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
         this.gridExtensionSourcePaths()
-        if (this.nuker() === Result.fail) return Result.fail
-        if (this.powerSpawn() === Result.fail) return Result.fail
-        if (this.observer() === Result.fail) return Result.fail
+        if (this.nuker() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
+        if (this.powerSpawn() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
+        if (this.observer() === Result.fail) {
+            this.planAttempts.push(false)
+            console.log('failed', this.planAttempts)
+            return Result.noAction
+        }
         this.planGridCoords()
         this.runMinCut()
         this.groupMinCutCoords()
@@ -3288,12 +3276,12 @@ export class CommunePlanner {
     /**
      * Find the plan with the lowest score
      */
-    private findBestPlanIndex() {
+    private findBestPlanIndex(planAttempts: BasePlanAttempt[]) {
         let bestScore = Infinity
         let bestPlanIndex: number | undefined
 
-        for (let i = 0; i < this.planAttempts.length; i++) {
-            const plan = this.planAttempts[i]
+        for (let i = 0; i < planAttempts.length; i++) {
+            const plan = planAttempts[i] as BasePlanAttempt
 
             if (plan.score >= bestScore) continue
 
@@ -3303,10 +3291,10 @@ export class CommunePlanner {
 
         return bestPlanIndex
     }
-    private choosePlan() {
-        const plan = this.planAttempts[this.findBestPlanIndex()]
+    private choosePlan(planAttempts: BasePlanAttempt[]) {
+        const plan = planAttempts[this.findBestPlanIndex(planAttempts)] as BasePlanAttempt
         const roomMemory = Memory.rooms[this.room.name]
-
+        console.log('chosen plan', plan, plan.score, plan.upgradePath, 'index', this.findBestPlanIndex(planAttempts))
         roomMemory[RoomMemoryKeys.score] = plan.score
         roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
         roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans
@@ -3320,7 +3308,7 @@ export class CommunePlanner {
         roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
         roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
         roomMemory[RoomMemoryKeys.communePlanned] = true
-
+        console.log('plan end', roomMemory[RoomMemoryKeys.communePlanned])
         // Delete uneeded plan data from global to free up space
         delete this.planAttempts
     }
@@ -3335,9 +3323,7 @@ export class CommunePlanner {
             }
         }
     }
-    private visualizeBestPlan() {
-        this.visualizePlan(this.findBestPlanIndex())
-    }
+
     private visualizePlans() {
         if (this.planVisualizeIndex === undefined) this.planVisualizeIndex = 0
         else {
@@ -3349,6 +3335,9 @@ export class CommunePlanner {
     }
     private visualizePlan(planIndex: number) {
         const plan = this.planAttempts[planIndex]
+        // Type safety, there's no reason the plan should ever actually be invalid
+        if (!plan) return
+
         const basePlans = BasePlans.unpack(plan.basePlans)
 
         for (const packedCoord in basePlans.map) {
@@ -3473,5 +3462,54 @@ export class CommunePlanner {
         /* this.room.visualizeCoordMap(this.reverseExitFlood) */
         /* this.room.visualizeCoordMap(this.byPlannedRoad, true, 100) */
         /* this.room.visualizeCoordMap(this.terrainCoords, true) */
+    }
+
+    _reverseExitFlood: Uint32Array
+    get reverseExitFlood() {
+        if (this._reverseExitFlood) return this._reverseExitFlood
+
+        this._reverseExitFlood = new Uint32Array(2500)
+
+        let visitedCoords = new Uint8Array(2500)
+        for (const coord of this.exitCoords) visitedCoords[packAsNum(coord)] = 1
+
+        let depth = -1
+        let thisGeneration = this.exitCoords
+        let nextGeneration: Coord[]
+
+        while (thisGeneration.length) {
+            nextGeneration = []
+
+            // Iterate through positions of this gen
+
+            for (const coord1 of thisGeneration) {
+                this._reverseExitFlood[packAsNum(coord1)] = depth
+
+                // Add viable adjacent coords to the next generation
+
+                for (const offset of adjacentOffsets) {
+                    const coord2 = {
+                        x: coord1.x + offset.x,
+                        y: coord1.y + offset.y,
+                    }
+
+                    if (!isXYInRoom(coord2.x, coord2.y)) continue
+
+                    if (visitedCoords[packAsNum(coord2)] === 1) continue
+                    visitedCoords[packAsNum(coord2)] = 1
+
+                    if (this.terrainCoords[packAsNum(coord2)] === 255) continue
+
+                    nextGeneration.push(coord2)
+                }
+            }
+
+            // Set up for next generation
+
+            depth -= 1
+            thisGeneration = nextGeneration
+        }
+
+        return this._reverseExitFlood
     }
 }

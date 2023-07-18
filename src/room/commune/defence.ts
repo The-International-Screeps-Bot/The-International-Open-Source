@@ -197,7 +197,7 @@ export class DefenceManager {
             )
         })
 
-        // Attack enemies in order of most members that can attack them
+        // Attack enemies in order of most net damage members can heal
 
         for (const enemyCreepID of defenderEnemyTargetsByDamage) {
             if (!room.attackingDefenderIDs.size) break
@@ -214,7 +214,7 @@ export class DefenceManager {
                 room.attackingDefenderIDs.delete(memberID)
             }
 
-            if (room.towerAttackTarget) continue
+            if (this.communeManager.towerAttackTarget) continue
 
             const damage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
             room.visual.text(damage.toString(), enemyCreep.pos.x, enemyCreep.pos.y - 0.25, {
@@ -233,7 +233,7 @@ export class DefenceManager {
                     continue
             }
 
-            room.towerAttackTarget = enemyCreep
+            this.communeManager.towerAttackTarget = enemyCreep
         }
     }
 

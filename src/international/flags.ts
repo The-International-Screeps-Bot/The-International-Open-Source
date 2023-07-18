@@ -41,7 +41,7 @@ class FlagManager {
 
         flag.setColor(COLOR_GREEN)
 
-        const headers: any[] = ['sender', '', 'receiver', 'resource', 'amount', 'ticks since']
+        const headers = ['sender', '', 'receiver', 'resource', 'amount', 'ticks since']
 
         const data: any[][] = []
 
@@ -108,7 +108,7 @@ class FlagManager {
 
         flag.setColor(COLOR_GREEN)
 
-        const headers: any[] = ['sender', '', 'receiver', 'resource', 'amount', 'ticks since']
+        const headers = ['sender', '', 'receiver', 'resource', 'amount', 'ticks since']
 
         const data: any[][] = []
 

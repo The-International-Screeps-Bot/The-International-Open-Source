@@ -8,6 +8,7 @@ import {
     defaultPlainCost,
     defaultSwampCost,
     impassibleStructureTypes,
+    impassibleStructureTypesSet,
     roomDimensions,
 } from './constants'
 import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
@@ -100,104 +101,118 @@ function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<
     }
 
     for (const roomName of allowedRoomNames) {
-        const roomMemory = Memory.rooms[roomName]
+        if (weightCommuneStructurePlans(args, roomName)) continue
+        if (weightRemoteStructurePlans(args, roomName)) continue
+    }
+}
 
-        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
-            // Weight structures
+function weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: string) {
+    const roomMemory = Memory.rooms[roomName]
 
-            const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
+    if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return false
 
-            for (const packedCoord in basePlans.map) {
-                const coordData = basePlans.map[packedCoord]
+    const room = Game.rooms[roomName]
+    if (!room) return false
 
-                for (const data of coordData) {
-                    const weight = data.structureType === STRUCTURE_ROAD ? 1 : 255
+    // Weight structures
 
-                    const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                    args.weightCoords[roomName][packedCoord] = Math.max(weight, currentWeight)
-                }
-            }
+    const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
 
-            const weightRoom = Game.rooms[roomName]
-            if (weightRoom) {
-                // Weight potential and actual stationary positions
+    for (const packedCoord in basePlans.map) {
+        const coordData = basePlans.map[packedCoord]
 
-                for (const index in weightRoom.find(FIND_SOURCES)) {
-                    // Loop through each position of harvestPositions, have creeps prefer to avoid
+        for (const data of coordData) {
+            const weight = impassibleStructureTypesSet.has(data.structureType) ? 255 : 1
 
-                    for (const pos of weightRoom.roomManager.sourceHarvestPositions[index]) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-                }
-
-                if (weightRoom.roomManager.anchor) {
-                    // The last upgrade position should be the deliver pos, which we want to weight normal
-
-                    for (const pos of weightRoom.roomManager.upgradePositions) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-
-                    for (const pos of weightRoom.roomManager.mineralHarvestPositions) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-
-                    const stampAnchors = weightRoom.roomManager.stampAnchors
-                    if (stampAnchors) {
-                        const packedCoord = packCoord(stampAnchors.hub[0])
-
-                        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-
-                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-                    for (const pos of weightRoom.fastFillerPositions) {
-                        const packedCoord = packCoord(pos)
-
-                        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-                    }
-                }
-            }
-        } else if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
-            for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
-                const path = unpackPosList(packedPath)
-
-                for (const pos of path) {
-                    if (!args.weightCoords[pos.roomName]) args.weightCoords[pos.roomName] = {}
-                    args.weightCoords[pos.roomName][packCoord(pos)] = 1
-                }
-            }
-
-            // Prefer to avoid the best source harvest pos
-            for (const packedPositions of roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]) {
-                const positions = unpackPosList(packedPositions)
-                const packedCoord = packCoord(positions[positions.length - 1])
-
-                const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-            }
-
-            // Prefer to avoid all potential reservation positions
-
-            const positions = unpackPosList(roomMemory[RoomMemoryKeys.remoteControllerPositions])
-
-            for (const pos of positions) {
-                const packedCoord = packCoord(pos)
-                const currentWeight = args.weightCoords[roomName][packedCoord] || 0
-                args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
-            }
+            const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+            args.weightCoords[roomName][packedCoord] = Math.max(weight, currentWeight)
         }
     }
+
+    // Weight potential and actual stationary positions
+
+    for (const index in room.find(FIND_SOURCES)) {
+        // Loop through each position of harvestPositions, have creeps prefer to avoid
+
+        for (const pos of room.roomManager.sourceHarvestPositions[index]) {
+            const packedCoord = packCoord(pos)
+
+            const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+            args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+        }
+    }
+
+    if (room.roomManager.anchor) {
+        // The last upgrade position should be the deliver pos, which we want to weight normal
+
+        for (const pos of room.roomManager.upgradePositions) {
+            const packedCoord = packCoord(pos)
+
+            const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+            args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+        }
+
+        for (const pos of room.roomManager.mineralHarvestPositions) {
+            const packedCoord = packCoord(pos)
+
+            const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+            args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+        }
+
+        const stampAnchors = room.roomManager.stampAnchors
+        if (stampAnchors) {
+            const packedCoord = packCoord(stampAnchors.hub[0])
+
+            const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+            args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+        }
+
+        // Loop through each position of fastFillerPositions, have creeps prefer to avoid
+
+        for (const pos of room.fastFillerPositions) {
+            const packedCoord = packCoord(pos)
+
+            const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+            args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+        }
+    }
+
+    return true
+}
+
+function weightRemoteStructurePlans(args: CustomPathFinderArgs, roomName: string) {
+    const roomMemory = Memory.rooms[roomName]
+
+    if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
+    for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
+        const path = unpackPosList(packedPath)
+
+        for (const pos of path) {
+            if (!args.weightCoords[pos.roomName]) args.weightCoords[pos.roomName] = {}
+            args.weightCoords[pos.roomName][packCoord(pos)] = 1
+        }
+    }
+
+    // Prefer to avoid the best source harvest pos
+    for (const packedPositions of roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]) {
+        const positions = unpackPosList(packedPositions)
+        const packedCoord = packCoord(positions[positions.length - 1])
+
+        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+    }
+
+    // Prefer to avoid all potential reservation positions
+
+    const positions = unpackPosList(roomMemory[RoomMemoryKeys.remoteControllerPositions])
+
+    for (const pos of positions) {
+        const packedCoord = packCoord(pos)
+        const currentWeight = args.weightCoords[roomName][packedCoord] || 0
+        args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
+    }
+
+    return true
 }
 
 function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
