@@ -233,8 +233,7 @@ export class CommunePlanner {
 
         if (this.recording) this.record()
 
-        // Planning is complete, choose the best one
-        console.log('before', this.room.name, this.planAttempts, typeof this.planAttempts, JSON.stringify(this.planAttempts))
+        // If planning is complete, choose the best plan using a scoring system
         if (
             this.fastFillerStartCoords &&
             this.planAttempts.length === this.fastFillerStartCoords.length
@@ -242,10 +241,10 @@ export class CommunePlanner {
             // Filter and make sure we have at least one completed plan, if not, mark the room as failed
             const planAttempts = this.planAttempts.filter<BasePlanAttempt>((plan): plan is BasePlanAttempt => plan !== false)
             if (!planAttempts.length) return Result.fail
-            console.log('resulting plans', JSON.stringify(this.planAttempts))
+
             /* this.visualizeBestPlan() */
             this.choosePlan(planAttempts)
-            console.log('finished plan', this.room.memory[RoomMemoryKeys.communePlanned])
+
             return Result.success
         }
 
@@ -302,12 +301,12 @@ export class CommunePlanner {
         delete this.baseCoords
         return Result.noAction
  */
-        console.log('before failed?', this.room.name, this.planAttempts, JSON.stringify(this.planAttempts))
+
         this.avoidSources()
         this.avoidMineral()
         if (this.fastFiller() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         this.postFastFillerConfig()
@@ -315,40 +314,40 @@ export class CommunePlanner {
         /* this.pruneFastFillerRoads() */
         if (this.findCenterUpgradePos() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         this.findSourceHarvestPositions()
         if (this.hub() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         if (this.labs() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         this.sourceStructures()
         if (this.gridExtensions() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         this.gridExtensionSourcePaths()
         if (this.nuker() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         if (this.powerSpawn() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         if (this.observer() === Result.fail) {
             this.planAttempts.push(false)
-            console.log('failed', this.planAttempts)
+
             return Result.noAction
         }
         this.planGridCoords()
@@ -3294,7 +3293,7 @@ export class CommunePlanner {
     private choosePlan(planAttempts: BasePlanAttempt[]) {
         const plan = planAttempts[this.findBestPlanIndex(planAttempts)] as BasePlanAttempt
         const roomMemory = Memory.rooms[this.room.name]
-        console.log('chosen plan', plan, plan.score, plan.upgradePath, 'index', this.findBestPlanIndex(planAttempts))
+
         roomMemory[RoomMemoryKeys.score] = plan.score
         roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
         roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans
@@ -3308,7 +3307,7 @@ export class CommunePlanner {
         roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
         roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
         roomMemory[RoomMemoryKeys.communePlanned] = true
-        console.log('plan end', roomMemory[RoomMemoryKeys.communePlanned])
+
         // Delete uneeded plan data from global to free up space
         delete this.planAttempts
     }
