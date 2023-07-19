@@ -7,8 +7,7 @@ class UserScriptManager {
 
     }
     run() {
-
-        console.log('hi')
+        
     }
 }
 
