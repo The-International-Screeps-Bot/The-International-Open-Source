@@ -8,6 +8,8 @@ class UserScriptManager {
     }
     run() {
 
-
+        console.log('hi')
     }
 }
+
+export const userScriptManager = new UserScriptManager()

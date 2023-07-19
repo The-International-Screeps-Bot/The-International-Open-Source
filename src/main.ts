@@ -62,6 +62,7 @@ import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 /* const collaborator = require('collaborator-obfuscated.js') as Collaborator */
 import { collaborator } from 'international/collectivization/collaborator-obfuscated'
+import { userScriptManager } from 'other/userScript/userScript'
 
 function originalLoop() {
     profiler.wrap((): void => {
@@ -118,6 +119,8 @@ function originalLoop() {
             const statName: InternationalStatNames = 'imcu'
             updateStat('', statName, cpuUsed, true)
         }
+
+        userScriptManager.run()
 
         roomsManager.run()
 
