@@ -20,13 +20,13 @@ export class PlayerManager {
         for (const playerName in Memory.players) {
             const player = Memory.players[playerName]
 
-            // Decay specified values over time
+            // Decay specified numberical values over time
 
             for (const key of playerDecayKeys) {
 
-                if (player[key] < 1) continue
+                if (player[key] as number < 1) continue
 
-                player[key] *= defaultDataDecay * sleepFor
+                (player[key] as number) *= defaultDataDecay * sleepFor
             }
 
             // So long as the player has attacked at some pount, record it

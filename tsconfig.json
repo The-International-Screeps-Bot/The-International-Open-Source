@@ -16,7 +16,12 @@
         "allowUnreachableCode": true,
         "strictNullChecks": false,
         "esModuleInterop": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "skipLibCheck": true,
     },
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["node_modules", "dist"],
+    "typedocOptions": {
+        "out": "./docs",
+        "readme": "none"
+    }
 }

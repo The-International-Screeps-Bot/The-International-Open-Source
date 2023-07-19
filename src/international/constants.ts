@@ -2,6 +2,8 @@ import { packCoord } from 'other/codec'
 import { collectiveManager } from './collective'
 import { settings } from './settings'
 
+export type PlayerRelationship = 'ally' | 'enemy'
+
 export enum PlayerMemoryKeys {
     /**
      * Generally how good their offense is
@@ -23,6 +25,7 @@ export enum PlayerMemoryKeys {
      * the positive, non-zero value for which to weight enemy exit retreat threat
      */
     rangeFromExitWeight,
+    relationship,
 }
 
 export const playerDecayKeys = new Set([

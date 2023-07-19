@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    PlayerMemoryKeys,
     Result,
     RoomMemoryKeys,
     RoomTypes,
@@ -28,6 +29,7 @@ import {
     forCoordsInRange,
     forRoomNamesAroundRangeXY,
     getRangeXY,
+    isAlly,
     makeRoomCoord,
     packAsNum,
     randomTick,
@@ -64,6 +66,12 @@ export interface InterpretedRoomEvent {
     actionType?: EventAttackType | EventHealType
     amount?: number
     target?: Id<Creep | PowerCreep | Structure | Resource | Ruin | Tombstone>
+}
+
+export interface DeadCreepNames {
+    my: Set<string>
+    enemy: Set<string>
+    ally: Set<string>
 }
 
 export class RoomManager {
@@ -1086,5 +1094,34 @@ export class RoomManager {
         }
 
         return this._events = events
+    }
+
+    _deadCreepNames: DeadCreepNames
+    get deadCreepNames() {
+        if (this._deadCreepNames) return this._deadCreepNames
+
+        const deadCreepNames: DeadCreepNames = {
+            my: new Set(),
+            enemy: new Set(),
+            ally: new Set(),
+        }
+
+        for (const tombstone of this.room.find(FIND_TOMBSTONES)) {
+
+            if (tombstone.creep.name === Memory.me) {
+
+                deadCreepNames.my.add(tombstone.creep.name)
+                continue
+            }
+
+            if (isAlly(tombstone.creep.name)) {
+
+                deadCreepNames.ally.add(tombstone.creep.name)
+            }
+
+            deadCreepNames.enemy.add(tombstone.creep.name)
+        }
+
+        return this._deadCreepNames = deadCreepNames
     }
 }

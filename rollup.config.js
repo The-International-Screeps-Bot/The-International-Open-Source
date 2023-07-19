@@ -52,13 +52,5 @@ export default {
         shouldUglify && terser(),
         typescript({ tsconfig: './tsconfig.json' }),
         screeps({ config: cfg, dryRun: cfg == null }),
-        /* copy({
-            targets: [
-              {
-                src: 'src/international/collectivization/collaborator-obfuscated.js',
-                dest: 'dist',
-              },
-            ]
-        }), */
     ],
 }

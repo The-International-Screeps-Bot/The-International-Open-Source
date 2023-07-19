@@ -12,6 +12,7 @@ import {
     preferredCommuneRange,
     RoomMemoryKeys,
     RoomTypes,
+    PlayerMemoryKeys,
 } from './constants'
 import { collectiveManager } from './collective'
 
@@ -944,4 +945,16 @@ export function visualizePath(
             opacity: 0.2,
         })
     }
+}
+
+/**
+ * Linearly checks if a given player name matches one of our allies
+ */
+export function isAlly(playerName: string) {
+
+    const playerMemory = Memory.players[playerName]
+    if (!playerMemory) return false
+
+    if (playerMemory[PlayerMemoryKeys.relationship] !== 'ally') return false
+    return true
 }

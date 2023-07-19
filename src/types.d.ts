@@ -17,6 +17,7 @@ import {
     RoomTypes,
     SleepFor,
     Result,
+    PlayerRelationship,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -2117,6 +2118,7 @@ declare global {
         [PlayerMemoryKeys.hate]: number
         [PlayerMemoryKeys.lastAttacked]: number
         [PlayerMemoryKeys.rangeFromExitWeight]: number
+        [PlayerMemoryKeys.relationship]: PlayerRelationship
     }
 
     interface WorkRequest {

@@ -1,6 +1,6 @@
 {
-    "name": "@the-international-screeps-bot/the-international-open-source",
-    "version": "1.0.17",
+    "name": "the-international-screeps-bot",
+    "version": "2.109.0",
     "description": "",
     "files": [
         "main.js"
@@ -19,25 +19,25 @@
         "test-watch": "jest --watch",
         "test-cov": "jest --coverage",
         "test-only": "bash -c 'jest --watch --coverage --verbose --collectCoverageFrom=\"**/*$1*\" $1' -- ",
-        "obfuscate": "tsc --target es2019 ./src/international/collectivization/collaborator.ts & javascript-obfuscator ./src/international/collectivization/collaborator.js --self-defending true --dead-code-injection true --control-flow-flattening true"
+        "obfuscate": "tsc --target es2019 ./src/international/collectivization/collaborator.ts & javascript-obfuscator ./src/international/collectivization/collaborator.js --self-defending true --dead-code-injection true --control-flow-flattening true",
+        "document": "npx typedoc src/*"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/CarsonBurke/The-International-Screeps-Bot.git"
+        "url": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source"
     },
-    "author": "",
-    "license": "Unlicense",
     "bugs": {
-        "url": "https://github.com/CarsonBurke/The-International-Screeps-Bot/issues"
-    },
-    "homepage": "https://github.com/CarsonBurke/The-International-Screeps-Bot#readme",
+        "url": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues"
+      },
+    "author": "",
+    "license": "MIT",
+    "homepage": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source",
     "devDependencies": {
         "@rollup/plugin-commonjs": "^20.0.0",
         "@rollup/plugin-node-resolve": "^13.0.4",
         "@types/chai": "^4.3.0",
         "@types/jest": "^27.0.1",
         "@types/lodash": "3.10.2",
-        "@types/mocha": "^5.2.5",
         "@types/node": "^13.13.1",
         "@types/screeps": "^3.3.0",
         "@types/sinon": "^5.0.5",
@@ -58,7 +58,6 @@
         "javascript-obfuscator": "^4.0.2",
         "jest": "^27.1.0",
         "lodash": "^3.10.1",
-        "mocha": "^5.2.0",
         "prettier": "^2.3.2",
         "rollup": "^2.56.2",
         "rollup-plugin-clear": "^2.0.7",
