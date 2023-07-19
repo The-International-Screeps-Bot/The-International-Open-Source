@@ -20,7 +20,7 @@
         "test-cov": "jest --coverage",
         "test-only": "bash -c 'jest --watch --coverage --verbose --collectCoverageFrom=\"**/*$1*\" $1' -- ",
         "obfuscate": "tsc --target es2019 ./src/international/collectivization/collaborator.ts & javascript-obfuscator ./src/international/collectivization/collaborator.js --self-defending true --dead-code-injection true --control-flow-flattening true",
-        "document": "npx typedoc src/*"
+        "document": "npx typedoc --entryPointStrategy expand ./src"
     },
     "repository": {
         "type": "git",
