@@ -5,7 +5,7 @@ collaborator.ts
 collaborator.js
 
 # user-custom code
-userScript
+src/other/userScript/
 
 # Build
 dist
