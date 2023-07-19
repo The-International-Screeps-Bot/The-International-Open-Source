@@ -3,7 +3,7 @@ import { CommuneManager } from './commune'
 import { customLog } from 'international/utils'
 import { collectiveManager } from 'international/collective'
 
-export class PowerSpawningStructuresManager {
+export class PowerSpawnsManager {
     communeManager: CommuneManager
     powerSpawn: StructurePowerSpawn
 

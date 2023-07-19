@@ -56,7 +56,7 @@ import { CreepRoleManager } from '../creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
-import { PowerSpawningStructuresManager } from './powerSpawn'
+import { PowerSpawnsManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
 import { TowerManager } from './towers'
@@ -96,7 +96,7 @@ export class CommuneManager {
     storingStructuresManager: StoringStructuresManager
     linkManager: LinkManager
     labManager: LabManager
-    powerSpawningStructuresManager: PowerSpawningStructuresManager
+    powerSpawningStructuresManager: PowerSpawnsManager
     spawnRequestsManager: SpawnRequestsManager
     spawningStructuresManager: SpawningStructuresManager
     sourceManager: SourceManager
@@ -136,7 +136,7 @@ export class CommuneManager {
         this.storingStructuresManager = new StoringStructuresManager(this)
         this.linkManager = new LinkManager(this)
         this.labManager = new LabManager(this)
-        this.powerSpawningStructuresManager = new PowerSpawningStructuresManager(this)
+        this.powerSpawningStructuresManager = new PowerSpawnsManager(this)
         this.spawnRequestsManager = new SpawnRequestsManager(this)
         this.spawningStructuresManager = new SpawningStructuresManager(this)
         this.sourceManager = new SourceManager(this)
