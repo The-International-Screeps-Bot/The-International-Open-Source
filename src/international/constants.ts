@@ -1631,3 +1631,4 @@ export const dynamicScoreRoomRange = 8
 export const maxControllerLevel = 8
 export const preferredCommuneRange = 5.5
 export const defaultDataDecay = 0.99999
+export const revolutionary = 'MarvinTMB'

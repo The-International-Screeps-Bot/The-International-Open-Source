@@ -24,6 +24,9 @@ import { Settings } from 'international/settings'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { BasePlans } from 'room/construction/basePlans'
 
+
+
+
 declare global {
     interface ProfilerMemory {
         data: { [name: string]: ProfilerData }
@@ -43,6 +46,10 @@ declare global {
         status(): void
         stop(): void
         toString(): string
+    }
+
+    interface Collaborator {
+        run(): void
     }
 
     interface Coord {

@@ -4,12 +4,6 @@
 
 import './international/commands'
 import { collectiveManager } from './international/collective'
-import './international/config'
-import './international/tickInit'
-import './international/creepOrganizer'
-import './international/constructionSiteManager'
-import './international/mapVisuals'
-import './international/endRun'
 
 // Room
 
@@ -56,7 +50,7 @@ import './room/construction/minCut'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { constructionSiteManager } from './international/constructionSiteManager'
 import { mapVisualsManager } from './international/mapVisuals'
-import { endRun } from './international/endTickManager'
+import { endTickManager } from './international/endTickManager'
 import { CommunePlanner } from 'room/communePlanner'
 import { RoomManager } from 'room/room'
 import { ObserverManager } from 'room/commune/observer'
@@ -66,6 +60,8 @@ import { SourceManager } from 'room/commune/sourceManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
+/* const collaborator = require('collaborator-obfuscated.js') as Collaborator */
+import { collaborator } from 'international/collectivization/collaborator-obfuscated'
 
 function originalLoop() {
     profiler.wrap((): void => {
@@ -95,7 +91,8 @@ function originalLoop() {
         respawnManager.run()
         configManager.run()
         allyRequestManager.initRun()
-        playerManager.run()
+        playerManager.run();
+        (collaborator as Collaborator).run()
         tickInit.run()
         tickInit.configGeneral()
         statsManager.internationalPreTick()
@@ -129,7 +126,7 @@ function originalLoop() {
         collectiveManager.advancedGeneratePixel()
         collectiveManager.advancedSellPixels()
 
-        endRun.run()
+        endTickManager.run()
     })
 }
 

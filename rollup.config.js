@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import clear from 'rollup-plugin-clear'
 import screeps from 'rollup-plugin-screeps'
+import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser'
 import yaml from 'yaml'
 import { readFileSync } from 'fs'
@@ -32,14 +33,32 @@ export default {
         file: 'dist/main.js',
         format: 'cjs',
         sourcemap: true,
+        banner:
+`
+// The International Screeps Bot
+// DO NOT USE THIS BOT TO BULLY PLAYERS
+// code repository: https://github.com/The-International-Screeps-Bot/The-International-Open-Source
+`
     },
 
     plugins: [
         clear({ targets: ['dist'] }),
-        commonjs(),
+        commonjs({
+            namedExports: {
+                'src/international/collectivization/collaborator-obfuscated': ['collaborator'],
+            }
+        }),
         resolve({ rootDir: 'src' }),
         shouldUglify && terser(),
         typescript({ tsconfig: './tsconfig.json' }),
         screeps({ config: cfg, dryRun: cfg == null }),
+        /* copy({
+            targets: [
+              {
+                src: 'src/international/collectivization/collaborator-obfuscated.js',
+                dest: 'dist',
+              },
+            ]
+        }), */
     ],
 }

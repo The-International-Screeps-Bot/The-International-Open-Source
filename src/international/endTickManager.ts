@@ -41,4 +41,4 @@ class EndTickManager {
     }
 }
 
-export const endRun = new EndTickManager()
+export const endTickManager = new EndTickManager()
