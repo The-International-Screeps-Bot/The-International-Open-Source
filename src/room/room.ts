@@ -59,6 +59,13 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { customFindPath } from 'international/customPathFinder'
 
+export interface InterpretedRoomEvent {
+    eventType: EventConstant
+    actionType?: EventAttackType | EventHealType
+    amount?: number
+    target?: Id<Creep | PowerCreep | Structure | Resource | Ruin | Tombstone>
+}
+
 export class RoomManager {
     // sub managers
 
@@ -1063,5 +1070,21 @@ export class RoomManager {
         }
 
         return (this._enemySquadData = highestEnemySquadData)
+    }
+
+    /* TODO */
+    _events: {[targetID: string]: InterpretedRoomEvent}
+    get events() {
+        if (this._events) return this._events
+
+        const eventLog = this.room.getEventLog()
+        const events: {[targetID: string]: InterpretedRoomEvent} = {}
+
+        for (const event of eventLog) {
+
+
+        }
+
+        return this._events = events
     }
 }
