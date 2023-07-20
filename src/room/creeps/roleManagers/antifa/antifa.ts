@@ -642,3 +642,7 @@ export class Antifa extends Creep {
         }
     }
 }
+
+export const antifaUtils = {
+    
+}
