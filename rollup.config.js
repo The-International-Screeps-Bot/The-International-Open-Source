@@ -43,6 +43,11 @@ export default {
 
     plugins: [
         clear({ targets: ['dist'] }),
+        copy({
+          targets: [
+            { src: 'wasm/pkg/commiebot_wasm_bg.wasm', dest: 'dist' }
+          ]
+        }),
         commonjs({
             namedExports: {
                 'src/international/collectivization/collaborator-obfuscated': ['collaborator'],

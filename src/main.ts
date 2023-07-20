@@ -64,6 +64,15 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { collaborator } from 'international/collectivization/collaborator-obfuscated'
 import { userScriptManager } from 'other/userScript/userScript'
 
+// TextEncoder/Decoder polyfill for UTF-8 conversion
+// from https://github.com/anonyco/FastestSmallestTextEncoderDecoder
+import './EncoderDecoderTogether.min.js'
+
+import { initSync } from 'commiebot-wasm/commiebot_wasm.js';
+let wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'));
+let wasm = initSync(wasm_module);
+wasm.log_setup();
+
 function originalLoop() {
     profiler.wrap((): void => {
         if (Memory.me === 'PandaMaster' && Game.shard.name === 'shard0') {
@@ -79,6 +88,8 @@ function originalLoop() {
         }
 
         memHack.run()
+
+        wasm.wasm_function()
 
         collectiveManager.update()
 
