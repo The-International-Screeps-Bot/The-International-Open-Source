@@ -3,7 +3,7 @@
         "allowJs": true,
         "experimentalDecorators": true,
         "module": "esnext",
-        "lib": ["es2019"],
+        "lib": ["es2019", "dom"],
         "target": "es2019",
         "moduleResolution": "node",
         "outDir": "dist",

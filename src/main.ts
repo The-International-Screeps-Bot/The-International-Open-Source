@@ -64,9 +64,14 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { collaborator } from 'international/collectivization/collaborator-obfuscated'
 import { userScriptManager } from 'other/userScript/userScript'
 
-// @ts-ignore
-import { log_setup, wasm_function } from '../wasm/Cargo.toml'
-log_setup();
+// TextEncoder/Decoder polyfill for UTF-8 conversion
+// from https://github.com/anonyco/FastestSmallestTextEncoderDecoder
+import './EncoderDecoderTogether.min.js'
+
+import { initSync } from 'commiebot-wasm/commiebot_wasm.js';
+let wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'));
+let wasm = initSync(wasm_module);
+wasm.log_setup();
 
 function originalLoop() {
     profiler.wrap((): void => {
@@ -84,7 +89,7 @@ function originalLoop() {
 
         memHack.run()
 
-        wasm_function()
+        wasm.wasm_function()
 
         collectiveManager.update()
 

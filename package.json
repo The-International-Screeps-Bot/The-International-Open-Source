@@ -3,11 +3,13 @@
     "version": "2.109.0",
     "description": "",
     "files": [
-        "main.js"
+        "main.js",
+        "wasm/pkg/"
     ],
     "main": "dist/main.js",
     "scripts": {
         "build": "rollup -c",
+        "build-wasm": "cd wasm && wasm-pack build --target web",
         "lint": "eslint src",
         "lint-fix": "eslint src --fix",
         "push-mmo": "rollup -c --environment DEST:mmo",
@@ -28,7 +30,7 @@
     },
     "bugs": {
         "url": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues"
-      },
+    },
     "author": "",
     "license": "MIT",
     "homepage": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source",
@@ -44,7 +46,6 @@
         "@types/sinon-chai": "^3.2.0",
         "@typescript-eslint/eslint-plugin": "^4.20.0",
         "@typescript-eslint/parser": "^4.20.0",
-        "@wasm-tool/rollup-plugin-rust": "^2.4.0",
         "chai": "^4.2.0",
         "dotenv": "^16.0.2",
         "eslint": "^7.23.0",
@@ -80,6 +81,7 @@
     },
     "dependencies": {
         "base32768": "^3.0.1",
+        "commiebot-wasm": "file:wasm/pkg",
         "source-map": "~0.6.1"
     },
     "screeps_bot": true

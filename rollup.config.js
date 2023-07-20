@@ -2,7 +2,6 @@ import typescript from 'rollup-plugin-typescript2'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import clear from 'rollup-plugin-clear'
-import rust from "@wasm-tool/rollup-plugin-rust";
 import screeps from 'rollup-plugin-screeps'
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser'
@@ -29,14 +28,11 @@ const shouldUglify = cfg && cfg.uglify
 if (cfg) delete cfg.uglify
 
 export default {
-    input: [
-        'src/main.ts',
-        'wasm/Cargo.toml',
-    ],
+    input: 'src/main.ts',
     output: {
-        dir: 'dist',
+        file: 'dist/main.js',
         format: 'cjs',
-        //sourcemap: true,
+        sourcemap: true,
         banner:
 `
 // The International Screeps Bot
@@ -47,13 +43,10 @@ export default {
 
     plugins: [
         clear({ targets: ['dist'] }),
-        rust({
-            nodejs: true,
-            inlineWasm: true,
-            experimental: {
-                directExports: true,
-                synchronous: true,
-            }
+        copy({
+          targets: [
+            { src: 'wasm/pkg/commiebot_wasm_bg.wasm', dest: 'dist' }
+          ]
         }),
         commonjs({
             namedExports: {
