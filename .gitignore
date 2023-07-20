@@ -4,6 +4,10 @@ collectivizer.ts
 collaborator.ts
 collaborator.js
 
+# wasm output directories
+wasm/target
+wasm/pkg
+
 # user-custom code
 src/other/userScript/
 

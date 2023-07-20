@@ -64,6 +64,10 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { collaborator } from 'international/collectivization/collaborator-obfuscated'
 import { userScriptManager } from 'other/userScript/userScript'
 
+// @ts-ignore
+import { log_setup, wasm_function } from '../wasm/Cargo.toml'
+log_setup();
+
 function originalLoop() {
     profiler.wrap((): void => {
         if (Memory.me === 'PandaMaster' && Game.shard.name === 'shard0') {
@@ -79,6 +83,8 @@ function originalLoop() {
         }
 
         memHack.run()
+
+        wasm_function()
 
         collectiveManager.update()
 
