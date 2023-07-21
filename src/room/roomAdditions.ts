@@ -1370,10 +1370,9 @@ const roomAdditions = {
         get() {
             if (this._unprotectedEnemyCreeps) return this._unprotectedEnemyCreeps
 
-            const avoidStructureTypes = new Set([STRUCTURE_RAMPART])
-
             return (this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
-                return !this.coordHasStructureTypes(enemyCreep.pos, avoidStructureTypes)
+                // Make sure the creep doesn't have a rampart protecting them
+                return !this.findStructureAtCoord(enemyCreep.pos, (structure => structure.structureType === STRUCTURE_RAMPART))
             }))
         },
     },

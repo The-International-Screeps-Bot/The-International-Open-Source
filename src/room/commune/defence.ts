@@ -39,8 +39,21 @@ export class DefenceManager {
 
         if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
+        if (!this.communeManager.room.enemyCreeps.length) {
+
+            this.considerRampartsPublic()
+            return
+        }
+
+        // There are at least enemy creeps
+
+        this.makeRampartsPrivate()
         this.advancedActivateSafeMode()
-        this.manageRampartPublicity()
+
+        if (!this.communeManager.room.enemyAttackers.length) return
+
+        // There are at least enemyAttackers
+
         this.assignDefenceTargets()
 
         // If CPU logging is enabled, log the CPU used by this manager
@@ -137,48 +150,43 @@ export class DefenceManager {
         collectiveManager.safemodedCommuneName = this.communeManager.room.name
     }
 
-    private manageRampartPublicity() {
+    private considerRampartsPublic() {
+
+        if (!Memory.publicRamparts) return
+
         const { room } = this.communeManager
 
-        // If there are no enemies it is safe to publicize ramparts
+        // Wait some pseudo-random time before publicizing ramparts
+        if (room.memory[RoomMemoryKeys.lastAttacked] < randomIntRange(100, 150)) return
 
-        if (!room.enemyCreeps.length) {
-            if (!Memory.publicRamparts) return
+        // Publicize at most 10 ramparts per tick, to avoid too many intents
 
-            // Wait some pseudo-random time before publicizing ramparts
+        let intents = 0
 
-            if (room.memory[RoomMemoryKeys.lastAttacked] < randomIntRange(100, 150)) return
+        for (const rampart of room.roomManager.structures.rampart) {
+            if (intents >= 10) return
 
-            // Publicize at most 10 ramparts per tick, to avoid too many intents
+            // If the rampart is public
 
-            let intents = 0
+            if (rampart.isPublic) continue
 
-            for (const rampart of room.roomManager.structures.rampart) {
-                if (intents >= 10) return
+            // Otherwise set the rampart to public, increase increment
 
-                // If the rampart is public
-
-                if (rampart.isPublic) continue
-
-                // Otherwise set the rampart to public, increase increment
-
-                rampart.setPublic(true)
-                intents += 1
-            }
-
-            return
+            rampart.setPublic(true)
+            intents += 1
         }
+    }
 
-        // If there are enemyAttackers, privitize all ramparts that are public
+    private makeRampartsPrivate() {
 
-        for (const rampart of room.roomManager.structures.rampart)
+        for (const rampart of this.communeManager.room.roomManager.structures.rampart) {
+
             if (rampart.isPublic) rampart.setPublic(false)
+        }
     }
 
     private assignDefenceTargets() {
         const { room } = this.communeManager
-
-        if (!room.enemyAttackers.length) return
 
         // Sort by estimated percent health change
 

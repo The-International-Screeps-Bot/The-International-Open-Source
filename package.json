@@ -8,6 +8,9 @@
     ],
     "main": "dist/main.js",
     "scripts": {
+        "init": "npm i",
+        "init-total": "npm i && cd wasm && cargo build && rustup default nightly",
+        "build-total": "npm run build-wasm && npm run obfuscate && npm run build",
         "build": "rollup -c",
         "build-wasm": "cd wasm && rustup run nightly wasm-pack build --target web --config build.rustflags=['-Ctarget-cpu=mvp'] -Z build-std=std,panic_abort",
         "lint": "eslint src",
@@ -41,7 +44,7 @@
         "@types/jest": "^27.0.1",
         "@types/lodash": "3.10.2",
         "@types/node": "^13.13.1",
-        "@types/screeps": "^3.3.0",
+        "@types/screeps": "^3.3.3",
         "@types/sinon": "^5.0.5",
         "@types/sinon-chai": "^3.2.0",
         "@typescript-eslint/eslint-plugin": "^4.20.0",

@@ -10,6 +10,7 @@ wasm/target
 # you'll need to delete it within the dir (for now, see
 # https://github.com/rustwasm/wasm-pack/pull/1131)
 wasm/pkg
+Cargo.lock
 
 # user-custom code
 src/other/userScript/
