@@ -9,7 +9,7 @@
     "main": "dist/main.js",
     "scripts": {
         "build": "rollup -c",
-        "build-wasm": "cd wasm && wasm-pack build --target web",
+        "build-wasm": "cd wasm && rustup run nightly wasm-pack build --target web --config build.rustflags=['-Ctarget-cpu=mvp'] -Z build-std=std,panic_abort",
         "lint": "eslint src",
         "lint-fix": "eslint src --fix",
         "push-mmo": "rollup -c --environment DEST:mmo",
@@ -56,6 +56,7 @@
         "eslint-plugin-jsdoc": "^31.6.1",
         "eslint-plugin-prettier": "^3.3.1",
         "eslint-plugin-screeps": "^2.1.0",
+        "fastestsmallesttextencoderdecoder-encodeinto": "^1.0.22",
         "fs": "^0.0.1-security",
         "javascript-obfuscator": "^4.0.2",
         "jest": "^27.1.0",
