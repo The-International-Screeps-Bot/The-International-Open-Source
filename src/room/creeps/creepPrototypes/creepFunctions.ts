@@ -1863,6 +1863,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
     if (target instanceof Resource) {
         this.pickup(target)
+        this.movedResource = true
 
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
             request[CreepRoomLogisticsRequestKeys.amount]
@@ -1873,8 +1874,6 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     }
 
     if (request[CreepRoomLogisticsRequestKeys.type] === 'transfer') {
-        this.room.visual.text('hi', this.pos)
-
         const result = this.transfer(
             target as AnyStoreStructure | Creep,
             request[CreepRoomLogisticsRequestKeys.resourceType],
@@ -1884,6 +1883,8 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
             this.room.visual.text(result.toString(), this.pos)
             return Result.fail
         }
+
+        this.movedResource = true
 
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
             request[CreepRoomLogisticsRequestKeys.amount]
@@ -1908,6 +1909,8 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         )
             return Result.fail
 
+        this.movedResource = true
+
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
             request[CreepRoomLogisticsRequestKeys.amount]
         target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
@@ -1925,6 +1928,8 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         ) !== OK
     )
         return Result.fail
+
+    this.movedResource = true
 
     this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
         request[CreepRoomLogisticsRequestKeys.amount]
@@ -1970,6 +1975,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
 
     if (target instanceof Resource) {
         this.pickup(target)
+        this.movedResource = true
 
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
             request[CreepRoomLogisticsRequestKeys.amount]
@@ -1988,6 +1994,8 @@ Creep.prototype.runRoomLogisticsRequest = function () {
             ) !== OK
         )
             return Result.fail
+
+        this.movedResource = true
 
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
             request[CreepRoomLogisticsRequestKeys.amount]
@@ -2012,6 +2020,8 @@ Creep.prototype.runRoomLogisticsRequest = function () {
         )
             return Result.fail
 
+        this.movedResource = true
+
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
             request[CreepRoomLogisticsRequestKeys.amount]
         target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
@@ -2029,6 +2039,8 @@ Creep.prototype.runRoomLogisticsRequest = function () {
         ) !== OK
     )
         return Result.fail
+
+    this.movedResource = true
 
     this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
         request[CreepRoomLogisticsRequestKeys.amount]

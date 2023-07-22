@@ -4,7 +4,7 @@ import { customLog } from "./utils"
  * Credit to SemperRabbit for this nice piece of code!
  */
 class RespawnManager {
-    public run() {
+    run() {
         if (!this.hasRespawned()) return
 
         global.clearMemory()

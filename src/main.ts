@@ -32,7 +32,6 @@ import { migrationManager } from 'international/migration'
 import { respawnManager } from './international/respawn'
 import { tickInit } from './international/tickInit'
 import { allyRequestManager } from 'international/AllyRequests'
-import ExecutePandaMasterCode from './other/PandaMaster/Execute'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
@@ -60,26 +59,18 @@ import { SourceManager } from 'room/commune/sourceManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
-/* const collaborator = require('collaborator-obfuscated.js') as Collaborator */
-import { collaborator } from 'international/collectivization/collaborator-obfuscated'
 import { userScriptManager } from 'other/userScript/userScript'
 
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js';
 
-import { initSync } from 'commiebot-wasm/commiebot_wasm.js';
+import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 let wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'));
 let wasm = initSync(wasm_module);
 wasm.log_setup();
 
 function originalLoop() {
     profiler.wrap((): void => {
-        if (Memory.me === 'PandaMaster' && Game.shard.name === 'shard0') {
-            ExecutePandaMasterCode(false)
-        } else if (Game.cpu.limit === 2) {
-            ExecutePandaMasterCode()
-            return
-        }
 
         if (Game.cpu.bucket < CPUMaxPerTick) {
             outOfBucket()
@@ -102,8 +93,7 @@ function originalLoop() {
         respawnManager.run()
         configManager.run()
         allyRequestManager.initRun()
-        playerManager.run();
-        (collaborator as Collaborator).run()
+        playerManager.run()
         tickInit.run()
         tickInit.configGeneral()
         statsManager.internationalPreTick()

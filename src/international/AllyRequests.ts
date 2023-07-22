@@ -83,39 +83,7 @@ class AllyRequestManager {
      * An array of the requests you have made this tick
      */
     myRequests: AllyRequest[]
-
     currentAlly: string
-
-    _allyRequests: Partial<Record<keyof typeof AllyRequestTypes, { [ID: string]: AllyRequest }>>
-    get allyRequests() {
-        if (this._allyRequests) return this._allyRequests
-
-        this._allyRequests = {}
-        for (const key in AllyRequestTypes)
-            this._allyRequests[key as keyof typeof AllyRequestTypes] = {}
-
-        if (!RawMemory.foreignSegment) return this._allyRequests
-        if (RawMemory.foreignSegment.username !== this.currentAlly) return this._allyRequests
-
-        let rawAllyRequests: AllyRequest[]
-
-        try {
-            rawAllyRequests = JSON.parse(RawMemory.foreignSegment.data)
-        } catch (err) {
-            customLog('Error in getting requests for simpleAllies', this.currentAlly)
-        }
-
-        // Organize requests by type with keys of ID
-
-        for (const request of rawAllyRequests) {
-            const ID = collectiveManager.newTickID()
-            request.ID = ID
-
-            this._allyRequests[allyRequestTypeKeys[request.requestType]][ID] = request
-        }
-
-        return this._allyRequests
-    }
 
     /**
      * To call before any requests are made. Configures some required values
@@ -212,6 +180,37 @@ class AllyRequestManager {
             roomName,
             priority,
         })
+    }
+
+    _allyRequests: Partial<Record<keyof typeof AllyRequestTypes, { [ID: string]: AllyRequest }>>
+    get allyRequests() {
+        if (this._allyRequests) return this._allyRequests
+
+        this._allyRequests = {}
+        for (const key in AllyRequestTypes)
+            this._allyRequests[key as keyof typeof AllyRequestTypes] = {}
+
+        if (!RawMemory.foreignSegment) return this._allyRequests
+        if (RawMemory.foreignSegment.username !== this.currentAlly) return this._allyRequests
+
+        let rawAllyRequests: AllyRequest[]
+
+        try {
+            rawAllyRequests = JSON.parse(RawMemory.foreignSegment.data)
+        } catch (err) {
+            customLog('Error in getting requests for simpleAllies', this.currentAlly)
+        }
+
+        // Organize requests by type with keys of ID
+
+        for (const request of rawAllyRequests) {
+            const ID = collectiveManager.newTickID()
+            request.ID = ID
+
+            this._allyRequests[allyRequestTypeKeys[request.requestType]][ID] = request
+        }
+
+        return this._allyRequests
     }
 }
 

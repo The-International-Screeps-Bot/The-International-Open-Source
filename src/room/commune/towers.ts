@@ -32,12 +32,12 @@ export class TowerManager {
 
         if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const towers = this.communeManager.room.roomManager.structures.tower.filter(
+        const towers = room.roomManager.structures.tower.filter(
             tower => tower.RCLActionable,
         )
         if (!towers.length) {
-            this.communeManager.room.towerInferiority =
-                this.communeManager.room.enemyCreeps.length > 0
+            room.towerInferiority =
+                room.enemyCreeps.length > 0
             return
         }
 

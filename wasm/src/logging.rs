@@ -60,7 +60,7 @@ pub fn setup_logging(verbosity: log::LevelFilter) {
 fn panic_hook(info: &PanicInfo) {
     // import JS Error API to get backtrace info (backtraces don't work in wasm)
     // Node 8 does support this API: https://nodejs.org/docs/latest-v8.x/api/errors.html#errors_error_stack
-    
+
     #[wasm_bindgen]
     extern "C" {
         type Error;
