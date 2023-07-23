@@ -1,7 +1,6 @@
 # non-public features
 
 collectivizer.ts
-settings.ts
 
 # wasm output directories
 wasm/target
@@ -12,7 +11,10 @@ wasm/pkg
 Cargo.lock
 
 # user-custom code
-src/other/userScript/
+src/other/userScript/*
+!userScript.example.ts
+settings.ts
+
 
 # Build
 dist

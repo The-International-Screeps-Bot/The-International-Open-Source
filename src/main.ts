@@ -59,7 +59,6 @@ import { SourceManager } from 'room/commune/sourceManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
-import { userScriptManager } from 'other/userScript/userScript'
 
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js'
@@ -82,6 +81,8 @@ function originalLoop() {
         /* wasm.wasm_function() */
 
         collectiveManager.update()
+        if (global.collectivizer) global.collectivizer.run()
+        if (global.userScript) global.userScript()
 
         // If CPU logging is enabled, get the CPU used at the start
 

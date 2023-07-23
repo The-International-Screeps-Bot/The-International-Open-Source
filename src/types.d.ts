@@ -2252,6 +2252,22 @@ declare global {
     namespace NodeJS {
         interface Global {
             [key: string]: any
+
+            // User custom
+
+            collectivizer: TCollectivizer
+
+            settings: Settings
+            // Intentionally unused
+            settingsExample: Settings
+
+            userScript(): void
+            // Intentionally unused
+            userScriptExample(): void
+
+            //
+
+
             /**
              * Whether global is constructed or not
              */
@@ -2261,8 +2277,6 @@ declare global {
              * A strings to custom log as rich text
              */
             logs: string
-
-            settings: Settings
 
             /**
              * The number of construction sites placed by the bot
