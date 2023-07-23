@@ -43,7 +43,7 @@ export class WorkRequestManager {
 
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         const request = Memory.workRequests[requestName]
 
@@ -153,7 +153,7 @@ export class WorkRequestManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Claim Request Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,

@@ -140,7 +140,7 @@ export class RoomManager {
         }
 
         const roomType = roomMemory[RoomMemoryKeys.type]
-        if (Memory.roomStats > 0 && roomTypesUsedForStats.includes(roomType)) {
+        if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType)) {
             statsManager.roomPreTick(room.name, roomType)
         }
 
@@ -324,7 +324,11 @@ export class RoomManager {
         const stampAnchors = commune.roomManager.stampAnchors
         if (!stampAnchors) throw Error('no stampAnchors for ' + commune.name)
 
-        const hubAnchor = new RoomPosition(stampAnchors.hub[0].x, stampAnchors.hub[0].y, commune.name)
+        const hubAnchor = new RoomPosition(
+            stampAnchors.hub[0].x,
+            stampAnchors.hub[0].y,
+            commune.name,
+        )
         const sourcePaths: RoomPosition[][] = []
 
         for (const positions of packedRemoteSourceHarvestPositions) {
@@ -1081,19 +1085,17 @@ export class RoomManager {
     }
 
     /* TODO */
-    _events: {[targetID: string]: InterpretedRoomEvent}
+    _events: { [targetID: string]: InterpretedRoomEvent }
     get events() {
         if (this._events) return this._events
 
         const eventLog = this.room.getEventLog()
-        const events: {[targetID: string]: InterpretedRoomEvent} = {}
+        const events: { [targetID: string]: InterpretedRoomEvent } = {}
 
         for (const event of eventLog) {
-
-
         }
 
-        return this._events = events
+        return (this._events = events)
     }
 
     _deadCreepNames: DeadCreepNames
@@ -1107,21 +1109,18 @@ export class RoomManager {
         }
 
         for (const tombstone of this.room.find(FIND_TOMBSTONES)) {
-
             if (tombstone.creep.name === Memory.me) {
-
                 deadCreepNames.my.add(tombstone.creep.name)
                 continue
             }
 
             if (isAlly(tombstone.creep.name)) {
-
                 deadCreepNames.ally.add(tombstone.creep.name)
             }
 
             deadCreepNames.enemy.add(tombstone.creep.name)
         }
 
-        return this._deadCreepNames = deadCreepNames
+        return (this._deadCreepNames = deadCreepNames)
     }
 }

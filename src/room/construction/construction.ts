@@ -244,7 +244,7 @@ export class ConstructionManager {
         this.room.visual.text(RCL.toString(), this.room.controller.pos)
     }
     private migrate() {
-        if (!Memory.structureMigration) return
+        if (!global.settings.structureMigration) return
         if (!randomTick(100)) return
 
         const structures = this.room.roomManager.structures

@@ -293,7 +293,7 @@ export class Antifa extends Creep {
             this.message = 'EC'
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 this.room.visual.line(this.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -326,7 +326,7 @@ export class Antifa extends Creep {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -403,7 +403,7 @@ export class Antifa extends Creep {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -465,7 +465,7 @@ export class Antifa extends Creep {
             this.message = 'EC'
 
             const enemyCreep = findClosestObject(this.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 this.room.visual.line(this.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -491,7 +491,7 @@ export class Antifa extends Creep {
         }
 
         const enemyAttacker = findClosestObject(this.pos, enemyAttackers)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -526,7 +526,7 @@ export class Antifa extends Creep {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -573,7 +573,7 @@ export class Antifa extends Creep {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -643,6 +643,4 @@ export class Antifa extends Creep {
     }
 }
 
-export const antifaUtils = {
-    
-}
+export const antifaUtils = {}

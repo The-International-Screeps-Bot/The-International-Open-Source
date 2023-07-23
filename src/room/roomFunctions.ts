@@ -69,7 +69,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
 
     // Stop if roomVisuals are disabled
 
-    if (!Memory.roomVisuals) return
+    if (!global.settings.roomVisuals) return
 
     // Construct colors for each type
 
@@ -89,7 +89,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
     room.visual.line(pos1, pos2, { color })
 }
 
-Room.prototype.targetVisual = function (coord1, coord2, visualize = Memory.roomVisuals) {
+Room.prototype.targetVisual = function (coord1, coord2, visualize = global.settings.roomVisuals) {
     if (!visualize) return
 
     this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
@@ -150,7 +150,7 @@ Room.prototype.scoutEnemyReservedRemote = function () {
 
     // If the controller is not reserved by an ally
 
-    if (!Memory.allyPlayers.includes(controller.reservation.username)) {
+    if (!global.settings.allies.includes(controller.reservation.username)) {
         this.memory[RoomMemoryKeys.owner] = controller.reservation.username
         return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
     }
@@ -190,7 +190,7 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
         if (creep.parts.work > 0) {
             // If the creep is owned by an ally
 
-            if (Memory.allyPlayers.includes(creep.owner.username)) {
+            if (global.settings.allies.includes(creep.owner.username)) {
                 // Set type to allyRemote and stop
 
                 this.memory[RoomMemoryKeys.owner] = creep.owner.username
@@ -581,7 +581,7 @@ Room.prototype.basicScout = function () {
 
         // If the controller is owned by an ally
 
-        if (Memory.allyPlayers.includes(owner))
+        if (global.settings.allies.includes(owner))
             return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
 
         return this.scoutEnemyRoom()
@@ -623,7 +623,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
             // If the controller is owned by an ally
 
-            if (Memory.allyPlayers.includes(owner))
+            if (global.settings.allies.includes(owner))
                 return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
 
             return this.scoutEnemyRoom()
@@ -642,7 +642,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 }
 
 Room.prototype.createAttackCombatRequest = function (opts) {
-    if (!Memory.autoAttack) return
+    if (!global.settings.autoAttack) return
     if (this.controller && this.controller.safeMode) return
 
     let request = Memory.combatRequests[this.name]
@@ -662,7 +662,7 @@ Room.prototype.createAttackCombatRequest = function (opts) {
         )
     )
         return
-    if (Memory.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
+    if (global.settings.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
 
     request = Memory.combatRequests[this.name] = {
         [CombatRequestKeys.type]: 'attack',
@@ -680,7 +680,7 @@ Room.prototype.createAttackCombatRequest = function (opts) {
 }
 
 Room.prototype.createHarassCombatRequest = function (opts) {
-    if (!Memory.autoAttack) return
+    if (!global.settings.autoAttack) return
 
     let request = Memory.combatRequests[this.name]
     if (request) {
@@ -693,7 +693,7 @@ Room.prototype.createHarassCombatRequest = function (opts) {
     }
 
     if (!this.enemyCreeps.length) return
-    if (Memory.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
+    if (global.settings.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
     if (this.enemyAttackers.length > 0) return
 
     request = Memory.combatRequests[this.name] = {
@@ -1771,7 +1771,7 @@ Room.prototype.findClosestPosOfValueAsym = function (opts) {
     return false
 }
 
-Room.prototype.errorVisual = function (coord, visualize = Memory.roomVisuals) {
+Room.prototype.errorVisual = function (coord, visualize = global.settings.roomVisuals) {
     if (!visualize) return
 
     this.visual.circle(coord.x, coord.y, {

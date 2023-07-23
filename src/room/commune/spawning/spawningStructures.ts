@@ -68,14 +68,14 @@ export class SpawningStructuresManager {
         const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
         if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
         this.runSpawning()
         this.test()
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Spawn Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,

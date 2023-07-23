@@ -38,7 +38,7 @@ class TickInit {
     public run() {
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.configGeneral()
         statsManager.internationalPreTick()
@@ -46,7 +46,7 @@ class TickInit {
         this.configCombatRequests()
         this.configHaulRequests()
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Tick Config', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -64,7 +64,7 @@ class TickInit {
 
         // Chant logic
 
-        if (Memory.creepChant) {
+        if (global.settings.creepChant) {
             if (Memory.chantIndex >= chant.length - 1) Memory.chantIndex = 0
             else Memory.chantIndex += 1
         }
@@ -132,7 +132,7 @@ class TickInit {
             )
                 continue
 
-            if (!Memory.autoClaim) continue
+            if (!global.settings.autoClaim) continue
 
             // If there is not enough reserved GCL to make a new request
 

@@ -14,7 +14,7 @@ export class CombatRequestManager {
     public run() {
         const { room } = this.communeManager
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         for (
             let index = room.memory[RoomMemoryKeys.combatRequests].length - 1;
@@ -51,7 +51,7 @@ export class CombatRequestManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Combat Request Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,

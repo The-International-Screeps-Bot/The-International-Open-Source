@@ -1,4 +1,4 @@
-import { settings } from './settings'
+import { playerManager } from './players'
 import { statsManager } from './statsManager'
 
 /**
@@ -10,45 +10,26 @@ class ConfigManager {
         this.configGlobal()
     }
     /**
+     * Make sure we have configured memory for allies
+     */
+    configAllys() {
+        for (const playerName in global.settings.allies) {
+            if (Memory.players[playerName]) continue
+
+            playerManager.initPlayer(playerName)
+        }
+    }
+    /**
      * Construct Memory if it isn't constructed yet
      */
     private configMemory() {
         if (Memory.breakingVersion) return
 
-        Memory.breakingVersion = settings.breakingVersion
-
+        Memory.breakingVersion = global.settings.breakingVersion
         Memory.me =
             (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
             'username'
-
-        // Settings
-
-        Memory.roomVisuals = settings.roomVisuals
-        Memory.baseVisuals = settings.baseVisuals
-        Memory.dataVisuals = settings.dataVisuals
-        Memory.mapVisuals = settings.mapVisuals
-        Memory.errorExporting = settings.errorExporting
-        Memory.CPULogging = Game.shard.name === 'performanceServer' ? true : settings.CPULogging
-        Memory.roomStats = Game.shard.name === 'performanceServer' ? 2 : settings.roomStats
-        Memory.allyPlayers = settings.allyPlayers
-        Memory.nonAggressionPlayers = settings.nonAggressionPlayers
-        Memory.pixelSelling = settings.pixelSelling
-        Memory.pixelGeneration = settings.pixelGeneration
-        Memory.tradeBlacklist = settings.tradeBlacklist
-        Memory.autoClaim = settings.autoClaim
-        Memory.autoAttack = settings.autoAttack
-        Memory.publicRamparts = settings.publicRamparts
-        Memory.allyTrading = settings.allyTrading
-        Memory.marketUsage = settings.marketUsage
-        Memory.logging =
-            Game.shard.name !== 'performanceServer'
-                ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
-                : false
-        Memory.creepSay = settings.creepSay
-        Memory.creepChant = settings.creepChant
-        Memory.simpleAlliesSegment = settings.simpleAlliesSegment
-        Memory.structureMigration = settings.structureMigration
 
         // Construct foundation
 

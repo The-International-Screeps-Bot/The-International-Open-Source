@@ -102,7 +102,7 @@ export class RemoteDismantler extends Creep {
         if (
             this.room.controller &&
             this.room.controller.owner &&
-            Memory.allyPlayers.includes(this.room.controller.owner.username)
+            global.settings.allies.includes(this.room.controller.owner.username)
         )
             return true
 

@@ -1,6 +1,5 @@
 import { packCoord } from 'other/codec'
 import { collectiveManager } from './collective'
-import { settings } from './settings'
 
 export type PlayerRelationship = 'ally' | 'enemy'
 
@@ -481,7 +480,7 @@ export enum TrafficPriorities {
     antifaRangedAttacker,
 }
 
-export const version = `v2.${settings.breakingVersion}.0`
+export const version = `v2.${global.settings.breakingVersion}.0`
 
 // Set of messages to randomly apply to commune rooms
 

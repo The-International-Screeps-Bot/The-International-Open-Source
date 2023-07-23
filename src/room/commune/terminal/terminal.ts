@@ -112,14 +112,14 @@ export class TerminalManager {
 
         // The market is disabled by us or the server
 
-        if (!Memory.marketUsage) return
+        if (!global.settings.marketUsage) return
         if (!collectiveManager.marketIsFunctional) return
 
         this.manageResources()
     }
     /*
     private createAllyRequests() {
-        if (!Memory.allyTrading) return
+        if (!global.settings.allyTrading) return
 
         const { room } = this.communeManager
         const { terminal } = room
@@ -272,7 +272,7 @@ export class TerminalManager {
     }
 
     private respondToAllyRequests() {
-        if (!Memory.allyTrading) return Result.noAction
+        if (!global.settings.allyTrading) return Result.noAction
 
         // We don't have enough energy to help other rooms
 

@@ -198,7 +198,6 @@ export class Quad {
             const kiteResult = this.rangedKite()
             if (kiteResult === Result.action) return true
             if (kiteResult === Result.success) {
-
                 this.advancedTransform()
             }
 
@@ -559,7 +558,7 @@ export class Quad {
         if (!controller) return false
         if (!controller.owner) return false
         if (controller.owner.username === Memory.me) return false
-        if (Memory.allyPlayers.includes(controller.owner.username)) return false
+        if (global.settings.allies.includes(controller.owner.username)) return false
         if (!this.leader.room.roomManager.structures.tower.length) return false
 
         return true
@@ -693,7 +692,7 @@ export class Quad {
             this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -728,7 +727,7 @@ export class Quad {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyCreeps)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -853,7 +852,7 @@ export class Quad {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,

@@ -414,7 +414,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                     // If the rampart is public and owned by an ally
                     // We don't want to try to walk through enemy public ramparts as it could trick our pathing
 
-                    if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username))
+                    if (rampart.isPublic && global.settings.allies.includes(rampart.owner.username))
                         continue
 
                     // Otherwise set the rampart's pos as impassible

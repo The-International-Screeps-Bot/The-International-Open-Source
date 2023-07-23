@@ -30,7 +30,7 @@ export class RoomVisualsManager {
         const { room } = this.roomManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.roomVisuals()
         this.baseVisuals()
@@ -38,7 +38,7 @@ export class RoomVisualsManager {
 
         // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Room Visuals Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -52,7 +52,7 @@ export class RoomVisualsManager {
     private roomVisuals() {
         // Stop if roomVisuals are disabled
 
-        if (!Memory.roomVisuals) return
+        if (!global.settings.roomVisuals) return
 
         this.controllerVisuals()
         this.spawnVisuals()
@@ -113,7 +113,7 @@ export class RoomVisualsManager {
                 }
 
                 if (
-                    Memory.allyPlayers.includes(
+                    global.settings.allies.includes(
                         this.roomManager.room.controller.reservation.username,
                     )
                 ) {
@@ -203,7 +203,7 @@ export class RoomVisualsManager {
     }
 
     private baseVisuals() {
-        if (!Memory.baseVisuals) return
+        if (!global.settings.baseVisuals) return
 
         const roomMemory = Memory.rooms[this.roomManager.room.name]
         if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return
@@ -213,7 +213,7 @@ export class RoomVisualsManager {
     }
 
     private dataVisuals() {
-        if (!Memory.dataVisuals) return
+        if (!global.settings.dataVisuals) return
 
         if (!global.communes.has(this.roomManager.room.name)) return
 

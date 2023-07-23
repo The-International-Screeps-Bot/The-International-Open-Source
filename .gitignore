@@ -1,8 +1,7 @@
 # non-public features
 
 collectivizer.ts
-collaborator.ts
-collaborator.js
+# settings.ts
 
 # wasm output directories
 wasm/target

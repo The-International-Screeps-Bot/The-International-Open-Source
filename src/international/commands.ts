@@ -1,5 +1,4 @@
 import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys } from './constants'
-import { Settings, settings } from './settings'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
 
@@ -14,12 +13,10 @@ global.CG = global.clearGlobal
  * Delete properties in Memory
  * @param includeSettings Skip settings deletion unless specified
  */
-global.clearMemory = function (includeSettings: boolean = true) {
+global.clearMemory = function () {
     // Clear all properties in memory
 
     for (const key in Memory) {
-        if (!includeSettings && settings[key as keyof Settings] !== undefined) continue
-
         delete Memory[key as keyof typeof Memory]
     }
 

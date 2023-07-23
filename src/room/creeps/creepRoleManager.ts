@@ -24,19 +24,25 @@ export class CreepRoleManager {
         const { room } = this.roomManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         for (const role of creepRoles) this.runManager(role)
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            const cpuUsed2 = this.roomManager.room.myCreepsAmount ? cpuUsed / this.roomManager.room.myCreepsAmount : 0
-            customLog('Role Manager', `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`, {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
+            const cpuUsed2 = this.roomManager.room.myCreepsAmount
+                ? cpuUsed / this.roomManager.room.myCreepsAmount
+                : 0
+            customLog(
+                'Role Manager',
+                `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`,
+                {
+                    textColor: customColors.white,
+                    bgColor: customColors.lightBlue,
+                },
+            )
             const statName: RoomCommuneStatNames = 'rolmcu'
             const statName2: RoomCommuneStatNames = 'rolmpccu'
             updateStat(room.name, statName, cpuUsed)
@@ -59,10 +65,11 @@ export class CreepRoleManager {
 
         customLog(
             `${role}s`,
-            `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(2)}, CPU Per Creep: ${(
-                (Game.cpu.getUsed() - roleCPUStart) /
-                creepsOfRoleAmount
-            ).toFixed(2)}`,
+            `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(
+                2,
+            )}, CPU Per Creep: ${((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(
+                2,
+            )}`,
             {
                 superPosition: 3,
             },

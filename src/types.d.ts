@@ -21,12 +21,9 @@ import {
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
-import { Settings } from 'international/settings'
+import { Settings } from 'international/settingsDefault'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { BasePlans } from 'room/construction/basePlans'
-
-
-
 
 declare global {
     interface ProfilerMemory {
@@ -791,7 +788,8 @@ declare global {
         lastSeen: number
     }
 
-    interface Memory extends Settings {
+    interface Memory {
+        breakingVersion: number
         /**
          * The name of the user
          */
@@ -2264,6 +2262,8 @@ declare global {
              */
             logs: string
 
+            settings: Settings
+
             /**
              * The number of construction sites placed by the bot
              */
@@ -2302,7 +2302,7 @@ declare global {
             /**
              * Deletes all properties of Memory
              */
-            clearMemory(includeSettings?: boolean): string
+            clearMemory(): string
 
             /**
              * Kills all creeps owned by the bot

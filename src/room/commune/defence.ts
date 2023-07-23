@@ -37,10 +37,9 @@ export class DefenceManager {
     run() {
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         if (!this.communeManager.room.enemyCreeps.length) {
-
             this.considerRampartsPublic()
             return
         }
@@ -58,7 +57,7 @@ export class DefenceManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Defense Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -151,8 +150,7 @@ export class DefenceManager {
     }
 
     private considerRampartsPublic() {
-
-        if (!Memory.publicRamparts) return
+        if (!global.settings.publicRamparts) return
 
         const { room } = this.communeManager
 
@@ -178,9 +176,7 @@ export class DefenceManager {
     }
 
     private makeRampartsPrivate() {
-
         for (const rampart of this.communeManager.room.roomManager.structures.rampart) {
-
             if (rampart.isPublic) rampart.setPublic(false)
         }
     }
@@ -275,7 +271,7 @@ export class DefenceManager {
             [CombatRequestKeys.inactionTimerMax]: onlyInvader ? 1 : undefined,
         })
 
-        if (Memory.allyPlayers) {
+        if (global.settings.allies) {
             allyRequestManager.requestDefense(room.name, minDamage, minMeleeHeal, minRangedHeal, 1)
         }
     }

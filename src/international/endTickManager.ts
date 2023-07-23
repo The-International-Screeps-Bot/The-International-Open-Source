@@ -12,7 +12,7 @@ class EndTickManager {
         allyRequestManager.endRun()
         statsManager.internationalEndTick()
 
-        if (!Memory.logging) return
+        if (!global.settings.logging) return
 
         // Fill up the console with empty logs
         for (let i = 0; i < 99; i += 1) console.log()

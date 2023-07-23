@@ -18,7 +18,7 @@ const CPUUsers: CpuUsers = {
 }
 
 function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
-    const roomStatsLevel = Memory.roomStats
+    const roomStatsLevel = global.settings.roomStats
     switch (statName) {
         case RoomStatNamesEnum.SpawnUsagePercentage:
         case RoomStatNamesEnum.EnergyInputHarvest:
@@ -69,7 +69,7 @@ function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
         case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
         case RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage:
         case RoomStatNamesEnum.RemoteRoomCPUUsage:
-            if (Memory.CPULogging === true) return 3
+            if (global.settings.CPULogging === true) return 3
             else return 0
         default:
             return 0
@@ -171,7 +171,7 @@ export class StatsManager {
             [RoomStatNamesEnum.ConstructionManagerCPUUsage]: 0,
             [RoomStatNamesEnum.EndTickCreepManagerCPUUsage]: 0,
         }
-        const roomStats = Memory.roomStats
+        const roomStats = global.settings.roomStats
         let stats = undefined
         if (roomType === RoomTypes.commune) {
             switch (roomStats) {
@@ -186,7 +186,7 @@ export class StatsManager {
                     break
             }
 
-            if (Memory.CPULogging === true) {
+            if (global.settings.CPULogging === true) {
                 stats = {
                     ...stats,
                     ...communeLevel3,
@@ -212,7 +212,7 @@ export class StatsManager {
                 break
         }
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             stats = {
                 ...stats,
                 ...remoteLevel3,
@@ -267,7 +267,7 @@ export class StatsManager {
                         remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild]
 
                     // CPU
-                    if (Memory.CPULogging === true) {
+                    if (global.settings.CPULogging === true) {
                         globalCommuneStats[RoomStatNamesEnum.RemoteRoomCPUUsage] +=
                             remoteRoomStats[RoomStatNamesEnum.RemoteRoomCPUUsage]
                         globalCommuneStats[RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage] +=
@@ -367,12 +367,15 @@ export class StatsManager {
                         break
                     // level 2 w average
                     case 2:
-                        if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
+                        if (
+                            forceUpdate ||
+                            (global.settings.roomStats && global.settings.roomStats >= 2)
+                        )
                             roomStats[name] = this.average(value, globalValue)
                         else roomStats[name] = 0
                         break
                     case 3:
-                        if (forceUpdate || Memory.CPULogging === true) {
+                        if (forceUpdate || global.settings.CPULogging === true) {
                             roomStats[name] = this.average(value, globalValue)
                         } else roomStats[name] = 0
                         break
@@ -485,7 +488,7 @@ export class StatsManager {
         })
         delete global.roomStats
 
-        if (Memory.CPULogging === true && Memory.stats.CPUUsers !== undefined) {
+        if (global.settings.CPULogging === true && Memory.stats.CPUUsers !== undefined) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             const CPUUsers = Memory.stats.CPUUsers
             Memory.stats.CPUUsers = {

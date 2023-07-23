@@ -16,7 +16,7 @@ import { updateStat } from './statsManager'
  */
 class MapVisualsManager {
     run() {
-        if (!Memory.mapVisuals) return
+        if (!global.settings.mapVisuals) return
 
         for (const roomName in Memory.rooms) {
             const roomMemory = Memory.rooms[roomName]

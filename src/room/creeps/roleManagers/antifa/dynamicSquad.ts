@@ -186,7 +186,7 @@ export class DynamicSquad {
             creep.message = 'EC'
 
             const enemyCreep = findClosestObject(creep.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 creep.room.visual.line(creep.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -219,7 +219,7 @@ export class DynamicSquad {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(creep.pos, enemyAttackers)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             creep.room.visual.line(creep.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -296,7 +296,7 @@ export class DynamicSquad {
         if (!structures.length) return false
 
         let structure = findClosestObject(creep.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             creep.room.visual.line(creep.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -348,7 +348,7 @@ export class DynamicSquad {
         if (!structures.length) return false
 
         let structure = findClosestObject(creep.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             creep.room.visual.line(creep.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,

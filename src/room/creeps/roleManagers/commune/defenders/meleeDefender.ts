@@ -40,8 +40,15 @@ export class MeleeDefender extends Creep {
 
             const targetDamage = room.defenderEnemyTargetsWithDamage.get(enemyCreep.id)
             if (!targetDamage) {
-                room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, enemyCreep.netTowerDamage + estimatedDamage)
-            } else room.defenderEnemyTargetsWithDamage.set(enemyCreep.id, targetDamage + estimatedDamage)
+                room.defenderEnemyTargetsWithDamage.set(
+                    enemyCreep.id,
+                    enemyCreep.netTowerDamage + estimatedDamage,
+                )
+            } else
+                room.defenderEnemyTargetsWithDamage.set(
+                    enemyCreep.id,
+                    targetDamage + estimatedDamage,
+                )
 
             //
 
@@ -98,7 +105,7 @@ export class MeleeDefender extends Creep {
             findClosestObject(this.pos, enemyCreeps) ||
             findClosestObject(this.pos, this.room.enemyCreeps)
 
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, enemyCreep.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -193,7 +200,7 @@ export class MeleeDefender extends Creep {
 
         // Visualize the targeting, if roomVisuals are enabled
 
-        if (Memory.roomVisuals) {
+        if (global.settings.roomVisuals) {
             /*
             for (const rampart of ramparts)
                 room.visual.text(

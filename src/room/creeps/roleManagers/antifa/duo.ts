@@ -179,7 +179,7 @@ export class Duo {
             this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -221,7 +221,7 @@ export class Duo {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -307,7 +307,7 @@ export class Duo {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -373,7 +373,7 @@ export class Duo {
             this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -409,7 +409,7 @@ export class Duo {
         }
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -452,7 +452,7 @@ export class Duo {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -503,7 +503,7 @@ export class Duo {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, structure.pos, {
                 color: customColors.green,
                 opacity: 0.3,

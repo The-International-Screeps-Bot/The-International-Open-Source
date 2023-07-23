@@ -47,12 +47,14 @@ const reverseReactions: {
     XZHO2: ['X', 'ZHO2'],
 }
 
-const allCompounds: (MineralConstant | MineralCompoundConstant)[] = [...Object.keys(reverseReactions), ...minerals] as (
-    | MineralConstant
-    | MineralCompoundConstant
-)[]
+const allCompounds: (MineralConstant | MineralCompoundConstant)[] = [
+    ...Object.keys(reverseReactions),
+    ...minerals,
+] as (MineralConstant | MineralCompoundConstant)[]
 
-function decompose(compound: MineralConstant | MineralCompoundConstant): (MineralConstant | MineralCompoundConstant)[] {
+function decompose(
+    compound: MineralConstant | MineralCompoundConstant,
+): (MineralConstant | MineralCompoundConstant)[] {
     return reverseReactions[compound as MineralCompoundConstant]
 }
 
@@ -170,7 +172,8 @@ export class LabManager {
 
         // We need a storage or terminal
 
-        const storingStructure = this.communeManager.room.terminal || this.communeManager.room.storage
+        const storingStructure =
+            this.communeManager.room.terminal || this.communeManager.room.storage
         if (!storingStructure) return this._inputLabs
 
         // Try to use cached lab IDs if valid
@@ -200,7 +203,8 @@ export class LabManager {
 
             // Tzhe lab isn't in range of all labs
 
-            if (labs.filter(otherLab => getRange(lab.pos, otherLab.pos) <= 2).length < labs.length) continue
+            if (labs.filter(otherLab => getRange(lab.pos, otherLab.pos) <= 2).length < labs.length)
+                continue
 
             // Make the lab an input
 
@@ -261,7 +265,10 @@ export class LabManager {
         //See if the lab is ready to boost...
         if (lab.mineralType != boost) return false
 
-        if (lab.mineralAmount < LAB_BOOST_MINERAL || lab.store.getUsedCapacity(RESOURCE_ENERGY) < LAB_BOOST_ENERGY)
+        if (
+            lab.mineralAmount < LAB_BOOST_MINERAL ||
+            lab.store.getUsedCapacity(RESOURCE_ENERGY) < LAB_BOOST_ENERGY
+        )
             return false
 
         //This needs to see if the lab is fully ready to boost the creep.  This will work
@@ -329,7 +336,7 @@ export class LabManager {
         if (this.inputLabs.length < 2) return
         if (!this.outputLabs.length) return
 
-        if (Memory.roomVisuals) {
+        if (global.settings.roomVisuals) {
             this.communeManager.room.visual.resource(
                 this.inputResources[0],
                 this.inputLabs[0].pos.x,
@@ -404,11 +411,19 @@ export class LabManager {
                     lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
                 )
 
-                if (freelabs.length == 0 && this.inputLabIDs[1] && !boostingLabs.includes(this.inputLabIDs[1])) {
+                if (
+                    freelabs.length == 0 &&
+                    this.inputLabIDs[1] &&
+                    !boostingLabs.includes(this.inputLabIDs[1])
+                ) {
                     freelabs = [this.inputLab1]
                 }
 
-                if (freelabs.length == 0 && this.inputLabIDs[1] && !boostingLabs.includes(this.inputLabIDs[1])) {
+                if (
+                    freelabs.length == 0 &&
+                    this.inputLabIDs[1] &&
+                    !boostingLabs.includes(this.inputLabIDs[1])
+                ) {
                     freelabs = [this.inputLab2]
                 }
 
@@ -430,8 +445,13 @@ export class LabManager {
         if (this.isReverse) {
             return this.resourceAmount(this.outputResource) - this.targetAmount
         } else {
-            let minMaterial = _.min(_.map(decompose(this.outputResource), comp => this.resourceAmount(comp)))
-            return Math.min(minMaterial, this.targetAmount - this.resourceAmount(this.outputResource))
+            let minMaterial = _.min(
+                _.map(decompose(this.outputResource), comp => this.resourceAmount(comp)),
+            )
+            return Math.min(
+                minMaterial,
+                this.targetAmount - this.resourceAmount(this.outputResource),
+            )
         }
     }
 
@@ -470,7 +490,10 @@ export class LabManager {
             )
         }
         for (const compound in this.targetCompounds) {
-            var amount = Math.max(0, this.targetCompounds[compound as MineralConstant | MineralCompoundConstant]) // this.communeManager.roomai.trading.maxStorageAmount(compound))
+            var amount = Math.max(
+                0,
+                this.targetCompounds[compound as MineralConstant | MineralCompoundConstant],
+            ) // this.communeManager.roomai.trading.maxStorageAmount(compound))
             /* console.log('updateDeficits ' + this.communeManager.room.name + ': ' + compound + ', ' + amount) */
             this.chainDecompose(compound as MineralConstant | MineralCompoundConstant, amount)
         }
@@ -485,7 +508,11 @@ export class LabManager {
     /**
      * Assigns input resources based on the output, alongside reaction settings
      */
-    private assignReaction(outputResource: MineralCompoundConstant, targetAmount: number, reverse: boolean) {
+    private assignReaction(
+        outputResource: MineralCompoundConstant,
+        targetAmount: number,
+        reverse: boolean,
+    ) {
         this.outputResource = outputResource
 
         this.inputResources[0] = reverseReactions[outputResource][0]
@@ -519,7 +546,8 @@ export class LabManager {
         if (nextReaction) {
             this.assignReaction(
                 nextReaction.type,
-                this.resourceAmount(nextReaction.type) + Math.min(reactionCycleAmount, nextReaction.amount),
+                this.resourceAmount(nextReaction.type) +
+                    Math.min(reactionCycleAmount, nextReaction.amount),
                 false,
             )
 
@@ -541,7 +569,10 @@ export class LabManager {
             return false
         }
 
-        if (_.any(decompose(this.outputResource), r => this.resourceAmount(r) < LAB_REACTION_AMOUNT)) return true
+        if (
+            _.any(decompose(this.outputResource), r => this.resourceAmount(r) < LAB_REACTION_AMOUNT)
+        )
+            return true
         return this.resourceAmount(this.outputResource) >= this.targetAmount
     }
 
@@ -556,7 +587,8 @@ export class LabManager {
 
         console.log(target + ':' + targetAmount + ' missing: ' + JSON.stringify(missing))
 
-        if (!missing.length) return { type: target as MineralCompoundConstant, amount: targetAmount }
+        if (!missing.length)
+            return { type: target as MineralCompoundConstant, amount: targetAmount }
 
         // filter uncookable resources (e.g. H). Can't get those using reactions
 
@@ -564,7 +596,10 @@ export class LabManager {
         missing = missing.filter(r => decompose(r))
 
         for (const resource of missing) {
-            const result = this.chainFindNextReaction(resource, targetAmount - this.resourceAmount(resource))
+            const result = this.chainFindNextReaction(
+                resource,
+                targetAmount - this.resourceAmount(resource),
+            )
             if (result) return result
         }
 
@@ -625,7 +660,10 @@ export class LabManager {
             if (this.outputResource && (!lab.mineralType || lab.mineralType === resourceType)) {
                 // We have enough
 
-                if (lab.mineralType && lab.reserveStore[lab.mineralType] > lab.store.getCapacity(lab.mineralType) * 0.5)
+                if (
+                    lab.mineralType &&
+                    lab.reserveStore[lab.mineralType] > lab.store.getCapacity(lab.mineralType) * 0.5
+                )
                     continue
 
                 // Ask for more
@@ -636,7 +674,11 @@ export class LabManager {
                     type: 'transfer',
                     priority:
                         50 +
-                        scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20),
+                        scalePriority(
+                            lab.store.getCapacity(lab.mineralType),
+                            lab.reserveStore[lab.mineralType],
+                            20,
+                        ),
                 })
                 continue
             }
@@ -649,7 +691,12 @@ export class LabManager {
                 type: 'withdraw',
                 priority:
                     20 +
-                    scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
+                    scalePriority(
+                        lab.store.getCapacity(lab.mineralType),
+                        lab.reserveStore[lab.mineralType],
+                        20,
+                        true,
+                    ),
             })
         }
     }
@@ -667,7 +714,8 @@ export class LabManager {
 
                 if (
                     lab.mineralType &&
-                    lab.reserveStore[lab.mineralType] < lab.store.getCapacity(lab.mineralType) * 0.25
+                    lab.reserveStore[lab.mineralType] <
+                        lab.store.getCapacity(lab.mineralType) * 0.25
                 )
                     continue
 
@@ -697,7 +745,12 @@ export class LabManager {
                 type: 'withdraw',
                 priority:
                     20 +
-                    scalePriority(lab.store.getCapacity(lab.mineralType), lab.reserveStore[lab.mineralType], 20, true),
+                    scalePriority(
+                        lab.store.getCapacity(lab.mineralType),
+                        lab.reserveStore[lab.mineralType],
+                        20,
+                        true,
+                    ),
             })
         }
     }

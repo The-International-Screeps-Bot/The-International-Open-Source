@@ -62,16 +62,16 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { userScriptManager } from 'other/userScript/userScript'
 
 // TextEncoder/Decoder polyfill for UTF-8 conversion
-import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js';
+import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js'
 
+/*
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 let wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'));
 let wasm = initSync(wasm_module);
 wasm.log_setup();
-
+ */
 function originalLoop() {
     profiler.wrap((): void => {
-
         if (Game.cpu.bucket < CPUMaxPerTick) {
             outOfBucket()
             return
@@ -79,13 +79,13 @@ function originalLoop() {
 
         memHack.run()
 
-        wasm.wasm_function()
+        /* wasm.wasm_function() */
 
         collectiveManager.update()
 
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         // Run prototypes
 
@@ -110,7 +110,7 @@ function originalLoop() {
         constructionSiteManager.run()
         collectiveManager.orderManager()
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('International Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -139,7 +139,7 @@ function outOfBucket() {
         bgColor: customColors.red,
     })
     console.log(
-        Memory.logging
+        global.settings.logging
             ? global.logs
             : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
     )

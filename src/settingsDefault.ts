@@ -1,7 +1,7 @@
 export interface Settings {
     /**
-     * The current breaking version of the bot
-     * Increment by 1 when a change has been made that will break previous versions of the bot
+     * The current breaking version of the bot.
+     * Increment to induce migrations which can be controlled with the migration manager
      */
     breakingVersion: number | undefined
     /**
@@ -37,7 +37,7 @@ export interface Settings {
     /**
      * A list of usernames to treat as allies
      */
-    allyPlayers: string[]
+    allies: string[]
 
     /**
      * A list of usernames to treat as neutral
@@ -113,20 +113,18 @@ export interface Settings {
     structureMigration: boolean
 }
 
-export const settings: Settings = {
-    // Increment to induce migrations which can be controlled with the migration manager
-
+/**
+ * Default global.settings. DO NOT MODIFY. Instead, include your preferences in global.settings.ts
+ */
+export const defaultSettings: Settings = {
     breakingVersion: 109,
-
-    // Default values, do not change. Instead modify clones in memory
-
     roomVisuals: false,
     baseVisuals: false,
     dataVisuals: false,
     mapVisuals: false,
-    CPULogging: false,
+    CPULogging: Game.shard.name === 'performanceServer' ? true : false,
     roomStats: 2,
-    allyPlayers: [
+    allies: [
         'MarvinTMB',
         'PandaMaster',
         'lokenwow',
@@ -147,7 +145,10 @@ export const settings: Settings = {
     publicRamparts: false,
     allyTrading: true,
     marketUsage: true,
-    logging: false,
+    logging:
+        Game.shard.name !== 'performanceServer'
+            ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
+            : false,
     creepSay: true,
     creepChant: true,
     simpleAlliesSegment: 90,

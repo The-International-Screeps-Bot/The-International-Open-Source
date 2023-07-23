@@ -25,7 +25,7 @@ export class EndTickCreepManager {
 
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         if (
             Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune &&
@@ -49,7 +49,7 @@ export class EndTickCreepManager {
                     creep.moved = creep.moveRequest
                     delete room.moveRequests[creep.moveRequest]
 
-                    if (Memory.roomVisuals) {
+                    if (global.settings.roomVisuals) {
                         const moved = unpackCoord(creep.moved)
 
                         room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
@@ -66,7 +66,7 @@ export class EndTickCreepManager {
                 const creepAtPos = Game.creeps[creepNameAtPos] || Game.powerCreeps[creepNameAtPos]
                 const packedCoord = packCoord(creep.pos)
 
-                if (Memory.roomVisuals) {
+                if (global.settings.roomVisuals) {
                     const moved = unpackCoord(creep.moveRequest)
 
                     room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
@@ -96,7 +96,7 @@ export class EndTickCreepManager {
                 creep.endRun()
                 creep.recurseMoveRequest()
 
-                if (Memory.creepSay && creep.message.length) creep.say(creep.message)
+                if (global.settings.creepSay && creep.message.length) creep.say(creep.message)
             }
         }
 
@@ -109,7 +109,7 @@ export class EndTickCreepManager {
                 creep.endRun()
                 creep.recurseMoveRequest()
 
-                if (Memory.creepSay && creep.message.length) creep.say(creep.message)
+                if (global.settings.creepSay && creep.message.length) creep.say(creep.message)
             }
         }
 
@@ -117,7 +117,7 @@ export class EndTickCreepManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging === true) {
+        if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('End Tick Creep Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -132,7 +132,7 @@ export class EndTickCreepManager {
      * If enabled and there is a chant this tick, have a random creeps that isn't on an exit say the chant
      */
     private runChant() {
-        if (!Memory.creepChant) return
+        if (!global.settings.creepChant) return
 
         const currentChant = chant[Memory.chantIndex]
         if (!currentChant) return
@@ -166,7 +166,7 @@ export class EndTickCreepManager {
                 let chant: string
                 if (
                     tombstone.creep.owner.username === Memory.me ||
-                    Memory.allyPlayers.includes(tombstone.creep.owner.username)
+                    global.settings.allies.includes(tombstone.creep.owner.username)
                 ) {
                     chant = randomOf(friendlyDieChants)
                 } else {

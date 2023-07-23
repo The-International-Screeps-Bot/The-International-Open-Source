@@ -159,7 +159,7 @@ export class CollectiveManager {
      * Find the highest order and sell pixels to it
      */
     advancedSellPixels() {
-        if (!Memory.pixelSelling) return
+        if (!global.settings.pixelSelling) return
 
         if (Game.resources[PIXEL] === 0) return
 
@@ -218,7 +218,7 @@ export class CollectiveManager {
     }
 
     advancedGeneratePixel() {
-        if (!Memory.pixelGeneration) return
+        if (!global.settings.pixelGeneration) return
 
         // Stop if the bot is not running on MMO
 

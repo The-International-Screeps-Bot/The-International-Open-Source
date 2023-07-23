@@ -1166,7 +1166,7 @@ Creep.prototype.passiveHeal = function () {
 
             // If the creep is not owned and isn't an ally
 
-            if (!posData.creep.my && !Memory.allyPlayers.includes(posData.creep.owner.username))
+            if (!posData.creep.my && !global.settings.allies.includes(posData.creep.owner.username))
                 continue
 
             // If the creep is at full health, iterate
@@ -1201,7 +1201,7 @@ Creep.prototype.passiveHeal = function () {
 
         // If the creep is not owned and isn't an ally
 
-        if (!posData.creep.my && !Memory.allyPlayers.includes(posData.creep.owner.username))
+        if (!posData.creep.my && !global.settings.allies.includes(posData.creep.owner.username))
             continue
 
         // If the creep is at full health, iterate

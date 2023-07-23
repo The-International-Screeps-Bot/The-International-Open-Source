@@ -30,14 +30,11 @@ export class TowerManager {
         const { room } = this.communeManager
         // If CPU logging is enabled, get the CPU used at the start
 
-        if (Memory.CPULogging) var managerCPUStart = Game.cpu.getUsed()
+        if (global.settings.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
-        const towers = room.roomManager.structures.tower.filter(
-            tower => tower.RCLActionable,
-        )
+        const towers = room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
-            room.towerInferiority =
-                room.enemyCreeps.length > 0
+            room.towerInferiority = room.enemyCreeps.length > 0
             return
         }
 
@@ -50,7 +47,6 @@ export class TowerManager {
         }
 
         if (randomTick()) {
-
             delete this._towerRampartRepairThreshold
         }
 
@@ -63,7 +59,7 @@ export class TowerManager {
 
         // If CPU logging is enabled, log the CPU used by this manager
 
-        if (Memory.CPULogging) {
+        if (global.settings.CPULogging) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
             customLog('Tower Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
@@ -74,19 +70,14 @@ export class TowerManager {
         }
     }
 
-    private trackEnemySquads() {
-
-
-    }
+    private trackEnemySquads() {}
 
     private findAttackTarget() {
         const { room } = this.communeManager
         const enemyCreeps = room.enemyCreeps
 
         if (!this.communeManager.towerAttackTarget) {
-
-            const [score, target] = findWithHighestScore(enemyCreeps, (enemyCreep) => {
-
+            const [score, target] = findWithHighestScore(enemyCreeps, enemyCreep => {
                 const damage = enemyCreep.netTowerDamage
 
                 if (enemyCreep.owner.username === 'Invader') {
@@ -102,7 +93,10 @@ export class TowerManager {
                         playerManager.initPlayer(enemyCreep.owner.username)
                     const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
-                    if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits) {
+                    if (
+                        findWeightedRangeFromExit(enemyCreep.pos, weight) * damage <
+                        enemyCreep.hits
+                    ) {
                         if (room.towerInferiority) return false
                         room.towerInferiority = true
                         this.createPowerTasks()
@@ -227,17 +221,18 @@ export class TowerManager {
     }
 
     private findRampartRepairTarget() {
-
         const { room } = this.communeManager
         const ramparts = room.enemyAttackers.length
-        ? room.communeManager.defensiveRamparts
-        : room.communeManager.rampartRepairTargets
+            ? room.communeManager.defensiveRamparts
+            : room.communeManager.rampartRepairTargets
 
-        const [score, rampart] = findWithLowestScore(ramparts, (rampart) => {
-
+        const [score, rampart] = findWithLowestScore(ramparts, rampart => {
             let score = rampart.hits
             // Account for decay amount: percent of time to decay times decay amount
-            score += Math.floor(RAMPART_DECAY_AMOUNT * (RAMPART_DECAY_TIME - rampart.ticksToDecay / RAMPART_DECAY_TIME))
+            score += Math.floor(
+                RAMPART_DECAY_AMOUNT *
+                    (RAMPART_DECAY_TIME - rampart.ticksToDecay / RAMPART_DECAY_TIME),
+            )
 
             return score
         })
@@ -350,7 +345,7 @@ export class TowerManager {
         // Melee damage includes ranged
         rampartRepairTreshold += enemySquadData.highestMeleeDamage
 
-        return this._towerRampartRepairThreshold = rampartRepairTreshold
+        return (this._towerRampartRepairThreshold = rampartRepairTreshold)
     }
 }
 

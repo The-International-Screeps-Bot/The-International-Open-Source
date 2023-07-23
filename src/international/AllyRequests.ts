@@ -91,27 +91,29 @@ class AllyRequestManager {
     initRun() {
         this.myRequests = []
 
-        if (!Memory.allyTrading) return
-        if (!Memory.allyPlayers.length) return
+        if (!global.settings.allyTrading) return
+        if (!global.settings.allies.length) return
 
-        this.currentAlly = Memory.allyPlayers[Game.time % Memory.allyPlayers.length]
+        this.currentAlly = global.settings.allies[Game.time % global.settings.allies.length]
 
-        const nextAllyName = Memory.allyPlayers[(Game.time + 1) % Memory.allyPlayers.length]
-        RawMemory.setActiveForeignSegment(nextAllyName, Memory.simpleAlliesSegment)
+        const nextAllyName = global.settings.allies[(Game.time + 1) % global.settings.allies.length]
+        RawMemory.setActiveForeignSegment(nextAllyName, global.settings.simpleAlliesSegment)
     }
 
     /**
      * To call after requests have been made, to assign requests to the next ally
      */
     endRun() {
-        if (!Memory.allyTrading) return
+        if (!global.settings.allyTrading) return
 
         // Make sure we don't have too many segments open
         if (Object.keys(RawMemory.segments).length >= 10) return
 
         // Assign myRequests to the public segment
-        RawMemory.segments[Memory.simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
-        RawMemory.setPublicSegments([Memory.simpleAlliesSegment])
+        RawMemory.segments[global.settings.simpleAlliesSegment] = JSON.stringify(
+            this.myRequests || [],
+        )
+        RawMemory.setPublicSegments([global.settings.simpleAlliesSegment])
     }
 
     requestAttack(

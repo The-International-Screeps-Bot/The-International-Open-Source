@@ -164,7 +164,7 @@ interface CustomLogOpts {
  * @param bgColor Colour of the background. Default is white
  */
 export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
-    if (!Memory.logging) return
+    if (!global.settings.logging) return
 
     if (!opts) opts = {}
     if (!opts.textColor) opts.textColor = customColors.black
@@ -930,7 +930,7 @@ export function randomOf<T>(array: T[]): T {
 export function visualizePath(
     path: RoomPosition[],
     color: string = customColors.yellow,
-    visualize: boolean = Memory.roomVisuals,
+    visualize: boolean = global.settings.roomVisuals,
 ) {
     if (!visualize) return
 
@@ -951,7 +951,6 @@ export function visualizePath(
  * Linearly checks if a given player name matches one of our allies
  */
 export function isAlly(playerName: string) {
-
     const playerMemory = Memory.players[playerName]
     if (!playerMemory) return false
 

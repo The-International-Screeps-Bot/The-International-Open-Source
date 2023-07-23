@@ -55,7 +55,7 @@ const roomAdditions = {
 
             if (this.memory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                    filter: creep => !Memory.allyPlayers.includes(creep.owner.username),
+                    filter: creep => !global.settings.allies.includes(creep.owner.username),
                 }))
             }
 
@@ -63,8 +63,8 @@ const roomAdditions = {
 
             return (this._enemyCreeps = this.find(FIND_HOSTILE_CREEPS, {
                 filter: creep =>
-                    !Memory.allyPlayers.includes(creep.owner.username) &&
-                    !Memory.nonAggressionPlayers.includes(creep.owner.username),
+                    !global.settings.allies.includes(creep.owner.username) &&
+                    !global.settings.nonAggressionPlayers.includes(creep.owner.username),
             }))
         },
     },
@@ -96,7 +96,7 @@ const roomAdditions = {
             if (this._allyCreeps) return this._allyCreeps
 
             return (this._allyCreeps = this.find(FIND_HOSTILE_CREEPS, {
-                filter: creep => Memory.allyPlayers.includes(creep.owner.username),
+                filter: creep => global.settings.allies.includes(creep.owner.username),
             }))
         },
     },
@@ -134,7 +134,7 @@ const roomAdditions = {
             if (this._enemyCSites) return this._enemyCSites
 
             return (this._enemyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => !Memory.allyPlayers.includes(cSite.owner.username),
+                filter: cSite => !global.settings.allies.includes(cSite.owner.username),
             }))
         },
     },
@@ -143,7 +143,7 @@ const roomAdditions = {
             if (this._allyCSites) return this._allyCSites
 
             return (this._allyCSites = this.find(FIND_HOSTILE_CONSTRUCTION_SITES, {
-                filter: cSite => Memory.allyPlayers.includes(cSite.owner.username),
+                filter: cSite => global.settings.allies.includes(cSite.owner.username),
             }))
         },
     },
@@ -334,12 +334,12 @@ const roomAdditions = {
 
                 if (
                     this.controller.owner &&
-                    Memory.allyPlayers.includes(this.controller.owner.username)
+                    global.settings.allies.includes(this.controller.owner.username)
                 )
                     return this._combatStructureTargets
                 if (
                     this.controller.reservation &&
-                    Memory.allyPlayers.includes(this.controller.reservation.username)
+                    global.settings.allies.includes(this.controller.reservation.username)
                 )
                     return this._combatStructureTargets
             }
@@ -1372,7 +1372,10 @@ const roomAdditions = {
 
             return (this._unprotectedEnemyCreeps = this.enemyCreeps.filter(enemyCreep => {
                 // Make sure the creep doesn't have a rampart protecting them
-                return !this.findStructureAtCoord(enemyCreep.pos, (structure => structure.structureType === STRUCTURE_RAMPART))
+                return !this.findStructureAtCoord(
+                    enemyCreep.pos,
+                    structure => structure.structureType === STRUCTURE_RAMPART,
+                )
             }))
         },
     },
@@ -1507,7 +1510,7 @@ const roomAdditions = {
                 // If the rampart is public and owned by an ally
                 // We don't want to try to walk through enemy public ramparts as it could trick our pathing
 
-                if (rampart.isPublic && Memory.allyPlayers.includes(rampart.owner.username))
+                if (rampart.isPublic && global.settings.allies.includes(rampart.owner.username))
                     continue
 
                 // Otherwise set the rampart's pos as impassible
