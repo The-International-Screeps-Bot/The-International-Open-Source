@@ -63,12 +63,12 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js'
 
-/*
+
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 let wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'));
 let wasm = initSync(wasm_module);
 wasm.log_setup();
- */
+
 function originalLoop() {
     profiler.wrap((): void => {
         if (Game.cpu.bucket < CPUMaxPerTick) {
@@ -78,7 +78,7 @@ function originalLoop() {
 
         memHack.run()
 
-        /* wasm.wasm_function() */
+        wasm.wasm_function()
 
         collectiveManager.update()
         if (global.collectivizer) global.collectivizer.run()

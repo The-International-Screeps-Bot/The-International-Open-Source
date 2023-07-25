@@ -25,6 +25,11 @@ export enum PlayerMemoryKeys {
      */
     rangeFromExitWeight,
     relationship,
+    /**
+     * The positive reputation we've determined for the player.
+     * Effects response to ally requests and such
+     */
+    reputation,
 }
 
 export const playerDecayKeys = new Set([

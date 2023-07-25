@@ -2117,6 +2117,7 @@ declare global {
         [PlayerMemoryKeys.lastAttacked]: number
         [PlayerMemoryKeys.rangeFromExitWeight]: number
         [PlayerMemoryKeys.relationship]: PlayerRelationship
+        [PlayerMemoryKeys.reputation]: number
     }
 
     interface WorkRequest {

@@ -66,18 +66,22 @@ class RoomsManager {
 
             // Log room stats
 
-            let logMessage = `Creeps: ${room.myCreepsAmount}`
+            let logMessage = `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreepsAmount}`
 
             if (global.settings.CPULogging === true) {
                 const cpuUsed = Game.cpu.getUsed() - roomCPUStart
                 logMessage += `, CPU: ${cpuUsed.toFixed(2)}`
                 updateStat(roomName, statName, cpuUsed)
             }
-            customLog(room.name + ' ' + roomType, logMessage, {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-                superPosition: 2,
-            })
+            customLog(
+                `<a style="cursor: pointer" href="https://screeps.com/a/#!/${Game.shard.name}/${room.name}">${room.name}</a>`,
+                logMessage,
+                {
+                    textColor: customColors.white,
+                    bgColor: customColors.lightBlue,
+                    superPosition: 2,
+                },
+            )
             if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
                 statsManager.roomEndTick(room.name, roomType)
         }

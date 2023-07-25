@@ -1,6 +1,6 @@
 import typescript from 'rollup-plugin-typescript2'
 import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
+import commonjs from '@rollup/plugin-commonjs';
 import clear from 'rollup-plugin-clear'
 import screeps from 'rollup-plugin-screeps'
 import copy from 'rollup-plugin-copy';
@@ -8,24 +8,27 @@ import { terser } from 'rollup-plugin-terser'
 import yaml from 'yaml'
 import { readFileSync } from 'fs'
 
-let cfg
+let config
 const dest = process.env.DEST
 if (!dest) {
     console.log('No destination specified - code will be compiled but not uploaded')
 } else {
-    cfg = (yaml.parse(readFileSync('.screeps.yaml', { encoding: 'utf8' })).servers || {})[dest]
-    if (cfg == null) throw new Error('Invalid upload destination')
-    cfg.hostname = cfg.host
-    cfg.port = cfg.port || (cfg.secure ? 443 : 21025)
-    cfg.host = `${cfg.host}:${cfg.port}`
-    cfg.email = cfg.username
-    cfg.protocol = cfg.secure ? 'https' : 'http'
-    cfg.path = cfg.path || '/'
-    cfg.branch = cfg.branch || 'auto'
+    config = (yaml.parse(readFileSync('.screeps.yaml', { encoding: 'utf8' })).servers || {})[dest]
+    if (config == null) throw new Error('Invalid upload destination')
+    config.hostname = config.host
+    config.port = config.port || (config.secure ? 443 : 21025)
+    config.host = `${config.host}:${config.port}`
+    config.email = config.username
+    config.protocol = config.secure ? 'https' : 'http'
+    config.path = config.path || '/'
+    config.branch = config.branch || 'auto'
 }
 
-const shouldUglify = cfg && cfg.uglify
-if (cfg) delete cfg.uglify
+const shouldUglify = config && config.uglify
+const ignoreWarningTypes = new Set([
+    'Circular dependency',
+    "Use of eval is strongly discouraged"
+])
 
 export default {
     input: 'src/main.ts',
@@ -48,14 +51,21 @@ export default {
             { src: 'wasm/pkg/commiebot_wasm_bg.wasm', dest: 'dist' }
           ]
         }),
-        commonjs({
-            namedExports: {
-                'src/international/collectivization/collaborator-obfuscated': ['collaborator'],
-            }
-        }),
-        resolve({ rootDir: 'src' }),
+        resolve(),
+        commonjs(),
         shouldUglify && terser(),
         typescript({ tsconfig: './tsconfig.json' }),
-        screeps({ config: cfg, dryRun: cfg == null }),
+        screeps({ config: config, dryRun: !!config }),
     ],
+    /**
+     * Skip over certain blacklisten warnings that we don't need to be concerned about
+     */
+    onwarn: function (warning) {
+
+        // Skip warning types we don't care about
+        if (ignoreWarningTypes.has(warning.toString().split(':')[0])) return
+
+        // warn about everything else
+        console.warn(warning.message)
+    }
 }
