@@ -1,5 +1,8 @@
 // Imports
 
+import './settings'
+import './other/userScript/userScript'
+
 // International
 
 import './international/commands'
@@ -63,12 +66,12 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js'
 
-
+/*
+const wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'))
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
-let wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'));
-let wasm = initSync(wasm_module);
+const wasm = initSync(wasm_module)
 wasm.log_setup();
-
+ */
 function originalLoop() {
     profiler.wrap((): void => {
         if (Game.cpu.bucket < CPUMaxPerTick) {
@@ -78,7 +81,7 @@ function originalLoop() {
 
         memHack.run()
 
-        wasm.wasm_function()
+        /* wasm.wasm_function() */
 
         collectiveManager.update()
         if (global.collectivizer) global.collectivizer.run()
@@ -120,8 +123,6 @@ function originalLoop() {
             const statName: InternationalStatNames = 'imcu'
             updateStat('', statName, cpuUsed, true)
         }
-
-        userScriptManager.run()
 
         roomsManager.run()
 

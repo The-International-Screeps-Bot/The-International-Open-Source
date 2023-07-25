@@ -17,7 +17,9 @@ extern "C" {
 pub fn wasm_function() {
     /* custom_log("Hello", "WASM here", None); */
 	info!("hello from wasm!!");
+    info!("test");
     print!("hi, again from wasm!");
+    warn!("warn");
 }
 
 #[wasm_bindgen]
