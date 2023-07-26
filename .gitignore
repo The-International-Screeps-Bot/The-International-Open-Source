@@ -30,7 +30,6 @@ config.yml
 
 # npm
 node_modules
-package-lock.json
 
 # Other Stuff
 .env
