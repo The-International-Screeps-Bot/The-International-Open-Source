@@ -99,7 +99,6 @@ export class DefenceManager {
         )
 
         if (!nonInvaderAttackers.length) return false
-
         if (!this.isControllerSafe()) return true
 
         // Otherwise if safeMode can be activated

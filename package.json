@@ -25,7 +25,9 @@
         "test-watch": "jest --watch",
         "test-cov": "jest --coverage",
         "test-only": "bash -c 'jest --watch --coverage --verbose --collectCoverageFrom=\"**/*$1*\" $1' -- ",
-        "document": "npx typedoc --entryPointStrategy expand ./src"
+        "release": "semantic-release",
+        "compodoc": "npx @compodoc/compodoc -p tsconfig.json --disableSourceCode --output docs",
+        "compodoc:serve": "npx @compodoc/compodoc -p tsconfig.json --disableSourceCode -s --output docs"
     },
     "repository": {
         "type": "git",
@@ -35,11 +37,16 @@
         "url": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues"
     },
     "author": "",
-    "license": "MIT",
+    "license": "GNU GPLv3",
     "homepage": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source",
     "devDependencies": {
         "@rollup/plugin-commonjs": "^20.0.0",
         "@rollup/plugin-node-resolve": "^13.0.4",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/commit-analyzer": "^9.0.2",
+        "@semantic-release/git": "^10.0.1",
+        "@semantic-release/release-notes-generator": "^11.0.1",
+        "@compodoc/compodoc": "^1.1.19",
         "@types/chai": "^4.3.0",
         "@types/jest": "^27.0.1",
         "@types/lodash": "3.10.2",
@@ -83,6 +90,7 @@
     },
     "dependencies": {
         "base32768": "^3.0.1",
+        "semantic-release": "^21.0.7",
         "source-map": "~0.6.1"
     },
     "screeps_bot": true
