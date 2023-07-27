@@ -28,6 +28,7 @@ import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { collectiveManager } from 'international/collective'
 import { roomUtils } from 'room/roomUtils'
+import { RampartPlans } from 'room/construction/rampartPlans'
 
 export class DefenceManager {
     communeManager: CommuneManager
@@ -100,7 +101,9 @@ export class DefenceManager {
 
         if (!nonInvaderAttackers.length) return false
         if (!this.isControllerSafe()) return true
+        if (!this.isBaseSafe()) return true
 
+/*
         // Otherwise if safeMode can be activated
 
         // Get the previous tick's events
@@ -134,18 +137,56 @@ export class DefenceManager {
             if (safemodeTargets.includes(attackTarget.structureType)) return true
         }
 
-        return false
+        return false */
+    }
+
+    private isBaseSafe() {
+        const { room } = this.communeManager
+        const terrain = Game.map.getRoomTerrain(room.name)
+        const rampartPlans = RampartPlans.unpack(
+            Memory.rooms[room.name][RoomMemoryKeys.rampartPlans],
+        )
+        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], coord => {
+
+            // Ignore terrain that protects us
+            if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
+
+            const planData = rampartPlans.getXY(coord.x, coord.y)
+            if (planData) {
+                // Filter out non-mincut ramparts
+                if (planData.buildForNuke || planData.coversStructure) return true
+                // Don't flood past mincut ramparts
+                return false
+            }
+
+            // See if there is an enemy creep
+            const enemyCreepID = room.roomManager.enemyCreepPositions[packCoord(coord)]
+            if (!enemyCreepID) return true
+
+            const enemyCreep = findObjectWithID(enemyCreepID)
+            if (isAlly(enemyCreep.name)) return true
+            // If it can deal damage, safemode
+            if (
+                enemyCreep.combatStrength.ranged ||
+                enemyCreep.combatStrength.melee ||
+                enemyCreep.combatStrength.dismantle
+            )
+                return 'stop'
+
+            return true
+        })
+
+        // If there is an enemy inside our base, we want to safemode
+        return !enemyCoord
     }
 
     /**
      * Identify claim creeps trying to downgrade the controller, safemode just before
      */
     private isControllerSafe() {
-
         const { room } = this.communeManager
         const terrain = Game.map.getRoomTerrain(room.name)
-        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], (coord) => {
-
+        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], coord => {
             // See if we should even consider the coord
 
             // Ignore terrain that protects us
@@ -166,13 +207,13 @@ export class DefenceManager {
             const enemyCreep = findObjectWithID(enemyCreepID)
             if (isAlly(enemyCreep.name)) return true
             // We only need to protect our controller from claim creeps
-            if (!enemyCreep.parts.claim) return true
+            if (enemyCreep.parts.claim) return 'stop'
 
             // We identified an enemy claimed near our controller!
-            return 'stop'
+            return true
         })
 
-        // If there is an enemy claimer, safemode
+        // If there is an enemy claimer, we want to safemode
         return !enemyCoord
     }
 
