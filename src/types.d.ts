@@ -1110,24 +1110,9 @@ declare global {
         ): CoordMap
 
         /**
-         * Gets ranges from for each position from a certain point
-         */
-        floodFill(seeds: Coord[], coordMap: CoordMap, visuals?: boolean): CoordMap
-
-        /**
          * Flood fills a room until it finds one of a set of positions
          */
         findClosestPos(opts: FindClosestPos): RoomPosition | false
-
-        /**
-         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
-         */
-        findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
-
-        /**
-         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified, that does not infringe on disabled tiles
-         */
-        findClosestPosOfValueAsym(opts: FindClosestPosOfValueOptsAsym): RoomPosition | false
 
         errorVisual(coord: Coord, visualize?: boolean): void
 

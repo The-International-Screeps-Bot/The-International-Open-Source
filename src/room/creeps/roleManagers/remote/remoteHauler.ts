@@ -11,7 +11,7 @@ import {
     customLog,
     findClosestObject,
     findCoordsInsideRect,
-    findFunctionCPU,
+    findCPUOf,
     findObjectWithID,
     getRangeXY,
     getRange,

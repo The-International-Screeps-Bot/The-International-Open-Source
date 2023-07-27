@@ -5,7 +5,7 @@ import {
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
     findClosestObject,
-    findFunctionCPU,
+    findCPUOf,
     findLinkThroughput,
     findObjectWithID,
     forAdjacentCoords,

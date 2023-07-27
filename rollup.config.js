@@ -55,7 +55,7 @@ export default {
         commonjs(),
         shouldUglify && terser(),
         typescript({ tsconfig: './tsconfig.json' }),
-        screeps({ config: config, dryRun: !!config }),
+        screeps({ config: config, dryRun: !config }),
     ],
     /**
      * Skip over certain blacklisten warnings that we don't need to be concerned about

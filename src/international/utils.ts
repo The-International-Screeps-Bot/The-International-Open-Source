@@ -151,7 +151,7 @@ export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
 }
 
 interface CustomLogOpts {
-    superPosition?: number
+    position?: number
     textColor?: string
     bgColor?: string
 }
@@ -175,7 +175,7 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
     global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${
         opts.bgColor
     }; margin-left: ${
-        (opts.superPosition ?? 0) * 8
+        (opts.position ?? 0) * 8
     }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${
         opts.textColor
     };'>${title}:</div>`
@@ -611,12 +611,12 @@ export function randomIntRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min)
 }
 
-export function findFunctionCPU(func: Function) {
+export function findCPUOf(func: Function) {
     const CPU = Game.cpu.getUsed()
 
     func()
 
-    customLog('CPU for ' + func, Game.cpu.getUsed() - CPU)
+    customLog('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
 }
 
 export function isXYExit(x: number, y: number) {

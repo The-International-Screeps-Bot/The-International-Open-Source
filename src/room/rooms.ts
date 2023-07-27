@@ -74,12 +74,12 @@ class RoomsManager {
                 updateStat(roomName, statName, cpuUsed)
             }
             customLog(
-                `<a style="cursor: pointer" href="https://screeps.com/a/#!/${Game.shard.name}/${room.name}">${room.name}</a>`,
+                `<a style="cursor: pointer;color:inherit" href="https://screeps.com/a/#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
                 logMessage,
                 {
                     textColor: customColors.white,
                     bgColor: customColors.lightBlue,
-                    superPosition: 2,
+                    position: 2,
                 },
             )
             if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
@@ -93,7 +93,7 @@ class RoomsManager {
             customLog('Room Manager', cpuUsed.toFixed(2), {
                 textColor: customColors.white,
                 bgColor: customColors.lightBlue,
-                superPosition: 1,
+                position: 1,
             })
             const statName: InternationalStatNames = 'roomcu'
             updateStat('', statName, cpuUsed, true)

@@ -23,6 +23,7 @@ import {
     customLog,
     findCarryPartsRequired,
     findClosestRoomName,
+    findCPUOf,
     randomRange,
     randomTick,
 } from './utils'

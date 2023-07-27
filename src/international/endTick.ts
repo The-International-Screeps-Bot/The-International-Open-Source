@@ -1,5 +1,5 @@
 import { customColors } from 'international/constants'
-import { customLog, findCPUColor, findFunctionCPU } from 'international/utils'
+import { customLog, findCPUColor, findCPUOf } from 'international/utils'
 import { allyRequestManager } from 'international/AllyRequests'
 import { collectiveManager, CollectiveManager } from './collective'
 import { statsManager } from './statsManager'
@@ -14,12 +14,15 @@ class EndTickManager {
 
         if (!global.settings.logging) return
 
+        const interval = 100 / Math.floor(global.settings.logging)
+
         // Fill up the console with empty logs
-        for (let i = 0; i < 99; i += 1) console.log()
+        for (let i = 0; i < interval; i += 1) console.log()
 
         customLog('General data', '⬇️')
-        customLog('Creeps total', Object.values(Game.creeps).length, { superPosition: 1 })
-        customLog('Heap used', global.usedHeap(), { superPosition: 1 })
+        customLog('Creeps total', Object.values(Game.creeps).length, { position: 1 })
+        customLog('Heap used', global.usedHeap(), { position: 1 })
+        customLog('Tick', Game.time, { position: 1 })
 
         // Get the CPU color based on the amount of used CPU
 
@@ -31,7 +34,7 @@ class EndTickManager {
             {
                 textColor: customColors.white,
                 bgColor: CPUColor,
-                superPosition: 1,
+                position: 1,
             },
         )
 

@@ -85,9 +85,9 @@ export interface Settings {
     marketUsage: boolean
 
     /**
-     * Wether or not the bot should be using customLog
+     * The number of ticks to publish customLogs for. 0 disabled logging. Cannot be more than 100
      */
-    logging: boolean
+    logging: number
 
     /**
      * Wether or not creeps should use .say
@@ -145,10 +145,7 @@ export const defaultSettings: Settings = {
     publicRamparts: false,
     allyTrading: true,
     marketUsage: true,
-    logging:
-        Game.shard.name !== 'performanceServer'
-            ? Object.keys(Game.spawns).length > 0 || Game.shard.name.search('shard[0-3]') === -1
-            : false,
+    logging: Game.shard.name === 'performanceServer' ? 0 : 1,
     creepSay: true,
     creepChant: true,
     simpleAlliesSegment: 90,

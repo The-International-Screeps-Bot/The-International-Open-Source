@@ -1,6 +1,12 @@
 import { customColors } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog, findFunctionCPU, findObjectWithID, randomTick, scalePriority } from 'international/utils'
+import {
+    customLog,
+    findCPUOf,
+    findObjectWithID,
+    randomTick,
+    scalePriority,
+} from 'international/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 
@@ -22,7 +28,8 @@ export class StoringStructuresManager {
         if (storage) storingStructures.push(storage)
 
         const terminal = this.communeManager.room.terminal
-        if (terminal && !terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) storingStructures.push(terminal)
+        if (terminal && !terminal.effectsData.get(PWR_DISRUPT_TERMINAL))
+            storingStructures.push(terminal)
 
         for (const structure of storingStructures) {
             this.communeManager.room.createRoomLogisticsRequest({

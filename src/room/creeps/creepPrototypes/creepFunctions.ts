@@ -1481,7 +1481,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
         }
     }
     /*
-    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types), { superPosition: 1 })
+    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types), { position: 1 })
  */
     let creepRequest: CreepRoomLogisticsRequest | 0
 
@@ -1841,7 +1841,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return Result.fail
 
-    /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
+    /* customLog('REQUEST RESPONSE', request.T, { position: 1 }) */
     const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
     this.room.targetVisual(this.pos, target.pos)
     if (getRange(target.pos, this.pos) > 1) {
@@ -1857,7 +1857,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     /*     customLog(
         'DOING REQUEST',
         request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + this.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + this.name,
-        { superPosition: 1 },
+        { position: 1 },
     ) */
     // Pickup type
 
@@ -1953,7 +1953,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     const request = this.memory[CreepMemoryKeys.roomLogisticsRequests][0]
     if (!request) return Result.fail
 
-    /* customLog('REQUEST RESPONSE', request.T, { superPosition: 1 }) */
+    /* customLog('REQUEST RESPONSE', request.T, { position: 1 }) */
     const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
 
     if (getRange(target.pos, this.pos) > 1) {
@@ -1969,7 +1969,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     /*     customLog(
         'DOING REQUEST',
         request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + this.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + this.name,
-        { superPosition: 1 },
+        { position: 1 },
     ) */
     // Pickup type
 

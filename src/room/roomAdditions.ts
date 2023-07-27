@@ -22,7 +22,7 @@ import {
     packAsNum,
     packXYAsNum,
     unpackNumAsPos,
-    findFunctionCPU,
+    findCPUOf,
     areCoordsEqual,
     getRange,
     findHighestScore,

@@ -71,7 +71,7 @@ export class CreepRoleManager {
                 2,
             )}`,
             {
-                superPosition: 3,
+                position: 3,
             },
         )
     }
