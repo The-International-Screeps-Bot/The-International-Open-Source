@@ -2,6 +2,9 @@ import {
     CombatRequestKeys,
     customColors,
     defaultDataDecay,
+    impassibleStructureTypes,
+    impassibleStructureTypesSet,
+    ourImpassibleStructuresSet,
     PlayerMemoryKeys,
     roomDimensions,
     RoomMemoryKeys,
@@ -15,6 +18,7 @@ import {
     findObjectWithID,
     findWeightedRangeFromExit,
     getRange,
+    isAlly,
     isXYInBorder,
     randomIntRange,
     randomRange,
@@ -23,6 +27,7 @@ import {
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { collectiveManager } from 'international/collective'
+import { roomUtils } from 'room/roomUtils'
 
 export class DefenceManager {
     communeManager: CommuneManager
@@ -95,6 +100,8 @@ export class DefenceManager {
 
         if (!nonInvaderAttackers.length) return false
 
+        if (!this.isControllerSafe()) return true
+
         // Otherwise if safeMode can be activated
 
         // Get the previous tick's events
@@ -129,6 +136,45 @@ export class DefenceManager {
         }
 
         return false
+    }
+
+    /**
+     * Identify claim creeps trying to downgrade the controller, safemode just before
+     */
+    private isControllerSafe() {
+
+        const { room } = this.communeManager
+        const terrain = Game.map.getRoomTerrain(room.name)
+        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], (coord) => {
+
+            // See if we should even consider the coord
+
+            // Ignore terrain that protects us
+            if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
+
+            // Don't go out of range 2 from controller
+            if (getRange(room.controller.pos, coord) > 2) return false
+
+            // Ignore structures that protect us
+            if (room.coordHasStructureTypes(coord, ourImpassibleStructuresSet)) return false
+
+            // Past this point we should always add this coord to the next generation
+
+            // See if there is an enemy creep
+            const enemyCreepID = room.roomManager.enemyCreepPositions[packCoord(coord)]
+            if (!enemyCreepID) return true
+
+            const enemyCreep = findObjectWithID(enemyCreepID)
+            if (isAlly(enemyCreep.name)) return true
+            // We only need to protect our controller from claim creeps
+            if (!enemyCreep.parts.claim) return true
+
+            // We identified an enemy claimed near our controller!
+            return 'stop'
+        })
+
+        // If there is an enemy claimer, safemode
+        return !!enemyCoord
     }
 
     private advancedActivateSafeMode() {

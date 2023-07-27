@@ -638,6 +638,12 @@ export const storingStructureTypesSet: Set<StructureConstant> = new Set([
     STRUCTURE_TERMINAL,
 ])
 
+/**
+ * Our structure types that enemies can't walk on
+ */
+export const ourImpassibleStructures = impassibleStructureTypes.concat(STRUCTURE_RAMPART)
+export const ourImpassibleStructuresSet = new Set(ourImpassibleStructures)
+
 export const customColors = {
     white: '#ffffff',
     lightGrey: '#eaeaea',

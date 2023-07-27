@@ -8,10 +8,19 @@ import {
 import { collectiveManager } from 'international/collective'
 import {
     advancedFindDistance,
+    findAdjacentCoordsToCoord,
+    forAdjacentCoords,
     forRoomNamesAroundRangeXY,
     makeRoomCoord,
+    packAsNum,
     roomNameFromRoomXY,
 } from 'international/utils'
+
+/**
+ * considers a position being flooded
+ * @returns Wether or not the position should be flooded next generation
+ */
+type FloodForCoordCheck = (coord: Coord, packedCoord: number, generation?: number) => boolean | 'stop'
 
 export const roomUtils = {
     abandonRemote(roomName: string, time: number) {
@@ -92,4 +101,45 @@ export const roomUtils = {
         roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
         roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
     },
+    floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
+        const visitedCoords = new Uint8Array(2500)
+
+        let depth = 0
+        let thisGeneration = seeds
+        let nextGeneration: Coord[] = []
+
+        // Record seeds as visited
+        for (const coord of seeds) visitedCoords[packAsNum(coord)] = 1
+
+        while (thisGeneration.length) {
+
+            // Reset next gen
+            nextGeneration = []
+
+            for (const coord of thisGeneration) {
+                // Try to flood to adjacent coords
+                for (const adjacentCoord of findAdjacentCoordsToCoord(coord)) {
+                    const packedAdjacentCoord = packAsNum(adjacentCoord)
+                    // Make sure we haven't visited this coord before
+                    if (visitedCoords[packedAdjacentCoord]) continue
+
+                    visitedCoords[packedAdjacentCoord] = 1
+
+                    // Custom check for the coord
+                    const checkResult = coordCheck(adjacentCoord, packedAdjacentCoord, depth)
+                    if (checkResult === 'stop') return adjacentCoord
+                    else if (checkResult === false) continue
+
+                    nextGeneration.push(coord)
+                }
+            }
+
+            // Set this gen to next gen
+            thisGeneration = nextGeneration
+            depth += 1
+        }
+
+        return false
+    },
+    floodFillCardinalFor() {},
 }
