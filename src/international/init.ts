@@ -4,15 +4,15 @@ import { statsManager } from './statsManager'
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function
  */
-class ConfigManager {
+class InitManager {
     public run() {
-        this.configMemory()
-        this.configGlobal()
+        this.initMemory()
+        this.initGlobal()
     }
     /**
      * Make sure we have configured memory for allies
      */
-    configAllys() {
+    initAllies() {
         for (const playerName in global.settings.allies) {
             if (Memory.players[playerName]) continue
 
@@ -22,7 +22,7 @@ class ConfigManager {
     /**
      * Construct Memory if it isn't constructed yet
      */
-    private configMemory() {
+    private initMemory() {
         if (Memory.breakingVersion) return
 
         Memory.breakingVersion = global.settings.breakingVersion
@@ -43,11 +43,15 @@ class ConfigManager {
         Memory.haulRequests = {}
         Memory.nukeRequests = {}
         statsManager.internationalConfig()
+
+        //
+
+        this.initAllies()
     }
     /**
      * Construct global if it isn't constructed yet
      */
-    private configGlobal() {
+    private initGlobal() {
         if (global.constructed) return
 
         global.constructed = true
@@ -60,4 +64,4 @@ class ConfigManager {
     }
 }
 
-export const configManager = new ConfigManager()
+export const initManager = new InitManager()

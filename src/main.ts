@@ -28,7 +28,7 @@ import { memHack } from 'other/memHack'
 import { customLog } from 'international/utils'
 import { CPUMaxPerTick, customColors } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
-import { configManager } from './international/config'
+import { initManager } from './international/init'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migration'
@@ -95,7 +95,7 @@ function originalLoop() {
 
         migrationManager.run()
         respawnManager.run()
-        configManager.run()
+        initManager.run()
         allyRequestManager.initRun()
         playerManager.run()
         tickInit.run()
