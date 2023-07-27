@@ -74,7 +74,7 @@ export class DefenceManager {
         }
     }
 
-    private shouldActivatesSafeMode() {
+    private shouldSafeMode() {
         const { room } = this.communeManager
         const { controller } = room
 
@@ -103,7 +103,9 @@ export class DefenceManager {
         if (!this.isControllerSafe()) return true
         if (!this.isBaseSafe()) return true
 
-/*
+        return false
+
+        /*
         // Otherwise if safeMode can be activated
 
         // Get the previous tick's events
@@ -147,7 +149,6 @@ export class DefenceManager {
             Memory.rooms[room.name][RoomMemoryKeys.rampartPlans],
         )
         const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], coord => {
-
             // Ignore terrain that protects us
             if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
@@ -218,7 +219,7 @@ export class DefenceManager {
     }
 
     private advancedActivateSafeMode() {
-        if (!this.shouldActivatesSafeMode()) return
+        if (!this.shouldSafeMode()) return
 
         // If another room is safemoded and we determined it to be okay: unclaim it so we can safemode
         if (collectiveManager.safemodedCommuneName) {

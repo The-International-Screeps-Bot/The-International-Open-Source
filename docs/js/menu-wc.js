@@ -95,9 +95,6 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                                 <a href="classes/CommunePlanner.html" data-type="entity-link" >CommunePlanner</a>
                             </li>
                             <li class="link">
-                                <a href="classes/ConfigManager.html" data-type="entity-link" >ConfigManager</a>
-                            </li>
-                            <li class="link">
                                 <a href="classes/ConstructionManager.html" data-type="entity-link" >ConstructionManager</a>
                             </li>
                             <li class="link">
@@ -171,6 +168,9 @@ customElements.define('compodoc-menu', class extends HTMLElement {
                             </li>
                             <li class="link">
                                 <a href="classes/HubHauler.html" data-type="entity-link" >HubHauler</a>
+                            </li>
+                            <li class="link">
+                                <a href="classes/InitManager.html" data-type="entity-link" >InitManager</a>
                             </li>
                             <li class="link">
                                 <a href="classes/Int32Queue.html" data-type="entity-link" >Int32Queue</a>
