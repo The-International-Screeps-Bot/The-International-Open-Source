@@ -174,7 +174,7 @@ export class DefenceManager {
         })
 
         // If there is an enemy claimer, safemode
-        return !!enemyCoord
+        return !enemyCoord
     }
 
     private advancedActivateSafeMode() {
