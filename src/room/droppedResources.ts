@@ -1,7 +1,6 @@
 import { customLog, scalePriority } from 'international/utils'
 import { RoomManager } from 'room/room'
 
-
 export class DroppedResourceManager {
     roomManager: RoomManager
 
