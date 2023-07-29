@@ -73,13 +73,15 @@ const wasm = initSync(wasm_module)
 wasm.log_setup();
  */
 function originalLoop() {
-    profiler.wrap((): void => {
-        if (Game.cpu.bucket < CPUMaxPerTick) {
-            outOfBucket()
-            return
-        }
 
-        memHack.run()
+    if (Game.cpu.bucket < CPUMaxPerTick) {
+        outOfBucket()
+        return
+    }
+
+    memHack.run()
+
+    profiler.wrap((): void => {
 
         /* wasm.wasm_function() */
 

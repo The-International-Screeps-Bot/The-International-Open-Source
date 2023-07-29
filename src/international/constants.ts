@@ -209,7 +209,13 @@ export enum RoomMemoryKeys {
     rampartPlans,
     mineral,
     mineralType,
+    /**
+     * A valuation of base plan score. Lower is better
+     */
     score,
+    /**
+     * A valuation of base plan score with changing variables. Lower is better
+     */
     dynamicScore,
     dynamicScoreUpdate,
     communePlanned,

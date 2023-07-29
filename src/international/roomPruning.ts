@@ -1,5 +1,5 @@
-import { RoomMemoryKeys } from './constants'
-import { randomIntRange } from './utils'
+import { RoomMemoryKeys, WorkRequestKeys } from './constants'
+import { findLowestScore, randomIntRange } from './utils'
 
 class RoomPruningManager {
     sleepTime = randomIntRange(50000, 100000)
@@ -13,8 +13,8 @@ class RoomPruningManager {
         // Make sure all rooms are max RCL
         // Temple rooms?
 
-        let highestScore = 0
-        let highestScoreCommuneName: string
+        let highestCommuneScore = 0
+        let highestCommuneScoreCommuneName: string
 
         for (const roomName of global.communes) {
             const room = Game.rooms[roomName]
@@ -27,22 +27,18 @@ class RoomPruningManager {
             const roomMemory = Memory.rooms[roomName]
             const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
 
-            if (score <= highestScore) continue
+            if (score <= highestCommuneScore) continue
 
-            highestScore = score
-            highestScoreCommuneName = roomName
+            highestCommuneScore = score
+            highestCommuneScoreCommuneName = roomName
         }
 
-        // Find the lowest scoring workRequest that is also lower than the highest scoring commune
+        // Find the lowest scoring workRequest
+        const lowestWorkRequestScore = findLowestScore(Object.keys(Memory.workRequests), roomName => Memory.rooms[roomName][RoomMemoryKeys.score] + Memory.rooms[roomName][RoomMemoryKeys.dynamicScore])
+        // The best work request must be better than our worst commune
+        if (lowestWorkRequestScore >= highestCommuneScore) return
 
-        let lowestScore = 0
-        let lowestScoreWorkRequestName: string
-
-        /*
-        for (const )
-        */
-
-        Memory.rooms[highestScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
+        Memory.rooms[highestCommuneScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
     }
 }
 
