@@ -196,7 +196,7 @@ export class SpawnRequestsManager {
                         defaultParts: [MOVE, CARRY],
                         extraParts: [WORK],
                         partsMultiplier: 6,
-                        minCreeps: undefined,
+
                         maxCreeps: Math.min(
                             3,
                             this.communeManager.room.roomManager.communeSourceHarvestPositions[
@@ -587,7 +587,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [CARRY, MOVE, WORK],
                         partsMultiplier,
-                        minCreeps: undefined,
+
                         maxCreeps,
                         minCost: 200,
                         priority,
@@ -602,7 +602,7 @@ export class SpawnRequestsManager {
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
                     partsMultiplier,
-                    minCreeps: undefined,
+
                     maxCreeps,
                     minCost: 250,
                     priority,
@@ -630,12 +630,14 @@ export class SpawnRequestsManager {
 
                 let partsMultiplier = 0
 
-                const actionableStoringStructure = (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) || (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6)
+                const actionableStoringStructure =
+                    (this.communeManager.room.storage &&
+                        this.communeManager.room.controller.level >= 4) ||
+                    (this.communeManager.room.terminal &&
+                        this.communeManager.room.controller.level >= 6)
 
                 // If there is an rcl actionable storage or terminal
-                if (
-                    actionableStoringStructure
-                ) {
+                if (actionableStoringStructure) {
                     // If the storage is sufficiently full, increase parts wanted porportionately
 
                     if (
@@ -670,7 +672,6 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
-                        minCreeps: undefined,
                         maxCreeps,
                         minCost: 200,
                         priority,
@@ -739,7 +740,6 @@ export class SpawnRequestsManager {
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
-                    minCreeps: undefined,
                     maxCreeps,
                     minCost: 300,
                     priority,
@@ -919,7 +919,6 @@ export class SpawnRequestsManager {
                             ],
                             partsMultiplier,
                             threshold,
-                            minCreeps: undefined,
                             maxCreeps,
                             minCost: 200,
                             priority,
@@ -939,7 +938,7 @@ export class SpawnRequestsManager {
                             extraParts: [WORK, MOVE, WORK, WORK, WORK],
                             partsMultiplier,
                             threshold,
-                            minCreeps: undefined,
+
                             maxCreeps,
                             minCost: 250,
                             priority,
@@ -961,7 +960,7 @@ export class SpawnRequestsManager {
                             extraParts: [WORK, MOVE, WORK, WORK, WORK, WORK, MOVE, WORK],
                             partsMultiplier,
                             threshold,
-                            minCreeps: undefined,
+
                             maxCreeps,
                             minCost: 250,
                             priority,
@@ -980,7 +979,7 @@ export class SpawnRequestsManager {
                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
                         partsMultiplier,
                         threshold,
-                        minCreeps: undefined,
+
                         maxCreeps,
                         minCost: 200,
                         priority,
@@ -1095,7 +1094,7 @@ export class SpawnRequestsManager {
                             partsMultiplier: Math.ceil(partsMultiplier / 2),
                             spawnGroup,
                             threshold: 0.1,
-                            minCreeps: undefined,
+
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 250 * 3,
                             minCost: 300,
@@ -1116,7 +1115,7 @@ export class SpawnRequestsManager {
                             partsMultiplier: Math.floor(partsMultiplier / 2),
                             spawnGroup,
                             threshold: 0.1,
-                            minCreeps: undefined,
+
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 400 * 2,
                             minCost: 300,
@@ -1136,7 +1135,7 @@ export class SpawnRequestsManager {
                         partsMultiplier: Math.ceil(partsMultiplier / 2),
                         spawnGroup,
                         threshold: 0.1,
-                        minCreeps: undefined,
+
                         maxCreeps: sourcePositionsAmount,
                         maxCostPerCreep: 50 + 250 * 3,
                         minCost: 300,

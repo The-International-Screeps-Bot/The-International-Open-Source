@@ -673,6 +673,7 @@ export class SpawningStructuresManager {
      * Spawn request debugging
      */
     private test() {
+        return
         // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
         if (!this.communeManager.spawnRequestsArgs.length)
             this.communeManager.spawnRequestsManager.run()
