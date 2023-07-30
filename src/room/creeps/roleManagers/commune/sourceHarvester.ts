@@ -244,7 +244,7 @@ export class SourceHarvester extends Creep {
         this.room.createRoomLogisticsRequest({
             target: this,
             type: 'withdraw',
-            priority: scalePriority(this.store.getCapacity(), this.reserveStore.energy, 5, true),
+            priority: 100,
         })
         return true
     }

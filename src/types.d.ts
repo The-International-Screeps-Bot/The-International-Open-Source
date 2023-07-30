@@ -483,6 +483,9 @@ declare global {
         target: AnyStoreStructure | Creep | Tombstone | Ruin | Resource
         resourceType?: ResourceConstant
         onlyFull?: boolean
+        /**
+         * Lower priority is more preferable
+         */
         priority?: number
         maxAmount?: number
     }
