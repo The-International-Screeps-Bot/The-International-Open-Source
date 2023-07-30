@@ -442,7 +442,7 @@ declare global {
         extraOpts: SpawnOptions
     }
 
-    type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
+    type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals' | 'spawnRequestVisuals'
 
     type RoomLogisticsRequestTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
 
@@ -968,9 +968,9 @@ declare global {
         scoutTargets: Set<string>
 
         /**
-         * Arguments for construction spawn requests
+         * Arguments for construction spawn requests. Defined by the spawnRequest manager on run(). 
          */
-        spawnRequestsArgs: SpawnRequestArgs[]
+        spawnRequestsArgs: SpawnRequestArgs[] | undefined
 
         /**
          * Tile types as defined by the rampartPlanner

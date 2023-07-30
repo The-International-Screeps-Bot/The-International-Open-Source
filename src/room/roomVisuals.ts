@@ -776,7 +776,6 @@ export class RoomVisualsManager {
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const remoteMemory = Memory.rooms[remoteName]
-            console.log(remoteName, sourceIndex)
             const row: any[] = []
 
             row.push(remoteName)

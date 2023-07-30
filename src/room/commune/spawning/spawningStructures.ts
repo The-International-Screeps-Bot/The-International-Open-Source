@@ -7,12 +7,13 @@ import {
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import { updateStat } from 'international/statsManager'
-import { customLog, getRange, newID } from 'international/utils'
+import { customLog, findAdjacentCoordsToCoord, getRange, newID } from 'international/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
 import './spawnRequests'
 import { spawnFunctions } from './spawn'
+import { Dashboard, Rectangle, Table } from 'screeps-viz'
 
 export class SpawningStructuresManager {
     communeManager: CommuneManager
@@ -69,9 +70,10 @@ export class SpawningStructuresManager {
         // If CPU logging is enabled, get the CPU used at the start
 
         if (global.settings.CPULogging) var managerCPUStart = Game.cpu.getUsed()
-
+        // There are no spawns
         if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
+        this.visualizeRequests()
         this.runSpawning()
         this.test()
 
@@ -87,7 +89,13 @@ export class SpawningStructuresManager {
     }
 
     private runSpawning() {
-        if (!this.inactiveSpawns.length) return
+        // There are no spawns that we can spawn with (they are probably spawning something)
+        if (!this.inactiveSpawns.length) {
+
+            // Clear out potentially active and stale spawnRequests
+            delete this.spawnRequests
+            return
+        }
 
         this.communeManager.spawnRequestsManager.run()
 
@@ -236,7 +244,6 @@ export class SpawningStructuresManager {
             if (skipEndPart) continue
 
             // Ensure each part besides tough has a place at the end to reduce CPU when creeps perform actions
-
             endParts.push(part)
         }
 
@@ -244,21 +251,7 @@ export class SpawningStructuresManager {
     }
 
     private findDirections(pos: RoomPosition) {
-        const adjacentCoords: Coord[] = []
-
-        for (let x = pos.x - 1; x <= pos.x + 1; x += 1) {
-            for (let y = pos.y - 1; y <= pos.y + 1; y += 1) {
-                if (pos.x === x && pos.y === y) continue
-
-                const coord = { x, y }
-
-                /* if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue */
-
-                // Otherwise ass the x and y to positions
-
-                adjacentCoords.push(coord)
-            }
-        }
+        const adjacentCoords = findAdjacentCoordsToCoord(pos)
 
         const anchor = this.communeManager.room.roomManager.anchor
         if (!anchor)
@@ -281,39 +274,32 @@ export class SpawningStructuresManager {
     }
 
     private constructSpawnRequests(args: SpawnRequestArgs) {
-        // If the args aren't defined, stop
-
         if (!args) return
 
-        // If minCreeps is defined
-
         if (args.minCreeps) {
-            // Construct spawn requests individually, and stop
-
+            // We know how many creeps we want, do them seperately and uniformly
             this.spawnRequestIndividually(args)
             return
         }
 
-        // Construct spawn requests by group
-
+        // We don't know how many creeps we want
         this.spawnRequestByGroup(args)
     }
 
     private findMaxCostPerCreep(maxCostPerCreep: number) {
         if (!maxCostPerCreep) maxCostPerCreep = this.communeManager.room.energyCapacityAvailable
 
-        // If there are no sourceHarvesters or haulers
-
+        // If there are missing a type of basic eco creep
         if (
             this.communeManager.room.myCreeps.sourceHarvester.length === 0 ||
             this.communeManager.room.myCreeps.hauler.length === 0
-        )
-            // Inform the smaller of the following
+        ) {
 
+            // We need a basic eco, just spawn whatever we can that's acceptable
             return Math.min(maxCostPerCreep, this.communeManager.room.energyAvailable)
+        }
 
-        // Otherwise the smaller of the following
-
+        // We have a basic eco, try to have creeps meet the prescribed cost
         return Math.min(maxCostPerCreep, this.communeManager.room.energyCapacityAvailable)
     }
 
@@ -709,4 +695,69 @@ export class SpawningStructuresManager {
     }
 
     private testRequests() {}
+
+    private visualizeRequests() {
+        if (!this.communeManager.room.flags.spawnRequestVisuals) return
+
+        const headers = [
+            'role',
+            'priority',
+            'cost',
+        ]
+        const data: any[][] = []
+
+        const requestsArgs =
+            this.communeManager.room.spawnRequestsArgs ||
+            this.communeManager.spawnRequestsManager.run()
+        if (!requestsArgs) return
+
+        this.spawnRequests = []
+
+        for (const requestArgs of requestsArgs) {
+            this.constructSpawnRequests(requestArgs)
+
+            for (let i = 0; i < this.spawnRequests.length; i++) {
+                const request = this.spawnRequests[i]
+
+                const row: any[] = []
+                row.push(requestArgs.role)
+                row.push(requestArgs.priority)
+                row.push(`${
+                    this.communeManager.nextSpawnEnergyAvailable
+                } / ${request.cost}`)
+
+                data.push(row)
+            }
+        }
+
+        // Reset spawn requests so we can still use them normally for spawning
+        delete this.spawnRequests
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.communeManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Spawn Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+    }
 }
