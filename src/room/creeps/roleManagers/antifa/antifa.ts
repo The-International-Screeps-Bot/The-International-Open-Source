@@ -78,16 +78,20 @@ export class Antifa extends Creep {
             creepMemory[CreepMemoryKeys.squadMembers].length === 1
         )
             return false
+        // valid role check, just in case
         if (!squadQuotas[creepMemory[CreepMemoryKeys.squadType]][this.role]) return false
 
-        // The squad has already been run
-
+        // The squad has already been ran by another squad member
         if (this.squadRan) return true
 
         if (!this.findSquad()) {
             const request = Memory.combatRequests[creepMemory[CreepMemoryKeys.combatRequest]]
-            if (request && request[CombatRequestKeys.responder] === this.room.name)
-                this.activeRenew()
+            // Either we're in our home commune or are request is for this room
+            if (this.commune.name === this.room.name || (request && request[CombatRequestKeys.responder] === this.room.name)) {
+                // run singleton logic while we wait to form a squad
+                return false
+            }
+
             return true
         }
 
@@ -638,7 +642,9 @@ export class Antifa extends Creep {
             const creep: Antifa = Game.creeps[creepName]
             if (creep.spawning) continue
 
-            if (!creep.runSquad()) creep.runSingle()
+            if (creep.runSquad()) continue
+            // The creep isn't running squad logic, run singleton logic
+            creep.runSingle()
         }
     }
 }
