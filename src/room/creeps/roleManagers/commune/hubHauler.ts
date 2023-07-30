@@ -26,7 +26,12 @@ export class HubHauler extends Creep {
 
         this.createMoveRequest({
             origin: this.pos,
-            goals: [{ pos: new RoomPosition(stampAnchors.hub[0].x, stampAnchors.hub[0].y, room.name), range: 0 }],
+            goals: [
+                {
+                    pos: new RoomPosition(stampAnchors.hub[0].x, stampAnchors.hub[0].y, room.name),
+                    range: 0,
+                },
+            ],
         })
 
         return true
@@ -117,7 +122,11 @@ export class HubHauler extends Creep {
 
             // If the terminal is sufficiently balanced compared to the storage
 
-            if (terminal.store[resourceType] < storage.store[resourceType] * 0.3 + this.store.getCapacity()) continue
+            if (
+                terminal.store[resourceType] <
+                storage.store[resourceType] * 0.3 + this.store.getCapacity()
+            )
+                continue
 
             this.message += 'RST ' + resourceType
 
@@ -160,7 +169,11 @@ export class HubHauler extends Creep {
 
             // If the storage is sufficiently balanced compared to the storage
 
-            if (storage.store[resourceType] * 0.3 < terminal.store[resourceType] + this.store.getCapacity()) continue
+            if (
+                storage.store[resourceType] * 0.3 <
+                terminal.store[resourceType] + this.store.getCapacity()
+            )
+                continue
 
             this.message += 'RTT ' + resourceType
 
@@ -192,7 +205,8 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy) return false
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > hubLink.store.energy)
+            return false
 
         // If the controllerLink is less than x% full
 
@@ -210,7 +224,8 @@ export class HubHauler extends Creep {
         const { fastFillerLink } = room
         if (
             fastFillerLink &&
-            fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold > fastFillerLink.store.energy
+            fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold >
+                fastFillerLink.store.energy
         )
             return false
 
@@ -246,7 +261,8 @@ export class HubHauler extends Creep {
 
         // If there is unsufficient space to justify a fill
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy) return false
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy)
+            return false
 
         const { controllerLink } = room.communeManager
         const { fastFillerLink } = room
@@ -258,7 +274,8 @@ export class HubHauler extends Creep {
                 fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold <
                     fastFillerLink.store.energy) &&
             (!controllerLink ||
-                controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold + room.upgradeStrength * 2 <
+                controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold +
+                    this.room.communeManager.upgradeStrength * 2 <
                     controllerLink.store.energy)
         )
             return false
@@ -276,7 +293,10 @@ export class HubHauler extends Creep {
         this.createCreepRoomLogisticsRequest(
             'transfer',
             hubLink.id,
-            Math.min(this.freeNextStore + this.store.energy, hubLink.store.getFreeCapacity(RESOURCE_ENERGY)),
+            Math.min(
+                this.freeNextStore + this.store.energy,
+                hubLink.store.getFreeCapacity(RESOURCE_ENERGY),
+            ),
         )
         return true
     }
@@ -295,7 +315,11 @@ export class HubHauler extends Creep {
             //if it's needed for production, we need it.
             if (
                 room.memory[RoomMemoryKeys.factoryUsableResources].includes(
-                    resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
+                    resource as
+                        | CommodityConstant
+                        | MineralConstant
+                        | RESOURCE_GHODIUM
+                        | RESOURCE_ENERGY,
                 )
             )
                 continue
@@ -304,7 +328,10 @@ export class HubHauler extends Creep {
             if (resource == RESOURCE_BATTERY) continue
 
             //We don't want to remove the output if there's less then a full creep's worth.
-            if (resource == room.memory[RoomMemoryKeys.factoryProduct] && factory.store[resource] < this.freeNextStore)
+            if (
+                resource == room.memory[RoomMemoryKeys.factoryProduct] &&
+                factory.store[resource] < this.freeNextStore
+            )
                 continue
 
             //I'm favoring the terminal here because it's likely going to get sold, or shipped out in late game.
@@ -316,21 +343,41 @@ export class HubHauler extends Creep {
             let amount = Math.min(
                 this.freeNextStore,
                 target.freeNextStore,
-                factory.store[resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY],
+                factory.store[
+                    resource as
+                        | CommodityConstant
+                        | MineralConstant
+                        | RESOURCE_GHODIUM
+                        | RESOURCE_ENERGY
+                ],
             )
 
             this.createCreepRoomLogisticsRequest(
                 'withdraw',
                 factory.id,
                 amount,
-                resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
+                resource as
+                    | CommodityConstant
+                    | MineralConstant
+                    | RESOURCE_GHODIUM
+                    | RESOURCE_ENERGY,
             )
             this.createCreepRoomLogisticsRequest(
                 'transfer',
                 target.id,
                 amount +
-                    this.store[resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY],
-                resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
+                    this.store[
+                        resource as
+                            | CommodityConstant
+                            | MineralConstant
+                            | RESOURCE_GHODIUM
+                            | RESOURCE_ENERGY
+                    ],
+                resource as
+                    | CommodityConstant
+                    | MineralConstant
+                    | RESOURCE_GHODIUM
+                    | RESOURCE_ENERGY,
             )
             return true
         }
@@ -351,7 +398,12 @@ export class HubHauler extends Creep {
         let amount = this.freeNextStore
 
         this.createCreepRoomLogisticsRequest('withdraw', factory.id, amount, RESOURCE_BATTERY)
-        this.createCreepRoomLogisticsRequest('transfer', target.id, amount + this.store.battery, RESOURCE_BATTERY)
+        this.createCreepRoomLogisticsRequest(
+            'transfer',
+            target.id,
+            amount + this.store.battery,
+            RESOURCE_BATTERY,
+        )
         return true
     }
 
@@ -372,7 +424,10 @@ export class HubHauler extends Creep {
 
         if (factory.freeNextStore < this.store.getCapacity()) return false
 
-        if (room.memory[RoomMemoryKeys.factoryProduct] && room.memory[RoomMemoryKeys.factoryUsableResources]) {
+        if (
+            room.memory[RoomMemoryKeys.factoryProduct] &&
+            room.memory[RoomMemoryKeys.factoryUsableResources]
+        ) {
             for (let resource of room.memory[RoomMemoryKeys.factoryUsableResources]) {
                 //If there's enough of the component, for now it's just checking for 1000, but 1000 of a T3 resource is a lot, 1000 of a mineral isn't much...
 
@@ -383,7 +438,11 @@ export class HubHauler extends Creep {
                 else if (storage && storage.store[resource] > 0) provider = storage
                 if (!provider) continue
 
-                const amount = Math.min(this.freeNextStore, provider.store[resource], 2000 - factory.store[resource])
+                const amount = Math.min(
+                    this.freeNextStore,
+                    provider.store[resource],
+                    2000 - factory.store[resource],
+                )
                 if (amount <= 0) continue
 
                 // Make sure we aren't using vital energy
@@ -395,7 +454,12 @@ export class HubHauler extends Creep {
                     continue
 
                 this.createCreepRoomLogisticsRequest('withdraw', provider.id, amount, resource)
-                this.createCreepRoomLogisticsRequest('transfer', factory.id, amount + this.store[resource], resource)
+                this.createCreepRoomLogisticsRequest(
+                    'transfer',
+                    factory.id,
+                    amount + this.store[resource],
+                    resource,
+                )
                 return true
             }
         }
@@ -460,7 +524,10 @@ export class HubHauler extends Creep {
         this.createCreepRoomLogisticsRequest(
             'transfer',
             powerSpawn.id,
-            Math.min(this.freeNextStore + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+            Math.min(
+                this.freeNextStore + this.store[resource],
+                powerSpawn.freeSpecificStore(resource),
+            ),
             resource,
         )
         return true
@@ -503,7 +570,10 @@ export class HubHauler extends Creep {
         this.createCreepRoomLogisticsRequest(
             'transfer',
             powerSpawn.id,
-            Math.min(this.freeNextStore + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+            Math.min(
+                this.freeNextStore + this.store[resource],
+                powerSpawn.freeSpecificStore(resource),
+            ),
             resource,
         )
         return true

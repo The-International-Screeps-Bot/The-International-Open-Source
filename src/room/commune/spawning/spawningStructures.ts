@@ -74,8 +74,8 @@ export class SpawningStructuresManager {
         if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
         this.visualizeRequests()
-        this.runSpawning()
         this.test()
+        this.runSpawning()
 
         if (global.settings.CPULogging === true) {
             const cpuUsed = Game.cpu.getUsed() - managerCPUStart
@@ -91,18 +91,19 @@ export class SpawningStructuresManager {
     private runSpawning() {
         // There are no spawns that we can spawn with (they are probably spawning something)
         if (!this.inactiveSpawns.length) {
-
             // Clear out potentially active and stale spawnRequests
             delete this.spawnRequests
             return
         }
 
-        this.communeManager.spawnRequestsManager.run()
+        // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
+        if (!this.communeManager.spawnRequestsArgs.length)
+            this.communeManager.spawnRequestsManager.run()
 
         this.spawnIndex = this.inactiveSpawns.length - 1
         this.spawnRequests = []
 
-        for (const spawnRequestArgs of this.communeManager.room.spawnRequestsArgs) {
+        for (const spawnRequestArgs of this.communeManager.spawnRequestsArgs) {
             this.constructSpawnRequests(spawnRequestArgs)
 
             // Loop through priorities inside requestsByPriority
@@ -110,6 +111,9 @@ export class SpawningStructuresManager {
             for (let i = 0; i < this.spawnRequests.length; i++) {
                 if (!this.runSpawnRequest(i)) return
             }
+
+            // Reset spawnRequests for next set of args translation
+            this.spawnRequests = []
         }
     }
 
@@ -186,8 +190,7 @@ export class SpawningStructuresManager {
         this.communeManager.nextSpawnEnergyAvailable -= request.cost
         updateStat(this.communeManager.room.name, 'eosp', request.cost)
 
-        // Decrease the spawnIndex
-
+        // Record spawn usage and check if there is another spawn
         this.spawnIndex -= 1
         if (this.spawnIndex < 0) return false
     }
@@ -294,7 +297,6 @@ export class SpawningStructuresManager {
             this.communeManager.room.myCreeps.sourceHarvester.length === 0 ||
             this.communeManager.room.myCreeps.hauler.length === 0
         ) {
-
             // We need a basic eco, just spawn whatever we can that's acceptable
             return Math.min(maxCostPerCreep, this.communeManager.room.energyAvailable)
         }
@@ -671,15 +673,16 @@ export class SpawningStructuresManager {
      * Spawn request debugging
      */
     private test() {
-        return
+        // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
+        if (!this.communeManager.spawnRequestsArgs.length)
+            this.communeManager.spawnRequestsManager.run()
 
         this.testArgs()
         this.testRequests()
     }
 
     private testArgs() {
-        this.communeManager.spawnRequestsManager.run()
-        for (const request of this.communeManager.room.spawnRequestsArgs) {
+        for (const request of this.communeManager.spawnRequestsArgs) {
             if (request.role === 'remoteSourceHarvester') {
                 customLog(
                     'SPAWN REQUEST ARGS',
@@ -699,35 +702,30 @@ export class SpawningStructuresManager {
     private visualizeRequests() {
         if (!this.communeManager.room.flags.spawnRequestVisuals) return
 
-        const headers = [
-            'role',
-            'priority',
-            'cost',
-        ]
+        const headers = ['role', 'priority', 'cost']
         const data: any[][] = []
 
-        const requestsArgs =
-            this.communeManager.room.spawnRequestsArgs ||
+        // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
+        if (!this.communeManager.spawnRequestsArgs.length)
             this.communeManager.spawnRequestsManager.run()
-        if (!requestsArgs) return
 
         this.spawnRequests = []
 
-        for (const requestArgs of requestsArgs) {
+        for (const requestArgs of this.communeManager.spawnRequestsArgs) {
             this.constructSpawnRequests(requestArgs)
-
+            customLog('requests', this.spawnRequests.length)
             for (let i = 0; i < this.spawnRequests.length; i++) {
                 const request = this.spawnRequests[i]
-
+                customLog('spawnRequest', i)
                 const row: any[] = []
                 row.push(requestArgs.role)
                 row.push(requestArgs.priority)
-                row.push(`${
-                    this.communeManager.nextSpawnEnergyAvailable
-                } / ${request.cost}`)
+                row.push(`${this.communeManager.nextSpawnEnergyAvailable} / ${request.cost}`)
 
                 data.push(row)
             }
+
+            this.spawnRequests = []
         }
 
         // Reset spawn requests so we can still use them normally for spawning

@@ -127,6 +127,16 @@ export class CommuneManager {
      */
     haulerCarryParts: number
     towerAttackTarget: Creep
+    /**
+     * Arguments for construction spawn requests. Defined by the spawnRequest manager on run().
+     */
+    spawnRequestsArgs: SpawnRequestArgs[]
+    /**
+     * The carry parts needed to effectively run the commune
+     */
+    haulerNeed: number
+    mineralHarvestStrength: number
+    upgradeStrength: number
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
@@ -209,10 +219,10 @@ export class CommuneManager {
             roomMemory[RoomMemoryKeys.combatRequests] = []
         if (!roomMemory[RoomMemoryKeys.haulRequests]) roomMemory[RoomMemoryKeys.haulRequests] = []
 
-        room.spawnRequestsArgs = []
-        room.upgradeStrength = 0
-        room.mineralHarvestStrength = 0
-        room.haulerNeed = 0
+        this.spawnRequestsArgs = []
+        this.upgradeStrength = 0
+        this.mineralHarvestStrength = 0
+        this.haulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
         this.estimatedEnergyIncome = 0
 
@@ -331,7 +341,6 @@ export class CommuneManager {
     }
 
     private test() {
-        customLog(this.sourceLinks)
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*

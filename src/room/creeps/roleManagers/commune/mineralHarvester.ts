@@ -5,7 +5,7 @@ import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
     preTickManager() {
-        this.room.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
+        this.room.communeManager.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
     }
 
     advancedHarvestMineral?(mineral: Mineral) {
@@ -46,7 +46,10 @@ export class MineralHarvester extends Creep {
 
         // Find amount of minerals harvested and record it in data
 
-        const mineralsHarvested = Math.min(this.parts.work * HARVEST_MINERAL_POWER, mineral.mineralAmount)
+        const mineralsHarvested = Math.min(
+            this.parts.work * HARVEST_MINERAL_POWER,
+            mineral.mineralAmount,
+        )
         this.reserveStore[mineral.mineralType] += mineralsHarvested
         updateStat(this.room.name, 'mh', mineralsHarvested)
 
@@ -74,7 +77,10 @@ export class MineralHarvester extends Creep {
             if (creep.advancedHarvestMineral(mineral) !== Result.success) continue
 
             const mineralContainer = room.mineralContainer
-            if (mineralContainer && creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()) {
+            if (
+                mineralContainer &&
+                creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()
+            ) {
                 creep.transfer(mineralContainer, mineral.mineralType)
             }
         }

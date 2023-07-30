@@ -25,7 +25,7 @@ export class ControllerUpgrader extends Creep {
     }
 
     preTickManager() {
-        this.room.upgradeStrength += this.upgradeStrength
+        this.room.communeManager.upgradeStrength += this.room.communeManager.upgradeStrength
     }
 
     public static roleManager(room: Room, creepsOfRole: string[]) {
@@ -42,7 +42,6 @@ export class ControllerUpgrader extends Creep {
                 room.controller.ticksToDowngrade <
                     room.communeManager.controllerDowngradeUpgradeThreshold
             ) {
-
                 creep.advancedUpgradeController()
                 continue
             }

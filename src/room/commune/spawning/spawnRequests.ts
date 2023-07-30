@@ -61,13 +61,13 @@ export class SpawnRequestsManager {
         this.requestHauler()
         this.antifa()
 
-        this.communeManager.room.spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
+        this.communeManager.spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
             args => args,
         ) as SpawnRequestArgs[]
 
         // Sort in descending priority
 
-        this.communeManager.room.spawnRequestsArgs.sort((a, b) => {
+        this.communeManager.spawnRequestsArgs.sort((a, b) => {
             return a.priority - b.priority
         })
     }
@@ -223,7 +223,7 @@ export class SpawnRequestsManager {
 
                 // Construct the required carry parts
 
-                const partsMultiplier = this.communeManager.room.haulerNeed
+                const partsMultiplier = this.communeManager.haulerNeed
 
                 const role = 'hauler'
 

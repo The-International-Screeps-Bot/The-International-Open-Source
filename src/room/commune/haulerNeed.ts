@@ -14,26 +14,30 @@ export class HaulerNeedManager {
         this.sourceNeed()
         this.controllerNeed()
 
-        room.haulerNeed += findCarryPartsRequired(
+        this.communeManager.haulerNeed += findCarryPartsRequired(
             room.memory[RoomMemoryKeys.mineralPath].length / packedPosLength + 3,
-            room.mineralHarvestStrength / EXTRACTOR_COOLDOWN * 1.1,
+            (this.communeManager.mineralHarvestStrength / EXTRACTOR_COOLDOWN) * 1.1,
         )
-        room.haulerNeed += room.roomManager.structures.lab.length
+        this.communeManager.haulerNeed += room.roomManager.structures.lab.length
 
         const extensions =
-            room.roomManager.structures.extension.length - stamps.fastFiller.structures.extension.length
+            room.roomManager.structures.extension.length -
+            stamps.fastFiller.structures.extension.length
         if (extensions > 0) {
             room.roomManager.structures.extension.length / (room.towerInferiority ? 1.5 : 4)
         }
 
-        /* room.haulerNeed += room.roomManager.structures.extension.length / 10 */
+        /* haulerNeed += room.roomManager.structures.extension.length / 10 */
 
-        if ((room.controller.level >= 4 && room.storage) || (room.terminal && room.controller.level >= 6)) {
-            room.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
-            room.haulerNeed += Memory.stats.rooms[room.name].su * 8
+        if (
+            (room.controller.level >= 4 && room.storage) ||
+            (room.terminal && room.controller.level >= 6)
+        ) {
+            this.communeManager.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
+            this.communeManager.haulerNeed += Memory.stats.rooms[room.name].su * 8
         }
 
-        room.haulerNeed = Math.round(room.haulerNeed)
+        this.communeManager.haulerNeed = Math.round(this.communeManager.haulerNeed)
     }
 
     private sourceNeed() {
@@ -44,7 +48,7 @@ export class HaulerNeedManager {
                 const sourceLink = room.communeManager.sourceLinks[index]
                 if (sourceLink && sourceLink.RCLActionable) continue
 
-                room.haulerNeed += findCarryPartsRequired(
+                this.communeManager.haulerNeed += findCarryPartsRequired(
                     room.roomManager.communeSourceHarvestPositions[index].length + 3,
                     room.estimatedSourceIncome[index] * 1.1,
                 )
@@ -59,7 +63,7 @@ export class HaulerNeedManager {
             const sourceLink = room.communeManager.sourceLinks[index]
             if (sourceLink && sourceLink.RCLActionable) continue
 
-            room.haulerNeed += findCarryPartsRequired(
+            this.communeManager.haulerNeed += findCarryPartsRequired(
                 room.roomManager.communeSourcePaths[index].length + 3,
                 room.estimatedSourceIncome[index] * 1.1,
             )
@@ -74,9 +78,9 @@ export class HaulerNeedManager {
         // There is a viable controllerContainer
 
         if (room.controllerContainer) {
-            room.haulerNeed += findCarryPartsRequired(
+            this.communeManager.haulerNeed += findCarryPartsRequired(
                 room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
-                room.upgradeStrength * 1.1,
+                this.communeManager.upgradeStrength * 1.1,
             )
             return
         }
@@ -88,9 +92,9 @@ export class HaulerNeedManager {
             this.communeManager.controllerLink.RCLActionable &&
             (!room.hubLink || !room.hubLink.RCLActionable)
         ) {
-            room.haulerNeed += findCarryPartsRequired(
+            this.communeManager.haulerNeed += findCarryPartsRequired(
                 room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
-                room.upgradeStrength * 1.1,
+                this.communeManager.upgradeStrength * 1.1,
             )
             return
         }

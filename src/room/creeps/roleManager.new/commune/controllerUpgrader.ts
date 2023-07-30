@@ -1,7 +1,6 @@
 import { RoomMemoryKeys, packedPosLength } from 'international/constants'
 
 export class ControllerUpgraderManager {
-
     role: CreepRoles = 'controllerUpgrader'
     // Allows for the pattern: instance.manager.run(instance)
     manager = this
@@ -15,7 +14,8 @@ export class ControllerUpgraderManager {
 
         if (
             creep.ticksToLive >
-            creep.body.length * CREEP_SPAWN_TIME + creep.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength
+            creep.body.length * CREEP_SPAWN_TIME +
+                creep.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength
         )
             return false
 
@@ -23,32 +23,30 @@ export class ControllerUpgraderManager {
 
         return true
     }
-/*
+    /*
 // Not good enough, we need to account for downgrading; state machine
     shouldBuild(creep: Creep) {
         return !!creep.room.roomManager.cSiteTarget;
     }
  */
     initialRun(room: Room) {
-
         for (const creepName of room.myCreeps[this.role]) {
             this.initialRunCreep(Game.creeps[creepName])
         }
     }
 
     private initialRunCreep(creep: Creep) {
-        creep.room.upgradeStrength += creep.upgradeStrength
+        creep.room.communeManager.upgradeStrength += creep.room.communeManager.upgradeStrength
     }
 
     run(room: Room) {
-
         for (const creepName of room.myCreeps[this.role]) {
             this.runCreep(Game.creeps[creepName])
         }
     }
 
     private runCreep(creep: Creep) {
-/*         if (this.shouldBuild(creep)) {
+        /*         if (this.shouldBuild(creep)) {
             creep.advancedBuild();
             return;
         } */

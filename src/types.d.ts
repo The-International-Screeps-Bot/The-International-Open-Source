@@ -968,11 +968,6 @@ declare global {
         scoutTargets: Set<string>
 
         /**
-         * Arguments for construction spawn requests. Defined by the spawnRequest manager on run(). 
-         */
-        spawnRequestsArgs: SpawnRequestArgs[] | undefined
-
-        /**
          * Tile types as defined by the rampartPlanner
          */
         tileCoords: CoordMap
@@ -1022,14 +1017,6 @@ declare global {
         attackingDefenderIDs: Set<Id<Creep>>
         defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
         defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
-
-        upgradeStrength: number
-        mineralHarvestStrength: number
-
-        /**
-         * The carry parts needed to effectively run the commune
-         */
-        haulerNeed: number
 
         usedRampartIDs: Map<Id<StructureRampart>, Id<Creep>>
 
@@ -1801,7 +1788,6 @@ declare global {
         readonly strength: number
 
         _upgradeStrength: number
-
         readonly upgradeStrength: number
 
         _combatStrength: CombatStrength
