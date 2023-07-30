@@ -630,13 +630,13 @@ export class SpawnRequestsManager {
 
                 let partsMultiplier = 0
 
-                // If there is an active storage
+                const actionableStoringStructure = (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) || (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6)
 
+                // If there is an rcl actionable storage or terminal
                 if (
-                    this.communeManager.room.storage &&
-                    this.communeManager.room.controller.level >= 4
+                    actionableStoringStructure
                 ) {
-                    // If the storage is sufficiently full, provide x amount per y enemy in storage
+                    // If the storage is sufficiently full, increase parts wanted porportionately
 
                     if (
                         this.communeManager.room.resourcesInStoringStructures.energy <
@@ -661,17 +661,17 @@ export class SpawnRequestsManager {
                 }
 
                 const role = 'builder'
+                const maxCreeps = 15
 
-                // If there is a storage or terminal
-
-                if (this.communeManager.room.storage || this.communeManager.room.terminal) {
+                // If there is an rcl actionable storage or terminal
+                if (actionableStoringStructure) {
                     return {
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
                         minCreeps: undefined,
-                        maxCreeps: Infinity,
+                        maxCreeps,
                         minCost: 200,
                         priority,
                         memoryAdditions: {
@@ -688,7 +688,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
-                        maxCreeps: Infinity,
+                        maxCreeps,
                         minCost: 200,
                         priority,
                         memoryAdditions: {
@@ -705,7 +705,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [WORK, MOVE, CARRY, MOVE],
                         partsMultiplier: partsMultiplier,
-                        maxCreeps: Infinity,
+                        maxCreeps,
                         minCost: 250,
                         priority,
                         memoryAdditions: {
@@ -725,7 +725,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier,
-                        maxCreeps: Infinity,
+                        maxCreeps,
                         minCost: 250,
                         priority,
                         memoryAdditions: {
@@ -740,7 +740,7 @@ export class SpawnRequestsManager {
                     extraParts: [CARRY, MOVE, WORK, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
                     minCreeps: undefined,
-                    maxCreeps: Infinity,
+                    maxCreeps,
                     minCost: 300,
                     priority,
                     memoryAdditions: {
