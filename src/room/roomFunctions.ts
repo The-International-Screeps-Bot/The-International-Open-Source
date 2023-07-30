@@ -1554,10 +1554,10 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     if (!this.myCreepsAmount) return Result.noAction
 
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
-    // We can only handle energy until we have a storage or terminal
+    // We should only handle energy until we have an active storage or terminal
     else if (
         args.resourceType !== RESOURCE_ENERGY &&
-        (!this.storage || this.controller.level < 4 || !this.terminal || this.controller.level < 6)
+        ((!this.storage || this.controller.level < 4) || (!this.terminal || this.controller.level < 6))
     )
         return Result.fail
 
