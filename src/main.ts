@@ -51,15 +51,6 @@ import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 
-// TextEncoder/Decoder polyfill for UTF-8 conversion
-import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js'
-
-/*
-const wasm_module = new WebAssembly.Module(require('commiebot_wasm_bg'))
-import { initSync } from '../wasm/pkg/commiebot_wasm.js'
-const wasm = initSync(wasm_module)
-wasm.log_setup();
- */
 export function originalLoop() {
 
     if (Game.cpu.bucket < CPUMaxPerTick) {
@@ -70,8 +61,6 @@ export function originalLoop() {
     memHack.run()
 
     profiler.wrap((): void => {
-
-        /* wasm.wasm_function() */
 
         collectiveManager.update()
         if (global.collectivizer) global.collectivizer.run()

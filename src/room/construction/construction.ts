@@ -51,6 +51,8 @@ export class ConstructionManager {
     preTickRun() {
         this.room = this.communeManager.room
 
+        this.visualize()
+
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
         // If it's not our first room, wait until RCL 2 before begining construction efforts
         if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
@@ -188,7 +190,7 @@ export class ConstructionManager {
         }
     }
     public visualize() {
-        const RCL = /* this.room.controller.level */ Game.time % 8
+        const RCL = /* this.room.controller.level */ /* Game.time % 8 */ 8
         const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
         for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {

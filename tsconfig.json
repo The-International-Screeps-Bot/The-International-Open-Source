@@ -13,7 +13,7 @@
         "removeComments": true,
         "noImplicitReturns": true,
         "allowSyntheticDefaultImports": true,
-        "allowUnreachableCode": false,
+        "allowUnreachableCode": true,
         "strictNullChecks": false,
         "esModuleInterop": true,
         "sourceMap": true,
