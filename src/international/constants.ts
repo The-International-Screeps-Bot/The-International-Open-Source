@@ -1265,12 +1265,6 @@ export const relayRoles: Set<CreepRoles> = new Set(['hauler', 'remoteHauler'])
  */
 export const cacheAmountModifier = 25
 
-export const UNWALKABLE = -1
-export const NORMAL = 0
-export const PROTECTED = 1
-export const TO_EXIT = 2
-export const EXIT = 3
-
 /**
  * Which structures should be safemoded when attacked
  */

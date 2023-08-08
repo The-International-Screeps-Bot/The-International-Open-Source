@@ -15,7 +15,8 @@ class GarbageCollector {
 
         // Only run when sleep has expired
         if (Game.time - this.sleep > this.sleepFor) return
-        
+        this.sleep = Game.time
+
         this.cleanRooms()
         this.cleanPlayers()
     }

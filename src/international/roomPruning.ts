@@ -4,11 +4,15 @@ import { findLowestScore, randomIntRange } from './utils'
 class RoomPruningManager {
     sleepTime = randomIntRange(50000, 100000)
     lastAttempt: number
-
+    /**
+     * The tick for which we were last ran
+     */
+    sleep = 0
+    sleepFor = 100000
     run() {
-        return
-
-        if (this.lastAttempt + this.sleepTime > Game.time) return
+        // Only run when sleep has expired
+        if (Game.time - this.sleep > this.sleepFor) return
+        this.sleep = Game.time
 
         // Make sure all rooms are max RCL
         // Temple rooms?
@@ -17,12 +21,6 @@ class RoomPruningManager {
         let highestCommuneScoreCommuneName: string
 
         for (const roomName of global.communes) {
-            const room = Game.rooms[roomName]
-
-            if (room.controller.level < 8) {
-                this.lastAttempt = Game.time
-                return
-            }
 
             const roomMemory = Memory.rooms[roomName]
             const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]

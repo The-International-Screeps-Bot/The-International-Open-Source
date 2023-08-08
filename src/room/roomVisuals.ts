@@ -3,8 +3,6 @@ import {
     CombatRequestKeys,
     HaulRequestKeys,
     customColors,
-    NORMAL,
-    PROTECTED,
     roomDimensions,
     stamps,
     packedPosLength,

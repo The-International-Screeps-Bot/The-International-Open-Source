@@ -485,20 +485,16 @@ export class RoomManager {
         if (this._communeSources) return this._communeSources
 
         const sourceIDs = this.room.memory[RoomMemoryKeys.communeSources]
-        if (sourceIDs) {
-            this._communeSources = []
+        if (!sourceIDs) throw Error('No commune sources ' + this.room.name)
+        this._communeSources = []
 
-            for (let i = 0; i < sourceIDs.length; i++) {
-                const source = findObjectWithID(sourceIDs[i])
+        for (let i = 0; i < sourceIDs.length; i++) {
+            const source = findObjectWithID(sourceIDs[i])
 
-                source.communeIndex = i
-                this._communeSources.push(source)
-            }
-
-            return this._communeSources
+            source.communeIndex = i
+            this._communeSources.push(source)
         }
 
-        throw Error('No commune sources ' + this.room.name)
         return this._communeSources
     }
 
@@ -555,14 +551,12 @@ export class RoomManager {
         const packedSourceHarvestPositions =
             this.room.memory[RoomMemoryKeys.communeSourceHarvestPositions]
 
-        if (packedSourceHarvestPositions) {
-            return (this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(
-                positions => unpackPosList(positions),
-            ))
-        }
+        if (!packedSourceHarvestPositions)
+            throw Error('No commune source harvest positions ' + this.room.name)
 
-        throw Error('No commune source harvest positions ' + this.room.name)
-        return this._communeSourceHarvestPositions
+        return (this._communeSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
+            unpackPosList(positions),
+        ))
     }
 
     _remoteSourceHarvestPositions: RoomPosition[][]
@@ -585,14 +579,11 @@ export class RoomManager {
         if (this._communeSourcePaths) return this._communeSourcePaths
 
         const packedSourcePaths = this.room.memory[RoomMemoryKeys.communeSourcePaths]
-        if (packedSourcePaths) {
-            return (this._communeSourcePaths = packedSourcePaths.map(positions =>
-                unpackPosList(positions),
-            ))
-        }
+        if (!packedSourcePaths) throw Error('No commune source paths ' + this.room.name)
 
-        throw Error('No commune source paths ' + this.room.name)
-        return (this._communeSourcePaths = [])
+        return (this._communeSourcePaths = packedSourcePaths.map(positions =>
+            unpackPosList(positions),
+        ))
     }
 
     _remoteSourcePaths: RoomPosition[][]
@@ -614,13 +605,9 @@ export class RoomManager {
         if (this._centerUpgradePos) return this._centerUpgradePos
 
         const packedPos = Memory.rooms[this.room.name][RoomMemoryKeys.centerUpgradePos]
-        if (packedPos) {
-            return (this._centerUpgradePos = unpackPos(packedPos))
-        }
+        if (!packedPos) throw Error('No center upgrade pos ' + this.room.name)
 
-        throw Error('No center upgrade pos ' + this.room.name)
-
-        return this._centerUpgradePos
+        return (this._centerUpgradePos = unpackPos(packedPos))
     }
 
     _upgradePositions: RoomPosition[]
@@ -674,12 +661,9 @@ export class RoomManager {
         if (this._mineralHarvestPositions) return this._mineralHarvestPositions
 
         const packedPositions = this.room.memory[RoomMemoryKeys.mineralPositions]
-        if (packedPositions) {
-            return (this._mineralHarvestPositions = unpackPosList(packedPositions))
-        }
+        if (!packedPositions) throw Error('No mineral harvest positions ' + this.room.name)
 
-        throw Error('No mineral harvest positions ' + this.room.name)
-        return this._mineralHarvestPositions
+        return (this._mineralHarvestPositions = unpackPosList(packedPositions))
     }
 
     _generalRepairStructures: (StructureContainer | StructureRoad)[]

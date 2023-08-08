@@ -2092,6 +2092,7 @@ declare global {
         [PlayerMemoryKeys.rangeFromExitWeight]: number
         [PlayerMemoryKeys.relationship]: PlayerRelationship
         [PlayerMemoryKeys.reputation]: number
+        [PlayerMemoryKeys.lastSeen]: number
     }
 
     interface WorkRequest {
