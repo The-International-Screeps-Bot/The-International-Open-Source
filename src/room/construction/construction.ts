@@ -42,7 +42,11 @@ export class ConstructionManager {
     communeManager: CommuneManager
     room: Room
     placedSites: number
-    lastRun = Game.time
+    /**
+     * The tick when the program was put to sleep
+     */
+    sleep = 0
+    sleepFor = randomIntRange(20, 100)
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -51,13 +55,9 @@ export class ConstructionManager {
     preTickRun() {
         this.room = this.communeManager.room
 
-        this.visualize()
-
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
         // If it's not our first room, wait until RCL 2 before begining construction efforts
         if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
-
-        /* this.visualize() */
 
         if (this.clearEnemyStructures() === Result.action) return
 
@@ -73,12 +73,11 @@ export class ConstructionManager {
         // If there are no builders, just run every few ticks
         else if (
             this.room.controller.level !== 1 &&
-            this.lastRun &&
-            this.lastRun + randomIntRange(20, 100) > Game.time
+            Game.time - this.sleep > this.sleepFor
         )
             return
 
-        this.lastRun = Game.time
+        this.sleep = Game.time
 
         // If the construction site count is at its limit, stop
 
