@@ -1012,7 +1012,6 @@ export class CommunePlanner {
             if (!closestHarvestPos) {
                 console.log(sourceHarvestPositions)
                 throw Error('no closest harvest pos ' + this.room.name)
-                return
             }
 
             this.setBasePlansXY(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_CONTAINER, 3)
@@ -2074,7 +2073,7 @@ export class CommunePlanner {
                         y: stampAnchor.y - coord.y + stampAnchor.y,
                     }
 
-                for (i = 0; i, structureCoords.length; i++) {
+                for (i = 0; i < structureCoords.length; i++) {
                     if (areCoordsEqual(coord, structureCoords[i])) break
                 }
 

@@ -2,28 +2,16 @@
 
 import './settings'
 import './other/userScript/userScript'
-
-// International
-
 import './international/commands'
 import { collectiveManager } from './international/collective'
-
-// Room
-
 import { roomsManager } from 'room/rooms'
 import './room/roomAdditions'
-
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 import './room/roomObjectAdditions'
 import './room/structureAdditions'
-
-// Creep
-
 import './room/creeps/creepAdditions'
-
-// Other
-
+import './other/profilerRegister'
 import { memHack } from 'other/memHack'
 import { customLog, findCPUOf } from 'international/utils'
 import { CPUMaxPerTick, customColors } from 'international/constants'
@@ -72,7 +60,7 @@ import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 const wasm = initSync(wasm_module)
 wasm.log_setup();
  */
-function originalLoop() {
+export function originalLoop() {
 
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
@@ -137,7 +125,7 @@ function originalLoop() {
     })
 }
 
-function outOfBucket() {
+export function outOfBucket() {
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         textColor: customColors.white,
         bgColor: customColors.red,
@@ -150,31 +138,3 @@ function outOfBucket() {
 }
 
 export const loop = ErrorMapper.wrapLoop(originalLoop)
-
-// Profiler decs
-
-profiler.registerClass(CommuneManager, 'CommuneManager')
-profiler.registerClass(RoomManager, 'RoomManager')
-profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
-profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
-profiler.registerClass(TerminalManager, 'TerminalManager')
-profiler.registerClass(LabManager, 'LabManager')
-profiler.registerClass(FactoryManager, 'FactoryManager')
-profiler.registerClass(StatsManager, 'StatsManager')
-profiler.registerClass(CommunePlanner, 'CommunePlanner')
-profiler.registerClass(ConstructionManager, 'ConstructionManager')
-profiler.registerClass(ObserverManager, 'ObserverManager')
-profiler.registerClass(RemotesManager, 'RemotesManager')
-profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
-profiler.registerClass(SourceManager, 'SourceManager')
-profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
-profiler.registerClass(Quad, 'Quad')
-profiler.registerClass(DynamicSquad, 'DynamicSquad')
-profiler.registerClass(Duo, 'Duo')
-profiler.registerFN(updateStat, 'updateStat')
-profiler.registerFN(originalLoop, 'loop')
-
-for (const creepClass of new Set(Object.values(creepClasses))) {
-    profiler.registerClass(creepClass, creepClass.toString().match(/ (\w+)/)[1])
-}
-profiler.registerFN(outOfBucket, 'outOfBucket')

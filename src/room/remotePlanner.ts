@@ -999,7 +999,6 @@ export class RemotePlanner {
 
             if (!closestHarvestPos) {
                 throw Error('no closest harvest pos ' + this.room.name)
-                return
             }
 
             this.setBasePlansXY(closestHarvestPos.x, closestHarvestPos.y, STRUCTURE_CONTAINER, 3)
@@ -2055,7 +2054,7 @@ export class RemotePlanner {
                         y: stampAnchor.y - coord.y + stampAnchor.y,
                     }
 
-                for (i = 0; i, structureCoords.length; i++) {
+                for (i = 0; i < structureCoords.length; i++) {
                     if (areCoordsEqual(coord, structureCoords[i])) break
                 }
 

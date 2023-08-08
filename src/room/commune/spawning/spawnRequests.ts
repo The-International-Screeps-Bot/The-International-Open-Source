@@ -1231,7 +1231,7 @@ export class SpawnRequestsManager {
 
             if (totalRemoteNeed <= 0) continue
 
-            // Construct requests for remoteReservers
+            // Construct requests for remoteBuilders
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
