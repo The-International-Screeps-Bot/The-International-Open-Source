@@ -90,7 +90,7 @@ export class ConstructionManager {
         this.placedSites = 0
 
         const RCL = this.room.controller.level
-        const maxCSites = collectiveManager.maxCSitesPerRoom
+        const maxCSites = Math.min(collectiveManager.maxCSitesPerRoom, MAX_CONSTRUCTION_SITES - global.constructionSitesCount)
 
         this.placeRamparts(RCL, maxCSites)
         this.placeBase(RCL, maxCSites)
@@ -100,7 +100,6 @@ export class ConstructionManager {
         const hasStoringStructure = !!this.room.communeManager.storingStructures.length
 
         for (const packedCoord in rampartPlans.map) {
-            if (this.placedSites >= maxCSites) return
 
             const coord = unpackCoord(packedCoord)
             const data = rampartPlans.map[packedCoord]
@@ -137,6 +136,7 @@ export class ConstructionManager {
 
             this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
             this.placedSites += 1
+            if (this.placedSites >= maxCSites) return
         }
 
         if (this.placedSites >= maxCSites) return
@@ -148,7 +148,6 @@ export class ConstructionManager {
 
         for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
             for (const packedCoord in basePlans.map) {
-                if (this.placedSites >= maxCSites) return
 
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
@@ -182,28 +181,33 @@ export class ConstructionManager {
 
                     this.room.createConstructionSite(coord.x, coord.y, data.structureType)
                     this.placedSites += 1
+                    if (this.placedSites >= maxCSites) return
                     break
                 }
             }
         }
     }
     public visualize() {
-        const RCL = /* this.room.controller.level */ 8
+        const RCL = /* this.room.controller.level */ Game.time % 8
         const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
 
-        for (const packedCoord in basePlans.map) {
-            const coord = unpackCoord(packedCoord)
-            const coordData = basePlans.map[packedCoord]
+        for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
+            for (const packedCoord in basePlans.map) {
 
-            for (let i = 0; i < coordData.length; i++) {
-                const data = coordData[i]
-                if (data.minRCL > RCL) continue
+                const coord = unpackCoord(packedCoord)
+                const coordData = basePlans.map[packedCoord]
 
-                this.room.visual.structure(coord.x, coord.y, data.structureType)
-                this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, {
-                    font: 0.4,
-                })
-                break
+                for (let i = 0; i < coordData.length; i++) {
+                    const data = coordData[i]
+                    if (data.minRCL > RCL) continue
+                    if (data.minRCL > placeRCL) break
+
+                    this.room.visual.structure(coord.x, coord.y, data.structureType)
+                    this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, {
+                        font: 0.4,
+                    })
+                    break
+                }
             }
         }
 

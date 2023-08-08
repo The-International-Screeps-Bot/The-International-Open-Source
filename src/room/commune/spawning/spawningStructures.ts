@@ -714,10 +714,10 @@ export class SpawningStructuresManager {
 
         for (const requestArgs of this.communeManager.spawnRequestsArgs) {
             this.constructSpawnRequests(requestArgs)
-            customLog('requests', this.spawnRequests.length)
+
             for (let i = 0; i < this.spawnRequests.length; i++) {
                 const request = this.spawnRequests[i]
-                customLog('spawnRequest', i)
+
                 const row: any[] = []
                 row.push(requestArgs.role)
                 row.push(requestArgs.priority)

@@ -289,20 +289,6 @@ export class CommunePlanner {
 
             this.score = 0
         }
-        /*
-        this.setBasePlansXY(24, 24, STRUCTURE_CONTAINER, 2)
-        this.setBasePlansXY(25, 25, STRUCTURE_CONTAINER, 2)
-        this.setBasePlansXY(25, 25, STRUCTURE_LINK, 5)
-        customLog('PLAN 1', JSON.stringify(this.basePlans.map))
-
-        const packedPlans = this.basePlans.pack()
-        customLog('PACKED', packedPlans)
-
-        const unpacked = BasePlans.unpack(packedPlans)
-        customLog('UNPACKED', JSON.stringify(unpacked.map))
-        delete this.baseCoords
-        return Result.noAction
- */
 
         this.avoidSources()
         this.avoidMineral()

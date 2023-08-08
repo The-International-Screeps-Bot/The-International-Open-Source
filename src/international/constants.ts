@@ -30,6 +30,10 @@ export enum PlayerMemoryKeys {
      * Effects response to ally requests and such
      */
     reputation,
+    /**
+     * The last time this player was seen. Used for garbage collection, to remove old players
+     */
+    lastSeen,
 }
 
 export const playerDecayKeys = new Set([

@@ -502,6 +502,9 @@ export class CollectiveManager {
     }
 
     _maxCSitesPerRoom: number
+    /**
+     * The largest amount of construction sites we can try to have in a room
+     */
     get maxCSitesPerRoom() {
         if (this._maxCSitesPerRoom) return this._maxCSitesPerRoom
 
