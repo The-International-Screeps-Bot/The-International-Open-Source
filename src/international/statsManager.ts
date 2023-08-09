@@ -307,7 +307,7 @@ export class StatsManager {
         this.internationalEndTick()
     }
 
-    internationalPreTick() {
+    tickInit() {
         global.roomStats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
     }
 

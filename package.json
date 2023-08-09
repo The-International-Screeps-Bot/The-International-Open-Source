@@ -1,10 +1,9 @@
 {
     "name": "the-international-screeps-bot",
-    "version": "2.109.0",
+    "version": "2.114.0",
     "description": "",
     "files": [
-        "main.js",
-        "wasm/pkg/"
+        "dist"
     ],
     "main": "dist/main.js",
     "scripts": {
@@ -20,7 +19,7 @@
         "push-pserver": "rollup -c --environment DEST:pserver",
         "watch-mmo": "rollup -cw --environment DEST:mmo",
         "watch-pserver": "rollup -cw --environment DEST:pserver",
-        "server": "node server --maxTicks=10000",
+        "server": "node server",
         "test": "jest",
         "test-watch": "jest --watch",
         "test-cov": "jest --coverage",
@@ -36,9 +35,11 @@
     "bugs": {
         "url": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues"
     },
-    "author": "",
+    "author": "Carson Burke",
+    "contributors": ["Pieterbrandsen"],
     "license": "GNU GPLv3",
     "homepage": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source",
+    "keywords": ["screeps", "screeps bot", "commie bot", "the international", "the international screeps bot"],
     "devDependencies": {
         "@compodoc/compodoc": "^1.1.19",
         "@rollup/plugin-commonjs": "^20.0.0",

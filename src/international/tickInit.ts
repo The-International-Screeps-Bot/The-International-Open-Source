@@ -36,13 +36,6 @@ import { RoomManager } from 'room/room'
 import { roomUtils } from 'room/roomUtils'
 
 class TickInit {
-    public run() {
-        this.configGeneral()
-        statsManager.internationalPreTick()
-        this.configWorkRequests()
-        this.configCombatRequests()
-        this.configHaulRequests()
-    }
 
     configGeneral() {
         // General
@@ -60,6 +53,13 @@ class TickInit {
 
         global.constructionSitesCount = Object.keys(Game.constructionSites).length
         global.logs = ``
+    }
+
+    configRequests() {
+
+        this.configWorkRequests()
+        this.configCombatRequests()
+        this.configHaulRequests()
     }
 
     configWorkRequests() {

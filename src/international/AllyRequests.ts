@@ -110,14 +110,18 @@ class AllyRequestManager {
     endRun() {
         if (!global.settings.allyTrading) return
         if (!global.settings.allies.length) return
-        if (!this.myRequests.length) return // Debug
+
         // Make sure we don't have too many segments open
         if (Object.keys(RawMemory.segments).length >= maxSegmentsOpen) {
             throw Error('Too many segments open: AllyRequestManager')
         }
 
-        const newSegmentData = (collectiveManager.myAllyRequestData =
-            collectiveManager.myAllyRequestData.concat(this.myRequests))
+/*         const newSegmentData = (collectiveManager.myAllyRequestData =
+            collectiveManager.myAllyRequestData.concat(this.myRequests)) */
+
+        if (!collectiveManager.myAllyRequestData.length) return
+        const newSegmentData = collectiveManager.myAllyRequestData
+
         customLog('Added data to requests')
         // Assign my requests publically for my allies to read
         RawMemory.segments[global.settings.allySegmentID] = JSON.stringify(newSegmentData)

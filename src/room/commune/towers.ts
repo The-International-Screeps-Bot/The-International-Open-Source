@@ -215,8 +215,8 @@ export class TowerManager {
             let score = rampart.hits
             // Account for decay amount: percent of time to decay times decay amount
             score += Math.floor(
-                RAMPART_DECAY_AMOUNT *
-                    (RAMPART_DECAY_TIME - rampart.ticksToDecay / RAMPART_DECAY_TIME),
+                (RAMPART_DECAY_AMOUNT * (RAMPART_DECAY_TIME - rampart.ticksToDecay)) /
+                    RAMPART_DECAY_TIME,
             )
 
             return score

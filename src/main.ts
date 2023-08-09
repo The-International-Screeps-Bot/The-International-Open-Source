@@ -63,17 +63,14 @@ export function originalLoop() {
         respawnManager.run()
         initManager.run()
 
-        tickInit.run()
         tickInit.configGeneral()
-        statsManager.internationalPreTick()
+        statsManager.tickInit()
         collectiveManager.update()
         allyRequestManager.initRun()
         wasm.collaborator()
 
         roomsManager.updateRun()
-        tickInit.configWorkRequests()
-        tickInit.configCombatRequests()
-        tickInit.configHaulRequests()
+        tickInit.configRequests()
 
         if (global.collectivizer) global.collectivizer.run()
         if (global.userScript) global.userScript()

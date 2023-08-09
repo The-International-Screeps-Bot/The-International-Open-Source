@@ -1061,7 +1061,7 @@ export class RoomManager {
 
                 if (squadData[key] <= highestEnemySquadData[key]) continue
 
-                highestEnemySquadData[key] = this.enemySquadData[key]
+                highestEnemySquadData[key] = squadData[key]
             }
         }
 
