@@ -12,7 +12,7 @@ import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 import { collectiveManager } from 'international/collective'
-import { SleepAble } from 'utils/SleepAble'
+import { Sleepable } from 'utils/Sleepable'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_EXTENSION,
@@ -33,7 +33,7 @@ const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
     STRUCTURE_RAMPART,
 ])
 
-export class ConstructionManager extends SleepAble {
+export class ConstructionManager extends Sleepable {
     communeManager: CommuneManager
     room: Room
     placedSites: number
@@ -64,7 +64,7 @@ export class ConstructionManager extends SleepAble {
         }
         // If there are no builders, just run every few ticks
         else if (this.room.controller.level !== 1 && this.isSleeping()) return
-        this.sleepNextTick()
+        this.sleepWhenDone()
 
         // If the construction site count is at its limit, stop
 

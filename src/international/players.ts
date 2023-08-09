@@ -1,9 +1,9 @@
 import { isNumber } from 'lodash'
 import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from './constants'
 import { randomTick } from '../utils/utils'
-import { SleepAble } from '../utils/SleepAble'
+import { Sleepable } from '../utils/Sleepable'
 
-export class PlayerManager extends SleepAble {
+export class PlayerManager extends Sleepable {
     /**
      * The highest offensive threat of known players
      */

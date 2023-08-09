@@ -1,21 +1,25 @@
-import { RoomMemoryKeys, WorkRequestKeys } from './constants'
+import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
 import { findLowestScore, randomIntRange } from '../utils/utils'
-import { SleepAble } from 'utils/SleepAble'
+import { Sleepable } from 'utils/Sleepable'
 
-class RoomPruningManager extends SleepAble {
-    sleepTime = randomIntRange(50000, 100000)
-    lastAttempt: number
-    sleepFor = 100000
+class RoomPruningManager extends Sleepable {
+    sleepFor = randomIntRange(50000, 100000)
     run() {
         if (this.isSleepingResponsive()) return
 
         // Make sure all rooms are max RCL
         // Temple rooms?
 
+        let rooms = 0
         let highestCommuneScore = 0
         let highestCommuneScoreCommuneName: string
 
         for (const roomName of global.communes) {
+            const room = Game.rooms[roomName]
+            if (room.controller.level < maxControllerLevel) return
+
+            rooms += 1
+
             const roomMemory = Memory.rooms[roomName]
             const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
 
@@ -24,6 +28,9 @@ class RoomPruningManager extends SleepAble {
             highestCommuneScore = score
             highestCommuneScoreCommuneName = roomName
         }
+
+        // Have multiple rooms before we unclaim
+        if (rooms <= 1) return
 
         // Find the lowest scoring workRequest
         const lowestWorkRequestScore = findLowestScore(

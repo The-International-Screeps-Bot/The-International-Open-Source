@@ -1,5 +1,5 @@
 import { collectiveManager } from './collective'
-import { customColors } from './constants'
+import { customColors, maxSegmentsOpen } from './constants'
 import { customLog, errorLog } from '../utils/utils'
 
 export enum AllyRequestTypes {
@@ -81,10 +81,12 @@ export interface CreepCombatData {
  */
 class AllyRequestManager {
     /**
-     * An array of the requests you have made this tick
+     * Intra tick requests we intend to send to our allies
      */
     myRequests: AllyRequest[]
-    myCommands: any[]
+    /**
+     * The ally we are sending requests to this tick
+     */
     currentAlly: string
 
     /**
@@ -107,26 +109,19 @@ class AllyRequestManager {
      */
     endRun() {
         if (!global.settings.allyTrading) return
-
+        if (!global.settings.allies.length) return
+        if (!this.myRequests.length) return // Debug
         // Make sure we don't have too many segments open
-        if (Object.keys(RawMemory.segments).length >= 10) {
+        if (Object.keys(RawMemory.segments).length >= maxSegmentsOpen) {
             throw Error('Too many segments open: AllyRequestManager')
         }
 
+        const newSegmentData = (collectiveManager.myAllyRequestData =
+            collectiveManager.myAllyRequestData.concat(this.myRequests))
+        customLog('Added data to requests')
         // Assign my requests publically for my allies to read
-        RawMemory.segments[global.settings.allySegmentID] = JSON.stringify(this.getSegmentData())
+        RawMemory.segments[global.settings.allySegmentID] = JSON.stringify(newSegmentData)
         RawMemory.setPublicSegments([global.settings.allySegmentID])
-        delete this.myCommands
-    }
-
-    /**
-     * Combine our data into a single variable for segment insertion
-     */
-    private getSegmentData() {
-        let data: any[] = this.myRequests
-        if (this.myCommands) data = data.concat(this.myCommands)
-
-        return data
     }
 
     requestAttack(

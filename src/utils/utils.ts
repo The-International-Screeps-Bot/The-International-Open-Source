@@ -15,6 +15,7 @@ import {
     PlayerMemoryKeys,
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
+import { debugUtils } from 'debug/debugUtils'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -198,7 +199,7 @@ export function errorLog(title: any, message?: any, opts?: CustomLogOpts) {
  *
  */
 export function stringifyLog(title: any, message?: any, opts?: CustomLogOpts) {
-    customLog(`(Stringify) ${title}`, message, opts)
+    customLog(`(Stringify) ${title}`, debugUtils.stringify(message), opts)
 }
 
 /**

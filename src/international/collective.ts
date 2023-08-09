@@ -1,4 +1,4 @@
-import { SleepAble } from 'utils/SleepAble'
+import { Sleepable } from 'utils/Sleepable'
 import {
     createPosMap,
     customLog,
@@ -24,7 +24,7 @@ import {
 /**
  * Handles inter room and non-room matters
  */
-export class CollectiveManager extends SleepAble {
+export class CollectiveManager extends Sleepable {
     /**
      * Antifa creeps by combat request name, then by role with an array of creep names
      */
@@ -53,7 +53,10 @@ export class CollectiveManager extends SleepAble {
      * The name of the room that is safemoded, if there is one
      */
     safemodedCommuneName: string | undefined
-    allyRequestData: any[]
+    /**
+     * An intra-tick collection of request data we wish to submit to allies
+     */
+    myAllyRequestData: any[]
 
     /**
      * Updates values to be present for this tick
@@ -73,7 +76,7 @@ export class CollectiveManager extends SleepAble {
         for (const mineralType of minerals) {
             this.mineralCommunes[mineralType] = 0
         }
-        this.allyRequestData = []
+        this.myAllyRequestData = []
 
         delete this._myOrders
         delete this._orders
