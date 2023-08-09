@@ -957,3 +957,15 @@ export function isAlly(playerName: string) {
     if (playerMemory[PlayerMemoryKeys.relationship] !== 'ally') return false
     return true
 }
+
+export function outOfBucket() {
+    customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+        textColor: customColors.white,
+        bgColor: customColors.red,
+    })
+    console.log(
+        global.settings.logging
+            ? global.logs
+            : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
+    )
+}

@@ -107,11 +107,11 @@ class AllyRequestManager {
         if (!global.settings.allyTrading) return
 
         // Make sure we don't have too many segments open
-        if (Object.keys(RawMemory.segments).length >= 10) return
+        if (Object.keys(RawMemory.segments).length >= 10) throw Error('Too many segments open: AllyRequestManager')
 
-        // Assign myRequests to the public segment
+        // Assign my requests publically for my allies to read
         RawMemory.segments[global.settings.simpleAlliesSegment] = JSON.stringify(
-            this.myRequests || [],
+            this.myRequests,
         )
         RawMemory.setPublicSegments([global.settings.simpleAlliesSegment])
     }

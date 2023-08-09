@@ -1,5 +1,3 @@
-// Imports
-
 import './settings'
 import './other/userScript/userScript'
 import './international/commands'
@@ -13,7 +11,7 @@ import './room/structureAdditions'
 import './room/creeps/creepAdditions'
 import './other/profilerRegister'
 import { memHack } from 'other/memHack'
-import { customLog, findCPUOf } from 'international/utils'
+import { customLog, findCPUOf, outOfBucket } from 'international/utils'
 import { CPUMaxPerTick, customColors } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
 import { initManager } from './international/init'
@@ -50,9 +48,9 @@ import { SourceManager } from 'room/commune/sourceManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
+import { wasm } from 'other/wasmInit'
 
 export function originalLoop() {
-
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
         return
@@ -61,7 +59,6 @@ export function originalLoop() {
     memHack.run()
 
     profiler.wrap((): void => {
-
         collectiveManager.update()
         if (global.collectivizer) global.collectivizer.run()
         if (global.userScript) global.userScript()
@@ -75,6 +72,7 @@ export function originalLoop() {
         migrationManager.run()
         respawnManager.run()
         initManager.run()
+        wasm.collaborator()
         allyRequestManager.initRun()
         playerManager.run()
         tickInit.run()
@@ -113,17 +111,4 @@ export function originalLoop() {
         endTickManager.run()
     })
 }
-
-export function outOfBucket() {
-    customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-        textColor: customColors.white,
-        bgColor: customColors.red,
-    })
-    console.log(
-        global.settings.logging
-            ? global.logs
-            : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
-    )
-}
-
 export const loop = ErrorMapper.wrapLoop(originalLoop)

@@ -17,8 +17,9 @@ import { WorkRequestManager } from "room/commune/workRequest"
 import { Quad } from "room/creeps/roleManagers/antifa/quad"
 import { DynamicSquad } from "room/creeps/roleManagers/antifa/dynamicSquad"
 import { Duo } from "room/creeps/roleManagers/antifa/duo"
-import { originalLoop, outOfBucket } from "main"
+import { originalLoop } from "main"
 import { creepClasses } from "room/creeps/creepClasses"
+import { outOfBucket } from "international/utils"
 
 profiler.registerClass(CommuneManager, 'CommuneManager')
 profiler.registerClass(RoomManager, 'RoomManager')
@@ -40,6 +41,9 @@ profiler.registerClass(DynamicSquad, 'DynamicSquad')
 profiler.registerClass(Duo, 'Duo')
 profiler.registerFN(updateStat, 'updateStat')
 profiler.registerFN(originalLoop, 'loop')
+
+if (global.userScript) profiler.registerFN(global.userScript, 'userScript')
+if (global.collectivizer) profiler.registerClass(global.collectivizer, 'collectivizer')
 
 for (const creepClass of new Set(Object.values(creepClasses))) {
     profiler.registerClass(creepClass, creepClass.toString().match(/ (\w+)/)[1])

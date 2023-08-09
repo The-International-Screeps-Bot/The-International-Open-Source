@@ -9,11 +9,11 @@
     "main": "dist/main.js",
     "scripts": {
         "init": "npm i",
-        "init-rust": "cd wasm && cargo build && rustup default nightly",
+        "init-rust": "cd src/wasm && cargo build && rustup default nightly",
         "init-total": "npm i && npm run init-rust",
         "build-total": "npm run build-wasm && npm run build",
         "build": "rollup -c",
-        "build-wasm": "cd wasm && wasm-pack build --target web --config build.rustflags=['-Ctarget-cpu=mvp'] -Z build-std=std,panic_abort",
+        "build-wasm": "cd src/wasm && wasm-pack build --target web --config build.rustflags=['-Ctarget-cpu=mvp'] -Z build-std=std,panic_abort && git add --force pkg/* && git rm --force pkg/.gitignore",
         "lint": "eslint src",
         "lint-fix": "eslint src --fix",
         "push-mmo": "rollup -c --environment DEST:mmo",

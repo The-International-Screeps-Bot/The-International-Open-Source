@@ -3,11 +3,11 @@
 collectivizer.ts
 
 # wasm output directories
-wasm/target
+src/wasm/target
 # wasm-pack always puts a .gitignore in here; if you want to not ignore it,
 # you'll need to delete it within the dir (for now, see
 # https://github.com/rustwasm/wasm-pack/pull/1131)
-wasm/pkg
+src/wasm/src
 Cargo.lock
 
 # user-custom code

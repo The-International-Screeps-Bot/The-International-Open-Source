@@ -27,10 +27,11 @@ if (!dest) {
 const shouldUglify = config && config.uglify
 const ignoreWarningTypes = new Set([
     'Circular dependency',
-    "Use of eval is strongly discouraged",
+    "Use of eval is strongly discouraged, as it poses security risks and may cause issues with minification",
 ])
 
 export default {
+    inlineDynamicImports: true,
     input: 'src/main.ts',
     output: {
         file: 'dist/main.js',
@@ -48,11 +49,13 @@ export default {
         clear({ targets: ['dist'] }),
         copy({
           targets: [
-            { src: 'wasm/pkg/commiebot_wasm_bg.wasm', dest: 'dist' }
+            { src: 'src/wasm/pkg/commiebot_wasm_bg.wasm', dest: 'dist' },
           ]
         }),
         resolve(),
-        commonjs(),
+        commonjs({
+            ignoreTryCatch: false
+        }),
         shouldUglify && terser(),
         typescript({ tsconfig: './tsconfig.json' }),
         screeps({ config: config, dryRun: !config }),
