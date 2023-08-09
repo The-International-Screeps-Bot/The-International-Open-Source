@@ -1,4 +1,4 @@
-import { customLog, packXYAsNum, splitStringAt } from 'international/utils'
+import { customLog, packXYAsNum, splitStringAt } from 'utils/utils'
 import { packCoord, packBasePlanCoord, packXYAsCoord, unpackBasePlanCoords } from 'other/codec'
 import { encode, decode } from 'base32768'
 import { allStructureTypes } from 'international/constants'

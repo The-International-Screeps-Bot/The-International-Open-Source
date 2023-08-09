@@ -1,5 +1,5 @@
 import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
-import { customLog, findLargestTransactionAmount, newID, roundTo } from 'international/utils'
+import { customLog, findLargestTransactionAmount, newID, roundTo } from 'utils/utils'
 import './marketFunctions'
 import { allyRequestManager, AllyRequest, AllyRequestTypes } from 'international/AllyRequests'
 import { collectiveManager } from 'international/collective'

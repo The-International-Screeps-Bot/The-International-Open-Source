@@ -12,7 +12,7 @@ import {
     roomDimensions,
 } from './constants'
 import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
-import { customLog, unpackNumAsCoord, visualizePath } from './utils'
+import { customLog, unpackNumAsCoord, visualizePath } from '../utils/utils'
 
 export function customFindPath(args: CustomPathFinderArgs) {
     const allowedRoomNames = new Set([args.origin.roomName])

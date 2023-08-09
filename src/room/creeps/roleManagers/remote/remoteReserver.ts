@@ -5,7 +5,7 @@ import {
     RoomTypes,
     packedPosLength,
 } from 'international/constants'
-import { getRange, randomTick } from 'international/utils'
+import { getRange, randomTick } from 'utils/utils'
 import {
     packCoord,
     reversePosList,

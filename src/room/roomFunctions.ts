@@ -43,7 +43,7 @@ import {
     unpackNumAsCoord,
     unpackNumAsPos,
     doesCoordExist,
-} from 'international/utils'
+} from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import {
     packCoord,
@@ -1557,7 +1557,8 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     // We should only handle energy until we have an active storage or terminal
     else if (
         args.resourceType !== RESOURCE_ENERGY &&
-        ((!this.storage || this.controller.level < 4) && (!this.terminal || this.controller.level < 6))
+        (!this.storage || this.controller.level < 4) &&
+        (!this.terminal || this.controller.level < 6)
     )
         return Result.fail
 

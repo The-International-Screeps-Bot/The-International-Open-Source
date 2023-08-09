@@ -6,7 +6,7 @@ import {
     customColors,
     squadQuotas,
 } from 'international/constants'
-import { customLog, findClosestObject, getRangeXY, isExit, isXYExit } from 'international/utils'
+import { customLog, findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { Duo } from './duo'
 import { Quad } from './quad'
@@ -87,7 +87,10 @@ export class Antifa extends Creep {
         if (!this.findSquad()) {
             const request = Memory.combatRequests[creepMemory[CreepMemoryKeys.combatRequest]]
             // Either we're in our home commune or are request is for this room
-            if (this.commune.name === this.room.name || (request && request[CombatRequestKeys.responder] === this.room.name)) {
+            if (
+                this.commune.name === this.room.name ||
+                (request && request[CombatRequestKeys.responder] === this.room.name)
+            ) {
                 // run singleton logic while we wait to form a squad
                 return false
             }

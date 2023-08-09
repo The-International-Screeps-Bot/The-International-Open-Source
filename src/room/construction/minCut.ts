@@ -72,7 +72,7 @@ import {
     isXYInBorder,
     packXYAsNum,
     unpackNumAsCoord,
-} from 'international/utils'
+} from 'utils/utils'
 
 // the eight surrounding points of a tile
 // note the order here is somehow important, the element i and (i + 4) % 8 should be the opposite direction

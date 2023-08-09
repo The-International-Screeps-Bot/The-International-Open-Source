@@ -26,7 +26,7 @@ import {
     areCoordsEqual,
     getRange,
     findHighestScore,
-} from 'international/utils'
+} from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { profiler } from 'other/profiler'
 import {

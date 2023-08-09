@@ -1,5 +1,5 @@
 import { CreepMemoryKeys, RoomTypes, customColors, roomDimensions } from 'international/constants'
-import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'international/utils'
+import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils/utils'
 import { Antifa } from './antifa'
 
 export class Duo {

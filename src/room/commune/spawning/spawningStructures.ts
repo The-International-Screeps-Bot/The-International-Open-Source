@@ -7,7 +7,7 @@ import {
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import { updateStat } from 'international/statsManager'
-import { customLog, findAdjacentCoordsToCoord, getRange, newID } from 'international/utils'
+import { customLog, findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
@@ -67,25 +67,13 @@ export class SpawningStructuresManager {
 
     public run() {
         const { room } = this.communeManager
-        // If CPU logging is enabled, get the CPU used at the start
 
-        if (global.settings.CPULogging) var managerCPUStart = Game.cpu.getUsed()
         // There are no spawns
         if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
         this.visualizeRequests()
         this.test()
         this.runSpawning()
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Spawn Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'smcu'
-            updateStat(room.name, statName, cpuUsed)
-        }
     }
 
     private runSpawning() {

@@ -14,7 +14,7 @@ import {
     findLowestScore,
     randomRange,
     randomTick,
-} from 'international/utils'
+} from 'utils/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
 import { roomUtils } from 'room/roomUtils'

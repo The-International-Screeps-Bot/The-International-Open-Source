@@ -1,5 +1,5 @@
 import { customColors } from 'international/constants'
-import { customLog, findCPUColor, findCPUOf } from 'international/utils'
+import { customLog, findCPUColor, findCPUOf } from 'utils/utils'
 import { allyRequestManager } from 'international/AllyRequests'
 import { collectiveManager, CollectiveManager } from './collective'
 import { statsManager } from './statsManager'

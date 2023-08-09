@@ -14,13 +14,17 @@ import {
     makeRoomCoord,
     packAsNum,
     roomNameFromRoomXY,
-} from 'international/utils'
+} from 'utils/utils'
 
 /**
  * considers a position being flooded
  * @returns Wether or not the position should be flooded next generation
  */
-type FloodForCoordCheck = (coord: Coord, packedCoord: number, generation?: number) => boolean | 'stop'
+type FloodForCoordCheck = (
+    coord: Coord,
+    packedCoord: number,
+    generation?: number,
+) => boolean | 'stop'
 
 export const roomUtils = {
     abandonRemote(roomName: string, time: number) {
@@ -112,7 +116,6 @@ export const roomUtils = {
         for (const coord of seeds) visitedCoords[packAsNum(coord)] = 1
 
         while (thisGeneration.length) {
-
             // Reset next gen
             nextGeneration = []
 

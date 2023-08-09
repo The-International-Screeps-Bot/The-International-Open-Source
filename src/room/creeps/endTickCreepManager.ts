@@ -8,7 +8,7 @@ import {
     powerCreepClassNames,
 } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog, forCoordsInRange, randomOf, randomRange, randomTick } from 'international/utils'
+import { customLog, forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'
 import { RoomManager } from '../room'
 import { packCoord, unpackCoord } from 'other/codec'
 
@@ -22,10 +22,6 @@ export class EndTickCreepManager {
     public run() {
         const { room } = this.roomManager
         if (!this.roomManager.room.myCreepsAmount) return
-
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         if (
             Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune &&
@@ -114,18 +110,6 @@ export class EndTickCreepManager {
         }
 
         this.runChant()
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('End Tick Creep Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'etcmcu'
-            updateStat(room.name, statName, cpuUsed)
-        }
     }
 
     /**

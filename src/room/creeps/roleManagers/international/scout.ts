@@ -6,7 +6,7 @@ import {
     communeSign,
     nonCommuneSigns,
 } from 'international/constants'
-import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'international/utils'
+import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'utils/utils'
 import { partial } from 'lodash'
 
 export class Scout extends Creep {
@@ -152,7 +152,6 @@ export class Scout extends Creep {
      * Tries to sign a room's controller depending on the situation
      */
     advancedSignController?(): boolean {
-
         const { controller } = this.room
         if (!controller) return true
 
@@ -221,7 +220,7 @@ export class Scout extends Creep {
             )
                 return true
 
-                this.message = this.moveRequest
+            this.message = this.moveRequest
 
             return false
         }

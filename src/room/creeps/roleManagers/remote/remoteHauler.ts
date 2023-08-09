@@ -17,7 +17,7 @@ import {
     getRange,
     randomTick,
     randomIntRange,
-} from 'international/utils'
+} from 'utils/utils'
 import { indexOf } from 'lodash'
 import { packCoord, reversePosList, unpackCoord, unpackPos, unpackPosAt } from 'other/codec'
 import { creepClasses } from 'room/creeps/creepClasses'

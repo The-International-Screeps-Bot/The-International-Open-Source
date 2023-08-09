@@ -11,7 +11,7 @@ import {
     isXYInBorder,
     randomTick,
     scalePriority,
-} from 'international/utils'
+} from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { playerManager } from 'international/players'
@@ -28,9 +28,6 @@ export class TowerManager {
 
     run() {
         const { room } = this.communeManager
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging) var managerCPUStart = Game.cpu.getUsed()
 
         const towers = room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
@@ -56,18 +53,6 @@ export class TowerManager {
         if (!this.healCreeps()) return
         if (!this.repairRamparts()) return
         if (!this.repairGeneral()) return
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Tower Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'tmcu'
-            updateStat(room.name, statName, cpuUsed)
-        }
     }
 
     private trackEnemySquads() {}

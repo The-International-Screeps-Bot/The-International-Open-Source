@@ -1,5 +1,5 @@
 import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
-import { advancedFindDistance, customLog } from 'international/utils'
+import { advancedFindDistance, customLog } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { updateStat } from 'international/statsManager'
@@ -13,8 +13,6 @@ export class CombatRequestManager {
 
     public run() {
         const { room } = this.communeManager
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         for (
             let index = room.memory[RoomMemoryKeys.combatRequests].length - 1;
@@ -47,18 +45,6 @@ export class CombatRequestManager {
             }
 
             this[`${request[CombatRequestKeys.type]}Request`](requestName, index)
-        }
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Combat Request Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'cormcu'
-            updateStat(room.name, statName, cpuUsed)
         }
     }
 

@@ -27,7 +27,6 @@ if (!dest) {
 const shouldUglify = config && config.uglify
 const ignoreWarningTypes = new Set([
     'Circular dependency',
-    "Use of eval is strongly discouraged, as it poses security risks and may cause issues with minification",
 ])
 
 export default {

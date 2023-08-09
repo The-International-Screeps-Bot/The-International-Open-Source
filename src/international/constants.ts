@@ -1537,21 +1537,6 @@ export enum RoomStatNamesEnum {
     TotalCreepCount = 'tcc',
     PowerCreepCount = 'pcc',
     SpawnUsagePercentage = 'su',
-    AllyCreepRequestManangerCPUUsage = 'acrmcu',
-    WorkRequestManagerCPUUsage = 'clrmcu',
-    TowerManagerCPUUsage = 'tmcu',
-    SpawnManagerCPUUsage = 'smcu',
-    CombatRequestManagerCPUUsage = 'cormcu',
-    DefenceManagerCPUUsage = 'dmcu',
-    SpawnRequestsManagerCPUUsage = 'srmcu',
-    RoomCPUUsage = 'rocu',
-    RoomVisualsManagerCPUUsage = 'rvmcu',
-    ConstructionManagerCPUUsage = 'cmcu',
-    RoleManagerCPUUsage = 'rolmcu',
-    RoleManagerPerCreepCPUUsage = 'rolmpccu',
-    EndTickCreepManagerCPUUsage = 'etcmcu',
-    PowerRoleManagerCPUUsage = 'prmcu',
-    PowerRoleManagerPerCreepCPUUsage = 'prmpccu',
 
     GameTime = 'gt',
     RemoteCount = 'rc',
@@ -1559,24 +1544,6 @@ export enum RoomStatNamesEnum {
     RemoteEnergyInputHarvest = 'reih',
     RemoteEnergyOutputRepairOther = 'reoro',
     RemoteEnergyOutputBuild = 'reob',
-    RemoteRoomCPUUsage = 'rrocu',
-    RemoteRoomVisualsManagerCPUUsage = 'rrvmcu',
-    RemoteConstructionManagerCPUUsage = 'rcmcu',
-    RemoteRoleManagerCPUUsage = 'rrolmcu',
-    RemoteRoleManagerPerCreepCPUUsage = 'rrolmpccu',
-    RemoteEndTickCreepManagerCPUUsage = 'retcmcu',
-    RemotePowerRoleManangerCPUUsage = 'rprmcu',
-    RemotePowerRoleManagerPerCreepCPUUsage = 'rprmpccu',
-}
-
-export enum InternationalStatNamesEnum {
-    CollectiveManagerCPUUsage = 'imcu',
-    CreepOrganizerCPUUsage = 'cocu',
-    MapVisualsManangerCPUUsage = 'mvmcu',
-    PowerCreepOrganizerCPUUsage = 'pccu',
-    TickInitCPUUsage = 'tccu',
-    RoomManagerCPUUsage = 'roomcu',
-    StatsManagerCPUUsage = 'smcu',
 }
 
 export const packedPosLength = 3

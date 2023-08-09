@@ -1,5 +1,5 @@
 import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
-import { customLog, findLargestTransactionAmount, newID, roundTo } from 'international/utils'
+import { customLog, findLargestTransactionAmount, newID, roundTo } from 'utils/utils'
 import './marketFunctions'
 import { allyRequestManager, AllyRequest, AllyRequestTypes } from 'international/AllyRequests'
 import { collectiveManager } from 'international/collective'
@@ -47,7 +47,7 @@ export class TerminalManager {
                 terminal.store.getFreeCapacity(),
             )
 
-            // If we have allies to trade with, alternate requesting eveyr tick
+            // If we have allies to trade with, also request from them
 
             allyRequestManager.requestResource(room.name, resource, amount, priority)
 

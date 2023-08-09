@@ -1,5 +1,5 @@
 import { CreepMemoryKeys } from 'international/constants'
-import { customLog, findClosestObject, getRange } from 'international/utils'
+import { customLog, findClosestObject, getRange } from 'utils/utils'
 
 export class Hauler extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -7,7 +7,7 @@ export class Hauler extends Creep {
     }
 
     run?() {
-/*
+        /*
         const creepMemory = Memory.creeps[this.name]
 
         if (!creepMemory[CreepMemoryKeys.roomLogisticsRequests].length && this.needsResources()) {

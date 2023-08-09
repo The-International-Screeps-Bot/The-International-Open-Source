@@ -1,5 +1,5 @@
 import { customColors } from 'international/constants'
-import { customLog, scalePriority } from 'international/utils'
+import { customLog, scalePriority } from 'utils/utils'
 import { RoomManager } from './room'
 
 export class ContainerManager {
@@ -14,7 +14,6 @@ export class ContainerManager {
     }
 
     runCommune() {
-
         this.runSourceContainers()
         this.runFastFillerContainers()
         this.runControllerContainer()
@@ -37,7 +36,11 @@ export class ContainerManager {
                 target: container,
                 type: 'transfer',
                 onlyFull: true,
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
+                priority: scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore.energy,
+                    20,
+                ),
             })
 
             if (container.reserveStore.energy < container.store.getCapacity() * 0.5) continue
@@ -47,21 +50,30 @@ export class ContainerManager {
                 maxAmount: container.reserveStore.energy * 0.5,
                 onlyFull: true,
                 type: 'offer',
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 10, true),
+                priority: scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore.energy,
+                    10,
+                    true,
+                ),
             })
         }
     }
 
     private runSourceContainers() {
         for (const container of this.roomManager.room.sourceContainers) {
-
             if (!container) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
                 type: 'withdraw',
                 onlyFull: true,
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
+                priority: scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore.energy,
+                    20,
+                    true,
+                ),
             })
         }
     }
@@ -72,7 +84,11 @@ export class ContainerManager {
 
         if (container.usedReserveStore > container.store.getCapacity() * 0.9) return
 
-        let priority = this.roomManager.room.controller.ticksToDowngrade < this.roomManager.room.communeManager.controllerDowngradeUpgradeThreshold ? 0 : 50
+        let priority =
+            this.roomManager.room.controller.ticksToDowngrade <
+            this.roomManager.room.communeManager.controllerDowngradeUpgradeThreshold
+                ? 0
+                : 50
         priority += scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20)
 
         this.roomManager.room.createRoomLogisticsRequest({
@@ -94,7 +110,14 @@ export class ContainerManager {
             resourceType,
             type: 'withdraw',
             onlyFull: true,
-            priority: 20 + scalePriority(container.store.getCapacity(), container.reserveStore[resourceType], 20, true),
+            priority:
+                20 +
+                scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore[resourceType],
+                    20,
+                    true,
+                ),
         })
     }
 }

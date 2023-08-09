@@ -1,12 +1,6 @@
 import { customColors } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import {
-    customLog,
-    findCPUOf,
-    findObjectWithID,
-    randomTick,
-    scalePriority,
-} from 'international/utils'
+import { customLog, findCPUOf, findObjectWithID, randomTick, scalePriority } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 

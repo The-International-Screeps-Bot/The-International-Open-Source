@@ -1,5 +1,5 @@
 import { Result, customColors, PowerCreepMemoryKeys } from 'international/constants'
-import { customLog, findObjectWithID, getRange } from 'international/utils'
+import { customLog, findObjectWithID, getRange } from 'utils/utils'
 
 export class Operator extends PowerCreep {
     constructor(creepID: Id<PowerCreep>) {

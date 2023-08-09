@@ -1,5 +1,5 @@
 import { CreepMemoryKeys } from 'international/constants'
-import { findClosestPos, getRangeXY, getRange } from 'international/utils'
+import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 
 export class FastFiller extends Creep {
@@ -32,7 +32,8 @@ export class FastFiller extends Creep {
 
         // Stop if the creep already has a packedFastFillerPos
 
-        if (this.memory[CreepMemoryKeys.packedCoord]) return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
+        if (this.memory[CreepMemoryKeys.packedCoord])
+            return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
 
         // Get usedFastFillerPositions
 
@@ -110,7 +111,11 @@ export class FastFiller extends Creep {
 
                 // Otherwise, if there is insufficient energy in the structure, iterate
 
-                if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < structure.store.getCapacity() * 0.5) continue
+                if (
+                    structure.store.getUsedCapacity(RESOURCE_ENERGY) <
+                    structure.store.getCapacity() * 0.5
+                )
+                    continue
 
                 this.withdraw(structure, RESOURCE_ENERGY)
                 return true
@@ -169,7 +174,11 @@ export class FastFiller extends Creep {
 
             // If the structureType is an extension or spawn, iterate
 
-            if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
+            if (
+                structure.structureType !== STRUCTURE_SPAWN &&
+                structure.structureType !== STRUCTURE_EXTENSION
+            )
+                continue
 
             if (structure.nextStore.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
 

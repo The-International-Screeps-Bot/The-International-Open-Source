@@ -1,4 +1,4 @@
-import { customLog } from "./utils"
+import { customLog } from '../utils/utils'
 
 /**
  * Credit to SemperRabbit for this nice piece of code!
@@ -16,7 +16,6 @@ class RespawnManager {
         // Make sure there are no creeps
 
         for (const key in Game.creeps) {
-
             return false
         }
 
@@ -24,8 +23,8 @@ class RespawnManager {
         if (roomNames.length > 1) return false
 
         const room = Game.rooms[roomNames[0]]
-        if (!room &&
-            !room.controller ||
+        if (
+            (!room && !room.controller) ||
             !room.controller.my ||
             room.controller.level !== 1 ||
             room.controller.progress ||

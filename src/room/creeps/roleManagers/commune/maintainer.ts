@@ -1,6 +1,6 @@
 import { CreepMemoryKeys, Result, roomDimensions } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { findCoordsInsideRect, findObjectWithID, getRange } from 'international/utils'
+import { findCoordsInsideRect, findObjectWithID, getRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { creepUtils } from 'room/creeps/creepUtils'
 

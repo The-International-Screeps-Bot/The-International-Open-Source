@@ -5,7 +5,7 @@ import {
     RoomTypes,
     customColors,
 } from 'international/constants'
-import { advancedFindDistance, customLog } from 'international/utils'
+import { advancedFindDistance, customLog } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { updateStat } from 'international/statsManager'
@@ -40,10 +40,6 @@ export class WorkRequestManager {
 
         const requestName = room.memory[RoomMemoryKeys.workRequest]
         if (!requestName) return
-
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         const request = Memory.workRequests[requestName]
 
@@ -150,18 +146,6 @@ export class WorkRequestManager {
 
             if (request[WorkRequestKeys.minDamage] > 0 || request[WorkRequestKeys.minHeal] > 0) this.abandonRemote()
         } */
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Claim Request Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'clrmcu'
-            updateStat(room.name, statName, cpuUsed)
-        }
     }
 
     private stopResponse(deleteCombat?: boolean) {

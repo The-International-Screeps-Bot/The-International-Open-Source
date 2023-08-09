@@ -30,7 +30,7 @@ import {
     forCoordsAroundRange,
     forAdjacentCoords,
     visualizePath,
-} from 'international/utils'
+} from 'utils/utils'
 import {
     packCoord,
     packPos,

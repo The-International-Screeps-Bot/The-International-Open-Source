@@ -5,7 +5,7 @@ import {
     RoomTypes,
     remoteTypeWeights,
 } from 'international/constants'
-import { findObjectWithID, getRangeXY, randomTick } from 'international/utils'
+import { findObjectWithID, getRangeXY, randomTick } from 'utils/utils'
 
 export class RemoteDismantler extends Creep {
     constructor(creepID: Id<Creep>) {

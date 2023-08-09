@@ -1,7 +1,7 @@
 import { minerals } from 'international/constants'
 import { CommuneManager } from './commune'
 import { Hauler } from '../creeps/roleManagers/commune/hauler'
-import { findObjectWithID, getRange, randomTick, scalePriority } from 'international/utils'
+import { findObjectWithID, getRange, randomTick, scalePriority } from 'utils/utils'
 
 const reactionCycleAmount = 5000
 

@@ -1,12 +1,14 @@
+import { SleepAble } from 'utils/SleepAble'
 import {
     createPosMap,
     customLog,
     getAvgPrice,
     packXYAsNum,
+    randomIntRange,
     randomRange,
     randomTick,
     roundTo,
-} from './utils'
+} from '../utils/utils'
 
 import {
     cacheAmountModifier,
@@ -22,7 +24,7 @@ import {
 /**
  * Handles inter room and non-room matters
  */
-export class CollectiveManager {
+export class CollectiveManager extends SleepAble {
     /**
      * Antifa creeps by combat request name, then by role with an array of creep names
      */
@@ -51,6 +53,7 @@ export class CollectiveManager {
      * The name of the room that is safemoded, if there is one
      */
     safemodedCommuneName: string | undefined
+    allyRequestData: any[]
 
     /**
      * Updates values to be present for this tick
@@ -70,6 +73,7 @@ export class CollectiveManager {
         for (const mineralType of minerals) {
             this.mineralCommunes[mineralType] = 0
         }
+        this.allyRequestData = []
 
         delete this._myOrders
         delete this._orders
@@ -78,12 +82,12 @@ export class CollectiveManager {
         delete this._defaultMinCacheAmount
         delete this.internationalDataVisuals
 
-        if (randomTick()) {
-            delete this._funnelOrder
-            delete this._minCredits
-            delete this._resourcesInStoringStructures
-            delete this._maxCSitesPerRoom
-        }
+        if (this.isSleepingResponsive()) return
+
+        delete this._funnelOrder
+        delete this._minCredits
+        delete this._resourcesInStoringStructures
+        delete this._maxCSitesPerRoom
     }
 
     newCustomCreepID() {

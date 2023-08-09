@@ -19,7 +19,7 @@ import {
     getRange,
     randomRange,
     roundTo,
-} from 'international/utils'
+} from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
 import { updateStat } from 'international/statsManager'

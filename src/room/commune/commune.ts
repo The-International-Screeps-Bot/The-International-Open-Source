@@ -23,7 +23,7 @@ import {
     unpackNumAsCoord,
     findLowestScore,
     roundTo,
-} from 'international/utils'
+} from 'utils/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
 
@@ -263,8 +263,9 @@ export class CommuneManager {
         room.defenderEnemyTargetsWithDamage = new Map()
         room.defenderEnemyTargetsWithDefender = new Map()
 
-        if (room.terminal && room.controller.level >= 6)
+        if (room.terminal && room.controller.level >= 6) {
             collectiveManager.terminalCommunes.push(room.name)
+        }
 
         collectiveManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
     }

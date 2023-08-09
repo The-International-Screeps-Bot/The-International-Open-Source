@@ -1,5 +1,5 @@
 import { NukeRequestKeys, Result, RoomMemoryKeys } from 'international/constants'
-import { scalePriority } from 'international/utils'
+import { scalePriority } from 'utils/utils'
 import { CommuneManager } from './commune'
 
 const nukerResources = [RESOURCE_ENERGY, RESOURCE_GHODIUM]
@@ -25,7 +25,9 @@ export class NukerManager {
         if (this.createRoomLogisticsRequests() === Result.action) return
 
         const request = Memory.nukeRequests[requestName]
-        this.nuker.launchNuke(new RoomPosition(request[NukeRequestKeys.x], request[NukeRequestKeys.y], requestName))
+        this.nuker.launchNuke(
+            new RoomPosition(request[NukeRequestKeys.x], request[NukeRequestKeys.y], requestName),
+        )
     }
 
     private createRoomLogisticsRequests() {

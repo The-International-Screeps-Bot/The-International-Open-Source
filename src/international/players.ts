@@ -1,19 +1,16 @@
 import { isNumber } from 'lodash'
 import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from './constants'
-import { randomTick } from './utils'
+import { randomTick } from '../utils/utils'
+import { SleepAble } from '../utils/SleepAble'
 
-const sleepFor = 10
-
-export class PlayerManager {
+export class PlayerManager extends SleepAble {
     /**
      * The highest offensive threat of known players
      */
     highestThreat: number = 0
 
-    constructor() {}
-
     run() {
-        if (this.sleeping(sleepFor)) return
+        if (this.isSleepingResponsive()) return
 
         this.highestThreat = 0
 
@@ -23,10 +20,8 @@ export class PlayerManager {
             // Decay specified numberical values over time
 
             for (const key of playerDecayKeys) {
-
-                if (player[key] as number < 1) continue
-
-                (player[key] as number) *= defaultDataDecay * sleepFor
+                if ((player[key] as number) < 1) continue
+                ;(player[key] as number) *= defaultDataDecay * this.sleepFor
             }
 
             // So long as the player has attacked at some pount, record it
@@ -41,14 +36,13 @@ export class PlayerManager {
     }
 
     initPlayer(playerName: string) {
-
-        return Memory.players[playerName] = {
+        return (Memory.players[playerName] = {
             [PlayerMemoryKeys.offensiveThreat]: 0,
             [PlayerMemoryKeys.defensiveStrength]: 0,
             [PlayerMemoryKeys.hate]: 0,
             [PlayerMemoryKeys.lastAttacked]: Infinity,
             [PlayerMemoryKeys.rangeFromExitWeight]: 0.5,
-        }
+        })
     }
 
     /**
@@ -59,7 +53,9 @@ export class PlayerManager {
         if (this._playersByHate) return this._playersByHate
 
         this._playersByHate = Object.keys(Memory.players).sort((a, b) => {
-            return Memory.players[a][PlayerMemoryKeys.hate] - Memory.players[b][PlayerMemoryKeys.hate]
+            return (
+                Memory.players[a][PlayerMemoryKeys.hate] - Memory.players[b][PlayerMemoryKeys.hate]
+            )
         })
 
         return this._playersByHate
@@ -71,21 +67,6 @@ export class PlayerManager {
 
     }
  */
-
-    sleepUntil: number
-
-    /**
-     * @param sleepFor the number of ticks to sleep for
-     * @returns Wether we are sleeping or not
-     */
-    private sleeping(sleepFor: number) {
-
-        if (!this.sleepUntil) return true
-        if (Game.time < this.sleepUntil) return true
-
-        this.sleepUntil = Game.time + sleepFor
-        return true
-    }
 }
 
 export const playerManager = new PlayerManager()

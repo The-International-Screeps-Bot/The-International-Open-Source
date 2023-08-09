@@ -19,7 +19,7 @@ import {
     randomVal,
     getRangeEuc,
     findWeightedRangeFromExit,
-} from 'international/utils'
+} from 'utils/utils'
 import { packCoord } from 'other/codec'
 
 export class MeleeDefender extends Creep {

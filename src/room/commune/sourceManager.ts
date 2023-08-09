@@ -1,4 +1,4 @@
-import { customLog } from 'international/utils'
+import { customLog } from 'utils/utils'
 import { CommuneManager } from './commune'
 
 export class SourceManager {
@@ -34,7 +34,9 @@ export class SourceManager {
 
             effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
             if (effect)
-                income += POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] / POWER_INFO[PWR_REGEN_SOURCE].period
+                income +=
+                    POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] /
+                    POWER_INFO[PWR_REGEN_SOURCE].period
 
             room.estimatedSourceIncome[i] = income
         }

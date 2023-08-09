@@ -10,7 +10,7 @@ import {
     RoomTypes,
 } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
+import { customLog, findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 import { allyRequestManager, AllyRequestTypes } from 'international/AllyRequests'
@@ -26,25 +26,10 @@ export class RoomVisualsManager {
 
     public run() {
         const { room } = this.roomManager
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.roomVisuals()
         this.baseVisuals()
         this.dataVisuals()
-
-        // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Room Visuals Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'rvmcu'
-            updateStat(room.name, statName, cpuUsed)
-        }
     }
 
     private roomVisuals() {

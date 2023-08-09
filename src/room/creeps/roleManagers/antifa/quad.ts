@@ -28,7 +28,7 @@ import {
     unpackNumAsCoord,
     forCoordsInRange,
     packXYAsNum,
-} from 'international/utils'
+} from 'utils/utils'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { Antifa } from './antifa'
 

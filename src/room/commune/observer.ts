@@ -1,4 +1,4 @@
-import { customLog, makeRoomCoord, randomTick, roomNameFromRoomXY } from 'international/utils'
+import { customLog, makeRoomCoord, randomTick, roomNameFromRoomXY } from 'utils/utils'
 import { CommuneManager } from './commune'
 import { RoomMemoryKeys } from 'international/constants'
 
@@ -51,13 +51,22 @@ export class ObserverManager {
 
                 if (!Memory.rooms[roomName]) {
                     score =
-                        (OBSERVER_RANGE - Game.map.getRoomLinearDistance(roomName, this.communeManager.room.name)) *
+                        (OBSERVER_RANGE -
+                            Game.map.getRoomLinearDistance(
+                                roomName,
+                                this.communeManager.room.name,
+                            )) *
                         1000
                 } else {
                     score =
                         Game.time -
                         (Memory.rooms[roomName][RoomMemoryKeys.lastScout] || 0) +
-                        (OBSERVER_RANGE - Game.map.getRoomLinearDistance(roomName, this.communeManager.room.name)) * 10
+                        (OBSERVER_RANGE -
+                            Game.map.getRoomLinearDistance(
+                                roomName,
+                                this.communeManager.room.name,
+                            )) *
+                            10
                 }
 
                 if (score <= highestScore) continue

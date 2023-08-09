@@ -13,7 +13,7 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import './roomVisuals'
-import { createPosMap, customLog } from 'international/utils'
+import { createPosMap, customLog } from 'utils/utils'
 import { updateStat, statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
@@ -42,18 +42,11 @@ class RoomsManager {
         }
     }
     run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
         const statName: RoomCommuneStatNames = 'rocu'
 
         // Loop through room names in Game.rooms
 
         for (const roomName in Game.rooms) {
-            // Get the CPU used at the start
-
-            if (global.settings.CPULogging === true) var roomCPUStart = Game.cpu.getUsed()
-
             // Get the room using the roomName
 
             const room = Game.rooms[roomName]
@@ -68,11 +61,6 @@ class RoomsManager {
 
             let logMessage = `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreepsAmount}`
 
-            if (global.settings.CPULogging === true) {
-                const cpuUsed = Game.cpu.getUsed() - roomCPUStart
-                logMessage += `, CPU: ${cpuUsed.toFixed(2)}`
-                updateStat(roomName, statName, cpuUsed)
-            }
             customLog(
                 `<a style="cursor: pointer;color:inherit" href="https://screeps.com/a/#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
                 logMessage,
@@ -84,19 +72,6 @@ class RoomsManager {
             )
             if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
                 statsManager.roomEndTick(room.name, roomType)
-        }
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Room Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-                position: 1,
-            })
-            const statName: InternationalStatNames = 'roomcu'
-            updateStat('', statName, cpuUsed, true)
         }
     }
 }

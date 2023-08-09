@@ -1,4 +1,4 @@
-import { customLog, scalePriority } from 'international/utils'
+import { customLog, scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
 
 export class TombstoneManager {

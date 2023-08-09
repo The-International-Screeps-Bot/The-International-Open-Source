@@ -1,22 +1,18 @@
-import { Result, } from 'international/constants'
-import { customLog, findObjectWithID, getRange } from 'international/utils'
+import { Result } from 'international/constants'
+import { customLog, findObjectWithID, getRange } from 'utils/utils'
 
 export class BuilderManager {
-
     role: CreepRoles = 'hauler'
     // Allows for the pattern: instance.manager.run(instance)
     manager = this
 
     initialRun(room: Room) {
-
         for (const creepName of room.myCreeps[this.role]) {
-
             this.initialRunCreep(Game.creeps[creepName])
         }
     }
 
     private initialRunCreep(creep: Creep) {
-
         if (!creep.room.roomManager.cSiteTarget) return
         if (!creep.room.communeManager.buildersMakeRequests) return
         if (creep.usedReserveStore > creep.store.getCapacity() * 0.5) return
@@ -29,17 +25,13 @@ export class BuilderManager {
     }
 
     run(room: Room) {
-
         for (const creepName of room.myCreeps[this.role]) {
-
             this.runCreep(Game.creeps[creepName])
         }
     }
 
     private runCreep(creep: Creep) {
-
         if (creep.advancedBuild() === Result.fail) {
-
             creep.advancedRecycle()
         }
     }

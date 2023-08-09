@@ -1,6 +1,6 @@
 import { Result, RoomMemoryKeys } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { getRangeXY, getRange } from 'international/utils'
+import { getRangeXY, getRange } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {

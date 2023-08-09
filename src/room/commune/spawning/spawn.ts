@@ -1,6 +1,6 @@
 import { creepRoles } from 'international/constants'
 import { collectiveManager } from 'international/collective'
-import { customLog, newID } from 'international/utils'
+import { customLog, newID } from 'utils/utils'
 
 export const spawnFunctions = {
     testSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {

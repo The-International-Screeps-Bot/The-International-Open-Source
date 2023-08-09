@@ -11,7 +11,7 @@ import './room/structureAdditions'
 import './room/creeps/creepAdditions'
 import './other/profilerRegister'
 import { memHack } from 'other/memHack'
-import { customLog, findCPUOf, outOfBucket } from 'international/utils'
+import { customLog, findCPUOf, outOfBucket } from 'utils/utils'
 import { CPUMaxPerTick, customColors } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
 import { initManager } from './international/init'
@@ -59,29 +59,25 @@ export function originalLoop() {
     memHack.run()
 
     profiler.wrap((): void => {
-        collectiveManager.update()
-        if (global.collectivizer) global.collectivizer.run()
-        if (global.userScript) global.userScript()
-
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
-        // Run prototypes
-
         migrationManager.run()
         respawnManager.run()
         initManager.run()
-        wasm.collaborator()
-        allyRequestManager.initRun()
-        playerManager.run()
+
         tickInit.run()
         tickInit.configGeneral()
         statsManager.internationalPreTick()
+        collectiveManager.update()
+        allyRequestManager.initRun()
+        wasm.collaborator()
+
         roomsManager.updateRun()
         tickInit.configWorkRequests()
         tickInit.configCombatRequests()
         tickInit.configHaulRequests()
+
+        if (global.collectivizer) global.collectivizer.run()
+        if (global.userScript) global.userScript()
+        playerManager.run()
         roomsManager.initRun()
         creepOrganizer.run()
         powerCreepOrganizer.run()
@@ -90,16 +86,6 @@ export function originalLoop() {
         flagManager.run()
         constructionSiteManager.run()
         collectiveManager.orderManager()
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('International Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: InternationalStatNames = 'imcu'
-            updateStat('', statName, cpuUsed, true)
-        }
 
         roomsManager.run()
 

@@ -1,6 +1,6 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
-import { customLog } from './utils'
+import { customLog } from '../utils/utils'
 import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { updateStat } from './statsManager'
@@ -9,24 +9,10 @@ class CreepOrganizer {
     constructor() {}
 
     public run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
         // Loop through all of my creeps
 
         for (const creepName in Memory.creeps) {
             this.processCreep(creepName)
-        }
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Creep Organizer', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: InternationalStatNames = 'cocu'
-            updateStat('', statName, cpuUsed, true)
         }
     }
 

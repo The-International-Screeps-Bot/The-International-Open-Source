@@ -6,18 +6,13 @@ import {
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
-import {
-    customLog,
-    findObjectWithID,
-    packAsNum,
-    randomIntRange,
-    randomTick,
-} from 'international/utils'
+import { customLog, findObjectWithID, packAsNum, randomIntRange, randomTick } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 import { collectiveManager } from 'international/collective'
+import { SleepAble } from 'utils/SleepAble'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_EXTENSION,
@@ -38,17 +33,14 @@ const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
     STRUCTURE_RAMPART,
 ])
 
-export class ConstructionManager {
+export class ConstructionManager extends SleepAble {
     communeManager: CommuneManager
     room: Room
     placedSites: number
-    /**
-     * The tick when the program was put to sleep
-     */
-    sleep = 0
-    sleepFor = randomIntRange(20, 100)
+    sleepFor = randomIntRange(50, 100)
 
     constructor(communeManager: CommuneManager) {
+        super()
         this.communeManager = communeManager
     }
 
@@ -71,13 +63,8 @@ export class ConstructionManager {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
         }
         // If there are no builders, just run every few ticks
-        else if (
-            this.room.controller.level !== 1 &&
-            Game.time - this.sleep > this.sleepFor
-        )
-            return
-
-        this.sleep = Game.time
+        else if (this.room.controller.level !== 1 && this.isSleeping()) return
+        this.sleepNextTick()
 
         // If the construction site count is at its limit, stop
 
@@ -91,7 +78,10 @@ export class ConstructionManager {
         this.placedSites = 0
 
         const RCL = this.room.controller.level
-        const maxCSites = Math.min(collectiveManager.maxCSitesPerRoom, MAX_CONSTRUCTION_SITES - global.constructionSitesCount)
+        const maxCSites = Math.min(
+            collectiveManager.maxCSitesPerRoom,
+            MAX_CONSTRUCTION_SITES - global.constructionSitesCount,
+        )
 
         this.placeRamparts(RCL, maxCSites)
         this.placeBase(RCL, maxCSites)
@@ -101,7 +91,6 @@ export class ConstructionManager {
         const hasStoringStructure = !!this.room.communeManager.storingStructures.length
 
         for (const packedCoord in rampartPlans.map) {
-
             const coord = unpackCoord(packedCoord)
             const data = rampartPlans.map[packedCoord]
             if (data.minRCL > RCL) continue
@@ -149,7 +138,6 @@ export class ConstructionManager {
 
         for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
             for (const packedCoord in basePlans.map) {
-
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
 
@@ -194,7 +182,6 @@ export class ConstructionManager {
 
         for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
             for (const packedCoord in basePlans.map) {
-
                 const coord = unpackCoord(packedCoord)
                 const coordData = basePlans.map[packedCoord]
 

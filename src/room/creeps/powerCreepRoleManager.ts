@@ -1,6 +1,6 @@
 import { customColors, powerCreepClassNames } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog } from 'international/utils'
+import { customLog } from 'utils/utils'
 import { RoomManager } from 'room/room'
 import { Operator } from './powerCreeps/operator'
 
@@ -17,32 +17,8 @@ export class PowerCreepRoleManager {
 
     public run() {
         const { room } = this.roomManager
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         for (const className of powerCreepClassNames) this.runManager(className)
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            const cpuUsed2 = this.roomManager.room.myCreepsAmount
-                ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
-                : 0
-            customLog(
-                'Power Role Manager',
-                `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`,
-                {
-                    textColor: customColors.white,
-                    bgColor: customColors.lightBlue,
-                },
-            )
-            const statName: RoomCommuneStatNames = 'prmcu'
-            const statName2: RoomCommuneStatNames = 'prmpccu'
-            updateStat(room.name, statName, cpuUsed)
-            updateStat(room.name, statName2, cpuUsed2)
-        }
     }
 
     private runManager(className: PowerClassConstant) {

@@ -1,5 +1,5 @@
 import { Result } from 'international/constants'
-import { customLog, findObjectWithID, getRange } from 'international/utils'
+import { customLog, findObjectWithID, getRange } from 'utils/utils'
 
 export class Builder extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -7,8 +7,7 @@ export class Builder extends Creep {
     }
 
     preTickManager() {
-
-        if(this.avoidEnemyThreatCoords()) return
+        if (this.avoidEnemyThreatCoords()) return
 
         if (!this.room.roomManager.cSiteTarget) return
         if (!this.room.communeManager.buildersMakeRequests) return

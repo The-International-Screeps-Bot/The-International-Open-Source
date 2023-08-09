@@ -23,7 +23,7 @@ import {
     randomIntRange,
     randomRange,
     randomTick,
-} from 'international/utils'
+} from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { collectiveManager } from 'international/collective'
@@ -41,10 +41,6 @@ export class DefenceManager {
     }
 
     run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
         if (!this.communeManager.room.enemyCreeps.length) {
             this.considerRampartsPublic()
             return
@@ -60,18 +56,6 @@ export class DefenceManager {
         // There are at least enemyAttackers
 
         this.assignDefenceTargets()
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Defense Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'dmcu'
-            updateStat(this.communeManager.room.name, statName, cpuUsed)
-        }
     }
 
     private shouldSafeMode() {

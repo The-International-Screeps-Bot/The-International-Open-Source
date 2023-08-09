@@ -1,5 +1,6 @@
 import { collectiveManager } from './collective'
-import { customLog } from './utils'
+import { customColors } from './constants'
+import { customLog, errorLog } from '../utils/utils'
 
 export enum AllyRequestTypes {
     /**
@@ -76,13 +77,14 @@ export interface CreepCombatData {
 }
 
 /**
- * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated simpleAlliesSegment before usage
+ * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated allySegmentID before usage
  */
 class AllyRequestManager {
     /**
      * An array of the requests you have made this tick
      */
     myRequests: AllyRequest[]
+    myCommands: any[]
     currentAlly: string
 
     /**
@@ -97,7 +99,7 @@ class AllyRequestManager {
         this.currentAlly = global.settings.allies[Game.time % global.settings.allies.length]
 
         const nextAllyName = global.settings.allies[(Game.time + 1) % global.settings.allies.length]
-        RawMemory.setActiveForeignSegment(nextAllyName, global.settings.simpleAlliesSegment)
+        RawMemory.setActiveForeignSegment(nextAllyName, global.settings.allySegmentID)
     }
 
     /**
@@ -107,13 +109,24 @@ class AllyRequestManager {
         if (!global.settings.allyTrading) return
 
         // Make sure we don't have too many segments open
-        if (Object.keys(RawMemory.segments).length >= 10) throw Error('Too many segments open: AllyRequestManager')
+        if (Object.keys(RawMemory.segments).length >= 10) {
+            throw Error('Too many segments open: AllyRequestManager')
+        }
 
         // Assign my requests publically for my allies to read
-        RawMemory.segments[global.settings.simpleAlliesSegment] = JSON.stringify(
-            this.myRequests,
-        )
-        RawMemory.setPublicSegments([global.settings.simpleAlliesSegment])
+        RawMemory.segments[global.settings.allySegmentID] = JSON.stringify(this.getSegmentData())
+        RawMemory.setPublicSegments([global.settings.allySegmentID])
+        delete this.myCommands
+    }
+
+    /**
+     * Combine our data into a single variable for segment insertion
+     */
+    private getSegmentData() {
+        let data: any[] = this.myRequests
+        if (this.myCommands) data = data.concat(this.myCommands)
+
+        return data
     }
 
     requestAttack(
@@ -200,12 +213,20 @@ class AllyRequestManager {
         try {
             rawAllyRequests = JSON.parse(RawMemory.foreignSegment.data)
         } catch (err) {
-            customLog('Error in getting requests for simpleAllies', this.currentAlly)
+            errorLog('Error in getting requests for simpleAllies', this.currentAlly)
         }
 
         // Organize requests by type with keys of ID
 
         for (const request of rawAllyRequests) {
+            if (!AllyRequestTypes[request.requestType]) {
+                errorLog(
+                    'AllyRequestManager',
+                    `Improper request, no type has been assigned. Request is from ${this.currentAlly}`,
+                )
+                continue
+            }
+
             const ID = collectiveManager.newTickID()
             request.ID = ID
 

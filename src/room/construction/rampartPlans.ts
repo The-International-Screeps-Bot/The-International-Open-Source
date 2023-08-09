@@ -1,4 +1,4 @@
-import { packXYAsNum } from 'international/utils'
+import { packXYAsNum } from 'utils/utils'
 import { packCoord, packRampartPlanCoord, packXYAsCoord } from 'other/codec'
 import { encode, decode } from 'base32768'
 import { allStructureTypes } from 'international/constants'
@@ -28,7 +28,6 @@ export class RampartPlans {
         const plans = new RampartPlans()
 
         for (let i = 0; i < packedMap.length; i += 5) {
-
             const data = decode(packedMap[i + 2] + packedMap[i + 3] + packedMap[i + 4])
 
             plans.map[packedMap[i] + packedMap[i + 1]] = {

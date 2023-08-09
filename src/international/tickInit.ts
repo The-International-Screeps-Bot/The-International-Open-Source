@@ -26,7 +26,7 @@ import {
     findCPUOf,
     randomRange,
     randomTick,
-} from './utils'
+} from '../utils/utils'
 import { collectiveManager, CollectiveManager } from './collective'
 import { updateStat, statsManager } from './statsManager'
 import { indexOf } from 'lodash'
@@ -37,25 +37,11 @@ import { roomUtils } from 'room/roomUtils'
 
 class TickInit {
     public run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (global.settings.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
         this.configGeneral()
         statsManager.internationalPreTick()
         this.configWorkRequests()
         this.configCombatRequests()
         this.configHaulRequests()
-
-        if (global.settings.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Tick Config', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: InternationalStatNames = 'tccu'
-            updateStat('', statName, cpuUsed, true)
-        }
     }
 
     configGeneral() {

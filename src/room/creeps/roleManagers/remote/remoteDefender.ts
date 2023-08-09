@@ -5,7 +5,7 @@ import {
     RoomTypes,
     remoteTypeWeights,
 } from 'international/constants'
-import { findClosestObject, getRangeXY, randomIntRange } from 'international/utils'
+import { findClosestObject, getRangeXY, randomIntRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
 
 export class RemoteDefender extends Creep {

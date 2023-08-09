@@ -25,11 +25,6 @@ export interface Settings {
     mapVisuals: boolean
 
     /**
-     * Wether the bot should log CPU data
-     */
-    CPULogging: boolean
-
-    /**
      * Wether the bot save RoomStats data
      */
     roomStats: 0 | 1 | 2
@@ -102,7 +97,7 @@ export interface Settings {
     /**
      * The public segment number (0-99) that you and your allies are using
      */
-    simpleAlliesSegment: number
+    allySegmentID: number
     /**
      * Wether or not to send errors, if set up, to the error storer
      */
@@ -122,7 +117,6 @@ export const defaultSettings: Settings = {
     baseVisuals: false,
     dataVisuals: false,
     mapVisuals: false,
-    CPULogging: Game.shard.name === 'performanceServer' ? true : false,
     roomStats: 2,
     allies: [],
     nonAggressionPlayers: [],
@@ -137,7 +131,7 @@ export const defaultSettings: Settings = {
     logging: Game.shard.name === 'performanceServer' ? 0 : 1,
     creepSay: true,
     creepChant: true,
-    simpleAlliesSegment: 90,
+    allySegmentID: 90,
     errorExporting: false,
     structureMigration: true,
 }

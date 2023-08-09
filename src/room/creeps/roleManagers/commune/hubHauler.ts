@@ -5,7 +5,7 @@ import {
     linkSendThreshold,
     powerSpawnRefillThreshold,
 } from 'international/constants'
-import { findObjectWithID, getRange, unpackNumAsPos } from 'international/utils'
+import { findObjectWithID, getRange, unpackNumAsPos } from 'utils/utils'
 
 //import { HubHauler } from '../../creepClasses'
 

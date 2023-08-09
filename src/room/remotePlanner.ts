@@ -42,7 +42,7 @@ import {
     forCoordsAroundRange,
     randomIntRange,
     sortBy,
-} from 'international/utils'
+} from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import {
     packCoord,

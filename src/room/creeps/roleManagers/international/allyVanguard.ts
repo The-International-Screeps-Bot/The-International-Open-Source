@@ -5,7 +5,7 @@ import {
     RoomTypes,
     Result,
 } from 'international/constants'
-import { findObjectWithID, getRangeXY, getRange } from 'international/utils'
+import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {

@@ -13,7 +13,7 @@ import {
     getRangeEucXY,
     getRange,
     randomTick,
-} from 'international/utils'
+} from 'utils/utils'
 import { packCoord } from 'other/codec'
 
 export class RangedDefender extends Creep {

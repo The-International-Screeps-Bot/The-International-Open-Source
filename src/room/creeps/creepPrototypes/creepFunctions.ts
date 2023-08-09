@@ -37,7 +37,7 @@ import {
     randomTick,
     arePositionsEqual,
     findWithLowestScore,
-} from 'international/utils'
+} from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { any, pick, random, repeat } from 'lodash'
 import {

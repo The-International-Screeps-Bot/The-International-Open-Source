@@ -6,7 +6,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
-import { getRangeXY, randomIntRange, randomTick } from 'international/utils'
+import { getRangeXY, randomIntRange, randomTick } from 'utils/utils'
 
 export class RemoteCoreAttacker extends Creep {
     constructor(creepID: Id<Creep>) {

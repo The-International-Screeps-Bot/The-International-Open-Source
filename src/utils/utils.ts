@@ -13,8 +13,8 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     PlayerMemoryKeys,
-} from './constants'
-import { collectiveManager } from './collective'
+} from '../international/constants'
+import { collectiveManager } from '../international/collective'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -158,10 +158,6 @@ interface CustomLogOpts {
 
 /**
  * Outputs HTML and CSS styled console logs
- * @param title Title of the log
- * @param message Main content of the log
- * @param color Colour of the text. Default is black
- * @param bgColor Colour of the background. Default is white
  */
 export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
     if (!global.settings.logging) return
@@ -185,6 +181,24 @@ export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
     global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${
         opts.textColor
     };'>${message ?? ''}</div></div>`
+}
+
+/**
+ * Uniform styling for customLog error logs
+ * @param title the location of the error - ussually the function or class name
+ * @param message the description of the error
+ */
+export function errorLog(title: any, message?: any, opts?: CustomLogOpts) {
+    opts.textColor = customColors.white
+    opts.bgColor = customColors.red
+    customLog(`(Error) ${title}`, message, opts)
+}
+
+/**
+ *
+ */
+export function stringifyLog(title: any, message?: any, opts?: CustomLogOpts) {
+    customLog(`(Stringify) ${title}`, message, opts)
 }
 
 /**

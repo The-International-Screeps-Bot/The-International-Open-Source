@@ -36,7 +36,7 @@ import {
     roomNameFromRoomCoord,
     roomNameFromRoomXY,
     sortBy,
-} from 'international/utils'
+} from 'utils/utils'
 import { CommuneManager } from './commune/commune'
 import { DroppedResourceManager } from './droppedResources'
 import { ContainerManager } from './container'

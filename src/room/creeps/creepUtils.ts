@@ -1,6 +1,6 @@
 import { CreepMemoryKeys, Result, creepRoles } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { getRange } from 'international/utils'
+import { getRange } from 'utils/utils'
 
 export const creepUtils = {
     expandName(creepName: string) {
@@ -131,10 +131,7 @@ export const creepUtils = {
 
         return true
     },
-    repairCommuneStationary(creep: Creep) {
-
-        
-    },
+    repairCommuneStationary(creep: Creep) {},
     repairNearby(creep: Creep) {
         // If the this has no energy, inform false
 

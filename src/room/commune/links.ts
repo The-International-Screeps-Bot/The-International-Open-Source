@@ -1,5 +1,5 @@
 import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
-import { customLog } from 'international/utils'
+import { customLog } from 'utils/utils'
 import { CommuneManager } from './commune'
 
 export class LinkManager {
@@ -38,14 +38,21 @@ export class LinkManager {
             if (!sourceLink) continue
             // If the link is not nearly full, iterate
 
-            if (sourceLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > sourceLink.store.energy) continue
+            if (
+                sourceLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold >
+                sourceLink.store.energy
+            )
+                continue
 
             // Otherwise, loop through each receiverLink
 
             for (const receiverLink of receiverLinks as StructureLink[]) {
                 // If the link is more than x% full, iterate
 
-                if (receiverLink.store.energy > receiverLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold)
+                if (
+                    receiverLink.store.energy >
+                    receiverLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold
+                )
                     continue
 
                 // Otherwise, have the sourceLink transfer to the receiverLink
@@ -53,7 +60,8 @@ export class LinkManager {
                 sourceLink.transferEnergy(receiverLink)
 
                 receiverLink.store.energy += sourceLink.store.energy
-                sourceLink.store.energy -= receiverLink.store.getCapacity(RESOURCE_ENERGY) - receiverLink.store.energy
+                sourceLink.store.energy -=
+                    receiverLink.store.getCapacity(RESOURCE_ENERGY) - receiverLink.store.energy
 
                 // And stop the loop
 
@@ -71,11 +79,15 @@ export class LinkManager {
 
         // If the hubLink is not sufficiently full, stop
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy)
+            return
 
         // If the fastFillerLink is more than x% full, stop
 
-        if (fastFillerLink.store.energy > fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold)
+        if (
+            fastFillerLink.store.energy >
+            fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold
+        )
             return
 
         // Otherwise, have the sourceLink transfer to the recieverLink
@@ -107,11 +119,15 @@ export class LinkManager {
 
         // If the hubLink is not sufficiently full, stop
 
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy) return
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold > hubLink.store.energy)
+            return
 
         // If the controllerLink is more than x% full, stop
 
-        if (controllerLink.store.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold)
+        if (
+            controllerLink.store.energy >
+            controllerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold
+        )
             return
 
         // Otherwise, have the sourceLink transfer to the recieverLink
@@ -128,7 +144,11 @@ export class LinkManager {
 
         // If we have suffient energy
 
-        if (controllerLink.reserveStore.energy > controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.75) return
+        if (
+            controllerLink.reserveStore.energy >
+            controllerLink.store.getCapacity(RESOURCE_ENERGY) * 0.75
+        )
+            return
 
         this.communeManager.room.createRoomLogisticsRequest({
             target: controllerLink,
