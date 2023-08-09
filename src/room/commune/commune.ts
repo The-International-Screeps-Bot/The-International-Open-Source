@@ -287,7 +287,7 @@ export class CommuneManager {
         this.workRequestManager.preTickRun()
     }
 
-    public run() {
+    run() {
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
         this.defenceManager.run()

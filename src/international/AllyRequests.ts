@@ -116,6 +116,8 @@ class AllyRequestManager {
             throw Error('Too many segments open: AllyRequestManager')
         }
 
+        this.convertTerminalRequestsForAllies()
+
 /*         const newSegmentData = (collectiveManager.myAllyRequestData =
             collectiveManager.myAllyRequestData.concat(this.myRequests)) */
 
@@ -126,6 +128,18 @@ class AllyRequestManager {
         // Assign my requests publically for my allies to read
         RawMemory.segments[global.settings.allySegmentID] = JSON.stringify(newSegmentData)
         RawMemory.setPublicSegments([global.settings.allySegmentID])
+    }
+
+    /**
+     * Convert unfilfilled terminal requests to ally requests, so they can respond to them. The goal is to prioritize internal sending over ally sending
+     */
+    private convertTerminalRequestsForAllies() {
+
+        for (const ID in collectiveManager.terminalRequests) {
+
+            const request = collectiveManager.terminalRequests[ID]
+            this.requestResource(request.roomName, request.resource, request.amount, request.priority)
+        }
     }
 
     requestAttack(

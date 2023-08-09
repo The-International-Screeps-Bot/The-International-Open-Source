@@ -202,6 +202,7 @@ export class RoomManager {
     preTickRun() {
         if (this.room.communeManager) {
             this.room.communeManager.preTickRun()
+            return
         }
     }
 

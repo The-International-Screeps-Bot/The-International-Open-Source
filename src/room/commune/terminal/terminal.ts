@@ -22,6 +22,30 @@ export class TerminalManager {
         this.createTerminalRequests()
     }
 
+    run() {
+        const { room } = this.communeManager
+        const { terminal } = room
+
+        // Stop if there is no terminal
+
+        if (!terminal) return
+        if (!terminal.RCLActionable) return
+
+        /* this.createAllyRequests() */
+
+        if (terminal.cooldown > 0) return
+
+        if (this.respondToTerminalRequests()) return
+        if (this.respondToAllyRequests()) return
+
+        // The market is disabled by us or the server
+
+        if (!global.settings.marketUsage) return
+        if (!collectiveManager.marketIsFunctional) return
+
+        this.manageResources()
+    }
+
     private createTerminalRequests() {
         const { room } = this.communeManager
         const { terminal } = room
@@ -47,10 +71,6 @@ export class TerminalManager {
                 terminal.store.getFreeCapacity(),
             )
 
-            // If we have allies to trade with, also request from them
-
-            allyRequestManager.requestResource(room.name, resource, amount, priority)
-
             const ID = newID()
 
             collectiveManager.terminalRequests[ID] = {
@@ -63,30 +83,7 @@ export class TerminalManager {
         }
     }
 
-    run() {
-        const { room } = this.communeManager
-        const { terminal } = room
-
-        // Stop if there is no terminal
-
-        if (!terminal) return
-        if (!terminal.RCLActionable) return
-
-        /* this.createAllyRequests() */
-
-        if (terminal.cooldown > 0) return
-
-        if (this.respondToTerminalRequests()) return
-        if (this.respondToAllyRequests()) return
-
-        // The market is disabled by us or the server
-
-        if (!global.settings.marketUsage) return
-        if (!collectiveManager.marketIsFunctional) return
-
-        this.manageResources()
-    }
-    findBestTerminalRequest(): [TerminalRequest, number] {
+    private findBestTerminalRequest(): [TerminalRequest, number] {
         const budget = Math.min(
             this.communeManager.room.resourcesInStoringStructures.energy -
                 this.communeManager.minStoredEnergy,
