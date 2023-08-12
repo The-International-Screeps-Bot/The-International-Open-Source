@@ -9,6 +9,7 @@ src/wasm/target
 # https://github.com/rustwasm/wasm-pack/pull/1131)
 src/wasm/src
 Cargo.lock
+Cargo.toml
 
 # user-custom code
 src/other/userScript/*
