@@ -2,12 +2,6 @@
 /* eslint-disable */
 /**
 */
-export function wasm_function(): void;
-/**
-*/
-export function run_test(): void;
-/**
-*/
 export function collaborator(): void;
 /**
 */
@@ -170,10 +164,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly wasm_function: () => void;
   readonly collaborator: () => void;
   readonly log_setup: () => void;
-  readonly run_test: () => void;
   readonly __wbg_searchgoal_free: (a: number) => void;
   readonly searchgoal_pos: (a: number) => number;
   readonly searchgoal_range: (a: number) => number;

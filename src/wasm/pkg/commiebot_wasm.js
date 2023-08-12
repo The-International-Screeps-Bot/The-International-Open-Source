@@ -192,18 +192,6 @@ function debugString(val) {
 }
 /**
 */
-export function wasm_function() {
-    wasm.wasm_function();
-}
-
-/**
-*/
-export function run_test() {
-    wasm.run_test();
-}
-
-/**
-*/
 export function collaborator() {
     wasm.collaborator();
 }
@@ -364,7 +352,7 @@ function __wbg_get_imports() {
         getInt32Memory0()[arg0 / 4 + 1] = len1;
         getInt32Memory0()[arg0 / 4 + 0] = ptr1;
     };
-    imports.wbg.__wbg_getMe_5e040ba5f4c2e2b2 = function() {
+    imports.wbg.__wbg_getMe_463fab2b1ba54c2f = function() {
         const ret = getMe();
         return addHeapObject(ret);
     };
