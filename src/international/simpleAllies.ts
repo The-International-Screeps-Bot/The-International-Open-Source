@@ -136,12 +136,11 @@ class SimpleAllies {
      * Try to get segment data from our current ally. If successful, assign to the instane
      */
     readAllySegment() {
+        if (!global.settings.allies.length) {
+            throw Error("Failed to find an ally for simpleAllies, you probably have none :(")
+        }
 
         this.currentAlly = global.settings.allies[Game.time % global.settings.allies.length]
-        if (!this.currentAlly) {
-            throw Error('Failed to find an ally for simpleAllies, you probably have no allies :(')
-            return
-        }
 
         // Make a request to read the data of the next ally in the list, for next tick
         const nextAllyName = global.settings.allies[(Game.time + 1) % global.settings.allies.length]

@@ -118,7 +118,9 @@ export const defaultSettings: Settings = {
     dataVisuals: false,
     mapVisuals: false,
     roomStats: 2,
-    allies: [],
+    allies: [
+        'MarvinTMB'
+    ],
     nonAggressionPlayers: [],
     tradeBlacklist: [],
     pixelSelling: false,
