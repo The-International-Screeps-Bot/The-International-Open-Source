@@ -984,3 +984,22 @@ export function outOfBucket() {
             : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
     )
 }
+
+/**
+ * Finds your username
+ */
+export function getMe() {
+    if (Memory.me) return Memory.me
+
+    for (const roomName in Game.rooms) {
+
+        const room = Game.rooms[roomName]
+        if (!room.controller) continue
+        if (!room.controller.my) continue
+
+        return room.controller.owner.username
+    }
+
+    // This should never happen
+    return 'username'
+}

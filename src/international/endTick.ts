@@ -1,16 +1,11 @@
 import { customColors } from 'international/constants'
 import { customLog, findCPUColor, findCPUOf } from 'utils/utils'
-import { allyRequestManager } from 'international/AllyRequests'
-import { collectiveManager, CollectiveManager } from './collective'
-import { statsManager } from './statsManager'
 
 /**
  * Handles logging, stat recording, and more at the end of the tick
  */
 class EndTickManager {
     run() {
-        allyRequestManager.endRun()
-        statsManager.internationalEndTick()
 
         if (!global.settings.logging) return
 

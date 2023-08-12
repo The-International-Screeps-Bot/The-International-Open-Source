@@ -1,3 +1,4 @@
+import { getMe } from 'utils/utils'
 import { playerManager } from './players'
 import { statsManager } from './statsManager'
 
@@ -26,10 +27,10 @@ class InitManager {
         if (Memory.breakingVersion) return
 
         Memory.breakingVersion = global.settings.breakingVersion
-        Memory.me =
-            (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
+        Memory.me = getMe()
+            /* (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
-            'username'
+            'username' */
 
         // Construct foundation
 

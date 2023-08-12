@@ -1,10 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @returns {number | undefined}
-*/
-export function find_collective_segment(): number | undefined;
-/**
 */
 export function wasm_function(): void;
 /**
@@ -174,7 +170,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly find_collective_segment: () => number;
   readonly wasm_function: () => void;
   readonly collaborator: () => void;
   readonly log_setup: () => void;

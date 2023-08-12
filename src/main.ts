@@ -20,7 +20,7 @@ import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { migrationManager } from 'international/migration'
 import { respawnManager } from './international/respawn'
 import { tickInit } from './international/tickInit'
-import { allyRequestManager } from 'international/AllyRequests'
+import { simpleAllies } from 'international/simpleAllies'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
@@ -66,7 +66,7 @@ export function originalLoop() {
         tickInit.configGeneral()
         statsManager.tickInit()
         collectiveManager.update()
-        allyRequestManager.initRun()
+        simpleAllies.initRun()
         wasm.collaborator()
 
         roomsManager.updateRun()
@@ -87,6 +87,8 @@ export function originalLoop() {
         roomsManager.run()
 
         mapVisualsManager.run()
+        simpleAllies.endRun()
+        statsManager.internationalEndTick()
 
         collectiveManager.advancedGeneratePixel()
         collectiveManager.advancedSellPixels()

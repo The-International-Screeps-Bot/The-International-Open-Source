@@ -175,7 +175,6 @@ declare global {
         | 'antifaDowngrader'
 
     interface TerminalRequest {
-        ID: string
         /**
          * Preference from 0-1 where 1 is least prefered
          */
@@ -2012,7 +2011,7 @@ declare global {
         [RoomMemoryKeys.haulRequests]: string[]
         [RoomMemoryKeys.nukeRequest]: string
         [RoomMemoryKeys.threatened]: number
-        [RoomMemoryKeys.lastAttacked]: number
+        [RoomMemoryKeys.lastAttackedBy]: number
         [RoomMemoryKeys.minHaulerCost]: number
         [RoomMemoryKeys.minHaulerCostUpdate]: number
         [RoomMemoryKeys.greatestRCL]: number
@@ -2088,7 +2087,7 @@ declare global {
         [PlayerMemoryKeys.offensiveThreat]: number
         [PlayerMemoryKeys.defensiveStrength]: number
         [PlayerMemoryKeys.hate]: number
-        [PlayerMemoryKeys.lastAttacked]: number
+        [PlayerMemoryKeys.lastAttackedBy]: number
         [PlayerMemoryKeys.rangeFromExitWeight]: number
         [PlayerMemoryKeys.relationship]: PlayerRelationship
         [PlayerMemoryKeys.reputation]: number
@@ -2227,6 +2226,7 @@ declare global {
 
     namespace NodeJS {
         interface Global {
+            // Required for roomAdditions. Eventually this should be removed
             [key: string]: any
 
             // User custom
@@ -2242,7 +2242,6 @@ declare global {
             userScriptExample(): void
 
             //
-
 
             /**
              * Whether global is constructed or not

@@ -23,6 +23,7 @@ opt-level = 3
 lto = true
 
 [package.metadata.wasm-pack.profile.release]
+strip = true
 #wasm-opt = ["-O4", "--disable-sign-ext"]
 wasm-opt = false
 

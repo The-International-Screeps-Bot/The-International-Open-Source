@@ -1,7 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export function find_collective_segment(): number;
 export function wasm_function(): void;
 export function collaborator(): void;
 export function log_setup(): void;

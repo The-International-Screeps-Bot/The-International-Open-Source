@@ -19,7 +19,7 @@ export enum PlayerMemoryKeys {
     /**
      * The last time we were attacked by them
      */
-    lastAttacked,
+    lastAttackedBy,
     /**
      * the positive, non-zero value for which to weight enemy exit retreat threat
      */
@@ -234,7 +234,7 @@ export enum RoomMemoryKeys {
     haulRequests,
     nukeRequest,
     threatened,
-    lastAttacked,
+    lastAttackedBy,
     minHaulerCost,
     minHaulerCostUpdate,
     greatestRCL,
@@ -311,7 +311,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.minHaulerCost,
     RoomMemoryKeys.minHaulerCostUpdate,
     RoomMemoryKeys.threatened,
-    RoomMemoryKeys.lastAttacked,
+    RoomMemoryKeys.lastAttackedBy,
     RoomMemoryKeys.abandonCommune,
     RoomMemoryKeys.score,
     RoomMemoryKeys.dynamicScore,
@@ -355,7 +355,7 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
         RoomMemoryKeys.minHaulerCost,
         RoomMemoryKeys.minHaulerCostUpdate,
         RoomMemoryKeys.threatened,
-        RoomMemoryKeys.lastAttacked,
+        RoomMemoryKeys.lastAttackedBy,
         RoomMemoryKeys.abandonCommune,
         RoomMemoryKeys.score,
         RoomMemoryKeys.dynamicScore,
@@ -499,7 +499,7 @@ export const version = `v2.${global.settings.breakingVersion}.0`
 
 // Set of messages to randomly apply to commune rooms
 
-export const communeSign = 'A commune of the proletariat. Bourgeoisie not welcome here! ' + version
+export const communeSign = 'A commune of the proletariat. Bourgeoisie not welcome here! Now Collectivized. ' + version
 
 // Set of messages to randomly apply to non-commune rooms
 

@@ -13,7 +13,7 @@ import { updateStat } from 'international/statsManager'
 import { customLog, findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
-import { allyRequestManager, AllyRequestTypes } from 'international/AllyRequests'
+import { simpleAllies, AllyRequestTypes } from 'international/simpleAllies'
 import { collectiveManager } from 'international/collective'
 import { playerManager } from 'international/players'
 
@@ -204,7 +204,7 @@ export class RoomVisualsManager {
     }
 
     public internationalDataVisuals() {
-        this.internationalAllyBuildRequestsDataVisuals(
+        this.internationalAllyWorkRequestsDataVisuals(
             this.internationalAllyCombatRequestsDataVisuals(
                 this.internationalAllyResourceRequestsDataVisuals(
                     this.internationalRequestsDataVisuals(
@@ -474,15 +474,14 @@ export class RoomVisualsManager {
 
         const data: any[][] = []
 
-        const requests = allyRequestManager.allyRequests.resource
+        const requests = simpleAllies.allySegmentData.requests.resource
         for (const ID in requests) {
             const request = requests[ID]
-            if (request.requestType !== AllyRequestTypes.resource) continue
 
             const row: any[] = [
                 request.roomName,
                 request.resourceType,
-                request.maxAmount,
+                request.amount,
                 request.priority.toFixed(2),
             ]
             data.push(row)
@@ -520,27 +519,24 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
-        const headers = ['room', 'type', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
+        const headers = ['room', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
 
         const data: any[][] = []
 
-        const requests = allyRequestManager.allyRequests.defense
-        for (const ID in requests) {
-            const request = requests[ID]
-            if (
-                request.requestType !== AllyRequestTypes.attack &&
-                request.requestType !== AllyRequestTypes.defense
-            )
-                continue
+        const defenseRequests = simpleAllies.allySegmentData.requests.defense
+        for (const roomName in defenseRequests) {
+            const request = defenseRequests[roomName]
 
-            const row: any[] = [
-                request.roomName,
-                AllyRequestTypes[request.requestType],
-                request.minDamage,
-                request.minMeleeHeal,
-                request.minRangedHeal,
-                request.priority.toFixed(2),
-            ]
+            const row: any[] = [roomName, request.priority.toFixed(2)]
+            data.push(row)
+            continue
+        }
+
+        const attackRequests = simpleAllies.allySegmentData.requests.attack
+        for (const roomName in attackRequests) {
+            const request = attackRequests[roomName]
+
+            const row: any[] = [roomName, request.priority.toFixed(2)]
             data.push(row)
             continue
         }
@@ -575,17 +571,16 @@ export class RoomVisualsManager {
         return y + height
     }
 
-    private internationalAllyBuildRequestsDataVisuals(y: number) {
-        const headers = ['room', 'priority']
+    private internationalAllyWorkRequestsDataVisuals(y: number) {
+        const headers = ['room', 'type', 'priority']
 
         const data: any[][] = []
 
-        const requests = allyRequestManager.allyRequests.build
-        for (const ID in requests) {
-            const request = requests[ID]
-            if (request.requestType !== AllyRequestTypes.build) continue
+        const requests = simpleAllies.allySegmentData.requests.work
+        for (const roomName in requests) {
+            const request = requests[roomName]
 
-            const row: any[] = [request.roomName, request.priority.toFixed(2)]
+            const row: any[] = [roomName, request.workType, request.priority.toFixed(2)]
             data.push(row)
             continue
         }
@@ -640,7 +635,7 @@ export class RoomVisualsManager {
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
                 roomMemory[RoomMemoryKeys.threatened].toFixed(2),
-                roomMemory[RoomMemoryKeys.lastAttacked],
+                roomMemory[RoomMemoryKeys.lastAttackedBy],
                 this.roomManager.room.communeManager.storedEnergyUpgradeThreshold,
                 this.roomManager.room.communeManager.storedEnergyBuildThreshold,
                 this.roomManager.room.towerInferiority || 'false',

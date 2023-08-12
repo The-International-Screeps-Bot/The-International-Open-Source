@@ -54,9 +54,9 @@ export class CollectiveManager extends Sleepable {
      */
     safemodedCommuneName: string | undefined
     /**
-     * An intra-tick collection of request data we wish to submit to allies
+     * An intra-tick collection of commands we wish to issue
      */
-    myAllyRequestData: any[]
+    myCommands: any[]
 
     /**
      * Updates values to be present for this tick
@@ -76,7 +76,7 @@ export class CollectiveManager extends Sleepable {
         for (const mineralType of minerals) {
             this.mineralCommunes[mineralType] = 0
         }
-        this.myAllyRequestData = []
+        this.myCommands = []
 
         delete this._myOrders
         delete this._orders

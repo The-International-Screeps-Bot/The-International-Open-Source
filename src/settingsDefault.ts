@@ -72,7 +72,7 @@ export interface Settings {
     /**
      * Wether the bot should try trading with its allies
      */
-    allyTrading: boolean
+    allyCommunication: boolean
 
     /**
      * Wether or not the bot should be using the market
@@ -126,7 +126,7 @@ export const defaultSettings: Settings = {
     autoClaim: true,
     autoAttack: false,
     publicRamparts: false,
-    allyTrading: true,
+    allyCommunication: true,
     marketUsage: true,
     logging: Game.shard.name === 'performanceServer' ? 0 : 1,
     creepSay: true,

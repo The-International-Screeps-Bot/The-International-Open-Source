@@ -11,7 +11,7 @@ import {
     safemodeTargets,
 } from 'international/constants'
 import { playerManager } from 'international/players'
-import { allyRequestManager } from 'international/AllyRequests'
+import { simpleAllies } from 'international/simpleAllies'
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
@@ -226,7 +226,7 @@ export class DefenceManager {
         const { room } = this.communeManager
 
         // Wait some pseudo-random time before publicizing ramparts
-        if (room.memory[RoomMemoryKeys.lastAttacked] < randomIntRange(100, 150)) return
+        if (room.memory[RoomMemoryKeys.lastAttackedBy] < randomIntRange(100, 150)) return
 
         // Publicize at most 10 ramparts per tick, to avoid too many intents
 
@@ -342,8 +342,10 @@ export class DefenceManager {
             [CombatRequestKeys.inactionTimerMax]: onlyInvader ? 1 : undefined,
         })
 
-        if (global.settings.allies) {
-            allyRequestManager.requestDefense(room.name, minDamage, minMeleeHeal, minRangedHeal, 1)
+        if (!global.settings.allyCommunication) return
+
+        simpleAllies.myRequests.defense[room.name] = {
+            priority: 1,
         }
     }
 
@@ -406,10 +408,10 @@ export class DefenceManager {
                     player[PlayerMemoryKeys.offensiveThreat],
                 )
                 player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
-                player[PlayerMemoryKeys.lastAttacked] = 0
+                player[PlayerMemoryKeys.lastAttackedBy] = 0
             }
 
-            roomMemory[RoomMemoryKeys.lastAttacked] = 0
+            roomMemory[RoomMemoryKeys.lastAttackedBy] = 0
             return
         }
 
@@ -419,6 +421,6 @@ export class DefenceManager {
         if (roomMemory[RoomMemoryKeys.threatened] > 0)
             roomMemory[RoomMemoryKeys.threatened] *= defaultDataDecay
 
-        roomMemory[RoomMemoryKeys.lastAttacked] += 1
+        roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
     }
 }

@@ -26,7 +26,7 @@ export class PlayerManager extends Sleepable {
 
             // So long as the player has attacked at some pount, record it
 
-            player[PlayerMemoryKeys.lastAttacked] += 1
+            player[PlayerMemoryKeys.lastAttackedBy] += 1
 
             const threat = player[PlayerMemoryKeys.offensiveThreat]
             if (threat <= this.highestThreat) continue
@@ -40,7 +40,7 @@ export class PlayerManager extends Sleepable {
             [PlayerMemoryKeys.offensiveThreat]: 0,
             [PlayerMemoryKeys.defensiveStrength]: 0,
             [PlayerMemoryKeys.hate]: 0,
-            [PlayerMemoryKeys.lastAttacked]: Infinity,
+            [PlayerMemoryKeys.lastAttackedBy]: Infinity,
             [PlayerMemoryKeys.rangeFromExitWeight]: 0.5,
         })
     }

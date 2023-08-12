@@ -7,7 +7,6 @@ global.clearGlobal = function () {
 
     Game.cpu?.halt()
 }
-global.CG = global.clearGlobal
 
 /**
  * Delete properties in Memory
@@ -22,7 +21,6 @@ global.clearMemory = function () {
 
     return 'Cleared all of Memory'
 }
-global.CM = global.clearMemory
 
 global.killCreeps = function (roles?) {
     // Cancel spawning in communes
@@ -54,8 +52,6 @@ global.killCreeps = function (roles?) {
 
     return `Killed an total of ${killedCreepCount} creeps ${roles ? `with the roles ${roles}` : ''}`
 }
-global.marxistLeninism = global.killCreeps
-global.genocide = global.killCreeps
 
 global.removeCSites = function (removeInProgress, types?) {
     let removedCSCount = 0
@@ -276,7 +272,6 @@ global.deleteBasePlans = function (roomName) {
 
     return 'Deleted base plans for ' + roomName
 }
-global.DBP = global.deleteBasePlans
 
 global.usedHeap = function () {
     const usedHeap =
