@@ -212,8 +212,7 @@ export class TowerManager {
         const ramparts = room.enemyAttackers.length
             ? room.communeManager.defensiveRamparts
             : room.communeManager.rampartRepairTargets
-        console.log('----------------------')
-        console.log(ramparts.length, room.roomManager.structures.rampart.length)
+
         const [score, rampart] = findWithLowestScore(ramparts, rampart => {
             let score = rampart.hits
             // Account for decay amount: percent of time to decay times decay amount
@@ -224,10 +223,9 @@ export class TowerManager {
 
             return score
         })
-        console.log(rampart)
+
         const rampartRepairThreshold = this.rampartRepairTreshold
-        console.log(score, rampartRepairThreshold)
-        console.log('--------------')
+
         // Make sure the rampart is below the treshold
         if (score > rampartRepairThreshold) return false
         return rampart
