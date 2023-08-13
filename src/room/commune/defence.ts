@@ -14,6 +14,7 @@ import { playerManager } from 'international/players'
 import { simpleAllies } from 'international/simpleAllies'
 import { updateStat } from 'international/statsManager'
 import {
+    createErrorStack,
     customLog,
     findObjectWithID,
     findWeightedRangeFromExit,
@@ -80,10 +81,10 @@ export class DefenceManager {
         // Filter attackers that are not invaders. If there are none, stop
 
         const nonInvaderAttackers = room.enemyAttackers.filter(
-            enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username /* !== 'Invader' */,
+            enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username !== 'Invader',
         )
-
         if (!nonInvaderAttackers.length) return false
+
         if (!this.isControllerSafe()) return true
         if (!this.isBaseSafe()) return true
 
@@ -126,13 +127,25 @@ export class DefenceManager {
         return false */
     }
 
+    private isSafe() {
+
+
+    }
+
     private isBaseSafe() {
         const { room } = this.communeManager
+
+        const anchor = room.roomManager.anchor
+        if (!anchor) {
+
+            throw createErrorStack('no anchor')
+        }
+
         const terrain = Game.map.getRoomTerrain(room.name)
         const rampartPlans = RampartPlans.unpack(
             Memory.rooms[room.name][RoomMemoryKeys.rampartPlans],
         )
-        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], coord => {
+        const enemyCoord = roomUtils.floodFillFor(room.name, [anchor], coord => {
             // Ignore terrain that protects us
             if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
@@ -171,14 +184,14 @@ export class DefenceManager {
     private isControllerSafe() {
         const { room } = this.communeManager
         const terrain = Game.map.getRoomTerrain(room.name)
-        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], coord => {
+        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], (coord, packedCoord, depth) => {
             // See if we should even consider the coord
 
             // Ignore terrain that protects us
             if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
             // Don't go out of range 2 from controller
-            if (getRange(room.controller.pos, coord) > 2) return false
+            if (depth > 2) return false
 
             // Ignore structures that protect us
             if (room.coordHasStructureTypes(coord, ourImpassibleStructuresSet)) return false

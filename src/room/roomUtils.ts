@@ -131,7 +131,7 @@ export const roomUtils = {
                     // Custom check for the coord
                     const checkResult = coordCheck(adjacentCoord, packedAdjacentCoord, depth)
                     if (checkResult === 'stop') return adjacentCoord
-                    else if (checkResult === false) continue
+                    if (!checkResult) continue
 
                     nextGeneration.push(coord)
                 }
