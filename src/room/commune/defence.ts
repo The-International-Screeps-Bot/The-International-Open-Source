@@ -14,7 +14,6 @@ import { playerManager } from 'international/players'
 import { simpleAllies } from 'international/simpleAllies'
 import { updateStat } from 'international/statsManager'
 import {
-    createErrorStack,
     customLog,
     findObjectWithID,
     findWeightedRangeFromExit,
@@ -138,7 +137,7 @@ export class DefenceManager {
         const anchor = room.roomManager.anchor
         if (!anchor) {
 
-            throw createErrorStack('no anchor')
+            throw Error('no anchor')
         }
 
         const terrain = Game.map.getRoomTerrain(room.name)

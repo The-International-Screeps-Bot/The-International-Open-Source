@@ -1003,11 +1003,3 @@ export function getMe() {
     // This should never happen
     return 'username'
 }
-
-export function createErrorStack(message: string) {
-
-    console.log('Error: ' + message)
-
-    const err = new Error(message)
-    return err.stack
-}

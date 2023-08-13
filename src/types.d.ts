@@ -196,11 +196,11 @@ declare global {
          */
         coversStructure: number
         /**
-         * A boolean integer
+         * A boolean integer. buildForNuke cannot be true if buildForThreat is true
          */
         buildForNuke: number
         /**
-         * A boolean integer
+         * A boolean integer. buildForThreat cannot be true if buildForNuke is true
          */
         buildForThreat: number
         /**

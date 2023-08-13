@@ -49,10 +49,10 @@ export class TowerManager {
 
         this.createRoomLogisticsRequests()
 
-        if (!this.attackEnemyCreeps()) return
-        if (!this.healCreeps()) return
-        if (!this.repairRamparts()) return
-        if (!this.repairGeneral()) return
+        if (this.attackEnemyCreeps()) return
+        if (this.healCreeps()) return
+        if (this.repairRamparts()) return
+        if (this.repairGeneral()) return
     }
 
     private trackEnemySquads() {}
@@ -110,15 +110,15 @@ export class TowerManager {
         if (this.communeManager.room.flags.disableTowerAttacks) {
             this.communeManager.room.towerInferiority =
                 this.communeManager.room.enemyAttackers.length > 0
-            return true
+            return false
         }
         if (!this.actionableTowerIDs.length) return false
         if (!this.communeManager.room.enemyCreeps.length) return false
 
         const attackTarget = this.findAttackTarget()
         if (!attackTarget) {
-            this.scatterShot()
-            return true
+
+            return this.scatterShot()
         }
 
         for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
@@ -128,11 +128,11 @@ export class TowerManager {
 
             this.actionableTowerIDs.splice(i, 1)
 
-            const hits = (attackTarget.reserveHits -= towerFunctions.estimateDamageNet(
+            attackTarget.reserveHits -= towerFunctions.estimateDamageNet(
                 tower,
                 attackTarget,
-            ))
-            if (hits <= 0) return true
+            )
+            if (attackTarget.reserveHits <= 0) return true
         }
 
         return true
@@ -143,11 +143,11 @@ export class TowerManager {
      * Maybe we can mess up healing
      */
     scatterShot() {
-        if (this.actionableTowerIDs.length <= 1) return
-        if (!randomTick(200)) return
+        if (this.actionableTowerIDs.length <= 1) return false
+        if (!randomTick(200)) return false
 
         const enemyCreeps = this.communeManager.room.enemyCreeps
-        if (enemyCreeps.length < 4) return
+        if (enemyCreeps.length < Math.min(4, this.actionableTowerIDs.length)) return false
 
         let targetIndex = 0
 
@@ -167,6 +167,8 @@ export class TowerManager {
 
             targetIndex += 1
         }
+
+        return true
     }
 
     findHealTarget() {
@@ -192,7 +194,7 @@ export class TowerManager {
         if (!this.actionableTowerIDs.length) return false
 
         const healTarget = this.findHealTarget()
-        if (!healTarget) return true
+        if (!healTarget) return false
 
         for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
             const tower = findObjectWithID(this.actionableTowerIDs[i])
@@ -210,7 +212,8 @@ export class TowerManager {
         const ramparts = room.enemyAttackers.length
             ? room.communeManager.defensiveRamparts
             : room.communeManager.rampartRepairTargets
-
+        console.log('----------------------')
+        console.log(ramparts.length, room.roomManager.structures.rampart.length)
         const [score, rampart] = findWithLowestScore(ramparts, rampart => {
             let score = rampart.hits
             // Account for decay amount: percent of time to decay times decay amount
@@ -221,9 +224,10 @@ export class TowerManager {
 
             return score
         })
-
+        console.log(rampart)
         const rampartRepairThreshold = this.rampartRepairTreshold
-
+        console.log(score, rampartRepairThreshold)
+        console.log('--------------')
         // Make sure the rampart is below the treshold
         if (score > rampartRepairThreshold) return false
         return rampart
@@ -255,10 +259,10 @@ export class TowerManager {
 
     private repairGeneral() {
         if (!this.actionableTowerIDs.length) return false
-        if (!randomTick(100)) return true
+        if (!randomTick(100)) return false
 
         const structures = this.findGeneralRepairTargets()
-        if (!structures.length) return true
+        if (!structures.length) return false
 
         for (let i = this.actionableTowerIDs.length - 1; i >= 0; i--) {
             const tower = findObjectWithID(this.actionableTowerIDs[i])

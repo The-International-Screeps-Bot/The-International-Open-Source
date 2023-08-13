@@ -342,6 +342,7 @@ export class CommuneManager {
     }
 
     private test() {
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -751,16 +752,22 @@ export class CommuneManager {
             if (
                 data.coversStructure &&
                 !this.room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
-            )
+            ) {
+
                 continue
+            }
 
             if (data.buildForNuke) {
                 if (!this.room.roomManager.nukeTargetCoords[packAsNum(structure.pos)]) continue
 
                 rampartRepairTargets.push(structure)
-            } else if (data.buildForThreat) {
+                continue
+            }
+            if (data.buildForThreat) {
                 if (!this.needsSecondMincutLayer) continue
+
                 rampartRepairTargets.push(structure)
+                continue
             }
 
             rampartRepairTargets.push(structure)
