@@ -102,10 +102,13 @@ export class ConstructionManager extends Sleepable {
                     coord,
                     structure => structure.structureType === STRUCTURE_RAMPART,
                 )
-            )
+            ) {
+
                 continue
-            if (data.coversStructure) {
-                if (!this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) continue
+            }
+
+            if (data.coversStructure && !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) {
+                continue
             }
 
             if (data.buildForNuke) {

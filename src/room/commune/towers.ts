@@ -217,7 +217,7 @@ export class TowerManager {
         const [score, rampart] = findWithLowestScore(ramparts, rampart => {
             let score = rampart.hits
             // Account for decay amount: percent of time to decay times decay amount
-            score += Math.floor(
+            score -= Math.floor(
                 (RAMPART_DECAY_AMOUNT * (RAMPART_DECAY_TIME - rampart.ticksToDecay)) /
                     RAMPART_DECAY_TIME,
             )
