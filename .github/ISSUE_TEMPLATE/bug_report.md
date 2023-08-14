@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+**Commit or otherwise version of the bot**
+
 **Describe the bug**
 
 **Expected behaviour**
