@@ -52,7 +52,7 @@ export class RemoteHauler extends Creep {
         return true
     }
 
-    preTickManager() {
+    initRun() {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) {
             this.suicide()
             return

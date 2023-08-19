@@ -26,7 +26,7 @@ export class RemoteDismantler extends Creep {
         return true
     }
 
-    preTickManager() {
+    initRun() {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
         if (!this.findRemote()) return
 
@@ -135,7 +135,7 @@ export class RemoteDismantler extends Creep {
             }
         }
 
-        const targets = room.dismantleTargets
+        const targets = room.roomManager.dismantleTargets
 
         if (targets.length) {
             target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })

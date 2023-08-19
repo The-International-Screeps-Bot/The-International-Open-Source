@@ -23,7 +23,7 @@ export class RemoteDefender extends Creep {
         return true
     }
 
-    preTickManager(): void {
+    initRun(): void {
         if (!this.findRemote()) return
 
         const role = this.role as 'remoteDefender'
@@ -109,12 +109,12 @@ export class RemoteDefender extends Creep {
     advancedAttackEnemies?(): boolean {
         const { room } = this
 
-        const enemyAttackers = room.enemyAttackers
+        const enemyAttackers = room.roomManager.enemyAttackers
 
         // If there are none
 
         if (!enemyAttackers.length) {
-            const enemyCreeps = room.enemyCreeps
+            const enemyCreeps = room.roomManager.notMyCreeps.enemy
 
             if (!enemyCreeps.length) {
                 return this.aggressiveHeal()

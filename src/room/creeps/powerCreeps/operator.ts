@@ -6,7 +6,7 @@ export class Operator extends PowerCreep {
         super(creepID)
     }
 
-    preTickManager() {
+    initRun() {
         this.managePowerTask()
         this.avoidEnemyThreatCoords()
     }

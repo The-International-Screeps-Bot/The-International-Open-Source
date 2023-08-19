@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, packedPosLength, Result, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, packedPosLength, ReservedCoordTypes, Result, RoomMemoryKeys } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
@@ -38,7 +38,16 @@ export class SourceHarvester extends Creep {
         return true
     }
 
-    preTickManager() {
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+        }
+    }
+
+    initRun() {
         const { room } = this
 
         if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined && !this.isDying())

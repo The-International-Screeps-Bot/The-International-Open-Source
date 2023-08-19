@@ -654,6 +654,18 @@ export const storingStructureTypesSet: Set<StructureConstant> = new Set([
 export const ourImpassibleStructures = impassibleStructureTypes.concat(STRUCTURE_RAMPART)
 export const ourImpassibleStructuresSet = new Set(ourImpassibleStructures)
 
+export const combatTargetStructureTypes: Set<StructureConstant> = new Set([
+    STRUCTURE_SPAWN,
+    STRUCTURE_TOWER,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_STORAGE,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_FACTORY,
+    STRUCTURE_NUKER,
+    STRUCTURE_OBSERVER
+])
+
 export const customColors = {
     white: '#ffffff',
     lightGrey: '#eaeaea',
@@ -1465,6 +1477,8 @@ export enum Result {
 }
 
 export const maxRemoteRoomDistance = 5
+// Past this it's probably not efficient
+export const maxRemotePathDistance = 250
 export const offsetsByDirection = [
     ,
     [0, -1],
@@ -1617,3 +1631,19 @@ export const preferredCommuneRange = 5.5
 export const defaultDataDecay = 0.99999
 export const revolutionary = 'MarvinTMB'
 export const maxSegmentsOpen = 10
+
+export enum ReservedCoordTypes {
+    /**
+     * Probably a more temporary reserved coord that need not be considered in all situations
+     */
+    normal,
+    /**
+     * Probably a more permanent reserved coord that should be considered in more situations
+     */
+    important,
+    /**
+     * Probably a position very important to combat related coordinate reservation
+     */
+    necessary
+}
+export type ReservedCoordTypesKeys = typeof ReservedCoordTypes[keyof typeof ReservedCoordTypes]

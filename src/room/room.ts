@@ -1,11 +1,14 @@
 import {
     CreepMemoryKeys,
     PlayerMemoryKeys,
+    ReservedCoordTypes,
+    ReservedCoordTypesKeys,
     Result,
     RoomMemoryKeys,
     RoomTypes,
     adjacentOffsets,
     allStructureTypes,
+    combatTargetStructureTypes,
     creepRoles,
     customColors,
     defaultRoadPlanningPlainCost,
@@ -28,6 +31,7 @@ import {
     forAdjacentCoords,
     forCoordsInRange,
     forRoomNamesAroundRangeXY,
+    getRange,
     getRangeXY,
     isAlly,
     makeRoomCoord,
@@ -60,6 +64,7 @@ import {
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { customFindPath } from 'international/customPathFinder'
+import { roomUtils } from './roomUtils'
 
 export interface InterpretedRoomEvent {
     eventType: EventConstant
@@ -72,6 +77,16 @@ export interface DeadCreepNames {
     my: Set<string>
     enemy: Set<string>
     ally: Set<string>
+}
+
+export interface NotMyCreeps {
+    ally: Creep[]
+    enemy: Creep[]
+}
+
+export interface NotMyConstructionSites {
+    ally: ConstructionSite[]
+    enemy: ConstructionSite[]
 }
 
 export class RoomManager {
@@ -110,24 +125,42 @@ export class RoomManager {
      * Incremental order of move request runs
      */
     runMoveRequestOrder = 0
+    /**
+     * Packed coords reserved by creeps
+     */
+    reservedCoords: Map<string, ReservedCoordTypes>
 
     update(room: Room) {
         delete this.checkedStructureUpdate
         delete this.checkedCSiteUpdate
-        delete this._usedControllerCoords
         delete this._generalRepairStructures
         delete this._communeSources
         delete this._remoteSources
         delete this._mineral
-        delete this._usedStationaryCoords
         delete this.checkedStructureUpdate
         delete this.checkedCSiteUpdate
         delete this._structures
         delete this._cSites
+        delete this._notMyCreeps
+        delete this._enemyAttackers
+        delete this._myDamagedCreeps
+        delete this._myDamagedPowerCreeps
+        delete this._allyDamagedCreeps
+        delete this._notMyConstructionSites
+        delete this._allyConstructionSitesByType
+        delete this._actionableSpawningStructures
+        delete this._spawningStructuresByPriority
+        delete this._spawningStructuresByNeed
+        delete this._dismantleTargets
+        delete this._destructibleStructures
+        delete this._combatStructureTargets
+        delete this._fastFillerPositions
 
         if (randomTick()) {
             delete this._nukeTargetCoords
         }
+
+        this.reservedCoords = new Map()
 
         this.room = room
         const roomMemory = room.memory
@@ -281,7 +314,7 @@ export class RoomManager {
         return sourceHarvestPositions.map(positions => packPosList(positions))
     }
 
-    findRemoteSourceFastFillerPaths(
+    findRemoteSourcePaths(
         commune: Room,
         packedRemoteSourceHarvestPositions: string[],
         pathsThrough: Set<string>,
@@ -308,6 +341,9 @@ export class RoomManager {
 
             sourcePaths.push(path)
         }
+
+
+
         /*
         for (const index in sourcePaths) {
             const path = sourcePaths[index]
@@ -723,35 +759,6 @@ export class RoomManager {
         throw Error('No remote controller positions ' + this.room.name)
     }
 
-    _usedControllerCoords: Set<string>
-    /**
-     * Positions around the controller used for reserving, claiming, and downgrading
-     */
-    get usedControllerCoords() {
-        if (this._usedControllerCoords) return this._usedControllerCoords
-
-        this._usedControllerCoords = new Set()
-
-        for (const creepName of this.room.myCreeps.remoteReserver) {
-            // Get the creep using its name
-
-            const creep = Game.creeps[creepName]
-
-            // If the creep is isDying, iterate
-
-            if (creep.isDying()) continue
-
-            const packedCoord = creep.memory[CreepMemoryKeys.packedCoord]
-            if (!packedCoord) continue
-
-            // The creep has a packedPos
-
-            this._usedControllerCoords.add(packedCoord)
-        }
-
-        return this._usedControllerCoords
-    }
-
     _remoteControllerPath: RoomPosition[]
     get remoteControllerPath() {
         if (this._remoteControllerPath) return this._remoteControllerPath
@@ -762,13 +769,6 @@ export class RoomManager {
         }
 
         throw Error('No remote controller path ' + this.room.name)
-    }
-
-    _usedPositions: Set<string>
-    get usedPositions() {
-        if (this._usedPositions) return this._usedPositions
-
-        return (this._usedPositions = new Set())
     }
 
     get cSiteTarget() {
@@ -827,11 +827,6 @@ export class RoomManager {
         }
 
         return false
-    }
-
-    _usedStationaryCoords: Set<string>
-    get usedStationaryCoords() {
-        return (this._usedStationaryCoords = new Set())
     }
 
     allStructureIDs: Id<Structure<StructureConstant>>[]
@@ -1000,11 +995,95 @@ export class RoomManager {
         return this._cSites
     }
 
+    _notMyCreeps: NotMyCreeps
+    /**
+     * Creeps that are not owned by me
+     */
+    get notMyCreeps() {
+        if (this._notMyCreeps) return this._notMyCreeps
+
+        const notMyCreeps: NotMyCreeps = {
+            ally: [],
+            enemy: [],
+        }
+
+        for (const creep of this.room.find(FIND_HOSTILE_CREEPS)) {
+            if (isAlly(creep.owner.username)) {
+                notMyCreeps.ally.push(creep)
+                continue
+            }
+
+            // The creep isn't of an ally, so it's of an enemy!
+
+            notMyCreeps.enemy.push(creep)
+        }
+
+        return (this._notMyCreeps = notMyCreeps)
+    }
+
+    _enemyAttackers: Creep[]
+    get enemyAttackers() {
+        if (this._enemyAttackers) return this._enemyAttackers
+
+        // If commune, include creeps that can damage structures
+
+        if (Memory.rooms[this.room.name][RoomMemoryKeys.type] === RoomTypes.commune) {
+            const enemyAttackers = this.notMyCreeps.enemy.filter(function (creep) {
+                return (
+                    creep.parts.attack +
+                        creep.parts.ranged_attack +
+                        creep.parts.work +
+                        creep.parts.heal >
+                    0
+                )
+            })
+            return (this._enemyAttackers = enemyAttackers)
+        }
+
+        const enemyAttackers = this.notMyCreeps.enemy.filter(function (creep) {
+            return creep.parts.attack + creep.parts.ranged_attack + creep.parts.heal > 0
+        })
+        return (this._enemyAttackers = enemyAttackers)
+    }
+
+    _myDamagedCreeps: Creep[]
+    get myDamagedCreeps() {
+        if (this._myDamagedCreeps) return this._myDamagedCreeps
+
+        const myDamagedCreeps = this.room.find(FIND_MY_CREEPS, {
+            filter: creep => creep.hits < creep.hitsMax,
+        })
+
+        return (this._myDamagedCreeps = myDamagedCreeps)
+    }
+
+    _myDamagedPowerCreeps: PowerCreep[]
+    get myDamagedPowerCreeps() {
+        if (this._myDamagedPowerCreeps) return this._myDamagedPowerCreeps
+
+        const myDamagedPowerCreeps = this.room.find(FIND_MY_POWER_CREEPS, {
+            filter: creep => creep.hits < creep.hitsMax,
+        })
+
+        return (this._myDamagedPowerCreeps = myDamagedPowerCreeps)
+    }
+
+    _allyDamagedCreeps: Creep[]
+    get allyDamagedCreeps() {
+        if (this._allyDamagedCreeps) return this._allyDamagedCreeps
+
+        const allyDamagedCreeps = this.notMyCreeps.enemy.filter(creep => {
+            return creep.hits < creep.hitsMax
+        })
+
+        return (this._allyDamagedCreeps = allyDamagedCreeps)
+    }
+
     _enemyCreepPositions: { [packedCoord: string]: Id<Creep> }
     get enemyCreepPositions() {
         const enemyCreepPositions: { [packedCoord: string]: Id<Creep> } = {}
 
-        for (const creep of this.room.enemyCreeps) {
+        for (const creep of this.room.roomManager.notMyCreeps.enemy) {
             const packedCoord = packCoord(creep.pos)
             enemyCreepPositions[packedCoord] = creep.id
         }
@@ -1022,7 +1101,7 @@ export class RoomManager {
             highestHeal: 0,
             highestDismantle: 0,
         }
-        const enemyCreeps = this.room.enemyCreeps
+        const enemyCreeps = this.room.roomManager.notMyCreeps.enemy
         if (!enemyCreeps.length) return (this._enemySquadData = highestEnemySquadData)
 
         const enemyCreepIDs = new Set(enemyCreeps.map(creep => creep.id))
@@ -1107,5 +1186,264 @@ export class RoomManager {
         }
 
         return (this._deadCreepNames = deadCreepNames)
+    }
+
+    _notMyConstructionSites: NotMyConstructionSites
+    get notMyConstructionSites() {
+        if (this._notMyConstructionSites) return this._notMyConstructionSites
+
+        const notMyConstructionSites: NotMyConstructionSites = {
+            ally: [],
+            enemy: [],
+        }
+
+        const constructionSites = this.room.find(FIND_HOSTILE_CONSTRUCTION_SITES)
+        for (const cSite of constructionSites) {
+            if (isAlly(cSite.owner.username)) {
+                notMyConstructionSites.ally.push(cSite)
+                continue
+            }
+
+            // The construction site isn't owned by an ally, so it is an enemy's!
+
+            notMyConstructionSites.enemy.push(cSite)
+        }
+
+        return (this._notMyConstructionSites = notMyConstructionSites)
+    }
+
+    _allyConstructionSitesByType: Partial<
+        Record<StructureConstant, ConstructionSite<BuildableStructureConstant>[]>
+    >
+    get allyConstructionSitesByType() {
+        if (this._allyConstructionSitesByType) return this._allyConstructionSitesByType
+
+        const allyConstructionSitesByType: Partial<
+            Record<StructureConstant, ConstructionSite<BuildableStructureConstant>[]>
+        > = {}
+
+        for (const structureType of allStructureTypes) {
+            allyConstructionSitesByType[structureType] = []
+        }
+
+        for (const cSite of this.notMyConstructionSites.ally) {
+            allyConstructionSitesByType[cSite.structureType].push(cSite)
+        }
+
+        return (this._allyConstructionSitesByType = allyConstructionSitesByType)
+    }
+
+    _actionableSpawningStructures: SpawningStructures
+    /**
+     * RCL actionable spawns and extensions
+     */
+    get actionableSpawningStructures() {
+        if (this._actionableSpawningStructures) return this._actionableSpawningStructures
+
+        let actionableSpawningStructures: SpawningStructures = this.structures.spawn
+        actionableSpawningStructures = actionableSpawningStructures.concat(
+            this.structures.extension,
+        )
+        actionableSpawningStructures = actionableSpawningStructures.filter(
+            structure => structure.RCLActionable,
+        )
+
+        return (this._actionableSpawningStructures = actionableSpawningStructures)
+    }
+
+    _spawningStructuresByPriority: SpawningStructures
+    get spawningStructuresByPriority() {
+        if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
+
+        const anchor = this.anchor
+        if (!anchor) throw Error('no anchor')
+
+        let spawningStructuresByPriority: SpawningStructures = []
+        const structuresToSort: SpawningStructures = []
+
+        for (const structure of this.actionableSpawningStructures) {
+            if (roomUtils.isSourceSpawningStructure(this.room.name, structure)) {
+                this.actionableSpawningStructures.push(structure)
+            }
+
+            structuresToSort.push(structure)
+        }
+
+        spawningStructuresByPriority = spawningStructuresByPriority.concat(
+            structuresToSort.sort((a, b) => getRange(a.pos, anchor) - getRange(b.pos, anchor)),
+        )
+
+        return (this._spawningStructuresByPriority = spawningStructuresByPriority)
+    }
+
+    _spawningStructuresByNeed: SpawningStructures
+    get spawningstructuresByNeed() {
+        if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
+
+        const anchor = this.anchor
+        if (!anchor) throw Error('no anchor')
+
+        let spawningStructuresByNeed = this.actionableSpawningStructures
+
+        const packedSourceHarvestPositions =
+            Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
+        for (const i in packedSourceHarvestPositions) {
+            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], parseInt(i))
+
+            spawningStructuresByNeed = spawningStructuresByNeed.filter(
+                structure => getRange(structure.pos, closestHarvestPos) > 1,
+            )
+        }
+
+        if (
+            this.room.myCreeps.fastFiller.length &&
+            ((this.room.controller.level >= 6 &&
+                this.room.fastFillerLink &&
+                this.room.hubLink &&
+                (this.room.storage || this.room.terminal) &&
+                this.room.myCreeps.hubHauler.length) ||
+                (this.room.fastFillerContainerLeft && this.room.fastFillerContainerRight))
+        ) {
+            spawningStructuresByNeed = spawningStructuresByNeed.filter(
+                structure => getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
+            )
+        }
+
+        return (this._spawningStructuresByNeed = spawningStructuresByNeed)
+    }
+
+    _dismantleTargets: Structure[]
+    get dismantleTargets() {
+        if (this._dismantleTargets) return this._dismantleTargets
+
+        // We own the room, attack enemy owned structures
+
+        if (this.room.controller && this.room.controller.my) {
+            return (this._dismantleTargets = this.room.find(FIND_STRUCTURES, {
+                filter: structure =>
+                    (structure as OwnedStructure).owner &&
+                    !(structure as OwnedStructure).my &&
+                    structure.structureType !== STRUCTURE_INVADER_CORE,
+            }))
+        }
+
+        // We don't own the room, attack things that we can that aren't roads or containers
+
+        return (this._dismantleTargets = this.room.find(FIND_STRUCTURES, {
+            filter: structure =>
+                structure.structureType !== STRUCTURE_ROAD &&
+                structure.structureType !== STRUCTURE_CONTAINER &&
+                structure.structureType !== STRUCTURE_CONTROLLER &&
+                structure.structureType !== STRUCTURE_INVADER_CORE &&
+                structure.structureType !== STRUCTURE_KEEPER_LAIR &&
+                // We don't want to attack respawn or novice zone walls with infinite hits
+
+                structure.hits,
+        }))
+    }
+
+    _destructibleStructures: Structure[]
+    get destructableStructures() {
+        if (this._destructibleStructures) return this._destructibleStructures
+
+        const destructibleStructures = this.room.find(FIND_STRUCTURES, {
+            filter: structure =>
+                structure.structureType !== STRUCTURE_CONTROLLER &&
+                structure.structureType !== STRUCTURE_INVADER_CORE,
+        })
+        return (this._destructibleStructures = destructibleStructures)
+    }
+
+    _combatStructureTargets: Structure[]
+    get combatStructureTargets() {
+        if (this._combatStructureTargets) return this._combatStructureTargets
+
+        const controller = this.room.controller
+        if (controller) {
+            if (controller.my || controller.reservation.username === Memory.me)
+                return (this._combatStructureTargets = [])
+
+            if (controller.owner && isAlly(controller.owner.username))
+                return (this._combatStructureTargets = [])
+            if (controller.reservation && isAlly(controller.reservation.username))
+                return (this._combatStructureTargets = [])
+        }
+
+        const combatStructureTargets = this.room.find(FIND_STRUCTURES, {
+            filter: structure => combatTargetStructureTypes.has(structure.structureType),
+        })
+        return (this._combatStructureTargets = combatStructureTargets)
+    }
+
+    _fastFillerPositions: RoomPosition[]
+    get fastFillerPositions() {
+        if (this._fastFillerPositions) return this._fastFillerPositions
+
+        const anchor = this.anchor
+        if (!anchor) throw Error('no anchor')
+
+        const fastFillerPositions: RoomPosition[] = []
+        let rawFastFillerPositions = [
+            new RoomPosition(anchor.x - 1, anchor.y - 1, this.room.name),
+            new RoomPosition(anchor.x - 1, anchor.y + 1, this.room.name),
+            new RoomPosition(anchor.x + 1, anchor.y - 1, this.room.name),
+            new RoomPosition(anchor.x + 1, anchor.y + 1, this.room.name),
+        ]
+
+        for (const pos of rawFastFillerPositions) {
+            const adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {
+                spawn: 0,
+                extension: 0,
+                container: 0,
+                link: 0,
+            }
+
+            forAdjacentCoords(pos, adjacentCoord => {
+                const structuresAtCoord = this.structureCoords.get(packCoord(adjacentCoord))
+                if (!structuresAtCoord) return
+
+                for (const ID of structuresAtCoord) {
+                    const structure = findObjectWithID(ID)
+
+                    if (adjacentStructuresByType[structure.structureType] === undefined) continue
+
+                    // Increase structure amount for this structureType on the adjacentPos
+
+                    adjacentStructuresByType[structure.structureType] += 1
+                }
+            })
+
+            // If there is containers and spawning structures, make it an offial fastFillerPosition
+
+            if (
+                adjacentStructuresByType[STRUCTURE_CONTAINER] +
+                    adjacentStructuresByType[STRUCTURE_LINK] ===
+                0
+            )
+                continue
+
+            if (
+                adjacentStructuresByType[STRUCTURE_SPAWN] +
+                    adjacentStructuresByType[STRUCTURE_EXTENSION] ===
+                0
+            )
+                continue
+
+            this._fastFillerPositions.push(pos)
+        }
+
+        return (this._fastFillerPositions = fastFillerPositions)
+    }
+
+    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypesKeys) {
+
+        const currentCoordType = this.reservedCoords.get(packedCoord) || ReservedCoordTypes.normal
+        if (currentCoordType) {
+
+            this.reservedCoords.set(packedCoord, Math.max(currentCoordType, newCoordType))
+            return
+        }
+
+        this.reservedCoords.set(packedCoord, newCoordType)
     }
 }

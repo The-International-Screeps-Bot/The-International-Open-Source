@@ -22,6 +22,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     packedPosLength,
+    maxRemotePathDistance,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -43,6 +44,8 @@ import {
     unpackNumAsCoord,
     unpackNumAsPos,
     doesCoordExist,
+    findClosestObjectInRange,
+    findClosestObject,
 } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import {
@@ -176,7 +179,9 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
 
     // Find creeps that I don't own that aren't invaders
 
-    const creepsNotMine = this.enemyCreeps.concat(this.allyCreeps)
+    const creepsNotMine = this.roomManager.notMyCreeps.enemy.concat(
+        this.roomManager.notMyCreeps.ally,
+    )
 
     // Iterate through them
 
@@ -317,23 +322,27 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
         // Generate new important positions
 
+        let use: boolean = true
         let newCost = 0
         const pathsThrough: Set<string> = new Set()
 
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
         const packedRemoteSourceHarvestPositions =
             this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
-        const packedRemoteSourcePaths = this.roomManager.findRemoteSourceFastFillerPaths(
+        const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
             scoutingRoom,
             packedRemoteSourceHarvestPositions,
             pathsThrough,
         )
 
         for (const packedPath of packedRemoteSourcePaths) {
-            newCost += packedPath.length / packedPosLength
             if (!packedPath.length) {
                 return roomMemory[RoomMemoryKeys.type]
             }
+            const unpackedLength = packedPath.length / packedPosLength
+
+            newCost += unpackedLength
+            if (unpackedLength > maxRemotePathDistance) use = false
         }
 
         const packedRemoteControllerPositions =
@@ -343,8 +352,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             packedRemoteControllerPositions,
             pathsThrough,
         )
-        if (!packedRemoteControllerPath.length)
-            throw Error('No remote controller path for ' + this.name)
+        if (!packedRemoteControllerPath.length) {
+            return roomMemory[RoomMemoryKeys.type]
+        }
+        if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) use = false
 
         newCost += packedRemoteControllerPath.length / packedPosLength
 
@@ -361,6 +372,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         }
 
         // Successful remote value generation, now assign them
+
+        roomMemory[RoomMemoryKeys.use] = use
 
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
         roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
@@ -398,6 +411,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // The room is not a remote
 
+    let use: boolean = true
+
     // Generate new important positions
     const pathsThrough: Set<string> = new Set()
 
@@ -406,7 +421,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         scoutingRoom,
         packedRemoteSources,
     )
-    const packedRemoteSourcePaths = this.roomManager.findRemoteSourceFastFillerPaths(
+    const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
         scoutingRoom,
         packedRemoteSourceHarvestPositions,
         pathsThrough,
@@ -424,8 +439,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         packedRemoteControllerPositions,
         pathsThrough,
     )
-    if (!packedRemoteControllerPath.length)
-        throw Error('No remote controller path for ' + this.name)
+    if (!packedRemoteControllerPath.length) {
+        return roomMemory[RoomMemoryKeys.type]
+    }
+    if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) use = false
 
     roomMemory[RoomMemoryKeys.roads] = []
     roomMemory[RoomMemoryKeys.roadsQuota] = []
@@ -435,14 +452,18 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.roads][sourceIndex] = 0
         roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] = 0
 
-        const positions = unpackPosList(packedPath)
+        const path = unpackPosList(packedPath)
 
-        for (const pos of positions) {
+        for (const pos of path) {
             if (pos.roomName !== this.name) break
 
             roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] += 1
         }
+
+        if (path.length > maxRemotePathDistance) use = false
     }
+
+    roomMemory[RoomMemoryKeys.use] = use
 
     roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
     roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
@@ -656,7 +677,7 @@ Room.prototype.createAttackCombatRequest = function (opts) {
     }
 
     if (
-        !this.enemyCreeps.length &&
+        !this.roomManager.notMyCreeps.enemy.length &&
         !this.find(FIND_HOSTILE_STRUCTURES).find(
             structure => structure.structureType !== STRUCTURE_CONTROLLER,
         )
@@ -692,9 +713,9 @@ Room.prototype.createHarassCombatRequest = function (opts) {
         return
     }
 
-    if (!this.enemyCreeps.length) return
+    if (!this.roomManager.notMyCreeps.enemy.length) return
     if (global.settings.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
-    if (this.enemyAttackers.length > 0) return
+    if (this.roomManager.enemyAttackers.length > 0) return
 
     request = Memory.combatRequests[this.name] = {
         [CombatRequestKeys.type]: 'harass',
@@ -1133,17 +1154,12 @@ Room.prototype.errorVisual = function (coord, visualize = global.settings.roomVi
 Room.prototype.findAllyCSiteTargetID = function (creep) {
     // If there are no sites inform false
 
-    if (!this.allyCSites.length) return false
+    if (!this.roomManager.notMyConstructionSites.ally.length) return false
 
     // Loop through structuretypes of the build priority
 
     for (const structureType of defaultStructureTypesByBuildPriority) {
-        // Get the structures with the relevant type
-
-        const cSitesOfType = this.allyCSitesByType[structureType]
-
-        // If there are no cSites of this type, iterate
-
+        const cSitesOfType = this.roomManager.allyConstructionSitesByType[structureType]
         if (!cSitesOfType.length) continue
 
         // Otherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
@@ -1152,19 +1168,14 @@ Room.prototype.findAllyCSiteTargetID = function (creep) {
 
         // Record the closest site to the anchor in the room's global and inform true
 
-        this.memory[RoomMemoryKeys.constructionSiteTarget] = anchor.findClosestByPath(
+        this.memory[RoomMemoryKeys.constructionSiteTarget] = findClosestObject(
+            anchor,
             cSitesOfType,
-            {
-                ignoreCreeps: true,
-                ignoreDestructibleStructures: true,
-                ignoreRoads: true,
-                range: 3,
-            },
         ).id
         return true
     }
 
-    // If no cSiteTarget was found, inform false
+    // no target was found
 
     return false
 }

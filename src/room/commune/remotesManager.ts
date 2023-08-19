@@ -127,7 +127,7 @@ export class RemotesManager {
 
                 // Increase the defenderNeed according to the enemy attackers' combined strength
 
-                for (const enemyCreep of remote.enemyCreeps) {
+                for (const enemyCreep of remote.roomManager.notMyCreeps.enemy) {
                     remoteMemory[RoomMemoryKeys.minDamage] +=
                         enemyCreep.combatStrength.heal + enemyCreep.combatStrength.heal * enemyCreep.defenceStrength ||
                         Math.max(Math.floor(enemyCreep.hits / 20), 1)
@@ -143,7 +143,7 @@ export class RemotesManager {
 
                 // Temporary measure while DynamicSquads are in progress
 
-                const enemyAttackers = remote.enemyAttackers
+                const enemyAttackers = remote.roomManager.enemyAttackers
                 if (enemyAttackers.length) {
                     const score = findLowestScore(enemyAttackers, creep => {
                         return creep.ticksToLive
@@ -172,7 +172,7 @@ export class RemotesManager {
                 // Create need if there are any structures that need to be removed
 
                 remoteMemory[RoomMemoryKeys.remoteDismantler] = Math.min(
-                    remote.dismantleTargets.length,
+                    remote.roomManager.dismantleTargets.length,
                     8,
                 )
             }

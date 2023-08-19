@@ -130,7 +130,7 @@ export class WorkRequestManager {
         if (!requestRoom.controller.safeMode) {
             // Increase the defenderNeed according to the enemy attackers' combined strength
 
-            for (const enemyCreep of requestRoom.enemyAttackers) {
+            for (const enemyCreep of requestRoom.roomManager.enemyAttackers) {
                 if (enemyCreep.owner.username === 'Invader') continue
 
                 request[WorkRequestKeys.minDamage] += enemyCreep.combatStrength.heal
@@ -139,7 +139,7 @@ export class WorkRequestManager {
 
             // Decrease the defenderNeed according to ally combined strength
 
-            for (const allyCreep of requestRoom.allyCreeps) {
+            for (const allyCreep of requestRoom.roomManager.notMyCreeps.ally.ally) {
                 request[WorkRequestKeys.minDamage] -= allyCreep.combatStrength.heal
                 request[WorkRequestKeys.minHeal] -= allyCreep.combatStrength.ranged
             }

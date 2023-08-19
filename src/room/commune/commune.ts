@@ -342,7 +342,6 @@ export class CommuneManager {
     }
 
     private test() {
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -753,7 +752,6 @@ export class CommuneManager {
                 data.coversStructure &&
                 !this.room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
             ) {
-
                 continue
             }
 
@@ -861,7 +859,7 @@ export class CommuneManager {
         const anchor = this.room.roomManager.anchor
         if (!anchor) throw Error('no anchor for fastFillerSpawnEnergyCapacity ' + this.room)
 
-        for (const structure of this.room.spawningStructures) {
+        for (const structure of this.room.roomManager.actionableSpawningStructures) {
             if (!structure.RCLActionable) continue
 
             fastFillerSpawnEnergyCapacity += structure.store.getCapacity(RESOURCE_ENERGY)

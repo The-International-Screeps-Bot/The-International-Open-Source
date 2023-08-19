@@ -1,8 +1,18 @@
-import { CreepMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, ReservedCoordTypes } from 'international/constants'
 import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 
 export class FastFiller extends Creep {
+
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+        }
+    }
+
     travelToFastFiller?(): boolean {
         const fastFillerPos = this.findFastFillerPos()
         if (!fastFillerPos) return true
@@ -37,9 +47,9 @@ export class FastFiller extends Creep {
 
         // Get usedFastFillerPositions
 
-        const usedFastFillerCoords = room.usedFastFillerCoords
+        const usedFastFillerCoords = room.roomManager.reservedCoords
 
-        const openFastFillerPositions = room.fastFillerPositions.filter(
+        const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(
             pos => !usedFastFillerCoords.has(packCoord(pos)),
         )
         if (!openFastFillerPositions.length) return false
@@ -48,7 +58,7 @@ export class FastFiller extends Creep {
         const packedCoord = packCoord(fastFillerPos)
 
         this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-        room._usedFastFillerCoords.add(packedCoord)
+        room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return fastFillerPos
     }

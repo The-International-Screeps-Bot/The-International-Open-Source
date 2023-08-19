@@ -17,7 +17,7 @@ export class Scout extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
+    initRun() {
         if (!this.memory[CreepMemoryKeys.scoutTarget]) return
 
         this.commune.scoutTargets.add(this.memory[CreepMemoryKeys.scoutTarget])

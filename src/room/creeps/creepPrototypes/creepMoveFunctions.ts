@@ -42,7 +42,7 @@ import {
     unpackPosList,
 } from 'other/codec'
 
-PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (path, opts) {
+PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (path, args, opts = {}) {
     // Inform true if there is no path
 
     if (!path) return true
@@ -57,7 +57,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (pat
 
     const creepMemory = Memory.creeps[this.name]
     if (!creepMemory[CreepMemoryKeys.lastCache]) return true
-    if (creepMemory[CreepMemoryKeys.flee] !== opts.flee) return true
+    if (creepMemory[CreepMemoryKeys.flee] !== args.flee) return true
 
     // Inform true if the path is out of caching time
 
@@ -71,7 +71,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (pat
 
     // Inform true if the creep's previous target isn't its current
 
-    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), opts.goals[0].pos))
+    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), args.goals[0].pos))
         return true
 
     // If next pos in the path is not in range, inform true
@@ -83,7 +83,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (pat
     return false
 }
 /*
-PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (opts, pathOpts) {
+PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (args, pathOpts) {
     // Stop if the we know the creep won't move
 
     if (this.moveRequest) return false
@@ -91,7 +91,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.fatigue > 0) return false
     if (this instanceof Creep && !this.parts.move) return false
 
-    if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
+    if (this.room.enemyDamageThreat) return this.createMoveRequest(args)
 
     const cachedIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
     if (cachedIndex >= 0 && cachedIndex + 2 !== pathOpts.packedPath.length) {
@@ -121,7 +121,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
                 // The room is unsafe, don't use cached paths
 
-                return this.createMoveRequest(opts)
+                return this.createMoveRequest(args)
             }
         }
 
@@ -134,24 +134,24 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     // If loose is enabled, don't try to get back on the cached path
 
-    if (pathOpts.loose) return this.createMoveRequest(opts)
+    if (pathOpts.loose) return this.createMoveRequest(args)
 
     // Try to get on the path
 
-    opts.goals = []
+    args.goals = []
 
     for (const pos of unpackPosList(pathOpts.packedPath))
-        opts.goals.push({
+        args.goals.push({
             pos: pos,
             range: 0,
         })
 
-    return this.createMoveRequest(opts)
+    return this.createMoveRequest(args)
 }
  */
 
 PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (
-    opts,
+    args,
     pathOpts,
 ) {
     // Stop if the we know the creep won't move
@@ -164,7 +164,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         return Result.noAction
     }
 
-    if (this.room.enemyDamageThreat) return this.createMoveRequest(opts)
+    if (this.room.enemyDamageThreat) return this.createMoveRequest(args)
 
     const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
@@ -173,11 +173,11 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     const path = unpackPosList(pathOpts.packedPath)
     for (const pos of path) new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: customColors.lightBlue, opacity: 0.2 })
  */
-    const packedGoalPos = packPos(opts.goals[0].pos)
+    const packedGoalPos = packPos(args.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
 
     if (global.settings.roomVisuals) {
-        this.room.targetVisual(this.pos, opts.goals[0].pos, true)
+        this.room.targetVisual(this.pos, args.goals[0].pos, true)
 
         this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
             font: 0.4,
@@ -227,7 +227,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
                 // The room is unsafe, don't use cached paths
 
-                return this.createMoveRequest(opts)
+                return this.createMoveRequest(args)
             }
         }
 
@@ -239,32 +239,32 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     }
 
     if (isOnLastPos || this.memory[CreepMemoryKeys.usedPathForGoal]) {
-        this.memory[CreepMemoryKeys.usedPathForGoal] = packPos(opts.goals[0].pos)
-        return this.createMoveRequest(opts)
+        this.memory[CreepMemoryKeys.usedPathForGoal] = packPos(args.goals[0].pos)
+        return this.createMoveRequest(args)
     }
 
     // If loose is enabled, don't try to get back on the cached path
     /*
     this.room.visual.text((pathOpts.loose || false).toString(), this.pos.x, this.pos.y + 0.5, { font: 0.4 })
  */
-    if (pathOpts.loose) return this.createMoveRequest(opts)
+    if (pathOpts.loose) return this.createMoveRequest(args)
 
     this.room.errorVisual(this.pos)
 
     // Try to get on the path
 
-    opts.goals = []
+    args.goals = []
 
     for (const pos of unpackPosList(pathOpts.packedPath))
-        opts.goals.push({
+        args.goals.push({
             pos: pos,
             range: 0,
         })
 
-    return this.createMoveRequest(opts)
+    return this.createMoveRequest(args)
 }
 
-PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (opts) {
+PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (args, opts = {}) {
     const { room } = this
 
     // Stop if the we know the creep won't move
@@ -279,9 +279,9 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     /*
     if (this.spawning) return false
  */
-    // Assign default opts
+    // Assign default args
 
-    if (!opts.origin) opts.origin = this.pos
+    if (!args.origin) args.origin = this.pos
     if (!opts.cacheAmount) opts.cacheAmount = collectiveManager.defaultMinCacheAmount
 
     let path: RoomPosition[]
@@ -305,38 +305,37 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     // See if the creep needs a new path
 
-    if (this.needsNewPath(path, opts)) {
-        // Assign the creep to the opts
+    if (this.needsNewPath(path, args)) {
+        // Assign the creep to the args
 
-        opts.creep = this
+        args.creep = this
 
-        // Inform opts to avoid impassible structures
+        // Inform args to avoid impassible structures
 
-        opts.avoidImpassibleStructures = true
-        opts.avoidStationaryPositions = true
+        args.avoidImpassibleStructures = true
+        args.avoidStationaryPositions = true
 
         // If there is no safemode
 
-        if (!room.controller || !room.controller.safeMode) opts.avoidNotMyCreeps = true
+        if (!room.controller || !room.controller.safeMode) args.avoidNotMyCreeps = true
 
         if (creepMemory[CreepMemoryKeys.preferRoads]) {
-            if (!opts.plainCost) opts.plainCost = defaultPlainCost * 2
-            if (!opts.swampCost) opts.swampCost = defaultCreepSwampCost * 2
+            if (!args.plainCost) args.plainCost = defaultPlainCost * 2
+            if (!args.swampCost) args.swampCost = defaultCreepSwampCost * 2
         }
 
         // Generate a new path
 
-        path = customFindPath(opts)
+        path = customFindPath(args)
         if (!path.length && !this.spawning) return Result.fail
 
         // Limit the path's length to the cacheAmount
 
         path.splice(opts.cacheAmount)
 
-        // Set the lastCache to the current tick
-
         creepMemory[CreepMemoryKeys.lastCache] = Game.time
-        creepMemory[CreepMemoryKeys.flee] = opts.flee
+        creepMemory[CreepMemoryKeys.flee] = args.flee
+        if (opts.reserveCoord !== undefined) creepMemory[CreepMemoryKeys.packedCoord] = packCoord(path[path.length - 1])
 
         // Show that a new path has been created
 
@@ -382,13 +381,13 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         delete creepMemory[CreepMemoryKeys.lastCache]
     }
 
-    // Set the creep's pathOpts to reflect this moveRequest's opts
+    // Set the creep's pathOpts to reflect this moveRequest's args
 
-    this.pathOpts = opts
+    this.pathOpts = args
 
     // Assign the goal's pos to the creep's goalPos
 
-    creepMemory[CreepMemoryKeys.goalPos] = packPos(opts.goals[0].pos)
+    creepMemory[CreepMemoryKeys.goalPos] = packPos(args.goals[0].pos)
 
     // Set the path in the creep's memory
 

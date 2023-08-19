@@ -1,6 +1,8 @@
 import { BasePlans } from 'room/construction/basePlans'
 import {
     CreepMemoryKeys,
+    ReservedCoordTypes,
+    ReservedCoordTypesKeys,
     Result,
     RoomMemoryKeys,
     RoomTypes,
@@ -13,6 +15,81 @@ import {
 } from './constants'
 import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
 import { customLog, unpackNumAsCoord, visualizePath } from '../utils/utils'
+
+export interface PathGoal {
+    pos: RoomPosition
+    range: number
+}
+
+export interface CustomPathFinderArgs {
+    /**
+     * Not required when pathing for creeps
+     */
+    origin?: RoomPosition
+    goals: PathGoal[]
+    /**
+     * room types as keys to weight based on properties
+     */
+    typeWeights?: Partial<{ [key in RoomTypes]: number }>
+    plainCost?: number
+    swampCost?: number
+    maxRooms?: number
+    /**
+     * Default is false
+     */
+    flee?: boolean
+    creep?: Creep
+    /**
+     * Default is true
+     */
+    avoidDanger?: boolean
+
+    weightStructures?: Partial<{ [key in StructureConstant]: number }>
+
+    /**
+     * An object with keys of weights and values of positions
+     */
+
+    weightCoords?: { [roomName: string]: { [packedCoord: string]: number } }
+
+    /**
+     * The name of the costMatrix to weight. Will apply minimal alterations in use
+     */
+    weightCostMatrix?: string
+
+    /**
+     * The names of the costMatrixes to weight. Will apply onto cost matrix in use
+     */
+    weightCostMatrixes?: string[]
+
+    weightCoordMaps?: CoordMap[]
+
+    /**
+     *
+     */
+    avoidEnemyRanges?: boolean
+
+    avoidStationaryPositions?: boolean
+
+    /**
+     *
+     */
+    avoidImpassibleStructures?: boolean
+
+    /**
+     * Marks creeps not owned by the bot as avoid
+     */
+    avoidNotMyCreeps?: boolean
+
+    /**
+     * Weight my ramparts by this value
+     */
+    myRampartWeight?: number
+
+    weightStructurePlans?: boolean
+
+    minReservedCoordType?: ReservedCoordTypesKeys
+}
 
 export function customFindPath(args: CustomPathFinderArgs) {
     const allowedRoomNames = new Set([args.origin.roomName])
@@ -169,7 +246,7 @@ function weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: strin
 
         // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
-        for (const pos of room.fastFillerPositions) {
+        for (const pos of room.roomManager.fastFillerPositions) {
             const packedCoord = packCoord(pos)
 
             const currentWeight = args.weightCoords[roomName][packedCoord] || 0
@@ -322,33 +399,12 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             // If avoidStationaryPositions is requested
 
             if (args.avoidStationaryPositions) {
-                for (const packedCoord of room.usedSourceHarvestCoords) {
+                for (const [packedCoord, coordType] of room.roomManager.reservedCoords) {
+
+                    if (coordType <= (args.minReservedCoordType ?? ReservedCoordTypes.important)) continue
+
                     const coord = unpackCoord(packedCoord)
                     cm.set(coord.x, coord.y, 20)
-                }
-
-                if (room.roomManager.anchor) {
-                    // The last upgrade position should be the deliver pos, which we want to weight normal
-
-                    for (const packedCoord of room.usedUpgradeCoords) {
-                        const coord = unpackCoord(packedCoord)
-                        cm.set(coord.x, coord.y, 20)
-                    }
-
-                    for (const packedCoord of room.usedMineralCoords) {
-                        const coord = unpackCoord(packedCoord)
-                        cm.set(coord.x, coord.y, 20)
-                    }
-
-                    const stampAnchors = room.roomManager.stampAnchors
-                    if (stampAnchors) cm.set(stampAnchors.hub[0].x, stampAnchors.hub[0].y, 20)
-
-                    // Loop through each position of fastFillerPositions, have creeps prefer to avoid
-
-                    for (const packedCoord of room.usedFastFillerCoords) {
-                        const coord = unpackCoord(packedCoord)
-                        cm.set(coord.x, coord.y, 20)
-                    }
                 }
             }
 
@@ -368,7 +424,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
             // Loop trough each construction site belonging to an ally
 
-            for (const cSite of room.allyCSites) cm.set(cSite.pos.x, cSite.pos.y, 255)
+            for (const cSite of room.roomManager.notMyConstructionSites.ally)
+                cm.set(cSite.pos.x, cSite.pos.y, 255)
 
             // If there is a request to avoid enemy ranges
 
@@ -387,8 +444,10 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             }
 
             if (args.avoidNotMyCreeps && (!room.controller || !room.controller.safeMode)) {
-                for (const creep of room.enemyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
-                for (const creep of room.allyCreeps) cm.set(creep.pos.x, creep.pos.y, 255)
+                for (const creep of room.roomManager.notMyCreeps.enemy)
+                    cm.set(creep.pos.x, creep.pos.y, 255)
+                for (const creep of room.roomManager.notMyCreeps.ally)
+                    cm.set(creep.pos.x, creep.pos.y, 255)
 
                 for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS))
                     cm.set(creep.pos.x, creep.pos.y, 255)

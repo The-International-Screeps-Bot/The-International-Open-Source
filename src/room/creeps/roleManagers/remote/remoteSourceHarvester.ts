@@ -46,7 +46,7 @@ export class RemoteHarvester extends Creep {
         return true
     }
 
-    preTickManager(): void {
+    initRun(): void {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) {
             this.suicide()
             return

@@ -14,6 +14,12 @@ class CreepOrganizer {
         for (const creepName in Memory.creeps) {
             this.processCreep(creepName)
         }
+
+        // Initial run after all creeps have been updated
+        for (const creepName in Game.creeps) {
+
+            Game.creeps[creepName].initRun()
+        }
     }
 
     private processCreep(creepName: string) {
@@ -63,7 +69,8 @@ class CreepOrganizer {
             return
         }
 
-        creep.preTickManager()
+        creep.update()
+        creep.initRun()
 
         // If the creep isn't isDying, organize by its roomFrom and role
 

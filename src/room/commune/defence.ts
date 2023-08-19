@@ -41,7 +41,7 @@ export class DefenceManager {
     }
 
     run() {
-        if (!this.communeManager.room.enemyCreeps.length) {
+        if (!this.communeManager.room.roomManager.notMyCreeps.enemy.length) {
             this.considerRampartsPublic()
             return
         }
@@ -51,7 +51,7 @@ export class DefenceManager {
         this.makeRampartsPrivate()
         this.advancedActivateSafeMode()
 
-        if (!this.communeManager.room.enemyAttackers.length) return
+        if (!this.communeManager.room.roomManager.enemyAttackers.length) return
 
         // There are at least enemyAttackers
 
@@ -79,7 +79,7 @@ export class DefenceManager {
 
         // Filter attackers that are not invaders. If there are none, stop
 
-        const nonInvaderAttackers = room.enemyAttackers.filter(
+        const nonInvaderAttackers = room.roomManager.enemyAttackers.filter(
             enemyCreep => !enemyCreep.isOnExit && enemyCreep.owner.username !== 'Invader',
         )
         if (!nonInvaderAttackers.length) return false
@@ -126,17 +126,13 @@ export class DefenceManager {
         return false */
     }
 
-    private isSafe() {
-
-
-    }
+    private isSafe() {}
 
     private isBaseSafe() {
         const { room } = this.communeManager
 
         const anchor = room.roomManager.anchor
         if (!anchor) {
-
             throw Error('no anchor')
         }
 
@@ -183,32 +179,36 @@ export class DefenceManager {
     private isControllerSafe() {
         const { room } = this.communeManager
         const terrain = Game.map.getRoomTerrain(room.name)
-        const enemyCoord = roomUtils.floodFillFor(room.name, [room.controller.pos], (coord, packedCoord, depth) => {
-            // See if we should even consider the coord
+        const enemyCoord = roomUtils.floodFillFor(
+            room.name,
+            [room.controller.pos],
+            (coord, packedCoord, depth) => {
+                // See if we should even consider the coord
 
-            // Ignore terrain that protects us
-            if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
+                // Ignore terrain that protects us
+                if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
-            // Don't go out of range 2 from controller
-            if (depth > 2) return false
+                // Don't go out of range 2 from controller
+                if (depth > 2) return false
 
-            // Ignore structures that protect us
-            if (room.coordHasStructureTypes(coord, ourImpassibleStructuresSet)) return false
+                // Ignore structures that protect us
+                if (room.coordHasStructureTypes(coord, ourImpassibleStructuresSet)) return false
 
-            // Past this point we should always add this coord to the next generation
+                // Past this point we should always add this coord to the next generation
 
-            // See if there is an enemy creep
-            const enemyCreepID = room.roomManager.enemyCreepPositions[packCoord(coord)]
-            if (!enemyCreepID) return true
+                // See if there is an enemy creep
+                const enemyCreepID = room.roomManager.enemyCreepPositions[packCoord(coord)]
+                if (!enemyCreepID) return true
 
-            const enemyCreep = findObjectWithID(enemyCreepID)
-            if (isAlly(enemyCreep.name)) return true
-            // We only need to protect our controller from claim creeps
-            if (enemyCreep.parts.claim) return 'stop'
+                const enemyCreep = findObjectWithID(enemyCreepID)
+                if (isAlly(enemyCreep.name)) return true
+                // We only need to protect our controller from claim creeps
+                if (enemyCreep.parts.claim) return 'stop'
 
-            // We identified an enemy claimed near our controller!
-            return true
-        })
+                // We identified an enemy claimed near our controller!
+                return true
+            },
+        )
 
         // If there is an enemy claimer, we want to safemode
         return !enemyCoord
@@ -333,7 +333,7 @@ export class DefenceManager {
         let minMeleeHeal = 0
         let minRangedHeal = 0
 
-        for (const enemyCreep of room.enemyAttackers) {
+        for (const enemyCreep of room.roomManager.enemyAttackers) {
             minDamage += Math.max(enemyCreep.combatStrength.heal, Math.ceil(enemyCreep.hits / 50))
             minMeleeHeal += enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged
             minRangedHeal += enemyCreep.combatStrength.ranged
@@ -369,7 +369,7 @@ export class DefenceManager {
 
         if (!room.towerInferiority) return
 
-        for (const enemyCreep of room.enemyAttackers) {
+        for (const enemyCreep of room.roomManager.enemyAttackers) {
             let threat = 0
 
             threat += enemyCreep.combatStrength.dismantle

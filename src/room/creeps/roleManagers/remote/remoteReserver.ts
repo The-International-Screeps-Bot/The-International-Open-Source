@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    ReservedCoordTypes,
     Result,
     RoomMemoryKeys,
     RoomTypes,
@@ -39,7 +40,16 @@ export class RemoteReserver extends Creep {
         return true
     }
 
-    preTickManager() {
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
+        }
+    }
+
+    initRun() {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) {
             this.suicide()
             return
@@ -140,17 +150,15 @@ export class RemoteReserver extends Creep {
             return unpackCoordAsPos(packedCoord, this.room.name)
         }
 
-        const usedControllerCoords = this.room.roomManager.usedControllerCoords
-
         const usePos = this.room.roomManager.remoteControllerPositions.find(
-            pos => !usedControllerCoords.has(packCoord(pos)),
+            pos => !this.room.roomManager.reservedCoords.has(packCoord(pos)),
         )
         if (!usePos) return false
 
         packedCoord = packCoord(usePos)
 
         this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-        this.room.roomManager._usedControllerCoords.add(packedCoord)
+        this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return usePos
     }

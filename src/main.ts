@@ -49,6 +49,7 @@ import { WorkRequestManager } from 'room/commune/workRequest'
 import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { wasm } from 'other/wasmInit'
+import { requestsManager } from 'international/requests'
 
 export function originalLoop() {
     if (Game.cpu.bucket < CPUMaxPerTick) {
@@ -70,7 +71,7 @@ export function originalLoop() {
         wasm.collaborator()
 
         roomsManager.updateRun()
-        tickInit.configRequests()
+        requestsManager.run()
 
         if (global.collectivizer) global.collectivizer.run()
         if (global.userScript) global.userScript()

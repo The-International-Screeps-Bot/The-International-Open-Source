@@ -58,7 +58,7 @@ class PowerCreepOrganizer {
 
         room.myPowerCreepsAmount += 1
 
-        creep.preTickManager()
+        creep.initRun()
     }
 }
 

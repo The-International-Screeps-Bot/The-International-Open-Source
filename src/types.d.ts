@@ -18,12 +18,14 @@ import {
     SleepFor,
     Result,
     PlayerRelationship,
+    ReservedCoordTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settingsDefault'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { BasePlans } from 'room/construction/basePlans'
+import { CustomPathFinderArgs } from 'international/customPathFinder'
 
 declare global {
     interface ProfilerMemory {
@@ -216,79 +218,6 @@ declare global {
         | 'tradeHorizontal'
         | 'tradeVertical'
 
-    interface PathGoal {
-        pos: RoomPosition
-        range: number
-    }
-
-    interface CustomPathFinderArgs {
-        /**
-         * Not required when pathing for creeps
-         */
-        origin?: RoomPosition
-        goals: PathGoal[]
-        /**
-         * room types as keys to weight based on properties
-         */
-        typeWeights?: Partial<{ [key in RoomTypes]: number }>
-        plainCost?: number
-        swampCost?: number
-        maxRooms?: number
-        /**
-         * Default is false
-         */
-        flee?: boolean
-        creep?: Creep
-        /**
-         * Default is true
-         */
-        avoidDanger?: boolean
-
-        weightStructures?: Partial<{ [key in StructureConstant]: number }>
-
-        /**
-         * An object with keys of weights and values of positions
-         */
-
-        weightCoords?: { [roomName: string]: { [packedCoord: string]: number } }
-
-        /**
-         * The name of the costMatrix to weight. Will apply minimal alterations in use
-         */
-        weightCostMatrix?: string
-
-        /**
-         * The names of the costMatrixes to weight. Will apply onto cost matrix in use
-         */
-        weightCostMatrixes?: string[]
-
-        weightCoordMaps?: CoordMap[]
-
-        /**
-         *
-         */
-        avoidEnemyRanges?: boolean
-
-        avoidStationaryPositions?: boolean
-
-        /**
-         *
-         */
-        avoidImpassibleStructures?: boolean
-
-        /**
-         * Marks creeps not owned by the bot as avoid
-         */
-        avoidNotMyCreeps?: boolean
-
-        /**
-         * Weight my ramparts by this value
-         */
-        myRampartWeight?: number
-
-        weightStructurePlans?: boolean
-    }
-
     interface BasePlanAttempt {
         score: number
         stampAnchors: PackedStampAnchors
@@ -357,8 +286,12 @@ declare global {
         asymOffset: number
     }
 
-    interface MoveRequestOpts extends CustomPathFinderArgs {
+    interface MoveRequestOpts {
         cacheAmount?: number
+        /**
+         * Allow for assigning reservedCoord of a type on successful pathfind
+         */
+        reserveCoord?: ReservedCoordTypes
     }
 
     interface MoveRequestByPathOpts {
@@ -1267,78 +1200,6 @@ declare global {
         _global: RoomGlobal
         readonly global: RoomGlobal
 
-        // Creeps
-
-        _enemyCreeps: Creep[]
-        readonly enemyCreeps: Creep[]
-
-        _enemyAttackers: Creep[]
-        readonly enemyAttackers: Creep[]
-
-        _allyCreeps: Creep[]
-        readonly allyCreeps: Creep[]
-
-        _myDamagedCreeps: Creep[]
-        readonly myDamagedCreeps: Creep[]
-
-        _myDamagedPowerCreeps: PowerCreep[]
-        readonly myDamagedPowerCreeps: PowerCreep[]
-
-        _allyDamagedCreeps: Creep[]
-        readonly allyDamagedCreeps: Creep[]
-
-        // Buildings
-
-        _enemyCSites: ConstructionSite[]
-        readonly enemyCSites: ConstructionSite[]
-
-        _allyCSites: ConstructionSite[]
-        readonly allyCSites: ConstructionSite[]
-
-        _allyCSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>>
-        readonly allyCSitesByType: Record<StructureConstant, ConstructionSite[]>
-
-        _spawningStructures: SpawningStructures
-        readonly spawningStructures: SpawningStructures
-
-        _spawningStructuresByPriority: SpawningStructures
-        readonly spawningStructuresByPriority: SpawningStructures
-
-        _spawningStructuresByNeed: SpawningStructures
-        readonly spawningStructuresByNeed: SpawningStructures
-
-        _taskNeedingSpawningStructures: SpawningStructures
-        readonly taskNeedingSpawningStructures: SpawningStructures
-
-        _dismantleTargets: Structure[]
-
-        readonly dismantleTargets: Structure[]
-
-        _destructableStructures: Structure[]
-
-        readonly destructableStructures: Structure[]
-
-        _combatStructureTargets: Structure[]
-
-        readonly combatStructureTargets: Structure[]
-
-        // Resource info
-
-        _usedSourceHarvestCoords: Set<string>
-        readonly usedSourceHarvestCoords: Set<string>
-
-        _usedUpgradeCoords: Set<string>
-        readonly usedUpgradeCoords: Set<string>
-
-        _usedMineralCoords: Set<string>
-        readonly usedMineralCoords: Set<string>
-
-        _fastFillerPositions: RoomPosition[]
-        readonly fastFillerPositions: RoomPosition[]
-
-        _usedFastFillerCoords: Set<string>
-        readonly usedFastFillerCoords: Set<string>
-
         _remoteNamesBySourceEfficacy: string[]
         readonly remoteNamesBySourceEfficacy: string[]
 
@@ -1436,7 +1297,9 @@ declare global {
     interface IdealSquadMembers {}
 
     interface CreepFunctions {
-        preTickManager(): void
+        update(): void
+
+        initRun(): void
 
         endRun(): void
 
@@ -1513,17 +1376,17 @@ declare global {
         /**
          *
          */
-        needsNewPath(path: RoomPosition[] | undefined, opts: MoveRequestOpts): boolean
+        needsNewPath(path: RoomPosition[] | undefined, args: CustomPathFinderArgs, opts?: MoveRequestOpts): boolean
 
         /**
          *
          */
-        createMoveRequestByPath(opts: MoveRequestOpts, pathOpts: MoveRequestByPathOpts): number
+        createMoveRequestByPath(args: CustomPathFinderArgs, pathOpts: MoveRequestByPathOpts): number
 
         /**
          *
          */
-        createMoveRequest(opts: MoveRequestOpts): number
+        createMoveRequest(args: CustomPathFinderArgs, opts?: MoveRequestOpts): number
 
         assignMoveRequest(coord: Coord): void
 

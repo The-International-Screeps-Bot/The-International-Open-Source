@@ -7,7 +7,8 @@ export const spawnFunctions = {
         return spawn.spawnCreep(spawnRequest.body, requestID.toString(), { dryRun: true })
     },
     advancedSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
-        spawnRequest.extraOpts.energyStructures = spawn.room.spawningStructuresByPriority
+        spawnRequest.extraOpts.energyStructures =
+            spawn.room.roomManager.spawningStructuresByPriority
 
         const creepName = [
             creepRoles.indexOf(spawnRequest.role),

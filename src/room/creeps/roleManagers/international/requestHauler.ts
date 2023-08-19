@@ -6,7 +6,7 @@ export class RequestHauler extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
+    initRun() {
         if (Memory.haulRequests[this.memory[CreepMemoryKeys.haulRequest]]) {
             collectiveManager.creepsByHaulRequest[this.memory[CreepMemoryKeys.haulRequest]].push(
                 this.name,

@@ -9,7 +9,7 @@ import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
-    preTickManager() {
+    initRun() {
         const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
 
         if (!request) return

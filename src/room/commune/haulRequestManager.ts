@@ -96,7 +96,7 @@ export class HaulRequestManager {
 
         // If there are threats to our hegemony, temporarily abandon the request
         /*
-        if (requestRoom.enemyAttackers.length > 0) {
+        if (requestRoom.roomManager.enemyAttackers.length > 0) {
             request[CombatRequestKeys.abandon] = 1500
 
             room.memory.haulRequests.splice(index, 1)
@@ -117,7 +117,7 @@ export class HaulRequestManager {
         // If there are no enemyCreeps, delete the combatRequest
 
         if (
-            !requestRoom.enemyCreeps.length &&
+            !requestRoom.roomManager.notMyCreeps.enemy.length &&
             (!requestRoom.controller || !requestRoom.controller.owner)
         ) {
             delete Memory.haulRequests[requestName]

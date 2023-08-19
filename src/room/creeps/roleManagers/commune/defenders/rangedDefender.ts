@@ -3,6 +3,7 @@ import {
     customColors,
     rangedMassAttackMultiplierByRange,
     CreepMemoryKeys,
+    ReservedCoordTypes,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -17,7 +18,17 @@ import {
 import { packCoord } from 'other/codec'
 
 export class RangedDefender extends Creep {
-    preTickManager() {
+
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.necessary)
+        }
+    }
+
+    initRun() {
         if (this.spawning) return
 
         const { room } = this
@@ -70,10 +81,10 @@ export class RangedDefender extends Creep {
 
         // Get enemyAttackers in the room, informing false if there are none
 
-        let enemyCreeps = room.enemyAttackers
+        let enemyCreeps = room.roomManager.enemyAttackers
 
         if (!enemyCreeps.length) {
-            enemyCreeps = room.enemyCreeps
+            enemyCreeps = room.roomManager.notMyCreeps.enemy
 
             if (!enemyCreeps.length) return
 
@@ -98,7 +109,7 @@ export class RangedDefender extends Creep {
             this.combatTarget.id !== this.room.communeManager.towerAttackTarget.id
         ) {
             let massDamage = 0
-            for (const enemyCreep of this.room.enemyAttackers) {
+            for (const enemyCreep of this.room.roomManager.enemyAttackers) {
                 const range = getRange(this.pos, enemyCreep.pos)
                 if (range > 3) continue
 
@@ -121,7 +132,7 @@ export class RangedDefender extends Creep {
 
         const enemyCreep =
             findClosestObject(this.pos, enemyCreeps) ||
-            findClosestObject(this.pos, this.room.enemyCreeps)
+            findClosestObject(this.pos, this.room.roomManager.notMyCreeps.enemy)
 
         if (global.settings.roomVisuals)
             this.room.visual.line(this.pos, enemyCreep.pos, {
@@ -156,7 +167,7 @@ export class RangedDefender extends Creep {
             return findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
 
         const currentRampart = findObjectWithID(this.memory[CreepMemoryKeys.rampartTarget])
-        const enemyAttackers = room.enemyAttackers
+        const enemyAttackers = room.roomManager.enemyAttackers
 
         let bestScore = Infinity
         let bestRampart: StructureRampart | undefined
@@ -209,7 +220,7 @@ export class RangedDefender extends Creep {
     defendWithRampart?() {
         const { room } = this
 
-        const enemyCreeps = room.enemyAttackers
+        const enemyCreeps = room.roomManager.enemyAttackers
 
         const rampart = this.findRampart()
         if (!rampart) return this.defendWithoutRamparts(enemyCreeps)

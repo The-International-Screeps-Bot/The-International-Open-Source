@@ -77,7 +77,7 @@ export class CombatRequestManager {
 
         // If there are threats to our hegemony, temporarily abandon the request
         /*
-        if (requestRoom.enemyAttackers.length > 0) {
+        if (requestRoom.roomManager.enemyAttackers.length > 0) {
             request[CombatRequestKeys.abandon] = 1500
 
             room.memory.combatRequests.splice(index, 1)
@@ -98,7 +98,7 @@ export class CombatRequestManager {
         // If there are no enemyCreeps, delete the combatRequest
 
         if (
-            !requestRoom.enemyCreeps.length &&
+            !requestRoom.roomManager.notMyCreeps.enemy.length &&
             (!requestRoom.controller || !requestRoom.controller.owner)
         ) {
             this.communeManager.deleteCombatRequest(requestName, index)
@@ -124,7 +124,7 @@ export class CombatRequestManager {
  */
         // If there are threats to our hegemony, temporarily abandon the request
 
-        const threateningAttacker = requestRoom.enemyAttackers.find(
+        const threateningAttacker = requestRoom.roomManager.enemyAttackers.find(
             creep => creep.combatStrength.ranged + creep.combatStrength.ranged > 0,
         )
 
@@ -138,7 +138,7 @@ export class CombatRequestManager {
 
         // If there are no enemyCreeps, delete the combatRequest
 
-        if (!requestRoom.enemyCreeps.length) {
+        if (!requestRoom.roomManager.notMyCreeps.enemy.length) {
             request[CombatRequestKeys.abandon] = 1500
             request[CombatRequestKeys.abandonments] += 1
             this.manageAbandonment(requestName, index)
@@ -159,7 +159,7 @@ export class CombatRequestManager {
             return
         }
 
-        for (const enemyCreep of requestRoom.enemyAttackers) {
+        for (const enemyCreep of requestRoom.roomManager.enemyAttackers) {
             if (enemyCreep.combatStrength.ranged > request[CombatRequestKeys.minRangedHeal] * 4)
                 request[CombatRequestKeys.minRangedHeal] = enemyCreep.combatStrength.ranged + 1
 

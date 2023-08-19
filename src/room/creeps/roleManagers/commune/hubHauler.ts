@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    ReservedCoordTypes,
     RoomMemoryKeys,
     linkReceiveTreshold,
     linkSendThreshold,
@@ -10,6 +11,16 @@ import { findObjectWithID, getRange, unpackNumAsPos } from 'utils/utils'
 //import { HubHauler } from '../../creepClasses'
 
 export class HubHauler extends Creep {
+
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+        }
+    }
+
     travelToHub?(): boolean {
         const { room } = this
 

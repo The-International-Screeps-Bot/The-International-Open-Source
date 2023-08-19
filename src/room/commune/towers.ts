@@ -31,7 +31,7 @@ export class TowerManager {
 
         const towers = room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
         if (!towers.length) {
-            room.towerInferiority = room.enemyCreeps.length > 0
+            room.towerInferiority = room.roomManager.notMyCreeps.enemy.length > 0
             return
         }
 
@@ -59,7 +59,7 @@ export class TowerManager {
 
     private findAttackTarget() {
         const { room } = this.communeManager
-        const enemyCreeps = room.enemyCreeps
+        const enemyCreeps = room.roomManager.notMyCreeps.enemy
 
         if (!this.communeManager.towerAttackTarget) {
             const [score, target] = findWithHighestScore(enemyCreeps, enemyCreep => {
@@ -109,15 +109,14 @@ export class TowerManager {
     private attackEnemyCreeps() {
         if (this.communeManager.room.flags.disableTowerAttacks) {
             this.communeManager.room.towerInferiority =
-                this.communeManager.room.enemyAttackers.length > 0
+                this.communeManager.room.roomManager.enemyAttackers.length > 0
             return false
         }
         if (!this.actionableTowerIDs.length) return false
-        if (!this.communeManager.room.enemyCreeps.length) return false
+        if (!this.communeManager.room.roomManager.notMyCreeps.enemy.length) return false
 
         const attackTarget = this.findAttackTarget()
         if (!attackTarget) {
-
             return this.scatterShot()
         }
 
@@ -128,10 +127,7 @@ export class TowerManager {
 
             this.actionableTowerIDs.splice(i, 1)
 
-            attackTarget.reserveHits -= towerFunctions.estimateDamageNet(
-                tower,
-                attackTarget,
-            )
+            attackTarget.reserveHits -= towerFunctions.estimateDamageNet(tower, attackTarget)
             if (attackTarget.reserveHits <= 0) return true
         }
 
@@ -146,7 +142,7 @@ export class TowerManager {
         if (this.actionableTowerIDs.length <= 1) return false
         if (!randomTick(200)) return false
 
-        const enemyCreeps = this.communeManager.room.enemyCreeps
+        const enemyCreeps = this.communeManager.room.roomManager.notMyCreeps.enemy
         if (enemyCreeps.length < Math.min(4, this.actionableTowerIDs.length)) return false
 
         let targetIndex = 0
@@ -174,8 +170,8 @@ export class TowerManager {
     findHealTarget() {
         const { room } = this.communeManager
 
-        if (room.enemyAttackers.length) {
-            return room.myDamagedCreeps.find(creep => {
+        if (room.roomManager.enemyAttackers.length) {
+            return room.roomManager.myDamagedCreeps.find(creep => {
                 return !creep.isOnExit && !room.enemyThreatCoords.has(packCoord(creep.pos))
             })
         }
@@ -184,8 +180,8 @@ export class TowerManager {
 
         // Construct heal targets from my and allied damaged creeps in the this
 
-        healTargets = room.myDamagedCreeps.concat(room.allyDamagedCreeps)
-        healTargets = healTargets.concat(room.myDamagedPowerCreeps)
+        healTargets = room.roomManager.myDamagedCreeps.concat(room.roomManager.allyDamagedCreeps)
+        healTargets = healTargets.concat(room.roomManager.myDamagedPowerCreeps)
 
         return healTargets.find(creep => !creep.isOnExit)
     }
@@ -209,7 +205,7 @@ export class TowerManager {
 
     private findRampartRepairTarget() {
         const { room } = this.communeManager
-        const ramparts = room.enemyAttackers.length
+        const ramparts = room.roomManager.enemyAttackers.length
             ? room.communeManager.defensiveRamparts
             : room.communeManager.rampartRepairTargets
 

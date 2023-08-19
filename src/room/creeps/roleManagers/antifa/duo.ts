@@ -1,6 +1,7 @@
 import { CreepMemoryKeys, RoomTypes, customColors, roomDimensions } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils/utils'
 import { Antifa } from './antifa'
+import { CustomPathFinderArgs } from 'international/customPathFinder'
 
 export class Duo {
     /**
@@ -125,7 +126,7 @@ export class Duo {
         for (const member of this.members) member.moved = 'moved'
     }
 
-    createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
+    createMoveRequest(opts: CustomPathFinderArgs, moveLeader = this.leader) {
         if (!this.canMove) {
             this.holdFormation()
             return
@@ -153,20 +154,22 @@ export class Duo {
     advancedRangedAttack() {
         const { room } = this.leader
 
-        let enemyAttackers = room.enemyAttackers.filter(function (creep) {
+        let enemyAttackers = room.roomManager.enemyAttackers.filter(function (creep) {
             return !creep.isOnExit
         })
 
-        if (!room.enemyAttackers.length) enemyAttackers = room.enemyAttackers
+        if (!room.roomManager.enemyAttackers.length)
+            enemyAttackers = room.roomManager.enemyAttackers
 
         // If there are none
 
         if (!enemyAttackers.length) {
-            let enemyCreeps = room.enemyCreeps.filter(function (creep) {
+            let enemyCreeps = room.roomManager.notMyCreeps.enemy.filter(function (creep) {
                 return !creep.isOnExit
             })
 
-            if (!room.enemyCreeps.length) enemyCreeps = room.enemyCreeps
+            if (!room.roomManager.notMyCreeps.enemy.length)
+                enemyCreeps = room.roomManager.notMyCreeps.enemy
 
             if (!enemyCreeps.length) {
                 return this.rangedAttackStructures()
@@ -302,7 +305,7 @@ export class Duo {
     }
 
     rangedAttackStructures() {
-        const structures = this.leader.room.combatStructureTargets
+        const structures = this.leader.room.roomManager.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -353,20 +356,20 @@ export class Duo {
     advancedAttack() {
         const { room } = this.leader
 
-        let enemyAttackers = room.enemyAttackers.filter(function (creep) {
+        let enemyAttackers = room.roomManager.enemyAttackers.filter(function (creep) {
             return !creep.isOnExit
         })
 
-        if (!enemyAttackers.length) enemyAttackers = room.enemyAttackers
+        if (!enemyAttackers.length) enemyAttackers = room.roomManager.enemyAttackers
 
         // If there are none
 
         if (!enemyAttackers.length) {
-            let enemyCreeps = room.enemyCreeps.filter(function (creep) {
+            let enemyCreeps = room.roomManager.notMyCreeps.enemy.filter(function (creep) {
                 return !creep.isOnExit
             })
 
-            if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps
+            if (!enemyCreeps.length) enemyCreeps = room.roomManager.notMyCreeps.enemy
 
             if (!enemyCreeps.length) return this.attackStructures()
 
@@ -447,7 +450,7 @@ export class Duo {
     }
 
     attackStructures() {
-        const structures = this.leader.room.combatStructureTargets
+        const structures = this.leader.room.roomManager.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -498,7 +501,7 @@ export class Duo {
     advancedDismantle() {
         // Avoid targets we can't dismantle
 
-        const structures = this.leader.room.combatStructureTargets
+        const structures = this.leader.room.roomManager.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -551,7 +554,7 @@ export class Duo {
 
         // Filter only enemy construction sites worth stomping
 
-        const enemyCSites = this.leader.room.enemyCSites.filter(
+        const enemyCSites = this.leader.room.roomManager.notMyConstructionSites.enemy.filter(
             cSite => cSite.progress > 0 && !isExit(cSite.pos),
         )
 
@@ -575,7 +578,7 @@ export class Duo {
 
         // If there are no attackers, only heal the leader if it's damaged
 
-        if (!this.leader.room.enemyAttackers.length) {
+        if (!this.leader.room.roomManager.enemyAttackers.length) {
             if (this.leader.hits < this.leader.hitsMax) this.members[1].heal(this.leader)
             return
         }

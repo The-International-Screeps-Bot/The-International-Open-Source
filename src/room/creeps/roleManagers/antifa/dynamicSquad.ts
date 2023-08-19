@@ -8,6 +8,7 @@ import {
 } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils/utils'
 import { Antifa } from './antifa'
+import { CustomPathFinderArgs } from 'international/customPathFinder'
 
 /**
  * A squad of a semi-dynamic size
@@ -159,20 +160,22 @@ export class DynamicSquad {
 
         const creep = Game.creeps[creepName]
 
-        let enemyAttackers = creep.room.enemyAttackers.filter(function (enemyAttacker) {
+        let enemyAttackers = creep.room.roomManager.enemyAttackers.filter(function (enemyAttacker) {
             return !enemyAttacker.isOnExit
         })
 
-        if (!enemyAttackers.length) enemyAttackers = creep.room.enemyAttackers
+        if (!enemyAttackers.length) enemyAttackers = creep.room.roomManager.enemyAttackers
 
         // If there are none
 
         if (!enemyAttackers.length) {
-            let enemyCreeps = creep.room.enemyCreeps.filter(function (enemyAttacker) {
+            let enemyCreeps = creep.room.roomManager.notMyCreeps.enemy.filter(function (
+                enemyAttacker,
+            ) {
                 return !enemyAttacker.isOnExit
             })
 
-            if (!enemyCreeps.length) enemyCreeps = creep.room.enemyCreeps
+            if (!enemyCreeps.length) enemyCreeps = creep.room.roomManager.notMyCreeps.enemy
 
             if (!enemyCreeps.length) {
                 if (creep.aggressiveHeal()) return true
@@ -291,7 +294,7 @@ export class DynamicSquad {
     rangedAttackStructures?(creep: Creep) {
         creep.message = 'RAS'
 
-        const structures = creep.room.combatStructureTargets
+        const structures = creep.room.roomManager.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -343,7 +346,7 @@ export class DynamicSquad {
 
         // Avoid targets we can't dismantle
 
-        const structures = creep.room.combatStructureTargets
+        const structures = creep.room.roomManager.combatStructureTargets
 
         if (!structures.length) return false
 
@@ -424,7 +427,7 @@ export class DynamicSquad {
         for (const member of this.members) member.moved = 'moved'
     }
 
-    createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
+    createMoveRequest(opts: CustomPathFinderArgs, moveLeader = this.leader) {
         if (!this.canMove) {
             this.holdFormation()
             return

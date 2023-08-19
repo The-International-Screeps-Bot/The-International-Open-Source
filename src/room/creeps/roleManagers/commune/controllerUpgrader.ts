@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomMemoryKeys, packedPosLength } from 'international/constants'
+import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
 
 export class ControllerUpgrader extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -24,7 +24,16 @@ export class ControllerUpgrader extends Creep {
         return true
     }
 
-    preTickManager() {
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+        }
+    }
+
+    initRun() {
         this.room.communeManager.upgradeStrength += this.room.communeManager.upgradeStrength
     }
 
@@ -47,7 +56,7 @@ export class ControllerUpgrader extends Creep {
             }
 
             const cSiteTarget = creep.room.roomManager.cSiteTarget
-            if (cSiteTarget && !creep.room.enemyAttackers.length) {
+            if (cSiteTarget && !creep.room.roomManager.enemyAttackers.length) {
                 creep.advancedBuild()
                 continue
             }

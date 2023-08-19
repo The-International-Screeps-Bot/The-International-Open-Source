@@ -27,7 +27,8 @@ export class EndTickCreepManager {
             Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune &&
             room.communeManager.spawningStructuresManager.activeSpawns
         ) {
-            for (const spawn of room.communeManager.spawningStructuresManager.activeSpawns) {
+            for (const spawn of room.communeManager.spawningStructuresManager
+                .activeSpawns) {
                 const creep = Game.creeps[spawn.spawning.name]
 
                 if (!creep.moveRequest) continue

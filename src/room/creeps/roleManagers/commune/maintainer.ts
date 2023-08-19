@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, Result, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, ReservedCoordTypes, Result, roomDimensions } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
@@ -9,7 +9,16 @@ export class Maintainer extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.normal)
+        }
+    }
+
+    initRun() {
         this.avoidEnemyThreatCoords()
     }
 

@@ -7,7 +7,7 @@ export class Vanguard extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
+    initRun() {
         if (this.isDying()) return
 
         if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined)

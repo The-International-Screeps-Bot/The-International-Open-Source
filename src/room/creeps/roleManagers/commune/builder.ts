@@ -6,7 +6,7 @@ export class Builder extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
+    initRun() {
         if (this.avoidEnemyThreatCoords()) return
 
         if (!this.room.roomManager.cSiteTarget) return

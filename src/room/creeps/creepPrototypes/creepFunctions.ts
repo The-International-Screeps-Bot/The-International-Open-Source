@@ -17,6 +17,7 @@ import {
     CreepMemoryKeys,
     CreepRoomLogisticsRequestKeys,
     RoomMemoryKeys,
+    ReservedCoordTypes,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -54,7 +55,9 @@ import { creepClasses } from '../creepClasses'
 import { updateStat } from 'international/statsManager'
 import { customFindPath } from 'international/customPathFinder'
 
-Creep.prototype.preTickManager = function () {}
+Creep.prototype.update = function () {}
+
+Creep.prototype.initRun = function () {}
 
 Creep.prototype.endRun = function () {}
 
@@ -210,25 +213,21 @@ Creep.prototype.findUpgradePos = function () {
     if (this.memory[CreepMemoryKeys.packedCoord])
         return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
 
-    // Get usedUpgradeCoords, informing false if they're undefined
-
-    const usedUpgradeCoords = room.usedUpgradeCoords
-
     // Loop through each upgradePositions
 
     for (const pos of room.roomManager.upgradePositions) {
         // Construct the packedPos using pos
 
-        const packedPos = packCoord(pos)
+        const packedCoord = packCoord(pos)
 
         // Iterate if the pos is used
 
-        if (usedUpgradeCoords.has(packedPos)) continue
+        if (this.room.roomManager.reservedCoords.has(packedCoord)) continue
 
         // Otherwise record packedPos in the creep's memory and in usedUpgradeCoords
 
-        this.memory[CreepMemoryKeys.packedCoord] = packedPos
-        usedUpgradeCoords.add(packedPos)
+        this.memory[CreepMemoryKeys.packedCoord] = packedCoord
+        this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return pos
     }
@@ -259,7 +258,7 @@ Creep.prototype.advancedUpgradeController = function () {
             !this.room.roomManager.upgradePositions.find(
                 pos =>
                     arePositionsEqual(this.pos, pos) &&
-                    !this.room.usedUpgradeCoords.has(packCoord(pos)),
+                    !this.room.roomManager.reservedCoords.has(packCoord(pos)),
             )
         ) {
             const upgradePos = this.findUpgradePos()
@@ -599,7 +598,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 }
 
 Creep.prototype.findNewRampartRepairTarget = function () {
-    const ramparts = this.room.enemyAttackers.length
+    const ramparts = this.room.roomManager.enemyAttackers.length
         ? this.room.communeManager.defensiveRamparts
         : this.room.communeManager.rampartRepairTargets
 
@@ -777,7 +776,7 @@ Creep.prototype.findSourceHarvestPos = function (index) {
         if (randomTick()) {
             const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceHarvestCoords.has(packedSourceCoord)) {
+            if (!room.roomManager.reservedCoords.has(packedSourceCoord)) {
                 this.memory[CreepMemoryKeys.packedCoord] = packedSourceCoord
                 return sourcePos
             }
@@ -788,7 +787,7 @@ Creep.prototype.findSourceHarvestPos = function (index) {
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.usedSourceHarvestCoords
+    const usedSourceHarvestCoords = room.roomManager.reservedCoords
 
     const usePos = room.roomManager.sourceHarvestPositions[index].find(
         pos => !usedSourceHarvestCoords.has(packCoord(pos)),
@@ -798,7 +797,7 @@ Creep.prototype.findSourceHarvestPos = function (index) {
     packedCoord = packCoord(usePos)
 
     this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-    room._usedSourceHarvestCoords.add(packedCoord)
+    room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
     return usePos
 }
@@ -817,7 +816,7 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
         if (randomTick()) {
             const sourcePos = room.roomManager.communeSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceHarvestCoords.has(packedSourceCoord)) {
+            if (!room.roomManager.reservedCoords.has(packedSourceCoord)) {
                 this.memory[CreepMemoryKeys.packedCoord] = packedSourceCoord
                 return sourcePos
             }
@@ -828,17 +827,15 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.usedSourceHarvestCoords
-
     const usePos = room.roomManager.communeSourceHarvestPositions[index].find(
-        pos => !usedSourceHarvestCoords.has(packCoord(pos)),
+        pos => !room.roomManager.reservedCoords.has(packCoord(pos)),
     )
     if (!usePos) return false
 
     packedCoord = packCoord(usePos)
 
     this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-    room._usedSourceHarvestCoords.add(packedCoord)
+    room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
     return usePos
 }
@@ -856,7 +853,7 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
         if (randomTick()) {
             const sourcePos = room.roomManager.remoteSourceHarvestPositions[index][0]
             const packedSourceCoord = packCoord(sourcePos)
-            if (!room.usedSourceHarvestCoords.has(packedSourceCoord)) {
+            if (!room.roomManager.reservedCoords.has(packedSourceCoord)) {
                 this.memory[CreepMemoryKeys.packedCoord] = packedSourceCoord
                 return sourcePos
             }
@@ -867,7 +864,7 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.usedSourceHarvestCoords
+    const usedSourceHarvestCoords = room.roomManager.reservedCoords
 
     const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(
         pos => !usedSourceHarvestCoords.has(packCoord(pos)),
@@ -877,7 +874,7 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
     packedCoord = packCoord(usePos)
 
     this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-    room._usedSourceHarvestCoords.add(packedCoord)
+    room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
     return usePos
 }
@@ -894,7 +891,7 @@ Creep.prototype.findMineralHarvestPos = function () {
 
     // Get usedSourceHarvestPositions
 
-    const usedMineralCoords = room.usedMineralCoords
+    const usedMineralCoords = room.roomManager.reservedCoords
 
     const usePos = room.roomManager.mineralHarvestPositions.find(
         pos => !usedMineralCoords.has(packCoord(pos)),
@@ -904,7 +901,7 @@ Creep.prototype.findMineralHarvestPos = function () {
     packedCoord = packCoord(usePos)
 
     this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-    room._usedMineralCoords.add(packedCoord)
+    room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
     return usePos
 }
@@ -1237,7 +1234,7 @@ Creep.prototype.aggressiveHeal = function () {
 
     const healTargets = room
         .find(FIND_MY_CREEPS)
-        .concat(room.allyCreeps)
+        .concat(room.roomManager.notMyCreeps.ally)
         .filter(function (creep) {
             return creep.hitsMax > creep.hits
         })

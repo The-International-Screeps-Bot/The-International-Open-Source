@@ -1,6 +1,8 @@
-import { CreepMemoryKeys, Result, creepRoles } from 'international/constants'
+import { CreepMemoryKeys, ReservedCoordTypes, Result, creepRoles } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import { getRange } from 'utils/utils'
+import { CreepRoleManager } from './creepRoleManager'
+import { packCoord } from 'other/codec'
 
 export const creepUtils = {
     expandName(creepName: string) {
@@ -78,6 +80,7 @@ export const creepUtils = {
 
         creep.message = '⏩🔧'
         creep.room.targetVisual(creep.pos, repairTarget.pos)
+
 
         creep.actionCoord = repairTarget.pos
 

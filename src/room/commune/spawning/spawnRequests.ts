@@ -326,7 +326,8 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 // Get the fastFiller positions, if there are none, inform false
 
-                const fastFillerPositionsCount = this.communeManager.room.fastFillerPositions.length
+                const fastFillerPositionsCount =
+                    this.communeManager.room.roomManager.fastFillerPositions.length
                 if (!fastFillerPositionsCount) return false
 
                 let priority = 0.75
@@ -371,7 +372,7 @@ export class SpawnRequestsManager {
             const minPriority = 6
             const maxPriority = this.minRemotePriority - 1
 
-            const { enemyCreeps } = this.communeManager.room
+            const enemyCreeps = this.communeManager.room.roomManager.notMyCreeps.enemy
 
             // Melee defender
 
