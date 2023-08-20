@@ -2,7 +2,7 @@ import typescript from 'rollup-plugin-typescript2'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs';
 import clear from 'rollup-plugin-clear'
-import screeps from 'rollup-plugin-screeps'
+import screeps from 'rollup-plugin-screeps-world'
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser'
 import yaml from 'yaml'

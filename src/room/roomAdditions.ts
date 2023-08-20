@@ -81,6 +81,8 @@ const roomAdditions = {
             })
         },
     },
+
+    //
     remoteSourceIndexesByEfficacy: {
         get() {
             if (this._remoteSourceIndexesByEfficacy) return this._remoteSourceIndexesByEfficacy
@@ -114,6 +116,7 @@ const roomAdditions = {
             })
         },
     },
+    //
     sourceContainers: {
         get() {
             if (this._sourceContainers) return this._sourceContainers
@@ -176,6 +179,7 @@ const roomAdditions = {
             return (this._sourceContainers = sourceContainers)
         },
     },
+    //
     fastFillerContainerLeft: {
         get() {
             if (this._fastFillerContainerLeft !== undefined) return this._fastFillerContainerLeft

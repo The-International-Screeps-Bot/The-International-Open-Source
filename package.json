@@ -36,10 +36,18 @@
         "url": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues"
     },
     "author": "Carson Burke",
-    "contributors": ["Pieterbrandsen"],
+    "contributors": [
+        "Pieterbrandsen"
+    ],
     "license": "GNU GPLv3",
     "homepage": "https://github.com/The-International-Screeps-Bot/The-International-Open-Source",
-    "keywords": ["screeps", "screeps bot", "commie bot", "the international", "the international screeps bot"],
+    "keywords": [
+        "screeps",
+        "screeps bot",
+        "commie bot",
+        "the international",
+        "the international screeps bot"
+    ],
     "devDependencies": {
         "@compodoc/compodoc": "^1.1.19",
         "@rollup/plugin-commonjs": "^20.0.0",
@@ -74,7 +82,7 @@
         "rollup": "^2.56.2",
         "rollup-plugin-clear": "^2.0.7",
         "rollup-plugin-copy": "^3.4.0",
-        "rollup-plugin-screeps": "^1.0.1",
+        "rollup-plugin-screeps-world": "^1.0.4",
         "rollup-plugin-terser": "^7.0.2",
         "rollup-plugin-typescript2": "^0.30.0",
         "screeps-grafana": "^2.2.2",

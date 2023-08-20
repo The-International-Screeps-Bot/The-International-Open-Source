@@ -134,6 +134,6 @@ export const defaultSettings: Settings = {
     creepSay: true,
     creepChant: true,
     allySegmentID: 90,
-    errorExporting: false,
+    errorExporting: true,
     structureMigration: true,
 }

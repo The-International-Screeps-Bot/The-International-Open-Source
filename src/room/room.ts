@@ -155,6 +155,8 @@ export class RoomManager {
         delete this._destructibleStructures
         delete this._combatStructureTargets
         delete this._fastFillerPositions
+        delete this._remoteNamesByEfficacy
+        delete this._remoteSourceIndexesByEfficacy
 
         if (randomTick()) {
             delete this._nukeTargetCoords
@@ -458,6 +460,18 @@ export class RoomManager {
             this.room.controller.safeMode &&
             global.communes.has(this.room.name)
         )
+    }
+
+    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypesKeys) {
+
+        const currentCoordType = this.reservedCoords.get(packedCoord) || ReservedCoordTypes.normal
+        if (currentCoordType) {
+
+            this.reservedCoords.set(packedCoord, Math.max(currentCoordType, newCoordType))
+            return
+        }
+
+        this.reservedCoords.set(packedCoord, newCoordType)
     }
 
     _anchor: RoomPosition
@@ -1435,15 +1449,137 @@ export class RoomManager {
         return (this._fastFillerPositions = fastFillerPositions)
     }
 
-    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypesKeys) {
+    _remoteNamesByEfficacy: string[]
+    get remoteNamesByEfficacy() {
 
-        const currentCoordType = this.reservedCoords.get(packedCoord) || ReservedCoordTypes.normal
-        if (currentCoordType) {
+        if (this._remoteNamesByEfficacy) return this._remoteNamesByEfficacy
 
-            this.reservedCoords.set(packedCoord, Math.max(currentCoordType, newCoordType))
-            return
+        // Filter rooms that have some sourceEfficacies recorded
+
+        const remoteNamesBySourceEfficacy = Memory.rooms[this.room.name][RoomMemoryKeys.remotes].filter(
+            function (roomName) {
+                return Memory.rooms[roomName][RoomMemoryKeys.remoteSourceFastFillerPaths].length
+            },
+        )
+
+        // Sort the remotes based on the average source efficacy
+
+        return remoteNamesBySourceEfficacy.sort(function (a1, b1) {
+            return (
+                Memory.rooms[a1][RoomMemoryKeys.remoteSourceFastFillerPaths].reduce(
+                    (a2, b2) => a2 + b2.length,
+                    0,
+                ) /
+                    Memory.rooms[a1][RoomMemoryKeys.remoteSourceFastFillerPaths].length -
+                Memory.rooms[b1][RoomMemoryKeys.remoteSourceFastFillerPaths].reduce(
+                    (a2, b2) => a2 + b2.length,
+                    0,
+                ) /
+                    Memory.rooms[b1][RoomMemoryKeys.remoteSourceFastFillerPaths].length
+            )
+        })
+    }
+
+    _remoteSourceIndexesByEfficacy: string[]
+    get remoteSourceIndexesByEfficacy() {
+
+        if (this._remoteSourceIndexesByEfficacy) return this._remoteSourceIndexesByEfficacy
+
+        const remoteSourceIndexesByEfficacy: string[] = []
+
+        for (const remoteName of Memory.rooms[this.room.name][RoomMemoryKeys.remotes]) {
+            const remoteMemory = Memory.rooms[remoteName]
+
+            for (
+                let sourceIndex = 0;
+                sourceIndex < remoteMemory[RoomMemoryKeys.remoteSources].length;
+                sourceIndex++
+            ) {
+                remoteSourceIndexesByEfficacy.push(remoteName + ' ' + sourceIndex)
+            }
         }
 
-        this.reservedCoords.set(packedCoord, newCoordType)
+        return remoteSourceIndexesByEfficacy.sort(function (a, b) {
+            const aSplit = a.split(' ')
+            const bSplit = b.split(' ')
+
+            return (
+                Memory.rooms[aSplit[0]][RoomMemoryKeys.remoteSourceFastFillerPaths][
+                    parseInt(aSplit[1])
+                ].length -
+                Memory.rooms[bSplit[0]][RoomMemoryKeys.remoteSourceFastFillerPaths][
+                    parseInt(bSplit[1])
+                ].length
+            )
+        })
     }
+
+    sourceContainerIDs: Id<StructureContainer>[]
+    _sourceContainers: StructureContainer[]
+    get sourceContainers() {
+
+        if (this._sourceContainers) return this._sourceContainers
+
+        if (this.sourceContainerIDs) {
+            const sourceContainers: StructureContainer[] = []
+
+            for (const ID of this.sourceContainerIDs) {
+                const container = findObjectWithID(ID)
+                if (!container) break
+
+                sourceContainers.push(container)
+            }
+
+            if (sourceContainers.length === this.sourceContainerIDs.length) {
+                return (this._sourceContainers = sourceContainers)
+            }
+        }
+
+        const sourceContainers: StructureContainer[] = []
+
+        const roomType = Memory.rooms[this.room.name][RoomMemoryKeys.type]
+        if (roomType === RoomTypes.commune) {
+            const positions = this.communeSourceHarvestPositions
+            for (let i = 0; i < positions.length; i++) {
+                const structure = this.room.findStructureAtCoord(
+                    positions[i][0],
+                    structure => structure.structureType === STRUCTURE_CONTAINER,
+                )
+                if (!structure) continue
+
+                sourceContainers[i] = structure as StructureContainer
+            }
+        } else if (roomType === RoomTypes.remote) {
+            const positions = this.remoteSourceHarvestPositions
+            for (let i = 0; i < positions.length; i++) {
+                const structure = this.room.findStructureAtCoord(
+                    positions[i][0],
+                    structure => structure.structureType === STRUCTURE_CONTAINER,
+                )
+                if (!structure) continue
+
+                sourceContainers[i] = structure as StructureContainer
+            }
+        } else {
+            const positions = this.sourceHarvestPositions
+            for (let i = 0; i < positions.length; i++) {
+                const structure = this.room.findStructureAtCoord(
+                    positions[i][0],
+                    structure => structure.structureType === STRUCTURE_CONTAINER,
+                )
+                if (!structure) continue
+
+                sourceContainers[i] = structure as StructureContainer
+            }
+        }
+
+        if (sourceContainers.length === this.room.find(FIND_SOURCES).length) {
+
+            this.sourceContainerIDs = sourceContainers.map(container => container.id)
+        }
+
+        return (this._sourceContainers = sourceContainers)
+    }
+
+    
 }
