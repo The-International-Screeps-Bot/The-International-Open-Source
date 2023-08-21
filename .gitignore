@@ -1,9 +1,13 @@
 # non-public features
-
 collectivizer.ts
 
-# wasm output directories
-src/wasm/target
+# user-custom code
+
+src/other/userScript/*
+!userScript.example.ts
+settings.ts
+.screeps.yaml
+
 # wasm-pack always puts a .gitignore in here; if you want to not ignore it,
 # you'll need to delete it within the dir (for now, see
 # https://github.com/rustwasm/wasm-pack/pull/1131)
@@ -11,10 +15,8 @@ src/wasm/src
 Cargo.lock
 Cargo.toml
 
-# user-custom code
-src/other/userScript/*
-!userScript.example.ts
-settings.ts
+# wasm output directories
+src/wasm/target
 
 
 # Build
@@ -40,6 +42,5 @@ push.log
 tmp-test-server
 coverage
 .envrc
-.screeps.yaml
 
 .idea/
