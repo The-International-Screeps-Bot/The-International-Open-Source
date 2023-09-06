@@ -398,8 +398,15 @@ export class DefenceManager {
         const { room } = this.communeManager
 
         this.findPresentThreat()
-
         const roomMemory = Memory.rooms[room.name]
+
+        if (!this.presentThreat) {
+            // Reduce attack threat over time
+            if (roomMemory[RoomMemoryKeys.threatened] > 0)
+                roomMemory[RoomMemoryKeys.threatened] *= defaultDataDecay
+
+            roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
+        }
 
         roomMemory[RoomMemoryKeys.threatened] = Math.max(
             roomMemory[RoomMemoryKeys.threatened],
@@ -407,32 +414,22 @@ export class DefenceManager {
             playerManager.highestThreat / 3,
         )
 
-        if (this.presentThreat) {
-            for (const [playerName, threat] of this.threatByPlayers) {
-                let player = Memory.players[playerName]
+        for (const [playerName, threat] of this.threatByPlayers) {
+            let player = Memory.players[playerName]
 
-                if (!player) {
-                    player = playerManager.initPlayer(playerName)
-                }
-
-                player[PlayerMemoryKeys.offensiveThreat] = Math.max(
-                    threat,
-                    player[PlayerMemoryKeys.offensiveThreat],
-                )
-                player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
-                player[PlayerMemoryKeys.lastAttackedBy] = 0
+            if (!player) {
+                player = playerManager.initPlayer(playerName)
             }
 
-            roomMemory[RoomMemoryKeys.lastAttackedBy] = 0
-            return
+            player[PlayerMemoryKeys.offensiveThreat] = Math.max(
+                threat,
+                player[PlayerMemoryKeys.offensiveThreat],
+            )
+            player[PlayerMemoryKeys.hate] = Math.max(threat, player[PlayerMemoryKeys.hate])
+            player[PlayerMemoryKeys.lastAttackedBy] = 0
         }
 
-        // There is no present threat
-
-        // Reduce attack threat over time
-        if (roomMemory[RoomMemoryKeys.threatened] > 0)
-            roomMemory[RoomMemoryKeys.threatened] *= defaultDataDecay
-
-        roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
+        roomMemory[RoomMemoryKeys.lastAttackedBy] = 0
+        return
     }
 }

@@ -227,8 +227,9 @@ export class CommuneManager {
         this.estimatedEnergyIncome = 0
 
         if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
-        if (roomMemory[RoomMemoryKeys.threatened] == undefined)
+        if (roomMemory[RoomMemoryKeys.threatened] == undefined) {
             roomMemory[RoomMemoryKeys.threatened] = 0
+        }
 
         room.usedRampartIDs = new Map()
 
@@ -762,7 +763,7 @@ export class CommuneManager {
                 continue
             }
             if (data.buildForThreat) {
-                if (!this.needsSecondMincutLayer) continue
+                if (!this.buildSecondMincutLayer) continue
 
                 rampartRepairTargets.push(structure)
                 continue
@@ -774,11 +775,13 @@ export class CommuneManager {
         return (this._rampartRepairTargets = rampartRepairTargets)
     }
 
-    get needsSecondMincutLayer() {
-        return (
+    get buildSecondMincutLayer() {
+        const buildSecondMincutLayer = (
             Memory.rooms[this.room.name][RoomMemoryKeys.threatened] >
             Math.floor(Math.pow(this.room.controller.level * 30, 1.63))
-        )
+        ) && this.room.towerInferiority !== true
+
+        return buildSecondMincutLayer
     }
 
     private sourceLinkIDs: Id<StructureLink>[]
@@ -883,8 +886,11 @@ export class CommuneManager {
         todo: implement pow() to decrease the decrease in path distance as threat increases
         */
 
-        const threatenedEffect = Math.max(Memory.rooms[this.room.name][RoomMemoryKeys.threatened] / 1000, 20000)
+        const threatenedEffect = Math.max(
+            Memory.rooms[this.room.name][RoomMemoryKeys.threatened] / 1000,
+            20000,
+        )
         this._maxRemotePathDistance = this.maxRemotePathDistance / threatenedEffect
-        return
+        return this._maxRemotePathDistance
     }
 }

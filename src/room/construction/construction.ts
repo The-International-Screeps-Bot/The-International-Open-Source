@@ -103,11 +103,13 @@ export class ConstructionManager extends Sleepable {
                     structure => structure.structureType === STRUCTURE_RAMPART,
                 )
             ) {
-
                 continue
             }
 
-            if (data.coversStructure && !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)) {
+            if (
+                data.coversStructure &&
+                !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)
+            ) {
                 continue
             }
 
@@ -120,7 +122,7 @@ export class ConstructionManager extends Sleepable {
             }
 
             if (data.buildForThreat) {
-                if (!this.communeManager.needsSecondMincutLayer) continue
+                if (!this.communeManager.buildSecondMincutLayer) continue
 
                 this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
                 this.placedSites += 1
