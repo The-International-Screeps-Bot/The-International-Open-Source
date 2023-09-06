@@ -293,7 +293,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         for (const pos of path) {
             newSourceEfficacy +=
-                collectiveManager.getTerrainCoords(pos.roomName)[packAsNum(pos)] ===
+                collectiveManager.getTerrainBinary(pos.roomName)[packAsNum(pos)] ===
                 TERRAIN_MASK_SWAMP
                     ? defaultSwampCost
                     : 1
@@ -786,7 +786,7 @@ Room.prototype.distanceTransform = function (
     const distanceCoords = new Uint8Array(2500)
 
     if (!initialCoords)
-        initialCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
+        initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
 
     let x
     let y
@@ -882,7 +882,7 @@ Room.prototype.diagonalDistanceTransform = function (
     const distanceCoords = new Uint8Array(2500)
 
     if (!initialCoords)
-        initialCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
+        initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
 
     let x
     let y

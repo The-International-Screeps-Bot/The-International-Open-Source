@@ -21,6 +21,7 @@ import {
     minerals,
 } from './constants'
 
+
 /**
  * Handles inter room and non-room matters
  */
@@ -57,6 +58,10 @@ export class CollectiveManager extends Sleepable {
      * An intra-tick collection of commands we wish to issue
      */
     myCommands: any[]
+    /**
+     * Terrain binaries of wall or not wall for rooms
+     */
+    terrainBinaries: {[roomName: string]: Uint8Array} = {}
 
     /**
      * Updates values to be present for this tick
@@ -240,23 +245,24 @@ export class CollectiveManager extends Sleepable {
         Game.cpu.generatePixel()
     }
 
-    getTerrainCoords(roomName: string) {
-        if (!global.terrainCoords) global.terrainCoords = {}
+    /**
+     * Provides a cached binary of wall or not wall terrain
+     */
+    getTerrainBinary(roomName: string) {
+        if (this.terrainBinaries[roomName]) return this.terrainBinaries[roomName]
 
-        if (global.terrainCoords[roomName]) return global.terrainCoords[roomName]
-
-        global.terrainCoords[roomName] = new Uint8Array(2500)
+        this.terrainBinaries[roomName] = new Uint8Array(2500)
 
         const terrain = Game.map.getRoomTerrain(roomName)
 
         for (let x = 0; x < roomDimensions; x += 1) {
             for (let y = 0; y < roomDimensions; y += 1) {
-                global.terrainCoords[roomName][packXYAsNum(x, y)] =
+                this.terrainBinaries[roomName][packXYAsNum(x, y)] =
                     terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
             }
         }
 
-        return global.terrainCoords[roomName]
+        return this.terrainBinaries[roomName]
     }
 
     newTickID() {

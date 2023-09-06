@@ -259,6 +259,7 @@ export enum RoomMemoryKeys {
     abandonRemote,
     recursedAbandonment,
     use,
+    useSources,
     enemyReserved,
     invaderCore,
     disableCachedPaths,
@@ -329,6 +330,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.abandonRemote,
     RoomMemoryKeys.recursedAbandonment,
     RoomMemoryKeys.pathsThrough,
+    RoomMemoryKeys.useSources,
 
     // Ally and Enemy
 

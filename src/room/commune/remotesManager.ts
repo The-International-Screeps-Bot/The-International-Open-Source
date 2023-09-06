@@ -59,9 +59,13 @@ export class RemotesManager {
                 continue
             }
 
+            // If we've determined the room to be unusable
+            if (this.manageUse(remoteName)) continue
+
             // The room is closed or is now a respawn or novice zone
 
             if (
+                randomTick(20) &&
                 Game.map.getRoomStatus(remoteName).status !==
                 Game.map.getRoomStatus(room.name).status
             ) {
@@ -293,6 +297,24 @@ export class RemotesManager {
         remoteMemory[RoomMemoryKeys.disableCachedPaths] = false
     }
 
+    /**
+     * true = continue use
+     * false = stop use
+     */
+    private manageUse(remoteName: string): boolean {
+        const roomMemory = Memory.rooms[remoteName]
+        if (!roomMemory[RoomMemoryKeys.use]) return false
+
+        let disabledSources = this.manageMaxDistance(remoteName)
+        if (disabledSources >= roomMemory[RoomMemoryKeys.remoteSources].length) {
+
+            roomMemory[RoomMemoryKeys.use] = false
+            return false
+        }
+
+        return true
+    }
+
     private manageAbandonment(remoteName: string) {
         const remoteMemory = Memory.rooms[remoteName]
 
@@ -330,5 +352,25 @@ export class RemotesManager {
         }
 
         remoteMemory[RoomMemoryKeys.recursedAbandonment] = true
+    }
+
+    private manageMaxDistance(remoteName: string) {
+        let disabledSources = 0
+        const roomMemory = Memory.rooms[remoteName]
+
+        // Also do for: roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]
+
+        for (const index in roomMemory[RoomMemoryKeys.remoteSourceHubPaths]) {
+            const path = roomMemory[RoomMemoryKeys.remoteSourceHubPaths][index]
+
+            if (path.length / packedPosLength <= maxRemoteRoomDistance) {
+                disabledSources += 1
+                continue
+            }
+
+            roomMemory[RoomMemoryKeys.useSources][index] = false
+        }
+
+        return disabledSources
     }
 }

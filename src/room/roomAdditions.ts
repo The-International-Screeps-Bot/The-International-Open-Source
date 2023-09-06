@@ -281,6 +281,7 @@ const roomAdditions = {
             return this._mineralContainer
         },
     },
+    //
     fastFillerLink: {
         get() {
             if (this._fastFillerLink !== undefined) return this._fastFillerLink
@@ -333,6 +334,7 @@ const roomAdditions = {
             return this._hubLink
         },
     },
+    //
     droppedEnergy: {
         get() {
             if (this._droppedEnergy) return this._droppedEnergy
@@ -368,7 +370,7 @@ const roomAdditions = {
         get() {
             if (this._quadCostMatrix) return this._quadCostMatrix
 
-            const terrainCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
+            const terrainCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
             this._quadCostMatrix = new PathFinder.CostMatrix()
 
             const roadCoords = new Set()
@@ -529,7 +531,7 @@ const roomAdditions = {
         get() {
             if (this._quadBulldozeCostMatrix) return this._quadBulldozeCostMatrix
 
-            const terrainCoords = new Uint8Array(collectiveManager.getTerrainCoords(this.name))
+            const terrainCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
             this._quadBulldozeCostMatrix = new PathFinder.CostMatrix()
 
             const roadCoords = new Set()
@@ -693,6 +695,7 @@ const roomAdditions = {
             return this._quadBulldozeCostMatrix
         },
     },
+    //
     enemyDamageThreat: {
         get() {
             if (this._enemyDamageThreat !== undefined) return this._enemyDamageThreat
@@ -710,6 +713,7 @@ const roomAdditions = {
             return (this._enemyDamageThreat = false)
         },
     },
+    //
     enemyThreatCoords: {
         get() {
             if (this._enemyThreatCoords) return this._enemyThreatCoords
@@ -722,7 +726,6 @@ const roomAdditions = {
                 return this._enemyThreatCoords
 
             // If there is no enemy threat
-
             if (!this.roomManager.enemyAttackers.length) return this._enemyThreatCoords
 
             const enemyAttackers: Creep[] = []
@@ -780,6 +783,7 @@ const roomAdditions = {
             return this._enemyThreatCoords
         },
     },
+    //
     enemyThreatGoals: {
         get() {
             if (this._enemyThreatGoals) return this._enemyThreatGoals
@@ -806,6 +810,7 @@ const roomAdditions = {
             return this._enemyThreatGoals
         },
     },
+    //
     flags: {
         get() {
             if (this._flags) return this._flags
@@ -819,6 +824,7 @@ const roomAdditions = {
             return this._flags
         },
     },
+    //
     factory: {
         get() {
             if (this._factory !== undefined) return this._factory
@@ -878,6 +884,7 @@ const roomAdditions = {
             return this._resourcesInStoringStructures
         },
     },
+    //
     unprotectedEnemyCreeps: {
         get() {
             if (this._unprotectedEnemyCreeps) return this._unprotectedEnemyCreeps
@@ -893,6 +900,7 @@ const roomAdditions = {
             ))
         },
     },
+    //
     exitCoords: {
         get() {
             if (this._exitCoords) return this._exitCoords
@@ -934,6 +942,7 @@ const roomAdditions = {
             return this._exitCoords
         },
     },
+    //
     advancedLogistics: {
         get() {
             if (this._advancedLogistics !== undefined) return this._advancedLogistics
@@ -964,7 +973,6 @@ const roomAdditions = {
             for (const road of this.roomManager.structures.road) cm.set(road.pos.x, road.pos.y, 1)
 
             for (const [packedCoord, coordType] of this.roomManager.reservedCoords) {
-
                 if (coordType !== ReservedCoordTypes.important) continue
 
                 const coord = unpackCoord(packedCoord)
@@ -1034,6 +1042,7 @@ const roomAdditions = {
             return (this._defaultCostMatrix = cm.clone())
         },
     },
+    //
     totalEnemyCombatStrength: {
         get() {
             if (this._totalEnemyCombatStrength) return this._totalEnemyCombatStrength

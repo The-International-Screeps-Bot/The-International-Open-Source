@@ -1910,6 +1910,7 @@ declare global {
         [RoomMemoryKeys.abandonRemote]: number
         [RoomMemoryKeys.recursedAbandonment]: boolean
         [RoomMemoryKeys.use]: boolean
+        [RoomMemoryKeys.useSources]: boolean[]
         [RoomMemoryKeys.enemyReserved]: boolean
         [RoomMemoryKeys.invaderCore]: number
         [RoomMemoryKeys.disableCachedPaths]: boolean

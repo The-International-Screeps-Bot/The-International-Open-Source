@@ -5,7 +5,7 @@ import {
     RoomTypes,
     customColors,
 } from 'international/constants'
-import { advancedFindDistance, customLog } from 'utils/utils'
+import { advancedFindDistance, customLog, randomTick } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { updateStat } from 'international/statsManager'
@@ -66,6 +66,7 @@ export class WorkRequestManager {
         // The room is closed or is now a respawn or novice zone
 
         if (
+            randomTick(20) &&
             Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
         ) {
             this.delete()
