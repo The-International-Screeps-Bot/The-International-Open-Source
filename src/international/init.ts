@@ -14,7 +14,7 @@ class InitManager {
      * Make sure we have configured memory for allies
      */
     initAllies() {
-        for (const playerName in global.settings.allies) {
+        for (const playerName of global.settings.allies) {
             if (Memory.players[playerName]) continue
 
             playerManager.initPlayer(playerName)
