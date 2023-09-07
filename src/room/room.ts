@@ -1199,6 +1199,7 @@ export class RoomManager {
         const events: { [targetID: string]: InterpretedRoomEvent } = {}
 
         for (const event of eventLog) {
+
         }
 
         return (this._events = events)

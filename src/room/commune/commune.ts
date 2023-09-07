@@ -894,28 +894,22 @@ export class CommuneManager {
         return this._maxRemotePathDistance
     }
 
-    _enemyBarricadeDamage: 
-    get enemyBarricadeDamage() {
+    // /**
+    //  * Wether or not the barricade damage was recorded / updated for this tick
+    //  */
+    // barricadeDamageOverTimeRecorded: boolean
+    // _barricadeDamageOverTime: Uint16Array
+    // get barricadeDamageOverTime() {
 
+    //     if (this._barricadeDamageOverTime) return this._barricadeDamageOverTime
 
-    }
+    //     const barricadeDamageOverTime: Uint16Array = new Uint16Array(2500)
 
-    /**
-     * Wether or not the barricade damage was recorded / updated for this tick
-     */
-    barricadeDamageOverTimeRecorded: boolean
-    _barricadeDamageOverTime: Uint16Array
-    get barricadeDamageOverTime() {
+    //     for (const rampart of this.room.roomManager.structures.rampart) {
 
-        if (this._barricadeDamageOverTime) return this._barricadeDamageOverTime
+    //         const packedCoord = packAsNum(rampart.pos)
 
-        const barricadeDamageOverTime: Uint16Array = new Uint16Array(2500)
-
-        for (const rampart of this.room.roomManager.structures.rampart) {
-
-            const packedCoord = packAsNum(rampart.pos)
-
-            barricadeDamageOverTime[packedCoord] = rampart.hits
-        }
-    }
+    //         barricadeDamageOverTime[packedCoord] = rampart.hits
+    //     }
+    // }
 }
