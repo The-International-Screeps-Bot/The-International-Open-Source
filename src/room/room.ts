@@ -1472,7 +1472,7 @@ export class RoomManager {
             )
                 continue
 
-            this._fastFillerPositions.push(pos)
+            fastFillerPositions.push(pos)
         }
 
         return (this._fastFillerPositions = fastFillerPositions)
