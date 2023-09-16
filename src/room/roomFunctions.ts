@@ -57,7 +57,6 @@ import {
     unpackPosList,
 } from 'other/codec'
 import { posix } from 'path'
-import { BasePlans } from './construction/basePlans'
 import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
 import { roomUtils } from './roomUtils'

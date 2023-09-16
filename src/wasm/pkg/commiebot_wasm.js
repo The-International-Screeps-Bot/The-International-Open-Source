@@ -338,20 +338,6 @@ function __wbg_get_imports() {
         getInt32Memory0()[arg0 / 4 + 1] = len1;
         getInt32Memory0()[arg0 / 4 + 0] = ptr1;
     };
-    imports.wbg.__wbg_setstackTraceLimit_1e311e6e52596ac7 = function(arg0) {
-        Error.stackTraceLimit = arg0;
-    };
-    imports.wbg.__wbg_new_26f2ef54137daf0f = function() {
-        const ret = new Error();
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_stack_18f5a1687f0ed62b = function(arg0, arg1) {
-        const ret = getObject(arg1).stack;
-        const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        getInt32Memory0()[arg0 / 4 + 1] = len1;
-        getInt32Memory0()[arg0 / 4 + 0] = ptr1;
-    };
     imports.wbg.__wbg_getMe_463fab2b1ba54c2f = function() {
         const ret = getMe();
         return addHeapObject(ret);
@@ -377,9 +363,6 @@ function __wbg_get_imports() {
         const ret = getObject(arg0) in getObject(arg1);
         return ret;
     };
-    imports.wbg.__wbg_log_1d3ae0273d8f4f8a = function(arg0) {
-        console.log(getObject(arg0));
-    };
     imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
         const obj = getObject(arg1);
         const ret = typeof(obj) === 'number' ? obj : undefined;
@@ -396,13 +379,6 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbg_setpacked_2a31b92dc78157c1 = function(arg0, arg1) {
         getObject(arg0).__packedPos = arg1 >>> 0;
-    };
-    imports.wbg.__wbg_time_71b2921cb0a88607 = function() {
-        const ret = Game.time;
-        return ret;
-    };
-    imports.wbg.__wbg_notify_82b7b097cddbabc6 = function(arg0, arg1, arg2) {
-        Game.notify(getObject(arg0), arg1 === 0 ? undefined : arg2 >>> 0);
     };
     imports.wbg.__wbg_foreignsegment_4d42e4f33186c6c7 = function() {
         const ret = RawMemory.foreignSegment;

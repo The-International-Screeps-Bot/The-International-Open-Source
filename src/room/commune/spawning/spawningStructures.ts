@@ -242,11 +242,12 @@ export class SpawningStructuresManager {
     }
 
     private findDirections(pos: RoomPosition) {
-        const adjacentCoords = findAdjacentCoordsToCoord(pos)
 
         const anchor = this.communeManager.room.roomManager.anchor
         if (!anchor)
             throw Error('No anchor for spawning structures ' + this.communeManager.room.name)
+
+        const adjacentCoords = findAdjacentCoordsToCoord(pos)
 
         // Sort by distance from the first pos in the path
 

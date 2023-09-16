@@ -81,7 +81,6 @@ import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
 import { decode, encode } from 'base32768'
-import { BasePlans } from '../construction/basePlans'
 import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
@@ -742,7 +741,7 @@ export class CommuneManager {
     private _rampartRepairTargets: StructureRampart[]
     get rampartRepairTargets() {
         const rampartRepairTargets: StructureRampart[] = []
-        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
+        const rampartPlans = this.room.roomManager.rampartPlans
 
         for (const structure of this.room.roomManager.structures.rampart) {
             const data = rampartPlans.map[packCoord(structure.pos)]
@@ -811,12 +810,24 @@ export class CommuneManager {
         const links: (StructureLink | false)[] = []
         let definedLinks = 0
 
-        for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
+/*         for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
             const closestSourceHarvestPos = positions[0]
 
             const structure = this.room.findStructureInRange(
                 closestSourceHarvestPos,
                 1,
+                structure => structure.structureType === STRUCTURE_LINK,
+            ) as StructureLink | false
+            links.push(structure)
+
+            if (!structure) continue
+
+            definedLinks += 1
+        } */
+        for (const coord of stampAnchors.sourceLink) {
+
+            const structure = this.room.findStructureAtCoord(
+                coord,
                 structure => structure.structureType === STRUCTURE_LINK,
             ) as StructureLink | false
             links.push(structure)

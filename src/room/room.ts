@@ -759,7 +759,7 @@ export class RoomManager {
             const relevantStructures = (
                 structures.container as (StructureContainer | StructureRoad)[]
             ).concat(structures.road)
-            const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
+            const basePlans = this.basePlans
             const RCL = this.room.controller.level
 
             for (const structure of relevantStructures) {
@@ -873,6 +873,9 @@ export class RoomManager {
 
     allStructureIDs: Id<Structure<StructureConstant>>[]
     checkedStructureUpdate: boolean
+    /**
+     * Checks if there has been a structure cache update, running one if there hasn't. Only use this for static properties, and not hits, store, etc.
+     */
     get structureUpdate() {
         if (this.checkedStructureUpdate === true) return false
 
@@ -1432,6 +1435,7 @@ export class RoomManager {
             new RoomPosition(anchor.x + 1, anchor.y - 1, this.room.name),
             new RoomPosition(anchor.x + 1, anchor.y + 1, this.room.name),
         ]
+        const structureCoords = this.structureCoords
 
         for (const pos of rawFastFillerPositions) {
             const adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {
@@ -1442,7 +1446,7 @@ export class RoomManager {
             }
 
             forAdjacentCoords(pos, adjacentCoord => {
-                const structuresAtCoord = this.structureCoords.get(packCoord(adjacentCoord))
+                const structuresAtCoord = structureCoords.get(packCoord(adjacentCoord))
                 if (!structuresAtCoord) return
 
                 for (const ID of structuresAtCoord) {
@@ -1546,7 +1550,7 @@ export class RoomManager {
     get sourceContainers() {
         if (this._sourceContainers) return this._sourceContainers
 
-        if (this.sourceContainerIDs && !this.structureUpdate) {
+        if (this.sourceContainerIDs) {
             const sourceContainers = this.sourceContainerIDs.map(ID => findObjectWithID(ID))
 
             return (this._sourceContainers = sourceContainers)
@@ -1599,7 +1603,7 @@ export class RoomManager {
     get fastFillerContainers() {
         if (this._fastFillerContainers) return this._fastFillerContainers
 
-        if (this.fastFillerContainerIDs && !this.structureUpdate) {
+        if (this.fastFillerContainerIDs) {
             const fastFillerContainers = this.fastFillerContainerIDs.map(ID => findObjectWithID(ID))
             return (this._fastFillerContainers = fastFillerContainers)
         }
@@ -2450,5 +2454,27 @@ export class RoomManager {
         if (this._observer !== undefined) return this._observer
 
         return (this._observer = this.structures.observer[0])
+    }
+
+    _basePlans: BasePlans
+    /**
+     * cached unpacked base plans, if they exist
+     */
+    get basePlans() {
+        if (this._basePlans !== undefined) return this._basePlans
+
+        this._basePlans = BasePlans.unpack(Memory.rooms[this.room.name][RoomMemoryKeys.basePlans])
+        return this._basePlans
+    }
+
+    _rampartPlans: RampartPlans
+    /**
+     * cached unoacked rampart plans, if they exist
+     */
+    get rampartPlans() {
+        if (this._rampartPlans !== undefined) return this._rampartPlans
+
+        this._rampartPlans = RampartPlans.unpack(Memory.rooms[this.room.name][RoomMemoryKeys.rampartPlans])
+        return this._rampartPlans
     }
 }

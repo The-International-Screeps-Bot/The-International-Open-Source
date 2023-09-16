@@ -87,7 +87,7 @@ export class ConstructionManager extends Sleepable {
         this.placeBase(RCL, maxCSites)
     }
     private placeRamparts(RCL: number, maxCSites: number) {
-        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
+        const rampartPlans = this.communeManager.room.roomManager.rampartPlans
         const hasStoringStructure = !!this.room.communeManager.storingStructures.length
 
         for (const packedCoord in rampartPlans.map) {
@@ -139,7 +139,7 @@ export class ConstructionManager extends Sleepable {
     private placeBase(RCL: number, maxCSites: number) {
         if (this.placedSites >= maxCSites) return
 
-        const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
+        const basePlans = this.communeManager.room.roomManager.basePlans
 
         for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
             for (const packedCoord in basePlans.map) {
@@ -183,7 +183,7 @@ export class ConstructionManager extends Sleepable {
     }
     public visualize() {
         const RCL = /* this.room.controller.level */ /* Game.time % 8 */ 8
-        const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
+        const basePlans = this.room.roomManager.basePlans
 
         for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
             for (const packedCoord in basePlans.map) {
@@ -204,7 +204,7 @@ export class ConstructionManager extends Sleepable {
             }
         }
 
-        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
+        const rampartPlans = this.communeManager.room.roomManager.rampartPlans
 
         for (const packedCoord in rampartPlans.map) {
             const coord = unpackCoord(packedCoord)
@@ -245,7 +245,7 @@ export class ConstructionManager extends Sleepable {
         if (!randomTick(100)) return
 
         const structures = this.room.roomManager.structures
-        const basePlans = BasePlans.unpack(this.room.memory[RoomMemoryKeys.basePlans])
+        const basePlans = this.room.roomManager.basePlans
 
         for (const structureType of generalMigrationStructures) {
             for (const structure of structures[structureType]) {
@@ -292,7 +292,7 @@ export class ConstructionManager extends Sleepable {
             misplacedSpawns[i].destroy()
         }
         /*
-        const rampartPlans = RampartPlans.unpack(this.room.memory[RoomMemoryKeys.rampartPlans])
+        const rampartPlans = this.room.roomManager.rampartPlans
 
         for (const structure of structures.rampart) {
             const packedCoord = packCoord(structure.pos)

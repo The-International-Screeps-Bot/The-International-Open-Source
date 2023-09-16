@@ -269,6 +269,7 @@ global.deleteBasePlans = function (roomName) {
     if (!room) return 'No vision in ' + roomName
 
     delete room.memory[RoomMemoryKeys.communePlanned]
+    room.roomManager._basePlans = undefined
 
     return 'Deleted base plans for ' + roomName
 }

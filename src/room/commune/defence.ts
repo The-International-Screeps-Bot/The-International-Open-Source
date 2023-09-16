@@ -137,9 +137,7 @@ export class DefenceManager {
         }
 
         const terrain = Game.map.getRoomTerrain(room.name)
-        const rampartPlans = RampartPlans.unpack(
-            Memory.rooms[room.name][RoomMemoryKeys.rampartPlans],
-        )
+        const rampartPlans = this.communeManager.room.roomManager.rampartPlans
         const enemyCoord = roomUtils.floodFillFor(room.name, [anchor], coord => {
             // Ignore terrain that protects us
             if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false

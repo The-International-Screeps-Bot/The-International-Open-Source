@@ -193,7 +193,7 @@ function weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: strin
 
     // Weight structures
 
-    const basePlans = BasePlans.unpack(roomMemory[RoomMemoryKeys.basePlans])
+    const basePlans = room.roomManager.basePlans
 
     for (const packedCoord in basePlans.map) {
         const coordData = basePlans.map[packedCoord]
