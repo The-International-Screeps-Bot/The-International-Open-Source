@@ -389,6 +389,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.remoteHaulers] = []
         roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
         roomMemory[RoomMemoryKeys.hasContainer] = []
+        roomMemory[RoomMemoryKeys.disableSources] = []
 
         for (const i in packedRemoteSources) {
             roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
@@ -479,6 +480,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.remoteHaulers] = []
     roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
     roomMemory[RoomMemoryKeys.hasContainer] = []
+    roomMemory[RoomMemoryKeys.disableSources] = []
 
     for (const i in packedRemoteSources) {
         roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0

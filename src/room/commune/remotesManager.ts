@@ -61,7 +61,7 @@ export class RemotesManager {
             }
 
             // If we've determined the room to be unusable
-            if (this.manageUse(remoteName)) continue
+            if (!this.manageUse(remoteName)) continue
 
             // The room is closed or is now a respawn or novice zone
 

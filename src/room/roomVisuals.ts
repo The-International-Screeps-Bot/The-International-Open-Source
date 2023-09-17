@@ -746,6 +746,7 @@ export class RoomVisualsManager {
             'reserver',
             'coreAttacker',
             '❌',
+            '🛑',
         ]
         const data: any[][] = []
 
@@ -788,6 +789,7 @@ export class RoomVisualsManager {
                 remoteMemory[RoomMemoryKeys.abandonRemote] ||
                     remoteMemory[RoomMemoryKeys.abandonRemote] + '',
             )
+            row.push(remoteMemory[RoomMemoryKeys.disable])
 
             data.push(row)
         }
