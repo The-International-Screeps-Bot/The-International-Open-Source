@@ -9,7 +9,7 @@ export class DroppedResourceManager {
     }
 
     runCommune() {
-        for (const resource of this.roomManager.room.droppedResources) {
+        for (const resource of this.roomManager.droppedResources) {
             if (resource.amount < 50) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
@@ -23,7 +23,7 @@ export class DroppedResourceManager {
     }
 
     runRemote() {
-        for (const resource of this.roomManager.room.droppedResources) {
+        for (const resource of this.roomManager.droppedResources) {
             if (resource.resourceType !== RESOURCE_ENERGY) continue
             if (resource.amount < 50) continue
 

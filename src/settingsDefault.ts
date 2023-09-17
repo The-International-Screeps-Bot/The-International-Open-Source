@@ -106,6 +106,10 @@ export interface Settings {
      * Wether or not to try to migrate existing structures to planned positions
      */
     structureMigration: boolean
+    /**
+     * Wether or not to generate visuals for room logistics requests
+     */
+    roomLogisticsVisuals: boolean
 }
 
 /**
@@ -136,4 +140,5 @@ export const defaultSettings: Settings = {
     allySegmentID: 90,
     errorExporting: true,
     structureMigration: true,
+    roomLogisticsVisuals: false,
 }

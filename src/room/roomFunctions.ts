@@ -1606,6 +1606,13 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     else args.priority = Math.round(args.priority * 100) / 100
 
     const ID = collectiveManager.newTickID()
+
+    if (global.settings.roomLogisticsVisuals && args.type === 'pickup') {
+
+        this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
+        this.visual.text(args.priority.toString(), args.target.pos, { font: .4 })
+    }
+
     /* this.visual.text(args.priority.toString(), args.target.pos) */
     /* this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
     /* if (args.type === 'transfer') this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
@@ -1631,7 +1638,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         resourceType: args.resourceType,
         amount: amount,
         priority: args.priority,
-        onlyFull: args.onlyFull,
+        onlyFull: true || args.onlyFull,
         noReserve: !this.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
     })
 }

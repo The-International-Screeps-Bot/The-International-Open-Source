@@ -882,29 +882,6 @@ export class CommuneManager {
         return (this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity)
     }
 
-    _maxRemotePathDistance: number
-    /**
-     * The max remote path distance allowed for this commune
-     */
-    get maxRemotePathDistance() {
-        if (this._maxRemotePathDistance !== undefined) return this._maxRemotePathDistance
-        /*
-        threatened = 2000
-        effect = 2
-        distance = 300
-        300 / effect = 150
-
-        todo: implement pow() to decrease the decrease in path distance as threat increases
-        */
-
-        const threatenedEffect = Math.max(
-            Memory.rooms[this.room.name][RoomMemoryKeys.threatened] / 1000,
-            20000,
-        )
-        this._maxRemotePathDistance = this.maxRemotePathDistance / threatenedEffect
-        return this._maxRemotePathDistance
-    }
-
     // /**
     //  * Wether or not the barricade damage was recorded / updated for this tick
     //  */

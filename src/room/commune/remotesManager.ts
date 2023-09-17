@@ -6,6 +6,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     defaultDataDecay,
+    maxRemotePathDistance,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -363,7 +364,7 @@ export class RemotesManager {
         for (const index in roomMemory[RoomMemoryKeys.remoteSourceHubPaths]) {
             const path = roomMemory[RoomMemoryKeys.remoteSourceHubPaths][index]
 
-            if (path.length / packedPosLength <= maxRemoteRoomDistance) {
+            if (path.length / packedPosLength <= maxRemotePathDistance) {
                 disabledSources += 1
                 continue
             }

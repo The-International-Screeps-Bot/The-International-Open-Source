@@ -1633,7 +1633,8 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
         if (request.onlyFull) {
             // If the creep has enough space
 
-            if (this.freeNextStore >= target.reserveAmount) return true
+            /* if (this.freeNextStore >= target.reserveAmount) return true */
+            if (target.reserveAmount >= this.freeNextStore) return true
             return false
         }
 
@@ -1712,9 +1713,13 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
         if (request.onlyFull) {
             // If the creep has enough resource
             /* this.room.visual.text(Math.min(amount, target.store.getCapacity(request.resourceType) / 2).toString(), this.pos) */
+
+            //
+            const creepEffectiveCapacity = this.store.getCapacity() - this.store.getUsedCapacity() + this.nextStore[request.resourceType]
+
             if (
                 this.nextStore[request.resourceType] >=
-                Math.min(amount, target.store.getCapacity(request.resourceType) / 2)
+                Math.min(amount, Math.min(target.store.getCapacity(request.resourceType), creepEffectiveCapacity))
             )
                 return true
             return false
@@ -1906,7 +1911,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         )
             return Result.fail
 
-        this.movedResource = true
+        target.movedResource = true
 
         this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
             request[CreepRoomLogisticsRequestKeys.amount]
@@ -1914,7 +1919,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
             request[CreepRoomLogisticsRequestKeys.amount]
 
         this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
-        return Result.success
+        return Result.action
     }
 
     if (

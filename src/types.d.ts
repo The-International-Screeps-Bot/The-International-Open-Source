@@ -389,7 +389,7 @@ declare global {
         resourceType: ResourceConstant
         amount: number
         /**
-         * If the responder should only take the task if it will use its full capacity. Default is false
+         * If the responder should only take the task if it will use its full capacity. Default is true
          */
         onlyFull?: boolean
         /**
@@ -1230,12 +1230,6 @@ declare global {
 
         _hubLink: StructureLink | false
         readonly hubLink: StructureLink | false
-
-        _droppedEnergy: Resource[]
-        readonly droppedEnergy: Resource[]
-
-        _droppedResources: Resource[]
-        readonly droppedResources: Resource[]
 
         _actionableWalls: StructureWall[]
         readonly actionableWalls: StructureWall[]

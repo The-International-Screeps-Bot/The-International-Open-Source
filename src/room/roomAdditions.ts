@@ -335,26 +335,6 @@ const roomAdditions = {
         },
     },
     //
-    droppedEnergy: {
-        get() {
-            if (this._droppedEnergy) return this._droppedEnergy
-
-            return (this._droppedEnergy = this.find(FIND_DROPPED_RESOURCES, {
-                filter: resource =>
-                    resource.resourceType === RESOURCE_ENERGY &&
-                    !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
-            }))
-        },
-    },
-    droppedResources: {
-        get() {
-            if (this._droppedResources) return this._droppedResources
-
-            return (this._droppedResources = this.find(FIND_DROPPED_RESOURCES, {
-                filter: resource => !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
-            }))
-        },
-    },
     actionableWalls: {
         get() {
             if (this._actionableWalls) return this._actionableWalls
