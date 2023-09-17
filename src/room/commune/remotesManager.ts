@@ -68,7 +68,7 @@ export class RemotesManager {
             if (
                 randomTick(20) &&
                 Game.map.getRoomStatus(remoteName).status !==
-                Game.map.getRoomStatus(room.name).status
+                    Game.map.getRoomStatus(room.name).status
             ) {
                 this.communeManager.removeRemote(remoteName, index)
                 continue
@@ -304,12 +304,11 @@ export class RemotesManager {
      */
     private manageUse(remoteName: string): boolean {
         const roomMemory = Memory.rooms[remoteName]
-        if (!roomMemory[RoomMemoryKeys.use]) return false
+        if (!randomTick(20) && roomMemory[RoomMemoryKeys.disable]) return false
 
         let disabledSources = this.manageMaxDistance(remoteName)
         if (disabledSources >= roomMemory[RoomMemoryKeys.remoteSources].length) {
-
-            roomMemory[RoomMemoryKeys.use] = false
+            roomMemory[RoomMemoryKeys.disable] = true
             return false
         }
 
@@ -365,11 +364,11 @@ export class RemotesManager {
             const path = roomMemory[RoomMemoryKeys.remoteSourceHubPaths][index]
 
             if (path.length / packedPosLength <= maxRemotePathDistance) {
-                disabledSources += 1
                 continue
             }
 
-            roomMemory[RoomMemoryKeys.useSources][index] = false
+            disabledSources += 1
+            roomMemory[RoomMemoryKeys.disableSources][index] = true
         }
 
         return disabledSources

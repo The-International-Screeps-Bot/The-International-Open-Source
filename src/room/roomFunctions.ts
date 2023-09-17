@@ -321,7 +321,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
         // Generate new important positions
 
-        let use: boolean = true
+        let disable: boolean
         let newCost = 0
         const pathsThrough: Set<string> = new Set()
 
@@ -341,7 +341,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             const unpackedLength = packedPath.length / packedPosLength
 
             newCost += unpackedLength
-            if (unpackedLength > maxRemotePathDistance) use = false
+            if (unpackedLength > maxRemotePathDistance) disable = true
         }
 
         const packedRemoteControllerPositions =
@@ -354,7 +354,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         if (!packedRemoteControllerPath.length) {
             return roomMemory[RoomMemoryKeys.type]
         }
-        if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) use = false
+        if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) disable = true
 
         newCost += packedRemoteControllerPath.length / packedPosLength
 
@@ -372,7 +372,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Successful remote value generation, now assign them
 
-        roomMemory[RoomMemoryKeys.use] = use
+        roomMemory[RoomMemoryKeys.disable] = disable
 
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
         roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
@@ -410,7 +410,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     // The room is not a remote
 
-    let use: boolean = true
+    let disable: boolean
 
     // Generate new important positions
     const pathsThrough: Set<string> = new Set()
@@ -441,7 +441,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     if (!packedRemoteControllerPath.length) {
         return roomMemory[RoomMemoryKeys.type]
     }
-    if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) use = false
+    if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) disable = true
 
     roomMemory[RoomMemoryKeys.roads] = []
     roomMemory[RoomMemoryKeys.roadsQuota] = []
@@ -459,10 +459,10 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] += 1
         }
 
-        if (path.length > maxRemotePathDistance) use = false
+        if (path.length > maxRemotePathDistance) disable = true
     }
 
-    roomMemory[RoomMemoryKeys.use] = use
+    roomMemory[RoomMemoryKeys.disable] = disable
 
     roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
     roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
@@ -1608,9 +1608,8 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     const ID = collectiveManager.newTickID()
 
     if (global.settings.roomLogisticsVisuals && args.type === 'pickup') {
-
         this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
-        this.visual.text(args.priority.toString(), args.target.pos, { font: .4 })
+        this.visual.text(args.priority.toString(), args.target.pos, { font: 0.4 })
     }
 
     /* this.visual.text(args.priority.toString(), args.target.pos) */

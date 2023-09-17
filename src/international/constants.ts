@@ -258,8 +258,8 @@ export enum RoomMemoryKeys {
     remoteDismantler,
     abandonRemote,
     recursedAbandonment,
-    use,
-    useSources,
+    disable,
+    disableSources,
     enemyReserved,
     invaderCore,
     disableCachedPaths,
@@ -330,7 +330,7 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.abandonRemote,
     RoomMemoryKeys.recursedAbandonment,
     RoomMemoryKeys.pathsThrough,
-    RoomMemoryKeys.useSources,
+    RoomMemoryKeys.disableSources,
 
     // Ally and Enemy
 
@@ -501,7 +501,8 @@ export const version = `v2.${global.settings.breakingVersion}.0`
 
 // Set of messages to randomly apply to commune rooms
 
-export const communeSign = 'A commune of the proletariat. Bourgeoisie not welcome here! Now Collectivized. ' + version
+export const communeSign =
+    'A commune of the proletariat. Bourgeoisie not welcome here! Now Collectivized. ' + version
 
 // Set of messages to randomly apply to non-commune rooms
 
@@ -665,7 +666,7 @@ export const combatTargetStructureTypes: Set<StructureConstant> = new Set([
     STRUCTURE_POWER_SPAWN,
     STRUCTURE_FACTORY,
     STRUCTURE_NUKER,
-    STRUCTURE_OBSERVER
+    STRUCTURE_OBSERVER,
 ])
 
 export const customColors = {
@@ -1646,6 +1647,6 @@ export enum ReservedCoordTypes {
     /**
      * Probably a position very important to combat related coordinate reservation
      */
-    necessary
+    necessary,
 }
 export type ReservedCoordTypesKeys = typeof ReservedCoordTypes[keyof typeof ReservedCoordTypes]

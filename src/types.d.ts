@@ -1370,7 +1370,11 @@ declare global {
         /**
          *
          */
-        needsNewPath(path: RoomPosition[] | undefined, args: CustomPathFinderArgs, opts?: MoveRequestOpts): boolean
+        needsNewPath(
+            path: RoomPosition[] | undefined,
+            args: CustomPathFinderArgs,
+            opts?: MoveRequestOpts,
+        ): boolean
 
         /**
          *
@@ -1903,8 +1907,8 @@ declare global {
         [RoomMemoryKeys.remoteDismantler]: number
         [RoomMemoryKeys.abandonRemote]: number
         [RoomMemoryKeys.recursedAbandonment]: boolean
-        [RoomMemoryKeys.use]: boolean
-        [RoomMemoryKeys.useSources]: boolean[]
+        [RoomMemoryKeys.disable]: boolean
+        [RoomMemoryKeys.disableSources]: boolean[]
         [RoomMemoryKeys.enemyReserved]: boolean
         [RoomMemoryKeys.invaderCore]: number
         [RoomMemoryKeys.disableCachedPaths]: boolean
