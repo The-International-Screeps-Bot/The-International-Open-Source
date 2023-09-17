@@ -312,6 +312,7 @@ export class RemotesManager {
             return false
         }
 
+        roomMemory[RoomMemoryKeys.disable] = undefined
         return true
     }
 
