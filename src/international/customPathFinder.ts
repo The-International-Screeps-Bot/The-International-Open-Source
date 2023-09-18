@@ -399,12 +399,12 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             // If avoidStationaryPositions is requested
 
             if (args.avoidStationaryPositions) {
-                for (const [packedCoord, coordType] of room.roomManager.reservedCoords) {
+                for (const [packedCoord, reserveType] of room.roomManager.reservedCoords) {
 
-                    if (coordType <= (args.minReservedCoordType ?? ReservedCoordTypes.important)) continue
+                    if (args.minReservedCoordType && reserveType < args.minReservedCoordType) continue
 
                     const coord = unpackCoord(packedCoord)
-                    cm.set(coord.x, coord.y, 20)
+                    cm.set(coord.x, coord.y, (reserveType * 5) + 5)
                 }
             }
 
