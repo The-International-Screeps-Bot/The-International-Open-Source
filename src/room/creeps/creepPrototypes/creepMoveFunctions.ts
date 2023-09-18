@@ -317,6 +317,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
         path = customFindPath(args)
         if (!path.length && !this.spawning) return Result.fail
 
+
         // Limit the path's length to the cacheAmount
 
         path.splice(opts.cacheAmount)
