@@ -679,7 +679,7 @@ export const customColors = {
     lightBlue: '#0f66fc',
     darkBlue: '#02007d',
     black: '#000000',
-    yellow: '#d8f100',
+    yellow: '#ABB400',
     red: '#d10000',
     green: '#00d137',
     brown: '#aa7253',

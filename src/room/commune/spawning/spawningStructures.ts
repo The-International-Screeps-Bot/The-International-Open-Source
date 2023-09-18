@@ -113,13 +113,13 @@ export class SpawningStructuresManager {
 
         if (request.cost > this.communeManager.room.energyCapacityAvailable) {
             customLog(
-                'Failed to spawn',
+                'Failed to spawn: not enough energy',
                 `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${
                     this.communeManager.room.energyCapacityAvailable
                 } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
                 {
                     textColor: customColors.white,
-                    bgColor: customColors.red,
+                    bgColor: customColors.yellow,
                 },
             )
 
@@ -128,13 +128,13 @@ export class SpawningStructuresManager {
 
         if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
             customLog(
-                'Failed to spawn',
+                'Failed to spawn: not enough energy',
                 `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
                     this.communeManager.nextSpawnEnergyAvailable
                 } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
                 {
                     textColor: customColors.white,
-                    bgColor: customColors.red,
+                    bgColor: customColors.yellow,
                 },
             )
             return false
@@ -157,7 +157,7 @@ export class SpawningStructuresManager {
             // Log the error and stop the loop
 
             customLog(
-                'Failed to spawn',
+                'Failed to spawn: dryrun failed',
                 `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                 {
                     textColor: customColors.white,
