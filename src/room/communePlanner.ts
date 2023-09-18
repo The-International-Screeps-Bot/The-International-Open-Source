@@ -3146,6 +3146,8 @@ export class CommunePlanner {
                 for (let rcl = data.minRCL - 1; rcl < 8; rcl += 1) {
                     this.roadQuota[rcl] += 1
                 }
+
+                break
             }
         }
     }

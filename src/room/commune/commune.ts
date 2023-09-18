@@ -359,6 +359,7 @@ export class CommuneManager {
     }
 
     private test() {
+        this.hasSufficientRoads
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -640,7 +641,7 @@ export class CommuneManager {
      * Informs wether we have sufficient roads compared to the roadQuota for our RCL
      */
     get hasSufficientRoads() {
-        if (this._hasSufficientRoads !== undefined) return this._hasSufficientRoads
+        /* if (this._hasSufficientRoads !== undefined) return this._hasSufficientRoads */
 
         const roomMemory = Memory.rooms[this.room.name]
         const RCLIndex = this.room.controller.level - 1
@@ -651,6 +652,10 @@ export class CommuneManager {
         if (minRoads === 0) return false
 
         const roads = this.room.roomManager.structures.road.length
+        customLog("ROADS", roads)
+        customLog('road quotas', roomMemory[RoomMemoryKeys.roadQuota])
+        customLog('minRoads', minRoads)
+        customLog("SUPREM", roads >= minRoads * 0.9)
         // Make sure we have 90% of the intended roads amount
         return (this._hasSufficientRoads = roads >= minRoads * 0.9)
     }
