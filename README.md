@@ -97,7 +97,7 @@ For more information, please go to the [wiki](https://github.com/CarsonBurke/The
 
 ### Grafana
 
-Soon to be added again when PandaMaster fixes the new ScreepsPlus replacement site!
+Use `https://pandascreeps.com` for Stats hosting
 
 ### Private server
 
