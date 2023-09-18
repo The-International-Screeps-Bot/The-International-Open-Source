@@ -204,6 +204,8 @@ export class TerminalManager {
 
     private respondToAllyRequests() {
         if (!global.settings.allyCommunication) return Result.noAction
+        if (!simpleAllies.allySegmentData) return Result.noAction
+        if (!simpleAllies.allySegmentData.requests) return Result.noAction
 
         // We don't have enough energy to help other rooms
 
