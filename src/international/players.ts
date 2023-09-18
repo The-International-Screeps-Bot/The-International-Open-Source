@@ -21,7 +21,7 @@ export class PlayerManager extends Sleepable {
 
             for (const key of playerDecayKeys) {
                 if ((player[key] as number) < 1) continue
-                ;(player[key] as number) *= defaultDataDecay * this.sleepFor
+                ;(player[key] as number) *= defaultDataDecay / this.sleepFor
             }
 
             // So long as the player has attacked at some pount, record it
