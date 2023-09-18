@@ -3,6 +3,7 @@ import {
     CreepMemoryKeys,
     Result,
     RoomTypes,
+    WorkTypes,
     customColors,
     packedQuadAttackMemberOffsets,
     quadAttackMemberOffsets,
@@ -532,7 +533,7 @@ export class Quad {
                 if (member.worked) continue
 
                 member.heal(lowestHitsMember)
-                member.worked = true
+                member.worked = WorkTypes.heal
             }
 
             return
@@ -580,7 +581,7 @@ export class Quad {
             const memberHealer = notHealedMembers[memberIndex]
 
             memberHealer.heal(member)
-            memberHealer.worked = true
+            memberHealer.worked = WorkTypes.heal
 
             notHealedMembers.splice(memberIndex, 1)
         }

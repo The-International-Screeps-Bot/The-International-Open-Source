@@ -19,6 +19,7 @@ import {
     Result,
     PlayerRelationship,
     ReservedCoordTypes,
+    WorkTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -1515,19 +1516,14 @@ declare global {
         combatTarget: Creep
 
         /**
-         * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
+         * Wether the creep did a harvest, build, upgrade, dismantle, repair, heal, attack this tick
          */
-        worked: boolean
+        worked: WorkTypes
 
         /**
          * Wether the creep rangedHealed or rangedAttacked this tick
          */
         ranged: boolean
-
-        /**
-         * Wether the creep healed or attacked this tick
-         */
-        meleed: boolean
 
         /**
          * Whether the creep is actively pulling another creep or not
@@ -1619,7 +1615,7 @@ declare global {
 
         _role: CreepRoles
         /**
-         * The lifetime designation that boardly describes what the creep should do
+         * The lifetime designation that broadly describes what the creep should do
          */
         readonly role: CreepRoles
 

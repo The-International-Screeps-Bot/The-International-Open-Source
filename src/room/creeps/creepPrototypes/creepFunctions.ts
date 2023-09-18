@@ -18,6 +18,7 @@ import {
     CreepRoomLogisticsRequestKeys,
     RoomMemoryKeys,
     ReservedCoordTypes,
+    WorkTypes,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -193,7 +194,7 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
     // Record that the creep has worked
 
-    this.worked = true
+    this.worked = WorkTypes.harvest
 
     // Find amount of energy harvested and record it in data
 
@@ -1141,7 +1142,7 @@ Creep.prototype.passiveHeal = function () {
             // Have it heal itself and stop
 
             this.heal(this)
-            this.worked = true
+            this.worked = WorkTypes.heal
             return false
         }
 
@@ -1173,7 +1174,7 @@ Creep.prototype.passiveHeal = function () {
             // have the creep heal the adjacentCreep and stop
 
             this.heal(posData.creep)
-            this.worked = true
+            this.worked = WorkTypes.heal
             return false
         }
     }
@@ -1227,7 +1228,7 @@ Creep.prototype.aggressiveHeal = function () {
             // Have it heal itself and stop
 
             this.heal(this)
-            this.worked = true
+            this.worked = WorkTypes.heal
             return true
         }
     }

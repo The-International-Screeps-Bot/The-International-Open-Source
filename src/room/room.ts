@@ -17,6 +17,7 @@ import {
     dynamicScoreRoomRange,
     impassibleStructureTypes,
     maxControllerLevel,
+    packedPosLength,
     powerCreepClassNames,
     preferredCommuneRange,
     quadAttackMemberOffsets,
@@ -628,7 +629,7 @@ export class RoomManager {
         if (this._communeSourceHarvestPositions) return this._communeSourceHarvestPositions
 
         const packedSourceHarvestPositions =
-            this.room.memory[RoomMemoryKeys.communeSourceHarvestPositions]
+            Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
 
         if (!packedSourceHarvestPositions)
             throw Error('No commune source harvest positions ' + this.room.name)
@@ -643,21 +644,20 @@ export class RoomManager {
         if (this._remoteSourceHarvestPositions) return this._remoteSourceHarvestPositions
 
         const packedSourceHarvestPositions =
-            this.room.memory[RoomMemoryKeys.remoteSourceHarvestPositions]
-        if (packedSourceHarvestPositions) {
-            return (this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(
-                positions => unpackPosList(positions),
-            ))
-        }
+            Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceHarvestPositions]
+        if (!packedSourceHarvestPositions)
+            throw Error('No remote source harvest positions ' + this.room.name)
 
-        throw Error('No remote source harvest positions ' + this.room.name)
+        return (this._remoteSourceHarvestPositions = packedSourceHarvestPositions.map(positions =>
+            unpackPosList(positions),
+        ))
     }
 
     _communeSourcePaths: RoomPosition[][]
     get communeSourcePaths() {
         if (this._communeSourcePaths) return this._communeSourcePaths
 
-        const packedSourcePaths = this.room.memory[RoomMemoryKeys.communeSourcePaths]
+        const packedSourcePaths = Memory.rooms[this.room.name][RoomMemoryKeys.communeSourcePaths]
         if (!packedSourcePaths) throw Error('No commune source paths ' + this.room.name)
 
         return (this._communeSourcePaths = packedSourcePaths.map(positions =>
@@ -669,14 +669,13 @@ export class RoomManager {
     get remoteSourcePaths() {
         if (this._remoteSourcePaths) return this._remoteSourcePaths
 
-        const packedSourcePaths = this.room.memory[RoomMemoryKeys.remoteSourceFastFillerPaths]
-        if (packedSourcePaths) {
-            return (this._remoteSourcePaths = packedSourcePaths.map(positions =>
-                unpackPosList(positions),
-            ))
-        }
+        const packedSourcePaths =
+            Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceFastFillerPaths]
+        if (!packedSourcePaths) throw Error('No remote source paths ' + this.room.name)
 
-        throw Error('No remote source paths ' + this.room.name)
+        return (this._remoteSourcePaths = packedSourcePaths.map(positions =>
+            unpackPosList(positions),
+        ))
     }
 
     _centerUpgradePos: RoomPosition
@@ -1202,7 +1201,6 @@ export class RoomManager {
         const events: { [targetID: string]: InterpretedRoomEvent } = {}
 
         for (const event of eventLog) {
-
         }
 
         return (this._events = events)
@@ -1334,8 +1332,8 @@ export class RoomManager {
         const packedSourceHarvestPositions =
             Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
         for (const i in packedSourceHarvestPositions) {
-            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], parseInt(i))
-
+            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
+            console.log(closestHarvestPos)
             spawningStructuresByNeed = spawningStructuresByNeed.filter(
                 structure => getRange(structure.pos, closestHarvestPos) > 1,
             )
@@ -2474,7 +2472,9 @@ export class RoomManager {
     get rampartPlans() {
         if (this._rampartPlans !== undefined) return this._rampartPlans
 
-        this._rampartPlans = RampartPlans.unpack(Memory.rooms[this.room.name][RoomMemoryKeys.rampartPlans])
+        this._rampartPlans = RampartPlans.unpack(
+            Memory.rooms[this.room.name][RoomMemoryKeys.rampartPlans],
+        )
         return this._rampartPlans
     }
 }

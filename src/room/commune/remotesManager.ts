@@ -13,6 +13,7 @@ import {
     customLog,
     findCarryPartsRequired,
     findLowestScore,
+    getRange,
     randomRange,
     randomTick,
 } from 'utils/utils'
@@ -27,7 +28,7 @@ export class RemotesManager {
         this.communeManager = communeManager
     }
 
-    public preTickRun() {
+    public initRun() {
         const { room } = this.communeManager
 
         // Loop through the commune's remote names
@@ -126,9 +127,28 @@ export class RemotesManager {
             }
 
             if (remote) {
+                const sourceContainers = remote.sourceContainers
+                const remoteSources = remote.roomManager.remoteSources
+                for (const i in remoteSources) {
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
+
+                    const source = remoteSources[i]
+                    const container = sourceContainers[i]
+                    if (container) {
+
+                        remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] += container.store.energy
+                    }
+
+                    for (const resource of remote.roomManager.droppedEnergy) {
+
+                        if (getRange(resource.pos, source.pos) > 1) continue
+
+                        remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] += resource.amount
+                    }
+                }
                 /*
                 remoteMemory[RoomMemoryKeys.minDamage] = 0
-                remoteMemory[RoomMemory\google-sheets\flowchartKeys.minHeal] = 0
+                remoteMemory[RoomMemoryKeys.minHeal] = 0
 
                 // Increase the defenderNeed according to the enemy attackers' combined strength
 
@@ -141,7 +161,7 @@ export class RemotesManager {
 
                 // Record if we have or don't have a source container for each source
 
-                const sourceContainers = remote.sourceContainers
+
                 for (const i in sourceContainers) {
                     remoteMemory[RoomMemoryKeys.hasContainer][i] = !!sourceContainers
                 }
@@ -183,25 +203,31 @@ export class RemotesManager {
             }
 
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
+                const remoteSourcePathLength =
+                    remoteMemory[this.communeManager.remoteSourcePathType].length / packedPosLength
                 const hasContainer = remoteMemory[RoomMemoryKeys.hasContainer][i]
                 if (hasContainer) {
+                    // account for repair cost for container
+
                     const creditChange = CONTAINER_DECAY / (CONTAINER_DECAY_TIME * REPAIR_POWER)
-                    if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] > 0) {
-                        remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] -= creditChange
-                    }
+
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] -=
+                        creditChange * remoteSourcePathLength
+
                     remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][i] -= creditChange
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] -= creditChange
                     continue
                 }
 
-                // We don't have a container
+                // We don't have a container, account for decay cost
 
                 const creditChange = Math.ceil(
                     remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] / ENERGY_DECAY,
                 )
-                if (remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] > 0) {
-                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] -= creditChange
-                }
+
+                remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] -=
+                    creditChange * remoteSourcePathLength
+
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][i] -= creditChange
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] -= creditChange
             }

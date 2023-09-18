@@ -152,7 +152,7 @@ export const roomUtils = {
         const packedSourceHarvestPositions = Memory.rooms[roomName][RoomMemoryKeys.communeSourceHarvestPositions]
         for (const i in packedSourceHarvestPositions) {
 
-            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], parseInt(i))
+            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
 
             return getRange(structure.pos, closestHarvestPos) <= 1
         }

@@ -299,6 +299,8 @@ export enum RoomMemoryKeys {
     portalsTo,
 }
 
+export type RemoteSourcePathTypes = RoomMemoryKeys.remoteSourceFastFillerPaths | RoomMemoryKeys.remoteSourceHubPaths
+
 // General
 
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
@@ -1650,3 +1652,17 @@ export enum ReservedCoordTypes {
     necessary,
 }
 export type ReservedCoordTypesKeys = typeof ReservedCoordTypes[keyof typeof ReservedCoordTypes]
+
+/**
+ * Types of work intents
+ */
+export enum WorkTypes {
+    harvest,
+    repair,
+    build,
+    upgrade,
+    dismantle,
+    heal,
+    attack,
+    attackController,
+}

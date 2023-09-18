@@ -183,7 +183,8 @@ export class StatsManager {
             globalCommuneStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
 
             const spawns = room.roomManager.structures.spawn
-            if (spawns.length > 0)
+            if (spawns.length > 0) {
+
                 globalCommuneStats.su =
                     spawns.reduce(
                         (sum, spawn) =>
@@ -195,6 +196,7 @@ export class StatsManager {
                                 : 0),
                         0,
                     ) / spawns.length
+            }
 
             if (each250Ticks || forceUpdate) {
                 if (room.controller && room.controller.my) {

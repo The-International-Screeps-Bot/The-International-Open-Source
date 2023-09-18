@@ -109,19 +109,6 @@ export class RemoteHauler extends Creep {
         if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
 
-        // Make sure reservation is below reservation maximum
-        if (
-            remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] >=
-            Math.round(
-                (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
-                    packedPosLength) *
-                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
-            ) *
-                2
-        ) {
-            return false
-        }
-
         // Make sure we have enough free space to keep reservation below credit
         if (
             remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] -
@@ -302,7 +289,7 @@ export class RemoteHauler extends Creep {
         const sourceHarvestPos = unpackPosAt(
             Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
                 RoomMemoryKeys.remoteSourceHarvestPositions
-            ][creepMemory[CreepMemoryKeys.sourceIndex]],
+            ][creepMemory[CreepMemoryKeys.sourceIndex]]
         )
 
         this.message += creepMemory[CreepMemoryKeys.remote]
@@ -532,8 +519,10 @@ export class RemoteHauler extends Creep {
     }
 
     relayCoord?(coord: Coord) {
-        if (global.settings.roomVisuals)
+        if (global.settings.roomVisuals) {
+
             this.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
+        }
 
         const creepAtPosName = this.room.creepPositions[packCoord(coord)]
         if (!creepAtPosName) return false
@@ -553,12 +542,12 @@ export class RemoteHauler extends Creep {
         const nextEnergy = Math.min(this.nextStore.energy, creepAtPos.freeNextStore)
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy
- */
+        */
         /*
         customLog('thisEnergy', this.store.energy)
         customLog('creepAtPos Energy', creepAtPos.freeNextStore)
         customLog('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
- */
+        */
         const nextEnergy = Math.min(this.store.energy, creepAtPos.freeNextStore)
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy
@@ -657,11 +646,11 @@ export class RemoteHauler extends Creep {
                 x: moveCoord.x + offset.x,
                 y: moveCoord.y + offset.y,
             }
-
+            /*
             // If the x and y are dissimilar
 
             if (coord.x !== moveCoord.x && coord.y !== moveCoord.y) continue
-
+            */
             if (this.relayCoord(coord)) return true
         }
 
@@ -671,10 +660,11 @@ export class RemoteHauler extends Creep {
     relay?() {
         // If there is no easy way to know what coord the creep is trying to go to next
 
+        const creepMemory = Memory.creeps[this.name]
         if (
             !this.moveRequest &&
-            (!this.memory[CreepMemoryKeys.path] ||
-                this.memory[CreepMemoryKeys.path].length / packedPosLength < 2)
+            (!creepMemory[CreepMemoryKeys.path] ||
+                creepMemory[CreepMemoryKeys.path].length / packedPosLength < 2)
         )
             return
         if (this.movedResource) return
@@ -684,10 +674,10 @@ export class RemoteHauler extends Creep {
 
         if (
             !this.fatigue &&
-            this.memory[CreepMemoryKeys.remote] === this.room.name &&
+            creepMemory[CreepMemoryKeys.remote] === this.room.name &&
             getRange(
                 this.room.roomManager.remoteSourceHarvestPositions[
-                    this.memory[CreepMemoryKeys.sourceIndex]
+                    creepMemory[CreepMemoryKeys.sourceIndex]
                 ][0],
                 this.pos,
             ) <= 1
@@ -696,7 +686,7 @@ export class RemoteHauler extends Creep {
 
         const moveCoord = this.moveRequest
             ? unpackCoord(this.moveRequest)
-            : unpackPosAt(this.memory[CreepMemoryKeys.path], 1)
+            : unpackPosAt(creepMemory[CreepMemoryKeys.path])
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)

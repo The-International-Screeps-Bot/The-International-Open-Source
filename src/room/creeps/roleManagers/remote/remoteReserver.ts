@@ -145,7 +145,8 @@ export class RemoteReserver extends Creep {
     }
 
     findControllerPos?() {
-        let packedCoord = this.memory[CreepMemoryKeys.packedCoord]
+        const creepMemory = Memory.creeps[this.name]
+        let packedCoord = creepMemory[CreepMemoryKeys.packedCoord]
         if (packedCoord) {
             return unpackCoordAsPos(packedCoord, this.room.name)
         }
@@ -157,7 +158,7 @@ export class RemoteReserver extends Creep {
 
         packedCoord = packCoord(usePos)
 
-        this.memory[CreepMemoryKeys.packedCoord] = packedCoord
+        creepMemory[CreepMemoryKeys.packedCoord] = packedCoord
         this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return usePos
@@ -201,8 +202,7 @@ export class RemoteReserver extends Creep {
         const controllerPos = unpackPosAt(
             Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][
                 RoomMemoryKeys.remoteControllerPositions
-            ],
-            0,
+            ]
         )
 
         this.createMoveRequestByPath(

@@ -45,6 +45,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     rampartUpkeepCost,
+    RemoteSourcePathTypes,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -136,6 +137,7 @@ export class CommuneManager {
     haulerNeed: number
     mineralHarvestStrength: number
     upgradeStrength: number
+    remoteSourcePathType: RemoteSourcePathTypes
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
@@ -248,6 +250,21 @@ export class CommuneManager {
                 this.remoteSourceHarvesters[remoteName].push([])
         }
 
+        // identify the remoteSourcePathType
+
+        if (!this.remoteSourcePathType || randomTick()) {
+            if (this.storingStructures.length) {
+                this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
+            }
+            else {
+
+                this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
+                /* this.remoteSourcePathType = RoomMemoryKeys.remoteSourceHubPaths */
+            }
+        }
+
+        Memory.rooms[this.room.name][this.remoteSourcePathType]
+
         // For each role, construct an array for creepsFromRoom
 
         room.creepsFromRoom = {}
@@ -281,7 +298,7 @@ export class CommuneManager {
         this.constructionManager.preTickRun()
         this.observerManager.preTickRun()
         this.terminalManager.preTickRun()
-        this.remotesManager.preTickRun()
+        this.remotesManager.initRun()
         this.haulRequestManager.preTickRun()
         this.sourceManager.preTickRun()
         this.workRequestManager.preTickRun()
@@ -774,11 +791,14 @@ export class CommuneManager {
         return (this._rampartRepairTargets = rampartRepairTargets)
     }
 
+    /**
+     * Prescriptive of if we desire a second mincut layer
+     */
     get buildSecondMincutLayer() {
-        const buildSecondMincutLayer = (
+        const buildSecondMincutLayer =
             Memory.rooms[this.room.name][RoomMemoryKeys.threatened] >
-            Math.floor(Math.pow(this.room.controller.level * 30, 1.63))
-        ) && this.room.towerInferiority !== true
+                Math.floor(Math.pow(this.room.controller.level * 30, 1.63)) &&
+            this.room.towerInferiority !== true
 
         return buildSecondMincutLayer
     }
@@ -810,7 +830,7 @@ export class CommuneManager {
         const links: (StructureLink | false)[] = []
         let definedLinks = 0
 
-/*         for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
+        /*         for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
             const closestSourceHarvestPos = positions[0]
 
             const structure = this.room.findStructureInRange(
@@ -825,7 +845,6 @@ export class CommuneManager {
             definedLinks += 1
         } */
         for (const coord of stampAnchors.sourceLink) {
-
             const structure = this.room.findStructureAtCoord(
                 coord,
                 structure => structure.structureType === STRUCTURE_LINK,
@@ -880,6 +899,13 @@ export class CommuneManager {
         }
 
         return (this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity)
+    }
+
+    /**
+     * Presciption on if we should be trying to build remote contianers
+     */
+    get shouldRemoteContainers() {
+        return this.room.energyCapacityAvailable >= 650
     }
 
     // /**

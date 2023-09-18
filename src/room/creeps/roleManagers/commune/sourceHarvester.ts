@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, packedPosLength, ReservedCoordTypes, Result, RoomMemoryKeys } from 'international/constants'
+import { CreepMemoryKeys, packedPosLength, ReservedCoordTypes, Result, RoomMemoryKeys, WorkTypes } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import {
     customLog,
@@ -227,7 +227,7 @@ export class SourceHarvester extends Creep {
         if (repairResult === OK) {
             // Record that the creep has worked
 
-            this.worked = true
+            this.worked = WorkTypes.repair
 
             // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 

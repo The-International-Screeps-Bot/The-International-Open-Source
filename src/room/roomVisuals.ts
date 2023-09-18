@@ -755,13 +755,14 @@ export class RoomVisualsManager {
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const remoteMemory = Memory.rooms[remoteName]
+            const pathType = this.roomManager.room.communeManager.remoteSourcePathType
             const row: any[] = []
 
             row.push(remoteName)
             row.push(sourceIndex)
-            if (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex])
+            if (remoteMemory[pathType][sourceIndex])
                 row.push(
-                    remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
+                    remoteMemory[pathType][sourceIndex].length /
                         packedPosLength,
                 )
             else row.push('undefined')
@@ -773,7 +774,7 @@ export class RoomVisualsManager {
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
                     '/' +
                     Math.round(
-                        (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex]
+                        (remoteMemory[pathType][sourceIndex]
                             .length /
                             packedPosLength) *
                             remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
