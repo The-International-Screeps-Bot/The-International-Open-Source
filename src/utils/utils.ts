@@ -974,6 +974,7 @@ export function isAlly(playerName: string) {
 }
 
 export function outOfBucket() {
+    global.logs = ''
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         textColor: customColors.white,
         bgColor: customColors.red,
@@ -992,7 +993,6 @@ export function getMe() {
     if (Memory.me) return Memory.me
 
     for (const roomName in Game.rooms) {
-
         const room = Game.rooms[roomName]
         if (!room.controller) continue
         if (!room.controller.my) continue
