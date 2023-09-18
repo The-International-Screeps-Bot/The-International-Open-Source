@@ -1,6 +1,7 @@
 import {
     CreepMemoryKeys,
     packedPosLength,
+    ReservedCoordTypes,
     Result,
     RoomMemoryKeys,
     RoomTypes,
@@ -45,6 +46,15 @@ export class RemoteHarvester extends Creep {
         // Record creep as isDying
 
         return true
+    }
+
+    update() {
+
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+        }
     }
 
     initRun(): void {

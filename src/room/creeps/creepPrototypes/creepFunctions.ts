@@ -860,6 +860,7 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
             }
         }
  */
+
         return unpackCoordAsPos(packedCoord, room.name)
     }
 
