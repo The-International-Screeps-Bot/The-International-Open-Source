@@ -247,14 +247,13 @@ export class CommunePlanner {
         // Initial configuration
 
         if (!this.terrainCoords) {
-            this.terrainCoords = collectiveManager.getTerrainBinary(this.room.name)
             this.planAttempts = []
+            this.terrainCoords = collectiveManager.getTerrainBinary(this.room.name)
         }
 
         // Plan attempt / configuration
 
         if (!this.baseCoords) {
-            this.baseCoords = new Uint8Array(this.terrainCoords)
             this.roadCoords = new Uint8Array(this.terrainCoords)
             this.rampartCoords = new Uint8Array(2500)
             this.byPlannedRoad = new Uint8Array(2500)
@@ -282,6 +281,7 @@ export class CommunePlanner {
             }
 
             this.score = 0
+            this.baseCoords = new Uint8Array(this.terrainCoords)
         }
 
         this.avoidSources()

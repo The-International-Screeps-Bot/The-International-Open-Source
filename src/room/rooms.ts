@@ -38,11 +38,10 @@ class RoomsManager {
     initRun() {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
-            room.roomManager.preTickRun()
+            room.roomManager.initRun()
         }
     }
     run() {
-        const statName: RoomCommuneStatNames = 'rocu'
 
         // Loop through room names in Game.rooms
 

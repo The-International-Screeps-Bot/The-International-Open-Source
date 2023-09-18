@@ -267,14 +267,17 @@ export class RoomManager {
         room.communeManager.update(room)
     }
 
-    preTickRun() {
+    initRun() {
+
         if (this.room.communeManager) {
-            this.room.communeManager.preTickRun()
+            this.room.communeManager.initRun()
             return
         }
     }
 
     run() {
+        this.test()
+
         if (this.room.communeManager) {
             this.room.communeManager.run()
             return
@@ -291,6 +294,21 @@ export class RoomManager {
         this.powerCreepRoleManager.run()
         this.endTickCreepManager.run()
         this.roomVisualsManager.run()
+    }
+
+    private test() {
+        this.visualizeReservedCoords()
+    }
+
+    /**
+     * Debug
+     */
+    private visualizeReservedCoords() {
+        customLog('reservedCoords', JSON.stringify([...this.reservedCoords]))
+        for (const [packedCoord, reserveType] of this.reservedCoords) {
+            const coord = unpackCoord(packedCoord)
+            this.room.coordVisual(coord.x, coord.y, `hsl(${200}${reserveType * 50}, 100%, 60%)`)
+        }
     }
 
     findRemoteSources(commune: Room) {
@@ -1498,15 +1516,9 @@ export class RoomManager {
 
         return remoteNamesBySourceEfficacy.sort(function (a1, b1) {
             return (
-                Memory.rooms[a1][pathType].reduce(
-                    (a2, b2) => a2 + b2.length,
-                    0,
-                ) /
+                Memory.rooms[a1][pathType].reduce((a2, b2) => a2 + b2.length, 0) /
                     Memory.rooms[a1][pathType].length -
-                Memory.rooms[b1][pathType].reduce(
-                    (a2, b2) => a2 + b2.length,
-                    0,
-                ) /
+                Memory.rooms[b1][pathType].reduce((a2, b2) => a2 + b2.length, 0) /
                     Memory.rooms[b1][pathType].length
             )
         })

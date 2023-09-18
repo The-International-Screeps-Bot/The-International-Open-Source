@@ -256,9 +256,7 @@ export class CommuneManager {
             if (this.storingStructures.length) {
                 /* this.remoteSourcePathType = RoomMemoryKeys.remoteSourceHubPaths */
                 this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
-            }
-            else {
-
+            } else {
                 this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
             }
         }
@@ -287,7 +285,7 @@ export class CommuneManager {
         collectiveManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
     }
 
-    preTickRun() {
+    initRun() {
         this.preTickTest()
 
         this.room.roomManager.communePlanner.preTickRun()
@@ -359,7 +357,6 @@ export class CommuneManager {
     }
 
     private test() {
-        this.hasSufficientRoads
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -652,10 +649,7 @@ export class CommuneManager {
         if (minRoads === 0) return false
 
         const roads = this.room.roomManager.structures.road.length
-        customLog("ROADS", roads)
-        customLog('road quotas', roomMemory[RoomMemoryKeys.roadQuota])
-        customLog('minRoads', minRoads)
-        customLog("SUPREM", roads >= minRoads * 0.9)
+
         // Make sure we have 90% of the intended roads amount
         return (this._hasSufficientRoads = roads >= minRoads * 0.9)
     }
