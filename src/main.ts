@@ -52,6 +52,7 @@ import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 
 export function originalLoop() {
+    if (Game.flags['deactivate']) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
         return
