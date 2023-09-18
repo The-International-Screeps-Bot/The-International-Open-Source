@@ -8,6 +8,7 @@ import {
 } from 'international/simpleAllies'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from 'room/commune/commune'
+import { marketUtils } from './marketFunctions'
 
 export class TerminalManager {
     communeManager: CommuneManager
@@ -34,15 +35,12 @@ export class TerminalManager {
 
         if (!terminal) return
         if (!terminal.RCLActionable) return
-
-        /* this.createAllyRequests() */
-
         if (terminal.cooldown > 0) return
 
         if (this.respondToTerminalRequests()) return
         if (this.respondToAllyRequests()) return
 
-        // The market is disabled by us or the server
+        // Check if the market is disabled by us or the server
 
         if (!global.settings.marketUsage) return
         if (!collectiveManager.marketIsFunctional) return
@@ -251,7 +249,7 @@ export class TerminalManager {
 
                 min *= 1.2
 
-                if (room.advancedBuy(resource, min - terminal.store[resource], min)) return
+                if (marketUtils.advancedBuy(room, resource, min - terminal.store[resource], min)) return
                 continue
             }
 
@@ -265,7 +263,7 @@ export class TerminalManager {
 
             // Try to sell the excess amount
 
-            if (room.advancedSell(resource, terminal.store[resource] - max, max)) return
+            if (marketUtils.advancedSell(room, resource, terminal.store[resource] - max, max)) return
         }
     }
 }

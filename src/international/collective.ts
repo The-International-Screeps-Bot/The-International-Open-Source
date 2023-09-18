@@ -19,6 +19,7 @@ import {
     roomDimensions,
     RoomMemoryKeys,
     minerals,
+    PlayerMemoryKeys,
 } from './constants'
 
 
@@ -355,6 +356,9 @@ export class CollectiveManager extends Sleepable {
             // Get the order using its ID
 
             const order = orders[orderID]
+            const roomMemory = Memory.rooms[order.roomName]
+            // Filter out orders from players we hate
+            if (roomMemory && roomMemory[RoomMemoryKeys.owner] && Memory.players[roomMemory[RoomMemoryKeys.owner]] && Memory.players[roomMemory[RoomMemoryKeys.owner]][PlayerMemoryKeys.hate] > 0) continue
 
             if (!this._orders[order.type][order.resourceType]) {
                 this._orders[order.type][order.resourceType] = [order]

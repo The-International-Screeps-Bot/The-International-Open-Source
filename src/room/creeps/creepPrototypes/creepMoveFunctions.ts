@@ -42,7 +42,11 @@ import {
     unpackPosList,
 } from 'other/codec'
 
-PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (path, args, opts = {}) {
+PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (
+    path,
+    args,
+    opts = {},
+) {
     // Inform true if there is no path
 
     if (!path) return true
@@ -210,27 +214,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             return Result.success
         }
 
-        // If we have a remote, avoid abandoned remotes
-
-        if (pathOpts.remoteName) {
-            const roomNames: Set<string> = new Set()
-
-            for (const pos of path) {
-                roomNames.add(pos.roomName)
-            }
-
-            for (const roomName of roomNames) {
-                const roomMemory = Memory.rooms[roomName]
-
-                if (Memory.rooms[roomName][RoomMemoryKeys.type] !== RoomTypes.remote) continue
-                if (!roomMemory[RoomMemoryKeys.abandonRemote]) continue
-
-                // The room is unsafe, don't use cached paths
-
-                return this.createMoveRequest(args)
-            }
-        }
-
         // Give the creep a sliced version of the path it is trying to use
 
         this.memory[CreepMemoryKeys.path] = packedPath
@@ -264,7 +247,10 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     return this.createMoveRequest(args)
 }
 
-PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (args, opts = {}) {
+PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = function (
+    args,
+    opts = {},
+) {
     const { room } = this
 
     // Stop if the we know the creep won't move
@@ -335,7 +321,8 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         creepMemory[CreepMemoryKeys.lastCache] = Game.time
         creepMemory[CreepMemoryKeys.flee] = args.flee
-        if (opts.reserveCoord !== undefined) creepMemory[CreepMemoryKeys.packedCoord] = packCoord(path[path.length - 1])
+        if (opts.reserveCoord !== undefined)
+            creepMemory[CreepMemoryKeys.packedCoord] = packCoord(path[path.length - 1])
 
         // Show that a new path has been created
 

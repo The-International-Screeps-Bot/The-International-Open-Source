@@ -1112,50 +1112,9 @@ declare global {
 
         findSwampPlainsRatio(): number
 
-        // General roomFunctions
-
-        workRequestManager(): void
-        combatRequestManager(): void
-
-        trafficManager(): void
-
         // Spawn functions
 
-        constructSpawnRequests(opts: SpawnRequestArgs | false): void
-
-        findMaxCostPerCreep(maxCostPerCreep: number): number
-
-        createSpawnRequest(
-            priority: number,
-            role: CreepRoles,
-            defaultParts: number,
-            bodyPartCounts: { [key in PartsByPriority]: number },
-            tier: number,
-            cost: number,
-            memory: any,
-        ): void
-
-        spawnRequestIndividually(opts: SpawnRequestArgs): void
-
-        spawnRequestByGroup(opts: SpawnRequestArgs): void
-
-        // Market functions
-
-        advancedSell(resourceType: ResourceConstant, amount: number, targetAmount: number): boolean
-
-        advancedBuy(resourceType: ResourceConstant, amount: number, targetAmount: number): boolean
-
-        // Construction functions
-
-        remoteConstructionManager(): void
-
-        remotePlanner(commune: Room): boolean
-
-        clearOtherStructures(): void
-
-        remoteConstructionPlacement(): void
-
-        communeConstructionPlacement(): void
+        // structure functions
 
         findStructureAtCoord<T extends Structure>(
             coord: Coord,

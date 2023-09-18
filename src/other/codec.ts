@@ -1,5 +1,10 @@
 // eslint-disable
-import { allStructureTypes, buildableStructureTypes, packedPosLength, stampKeys } from 'international/constants'
+import {
+    allStructureTypes,
+    buildableStructureTypes,
+    packedPosLength,
+    stampKeys,
+} from 'international/constants'
 import { encode, decode } from 'base32768'
 
 /**
@@ -97,7 +102,6 @@ export function unpackCoordAsPos(packedCoord: string, roomName: string) {
  * Reverse the encoded coordList
  */
 export function reversePosList(coordList: string) {
-
     return coordList
         .match(/.{1,3}/g)
         .reverse()
@@ -259,9 +263,13 @@ export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
     const lastIndex = planCoords.length - 1
 
     for (let i = 0; i < planCoords.length; i++) {
-
         const planCoord = planCoords[i]
-        packedCoords += encode(new Uint8Array([buildableStructureTypes.indexOf(planCoord.structureType), planCoord.minRCL]))
+        packedCoords += encode(
+            new Uint8Array([
+                buildableStructureTypes.indexOf(planCoord.structureType),
+                planCoord.minRCL,
+            ]),
+        )
         if (i < lastIndex) packedCoords += ','
     }
     packedCoords += '_'
@@ -287,10 +295,7 @@ export function unpackBasePlanCoords(packedPlanCoords: string) {
  * Pack a planned cord for base building
  */
 export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
-
-    return encode(
-        new Uint8Array(Object.values(planCoord)),
-    )
+    return encode(new Uint8Array(Object.values(planCoord)))
 }
 
 /**
@@ -298,7 +303,13 @@ export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
  */
 export function unpackRampartPlanCoord(chars: string): RampartPlanCoord {
     const coord = decode(chars)
-    return { minRCL: coord[0], coversStructure: coord[1], buildForNuke: coord[2], buildForThreat: coord[3], needsStoringStructure: coord[4] }
+    return {
+        minRCL: coord[0],
+        coversStructure: coord[1],
+        buildForNuke: coord[2],
+        buildForThreat: coord[3],
+        needsStoringStructure: coord[4],
+    }
 }
 
 export function packStampAnchors(stampAnchors: StampAnchors) {
@@ -307,7 +318,9 @@ export function packStampAnchors(stampAnchors: StampAnchors) {
     for (const key in stampAnchors) {
         const structureType = key as StampTypes
 
-        packedStampAnchors[stampKeys.indexOf(structureType)] = packCoordList(stampAnchors[structureType])
+        packedStampAnchors[stampKeys.indexOf(structureType)] = packCoordList(
+            stampAnchors[structureType],
+        )
     }
 
     return packedStampAnchors

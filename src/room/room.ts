@@ -1484,28 +1484,30 @@ export class RoomManager {
     get remoteNamesByEfficacy() {
         if (this._remoteNamesByEfficacy) return this._remoteNamesByEfficacy
 
+        const pathType = this.room.communeManager.remoteSourcePathType
+
         // Filter rooms that have some sourceEfficacies recorded
 
         const remoteNamesBySourceEfficacy = Memory.rooms[this.room.name][
             RoomMemoryKeys.remotes
         ].filter(function (roomName) {
-            return Memory.rooms[roomName][RoomMemoryKeys.remoteSourceFastFillerPaths].length
+            return Memory.rooms[roomName][pathType].length
         })
 
         // Sort the remotes based on the average source efficacy
 
         return remoteNamesBySourceEfficacy.sort(function (a1, b1) {
             return (
-                Memory.rooms[a1][RoomMemoryKeys.remoteSourceFastFillerPaths].reduce(
+                Memory.rooms[a1][pathType].reduce(
                     (a2, b2) => a2 + b2.length,
                     0,
                 ) /
-                    Memory.rooms[a1][RoomMemoryKeys.remoteSourceFastFillerPaths].length -
-                Memory.rooms[b1][RoomMemoryKeys.remoteSourceFastFillerPaths].reduce(
+                    Memory.rooms[a1][pathType].length -
+                Memory.rooms[b1][pathType].reduce(
                     (a2, b2) => a2 + b2.length,
                     0,
                 ) /
-                    Memory.rooms[b1][RoomMemoryKeys.remoteSourceFastFillerPaths].length
+                    Memory.rooms[b1][pathType].length
             )
         })
     }
