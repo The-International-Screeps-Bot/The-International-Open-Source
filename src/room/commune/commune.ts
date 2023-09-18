@@ -70,6 +70,7 @@ import {
     packCoord,
     packXYAsCoord,
     unpackCoord,
+    unpackPosAt,
     unpackPosList,
     unpackStampAnchors,
 } from 'other/codec'
@@ -86,6 +87,7 @@ import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
+import { roomUtils } from 'room/roomUtils'
 
 export class CommuneManager {
     // Managers
@@ -174,6 +176,9 @@ export class CommuneManager {
         delete this._sourceLinks
         delete this._controllerLink
         delete this.towerAttackTarget
+        delete this._actionableSpawningStructures
+        delete this._spawningStructuresByPriority
+        delete this._spawningStructuresByNeed
 
         if (randomTick()) {
             delete this._maxUpgradeStrength
@@ -891,13 +896,99 @@ export class CommuneManager {
         const anchor = this.room.roomManager.anchor
         if (!anchor) throw Error('no anchor for fastFillerSpawnEnergyCapacity ' + this.room)
 
-        for (const structure of this.room.roomManager.actionableSpawningStructures) {
+        for (const structure of this.actionableSpawningStructures) {
             if (!structure.RCLActionable) continue
 
             fastFillerSpawnEnergyCapacity += structure.store.getCapacity(RESOURCE_ENERGY)
         }
 
         return (this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity)
+    }
+
+    _actionableSpawningStructures: SpawningStructures
+    /**
+     * RCL actionable spawns and extensions
+     */
+    get actionableSpawningStructures() {
+        if (this._actionableSpawningStructures) return this._actionableSpawningStructures
+
+        let actionableSpawningStructures: SpawningStructures = this.room.roomManager.structures.spawn
+        actionableSpawningStructures = actionableSpawningStructures.concat(
+            this.room.roomManager.structures.extension,
+        )
+        actionableSpawningStructures = actionableSpawningStructures.filter(
+            structure => structure.RCLActionable,
+        )
+
+        return (this._actionableSpawningStructures = actionableSpawningStructures)
+    }
+
+    spawningStructuresByPriorityID: Id<StructureExtension | StructureSpawn>[]
+    _spawningStructuresByPriority: SpawningStructures
+    get spawningStructuresByPriority() {
+        if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
+
+        if (this.spawningStructuresByPriorityID && !this.room.roomManager.structureUpdate) {
+
+            return this._spawningStructuresByPriority = this.spawningStructuresByPriorityID.map(ID => findObjectWithID(ID))
+        }
+
+        const anchor = this.room.roomManager.anchor
+        if (!anchor) throw Error('no anchor')
+
+        let spawningStructuresByPriority: SpawningStructures = []
+        const structuresToSort: SpawningStructures = []
+
+        for (const structure of this.actionableSpawningStructures) {
+            if (roomUtils.isSourceSpawningStructure(this.room.name, structure)) {
+                this.actionableSpawningStructures.push(structure)
+            }
+
+            structuresToSort.push(structure)
+        }
+
+        spawningStructuresByPriority = spawningStructuresByPriority.concat(
+            structuresToSort.sort((a, b) => getRange(a.pos, anchor) - getRange(b.pos, anchor)),
+        )
+
+        this.spawningStructuresByPriorityID = spawningStructuresByPriority.map(structure => structure.id)
+        return (this._spawningStructuresByPriority = spawningStructuresByPriority)
+    }
+
+    _spawningStructuresByNeed: SpawningStructures
+    get spawningstructuresByNeed() {
+        if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
+
+        const anchor = this.room.roomManager.anchor
+        if (!anchor) throw Error('no anchor')
+
+        let spawningStructuresByNeed = this.actionableSpawningStructures
+
+        const packedSourceHarvestPositions =
+            Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
+        for (const i in packedSourceHarvestPositions) {
+            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
+            console.log(closestHarvestPos)
+            spawningStructuresByNeed = spawningStructuresByNeed.filter(
+                structure => getRange(structure.pos, closestHarvestPos) > 1,
+            )
+        }
+
+        if (
+            this.room.myCreeps.fastFiller.length &&
+            ((this.room.controller.level >= 6 &&
+                this.room.fastFillerLink &&
+                this.room.hubLink &&
+                (this.room.storage || this.room.terminal) &&
+                this.room.myCreeps.hubHauler.length) ||
+                (this.room.fastFillerContainerLeft && this.room.fastFillerContainerRight))
+        ) {
+            spawningStructuresByNeed = spawningStructuresByNeed.filter(
+                structure => getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
+            )
+        }
+
+        return (this._spawningStructuresByNeed = spawningStructuresByNeed)
     }
 
     /**

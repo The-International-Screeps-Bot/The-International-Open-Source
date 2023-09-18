@@ -158,6 +158,7 @@ export class CommunePlanner {
     recording: boolean
     markSourcesAvoid: boolean
     finishedTowerPaths: boolean
+    planConfiged: boolean
 
     //
 
@@ -253,7 +254,8 @@ export class CommunePlanner {
 
         // Plan attempt / configuration
 
-        if (!this.baseCoords) {
+        if (!this.planConfiged) {
+            this.baseCoords = new Uint8Array(this.terrainCoords)
             this.roadCoords = new Uint8Array(this.terrainCoords)
             this.rampartCoords = new Uint8Array(2500)
             this.byPlannedRoad = new Uint8Array(2500)
@@ -281,7 +283,7 @@ export class CommunePlanner {
             }
 
             this.score = 0
-            this.baseCoords = new Uint8Array(this.terrainCoords)
+            this.planConfiged = true
         }
 
         this.avoidSources()
@@ -3233,6 +3235,7 @@ export class CommunePlanner {
         delete this.towerAttemptIndex
         delete this.RCLPlannedStructureTypes
 
+        delete this.planConfiged
         delete this.plannedGridCoords
         delete this.finishedGrid
         delete this.generalShielded

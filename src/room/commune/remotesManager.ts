@@ -281,8 +281,8 @@ export class RemotesManager {
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
                 remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] += findCarryPartsRequired(
-                    remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
-                        packedPosLength,
+                    (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
+                        packedPosLength) * 2,
                     income,
                 )
             }

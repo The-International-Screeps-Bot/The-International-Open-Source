@@ -155,9 +155,6 @@ export class RoomManager {
         delete this._allyDamagedCreeps
         delete this._notMyConstructionSites
         delete this._allyConstructionSitesByType
-        delete this._actionableSpawningStructures
-        delete this._spawningStructuresByPriority
-        delete this._spawningStructuresByNeed
         delete this._dismantleTargets
         delete this._destructibleStructures
         delete this._combatStructureTargets
@@ -1293,85 +1290,6 @@ export class RoomManager {
         }
 
         return (this._allyConstructionSitesByType = allyConstructionSitesByType)
-    }
-
-    _actionableSpawningStructures: SpawningStructures
-    /**
-     * RCL actionable spawns and extensions
-     */
-    get actionableSpawningStructures() {
-        if (this._actionableSpawningStructures) return this._actionableSpawningStructures
-
-        let actionableSpawningStructures: SpawningStructures = this.structures.spawn
-        actionableSpawningStructures = actionableSpawningStructures.concat(
-            this.structures.extension,
-        )
-        actionableSpawningStructures = actionableSpawningStructures.filter(
-            structure => structure.RCLActionable,
-        )
-
-        return (this._actionableSpawningStructures = actionableSpawningStructures)
-    }
-
-    _spawningStructuresByPriority: SpawningStructures
-    get spawningStructuresByPriority() {
-        if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
-
-        const anchor = this.anchor
-        if (!anchor) throw Error('no anchor')
-
-        let spawningStructuresByPriority: SpawningStructures = []
-        const structuresToSort: SpawningStructures = []
-
-        for (const structure of this.actionableSpawningStructures) {
-            if (roomUtils.isSourceSpawningStructure(this.room.name, structure)) {
-                this.actionableSpawningStructures.push(structure)
-            }
-
-            structuresToSort.push(structure)
-        }
-
-        spawningStructuresByPriority = spawningStructuresByPriority.concat(
-            structuresToSort.sort((a, b) => getRange(a.pos, anchor) - getRange(b.pos, anchor)),
-        )
-
-        return (this._spawningStructuresByPriority = spawningStructuresByPriority)
-    }
-
-    _spawningStructuresByNeed: SpawningStructures
-    get spawningstructuresByNeed() {
-        if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
-
-        const anchor = this.anchor
-        if (!anchor) throw Error('no anchor')
-
-        let spawningStructuresByNeed = this.actionableSpawningStructures
-
-        const packedSourceHarvestPositions =
-            Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
-        for (const i in packedSourceHarvestPositions) {
-            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
-            console.log(closestHarvestPos)
-            spawningStructuresByNeed = spawningStructuresByNeed.filter(
-                structure => getRange(structure.pos, closestHarvestPos) > 1,
-            )
-        }
-
-        if (
-            this.room.myCreeps.fastFiller.length &&
-            ((this.room.controller.level >= 6 &&
-                this.room.fastFillerLink &&
-                this.room.hubLink &&
-                (this.room.storage || this.room.terminal) &&
-                this.room.myCreeps.hubHauler.length) ||
-                (this.room.fastFillerContainerLeft && this.room.fastFillerContainerRight))
-        ) {
-            spawningStructuresByNeed = spawningStructuresByNeed.filter(
-                structure => getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
-            )
-        }
-
-        return (this._spawningStructuresByNeed = spawningStructuresByNeed)
     }
 
     _dismantleTargets: Structure[]

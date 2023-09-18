@@ -242,7 +242,6 @@ export class SpawningStructuresManager {
     }
 
     private findDirections(pos: RoomPosition) {
-
         const anchor = this.communeManager.room.roomManager.anchor
         if (!anchor)
             throw Error('No anchor for spawning structures ' + this.communeManager.room.name)
@@ -649,8 +648,7 @@ export class SpawningStructuresManager {
     }
 
     createRoomLogisticsRequests() {
-        for (const structure of this.communeManager.room.roomManager
-            .spawningstructuresByNeed) {
+        for (const structure of this.communeManager.spawningstructuresByNeed) {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
                 type: 'transfer',

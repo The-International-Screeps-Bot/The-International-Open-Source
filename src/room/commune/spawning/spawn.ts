@@ -8,7 +8,7 @@ export const spawnFunctions = {
     },
     advancedSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
         spawnRequest.extraOpts.energyStructures =
-            spawn.room.roomManager.spawningStructuresByPriority
+            spawn.room.communeManager.spawningStructuresByPriority
 
         const creepName = [
             creepRoles.indexOf(spawnRequest.role),
