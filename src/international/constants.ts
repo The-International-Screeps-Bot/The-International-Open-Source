@@ -1639,6 +1639,10 @@ export const maxSegmentsOpen = 10
 
 export enum ReservedCoordTypes {
     /**
+     * The reserved is dying
+     */
+    dying,
+    /**
      * Probably a more temporary reserved coord that need not be considered in all situations
      */
     normal,

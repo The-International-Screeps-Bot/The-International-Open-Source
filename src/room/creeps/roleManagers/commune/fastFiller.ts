@@ -9,7 +9,12 @@ export class FastFiller extends Creep {
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
 
-            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            }
+            else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
         }
     }
 
@@ -47,10 +52,13 @@ export class FastFiller extends Creep {
 
         // Get usedFastFillerPositions
 
-        const usedFastFillerCoords = room.roomManager.reservedCoords
+        const reservedCoords = room.roomManager.reservedCoords
 
         const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(
-            pos => !usedFastFillerCoords.has(packCoord(pos)),
+            pos => {
+
+                return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+            }
         )
         if (!openFastFillerPositions.length) return false
 

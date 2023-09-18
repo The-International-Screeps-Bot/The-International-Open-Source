@@ -223,7 +223,7 @@ Creep.prototype.findUpgradePos = function () {
 
         // Iterate if the pos is used
 
-        if (this.room.roomManager.reservedCoords.has(packedCoord)) continue
+        if (this.room.roomManager.reservedCoords.get(packedCoord) !== ReservedCoordTypes.important) continue
 
         // Otherwise record packedPos in the creep's memory and in usedUpgradeCoords
 
@@ -829,7 +829,7 @@ Creep.prototype.findCommuneSourceHarvestPos = function (index) {
     // Get usedSourceHarvestPositions
 
     const usePos = room.roomManager.communeSourceHarvestPositions[index].find(
-        pos => !room.roomManager.reservedCoords.has(packCoord(pos)),
+        pos => room.roomManager.reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important,
     )
     if (!usePos) return false
 
@@ -866,10 +866,11 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
 
     // Get usedSourceHarvestPositions
 
-    const usedSourceHarvestCoords = room.roomManager.reservedCoords
-
+    const reservedCoords = room.roomManager.reservedCoords
     const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(
-        pos => !usedSourceHarvestCoords.has(packCoord(pos)),
+        pos => {
+            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+        }
     )
     if (!usePos) return false
 

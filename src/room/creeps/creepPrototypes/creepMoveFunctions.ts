@@ -238,11 +238,13 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     args.goals = []
 
-    for (const pos of unpackPosList(pathOpts.packedPath))
+    for (const pos of unpackPosList(pathOpts.packedPath)) {
+
         args.goals.push({
-            pos: pos,
+            pos,
             range: 0,
         })
+    }
 
     return this.createMoveRequest(args)
 }

@@ -254,12 +254,12 @@ export class CommuneManager {
 
         if (!this.remoteSourcePathType || randomTick()) {
             if (this.storingStructures.length) {
+                /* this.remoteSourcePathType = RoomMemoryKeys.remoteSourceHubPaths */
                 this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
             }
             else {
 
                 this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
-                /* this.remoteSourcePathType = RoomMemoryKeys.remoteSourceHubPaths */
             }
         }
 

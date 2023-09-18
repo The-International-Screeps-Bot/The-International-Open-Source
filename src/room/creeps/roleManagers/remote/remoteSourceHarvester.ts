@@ -53,7 +53,12 @@ export class RemoteHarvester extends Creep {
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
 
-            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            }
+            else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
         }
     }
 

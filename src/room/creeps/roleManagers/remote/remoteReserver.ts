@@ -45,7 +45,12 @@ export class RemoteReserver extends Creep {
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
 
-            this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            }
+            else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
         }
     }
 
@@ -151,8 +156,12 @@ export class RemoteReserver extends Creep {
             return unpackCoordAsPos(packedCoord, this.room.name)
         }
 
+        const reservedCoords = this.room.roomManager.reservedCoords
         const usePos = this.room.roomManager.remoteControllerPositions.find(
-            pos => !this.room.roomManager.reservedCoords.has(packCoord(pos)),
+            pos => {
+
+                return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+            }
         )
         if (!usePos) return false
 
