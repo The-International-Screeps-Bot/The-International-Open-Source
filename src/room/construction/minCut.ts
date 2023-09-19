@@ -66,13 +66,7 @@
 
 import { customColors, roomDimensions } from 'international/constants'
 import { collectiveManager } from 'international/collective'
-import {
-    customLog,
-    findCoordsInRangeXY,
-    isXYInBorder,
-    packXYAsNum,
-    unpackNumAsCoord,
-} from 'utils/utils'
+import { findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'utils/utils'
 
 // the eight surrounding points of a tile
 // note the order here is somehow important, the element i and (i + 4) % 8 should be the opposite direction

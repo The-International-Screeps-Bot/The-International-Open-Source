@@ -1,5 +1,6 @@
 import { allResources, customColors } from 'international/constants'
-import { customLog, findObjectWithID } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findObjectWithID } from 'utils/utils'
 
 Object.defineProperties(RoomObject.prototype, {
     effectsData: {

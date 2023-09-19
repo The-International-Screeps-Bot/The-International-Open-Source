@@ -1,7 +1,6 @@
 import { PlayerMemoryKeys, customColors, towerPowers } from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import {
-    customLog,
     findHighestScore,
     findObjectWithID,
     findWeightedRangeFromExit,

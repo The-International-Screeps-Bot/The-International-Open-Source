@@ -1,5 +1,6 @@
 import { Result, customColors, PowerCreepMemoryKeys } from 'international/constants'
-import { customLog, findObjectWithID, getRange } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findObjectWithID, getRange } from 'utils/utils'
 
 export class Operator extends PowerCreep {
     constructor(creepID: Id<PowerCreep>) {
@@ -145,7 +146,7 @@ export class Operator extends PowerCreep {
         const task = this.findNewBestPowerTask()
         if (!task) return Result.fail
 
-        customLog('FIND TASK', findObjectWithID(task.targetID))
+        log('FIND TASK', findObjectWithID(task.targetID))
 
         const taskTarget = findObjectWithID(task.targetID)
         taskTarget.reservePowers
@@ -201,7 +202,7 @@ export class Operator extends PowerCreep {
         if (!taskTarget) return Result.fail
 
         // We aren't in range, get closer
-        customLog('TRY TASK', taskTarget)
+        log('TRY TASK', taskTarget)
         const minRange = (POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]] as any).range
         if (minRange && getRange(this.pos, taskTarget.pos) > minRange) {
             this.createMoveRequest({
@@ -222,7 +223,7 @@ export class Operator extends PowerCreep {
         this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget)
 
         // We did the power
-        customLog('WE DID THE POWA', taskTarget)
+        log('WE DID THE POWA', taskTarget)
 
         // Assume the power consumed ops if it does so
 

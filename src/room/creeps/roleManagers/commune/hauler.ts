@@ -1,5 +1,6 @@
 import { CreepMemoryKeys } from 'international/constants'
-import { customLog, findClosestObject, getRange } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findClosestObject, getRange } from 'utils/utils'
 
 export class Hauler extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -18,7 +19,7 @@ export class Hauler extends Creep {
         this.passiveRenew()
         this.runRoomLogisticsRequestsAdvanced()
 
-        /* customLog('HAULER RUN', this.name) */
+        /* log('HAULER RUN', this.name) */
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {

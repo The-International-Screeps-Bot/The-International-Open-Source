@@ -7,7 +7,8 @@ import {
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import { updateStat } from 'international/statsManager'
-import { customLog, findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
+import { LogTypes, log } from 'utils/logging'
+import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
@@ -112,14 +113,13 @@ export class SpawningStructuresManager {
         // If this is ran then there is a bug in spawnRequest creation
 
         if (request.cost > this.communeManager.room.energyCapacityAvailable) {
-            customLog(
+            log(
                 'Failed to spawn: not enough energy',
                 `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${
                     this.communeManager.room.energyCapacityAvailable
                 } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
                 {
-                    textColor: customColors.white,
-                    bgColor: customColors.yellow,
+                    type: LogTypes.warning,
                 },
             )
 
@@ -127,14 +127,13 @@ export class SpawningStructuresManager {
         }
 
         if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
-            customLog(
+            log(
                 'Failed to spawn: not enough energy',
                 `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
                     this.communeManager.nextSpawnEnergyAvailable
                 } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
                 {
-                    textColor: customColors.white,
-                    bgColor: customColors.yellow,
+                    type: LogTypes.warning,
                 },
             )
             return false
@@ -156,12 +155,11 @@ export class SpawningStructuresManager {
         if (testSpawnResult !== OK) {
             // Log the error and stop the loop
 
-            customLog(
+            log(
                 'Failed to spawn: dryrun failed',
                 `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                 {
-                    textColor: customColors.white,
-                    bgColor: customColors.red,
+                    type: LogTypes.error,
                 },
             )
 
@@ -509,9 +507,8 @@ export class SpawningStructuresManager {
 
         //Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
         if (args.extraParts.length == 0) {
-            customLog('spawnRequestByGroup error', '0 length extraParts?' + JSON.stringify(args), {
-                textColor: customColors.white,
-                bgColor: customColors.red,
+            log('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
+                type: LogTypes.error,
             })
             return
         }
@@ -673,7 +670,7 @@ export class SpawningStructuresManager {
     private testArgs() {
         for (const request of this.communeManager.spawnRequestsArgs) {
             if (request.role === 'remoteSourceHarvester') {
-                customLog(
+                log(
                     'SPAWN REQUEST ARGS',
                     request.role +
                         request.memoryAdditions[CreepMemoryKeys.remote] +
@@ -682,7 +679,7 @@ export class SpawningStructuresManager {
                 )
                 continue
             }
-            customLog('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
+            log('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
         }
     }
 

@@ -14,7 +14,6 @@ import {
 } from 'international/constants'
 import {
     createPosMap,
-    customLog,
     findClosestObject,
     findObjectWithID,
     findCoordsInsideRect,

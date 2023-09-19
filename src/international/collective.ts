@@ -1,7 +1,6 @@
 import { Sleepable } from 'utils/Sleepable'
 import {
     createPosMap,
-    customLog,
     getAvgPrice,
     packXYAsNum,
     randomIntRange,
@@ -21,7 +20,6 @@ import {
     minerals,
     PlayerMemoryKeys,
 } from './constants'
-
 
 /**
  * Handles inter room and non-room matters
@@ -62,7 +60,7 @@ export class CollectiveManager extends Sleepable {
     /**
      * Terrain binaries of wall or not wall for rooms
      */
-    terrainBinaries: {[roomName: string]: Uint8Array} = {}
+    terrainBinaries: { [roomName: string]: Uint8Array } = {}
 
     /**
      * Updates values to be present for this tick
@@ -180,8 +178,8 @@ export class CollectiveManager extends Sleepable {
 
         const minPrice = avgPrice * 0.8
         /*
-        customLog('minPixelPrice', minPrice)
-        customLog('avgPixelPrice', avgPrice)
+        log('minPixelPrice', minPrice)
+        log('avgPixelPrice', avgPrice)
  */
         const buyOrder = this.getBuyOrder(PIXEL, minPrice)
 
@@ -358,7 +356,13 @@ export class CollectiveManager extends Sleepable {
             const order = orders[orderID]
             const roomMemory = Memory.rooms[order.roomName]
             // Filter out orders from players we hate
-            if (roomMemory && roomMemory[RoomMemoryKeys.owner] && Memory.players[roomMemory[RoomMemoryKeys.owner]] && Memory.players[roomMemory[RoomMemoryKeys.owner]][PlayerMemoryKeys.hate] > 0) continue
+            if (
+                roomMemory &&
+                roomMemory[RoomMemoryKeys.owner] &&
+                Memory.players[roomMemory[RoomMemoryKeys.owner]] &&
+                Memory.players[roomMemory[RoomMemoryKeys.owner]][PlayerMemoryKeys.hate] > 0
+            )
+                continue
 
             if (!this._orders[order.type][order.resourceType]) {
                 this._orders[order.type][order.resourceType] = [order]

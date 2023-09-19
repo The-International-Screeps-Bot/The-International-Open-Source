@@ -1,5 +1,6 @@
 import { customColors } from 'international/constants'
-import { customLog, scalePriority } from 'utils/utils'
+import { log } from 'utils/logging'
+import { scalePriority } from 'utils/utils'
 import { RoomManager } from './room'
 
 export class ContainerManager {

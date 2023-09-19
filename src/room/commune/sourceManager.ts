@@ -1,4 +1,4 @@
-import { customLog } from 'utils/utils'
+import { log } from 'utils/logging'
 import { CommuneManager } from './commune'
 
 export class SourceManager {

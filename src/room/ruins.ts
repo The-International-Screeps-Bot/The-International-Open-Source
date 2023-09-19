@@ -1,4 +1,5 @@
-import { customLog, scalePriority } from 'utils/utils'
+import { log } from 'utils/logging'
+import { scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
 
 export class RuinManager {

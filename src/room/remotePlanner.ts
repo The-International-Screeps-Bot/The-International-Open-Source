@@ -19,7 +19,6 @@ import {
 import {
     areCoordsEqual,
     createPosMap,
-    customLog,
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
     findAvgBetweenCoords,
@@ -324,13 +323,13 @@ export class RemotePlanner {
         this.setBasePlansXY(24, 24, STRUCTURE_CONTAINER, 2)
         this.setBasePlansXY(25, 25, STRUCTURE_CONTAINER, 2)
         this.setBasePlansXY(25, 25, STRUCTURE_LINK, 5)
-        customLog('PLAN 1', JSON.stringify(this.basePlans.map))
+        log('PLAN 1', JSON.stringify(this.basePlans.map))
 
         const packedPlans = this.basePlans.pack()
-        customLog('PACKED', packedPlans)
+        log('PACKED', packedPlans)
 
         const unpacked = BasePlans.unpack(packedPlans)
-        customLog('UNPACKED', JSON.stringify(unpacked.map))
+        log('UNPACKED', JSON.stringify(unpacked.map))
         delete this.baseCoords
         return Result.noAction
  */

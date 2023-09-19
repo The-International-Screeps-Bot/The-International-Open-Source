@@ -13,11 +13,12 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import './roomVisuals'
-import { createPosMap, customLog } from 'utils/utils'
+import { createPosMap } from 'utils/utils'
 import { updateStat, statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
+import { LogTypes, log } from 'utils/logging'
 
 class RoomsManager {
     constructor() {}
@@ -42,7 +43,6 @@ class RoomsManager {
         }
     }
     run() {
-
         // Loop through room names in Game.rooms
 
         for (const roomName in Game.rooms) {
@@ -60,12 +60,11 @@ class RoomsManager {
 
             let logMessage = `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreepsAmount}`
 
-            customLog(
+            log(
                 `<a style="cursor: pointer;color:inherit" href="https://screeps.com/a/#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
                 logMessage,
                 {
-                    textColor: customColors.white,
-                    bgColor: customColors.lightBlue,
+                    type: LogTypes.info,
                     position: 2,
                 },
             )

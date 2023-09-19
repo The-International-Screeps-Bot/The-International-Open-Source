@@ -8,7 +8,8 @@ import {
     powerCreepClassNames,
 } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog, forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'
+import { log } from 'utils/logging'
+import { forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'
 import { RoomManager } from '../room'
 import { packCoord, unpackCoord } from 'other/codec'
 

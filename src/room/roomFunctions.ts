@@ -29,7 +29,6 @@ import {
     areCoordsEqual,
     cleanRoomMemory,
     createPosMap,
-    customLog,
     findAdjacentCoordsToCoord,
     findClosestClaimType,
     findClosestCommuneName,
@@ -60,6 +59,7 @@ import { posix } from 'path'
 import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
 import { roomUtils } from './roomUtils'
+import { log } from 'utils/logging'
 
 /**
     @param pos1 pos of the object performing the action
@@ -354,7 +354,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         if (!packedRemoteControllerPath.length) {
             return roomMemory[RoomMemoryKeys.type]
         }
-        if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) disable = true
+        if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance)
+            disable = true
 
         newCost += packedRemoteControllerPath.length / packedPosLength
 
@@ -1526,7 +1527,7 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
     // There is already has a power creep responding to this target with the power
-    customLog('MADE POWER TASK FOR', target)
+    log('MADE POWER TASK FOR', target)
     if (target.reservePowers.has(powerType)) return false
 
     // Create a power task with info on the cooldown

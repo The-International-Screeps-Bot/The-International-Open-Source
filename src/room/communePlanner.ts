@@ -19,7 +19,6 @@ import {
 import {
     areCoordsEqual,
     createPosMap,
-    customLog,
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
     findAvgBetweenCoords,

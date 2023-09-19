@@ -6,7 +6,8 @@ import {
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
-import { customLog, findObjectWithID, packAsNum, randomIntRange, randomTick } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findObjectWithID, packAsNum, randomIntRange, randomTick } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'

@@ -16,6 +16,7 @@ import {
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
 import { debugUtils } from 'debug/debugUtils'
+import { LogTypes, log } from './logging'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -149,57 +150,6 @@ export function areCoordsEqual(coord1: Coord, coord2: Coord) {
  */
 export function arePositionsEqual(pos1: RoomPosition, pos2: RoomPosition) {
     return pos1.roomName === pos2.roomName && pos1.x === pos2.x && pos1.y === pos2.y
-}
-
-interface CustomLogOpts {
-    position?: number
-    textColor?: string
-    bgColor?: string
-}
-
-/**
- * Outputs HTML and CSS styled console logs
- */
-export function customLog(title: any, message?: any, opts?: CustomLogOpts) {
-    if (!global.settings.logging) return
-
-    if (!opts) opts = {}
-    if (!opts.textColor) opts.textColor = customColors.black
-    if (!opts.bgColor) opts.bgColor = customColors.white
-
-    // Create the title
-
-    global.logs += `<div style='width: 85vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${
-        opts.bgColor
-    }; margin-left: ${
-        (opts.position ?? 0) * 8
-    }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${
-        opts.textColor
-    };'>${title}:</div>`
-
-    // Create the content
-
-    global.logs += `<div style='box-shadow: inset rgb(0, 0, 0, 0.1) 0 0 0 10000px; padding: 3px; font-size: 14px; font-weight: 200; color: ${
-        opts.textColor
-    };'>${message ?? ''}</div></div>`
-}
-
-/**
- * Uniform styling for customLog error logs
- * @param title the location of the error - ussually the function or class name
- * @param message the description of the error
- */
-export function errorLog(title: any, message?: any, opts?: CustomLogOpts) {
-    opts.textColor = customColors.white
-    opts.bgColor = customColors.red
-    customLog(`(Error) ${title}`, message, opts)
-}
-
-/**
- *
- */
-export function stringifyLog(title: any, message?: any, opts?: CustomLogOpts) {
-    customLog(`(Stringify) ${title}`, debugUtils.stringify(message), opts)
 }
 
 /**
@@ -631,7 +581,7 @@ export function findCPUOf(func: Function) {
 
     func()
 
-    customLog('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
+    log('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
 }
 
 export function isXYExit(x: number, y: number) {
@@ -975,9 +925,8 @@ export function isAlly(playerName: string) {
 
 export function outOfBucket() {
     global.logs = ''
-    customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-        textColor: customColors.white,
-        bgColor: customColors.red,
+    log('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+        type: LogTypes.warning
     })
     console.log(
         global.settings.logging

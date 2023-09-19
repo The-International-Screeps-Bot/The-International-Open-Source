@@ -20,7 +20,6 @@ import {
     advancedFindDistance,
     cleanRoomMemory,
     createPosMap,
-    customLog,
     findCarryPartsRequired,
     findClosestRoomName,
     findCPUOf,
@@ -36,7 +35,6 @@ import { RoomManager } from 'room/room'
 import { roomUtils } from 'room/roomUtils'
 
 class TickInit {
-
     configGeneral() {
         // General
 

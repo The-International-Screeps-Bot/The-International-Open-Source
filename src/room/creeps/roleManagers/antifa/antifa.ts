@@ -6,7 +6,8 @@ import {
     customColors,
     squadQuotas,
 } from 'international/constants'
-import { customLog, findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { Duo } from './duo'
 import { Quad } from './quad'

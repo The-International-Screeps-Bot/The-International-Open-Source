@@ -1,5 +1,5 @@
 import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
-import { advancedFindDistance, customLog } from 'utils/utils'
+import { advancedFindDistance } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { updateStat } from 'international/statsManager'

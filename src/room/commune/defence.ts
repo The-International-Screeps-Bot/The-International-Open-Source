@@ -14,7 +14,6 @@ import { playerManager } from 'international/players'
 import { simpleAllies } from 'international/simpleAllies'
 import { updateStat } from 'international/statsManager'
 import {
-    customLog,
     findObjectWithID,
     findWeightedRangeFromExit,
     getRange,

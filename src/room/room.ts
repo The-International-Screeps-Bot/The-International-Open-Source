@@ -28,7 +28,6 @@ import {
 import {
     advancedFindDistance,
     cleanRoomMemory,
-    customLog,
     findClosestObject,
     findHighestScore,
     findObjectWithID,
@@ -72,6 +71,7 @@ import { RampartPlans } from './construction/rampartPlans'
 import { PathGoal, customFindPath } from 'international/customPathFinder'
 import { roomUtils } from './roomUtils'
 import { collectiveManager } from 'international/collective'
+import { log } from 'utils/logging'
 
 export interface InterpretedRoomEvent {
     eventType: EventConstant
@@ -265,7 +265,6 @@ export class RoomManager {
     }
 
     initRun() {
-
         if (this.room.communeManager) {
             this.room.communeManager.initRun()
             return
@@ -293,15 +292,13 @@ export class RoomManager {
         this.roomVisualsManager.run()
     }
 
-    private test() {
-        
-    }
+    private test() {}
 
     /**
      * Debug
      */
     private visualizeReservedCoords() {
-        customLog('reservedCoords', JSON.stringify([...this.reservedCoords]))
+        log('reservedCoords', JSON.stringify([...this.reservedCoords]))
         for (const [packedCoord, reserveType] of this.reservedCoords) {
             const coord = unpackCoord(packedCoord)
             this.room.coordVisual(coord.x, coord.y, `hsl(${200}${reserveType * 50}, 100%, 60%)`)

@@ -14,7 +14,8 @@ import {
     roomDimensions,
 } from './constants'
 import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
-import { customLog, unpackNumAsCoord, visualizePath } from '../utils/utils'
+import { LogTypes, log } from 'utils/logging'
+import { unpackNumAsCoord, visualizePath } from '../utils/utils'
 
 export interface PathGoal {
     pos: RoomPosition
@@ -400,11 +401,11 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
             if (args.avoidStationaryPositions) {
                 for (const [packedCoord, reserveType] of room.roomManager.reservedCoords) {
-
-                    if (args.minReservedCoordType && reserveType < args.minReservedCoordType) continue
+                    if (args.minReservedCoordType && reserveType < args.minReservedCoordType)
+                        continue
 
                     const coord = unpackCoord(packedCoord)
-                    cm.set(coord.x, coord.y, (reserveType * 5) + 5)
+                    cm.set(coord.x, coord.y, reserveType * 5 + 5)
                 }
             }
 
@@ -526,14 +527,13 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
     // If the pathFindResult is incomplete, inform an empty array
 
     if (pathFinderResult.incomplete) {
-        customLog(
+        log(
             'Incomplete Path',
             `${args.origin} -> ${args.goals[0].pos} range: ${args.goals[0].range} goals: ${
                 args.goals.length
             } path len: ${pathFinderResult.path.length} allowed: ${Array.from(allowedRoomNames)}`,
             {
-                textColor: customColors.white,
-                bgColor: customColors.red,
+                type: LogTypes.warning,
             },
         )
 

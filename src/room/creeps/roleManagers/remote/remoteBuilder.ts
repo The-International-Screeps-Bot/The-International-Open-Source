@@ -6,7 +6,6 @@ import {
     RoomTypes,
 } from 'international/constants'
 import {
-    customLog,
     findCarryPartsRequired,
     findObjectWithID,
     getRangeXY,

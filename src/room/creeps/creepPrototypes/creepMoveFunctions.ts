@@ -19,7 +19,6 @@ import { collectiveManager } from 'international/collective'
 import {
     areCoordsEqual,
     arePositionsEqual,
-    customLog,
     findAdjacentCoordsToCoord,
     findObjectWithID,
     getRangeXY,
@@ -239,7 +238,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     args.goals = []
 
     for (const pos of unpackPosList(pathOpts.packedPath)) {
-
         args.goals.push({
             pos,
             range: 0,
@@ -316,7 +314,6 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         path = customFindPath(args)
         if (!path.length && !this.spawning) return Result.fail
-
 
         // Limit the path's length to the cacheAmount
 

@@ -8,7 +8,6 @@ import {
     RoomTypes,
 } from 'international/constants'
 import {
-    customLog,
     findClosestObject,
     findCoordsInsideRect,
     findCPUOf,
@@ -289,7 +288,7 @@ export class RemoteHauler extends Creep {
         const sourceHarvestPos = unpackPosAt(
             Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
                 RoomMemoryKeys.remoteSourceHarvestPositions
-            ][creepMemory[CreepMemoryKeys.sourceIndex]]
+            ][creepMemory[CreepMemoryKeys.sourceIndex]],
         )
 
         this.message += creepMemory[CreepMemoryKeys.remote]
@@ -520,7 +519,6 @@ export class RemoteHauler extends Creep {
 
     relayCoord?(coord: Coord) {
         if (global.settings.roomVisuals) {
-
             this.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
         }
 
@@ -544,16 +542,16 @@ export class RemoteHauler extends Creep {
         creepAtPos.nextStore.energy += nextEnergy
         */
         /*
-        customLog('thisEnergy', this.store.energy)
-        customLog('creepAtPos Energy', creepAtPos.freeNextStore)
-        customLog('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
+        log('thisEnergy', this.store.energy)
+        log('creepAtPos Energy', creepAtPos.freeNextStore)
+        log('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
         */
         const nextEnergy = Math.min(this.store.energy, creepAtPos.freeNextStore)
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy
         /*
-        customLog('this needs res', this.needsResources())
-        customLog('creepAtPos need res', creepAtPos.needsResources())
+        log('this needs res', this.needsResources())
+        log('creepAtPos need res', creepAtPos.needsResources())
  */
         // Stop previously attempted moveRequests as they do not account for a relay
 

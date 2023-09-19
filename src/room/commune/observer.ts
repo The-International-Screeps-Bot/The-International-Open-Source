@@ -1,4 +1,5 @@
-import { customLog, makeRoomCoord, randomTick, roomNameFromRoomXY } from 'utils/utils'
+import { log } from 'utils/logging'
+import { makeRoomCoord, randomTick, roomNameFromRoomXY } from 'utils/utils'
 import { CommuneManager } from './commune'
 import { RoomMemoryKeys } from 'international/constants'
 

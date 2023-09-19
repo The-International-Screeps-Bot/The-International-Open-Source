@@ -1,5 +1,5 @@
 import { customColors, RoomMemoryKeys, RoomStatNamesEnum, RoomTypes } from './constants'
-import { customLog } from '../utils/utils'
+import { log, LogTypes } from 'utils/logging'
 
 function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
     const roomStatsLevel = global.settings.roomStats
@@ -150,9 +150,8 @@ export class StatsManager {
         const globalCommuneStats = global.roomStats[RoomTypes.commune][roomName] as RoomCommuneStats
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
-            customLog('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
-                textColor: customColors.white,
-                bgColor: customColors.red,
+            log('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
+                type: LogTypes.warning
             })
             return
         }

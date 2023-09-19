@@ -110,6 +110,10 @@ export interface Settings {
      * Wether or not to generate visuals for room logistics requests
      */
     roomLogisticsVisuals: boolean
+    /**
+     * Wether or not to generate and display logs for debugging purposes
+     */
+    debugLogging: boolean
 }
 
 /**
@@ -141,4 +145,5 @@ export const defaultSettings: Settings = {
     errorExporting: true,
     structureMigration: true,
     roomLogisticsVisuals: false,
+    debugLogging: false,
 }

@@ -1,7 +1,6 @@
 import {
     cleanRoomMemory,
     createPosMap,
-    customLog,
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
     findClosestObject,
@@ -88,6 +87,7 @@ import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
 import { roomUtils } from 'room/roomUtils'
+import { LogTypes, log } from 'utils/logging'
 
 export class CommuneManager {
     // Managers
@@ -355,9 +355,8 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
-            bgColor: customColors.red,
-            textColor: customColors.white,
+        log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+            type: LogTypes.info,
         })
     }
 
@@ -376,9 +375,8 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
-            bgColor: customColors.red,
-            textColor: customColors.white,
+        log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+            type: LogTypes.info,
         })
     }
 
@@ -912,7 +910,8 @@ export class CommuneManager {
     get actionableSpawningStructures() {
         if (this._actionableSpawningStructures) return this._actionableSpawningStructures
 
-        let actionableSpawningStructures: SpawningStructures = this.room.roomManager.structures.spawn
+        let actionableSpawningStructures: SpawningStructures =
+            this.room.roomManager.structures.spawn
         actionableSpawningStructures = actionableSpawningStructures.concat(
             this.room.roomManager.structures.extension,
         )
@@ -929,8 +928,9 @@ export class CommuneManager {
         if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
         if (this.spawningStructuresByPriorityID && !this.room.roomManager.structureUpdate) {
-
-            return this._spawningStructuresByPriority = this.spawningStructuresByPriorityID.map(ID => findObjectWithID(ID))
+            return (this._spawningStructuresByPriority = this.spawningStructuresByPriorityID.map(
+                ID => findObjectWithID(ID),
+            ))
         }
 
         const anchor = this.room.roomManager.anchor
@@ -951,7 +951,9 @@ export class CommuneManager {
             structuresToSort.sort((a, b) => getRange(a.pos, anchor) - getRange(b.pos, anchor)),
         )
 
-        this.spawningStructuresByPriorityID = spawningStructuresByPriority.map(structure => structure.id)
+        this.spawningStructuresByPriorityID = spawningStructuresByPriority.map(
+            structure => structure.id,
+        )
         return (this._spawningStructuresByPriority = spawningStructuresByPriority)
     }
 

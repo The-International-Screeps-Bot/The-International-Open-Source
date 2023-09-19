@@ -1,7 +1,13 @@
-import { CreepMemoryKeys, packedPosLength, ReservedCoordTypes, Result, RoomMemoryKeys, WorkTypes } from 'international/constants'
+import {
+    CreepMemoryKeys,
+    packedPosLength,
+    ReservedCoordTypes,
+    Result,
+    RoomMemoryKeys,
+    WorkTypes,
+} from 'international/constants'
 import { updateStat } from 'international/statsManager'
 import {
-    customLog,
     findCoordsInsideRect,
     findObjectWithID,
     getRangeXY,
@@ -39,14 +45,11 @@ export class SourceHarvester extends Creep {
     }
 
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             if (this.isDying()) {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
-            }
-            else {
+            } else {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
             }
         }

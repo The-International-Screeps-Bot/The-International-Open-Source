@@ -1,5 +1,6 @@
 import { Result } from 'international/constants'
-import { customLog, findObjectWithID, getRange } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findObjectWithID, getRange } from 'utils/utils'
 
 export class BuilderManager {
     role: CreepRoles = 'hauler'

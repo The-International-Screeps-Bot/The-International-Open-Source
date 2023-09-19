@@ -13,7 +13,6 @@ import {
 import {
     areCoordsEqual,
     arePositionsEqual,
-    customLog,
     doesCoordExist,
     doesXYExist,
     findClosestObject,

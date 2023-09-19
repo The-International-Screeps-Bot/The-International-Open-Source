@@ -1,5 +1,5 @@
 import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
-import { customLog } from 'utils/utils'
+import { log } from 'utils/logging'
 import { CommuneManager } from './commune'
 
 export class LinkManager {

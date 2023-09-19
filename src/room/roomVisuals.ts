@@ -10,7 +10,8 @@ import {
     RoomTypes,
 } from 'international/constants'
 import { updateStat } from 'international/statsManager'
-import { customLog, findObjectWithID, unpackNumAsCoord } from 'utils/utils'
+import { log } from 'utils/logging'
+import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 import { simpleAllies, AllyRequestTypes } from 'international/simpleAllies'

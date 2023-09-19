@@ -8,7 +8,6 @@ import {
 import { playerManager } from 'international/players'
 import {
     areCoordsEqual,
-    customLog,
     findClosestObject,
     findClosestObjectEuc,
     findFurthestObjectEuc,
@@ -24,12 +23,9 @@ import {
 import { packCoord } from 'other/codec'
 
 export class MeleeDefender extends Creep {
-
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.necessary)
         }
     }

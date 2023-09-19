@@ -10,7 +10,7 @@ import {
 } from 'international/constants'
 import {
     advancedFindDistance,
-    customLog,
+
     findCarryPartsRequired,
     findLowestScore,
     getRange,

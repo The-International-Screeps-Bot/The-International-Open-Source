@@ -22,7 +22,6 @@ import {
 } from 'international/constants'
 import {
     areCoordsEqual,
-    customLog,
     findClosestObject,
     findClosestPos,
     findCreepInQueueMatchingRequest,
@@ -223,7 +222,8 @@ Creep.prototype.findUpgradePos = function () {
 
         // Iterate if the pos is used
 
-        if (this.room.roomManager.reservedCoords.get(packedCoord) !== ReservedCoordTypes.important) continue
+        if (this.room.roomManager.reservedCoords.get(packedCoord) !== ReservedCoordTypes.important)
+            continue
 
         // Otherwise record packedPos in the creep's memory and in usedUpgradeCoords
 
@@ -867,11 +867,9 @@ Creep.prototype.findRemoteSourceHarvestPos = function (index) {
     // Get usedSourceHarvestPositions
 
     const reservedCoords = room.roomManager.reservedCoords
-    const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(
-        pos => {
-            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
-        }
-    )
+    const usePos = room.roomManager.remoteSourceHarvestPositions[index].find(pos => {
+        return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+    })
     if (!usePos) return false
 
     packedCoord = packCoord(usePos)
@@ -1481,7 +1479,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
         }
     }
     /*
-    customLog('FINDING REQ', bestRequest + ', ' + Array.from(types), { position: 1 })
+    log('FINDING REQ', bestRequest + ', ' + Array.from(types), { position: 1 })
  */
     let creepRequest: CreepRoomLogisticsRequest | 0
 
@@ -1718,11 +1716,20 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
             /* this.room.visual.text(Math.min(amount, target.store.getCapacity(request.resourceType) / 2).toString(), this.pos) */
 
             //
-            const creepEffectiveCapacity = this.store.getCapacity() - this.store.getUsedCapacity() + this.nextStore[request.resourceType]
+            const creepEffectiveCapacity =
+                this.store.getCapacity() -
+                this.store.getUsedCapacity() +
+                this.nextStore[request.resourceType]
 
             if (
                 this.nextStore[request.resourceType] >=
-                Math.min(amount, Math.min(target.store.getCapacity(request.resourceType), creepEffectiveCapacity))
+                Math.min(
+                    amount,
+                    Math.min(
+                        target.store.getCapacity(request.resourceType),
+                        creepEffectiveCapacity,
+                    ),
+                )
             )
                 return true
             return false
@@ -1846,7 +1853,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     const request = this.findRoomLogisticsRequest(args)
     if (!request) return Result.fail
 
-    /* customLog('REQUEST RESPONSE', request.T, { position: 1 }) */
+    /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
     const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
     this.room.targetVisual(this.pos, target.pos)
     if (getRange(target.pos, this.pos) > 1) {
@@ -1859,7 +1866,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         return Result.action
     }
 
-    /*     customLog(
+    /*     log(
         'DOING REQUEST',
         request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + this.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + this.name,
         { position: 1 },
@@ -1958,7 +1965,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     const request = this.memory[CreepMemoryKeys.roomLogisticsRequests][0]
     if (!request) return Result.fail
 
-    /* customLog('REQUEST RESPONSE', request.T, { position: 1 }) */
+    /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
     const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
 
     if (getRange(target.pos, this.pos) > 1) {
@@ -1971,7 +1978,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
         return Result.action
     }
 
-    /*     customLog(
+    /*     log(
         'DOING REQUEST',
         request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + this.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + this.name,
         { position: 1 },

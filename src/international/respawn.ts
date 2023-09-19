@@ -1,4 +1,4 @@
-import { customLog } from '../utils/utils'
+import { log } from 'utils/logging'
 
 /**
  * Credit to SemperRabbit for this nice piece of code!

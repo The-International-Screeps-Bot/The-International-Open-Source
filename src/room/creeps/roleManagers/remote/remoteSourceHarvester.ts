@@ -8,7 +8,6 @@ import {
     WorkTypes,
 } from 'international/constants'
 import {
-    customLog,
     findCarryPartsRequired,
     findObjectWithID,
     getRangeXY,
@@ -49,14 +48,11 @@ export class RemoteHarvester extends Creep {
     }
 
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             if (this.isDying()) {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
-            }
-            else {
+            } else {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
             }
         }
@@ -172,8 +168,11 @@ export class RemoteHarvester extends Creep {
                 // manage remote needs
 
                 // The smaller of the source path length or the creep's remaining lifetime
-                const creditLifetime =
-                    Math.min(remoteMemory[this.commune.communeManager.remoteSourcePathType].length / packedPosLength, this.ticksToLive)
+                const creditLifetime = Math.min(
+                    remoteMemory[this.commune.communeManager.remoteSourcePathType].length /
+                        packedPosLength,
+                    this.ticksToLive,
+                )
 
                 const totalCreditChange = Math.min(
                     // Dont allow negative credit change
@@ -199,7 +198,8 @@ export class RemoteHarvester extends Creep {
                             ),
                             totalCreditChange,
                         )
-                        remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] += creditChange * creditLifetime
+                        remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] +=
+                            creditChange * creditLifetime
                     }
                 }
                 // There is no container for the source
@@ -211,7 +211,8 @@ export class RemoteHarvester extends Creep {
                         ),
                         totalCreditChange,
                     )
-                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] += creditChange * creditLifetime
+                    remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] +=
+                        creditChange * creditLifetime
                 }
 
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] =

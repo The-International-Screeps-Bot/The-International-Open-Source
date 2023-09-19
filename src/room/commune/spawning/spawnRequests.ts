@@ -12,7 +12,6 @@ import {
     RoomMemoryKeys,
 } from 'international/constants'
 import {
-    customLog,
     findCarryPartsRequired,
     findLinkThroughput,
     getRangeXY,
@@ -764,7 +763,6 @@ export class SpawnRequestsManager {
                     this.communeManager.room.controller.ticksToDowngrade <=
                     this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
-
                     const priority = 5
 
                     if (this.communeManager.hasSufficientRoads) {
@@ -836,7 +834,7 @@ export class SpawnRequestsManager {
                         2,
                     )
                 }
-                
+
                 // Otherwise if there is no storing structure
                 else {
                     partsMultiplier += this.communeManager.estimatedEnergyIncome * 0.75

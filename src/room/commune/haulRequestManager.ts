@@ -4,7 +4,7 @@ import {
     CombatRequestKeys,
     RoomMemoryKeys,
 } from 'international/constants'
-import { advancedFindDistance, customLog, randomTick } from 'utils/utils'
+import { advancedFindDistance, randomTick } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { updateStat } from 'international/statsManager'
