@@ -1,5 +1,6 @@
 import { Sleepable } from 'utils/Sleepable'
-import { RoomMemoryKeys } from './constants'
+import { RoomMemoryKeys, codecCacheLength } from './constants'
+import { packCache, unpackCache } from 'other/codec'
 
 /**
  * Intended to clean Memory, global, segments from stale data
@@ -13,6 +14,7 @@ class GarbageCollector extends Sleepable {
 
         this.cleanRooms()
         this.cleanPlayers()
+        this.cleanCodecCachePartial()
     }
     cleanRooms() {
         for (const roomName in Memory.rooms) {
@@ -23,6 +25,17 @@ class GarbageCollector extends Sleepable {
         }
     }
     cleanPlayers() {}
+    cleanCodecCachePartial() {
+        const packCacheKeys = Object.keys(packCache)
+        if (packCacheKeys.length > codecCacheLength) {
+            delete packCache[packCacheKeys[0]]
+        }
+
+        const unpackCacheKeys = Object.keys(unpackCache)
+        if (unpackCacheKeys.length > codecCacheLength) {
+            delete unpackCache[unpackCacheKeys[0]]
+        }
+    }
 }
 
 export const garbageCollector = new GarbageCollector()

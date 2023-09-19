@@ -7,33 +7,23 @@ import {
     // codecCacheLength,
 } from 'international/constants'
 import { encode, decode } from 'base32768'
-const codecCacheLength = 9999
+const codecCacheLength = 999999
 
-const packCache: StringMap<string> = {}
-const unpackCache: StringMap<string> = {}
+export const packCache: StringMap<string> = {}
+export const unpackCache: StringMap<string> = {}
 
-function getPackCacheKey(key: string): string {
+function getPackCacheKey(key: string): any {
     return packCache[key]
 }
-function setPackCacheKey(key: string, value: string): void {
+function setPackCacheKey(key: string, value: any): void {
     packCache[key] = value
-
-    const packCacheKeys = Object.keys(packCache)
-    if (packCacheKeys.length > codecCacheLength) {
-        delete packCache[packCacheKeys[0]]
-    }
 }
 
-function getUnpackCacheKey(key: string): string {
+function getUnpackCacheKey(key: string): any {
     return unpackCache[key]
 }
-function setUnpackCacheKey(key: string, value: string): void {
+function setUnpackCacheKey(key: string, value: any): void {
     unpackCache[key] = value
-
-    const unpackCacheKeys = Object.keys(unpackCache)
-    if (unpackCacheKeys.length > codecCacheLength) {
-        delete unpackCache[unpackCacheKeys[0]]
-    }
 }
 
 /**
@@ -132,9 +122,9 @@ export function packXYAsCoord(x: number, y: number) {
  */
 export function unpackCoord(char: string) {
     let coord = getUnpackCacheKey(char)
-    if (coord) return JSON.parse(coord)
+    if (coord) return coord
     const decoded = decode(char)
-    coord = JSON.stringify({ x: decoded[0], y: decoded[1] })
+    coord = { x: decoded[0], y: decoded[1] }
     setUnpackCacheKey(char, coord)
     return { x: decoded[0], y: decoded[1] }
 }
@@ -279,18 +269,18 @@ export function packXYAsPos(x: number, y: number, roomName: string) {
  */
 export function unpackPos(chars: string) {
     let pos = getUnpackCacheKey(chars)
-    if (pos) return JSON.parse(pos)
+    if (pos) return new RoomPosition(pos.x, pos.y, pos.roomName)
     const decoded = decode(chars)
-    pos = JSON.stringify({
+    pos = {
         x: decoded[3],
         y: decoded[4],
         roomName: unpackRoomName(decoded[0], decoded[1], decoded[2]),
-    })
+    }
     setUnpackCacheKey(chars, pos)
     return new RoomPosition(
-        decoded[3],
-        decoded[4],
-        unpackRoomName(decoded[0], decoded[1], decoded[2]),
+        pos.x,
+        pos.y,
+        pos.roomName,
     )
 }
 
@@ -369,18 +359,17 @@ export function unpackBasePlanCoords(packedPlanCoords: string) {
         const key = 'b' + packedPlanCoord
         let planCoord = getUnpackCacheKey(key)
         if (planCoord) {
-            const data = JSON.parse(planCoord)
-            planCoords.push(data)
+            planCoords.push(planCoord)
             continue
         }
 
         const data = decode(packedPlanCoord)
-        planCoord = JSON.stringify({
+        planCoord = {
             structureType: buildableStructureTypes[data[0]],
             minRCL: data[1],
-        })
+        }
         setUnpackCacheKey(key, planCoord)
-        planCoords.push({ structureType: buildableStructureTypes[data[0]], minRCL: data[1] })
+        planCoords.push(planCoord)
     }
     return planCoords
 }
@@ -414,20 +403,14 @@ export function unpackRampartPlanCoord(chars: string): RampartPlanCoord {
     }
 
     const decoded = decode(chars)
-    coord = JSON.stringify({
-        minRCL: decoded[0],
-        coversStructure: decoded[1],
-        buildForNuke: decoded[2],
-        buildForThreat: decoded[3],
-        needsStoringStructure: decoded[4],
-    })
-    return {
+    coord = {
         minRCL: decoded[0],
         coversStructure: decoded[1],
         buildForNuke: decoded[2],
         buildForThreat: decoded[3],
         needsStoringStructure: decoded[4],
     }
+    return coord
 }
 
 export function packStampAnchors(stampAnchors: StampAnchors) {
