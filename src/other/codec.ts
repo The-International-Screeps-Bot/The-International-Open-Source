@@ -4,24 +4,35 @@ import {
     buildableStructureTypes,
     packedPosLength,
     stampKeys,
+    codecCacheLength,
 } from 'international/constants'
 import { encode, decode } from 'base32768'
 
 const packCache: StringMap<string> = {}
-const unPackCache: StringMap<string> = {}
+const unpackCache: StringMap<string> = {}
 
 function getPackCacheKey(key: string): string {
     return packCache[key]
 }
 function setPackCacheKey(key: string, value: string): void {
     packCache[key] = value
+
+    const packCacheKeys = Object.keys(packCache)
+    if (packCacheKeys.length > codecCacheLength) {
+        delete packCache[packCacheKeys[0]]
+    }
 }
 
 function getUnpackCacheKey(key: string): string {
-    return unPackCache[key]
+    return unpackCache[key]
 }
 function setUnpackCacheKey(key: string, value: string): void {
-    unPackCache[key] = value
+    unpackCache[key] = value
+
+    const unpackCacheKeys = Object.keys(unpackCache)
+    if (unpackCacheKeys.length > codecCacheLength) {
+        delete unpackCache[unpackCacheKeys[0]]
+    }
 }
 
 /**

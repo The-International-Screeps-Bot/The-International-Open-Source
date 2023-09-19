@@ -299,7 +299,9 @@ export enum RoomMemoryKeys {
     portalsTo,
 }
 
-export type RemoteSourcePathTypes = RoomMemoryKeys.remoteSourceFastFillerPaths | RoomMemoryKeys.remoteSourceHubPaths
+export type RemoteSourcePathTypes =
+    | RoomMemoryKeys.remoteSourceFastFillerPaths
+    | RoomMemoryKeys.remoteSourceHubPaths
 
 // General
 
@@ -1670,3 +1672,5 @@ export enum WorkTypes {
     attack,
     attackController,
 }
+
+export const codecCacheLength = 99999
