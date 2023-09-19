@@ -62,7 +62,7 @@ export function log(title: any, message?: any, opts?: LogOpts) {
         (opts.position ?? 0) * positionPaddingPixels
     }px;'><div style='padding: 3px; font-size: 14px; font-weigth: 400; color: ${
         logProperties.textColor
-    };'>${title}:</div>`
+    };'>${logProperties.preface} ${title}:</div>`
 
     // Create the content
 
