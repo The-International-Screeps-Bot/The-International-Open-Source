@@ -8,13 +8,12 @@ mockGlobal<Game>('Game', {
     shard: { name: 'shard' },
 })
 jest.mock('./ErrorExporter', () => {})
-import * as constants from '../international/constants'
+// import * as constants from '../international/constants'
 // jest.spyOn<any, any>(constants, 'packedQuadAttackMemberOffsets').mockReturnValue([])
 
-import { allStructureTypes, buildableStructureTypes } from 'international/constants'
+import { buildableStructureTypes } from 'international/constants'
 
 import * as Codec from './codec'
-import { BasePlans } from 'room/construction/basePlans'
 
 const roomName = 'W1N1'
 describe('codec', () => {

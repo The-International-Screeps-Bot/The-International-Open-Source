@@ -277,11 +277,7 @@ export function unpackPos(chars: string) {
         roomName: unpackRoomName(decoded[0], decoded[1], decoded[2]),
     }
     setUnpackCacheKey(chars, pos)
-    return new RoomPosition(
-        pos.x,
-        pos.y,
-        pos.roomName,
-    )
+    return new RoomPosition(pos.x, pos.y, pos.roomName)
 }
 
 /**
@@ -322,7 +318,6 @@ export function unpackPosAt(chars: string, index = 0) {
  */
 export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
     let packedCoords = ''
-    const lastIndex = planCoords.length - 1
 
     for (let i = 0; i < planCoords.length; i++) {
         const planCoord = planCoords[i]
@@ -341,9 +336,7 @@ export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
             setPackCacheKey(key, encoded)
             packedCoords += encoded
         }
-        if (i < lastIndex) packedCoords += ','
     }
-    // packedCoords += '_'
     return packedCoords
 }
 
@@ -353,7 +346,8 @@ export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
 export function unpackBasePlanCoords(packedPlanCoords: string) {
     const planCoords: BasePlanCoord[] = []
 
-    for (const packedPlanCoord of packedPlanCoords.split(',')) {
+    for (let i = 0; i < packedPlanCoords.length; i += 2) {
+        const packedPlanCoord = packedPlanCoords.slice(i, i + 2)
         if (!packedPlanCoord.length) continue
 
         const key = 'b' + packedPlanCoord
