@@ -294,7 +294,7 @@ export class RoomManager {
     }
 
     private test() {
-        this.visualizeReservedCoords()
+        
     }
 
     /**
