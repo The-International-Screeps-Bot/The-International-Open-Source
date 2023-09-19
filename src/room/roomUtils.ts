@@ -148,15 +148,14 @@ export const roomUtils = {
     },
     floodFillCardinalFor() {},
     isSourceSpawningStructure(roomName: string, structure: StructureExtension | StructureSpawn) {
-
-        const packedSourceHarvestPositions = Memory.rooms[roomName][RoomMemoryKeys.communeSourceHarvestPositions]
+        const packedSourceHarvestPositions =
+            Memory.rooms[roomName][RoomMemoryKeys.communeSourceHarvestPositions]
         for (const i in packedSourceHarvestPositions) {
-
             const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
 
-            return getRange(structure.pos, closestHarvestPos) <= 1
+            if (getRange(structure.pos, closestHarvestPos) <= 1) return true
         }
 
         return false
-    }
+    },
 }
