@@ -970,7 +970,6 @@ export class CommuneManager {
             Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
         for (const i in packedSourceHarvestPositions) {
             const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
-            console.log(closestHarvestPos)
             spawningStructuresByNeed = spawningStructuresByNeed.filter(
                 structure => getRange(structure.pos, closestHarvestPos) > 1,
             )
