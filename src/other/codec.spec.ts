@@ -1,12 +1,20 @@
 import { mockGlobal, mockInstanceOf, mockStructure } from 'screeps-jest'
+
+global.settings = {
+    breakVersion: 0,
+}
 mockGlobal<Memory>('Memory', {})
 mockGlobal<Game>('Game', {
     shard: { name: 'shard' },
 })
+jest.mock('./ErrorExporter', () => {})
+import * as constants from '../international/constants'
+// jest.spyOn<any, any>(constants, 'packedQuadAttackMemberOffsets').mockReturnValue([])
+
+import { allStructureTypes, buildableStructureTypes } from 'international/constants'
 
 import * as Codec from './codec'
 import { BasePlans } from 'room/construction/basePlans'
-import { allStructureTypes, buildableStructureTypes } from 'international/constants'
 
 const roomName = 'W1N1'
 describe('codec', () => {
@@ -59,11 +67,13 @@ describe('codec', () => {
                 positions.push(pos)
                 const encodedPos = Codec.packPos(pos)
                 const decodedPos = Codec.unpackPos(encodedPos)
-                expect({ x: decodedPos.x, y: decodedPos.y, roomName: decodedPos.roomName }).toEqual({
-                    x: pos.x,
-                    y: pos.y,
-                    roomName: pos.roomName,
-                })
+                expect({ x: decodedPos.x, y: decodedPos.y, roomName: decodedPos.roomName }).toEqual(
+                    {
+                        x: pos.x,
+                        y: pos.y,
+                        roomName: pos.roomName,
+                    },
+                )
 
                 const encodedCoord = Codec.packCoord({ x, y })
                 encodedCoords += encodedCoord
@@ -83,7 +93,11 @@ describe('codec', () => {
         const encodedList = Codec.packPosList(positions)
         const decodedList = Codec.unpackPosList(encodedList)
         for (let p = 0; p < positions.length; p++) {
-            expect({ x: decodedList[p].x, y: decodedList[p].y, roomName: decodedList[p].roomName }).toEqual({
+            expect({
+                x: decodedList[p].x,
+                y: decodedList[p].y,
+                roomName: decodedList[p].roomName,
+            }).toEqual({
                 x: positions[p].x,
                 y: positions[p].y,
                 roomName: positions[p].roomName,
@@ -119,44 +133,88 @@ describe('codec', () => {
         expect(reversed2Times.length).toEqual(49 * 49 * 3)
     })
 
-    it('should encode and decode room names', () => {
-        const roomNames = ['W1N1', 'W1S1', 'E1N1', 'E1S1']
-        for (const roomName of roomNames) {
-            const encoded = Codec.packRoomName(roomName)
-            const decoded = Codec.unpackRoomName(encoded.quadrant, encoded.x, encoded.y)
-            expect(decoded).toEqual(roomName)
-        }
-
-        expect(Codec.unpackRoomName(-1, 0, 0)).toEqual('ERROR')
-    })
-
     it('should encode and decode plan coord', () => {
-        for (let s = 1; s < 5; s++) {
+        for (let s = 1; s < buildableStructureTypes.length; s++) {
             for (let r = 1; r < 10; r++) {
-                const encoded = Codec.packBasePlanCoord([{ minRCL: r, structureType: buildableStructureTypes[s] }])
-                const decoded = Codec.unpackBasePlanCoords(encoded)
-                expect(decoded).toEqual({ minRCL: r, structureType: buildableStructureTypes[s] })
+                const encoded = Codec.packBasePlanCoord([
+                    { minRCL: r, structureType: buildableStructureTypes[s] },
+                ])
+                const decodedList = Codec.unpackBasePlanCoords(encoded)
+                expect(decodedList[0]).toEqual({
+                    minRCL: r,
+                    structureType: buildableStructureTypes[s],
+                })
             }
         }
     })
 
-    // it('should encode and decode base plans', () => {
-    //     const basePlan: { [packedCoord: string]: BasePlanCoord } = {}
+    it('should use the cache when available', () => {
+        const originalId = '63f1374851b2398ffdc7ccee'
+        const originalCoord: Coord = { x: 1, y: 1 }
+        const originalPos = new RoomPosition(1, 1, roomName)
+        const originalBaseCoord: BasePlanCoord = {
+            minRCL: 1,
+            structureType: STRUCTURE_EXTENSION,
+        }
+        const originalRampartPlanCoord: RampartPlanCoord = {
+            minRCL: 1,
+            buildForNuke: 0,
+            buildForThreat: 0,
+            coversStructure: 0,
+            needsStoringStructure: 0,
+        }
 
-    //     for (let x = 1; x < 50; x++) {
-    //         for (let y = 1; y < 50; y++) {
-    //             const coord = { x, y }
-    //             const packedCoord = Codec.packCoord(coord)
-    //             basePlan[packedCoord] = { minRCL: 1, structureType: STRUCTURE_EXTENSION }
-    //         }
-    //     }
+        Codec.packId(originalId)
+        const packedId = Codec.packId(originalId)
+        Codec.packCoord(originalCoord)
+        const packedCoord = Codec.packCoord(originalCoord)
+        Codec.packXYAsCoord(originalCoord.x, originalCoord.y)
+        const packedXYCoord = Codec.packXYAsCoord(originalCoord.x, originalCoord.y)
+        Codec.packPos(originalPos)
+        const packedPos = Codec.packPos(originalPos)
+        Codec.packXYAsPos(originalPos.x, originalPos.y, originalPos.roomName)
+        const packedXYPos = Codec.packXYAsPos(originalPos.x, originalPos.y, originalPos.roomName)
+        Codec.packBasePlanCoord([originalBaseCoord])
+        const packedBasePlanCoords = Codec.packBasePlanCoord([originalBaseCoord])
+        Codec.packRampartPlanCoord(originalRampartPlanCoord)
+        const packedRampartPlanCoords = Codec.packRampartPlanCoord(originalRampartPlanCoord)
 
-    //     const encoded = Codec.packBasePlans(basePlan)
-    //     const decoded = BasePlans.unpackBasePlans(encoded)
-    //     const values = Object.values(decoded.map)
-    //     values.forEach(planCoord => {
-    //         expect(planCoord).toEqual({ minRCL: 1, structureType: STRUCTURE_EXTENSION })
-    //     })
-    //     expect(values.length).toEqual(49 * 49)
-    // })
+        Codec.unpackId(packedId)
+        const decodedId = Codec.unpackId(packedId)
+        Codec.unpackCoord(packedCoord)
+        const decodedCoord = Codec.unpackCoord(packedCoord)
+        Codec.unpackCoord(packedXYCoord)
+        const decodedXYCoord = Codec.unpackCoord(packedXYCoord)
+        Codec.unpackPos(packedPos)
+        const decodedPos = Codec.unpackPos(packedPos)
+        Codec.unpackPos(packedXYPos)
+        const decodedXYPos = Codec.unpackPos(packedXYPos)
+        Codec.unpackBasePlanCoords(packedBasePlanCoords)
+        const decodedBasePlanCoords = Codec.unpackBasePlanCoords(packedBasePlanCoords)[0]
+        Codec.unpackRampartPlanCoord(packedRampartPlanCoords)
+        const decodedRampartPlanCoord = Codec.unpackRampartPlanCoord(packedRampartPlanCoords)
+
+        expect(decodedId).toEqual(originalId)
+        expect(decodedCoord).toEqual(originalCoord)
+        expect(decodedXYCoord).toEqual(originalCoord)
+        expect(decodedPos.x).toEqual(originalPos.x)
+        expect(decodedPos.y).toEqual(originalPos.y)
+        expect(decodedPos.roomName).toEqual(originalPos.roomName)
+        expect(decodedXYPos.x).toEqual(originalPos.x)
+        expect(decodedXYPos.y).toEqual(originalPos.y)
+        expect(decodedXYPos.roomName).toEqual(originalPos.roomName)
+        expect(decodedBasePlanCoords.minRCL).toEqual(originalBaseCoord.minRCL)
+        expect(decodedBasePlanCoords.structureType).toEqual(originalBaseCoord.structureType)
+        expect(decodedRampartPlanCoord.minRCL).toEqual(originalRampartPlanCoord.minRCL)
+        expect(decodedRampartPlanCoord.buildForNuke).toEqual(originalRampartPlanCoord.buildForNuke)
+        expect(decodedRampartPlanCoord.buildForThreat).toEqual(
+            originalRampartPlanCoord.buildForThreat,
+        )
+        expect(decodedRampartPlanCoord.coversStructure).toEqual(
+            originalRampartPlanCoord.coversStructure,
+        )
+        expect(decodedRampartPlanCoord.needsStoringStructure).toEqual(
+            originalRampartPlanCoord.needsStoringStructure,
+        )
+    })
 })
