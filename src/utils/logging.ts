@@ -1,17 +1,27 @@
-import { debugUtils } from "debug/debugUtils"
-import { customColors } from "international/constants"
+import { debugUtils } from 'debug/debugUtils'
+const customColors = {
+    white: '#ffffff',
+    lightGrey: '#eaeaea',
+    midGrey: '#bcbcbc',
+    darkGrey: '#5e5e5e',
+    lightBlue: '#0f66fc',
+    darkBlue: '#02007d',
+    black: '#000000',
+    yellow: '#ABB400',
+    red: '#d10000',
+    green: '#00d137',
+    brown: '#aa7253',
+    purple: '#8b06a3',
+    pink: '#d60ef9',
+    orange: '#f27602',
+    teal: '#02f2e2',
+}
 
 export enum LogTypes {
     info,
     warning,
     error,
-    debug
-}
-
-interface LogColors {
-    textColor: keyof typeof customColors
-    BGColor: keyof typeof customColors
-    preface: string
+    debug,
 }
 
 const logTypeProperties = {
@@ -45,7 +55,6 @@ interface LogOpts {
 const positionPaddingPixels = 8
 
 export function log(title: any, message?: any, opts?: LogOpts) {
-
     if (!global.settings.logging) return
 
     if (!opts) opts = {}
@@ -72,6 +81,5 @@ export function log(title: any, message?: any, opts?: LogOpts) {
 }
 
 export function stringifyLog(title: any, message: any, opts?: LogOpts) {
-
     return log(title, debugUtils.stringify(message), opts)
 }

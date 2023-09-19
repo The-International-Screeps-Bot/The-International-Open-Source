@@ -4,9 +4,10 @@ import {
     buildableStructureTypes,
     packedPosLength,
     stampKeys,
-    codecCacheLength,
+    // codecCacheLength,
 } from 'international/constants'
 import { encode, decode } from 'base32768'
+const codecCacheLength = 9999
 
 const packCache: StringMap<string> = {}
 const unpackCache: StringMap<string> = {}
