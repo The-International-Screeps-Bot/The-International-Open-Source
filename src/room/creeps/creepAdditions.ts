@@ -288,14 +288,6 @@ Object.defineProperties(Creep.prototype, {
             }
         },
     },
-    shoved: {
-        get() {
-            return this._shoved === Game.time
-        },
-        set() {
-            this._shoved = Game.time
-        },
-    },
 } as PropertyDescriptorMap & ThisType<Creep>)
 
 Object.defineProperties(PowerCreep.prototype, {

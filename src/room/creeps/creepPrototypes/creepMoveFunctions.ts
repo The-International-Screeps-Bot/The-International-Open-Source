@@ -458,7 +458,6 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         const creepAtPos = Game.creeps[creepAtPosName]
         if (creepAtPosName) {
             if (!creepAtPos.shoveable) return
-            if (creepAtPos.shoved) return
             if (creepAtPos.fatigue > 0) return
             if (creepAtPos.moved) return
             if (creepAtPos.moveRequest) return
@@ -518,7 +517,6 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         lowestScore = score
         shoveCoord = coord
-        if (creepAtPos) creepAtPos.shoved = true
     })
 
     return shoveCoord
