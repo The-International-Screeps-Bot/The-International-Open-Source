@@ -498,11 +498,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
     // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-    const energySpentOnConstruction = Math.min(
-        this.parts.work * BUILD_POWER,
-        (cSite.progressTotal - cSite.progress) * BUILD_POWER,
-        this.nextStore.energy,
-    )
+    const energySpentOnConstruction = Math.min(this.parts.work * BUILD_POWER)
 
     this.nextStore.energy -= energySpentOnConstruction
 
