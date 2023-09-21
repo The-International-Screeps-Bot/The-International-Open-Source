@@ -51,6 +51,8 @@ class TickInit {
 
         global.constructionSitesCount = Object.keys(Game.constructionSites).length
         global.logs = ``
+
+        statsManager.tickInit()
     }
 }
 

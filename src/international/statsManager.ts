@@ -233,11 +233,11 @@ export class StatsManager {
                 switch (statLevel) {
                     // level 1 w average
                     case 1:
-                        value = this.average(value, globalValue)
+                        roomStats[name] = this.average(value, globalValue, 1000, 8)
                         break
                     // level 1 wo average
                     case 1.5:
-                        value = this.round(globalValue)
+                        roomStats[name] = this.round(globalValue)
                         break
                     // level 2 w average
                     case 2:
@@ -245,13 +245,13 @@ export class StatsManager {
                             forceUpdate ||
                             (global.settings.roomStats && global.settings.roomStats >= 2)
                         )
-                            value = this.average(value, globalValue)
-                        else value = 0
+                            roomStats[name] = this.average(value, globalValue)
+                        else roomStats[name] = 0
                         break
                     case 3:
                         if (forceUpdate) {
-                            value = this.average(value, globalValue)
-                        } else value = 0
+                            roomStats[name] = this.average(value, globalValue)
+                        } else roomStats[name] = 0
                         break
                     default:
                         break

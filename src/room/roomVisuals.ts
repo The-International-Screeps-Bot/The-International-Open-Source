@@ -767,7 +767,9 @@ export class RoomVisualsManager {
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
+            if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] === undefined)
+                console.log(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange], remoteName)
+            //row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
             row.push(
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
                     '/' +
@@ -786,7 +788,7 @@ export class RoomVisualsManager {
                 remoteMemory[RoomMemoryKeys.abandonRemote] ||
                     remoteMemory[RoomMemoryKeys.abandonRemote] + '',
             )
-            row.push(remoteMemory[RoomMemoryKeys.disable])
+            row.push(remoteMemory[RoomMemoryKeys.disable] ? 'OFF' : 'ON')
 
             data.push(row)
         }
