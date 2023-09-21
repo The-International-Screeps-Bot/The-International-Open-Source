@@ -335,6 +335,7 @@ export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
             packedCoords += encoded
         }
     }
+    packedCoords += '_'
     return packedCoords
 }
 
