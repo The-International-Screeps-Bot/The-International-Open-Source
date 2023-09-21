@@ -136,6 +136,7 @@ export class RoomManager {
      * Packed coords reserved by creeps
      */
     reservedCoords: Map<string, ReservedCoordTypes>
+    roomLogisticsBlacklistCoords: Set<string> = new Set()
 
     update(room: Room) {
         delete this.checkedStructureUpdate
@@ -190,6 +191,7 @@ export class RoomManager {
 
         if (randomTick()) {
             delete this._nukeTargetCoords
+            this.roomLogisticsBlacklistCoords = new Set()
         }
 
         this.reservedCoords = new Map()
