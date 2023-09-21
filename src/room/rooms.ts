@@ -26,11 +26,11 @@ class RoomsManager {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
 
-            room.roomManager = global.roomManagers[room.name]
+            room.roomManager = RoomManager.roomManagers[room.name]
 
             if (!room.roomManager) {
                 room.roomManager = new RoomManager()
-                global.roomManagers[room.name] = room.roomManager
+                RoomManager.roomManagers[room.name] = room.roomManager
             }
 
             room.roomManager.update(room)

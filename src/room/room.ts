@@ -97,6 +97,9 @@ export interface NotMyConstructionSites {
 }
 
 export class RoomManager {
+
+    static roomManagers: { [roomName: string]: RoomManager } = {}
+
     // sub managers
 
     communePlanner: CommunePlanner
@@ -254,11 +257,11 @@ export class RoomManager {
             return
         }
 
-        room.communeManager = global.communeManagers[room.name]
+        room.communeManager = CommuneManager.communeManagers[room.name]
 
         if (!room.communeManager) {
             room.communeManager = new CommuneManager()
-            global.communeManagers[room.name] = room.communeManager
+            CommuneManager.communeManagers[room.name] = room.communeManager
         }
 
         // new commune planner

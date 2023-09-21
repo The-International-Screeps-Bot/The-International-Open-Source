@@ -90,7 +90,11 @@ import { roomUtils } from 'room/roomUtils'
 import { LogTypes, log } from 'utils/logging'
 
 export class CommuneManager {
+
+    static communeManagers: { [roomName: string]: CommuneManager } = {}
+
     // Managers
+
     constructionManager: ConstructionManager
     defenceManager: DefenceManager
 

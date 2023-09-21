@@ -635,43 +635,6 @@ declare global {
         prmpccu: number
     }
 
-    interface CpuUsers {
-        /**
-         * International Manager CPU Usage
-         */
-        imcu: number
-
-        /**
-         * Creep Organizer CPU Usage
-         */
-        cocu: number
-
-        /**
-         * Map Visuals Manager CPU Usage
-         */
-        mvmcu: number
-
-        /**
-         * Power Creep Organizer CPU Usage
-         */
-        pccu: number
-
-        /**
-         * Tick Config CPU Usage
-         */
-        tccu: number
-
-        /**
-         * Room Manager CPU Usage
-         */
-        roomcu: number
-
-        /**
-         * Stats Manager CPU Usage
-         */
-        smcu: number
-    }
-
     type InternationalStatNames = keyof CpuUsers
     type RoomStatNames = keyof RoomStats
     type RoomCommuneStatNames = keyof RoomCommuneStats
@@ -2072,9 +2035,6 @@ declare global {
                     [roomName: string]: Partial<RoomStats | RoomCommuneStats>
                 }
             }
-            CPUUsers: CpuUsers
-
-            terrainCoords: { [roomName: string]: CoordMap }
 
             lastReset: number
 
@@ -2082,10 +2042,6 @@ declare global {
              * Room names that have controllers we own
              */
             communes: Set<string>
-
-            roomManagers: { [roomName: string]: RoomManager }
-
-            communeManagers: { [roomName: string]: CommuneManager }
 
             // Command functions
 
