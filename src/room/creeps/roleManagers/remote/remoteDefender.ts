@@ -74,7 +74,7 @@ export class RemoteDefender extends Creep {
 
         // Get remotes by their efficacy
 
-        const remoteNamesByEfficacy = creep.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = creep.commune.roomManager.remoteNamesByEfficacy
 
         let roomMemory
 

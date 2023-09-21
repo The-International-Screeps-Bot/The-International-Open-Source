@@ -70,7 +70,7 @@ export class RemoteDismantler extends Creep {
         const creepMemory = Memory.creeps[this.name]
 
         const role = 'remoteDismantler'
-        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
 
         // Loop through each remote name
 

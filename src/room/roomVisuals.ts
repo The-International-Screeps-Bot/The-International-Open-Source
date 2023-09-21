@@ -127,7 +127,7 @@ export class RoomVisualsManager {
     private spawnVisuals() {
         // Get the spawns in the room
 
-        const spawns = this.roomManager.room.roomManager.structures.spawn
+        const spawns = this.roomManager.structures.spawn
 
         // Loop through them
 
@@ -751,7 +751,7 @@ export class RoomVisualsManager {
         ]
         const data: any[][] = []
 
-        for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {
+        for (const remoteInfo of this.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
@@ -762,10 +762,7 @@ export class RoomVisualsManager {
             row.push(remoteName)
             row.push(sourceIndex)
             if (remoteMemory[pathType][sourceIndex])
-                row.push(
-                    remoteMemory[pathType][sourceIndex].length /
-                        packedPosLength,
-                )
+                row.push(remoteMemory[pathType][sourceIndex].length / packedPosLength)
             else row.push('undefined')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
@@ -775,9 +772,7 @@ export class RoomVisualsManager {
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
                     '/' +
                     Math.round(
-                        (remoteMemory[pathType][sourceIndex]
-                            .length /
-                            packedPosLength) *
+                        (remoteMemory[pathType][sourceIndex].length / packedPosLength) *
                             remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
                     ) *
                         2,

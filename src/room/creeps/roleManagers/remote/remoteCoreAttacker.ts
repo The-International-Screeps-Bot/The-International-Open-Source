@@ -89,7 +89,7 @@ export class RemoteCoreAttacker extends Creep {
         const creepMemory = Memory.creeps[this.name]
 
         const role = 'remoteCoreAttacker'
-        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
 
         // Loop through each remote name
 

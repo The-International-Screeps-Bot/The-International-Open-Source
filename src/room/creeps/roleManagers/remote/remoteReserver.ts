@@ -41,14 +41,11 @@ export class RemoteReserver extends Creep {
     }
 
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             if (this.isDying()) {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
-            }
-            else {
+            } else {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
             }
         }
@@ -77,7 +74,7 @@ export class RemoteReserver extends Creep {
     findRemote?() {
         if (this.hasValidRemote()) return true
 
-        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
         for (const remoteName of remoteNamesByEfficacy) {
             const remoteMemory = Memory.rooms[remoteName]
 
@@ -157,12 +154,9 @@ export class RemoteReserver extends Creep {
         }
 
         const reservedCoords = this.room.roomManager.reservedCoords
-        const usePos = this.room.roomManager.remoteControllerPositions.find(
-            pos => {
-
-                return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
-            }
-        )
+        const usePos = this.room.roomManager.remoteControllerPositions.find(pos => {
+            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+        })
         if (!usePos) return false
 
         packedCoord = packCoord(usePos)
@@ -211,7 +205,7 @@ export class RemoteReserver extends Creep {
         const controllerPos = unpackPosAt(
             Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][
                 RoomMemoryKeys.remoteControllerPositions
-            ]
+            ],
         )
 
         this.createMoveRequestByPath(

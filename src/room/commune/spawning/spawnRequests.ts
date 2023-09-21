@@ -1030,7 +1030,8 @@ export class SpawnRequestsManager {
     private remoteSourceRoles() {
         let priorityIncrement = 0
 
-        for (const remoteInfo of this.communeManager.room.remoteSourceIndexesByEfficacy) {
+        for (const remoteInfo of this.communeManager.room.roomManager
+            .remoteSourceIndexesByEfficacy) {
             priorityIncrement += 1
 
             const splitRemoteInfo = remoteInfo.split(' ')
@@ -1214,7 +1215,7 @@ export class SpawnRequestsManager {
     }
 
     private generalRemoteRoles() {
-        const remoteNamesByEfficacy = this.communeManager.room.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.communeManager.room.roomManager.remoteNamesByEfficacy
 
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
             const remoteName = remoteNamesByEfficacy[index]

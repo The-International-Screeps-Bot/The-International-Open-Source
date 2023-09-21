@@ -1160,12 +1160,6 @@ declare global {
         _global: RoomGlobal
         readonly global: RoomGlobal
 
-        _remoteNamesBySourceEfficacy: string[]
-        readonly remoteNamesBySourceEfficacy: string[]
-
-        _remoteSourceIndexesByEfficacy: string[]
-        readonly remoteSourceIndexesByEfficacy: string[]
-
         // Container
 
         _sourceContainers: StructureContainer[]

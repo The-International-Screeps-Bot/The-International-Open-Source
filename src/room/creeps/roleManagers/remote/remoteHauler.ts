@@ -87,7 +87,7 @@ export class RemoteHauler extends Creep {
     findRemote?() {
         if (this.hasValidRemote()) return true
 
-        for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
+        for (const remoteInfo of this.commune.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1])
@@ -168,7 +168,7 @@ export class RemoteHauler extends Creep {
             return true
         }
 
-        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
 
         let roomMemory
 

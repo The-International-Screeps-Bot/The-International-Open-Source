@@ -118,7 +118,7 @@ export class RemoteHarvester extends Creep {
     findRemote?() {
         if (this.hasValidRemote()) return true
 
-        for (const remoteInfo of this.commune.remoteSourceIndexesByEfficacy) {
+        for (const remoteInfo of this.commune.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const sourceIndex = parseInt(splitRemoteInfo[1])

@@ -1421,15 +1421,15 @@ export class RoomManager {
 
         // Filter rooms that have some sourceEfficacies recorded
 
-        const remoteNamesBySourceEfficacy = Memory.rooms[this.room.name][
-            RoomMemoryKeys.remotes
-        ].filter(function (roomName) {
-            return Memory.rooms[roomName][pathType].length
-        })
+        const remoteNamesByEfficacy = Memory.rooms[this.room.name][RoomMemoryKeys.remotes].filter(
+            function (roomName) {
+                return Memory.rooms[roomName][pathType].length
+            },
+        )
 
         // Sort the remotes based on the average source efficacy
 
-        return remoteNamesBySourceEfficacy.sort(function (a1, b1) {
+        return remoteNamesByEfficacy.sort(function (a1, b1) {
             return (
                 Memory.rooms[a1][pathType].reduce((a2, b2) => a2 + b2.length, 0) /
                     Memory.rooms[a1][pathType].length -
