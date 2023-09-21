@@ -275,6 +275,27 @@ Object.defineProperties(Creep.prototype, {
             return this._idealSquadMembers
         },
     },
+    shoveable: {
+        get() {
+            switch (this.role) {
+                case 'sourceHarvester':
+                case 'mineralHarvester':
+                case 'remoteSourceHarvester':
+                    return true
+                default:
+                    return false
+                    break
+            }
+        },
+    },
+    shoved: {
+        get() {
+            return this._shoved === Game.time
+        },
+        set() {
+            this._shoved = Game.time
+        },
+    },
 } as PropertyDescriptorMap & ThisType<Creep>)
 
 Object.defineProperties(PowerCreep.prototype, {

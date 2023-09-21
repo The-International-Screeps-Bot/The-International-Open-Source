@@ -1401,6 +1401,17 @@ declare global {
         moved?: string | 'moved' | 'wait'
 
         /**
+         * Whether the creep is going to be shoved, _shoved is the tick it will be shoved
+         */
+        _shoved: number
+        shoved: boolean
+
+        /**
+         * Whether the creep may be shoved
+         */
+        shoveable: boolean
+
+        /**
          * The creep's opts when trying to make a moveRequest intra tick
          */
         pathOpts: CustomPathFinderArgs
