@@ -16,10 +16,10 @@ class CreepOrganizer {
         }
 
         // Initial run after all creeps have been updated
-        for (const creepName in Game.creeps) {
+        // for (const creepName in Game.creeps) {
 
-            Game.creeps[creepName].initRun()
-        }
+        //     Game.creeps[creepName].initRun()
+        // }
     }
 
     private processCreep(creepName: string) {
