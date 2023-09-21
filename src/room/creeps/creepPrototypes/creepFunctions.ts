@@ -610,7 +610,7 @@ Creep.prototype.findNewRampartRepairTarget = function () {
         return (
             getRange(this.pos, structure.pos) +
             structure.nextHits -
-            (structure.damageReceived * 10 || 0) / 1000
+            (structure.damageReceived * 2 || 0) / 1000
         )
     })
 
