@@ -939,8 +939,10 @@ export class CommunePlanner {
                 }).length,
         )
 
+        // re-allow some building around the controller while respecting existing disallowed tiles
         for (const coord of findCoordsInRange(this.room.controller.pos, 2)) {
             const packedCoord = packAsNum(coord)
+            if (this.baseCoords[packedCoord] === 255) continue
             this.baseCoords[packedCoord] = this.terrainCoords[packedCoord]
         }
 
