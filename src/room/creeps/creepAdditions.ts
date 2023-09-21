@@ -281,9 +281,9 @@ Object.defineProperties(Creep.prototype, {
                 case 'sourceHarvester':
                 case 'mineralHarvester':
                 case 'remoteSourceHarvester':
-                    return true
-                default:
                     return false
+                default:
+                    return true
                     break
             }
         },
