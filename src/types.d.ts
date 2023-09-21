@@ -1678,6 +1678,13 @@ declare global {
         intended: boolean
     }
 
+    interface StructureRampart {
+        lastHitsAvg?: number
+        lastHits?: number
+        damageReceived?: number
+        updateDamageReceived(): void
+    }
+
     interface CustomStore extends StoreDefinition {
         parentID: Id<AnyStoreStructure>
     }

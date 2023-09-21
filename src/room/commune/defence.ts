@@ -32,6 +32,7 @@ import { RampartPlans } from 'room/construction/rampartPlans'
 export class DefenceManager {
     communeManager: CommuneManager
 
+    isExtraRepairingDefenses: boolean
     presentThreat: number
     threatByPlayers: Map<string, number>
 
@@ -42,12 +43,14 @@ export class DefenceManager {
     run() {
         if (!this.communeManager.room.roomManager.notMyCreeps.enemy.length) {
             this.considerRampartsPublic()
+            this.stopExtraRepairingDefenses()
             return
         }
 
         // There are at least enemy creeps
 
         this.makeRampartsPrivate()
+        this.considerExtraRepairingDefenses()
         this.advancedActivateSafeMode()
 
         if (!this.communeManager.room.roomManager.enemyAttackers.length) return
@@ -252,6 +255,26 @@ export class DefenceManager {
 
             rampart.setPublic(true)
             intents += 1
+        }
+    }
+
+    private stopExtraRepairingDefenses() {
+        if (this.isExtraRepairingDefenses) this.isExtraRepairingDefenses = false
+        const { room } = this.communeManager
+
+        for (const rampart of room.roomManager.structures.rampart) {
+            delete rampart.lastHits
+            delete rampart.lastHitsAvg
+            delete rampart.damageReceived
+        }
+    }
+
+    private considerExtraRepairingDefenses() {
+        if (!this.isExtraRepairingDefenses) this.isExtraRepairingDefenses = true
+        const { room } = this.communeManager
+
+        for (const rampart of room.roomManager.structures.rampart) {
+            rampart.updateDamageReceived()
         }
     }
 

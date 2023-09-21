@@ -607,7 +607,11 @@ Creep.prototype.findNewRampartRepairTarget = function () {
         if (structure.nextHits / structure.hitsMax > 0.9) return false
 
         // Score by range and hits
-        return getRange(this.pos, structure.pos) + structure.nextHits / 1000
+        return (
+            getRange(this.pos, structure.pos) +
+            structure.nextHits -
+            (structure.damageReceived * 10 || 0) / 1000
+        )
     })
 
     if (!bestTarget) return false
