@@ -1679,8 +1679,7 @@ declare global {
     }
 
     interface StructureRampart {
-        lastHitsAvg?: number
-        lastHits?: number
+        originalHits?: number
         damageReceived?: number
         updateDamageReceived(): void
     }

@@ -23,12 +23,9 @@ Object.defineProperties(Structure.prototype, {
 
 Object.defineProperties(StructureRampart.prototype, {
     updateDamageReceived: function () {
-        if (!this.lastHits) this.lastHits = this.hits
-        if (!this.lastHitsAvg) this.lastHitsAvg = this.hits
+        if (!this.originalHits) this.originalHits = this.hits
 
-        this.lastHitsAvg = this.lastHitsAvg * 0.9 + this.hits * 0.1
-
-        const change = this.lastHitsAvg - this.hits
+        const change = this.originalHits - this.hits
         this.damageReceived = change > 0 ? change : 0
     },
 } as PropertyDescriptorMap & ThisType<StructureRampart>)

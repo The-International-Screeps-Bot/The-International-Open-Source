@@ -263,8 +263,7 @@ export class DefenceManager {
         const { room } = this.communeManager
 
         for (const rampart of room.roomManager.structures.rampart) {
-            delete rampart.lastHits
-            delete rampart.lastHitsAvg
+            delete rampart.originalHits
             delete rampart.damageReceived
         }
     }
