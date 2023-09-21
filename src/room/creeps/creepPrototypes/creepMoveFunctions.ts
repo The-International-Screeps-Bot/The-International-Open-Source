@@ -519,7 +519,6 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         lowestScore = score
         shoveCoord = coord
         if (creepAtPos) creepAtPos.shoved = true
-        this.shoved = true
     })
 
     return shoveCoord
