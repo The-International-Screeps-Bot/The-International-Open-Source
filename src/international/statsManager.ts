@@ -12,7 +12,6 @@ function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
         case RoomStatNamesEnum.TotalCreepCount:
         case RoomStatNamesEnum.PowerCreepCount:
         case RoomStatNamesEnum.ControllerLevel:
-        case RoomStatNamesEnum.BatteriesStoredTimes10:
         case RoomStatNamesEnum.EnergyStored:
             if (roomStatsLevel >= 1) return 1.5
             else return 0
@@ -70,7 +69,6 @@ export class StatsManager {
             [RoomStatNamesEnum.TotalCreepCount]: 0,
             [RoomStatNamesEnum.PowerCreepCount]: 0,
             [RoomStatNamesEnum.ControllerLevel]: 0,
-            [RoomStatNamesEnum.BatteriesStoredTimes10]: 0,
             [RoomStatNamesEnum.EnergyStored]: 0,
             [RoomStatNamesEnum.GameTime]: 0,
         }
@@ -151,7 +149,7 @@ export class StatsManager {
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
             log('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
-                type: LogTypes.warning
+                type: LogTypes.warning,
             })
             return
         }
@@ -205,14 +203,11 @@ export class StatsManager {
                             : room.controller.level
                 }
                 globalCommuneStats[RoomStatNamesEnum.EnergyStored] =
-                    room.resourcesInStoringStructures.energy
-                globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
+                    room.resourcesInStoringStructures.energy +
                     room.resourcesInStoringStructures.battery * 10
             } else {
                 globalCommuneStats[RoomStatNamesEnum.EnergyStored] =
                     roomStats[RoomStatNamesEnum.EnergyStored]
-                globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
-                    roomStats[RoomStatNamesEnum.BatteriesStoredTimes10]
                 globalCommuneStats[RoomStatNamesEnum.ControllerLevel] =
                     roomStats[RoomStatNamesEnum.ControllerLevel]
             }
