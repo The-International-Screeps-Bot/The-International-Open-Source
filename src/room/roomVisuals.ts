@@ -767,7 +767,10 @@ export class RoomVisualsManager {
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
+            if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] !== undefined)
+                row.push(
+                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2),
+                )
             row.push(
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
                     '/' +
