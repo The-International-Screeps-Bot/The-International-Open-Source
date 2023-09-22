@@ -13,6 +13,7 @@ import {
     RoomTypes,
     Result,
     communeCreepRoles,
+    ReservedCoordTypes,
 } from 'international/constants'
 import { customFindPath } from 'international/customPathFinder'
 import { collectiveManager } from 'international/collective'
@@ -481,8 +482,14 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
             if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord])
                 score += 1
 
+            // If the coord is reserved, increase score porportional to importance of the reservation
+            const reservationType = this.room.roomManager.reservedCoords.get(packedCoord)
+            if (reservationType !== undefined) score += 1 + reservationType
+
             if (global.settings.roomVisuals)
                 this.room.visual.text(score.toString(), coord.x, coord.y)
+
+            // Preference for lower-scoring coords
             if (score >= lowestScore) return
         }
 

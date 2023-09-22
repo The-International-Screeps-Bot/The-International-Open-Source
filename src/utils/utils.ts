@@ -949,6 +949,5 @@ export function getMe() {
         return room.controller.owner.username
     }
 
-    // This should never happen
-    return 'username'
+    throw Error('Could not find me')
 }
