@@ -50,7 +50,7 @@ class TickInit {
         // global
 
         global.constructionSitesCount = Object.keys(Game.constructionSites).length
-        global.logs = ``
+        global.logs = ''
     }
 }
 
