@@ -113,6 +113,13 @@ export enum CreepRoomLogisticsRequestKeys {
     noReserve,
 }
 
+export enum RoomLogisticsRequestTypes {
+    transfer,
+    withdraw,
+    pickup,
+    offer,
+}
+
 export type SleepFor = 'any' | 'noMove'
 
 export enum CreepMemoryKeys {

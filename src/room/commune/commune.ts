@@ -47,6 +47,7 @@ import {
     rampartUpkeepCost,
     RemoteSourcePathTypes,
     Result,
+    ReservedCoordTypes,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -90,6 +91,7 @@ import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
 import { roomUtils } from 'room/roomUtils'
 import { LogTypes, log } from 'utils/logging'
+import { creepUtils } from 'room/creeps/creepUtils'
 
 export class CommuneManager {
     static communeManagers: { [roomName: string]: CommuneManager } = {}
@@ -366,10 +368,10 @@ export class CommuneManager {
     }
 
     private test() {
-/*         log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
+        log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
         for (const structure of this.spawningStructuresByNeed) {
             this.room.coordVisual(structure.pos.x, structure.pos.y)
-        } */
+        }
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -973,135 +975,115 @@ export class CommuneManager {
     get spawningStructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
 
-        let spawningStructuresByNeed: SpawningStructures = []
+        // mark coords in range 1 of reserved source harvest positions
+        // mark coords in range of valid fastFiller position
 
-        const stampAnchors = this.room.roomManager.stampAnchors
-        if (!stampAnchors) throw Error('No stampAnchors')
+        let ignoreCoords = new Set<string>()
 
         // source extensions
 
-        for (const coord of stampAnchors.sourceExtension) {
-            const structure = this.room.findStructureAtCoord<StructureExtension>(
-                coord,
-                structure => structure.structureType === STRUCTURE_EXTENSION,
-            )
-            if (!structure) continue
+        const packedHarvestPositions =
+            Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
+        for (const packedPositions of packedHarvestPositions) {
+            const pos = unpackPosAt(packedPositions, 0)
 
-            spawningStructuresByNeed.push(structure)
+            // Make sure the position is reserved (presumably by a harvester)
+
+            const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+            if (!reserveType) continue
+            if (reserveType < ReservedCoordTypes.dying) continue
+
+            forCoordsAroundRange(pos, 1, coord => {
+                const structure = this.room.findStructureAtCoord(coord, structure => {
+                    return structure.structureType === STRUCTURE_EXTENSION
+                })
+                if (!structure) return
+
+                ignoreCoords.add(packCoord(coord))
+            })
         }
 
-        // grid extensions (non fastFiller, non-source)
+        ignoreCoords = this.findFastFillerIgnoreCoords(ignoreCoords)
 
-        for (const coord of stampAnchors.gridExtension) {
-            const structure = this.room.findStructureAtCoord<StructureExtension>(
-                coord,
-                structure => structure.structureType === STRUCTURE_EXTENSION,
-            )
-            if (!structure) continue
-
-            spawningStructuresByNeed.push(structure)
-        }
-
-        // fastFiller extensions, general spawns
-
-        const spawningStructuresByNeedFastFiller = this.findSpawningStructuresByNeedFastFiller()
-        spawningStructuresByNeed = spawningStructuresByNeed.concat(
-            spawningStructuresByNeedFastFiller,
-        )
+        // Filter out structures that have ignored coords
+        const spawningStructuresByNeed = this.actionableSpawningStructures.filter(structure => {
+            return !ignoreCoords.has(packCoord(structure.pos))
+        })
 
         return (this._spawningStructuresByNeed = spawningStructuresByNeed)
     }
 
-    private findSpawningStructuresByNeedFastFiller() {
+    private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
         // if link with valid conditions, no fastFiller structures are added
         // If both containers, no fastFiller structures are added
         // If one contianer, mark coords that are fulfilled and only add structures not on marked coord
 
-        const anchor = this.room.roomManager.anchor
-        if (!anchor) throw Error('no anchor')
+        const fastFillerLink = this.room.roomManager.fastFillerLink
+        if (
+            fastFillerLink &&
+            fastFillerLink.RCLActionable &&
+            this.room.roomManager.hubLink &&
+            this.room.roomManager.hubLink.RCLActionable &&
+            this.storingStructures.length &&
+            this.room.myCreeps.hubHauler.length
+        ) {
+            const fastFillerPositions = this.room.roomManager.fastFillerPositions
+            for (const pos of fastFillerPositions) {
+                // Make sure the position is reserved (presumably by a fastFiller)
 
-        if (this.room.myCreeps.fastFiller.length) {
-            const fastFillerLink = this.room.roomManager.fastFillerLink
-            if (
-                fastFillerLink &&
-                fastFillerLink.RCLActionable &&
-                this.room.roomManager.hubLink &&
-                this.room.roomManager.hubLink.RCLActionable &&
-                this.storingStructures.length
-            ) {
-                // give spawns outside the fastFiller
-                return this.room.roomManager.structures.spawn.filter(
-                    structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
-                )
-            }
+                const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+                if (!reserveType) continue
+                if (reserveType < ReservedCoordTypes.dying) continue
 
-            const fastFillerContainers = this.room.roomManager.fastFillerContainers
-            if (fastFillerContainers.length === 2) {
-                // give spawns outside the fastFiller
-                return this.room.roomManager.structures.spawn.filter(
-                    structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
-                )
-            }
-
-            if (fastFillerContainers.length) {
-                let addedSpawningStructures: SpawningStructures = []
-
-                // Find and mark coords fulfilled by the container
-
-                const fulfilledStructureCoords = new Set<string>()
-
-                for (const container of fastFillerContainers) {
-                    if (!container) continue
-
-                    forCoordsAroundRange(fastFillerContainers[0].pos, 3, coord => {
-                        if (getRange(coord, anchor) > 2) return
-
-                        fulfilledStructureCoords.add(packCoord(coord))
-                    })
-                }
-
-                // Add structures that are not marked as fulfilled
-
-                forCoordsAroundRange(anchor, 2, coord => {
-                    if (fulfilledStructureCoords.has(packCoord(coord))) return
-
-                    const structure = this.room.findStructureAtCoord<
-                        StructureExtension | StructureSpawn
-                    >(
-                        coord,
-                        structure =>
-                            structure.structureType === STRUCTURE_EXTENSION ||
-                            structure.structureType === STRUCTURE_SPAWN,
-                    )
-                    if (!structure) return
-
-                    addedSpawningStructures.push(structure)
+                forCoordsAroundRange(pos, 1, coord => {
+                    ignoreCoords.add(packCoord(coord))
                 })
-
-                // Add spawns outside the fastFiller
-                addedSpawningStructures.concat(
-                    this.room.roomManager.structures.spawn.filter(
-                        structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
-                    ),
-                )
-
-                return addedSpawningStructures
             }
+
+            return ignoreCoords
         }
 
-        // There are no containers or links in the fastFiller
+        if (this.room.roomManager.fastFillerContainers.length) {
+            const fastFillerPositions = this.room.roomManager.fastFillerPositions
+            for (const pos of fastFillerPositions) {
+                // Make sure the position is reserved (presumably by a fastFiller)
 
-        const structures = this.room.roomManager.structures
+                const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+                if (!reserveType) continue
+                if (reserveType < ReservedCoordTypes.dying) continue
 
-        // Add spawning structures inside the fastFiller
-        let addedSpawningStructures: SpawningStructures = structures.extension.filter(
-            structure => structure.RCLActionable && getRange(structure.pos, anchor) <= 2,
-        )
-        addedSpawningStructures = addedSpawningStructures.concat(
-            structures.spawn.filter(structure => structure.RCLActionable),
-        )
+                // Only ignore coords if the fastFiller pos is in range of a container
 
-        return addedSpawningStructures
+                let hasContainer: boolean
+                const potentialIgnoreCoords = new Set<string>()
+
+                forCoordsAroundRange(pos, 1, coord => {
+                    const structure = this.room.findStructureAtCoord(coord, structure => {
+                        return structure.structureType === STRUCTURE_CONTAINER
+                    })
+                    if (structure) {
+                        hasContainer = true
+                        return
+                    }
+
+                    // There is potentially a spawning structure on this coord
+
+                    potentialIgnoreCoords.add(packCoord(coord))
+                })
+
+                if (!hasContainer) continue
+
+                for (const packedCoord of potentialIgnoreCoords) {
+                    ignoreCoords.add(packedCoord)
+                }
+            }
+
+            return ignoreCoords
+        }
+
+        // There are no valid links or containers in the fastFiller
+
+        return ignoreCoords
     }
 
     /**
