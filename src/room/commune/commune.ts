@@ -366,6 +366,10 @@ export class CommuneManager {
     }
 
     private test() {
+/*         log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
+        for (const structure of this.spawningStructuresByNeed) {
+            this.room.coordVisual(structure.pos.x, structure.pos.y)
+        } */
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -966,7 +970,7 @@ export class CommuneManager {
     }
 
     _spawningStructuresByNeed: SpawningStructures
-    get spawningstructuresByNeed() {
+    get spawningStructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
 
         let spawningStructuresByNeed: SpawningStructures = []
@@ -976,7 +980,6 @@ export class CommuneManager {
 
         // source extensions
 
-        stampAnchors.sourceExtension
         for (const coord of stampAnchors.sourceExtension) {
             const structure = this.room.findStructureAtCoord<StructureExtension>(
                 coord,
@@ -1002,7 +1005,9 @@ export class CommuneManager {
         // fastFiller extensions, general spawns
 
         const spawningStructuresByNeedFastFiller = this.findSpawningStructuresByNeedFastFiller()
-        spawningStructuresByNeed = spawningStructuresByNeed.concat(spawningStructuresByNeedFastFiller)
+        spawningStructuresByNeed = spawningStructuresByNeed.concat(
+            spawningStructuresByNeedFastFiller,
+        )
 
         return (this._spawningStructuresByNeed = spawningStructuresByNeed)
     }
@@ -1015,67 +1020,73 @@ export class CommuneManager {
         const anchor = this.room.roomManager.anchor
         if (!anchor) throw Error('no anchor')
 
-        const fastFillerLink = this.room.roomManager.fastFillerLink
-        if (
-            fastFillerLink &&
-            fastFillerLink.RCLActionable &&
-            this.room.roomManager.hubLink &&
-            this.room.roomManager.hubLink.RCLActionable &&
-            this.storingStructures.length
-        ) {
-            // give spawns outside the fastFiller
-            return this.room.roomManager.structures.spawn.filter(
-                structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
-            )
-        }
-
-        const fastFillerContainers = this.room.roomManager.fastFillerContainers
-        if (fastFillerContainers.length === 2) {
-            // give spawns outside the fastFiller
-            return this.room.roomManager.structures.spawn.filter(
-                structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
-            )
-        }
-
-        if (fastFillerContainers.length) {
-            let addedSpawningStructures: SpawningStructures = []
-
-            // Find and mark coords fulfilled by the container
-
-            const fulfilledStructureCoords = new Set<string>()
-
-            forCoordsAroundRange(fastFillerContainers[0].pos, 3, coord => {
-                if (getRange(coord, anchor) > 2) return
-
-                fulfilledStructureCoords.add(packCoord(coord))
-            })
-
-            // Add structures that are not marked as fulfilled
-
-            forCoordsAroundRange(anchor, 2, coord => {
-                if (fulfilledStructureCoords.has(packCoord(coord))) return
-
-                const structure = this.room.findStructureAtCoord<
-                    StructureExtension | StructureSpawn
-                >(
-                    coord,
-                    structure =>
-                        structure.structureType === STRUCTURE_EXTENSION ||
-                        structure.structureType === STRUCTURE_SPAWN,
-                )
-                if (!structure) return
-
-                addedSpawningStructures.push(structure)
-            })
-
-            // Add spawns outside the fastFiller
-            addedSpawningStructures.concat(
-                this.room.roomManager.structures.spawn.filter(
+        if (this.room.myCreeps.fastFiller.length) {
+            const fastFillerLink = this.room.roomManager.fastFillerLink
+            if (
+                fastFillerLink &&
+                fastFillerLink.RCLActionable &&
+                this.room.roomManager.hubLink &&
+                this.room.roomManager.hubLink.RCLActionable &&
+                this.storingStructures.length
+            ) {
+                // give spawns outside the fastFiller
+                return this.room.roomManager.structures.spawn.filter(
                     structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
-                ),
-            )
+                )
+            }
 
-            return addedSpawningStructures
+            const fastFillerContainers = this.room.roomManager.fastFillerContainers
+            if (fastFillerContainers.length === 2) {
+                // give spawns outside the fastFiller
+                return this.room.roomManager.structures.spawn.filter(
+                    structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
+                )
+            }
+
+            if (fastFillerContainers.length) {
+                let addedSpawningStructures: SpawningStructures = []
+
+                // Find and mark coords fulfilled by the container
+
+                const fulfilledStructureCoords = new Set<string>()
+
+                for (const container of fastFillerContainers) {
+                    if (!container) continue
+
+                    forCoordsAroundRange(fastFillerContainers[0].pos, 3, coord => {
+                        if (getRange(coord, anchor) > 2) return
+
+                        fulfilledStructureCoords.add(packCoord(coord))
+                    })
+                }
+
+                // Add structures that are not marked as fulfilled
+
+                forCoordsAroundRange(anchor, 2, coord => {
+                    if (fulfilledStructureCoords.has(packCoord(coord))) return
+
+                    const structure = this.room.findStructureAtCoord<
+                        StructureExtension | StructureSpawn
+                    >(
+                        coord,
+                        structure =>
+                            structure.structureType === STRUCTURE_EXTENSION ||
+                            structure.structureType === STRUCTURE_SPAWN,
+                    )
+                    if (!structure) return
+
+                    addedSpawningStructures.push(structure)
+                })
+
+                // Add spawns outside the fastFiller
+                addedSpawningStructures.concat(
+                    this.room.roomManager.structures.spawn.filter(
+                        structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
+                    ),
+                )
+
+                return addedSpawningStructures
+            }
         }
 
         // There are no containers or links in the fastFiller
@@ -1084,7 +1095,7 @@ export class CommuneManager {
 
         // Add spawning structures inside the fastFiller
         let addedSpawningStructures: SpawningStructures = structures.extension.filter(
-            structure => getRange(structure.pos, anchor) <= 2,
+            structure => structure.RCLActionable && getRange(structure.pos, anchor) <= 2,
         )
         addedSpawningStructures = addedSpawningStructures.concat(
             structures.spawn.filter(structure => structure.RCLActionable),

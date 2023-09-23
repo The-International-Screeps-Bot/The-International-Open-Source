@@ -67,7 +67,6 @@ export class SpawningStructuresManager {
     }
 
     public run() {
-
         // There are no spawns
         if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
@@ -644,7 +643,7 @@ export class SpawningStructuresManager {
     }
 
     createRoomLogisticsRequests() {
-        for (const structure of this.communeManager.spawningstructuresByNeed) {
+        for (const structure of this.communeManager.spawningStructuresByNeed) {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
                 type: 'transfer',
