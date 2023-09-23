@@ -52,7 +52,7 @@ export class RemoteHauler extends Creep {
     }
 
     initRun() {
-        if (randomTick() && !this.getActiveBodyparts(MOVE)) {
+        if (randomTick() && (!this.getActiveBodyparts(MOVE) || !this.getActiveBodyparts(CARRY))) {
             this.suicide()
             return
         }
