@@ -22,10 +22,19 @@ Object.defineProperties(Structure.prototype, {
 } as PropertyDescriptorMap & ThisType<Structure>)
 
 Object.defineProperties(StructureRampart.prototype, {
-    updateDamageReceived: function () {
-        if (!this.originalHits) this.originalHits = this.hits
+    damageReceived: {
+        get() {
+            if (this._damageReceived) return this._damageReceived
 
-        const change = this.originalHits - this.hits
-        this.damageReceived = change > 0 ? change : 0
+            let avgHits = 0
+            const rampartHits = Memory.rooms[this.room.name][RoomMemoryKeys.rampartHits]
+            if (rampartHits[this.id]) {
+                avgHits = this._damageReceived = rampartHits[this.id] - this.hits
+                if (avgHits > 0) avgHits = 0
+                else avgHits *= -1
+            }
+            this._damageReceived = avgHits
+            return avgHits
+        },
     },
 } as PropertyDescriptorMap & ThisType<StructureRampart>)

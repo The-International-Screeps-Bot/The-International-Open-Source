@@ -245,6 +245,7 @@ export enum RoomMemoryKeys {
     marketData,
     factoryProduct,
     factoryUsableResources,
+    rampartHits,
 
     // Remote
 

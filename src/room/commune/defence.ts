@@ -14,6 +14,7 @@ import { playerManager } from 'international/players'
 import { simpleAllies } from 'international/simpleAllies'
 import { updateStat } from 'international/statsManager'
 import {
+    average,
     findObjectWithID,
     findWeightedRangeFromExit,
     getRange,
@@ -262,18 +263,21 @@ export class DefenceManager {
         if (this.isExtraRepairingDefenses) this.isExtraRepairingDefenses = false
         const { room } = this.communeManager
 
-        for (const rampart of room.roomManager.structures.rampart) {
-            delete rampart.originalHits
-            delete rampart.damageReceived
-        }
+        delete Memory.rooms[room.name][RoomMemoryKeys.rampartHits]
     }
 
     private considerExtraRepairingDefenses() {
         if (!this.isExtraRepairingDefenses) this.isExtraRepairingDefenses = true
         const { room } = this.communeManager
-
+        const rampartHits = Memory.rooms[room.name][RoomMemoryKeys.rampartHits]
+        if (!rampartHits) {
+            Memory.rooms[room.name][RoomMemoryKeys.rampartHits] = {}
+        }
         for (const rampart of room.roomManager.structures.rampart) {
-            rampart.updateDamageReceived()
+            if (!rampartHits[rampart.id]) {
+                rampartHits[rampart.id] = rampart.hits
+            }
+            rampartHits[rampart.id] = average(rampartHits[rampart.id], rampart.hits, 1000)
         }
     }
 

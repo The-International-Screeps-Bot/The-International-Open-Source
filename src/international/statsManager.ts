@@ -1,5 +1,6 @@
 import { customColors, RoomMemoryKeys, RoomStatNamesEnum, RoomTypes } from './constants'
 import { log, LogTypes } from 'utils/logging'
+import { average, round } from 'utils/utils'
 
 function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
     const roomStatsLevel = global.settings.roomStats
@@ -151,7 +152,7 @@ export class StatsManager {
 
         if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
             log('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
-                type: LogTypes.warning
+                type: LogTypes.warning,
             })
             return
         }
@@ -238,11 +239,11 @@ export class StatsManager {
                 switch (statLevel) {
                     // level 1 w average
                     case 1:
-                        value = this.average(value, globalValue)
+                        value = average(value, globalValue)
                         break
                     // level 1 wo average
                     case 1.5:
-                        value = this.round(globalValue)
+                        value = round(globalValue)
                         break
                     // level 2 w average
                     case 2:
@@ -250,12 +251,12 @@ export class StatsManager {
                             forceUpdate ||
                             (global.settings.roomStats && global.settings.roomStats >= 2)
                         )
-                            value = this.average(value, globalValue)
+                            value = average(value, globalValue)
                         else value = 0
                         break
                     case 3:
                         if (forceUpdate) {
-                            value = this.average(value, globalValue)
+                            value = average(value, globalValue)
                         } else value = 0
                         break
                     default:
@@ -327,7 +328,7 @@ export class StatsManager {
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
             limit: Game.cpu.limit,
-            usage: this.average(Memory.stats.cpu.usage, Game.cpu.getUsed()),
+            usage: average(Memory.stats.cpu.usage, Game.cpu.getUsed()),
         }
         Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
         Memory.stats.heapUsage =
@@ -362,19 +363,6 @@ export class StatsManager {
             }
         })
         delete global.roomStats
-    }
-
-    round(value: number, decimals: number = 8) {
-        const multiplier = Math.pow(10, decimals || 0)
-        return Math.round(value * multiplier) / multiplier
-    }
-
-    average(avg: number, number: number, averagedOverTickCount: number = 1000, precision?: number) {
-        if (!avg) avg = 0
-        if (!number) number = 0
-        avg -= avg / averagedOverTickCount
-        avg += number / averagedOverTickCount
-        return this.round(avg, precision)
     }
 }
 

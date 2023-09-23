@@ -926,7 +926,7 @@ export function isAlly(playerName: string) {
 export function outOfBucket() {
     global.logs = ''
     log('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-        type: LogTypes.warning
+        type: LogTypes.warning,
     })
     console.log(
         global.settings.logging
@@ -951,4 +951,22 @@ export function getMe() {
 
     // This should never happen
     return 'username'
+}
+
+export function round(value: number, decimals: number = 8) {
+    const multiplier = Math.pow(10, decimals || 0)
+    return Math.round(value * multiplier) / multiplier
+}
+
+export function average(
+    avg: number,
+    number: number,
+    averagedOverTickCount: number = 1000,
+    precision?: number,
+) {
+    if (!avg) avg = 0
+    if (!number) number = 0
+    avg -= avg / averagedOverTickCount
+    avg += number / averagedOverTickCount
+    return round(avg, precision)
 }

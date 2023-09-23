@@ -1679,9 +1679,8 @@ declare global {
     }
 
     interface StructureRampart {
-        originalHits?: number
+        _damageReceived?: number
         damageReceived?: number
-        updateDamageReceived(): void
     }
 
     interface CustomStore extends StoreDefinition {
@@ -1849,6 +1848,7 @@ declare global {
             | RESOURCE_GHODIUM
             | RESOURCE_ENERGY
         )[]
+        [RoomMemoryKeys.rampartHits]?: StringMap<number>
 
         // Remote
 
