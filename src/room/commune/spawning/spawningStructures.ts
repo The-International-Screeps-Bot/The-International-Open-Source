@@ -67,7 +67,6 @@ export class SpawningStructuresManager {
     }
 
     public run() {
-        const { room } = this.communeManager
 
         // There are no spawns
         if (!this.communeManager.room.roomManager.structures.spawn.length) return

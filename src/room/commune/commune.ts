@@ -22,6 +22,7 @@ import {
     unpackNumAsCoord,
     findLowestScore,
     roundTo,
+    forCoordsAroundRange,
 } from 'utils/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -45,6 +46,7 @@ import {
     RoomTypes,
     rampartUpkeepCost,
     RemoteSourcePathTypes,
+    Result,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -90,7 +92,6 @@ import { roomUtils } from 'room/roomUtils'
 import { LogTypes, log } from 'utils/logging'
 
 export class CommuneManager {
-
     static communeManagers: { [roomName: string]: CommuneManager } = {}
 
     // Managers
@@ -926,13 +927,13 @@ export class CommuneManager {
         return (this._actionableSpawningStructures = actionableSpawningStructures)
     }
 
-    spawningStructuresByPriorityID: Id<StructureExtension | StructureSpawn>[]
+    spawningStructuresByPriorityIDs: Id<StructureExtension | StructureSpawn>[]
     _spawningStructuresByPriority: SpawningStructures
     get spawningStructuresByPriority() {
         if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
-        if (this.spawningStructuresByPriorityID && !this.room.roomManager.structureUpdate) {
-            return (this._spawningStructuresByPriority = this.spawningStructuresByPriorityID.map(
+        if (this.spawningStructuresByPriorityIDs && !this.room.roomManager.structureUpdate) {
+            return (this._spawningStructuresByPriority = this.spawningStructuresByPriorityIDs.map(
                 ID => findObjectWithID(ID),
             ))
         }
@@ -945,7 +946,7 @@ export class CommuneManager {
 
         for (const structure of this.actionableSpawningStructures) {
             if (roomUtils.isSourceSpawningStructure(this.room.name, structure)) {
-                this.actionableSpawningStructures.push(structure)
+                spawningStructuresByPriority.push(structure)
             }
 
             structuresToSort.push(structure)
@@ -955,7 +956,7 @@ export class CommuneManager {
             structuresToSort.sort((a, b) => getRange(a.pos, anchor) - getRange(b.pos, anchor)),
         )
 
-        this.spawningStructuresByPriorityID = spawningStructuresByPriority.map(
+        this.spawningStructuresByPriorityIDs = spawningStructuresByPriority.map(
             structure => structure.id,
         )
         return (this._spawningStructuresByPriority = spawningStructuresByPriority)
@@ -965,35 +966,128 @@ export class CommuneManager {
     get spawningstructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
 
+        let spawningStructuresByNeed: SpawningStructures = []
+
+        const stampAnchors = this.room.roomManager.stampAnchors
+        if (!stampAnchors) throw Error('No stampAnchors')
+
+        // source extensions
+
+        stampAnchors.sourceExtension
+        for (const coord of stampAnchors.sourceExtension) {
+            const structure = this.room.findStructureAtCoord<StructureExtension>(
+                coord,
+                structure => structure.structureType === STRUCTURE_EXTENSION,
+            )
+            if (!structure) continue
+
+            spawningStructuresByNeed.push(structure)
+        }
+
+        // grid extensions (non fastFiller, non-source)
+
+        for (const coord of stampAnchors.gridExtension) {
+            const structure = this.room.findStructureAtCoord<StructureExtension>(
+                coord,
+                structure => structure.structureType === STRUCTURE_EXTENSION,
+            )
+            if (!structure) continue
+
+            spawningStructuresByNeed.push(structure)
+        }
+
+        // fastFiller extensions, general spawns
+
+        const spawningStructuresByNeedFastFiller = this.findSpawningStructuresByNeedFastFiller()
+        spawningStructuresByNeed = spawningStructuresByNeed.concat(spawningStructuresByNeedFastFiller)
+
+        return (this._spawningStructuresByNeed = spawningStructuresByNeed)
+    }
+
+    private findSpawningStructuresByNeedFastFiller() {
+        // if link with valid conditions, no fastFiller structures are added
+        // If both containers, no fastFiller structures are added
+        // If one contianer, mark coords that are fulfilled and only add structures not on marked coord
+
         const anchor = this.room.roomManager.anchor
         if (!anchor) throw Error('no anchor')
 
-        let spawningStructuresByNeed = this.actionableSpawningStructures
-
-        const packedSourceHarvestPositions =
-            Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
-        for (const i in packedSourceHarvestPositions) {
-            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
-            spawningStructuresByNeed = spawningStructuresByNeed.filter(
-                structure => getRange(structure.pos, closestHarvestPos) > 1,
-            )
-        }
-
+        const fastFillerLink = this.room.roomManager.fastFillerLink
         if (
-            this.room.myCreeps.fastFiller.length &&
-            ((this.room.controller.level >= 6 &&
-                this.room.fastFillerLink &&
-                this.room.hubLink &&
-                (this.room.storage || this.room.terminal) &&
-                this.room.myCreeps.hubHauler.length) ||
-                (this.room.fastFillerContainerLeft && this.room.fastFillerContainerRight))
+            fastFillerLink &&
+            fastFillerLink.RCLActionable &&
+            this.room.roomManager.hubLink &&
+            this.room.roomManager.hubLink.RCLActionable &&
+            this.storingStructures.length
         ) {
-            spawningStructuresByNeed = spawningStructuresByNeed.filter(
-                structure => getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
+            // give spawns outside the fastFiller
+            return this.room.roomManager.structures.spawn.filter(
+                structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
             )
         }
 
-        return (this._spawningStructuresByNeed = spawningStructuresByNeed)
+        const fastFillerContainers = this.room.roomManager.fastFillerContainers
+        if (fastFillerContainers.length === 2) {
+            // give spawns outside the fastFiller
+            return this.room.roomManager.structures.spawn.filter(
+                structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
+            )
+        }
+
+        if (fastFillerContainers.length) {
+            let addedSpawningStructures: SpawningStructures = []
+
+            // Find and mark coords fulfilled by the container
+
+            const fulfilledStructureCoords = new Set<string>()
+
+            forCoordsAroundRange(fastFillerContainers[0].pos, 3, coord => {
+                if (getRange(coord, anchor) > 2) return
+
+                fulfilledStructureCoords.add(packCoord(coord))
+            })
+
+            // Add structures that are not marked as fulfilled
+
+            forCoordsAroundRange(anchor, 2, coord => {
+                if (fulfilledStructureCoords.has(packCoord(coord))) return
+
+                const structure = this.room.findStructureAtCoord<
+                    StructureExtension | StructureSpawn
+                >(
+                    coord,
+                    structure =>
+                        structure.structureType === STRUCTURE_EXTENSION ||
+                        structure.structureType === STRUCTURE_SPAWN,
+                )
+                if (!structure) return
+
+                addedSpawningStructures.push(structure)
+            })
+
+            // Add spawns outside the fastFiller
+            addedSpawningStructures.concat(
+                this.room.roomManager.structures.spawn.filter(
+                    structure => structure.RCLActionable && getRange(structure.pos, anchor) > 2,
+                ),
+            )
+
+            return addedSpawningStructures
+        }
+
+        // There are no containers or links in the fastFiller
+
+        const structures = this.room.roomManager.structures
+
+        // Add spawning structures inside the fastFiller
+        let addedSpawningStructures: SpawningStructures = structures.extension.filter(
+            structure => getRange(structure.pos, anchor) <= 2,
+        )
+        addedSpawningStructures = addedSpawningStructures.concat(
+            structures.spawn.filter(structure => structure.RCLActionable),
+        )
+
+        return addedSpawningStructures
     }
 
     /**
