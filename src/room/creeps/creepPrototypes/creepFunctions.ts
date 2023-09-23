@@ -54,6 +54,7 @@ import {
 import { creepClasses } from '../creepClasses'
 import { updateStat } from 'international/statsManager'
 import { customFindPath } from 'international/customPathFinder'
+import { creepUtils } from '../creepUtils'
 
 Creep.prototype.update = function () {}
 
@@ -498,7 +499,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
     // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-    const energySpentOnConstruction = Math.min(this.parts.work * BUILD_POWER)
+    const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(this, cSite, this.parts.work)
 
     this.nextStore.energy -= energySpentOnConstruction
 
@@ -571,11 +572,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
     if (buildResult === OK) {
         // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-        const energySpentOnConstruction = Math.min(
-            this.parts.work * BUILD_POWER,
-            (cSiteTarget.progressTotal - cSiteTarget.progress) * BUILD_POWER,
-            this.nextStore.energy,
-        )
+        const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(this, cSiteTarget, this.parts.work)
 
         this.nextStore.energy -= energySpentOnConstruction
 

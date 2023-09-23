@@ -157,4 +157,15 @@ export const creepUtils = {
 
         return Result.success
     },
+    findEnergySpentOnConstruction(creep: Creep, cSite: ConstructionSite, workParts: number) {
+
+        const energySpent = Math.min(
+            workParts * BUILD_POWER,
+            // In private servers sometimes progress can be greater than progress total
+            Math.max((cSite.progressTotal - cSite.progress) * BUILD_POWER, 0),
+            creep.nextStore.energy,
+        )
+
+        return energySpent
+    }
 }
