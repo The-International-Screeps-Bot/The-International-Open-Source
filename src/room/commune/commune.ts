@@ -895,12 +895,15 @@ export class CommuneManager {
         if (this._fastFillerSpawnEnergyCapacity && !this.room.roomManager.structureUpdate)
             return this._fastFillerSpawnEnergyCapacity
 
-        let fastFillerSpawnEnergyCapacity = 0
         const anchor = this.room.roomManager.anchor
         if (!anchor) throw Error('no anchor for fastFillerSpawnEnergyCapacity ' + this.room)
 
+        let fastFillerSpawnEnergyCapacity = 0
+
         for (const structure of this.actionableSpawningStructures) {
             if (!structure.RCLActionable) continue
+            // Outside of the fastFiller
+            if (getRange(structure.pos, anchor) > 2) continue
 
             fastFillerSpawnEnergyCapacity += structure.store.getCapacity(RESOURCE_ENERGY)
         }

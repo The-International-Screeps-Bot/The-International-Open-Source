@@ -264,7 +264,7 @@ export class SpawningStructuresManager {
     private constructSpawnRequests(args: SpawnRequestArgs) {
         if (!args) return
 
-        if (args.minCreeps) {
+        if (args.minCreeps !== undefined) {
             // We know how many creeps we want, do them seperately and uniformly
             this.spawnRequestIndividually(args)
             return
@@ -504,7 +504,7 @@ export class SpawningStructuresManager {
 
         // So long as there are totalExtraParts left to assign
 
-        //Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
+        // Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
         if (args.extraParts.length == 0) {
             log('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
                 type: LogTypes.error,
