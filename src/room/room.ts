@@ -1621,7 +1621,7 @@ export class RoomManager {
     fastFillerLinkID: Id<StructureLink>
     _fastFillerLink: StructureLink | false
     get fastFillerLink() {
-        if (!this._fastFillerLink !== undefined) return this._fastFillerLink
+        if (this._fastFillerLink !== undefined) return this._fastFillerLink
 
         if (this.fastFillerLinkID) {
             const fastFillerLink = findObjectWithID(this.fastFillerLinkID)
@@ -1636,7 +1636,7 @@ export class RoomManager {
             structure => structure.structureType === STRUCTURE_LINK,
         )
         if (!this._fastFillerLink) {
-            return this._fastFillerLink
+            return false
         }
 
         this.fastFillerLinkID = this._fastFillerLink.id
@@ -1646,7 +1646,7 @@ export class RoomManager {
     hubLinkId: Id<StructureLink>
     _hubLink: StructureLink | false
     get hubLink() {
-        if (!this._hubLink !== undefined) return this._hubLink
+        if (this._hubLink !== undefined) return this._hubLink
 
         if (this.hubLinkId) {
             const hubLink = findObjectWithID(this.hubLinkId)
@@ -1663,7 +1663,7 @@ export class RoomManager {
         )
 
         if (!this._hubLink) {
-            return this._hubLink
+            return false
         }
 
         this.hubLinkId = this._hubLink.id

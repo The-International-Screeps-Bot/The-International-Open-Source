@@ -368,6 +368,7 @@ export class CommuneManager {
     }
 
     private test() {
+        this.visualizeSpawningStructuresByNeed()
 
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
@@ -392,7 +393,6 @@ export class CommuneManager {
      * Debug
      */
     private visualizeSpawningStructuresByNeed() {
-
         log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
         for (const structure of this.spawningStructuresByNeed) {
             this.room.coordVisual(structure.pos.x, structure.pos.y)
@@ -1022,6 +1022,7 @@ export class CommuneManager {
     }
 
     private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
+
         const fastFillerLink = this.room.roomManager.fastFillerLink
         if (
             fastFillerLink &&
