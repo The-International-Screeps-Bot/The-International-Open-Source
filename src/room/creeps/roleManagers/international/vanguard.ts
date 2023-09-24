@@ -1,10 +1,27 @@
-import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'international/constants'
+import {
+    WorkRequestKeys,
+    CreepMemoryKeys,
+    Result,
+    RoomTypes,
+    ReservedCoordTypes,
+} from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class Vanguard extends Creep {
     constructor(creepID: Id<Creep>) {
         super(creepID)
+    }
+
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
+        }
     }
 
     initRun() {
