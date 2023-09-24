@@ -508,7 +508,7 @@ export class CollectiveManager extends Sleepable {
 
         for (const roomName of global.communes) {
             const room = Game.rooms[roomName]
-            const resources = room.resourcesInStoringStructures
+            const resources = room.roomManager.resourcesInStoringStructures
 
             for (const key in resources) {
                 const resource = key as unknown as ResourceConstant

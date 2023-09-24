@@ -27,7 +27,7 @@ import {
     randomTick,
 } from '../utils/utils'
 import { collectiveManager, CollectiveManager } from './collective'
-import { updateStat, statsManager } from './statsManager'
+import { statsManager } from './statsManager'
 import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'

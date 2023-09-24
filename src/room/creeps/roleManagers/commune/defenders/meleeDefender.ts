@@ -37,7 +37,7 @@ export class MeleeDefender extends Creep {
 
         room.attackingDefenderIDs.add(this.id)
 
-        for (const enemyCreep of this.room.unprotectedEnemyCreeps) {
+        for (const enemyCreep of this.room.roomManager.unprotectedEnemyCreeps) {
             const range = getRange(this.pos, enemyCreep.pos)
             if (range > 1) continue
 

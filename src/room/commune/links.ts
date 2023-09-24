@@ -112,7 +112,7 @@ export class LinkManager {
 
         if (
             this.communeManager.room.controller.ticksToDowngrade > 10000 &&
-            this.communeManager.room.resourcesInStoringStructures.energy <
+            this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
                 this.communeManager.storedEnergyUpgradeThreshold * 0.5
         )
             return

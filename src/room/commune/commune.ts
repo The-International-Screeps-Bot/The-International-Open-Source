@@ -368,10 +368,7 @@ export class CommuneManager {
     }
 
     private test() {
-        /* log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
-        for (const structure of this.spawningStructuresByNeed) {
-            this.room.coordVisual(structure.pos.x, structure.pos.y)
-        } */
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -389,6 +386,17 @@ export class CommuneManager {
         log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             type: LogTypes.info,
         })
+    }
+
+    /**
+     * Debug
+     */
+    private visualizeSpawningStructuresByNeed() {
+
+        log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
+        for (const structure of this.spawningStructuresByNeed) {
+            this.room.coordVisual(structure.pos.x, structure.pos.y)
+        }
     }
 
     deleteCombatRequest(requestName: string, index: number) {
@@ -570,10 +578,10 @@ export class CommuneManager {
         if (this._maxCombatRequests !== undefined) return this._maxCombatRequests
 
         /* return (this._maxCombatRequests =
-            (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
+            (this.room.roomManager.resourcesInStoringStructures.energy - this.minStoredEnergy) /
             (5000 + this.room.controller.level * 1000)) */
         return (this._maxCombatRequests =
-            this.room.resourcesInStoringStructures.energy /
+            this.room.roomManager.resourcesInStoringStructures.energy /
             (10000 + this.room.controller.level * 3000))
     }
 
@@ -1014,7 +1022,6 @@ export class CommuneManager {
     }
 
     private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
-
         const fastFillerLink = this.room.roomManager.fastFillerLink
         if (
             fastFillerLink &&

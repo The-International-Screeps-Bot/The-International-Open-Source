@@ -629,7 +629,8 @@ export class LabManager {
     private resourceAmount(resource: MineralConstant | MineralCompoundConstant): number {
         if (!resource) return 0
 
-        let amount = this.communeManager.room.resourcesInStoringStructures[resource] || 0
+        let amount =
+            this.communeManager.room.roomManager.resourcesInStoringStructures[resource] || 0
 
         for (const lab of this.communeManager.room.roomManager.structures.lab) {
             if (lab.mineralType !== resource) continue

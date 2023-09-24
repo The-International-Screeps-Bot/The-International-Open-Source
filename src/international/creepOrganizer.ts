@@ -3,7 +3,7 @@ import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
 import { log } from 'utils/logging'
 import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
-import { updateStat } from './statsManager'
+import { statsManager } from './statsManager'
 
 class CreepOrganizer {
     constructor() {}
@@ -17,7 +17,6 @@ class CreepOrganizer {
 
         // Initial run after all creeps have been updated
         for (const creepName in Game.creeps) {
-
             Game.creeps[creepName].initRun()
         }
     }
@@ -33,6 +32,8 @@ class CreepOrganizer {
             delete Memory.creeps[creepName]
             return
         }
+
+        Memory.stats.creeps += 1
 
         // Get the creep's role
 

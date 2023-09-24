@@ -21,7 +21,7 @@ import {
 } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 
 export class SpawnRequestsManager {
@@ -265,7 +265,9 @@ export class SpawnRequestsManager {
                 if (!this.communeManager.room.roomManager.structures.extractor.length) return false
                 if (!this.communeManager.room.mineralContainer) return false
                 if (!this.communeManager.room.storage) return false
-                if (this.communeManager.room.resourcesInStoringStructures.energy < 40000)
+                if (
+                    this.communeManager.room.roomManager.resourcesInStoringStructures.energy < 40000
+                )
                     return false
                 if (!this.communeManager.room.terminal) return false
                 if (this.communeManager.room.terminal.store.getFreeCapacity() <= 10000) return false
@@ -563,7 +565,7 @@ export class SpawnRequestsManager {
                     // For every x energy in storage, add 1 multiplier
 
                     partsMultiplier += Math.pow(
-                        this.communeManager.room.resourcesInStoringStructures.energy /
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy /
                             (16000 + this.communeManager.room.controller.level * 1000),
                         1.8,
                     )
@@ -641,13 +643,13 @@ export class SpawnRequestsManager {
                     // If the storage is sufficiently full, increase parts wanted porportionately
 
                     if (
-                        this.communeManager.room.resourcesInStoringStructures.energy <
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
                         this.communeManager.room.communeManager.storedEnergyBuildThreshold
                     )
                         return false
 
                     partsMultiplier += Math.pow(
-                        this.communeManager.room.resourcesInStoringStructures.energy /
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy /
                             (20000 + this.communeManager.room.controller.level * 1200),
                         2,
                     )
@@ -821,13 +823,13 @@ export class SpawnRequestsManager {
                     // If storing structures are sufficiently full, provide x amount per y energy in storage
 
                     if (
-                        this.communeManager.room.resourcesInStoringStructures.energy <
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
                         this.communeManager.room.communeManager.storedEnergyUpgradeThreshold
                     ) {
                         return false
                     }
                     partsMultiplier = Math.pow(
-                        (this.communeManager.room.resourcesInStoringStructures.energy -
+                        (this.communeManager.room.roomManager.resourcesInStoringStructures.energy -
                             this.communeManager.room.communeManager.storedEnergyUpgradeThreshold *
                                 0.5) /
                             (6000 + this.communeManager.room.controller.level * 2000),

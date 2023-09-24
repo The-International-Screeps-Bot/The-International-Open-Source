@@ -1,5 +1,5 @@
 import { PlayerMemoryKeys, customColors, towerPowers } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import {
     findHighestScore,
     findObjectWithID,
@@ -236,7 +236,7 @@ export class TowerManager {
             const tower = findObjectWithID(this.actionableTowerIDs[i])
             if (tower.repair(repairTarget) !== OK) continue
 
-            updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
+            statsManager.updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
             this.actionableTowerIDs.splice(i, 1)
         }
 

@@ -1,15 +1,17 @@
-import { CreepMemoryKeys, ReservedCoordTypes, Result, RoomMemoryKeys } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import {
+    CreepMemoryKeys,
+    ReservedCoordTypes,
+    Result,
+    RoomMemoryKeys,
+} from 'international/constants'
+import { statsManager } from 'international/statsManager'
 import { getRangeXY, getRange } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
-
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
         }
     }
@@ -61,7 +63,7 @@ export class MineralHarvester extends Creep {
             mineral.mineralAmount,
         )
         this.reserveStore[mineral.mineralType] += mineralsHarvested
-        updateStat(this.room.name, 'mh', mineralsHarvested)
+        statsManager.updateStat(this.room.name, 'mh', mineralsHarvested)
 
         this.message = `⛏️${mineralsHarvested}`
         return Result.success

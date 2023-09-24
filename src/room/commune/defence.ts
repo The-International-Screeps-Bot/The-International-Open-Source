@@ -12,7 +12,7 @@ import {
 } from 'international/constants'
 import { playerManager } from 'international/players'
 import { simpleAllies } from 'international/simpleAllies'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import {
     findObjectWithID,
     findWeightedRangeFromExit,
@@ -28,6 +28,7 @@ import { CommuneManager } from './commune'
 import { collectiveManager } from 'international/collective'
 import { roomUtils } from 'room/roomUtils'
 import { RampartPlans } from 'room/construction/rampartPlans'
+import { log, LogTypes } from 'utils/logging'
 
 export class DefenceManager {
     communeManager: CommuneManager
@@ -279,6 +280,8 @@ export class DefenceManager {
                     (creepB.hits + room.defenderEnemyTargetsWithDamage.get(b)) / creepB.hitsMax)
             )
         })
+
+        log('ENEMY TARGETS BY DAMAGE', defenderEnemyTargetsByDamage, { type: LogTypes.warning })
 
         // Attack enemies in order of most net damage members can heal
 

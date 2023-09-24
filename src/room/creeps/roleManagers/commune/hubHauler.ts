@@ -11,12 +11,9 @@ import { findObjectWithID, getRange, unpackNumAsPos } from 'utils/utils'
 //import { HubHauler } from '../../creepClasses'
 
 export class HubHauler extends Creep {
-
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
         }
     }
@@ -460,7 +457,8 @@ export class HubHauler extends Creep {
 
                 if (
                     resource === RESOURCE_ENERGY &&
-                    room.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy
+                    room.roomManager.resourcesInStoringStructures.energy <
+                        room.communeManager.minStoredEnergy
                 )
                     continue
 
@@ -479,7 +477,7 @@ export class HubHauler extends Creep {
         /*
         // If the ratio of stored batteries to energy is sufficiently high
         // 100 : 1
-        if (room.resourcesInStoringStructures.battery * 100 > room.resourcesInStoringStructures.energy) return false
+        if (room.roomManager.resourcesInStoringStructures.battery * 100 > room.roomManager.resourcesInStoringStructures.energy) return false
 
         // Find a provider
 

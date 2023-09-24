@@ -1,5 +1,13 @@
-import { CreepMemoryKeys, ReservedCoordTypes, Result, RoomMemoryKeys, creepRoles, packedCoordLength, packedPosLength } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import {
+    CreepMemoryKeys,
+    ReservedCoordTypes,
+    Result,
+    RoomMemoryKeys,
+    creepRoles,
+    packedCoordLength,
+    packedPosLength,
+} from 'international/constants'
+import { statsManager } from 'international/statsManager'
 import { getRange } from 'utils/utils'
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackPosAt } from 'other/codec'
@@ -32,16 +40,17 @@ export const creepUtils = {
         // Estimate the repair cost, assuming it goes through
         const energySpentOnRepair = Math.min(
             workParts,
-            (target.hitsMax - target.hits) / REPAIR_POWER,
+            // Sometimes hitsMax can be more than hits
+            Math.max((target.hitsMax - target.hits) / REPAIR_POWER, 0),
             creep.store.energy,
         )
 
         // Record the repair attempt in different places for barricades than other structures
         if (target.structureType === STRUCTURE_RAMPART || target.structureType === STRUCTURE_WALL) {
-            updateStat(creep.room.name, 'eorwr', energySpentOnRepair)
+            statsManager.updateStat(creep.room.name, 'eorwr', energySpentOnRepair)
             creep.message = `🧱${energySpentOnRepair * REPAIR_POWER}`
         } else {
-            updateStat(creep.room.name, 'eoro', energySpentOnRepair)
+            statsManager.updateStat(creep.room.name, 'eoro', energySpentOnRepair)
             creep.message = `🔧${energySpentOnRepair * REPAIR_POWER}`
         }
 
@@ -53,7 +62,7 @@ export const creepUtils = {
         if (creep.needsResources()) {
             if (
                 creep.room.communeManager.storingStructures.length &&
-                creep.room.resourcesInStoringStructures.energy < 3000
+                creep.room.roomManager.resourcesInStoringStructures.energy < 3000
             )
                 return Result.fail
 
@@ -158,7 +167,6 @@ export const creepUtils = {
         return Result.success
     },
     findEnergySpentOnConstruction(creep: Creep, cSite: ConstructionSite, workParts: number) {
-
         const energySpent = Math.min(
             workParts * BUILD_POWER,
             // In private servers sometimes progress can be greater than progress total
@@ -167,5 +175,5 @@ export const creepUtils = {
         )
 
         return energySpent
-    }
+    },
 }

@@ -540,7 +540,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     threat = 0
 
-    const energy = this.resourcesInStoringStructures.energy
+    const energy = this.roomManager.resourcesInStoringStructures.energy
 
     roomMemory[RoomMemoryKeys.energy] = energy
     threat += Math.pow(energy, 0.5)

@@ -210,7 +210,7 @@ export class RoomManager {
         }
 
         const roomType = roomMemory[RoomMemoryKeys.type]
-        if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType)) {
+        if (roomTypesUsedForStats.includes(roomType)) {
             statsManager.roomPreTick(room.name, roomType)
         }
 

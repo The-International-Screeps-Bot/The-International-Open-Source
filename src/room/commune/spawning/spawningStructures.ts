@@ -6,7 +6,7 @@ import {
     partsByPriorityPartType,
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { LogTypes, log } from 'utils/logging'
 import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
@@ -167,12 +167,25 @@ export class SpawningStructuresManager {
         // Spawn the creep for real
 
         request.extraOpts.directions = this.findDirections(spawn.pos)
-        spawnFunctions.advancedSpawn(spawn, request, ID)
+        const result = spawnFunctions.advancedSpawn(spawn, request, ID)
+        if (result !== OK) {
+
+            log(
+                'Failed to spawn: spawning failed',
+                `error: ${result}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
+                {
+                    type: LogTypes.error,
+                    position: 3,
+                },
+            )
+
+            return false
+        }
 
         // Record in stats the costs
 
         this.communeManager.nextSpawnEnergyAvailable -= request.cost
-        updateStat(this.communeManager.room.name, 'eosp', request.cost)
+        statsManager.updateStat(this.communeManager.room.name, 'eosp', request.cost)
 
         // Record spawn usage and check if there is another spawn
         this.spawnIndex -= 1

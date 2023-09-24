@@ -9,7 +9,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { log } from 'utils/logging'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
@@ -632,7 +632,7 @@ export class RoomVisualsManager {
 
         const data: any[][] = [
             [
-                this.roomManager.room.resourcesInStoringStructures.energy || 0,
+                this.roomManager.room.roomManager.resourcesInStoringStructures.energy || 0,
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
                 roomMemory[RoomMemoryKeys.threatened].toFixed(2),

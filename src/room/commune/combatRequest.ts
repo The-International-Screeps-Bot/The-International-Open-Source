@@ -2,7 +2,7 @@ import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/c
 import { advancedFindDistance } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 
 export class CombatRequestManager {
     communeManager: CommuneManager

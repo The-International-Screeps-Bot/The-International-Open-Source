@@ -1,11 +1,12 @@
 import { log } from 'utils/logging'
 import { findLargestTransactionAmount, getAvgPrice } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 
 export const marketUtils = {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
-        const mySpecificOrders = collectiveManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
+        const mySpecificOrders =
+            collectiveManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
@@ -26,7 +27,7 @@ export const marketUtils = {
                 room.name,
             )
             if (result === OK && resourceType === 'energy') {
-                updateStat(room.name, 'eos', amount)
+                statsManager.updateStat(room.name, 'eos', amount)
             }
 
             return result == OK
@@ -52,13 +53,14 @@ export const marketUtils = {
             totalAmount: amount,
         })
         if (result === OK && resourceType === 'energy') {
-            updateStat(room.name, 'eos', amount)
+            statsManager.updateStat(room.name, 'eos', amount)
         }
 
         return result == OK
     },
     advancedBuy(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
-        const mySpecificOrders = collectiveManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
+        const mySpecificOrders =
+            collectiveManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
@@ -80,7 +82,7 @@ export const marketUtils = {
                 room.name,
             )
             if (result === OK && resourceType === 'energy') {
-                updateStat(room.name, 'eib', amount)
+                statsManager.updateStat(room.name, 'eib', amount)
             }
             return result == OK
         }
@@ -104,7 +106,7 @@ export const marketUtils = {
             totalAmount: amount,
         })
         if (result === OK && resourceType === 'energy') {
-            updateStat(room.name, 'eib', amount)
+            statsManager.updateStat(room.name, 'eib', amount)
         }
         return result == OK
     },

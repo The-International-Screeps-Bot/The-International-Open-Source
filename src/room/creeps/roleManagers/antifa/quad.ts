@@ -599,7 +599,7 @@ export class Quad {
         const enemyTargetsWithDamage: Map<Id<Creep>, number> = new Map()
         const enemyTargetsWithAntifa: Map<Id<Creep>, Id<Antifa>[]> = new Map()
 
-        for (const enemyCreep of this.leader.room.unprotectedEnemyCreeps) {
+        for (const enemyCreep of this.leader.room.roomManager.unprotectedEnemyCreeps) {
             const memberIDsInRange: Id<Antifa>[] = []
 
             let netDamage = -1 * enemyCreep.combatStrength.heal

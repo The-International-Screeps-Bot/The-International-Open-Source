@@ -1,5 +1,5 @@
 import { customColors, powerCreepClassNames } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { log } from 'utils/logging'
 import { RoomManager } from 'room/room'
 import { Operator } from './powerCreeps/operator'

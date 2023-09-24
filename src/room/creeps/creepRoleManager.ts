@@ -4,7 +4,7 @@ import './creepPrototypes/creepMoveFunctions'
 import { creepRoles, customColors } from 'international/constants'
 import { log } from 'utils/logging'
 import { RoomManager } from 'room/room'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { creepClasses } from './creepClasses'
 
 export class CreepRoleManager {

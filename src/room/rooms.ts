@@ -14,7 +14,7 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import './roomVisuals'
 import { createPosMap } from 'utils/utils'
-import { updateStat, statsManager } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
@@ -68,8 +68,7 @@ class RoomsManager {
                     position: 2,
                 },
             )
-            if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType))
-                statsManager.roomEndTick(room.name, roomType)
+
         }
     }
 }

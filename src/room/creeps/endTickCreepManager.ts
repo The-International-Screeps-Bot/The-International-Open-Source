@@ -7,7 +7,7 @@ import {
     friendlyDieChants,
     powerCreepClassNames,
 } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { log } from 'utils/logging'
 import { forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'
 import { RoomManager } from '../room'
@@ -28,8 +28,7 @@ export class EndTickCreepManager {
             Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune &&
             room.communeManager.spawningStructuresManager.activeSpawns
         ) {
-            for (const spawn of room.communeManager.spawningStructuresManager
-                .activeSpawns) {
+            for (const spawn of room.communeManager.spawningStructuresManager.activeSpawns) {
                 const creep = Game.creeps[spawn.spawning.name]
 
                 if (!creep.moveRequest) continue

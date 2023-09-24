@@ -662,17 +662,24 @@ declare global {
         }
 
         memory: {
+            /**
+             * percentage of Memory used
+             */
             usage: number
             limit: number
         }
 
+        /**
+         * Percentage of heap used
+         */
         heapUsage: number
         gcl: ControllerLevel
 
         gpl: ControllerLevel
         rooms: { [roomName: string]: Partial<RoomCommuneStats> }
-        constructionSiteCount: number
+        constructionSites: number
         CPUUsers: CpuUsers
+        creeps: number
     }
 
     type StatsRoomTypes = RoomTypes.commune | RoomTypes.remote
@@ -1178,9 +1185,6 @@ declare global {
 
         _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
         readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
-
-        _unprotectedEnemyCreeps: Creep[]
-        readonly unprotectedEnemyCreeps: Creep[]
 
         _exitCoords: Set<string>
         readonly exitCoords: Set<string>
@@ -2030,11 +2034,6 @@ declare global {
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: {
-                [roomType in StatsRoomTypes]: {
-                    [roomName: string]: Partial<RoomStats | RoomCommuneStats>
-                }
-            }
 
             lastReset: number
 

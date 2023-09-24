@@ -2,11 +2,7 @@ import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'inter
 import { log } from 'utils/logging'
 import { findLargestTransactionAmount, newID, roundTo } from 'utils/utils'
 import './marketFunctions'
-import {
-    simpleAllies,
-    AllyRequestTypes,
-    ResourceRequest,
-} from 'international/simpleAllies'
+import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/simpleAllies'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from 'room/commune/commune'
 import { marketUtils } from './marketFunctions'
@@ -64,7 +60,7 @@ export class TerminalManager {
             // We have enough
 
             const storedResourceAmount =
-                this.communeManager.room.resourcesInStoringStructures[resource] || 0
+                this.communeManager.room.roomManager.resourcesInStoringStructures[resource] || 0
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)
@@ -87,7 +83,7 @@ export class TerminalManager {
 
     private findBestTerminalRequest(): [TerminalRequest, string, number] {
         const budget = Math.min(
-            this.communeManager.room.resourcesInStoringStructures.energy -
+            this.communeManager.room.roomManager.resourcesInStoringStructures.energy -
                 this.communeManager.minStoredEnergy,
             this.communeManager.room.terminal.store[RESOURCE_ENERGY],
         )
@@ -110,8 +106,9 @@ export class TerminalManager {
                 budget,
                 Math.min(
                     request.amount,
-                    this.communeManager.room.resourcesInStoringStructures[request.resource] -
-                        terminalResourceTargets[request.resource]?.min(this.communeManager) || 0,
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        request.resource
+                    ] - terminalResourceTargets[request.resource]?.min(this.communeManager) || 0,
                 ),
                 this.communeManager.room.name,
                 request.roomName,
@@ -136,7 +133,7 @@ export class TerminalManager {
         // We don't have enough energy to help other rooms
 
         if (
-            this.communeManager.room.resourcesInStoringStructures.energy <
+            this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
             this.communeManager.minStoredEnergy
         )
             return false
@@ -157,7 +154,7 @@ export class TerminalManager {
 
     private findBestAllyRequest(): [ResourceRequest, string, number] {
         const budget = Math.min(
-            this.communeManager.room.resourcesInStoringStructures.energy -
+            this.communeManager.room.roomManager.resourcesInStoringStructures.energy -
                 this.communeManager.minStoredEnergy,
             this.communeManager.room.terminal.store[RESOURCE_ENERGY],
         )
@@ -180,8 +177,9 @@ export class TerminalManager {
                 budget,
                 Math.min(
                     request.amount,
-                    this.communeManager.room.resourcesInStoringStructures[request.resourceType] -
-                        terminalResourceTargets[request.resourceType]?.min(this.communeManager) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        request.resourceType
+                    ] - terminalResourceTargets[request.resourceType]?.min(this.communeManager) ||
                         0,
                 ),
                 this.communeManager.room.name,
@@ -211,7 +209,7 @@ export class TerminalManager {
         // We don't have enough energy to help other rooms
 
         if (
-            this.communeManager.room.resourcesInStoringStructures.energy <
+            this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
             this.communeManager.minStoredEnergy
         )
             return false
@@ -252,7 +250,8 @@ export class TerminalManager {
 
                 min *= 1.2
 
-                if (marketUtils.advancedBuy(room, resource, min - terminal.store[resource], min)) return
+                if (marketUtils.advancedBuy(room, resource, min - terminal.store[resource], min))
+                    return
                 continue
             }
 
@@ -266,7 +265,8 @@ export class TerminalManager {
 
             // Try to sell the excess amount
 
-            if (marketUtils.advancedSell(room, resource, terminal.store[resource] - max, max)) return
+            if (marketUtils.advancedSell(room, resource, terminal.store[resource] - max, max))
+                return
         }
     }
 }

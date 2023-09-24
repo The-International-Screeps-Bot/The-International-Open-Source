@@ -6,7 +6,7 @@ import {
     RoomMemoryKeys,
     WorkTypes,
 } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import {
     findCoordsInsideRect,
     findObjectWithID,
@@ -246,7 +246,7 @@ export class SourceHarvester extends Creep {
             )
 
             // Add repair points to total repairPoints counter and say the success
-            updateStat(this.room.name, 'eoro', energySpentOnRepairs)
+            statsManager.updateStat(this.room.name, 'eoro', energySpentOnRepairs)
             this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
 
             // Inform success

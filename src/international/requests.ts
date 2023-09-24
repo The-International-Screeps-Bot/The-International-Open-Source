@@ -254,7 +254,7 @@ class RequestsManager {
                 if (!room.storage) continue
 
                 if (
-                    room.resourcesInStoringStructures.energy /
+                    room.roomManager.resourcesInStoringStructures.energy /
                         (20000 + room.controller.level * 1000) <
                     room.memory[RoomMemoryKeys.haulRequests].length
                 )
