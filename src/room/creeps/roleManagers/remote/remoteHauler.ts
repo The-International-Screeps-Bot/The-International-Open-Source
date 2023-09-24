@@ -283,6 +283,61 @@ export class RemoteHauler extends Creep {
             return true
         }
 
+        if (this.room.name !== this.commune.name) {
+            // Fulfill requests near the hauler
+
+            this.runRoomLogisticsRequestsAdvanced({
+                types: new Set(['pickup', 'withdraw']),
+                resourceTypes: new Set([RESOURCE_ENERGY]),
+                conditions: request => {
+                    // If the target is near the creep
+
+                    const targetPos = findObjectWithID(request.targetID).pos
+                    return getRange(targetPos, this.pos) <= 1
+                },
+            })
+
+            if (!this.needsResources()) return true
+
+            // We have enough resources, return home
+
+            delete this.moved
+
+            this.message += this.commune.name
+
+            const anchor = this.commune.roomManager.anchor
+            if (!anchor) throw Error('No anchor for remoteHauler ' + this.room.name)
+
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: anchor,
+                            range: 3,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.keeper]: Infinity,
+                        [RoomTypes.enemyRemote]: Infinity,
+                        [RoomTypes.allyRemote]: Infinity,
+                    },
+                },
+                {
+                    packedPath:
+                        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
+                            RoomMemoryKeys.remoteSourceFastFillerPaths
+                        ][creepMemory[CreepMemoryKeys.sourceIndex]],
+                    remoteName: creepMemory[CreepMemoryKeys.remote],
+                },
+            )
+
+            return true
+        }
+
         // We aren't in the remote, go to the source
 
         const sourceHarvestPos = unpackPosAt(
@@ -375,7 +430,7 @@ export class RemoteHauler extends Creep {
                 ] += freeNextStoreDifference
             }
 
-            if (!this.needsResources()) return true
+            return !this.needsResources()
         }
 
         // Fulfill requests near the hauler

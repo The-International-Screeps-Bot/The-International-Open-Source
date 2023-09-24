@@ -107,22 +107,22 @@ export class StatsManager {
                 ) / spawns.length
         }
 
+        if (room.controller && room.controller.my) {
+            const progressPercentage = room.controller.progress / room.controller.progressTotal
+            roomStats.cl =
+                progressPercentage < 1
+                    ? room.controller.level + progressPercentage
+                    : room.controller.level
+        }
+
         if (each250Ticks || forceUpdate) {
-            if (room.controller && room.controller.my) {
-                const progressPercentage = room.controller.progress / room.controller.progressTotal
-                roomStats.cl =
-                    progressPercentage < 1
-                        ? room.controller.level + progressPercentage
-                        : room.controller.level
-            }
+
             roomStats[RoomStatNamesEnum.EnergyStored] =
                 room.roomManager.resourcesInStoringStructures.energy +
                 room.roomManager.resourcesInStoringStructures.battery * 10
         } else {
             roomStats[RoomStatNamesEnum.EnergyStored] =
                 interTickRoomStats[RoomStatNamesEnum.EnergyStored]
-            roomStats[RoomStatNamesEnum.ControllerLevel] =
-                interTickRoomStats[RoomStatNamesEnum.ControllerLevel]
         }
 
         // delete legacy stat key value pairs
@@ -253,7 +253,7 @@ export class StatsManager {
         this.stats = undefined
     }
 
-    average(
+    private average(
         avg: number,
         number: number,
         averagedOverTickCount: number = 1000,
