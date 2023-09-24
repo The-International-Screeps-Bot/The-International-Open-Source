@@ -1,6 +1,7 @@
 import { roundTo } from 'utils/utils'
 import { customColors, RoomMemoryKeys, RoomStatNamesEnum, RoomTypes } from './constants'
 import { log, LogTypes } from 'utils/logging'
+import { collectiveManager } from './collective'
 
 const remoteStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
     RoomStatNamesEnum.EnergyStored,
@@ -17,9 +18,9 @@ export class StatsManager {
     }
 
     private roomConfig(roomName: string, roomType: number) {
-        let roomStats = undefined
+
         if (roomType === RoomTypes.commune) {
-            roomStats = {
+            const roomStats = this.stats[RoomTypes.commune][roomName] = {
                 [RoomStatNamesEnum.SpawnUsagePercentage]: 0,
                 [RoomStatNamesEnum.EnergyInputHarvest]: 0,
                 [RoomStatNamesEnum.CreepCount]: 0,
@@ -43,29 +44,30 @@ export class StatsManager {
                 [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
             }
 
-            this.stats[RoomTypes.commune][roomName] = roomStats
-            if (!Memory.stats.rooms[roomName]) Memory.stats.rooms[roomName] = roomStats
+            if (Memory.stats.rooms[roomName]) return
+
+            Memory.stats.rooms[roomName] = roomStats
             return
         }
 
-        roomStats = {
+        this.stats[RoomTypes.remote][roomName] = {
             [RoomStatNamesEnum.RemoteEnergyStored]: 0,
             [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
             [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
             [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
         }
-
-        this.stats[RoomTypes.remote][roomName] = roomStats
     }
 
     roomPreTick(roomName: string, roomType: number) {
         this.roomConfig(roomName, roomType)
     }
 
-    private roomCommuneFinalEndTick(roomName: string, room: Room, forceUpdate: boolean = false) {
+    private roomCommuneFinalEndTick(roomName: string, forceUpdate: boolean = false) {
+
+        const room = Game.rooms[roomName]
         const roomMemory = Memory.rooms[roomName]
         const roomStats = Memory.stats.rooms[roomName]
-        const globalCommuneStats = this.stats[RoomTypes.commune][roomName] as RoomCommuneStats
+        const intraTickRoomStats = Memory.stats.rooms[roomName]
 
         const each250Ticks = Game.time % 250 === 0
 
@@ -74,27 +76,27 @@ export class StatsManager {
             const remoteRoomStats = this.stats[RoomTypes.remote][remoteRoomName]
             if (!remoteRoomStats) continue
 
-            globalCommuneStats[RoomStatNamesEnum.RemoteCount] += 1
-            globalCommuneStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] +=
+            intraTickRoomStats[RoomStatNamesEnum.RemoteCount] += 1
+            intraTickRoomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] +=
                 remoteRoomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest]
-            globalCommuneStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther] +=
+            intraTickRoomStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther] +=
                 remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther]
-            globalCommuneStats[RoomStatNamesEnum.RemoteEnergyOutputBuild] +=
+            intraTickRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild] +=
                 remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild]
 
             if (each250Ticks) {
-                globalCommuneStats[RoomStatNamesEnum.RemoteEnergyStored] +=
+                intraTickRoomStats[RoomStatNamesEnum.RemoteEnergyStored] +=
                     Game.rooms[remoteRoomName]?.roomManager.resourcesInStoringStructures.energy || 0
             }
         }
 
-        globalCommuneStats[RoomStatNamesEnum.CreepCount] = room.myCreepsAmount
-        globalCommuneStats[RoomStatNamesEnum.TotalCreepCount] = room.creepsFromRoomAmount
-        globalCommuneStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
+        intraTickRoomStats[RoomStatNamesEnum.CreepCount] = room.myCreepsAmount
+        intraTickRoomStats[RoomStatNamesEnum.TotalCreepCount] = room.creepsFromRoomAmount
+        intraTickRoomStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
 
         const spawns = room.roomManager.structures.spawn
         if (spawns.length > 0) {
-            globalCommuneStats.su =
+            intraTickRoomStats.su =
                 spawns.reduce(
                     (sum, spawn) =>
                         sum +
@@ -110,34 +112,34 @@ export class StatsManager {
         if (each250Ticks || forceUpdate) {
             if (room.controller && room.controller.my) {
                 const progressPercentage = room.controller.progress / room.controller.progressTotal
-                globalCommuneStats.cl =
+                intraTickRoomStats.cl =
                     progressPercentage < 1
                         ? room.controller.level + progressPercentage
                         : room.controller.level
             }
-            globalCommuneStats[RoomStatNamesEnum.EnergyStored] =
+            intraTickRoomStats[RoomStatNamesEnum.EnergyStored] =
                 room.roomManager.resourcesInStoringStructures.energy +
                 room.roomManager.resourcesInStoringStructures.battery * 10
         } else {
-            globalCommuneStats[RoomStatNamesEnum.EnergyStored] =
+            intraTickRoomStats[RoomStatNamesEnum.EnergyStored] =
                 roomStats[RoomStatNamesEnum.EnergyStored]
-            globalCommuneStats[RoomStatNamesEnum.ControllerLevel] =
+            intraTickRoomStats[RoomStatNamesEnum.ControllerLevel] =
                 roomStats[RoomStatNamesEnum.ControllerLevel]
         }
 
-        const activeGlobalStatNames = Object.keys(globalCommuneStats) as (keyof RoomCommuneStats)[]
+        const activeGlobalStatNames = Object.keys(intraTickRoomStats) as (keyof RoomCommuneStats)[]
         const activeStatNames = Object.keys(roomStats) as (keyof RoomCommuneStats)[]
         const nonActiveStats = activeStatNames.filter(
             stat => !activeGlobalStatNames.includes(stat),
         ) as (keyof RoomCommuneStats)[]
 
         nonActiveStats.forEach(name => {
-            delete globalCommuneStats[name]
+            delete intraTickRoomStats[name]
             delete roomStats[name]
         })
 
         for (const name of activeGlobalStatNames) {
-            let globalValue = globalCommuneStats[name] || 0
+            let globalValue = intraTickRoomStats[name] || 0
             let value = roomStats[name] || 0
 
             if (forceUpdate) {
@@ -239,9 +241,15 @@ export class StatsManager {
         // Run communes one last time to update stats
 
         for (const roomName in this.stats[RoomTypes.commune]) {
-            this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
-        }
 
+            if (!global.communes.has(roomName)) {
+
+                Memory.stats.rooms[roomName] = undefined
+            }
+
+            this.roomCommuneFinalEndTick(roomName)
+        }
+/*
         // Delete data for rooms that exist in memory but not in our stats
 
         for (const roomName in Memory.stats.rooms) {
@@ -249,8 +257,8 @@ export class StatsManager {
 
             Memory.stats.rooms[roomName] = undefined
         }
-
-        delete this.stats
+ */
+        this.stats = undefined
     }
 
     average(

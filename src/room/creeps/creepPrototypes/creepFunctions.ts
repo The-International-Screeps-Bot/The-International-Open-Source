@@ -211,24 +211,25 @@ Creep.prototype.advancedHarvestSource = function (source) {
 Creep.prototype.findUpgradePos = function () {
     const { room } = this
 
-    if (this.memory[CreepMemoryKeys.packedCoord])
+    const creepMemory = Memory.creeps[this.name]
+    if (creepMemory[CreepMemoryKeys.packedCoord]) {
+
         return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
+    }
 
     // Loop through each upgradePositions
 
     for (const pos of room.roomManager.upgradePositions) {
-        // Construct the packedPos using pos
 
         const packedCoord = packCoord(pos)
 
         // Iterate if the pos is used
-
-        if (this.room.roomManager.reservedCoords.get(packedCoord) !== ReservedCoordTypes.important)
+        if (this.room.roomManager.reservedCoords.get(packedCoord) > ReservedCoordTypes.dying)
             continue
 
         // Otherwise record packedPos in the creep's memory and in usedUpgradeCoords
 
-        this.memory[CreepMemoryKeys.packedCoord] = packedCoord
+        creepMemory[CreepMemoryKeys.packedCoord] = packedCoord
         this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return pos
@@ -256,12 +257,14 @@ Creep.prototype.advancedUpgradeController = function () {
 
     if (controllerStructure) {
         // If we're not on a viable upgrade pos
+
+        const upgradePos = this.room.roomManager.upgradePositions.find(
+            pos =>
+                arePositionsEqual(this.pos, pos) &&
+                this.room.roomManager.reservedCoords.has(packCoord(pos)) === undefined,
+        )
         if (
-            !this.room.roomManager.upgradePositions.find(
-                pos =>
-                    arePositionsEqual(this.pos, pos) &&
-                    !this.room.roomManager.reservedCoords.has(packCoord(pos)),
-            )
+            !upgradePos
         ) {
             const upgradePos = this.findUpgradePos()
             if (!upgradePos) return false
@@ -282,6 +285,7 @@ Creep.prototype.advancedUpgradeController = function () {
                 this.message += '➡️'
             }
         }
+
 
         this.actionCoord = room.roomManager.centerUpgradePos
 
@@ -912,16 +916,18 @@ Creep.prototype.needsResources = function () {
     const creepMemory = Memory.creeps[this.name]
 
     // If the creep is empty
-    if (this.usedNextStore <= 0) return (creepMemory[CreepMemoryKeys.needsResources] = true)
-    // Otherwise if the creep is full
-    else if (this.freeNextStore <= 0) {
-        delete creepMemory[CreepMemoryKeys.needsResources]
-        return false
-    } else {
-        // Otherwise keep it the same
-
-        return creepMemory[CreepMemoryKeys.needsResources]
+    if (this.usedNextStore <= 0) {
+        return (creepMemory[CreepMemoryKeys.needsResources] = true)
     }
+
+    // Otherwise if the creep is full
+    if (this.freeNextStore <= 0) {
+        creepMemory[CreepMemoryKeys.needsResources] = undefined
+        return false
+    }
+
+    // Otherwise keep it the same
+    return creepMemory[CreepMemoryKeys.needsResources]
 }
 
 Creep.prototype.hasNonEnergyResource = function () {

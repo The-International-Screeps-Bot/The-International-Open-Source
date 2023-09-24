@@ -368,7 +368,7 @@ export class CommuneManager {
     }
 
     private test() {
-        this.visualizeSpawningStructuresByNeed()
+        
 
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 

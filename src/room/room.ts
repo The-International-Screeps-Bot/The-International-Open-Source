@@ -297,7 +297,9 @@ export class RoomManager {
         this.roomVisualsManager.run()
     }
 
-    private test() {}
+    private test() {
+        this.visualizeReservedCoords()
+    }
 
     /**
      * Debug
