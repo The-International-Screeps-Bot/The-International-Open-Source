@@ -810,7 +810,6 @@ export class SpawnRequestsManager {
                     return false
 
                 let partsMultiplier = 1
-                let maxCreeps = this.communeManager.room.roomManager.upgradePositions.length - 1
 
                 // Storing structures logic
 
@@ -894,6 +893,12 @@ export class SpawnRequestsManager {
                             },
                         }
                     }
+
+                    const controllerLink = this.communeManager.controllerLink
+                    const maxCreeps =
+                        controllerLink && controllerLink.RCLActionable
+                            ? this.communeManager.room.roomManager.upgradePositions.length
+                            : this.communeManager.room.roomManager.upgradePositions.length - 1
 
                     if (this.spawnEnergyCapacity >= 1400) {
                         partsMultiplier = Math.round(partsMultiplier / 12)

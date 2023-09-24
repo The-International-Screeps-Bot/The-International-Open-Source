@@ -747,8 +747,8 @@ export class RoomManager {
         positions.push(positions.shift())
 
         // Make the center pos the first to be chosen (we want upgraders to stand on the container)
-
-        positions.unshift(centerUpgradePos)
+        const controllerLink = this.room.communeManager.controllerLink
+        if (!controllerLink || !controllerLink.RCLActionable) positions.unshift(centerUpgradePos)
 
         return (this._upgradePositions = positions)
     }
