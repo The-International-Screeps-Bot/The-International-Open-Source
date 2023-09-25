@@ -1186,6 +1186,9 @@ declare global {
         _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
         readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
 
+        _unprotectedEnemyCreeps: Creep[]
+        readonly unprotectedEnemyCreeps: Creep[]
+
         _exitCoords: Set<string>
         readonly exitCoords: Set<string>
 
