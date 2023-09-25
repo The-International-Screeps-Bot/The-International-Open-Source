@@ -1,5 +1,11 @@
 import { roundTo } from 'utils/utils'
-import { customColors, RoomMemoryKeys, RoomStatNamesEnum, RoomTypes } from './constants'
+import {
+    CPUMaxPerTick,
+    customColors,
+    RoomMemoryKeys,
+    RoomStatNamesEnum,
+    RoomTypes,
+} from './constants'
 import { log, LogTypes } from 'utils/logging'
 import { collectiveManager } from './collective'
 
@@ -25,7 +31,6 @@ const averageStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
     RoomStatNamesEnum.EnergyOutputRepairWallOrRampart,
     RoomStatNamesEnum.EnergyOutputSpawn,
     RoomStatNamesEnum.EnergyOutputPower,
-    RoomStatNamesEnum.RemoteCount,
     RoomStatNamesEnum.RemoteEnergyStored,
     RoomStatNamesEnum.RemoteEnergyInputHarvest,
     RoomStatNamesEnum.RemoteEnergyOutputRepairOther,
@@ -105,8 +110,7 @@ export class StatsManager {
                 remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild]
 
             if (each250Ticks) {
-                roomStats[RoomStatNamesEnum.RemoteEnergyStored] +=
-                    Game.rooms[remoteRoomName]?.roomManager.resourcesInStoringStructures.energy || 0
+                roomStats[RoomStatNamesEnum.RemoteEnergyStored] += 0
             }
         }
 
@@ -116,17 +120,15 @@ export class StatsManager {
 
         const spawns = room.roomManager.structures.spawn
         if (spawns.length > 0) {
-            roomStats.su =
-                spawns.reduce(
-                    (sum, spawn) =>
-                        sum +
-                        ((spawn.spawning && spawn.spawning.remainingTime) ||
-                        spawn.renewed ||
-                        !spawn.RCLActionable
-                            ? 1
-                            : 0),
-                    0,
-                ) / spawns.length
+            let spawningSpawnsCount = 0
+
+            for (const spawn of spawns) {
+                if (!spawn.spawning && !spawn.renewed) continue
+
+                spawningSpawnsCount += 1
+            }
+
+            roomStats[RoomStatNamesEnum.SpawnUsagePercentage] = spawningSpawnsCount / spawns.length
         }
 
         if (room.controller && room.controller.my) {
@@ -137,14 +139,19 @@ export class StatsManager {
                     : room.controller.level
         }
 
-        if (each250Ticks || forceUpdate) {
+/*         if (each250Ticks || forceUpdate) {
+            const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
             roomStats[RoomStatNamesEnum.EnergyStored] =
-                room.roomManager.resourcesInStoringStructures.energy +
-                room.roomManager.resourcesInStoringStructures.battery * 10
+                (resourcesInStoringStructures.energy || 0) +
+                (resourcesInStoringStructures.battery || 0) * 10
         } else {
-            interTickRoomStats[RoomStatNamesEnum.EnergyStored] =
-                roomStats[RoomStatNamesEnum.EnergyStored]
-        }
+            roomStats[RoomStatNamesEnum.EnergyStored] =
+                interTickRoomStats[RoomStatNamesEnum.EnergyStored]
+        } */
+        const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
+            roomStats[RoomStatNamesEnum.EnergyStored] =
+                (resourcesInStoringStructures.energy || 0) +
+                (resourcesInStoringStructures.battery || 0) * 10
 
         // delete legacy stat key value pairs
 
@@ -157,12 +164,18 @@ export class StatsManager {
 
         // implement average tick stats into inter tick stats
 
-        for (const key of averageStatNames) {
+        for (const key in roomStats) {
             const statName = key as keyof RoomCommuneStats
-            let globalValue = roomStats[statName] || 0
-            let value = interTickRoomStats[statName] || 0
 
-            interTickRoomStats[statName] = this.average(value, globalValue)
+            if (averageStatNames.has(statName)) {
+                let globalValue = roomStats[statName] || 0
+                let value = interTickRoomStats[statName] || 0
+
+                interTickRoomStats[statName] = this.average(value, globalValue)
+                continue
+            }
+
+            interTickRoomStats[statName] = roomStats[statName]
         }
     }
     internationalConfig() {
@@ -218,7 +231,6 @@ export class StatsManager {
         Memory.stats.lastReset = global.lastReset
         Memory.stats.tickLength = timestamp - Memory.stats.lastTickTimestamp
         Memory.stats.lastTickTimestamp = timestamp
-        Memory.stats.lastTick = Game.time
         Memory.stats.constructionSites = collectiveManager.constructionSiteCount || 0
 
         Memory.stats.resources = {
@@ -227,14 +239,10 @@ export class StatsManager {
             accessKeys: Game.resources[ACCESS_KEY],
             credits: Game.market.credits,
         }
-        Memory.stats.cpu = {
-            bucket: Game.cpu.bucket,
-            limit: Game.cpu.limit,
-            usage: this.average(Memory.stats.cpu.usage, Game.cpu.getUsed()),
-        }
+
         Memory.stats.memory.usage = roundTo(
-            Memory.stats.memory.limit / Math.floor(RawMemory.get().length),
-            2,
+            Math.floor(RawMemory.get().length / 1000) / Memory.stats.memory.limit,
+            8,
         )
 
         const heapStatistics = Game.cpu.getHeapStatistics()
@@ -254,6 +262,21 @@ export class StatsManager {
         }
         Memory.stats.creeps = collectiveManager.creepCount
         Memory.stats.powerCreeps = collectiveManager.powerCreepCount
+
+        // If the code wasn't ran or was properly ran last tick, assign cpu as normal. Otherwise assume we ran out of cpu
+        let usedCPU =
+            Memory.stats.lastTick === undefined || Memory.stats.lastTick + 1 === Game.time
+                ? Game.cpu.getUsed()
+                : CPUMaxPerTick
+
+        Memory.stats.cpu = {
+            bucket: Game.cpu.bucket,
+            limit: Game.cpu.limit,
+            usage: this.average(Memory.stats.cpu.usage, usedCPU),
+        }
+
+        // Make sure this runs last
+        Memory.stats.lastTick = Game.time
 
         // Run communes one last time to update stats
 

@@ -68,7 +68,6 @@ export class CollectiveManager extends Sleepable {
      * A string to console log as rich text
      */
     logs = ''
-    creepChant = 0
     /**
      * Room names that have controllers we own
      */
@@ -92,6 +91,7 @@ export class CollectiveManager extends Sleepable {
             this.mineralCommunes[mineralType] = 0
         }
         this.myCommands = []
+        this.logs = ''
         this.creepCount = 0
         this.powerCreepCount = 0
         this.communes = new Set()
