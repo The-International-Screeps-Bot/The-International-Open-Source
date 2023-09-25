@@ -207,7 +207,6 @@ export class StatsManager {
     }
 
     tickInit() {
-        Memory.stats.creeps = 0
         this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
     }
 
@@ -252,6 +251,7 @@ export class StatsManager {
             progressTotal: Game.gpl.progressTotal,
             level: Game.gpl.level,
         }
+        Memory.stats.creeps = Object.keys(Game.creeps).length
 
         // Run communes one last time to update stats
 
