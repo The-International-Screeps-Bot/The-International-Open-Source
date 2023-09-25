@@ -224,7 +224,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     if (
         roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-        !global.communes.has(roomMemory[RoomMemoryKeys.commune])
+        !collectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
     )
         roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 

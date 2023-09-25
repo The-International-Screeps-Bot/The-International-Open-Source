@@ -142,8 +142,8 @@ export class StatsManager {
                 room.roomManager.resourcesInStoringStructures.energy +
                 room.roomManager.resourcesInStoringStructures.battery * 10
         } else {
-            roomStats[RoomStatNamesEnum.EnergyStored] =
-                interTickRoomStats[RoomStatNamesEnum.EnergyStored]
+            interTickRoomStats[RoomStatNamesEnum.EnergyStored] =
+                roomStats[RoomStatNamesEnum.EnergyStored]
         }
 
         // delete legacy stat key value pairs
@@ -155,7 +155,7 @@ export class StatsManager {
             roomStats[statName] = undefined
         }
 
-        // integrate average tick stats into inter tick stats
+        // implement average tick stats into inter tick stats
 
         for (const key of averageStatNames) {
             const statName = key as keyof RoomCommuneStats
@@ -200,6 +200,7 @@ export class StatsManager {
             rooms: {},
             constructionSites: 0,
             creeps: 0,
+            powerCreeps: 0,
         }
 
         this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
@@ -218,7 +219,7 @@ export class StatsManager {
         Memory.stats.tickLength = timestamp - Memory.stats.lastTickTimestamp
         Memory.stats.lastTickTimestamp = timestamp
         Memory.stats.lastTick = Game.time
-        Memory.stats.constructionSites = global.constructionSitesCount || 0
+        Memory.stats.constructionSites = collectiveManager.constructionSiteCount || 0
 
         Memory.stats.resources = {
             pixels: Game.resources[PIXEL],
@@ -232,7 +233,7 @@ export class StatsManager {
             usage: this.average(Memory.stats.cpu.usage, Game.cpu.getUsed()),
         }
         Memory.stats.memory.usage = roundTo(
-            Memory.stats.memory.limit / Math.floor(RawMemory.get().length / 1000),
+            Memory.stats.memory.limit / Math.floor(RawMemory.get().length),
             2,
         )
 
@@ -251,12 +252,13 @@ export class StatsManager {
             progressTotal: Game.gpl.progressTotal,
             level: Game.gpl.level,
         }
-        Memory.stats.creeps = Object.keys(Game.creeps).length
+        Memory.stats.creeps = collectiveManager.creepCount
+        Memory.stats.powerCreeps = collectiveManager.powerCreepCount
 
         // Run communes one last time to update stats
 
         for (const roomName in this.stats[RoomTypes.commune]) {
-            if (!global.communes.has(roomName)) {
+            if (!collectiveManager.communes.has(roomName)) {
                 Memory.stats.rooms[roomName] = undefined
             }
 

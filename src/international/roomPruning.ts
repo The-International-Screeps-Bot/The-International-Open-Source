@@ -1,6 +1,7 @@
 import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
 import { findLowestScore, randomIntRange } from '../utils/utils'
 import { Sleepable } from 'utils/Sleepable'
+import { collectiveManager } from './collective'
 
 class RoomPruningManager extends Sleepable {
     sleepFor = randomIntRange(50000, 100000)
@@ -14,7 +15,7 @@ class RoomPruningManager extends Sleepable {
         let highestCommuneScore = 0
         let highestCommuneScoreCommuneName: string
 
-        for (const roomName of global.communes) {
+        for (const roomName of collectiveManager.communes) {
             const room = Game.rooms[roomName]
             if (room.controller.level < maxControllerLevel) return
 

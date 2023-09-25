@@ -199,7 +199,7 @@ export class RoomVisualsManager {
     private dataVisuals() {
         if (!global.settings.dataVisuals) return
 
-        if (!global.communes.has(this.roomManager.room.name)) return
+        if (!collectiveManager.communes.has(this.roomManager.room.name)) return
 
         this.remoteDataVisuals(this.statDataVisuals(this.generalDataVisuals(1)))
     }
@@ -299,7 +299,7 @@ export class RoomVisualsManager {
             totalSpawn = roomStats.su
         }
 
-        totalSpawn = totalSpawn / global.communes.size
+        totalSpawn = totalSpawn / collectiveManager.communes.size
 
         data[0].push(
             totalEstimatedIncome,

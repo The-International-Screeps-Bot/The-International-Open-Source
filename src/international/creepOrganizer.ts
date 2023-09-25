@@ -33,6 +33,8 @@ class CreepOrganizer {
             return
         }
 
+        collectiveManager.creepCount += 1
+
         // Get the creep's role
 
         const { role } = creep

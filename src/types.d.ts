@@ -680,6 +680,7 @@ declare global {
         constructionSites: number
         CPUUsers: CpuUsers
         creeps: number
+        powerCreeps: number
     }
 
     type StatsRoomTypes = RoomTypes.commune | RoomTypes.remote
@@ -2021,26 +2022,11 @@ declare global {
              */
             constructed: true | undefined
 
-            /**
-             * A strings to custom log as rich text
-             */
-            logs: string
-
-            /**
-             * The number of construction sites placed by the bot
-             */
-            constructionSitesCount: number
-
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
 
             lastReset: number
-
-            /**
-             * Room names that have controllers we own
-             */
-            communes: Set<string>
 
             // Command functions
 

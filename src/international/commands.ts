@@ -1,3 +1,4 @@
+import { collectiveManager } from './collective'
 import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
@@ -73,9 +74,9 @@ global.removeCSites = function (removeInProgress, types?) {
 
 global.destroyStructures = function (roomName, types?) {
     if (!roomName) {
-        if (global.communes.size > 1) return 'Provide a room name'
+        if (collectiveManager.communes.size > 1) return 'Provide a room name'
 
-        roomName = Array.from(global.communes)[0]
+        roomName = Array.from(collectiveManager.communes)[0]
     }
 
     // Get the room with the roomName
@@ -114,7 +115,7 @@ global.destroyCommuneStructures = function (types?) {
     let log = ``
     let destroyedStructureCount: number
 
-    for (const roomName of global.communes) {
+    for (const roomName of collectiveManager.communes) {
         // Get the room with the roomName
 
         const room = Game.rooms[roomName]
@@ -260,9 +261,9 @@ global.deleteCombatRequest = function (requestName) {
 
 global.deleteBasePlans = function (roomName) {
     if (!roomName) {
-        if (global.communes.size > 1) return 'Provide a room name'
+        if (collectiveManager.communes.size > 1) return 'Provide a room name'
 
-        roomName = Array.from(global.communes)[0]
+        roomName = Array.from(collectiveManager.communes)[0]
     }
 
     const room = Game.rooms[roomName]

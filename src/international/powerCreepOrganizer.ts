@@ -35,6 +35,8 @@ class PowerCreepOrganizer {
             return
         }
 
+        collectiveManager.powerCreepCount
+
         // Get the creep's role
 
         const { className } = creep

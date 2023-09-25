@@ -1,6 +1,7 @@
 import { customColors } from 'international/constants'
 import { LogTypes, log } from 'utils/logging'
 import { findCPUColor, findCPUOf } from 'utils/utils'
+import { collectiveManager } from './collective'
 
 /**
  * Handles logging, stat recording, and more at the end of the tick
@@ -34,7 +35,7 @@ class EndTickManager {
 
         // Log the accumilated global logs
 
-        console.log(global.logs)
+        console.log(collectiveManager.logs)
     }
 }
 

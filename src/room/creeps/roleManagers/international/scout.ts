@@ -124,7 +124,7 @@ export class Scout extends Creep {
         // Make sure the room has a commune
 
         if (room.memory[RoomMemoryKeys.commune]) {
-            if (!global.communes.has(room.memory[RoomMemoryKeys.commune])) {
+            if (!collectiveManager.communes.has(room.memory[RoomMemoryKeys.commune])) {
                 room.memory[RoomMemoryKeys.commune] = findClosestCommuneName(room.name)
             }
         } else {

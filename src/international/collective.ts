@@ -61,12 +61,23 @@ export class CollectiveManager extends Sleepable {
      * Terrain binaries of wall or not wall for rooms
      */
     terrainBinaries: { [roomName: string]: Uint8Array } = {}
+    constructionSiteCount = 0
+    creepCount: number
+    powerCreepCount: number
+    /**
+     * A string to console log as rich text
+     */
+    logs = ''
+    creepChant = 0
+    /**
+     * Room names that have controllers we own
+     */
+    communes: Set<string>
 
     /**
      * Updates values to be present for this tick
      */
     update() {
-        delete this.safemodedCommuneName
         this.creepsByCombatRequest = {}
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
@@ -81,20 +92,28 @@ export class CollectiveManager extends Sleepable {
             this.mineralCommunes[mineralType] = 0
         }
         this.myCommands = []
+        this.creepCount = 0
+        this.powerCreepCount = 0
+        this.communes = new Set()
 
-        delete this._myOrders
-        delete this._orders
-        delete this._myOrdersCount
-        delete this._workRequestsByScore
-        delete this._defaultMinCacheAmount
-        delete this.internationalDataVisuals
+        // delete
+
+        this.safemodedCommuneName = undefined
+        this._myOrders = undefined
+        this._orders = undefined
+        this._myOrdersCount = undefined
+        this._workRequestsByScore = undefined
+        this._defaultMinCacheAmount = undefined
+        this.internationalDataVisuals = undefined
 
         if (this.isSleepingResponsive()) return
 
-        delete this._funnelOrder
-        delete this._minCredits
-        delete this._resourcesInStoringStructures
-        delete this._maxCSitesPerRoom
+        // delete
+
+        this._funnelOrder = undefined
+        this._minCredits = undefined
+        this._resourcesInStoringStructures = undefined
+        this._maxCSitesPerRoom = undefined
     }
 
     newCustomCreepID() {
@@ -273,7 +292,7 @@ export class CollectiveManager extends Sleepable {
     get minCredits() {
         if (this._minCredits !== undefined) return this._minCredits
 
-        return (this._minCredits = global.communes.size * 10000)
+        return (this._minCredits = collectiveManager.communes.size * 10000)
     }
 
     /**
@@ -470,7 +489,7 @@ export class CollectiveManager extends Sleepable {
         const communesByLevel: { [level: string]: [string, number][] } = {}
         for (let i = 6; i < 8; i++) communesByLevel[i] = []
 
-        for (const roomName of global.communes) {
+        for (const roomName of collectiveManager.communes) {
             const room = Game.rooms[roomName]
             if (!room.terminal) continue
 
@@ -502,7 +521,7 @@ export class CollectiveManager extends Sleepable {
 
         this._resourcesInStoringStructures = {}
 
-        for (const roomName of global.communes) {
+        for (const roomName of collectiveManager.communes) {
             const room = Game.rooms[roomName]
             const resources = room.roomManager.resourcesInStoringStructures
 
@@ -525,7 +544,7 @@ export class CollectiveManager extends Sleepable {
     get maxCSitesPerRoom() {
         if (this._maxCSitesPerRoom) return this._maxCSitesPerRoom
 
-        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / global.communes.size, 20), 3)
+        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / collectiveManager.communes.size, 20), 3)
     }
 }
 

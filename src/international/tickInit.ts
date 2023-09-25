@@ -36,9 +36,6 @@ import { roomUtils } from 'room/roomUtils'
 
 class TickInit {
     configGeneral() {
-        // General
-
-        global.communes = new Set()
 
         // Chant logic
 
@@ -46,11 +43,6 @@ class TickInit {
             if (Memory.chantIndex >= chant.length - 1) Memory.chantIndex = 0
             else Memory.chantIndex += 1
         }
-
-        // global
-
-        global.constructionSitesCount = Object.keys(Game.constructionSites).length
-        global.logs = ''
     }
 }
 

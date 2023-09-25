@@ -97,7 +97,6 @@ export interface NotMyConstructionSites {
 }
 
 export class RoomManager {
-
     static roomManagers: { [roomName: string]: RoomManager } = {}
 
     // sub managers
@@ -297,9 +296,7 @@ export class RoomManager {
         this.roomVisualsManager.run()
     }
 
-    private test() {
-
-    }
+    private test() {}
 
     /**
      * Debug
@@ -505,10 +502,10 @@ export class RoomManager {
 
     isStartRoom() {
         return (
-            global.communes.size === 1 &&
+            collectiveManager.communes.size === 1 &&
             this.room.controller.my &&
             this.room.controller.safeMode &&
-            global.communes.has(this.room.name)
+            collectiveManager.communes.has(this.room.name)
         )
     }
 
@@ -2415,9 +2412,7 @@ export class RoomManager {
     }
 
     visualizePosHavers(posHavers: { pos: Coord }[]) {
-
         for (const structure of posHavers) {
-
             this.room.coordVisual(structure.pos.x, structure.pos.y)
         }
     }

@@ -532,7 +532,7 @@ export function findLargestTransactionAmount(
 export function findClosestCommuneName(roomName: string) {
     const communesNotThis = []
 
-    for (const communeName of global.communes) {
+    for (const communeName of collectiveManager.communes) {
         if (roomName == communeName) continue
 
         communesNotThis.push(communeName)
@@ -546,7 +546,7 @@ export function findClosestCommuneName(roomName: string) {
 }
 
 export function findClosestClaimType(roomName: string) {
-    return Array.from(global.communes).sort(
+    return Array.from(collectiveManager.communes).sort(
         (a, b) =>
             Game.map.getRoomLinearDistance(roomName, a) -
             Game.map.getRoomLinearDistance(roomName, b),
@@ -924,13 +924,13 @@ export function isAlly(playerName: string) {
 }
 
 export function outOfBucket() {
-    global.logs = ''
+    collectiveManager.logs = ''
     log('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-        type: LogTypes.warning
+        type: LogTypes.warning,
     })
     console.log(
         global.settings.logging
-            ? global.logs
+            ? collectiveManager.logs
             : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
     )
 }

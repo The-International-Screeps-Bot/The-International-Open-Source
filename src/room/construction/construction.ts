@@ -57,31 +57,38 @@ export class ConstructionManager extends Sleepable {
         this.place()
         this.migrate()
     }
-    private place() {
-        // If there are builders and enough cSites, stop
+    private shouldPlace() {
+        // If the construction site count is at its limit, stop
+        if (collectiveManager.constructionSiteCount >= MAX_CONSTRUCTION_SITES) return false
 
+        // If there are builders and enough cSites, stop
         if (this.room.myCreeps.builder.length) {
-            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return false
+
+            return true
         }
-        // If there are no builders, just run every few ticks
-        else if (this.room.controller.level !== 1 && this.isSleeping()) return
+
+        // If there are no builders
+
+        // Only run every so often
+        else if (this.room.controller.level !== 1 && this.isSleeping()) return false
         this.sleepWhenDone()
 
-        // If the construction site count is at its limit, stop
-
-        if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
-
-        // If there are enough construction sites
-
+        // If there are too many construction sites
         if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= collectiveManager.maxCSitesPerRoom)
-            return
+            return false
+
+        return true
+    }
+    private place() {
+        if (!this.shouldPlace()) return
 
         this.placedSites = 0
 
         const RCL = this.room.controller.level
         const maxCSites = Math.min(
             collectiveManager.maxCSitesPerRoom,
-            MAX_CONSTRUCTION_SITES - global.constructionSitesCount,
+            MAX_CONSTRUCTION_SITES - collectiveManager.constructionSiteCount,
         )
 
         this.placeRamparts(RCL, maxCSites)
