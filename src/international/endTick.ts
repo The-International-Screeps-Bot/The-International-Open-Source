@@ -15,7 +15,7 @@ class EndTickManager {
         for (let i = 0; i < interval; i += 1) console.log()
 
         log('General data', '⬇️')
-        log('Creeps total', Object.values(Game.creeps).length, { position: 1 })
+        log('Creeps total', Memory.stats.creeps, { position: 1 })
         log('Heap used', global.usedHeap(), { position: 1 })
         log('Tick', Game.time, { position: 1 })
 

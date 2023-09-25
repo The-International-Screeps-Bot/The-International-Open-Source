@@ -386,11 +386,7 @@ export class CollectiveManager extends Sleepable {
      * Gets the number of orders owned by me
      */
     get myOrdersCount() {
-        // If _myOrdersCount are already defined, inform them
-
-        if (this._myOrdersCount) return this._myOrdersCount
-
-        // Inform and set the number of my orders
+        if (this._myOrdersCount !== undefined) return this._myOrdersCount
 
         return (this._myOrdersCount = Object.keys(Game.market.orders).length)
     }

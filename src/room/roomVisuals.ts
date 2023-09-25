@@ -299,7 +299,7 @@ export class RoomVisualsManager {
             totalSpawn = roomStats.su
         }
 
-        totalSpawn = totalSpawn / Object.keys(Memory.stats.rooms).length
+        totalSpawn = totalSpawn / global.communes.size
 
         data[0].push(
             totalEstimatedIncome,
