@@ -10,6 +10,28 @@ const remoteStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
     RoomStatNamesEnum.EnergyOutputBuild,
 ])
 
+/**
+ * Names of stats to average for
+ */
+const averageStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
+    RoomStatNamesEnum.SpawnUsagePercentage,
+    RoomStatNamesEnum.EnergyInputHarvest,
+    RoomStatNamesEnum.MineralsHarvested,
+    RoomStatNamesEnum.EnergyInputBought,
+    RoomStatNamesEnum.EnergyOutputSold,
+    RoomStatNamesEnum.EnergyOutputUpgrade,
+    RoomStatNamesEnum.EnergyOutputBuild,
+    RoomStatNamesEnum.EnergyOutputRepairOther,
+    RoomStatNamesEnum.EnergyOutputRepairWallOrRampart,
+    RoomStatNamesEnum.EnergyOutputSpawn,
+    RoomStatNamesEnum.EnergyOutputPower,
+    RoomStatNamesEnum.RemoteCount,
+    RoomStatNamesEnum.RemoteEnergyStored,
+    RoomStatNamesEnum.RemoteEnergyInputHarvest,
+    RoomStatNamesEnum.RemoteEnergyOutputRepairOther,
+    RoomStatNamesEnum.RemoteEnergyOutputBuild,
+])
+
 export class StatsManager {
     stats: {
         [roomType in StatsRoomTypes]: {
@@ -116,7 +138,6 @@ export class StatsManager {
         }
 
         if (each250Ticks || forceUpdate) {
-
             roomStats[RoomStatNamesEnum.EnergyStored] =
                 room.roomManager.resourcesInStoringStructures.energy +
                 room.roomManager.resourcesInStoringStructures.battery * 10
@@ -134,9 +155,9 @@ export class StatsManager {
             roomStats[statName] = undefined
         }
 
-        // integrate intra tick stats into inter tick stats
+        // integrate average tick stats into inter tick stats
 
-        for (const key in roomStats) {
+        for (const key of averageStatNames) {
             const statName = key as keyof RoomCommuneStats
             let globalValue = roomStats[statName] || 0
             let value = interTickRoomStats[statName] || 0

@@ -368,7 +368,6 @@ export class CommuneManager {
     }
 
     private test() {
-        
 
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 

@@ -73,13 +73,14 @@ export class SpawningStructuresManager {
         this.visualizeRequests()
         this.test()
         this.runSpawning()
+
+        // Clear out potentially active and stale spawnRequests
+        this.spawnRequests = undefined
     }
 
     private runSpawning() {
         // There are no spawns that we can spawn with (they are probably spawning something)
         if (!this.inactiveSpawns.length) {
-            // Clear out potentially active and stale spawnRequests
-            delete this.spawnRequests
             return
         }
 
@@ -88,9 +89,9 @@ export class SpawningStructuresManager {
             this.communeManager.spawnRequestsManager.run()
 
         this.spawnIndex = this.inactiveSpawns.length - 1
-        this.spawnRequests = []
 
         for (const spawnRequestArgs of this.communeManager.spawnRequestsArgs) {
+            this.spawnRequests = []
             this.constructSpawnRequests(spawnRequestArgs)
 
             // Loop through priorities inside requestsByPriority
@@ -98,9 +99,6 @@ export class SpawningStructuresManager {
             for (let i = 0; i < this.spawnRequests.length; i++) {
                 if (!this.runSpawnRequest(i)) return
             }
-
-            // Reset spawnRequests for next set of args translation
-            this.spawnRequests = []
         }
     }
 
@@ -169,7 +167,6 @@ export class SpawningStructuresManager {
         request.extraOpts.directions = this.findDirections(spawn.pos)
         const result = spawnFunctions.advancedSpawn(spawn, request, ID)
         if (result !== OK) {
-
             log(
                 'Failed to spawn: spawning failed',
                 `error: ${result}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
@@ -696,6 +693,9 @@ export class SpawningStructuresManager {
 
     private testRequests() {}
 
+    /**
+     * Debug
+     */
     private visualizeRequests() {
         if (!this.communeManager.room.flags.spawnRequestVisuals) return
 
@@ -706,9 +706,8 @@ export class SpawningStructuresManager {
         if (!this.communeManager.spawnRequestsArgs.length)
             this.communeManager.spawnRequestsManager.run()
 
-        this.spawnRequests = []
-
         for (const requestArgs of this.communeManager.spawnRequestsArgs) {
+            this.spawnRequests = []
             this.constructSpawnRequests(requestArgs)
 
             for (let i = 0; i < this.spawnRequests.length; i++) {
@@ -721,12 +720,10 @@ export class SpawningStructuresManager {
 
                 data.push(row)
             }
-
-            this.spawnRequests = []
         }
 
         // Reset spawn requests so we can still use them normally for spawning
-        delete this.spawnRequests
+        this.spawnRequests = undefined
 
         const height = 3 + data.length
 
