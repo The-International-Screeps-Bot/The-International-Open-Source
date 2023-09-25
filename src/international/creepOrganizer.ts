@@ -33,7 +33,7 @@ class CreepOrganizer {
             return
         }
 
-        Memory.stats.creeps += 1
+        collectiveManager.creepCount += 1
 
         // Get the creep's role
 

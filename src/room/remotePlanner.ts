@@ -260,7 +260,11 @@ export class RemotePlanner {
     }
 
     get isStartRoom() {
-        return this.room.controller.my && this.room.controller.safeMode && global.communes.size <= 1
+        return (
+            this.room.controller.my &&
+            this.room.controller.safeMode &&
+            collectiveManager.communes.size <= 1
+        )
     }
 
     preTickRun() {

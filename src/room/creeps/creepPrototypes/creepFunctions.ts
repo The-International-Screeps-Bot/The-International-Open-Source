@@ -931,7 +931,16 @@ Creep.prototype.needsResources = function () {
 }
 
 Creep.prototype.hasNonEnergyResource = function () {
-    return !!Object.keys(this.nextStore).find(resourceType => resourceType !== RESOURCE_ENERGY)
+    for (const key in this.nextStore) {
+
+        const resourceType = key as ResourceConstant
+        if (resourceType === RESOURCE_ENERGY) continue
+
+        // The resourceType is not energy
+        return true
+    }
+
+    return false
 }
 
 Creep.prototype.findRecycleTarget = function () {

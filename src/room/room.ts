@@ -97,7 +97,6 @@ export interface NotMyConstructionSites {
 }
 
 export class RoomManager {
-
     static roomManagers: { [roomName: string]: RoomManager } = {}
 
     // sub managers
@@ -297,9 +296,7 @@ export class RoomManager {
         this.roomVisualsManager.run()
     }
 
-    private test() {
-
-    }
+    private test() {}
 
     /**
      * Debug
@@ -505,10 +502,10 @@ export class RoomManager {
 
     isStartRoom() {
         return (
-            global.communes.size === 1 &&
+            collectiveManager.communes.size === 1 &&
             this.room.controller.my &&
             this.room.controller.safeMode &&
-            global.communes.has(this.room.name)
+            collectiveManager.communes.has(this.room.name)
         )
     }
 
@@ -2114,7 +2111,7 @@ export class RoomManager {
                 // Ignore ramparts that can be one shotted
                 if (rampart.hits < highestDamage) continue
 
-                this.enemyThreatCoords.delete(packCoord(rampart.pos))
+                enemyThreatCoords.delete(packCoord(rampart.pos))
             }
         }
 
@@ -2157,7 +2154,7 @@ export class RoomManager {
         const flags: Partial<{ [key in FlagNames]: Flag }> = {}
 
         for (const flag of this.room.find(FIND_FLAGS)) {
-            this._flags[flag.name as FlagNames] = flag
+            flags[flag.name as FlagNames] = flag
         }
 
         return (this._flags = flags)
@@ -2176,17 +2173,17 @@ export class RoomManager {
 
         for (const structure of storingStructures) {
             if (!structure) continue
-            if (structure.RCLActionable) continue
+            if (!structure.RCLActionable) continue
 
             for (const key in structure.store) {
                 const resourceType = key as ResourceConstant
 
-                if (!this._resourcesInStoringStructures[resourceType]) {
-                    this._resourcesInStoringStructures[resourceType] = structure.store[resourceType]
+                if (!resourcesInStoringStructures[resourceType]) {
+                    resourcesInStoringStructures[resourceType] = structure.store[resourceType]
                     continue
                 }
 
-                this._resourcesInStoringStructures[resourceType] += structure.store[resourceType]
+                resourcesInStoringStructures[resourceType] += structure.store[resourceType]
             }
         }
 
@@ -2412,5 +2409,11 @@ export class RoomManager {
             Memory.rooms[this.room.name][RoomMemoryKeys.rampartPlans],
         )
         return this._rampartPlans
+    }
+
+    visualizePosHavers(posHavers: { pos: Coord }[]) {
+        for (const structure of posHavers) {
+            this.room.coordVisual(structure.pos.x, structure.pos.y)
+        }
     }
 }

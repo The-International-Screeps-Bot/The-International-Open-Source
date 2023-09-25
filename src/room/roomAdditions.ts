@@ -797,22 +797,6 @@ const roomAdditions = {
         },
     },
     //
-    unprotectedEnemyCreeps: {
-        get() {
-            if (this._unprotectedEnemyCreeps) return this._unprotectedEnemyCreeps
-
-            return (this._unprotectedEnemyCreeps = this.roomManager.notMyCreeps.enemy.filter(
-                enemyCreep => {
-                    // Make sure the creep doesn't have a rampart protecting them
-                    return !this.findStructureAtCoord(
-                        enemyCreep.pos,
-                        structure => structure.structureType === STRUCTURE_RAMPART,
-                    )
-                },
-            ))
-        },
-    },
-    //
     exitCoords: {
         get() {
             if (this._exitCoords) return this._exitCoords

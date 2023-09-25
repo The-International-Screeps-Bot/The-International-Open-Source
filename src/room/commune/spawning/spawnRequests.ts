@@ -23,6 +23,7 @@ import { collectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
 import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
+import { log } from 'utils/logging'
 
 export class SpawnRequestsManager {
     communeManager: CommuneManager
@@ -517,7 +518,7 @@ export class SpawnRequestsManager {
                 )
 
                 // If there are no ramparts or repair targets
-
+                
                 if (!repairRamparts.length && !repairTargets.length) return false
 
                 let priority: number
@@ -548,6 +549,7 @@ export class SpawnRequestsManager {
                 // Extra considerations if a storage is present
 
                 let maxCreeps = Infinity
+                const enemyAttackers = this.communeManager.room.roomManager.enemyAttackers
 
                 if (
                     this.communeManager.room.storage &&
@@ -555,9 +557,7 @@ export class SpawnRequestsManager {
                 ) {
                     if (
                         repairRamparts.length <= 0 &&
-                        !this.communeManager.room.totalEnemyCombatStrength.melee &&
-                        !this.communeManager.room.totalEnemyCombatStrength.ranged &&
-                        !this.communeManager.room.totalEnemyCombatStrength.dismantle
+                        !enemyAttackers.length
                     ) {
                         maxCreeps = 1
                     }
@@ -573,12 +573,18 @@ export class SpawnRequestsManager {
 
                 // For every attackValue, add a multiplier
 
-                partsMultiplier +=
-                    (this.communeManager.room.totalEnemyCombatStrength.melee +
-                        this.communeManager.room.totalEnemyCombatStrength.ranged * 1.6 +
-                        this.communeManager.room.totalEnemyCombatStrength.dismantle) /
-                    (REPAIR_POWER * 0.3)
+                if (enemyAttackers.length) {
 
+                    const totalEnemyCombatStrength = this.communeManager.room.roomManager.totalEnemyCombatStrength
+
+                    partsMultiplier +=
+                    (totalEnemyCombatStrength.melee +
+                        totalEnemyCombatStrength.ranged * 1.6 +
+                        totalEnemyCombatStrength.dismantle) /
+                    (REPAIR_POWER * 0.3)
+                }
+
+                log('e', partsMultiplier)
                 const role = 'maintainer'
 
                 // If all RCL 3 extensions are build

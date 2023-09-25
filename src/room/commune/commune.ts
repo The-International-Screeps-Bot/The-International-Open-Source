@@ -212,12 +212,12 @@ export class CommuneManager {
         }
 
         roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
-        global.communes.add(room.name)
+        collectiveManager.communes.add(room.name)
 
         if (this.room.controller.safeMode) collectiveManager.safemodedCommuneName = this.room.name
 
         if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
-            if (global.communes.size <= 1)
+            if (collectiveManager.communes.size <= 1)
                 roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
             else if (
                 room.controller.progress > room.controller.progressTotal ||
@@ -368,8 +368,6 @@ export class CommuneManager {
     }
 
     private test() {
-        
-
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
@@ -1022,7 +1020,6 @@ export class CommuneManager {
     }
 
     private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
-
         const fastFillerLink = this.room.roomManager.fastFillerLink
         if (
             fastFillerLink &&
