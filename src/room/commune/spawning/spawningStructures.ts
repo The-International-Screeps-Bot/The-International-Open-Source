@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    ReservedCoordTypes,
     RoomLogisticsRequestTypes,
     customColors,
     offsetsByDirection,
@@ -10,7 +11,7 @@ import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 import { LogTypes, log } from 'utils/logging'
 import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
-import { unpackPosAt } from 'other/codec'
+import { packCoord, unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawn'
 import './spawnRequests'
@@ -56,7 +57,9 @@ export class SpawningStructuresManager {
                     creep.memory[CreepMemoryKeys.path] &&
                     creep.memory[CreepMemoryKeys.path].length
                 ) {
-                    creep.assignMoveRequest(unpackPosAt(creep.memory[CreepMemoryKeys.path]))
+                    const coord = unpackPosAt(creep.memory[CreepMemoryKeys.path])
+                    this.communeManager.room.roomManager.reservedCoords.set(packCoord(coord), ReservedCoordTypes.spawning)
+                    creep.assignMoveRequest(coord)
                 }
 
                 this.activeSpawns.push(spawn)
@@ -154,7 +157,7 @@ export class SpawningStructuresManager {
 
             log(
                 'Failed to spawn: dryrun failed',
-                `error: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
+                `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                 {
                     type: LogTypes.error,
                 },
@@ -170,7 +173,7 @@ export class SpawningStructuresManager {
         if (result !== OK) {
             log(
                 'Failed to spawn: spawning failed',
-                `error: ${result}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
+                `error: ${result}, request: ${JSON.stringify(request)}`,
                 {
                     type: LogTypes.error,
                     position: 3,

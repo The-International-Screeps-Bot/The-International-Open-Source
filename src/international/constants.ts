@@ -1674,9 +1674,13 @@ export const maxSegmentsOpen = 10
  */
 export enum ReservedCoordTypes {
     /**
-     * The reserved is dying
+     * The creep is trying to spawn onto this coord
      */
-    dying = 1,
+    spawning,
+    /**
+     * The notable reserved coord reserver is dying
+     */
+    dying,
     /**
      * Probably a more temporary reserved coord that need not be considered in all situations
      */

@@ -5,7 +5,7 @@ import {
     RoomMemoryKeys,
 } from 'international/constants'
 import { statsManager } from 'international/statsManager'
-import { getRangeXY, getRange } from 'utils/utils'
+import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
@@ -91,6 +91,8 @@ export class MineralHarvester extends Creep {
             const mineralContainer = room.mineralContainer
             if (
                 mineralContainer &&
+                // No need to transfer if we're on top of the container
+                !areCoordsEqual(mineralContainer.pos, creep.pos) &&
                 creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()
             ) {
                 creep.transfer(mineralContainer, mineral.mineralType)

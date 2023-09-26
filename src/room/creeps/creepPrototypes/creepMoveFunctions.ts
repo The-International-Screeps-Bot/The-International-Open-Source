@@ -487,6 +487,9 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         // If the coord is reserved, increase score porportional to importance of the reservation
         const reservationType = this.room.roomManager.reservedCoords.get(packedCoord)
+        // Don't shove onto spawning-reserved coords
+        if (reservationType === ReservedCoordTypes.spawning) return
+        // Score based on value of reservation
         if (reservationType !== undefined) score += reservationType * 2
 
         if (global.settings.roomVisuals) this.room.visual.text(score.toString(), coord.x, coord.y)
