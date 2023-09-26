@@ -2,6 +2,7 @@ import {
     buildableStructuresSet,
     buildableStructureTypes,
     customColors,
+    impassibleStructureTypesSet,
     Result,
     RoomMemoryKeys,
     structureTypesToProtectSet,
@@ -48,6 +49,8 @@ export class ConstructionManager extends Sleepable {
     preTickRun() {
         this.room = this.communeManager.room
 
+        this.manageConstructionSites()
+
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
         // If it's not our first room, wait until RCL 2 before begining construction efforts
         if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
@@ -56,6 +59,23 @@ export class ConstructionManager extends Sleepable {
 
         this.place()
         this.migrate()
+    }
+    /**
+     * Try to shove creeps off of impassible construction sites so they can be built on
+     */
+    private manageConstructionSites() {
+
+        const constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES)
+        for (const cSite of constructionSites) {
+
+            if (!impassibleStructureTypesSet.has(cSite.structureType)) continue
+
+            const creepName = this.room.creepPositions[packCoord(cSite.pos)]
+            if (!creepName) continue
+
+            const creep = Game.creeps[creepName]
+            creep.shove()
+        }
     }
     private shouldPlace() {
         // If the construction site count is at its limit, stop
