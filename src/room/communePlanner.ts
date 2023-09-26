@@ -1225,7 +1225,7 @@ export class CommunePlanner {
             }
         }
 
-        sourceLinkCoords.reverse()
+        /* sourceLinkCoords.reverse() */
         for (const coord of sourceLinkCoords) {
             this.setBasePlansXY(coord.x, coord.y, STRUCTURE_LINK)
         }
