@@ -765,6 +765,7 @@ export class SpawnRequestsManager {
                 // If there is a storage, prefer needed remote creeps over upgraders
 
                 if (
+                    this.communeManager.room.controller.level === 1 ||
                     this.communeManager.room.controller.ticksToDowngrade <=
                     this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
@@ -807,9 +808,8 @@ export class SpawnRequestsManager {
                 // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 
                 if (
-                    this.communeManager.room.controller.level > 2 &&
-                    (this.communeManager.room.towerInferiority ||
-                        this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0)
+                    this.communeManager.room.towerInferiority ||
+                    this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0
                 )
                     return false
 

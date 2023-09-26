@@ -17,6 +17,7 @@ import './spawn'
 import './spawnRequests'
 import { spawnFunctions } from './spawn'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
+import { debugUtils } from 'debug/debugUtils'
 
 export class SpawningStructuresManager {
     communeManager: CommuneManager
@@ -173,7 +174,7 @@ export class SpawningStructuresManager {
         if (result !== OK) {
             log(
                 'Failed to spawn: spawning failed',
-                `error: ${result}, request: ${JSON.stringify(request)}`,
+                `error: ${result}, request: ${debugUtils.stringify(request)}`,
                 {
                     type: LogTypes.error,
                     position: 3,
