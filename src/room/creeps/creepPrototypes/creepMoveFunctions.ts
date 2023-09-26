@@ -39,8 +39,10 @@ import {
     unpackCoord,
     unpackCoordAsPos,
     unpackPos,
+    unpackPosAt,
     unpackPosList,
 } from 'other/codec'
+import { log } from 'utils/logging'
 
 PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (
     path,
@@ -170,7 +172,19 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     if (this.room.enemyDamageThreat) return this.createMoveRequest(args)
 
-    const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
+    // const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
+
+    let posIndex = -1
+
+    const packedCreepPos = packPos(this.pos)
+    for (let i = 0; i < pathOpts.packedPath.length - packedPosLength; i += packedPosLength) {
+
+        const pos = unpackPosAt(pathOpts.packedPath, i / packedPosLength)
+        if (!arePositionsEqual(this.pos, pos)) continue
+
+        posIndex = i
+        break
+    }
 
     //
     /*
@@ -183,13 +197,20 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (global.settings.roomVisuals) {
         this.room.targetVisual(this.pos, args.goals[0].pos, true)
 
+        this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y, {
+            font: 0.4,
+        })
         this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
             font: 0.4,
         })
-        this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y + 0.5)
     }
 
-    this.room.visual.text((posIndex || -1).toString(), this.pos)
+    this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y, {
+        font: 0.4,
+    })
+    this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
+        font: 0.4,
+    })
 
     if (
         !isOnLastPos &&
@@ -197,17 +218,23 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         this.memory[CreepMemoryKeys.usedPathForGoal] !== packedGoalPos
     ) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
+        const pos = unpackPosAt(packedPath, 0)
+/*
         const path = unpackPosList(packedPath)
-
         visualizePath(path)
-
-        this.room.targetVisual(this.pos, path[0])
+ */
+        this.room.targetVisual(this.pos, pos)
 
         // If we're on an exit and the next pos is in the other room, wait
 
-        if (path[0].roomName !== this.room.name) {
-            this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y - 1, { font: 0.5 })
-            /* this.room.visual.text(path[0].roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
+        if (pos.roomName !== this.room.name) {
+            this.room.visual.text(pos.roomName, this.pos.x, this.pos.y - .5, { font: 0.3 })
+
+            this.room.visual.text(args.goals[0].pos.roomName, this.pos.x, this.pos.y - 1, { font: 0.3 })
+
+            /* const secondPos = unpackPosAt(pathOpts.packedPath, posIndex / packedPosLength - 1)
+            this.room.visual.text(secondPos.roomName, this.pos.x, this.pos.y - 1, { font: 0.3 }) */
+            /* this.room.visual.text(pos.roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
 
             this.memory[CreepMemoryKeys.path] = packedPath
             this.moved = 'moved'
@@ -217,7 +244,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // Give the creep a sliced version of the path it is trying to use
 
         this.memory[CreepMemoryKeys.path] = packedPath
-        this.assignMoveRequest(path[0])
+        this.assignMoveRequest(pos)
         return Result.success
     }
 

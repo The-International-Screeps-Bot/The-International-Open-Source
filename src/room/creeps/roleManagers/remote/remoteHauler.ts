@@ -111,7 +111,9 @@ export class RemoteHauler extends Creep {
 
         // Make sure we have enough life to get there
 
-        const pathLength = remoteMemory[this.commune.communeManager.remoteSourcePathType][sourceIndex].length / packedPosLength
+        const pathLength =
+            remoteMemory[this.commune.communeManager.remoteSourcePathType][sourceIndex].length /
+            packedPosLength
         if (pathLength >= this.ticksToLive) return false
 
         // Make sure we have enough free space to keep reservation below credit
@@ -293,7 +295,10 @@ export class RemoteHauler extends Creep {
             // Fulfill requests near the hauler
 
             this.runRoomLogisticsRequestsAdvanced({
-                types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
+                types: new Set([
+                    RoomLogisticsRequestTypes.pickup,
+                    RoomLogisticsRequestTypes.withdraw,
+                ]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
                 conditions: request => {
                     // If the target is near the creep
@@ -303,45 +308,45 @@ export class RemoteHauler extends Creep {
                 },
             })
 
-            if (!this.needsResources()) return true
+            if (!this.needsResources()) {
+                // We have enough resources, return home
 
-            // We have enough resources, return home
+                delete this.moved
 
-            delete this.moved
+                this.message += this.commune.name
 
-            this.message += this.commune.name
+                const anchor = this.commune.roomManager.anchor
+                if (!anchor) throw Error('No anchor for remoteHauler ' + this.room.name)
 
-            const anchor = this.commune.roomManager.anchor
-            if (!anchor) throw Error('No anchor for remoteHauler ' + this.room.name)
-
-            this.createMoveRequestByPath(
-                {
-                    origin: this.pos,
-                    goals: [
-                        {
-                            pos: anchor,
-                            range: 3,
+                this.createMoveRequestByPath(
+                    {
+                        origin: this.pos,
+                        goals: [
+                            {
+                                pos: anchor,
+                                range: 3,
+                            },
+                        ],
+                        avoidEnemyRanges: true,
+                        typeWeights: {
+                            [RoomTypes.enemy]: Infinity,
+                            [RoomTypes.ally]: Infinity,
+                            [RoomTypes.keeper]: Infinity,
+                            [RoomTypes.enemyRemote]: Infinity,
+                            [RoomTypes.allyRemote]: Infinity,
                         },
-                    ],
-                    avoidEnemyRanges: true,
-                    typeWeights: {
-                        [RoomTypes.enemy]: Infinity,
-                        [RoomTypes.ally]: Infinity,
-                        [RoomTypes.keeper]: Infinity,
-                        [RoomTypes.enemyRemote]: Infinity,
-                        [RoomTypes.allyRemote]: Infinity,
                     },
-                },
-                {
-                    packedPath:
-                        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
-                            RoomMemoryKeys.remoteSourceFastFillerPaths
-                        ][creepMemory[CreepMemoryKeys.sourceIndex]],
-                    remoteName: creepMemory[CreepMemoryKeys.remote],
-                },
-            )
+                    {
+                        packedPath:
+                            Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
+                                RoomMemoryKeys.remoteSourceFastFillerPaths
+                            ][creepMemory[CreepMemoryKeys.sourceIndex]],
+                        remoteName: creepMemory[CreepMemoryKeys.remote],
+                    },
+                )
 
-            return true
+                return true
+            }
         }
 
         // We aren't in the remote, go to the source
@@ -405,7 +410,10 @@ export class RemoteHauler extends Creep {
             const freeNextStoreInitial = this.freeNextStore
 
             this.runRoomLogisticsRequestsAdvanced({
-                types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
+                types: new Set([
+                    RoomLogisticsRequestTypes.pickup,
+                    RoomLogisticsRequestTypes.withdraw,
+                ]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
                 conditions: request => {
                     // If the target is near the creep or source
@@ -442,7 +450,10 @@ export class RemoteHauler extends Creep {
         // Fulfill requests near the hauler
 
         this.runRoomLogisticsRequestsAdvanced({
-            types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
+            types: new Set<RoomLogisticsRequestTypes>([
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.withdraw,
+            ]),
             resourceTypes: new Set([RESOURCE_ENERGY]),
             conditions: request => {
                 // If the target is near the creep
