@@ -16,7 +16,7 @@ import {
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
 import { debugUtils } from 'debug/debugUtils'
-import { LogTypes, log } from './logging'
+import { LogTypes, customLog } from './logging'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -581,7 +581,7 @@ export function findCPUOf(func: Function) {
 
     func()
 
-    log('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
+    customLog('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
 }
 
 export function isXYExit(x: number, y: number) {
@@ -925,7 +925,7 @@ export function isAlly(playerName: string) {
 
 export function outOfBucket() {
     collectiveManager.logs = ''
-    log('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+    customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         type: LogTypes.warning,
     })
     console.log(

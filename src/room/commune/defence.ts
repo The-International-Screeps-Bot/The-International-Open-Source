@@ -28,7 +28,7 @@ import { CommuneManager } from './commune'
 import { collectiveManager } from 'international/collective'
 import { roomUtils } from 'room/roomUtils'
 import { RampartPlans } from 'room/construction/rampartPlans'
-import { log, LogTypes } from 'utils/logging'
+import { customLog, LogTypes } from 'utils/logging'
 
 export class DefenceManager {
     communeManager: CommuneManager
@@ -281,7 +281,9 @@ export class DefenceManager {
             )
         })
 
-        log('ENEMY TARGETS BY DAMAGE', defenderEnemyTargetsByDamage, { type: LogTypes.warning })
+        customLog('ENEMY TARGETS BY DAMAGE', defenderEnemyTargetsByDamage, {
+            type: LogTypes.warning,
+        })
 
         // Attack enemies in order of most net damage members can heal
 

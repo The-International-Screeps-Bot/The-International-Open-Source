@@ -1,5 +1,9 @@
-import { RoomLogisticsRequestTypes, linkReceiveTreshold, linkSendThreshold } from 'international/constants'
-import { log } from 'utils/logging'
+import {
+    RoomLogisticsRequestTypes,
+    linkReceiveTreshold,
+    linkSendThreshold,
+} from 'international/constants'
+import { customLog } from 'utils/logging'
 import { CommuneManager } from './commune'
 
 export class LinkManager {

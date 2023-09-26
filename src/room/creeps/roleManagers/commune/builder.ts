@@ -1,5 +1,5 @@
 import { Result, RoomLogisticsRequestTypes } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
 
 export class Builder extends Creep {

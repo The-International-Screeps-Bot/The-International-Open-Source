@@ -9,7 +9,7 @@ import {
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
-import { LogTypes, log } from 'utils/logging'
+import { LogTypes, customLog } from 'utils/logging'
 import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
@@ -59,7 +59,10 @@ export class SpawningStructuresManager {
                     creep.memory[CreepMemoryKeys.path].length
                 ) {
                     const coord = unpackPosAt(creep.memory[CreepMemoryKeys.path])
-                    this.communeManager.room.roomManager.reservedCoords.set(packCoord(coord), ReservedCoordTypes.spawning)
+                    this.communeManager.room.roomManager.reservedCoords.set(
+                        packCoord(coord),
+                        ReservedCoordTypes.spawning,
+                    )
                     creep.assignMoveRequest(coord)
                 }
 
@@ -114,7 +117,7 @@ export class SpawningStructuresManager {
         // If this is ran then there is a bug in spawnRequest creation
 
         if (request.cost > this.communeManager.room.energyCapacityAvailable) {
-            log(
+            customLog(
                 'Failed to spawn: not enough energy',
                 `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${
                     this.communeManager.room.energyCapacityAvailable
@@ -128,7 +131,7 @@ export class SpawningStructuresManager {
         }
 
         if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
-            log(
+            customLog(
                 'Failed to spawn: not enough energy',
                 `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
                     this.communeManager.nextSpawnEnergyAvailable
@@ -156,7 +159,7 @@ export class SpawningStructuresManager {
         if (testSpawnResult !== OK) {
             // Log the error and stop the loop
 
-            log(
+            customLog(
                 'Failed to spawn: dryrun failed',
                 `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
                 {
@@ -172,7 +175,7 @@ export class SpawningStructuresManager {
         request.extraOpts.directions = this.findDirections(spawn.pos)
         const result = spawnFunctions.advancedSpawn(spawn, request, ID)
         if (result !== OK) {
-            log(
+            customLog(
                 'Failed to spawn: spawning failed',
                 `error: ${result}, request: ${debugUtils.stringify(request)}`,
                 {
@@ -520,7 +523,7 @@ export class SpawningStructuresManager {
 
         // Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
         if (args.extraParts.length == 0) {
-            log('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
+            customLog('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
                 type: LogTypes.error,
             })
             return
@@ -683,7 +686,7 @@ export class SpawningStructuresManager {
     private testArgs() {
         for (const request of this.communeManager.spawnRequestsArgs) {
             if (request.role === 'remoteSourceHarvester') {
-                log(
+                customLog(
                     'SPAWN REQUEST ARGS',
                     request.role +
                         request.memoryAdditions[CreepMemoryKeys.remote] +
@@ -692,7 +695,7 @@ export class SpawningStructuresManager {
                 )
                 continue
             }
-            log('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
+            customLog('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
         }
     }
 

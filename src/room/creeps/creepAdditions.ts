@@ -6,7 +6,7 @@ import {
     roomDimensions,
     towerPowers,
 } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { getRangeXY, getRange, isXYExit, isExit } from 'utils/utils'
 import { profiler } from 'other/profiler'
 import { towerFunctions } from 'room/commune/towers'

@@ -1,5 +1,5 @@
 import { RoomMemoryKeys, packedPosLength, stamps } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneManager } from './commune'
 

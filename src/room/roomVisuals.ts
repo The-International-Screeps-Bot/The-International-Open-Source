@@ -10,7 +10,7 @@ import {
     RoomTypes,
 } from 'international/constants'
 import { statsManager } from 'international/statsManager'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'

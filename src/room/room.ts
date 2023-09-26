@@ -72,7 +72,7 @@ import { RampartPlans } from './construction/rampartPlans'
 import { PathGoal, customFindPath } from 'international/customPathFinder'
 import { roomUtils } from './roomUtils'
 import { collectiveManager } from 'international/collective'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 
 export interface InterpretedRoomEvent {
     eventType: EventConstant
@@ -236,7 +236,7 @@ export class RoomManager {
         for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])
 
         room.squadRequests = new Set()
-        
+
         room.roomLogisticsRequests = {
             [RoomLogisticsRequestTypes.transfer]: {},
             [RoomLogisticsRequestTypes.withdraw]: {},
@@ -303,7 +303,7 @@ export class RoomManager {
      * Debug
      */
     private visualizeReservedCoords() {
-        log('reservedCoords', JSON.stringify([...this.reservedCoords]))
+        customLog('reservedCoords', JSON.stringify([...this.reservedCoords]))
         for (const [packedCoord, reserveType] of this.reservedCoords) {
             const coord = unpackCoord(packedCoord)
             this.room.coordVisual(coord.x, coord.y, `hsl(${200}${reserveType * 50}, 100%, 60%)`)
@@ -926,6 +926,7 @@ export class RoomManager {
 
         const communeManager = this.room.communeManager
         if (communeManager) {
+            delete communeManager.spawningStructuresByPriorityIDs
             delete communeManager._fastFillerSpawnEnergyCapacity
         }
 

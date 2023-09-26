@@ -1,5 +1,5 @@
 import { CreepMemoryKeys } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findClosestObject, getRange } from 'utils/utils'
 
 export class Hauler extends Creep {

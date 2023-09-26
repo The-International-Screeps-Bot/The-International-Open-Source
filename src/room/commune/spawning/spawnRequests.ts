@@ -23,7 +23,7 @@ import { collectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
 import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 
 export class SpawnRequestsManager {
     communeManager: CommuneManager
@@ -581,7 +581,7 @@ export class SpawnRequestsManager {
                         (REPAIR_POWER * 0.3)
                 }
 
-                log('e', partsMultiplier)
+                customLog('e', partsMultiplier)
                 const role = 'maintainer'
 
                 // If all RCL 3 extensions are build
@@ -767,7 +767,7 @@ export class SpawnRequestsManager {
                 if (
                     this.communeManager.room.controller.level === 1 ||
                     this.communeManager.room.controller.ticksToDowngrade <=
-                    this.communeManager.controllerDowngradeUpgradeThreshold
+                        this.communeManager.controllerDowngradeUpgradeThreshold
                 ) {
                     const priority = 5
 

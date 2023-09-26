@@ -90,7 +90,7 @@ import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
 import { roomUtils } from 'room/roomUtils'
-import { LogTypes, log } from 'utils/logging'
+import { LogTypes, customLog } from 'utils/logging'
 import { creepUtils } from 'room/creeps/creepUtils'
 
 export class CommuneManager {
@@ -362,7 +362,7 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             type: LogTypes.info,
         })
     }
@@ -382,7 +382,7 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             type: LogTypes.info,
         })
     }
@@ -391,7 +391,9 @@ export class CommuneManager {
      * Debug
      */
     private visualizeSpawningStructuresByNeed() {
-        log('spawningStructuresByNeed', this.spawningStructuresByNeed, { type: LogTypes.error })
+        customLog('spawningStructuresByNeed', this.spawningStructuresByNeed, {
+            type: LogTypes.error,
+        })
         for (const structure of this.spawningStructuresByNeed) {
             this.room.coordVisual(structure.pos.x, structure.pos.y)
         }

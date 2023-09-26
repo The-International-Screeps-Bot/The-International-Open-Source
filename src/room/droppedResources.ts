@@ -1,4 +1,4 @@
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
 import { RoomLogisticsRequestTypes } from 'international/constants'

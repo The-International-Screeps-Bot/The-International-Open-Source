@@ -1,6 +1,6 @@
 import { statsManager } from 'international/statsManager'
 import { CommuneManager } from './commune'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { collectiveManager } from 'international/collective'
 
 export class PowerSpawnsManager {

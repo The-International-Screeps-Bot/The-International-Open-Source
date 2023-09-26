@@ -55,7 +55,7 @@ interface LogOpts {
 
 const positionPaddingPixels = 8
 
-export function log(title: any, message?: any, opts?: LogOpts) {
+export function customLog(title: any, message?: any, opts?: LogOpts) {
     if (!global.settings.logging) return
 
     if (!opts) opts = {}
@@ -82,5 +82,5 @@ export function log(title: any, message?: any, opts?: LogOpts) {
 }
 
 export function stringifyLog(title: any, message: any, opts?: LogOpts) {
-    return log(title, debugUtils.stringify(message), opts)
+    return customLog(title, debugUtils.stringify(message), opts)
 }

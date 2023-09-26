@@ -1,6 +1,6 @@
 import { RoomLogisticsRequestTypes, customColors } from 'international/constants'
 import { statsManager } from 'international/statsManager'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findCPUOf, findObjectWithID, randomTick, scalePriority } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'

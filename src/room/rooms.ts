@@ -18,7 +18,7 @@ import { statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
-import { LogTypes, log } from 'utils/logging'
+import { LogTypes, customLog } from 'utils/logging'
 
 class RoomsManager {
     constructor() {}
@@ -60,7 +60,7 @@ class RoomsManager {
 
             let logMessage = `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreepsAmount}`
 
-            log(
+            customLog(
                 `<a style="cursor: pointer;color:inherit" href="https://screeps.com/a/#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
                 logMessage,
                 {
@@ -68,7 +68,6 @@ class RoomsManager {
                     position: 2,
                 },
             )
-
         }
     }
 }

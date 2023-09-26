@@ -6,7 +6,7 @@ import {
     RoomStatNamesEnum,
     RoomTypes,
 } from './constants'
-import { log, LogTypes } from 'utils/logging'
+import { customLog, LogTypes } from 'utils/logging'
 import { collectiveManager } from './collective'
 
 const remoteStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
@@ -139,7 +139,7 @@ export class StatsManager {
                     : room.controller.level
         }
 
-/*         if (each250Ticks || forceUpdate) {
+        /*         if (each250Ticks || forceUpdate) {
             const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
             roomStats[RoomStatNamesEnum.EnergyStored] =
                 (resourcesInStoringStructures.energy || 0) +
@@ -149,9 +149,9 @@ export class StatsManager {
                 interTickRoomStats[RoomStatNamesEnum.EnergyStored]
         } */
         const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
-            roomStats[RoomStatNamesEnum.EnergyStored] =
-                (resourcesInStoringStructures.energy || 0) +
-                (resourcesInStoringStructures.battery || 0) * 10
+        roomStats[RoomStatNamesEnum.EnergyStored] =
+            (resourcesInStoringStructures.energy || 0) +
+            (resourcesInStoringStructures.battery || 0) * 10
 
         // delete legacy stat key value pairs
 

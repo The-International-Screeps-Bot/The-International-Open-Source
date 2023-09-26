@@ -14,7 +14,7 @@ import {
     roomDimensions,
 } from './constants'
 import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
-import { LogTypes, log } from 'utils/logging'
+import { LogTypes, customLog } from 'utils/logging'
 import { unpackNumAsCoord, visualizePath } from '../utils/utils'
 
 export interface PathGoal {
@@ -527,7 +527,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
     // If the pathFindResult is incomplete, inform an empty array
 
     if (pathFinderResult.incomplete) {
-        log(
+        customLog(
             'Incomplete Path',
             `${args.origin} -> ${args.goals[0].pos} range: ${args.goals[0].range} goals: ${
                 args.goals.length

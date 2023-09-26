@@ -1,4 +1,4 @@
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findLargestTransactionAmount, getAvgPrice } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'

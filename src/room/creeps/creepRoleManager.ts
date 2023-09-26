@@ -2,7 +2,7 @@ import './creepPrototypes/creepFunctions'
 import './creepPrototypes/creepMoveFunctions'
 
 import { creepRoles, customColors } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { RoomManager } from 'room/room'
 import { statsManager } from 'international/statsManager'
 import { creepClasses } from './creepClasses'
@@ -39,7 +39,7 @@ export class CreepRoleManager {
 
         const creepsOfRoleAmount = this.roomManager.room.myCreeps[role].length
 
-        log(
+        customLog(
             `${role}s`,
             `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(
                 2,

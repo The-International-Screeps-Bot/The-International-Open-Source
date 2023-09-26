@@ -42,7 +42,7 @@ import {
     unpackPosAt,
     unpackPosList,
 } from 'other/codec'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 
 PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (
     path,

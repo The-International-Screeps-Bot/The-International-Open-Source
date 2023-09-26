@@ -1,5 +1,5 @@
 import { RoomLogisticsRequestTypes, customColors } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { scalePriority } from 'utils/utils'
 import { RoomManager } from './room'
 

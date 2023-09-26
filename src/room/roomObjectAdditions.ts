@@ -1,5 +1,5 @@
 import { allResources, customColors } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findObjectWithID } from 'utils/utils'
 
 Object.defineProperties(RoomObject.prototype, {
@@ -59,7 +59,6 @@ Object.defineProperties(RoomObject.prototype, {
             this._usedNextStore = 0
 
             for (const key in this.nextStore) {
-
                 this._usedNextStore += this.nextStore[key as ResourceConstant]
             }
 

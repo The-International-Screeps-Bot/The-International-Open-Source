@@ -60,7 +60,7 @@ import { posix } from 'path'
 import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
 import { roomUtils } from './roomUtils'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 
 /**
     @param pos1 pos of the object performing the action
@@ -1528,7 +1528,7 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
     // There is already has a power creep responding to this target with the power
-    log('MADE POWER TASK FOR', target)
+    customLog('MADE POWER TASK FOR', target)
     if (target.reservePowers.has(powerType)) return false
 
     // Create a power task with info on the cooldown
