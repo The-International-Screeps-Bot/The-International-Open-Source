@@ -345,8 +345,7 @@ export class RemoteHarvester extends Creep {
 
     buildContainer(): number {
         // Don't build new remote containers until we can reserve the room
-
-        if (this.commune.communeManager.shouldRemoteContainers) return Result.noAction
+        if (!this.commune.communeManager.shouldRemoteContainers) return Result.noAction
 
         // Make sure we're a bit ahead source regen time
 
