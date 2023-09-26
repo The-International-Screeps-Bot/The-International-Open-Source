@@ -518,7 +518,7 @@ export class SpawnRequestsManager {
                 )
 
                 // If there are no ramparts or repair targets
-                
+
                 if (!repairRamparts.length && !repairTargets.length) return false
 
                 let priority: number
@@ -555,10 +555,7 @@ export class SpawnRequestsManager {
                     this.communeManager.room.storage &&
                     this.communeManager.room.controller.level >= 4
                 ) {
-                    if (
-                        repairRamparts.length <= 0 &&
-                        !enemyAttackers.length
-                    ) {
+                    if (repairRamparts.length <= 0 && !enemyAttackers.length) {
                         maxCreeps = 1
                     }
 
@@ -574,14 +571,14 @@ export class SpawnRequestsManager {
                 // For every attackValue, add a multiplier
 
                 if (enemyAttackers.length) {
-
-                    const totalEnemyCombatStrength = this.communeManager.room.roomManager.totalEnemyCombatStrength
+                    const totalEnemyCombatStrength =
+                        this.communeManager.room.roomManager.totalEnemyCombatStrength
 
                     partsMultiplier +=
-                    (totalEnemyCombatStrength.melee +
-                        totalEnemyCombatStrength.ranged * 1.6 +
-                        totalEnemyCombatStrength.dismantle) /
-                    (REPAIR_POWER * 0.3)
+                        (totalEnemyCombatStrength.melee +
+                            totalEnemyCombatStrength.ranged * 1.6 +
+                            totalEnemyCombatStrength.dismantle) /
+                        (REPAIR_POWER * 0.3)
                 }
 
                 log('e', partsMultiplier)
@@ -810,8 +807,9 @@ export class SpawnRequestsManager {
                 // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 
                 if (
-                    this.communeManager.room.towerInferiority ||
-                    this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0
+                    this.communeManager.room.controller.level > 2 &&
+                    (this.communeManager.room.towerInferiority ||
+                        this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0)
                 )
                     return false
 
