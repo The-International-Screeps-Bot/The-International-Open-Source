@@ -475,23 +475,24 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         const terrainType = terrain.get(coord.x, coord.y)
         if (terrainType === TERRAIN_MASK_WALL) return
 
-        let score: number
+        // Use scoring to determine the cost of using the coord compared to potential others
+
+        let score = 0
         if (targetCoord) {
-            score = getRangeEuc(coord, targetCoord) * 3
-            if (terrainType === TERRAIN_MASK_SWAMP) score += 1
-            if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord])
-                score += 1
-
-            // If the coord is reserved, increase score porportional to importance of the reservation
-            const reservationType = this.room.roomManager.reservedCoords.get(packedCoord)
-            if (reservationType !== undefined) score += 1 + reservationType
-
-            if (global.settings.roomVisuals)
-                this.room.visual.text(score.toString(), coord.x, coord.y)
-
-            // Preference for lower-scoring coords
-            if (score >= lowestScore) return
+            score += getRangeEuc(coord, targetCoord) * 3
         }
+
+        if (terrainType === TERRAIN_MASK_SWAMP) score += 1
+        if (room.creepPositions[packedCoord] || room.powerCreepPositions[packedCoord]) score += 1
+
+        // If the coord is reserved, increase score porportional to importance of the reservation
+        const reservationType = this.room.roomManager.reservedCoords.get(packedCoord)
+        if (reservationType !== undefined) score += reservationType * 2
+
+        if (global.settings.roomVisuals) this.room.visual.text(score.toString(), coord.x, coord.y)
+
+        // Preference for lower-scoring coords
+        if (score >= lowestScore) return
 
         // If the coord isn't safe to stand on
 

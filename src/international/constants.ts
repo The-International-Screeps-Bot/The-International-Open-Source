@@ -1657,11 +1657,14 @@ export const defaultDataDecay = 0.99999
 export const revolutionary = 'MarvinTMB'
 export const maxSegmentsOpen = 10
 
+/**
+ * Non-zero types of reserved registered coordinates
+ */
 export enum ReservedCoordTypes {
     /**
      * The reserved is dying
      */
-    dying,
+    dying = 1,
     /**
      * Probably a more temporary reserved coord that need not be considered in all situations
      */

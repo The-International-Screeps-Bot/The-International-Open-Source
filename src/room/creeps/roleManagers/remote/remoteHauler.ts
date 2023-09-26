@@ -108,6 +108,11 @@ export class RemoteHauler extends Creep {
         if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
 
+        // Make sure we have enough life to get there
+
+        const pathLength = remoteMemory[this.commune.communeManager.remoteSourcePathType][sourceIndex].length / packedPosLength
+        if (pathLength >= this.ticksToLive) return false
+
         // Make sure we have enough free space to keep reservation below credit
         if (
             remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] -
