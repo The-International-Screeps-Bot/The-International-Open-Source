@@ -377,8 +377,6 @@ declare global {
 
     type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals' | 'spawnRequestVisuals'
 
-    type RoomLogisticsRequestTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
-
     interface RoomLogisticsRequest {
         ID: string
         type: RoomLogisticsRequestTypes

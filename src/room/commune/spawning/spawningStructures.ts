@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    RoomLogisticsRequestTypes,
     customColors,
     offsetsByDirection,
     partsByPriority,
@@ -656,7 +657,7 @@ export class SpawningStructuresManager {
         for (const structure of this.communeManager.spawningStructuresByNeed) {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
-                type: 'transfer',
+                type: RoomLogisticsRequestTypes.transfer,
                 priority: 3,
             })
         }

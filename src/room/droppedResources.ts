@@ -1,6 +1,7 @@
 import { log } from 'utils/logging'
 import { scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
+import { RoomLogisticsRequestTypes } from 'international/constants'
 
 export class DroppedResourceManager {
     roomManager: RoomManager
@@ -16,7 +17,7 @@ export class DroppedResourceManager {
             this.roomManager.room.createRoomLogisticsRequest({
                 target: resource,
                 resourceType: resource.resourceType,
-                type: 'pickup',
+                type: RoomLogisticsRequestTypes.pickup,
                 priority: Math.max(5, 20 - resource.reserveAmount / 200),
                 onlyFull: true,
             })
@@ -30,7 +31,7 @@ export class DroppedResourceManager {
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: resource,
-                type: 'pickup',
+                type: RoomLogisticsRequestTypes.pickup,
                 priority: Math.max(5, 10 - resource.reserveAmount / 200),
             })
         }

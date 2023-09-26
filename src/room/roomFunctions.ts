@@ -23,6 +23,7 @@ import {
     RoomTypes,
     packedPosLength,
     maxRemotePathDistance,
+    RoomLogisticsRequestTypes,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -1585,7 +1586,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         amount = (args.target as Resource).reserveAmount
 
         if (amount < 1) return Result.fail
-    } else if (args.type === 'transfer') {
+    } else if (args.type === RoomLogisticsRequestTypes.transfer) {
         if (
             args.target.reserveStore[args.resourceType] >=
             args.target.store.getCapacity(args.resourceType)
@@ -1612,7 +1613,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     const ID = collectiveManager.newTickID()
 
-    if (global.settings.roomLogisticsVisuals && args.type === 'pickup') {
+    if (global.settings.roomLogisticsVisuals && args.type === RoomLogisticsRequestTypes.pickup) {
         this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
         this.visual.text(args.priority.toString(), args.target.pos, { font: 0.4 })
     }

@@ -1,4 +1,4 @@
-import { PlayerMemoryKeys, customColors, towerPowers } from 'international/constants'
+import { PlayerMemoryKeys, RoomLogisticsRequestTypes, customColors, towerPowers } from 'international/constants'
 import { statsManager } from 'international/statsManager'
 import {
     findHighestScore,
@@ -287,7 +287,7 @@ export class TowerManager {
             if (structure.usedReserveStore < structure.store.getCapacity(RESOURCE_ENERGY) * 0.8) {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
-                    type: 'transfer',
+                    type: RoomLogisticsRequestTypes.transfer,
                     priority:
                         3 +
                         scalePriority(
@@ -304,7 +304,7 @@ export class TowerManager {
                     target: structure,
                     maxAmount: structure.usedReserveStore - 100,
                     /* onlyFull: true, */
-                    type: 'offer',
+                    type: RoomLogisticsRequestTypes.offer,
                     priority: scalePriority(
                         structure.store.getCapacity(RESOURCE_ENERGY),
                         structure.usedReserveStore,

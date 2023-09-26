@@ -3,6 +3,7 @@ import {
     packedPosLength,
     ReservedCoordTypes,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     WorkTypes,
 } from 'international/constants'
@@ -184,7 +185,7 @@ export class SourceHarvester extends Creep {
 
                 const result = this.runRoomLogisticsRequestAdvanced({
                     resourceTypes: new Set([RESOURCE_ENERGY]),
-                    types: new Set(['withdraw', 'pickup', 'offer']),
+                    types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
                     conditions: request => {
                         getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                     },
@@ -218,7 +219,7 @@ export class SourceHarvester extends Creep {
 
             const result = this.runRoomLogisticsRequestAdvanced({
                 resourceTypes: new Set([RESOURCE_ENERGY]),
-                types: new Set(['withdraw', 'pickup', 'offer']),
+                types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
                 conditions: request => {
                     getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                 },
@@ -273,7 +274,7 @@ export class SourceHarvester extends Creep {
 
         this.room.createRoomLogisticsRequest({
             target: this,
-            type: 'withdraw',
+            type: RoomLogisticsRequestTypes.withdraw,
             priority: 100,
         })
         return true

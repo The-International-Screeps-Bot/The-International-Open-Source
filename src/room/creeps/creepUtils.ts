@@ -2,6 +2,7 @@ import {
     CreepMemoryKeys,
     ReservedCoordTypes,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     creepRoles,
     packedCoordLength,
@@ -70,7 +71,7 @@ export const creepUtils = {
             delete Memory.creeps[creep.name][CreepMemoryKeys.structureTarget]
 
             creep.runRoomLogisticsRequestsAdvanced({
-                types: new Set(['withdraw', 'offer', 'pickup']),
+                types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.offer, RoomLogisticsRequestTypes.pickup]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 

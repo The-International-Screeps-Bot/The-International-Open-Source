@@ -4,6 +4,7 @@ import {
     ReservedCoordTypes,
     ReservedCoordTypesKeys,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     RoomTypes,
     adjacentOffsets,
@@ -235,12 +236,12 @@ export class RoomManager {
         for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])
 
         room.squadRequests = new Set()
-
+        
         room.roomLogisticsRequests = {
-            transfer: {},
-            withdraw: {},
-            offer: {},
-            pickup: {},
+            [RoomLogisticsRequestTypes.transfer]: {},
+            [RoomLogisticsRequestTypes.withdraw]: {},
+            [RoomLogisticsRequestTypes.offer]: {},
+            [RoomLogisticsRequestTypes.pickup]: {},
         }
 
         if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) return

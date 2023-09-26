@@ -114,9 +114,21 @@ export enum CreepRoomLogisticsRequestKeys {
 }
 
 export enum RoomLogisticsRequestTypes {
+    /**
+     * Asks for resources to be transferred
+     */
     transfer,
+    /**
+     * Asks for resources to be withdrawn
+     */
     withdraw,
+    /**
+     * A dropped resource asking to be picked up
+     */
     pickup,
+    /**
+     * Offering to be picked up but not trying to get rid of the resource
+     */
     offer,
 }
 

@@ -1,4 +1,4 @@
-import { Result } from 'international/constants'
+import { Result, RoomLogisticsRequestTypes } from 'international/constants'
 import { log } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
 
@@ -16,7 +16,7 @@ export class Builder extends Creep {
 
         this.room.roomManager.room.createRoomLogisticsRequest({
             target: this,
-            type: 'transfer',
+            type: RoomLogisticsRequestTypes.transfer,
             priority: 100,
         })
     }

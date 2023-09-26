@@ -3,6 +3,7 @@ import {
     packedPosLength,
     ReservedCoordTypes,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     RoomTypes,
     WorkTypes,
@@ -297,7 +298,7 @@ export class RemoteHarvester extends Creep {
 
         this.room.createRoomLogisticsRequest({
             target: this,
-            type: 'withdraw',
+            type: RoomLogisticsRequestTypes.withdraw,
             priority: scalePriority(this.store.getCapacity(), this.reserveStore.energy, 5, true),
         })
 
@@ -310,7 +311,7 @@ export class RemoteHarvester extends Creep {
 
         return this.runRoomLogisticsRequestAdvanced({
             resourceTypes: new Set([RESOURCE_ENERGY]),
-            types: new Set(['withdraw', 'pickup', 'offer']),
+            types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
             conditions: request => {
                 getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
             },

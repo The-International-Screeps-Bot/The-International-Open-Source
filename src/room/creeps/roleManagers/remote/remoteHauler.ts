@@ -4,6 +4,7 @@ import {
     packedPosLength,
     relayOffsets,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
@@ -292,7 +293,7 @@ export class RemoteHauler extends Creep {
             // Fulfill requests near the hauler
 
             this.runRoomLogisticsRequestsAdvanced({
-                types: new Set(['pickup', 'withdraw']),
+                types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
                 conditions: request => {
                     // If the target is near the creep
@@ -404,7 +405,7 @@ export class RemoteHauler extends Creep {
             const freeNextStoreInitial = this.freeNextStore
 
             this.runRoomLogisticsRequestsAdvanced({
-                types: new Set(['pickup', 'withdraw']),
+                types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
                 conditions: request => {
                     // If the target is near the creep or source
@@ -441,7 +442,7 @@ export class RemoteHauler extends Creep {
         // Fulfill requests near the hauler
 
         this.runRoomLogisticsRequestsAdvanced({
-            types: new Set(['pickup', 'withdraw']),
+            types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
             resourceTypes: new Set([RESOURCE_ENERGY]),
             conditions: request => {
                 // If the target is near the creep
@@ -494,7 +495,7 @@ export class RemoteHauler extends Creep {
             this.passiveRenew()
 
             this.runRoomLogisticsRequestsAdvanced({
-                types: new Set(['transfer']),
+                types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.transfer]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 

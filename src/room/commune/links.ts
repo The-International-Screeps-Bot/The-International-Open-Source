@@ -1,4 +1,4 @@
-import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
+import { RoomLogisticsRequestTypes, linkReceiveTreshold, linkSendThreshold } from 'international/constants'
 import { log } from 'utils/logging'
 import { CommuneManager } from './commune'
 
@@ -152,7 +152,7 @@ export class LinkManager {
 
         this.communeManager.room.createRoomLogisticsRequest({
             target: controllerLink,
-            type: 'transfer',
+            type: RoomLogisticsRequestTypes.transfer,
             priority: 100,
         })
     }

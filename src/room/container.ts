@@ -1,4 +1,4 @@
-import { customColors } from 'international/constants'
+import { RoomLogisticsRequestTypes, customColors } from 'international/constants'
 import { log } from 'utils/logging'
 import { scalePriority } from 'utils/utils'
 import { RoomManager } from './room'
@@ -35,7 +35,7 @@ export class ContainerManager {
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                type: 'transfer',
+                type: RoomLogisticsRequestTypes.transfer,
                 onlyFull: true,
                 priority: scalePriority(
                     container.store.getCapacity(),
@@ -50,7 +50,7 @@ export class ContainerManager {
                 target: container,
                 maxAmount: container.reserveStore.energy * 0.5,
                 onlyFull: true,
-                type: 'offer',
+                type: RoomLogisticsRequestTypes.offer,
                 priority: scalePriority(
                     container.store.getCapacity(),
                     container.reserveStore.energy,
@@ -67,7 +67,7 @@ export class ContainerManager {
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 onlyFull: true,
                 priority: scalePriority(
                     container.store.getCapacity(),
@@ -94,7 +94,7 @@ export class ContainerManager {
 
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
-            type: 'transfer',
+            type: RoomLogisticsRequestTypes.transfer,
             onlyFull: true,
             priority,
         })
@@ -109,7 +109,7 @@ export class ContainerManager {
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             resourceType,
-            type: 'withdraw',
+            type: RoomLogisticsRequestTypes.withdraw,
             onlyFull: true,
             priority:
                 20 +
