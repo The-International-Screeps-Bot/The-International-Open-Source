@@ -176,9 +176,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     let posIndex = -1
 
-    const packedCreepPos = packPos(this.pos)
-    for (let i = 0; i < pathOpts.packedPath.length - packedPosLength; i += packedPosLength) {
-
+    for (let i = 0; i < pathOpts.packedPath.length - (packedPosLength + 1); i += packedPosLength) {
         const pos = unpackPosAt(pathOpts.packedPath, i / packedPosLength)
         if (!arePositionsEqual(this.pos, pos)) continue
 
@@ -219,7 +217,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     ) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const pos = unpackPosAt(packedPath, 0)
-/*
+        /*
         const path = unpackPosList(packedPath)
         visualizePath(path)
  */
@@ -228,9 +226,11 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // If we're on an exit and the next pos is in the other room, wait
 
         if (pos.roomName !== this.room.name) {
-            this.room.visual.text(pos.roomName, this.pos.x, this.pos.y - .5, { font: 0.3 })
+            this.room.visual.text(pos.roomName, this.pos.x, this.pos.y - 0.5, { font: 0.3 })
 
-            this.room.visual.text(args.goals[0].pos.roomName, this.pos.x, this.pos.y - 1, { font: 0.3 })
+            this.room.visual.text(args.goals[0].pos.roomName, this.pos.x, this.pos.y - 1, {
+                font: 0.3,
+            })
 
             /* const secondPos = unpackPosAt(pathOpts.packedPath, posIndex / packedPosLength - 1)
             this.room.visual.text(secondPos.roomName, this.pos.x, this.pos.y - 1, { font: 0.3 }) */
