@@ -176,7 +176,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
 
     let posIndex = -1
 
-    for (let i = 0; i < pathOpts.packedPath.length - (packedPosLength + 1); i += packedPosLength) {
+    for (let i = 0; i < pathOpts.packedPath.length - packedPosLength + 1; i += packedPosLength) {
         const pos = unpackPosAt(pathOpts.packedPath, i / packedPosLength)
         if (!arePositionsEqual(this.pos, pos)) continue
 
