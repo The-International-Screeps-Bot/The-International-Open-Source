@@ -8,7 +8,7 @@ import {
     linkSendThreshold,
     powerSpawnRefillThreshold,
 } from 'international/constants'
-import { unpackCoord } from 'other/codec'
+import { packCoord, unpackCoord } from 'other/codec'
 import { findObjectWithID, getRange, unpackNumAsPos } from 'utils/utils'
 
 //import { HubHauler } from '../../creepClasses'
@@ -32,6 +32,7 @@ export class HubHauler extends Creep {
         const stampAnchors = this.room.roomManager.stampAnchors
         if (!stampAnchors) throw Error('No stampAnchors for hubHauler ' + this.room.name)
 
+        creepMemory[CreepMemoryKeys.packedCoord] = packCoord(stampAnchors.hub[0])
         return stampAnchors.hub[0]
     }
 
