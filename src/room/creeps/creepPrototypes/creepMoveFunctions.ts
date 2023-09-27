@@ -202,14 +202,14 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             font: 0.4,
         })
     }
-
+/*
     this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y, {
         font: 0.4,
     })
     this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
         font: 0.4,
     })
-
+ */
     if (
         !isOnLastPos &&
         posIndex !== -1 &&
