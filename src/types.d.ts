@@ -1152,12 +1152,6 @@ declare global {
         _actionableWalls: StructureWall[]
         readonly actionableWalls: StructureWall[]
 
-        _quadCostMatrix: CostMatrix
-        readonly quadCostMatrix: CostMatrix
-
-        _quadBulldozeCostMatrix: CostMatrix
-        readonly quadBulldozeCostMatrix: CostMatrix
-
         _enemyDamageThreat: boolean
         readonly enemyDamageThreat: boolean
 

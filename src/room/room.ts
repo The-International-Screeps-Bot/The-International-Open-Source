@@ -1831,12 +1831,11 @@ export class RoomManager {
                 }
 
                 if (largestValue >= 50) {
-                    quadCostMatrix.set(x, y, 50)
 
                     quadCostMatrix.set(
                         x,
                         y,
-                        Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 50)),
+                        Math.max(terrainCoords[packXYAsNum(x, y)], largestValue),
                     )
                     continue
                 }
@@ -1860,8 +1859,6 @@ export class RoomManager {
                 }
             }
         }
-
-        /* this.visualizeCostMatrix(quadCostMatrix) */
 
         return (this._quadCostMatrix = quadCostMatrix)
     }
@@ -1998,12 +1995,11 @@ export class RoomManager {
                 }
 
                 if (largestValue >= 50) {
-                    quadBulldozeCostMatrix.set(x, y, 50)
 
                     quadBulldozeCostMatrix.set(
                         x,
                         y,
-                        Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 50)),
+                        Math.max(terrainCoords[packXYAsNum(x, y)], largestValue),
                     )
                     continue
                 }

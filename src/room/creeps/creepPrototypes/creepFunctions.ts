@@ -1299,7 +1299,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
                 range: 0,
             },
         ],
-        weightCostMatrixes: ['quadBulldozeCostMatrix'],
+        weightCoordMaps: [this.room.roomManager.quadBulldozeCostMatrix._bits]
     })
 
     path.push(goalPos)

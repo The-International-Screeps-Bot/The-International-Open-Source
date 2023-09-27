@@ -61,7 +61,7 @@ class RoomsManager {
             let logMessage = `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreepsAmount}`
 
             customLog(
-                `<a style="cursor: pointer;color:inherit" href="https://screeps.com/a/#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
+                `<a style="cursor: pointer;color:inherit; text-decoration:underline;" href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
                 logMessage,
                 {
                     type: LogTypes.info,
