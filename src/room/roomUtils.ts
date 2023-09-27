@@ -93,7 +93,7 @@ export const roomUtils = {
         })
 
         dynamicScore += Math.round(Math.pow(closestEnemy, -0.8) * 25)
-        dynamicScore += Math.round(communeScore * 15)
+        dynamicScore += Math.round(communeScore * 50)
         dynamicScore += allyScore
 
         // Prefer minerals with below average communes
