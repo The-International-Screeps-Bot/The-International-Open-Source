@@ -654,7 +654,7 @@ export class SpawnRequestsManager {
                     partsMultiplier += Math.pow(
                         this.communeManager.room.roomManager.resourcesInStoringStructures.energy /
                             (20000 + this.communeManager.room.controller.level * 1200),
-                        2,
+                        1.7,
                     )
                 }
 
