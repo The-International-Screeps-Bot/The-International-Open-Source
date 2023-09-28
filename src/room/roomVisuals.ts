@@ -294,12 +294,12 @@ export class RoomVisualsManager {
             totalRemoteEnergyHarvested += roomStats.reih
             totalUpgrade += roomStats.eou
             totalBuild += roomStats.eob
-            totalRepairOther = roomStats.eoro
-            totalBarricadeRepair = roomStats.eorwr
-            totalSpawn = roomStats.su
+            totalRepairOther += roomStats.eoro
+            totalBarricadeRepair += roomStats.eorwr
+            totalSpawn += roomStats.su
         }
 
-        totalSpawn = totalSpawn / collectiveManager.communes.size
+        const avgSpawn = totalSpawn / collectiveManager.communes.size
 
         data[0].push(
             totalEstimatedIncome,
@@ -309,7 +309,7 @@ export class RoomVisualsManager {
             totalBuild.toFixed(2),
             totalRepairOther.toFixed(2),
             totalBarricadeRepair.toFixed(2),
-            totalSpawn.toFixed(2),
+            avgSpawn.toFixed(2),
         )
 
         const height = 3 + data.length
