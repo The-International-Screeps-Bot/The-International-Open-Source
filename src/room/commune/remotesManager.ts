@@ -366,7 +366,7 @@ export class RemotesManager {
     private recurseAbandonment(remoteName: string) {
         const remoteMemory = Memory.rooms[remoteName]
 
-        for (const remoteName2 of remoteMemory[RoomMemoryKeys.pathsThrough]) {
+        for (const remoteName2 of Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.remotes]) {
             const remoteMemory2 = Memory.rooms[remoteName2]
 
             // No point in abandoning if the remote is already sufficiently abandoned
@@ -375,7 +375,7 @@ export class RemotesManager {
                 remoteMemory[RoomMemoryKeys.abandonRemote]
             )
                 continue
-
+            console.log(remoteName2)
             // We want to abandon if the remote paths through the specified remote
             if (!remoteMemory2[RoomMemoryKeys.pathsThrough].includes(remoteName)) continue
 
