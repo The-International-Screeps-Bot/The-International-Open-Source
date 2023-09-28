@@ -922,12 +922,13 @@ export class RoomManager {
 
         // Structures have been added, destroyed or aren't yet initialized
 
-        delete this._structureCoords
+        this._structureCoords = undefined
 
         const communeManager = this.room.communeManager
         if (communeManager) {
-            delete communeManager.spawningStructuresByPriorityIDs
-            delete communeManager._fastFillerSpawnEnergyCapacity
+            communeManager.spawningStructuresByPriorityIDs = undefined
+            communeManager.spawningStructuresByNeedIDs = undefined
+            communeManager._fastFillerSpawnEnergyCapacity = undefined
         }
 
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)

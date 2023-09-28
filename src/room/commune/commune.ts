@@ -932,11 +932,10 @@ export class CommuneManager {
     get actionableSpawningStructures() {
         if (this._actionableSpawningStructures) return this._actionableSpawningStructures
 
-        let actionableSpawningStructures: SpawningStructures =
-            this.room.roomManager.structures.spawn
-        actionableSpawningStructures = actionableSpawningStructures.concat(
-            this.room.roomManager.structures.extension,
-        )
+        const structures = this.room.roomManager.structures
+
+        let actionableSpawningStructures: SpawningStructures = structures.spawn
+        actionableSpawningStructures = actionableSpawningStructures.concat(structures.extension)
         actionableSpawningStructures = actionableSpawningStructures.filter(
             structure => structure.RCLActionable,
         )
@@ -979,9 +978,16 @@ export class CommuneManager {
         return (this._spawningStructuresByPriority = spawningStructuresByPriority)
     }
 
+    spawningStructuresByNeedIDs: Id<StructureExtension | StructureSpawn>[]
     _spawningStructuresByNeed: SpawningStructures
     get spawningStructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
+
+        if (this.spawningStructuresByNeedIDs && !this.room.roomManager.structureUpdate) {
+            return (this._spawningStructuresByNeed = this.spawningStructuresByNeedIDs.map(ID =>
+                findObjectWithID(ID),
+            ))
+        }
 
         // mark coords in range 1 of reserved source harvest positions
         // mark coords in range of valid fastFiller position

@@ -225,6 +225,16 @@ export class StatsManager {
     }
 
     internationalEndTick() {
+        // Run communes one last time to update stats
+
+        for (const roomName in this.stats[RoomTypes.commune]) {
+            if (!collectiveManager.communes.has(roomName)) {
+                Memory.stats.rooms[roomName] = undefined
+            }
+
+            this.roomCommuneFinalEndTick(roomName)
+        }
+
         const timestamp = Date.now()
 
         global.lastReset = (global.lastReset || 0) + 1
@@ -278,24 +288,6 @@ export class StatsManager {
         // Make sure this runs last
         Memory.stats.lastTick = Game.time
 
-        // Run communes one last time to update stats
-
-        for (const roomName in this.stats[RoomTypes.commune]) {
-            if (!collectiveManager.communes.has(roomName)) {
-                Memory.stats.rooms[roomName] = undefined
-            }
-
-            this.roomCommuneFinalEndTick(roomName)
-        }
-        /*
-        // Delete data for rooms that exist in memory but not in our stats
-
-        for (const roomName in Memory.stats.rooms) {
-            if (this.stats[RoomTypes.commune][roomName]) continue
-
-            Memory.stats.rooms[roomName] = undefined
-        }
- */
         this.stats = undefined
     }
 

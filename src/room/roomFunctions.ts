@@ -324,7 +324,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         let disable: boolean
         let newCost = 0
-        const pathsThrough: Set<string> = new Set()
+        const pathsThrough = new Set<string>()
 
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
         const packedRemoteSourceHarvestPositions =
@@ -416,7 +416,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     let disable: boolean
 
     // Generate new important positions
-    const pathsThrough: Set<string> = new Set()
+    const pathsThrough = new Set<string>()
 
     const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
     const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
@@ -1690,35 +1690,6 @@ Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
         const cSite = findObjectWithID(ID) as T
         /* console.log('findCSite', cSite, ID) */
         if (conditions(cSite)) return cSite
-    }
-
-    return false
-}
-
-Room.prototype.findStructureInsideRect = function <T extends Structure>(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    condition: (structure: T) => boolean,
-): T | false {
-    let structureID: Id<Structure>
-
-    for (let x = x1; x <= x2; x += 1) {
-        for (let y = y1; y <= y2; y += 1) {
-            // Iterate if the pos doesn't map onto a room
-
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
-
-            const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
-            if (!structureIDs) continue
-
-            structureID = structureIDs.find(structureID => {
-                return condition(findObjectWithID(structureID) as T)
-            })
-
-            if (structureID) return findObjectWithID(structureID) as T
-        }
     }
 
     return false

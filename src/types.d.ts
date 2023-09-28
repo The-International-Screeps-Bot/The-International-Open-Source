@@ -1100,14 +1100,6 @@ declare global {
             conditions: (cSite: T) => boolean,
         ): T | false
 
-        findStructureInsideRect<T extends Structure>(
-            x1: number,
-            y1: number,
-            x2: number,
-            y2: number,
-            condition: (structure: T) => boolean,
-        ): T | false
-
         findStructureInRange<T extends Structure>(
             startCoord: Coord,
             range: number,

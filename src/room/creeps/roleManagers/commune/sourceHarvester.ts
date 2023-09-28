@@ -145,11 +145,9 @@ export class SourceHarvester extends Creep {
 
         if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-        const structure = room.findStructureInsideRect(
-            this.pos.x - 1,
-            this.pos.y - 1,
-            this.pos.x + 1,
-            this.pos.y + 1,
+        const structure = room.findStructureInRange(
+            this.pos,
+            1,
             structure => {
                 return (
                     structure.structureType === STRUCTURE_EXTENSION &&

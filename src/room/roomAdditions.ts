@@ -252,11 +252,9 @@ const roomAdditions = {
             const stampAnchors = this.roomManager.stampAnchors
             if (!stampAnchors) return (this._hubLink = false)
 
-            this._hubLink = this.findStructureInsideRect(
-                stampAnchors.hub[0].x - 1,
-                stampAnchors.hub[0].y - 1,
-                stampAnchors.hub[0].x + 1,
-                stampAnchors.hub[0].y + 1,
+            this._hubLink = this.findStructureInRange(
+                stampAnchors.hub[0],
+                1,
                 structure => structure.structureType === STRUCTURE_LINK,
             )
 
