@@ -48,6 +48,7 @@ import {
     RemoteSourcePathTypes,
     Result,
     ReservedCoordTypes,
+    RoomStatNamesEnum,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -126,7 +127,6 @@ export class CommuneManager {
 
     room: Room
     nextSpawnEnergyAvailable: number
-    estimatedEnergyIncome: number
     /**
      * Organized by remote and sourceIndex
      */
@@ -237,7 +237,6 @@ export class CommuneManager {
         this.mineralHarvestStrength = 0
         this.haulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
-        this.estimatedEnergyIncome = 0
 
         if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
         if (roomMemory[RoomMemoryKeys.threatened] == undefined) {
@@ -448,6 +447,12 @@ export class CommuneManager {
         const combinedCost = BODYPART_COST[WORK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
+    }
+
+    get estimatedEnergyIncome() {
+
+        const roomStats = Memory.stats.rooms[this.room.name]
+        return roundTo(roomStats[RoomStatNamesEnum.EnergyInputHarvest] + roomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] + roomStats[RoomStatNamesEnum.EnergyInputBought], 2)
     }
 
     private _minStoredEnergy: number

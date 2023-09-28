@@ -201,7 +201,6 @@ Creep.prototype.advancedHarvestSource = function (source) {
 
     const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
     this.nextStore.energy += energyHarvested
-    this.commune.communeManager.estimatedEnergyIncome += energyHarvested
 
     statsManager.updateStat(this.room.name, 'eih', energyHarvested)
 

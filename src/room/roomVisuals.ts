@@ -471,6 +471,12 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyResourceRequestsDataVisuals(y: number) {
+
+        if (!simpleAllies.allySegmentData) {
+
+            return y
+        }
+
         const headers = ['room', 'resource', 'amount', 'priority']
 
         const data: any[][] = []
@@ -520,6 +526,12 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
+
+        if (!simpleAllies.allySegmentData) {
+
+            return y
+        }
+
         const headers = ['room', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
 
         const data: any[][] = []
@@ -573,6 +585,12 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyWorkRequestsDataVisuals(y: number) {
+
+        if (!simpleAllies.allySegmentData) {
+
+            return y
+        }
+
         const headers = ['room', 'type', 'priority']
 
         const data: any[][] = []
