@@ -29,6 +29,7 @@ const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_CONTAINER,
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
+    STRUCTURE_WALL,
 ]
 const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
     STRUCTURE_SPAWN,
