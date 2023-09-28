@@ -77,8 +77,9 @@ export class RemoteBuilder extends Creep {
         for (const remoteInfo of this.commune.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
+            
             const remoteMemory = Memory.rooms[remoteName]
-
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) continue
 
             this.assignRemote(remoteName)

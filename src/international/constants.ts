@@ -1570,7 +1570,7 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
 
 export const rangedMassAttackMultiplierByRange = [1, 1, 0.4, 0.1]
 
-export enum RoomStatNamesEnum {
+export enum RoomStatsKeys {
     ControllerLevel = 'cl',
     EnergyInputHarvest = 'eih',
     EnergyInputBought = 'eib',

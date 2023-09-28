@@ -772,8 +772,11 @@ export class RoomVisualsManager {
         for (const remoteInfo of this.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+
             const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const pathType = this.roomManager.room.communeManager.remoteSourcePathType
             const row: any[] = []
 

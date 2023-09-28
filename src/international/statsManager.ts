@@ -1,40 +1,34 @@
 import { roundTo } from 'utils/utils'
-import {
-    CPUMaxPerTick,
-    customColors,
-    RoomMemoryKeys,
-    RoomStatNamesEnum,
-    RoomTypes,
-} from './constants'
+import { CPUMaxPerTick, customColors, RoomMemoryKeys, RoomStatsKeys, RoomTypes } from './constants'
 import { customLog, LogTypes } from 'utils/logging'
 import { collectiveManager } from './collective'
 
 const remoteStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
-    RoomStatNamesEnum.EnergyStored,
-    RoomStatNamesEnum.EnergyInputHarvest,
-    RoomStatNamesEnum.EnergyOutputRepairOther,
-    RoomStatNamesEnum.EnergyOutputBuild,
+    RoomStatsKeys.EnergyStored,
+    RoomStatsKeys.EnergyInputHarvest,
+    RoomStatsKeys.EnergyOutputRepairOther,
+    RoomStatsKeys.EnergyOutputBuild,
 ])
 
 /**
  * Names of stats to average for
  */
 const averageStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
-    RoomStatNamesEnum.SpawnUsagePercentage,
-    RoomStatNamesEnum.EnergyInputHarvest,
-    RoomStatNamesEnum.MineralsHarvested,
-    RoomStatNamesEnum.EnergyInputBought,
-    RoomStatNamesEnum.EnergyOutputSold,
-    RoomStatNamesEnum.EnergyOutputUpgrade,
-    RoomStatNamesEnum.EnergyOutputBuild,
-    RoomStatNamesEnum.EnergyOutputRepairOther,
-    RoomStatNamesEnum.EnergyOutputRepairWallOrRampart,
-    RoomStatNamesEnum.EnergyOutputSpawn,
-    RoomStatNamesEnum.EnergyOutputPower,
-    RoomStatNamesEnum.RemoteEnergyStored,
-    RoomStatNamesEnum.RemoteEnergyInputHarvest,
-    RoomStatNamesEnum.RemoteEnergyOutputRepairOther,
-    RoomStatNamesEnum.RemoteEnergyOutputBuild,
+    RoomStatsKeys.SpawnUsagePercentage,
+    RoomStatsKeys.EnergyInputHarvest,
+    RoomStatsKeys.MineralsHarvested,
+    RoomStatsKeys.EnergyInputBought,
+    RoomStatsKeys.EnergyOutputSold,
+    RoomStatsKeys.EnergyOutputUpgrade,
+    RoomStatsKeys.EnergyOutputBuild,
+    RoomStatsKeys.EnergyOutputRepairOther,
+    RoomStatsKeys.EnergyOutputRepairWallOrRampart,
+    RoomStatsKeys.EnergyOutputSpawn,
+    RoomStatsKeys.EnergyOutputPower,
+    RoomStatsKeys.RemoteEnergyStored,
+    RoomStatsKeys.RemoteEnergyInputHarvest,
+    RoomStatsKeys.RemoteEnergyOutputRepairOther,
+    RoomStatsKeys.RemoteEnergyOutputBuild,
 ])
 
 export class StatsManager {
@@ -47,27 +41,27 @@ export class StatsManager {
     private roomConfig(roomName: string, roomType: number) {
         if (roomType === RoomTypes.commune) {
             const roomStats = (this.stats[RoomTypes.commune][roomName] = {
-                [RoomStatNamesEnum.SpawnUsagePercentage]: 0,
-                [RoomStatNamesEnum.EnergyInputHarvest]: 0,
-                [RoomStatNamesEnum.CreepCount]: 0,
-                [RoomStatNamesEnum.TotalCreepCount]: 0,
-                [RoomStatNamesEnum.PowerCreepCount]: 0,
-                [RoomStatNamesEnum.ControllerLevel]: 0,
-                [RoomStatNamesEnum.EnergyStored]: 0,
-                [RoomStatNamesEnum.MineralsHarvested]: 0,
-                [RoomStatNamesEnum.EnergyInputBought]: 0,
-                [RoomStatNamesEnum.EnergyOutputSold]: 0,
-                [RoomStatNamesEnum.EnergyOutputUpgrade]: 0,
-                [RoomStatNamesEnum.EnergyOutputBuild]: 0,
-                [RoomStatNamesEnum.EnergyOutputRepairOther]: 0,
-                [RoomStatNamesEnum.EnergyOutputRepairWallOrRampart]: 0,
-                [RoomStatNamesEnum.EnergyOutputSpawn]: 0,
-                [RoomStatNamesEnum.EnergyOutputPower]: 0,
-                [RoomStatNamesEnum.RemoteCount]: 0,
-                [RoomStatNamesEnum.RemoteEnergyStored]: 0,
-                [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
-                [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
-                [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
+                [RoomStatsKeys.SpawnUsagePercentage]: 0,
+                [RoomStatsKeys.EnergyInputHarvest]: 0,
+                [RoomStatsKeys.CreepCount]: 0,
+                [RoomStatsKeys.TotalCreepCount]: 0,
+                [RoomStatsKeys.PowerCreepCount]: 0,
+                [RoomStatsKeys.ControllerLevel]: 0,
+                [RoomStatsKeys.EnergyStored]: 0,
+                [RoomStatsKeys.MineralsHarvested]: 0,
+                [RoomStatsKeys.EnergyInputBought]: 0,
+                [RoomStatsKeys.EnergyOutputSold]: 0,
+                [RoomStatsKeys.EnergyOutputUpgrade]: 0,
+                [RoomStatsKeys.EnergyOutputBuild]: 0,
+                [RoomStatsKeys.EnergyOutputRepairOther]: 0,
+                [RoomStatsKeys.EnergyOutputRepairWallOrRampart]: 0,
+                [RoomStatsKeys.EnergyOutputSpawn]: 0,
+                [RoomStatsKeys.EnergyOutputPower]: 0,
+                [RoomStatsKeys.RemoteCount]: 0,
+                [RoomStatsKeys.RemoteEnergyStored]: 0,
+                [RoomStatsKeys.RemoteEnergyInputHarvest]: 0,
+                [RoomStatsKeys.RemoteEnergyOutputRepairOther]: 0,
+                [RoomStatsKeys.RemoteEnergyOutputBuild]: 0,
             })
 
             if (Memory.stats.rooms[roomName]) return
@@ -77,10 +71,10 @@ export class StatsManager {
         }
 
         this.stats[RoomTypes.remote][roomName] = {
-            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
-            [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
-            [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
-            [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
+            [RoomStatsKeys.RemoteEnergyStored]: 0,
+            [RoomStatsKeys.RemoteEnergyInputHarvest]: 0,
+            [RoomStatsKeys.RemoteEnergyOutputRepairOther]: 0,
+            [RoomStatsKeys.RemoteEnergyOutputBuild]: 0,
         }
     }
 
@@ -101,22 +95,22 @@ export class StatsManager {
             const remoteRoomStats = this.stats[RoomTypes.remote][remoteRoomName]
             if (!remoteRoomStats) continue
 
-            roomStats[RoomStatNamesEnum.RemoteCount] += 1
-            roomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] +=
-                remoteRoomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest]
-            roomStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther] +=
-                remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther]
-            roomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild] +=
-                remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild]
+            roomStats[RoomStatsKeys.RemoteCount] += 1
+            roomStats[RoomStatsKeys.RemoteEnergyInputHarvest] +=
+                remoteRoomStats[RoomStatsKeys.RemoteEnergyInputHarvest]
+            roomStats[RoomStatsKeys.RemoteEnergyOutputRepairOther] +=
+                remoteRoomStats[RoomStatsKeys.RemoteEnergyOutputRepairOther]
+            roomStats[RoomStatsKeys.RemoteEnergyOutputBuild] +=
+                remoteRoomStats[RoomStatsKeys.RemoteEnergyOutputBuild]
 
             if (each250Ticks) {
-                roomStats[RoomStatNamesEnum.RemoteEnergyStored] += 0
+                roomStats[RoomStatsKeys.RemoteEnergyStored] += 0
             }
         }
 
-        roomStats[RoomStatNamesEnum.CreepCount] = room.myCreepsAmount
-        roomStats[RoomStatNamesEnum.TotalCreepCount] = room.creepsFromRoomAmount
-        roomStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
+        roomStats[RoomStatsKeys.CreepCount] = room.myCreepsAmount
+        roomStats[RoomStatsKeys.TotalCreepCount] = room.creepsFromRoomAmount
+        roomStats[RoomStatsKeys.PowerCreepCount] = room.myPowerCreepsAmount
 
         const spawns = room.roomManager.structures.spawn
         if (spawns.length > 0) {
@@ -128,7 +122,7 @@ export class StatsManager {
                 spawningSpawnsCount += 1
             }
 
-            roomStats[RoomStatNamesEnum.SpawnUsagePercentage] = spawningSpawnsCount / spawns.length
+            roomStats[RoomStatsKeys.SpawnUsagePercentage] = spawningSpawnsCount / spawns.length
         }
 
         if (room.controller && room.controller.my) {
@@ -149,7 +143,7 @@ export class StatsManager {
                 interTickRoomStats[RoomStatNamesEnum.EnergyStored]
         } */
         const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
-        roomStats[RoomStatNamesEnum.EnergyStored] =
+        roomStats[RoomStatsKeys.EnergyStored] =
             (resourcesInStoringStructures.energy || 0) +
             (resourcesInStoringStructures.battery || 0) * 10
 

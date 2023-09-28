@@ -1422,6 +1422,9 @@ export class RoomManager {
     }
 
     _remoteNamesByEfficacy: string[]
+    /**
+     * Some rooms may no longer be remotes when accesed later in the code
+     */
     get remoteNamesByEfficacy() {
         if (this._remoteNamesByEfficacy) return this._remoteNamesByEfficacy
 
@@ -1448,6 +1451,9 @@ export class RoomManager {
     }
 
     _remoteSourceIndexesByEfficacy: string[]
+    /**
+     * Some rooms may no longer be remotes when accessed later in the code
+     */
     get remoteSourceIndexesByEfficacy() {
         if (this._remoteSourceIndexesByEfficacy) return this._remoteSourceIndexesByEfficacy
 

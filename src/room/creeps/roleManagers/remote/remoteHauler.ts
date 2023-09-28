@@ -91,6 +91,9 @@ export class RemoteHauler extends Creep {
         for (const remoteInfo of this.commune.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
+            const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+
             const sourceIndex = parseInt(splitRemoteInfo[1])
 
             if (!this.isRemoteValid(remoteName, sourceIndex)) continue
@@ -168,32 +171,6 @@ export class RemoteHauler extends Creep {
         delete creepMemory[CreepMemoryKeys.remote]
         delete creepMemory[CreepMemoryKeys.sourceIndex]
     }
-
-    /*
-    updateRemote?() {
-        if (this.memory[CreepMemoryKeys.remote]) {
-
-            return true
-        }
-
-        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
-
-        let roomMemory
-
-        for (const roomName of remoteNamesByEfficacy) {
-            roomMemory = Memory.rooms[roomName]
-
-            if (roomMemory.needs[RemoteData.remoteHauler] <= 0) continue
-
-            this.memory[CreepMemoryKeys.remote] = roomName
-            roomMemory.needs[RemoteData.remoteHauler] -= this.parts.carry
-
-            return true
-        }
-
-        return false
-    }
- */
 
     getResources?() {
         const creepMemory = Memory.creeps[this.name]

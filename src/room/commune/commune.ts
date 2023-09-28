@@ -48,7 +48,7 @@ import {
     RemoteSourcePathTypes,
     Result,
     ReservedCoordTypes,
-    RoomStatNamesEnum,
+    RoomStatsKeys,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -450,9 +450,13 @@ export class CommuneManager {
     }
 
     get estimatedEnergyIncome() {
-
         const roomStats = Memory.stats.rooms[this.room.name]
-        return roundTo(roomStats[RoomStatNamesEnum.EnergyInputHarvest] + roomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] + roomStats[RoomStatNamesEnum.EnergyInputBought], 2)
+        return roundTo(
+            roomStats[RoomStatsKeys.EnergyInputHarvest] +
+                roomStats[RoomStatsKeys.RemoteEnergyInputHarvest] +
+                roomStats[RoomStatsKeys.EnergyInputBought],
+            2,
+        )
     }
 
     private _minStoredEnergy: number
@@ -894,7 +898,7 @@ export class CommuneManager {
 
         if (this.controllerLinkID) {
             const structure = findObjectWithID(this.controllerLinkID)
-            if (structure) return this._controllerLink = structure
+            if (structure) return (this._controllerLink = structure)
         }
 
         const structure = this.room.findStructureAtCoord(

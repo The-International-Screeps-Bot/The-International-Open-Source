@@ -10,6 +10,7 @@ import {
     decayCosts,
     CreepMemoryKeys,
     RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import {
     findCarryPartsRequired,
@@ -1041,17 +1042,21 @@ export class SpawnRequestsManager {
     private remoteSourceRoles() {
         let priorityIncrement = 0
 
-        for (const remoteInfo of this.communeManager.room.roomManager
-            .remoteSourceIndexesByEfficacy) {
-            priorityIncrement += 1
-
+        const remoteSourceIndexesByEfficacy =
+            this.communeManager.room.roomManager.remoteSourceIndexesByEfficacy
+        for (const remoteInfo of remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
             const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+
+            priorityIncrement += 1
+
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+
             /*
             const remoteHaulerNeed = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
             const harvesterPriority = this.minRemotePriority + priorityIncrement + (remoteHaulerNeed > 0 ? 1 : 100)
@@ -1231,6 +1236,7 @@ export class SpawnRequestsManager {
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
             const remoteName = remoteNamesByEfficacy[index]
             const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 
