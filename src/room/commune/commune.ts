@@ -889,7 +889,7 @@ export class CommuneManager {
 
         if (this.controllerLinkID) {
             const structure = findObjectWithID(this.controllerLinkID)
-            if (structure) return structure
+            if (structure) return this._controllerLink = structure
         }
 
         const structure = this.room.findStructureAtCoord(

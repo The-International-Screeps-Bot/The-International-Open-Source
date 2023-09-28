@@ -707,7 +707,7 @@ export class RoomManager {
 
     _upgradePositions: RoomPosition[]
     get upgradePositions() {
-        if (this._upgradePositions) return this._upgradePositions
+        if (this._upgradePositions && !this.structureUpdate) return this._upgradePositions
 
         // Get the center upgrade pos, stopping if it's undefined
 
@@ -923,6 +923,7 @@ export class RoomManager {
         // Structures have been added, destroyed or aren't yet initialized
 
         this._structureCoords = undefined
+        this._upgradePositions = undefined
 
         const communeManager = this.room.communeManager
         if (communeManager) {
