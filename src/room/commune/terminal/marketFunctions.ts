@@ -28,6 +28,8 @@ export const marketUtils = {
             )
             if (result === OK && resourceType === 'energy') {
                 statsManager.updateStat(room.name, 'eos', amount)
+            } else if (result === OK && resourceType === 'battery') {
+                statsManager.updateStat(room.name, 'eos', amount * 10)
             }
 
             return result == OK
@@ -54,6 +56,8 @@ export const marketUtils = {
         })
         if (result === OK && resourceType === 'energy') {
             statsManager.updateStat(room.name, 'eos', amount)
+        } else if (result === OK && resourceType === 'battery') {
+            statsManager.updateStat(room.name, 'eos', amount * 10)
         }
 
         return result == OK
@@ -83,6 +87,8 @@ export const marketUtils = {
             )
             if (result === OK && resourceType === 'energy') {
                 statsManager.updateStat(room.name, 'eib', amount)
+            } else if (result === OK && resourceType === 'battery') {
+                statsManager.updateStat(room.name, 'eib', amount * 10)
             }
             return result == OK
         }
@@ -107,6 +113,8 @@ export const marketUtils = {
         })
         if (result === OK && resourceType === 'energy') {
             statsManager.updateStat(room.name, 'eib', amount)
+        } else if (result === OK && resourceType === 'battery') {
+            statsManager.updateStat(room.name, 'eib', amount * 10)
         }
         return result == OK
     },
