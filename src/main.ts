@@ -53,6 +53,7 @@ import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 
 export function originalLoop() {
+    if (global.userScript && Game.flags['usersScriptFirstRun']) global.userScript()
     if (Game.flags['deactivate']) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
@@ -76,7 +77,7 @@ export function originalLoop() {
         requestsManager.run()
 
         if (global.collectivizer) global.collectivizer.run()
-        if (global.userScript) global.userScript()
+        if (global.userScript && !Game.flags['usersScriptFirstRun']) global.userScript()
         playerManager.run()
         roomsManager.initRun()
         creepOrganizer.run()
