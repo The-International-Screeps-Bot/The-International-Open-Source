@@ -45,9 +45,9 @@ export class CollectiveManager extends Sleepable {
     terminalCommunes: string[]
 
     /**
-     * The aggregate number of each mineral in our communes
+     * The aggregate number of each mineral nodes we have access to
      */
-    mineralCommunes: Partial<{ [key in MineralConstant]: number }>
+    mineralNodes: Partial<{ [key in MineralConstant]: number }>
 
     /**
      * The name of the room that is safemoded, if there is one
@@ -86,9 +86,9 @@ export class CollectiveManager extends Sleepable {
         this.tickID = 0
         this.customCreepIDs = []
         this.customCreepIDIndex = 0
-        this.mineralCommunes = {}
+        this.mineralNodes = {}
         for (const mineralType of minerals) {
-            this.mineralCommunes[mineralType] = 0
+            this.mineralNodes[mineralType] = 0
         }
         this.myCommands = []
         this.logs = ''
@@ -457,8 +457,8 @@ export class CollectiveManager extends Sleepable {
     get avgCommunesPerMineral() {
         let sum = 0
 
-        for (const mineralType in this.mineralCommunes) {
-            sum += this.mineralCommunes[mineralType as MineralConstant]
+        for (const mineralType in this.mineralNodes) {
+            sum += this.mineralNodes[mineralType as MineralConstant]
         }
 
         const avg = roundTo(sum / minerals.length, 2)

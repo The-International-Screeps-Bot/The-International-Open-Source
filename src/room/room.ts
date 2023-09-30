@@ -1839,6 +1839,7 @@ export class RoomManager {
                 }
 
                 if (largestValue >= 50) {
+                    largestValue = 50
 
                     quadCostMatrix.set(
                         x,
@@ -1867,6 +1868,8 @@ export class RoomManager {
                 }
             }
         }
+
+        /* this.room.visualizeCostMatrix(quadCostMatrix) */
 
         return (this._quadCostMatrix = quadCostMatrix)
     }
@@ -2003,6 +2006,7 @@ export class RoomManager {
                 }
 
                 if (largestValue >= 50) {
+                    largestValue = 50
 
                     quadBulldozeCostMatrix.set(
                         x,

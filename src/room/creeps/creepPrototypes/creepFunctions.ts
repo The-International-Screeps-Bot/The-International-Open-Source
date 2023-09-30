@@ -56,6 +56,7 @@ import { creepClasses } from '../creepClasses'
 import { statsManager } from 'international/statsManager'
 import { customFindPath } from 'international/customPathFinder'
 import { creepUtils } from '../creepUtils'
+import { RoomManager } from 'room/room'
 
 Creep.prototype.update = function () {}
 
@@ -1298,7 +1299,9 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
                 range: 0,
             },
         ],
-        weightCoordMaps: [this.room.roomManager.quadBulldozeCostMatrix._bits]
+        weightCostMatrixes (roomName) {
+            return [RoomManager.roomManagers[roomName].quadBulldozeCostMatrix]
+        }
     })
 
     path.push(goalPos)

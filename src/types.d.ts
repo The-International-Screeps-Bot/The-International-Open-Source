@@ -20,6 +20,7 @@ import {
     PlayerRelationship,
     ReservedCoordTypes,
     WorkTypes,
+    creepRoles,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -148,7 +149,7 @@ declare global {
 
     type CoordMap = Uint8Array
 
-    type CreepRoles =
+    type CreepRoles = 
         | 'sourceHarvester'
         | 'hauler'
         | 'requestHauler'

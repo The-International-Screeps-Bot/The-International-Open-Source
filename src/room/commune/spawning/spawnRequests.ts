@@ -1677,8 +1677,14 @@ export class SpawnRequestsManager {
 
                         const role = 'antifaRangedAttacker'
 
-                        const spawnGroup =
-                            collectiveManager.creepsByCombatRequest[requestName][role]
+                        let spawnGroup: string[]
+
+                        if (collectiveManager.creepsByCombatRequest[requestName]) {
+
+                            spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                        }
+                        spawnGroup = []
+
                         const minCost = minRangedAttackCost + minRangedHealCost
                         const extraParts: BodyPartConstant[] = []
 

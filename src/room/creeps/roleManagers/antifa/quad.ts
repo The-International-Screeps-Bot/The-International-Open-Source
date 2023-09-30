@@ -34,6 +34,7 @@ import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { Antifa } from './antifa'
 import { CustomPathFinderArgs, PathGoal } from 'international/customPathFinder'
 import { LogTypes, customLog } from 'utils/logging'
+import { RoomManager } from 'room/room'
 
 const rangedFleeRange = 5
 const meleeFleeRange = 3
@@ -125,7 +126,7 @@ export class Quad {
 
         this.leader.message = 'IF'
 
-        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
+        if (this.leader.room.roomManager.enemyDamageThreat && this.runCombat()) return
 
         this.passiveRangedAttack()
 
@@ -225,6 +226,8 @@ export class Quad {
             this.leader.room.roomManager.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >=
             50
         ) {
+
+            this.leader.room.coordVisual(this.leader.pos.x, this.leader.pos.y)
             /*
             this.leader.createMoveRequest({
                 goals: [
@@ -367,7 +370,9 @@ export class Quad {
 
         // Attack mode
 
-        opts.weightCostMatrixes = ['quadCostMatrix']
+        opts.weightCostMatrixes = function(roomName) {
+            return [RoomManager.roomManagers[roomName].quadCostMatrix]
+        }
         moveLeader.createMoveRequest(opts)
 
         if (!moveLeader.moveRequest) return false

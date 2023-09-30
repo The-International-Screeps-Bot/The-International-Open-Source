@@ -293,7 +293,7 @@ export class CommuneManager {
             collectiveManager.terminalCommunes.push(room.name)
         }
 
-        collectiveManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
+        collectiveManager.mineralNodes[this.room.roomManager.mineral.mineralType] += 1
     }
 
     initRun() {

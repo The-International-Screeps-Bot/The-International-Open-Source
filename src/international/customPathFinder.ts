@@ -61,7 +61,7 @@ export interface CustomPathFinderArgs {
     /**
      * The names of the costMatrixes to weight. Will apply onto cost matrix in use
      */
-    weightCostMatrixes?: string[]
+    weightCostMatrixes?(roomName: string): CostMatrix[]
 
     weightCoordMaps?: CoordMap[]
 
@@ -506,13 +506,12 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                 for (let x = 0; x < roomDimensions; x += 1) {
                     for (let y = 0; y < roomDimensions; y += 1) {
+
                         // Loop through each costMatrix
 
-                        for (const weightCMName of args.weightCostMatrixes) {
-                            const weightCM = room[weightCMName as unknown as keyof Room]
-                            if (!weightCM) continue
+                        for (const costMatrix of args.weightCostMatrixes(roomName)) {
 
-                            cm.set(x, y, (weightCM as CostMatrix).get(x, y))
+                            cm.set(x, y, costMatrix.get(x, y))
                         }
                     }
                 }

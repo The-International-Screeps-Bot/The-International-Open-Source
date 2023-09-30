@@ -924,6 +924,7 @@ export function isAlly(playerName: string) {
 }
 
 export function outOfBucket() {
+    Memory.stats.lastTick = Game.time
     collectiveManager.logs = ''
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         type: LogTypes.warning,

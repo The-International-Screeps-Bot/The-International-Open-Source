@@ -101,7 +101,7 @@ export const roomUtils = {
         const roomMemory = Memory.rooms[roomName]
         const mineralType = roomMemory[RoomMemoryKeys.mineralType]
         const mineralScore =
-            collectiveManager.mineralCommunes[mineralType] - collectiveManager.avgCommunesPerMineral
+            collectiveManager.mineralNodes[mineralType] - collectiveManager.avgCommunesPerMineral
         dynamicScore += mineralScore * 40
 
         roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
