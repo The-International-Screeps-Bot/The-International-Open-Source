@@ -500,33 +500,6 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
 }
 
 /**
- * Finds the largest possible transaction amount given a budget and starting amount
- * @param budget The number of energy willing to be invested in the trade
- * @param amount The number of resources that would like to be traded
- * @param roomName1
- * @param roomName2
- * @returns
- */
-export function findLargestTransactionAmount(
-    budget: number,
-    amount: number,
-    roomName1: string,
-    roomName2: string,
-) {
-    budget = Math.max(budget, 1)
-
-    // So long as the the transactions cost is more than the budget
-
-    while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
-        // Decrease amount exponentially
-
-        amount = (amount - 1) * 0.8
-    }
-
-    return Math.floor(amount)
-}
-
-/**
  * Finds the name of the closest commune, exluding the specified roomName
  */
 export function findClosestCommuneName(roomName: string) {

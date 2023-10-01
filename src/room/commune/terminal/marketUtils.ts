@@ -1,5 +1,5 @@
 import { customLog } from 'utils/logging'
-import { findLargestTransactionAmount, getAvgPrice } from 'utils/utils'
+import { getAvgPrice } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 
@@ -15,7 +15,7 @@ export const marketUtils = {
         const order = collectiveManager.getBuyOrder(resourceType)
 
         if (order) {
-            const dealAmount = findLargestTransactionAmount(
+            const dealAmount = this.findLargestTransactionAmount(
                 room.terminal.store.energy * 0.75,
                 amount,
                 room.name,
@@ -73,7 +73,7 @@ export const marketUtils = {
         const order = collectiveManager.getSellOrder(resourceType, getAvgPrice(resourceType) * 1.2)
 
         if (order) {
-            const dealAmount = findLargestTransactionAmount(
+            const dealAmount = this.findLargestTransactionAmount(
                 room.terminal.store.energy * 0.75,
                 amount,
                 room.name,
@@ -118,4 +118,30 @@ export const marketUtils = {
         }
         return result == OK
     },
+    /**
+     * Finds the largest possible transaction amount given a budget and starting amount
+     * @param budget The number of energy willing to be invested in the trade
+     * @param amount The number of resources that would like to be traded
+     * @param roomName1
+     * @param roomName2
+     * @returns
+     */
+    findLargestTransactionAmount(
+        budget: number,
+        amount: number,
+        roomName1: string,
+        roomName2: string,
+    ) {
+        budget = Math.max(budget, 1)
+
+        // So long as the the transactions cost is more than the budget
+
+        while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
+            // Decrease amount exponentially
+
+            amount = (amount - 1) * 0.8
+        }
+
+        return Math.floor(amount)
+    }
 }

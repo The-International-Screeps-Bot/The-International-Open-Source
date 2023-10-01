@@ -295,7 +295,9 @@ export class StatsManager {
         if (!number) number = 0
 
         avg -= avg / averagedOverTickCount
-        avg += number / averagedOverTickCount
+
+        const timeStep = Game.time - Memory.stats.lastTick
+        avg += number / timeStep / averagedOverTickCount
 
         return roundTo(avg, precision)
     }

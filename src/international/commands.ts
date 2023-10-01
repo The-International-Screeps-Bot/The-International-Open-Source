@@ -1,5 +1,5 @@
 import { collectiveManager } from './collective'
-import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys } from './constants'
+import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys, RoomTypes } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
 
@@ -232,8 +232,15 @@ global.combat = function (requestName, type, opts, communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return `${communeName} is not of room type commune`
+
+        // Assign values
+
         request[CombatRequestKeys.responder] = communeName
-        roomMemory[RoomMemoryKeys.combatRequests].push(requestName)
+        if (!roomMemory[RoomMemoryKeys.combatRequests].includes(requestName)) {
+
+            roomMemory[RoomMemoryKeys.combatRequests].push(requestName)
+        }
     }
 
     return `${
