@@ -1563,9 +1563,12 @@ export class RoomManager {
                 structure => structure.structureType === STRUCTURE_CONTAINER,
             ),
         ]
-        const fastFillerContainers = potentialFastFillerContainers.filter(
-            container => !!container,
-        ) as StructureContainer[]
+        let fastFillerContainers: StructureContainer[] = []
+        for (const container of potentialFastFillerContainers) {
+            if (!container) continue
+
+            fastFillerContainers.push(container)
+        }
 
         this.fastFillerContainerIDs = fastFillerContainers.map(container => container.id)
         return (this._fastFillerContainers = fastFillerContainers)
