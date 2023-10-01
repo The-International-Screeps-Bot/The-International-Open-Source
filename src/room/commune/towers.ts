@@ -1,4 +1,9 @@
-import { PlayerMemoryKeys, RoomLogisticsRequestTypes, customColors, towerPowers } from 'international/constants'
+import {
+    PlayerMemoryKeys,
+    RoomLogisticsRequestTypes,
+    customColors,
+    towerPowers,
+} from 'international/constants'
 import { statsManager } from 'international/statsManager'
 import {
     findHighestScore,
@@ -106,7 +111,7 @@ export class TowerManager {
     }
 
     private attackEnemyCreeps() {
-        if (this.communeManager.room.flags.disableTowerAttacks) {
+        if (Game.flags.disableTowerAttacks) {
             this.communeManager.room.towerInferiority =
                 this.communeManager.room.roomManager.enemyAttackers.length > 0
             return false
@@ -171,7 +176,9 @@ export class TowerManager {
 
         if (room.roomManager.enemyAttackers.length) {
             return room.roomManager.myDamagedCreeps.find(creep => {
-                return !creep.isOnExit && !room.enemyThreatCoords.has(packCoord(creep.pos))
+                return (
+                    !creep.isOnExit && !room.roomManager.enemyThreatCoords.has(packCoord(creep.pos))
+                )
             })
         }
 

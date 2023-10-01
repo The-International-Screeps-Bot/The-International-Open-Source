@@ -145,18 +145,14 @@ export class SourceHarvester extends Creep {
 
         if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-        const structure = room.findStructureInRange(
-            this.pos,
-            1,
-            structure => {
-                return (
-                    structure.structureType === STRUCTURE_EXTENSION &&
-                    (structure as AnyStoreStructure).store.getCapacity(RESOURCE_ENERGY) -
-                        structure.nextStore.energy >
-                        0
-                )
-            },
-        )
+        const structure = room.findStructureInRange(this.pos, 1, structure => {
+            return (
+                structure.structureType === STRUCTURE_EXTENSION &&
+                (structure as AnyStoreStructure).store.getCapacity(RESOURCE_ENERGY) -
+                    structure.nextStore.energy >
+                    0
+            )
+        })
         if (!structure) return false
 
         return this.advancedTransfer(structure as AnyStoreStructure)
@@ -183,7 +179,11 @@ export class SourceHarvester extends Creep {
 
                 const result = this.runRoomLogisticsRequestAdvanced({
                     resourceTypes: new Set([RESOURCE_ENERGY]),
-                    types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
+                    types: new Set<RoomLogisticsRequestTypes>([
+                        RoomLogisticsRequestTypes.withdraw,
+                        RoomLogisticsRequestTypes.pickup,
+                        RoomLogisticsRequestTypes.offer,
+                    ]),
                     conditions: request => {
                         getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                     },
@@ -217,7 +217,11 @@ export class SourceHarvester extends Creep {
 
             const result = this.runRoomLogisticsRequestAdvanced({
                 resourceTypes: new Set([RESOURCE_ENERGY]),
-                types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
+                types: new Set<RoomLogisticsRequestTypes>([
+                    RoomLogisticsRequestTypes.withdraw,
+                    RoomLogisticsRequestTypes.pickup,
+                    RoomLogisticsRequestTypes.offer,
+                ]),
                 conditions: request => {
                     getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
                 },
@@ -259,7 +263,8 @@ export class SourceHarvester extends Creep {
     }
 
     transferToNearbyCreep?(): boolean {
-        const sourceContainer = this.room.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]]
+        const sourceContainer =
+            this.room.roomManager.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]]
         if (sourceContainer) return false
 
         const sourceLink =
@@ -284,7 +289,9 @@ export class SourceHarvester extends Creep {
 
         // Try to repair the sourceContainer
 
-        this.maintainContainer(this.room.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]])
+        this.maintainContainer(
+            this.room.roomManager.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]],
+        )
 
         if (this.transferToNearbyCreep()) return
     }

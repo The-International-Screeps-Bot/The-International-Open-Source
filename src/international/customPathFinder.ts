@@ -437,7 +437,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 if (!args.avoidEnemyRanges) return
                 if (room.controller && room.controller.safeMode && room.controller.my) return
 
-                for (const packedCoord of room.enemyThreatCoords) {
+                for (const packedCoord of room.roomManager.enemyThreatCoords) {
                     const coord = unpackCoord(packedCoord)
                     cm.set(coord.x, coord.y, 255)
                 }
@@ -505,11 +505,9 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                 for (let x = 0; x < roomDimensions; x += 1) {
                     for (let y = 0; y < roomDimensions; y += 1) {
-
                         // Loop through each costMatrix
 
                         for (const costMatrix of args.weightCostMatrixes(roomName)) {
-
                             cm.set(x, y, costMatrix.get(x, y))
                         }
                     }

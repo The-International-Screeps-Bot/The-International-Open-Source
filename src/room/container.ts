@@ -24,10 +24,7 @@ export class ContainerManager {
     private runFastFillerContainers() {
         if (!this.roomManager.room.myCreeps.fastFiller.length) return
 
-        const fastFillerContainers = [
-            this.roomManager.room.fastFillerContainerLeft,
-            this.roomManager.room.fastFillerContainerRight,
-        ]
+        const fastFillerContainers = this.roomManager.fastFillerContainers
 
         for (const container of fastFillerContainers) {
             if (!container) continue
@@ -62,7 +59,7 @@ export class ContainerManager {
     }
 
     private runSourceContainers() {
-        for (const container of this.roomManager.room.sourceContainers) {
+        for (const container of this.roomManager.sourceContainers) {
             if (!container) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
@@ -80,7 +77,7 @@ export class ContainerManager {
     }
 
     private runControllerContainer() {
-        const container = this.roomManager.room.controllerContainer
+        const container = this.roomManager.controllerContainer
         if (!container) return
 
         if (container.usedReserveStore > container.store.getCapacity() * 0.9) return
@@ -101,7 +98,7 @@ export class ContainerManager {
     }
 
     private runMineralContainer() {
-        const container = this.roomManager.room.mineralContainer
+        const container = this.roomManager.mineralContainer
         if (!container) return
 
         const resourceType = this.roomManager.mineral.mineralType

@@ -265,7 +265,7 @@ export class RemoteHarvester extends Creep {
         this.room.visual.text((sourcee.energy * ENERGY_REGEN_TIME).toString() + ', ' + (sourcee.ticksToRegeneration * 0.9 * sourcee.energyCapacity).toString(), this.pos)
         */
 
-        const container = this.room.sourceContainers[sourceIndex]
+        const container = this.room.roomManager.sourceContainers[sourceIndex]
         if (container) {
             // Repair or build the container if we're ahead on source regen
 
@@ -314,7 +314,11 @@ export class RemoteHarvester extends Creep {
 
         return this.runRoomLogisticsRequestAdvanced({
             resourceTypes: new Set([RESOURCE_ENERGY]),
-            types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
+            types: new Set<RoomLogisticsRequestTypes>([
+                RoomLogisticsRequestTypes.withdraw,
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.offer,
+            ]),
             conditions: request => {
                 getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
             },

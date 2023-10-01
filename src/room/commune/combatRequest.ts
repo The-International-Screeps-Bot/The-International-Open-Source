@@ -170,7 +170,7 @@ export class CombatRequestManager {
                 request[CombatRequestKeys.minDamage] = enemyCreep.combatStrength.heal + 1
         }
 
-        if (!requestRoom.enemyDamageThreat) {
+        if (!requestRoom.roomManager.enemyDamageThreat) {
             request[CombatRequestKeys.inactionTimer] -= 1
             this.manageInaction(requestName, index)
         } else

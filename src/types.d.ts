@@ -394,13 +394,6 @@ declare global {
     }[keyof T]
 
     interface RoomGlobal {
-        [key: string]: any
-
-        // Paths
-
-        source1PathLength: number
-        source2PathLength: number
-        upgradePathLength: number
 
         // Containers
 
@@ -416,9 +409,6 @@ declare global {
         fastFillerLink: Id<StructureLink> | undefined
         hubLink: Id<StructureLink> | undefined
 
-        //
-
-        defaultCostMatrix: number[]
     }
 
     interface EnemySquadData {
@@ -735,81 +725,6 @@ declare global {
          * Generates a square visual at the specified coordinate
          */
         coordVisual(x: number, y: number, fill?: string): void
-
-        // Room Getters
-
-        _global: RoomGlobal
-        readonly global: RoomGlobal
-
-        // Container
-
-        _sourceContainers: StructureContainer[]
-        readonly sourceContainers: StructureContainer[]
-
-        _fastFillerContainerLeft: StructureContainer | false
-        readonly fastFillerContainerLeft: StructureContainer | undefined
-
-        _fastFillerContainerRight: StructureContainer | false
-        readonly fastFillerContainerRight: StructureContainer | undefined
-
-        _controllerContainer: StructureContainer | false
-        readonly controllerContainer: StructureContainer | undefined
-
-        _mineralContainer: StructureContainer | false
-        readonly mineralContainer: StructureContainer | false
-
-        // Links
-
-        _fastFillerLink: StructureLink | false
-        readonly fastFillerLink: StructureLink | false
-
-        _hubLink: StructureLink | false
-        readonly hubLink: StructureLink | false
-
-        _actionableWalls: StructureWall[]
-        readonly actionableWalls: StructureWall[]
-
-        _enemyDamageThreat: boolean
-        readonly enemyDamageThreat: boolean
-
-        _enemyThreatCoords: Set<string>
-        readonly enemyThreatCoords: Set<string>
-
-        _enemyThreatGoals: PathGoal[]
-        readonly enemyThreatGoals: PathGoal[]
-
-        _flags: Partial<{ [key in FlagNames]: Flag }>
-        readonly flags: { [key in FlagNames]: Flag }
-
-        _factory: StructureFactory
-        readonly factory: StructureFactory
-
-        _powerSpawn: StructurePowerSpawn
-        readonly powerSpawn: StructurePowerSpawn
-
-        _nuker: StructureNuker
-        readonly nuker: StructureNuker
-
-        _observer: StructureObserver
-        readonly observer: StructureObserver
-
-        _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
-        readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
-
-        _unprotectedEnemyCreeps: Creep[]
-        readonly unprotectedEnemyCreeps: Creep[]
-
-        _exitCoords: Set<string>
-        readonly exitCoords: Set<string>
-
-        _advancedLogistics: boolean
-        readonly advancedLogistics: boolean
-
-        _defaultCostMatrix: CostMatrix
-        readonly defaultCostMatrix: CostMatrix
-
-        _totalEnemyCombatStrength: TotalEnemyCombatStrength
-        readonly totalEnemyCombatStrength: TotalEnemyCombatStrength
     }
 
     interface DepositRecord {
@@ -1527,8 +1442,6 @@ declare global {
 
     namespace NodeJS {
         interface Global {
-            // Required for roomAdditions. Eventually this should be removed
-            [key: string]: any
 
             // User custom
 
@@ -1543,6 +1456,8 @@ declare global {
             userScriptExample(): void
 
             //
+
+            Memory: Memory
 
             /**
              * Whether global is constructed or not

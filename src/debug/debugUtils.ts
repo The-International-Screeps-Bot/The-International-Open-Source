@@ -101,7 +101,7 @@ export const debugUtils = {
             const obj = { max: 0, entries: [] as any }
             for (const x in global) {
                 if (x == 'global' || x == 'Memory') continue
-                const string = JSON.stringify(global[x])
+                const string = JSON.stringify((global as any)[x])
                 if (string && string.length > l) {
                     obj.max = Math.max(obj.max, x.length)
                     obj.entries.push({ name: x, length: string.length })

@@ -602,8 +602,7 @@ export class CommuneManager {
         // Only set true if there are no viable storing structures
 
         return (
-            !this.room.fastFillerContainerLeft &&
-            !this.room.fastFillerContainerRight &&
+            !this.room.roomManager.fastFillerContainers.length &&
             !this.room.storage &&
             !this.room.terminal
         )
@@ -626,7 +625,7 @@ export class CommuneManager {
 
         // Link
 
-        const hubLink = this.room.hubLink
+        const hubLink = this.room.roomManager.hubLink
         const sourceLinks = this.sourceLinks
 
         // If there are transfer links, max out partMultiplier to their ability
@@ -698,7 +697,7 @@ export class CommuneManager {
         // We can use containers
 
         if (controllerLevel < 5) {
-            return (this._upgradeStructure = this.room.controllerContainer)
+            return (this._upgradeStructure = this.room.roomManager.controllerContainer)
         }
 
         // We can use links
@@ -706,7 +705,7 @@ export class CommuneManager {
         const controllerLink = this.controllerLink
         if (!controllerLink || !controllerLink.RCLActionable) return false
 
-        const hubLink = this.room.hubLink
+        const hubLink = this.room.roomManager.hubLink
         if (!hubLink || !hubLink.RCLActionable) return false
 
         return (this._upgradeStructure = controllerLink)
@@ -716,7 +715,7 @@ export class CommuneManager {
     get structureTypesByBuildPriority() {
         if (this._structureTypesByBuildPriority) return this._structureTypesByBuildPriority
 
-        if (!this.room.fastFillerContainerLeft && !this.room.fastFillerContainerRight) {
+        if (!this.room.roomManager.fastFillerContainers.length) {
             return (this._structureTypesByBuildPriority = [
                 STRUCTURE_RAMPART,
                 STRUCTURE_WALL,

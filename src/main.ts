@@ -54,7 +54,7 @@ import { requestsManager } from 'international/requests'
 
 export function originalLoop() {
     if (global.userScript && Game.flags['usersScriptFirstRun']) global.userScript()
-    if (Game.flags['deactivate']) return
+    if (Game.flags.deactivate) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
         return

@@ -97,7 +97,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.fatigue > 0) return false
     if (this instanceof Creep && !this.parts.move) return false
 
-    if (this.room.enemyDamageThreat) return this.createMoveRequest(args)
+    if (this.room.roomManager.enemyDamageThreat) return this.createMoveRequest(args)
 
     const cachedIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
     if (cachedIndex >= 0 && cachedIndex + 2 !== pathOpts.packedPath.length) {
@@ -170,7 +170,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         return Result.noAction
     }
 
-    if (this.room.enemyDamageThreat) return this.createMoveRequest(args)
+    if (this.room.roomManager.enemyDamageThreat) return this.createMoveRequest(args)
 
     // const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
 
@@ -202,7 +202,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             font: 0.4,
         })
     }
-/*
+    /*
     this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y, {
         font: 0.4,
     })
@@ -526,7 +526,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
 
         // If the coord isn't safe to stand on
 
-        if (room.enemyThreatCoords.has(packedCoord)) return
+        if (room.roomManager.enemyThreatCoords.has(packedCoord)) return
 
         if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) return
 
@@ -1003,11 +1003,11 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 }
 
 PowerCreep.prototype.avoidEnemyThreatCoords = Creep.prototype.avoidEnemyThreatCoords = function () {
-    if (!this.room.enemyThreatCoords.has(packCoord(this.pos))) return false
+    if (!this.room.roomManager.enemyThreatCoords.has(packCoord(this.pos))) return false
 
     this.createMoveRequest({
         origin: this.pos,
-        goals: this.room.enemyThreatGoals,
+        goals: this.room.roomManager.enemyThreatGoals,
         flee: true,
     })
 

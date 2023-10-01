@@ -156,7 +156,7 @@ export class Quad {
         if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest])
             return false
         /*
-        if (!this.leader.room.enemyDamageThreat) {
+        if (!this.leader.room.roomManager.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
             return true
         }
@@ -226,7 +226,6 @@ export class Quad {
             this.leader.room.roomManager.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >=
             50
         ) {
-
             this.leader.room.coordVisual(this.leader.pos.x, this.leader.pos.y)
             /*
             this.leader.createMoveRequest({
@@ -370,7 +369,7 @@ export class Quad {
 
         // Attack mode
 
-        opts.weightCostMatrixes = function(roomName) {
+        opts.weightCostMatrixes = function (roomName) {
             return [RoomManager.roomManagers[roomName].quadCostMatrix]
         }
         moveLeader.createMoveRequest(opts)
@@ -601,7 +600,6 @@ export class Quad {
     }
 
     private rangedAttackEnemyCreeps(attackingMemberNames: Set<string>) {
-
         // Get enemies by damage members can deal
 
         const enemyTargetsWithDamage: Map<Id<Creep>, number> = new Map()
@@ -656,24 +654,22 @@ export class Quad {
     }
 
     private rangedAttackEnemyStructures(attackingMemberNames: Set<string>) {
-        if (Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
-            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote) return attackingMemberNames
+        if (
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+        )
+            return attackingMemberNames
 
         for (const structure of this.leader.room.find(FIND_STRUCTURES)) {
-
             for (const memberName of attackingMemberNames) {
                 const member = Game.creeps[memberName]
 
                 const range = getRange(member.pos, structure.pos)
                 if (range > 3) continue
 
-                if (
-                    !(structure as OwnedStructure).owner ||
-                    range > 1
-                ) {
+                if (!(structure as OwnedStructure).owner || range > 1) {
                     member.rangedAttack(structure)
-                }
-                else member.rangedMassAttack()
+                } else member.rangedMassAttack()
 
                 member.ranged = true
                 attackingMemberNames.delete(member.name)
@@ -685,20 +681,15 @@ export class Quad {
     }
 
     private rangedAttackTarget(attackingMemberNames: Set<string>) {
-
         for (const memberName of attackingMemberNames) {
             const member = Game.creeps[memberName]
 
             const range = getRange(member.pos, this.target.pos)
             if (range > 3) continue
 
-            if (
-                !(this.target as OwnedStructure).owner ||
-                range > 1
-            ) {
+            if (!(this.target as OwnedStructure).owner || range > 1) {
                 member.rangedAttack(this.target)
-            }
-            else member.rangedMassAttack()
+            } else member.rangedMassAttack()
 
             member.ranged = true
             attackingMemberNames.delete(member.name)
@@ -711,11 +702,9 @@ export class Quad {
      * Attack viable targets without moving
      */
     passiveRangedAttack() {
-
         let attackingMemberNames = new Set(this.memberNames)
 
         if (this.target && this.target instanceof Creep) {
-
             attackingMemberNames = this.rangedAttackTarget(attackingMemberNames)
             if (!attackingMemberNames.size) return
         }
@@ -725,7 +714,6 @@ export class Quad {
 
         // If there is a target, even though it isn't a creep, try to attack it
         if (this.target) {
-
             attackingMemberNames = this.rangedAttackTarget(attackingMemberNames)
             if (!attackingMemberNames.size) return
         }
@@ -861,8 +849,11 @@ export class Quad {
         const request = Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]]
         if (!request) return false
         if (request[CombatRequestKeys.type] === 'defend') return false
-        if (Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
-            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote) return false
+        if (
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+        )
+            return false
 
         let bulldozeTarget: Structure
         this.leader.memory[CreepMemoryKeys.quadBulldozeTargets] = []
@@ -916,8 +907,11 @@ export class Quad {
         const request = Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]]
         if (!request) return false
         if (request[CombatRequestKeys.type] === 'defend') return false
-        if (Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
-            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote) return false
+        if (
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+        )
+            return false
 
         const structures = this.leader.room.roomManager.combatStructureTargets
 

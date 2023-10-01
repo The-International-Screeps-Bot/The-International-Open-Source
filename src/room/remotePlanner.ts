@@ -456,7 +456,7 @@ export class RemotePlanner {
         */
     }
     private recordExits() {
-        for (const packedCoord of this.room.exitCoords) {
+        for (const packedCoord of this.room.roomManager.exitCoords) {
             const coord = unpackCoord(packedCoord)
             this.exitCoords.push(coord)
             forAdjacentCoords(coord, adjCoord => {
@@ -662,7 +662,7 @@ export class RemotePlanner {
         visitedCoords = new Set()
         groupIndex = 0
 
-        for (const packedCoord of this.room.exitCoords) {
+        for (const packedCoord of this.room.roomManager.exitCoords) {
             const exitCoord = unpackCoord(packedCoord)
             if (visitedCoords.has(packedCoord)) continue
 
@@ -1746,7 +1746,7 @@ export class RemotePlanner {
                     if (visitedCoords[packAsNum(coord2)] === 1) continue
                     visitedCoords[packAsNum(coord2)] = 1
 
-                    if (this.room.exitCoords.has(packCoord(coord2))) return true
+                    if (this.room.roomManager.exitCoords.has(packCoord(coord2))) return true
 
                     if (this.terrainCoords[packAsNum(coord2)] === 255) continue
 

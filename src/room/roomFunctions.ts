@@ -1644,7 +1644,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         amount: amount,
         priority: args.priority,
         onlyFull: true || args.onlyFull,
-        noReserve: !this.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
+        noReserve: !this.roomManager.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
     })
 }
 

@@ -706,7 +706,7 @@ export class SpawningStructuresManager {
      * Debug
      */
     private visualizeRequests() {
-        if (!this.communeManager.room.flags.spawnRequestVisuals) return
+        if (!Game.flags.spawnRequestVisuals) return
 
         const headers = ['role', 'priority', 'cost']
         const data: any[][] = []

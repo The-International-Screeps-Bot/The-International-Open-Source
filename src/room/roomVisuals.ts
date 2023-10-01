@@ -650,7 +650,7 @@ export class RoomVisualsManager {
 
         const data: any[][] = [
             [
-                this.roomManager.room.roomManager.resourcesInStoringStructures.energy || 0,
+                this.roomManager.resourcesInStoringStructures.energy || 0,
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
                 roomMemory[RoomMemoryKeys.threatened].toFixed(2),

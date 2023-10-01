@@ -88,7 +88,7 @@ export class MineralHarvester extends Creep {
 
             if (creep.advancedHarvestMineral(mineral) !== Result.success) continue
 
-            const mineralContainer = room.mineralContainer
+            const mineralContainer = room.roomManager.mineralContainer
             if (
                 mineralContainer &&
                 // No need to transfer if we're on top of the container

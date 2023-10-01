@@ -29,8 +29,8 @@ export class LinkManager {
         if (!sourceLinks.filter(link => link).length) return
 
         let receiverLinks = [
-            this.communeManager.room.fastFillerLink,
-            this.communeManager.room.hubLink,
+            this.communeManager.room.roomManager.fastFillerLink,
+            this.communeManager.room.roomManager.hubLink,
             this.communeManager.controllerLink,
         ].filter(link => link)
 
@@ -75,10 +75,10 @@ export class LinkManager {
     }
 
     private hubToFastFiller() {
-        const hubLink = this.communeManager.room.hubLink
+        const hubLink = this.communeManager.room.roomManager.hubLink
         if (!hubLink) return
 
-        const fastFillerLink = this.communeManager.room.fastFillerLink
+        const fastFillerLink = this.communeManager.room.roomManager.fastFillerLink
         if (!fastFillerLink) return
 
         // If the hubLink is not sufficiently full, stop
@@ -106,7 +106,7 @@ export class LinkManager {
         const controllerLink = this.communeManager.controllerLink
         if (!controllerLink) return
 
-        const hubLink = this.communeManager.room.hubLink
+        const hubLink = this.communeManager.room.roomManager.hubLink
         if (!hubLink) {
             this.createControllerLinkRoomLogisticsRequest()
             return

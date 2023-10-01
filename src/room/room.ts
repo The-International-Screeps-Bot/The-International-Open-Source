@@ -179,7 +179,7 @@ export class RoomManager {
         this._enemyDamageThreat = undefined
         this._enemyThreatCoords = undefined
         this._enemyThreatGoals = undefined
-        this._flags = undefined
+        /* this._flags = undefined */
         this._resourcesInStoringStructures = undefined
         this._unprotectedEnemyCreeps = undefined
         this._exitCoords = undefined
@@ -1146,7 +1146,7 @@ export class RoomManager {
     get enemyCreepPositions() {
         const enemyCreepPositions: { [packedCoord: string]: Id<Creep> } = {}
 
-        for (const creep of this.room.roomManager.notMyCreeps.enemy) {
+        for (const creep of this.notMyCreeps.enemy) {
             const packedCoord = packCoord(creep.pos)
             enemyCreepPositions[packedCoord] = creep.id
         }
@@ -1164,7 +1164,7 @@ export class RoomManager {
             highestHeal: 0,
             highestDismantle: 0,
         }
-        const enemyCreeps = this.room.roomManager.notMyCreeps.enemy
+        const enemyCreeps = this.notMyCreeps.enemy
         if (!enemyCreeps.length) return (this._enemySquadData = highestEnemySquadData)
 
         const enemyCreepIDs = new Set(enemyCreeps.map(creep => creep.id))
@@ -1685,7 +1685,7 @@ export class RoomManager {
         const droppedEnergy = this.room.find(FIND_DROPPED_RESOURCES, {
             filter: resource =>
                 resource.resourceType === RESOURCE_ENERGY &&
-                !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
+                !resource.room.roomManager.enemyThreatCoords.has(packCoord(resource.pos)),
         })
         return (this._droppedEnergy = droppedEnergy)
     }
@@ -1695,7 +1695,8 @@ export class RoomManager {
         if (this._droppedResources) return this._droppedResources
 
         const droppedResources = this.room.find(FIND_DROPPED_RESOURCES, {
-            filter: resource => !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
+            filter: resource =>
+                !resource.room.roomManager.enemyThreatCoords.has(packCoord(resource.pos)),
         })
         return (this._droppedResources = droppedResources)
     }
@@ -1707,7 +1708,7 @@ export class RoomManager {
         const actionableWalls = this.room.find<StructureWall>(FIND_STRUCTURES, {
             filter: structure =>
                 structure.structureType === STRUCTURE_WALL &&
-                !structure.room.enemyThreatCoords.has(packCoord(structure.pos)),
+                !structure.room.roomManager.enemyThreatCoords.has(packCoord(structure.pos)),
         })
         return (this._actionableWalls = actionableWalls)
     }
@@ -2155,7 +2156,7 @@ export class RoomManager {
 
         return (this._enemyThreatGoals = enemyThreatGoals)
     }
-
+    /*
     _flags: Partial<{ [key in FlagNames]: Flag }>
     get flags() {
         if (this._flags) return this._flags
@@ -2168,14 +2169,17 @@ export class RoomManager {
 
         return (this._flags = flags)
     }
-
+ */
     _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
     get resourcesInStoringStructures() {
         if (this._resourcesInStoringStructures) return this._resourcesInStoringStructures
 
         const resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }> = {}
 
-        const storingStructures: AnyStoreStructure[] = [this.room.storage, this.room.factory]
+        const storingStructures: AnyStoreStructure[] = [
+            this.room.storage,
+            this.factory,
+        ]
         if (this.room.terminal && !this.room.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) {
             storingStructures.push(this.room.terminal)
         }
@@ -2369,7 +2373,7 @@ export class RoomManager {
     }
 
     _factory?: StructureFactory
-    get() {
+    get factory() {
         if (this._factory !== undefined) return this._factory
 
         return (this._factory = this.structures.factory[0])

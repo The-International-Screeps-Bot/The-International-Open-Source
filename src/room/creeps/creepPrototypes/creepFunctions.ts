@@ -246,8 +246,8 @@ Creep.prototype.advancedUpgradeController = function () {
 
     // Assign either the controllerLink or controllerContainer as the controllerStructure
 
-    let controllerStructure: StructureLink | StructureContainer | undefined =
-        room.controllerContainer
+    let controllerStructure: StructureLink | StructureContainer | false =
+        room.roomManager.controllerContainer
     const controllerLink = room.communeManager.controllerLink
 
     if (!controllerStructure && controllerLink && controllerLink.RCLActionable)
@@ -353,7 +353,11 @@ Creep.prototype.advancedUpgradeController = function () {
 
     if (this.needsResources()) {
         this.runRoomLogisticsRequestsAdvanced({
-            types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
+            types: new Set<RoomLogisticsRequestTypes>([
+                RoomLogisticsRequestTypes.withdraw,
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.offer,
+            ]),
             conditions: request => request.resourceType === RESOURCE_ENERGY,
         })
 
@@ -440,7 +444,11 @@ Creep.prototype.builderGetEnergy = function () {
         }
 
         this.runRoomLogisticsRequestsAdvanced({
-            types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
+            types: new Set<RoomLogisticsRequestTypes>([
+                RoomLogisticsRequestTypes.withdraw,
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.offer,
+            ]),
             resourceTypes: new Set([RESOURCE_ENERGY]),
         })
 
@@ -453,7 +461,11 @@ Creep.prototype.builderGetEnergy = function () {
     // We don't have a storage or terminal, don't allow use of sourceContainers
 
     this.runRoomLogisticsRequestsAdvanced({
-        types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.offer]),
+        types: new Set<RoomLogisticsRequestTypes>([
+            RoomLogisticsRequestTypes.withdraw,
+            RoomLogisticsRequestTypes.pickup,
+            RoomLogisticsRequestTypes.offer,
+        ]),
         resourceTypes: new Set([RESOURCE_ENERGY]),
         conditions: (request: RoomLogisticsRequest) => {
             const target = findObjectWithID(request.targetID)
@@ -951,10 +963,9 @@ Creep.prototype.findRecycleTarget = function () {
         if (spawn) return spawn
     }
 
-    const fastFillerContainers = [room.fastFillerContainerLeft, room.fastFillerContainerRight]
+    const fastFillerContainers = this.room.roomManager.fastFillerContainers
 
     for (const container of fastFillerContainers) {
-        if (!container) continue
 
         // If there is no spawn adjacent to the container
 
@@ -1300,9 +1311,9 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
                 range: 0,
             },
         ],
-        weightCostMatrixes (roomName) {
+        weightCostMatrixes(roomName) {
             return [RoomManager.roomManagers[roomName].quadBulldozeCostMatrix]
-        }
+        },
     })
 
     path.push(goalPos)
@@ -1528,9 +1539,15 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
                 }
             } else {
                 const nextRequest =
-                    this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.withdraw][bestRequest.delivery] ||
-                    this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.offer][bestRequest.delivery] ||
-                    this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.pickup][bestRequest.delivery]
+                    this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.withdraw][
+                        bestRequest.delivery
+                    ] ||
+                    this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.offer][
+                        bestRequest.delivery
+                    ] ||
+                    this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.pickup][
+                        bestRequest.delivery
+                    ]
 
                 nextCreepRequest = {
                     [CreepRoomLogisticsRequestKeys.type]: nextRequest.type,
@@ -1635,7 +1652,11 @@ Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     }
 
     if (!this.needsResources()) return new Set([RoomLogisticsRequestTypes.transfer])
-    return new Set([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.transfer])
+    return new Set([
+        RoomLogisticsRequestTypes.withdraw,
+        RoomLogisticsRequestTypes.pickup,
+        RoomLogisticsRequestTypes.transfer,
+    ])
 }
 
 Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID) {

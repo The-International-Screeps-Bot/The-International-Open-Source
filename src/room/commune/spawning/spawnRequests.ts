@@ -266,7 +266,7 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 if (this.communeManager.room.controller.level < 6) return false
                 if (!this.communeManager.room.roomManager.structures.extractor.length) return false
-                if (!this.communeManager.room.mineralContainer) return false
+                if (!this.communeManager.room.roomManager.mineralContainer) return false
                 if (!this.communeManager.room.storage) return false
                 if (
                     this.communeManager.room.roomManager.resourcesInStoringStructures.energy < 40000
@@ -304,7 +304,7 @@ export class SpawnRequestsManager {
                 // There is no hubLink and another link, or no terminal
 
                 if (
-                    (!this.communeManager.room.hubLink ||
+                    (!this.communeManager.room.roomManager.hubLink ||
                         this.communeManager.room.roomManager.structures.link.length < 2) &&
                     (!this.communeManager.room.terminal ||
                         !this.communeManager.room.terminal.RCLActionable)
@@ -337,12 +337,10 @@ export class SpawnRequestsManager {
                 let priority = 0.75
 
                 let totalFastFillerEnergy = 0
-                if (this.communeManager.room.fastFillerContainerLeft)
-                    totalFastFillerEnergy +=
-                        this.communeManager.room.fastFillerContainerLeft.store.energy
-                if (this.communeManager.room.fastFillerContainerRight)
-                    totalFastFillerEnergy +=
-                        this.communeManager.room.fastFillerContainerRight.store.energy
+                for (const container of this.communeManager.room.roomManager.fastFillerContainers) {
+
+                    totalFastFillerEnergy += container.store.energy
+                }
 
                 if (totalFastFillerEnergy < 1000) priority = 1.25
 
@@ -391,11 +389,13 @@ export class SpawnRequestsManager {
 
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
-                        requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
+                        requiredStrength +=
+                            this.communeManager.room.roomManager.totalEnemyCombatStrength.heal
                         if (!this.communeManager.room.roomManager.structures.tower.length) {
                             requiredStrength +=
-                                this.communeManager.room.totalEnemyCombatStrength.melee +
-                                this.communeManager.room.totalEnemyCombatStrength.ranged
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength
+                                    .melee +
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength.ranged
                         }
                     }
 
@@ -453,11 +453,13 @@ export class SpawnRequestsManager {
 
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
-                        requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
+                        requiredStrength +=
+                            this.communeManager.room.roomManager.totalEnemyCombatStrength.heal
                         if (!this.communeManager.room.roomManager.structures.tower.length) {
                             requiredStrength +=
-                                this.communeManager.room.totalEnemyCombatStrength.melee +
-                                this.communeManager.room.totalEnemyCombatStrength.ranged
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength
+                                    .melee +
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength.ranged
                         }
                     }
                     requiredStrength *= 0.3
@@ -725,8 +727,7 @@ export class SpawnRequestsManager {
                 // There are no fastFiller containers
 
                 if (
-                    !this.communeManager.room.fastFillerContainerLeft &&
-                    !this.communeManager.room.fastFillerContainerRight
+                    !this.communeManager.room.roomManager.fastFillerContainers.length
                 ) {
                     return {
                         role,
@@ -1681,7 +1682,6 @@ export class SpawnRequestsManager {
                         let spawnGroup: string[]
 
                         if (collectiveManager.creepsByCombatRequest[requestName]) {
-
                             spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                         }
                         spawnGroup = []
