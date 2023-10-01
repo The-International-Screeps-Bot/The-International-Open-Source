@@ -242,7 +242,7 @@ export class HubHauler extends Creep {
         const { room } = this
         const { storage } = room
         const { terminal } = room
-        const { hubLink } = room
+        const hubLink = this.room.roomManager.hubLink
 
         if (!hubLink) return false
 
@@ -264,7 +264,7 @@ export class HubHauler extends Creep {
 
         // If the fastFillerLink is less than x% full
 
-        const { fastFillerLink } = room
+        const fastFillerLink = this.room.roomManager.fastFillerLink
         if (
             fastFillerLink &&
             fastFillerLink.store.getCapacity(RESOURCE_ENERGY) * linkReceiveTreshold >
@@ -299,7 +299,7 @@ export class HubHauler extends Creep {
     reserveHubLinkTransfer?(): boolean {
         const { room } = this
 
-        const { hubLink } = room
+        const hubLink = this.room.roomManager.hubLink
         if (!hubLink) return false
 
         // If there is a sufficient cooldown (there is no point filling a link that can do nothing)
@@ -312,7 +312,7 @@ export class HubHauler extends Creep {
             return false
 
         const { controllerLink } = room.communeManager
-        const { fastFillerLink } = room
+        const fastFillerLink = this.room.roomManager.fastFillerLink
 
         // If a link is less than x% full
 

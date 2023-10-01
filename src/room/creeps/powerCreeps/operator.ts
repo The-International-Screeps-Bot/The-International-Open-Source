@@ -52,14 +52,14 @@ export class Operator extends PowerCreep {
     findRenewTask?() {
         if (this.ticksToLive > POWER_CREEP_LIFE_TIME * 0.1) return false
 
-        if (!this.room.powerSpawn) return false
+        if (!this.room.roomManager.powerSpawn) return false
 
         this.memory[PowerCreepMemoryKeys.task] = 'advancedRenew'
         return true
     }
 
     advancedRenew?() {
-        const powerSpawn = this.room.powerSpawn
+        const powerSpawn = this.room.roomManager.powerSpawn
         if (!powerSpawn) return Result.fail
 
         const minRange = 1

@@ -11,7 +11,7 @@ export class PowerSpawnsManager {
         this.communeManager = communeManager
     }
     public run() {
-        this.powerSpawn = this.communeManager.room.powerSpawn
+        this.powerSpawn = this.communeManager.room.roomManager.powerSpawn
         if (!this.powerSpawn) return
 
         this.advancedProcessPower()
