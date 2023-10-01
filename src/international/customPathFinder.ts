@@ -2,7 +2,6 @@ import { BasePlans } from 'room/construction/basePlans'
 import {
     CreepMemoryKeys,
     ReservedCoordTypes,
-    ReservedCoordTypesKeys,
     Result,
     RoomMemoryKeys,
     RoomTypes,
@@ -89,7 +88,7 @@ export interface CustomPathFinderArgs {
 
     weightStructurePlans?: boolean
 
-    minReservedCoordType?: ReservedCoordTypesKeys
+    minReservedCoordType?: ReservedCoordTypes
 }
 
 export function customFindPath(args: CustomPathFinderArgs) {

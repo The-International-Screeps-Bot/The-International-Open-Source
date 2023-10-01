@@ -93,6 +93,7 @@ import { has } from 'lodash'
 import { roomUtils } from 'room/roomUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { creepUtils } from 'room/creeps/creepUtils'
+import { SpawnRequestArgs } from 'types/spawnRequest'
 
 export class CommuneManager {
     static communeManagers: { [roomName: string]: CommuneManager } = {}

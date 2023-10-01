@@ -13,11 +13,12 @@ import { LogTypes, customLog } from 'utils/logging'
 import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
-import './spawn'
+import './spawnUtils'
 import './spawnRequests'
-import { spawnFunctions } from './spawn'
+import { spawnUtils } from './spawnUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { debugUtils } from 'debug/debugUtils'
+import { SpawnRequest, SpawnRequestArgs } from 'types/spawnRequest'
 
 export class SpawningStructuresManager {
     communeManager: CommuneManager
@@ -152,7 +153,7 @@ export class SpawningStructuresManager {
 
         // See if creep can be spawned
 
-        const testSpawnResult = spawnFunctions.testSpawn(spawn, request, ID)
+        const testSpawnResult = spawnUtils.testSpawn(spawn, request, ID)
 
         // If creep can't be spawned
 
@@ -173,7 +174,7 @@ export class SpawningStructuresManager {
         // Spawn the creep for real
 
         request.extraOpts.directions = this.findDirections(spawn.pos)
-        const result = spawnFunctions.advancedSpawn(spawn, request, ID)
+        const result = spawnUtils.advancedSpawn(spawn, request, ID)
         if (result !== OK) {
             customLog(
                 'Failed to spawn: spawning failed',

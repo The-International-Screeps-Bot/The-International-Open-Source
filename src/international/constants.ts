@@ -1,7 +1,7 @@
 import { packCoord } from 'other/codec'
 import { collectiveManager } from './collective'
 
-export type PlayerRelationship = 'ally' | 'enemy'
+
 
 export enum PlayerMemoryKeys {
     /**
@@ -1694,7 +1694,6 @@ export enum ReservedCoordTypes {
      */
     necessary,
 }
-export type ReservedCoordTypesKeys = typeof ReservedCoordTypes[keyof typeof ReservedCoordTypes]
 
 /**
  * Types of work intents

@@ -1,6 +1,7 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { RoomMemoryKeys, RoomTypes, customColors } from './constants'
 import { collectiveManager } from './collective'
+import { CombatRequestTypes } from 'types/internationalRequests'
 
 class FlagManager {
     run() {

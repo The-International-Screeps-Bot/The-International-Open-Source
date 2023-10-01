@@ -234,9 +234,10 @@ export class DefenceManager {
         if (!global.settings.publicRamparts) return
 
         const { room } = this.communeManager
+        const roomMemory = Memory.rooms[room.name]
 
         // Wait some pseudo-random time before publicizing ramparts
-        if (room.memory[RoomMemoryKeys.lastAttackedBy] < randomIntRange(100, 150)) return
+        if (roomMemory[RoomMemoryKeys.lastAttackedBy] !== undefined && roomMemory[RoomMemoryKeys.lastAttackedBy] < randomIntRange(100, 150)) return
 
         // Publicize at most 10 ramparts per tick, to avoid too many intents
 
@@ -407,7 +408,7 @@ export class DefenceManager {
             if (roomMemory[RoomMemoryKeys.threatened] > 0)
                 roomMemory[RoomMemoryKeys.threatened] *= defaultDataDecay
 
-            roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
+            if (roomMemory[RoomMemoryKeys.lastAttackedBy]) roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
         }
 
         roomMemory[RoomMemoryKeys.threatened] = Math.max(

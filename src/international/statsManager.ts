@@ -3,7 +3,101 @@ import { CPUMaxPerTick, customColors, RoomMemoryKeys, RoomStatsKeys, RoomTypes }
 import { customLog, LogTypes } from 'utils/logging'
 import { collectiveManager } from './collective'
 
-const remoteStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
+export interface RoomStats {
+    /**
+     * Game Time
+     */
+    gt: number
+    /**
+     * Remote Count
+     */
+    rc: number
+    /**
+     * Remote Energy Stored
+     */
+    res: number
+    /**
+     * Remote Energy Input Harvest
+     */
+    reih: number
+    /**
+     * Remote Energy Output Repair Other (non-barricade structures)
+     */
+    reoro: number
+    /**
+     * Remote Energy Output Build
+     */
+    reob: number
+}
+
+export interface CommuneStats extends RoomStats {
+    /**
+     * Controller Level
+     */
+    cl: number
+    /**
+     * Energy Input Harvest
+     */
+    eih: number
+    /**
+     * Energy Input Bought
+     */
+    eib?: number
+    /**
+     * Energy Output Upgrade
+     */
+    eou: number
+    /**
+     * Energy Output Repair Other (non-barricade structures)
+     */
+    eoro: number
+    /**
+     * Energy Output Repair Wall or Rampart
+     */
+    eorwr: number
+    /**
+     * Energy Output Build
+     */
+    eob: number
+    /**
+     * Energy Output Sold
+     */
+    eos: number
+    /**
+     * Energy Output Spawn
+     */
+    eosp: number
+    /**
+     * Energy Output Power
+     */
+    eop: number
+    /**
+     * Minerals Harvested
+     */
+    mh: number
+    /**
+     * Energy Stored
+     */
+    es: number
+    /**
+     * Creep Count
+     */
+    cc: number
+    /**
+     * Total Creep Count
+     */
+    tcc: number
+    /**
+     * Power Creep Count
+     */
+    pcc: number
+    /**
+     * Spawn Usage as a decimal
+     */
+    su: number
+}
+
+const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
     RoomStatsKeys.EnergyStored,
     RoomStatsKeys.EnergyInputHarvest,
     RoomStatsKeys.EnergyOutputRepairOther,
@@ -13,7 +107,7 @@ const remoteStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
 /**
  * Names of stats to average for
  */
-const averageStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
+const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
     RoomStatsKeys.SpawnUsagePercentage,
     RoomStatsKeys.EnergyInputHarvest,
     RoomStatsKeys.MineralsHarvested,
@@ -33,8 +127,8 @@ const averageStatNames: Set<Partial<RoomCommuneStatNames>> = new Set([
 
 export class StatsManager {
     stats: {
-        [roomType in StatsRoomTypes]: {
-            [roomName: string]: Partial<RoomStats | RoomCommuneStats>
+        [roomType in RoomTypes.commune | RoomTypes.remote]: {
+            [roomName: string]: Partial<RoomStats | CommuneStats>
         }
     }
 
@@ -86,7 +180,7 @@ export class StatsManager {
         const room = Game.rooms[roomName]
         const roomMemory = Memory.rooms[roomName]
         const interTickRoomStats = Memory.stats.rooms[roomName]
-        const roomStats = this.stats[RoomTypes.commune][roomName] as RoomCommuneStats
+        const roomStats = this.stats[RoomTypes.commune][roomName] as CommuneStats
 
         const each250Ticks = Game.time % 250 === 0
 
@@ -150,7 +244,7 @@ export class StatsManager {
         // delete legacy stat key value pairs
 
         for (const key in interTickRoomStats) {
-            const statName = key as keyof RoomCommuneStats
+            const statName = key as keyof CommuneStats
             if (roomStats[statName]) continue
 
             roomStats[statName] = undefined
@@ -159,7 +253,7 @@ export class StatsManager {
         // implement average tick stats into inter tick stats
 
         for (const key in roomStats) {
-            const statName = key as keyof RoomCommuneStats
+            const statName = key as keyof CommuneStats
 
             if (averageStatNames.has(statName)) {
                 let globalValue = roomStats[statName] || 0
@@ -305,16 +399,16 @@ export class StatsManager {
     updateStat(roomName: string, name: string, value: number) {
         if (!this.stats) return
 
-        let roomStatName = name as RoomStatNames
+        let roomStatName = name as keyof RoomStats
 
         if (this.stats[RoomTypes.commune][roomName]) {
-            ;(this.stats[RoomTypes.commune][roomName] as RoomCommuneStats)[roomStatName] += value
+            ;(this.stats[RoomTypes.commune][roomName] as CommuneStats)[roomStatName] += value
             return
         }
 
         if (this.stats[RoomTypes.remote][roomName]) {
             if (remoteStatNames.has(roomStatName)) {
-                roomStatName = ('r' + roomStatName) as RoomStatNames
+                roomStatName = ('r' + roomStatName) as keyof RoomStats
             }
 
             ;(this.stats[RoomTypes.remote][roomName] as RoomStats)[roomStatName] += value

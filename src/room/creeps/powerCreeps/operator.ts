@@ -1,4 +1,5 @@
 import { Result, customColors, PowerCreepMemoryKeys } from 'international/constants'
+import { PowerTask } from 'types/roomRequests'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
 

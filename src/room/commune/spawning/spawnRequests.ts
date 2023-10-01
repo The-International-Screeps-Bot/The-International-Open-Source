@@ -25,6 +25,7 @@ import { packPos, unpackPosList } from 'other/codec'
 import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 import { customLog } from 'utils/logging'
+import { SpawnRequestArgs } from 'types/spawnRequest'
 
 export class SpawnRequestsManager {
     communeManager: CommuneManager

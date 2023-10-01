@@ -2,7 +2,6 @@ import {
     CreepMemoryKeys,
     PlayerMemoryKeys,
     ReservedCoordTypes,
-    ReservedCoordTypesKeys,
     Result,
     RoomLogisticsRequestTypes,
     RoomMemoryKeys,
@@ -510,7 +509,7 @@ export class RoomManager {
         )
     }
 
-    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypesKeys) {
+    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypes) {
         const currentCoordType = this.reservedCoords.get(packedCoord) || ReservedCoordTypes.normal
         if (currentCoordType) {
             this.reservedCoords.set(packedCoord, Math.max(currentCoordType, newCoordType))

@@ -2,8 +2,9 @@ import { creepRoles } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
 import { newID } from 'utils/utils'
+import { SpawnRequest } from 'types/spawnRequest'
 
-export const spawnFunctions = {
+export const spawnUtils = {
     testSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
         return spawn.spawnCreep(spawnRequest.body, requestID.toString(), { dryRun: true })
     },

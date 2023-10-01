@@ -57,6 +57,7 @@ import { statsManager } from 'international/statsManager'
 import { customFindPath } from 'international/customPathFinder'
 import { creepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
+import { CreepRoomLogisticsRequest, RoomLogisticsRequest } from 'types/roomRequests'
 
 Creep.prototype.update = function () {}
 
