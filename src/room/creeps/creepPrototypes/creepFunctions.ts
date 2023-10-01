@@ -277,7 +277,12 @@ Creep.prototype.advancedUpgradeController = function () {
                         },
                     ],
                     avoidEnemyRanges: true,
-                    weightCostMatrix: 'defaultCostMatrix',
+                    defaultCostMatrix(roomName) {
+                        const roomManager = RoomManager.roomManagers[roomName]
+                        if (!roomManager) return false
+
+                        return roomManager.defaultCostMatrix
+                    },
                 })
 
                 this.message += '➡️'
@@ -369,7 +374,12 @@ Creep.prototype.advancedUpgradeController = function () {
             origin: this.pos,
             goals: [{ pos: room.controller.pos, range: 3 }],
             avoidEnemyRanges: true,
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
         return false
     }
@@ -387,7 +397,12 @@ Creep.prototype.advancedUpgradeController = function () {
             origin: this.pos,
             goals: [{ pos: room.controller.pos, range: 3 }],
             avoidEnemyRanges: true,
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         // Inform false
@@ -498,7 +513,12 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
             origin: this.pos,
             goals: [{ pos: cSite.pos, range: 3 }],
             avoidEnemyRanges: true,
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         return Result.action
@@ -572,7 +592,12 @@ Creep.prototype.advancedBuildAllyCSite = function () {
             origin: this.pos,
             goals: [{ pos: cSiteTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         return true
@@ -966,7 +991,6 @@ Creep.prototype.findRecycleTarget = function () {
     const fastFillerContainers = this.room.roomManager.fastFillerContainers
 
     for (const container of fastFillerContainers) {
-
         // If there is no spawn adjacent to the container
 
         if (!findClosestObjectInRange(container.pos, spawns, 1)) continue
@@ -1311,7 +1335,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
                 range: 0,
             },
         ],
-        weightCostMatrixes(roomName) {
+        defaultCostMatrixes(roomName) {
             return [RoomManager.roomManagers[roomName].quadBulldozeCostMatrix]
         },
     })
@@ -1895,7 +1919,12 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         return Result.action
@@ -2007,7 +2036,12 @@ Creep.prototype.runRoomLogisticsRequest = function () {
         this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         return Result.action

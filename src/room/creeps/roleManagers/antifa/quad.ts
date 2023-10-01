@@ -369,7 +369,7 @@ export class Quad {
 
         // Attack mode
 
-        opts.weightCostMatrixes = function (roomName) {
+        opts.defaultCostMatrixes = function (roomName) {
             return [RoomManager.roomManagers[roomName].quadCostMatrix]
         }
         moveLeader.createMoveRequest(opts)

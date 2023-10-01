@@ -12,6 +12,7 @@ import { statsManager } from 'international/statsManager'
 import { getRange } from 'utils/utils'
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackPosAt } from 'other/codec'
+import { RoomManager } from 'room/room'
 
 export const creepUtils = {
     expandName(creepName: string) {
@@ -71,7 +72,11 @@ export const creepUtils = {
             delete Memory.creeps[creep.name][CreepMemoryKeys.structureTarget]
 
             creep.runRoomLogisticsRequestsAdvanced({
-                types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.withdraw, RoomLogisticsRequestTypes.offer, RoomLogisticsRequestTypes.pickup]),
+                types: new Set<RoomLogisticsRequestTypes>([
+                    RoomLogisticsRequestTypes.withdraw,
+                    RoomLogisticsRequestTypes.offer,
+                    RoomLogisticsRequestTypes.pickup,
+                ]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 
@@ -100,7 +105,12 @@ export const creepUtils = {
                 origin: creep.pos,
                 goals: [{ pos: repairTarget.pos, range: 3 }],
                 avoidEnemyRanges: true,
-                weightCostMatrix: 'defaultCostMatrix',
+                defaultCostMatrix(roomName) {
+                    const roomManager = RoomManager.roomManagers[roomName]
+                    if (!roomManager) return false
+
+                    return roomManager.defaultCostMatrix
+                },
             })
 
             return false
@@ -138,7 +148,12 @@ export const creepUtils = {
             origin: creep.pos,
             goals: [{ pos: repairTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         return true

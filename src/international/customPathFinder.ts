@@ -53,14 +53,14 @@ export interface CustomPathFinderArgs {
     weightCoords?: { [roomName: string]: { [packedCoord: string]: number } }
 
     /**
-     * The name of the costMatrix to weight. Will apply minimal alterations in use
+     * The the costMatrix to begin with. Will apply minimal alterations in use
      */
-    weightCostMatrix?: string
+    defaultCostMatrix?(roomName: string): CostMatrix | false
 
     /**
      * The names of the costMatrixes to weight. Will apply onto cost matrix in use
      */
-    weightCostMatrixes?(roomName: string): CostMatrix[]
+    defaultCostMatrixes?(roomName: string): CostMatrix[]
 
     weightCoordMaps?: CoordMap[]
 
@@ -318,10 +318,11 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             /* const roomMemory = Memory.rooms[roomName] */
 
             const room = Game.rooms[roomName]
-            const cm =
-                room && args.weightCostMatrix
-                    ? (room[args.weightCostMatrix as keyof Room] as CostMatrix)
-                    : new PathFinder.CostMatrix()
+            let costs: CostMatrix
+            if (args.defaultCostMatrix) {
+                const defaultCosts = args.defaultCostMatrix(roomName)
+                if (defaultCosts) costs = defaultCosts
+            } else costs = new PathFinder.CostMatrix()
 
             // If there is no route
 
@@ -330,25 +331,25 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                 let x
                 let y = 0
-                for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
+                for (x = 0; x < roomDimensions; x += 1) costs.set(x, y, 255)
 
                 // Configure x and loop through left exits
 
                 x = 0
-                for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
+                for (y = 0; y < roomDimensions; y += 1) costs.set(x, y, 255)
 
                 // Configure y and loop through bottom exits
 
                 y = roomDimensions - 1
-                for (x = 0; x < roomDimensions; x += 1) cm.set(x, y, 255)
+                for (x = 0; x < roomDimensions; x += 1) costs.set(x, y, 255)
 
                 // Configure x and loop through right exits
 
                 x = roomDimensions - 1
-                for (y = 0; y < roomDimensions; y += 1) cm.set(x, y, 255)
+                for (y = 0; y < roomDimensions; y += 1) costs.set(x, y, 255)
             }
 
-            if (args.weightCostMatrix) return cm
+            if (args.defaultCostMatrix) return costs
 
             // Weight positions
 
@@ -356,7 +357,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 for (const packedCoord in args.weightCoords[roomName]) {
                     const coord = unpackCoord(packedCoord)
 
-                    cm.set(coord.x, coord.y, args.weightCoords[roomName][packedCoord])
+                    costs.set(coord.x, coord.y, args.weightCoords[roomName][packedCoord])
                 }
             }
 
@@ -370,16 +371,16 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                         if (coordMap[packedCoord] === 0) continue
 
                         const coord = unpackNumAsCoord(packedCoord)
-                        if (cm.get(coord.x, coord.y) === 255) continue
+                        if (costs.get(coord.x, coord.y) === 255) continue
 
-                        cm.set(coord.x, coord.y, coordMap[packedCoord])
+                        costs.set(coord.x, coord.y, coordMap[packedCoord])
                     }
                 }
             }
 
             // If we have no vision in the room
 
-            if (!room) return cm
+            if (!room) return costs
 
             // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
@@ -393,7 +394,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 if (!args.creep.memory[CreepMemoryKeys.preferRoads]) roadCost = args.plainCost
 
                 for (const road of room.roomManager.structures.road)
-                    cm.set(road.pos.x, road.pos.y, roadCost)
+                    costs.set(road.pos.x, road.pos.y, roadCost)
             }
 
             // If avoidStationaryPositions is requested
@@ -404,7 +405,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                         continue
 
                     const coord = unpackCoord(packedCoord)
-                    cm.set(coord.x, coord.y, reserveType * 5 + 5)
+                    costs.set(coord.x, coord.y, reserveType * 5 + 5)
                 }
             }
 
@@ -416,16 +417,20 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 const structureType = key as StructureConstant
 
                 for (const structure of room.roomManager.structures[structureType])
-                    cm.set(structure.pos.x, structure.pos.y, args.weightStructures[structureType])
+                    costs.set(
+                        structure.pos.x,
+                        structure.pos.y,
+                        args.weightStructures[structureType],
+                    )
             }
 
             for (const portal of room.roomManager.structures.portal)
-                cm.set(portal.pos.x, portal.pos.y, 255)
+                costs.set(portal.pos.x, portal.pos.y, 255)
 
             // Loop trough each construction site belonging to an ally
 
             for (const cSite of room.roomManager.notMyConstructionSites.ally)
-                cm.set(cSite.pos.x, cSite.pos.y, 255)
+                costs.set(cSite.pos.x, cSite.pos.y, 255)
 
             // If there is a request to avoid enemy ranges
 
@@ -439,18 +444,18 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                 for (const packedCoord of room.roomManager.enemyThreatCoords) {
                     const coord = unpackCoord(packedCoord)
-                    cm.set(coord.x, coord.y, 255)
+                    costs.set(coord.x, coord.y, 255)
                 }
             }
 
             if (args.avoidNotMyCreeps && (!room.controller || !room.controller.safeMode)) {
                 for (const creep of room.roomManager.notMyCreeps.enemy)
-                    cm.set(creep.pos.x, creep.pos.y, 255)
+                    costs.set(creep.pos.x, creep.pos.y, 255)
                 for (const creep of room.roomManager.notMyCreeps.ally)
-                    cm.set(creep.pos.x, creep.pos.y, 255)
+                    costs.set(creep.pos.x, creep.pos.y, 255)
 
                 for (const creep of room.find(FIND_HOSTILE_POWER_CREEPS))
-                    cm.set(creep.pos.x, creep.pos.y, 255)
+                    costs.set(creep.pos.x, creep.pos.y, 255)
             }
 
             // If avoiding structures that can't be walked on is enabled
@@ -466,7 +471,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                         // Otherwise, record rampart by the weight and iterate
 
-                        cm.set(rampart.pos.x, rampart.pos.y, args.myRampartWeight)
+                        costs.set(rampart.pos.x, rampart.pos.y, args.myRampartWeight)
                         continue
                     }
 
@@ -478,7 +483,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
                     // Otherwise set the rampart's pos as impassible
 
-                    cm.set(rampart.pos.x, rampart.pos.y, 255)
+                    costs.set(rampart.pos.x, rampart.pos.y, 255)
                 }
 
                 // Loop through structureTypes of impassibleStructureTypes
@@ -487,28 +492,28 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                     for (const structure of room.roomManager.structures[structureType]) {
                         // Set pos as impassible
 
-                        cm.set(structure.pos.x, structure.pos.y, 255)
+                        costs.set(structure.pos.x, structure.pos.y, 255)
                     }
 
                     for (const cSite of room.roomManager.cSites[structureType]) {
                         // Set pos as impassible
 
-                        cm.set(cSite.pos.x, cSite.pos.y, 255)
+                        costs.set(cSite.pos.x, cSite.pos.y, 255)
                     }
                 }
             }
 
             // Stop if there are no cost matrixes to weight
 
-            if (args.weightCostMatrixes) {
+            if (args.defaultCostMatrixes) {
                 // Otherwise iterate through each x and y in the room
 
                 for (let x = 0; x < roomDimensions; x += 1) {
                     for (let y = 0; y < roomDimensions; y += 1) {
                         // Loop through each costMatrix
 
-                        for (const costMatrix of args.weightCostMatrixes(roomName)) {
-                            cm.set(x, y, costMatrix.get(x, y))
+                        for (const costMatrix of args.defaultCostMatrixes(roomName)) {
+                            costs.set(x, y, costMatrix.get(x, y))
                         }
                     }
                 }
@@ -516,7 +521,7 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
             // Inform the CostMatrix
 
-            return cm
+            return costs
         },
     })
 
