@@ -1,5 +1,4 @@
 import {
-    cleanRoomMemory,
     createPosMap,
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
@@ -204,7 +203,7 @@ export class CommuneManager {
         if (roomMemory[RoomMemoryKeys.abandonCommune] === true) {
             room.controller.unclaim()
             roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-            cleanRoomMemory(room.name)
+            roomUtils.cleanMemory(room.name)
 
             for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
                 cSite.remove()
@@ -410,7 +409,7 @@ export class CommuneManager {
         const remoteMemory = Memory.rooms[remoteName]
 
         remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-        cleanRoomMemory(remoteName)
+        roomUtils.cleanMemory(remoteName)
     }
 
     findMinRangedAttackCost(minDamage: number = 10) {

@@ -27,7 +27,6 @@ import {
 } from 'international/constants'
 import {
     advancedFindDistance,
-    cleanRoomMemory,
     findClosestObject,
     findHighestScore,
     findObjectWithID,
@@ -202,10 +201,9 @@ export class RoomManager {
         const roomMemory = room.memory
 
         // If it hasn't been scouted for 100~ ticks
-
         if (Game.time - roomMemory[RoomMemoryKeys.lastScout] > Math.floor(Math.random() * 200)) {
             room.basicScout()
-            cleanRoomMemory(room.name)
+            roomUtils.cleanMemory(room.name)
         }
 
         const roomType = roomMemory[RoomMemoryKeys.type]
@@ -251,19 +249,16 @@ export class RoomManager {
         if (!room.controller.my) {
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-                cleanRoomMemory(room.name)
+                roomUtils.cleanMemory(room.name)
             }
             return
         }
 
         room.communeManager = CommuneManager.communeManagers[room.name]
-
         if (!room.communeManager) {
             room.communeManager = new CommuneManager()
             CommuneManager.communeManagers[room.name] = room.communeManager
         }
-
-        // new commune planner
 
         room.communeManager.update(room)
     }

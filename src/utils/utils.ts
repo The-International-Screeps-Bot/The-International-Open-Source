@@ -499,33 +499,6 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
     return undefined
 }
 
-/**
- * Finds the name of the closest commune, exluding the specified roomName
- */
-export function findClosestCommuneName(roomName: string) {
-    const communesNotThis = []
-
-    for (const communeName of collectiveManager.communes) {
-        if (roomName == communeName) continue
-
-        communesNotThis.push(communeName)
-    }
-
-    return communesNotThis.sort(
-        (a, b) =>
-            Game.map.getRoomLinearDistance(roomName, a) -
-            Game.map.getRoomLinearDistance(roomName, b),
-    )[0]
-}
-
-export function findClosestClaimType(roomName: string) {
-    return Array.from(collectiveManager.communes).sort(
-        (a, b) =>
-            Game.map.getRoomLinearDistance(roomName, a) -
-            Game.map.getRoomLinearDistance(roomName, b),
-    )[0]
-}
-
 export function findClosestRoomName(start: string, targets: string[]) {
     let minRange = Infinity
     let closest = undefined
@@ -580,28 +553,6 @@ export function randomChance(number: number = 10) {
 
 export function randomRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min)
-}
-
-/**
- * Removes roomType-based values in the room's memory that don't match its type
- */
-export function cleanRoomMemory(roomName: string) {
-    const roomMemory = Memory.rooms[roomName]
-
-    // Loop through keys in the room's memory
-
-    for (const key in roomMemory) {
-        // Iterate if key is not part of roomTypeProperties
-
-        if (!roomTypeProperties.has(key as unknown as keyof RoomMemory)) continue
-
-        // Iterate if key is part of this roomType's properties
-
-        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as unknown as keyof RoomMemory))
-            continue
-
-        delete roomMemory[key as unknown as keyof RoomMemory]
-    }
 }
 
 export function isNearRoomEdge(coord: Coord, minRange: number) {

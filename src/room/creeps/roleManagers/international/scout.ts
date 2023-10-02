@@ -6,8 +6,9 @@ import {
     communeSign,
     nonCommuneSigns,
 } from 'international/constants'
-import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'utils/utils'
+import { getRangeXY, getRange } from 'utils/utils'
 import { partial } from 'lodash'
+import { roomUtils } from 'room/roomUtils'
 
 export class Scout extends Creep {
     scoutedRooms?: string[]
@@ -253,7 +254,7 @@ export class Scout extends Creep {
 
                 // Clean the room's memory
 
-                cleanRoomMemory(room.name)
+                roomUtils.cleanMemory(room.name)
 
                 // And delete the creep's scoutTarget
 

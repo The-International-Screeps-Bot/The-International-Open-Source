@@ -27,7 +27,6 @@ export class ContainerManager {
         const fastFillerContainers = this.roomManager.fastFillerContainers
 
         for (const container of fastFillerContainers) {
-            if (!container) continue
             if (container.reserveStore.energy > container.store.getCapacity() * 0.9) continue
 
             this.roomManager.room.createRoomLogisticsRequest({

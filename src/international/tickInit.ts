@@ -18,7 +18,6 @@ import {
 } from './constants'
 import {
     advancedFindDistance,
-    cleanRoomMemory,
     createPosMap,
     findCarryPartsRequired,
     findClosestRoomName,

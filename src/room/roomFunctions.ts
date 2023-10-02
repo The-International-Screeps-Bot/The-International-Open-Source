@@ -28,11 +28,8 @@ import {
 import {
     advancedFindDistance,
     areCoordsEqual,
-    cleanRoomMemory,
     createPosMap,
     findAdjacentCoordsToCoord,
-    findClosestClaimType,
-    findClosestCommuneName,
     findCoordsInsideRect,
     findObjectWithID,
     getRangeXY,

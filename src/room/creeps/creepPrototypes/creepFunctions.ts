@@ -1916,7 +1916,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
     this.room.targetVisual(this.pos, target.pos)
     if (getRange(target.pos, this.pos) > 1) {
-        this.createMoveRequest({
+        const result = this.createMoveRequest({
             origin: this.pos,
             goals: [{ pos: target.pos, range: 1 }],
             defaultCostMatrix(roomName) {
@@ -1926,6 +1926,12 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
                 return roomManager.defaultCostMatrix
             },
         })
+        // An enemy is probably blocking access to the logistics target
+        if (result === Result.fail) {
+
+            this.room.roomManager.roomLogisticsBlacklistCoords.add(packCoord(target.pos))
+            Result.success
+        }
 
         return Result.action
     }
