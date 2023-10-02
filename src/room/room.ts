@@ -1339,8 +1339,13 @@ export class RoomManager {
 
         const controller = this.room.controller
         if (controller) {
-            if (controller.my || controller.reservation.username === Memory.me)
+            // We don't want to target any structures in communes or remotes
+            if (
+                controller.my ||
+                Memory.rooms[this.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+            ) {
                 return (this._combatStructureTargets = [])
+            }
 
             if (controller.owner && isAlly(controller.owner.username))
                 return (this._combatStructureTargets = [])
@@ -2174,10 +2179,7 @@ export class RoomManager {
 
         const resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }> = {}
 
-        const storingStructures: AnyStoreStructure[] = [
-            this.room.storage,
-            this.factory,
-        ]
+        const storingStructures: AnyStoreStructure[] = [this.room.storage, this.factory]
         if (this.room.terminal && !this.room.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) {
             storingStructures.push(this.room.terminal)
         }

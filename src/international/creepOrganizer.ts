@@ -21,10 +21,6 @@ class CreepOrganizer {
             Game.creeps[creepName].initRun()
         }
     }
-
-    private processCreep(creepName: string) {
-
-    }
 }
 
 export const creepOrganizer = new CreepOrganizer()
