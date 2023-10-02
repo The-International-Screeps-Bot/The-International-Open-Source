@@ -502,7 +502,7 @@ export class RemoteHarvester extends Creep {
                     typeWeights: {
                         [RoomTypes.enemy]: Infinity,
                         [RoomTypes.ally]: Infinity,
-                        [RoomTypes.keeper]: Infinity,
+                        [RoomTypes.sourceKeeper]: Infinity,
                         [RoomTypes.enemyRemote]: Infinity,
                         [RoomTypes.allyRemote]: Infinity,
                     },

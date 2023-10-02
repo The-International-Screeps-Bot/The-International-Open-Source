@@ -1,8 +1,6 @@
 import { packCoord } from 'other/codec'
 import { collectiveManager } from './collective'
 
-
-
 export enum PlayerMemoryKeys {
     /**
      * Generally how good their offense is
@@ -198,8 +196,8 @@ export enum RoomTypes {
     neutral,
     enemy,
     enemyRemote,
-    keeper,
-    keeperCenter,
+    sourceKeeper,
+    center,
     highway,
     intersection,
 }
@@ -211,6 +209,7 @@ export enum RoomMemoryKeys {
      * Tells (mostly civilians) if the room is safe (non-undefined number) and what tick it will refresh
      */
     danger,
+    portalsTo,
 
     // Types specific
 
@@ -313,9 +312,9 @@ export enum RoomMemoryKeys {
     defensiveStrength,
     offensiveThreat,
 
-    // Intersection
+    // Source Keeper
 
-    portalsTo,
+    keeperLairCoords,
 }
 
 export type RemoteSourcePathTypes =
@@ -368,8 +367,6 @@ export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
     RoomMemoryKeys.energy,
     RoomMemoryKeys.offensiveThreat,
     RoomMemoryKeys.defensiveStrength,
-
-    RoomMemoryKeys.portalsTo,
 ])
 
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
@@ -412,15 +409,15 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     ]),
     [RoomTypes.enemyRemote]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.neutral]: new Set([]),
-    [RoomTypes.keeper]: new Set([RoomMemoryKeys.owner]),
-    [RoomTypes.keeperCenter]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.intersection]: new Set([]),
+    [RoomTypes.sourceKeeper]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.keeperLairCoords]),
+    [RoomTypes.center]: new Set([RoomMemoryKeys.owner]),
     [RoomTypes.highway]: new Set([]),
-    [RoomTypes.intersection]: new Set([RoomMemoryKeys.portalsTo]),
 }
 
 export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set([
-    RoomTypes.keeper,
-    RoomTypes.keeperCenter,
+    RoomTypes.sourceKeeper,
+    RoomTypes.center,
     RoomTypes.highway,
     RoomTypes.intersection,
 ])
@@ -1531,7 +1528,7 @@ export const offsetsByDirection = [
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
 
 export const remoteTypeWeights: Partial<{ [key: string]: number }> = {
-    [RoomTypes.keeper]: Infinity,
+    [RoomTypes.sourceKeeper]: Infinity,
     [RoomTypes.enemy]: Infinity,
     [RoomTypes.enemyRemote]: Infinity,
     [RoomTypes.ally]: Infinity,

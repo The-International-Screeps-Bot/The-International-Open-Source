@@ -58,7 +58,7 @@ export class Duo {
             typeWeights: {
                 [RoomTypes.enemy]: Infinity,
                 [RoomTypes.ally]: Infinity,
-                [RoomTypes.keeper]: Infinity,
+                [RoomTypes.sourceKeeper]: Infinity,
                 [RoomTypes.enemyRemote]: 4,
                 [RoomTypes.allyRemote]: 4,
                 [RoomTypes.neutral]: 2,

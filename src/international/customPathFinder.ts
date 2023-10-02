@@ -12,9 +12,9 @@ import {
     impassibleStructureTypesSet,
     roomDimensions,
 } from './constants'
-import { packCoord, unpackCoord, unpackPosAt, unpackPosList } from 'other/codec'
+import { packCoord, unpackCoord, unpackCoordList, unpackPosAt, unpackPosList } from 'other/codec'
 import { LogTypes, customLog } from 'utils/logging'
-import { unpackNumAsCoord, visualizePath } from '../utils/utils'
+import { forCoordsAroundRange, unpackNumAsCoord, visualizePath } from '../utils/utils'
 
 export interface PathGoal {
     pos: RoomPosition
@@ -68,6 +68,8 @@ export interface CustomPathFinderArgs {
      *
      */
     avoidEnemyRanges?: boolean
+
+    avoidKeeperLairs?: boolean
 
     avoidStationaryPositions?: boolean
 
@@ -295,6 +297,7 @@ function weightRemoteStructurePlans(args: CustomPathFinderArgs, roomName: string
 function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
     args.plainCost = args.plainCost || defaultPlainCost
     args.swampCost = args.swampCost || defaultSwampCost
+    if (args.avoidKeeperLairs === undefined) args.avoidKeeperLairs = true
 
     const originRoom: undefined | Room = Game.rooms[args.origin.roomName]
     const maxRooms = args.maxRooms
@@ -315,9 +318,8 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
             if (!allowedRoomNames.has(roomName)) return false
 
-            /* const roomMemory = Memory.rooms[roomName] */
-
             const room = Game.rooms[roomName]
+            const roomMemory = Memory.rooms[roomName]
             let costs: CostMatrix
             if (args.defaultCostMatrix) {
                 const defaultCosts = args.defaultCostMatrix(roomName)
@@ -384,17 +386,20 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
             // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
-            if (
-                args.creep &&
-                (!args.creep.memory[CreepMemoryKeys.squadMembers] ||
-                    args.creep.memory[CreepMemoryKeys.squadMembers].length < 3) &&
-                (!args.weightStructures || !args.weightStructures.road)
-            ) {
-                let roadCost = 1
-                if (!args.creep.memory[CreepMemoryKeys.preferRoads]) roadCost = args.plainCost
+            if (args.creep) {
 
-                for (const road of room.roomManager.structures.road)
-                    costs.set(road.pos.x, road.pos.y, roadCost)
+                const creepMemory = Memory.creeps[args.creep.name]
+                if (
+                    (!creepMemory[CreepMemoryKeys.squadMembers] ||
+                        creepMemory[CreepMemoryKeys.squadMembers].length < 3) &&
+                    (!args.weightStructures || !args.weightStructures.road)
+                ) {
+                    let roadCost = 1
+                    if (!creepMemory[CreepMemoryKeys.preferRoads]) roadCost = args.plainCost
+
+                    for (const road of room.roomManager.structures.road)
+                        costs.set(road.pos.x, road.pos.y, roadCost)
+                }
             }
 
             // If avoidStationaryPositions is requested
@@ -445,6 +450,20 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
                 for (const packedCoord of room.roomManager.enemyThreatCoords) {
                     const coord = unpackCoord(packedCoord)
                     costs.set(coord.x, coord.y, 255)
+                }
+            }
+
+            if (args.avoidKeeperLairs) {
+
+                if (roomMemory[RoomMemoryKeys.type] === RoomTypes.sourceKeeper) {
+
+                    const lairCoords = unpackCoordList(roomMemory[RoomMemoryKeys.keeperLairCoords])
+                    for (const lairCoord of lairCoords) {
+
+                        forCoordsAroundRange(lairCoord, 4, coord => {
+                            costs.set(coord.x, coord.y, 255)
+                        })
+                    }
                 }
             }
 

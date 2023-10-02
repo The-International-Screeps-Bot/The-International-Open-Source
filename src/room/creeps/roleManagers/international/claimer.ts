@@ -88,7 +88,7 @@ export class Claimer extends Creep {
                     typeWeights: {
                         [RoomTypes.enemy]: Infinity,
                         [RoomTypes.ally]: Infinity,
-                        [RoomTypes.keeper]: Infinity,
+                        [RoomTypes.sourceKeeper]: Infinity,
                     },
                 }) === Result.fail
             ) {

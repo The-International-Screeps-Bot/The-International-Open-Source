@@ -30,10 +30,14 @@ import { BasePlans } from 'room/construction/basePlans'
 import { CustomPathFinderArgs } from 'international/customPathFinder'
 import { CombatRequest, HaulRequest, NukeRequest, WorkRequest } from 'types/internationalRequests'
 import { PlayerMemory } from 'types/players'
-import { CreepRoomLogisticsRequest, PowerTask, RoomLogisticsRequest, findNewRoomLogisticsRequestArgs } from 'types/roomRequests'
+import {
+    CreepRoomLogisticsRequest,
+    PowerTask,
+    RoomLogisticsRequest,
+    findNewRoomLogisticsRequestArgs,
+} from 'types/roomRequests'
 
 declare global {
-
     interface ProfilerData {
         calls: number
         time: number
@@ -308,10 +312,7 @@ declare global {
         y: number
     }
 
-
-
     type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals' | 'spawnRequestVisuals'
-
 
     interface Memory {
         breakingVersion: number
@@ -394,7 +395,6 @@ declare global {
     }[keyof T]
 
     interface RoomGlobal {
-
         // Containers
 
         sourceContainers: Id<StructureContainer>[]
@@ -408,7 +408,6 @@ declare global {
         controllerLink: Id<StructureLink> | undefined
         fastFillerLink: Id<StructureLink> | undefined
         hubLink: Id<StructureLink> | undefined
-
     }
 
     interface EnemySquadData {
@@ -1275,6 +1274,10 @@ declare global {
         [RoomMemoryKeys.type]: RoomTypes
         [RoomMemoryKeys.lastScout]: number
         [RoomMemoryKeys.danger]?: number
+        /***
+         * The destination roomNames of each portal
+         */
+        [RoomMemoryKeys.portalsTo]: string[]
 
         // Types specific
 
@@ -1379,11 +1382,10 @@ declare global {
         [RoomMemoryKeys.defensiveStrength]: number
         [RoomMemoryKeys.offensiveThreat]: number
 
-        // Highway
+        // Source Keeper
 
-        [RoomMemoryKeys.portalsTo]: string[]
+        [RoomMemoryKeys.keeperLairCoords]: string
     }
-
 
     interface CreepMemory {
         [CreepMemoryKeys.preferRoads]: boolean
@@ -1442,7 +1444,6 @@ declare global {
 
     namespace NodeJS {
         interface Global {
-
             // User custom
 
             collectivizer: TCollectivizer

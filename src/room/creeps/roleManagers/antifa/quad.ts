@@ -144,7 +144,7 @@ export class Quad {
             typeWeights: {
                 [RoomTypes.enemy]: Infinity,
                 [RoomTypes.ally]: 2,
-                [RoomTypes.keeper]: 5,
+                [RoomTypes.sourceKeeper]: 5,
                 [RoomTypes.enemyRemote]: 3,
                 [RoomTypes.allyRemote]: 3,
                 [RoomTypes.neutral]: 2,

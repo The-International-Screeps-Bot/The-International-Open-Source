@@ -47,6 +47,7 @@ import {
 import { collectiveManager } from 'international/collective'
 import {
     packCoord,
+    packCoordList,
     packXYAsCoord,
     unpackCoord,
     unpackCoordAsPos,
@@ -114,10 +115,17 @@ Room.prototype.scoutByRoomName = function () {
         return (this.memory[RoomMemoryKeys.type] = RoomTypes.intersection)
     if (EW % 10 === 0 || NS % 10 === 0)
         return (this.memory[RoomMemoryKeys.type] = RoomTypes.highway)
-    if (EW % 5 === 0 && NS % 5 === 0)
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeperCenter)
-    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1)
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.keeper)
+    if (EW % 5 === 0 && NS % 5 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.center)
+    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
+        const roomMemory = Memory.rooms[this.name]
+
+        // Record the positions of keeper lairs
+
+        const lairCoords = this.roomManager.structures.keeperLair.map(lair => lair.pos)
+        roomMemory[RoomMemoryKeys.keeperLairCoords] = packCoordList(lairCoords)
+
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.sourceKeeper)
+    }
 
     return false
 }

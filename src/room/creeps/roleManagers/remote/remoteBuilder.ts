@@ -77,7 +77,7 @@ export class RemoteBuilder extends Creep {
         for (const remoteInfo of this.commune.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            
+
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) continue
@@ -170,7 +170,7 @@ export class RemoteBuilder extends Creep {
                 typeWeights: {
                     [RoomTypes.enemy]: Infinity,
                     [RoomTypes.ally]: Infinity,
-                    [RoomTypes.keeper]: Infinity,
+                    [RoomTypes.sourceKeeper]: Infinity,
                     [RoomTypes.enemyRemote]: Infinity,
                     [RoomTypes.allyRemote]: Infinity,
                 },

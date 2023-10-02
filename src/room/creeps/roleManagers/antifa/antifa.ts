@@ -239,7 +239,7 @@ export class Antifa extends Creep {
                 typeWeights: {
                     [RoomTypes.enemy]: Infinity,
                     [RoomTypes.ally]: Infinity,
-                    [RoomTypes.keeper]: Infinity,
+                    [RoomTypes.sourceKeeper]: Infinity,
                 },
             })
             return
@@ -260,7 +260,7 @@ export class Antifa extends Creep {
             typeWeights: {
                 [RoomTypes.enemy]: Infinity,
                 [RoomTypes.ally]: Infinity,
-                [RoomTypes.keeper]: Infinity,
+                [RoomTypes.sourceKeeper]: Infinity,
             },
         })
     }

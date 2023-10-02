@@ -10,7 +10,6 @@ import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
-
     update() {
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
@@ -48,7 +47,7 @@ export class AllyVanguard extends Creep {
                 !roomMemory ||
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.enemy ||
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.enemyRemote ||
-                roomMemory[RoomMemoryKeys.type] === RoomTypes.keeper ||
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.sourceKeeper ||
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.ally ||
                 roomMemory[RoomMemoryKeys.type] === RoomTypes.allyRemote
             )
@@ -236,7 +235,7 @@ export class AllyVanguard extends Creep {
                     typeWeights: {
                         [RoomTypes.enemy]: Infinity,
                         [RoomTypes.ally]: Infinity,
-                        [RoomTypes.keeper]: Infinity,
+                        [RoomTypes.sourceKeeper]: Infinity,
                     },
                 }) === Result.fail
             ) {
