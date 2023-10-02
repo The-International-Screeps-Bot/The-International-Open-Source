@@ -1,6 +1,7 @@
 import { RoomMemoryKeys, creepRoles, packedPosLength } from 'international/constants'
+import { DefaultRoleManager } from 'room/creeps/defaultRoleManager'
 
-export class ControllerUpgraderManager {
+class ControllerUpgraderManager extends DefaultRoleManager {
     role: CreepRoles = 'controllerUpgrader'
     // Allows for the pattern: instance.manager.run(instance)
     manager = this
@@ -30,23 +31,23 @@ export class ControllerUpgraderManager {
     }
  */
 
-    updateRun(room: Room) {
+    runUpdate(room: Room) {
         for (const creepName of room.myCreeps[this.role]) {
             this.initialRunCreep(Game.creeps[creepName])
         }
     }
 
-    updateRunCreep(creep: Creep) {
+    runUpdateCreep(creep: Creep) {
         creep.room.communeManager.upgradeStrength += creep.room.communeManager.upgradeStrength
     }
 
-    initialRun(room: Room) {
+    runInitial(room: Room) {
         for (const creepName of room.myCreeps[this.role]) {
             this.initialRunCreep(Game.creeps[creepName])
         }
     }
 
-    private initialRunCreep(creep: Creep) {
+    initialRunCreep(creep: Creep) {
 
     }
 
@@ -56,7 +57,7 @@ export class ControllerUpgraderManager {
         }
     }
 
-    private runCreep(creep: Creep) {
+    runCreep(creep: Creep) {
         /*         if (this.shouldBuild(creep)) {
             creep.advancedBuild();
             return;
