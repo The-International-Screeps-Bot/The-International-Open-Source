@@ -23,7 +23,7 @@ class RequestsManager {
     }
 
     private runWorkRequests() {
-        let reservedGCL = Game.gcl.level - global.communes.size
+        let reservedGCL = Game.gcl.level - collectiveManager.communes.size
 
         // Subtract the number of workRequests with responders
 
@@ -35,7 +35,7 @@ class RequestsManager {
 
         const communesForResponding = []
 
-        for (const roomName of global.communes) {
+        for (const roomName of collectiveManager.communes) {
             if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) continue
 
             if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
@@ -75,7 +75,7 @@ class RequestsManager {
 
             if (
                 request[WorkRequestKeys.responder] &&
-                global.communes.has(request[WorkRequestKeys.responder])
+                collectiveManager.communes.has(request[WorkRequestKeys.responder])
             )
                 continue
 
@@ -84,7 +84,7 @@ class RequestsManager {
             // If there is not enough reserved GCL to make a new request
 
             if (reservedGCL <= 0) continue
-            if (global.communes.size >= collectiveManager.maxCommunes) continue
+            if (collectiveManager.communes.size >= collectiveManager.maxCommunes) continue
 
             // If the requested room is no longer neutral
 
@@ -147,7 +147,7 @@ class RequestsManager {
 
             const communes = []
 
-            for (const roomName of global.communes) {
+            for (const roomName of collectiveManager.communes) {
                 /* if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue */
 
                 // Ensure the combatRequest isn't responded to by the room the request is for
@@ -241,7 +241,7 @@ class RequestsManager {
 
             const communes = []
 
-            for (const roomName of global.communes) {
+            for (const roomName of collectiveManager.communes) {
                 if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName))
                     continue
 
@@ -254,7 +254,7 @@ class RequestsManager {
                 if (!room.storage) continue
 
                 if (
-                    room.resourcesInStoringStructures.energy /
+                    room.roomManager.resourcesInStoringStructures.energy /
                         (20000 + room.controller.level * 1000) <
                     room.memory[RoomMemoryKeys.haulRequests].length
                 )

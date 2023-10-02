@@ -7,10 +7,10 @@ import {
     roomDimensions,
     packedPosLength,
 } from './constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { makeRoomCoord, roomNameFromRoomCoord } from '../utils/utils'
 import { CollectiveManager } from './collective'
-import { updateStat } from './statsManager'
+import { statsManager } from './statsManager'
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled
@@ -46,7 +46,7 @@ class MapVisualsManager {
                 if (!anchor) throw Error('No anchor for mapVisuals commune ' + roomName)
 
                 Game.map.visual.text(
-                    `⚡${room.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`,
+                    `⚡${room.roomManager.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`,
                     new RoomPosition(2, 8, roomName),
                     {
                         align: 'left',

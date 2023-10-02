@@ -40,7 +40,8 @@ export class FactoryManager {
     allComponents(
         product: CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
     ): (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[] {
-        let result: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[] = []
+        let result: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[] =
+            []
 
         //If we're asked for a base material, it's the reverse reaction that's being requested,
         //  but we need to hard-code this case, so we don't get into an infinate loop.
@@ -57,17 +58,38 @@ export class FactoryManager {
         if (product == RESOURCE_ZYNTHIUM) return [RESOURCE_ZYNTHIUM_BAR, RESOURCE_ENERGY]
 
         //Don't include the product if we can't make it.
-        if (this.factory && COMMODITIES[product].level && COMMODITIES[product].level != this.factory.level) return []
+        if (
+            this.factory &&
+            COMMODITIES[product].level &&
+            COMMODITIES[product].level != this.factory.level
+        )
+            return []
 
         for (let component of Object.keys(COMMODITIES[product].components)) {
-            result.push(component as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)
+            result.push(
+                component as
+                    | CommodityConstant
+                    | MineralConstant
+                    | RESOURCE_GHODIUM
+                    | RESOURCE_ENERGY,
+            )
             if (
                 !BASE_RESOURCES.includes(component) &&
-                COMMODITIES[component as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY]
+                COMMODITIES[
+                    component as
+                        | CommodityConstant
+                        | MineralConstant
+                        | RESOURCE_GHODIUM
+                        | RESOURCE_ENERGY
+                ]
             ) {
                 result = result.concat(
                     this.allComponents(
-                        component as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
+                        component as
+                            | CommodityConstant
+                            | MineralConstant
+                            | RESOURCE_GHODIUM
+                            | RESOURCE_ENERGY,
                     ),
                 )
             }
@@ -85,7 +107,9 @@ export class FactoryManager {
         //This should probably be smarter, and use the known production quantity to know if it needs to recurse
         //  Into the items.  Ex: If we have a bunch of U_Bars in storare, we don't need U on this list.
         //  But for now, it asks for it.
-        this.communeManager.room.memory[RoomMemoryKeys.factoryUsableResources] = this.allComponents(this.getProduct())
+        this.communeManager.room.memory[RoomMemoryKeys.factoryUsableResources] = this.allComponents(
+            this.getProduct(),
+        )
     }
 
     setProduct(product: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM) {
@@ -97,7 +121,9 @@ export class FactoryManager {
         return this.communeManager.room.memory[RoomMemoryKeys.factoryProduct]
     }
 
-    haveAllMaterials(resource: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM): boolean {
+    haveAllMaterials(
+        resource: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM,
+    ): boolean {
         var currentlyHaveAllMaterials = true
         if (COMMODITIES[resource].level && COMMODITIES[resource].level !== this.factory.level) {
             //if(this.this.communeManager.room.name == "W15N18") console.log(this.this.communeManager.room.name + ' ' + resource + ' not right level.')
@@ -117,7 +143,7 @@ export class FactoryManager {
                         | RESOURCE_GHODIUM
                 ]
             var amountOnHand =
-                this.communeManager.room.resourcesInStoringStructures[
+                this.communeManager.room.roomManager.resourcesInStoringStructures[
                     component as
                         | DepositConstant
                         | CommodityConstant
@@ -131,14 +157,24 @@ export class FactoryManager {
             //this line doesn't include DepositConstant intentally.  that way !COMMODITIES will be false.
             if (
                 BASE_RESOURCES.includes(component) ||
-                !COMMODITIES[component as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM]
+                !COMMODITIES[
+                    component as
+                        | CommodityConstant
+                        | MineralConstant
+                        | RESOURCE_ENERGY
+                        | RESOURCE_GHODIUM
+                ]
             ) {
                 if (amountOnHand < required) currentlyHaveAllMaterials = false
             } else {
                 if (amountOnHand < required)
                     if (
                         !this.haveAllMaterials(
-                            component as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM,
+                            component as
+                                | CommodityConstant
+                                | MineralConstant
+                                | RESOURCE_ENERGY
+                                | RESOURCE_GHODIUM,
                         )
                     )
                         currentlyHaveAllMaterials = false
@@ -159,11 +195,18 @@ export class FactoryManager {
         let missingComponents = _.filter(
             Object.keys(receipe.components),
             r =>
-                this.factory.store[r as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM] <
-                receipe.components[r as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM],
+                this.factory.store[
+                    r as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+                ] <
+                receipe.components[
+                    r as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
+                ],
         )
 
-        if (missingComponents.length == 0 && (!receipe.level || receipe.level == this.factory.level)) {
+        if (
+            missingComponents.length == 0 &&
+            (!receipe.level || receipe.level == this.factory.level)
+        ) {
             return product
         } else {
             //If we're asked to make a base product, and we're missing the components, that means we don't have the compressed
@@ -173,10 +216,20 @@ export class FactoryManager {
             for (let component of missingComponents) {
                 if (
                     !BASE_RESOURCES.includes(component) &&
-                    COMMODITIES[component as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM]
+                    COMMODITIES[
+                        component as
+                            | CommodityConstant
+                            | MineralConstant
+                            | RESOURCE_ENERGY
+                            | RESOURCE_GHODIUM
+                    ]
                 ) {
                     let result = this.nextProduction(
-                        component as CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM,
+                        component as
+                            | CommodityConstant
+                            | MineralConstant
+                            | RESOURCE_ENERGY
+                            | RESOURCE_GHODIUM,
                     )
                     if (result) return result
                 }
@@ -191,10 +244,10 @@ export class FactoryManager {
         // We want a certain ratio of batteries to stored energy
 
         if (
-            this.communeManager.room.resourcesInStoringStructures[RESOURCE_ENERGY] >
+            this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_ENERGY] >
                 this.communeManager.room.communeManager.minStoredEnergy * 1.2 &&
-            this.communeManager.room.resourcesInStoringStructures.battery <
-                this.communeManager.room.resourcesInStoringStructures.energy / 100
+            this.communeManager.room.roomManager.resourcesInStoringStructures.battery <
+                this.communeManager.room.roomManager.resourcesInStoringStructures.energy / 100
         ) {
             // Convert energy into batteries
             this.setProduct(RESOURCE_BATTERY)
@@ -202,9 +255,10 @@ export class FactoryManager {
         }
 
         if (
-            this.communeManager.room.resourcesInStoringStructures[RESOURCE_ENERGY] <
+            this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_ENERGY] <
                 this.communeManager.room.communeManager.minStoredEnergy &&
-            this.communeManager.room.resourcesInStoringStructures[RESOURCE_BATTERY] >= 600
+            this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_BATTERY] >=
+                600
         ) {
             this.setProduct(RESOURCE_ENERGY)
             return
@@ -244,12 +298,14 @@ export class FactoryManager {
             let productionTarget = 10000
             if (resource == RESOURCE_COMPOSITE) productionTarget = 200
 
-            var totalOnHand = this.communeManager.room.resourcesInStoringStructures[resource]
+            var totalOnHand =
+                this.communeManager.room.roomManager.resourcesInStoringStructures[resource]
 
             //don't run the this.communeManager.room out of energy making batteries.
             if (
                 resource == RESOURCE_BATTERY &&
-                this.communeManager.room.resourcesInStoringStructures[RESOURCE_ENERGY] < 200000
+                this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_ENERGY] <
+                    200000
             )
                 continue
 
@@ -271,31 +327,67 @@ export class FactoryManager {
                 resource == RESOURCE_CELL ||
                 resource == RESOURCE_ALLOY ||
                 (resource == RESOURCE_PURIFIER &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_CATALYST] > 10000) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_CATALYST
+                    ] > 10000) ||
                 (resource == RESOURCE_UTRIUM_BAR &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_UTRIUM] > 10000) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_UTRIUM
+                    ] > 10000) ||
                 (resource == RESOURCE_LEMERGIUM_BAR &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_LEMERGIUM] > 10000) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_LEMERGIUM
+                    ] > 10000) ||
                 (resource == RESOURCE_ZYNTHIUM_BAR &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_ZYNTHIUM] > 10000 &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_ZYNTHIUM] >
-                        this.communeManager.room.resourcesInStoringStructures[RESOURCE_ZYNTHIUM_BAR]) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_ZYNTHIUM
+                    ] > 10000 &&
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_ZYNTHIUM
+                    ] >
+                        this.communeManager.room.roomManager.resourcesInStoringStructures[
+                            RESOURCE_ZYNTHIUM_BAR
+                        ]) ||
                 (resource == RESOURCE_KEANIUM_BAR &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_KEANIUM] > 10000 &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_KEANIUM] >
-                        this.communeManager.room.resourcesInStoringStructures[RESOURCE_KEANIUM_BAR]) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_KEANIUM
+                    ] > 10000 &&
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_KEANIUM
+                    ] >
+                        this.communeManager.room.roomManager.resourcesInStoringStructures[
+                            RESOURCE_KEANIUM_BAR
+                        ]) ||
                 (resource == RESOURCE_GHODIUM_MELT &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_GHODIUM] > 10000 &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_GHODIUM] >
-                        this.communeManager.room.resourcesInStoringStructures[RESOURCE_GHODIUM_MELT]) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_GHODIUM
+                    ] > 10000 &&
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_GHODIUM
+                    ] >
+                        this.communeManager.room.roomManager.resourcesInStoringStructures[
+                            RESOURCE_GHODIUM_MELT
+                        ]) ||
                 (resource == RESOURCE_OXIDANT &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_OXYGEN] > 10000 &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_OXYGEN] >
-                        this.communeManager.room.resourcesInStoringStructures[RESOURCE_OXIDANT]) ||
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_OXYGEN
+                    ] > 10000 &&
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_OXYGEN
+                    ] >
+                        this.communeManager.room.roomManager.resourcesInStoringStructures[
+                            RESOURCE_OXIDANT
+                        ]) ||
                 (resource == RESOURCE_REDUCTANT &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_HYDROGEN] > 10000 &&
-                    this.communeManager.room.resourcesInStoringStructures[RESOURCE_HYDROGEN] >
-                        this.communeManager.room.resourcesInStoringStructures[RESOURCE_REDUCTANT])
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_HYDROGEN
+                    ] > 10000 &&
+                    this.communeManager.room.roomManager.resourcesInStoringStructures[
+                        RESOURCE_HYDROGEN
+                    ] >
+                        this.communeManager.room.roomManager.resourcesInStoringStructures[
+                            RESOURCE_REDUCTANT
+                        ])
             ) {
                 let currentlyHaveAllMaterials: boolean = this.haveAllMaterials(resource)
                 if (!currentlyHaveAllMaterials) continue

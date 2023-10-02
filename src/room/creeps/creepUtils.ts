@@ -1,8 +1,21 @@
-import { CreepMemoryKeys, ReservedCoordTypes, Result, RoomMemoryKeys, creepRoles, packedCoordLength, packedPosLength } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import {
+    CreepMemoryKeys,
+    ReservedCoordTypes,
+    Result,
+    RoomLogisticsRequestTypes,
+    RoomMemoryKeys,
+    creepRoles,
+    packedCoordLength,
+    packedPosLength,
+    roomLogisticsRoles,
+} from 'international/constants'
+import { statsManager } from 'international/statsManager'
 import { getRange } from 'utils/utils'
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackPosAt } from 'other/codec'
+import { RoomManager } from 'room/room'
+import { collectiveManager } from 'international/collective'
+import { creepClasses } from './creepClasses'
 
 export const creepUtils = {
     expandName(creepName: string) {
@@ -32,16 +45,17 @@ export const creepUtils = {
         // Estimate the repair cost, assuming it goes through
         const energySpentOnRepair = Math.min(
             workParts,
-            (target.hitsMax - target.hits) / REPAIR_POWER,
+            // Sometimes hitsMax can be more than hits
+            Math.max((target.hitsMax - target.hits) / REPAIR_POWER, 0),
             creep.store.energy,
         )
 
         // Record the repair attempt in different places for barricades than other structures
         if (target.structureType === STRUCTURE_RAMPART || target.structureType === STRUCTURE_WALL) {
-            updateStat(creep.room.name, 'eorwr', energySpentOnRepair)
+            statsManager.updateStat(creep.room.name, 'eorwr', energySpentOnRepair)
             creep.message = `🧱${energySpentOnRepair * REPAIR_POWER}`
         } else {
-            updateStat(creep.room.name, 'eoro', energySpentOnRepair)
+            statsManager.updateStat(creep.room.name, 'eoro', energySpentOnRepair)
             creep.message = `🔧${energySpentOnRepair * REPAIR_POWER}`
         }
 
@@ -53,7 +67,7 @@ export const creepUtils = {
         if (creep.needsResources()) {
             if (
                 creep.room.communeManager.storingStructures.length &&
-                creep.room.resourcesInStoringStructures.energy < 3000
+                creep.room.roomManager.resourcesInStoringStructures.energy < 3000
             )
                 return Result.fail
 
@@ -61,7 +75,11 @@ export const creepUtils = {
             delete Memory.creeps[creep.name][CreepMemoryKeys.structureTarget]
 
             creep.runRoomLogisticsRequestsAdvanced({
-                types: new Set(['withdraw', 'offer', 'pickup']),
+                types: new Set<RoomLogisticsRequestTypes>([
+                    RoomLogisticsRequestTypes.withdraw,
+                    RoomLogisticsRequestTypes.offer,
+                    RoomLogisticsRequestTypes.pickup,
+                ]),
                 resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 
@@ -90,7 +108,12 @@ export const creepUtils = {
                 origin: creep.pos,
                 goals: [{ pos: repairTarget.pos, range: 3 }],
                 avoidEnemyRanges: true,
-                weightCostMatrix: 'defaultCostMatrix',
+                defaultCostMatrix(roomName) {
+                    const roomManager = RoomManager.roomManagers[roomName]
+                    if (!roomManager) return false
+
+                    return roomManager.defaultCostMatrix
+                },
             })
 
             return false
@@ -128,7 +151,12 @@ export const creepUtils = {
             origin: creep.pos,
             goals: [{ pos: repairTarget.pos, range: 3 }],
             avoidEnemyRanges: true,
-            weightCostMatrix: 'defaultCostMatrix',
+            defaultCostMatrix(roomName) {
+                const roomManager = RoomManager.roomManagers[roomName]
+                if (!roomManager) return false
+
+                return roomManager.defaultCostMatrix
+            },
         })
 
         return true
@@ -157,4 +185,71 @@ export const creepUtils = {
 
         return Result.success
     },
+    findEnergySpentOnConstruction(creep: Creep, cSite: ConstructionSite, workParts: number) {
+        const energySpent = Math.min(
+            workParts * BUILD_POWER,
+            // In private servers sometimes progress can be greater than progress total
+            Math.max((cSite.progressTotal - cSite.progress) * BUILD_POWER, 0),
+            creep.nextStore.energy,
+        )
+
+        return energySpent
+    },
+    organize(creepName: string) {
+
+        let creep = Game.creeps[creepName]
+
+        // If creep doesn't exist
+
+        if (!creep) {
+            // Delete creep from memory and iterate
+
+            delete Memory.creeps[creepName]
+            return
+        }
+
+        collectiveManager.creepCount += 1
+
+        // Get the creep's role
+
+        const { role } = creep
+        if (!role || role.startsWith('shard')) return
+
+        // Assign creep a class based on role
+
+        const creepClass = creepClasses[role]
+        if (!creepClass) return
+
+        creep = Game.creeps[creepName] = new creepClass(creep.id)
+
+        // Organize creep in its room by its role
+
+        creep.room.myCreeps[role].push(creepName)
+        creep.room.myCreepsAmount += 1
+
+        collectiveManager.customCreepIDs[creep.customID] = true
+
+        // Add the creep's name to the position in its room
+
+        if (!creep.spawning) creep.room.creepPositions[packCoord(creep.pos)] = creep.name
+
+        if (roomLogisticsRoles.has(role)) creep.roomLogisticsRequestManager()
+
+        // Get the commune the creep is from
+
+        const commune = creep.commune
+        if (!commune) return
+
+        if (!commune.controller.my) {
+            creep.suicide()
+            return
+        }
+
+        creep.update()
+
+        // If the creep isn't isDying, organize by its roomFrom and role
+
+        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
+        commune.creepsFromRoomAmount += 1
+    }
 }

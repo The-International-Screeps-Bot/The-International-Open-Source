@@ -6,7 +6,7 @@ import {
     customColors,
     squadQuotas,
 } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { Duo } from './duo'
@@ -93,7 +93,7 @@ export class Antifa extends Creep {
                 (request && request[CombatRequestKeys.responder] === this.room.name)
             ) {
                 // run singleton logic while we wait to form a squad
-                return false
+                return true
             }
 
             return true
@@ -178,7 +178,7 @@ export class Antifa extends Creep {
         )
             return false
 
-        const memberNames: string[] = []
+        const memberNames: string[] = [this.name]
 
         for (const memberName of creepMemory[CreepMemoryKeys.squadMembers]) {
             // We don't need others to think we need a squad when we have one now

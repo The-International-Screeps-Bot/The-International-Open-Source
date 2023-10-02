@@ -18,7 +18,6 @@ import {
 } from './constants'
 import {
     advancedFindDistance,
-    cleanRoomMemory,
     createPosMap,
     findCarryPartsRequired,
     findClosestRoomName,
@@ -27,7 +26,7 @@ import {
     randomTick,
 } from '../utils/utils'
 import { collectiveManager, CollectiveManager } from './collective'
-import { updateStat, statsManager } from './statsManager'
+import { statsManager } from './statsManager'
 import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
@@ -36,9 +35,6 @@ import { roomUtils } from 'room/roomUtils'
 
 class TickInit {
     configGeneral() {
-        // General
-
-        global.communes = new Set()
 
         // Chant logic
 
@@ -46,11 +42,6 @@ class TickInit {
             if (Memory.chantIndex >= chant.length - 1) Memory.chantIndex = 0
             else Memory.chantIndex += 1
         }
-
-        // global
-
-        global.constructionSitesCount = Object.keys(Game.constructionSites).length
-        global.logs = ``
     }
 }
 

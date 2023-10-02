@@ -1,7 +1,7 @@
 import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
-import { log } from 'utils/logging'
-import { findLargestTransactionAmount, newID, roundTo } from 'utils/utils'
-import './marketFunctions'
+import { customLog } from 'utils/logging'
+import { newID, roundTo } from 'utils/utils'
+import './marketUtils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from 'room/commune/commune'
 

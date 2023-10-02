@@ -1,4 +1,4 @@
-import { minerals } from 'international/constants'
+import { RoomLogisticsRequestTypes, minerals } from 'international/constants'
 import { CommuneManager } from './commune'
 import { Hauler } from '../creeps/roleManagers/commune/hauler'
 import { findObjectWithID, getRange, randomTick, scalePriority } from 'utils/utils'
@@ -629,7 +629,8 @@ export class LabManager {
     private resourceAmount(resource: MineralConstant | MineralCompoundConstant): number {
         if (!resource) return 0
 
-        let amount = this.communeManager.room.resourcesInStoringStructures[resource] || 0
+        let amount =
+            this.communeManager.room.roomManager.resourcesInStoringStructures[resource] || 0
 
         for (const lab of this.communeManager.room.roomManager.structures.lab) {
             if (lab.mineralType !== resource) continue
@@ -671,7 +672,7 @@ export class LabManager {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: lab,
                     resourceType,
-                    type: 'transfer',
+                    type: RoomLogisticsRequestTypes.transfer,
                     priority:
                         50 +
                         scalePriority(
@@ -688,7 +689,7 @@ export class LabManager {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: lab,
                 resourceType: lab.mineralType,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 priority:
                     20 +
                     scalePriority(
@@ -724,7 +725,7 @@ export class LabManager {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: lab,
                     resourceType: this.outputResource,
-                    type: 'withdraw',
+                    type: RoomLogisticsRequestTypes.withdraw,
                     priority:
                         20 +
                         scalePriority(
@@ -742,7 +743,7 @@ export class LabManager {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: lab,
                 resourceType: lab.mineralType,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 priority:
                     20 +
                     scalePriority(

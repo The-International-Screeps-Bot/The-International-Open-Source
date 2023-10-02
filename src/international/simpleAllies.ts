@@ -55,15 +55,18 @@ export interface EconRequest {
      */
     credits: number
     /**
-     * cumulative stored energy across the bot's rooms. Storage + terminal + factory should be sufficient
+     * the maximum amount of energy the bot is willing to share with allies. Should never be more than the amount of energy the bot has in storing structures
      */
-    energy: number
+    sharableEnergy: number
     /**
-     * The average energy income the bot has calculated over whatever timeframe they choose.
+     * The average energy income the bot has calculated over the last 100 ticks
      * Optional, as some bots might not be able to calculate this easily.
      */
     energyIncome?: number
-    mineralRooms?: { [key in MineralConstant]: number }
+    /**
+     * The number of mineral nodes the bot has access to, probably used to inform expansion
+     */
+    mineralNodes?: { [key in MineralConstant]: number }
 }
 
 export interface RoomRequest {

@@ -39,7 +39,7 @@ export class ControllerUpgrader extends Creep {
     }
 
     initRun() {
-        this.room.communeManager.upgradeStrength += this.room.communeManager.upgradeStrength
+        this.room.communeManager.upgradeStrength += this.upgradeStrength
     }
 
     public static roleManager(room: Room, creepsOfRole: string[]) {

@@ -10,7 +10,6 @@ import {
 } from 'international/constants'
 import {
     advancedFindDistance,
-
     findCarryPartsRequired,
     findLowestScore,
     getRange,
@@ -127,7 +126,7 @@ export class RemotesManager {
             }
 
             if (remote) {
-                const sourceContainers = remote.sourceContainers
+                const sourceContainers = remote.roomManager.sourceContainers
                 const remoteSources = remote.roomManager.remoteSources
                 for (const i in remoteSources) {
                     remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
@@ -135,12 +134,10 @@ export class RemotesManager {
                     const source = remoteSources[i]
                     const container = sourceContainers[i]
                     if (container) {
-
                         remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] += container.store.energy
                     }
 
                     for (const resource of remote.roomManager.droppedEnergy) {
-
                         if (getRange(resource.pos, source.pos) > 1) continue
 
                         remoteMemory[RoomMemoryKeys.remoteSourceCredit][i] += resource.amount
@@ -160,7 +157,6 @@ export class RemotesManager {
                 } */
 
                 // Record if we have or don't have a source container for each source
-
 
                 for (const i in sourceContainers) {
                     remoteMemory[RoomMemoryKeys.hasContainer][i] = !!sourceContainers
@@ -282,7 +278,8 @@ export class RemotesManager {
 
                 remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] += findCarryPartsRequired(
                     (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
-                        packedPosLength) * 2,
+                        packedPosLength) *
+                        2,
                     income,
                 )
             }
@@ -366,16 +363,22 @@ export class RemotesManager {
     private recurseAbandonment(remoteName: string) {
         const remoteMemory = Memory.rooms[remoteName]
 
-        for (const remoteName2 of remoteMemory[RoomMemoryKeys.pathsThrough]) {
+        for (const remoteName2 of Memory.rooms[this.communeManager.room.name][
+            RoomMemoryKeys.remotes
+        ]) {
             const remoteMemory2 = Memory.rooms[remoteName2]
+
+            // No point in abandoning if the remote is already sufficiently abandoned
             if (
                 remoteMemory2[RoomMemoryKeys.abandonRemote] >=
                 remoteMemory[RoomMemoryKeys.abandonRemote]
             )
                 continue
+            console.log(remoteName2)
+            // We want to abandon if the remote paths through the specified remote
+            if (!remoteMemory2[RoomMemoryKeys.pathsThrough].includes(remoteName)) continue
 
             roomUtils.abandonRemote(remoteName2, remoteMemory[RoomMemoryKeys.abandonRemote])
-            this.recurseAbandonment(remoteName2)
         }
 
         remoteMemory[RoomMemoryKeys.recursedAbandonment] = true

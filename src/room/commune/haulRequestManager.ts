@@ -7,7 +7,7 @@ import {
 import { advancedFindDistance, randomTick } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 
 export class HaulRequestManager {
     communeManager: CommuneManager
@@ -26,7 +26,8 @@ export class HaulRequestManager {
             if (
                 !request ||
                 !room.roomManager.structures.spawn.length ||
-                room.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy
+                room.roomManager.resourcesInStoringStructures.energy <
+                    this.communeManager.minStoredEnergy
             ) {
                 this.communeManager.room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
                 continue
@@ -37,7 +38,7 @@ export class HaulRequestManager {
             if (
                 randomTick(20) &&
                 Game.map.getRoomStatus(requestName).status !==
-                Game.map.getRoomStatus(room.name).status
+                    Game.map.getRoomStatus(room.name).status
             ) {
                 delete Memory.haulRequests[requestName]
                 room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
@@ -76,7 +77,7 @@ export class HaulRequestManager {
             if (
                 randomTick(20) &&
                 Game.map.getRoomStatus(requestName).status !==
-                Game.map.getRoomStatus(room.name).status
+                    Game.map.getRoomStatus(room.name).status
             ) {
                 delete Memory.haulRequests[requestName]
                 room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)

@@ -1,7 +1,7 @@
 import { packCoord } from 'other/codec'
 import { collectiveManager } from './collective'
 
-export type PlayerRelationship = 'ally' | 'enemy'
+
 
 export enum PlayerMemoryKeys {
     /**
@@ -111,6 +111,25 @@ export enum CreepRoomLogisticsRequestKeys {
     amount,
     onlyFull,
     noReserve,
+}
+
+export enum RoomLogisticsRequestTypes {
+    /**
+     * Asks for resources to be transferred
+     */
+    transfer,
+    /**
+     * Asks for resources to be withdrawn
+     */
+    withdraw,
+    /**
+     * A dropped resource asking to be picked up
+     */
+    pickup,
+    /**
+     * Offering to be picked up but not trying to get rid of the resource
+     */
+    offer,
 }
 
 export type SleepFor = 'any' | 'noMove'
@@ -1552,7 +1571,7 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
 
 export const rangedMassAttackMultiplierByRange = [1, 1, 0.4, 0.1]
 
-export enum RoomStatNamesEnum {
+export enum RoomStatsKeys {
     ControllerLevel = 'cl',
     EnergyInputHarvest = 'eih',
     EnergyInputBought = 'eib',
@@ -1651,9 +1670,16 @@ export const defaultDataDecay = 0.99999
 export const revolutionary = 'MarvinTMB'
 export const maxSegmentsOpen = 10
 
+/**
+ * Non-zero types of reserved registered coordinates
+ */
 export enum ReservedCoordTypes {
     /**
-     * The reserved is dying
+     * The creep is trying to spawn onto this coord
+     */
+    spawning,
+    /**
+     * The notable reserved coord reserver is dying
      */
     dying,
     /**
@@ -1669,7 +1695,6 @@ export enum ReservedCoordTypes {
      */
     necessary,
 }
-export type ReservedCoordTypesKeys = typeof ReservedCoordTypes[keyof typeof ReservedCoordTypes]
 
 /**
  * Types of work intents

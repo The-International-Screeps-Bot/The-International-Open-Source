@@ -6,7 +6,7 @@ import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { TerminalManager } from 'room/commune/terminal/terminal'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
-import { StatsManager, updateStat } from 'international/statsManager'
+import { StatsManager, statsManager } from 'international/statsManager'
 import { CommunePlanner } from 'room/communePlanner'
 import { ConstructionManager } from 'room/construction/construction'
 import { ObserverManager } from 'room/commune/observer'
@@ -20,6 +20,14 @@ import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { originalLoop } from 'main'
 import { creepClasses } from 'room/creeps/creepClasses'
 import { outOfBucket } from 'utils/utils'
+import { creepOrganizer } from 'international/creepOrganizer'
+import { requestsManager } from 'international/requests'
+import { simpleAllies } from 'international/simpleAllies'
+import { PlayerManager } from 'international/players'
+import { customFindPath } from 'international/customPathFinder'
+import { flagManager } from 'international/flags'
+
+// Classes
 
 profiler.registerClass(CommuneManager, 'CommuneManager')
 profiler.registerClass(RoomManager, 'RoomManager')
@@ -39,8 +47,22 @@ profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
 profiler.registerClass(Quad, 'Quad')
 profiler.registerClass(DynamicSquad, 'DynamicSquad')
 profiler.registerClass(Duo, 'Duo')
-profiler.registerFN(updateStat, 'updateStat')
+profiler.registerClass(PlayerManager, 'PlayerManager')
+
+// Objects
+
+profiler.registerObject(creepOrganizer, 'creepOrganizer')
+profiler.registerObject(requestsManager, 'requestsManager')
+profiler.registerObject(simpleAllies, 'simpleAllies')
+profiler.registerFN(flagManager, 'flagManager')
+
+// Functions
+
 profiler.registerFN(originalLoop, 'loop')
+profiler.registerFN(customFindPath, 'customFindPath')
+profiler.registerFN(outOfBucket, 'outOfBucket')
+
+// conditional or complicated
 
 if (global.userScript) profiler.registerFN(global.userScript, 'userScript')
 if (global.collectivizer) profiler.registerClass(global.collectivizer, 'collectivizer')
@@ -48,4 +70,3 @@ if (global.collectivizer) profiler.registerClass(global.collectivizer, 'collecti
 for (const creepClass of new Set(Object.values(creepClasses))) {
     profiler.registerClass(creepClass, creepClass.toString().match(/ (\w+)/)[1])
 }
-profiler.registerFN(outOfBucket, 'outOfBucket')

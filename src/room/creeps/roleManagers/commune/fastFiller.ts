@@ -3,16 +3,12 @@ import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 
 export class FastFiller extends Creep {
-
     update() {
-
         const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
         if (packedCoord) {
-
             if (this.isDying()) {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
-            }
-            else {
+            } else {
                 this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
             }
         }
@@ -54,12 +50,9 @@ export class FastFiller extends Creep {
 
         const reservedCoords = room.roomManager.reservedCoords
 
-        const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(
-            pos => {
-
-                return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
-            }
-        )
+        const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(pos => {
+            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+        })
         if (!openFastFillerPositions.length) return false
 
         const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
@@ -89,10 +82,7 @@ export class FastFiller extends Creep {
             }
         }
 
-        const fastFillerContainers: StructureContainer[] = []
-
-        if (room.fastFillerContainerLeft) fastFillerContainers.push(room.fastFillerContainerLeft)
-        if (room.fastFillerContainerRight) fastFillerContainers.push(room.fastFillerContainerRight)
+        const fastFillerContainers = this.room.roomManager.fastFillerContainers
 
         // If all spawningStructures are filled, inform false
 
@@ -140,8 +130,8 @@ export class FastFiller extends Creep {
             }
 
             let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = []
-            if (room.fastFillerLink && room.fastFillerLink.RCLActionable)
-                fastFillerStoringStructures.push(room.fastFillerLink)
+            if (room.roomManager.fastFillerLink && room.roomManager.fastFillerLink.RCLActionable)
+                fastFillerStoringStructures.push(room.roomManager.fastFillerLink)
             fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 
             // Loop through each fastFillerStoringStructure

@@ -25,11 +25,6 @@ export interface Settings {
     mapVisuals: boolean
 
     /**
-     * Wether the bot save RoomStats data
-     */
-    roomStats: 0 | 1 | 2
-
-    /**
      * A list of usernames to treat as allies
      */
     allies: string[]
@@ -125,7 +120,6 @@ export const defaultSettings: Settings = {
     baseVisuals: false,
     dataVisuals: false,
     mapVisuals: false,
-    roomStats: 2,
     allies: [
         'MarvinTMB'
     ],

@@ -16,7 +16,7 @@ import {
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
 import { debugUtils } from 'debug/debugUtils'
-import { LogTypes, log } from './logging'
+import { LogTypes, customLog } from './logging'
 
 /**
  * Finds the average trading price of a resourceType over a set amount of days
@@ -499,60 +499,6 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
     return undefined
 }
 
-/**
- * Finds the largest possible transaction amount given a budget and starting amount
- * @param budget The number of energy willing to be invested in the trade
- * @param amount The number of resources that would like to be traded
- * @param roomName1
- * @param roomName2
- * @returns
- */
-export function findLargestTransactionAmount(
-    budget: number,
-    amount: number,
-    roomName1: string,
-    roomName2: string,
-) {
-    budget = Math.max(budget, 1)
-
-    // So long as the the transactions cost is more than the budget
-
-    while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
-        // Decrease amount exponentially
-
-        amount = (amount - 1) * 0.8
-    }
-
-    return Math.floor(amount)
-}
-
-/**
- * Finds the name of the closest commune, exluding the specified roomName
- */
-export function findClosestCommuneName(roomName: string) {
-    const communesNotThis = []
-
-    for (const communeName of global.communes) {
-        if (roomName == communeName) continue
-
-        communesNotThis.push(communeName)
-    }
-
-    return communesNotThis.sort(
-        (a, b) =>
-            Game.map.getRoomLinearDistance(roomName, a) -
-            Game.map.getRoomLinearDistance(roomName, b),
-    )[0]
-}
-
-export function findClosestClaimType(roomName: string) {
-    return Array.from(global.communes).sort(
-        (a, b) =>
-            Game.map.getRoomLinearDistance(roomName, a) -
-            Game.map.getRoomLinearDistance(roomName, b),
-    )[0]
-}
-
 export function findClosestRoomName(start: string, targets: string[]) {
     let minRange = Infinity
     let closest = undefined
@@ -581,7 +527,7 @@ export function findCPUOf(func: Function) {
 
     func()
 
-    log('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
+    customLog('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
 }
 
 export function isXYExit(x: number, y: number) {
@@ -607,28 +553,6 @@ export function randomChance(number: number = 10) {
 
 export function randomRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min)
-}
-
-/**
- * Removes roomType-based values in the room's memory that don't match its type
- */
-export function cleanRoomMemory(roomName: string) {
-    const roomMemory = Memory.rooms[roomName]
-
-    // Loop through keys in the room's memory
-
-    for (const key in roomMemory) {
-        // Iterate if key is not part of roomTypeProperties
-
-        if (!roomTypeProperties.has(key as unknown as keyof RoomMemory)) continue
-
-        // Iterate if key is part of this roomType's properties
-
-        if (roomTypes[roomMemory[RoomMemoryKeys.type]].has(key as unknown as keyof RoomMemory))
-            continue
-
-        delete roomMemory[key as unknown as keyof RoomMemory]
-    }
 }
 
 export function isNearRoomEdge(coord: Coord, minRange: number) {
@@ -924,13 +848,14 @@ export function isAlly(playerName: string) {
 }
 
 export function outOfBucket() {
-    global.logs = ''
-    log('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
+    Memory.stats.lastTick = Game.time
+    collectiveManager.logs = ''
+    customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         type: LogTypes.warning,
     })
     console.log(
         global.settings.logging
-            ? global.logs
+            ? collectiveManager.logs
             : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
     )
 }
@@ -949,8 +874,7 @@ export function getMe() {
         return room.controller.owner.username
     }
 
-    // This should never happen
-    return 'username'
+    throw Error('Could not find me')
 }
 
 export function round(value: number, decimals: number = 8) {

@@ -57,9 +57,6 @@ class InitManager {
 
         global.constructed = true
 
-        global.roomManagers = {}
-        global.communeManagers = {}
-
         global.packedRoomNames = {}
         global.unpackedRoomNames = {}
     }

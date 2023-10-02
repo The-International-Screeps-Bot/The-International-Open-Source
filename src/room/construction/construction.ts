@@ -2,11 +2,12 @@ import {
     buildableStructuresSet,
     buildableStructureTypes,
     customColors,
+    impassibleStructureTypesSet,
     Result,
     RoomMemoryKeys,
     structureTypesToProtectSet,
 } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findObjectWithID, packAsNum, randomIntRange, randomTick } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
@@ -28,6 +29,7 @@ const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_CONTAINER,
     STRUCTURE_NUKER,
     STRUCTURE_FACTORY,
+    STRUCTURE_WALL,
 ]
 const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
     STRUCTURE_SPAWN,
@@ -48,6 +50,8 @@ export class ConstructionManager extends Sleepable {
     preTickRun() {
         this.room = this.communeManager.room
 
+        this.manageConstructionSites()
+
         if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
         // If it's not our first room, wait until RCL 2 before begining construction efforts
         if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
@@ -57,31 +61,55 @@ export class ConstructionManager extends Sleepable {
         this.place()
         this.migrate()
     }
-    private place() {
-        // If there are builders and enough cSites, stop
+    /**
+     * Try to shove creeps off of impassible construction sites so they can be built on
+     */
+    private manageConstructionSites() {
 
-        if (this.room.myCreeps.builder.length) {
-            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return
+        const constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES)
+        for (const cSite of constructionSites) {
+
+            if (!impassibleStructureTypesSet.has(cSite.structureType)) continue
+
+            const creepName = this.room.creepPositions[packCoord(cSite.pos)]
+            if (!creepName) continue
+
+            const creep = Game.creeps[creepName]
+            creep.shove()
         }
-        // If there are no builders, just run every few ticks
-        else if (this.room.controller.level !== 1 && this.isSleeping()) return
+    }
+    private shouldPlace() {
+        // If the construction site count is at its limit, stop
+        if (collectiveManager.constructionSiteCount >= MAX_CONSTRUCTION_SITES) return false
+
+        // If there are builders and enough cSites, stop
+        if (this.room.myCreeps.builder.length) {
+            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return false
+
+            return true
+        }
+
+        // If there are no builders
+
+        // Only run every so often
+        else if (this.room.controller.level !== 1 && this.isSleeping()) return false
         this.sleepWhenDone()
 
-        // If the construction site count is at its limit, stop
-
-        if (global.constructionSitesCount === MAX_CONSTRUCTION_SITES) return
-
-        // If there are enough construction sites
-
+        // If there are too many construction sites
         if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= collectiveManager.maxCSitesPerRoom)
-            return
+            return false
+
+        return true
+    }
+    private place() {
+        if (!this.shouldPlace()) return
 
         this.placedSites = 0
 
         const RCL = this.room.controller.level
         const maxCSites = Math.min(
             collectiveManager.maxCSitesPerRoom,
-            MAX_CONSTRUCTION_SITES - global.constructionSitesCount,
+            MAX_CONSTRUCTION_SITES - collectiveManager.constructionSiteCount,
         )
 
         this.placeRamparts(RCL, maxCSites)

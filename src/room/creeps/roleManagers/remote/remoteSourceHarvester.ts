@@ -3,6 +3,7 @@ import {
     packedPosLength,
     ReservedCoordTypes,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     RoomTypes,
     WorkTypes,
@@ -121,6 +122,9 @@ export class RemoteHarvester extends Creep {
         for (const remoteInfo of this.commune.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
+            const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+
             const sourceIndex = parseInt(splitRemoteInfo[1])
 
             if (!this.isRemoteValid(remoteName, sourceIndex)) continue
@@ -261,7 +265,7 @@ export class RemoteHarvester extends Creep {
         this.room.visual.text((sourcee.energy * ENERGY_REGEN_TIME).toString() + ', ' + (sourcee.ticksToRegeneration * 0.9 * sourcee.energyCapacity).toString(), this.pos)
         */
 
-        const container = this.room.sourceContainers[sourceIndex]
+        const container = this.room.roomManager.sourceContainers[sourceIndex]
         if (container) {
             // Repair or build the container if we're ahead on source regen
 
@@ -297,7 +301,7 @@ export class RemoteHarvester extends Creep {
 
         this.room.createRoomLogisticsRequest({
             target: this,
-            type: 'withdraw',
+            type: RoomLogisticsRequestTypes.withdraw,
             priority: scalePriority(this.store.getCapacity(), this.reserveStore.energy, 5, true),
         })
 
@@ -310,7 +314,11 @@ export class RemoteHarvester extends Creep {
 
         return this.runRoomLogisticsRequestAdvanced({
             resourceTypes: new Set([RESOURCE_ENERGY]),
-            types: new Set(['withdraw', 'pickup', 'offer']),
+            types: new Set<RoomLogisticsRequestTypes>([
+                RoomLogisticsRequestTypes.withdraw,
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.offer,
+            ]),
             conditions: request => {
                 getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
             },
@@ -344,8 +352,7 @@ export class RemoteHarvester extends Creep {
 
     buildContainer(): number {
         // Don't build new remote containers until we can reserve the room
-
-        if (this.commune.communeManager.shouldRemoteContainers) return Result.noAction
+        if (!this.commune.communeManager.shouldRemoteContainers) return Result.noAction
 
         // Make sure we're a bit ahead source regen time
 

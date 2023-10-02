@@ -1,5 +1,5 @@
 import { RoomMemoryKeys, packedPosLength, stamps } from 'international/constants'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneManager } from './commune'
 
@@ -44,7 +44,7 @@ export class HaulerNeedManager {
     private sourceNeed() {
         const { room } = this.communeManager
 
-        if (room.hubLink && room.hubLink.RCLActionable) {
+        if (room.roomManager.hubLink && room.roomManager.hubLink.RCLActionable) {
             for (let index in room.find(FIND_SOURCES)) {
                 const sourceLink = room.communeManager.sourceLinks[index]
                 if (sourceLink && sourceLink.RCLActionable) continue
@@ -78,7 +78,7 @@ export class HaulerNeedManager {
 
         // There is a viable controllerContainer
 
-        if (room.controllerContainer) {
+        if (room.roomManager.controllerContainer) {
             this.communeManager.haulerNeed += findCarryPartsRequired(
                 room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
                 this.communeManager.upgradeStrength * 1.1,
@@ -91,7 +91,7 @@ export class HaulerNeedManager {
         if (
             this.communeManager.controllerLink &&
             this.communeManager.controllerLink.RCLActionable &&
-            (!room.hubLink || !room.hubLink.RCLActionable)
+            (!room.roomManager.hubLink || !room.roomManager.hubLink.RCLActionable)
         ) {
             this.communeManager.haulerNeed += findCarryPartsRequired(
                 room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,

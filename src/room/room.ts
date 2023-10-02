@@ -2,8 +2,8 @@ import {
     CreepMemoryKeys,
     PlayerMemoryKeys,
     ReservedCoordTypes,
-    ReservedCoordTypesKeys,
     Result,
+    RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     RoomTypes,
     adjacentOffsets,
@@ -27,7 +27,6 @@ import {
 } from 'international/constants'
 import {
     advancedFindDistance,
-    cleanRoomMemory,
     findClosestObject,
     findHighestScore,
     findObjectWithID,
@@ -71,7 +70,7 @@ import { RampartPlans } from './construction/rampartPlans'
 import { PathGoal, customFindPath } from 'international/customPathFinder'
 import { roomUtils } from './roomUtils'
 import { collectiveManager } from 'international/collective'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 
 export interface InterpretedRoomEvent {
     eventType: EventConstant
@@ -97,6 +96,8 @@ export interface NotMyConstructionSites {
 }
 
 export class RoomManager {
+    static roomManagers: { [roomName: string]: RoomManager } = {}
+
     // sub managers
 
     communePlanner: CommunePlanner
@@ -136,6 +137,7 @@ export class RoomManager {
      * Packed coords reserved by creeps
      */
     reservedCoords: Map<string, ReservedCoordTypes>
+    roomLogisticsBlacklistCoords: Set<string> = new Set()
 
     update(room: Room) {
         delete this.checkedStructureUpdate
@@ -176,7 +178,7 @@ export class RoomManager {
         this._enemyDamageThreat = undefined
         this._enemyThreatCoords = undefined
         this._enemyThreatGoals = undefined
-        this._flags = undefined
+        /* this._flags = undefined */
         this._resourcesInStoringStructures = undefined
         this._unprotectedEnemyCreeps = undefined
         this._exitCoords = undefined
@@ -190,6 +192,7 @@ export class RoomManager {
 
         if (randomTick()) {
             delete this._nukeTargetCoords
+            this.roomLogisticsBlacklistCoords = new Set()
         }
 
         this.reservedCoords = new Map()
@@ -198,14 +201,13 @@ export class RoomManager {
         const roomMemory = room.memory
 
         // If it hasn't been scouted for 100~ ticks
-
         if (Game.time - roomMemory[RoomMemoryKeys.lastScout] > Math.floor(Math.random() * 200)) {
             room.basicScout()
-            cleanRoomMemory(room.name)
+            roomUtils.cleanMemory(room.name)
         }
 
         const roomType = roomMemory[RoomMemoryKeys.type]
-        if (global.settings.roomStats > 0 && roomTypesUsedForStats.includes(roomType)) {
+        if (roomTypesUsedForStats.includes(roomType)) {
             statsManager.roomPreTick(room.name, roomType)
         }
 
@@ -233,10 +235,10 @@ export class RoomManager {
         room.squadRequests = new Set()
 
         room.roomLogisticsRequests = {
-            transfer: {},
-            withdraw: {},
-            offer: {},
-            pickup: {},
+            [RoomLogisticsRequestTypes.transfer]: {},
+            [RoomLogisticsRequestTypes.withdraw]: {},
+            [RoomLogisticsRequestTypes.offer]: {},
+            [RoomLogisticsRequestTypes.pickup]: {},
         }
 
         if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) return
@@ -247,19 +249,16 @@ export class RoomManager {
         if (!room.controller.my) {
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-                cleanRoomMemory(room.name)
+                roomUtils.cleanMemory(room.name)
             }
             return
         }
 
-        room.communeManager = global.communeManagers[room.name]
-
+        room.communeManager = CommuneManager.communeManagers[room.name]
         if (!room.communeManager) {
             room.communeManager = new CommuneManager()
-            global.communeManagers[room.name] = room.communeManager
+            CommuneManager.communeManagers[room.name] = room.communeManager
         }
-
-        // new commune planner
 
         room.communeManager.update(room)
     }
@@ -298,7 +297,7 @@ export class RoomManager {
      * Debug
      */
     private visualizeReservedCoords() {
-        log('reservedCoords', JSON.stringify([...this.reservedCoords]))
+        customLog('reservedCoords', JSON.stringify([...this.reservedCoords]))
         for (const [packedCoord, reserveType] of this.reservedCoords) {
             const coord = unpackCoord(packedCoord)
             this.room.coordVisual(coord.x, coord.y, `hsl(${200}${reserveType * 50}, 100%, 60%)`)
@@ -498,14 +497,14 @@ export class RoomManager {
 
     isStartRoom() {
         return (
-            global.communes.size === 1 &&
+            collectiveManager.communes.size === 1 &&
             this.room.controller.my &&
             this.room.controller.safeMode &&
-            global.communes.has(this.room.name)
+            collectiveManager.communes.has(this.room.name)
         )
     }
 
-    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypesKeys) {
+    reserveCoord(packedCoord: string, newCoordType: ReservedCoordTypes) {
         const currentCoordType = this.reservedCoords.get(packedCoord) || ReservedCoordTypes.normal
         if (currentCoordType) {
             this.reservedCoords.set(packedCoord, Math.max(currentCoordType, newCoordType))
@@ -702,7 +701,7 @@ export class RoomManager {
 
     _upgradePositions: RoomPosition[]
     get upgradePositions() {
-        if (this._upgradePositions) return this._upgradePositions
+        if (this._upgradePositions && !this.structureUpdate) return this._upgradePositions
 
         // Get the center upgrade pos, stopping if it's undefined
 
@@ -740,8 +739,8 @@ export class RoomManager {
         positions.push(positions.shift())
 
         // Make the center pos the first to be chosen (we want upgraders to stand on the container)
-
-        positions.unshift(centerUpgradePos)
+        const controllerLink = this.room.communeManager.controllerLink
+        if (!controllerLink || !controllerLink.RCLActionable) positions.unshift(centerUpgradePos)
 
         return (this._upgradePositions = positions)
     }
@@ -917,11 +916,14 @@ export class RoomManager {
 
         // Structures have been added, destroyed or aren't yet initialized
 
-        delete this._structureCoords
+        this._structureCoords = undefined
+        this._upgradePositions = undefined
 
         const communeManager = this.room.communeManager
         if (communeManager) {
-            delete communeManager._fastFillerSpawnEnergyCapacity
+            communeManager.spawningStructuresByPriorityIDs = undefined
+            communeManager.spawningStructuresByNeedIDs = undefined
+            communeManager._fastFillerSpawnEnergyCapacity = undefined
         }
 
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
@@ -1139,7 +1141,7 @@ export class RoomManager {
     get enemyCreepPositions() {
         const enemyCreepPositions: { [packedCoord: string]: Id<Creep> } = {}
 
-        for (const creep of this.room.roomManager.notMyCreeps.enemy) {
+        for (const creep of this.notMyCreeps.enemy) {
             const packedCoord = packCoord(creep.pos)
             enemyCreepPositions[packedCoord] = creep.id
         }
@@ -1157,7 +1159,7 @@ export class RoomManager {
             highestHeal: 0,
             highestDismantle: 0,
         }
-        const enemyCreeps = this.room.roomManager.notMyCreeps.enemy
+        const enemyCreeps = this.notMyCreeps.enemy
         if (!enemyCreeps.length) return (this._enemySquadData = highestEnemySquadData)
 
         const enemyCreepIDs = new Set(enemyCreeps.map(creep => creep.id))
@@ -1337,8 +1339,13 @@ export class RoomManager {
 
         const controller = this.room.controller
         if (controller) {
-            if (controller.my || controller.reservation.username === Memory.me)
+            // We don't want to target any structures in communes or remotes
+            if (
+                controller.my ||
+                Memory.rooms[this.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+            ) {
                 return (this._combatStructureTargets = [])
+            }
 
             if (controller.owner && isAlly(controller.owner.username))
                 return (this._combatStructureTargets = [])
@@ -1414,6 +1421,9 @@ export class RoomManager {
     }
 
     _remoteNamesByEfficacy: string[]
+    /**
+     * Some rooms may no longer be remotes when accesed later in the code
+     */
     get remoteNamesByEfficacy() {
         if (this._remoteNamesByEfficacy) return this._remoteNamesByEfficacy
 
@@ -1440,6 +1450,9 @@ export class RoomManager {
     }
 
     _remoteSourceIndexesByEfficacy: string[]
+    /**
+     * Some rooms may no longer be remotes when accessed later in the code
+     */
     get remoteSourceIndexesByEfficacy() {
         if (this._remoteSourceIndexesByEfficacy) return this._remoteSourceIndexesByEfficacy
 
@@ -1550,9 +1563,12 @@ export class RoomManager {
                 structure => structure.structureType === STRUCTURE_CONTAINER,
             ),
         ]
-        const fastFillerContainers = potentialFastFillerContainers.filter(
-            container => !!container,
-        ) as StructureContainer[]
+        let fastFillerContainers: StructureContainer[] = []
+        for (const container of potentialFastFillerContainers) {
+            if (!container) continue
+
+            fastFillerContainers.push(container)
+        }
 
         this.fastFillerContainerIDs = fastFillerContainers.map(container => container.id)
         return (this._fastFillerContainers = fastFillerContainers)
@@ -1616,7 +1632,7 @@ export class RoomManager {
     fastFillerLinkID: Id<StructureLink>
     _fastFillerLink: StructureLink | false
     get fastFillerLink() {
-        if (!this._fastFillerLink !== undefined) return this._fastFillerLink
+        if (this._fastFillerLink !== undefined) return this._fastFillerLink
 
         if (this.fastFillerLinkID) {
             const fastFillerLink = findObjectWithID(this.fastFillerLinkID)
@@ -1631,7 +1647,7 @@ export class RoomManager {
             structure => structure.structureType === STRUCTURE_LINK,
         )
         if (!this._fastFillerLink) {
-            return this._fastFillerLink
+            return false
         }
 
         this.fastFillerLinkID = this._fastFillerLink.id
@@ -1641,7 +1657,7 @@ export class RoomManager {
     hubLinkId: Id<StructureLink>
     _hubLink: StructureLink | false
     get hubLink() {
-        if (!this._hubLink !== undefined) return this._hubLink
+        if (this._hubLink !== undefined) return this._hubLink
 
         if (this.hubLinkId) {
             const hubLink = findObjectWithID(this.hubLinkId)
@@ -1658,7 +1674,7 @@ export class RoomManager {
         )
 
         if (!this._hubLink) {
-            return this._hubLink
+            return false
         }
 
         this.hubLinkId = this._hubLink.id
@@ -1672,7 +1688,7 @@ export class RoomManager {
         const droppedEnergy = this.room.find(FIND_DROPPED_RESOURCES, {
             filter: resource =>
                 resource.resourceType === RESOURCE_ENERGY &&
-                !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
+                !resource.room.roomManager.enemyThreatCoords.has(packCoord(resource.pos)),
         })
         return (this._droppedEnergy = droppedEnergy)
     }
@@ -1682,7 +1698,8 @@ export class RoomManager {
         if (this._droppedResources) return this._droppedResources
 
         const droppedResources = this.room.find(FIND_DROPPED_RESOURCES, {
-            filter: resource => !resource.room.enemyThreatCoords.has(packCoord(resource.pos)),
+            filter: resource =>
+                !resource.room.roomManager.enemyThreatCoords.has(packCoord(resource.pos)),
         })
         return (this._droppedResources = droppedResources)
     }
@@ -1694,7 +1711,7 @@ export class RoomManager {
         const actionableWalls = this.room.find<StructureWall>(FIND_STRUCTURES, {
             filter: structure =>
                 structure.structureType === STRUCTURE_WALL &&
-                !structure.room.enemyThreatCoords.has(packCoord(structure.pos)),
+                !structure.room.roomManager.enemyThreatCoords.has(packCoord(structure.pos)),
         })
         return (this._actionableWalls = actionableWalls)
     }
@@ -1825,12 +1842,12 @@ export class RoomManager {
                 }
 
                 if (largestValue >= 50) {
-                    quadCostMatrix.set(x, y, 50)
+                    largestValue = 50
 
                     quadCostMatrix.set(
                         x,
                         y,
-                        Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 50)),
+                        Math.max(terrainCoords[packXYAsNum(x, y)], largestValue),
                     )
                     continue
                 }
@@ -1855,7 +1872,7 @@ export class RoomManager {
             }
         }
 
-        /* this.visualizeCostMatrix(quadCostMatrix) */
+        /* this.room.visualizeCostMatrix(quadCostMatrix) */
 
         return (this._quadCostMatrix = quadCostMatrix)
     }
@@ -1992,12 +2009,12 @@ export class RoomManager {
                 }
 
                 if (largestValue >= 50) {
-                    quadBulldozeCostMatrix.set(x, y, 50)
+                    largestValue = 50
 
                     quadBulldozeCostMatrix.set(
                         x,
                         y,
-                        Math.max(terrainCoords[packXYAsNum(x, y)], Math.min(largestValue, 50)),
+                        Math.max(terrainCoords[packXYAsNum(x, y)], largestValue),
                     )
                     continue
                 }
@@ -2107,7 +2124,7 @@ export class RoomManager {
                 // Ignore ramparts that can be one shotted
                 if (rampart.hits < highestDamage) continue
 
-                this.enemyThreatCoords.delete(packCoord(rampart.pos))
+                enemyThreatCoords.delete(packCoord(rampart.pos))
             }
         }
 
@@ -2142,7 +2159,7 @@ export class RoomManager {
 
         return (this._enemyThreatGoals = enemyThreatGoals)
     }
-
+    /*
     _flags: Partial<{ [key in FlagNames]: Flag }>
     get flags() {
         if (this._flags) return this._flags
@@ -2150,36 +2167,36 @@ export class RoomManager {
         const flags: Partial<{ [key in FlagNames]: Flag }> = {}
 
         for (const flag of this.room.find(FIND_FLAGS)) {
-            this._flags[flag.name as FlagNames] = flag
+            flags[flag.name as FlagNames] = flag
         }
 
         return (this._flags = flags)
     }
-
+ */
     _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
     get resourcesInStoringStructures() {
         if (this._resourcesInStoringStructures) return this._resourcesInStoringStructures
 
         const resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }> = {}
 
-        const storingStructures: AnyStoreStructure[] = [this.room.storage, this.room.factory]
+        const storingStructures: AnyStoreStructure[] = [this.room.storage, this.factory]
         if (this.room.terminal && !this.room.terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) {
             storingStructures.push(this.room.terminal)
         }
 
         for (const structure of storingStructures) {
             if (!structure) continue
-            if (structure.RCLActionable) continue
+            if (!structure.RCLActionable) continue
 
             for (const key in structure.store) {
                 const resourceType = key as ResourceConstant
 
-                if (!this._resourcesInStoringStructures[resourceType]) {
-                    this._resourcesInStoringStructures[resourceType] = structure.store[resourceType]
+                if (!resourcesInStoringStructures[resourceType]) {
+                    resourcesInStoringStructures[resourceType] = structure.store[resourceType]
                     continue
                 }
 
-                this._resourcesInStoringStructures[resourceType] += structure.store[resourceType]
+                resourcesInStoringStructures[resourceType] += structure.store[resourceType]
             }
         }
 
@@ -2356,7 +2373,7 @@ export class RoomManager {
     }
 
     _factory?: StructureFactory
-    get() {
+    get factory() {
         if (this._factory !== undefined) return this._factory
 
         return (this._factory = this.structures.factory[0])
@@ -2405,5 +2422,11 @@ export class RoomManager {
             Memory.rooms[this.room.name][RoomMemoryKeys.rampartPlans],
         )
         return this._rampartPlans
+    }
+
+    visualizePosHavers(posHavers: { pos: Coord }[]) {
+        for (const structure of posHavers) {
+            this.room.coordVisual(structure.pos.x, structure.pos.y)
+        }
     }
 }

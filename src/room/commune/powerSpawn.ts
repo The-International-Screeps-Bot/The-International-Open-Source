@@ -1,6 +1,6 @@
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 import { CommuneManager } from './commune'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { collectiveManager } from 'international/collective'
 
 export class PowerSpawnsManager {
@@ -11,7 +11,7 @@ export class PowerSpawnsManager {
         this.communeManager = communeManager
     }
     public run() {
-        this.powerSpawn = this.communeManager.room.powerSpawn
+        this.powerSpawn = this.communeManager.room.roomManager.powerSpawn
         if (!this.powerSpawn) return
 
         this.advancedProcessPower()
@@ -27,7 +27,8 @@ export class PowerSpawnsManager {
 
         const result = this.powerSpawn.processPower()
 
-        if (result === OK) updateStat(this.powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
+        if (result === OK)
+            statsManager.updateStat(this.powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
     }
 
     /**

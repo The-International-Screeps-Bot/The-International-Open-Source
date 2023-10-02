@@ -1,5 +1,10 @@
-import { PlayerMemoryKeys, customColors, towerPowers } from 'international/constants'
-import { updateStat } from 'international/statsManager'
+import {
+    PlayerMemoryKeys,
+    RoomLogisticsRequestTypes,
+    customColors,
+    towerPowers,
+} from 'international/constants'
+import { statsManager } from 'international/statsManager'
 import {
     findHighestScore,
     findObjectWithID,
@@ -106,7 +111,7 @@ export class TowerManager {
     }
 
     private attackEnemyCreeps() {
-        if (this.communeManager.room.flags.disableTowerAttacks) {
+        if (Game.flags.disableTowerAttacks) {
             this.communeManager.room.towerInferiority =
                 this.communeManager.room.roomManager.enemyAttackers.length > 0
             return false
@@ -171,7 +176,9 @@ export class TowerManager {
 
         if (room.roomManager.enemyAttackers.length) {
             return room.roomManager.myDamagedCreeps.find(creep => {
-                return !creep.isOnExit && !room.enemyThreatCoords.has(packCoord(creep.pos))
+                return (
+                    !creep.isOnExit && !room.roomManager.enemyThreatCoords.has(packCoord(creep.pos))
+                )
             })
         }
 
@@ -236,7 +243,7 @@ export class TowerManager {
             const tower = findObjectWithID(this.actionableTowerIDs[i])
             if (tower.repair(repairTarget) !== OK) continue
 
-            updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
+            statsManager.updateStat(this.communeManager.room.name, 'eorwr', TOWER_ENERGY_COST)
             this.actionableTowerIDs.splice(i, 1)
         }
 
@@ -287,7 +294,7 @@ export class TowerManager {
             if (structure.usedReserveStore < structure.store.getCapacity(RESOURCE_ENERGY) * 0.8) {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
-                    type: 'transfer',
+                    type: RoomLogisticsRequestTypes.transfer,
                     priority:
                         3 +
                         scalePriority(
@@ -304,7 +311,7 @@ export class TowerManager {
                     target: structure,
                     maxAmount: structure.usedReserveStore - 100,
                     /* onlyFull: true, */
-                    type: 'offer',
+                    type: RoomLogisticsRequestTypes.offer,
                     priority: scalePriority(
                         structure.store.getCapacity(RESOURCE_ENERGY),
                         structure.usedReserveStore,

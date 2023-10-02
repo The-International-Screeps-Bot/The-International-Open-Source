@@ -23,15 +23,13 @@ import {
     RoomTypes,
     packedPosLength,
     maxRemotePathDistance,
+    RoomLogisticsRequestTypes,
 } from 'international/constants'
 import {
     advancedFindDistance,
     areCoordsEqual,
-    cleanRoomMemory,
     createPosMap,
     findAdjacentCoordsToCoord,
-    findClosestClaimType,
-    findClosestCommuneName,
     findCoordsInsideRect,
     findObjectWithID,
     getRangeXY,
@@ -59,7 +57,7 @@ import { posix } from 'path'
 import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
 import { roomUtils } from './roomUtils'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 
 /**
     @param pos1 pos of the object performing the action
@@ -224,7 +222,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     if (
         roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-        !global.communes.has(roomMemory[RoomMemoryKeys.commune])
+        !collectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
     )
         roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 
@@ -323,7 +321,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         let disable: boolean
         let newCost = 0
-        const pathsThrough: Set<string> = new Set()
+        const pathsThrough = new Set<string>()
 
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
         const packedRemoteSourceHarvestPositions =
@@ -415,7 +413,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     let disable: boolean
 
     // Generate new important positions
-    const pathsThrough: Set<string> = new Set()
+    const pathsThrough = new Set<string>()
 
     const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
     const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
@@ -540,7 +538,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
     threat = 0
 
-    const energy = this.resourcesInStoringStructures.energy
+    const energy = this.roomManager.resourcesInStoringStructures.energy
 
     roomMemory[RoomMemoryKeys.energy] = energy
     threat += Math.pow(energy, 0.5)
@@ -1527,7 +1525,7 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
     // There is already has a power creep responding to this target with the power
-    log('MADE POWER TASK FOR', target)
+    customLog('MADE POWER TASK FOR', target)
     if (target.reservePowers.has(powerType)) return false
 
     // Create a power task with info on the cooldown
@@ -1565,6 +1563,8 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     // Don't make requests when there is nobody to respond
 
     if (!this.myCreepsAmount) return Result.noAction
+    if (this.roomManager.roomLogisticsBlacklistCoords.has(packCoord(args.target.pos)))
+        return Result.noAction
 
     if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
     // We should only handle energy until we have an active storage or terminal
@@ -1583,7 +1583,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         amount = (args.target as Resource).reserveAmount
 
         if (amount < 1) return Result.fail
-    } else if (args.type === 'transfer') {
+    } else if (args.type === RoomLogisticsRequestTypes.transfer) {
         if (
             args.target.reserveStore[args.resourceType] >=
             args.target.store.getCapacity(args.resourceType)
@@ -1610,7 +1610,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
     const ID = collectiveManager.newTickID()
 
-    if (global.settings.roomLogisticsVisuals && args.type === 'pickup') {
+    if (global.settings.roomLogisticsVisuals && args.type === RoomLogisticsRequestTypes.pickup) {
         this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
         this.visual.text(args.priority.toString(), args.target.pos, { font: 0.4 })
     }
@@ -1641,7 +1641,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
         amount: amount,
         priority: args.priority,
         onlyFull: true || args.onlyFull,
-        noReserve: !this.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
+        noReserve: !this.roomManager.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
     })
 }
 
@@ -1687,35 +1687,6 @@ Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
         const cSite = findObjectWithID(ID) as T
         /* console.log('findCSite', cSite, ID) */
         if (conditions(cSite)) return cSite
-    }
-
-    return false
-}
-
-Room.prototype.findStructureInsideRect = function <T extends Structure>(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    condition: (structure: T) => boolean,
-): T | false {
-    let structureID: Id<Structure>
-
-    for (let x = x1; x <= x2; x += 1) {
-        for (let y = y1; y <= y2; y += 1) {
-            // Iterate if the pos doesn't map onto a room
-
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
-
-            const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
-            if (!structureIDs) continue
-
-            structureID = structureIDs.find(structureID => {
-                return condition(findObjectWithID(structureID) as T)
-            })
-
-            if (structureID) return findObjectWithID(structureID) as T
-        }
     }
 
     return false

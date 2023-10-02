@@ -1,4 +1,6 @@
-class HaulerManager {
+import { DefaultRoleManager } from "room/creeps/defaultRoleManager"
+
+class HaulerManager extends DefaultRoleManager {
 
     role: CreepRoles = 'hauler'
     // Allows for the pattern: instance.manager.run(instance)
@@ -12,7 +14,7 @@ class HaulerManager {
         }
     }
 
-    private runCreep(creep: Creep) {
+    runCreep(creep: Creep) {
 
         creep.passiveRenew()
         creep.runRoomLogisticsRequestsAdvanced()

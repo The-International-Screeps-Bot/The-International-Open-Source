@@ -1,5 +1,6 @@
 import { Result, customColors, PowerCreepMemoryKeys } from 'international/constants'
-import { log } from 'utils/logging'
+import { PowerTask } from 'types/roomRequests'
+import { customLog } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
 
 export class Operator extends PowerCreep {
@@ -51,14 +52,14 @@ export class Operator extends PowerCreep {
     findRenewTask?() {
         if (this.ticksToLive > POWER_CREEP_LIFE_TIME * 0.1) return false
 
-        if (!this.room.powerSpawn) return false
+        if (!this.room.roomManager.powerSpawn) return false
 
         this.memory[PowerCreepMemoryKeys.task] = 'advancedRenew'
         return true
     }
 
     advancedRenew?() {
-        const powerSpawn = this.room.powerSpawn
+        const powerSpawn = this.room.roomManager.powerSpawn
         if (!powerSpawn) return Result.fail
 
         const minRange = 1
@@ -146,7 +147,7 @@ export class Operator extends PowerCreep {
         const task = this.findNewBestPowerTask()
         if (!task) return Result.fail
 
-        log('FIND TASK', findObjectWithID(task.targetID))
+        customLog('FIND TASK', findObjectWithID(task.targetID))
 
         const taskTarget = findObjectWithID(task.targetID)
         taskTarget.reservePowers
@@ -202,7 +203,7 @@ export class Operator extends PowerCreep {
         if (!taskTarget) return Result.fail
 
         // We aren't in range, get closer
-        log('TRY TASK', taskTarget)
+        customLog('TRY TASK', taskTarget)
         const minRange = (POWER_INFO[this.memory[PowerCreepMemoryKeys.taskPower]] as any).range
         if (minRange && getRange(this.pos, taskTarget.pos) > minRange) {
             this.createMoveRequest({
@@ -223,7 +224,7 @@ export class Operator extends PowerCreep {
         this.usePower(this.memory[PowerCreepMemoryKeys.taskPower], taskTarget)
 
         // We did the power
-        log('WE DID THE POWA', taskTarget)
+        customLog('WE DID THE POWA', taskTarget)
 
         // Assume the power consumed ops if it does so
 

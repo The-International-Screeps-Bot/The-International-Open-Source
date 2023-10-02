@@ -1,13 +1,11 @@
 // eslint-disable
 import {
-    allStructureTypes,
     buildableStructureTypes,
     packedPosLength,
     stampKeys,
     // codecCacheLength,
 } from 'international/constants'
 import { encode, decode } from 'base32768'
-const codecCacheLength = 999999
 
 export const packCache: StringMap<string> = {}
 export const unpackCache: StringMap<string> = {}
@@ -337,6 +335,7 @@ export function packBasePlanCoord(planCoords: BasePlanCoord[]) {
             packedCoords += encoded
         }
     }
+    packedCoords += '_'
     return packedCoords
 }
 
@@ -372,7 +371,7 @@ export function unpackBasePlanCoords(packedPlanCoords: string) {
  * Pack a planned cord for base building
  */
 export function packRampartPlanCoord(planCoord: RampartPlanCoord) {
-    const key = Object.values(planCoord).join(',')
+    const key = Object.values(planCoord).join()
     let packedCoord = getPackCacheKey(key)
     if (packedCoord) return packedCoord
     packedCoord = encode(new Uint8Array(Object.values(planCoord)))

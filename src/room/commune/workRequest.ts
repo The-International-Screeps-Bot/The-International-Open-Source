@@ -8,7 +8,7 @@ import {
 import { advancedFindDistance, randomTick } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 
 export class WorkRequestManager {
     communeManager: CommuneManager

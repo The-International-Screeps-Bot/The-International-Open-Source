@@ -1,6 +1,6 @@
-import { customColors } from 'international/constants'
-import { updateStat } from 'international/statsManager'
-import { log } from 'utils/logging'
+import { RoomLogisticsRequestTypes, customColors } from 'international/constants'
+import { statsManager } from 'international/statsManager'
+import { customLog } from 'utils/logging'
 import { findCPUOf, findObjectWithID, randomTick, scalePriority } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
@@ -30,7 +30,7 @@ export class StoringStructuresManager {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
                 onlyFull: true,
-                type: 'offer',
+                type: RoomLogisticsRequestTypes.offer,
                 priority: 0,
             })
 
@@ -40,7 +40,7 @@ export class StoringStructuresManager {
 
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,
-                type: 'transfer',
+                type: RoomLogisticsRequestTypes.transfer,
                 priority: 100,
             })
 

@@ -6,8 +6,9 @@ import {
     communeSign,
     nonCommuneSigns,
 } from 'international/constants'
-import { cleanRoomMemory, findClosestCommuneName, getRangeXY, getRange } from 'utils/utils'
+import { getRangeXY, getRange } from 'utils/utils'
 import { partial } from 'lodash'
+import { roomUtils } from 'room/roomUtils'
 
 export class Scout extends Creep {
     scoutedRooms?: string[]
@@ -124,7 +125,7 @@ export class Scout extends Creep {
         // Make sure the room has a commune
 
         if (room.memory[RoomMemoryKeys.commune]) {
-            if (!global.communes.has(room.memory[RoomMemoryKeys.commune])) {
+            if (!collectiveManager.communes.has(room.memory[RoomMemoryKeys.commune])) {
                 room.memory[RoomMemoryKeys.commune] = findClosestCommuneName(room.name)
             }
         } else {
@@ -253,7 +254,7 @@ export class Scout extends Creep {
 
                 // Clean the room's memory
 
-                cleanRoomMemory(room.name)
+                roomUtils.cleanMemory(room.name)
 
                 // And delete the creep's scoutTarget
 

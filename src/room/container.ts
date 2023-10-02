@@ -1,5 +1,5 @@
-import { customColors } from 'international/constants'
-import { log } from 'utils/logging'
+import { RoomLogisticsRequestTypes, customColors } from 'international/constants'
+import { customLog } from 'utils/logging'
 import { scalePriority } from 'utils/utils'
 import { RoomManager } from './room'
 
@@ -24,18 +24,14 @@ export class ContainerManager {
     private runFastFillerContainers() {
         if (!this.roomManager.room.myCreeps.fastFiller.length) return
 
-        const fastFillerContainers = [
-            this.roomManager.room.fastFillerContainerLeft,
-            this.roomManager.room.fastFillerContainerRight,
-        ]
+        const fastFillerContainers = this.roomManager.fastFillerContainers
 
         for (const container of fastFillerContainers) {
-            if (!container) continue
             if (container.reserveStore.energy > container.store.getCapacity() * 0.9) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                type: 'transfer',
+                type: RoomLogisticsRequestTypes.transfer,
                 onlyFull: true,
                 priority: scalePriority(
                     container.store.getCapacity(),
@@ -50,7 +46,7 @@ export class ContainerManager {
                 target: container,
                 maxAmount: container.reserveStore.energy * 0.5,
                 onlyFull: true,
-                type: 'offer',
+                type: RoomLogisticsRequestTypes.offer,
                 priority: scalePriority(
                     container.store.getCapacity(),
                     container.reserveStore.energy,
@@ -62,12 +58,12 @@ export class ContainerManager {
     }
 
     private runSourceContainers() {
-        for (const container of this.roomManager.room.sourceContainers) {
+        for (const container of this.roomManager.sourceContainers) {
             if (!container) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 onlyFull: true,
                 priority: scalePriority(
                     container.store.getCapacity(),
@@ -80,7 +76,7 @@ export class ContainerManager {
     }
 
     private runControllerContainer() {
-        const container = this.roomManager.room.controllerContainer
+        const container = this.roomManager.controllerContainer
         if (!container) return
 
         if (container.usedReserveStore > container.store.getCapacity() * 0.9) return
@@ -94,14 +90,14 @@ export class ContainerManager {
 
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
-            type: 'transfer',
+            type: RoomLogisticsRequestTypes.transfer,
             onlyFull: true,
             priority,
         })
     }
 
     private runMineralContainer() {
-        const container = this.roomManager.room.mineralContainer
+        const container = this.roomManager.mineralContainer
         if (!container) return
 
         const resourceType = this.roomManager.mineral.mineralType
@@ -109,7 +105,7 @@ export class ContainerManager {
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             resourceType,
-            type: 'withdraw',
+            type: RoomLogisticsRequestTypes.withdraw,
             onlyFull: true,
             priority:
                 20 +

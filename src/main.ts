@@ -3,7 +3,6 @@ import './other/userScript/userScript'
 import './international/commands'
 import { collectiveManager } from './international/collective'
 import { roomsManager } from 'room/rooms'
-import './room/roomAdditions'
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 import './room/roomObjectAdditions'
@@ -11,7 +10,7 @@ import './room/structureAdditions'
 import './room/creeps/creepAdditions'
 import './other/profilerRegister'
 import { memHack } from 'other/memHack'
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { findCPUOf, outOfBucket } from 'utils/utils'
 import { CPUMaxPerTick, customColors } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
@@ -25,7 +24,7 @@ import { simpleAllies } from 'international/simpleAllies'
 import { creepOrganizer } from './international/creepOrganizer'
 import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
-import { StatsManager, statsManager, updateStat } from 'international/statsManager'
+import { StatsManager, statsManager } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import { profiler } from 'other/profiler'
 import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
@@ -53,7 +52,8 @@ import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 
 export function originalLoop() {
-    if (Game.flags['deactivate']) return
+    if (global.userScript && Game.flags['usersScriptFirstRun']) global.userScript()
+    if (Game.flags.deactivate) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
         return
@@ -76,7 +76,7 @@ export function originalLoop() {
         requestsManager.run()
 
         if (global.collectivizer) global.collectivizer.run()
-        if (global.userScript) global.userScript()
+        if (global.userScript && !Game.flags['usersScriptFirstRun']) global.userScript()
         playerManager.run()
         roomsManager.initRun()
         creepOrganizer.run()

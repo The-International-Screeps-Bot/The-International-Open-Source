@@ -76,6 +76,7 @@ export class RemoteDismantler extends Creep {
 
         for (const roomName of remoteNamesByEfficacy) {
             const roomMemory = Memory.rooms[roomName]
+            if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
 
             if (roomMemory[RoomMemoryKeys[role]] <= 0) continue
 

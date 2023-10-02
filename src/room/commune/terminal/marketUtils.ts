@@ -1,11 +1,12 @@
-import { log } from 'utils/logging'
-import { findLargestTransactionAmount, getAvgPrice } from 'utils/utils'
+import { customLog } from 'utils/logging'
+import { getAvgPrice } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
-import { updateStat } from 'international/statsManager'
+import { statsManager } from 'international/statsManager'
 
 export const marketUtils = {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
-        const mySpecificOrders = collectiveManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
+        const mySpecificOrders =
+            collectiveManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
@@ -14,7 +15,7 @@ export const marketUtils = {
         const order = collectiveManager.getBuyOrder(resourceType)
 
         if (order) {
-            const dealAmount = findLargestTransactionAmount(
+            const dealAmount = this.findLargestTransactionAmount(
                 room.terminal.store.energy * 0.75,
                 amount,
                 room.name,
@@ -26,7 +27,9 @@ export const marketUtils = {
                 room.name,
             )
             if (result === OK && resourceType === 'energy') {
-                updateStat(room.name, 'eos', amount)
+                statsManager.updateStat(room.name, 'eos', amount)
+            } else if (result === OK && resourceType === 'battery') {
+                statsManager.updateStat(room.name, 'eos', amount * 10)
             }
 
             return result == OK
@@ -52,13 +55,16 @@ export const marketUtils = {
             totalAmount: amount,
         })
         if (result === OK && resourceType === 'energy') {
-            updateStat(room.name, 'eos', amount)
+            statsManager.updateStat(room.name, 'eos', amount)
+        } else if (result === OK && resourceType === 'battery') {
+            statsManager.updateStat(room.name, 'eos', amount * 10)
         }
 
         return result == OK
     },
     advancedBuy(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
-        const mySpecificOrders = collectiveManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
+        const mySpecificOrders =
+            collectiveManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
@@ -67,7 +73,7 @@ export const marketUtils = {
         const order = collectiveManager.getSellOrder(resourceType, getAvgPrice(resourceType) * 1.2)
 
         if (order) {
-            const dealAmount = findLargestTransactionAmount(
+            const dealAmount = this.findLargestTransactionAmount(
                 room.terminal.store.energy * 0.75,
                 amount,
                 room.name,
@@ -80,7 +86,9 @@ export const marketUtils = {
                 room.name,
             )
             if (result === OK && resourceType === 'energy') {
-                updateStat(room.name, 'eib', amount)
+                statsManager.updateStat(room.name, 'eib', amount)
+            } else if (result === OK && resourceType === 'battery') {
+                statsManager.updateStat(room.name, 'eib', amount * 10)
             }
             return result == OK
         }
@@ -104,8 +112,36 @@ export const marketUtils = {
             totalAmount: amount,
         })
         if (result === OK && resourceType === 'energy') {
-            updateStat(room.name, 'eib', amount)
+            statsManager.updateStat(room.name, 'eib', amount)
+        } else if (result === OK && resourceType === 'battery') {
+            statsManager.updateStat(room.name, 'eib', amount * 10)
         }
         return result == OK
     },
+    /**
+     * Finds the largest possible transaction amount given a budget and starting amount
+     * @param budget The number of energy willing to be invested in the trade
+     * @param amount The number of resources that would like to be traded
+     * @param roomName1
+     * @param roomName2
+     * @returns
+     */
+    findLargestTransactionAmount(
+        budget: number,
+        amount: number,
+        roomName1: string,
+        roomName2: string,
+    ) {
+        budget = Math.max(budget, 1)
+
+        // So long as the the transactions cost is more than the budget
+
+        while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
+            // Decrease amount exponentially
+
+            amount = (amount - 1) * 0.8
+        }
+
+        return Math.floor(amount)
+    }
 }

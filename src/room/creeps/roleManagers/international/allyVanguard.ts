@@ -4,11 +4,24 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     Result,
+    ReservedCoordTypes,
 } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
+
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
+        }
+    }
+
     initRun() {
         const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
 

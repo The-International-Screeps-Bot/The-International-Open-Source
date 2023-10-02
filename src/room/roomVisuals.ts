@@ -9,8 +9,8 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
-import { updateStat } from 'international/statsManager'
-import { log } from 'utils/logging'
+import { statsManager } from 'international/statsManager'
+import { customLog } from 'utils/logging'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
@@ -199,7 +199,7 @@ export class RoomVisualsManager {
     private dataVisuals() {
         if (!global.settings.dataVisuals) return
 
-        if (!global.communes.has(this.roomManager.room.name)) return
+        if (!collectiveManager.communes.has(this.roomManager.room.name)) return
 
         this.remoteDataVisuals(this.statDataVisuals(this.generalDataVisuals(1)))
     }
@@ -294,12 +294,12 @@ export class RoomVisualsManager {
             totalRemoteEnergyHarvested += roomStats.reih
             totalUpgrade += roomStats.eou
             totalBuild += roomStats.eob
-            totalRepairOther = roomStats.eoro
-            totalBarricadeRepair = roomStats.eorwr
-            totalSpawn = roomStats.su
+            totalRepairOther += roomStats.eoro
+            totalBarricadeRepair += roomStats.eorwr
+            totalSpawn += roomStats.su
         }
 
-        totalSpawn = totalSpawn / Object.keys(Memory.stats.rooms).length
+        const avgSpawn = totalSpawn / collectiveManager.communes.size
 
         data[0].push(
             totalEstimatedIncome,
@@ -309,7 +309,7 @@ export class RoomVisualsManager {
             totalBuild.toFixed(2),
             totalRepairOther.toFixed(2),
             totalBarricadeRepair.toFixed(2),
-            totalSpawn.toFixed(2),
+            avgSpawn.toFixed(2),
         )
 
         const height = 3 + data.length
@@ -471,6 +471,12 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyResourceRequestsDataVisuals(y: number) {
+
+        if (!simpleAllies.allySegmentData) {
+
+            return y
+        }
+
         const headers = ['room', 'resource', 'amount', 'priority']
 
         const data: any[][] = []
@@ -520,6 +526,12 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
+
+        if (!simpleAllies.allySegmentData) {
+
+            return y
+        }
+
         const headers = ['room', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
 
         const data: any[][] = []
@@ -573,6 +585,12 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyWorkRequestsDataVisuals(y: number) {
+
+        if (!simpleAllies.allySegmentData) {
+
+            return y
+        }
+
         const headers = ['room', 'type', 'priority']
 
         const data: any[][] = []
@@ -632,7 +650,7 @@ export class RoomVisualsManager {
 
         const data: any[][] = [
             [
-                this.roomManager.room.resourcesInStoringStructures.energy || 0,
+                this.roomManager.resourcesInStoringStructures.energy || 0,
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
                 roomMemory[RoomMemoryKeys.threatened].toFixed(2),
@@ -754,8 +772,11 @@ export class RoomVisualsManager {
         for (const remoteInfo of this.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+
             const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const pathType = this.roomManager.room.communeManager.remoteSourcePathType
             const row: any[] = []
 
@@ -763,11 +784,15 @@ export class RoomVisualsManager {
             row.push(sourceIndex)
             if (remoteMemory[pathType][sourceIndex])
                 row.push(remoteMemory[pathType][sourceIndex].length / packedPosLength)
-            else row.push('undefined')
+            else row.push('unknown')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
+            if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] !== undefined)
+                row.push(
+                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2),
+                )
+            else row.push('unknown')
             row.push(
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
                     '/' +
@@ -786,7 +811,7 @@ export class RoomVisualsManager {
                 remoteMemory[RoomMemoryKeys.abandonRemote] ||
                     remoteMemory[RoomMemoryKeys.abandonRemote] + '',
             )
-            row.push(remoteMemory[RoomMemoryKeys.disable])
+            row.push(remoteMemory[RoomMemoryKeys.disable] ? 'OFF' : 'ON')
 
             data.push(row)
         }

@@ -45,9 +45,9 @@ export class CollectiveManager extends Sleepable {
     terminalCommunes: string[]
 
     /**
-     * The aggregate number of each mineral in our communes
+     * The aggregate number of each mineral nodes we have access to
      */
-    mineralCommunes: Partial<{ [key in MineralConstant]: number }>
+    mineralNodes: Partial<{ [key in MineralConstant]: number }>
 
     /**
      * The name of the room that is safemoded, if there is one
@@ -61,12 +61,22 @@ export class CollectiveManager extends Sleepable {
      * Terrain binaries of wall or not wall for rooms
      */
     terrainBinaries: { [roomName: string]: Uint8Array } = {}
+    constructionSiteCount = 0
+    creepCount: number
+    powerCreepCount: number
+    /**
+     * A string to console log as rich text
+     */
+    logs = ''
+    /**
+     * Room names that have controllers we own
+     */
+    communes: Set<string>
 
     /**
      * Updates values to be present for this tick
      */
     update() {
-        delete this.safemodedCommuneName
         this.creepsByCombatRequest = {}
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
@@ -76,25 +86,34 @@ export class CollectiveManager extends Sleepable {
         this.tickID = 0
         this.customCreepIDs = []
         this.customCreepIDIndex = 0
-        this.mineralCommunes = {}
+        this.mineralNodes = {}
         for (const mineralType of minerals) {
-            this.mineralCommunes[mineralType] = 0
+            this.mineralNodes[mineralType] = 0
         }
         this.myCommands = []
+        this.logs = ''
+        this.creepCount = 0
+        this.powerCreepCount = 0
+        this.communes = new Set()
 
-        delete this._myOrders
-        delete this._orders
-        delete this._myOrdersCount
-        delete this._workRequestsByScore
-        delete this._defaultMinCacheAmount
-        delete this.internationalDataVisuals
+        // delete
+
+        this.safemodedCommuneName = undefined
+        this._myOrders = undefined
+        this._orders = undefined
+        this._myOrdersCount = undefined
+        this._workRequestsByScore = undefined
+        this._defaultMinCacheAmount = undefined
+        this.internationalDataVisuals = undefined
 
         if (this.isSleepingResponsive()) return
 
-        delete this._funnelOrder
-        delete this._minCredits
-        delete this._resourcesInStoringStructures
-        delete this._maxCSitesPerRoom
+        // delete
+
+        this._funnelOrder = undefined
+        this._minCredits = undefined
+        this._resourcesInStoringStructures = undefined
+        this._maxCSitesPerRoom = undefined
     }
 
     newCustomCreepID() {
@@ -273,7 +292,7 @@ export class CollectiveManager extends Sleepable {
     get minCredits() {
         if (this._minCredits !== undefined) return this._minCredits
 
-        return (this._minCredits = global.communes.size * 10000)
+        return (this._minCredits = collectiveManager.communes.size * 10000)
     }
 
     /**
@@ -386,11 +405,7 @@ export class CollectiveManager extends Sleepable {
      * Gets the number of orders owned by me
      */
     get myOrdersCount() {
-        // If _myOrdersCount are already defined, inform them
-
-        if (this._myOrdersCount) return this._myOrdersCount
-
-        // Inform and set the number of my orders
+        if (this._myOrdersCount !== undefined) return this._myOrdersCount
 
         return (this._myOrdersCount = Object.keys(Game.market.orders).length)
     }
@@ -442,8 +457,8 @@ export class CollectiveManager extends Sleepable {
     get avgCommunesPerMineral() {
         let sum = 0
 
-        for (const mineralType in this.mineralCommunes) {
-            sum += this.mineralCommunes[mineralType as MineralConstant]
+        for (const mineralType in this.mineralNodes) {
+            sum += this.mineralNodes[mineralType as MineralConstant]
         }
 
         const avg = roundTo(sum / minerals.length, 2)
@@ -474,7 +489,7 @@ export class CollectiveManager extends Sleepable {
         const communesByLevel: { [level: string]: [string, number][] } = {}
         for (let i = 6; i < 8; i++) communesByLevel[i] = []
 
-        for (const roomName of global.communes) {
+        for (const roomName of collectiveManager.communes) {
             const room = Game.rooms[roomName]
             if (!room.terminal) continue
 
@@ -506,9 +521,9 @@ export class CollectiveManager extends Sleepable {
 
         this._resourcesInStoringStructures = {}
 
-        for (const roomName of global.communes) {
+        for (const roomName of collectiveManager.communes) {
             const room = Game.rooms[roomName]
-            const resources = room.resourcesInStoringStructures
+            const resources = room.roomManager.resourcesInStoringStructures
 
             for (const key in resources) {
                 const resource = key as unknown as ResourceConstant
@@ -529,7 +544,7 @@ export class CollectiveManager extends Sleepable {
     get maxCSitesPerRoom() {
         if (this._maxCSitesPerRoom) return this._maxCSitesPerRoom
 
-        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / global.communes.size, 20), 3)
+        return Math.max(Math.min(MAX_CONSTRUCTION_SITES / collectiveManager.communes.size, 20), 3)
     }
 }
 

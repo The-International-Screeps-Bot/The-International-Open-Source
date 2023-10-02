@@ -1,4 +1,4 @@
-import { NukeRequestKeys, Result, RoomMemoryKeys } from 'international/constants'
+import { NukeRequestKeys, Result, RoomLogisticsRequestTypes, RoomMemoryKeys } from 'international/constants'
 import { scalePriority } from 'utils/utils'
 import { CommuneManager } from './commune'
 
@@ -38,7 +38,7 @@ export class NukerManager {
 
             this.communeManager.room.createRoomLogisticsRequest({
                 target: this.nuker,
-                type: 'transfer',
+                type: RoomLogisticsRequestTypes.transfer,
                 priority: 100,
             })
 

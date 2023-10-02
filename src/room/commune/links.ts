@@ -1,5 +1,9 @@
-import { linkReceiveTreshold, linkSendThreshold } from 'international/constants'
-import { log } from 'utils/logging'
+import {
+    RoomLogisticsRequestTypes,
+    linkReceiveTreshold,
+    linkSendThreshold,
+} from 'international/constants'
+import { customLog } from 'utils/logging'
 import { CommuneManager } from './commune'
 
 export class LinkManager {
@@ -25,8 +29,8 @@ export class LinkManager {
         if (!sourceLinks.filter(link => link).length) return
 
         let receiverLinks = [
-            this.communeManager.room.fastFillerLink,
-            this.communeManager.room.hubLink,
+            this.communeManager.room.roomManager.fastFillerLink,
+            this.communeManager.room.roomManager.hubLink,
             this.communeManager.controllerLink,
         ].filter(link => link)
 
@@ -71,10 +75,10 @@ export class LinkManager {
     }
 
     private hubToFastFiller() {
-        const hubLink = this.communeManager.room.hubLink
+        const hubLink = this.communeManager.room.roomManager.hubLink
         if (!hubLink) return
 
-        const fastFillerLink = this.communeManager.room.fastFillerLink
+        const fastFillerLink = this.communeManager.room.roomManager.fastFillerLink
         if (!fastFillerLink) return
 
         // If the hubLink is not sufficiently full, stop
@@ -102,7 +106,7 @@ export class LinkManager {
         const controllerLink = this.communeManager.controllerLink
         if (!controllerLink) return
 
-        const hubLink = this.communeManager.room.hubLink
+        const hubLink = this.communeManager.room.roomManager.hubLink
         if (!hubLink) {
             this.createControllerLinkRoomLogisticsRequest()
             return
@@ -112,7 +116,7 @@ export class LinkManager {
 
         if (
             this.communeManager.room.controller.ticksToDowngrade > 10000 &&
-            this.communeManager.room.resourcesInStoringStructures.energy <
+            this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
                 this.communeManager.storedEnergyUpgradeThreshold * 0.5
         )
             return
@@ -152,7 +156,7 @@ export class LinkManager {
 
         this.communeManager.room.createRoomLogisticsRequest({
             target: controllerLink,
-            type: 'transfer',
+            type: RoomLogisticsRequestTypes.transfer,
             priority: 100,
         })
     }

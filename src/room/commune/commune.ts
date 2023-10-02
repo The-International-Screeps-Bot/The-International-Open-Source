@@ -1,5 +1,4 @@
 import {
-    cleanRoomMemory,
     createPosMap,
     findAdjacentCoordsToCoord,
     findAdjacentCoordsToXY,
@@ -22,6 +21,7 @@ import {
     unpackNumAsCoord,
     findLowestScore,
     roundTo,
+    forCoordsAroundRange,
 } from 'utils/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -45,6 +45,9 @@ import {
     RoomTypes,
     rampartUpkeepCost,
     RemoteSourcePathTypes,
+    Result,
+    ReservedCoordTypes,
+    RoomStatsKeys,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -87,10 +90,15 @@ import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
 import { roomUtils } from 'room/roomUtils'
-import { LogTypes, log } from 'utils/logging'
+import { LogTypes, customLog } from 'utils/logging'
+import { creepUtils } from 'room/creeps/creepUtils'
+import { SpawnRequestArgs } from 'types/spawnRequest'
 
 export class CommuneManager {
+    static communeManagers: { [roomName: string]: CommuneManager } = {}
+
     // Managers
+
     constructionManager: ConstructionManager
     defenceManager: DefenceManager
 
@@ -119,7 +127,6 @@ export class CommuneManager {
 
     room: Room
     nextSpawnEnergyAvailable: number
-    estimatedEnergyIncome: number
     /**
      * Organized by remote and sourceIndex
      */
@@ -196,7 +203,7 @@ export class CommuneManager {
         if (roomMemory[RoomMemoryKeys.abandonCommune] === true) {
             room.controller.unclaim()
             roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-            cleanRoomMemory(room.name)
+            roomUtils.cleanMemory(room.name)
 
             for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
                 cSite.remove()
@@ -205,12 +212,12 @@ export class CommuneManager {
         }
 
         roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
-        global.communes.add(room.name)
+        collectiveManager.communes.add(room.name)
 
         if (this.room.controller.safeMode) collectiveManager.safemodedCommuneName = this.room.name
 
         if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
-            if (global.communes.size <= 1)
+            if (collectiveManager.communes.size <= 1)
                 roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
             else if (
                 room.controller.progress > room.controller.progressTotal ||
@@ -230,7 +237,6 @@ export class CommuneManager {
         this.mineralHarvestStrength = 0
         this.haulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
-        this.estimatedEnergyIncome = 0
 
         if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
         if (roomMemory[RoomMemoryKeys.threatened] == undefined) {
@@ -287,7 +293,7 @@ export class CommuneManager {
             collectiveManager.terminalCommunes.push(room.name)
         }
 
-        collectiveManager.mineralCommunes[this.room.roomManager.mineral.mineralType] += 1
+        collectiveManager.mineralNodes[this.room.roomManager.mineral.mineralType] += 1
     }
 
     initRun() {
@@ -355,7 +361,7 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             type: LogTypes.info,
         })
     }
@@ -375,9 +381,21 @@ export class CommuneManager {
 
         let CPUUsed = Game.cpu.getUsed()
 
-        log('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
+        customLog('CPU TEST 1 ' + this.room.name, Game.cpu.getUsed() - CPUUsed, {
             type: LogTypes.info,
         })
+    }
+
+    /**
+     * Debug
+     */
+    private visualizeSpawningStructuresByNeed() {
+        customLog('spawningStructuresByNeed', this.spawningStructuresByNeed, {
+            type: LogTypes.error,
+        })
+        for (const structure of this.spawningStructuresByNeed) {
+            this.room.coordVisual(structure.pos.x, structure.pos.y)
+        }
     }
 
     deleteCombatRequest(requestName: string, index: number) {
@@ -391,7 +409,7 @@ export class CommuneManager {
         const remoteMemory = Memory.rooms[remoteName]
 
         remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-        cleanRoomMemory(remoteName)
+        roomUtils.cleanMemory(remoteName)
     }
 
     findMinRangedAttackCost(minDamage: number = 10) {
@@ -429,6 +447,16 @@ export class CommuneManager {
         const combinedCost = BODYPART_COST[WORK] + BODYPART_COST[MOVE]
 
         return Math.ceil(rawCost / combinedCost) * combinedCost
+    }
+
+    get estimatedEnergyIncome() {
+        const roomStats = Memory.stats.rooms[this.room.name]
+        return roundTo(
+            roomStats[RoomStatsKeys.EnergyInputHarvest] +
+                roomStats[RoomStatsKeys.RemoteEnergyInputHarvest] +
+                roomStats[RoomStatsKeys.EnergyInputBought],
+            2,
+        )
     }
 
     private _minStoredEnergy: number
@@ -559,10 +587,10 @@ export class CommuneManager {
         if (this._maxCombatRequests !== undefined) return this._maxCombatRequests
 
         /* return (this._maxCombatRequests =
-            (this.room.resourcesInStoringStructures.energy - this.minStoredEnergy) /
+            (this.room.roomManager.resourcesInStoringStructures.energy - this.minStoredEnergy) /
             (5000 + this.room.controller.level * 1000)) */
         return (this._maxCombatRequests =
-            this.room.resourcesInStoringStructures.energy /
+            this.room.roomManager.resourcesInStoringStructures.energy /
             (10000 + this.room.controller.level * 3000))
     }
 
@@ -573,8 +601,7 @@ export class CommuneManager {
         // Only set true if there are no viable storing structures
 
         return (
-            !this.room.fastFillerContainerLeft &&
-            !this.room.fastFillerContainerRight &&
+            !this.room.roomManager.fastFillerContainers.length &&
             !this.room.storage &&
             !this.room.terminal
         )
@@ -597,7 +624,7 @@ export class CommuneManager {
 
         // Link
 
-        const hubLink = this.room.hubLink
+        const hubLink = this.room.roomManager.hubLink
         const sourceLinks = this.sourceLinks
 
         // If there are transfer links, max out partMultiplier to their ability
@@ -669,7 +696,7 @@ export class CommuneManager {
         // We can use containers
 
         if (controllerLevel < 5) {
-            return (this._upgradeStructure = this.room.controllerContainer)
+            return (this._upgradeStructure = this.room.roomManager.controllerContainer)
         }
 
         // We can use links
@@ -677,7 +704,7 @@ export class CommuneManager {
         const controllerLink = this.controllerLink
         if (!controllerLink || !controllerLink.RCLActionable) return false
 
-        const hubLink = this.room.hubLink
+        const hubLink = this.room.roomManager.hubLink
         if (!hubLink || !hubLink.RCLActionable) return false
 
         return (this._upgradeStructure = controllerLink)
@@ -687,7 +714,7 @@ export class CommuneManager {
     get structureTypesByBuildPriority() {
         if (this._structureTypesByBuildPriority) return this._structureTypesByBuildPriority
 
-        if (!this.room.fastFillerContainerLeft && !this.room.fastFillerContainerRight) {
+        if (!this.room.roomManager.fastFillerContainers.length) {
             return (this._structureTypesByBuildPriority = [
                 STRUCTURE_RAMPART,
                 STRUCTURE_WALL,
@@ -870,7 +897,7 @@ export class CommuneManager {
 
         if (this.controllerLinkID) {
             const structure = findObjectWithID(this.controllerLinkID)
-            if (structure) return structure
+            if (structure) return (this._controllerLink = structure)
         }
 
         const structure = this.room.findStructureAtCoord(
@@ -890,12 +917,15 @@ export class CommuneManager {
         if (this._fastFillerSpawnEnergyCapacity && !this.room.roomManager.structureUpdate)
             return this._fastFillerSpawnEnergyCapacity
 
-        let fastFillerSpawnEnergyCapacity = 0
         const anchor = this.room.roomManager.anchor
         if (!anchor) throw Error('no anchor for fastFillerSpawnEnergyCapacity ' + this.room)
 
+        let fastFillerSpawnEnergyCapacity = 0
+
         for (const structure of this.actionableSpawningStructures) {
             if (!structure.RCLActionable) continue
+            // Outside of the fastFiller
+            if (getRange(structure.pos, anchor) > 2) continue
 
             fastFillerSpawnEnergyCapacity += structure.store.getCapacity(RESOURCE_ENERGY)
         }
@@ -910,11 +940,10 @@ export class CommuneManager {
     get actionableSpawningStructures() {
         if (this._actionableSpawningStructures) return this._actionableSpawningStructures
 
-        let actionableSpawningStructures: SpawningStructures =
-            this.room.roomManager.structures.spawn
-        actionableSpawningStructures = actionableSpawningStructures.concat(
-            this.room.roomManager.structures.extension,
-        )
+        const structures = this.room.roomManager.structures
+
+        let actionableSpawningStructures: SpawningStructures = structures.spawn
+        actionableSpawningStructures = actionableSpawningStructures.concat(structures.extension)
         actionableSpawningStructures = actionableSpawningStructures.filter(
             structure => structure.RCLActionable,
         )
@@ -922,13 +951,13 @@ export class CommuneManager {
         return (this._actionableSpawningStructures = actionableSpawningStructures)
     }
 
-    spawningStructuresByPriorityID: Id<StructureExtension | StructureSpawn>[]
+    spawningStructuresByPriorityIDs: Id<StructureExtension | StructureSpawn>[]
     _spawningStructuresByPriority: SpawningStructures
     get spawningStructuresByPriority() {
         if (this._spawningStructuresByPriority) return this._spawningStructuresByPriority
 
-        if (this.spawningStructuresByPriorityID && !this.room.roomManager.structureUpdate) {
-            return (this._spawningStructuresByPriority = this.spawningStructuresByPriorityID.map(
+        if (this.spawningStructuresByPriorityIDs && !this.room.roomManager.structureUpdate) {
+            return (this._spawningStructuresByPriority = this.spawningStructuresByPriorityIDs.map(
                 ID => findObjectWithID(ID),
             ))
         }
@@ -941,7 +970,7 @@ export class CommuneManager {
 
         for (const structure of this.actionableSpawningStructures) {
             if (roomUtils.isSourceSpawningStructure(this.room.name, structure)) {
-                this.actionableSpawningStructures.push(structure)
+                spawningStructuresByPriority.push(structure)
             }
 
             structuresToSort.push(structure)
@@ -951,45 +980,128 @@ export class CommuneManager {
             structuresToSort.sort((a, b) => getRange(a.pos, anchor) - getRange(b.pos, anchor)),
         )
 
-        this.spawningStructuresByPriorityID = spawningStructuresByPriority.map(
+        this.spawningStructuresByPriorityIDs = spawningStructuresByPriority.map(
             structure => structure.id,
         )
         return (this._spawningStructuresByPriority = spawningStructuresByPriority)
     }
 
+    spawningStructuresByNeedIDs: Id<StructureExtension | StructureSpawn>[]
     _spawningStructuresByNeed: SpawningStructures
-    get spawningstructuresByNeed() {
+    get spawningStructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
 
-        const anchor = this.room.roomManager.anchor
-        if (!anchor) throw Error('no anchor')
+        if (this.spawningStructuresByNeedIDs && !this.room.roomManager.structureUpdate) {
+            return (this._spawningStructuresByNeed = this.spawningStructuresByNeedIDs.map(ID =>
+                findObjectWithID(ID),
+            ))
+        }
 
-        let spawningStructuresByNeed = this.actionableSpawningStructures
+        // mark coords in range 1 of reserved source harvest positions
+        // mark coords in range of valid fastFiller position
 
-        const packedSourceHarvestPositions =
+        let ignoreCoords = new Set<string>()
+
+        // source extensions
+
+        const packedHarvestPositions =
             Memory.rooms[this.room.name][RoomMemoryKeys.communeSourceHarvestPositions]
-        for (const i in packedSourceHarvestPositions) {
-            const closestHarvestPos = unpackPosAt(packedSourceHarvestPositions[i], 0)
-            spawningStructuresByNeed = spawningStructuresByNeed.filter(
-                structure => getRange(structure.pos, closestHarvestPos) > 1,
-            )
+        for (const packedPositions of packedHarvestPositions) {
+            const pos = unpackPosAt(packedPositions, 0)
+
+            // Make sure the position is reserved (presumably by a harvester)
+
+            const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+            if (!reserveType) continue
+            if (reserveType < ReservedCoordTypes.dying) continue
+
+            forCoordsAroundRange(pos, 1, coord => {
+                const structure = this.room.findStructureAtCoord(coord, structure => {
+                    return structure.structureType === STRUCTURE_EXTENSION
+                })
+                if (!structure) return
+
+                ignoreCoords.add(packCoord(coord))
+            })
         }
 
-        if (
-            this.room.myCreeps.fastFiller.length &&
-            ((this.room.controller.level >= 6 &&
-                this.room.fastFillerLink &&
-                this.room.hubLink &&
-                (this.room.storage || this.room.terminal) &&
-                this.room.myCreeps.hubHauler.length) ||
-                (this.room.fastFillerContainerLeft && this.room.fastFillerContainerRight))
-        ) {
-            spawningStructuresByNeed = spawningStructuresByNeed.filter(
-                structure => getRangeXY(structure.pos.x, anchor.x, structure.pos.y, anchor.y) > 2,
-            )
-        }
+        ignoreCoords = this.findFastFillerIgnoreCoords(ignoreCoords)
+
+        // Filter out structures that have ignored coords
+        const spawningStructuresByNeed = this.actionableSpawningStructures.filter(structure => {
+            return !ignoreCoords.has(packCoord(structure.pos))
+        })
 
         return (this._spawningStructuresByNeed = spawningStructuresByNeed)
+    }
+
+    private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
+        const fastFillerLink = this.room.roomManager.fastFillerLink
+        if (
+            fastFillerLink &&
+            fastFillerLink.RCLActionable &&
+            this.room.roomManager.hubLink &&
+            this.room.roomManager.hubLink.RCLActionable &&
+            this.storingStructures.length &&
+            this.room.myCreeps.hubHauler.length
+        ) {
+            const fastFillerPositions = this.room.roomManager.fastFillerPositions
+            for (const pos of fastFillerPositions) {
+                // Make sure the position is reserved (presumably by a fastFiller)
+
+                const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+                if (!reserveType) continue
+                if (reserveType < ReservedCoordTypes.dying) continue
+
+                forCoordsAroundRange(pos, 1, coord => {
+                    ignoreCoords.add(packCoord(coord))
+                })
+            }
+
+            return ignoreCoords
+        }
+
+        if (this.room.roomManager.fastFillerContainers.length) {
+            const fastFillerPositions = this.room.roomManager.fastFillerPositions
+            for (const pos of fastFillerPositions) {
+                // Make sure the position is reserved (presumably by a fastFiller)
+
+                const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+                if (!reserveType) continue
+                if (reserveType < ReservedCoordTypes.dying) continue
+
+                // Only ignore coords if the fastFiller pos is in range of a container
+
+                let hasContainer: boolean
+                const potentialIgnoreCoords = new Set<string>()
+
+                forCoordsAroundRange(pos, 1, coord => {
+                    const structure = this.room.findStructureAtCoord(coord, structure => {
+                        return structure.structureType === STRUCTURE_CONTAINER
+                    })
+                    if (structure) {
+                        hasContainer = true
+                        return
+                    }
+
+                    // There is potentially a spawning structure on this coord
+
+                    potentialIgnoreCoords.add(packCoord(coord))
+                })
+
+                if (!hasContainer) continue
+
+                for (const packedCoord of potentialIgnoreCoords) {
+                    ignoreCoords.add(packedCoord)
+                }
+            }
+
+            return ignoreCoords
+        }
+
+        // There are no valid links or containers in the fastFiller
+
+        return ignoreCoords
     }
 
     /**

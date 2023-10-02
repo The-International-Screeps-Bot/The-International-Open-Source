@@ -1,6 +1,7 @@
-import { log } from 'utils/logging'
+import { customLog } from 'utils/logging'
 import { scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
+import { RoomLogisticsRequestTypes } from 'international/constants'
 
 export class TombstoneManager {
     roomManager: RoomManager
@@ -19,7 +20,7 @@ export class TombstoneManager {
                 this.roomManager.room.createRoomLogisticsRequest({
                     target: tombstone,
                     resourceType: resourceType,
-                    type: 'withdraw',
+                    type: RoomLogisticsRequestTypes.withdraw,
                     priority: Math.max(5, 20 - amount / 200),
                 })
             }
@@ -36,7 +37,7 @@ export class TombstoneManager {
             this.roomManager.room.createRoomLogisticsRequest({
                 target: tombstone,
                 resourceType: resourceType,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 priority: Math.max(5, 20 - amount / 200),
             })
         }

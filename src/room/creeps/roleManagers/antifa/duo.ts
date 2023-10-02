@@ -41,7 +41,7 @@ export class Duo {
 
         this.leader.message = 'IF'
 
-        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
+        if (this.leader.room.roomManager.enemyDamageThreat && this.runCombat()) return
 
         this.createMoveRequest({
             origin: this.leader.pos,
@@ -70,7 +70,7 @@ export class Duo {
         if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest])
             return false
 
-        if (!this.leader.room.enemyDamageThreat) {
+        if (!this.leader.room.roomManager.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
             return true
         }
