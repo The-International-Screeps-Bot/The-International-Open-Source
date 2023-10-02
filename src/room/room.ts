@@ -140,13 +140,13 @@ export class RoomManager {
     roomLogisticsBlacklistCoords: Set<string> = new Set()
 
     update(room: Room) {
-        delete this.checkedStructureUpdate
+        delete this._structureUpdate
         delete this.checkedCSiteUpdate
         delete this._generalRepairStructures
         delete this._communeSources
         delete this._remoteSources
         delete this._mineral
-        delete this.checkedStructureUpdate
+        delete this._structureUpdate
         delete this.checkedCSiteUpdate
         delete this._structures
         delete this._cSites
@@ -882,12 +882,15 @@ export class RoomManager {
     }
 
     allStructureIDs: Id<Structure<StructureConstant>>[]
-    checkedStructureUpdate: boolean
+    /**
+     * true if there has been a structure update this tick
+     */
+    _structureUpdate: boolean
     /**
      * Checks if there has been a structure cache update, running one if there hasn't. Only use this for static properties, and not hits, store, etc.
      */
     get structureUpdate() {
-        if (this.checkedStructureUpdate === true) return false
+        if (this._structureUpdate === true) return false
 
         let newAllStructures: Structure[]
 
@@ -909,7 +912,7 @@ export class RoomManager {
                 }
 
                 if (!change && allStructures.length === this.allStructureIDs.length) {
-                    return (this.checkedStructureUpdate = false)
+                    return (this._structureUpdate = false)
                 }
             }
         }
@@ -918,18 +921,21 @@ export class RoomManager {
 
         this._structureCoords = undefined
         this._upgradePositions = undefined
+        this.sourceContainerIDs = undefined
+        this.fastFillerContainerIDs = undefined
 
         const communeManager = this.room.communeManager
         if (communeManager) {
             communeManager.spawningStructuresByPriorityIDs = undefined
             communeManager.spawningStructuresByNeedIDs = undefined
             communeManager._fastFillerSpawnEnergyCapacity = undefined
+            communeManager.sourceLinkIDs = undefined
         }
 
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
 
         this.allStructureIDs = newAllStructures.map(structure => structure.id)
-        return (this.checkedStructureUpdate = true)
+        return (this._structureUpdate = true)
     }
 
     _structureCoords: Map<string, Id<Structure<StructureConstant>>[]>
@@ -1490,7 +1496,7 @@ export class RoomManager {
     get sourceContainers() {
         if (this._sourceContainers) return this._sourceContainers
 
-        if (this.sourceContainerIDs) {
+        if (this.sourceContainerIDs && !this.structureUpdate) {
             const sourceContainers = this.sourceContainerIDs.map(ID => findObjectWithID(ID))
 
             return (this._sourceContainers = sourceContainers)
@@ -1543,8 +1549,8 @@ export class RoomManager {
     get fastFillerContainers() {
         if (this._fastFillerContainers) return this._fastFillerContainers
 
-        if (this.fastFillerContainerIDs) {
-            const fastFillerContainers = this.fastFillerContainerIDs.map(ID => findObjectWithID(ID))
+        if (this.fastFillerContainerIDs && !this.structureUpdate) {
+            let fastFillerContainers = this.fastFillerContainerIDs.map(ID => findObjectWithID(ID))
             return (this._fastFillerContainers = fastFillerContainers)
         }
 
@@ -1647,7 +1653,7 @@ export class RoomManager {
             structure => structure.structureType === STRUCTURE_LINK,
         )
         if (!this._fastFillerLink) {
-            return false
+            return this._fastFillerLink
         }
 
         this.fastFillerLinkID = this._fastFillerLink.id
@@ -1672,9 +1678,8 @@ export class RoomManager {
             1,
             structure => structure.structureType === STRUCTURE_LINK,
         )
-
         if (!this._hubLink) {
-            return false
+            return this._hubLink
         }
 
         this.hubLinkId = this._hubLink.id

@@ -832,61 +832,46 @@ export class CommuneManager {
         return buildSecondMincutLayer
     }
 
-    private sourceLinkIDs: Id<StructureLink>[]
+    sourceLinkIDs: (Id<StructureLink> | false)[]
     private _sourceLinks: (StructureLink | false)[]
     get sourceLinks() {
         if (this._sourceLinks) return this._sourceLinks
 
-        // If we have cached links, confirm they are valid and use them
+        // If we have cached links, convert them into false | StructureLink
         if (this.sourceLinkIDs) {
             const links: (StructureLink | false)[] = []
-
             for (const ID of this.sourceLinkIDs) {
-                const link = findObjectWithID(ID)
-                if (!link) break
+                if (!ID) {
+                    links.push(false)
+                    continue
+                }
 
+                const link = findObjectWithID(ID)
                 links.push(link)
             }
 
-            if (links.length === this.sourceLinkIDs.length) {
-                return (this._sourceLinks = links)
-            }
+            return this._sourceLinks = links
         }
 
         const stampAnchors = this.room.roomManager.stampAnchors
         if (!stampAnchors) throw Error('no stampAnchors for sourceLinks in ' + this.room.name)
 
         const links: (StructureLink | false)[] = []
-        let definedLinks = 0
+        this.sourceLinkIDs = []
 
-        /*         for (const positions of this.room.roomManager.communeSourceHarvestPositions) {
-            const closestSourceHarvestPos = positions[0]
-
-            const structure = this.room.findStructureInRange(
-                closestSourceHarvestPos,
-                1,
-                structure => structure.structureType === STRUCTURE_LINK,
-            ) as StructureLink | false
-            links.push(structure)
-
-            if (!structure) continue
-
-            definedLinks += 1
-        } */
         for (const coord of stampAnchors.sourceLink) {
             const structure = this.room.findStructureAtCoord(
                 coord,
                 structure => structure.structureType === STRUCTURE_LINK,
             ) as StructureLink | false
             links.push(structure)
+            this.sourceLinkIDs.push(false)
 
             if (!structure) continue
 
-            definedLinks += 1
+            this.sourceLinkIDs.push(structure.id)
         }
 
-        if (definedLinks === stampAnchors.sourceLink.length)
-            this.sourceLinkIDs = links.map(link => (link as StructureLink).id)
         return (this._sourceLinks = links)
     }
 
@@ -900,15 +885,15 @@ export class CommuneManager {
             if (structure) return (this._controllerLink = structure)
         }
 
-        const structure = this.room.findStructureAtCoord(
+        this._controllerLink = this.room.findStructureAtCoord(
             this.room.roomManager.centerUpgradePos,
             structure => structure.structureType === STRUCTURE_LINK,
         ) as StructureLink | false
-        this._controllerLink = structure
+        if (!this._controllerLink) {
+            return this._controllerLink
+        }
 
-        if (!structure) return false
-
-        this.controllerLinkID = structure.id
+        this.controllerLinkID = this._controllerLink.id
         return this._controllerLink
     }
 

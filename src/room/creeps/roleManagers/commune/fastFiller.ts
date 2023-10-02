@@ -110,9 +110,7 @@ export class FastFiller extends Creep {
                         if (resourceType === RESOURCE_ENERGY) continue
 
                         this.message = 'WCR'
-
                         this.withdraw(structure, resourceType as ResourceConstant)
-
                         return true
                     }
                 }
