@@ -270,7 +270,7 @@ export class StatsManager {
         Memory.stats = {
             lastReset: 0,
             tickLength: 0,
-            lastTick: 0,
+            lastTick: Game.time,
             lastTickTimestamp: 0,
             resources: {
                 pixels: 0,
@@ -381,17 +381,17 @@ export class StatsManager {
 
     private average(
         avg: number,
-        number: number,
+        dataPoint: number,
         averagedOverTickCount: number = 1000,
         precision: number = 8,
     ) {
         if (!avg) avg = 0
-        if (!number) number = 0
-
-        avg -= avg / averagedOverTickCount
+        if (!dataPoint) dataPoint = 0
 
         const timeStep = Game.time - Memory.stats.lastTick
-        avg += number / timeStep / averagedOverTickCount
+        
+        avg -= avg / averagedOverTickCount * timeStep
+        avg += dataPoint / timeStep / averagedOverTickCount
 
         return roundTo(avg, precision)
     }

@@ -221,12 +221,15 @@ export class CommuneManager {
                 roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
             else if (
                 room.controller.progress > room.controller.progressTotal ||
-                room.find(FIND_MY_STRUCTURES).length
+                room.find(FIND_MY_STRUCTURES, {
+                    filter: structure => structure.structureType !== STRUCTURE_CONTROLLER,
+                }).length
             ) {
                 roomMemory[RoomMemoryKeys.greatestRCL] = 8
             } else roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
-        } else if (room.controller.level > roomMemory[RoomMemoryKeys.greatestRCL])
+        } else if (room.controller.level > roomMemory[RoomMemoryKeys.greatestRCL]) {
             roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
+        }
 
         if (!roomMemory[RoomMemoryKeys.combatRequests])
             roomMemory[RoomMemoryKeys.combatRequests] = []
@@ -850,7 +853,7 @@ export class CommuneManager {
                 links.push(link)
             }
 
-            return this._sourceLinks = links
+            return (this._sourceLinks = links)
         }
 
         const stampAnchors = this.room.roomManager.stampAnchors

@@ -407,7 +407,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
         roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
-        // Add the room's name to the scoutingRoom's remotes list
+        // Add the room's name to the scoutingRoom's remotes data
+
+        scoutingRoom.communeManager.remoteSourceHarvesters[this.name] = []
+        for (const i in packedRemoteSources) {
+
+            scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
+        }
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
@@ -498,7 +504,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
     roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
-    // Add the room's name to the scoutingRoom's remotes list
+    // Add the room's name to the scoutingRoom's remotes data
+
+    scoutingRoom.communeManager.remoteSourceHarvesters[this.name] = []
+    for (const i in packedRemoteSources) {
+
+        scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
+    }
 
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
