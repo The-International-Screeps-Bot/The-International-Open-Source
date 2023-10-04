@@ -34,8 +34,8 @@ export class TerminalManager {
         if (!terminal.RCLActionable) return
         if (terminal.cooldown > 0) return
 
-        if (this.respondToTerminalRequests()) return
-        if (this.respondToAllyRequests()) return
+        if (this.respondToTerminalRequests() === Result.action) return
+        if (this.respondToAllyRequests() === Result.action) return
 
         // Check if the market is disabled by us or the server
 
@@ -146,10 +146,10 @@ export class TerminalManager {
             this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
             this.communeManager.minStoredEnergy
         )
-            return false
+            return Result.noAction
 
         const [request, ID, amount] = this.findBestTerminalRequest()
-        if (!request) return false
+        if (!request) return Result.noAction
 
         this.communeManager.room.terminal.send(
             request.resource,
@@ -159,7 +159,7 @@ export class TerminalManager {
         )
         delete collectiveManager.terminalRequests[ID]
         this.communeManager.room.terminal.intended = true
-        return true
+        return Result.action
     }
 
     private findBestAllyRequest(): [ResourceRequest, string, number] {
