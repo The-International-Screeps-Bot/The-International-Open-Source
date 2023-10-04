@@ -775,6 +775,7 @@ export class RoomVisualsManager {
 
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.roomManager.room.name) continue
 
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
             const pathType = this.roomManager.room.communeManager.remoteSourcePathType

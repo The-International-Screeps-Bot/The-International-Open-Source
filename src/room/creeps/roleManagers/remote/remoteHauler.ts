@@ -93,6 +93,7 @@ export class RemoteHauler extends Creep {
             const remoteName = splitRemoteInfo[0]
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 
             const sourceIndex = parseInt(splitRemoteInfo[1])
 

@@ -1052,6 +1052,7 @@ export class SpawnRequestsManager {
 
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
             if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
 
@@ -1239,6 +1240,7 @@ export class SpawnRequestsManager {
             const remoteName = remoteNamesByEfficacy[index]
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 

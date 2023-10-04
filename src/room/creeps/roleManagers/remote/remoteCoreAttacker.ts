@@ -94,10 +94,11 @@ export class RemoteCoreAttacker extends Creep {
         // Loop through each remote name
 
         for (const remoteName of remoteNamesByEfficacy) {
-            const roomMemory = Memory.rooms[remoteName]
-            if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.room.name) continue
 
-            if (roomMemory[RoomMemoryKeys[role]] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys[role]] <= 0) continue
 
             // Otherwise assign the remote to the creep and inform true
 
