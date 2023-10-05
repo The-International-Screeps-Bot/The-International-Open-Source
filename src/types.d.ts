@@ -36,6 +36,7 @@ import {
     RoomLogisticsRequest,
     findNewRoomLogisticsRequestArgs,
 } from 'types/roomRequests'
+import { UserScriptTemplate } from 'other/userScript/userScript.example'
 
 declare global {
     interface ProfilerData {
@@ -1440,6 +1441,21 @@ declare global {
         [PowerCreepMemoryKeys.taskRoom]: string
     }
 
+    interface UserScriptTemplate {
+        /**
+         * Run at the start of the tick
+         */
+        initialRun(): void
+        /**
+         * Run at the middle of the tick
+         */
+        run(): void
+        /**
+         * Run at the end of the tick
+         */
+        endRun(): void
+    }
+
     // Global
 
     namespace NodeJS {
@@ -1452,9 +1468,9 @@ declare global {
             // Intentionally unused
             settingsExample: Settings
 
-            userScript(): void
-            // Intentionally unused
-            userScriptExample(): void
+            userScript: UserScriptTemplate
+            // intentionally unused
+            userScriptExample: UserScriptTemplate
 
             //
 

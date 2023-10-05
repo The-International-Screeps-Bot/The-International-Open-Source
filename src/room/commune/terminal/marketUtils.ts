@@ -1,18 +1,20 @@
 import { customLog } from 'utils/logging'
-import { getAvgPrice } from 'utils/utils'
+import { findLowestScore, getAvgPrice } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
+import { marketOrdersManager } from 'international/marketOrders'
+import { Result } from 'international/constants'
 
 export const marketUtils = {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
         const mySpecificOrders =
-            collectiveManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
+            marketOrdersManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
         if (amount <= targetAmount * 0.5) return false
 
-        const order = collectiveManager.getBuyOrder(resourceType)
+        const order = marketOrdersManager.getBuyOrder(resourceType)
 
         if (order) {
             const dealAmount = this.findLargestTransactionAmount(
@@ -26,20 +28,22 @@ export const marketUtils = {
                 Math.min(dealAmount, order.remainingAmount),
                 room.name,
             )
+            if (result !== OK) return Result.fail
+
             if (result === OK && resourceType === 'energy') {
                 statsManager.updateStat(room.name, 'eos', amount)
             } else if (result === OK && resourceType === 'battery') {
                 statsManager.updateStat(room.name, 'eos', amount * 10)
             }
 
-            return result == OK
+            return Result.success
         }
 
         if (mySpecificOrders.length) return false
         if (Game.market.credits < collectiveManager.minCredits) return false
-        if (collectiveManager.myOrdersCount === MARKET_MAX_ORDERS) return false
+        if (marketOrdersManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        const orders = collectiveManager.orders[ORDER_SELL][resourceType]
+        const orders = marketOrdersManager.orders[ORDER_SELL][resourceType]
         if (!orders) return false
 
         const price = Math.max(
@@ -54,23 +58,28 @@ export const marketUtils = {
             price,
             totalAmount: amount,
         })
+        if (result !== OK) return Result.fail
+
         if (result === OK && resourceType === 'energy') {
             statsManager.updateStat(room.name, 'eos', amount)
         } else if (result === OK && resourceType === 'battery') {
             statsManager.updateStat(room.name, 'eos', amount * 10)
         }
 
-        return result == OK
+        return Result.success
     },
     advancedBuy(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
         const mySpecificOrders =
-            collectiveManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
+            marketOrdersManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
         if (amount <= targetAmount * 0.5) return false
 
-        const order = collectiveManager.getSellOrder(resourceType, getAvgPrice(resourceType) * 1.2)
+        const order = marketOrdersManager.getSellOrder(
+            resourceType,
+            getAvgPrice(resourceType) * 1.2,
+        )
 
         if (order) {
             const dealAmount = this.findLargestTransactionAmount(
@@ -85,18 +94,20 @@ export const marketUtils = {
                 Math.min(dealAmount, order.remainingAmount),
                 room.name,
             )
+            if (result !== OK) return Result.fail
+
             if (result === OK && resourceType === 'energy') {
                 statsManager.updateStat(room.name, 'eib', amount)
             } else if (result === OK && resourceType === 'battery') {
                 statsManager.updateStat(room.name, 'eib', amount * 10)
             }
-            return result == OK
+            return Result.success
         }
 
         if (mySpecificOrders.length) return false
-        if (collectiveManager.myOrdersCount === MARKET_MAX_ORDERS) return false
+        if (marketOrdersManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        const orders = collectiveManager.orders[ORDER_BUY][resourceType]
+        const orders = marketOrdersManager.orders[ORDER_BUY][resourceType]
         if (!orders) return false
 
         const price = Math.min(
@@ -111,12 +122,15 @@ export const marketUtils = {
             price,
             totalAmount: amount,
         })
+        if (result !== OK) return Result.fail
+
         if (result === OK && resourceType === 'energy') {
             statsManager.updateStat(room.name, 'eib', amount)
         } else if (result === OK && resourceType === 'battery') {
             statsManager.updateStat(room.name, 'eib', amount * 10)
         }
-        return result == OK
+
+        return Result.success
     },
     /**
      * Finds the largest possible transaction amount given a budget and starting amount
@@ -143,5 +157,5 @@ export const marketUtils = {
         }
 
         return Math.floor(amount)
-    }
+    },
 }

@@ -6,6 +6,7 @@ import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/s
 import { collectiveManager } from 'international/collective'
 import { CommuneManager } from 'room/commune/commune'
 import { marketUtils } from './marketUtils'
+import { marketOrdersManager } from 'international/marketOrders'
 
 export class TerminalManager {
     communeManager: CommuneManager
@@ -40,7 +41,7 @@ export class TerminalManager {
         // Check if the market is disabled by us or the server
 
         if (!global.settings.marketUsage) return
-        if (!collectiveManager.marketIsFunctional) return
+        if (!marketOrdersManager.isMarketFunctional) return
 
         this.manageResources()
     }
@@ -82,15 +83,15 @@ export class TerminalManager {
     }
 
     private findBestTerminalRequest(): [TerminalRequest, string, number] {
-
-        const resourcesInStoringStructures = this.communeManager.room.roomManager.resourcesInStoringStructures
-        const minStoredEnergy = terminalResourceTargets[RESOURCE_ENERGY].min(this.communeManager) * 1.1
+        const resourcesInStoringStructures =
+            this.communeManager.room.roomManager.resourcesInStoringStructures
+        const minStoredEnergy =
+            terminalResourceTargets[RESOURCE_ENERGY].min(this.communeManager) * 1.1
         const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
         const budget = Math.min(
             storedEnergy - minStoredEnergy,
             this.communeManager.room.terminal.store[RESOURCE_ENERGY],
         )
-
 
         let lowestScore = Infinity
         let bestRequestID: string
@@ -106,18 +107,12 @@ export class TerminalManager {
 
             const minStoredResource =
                 terminalResourceTargets[request.resource].min(this.communeManager) * 1.1
-            const storedResource =
-            resourcesInStoringStructures[
-                    request.resource
-                ] || 0
+            const storedResource = resourcesInStoringStructures[request.resource] || 0
             if (storedResource <= minStoredResource) continue
 
             const sendAmount = marketUtils.findLargestTransactionAmount(
                 budget,
-                Math.min(
-                    request.amount,
-                    storedResource - minStoredResource
-                ),
+                Math.min(request.amount, storedResource - minStoredResource),
                 this.communeManager.room.name,
                 request.roomName,
             )
@@ -163,14 +158,15 @@ export class TerminalManager {
     }
 
     private findBestAllyRequest(): [ResourceRequest, string, number] {
-        const resourcesInStoringStructures = this.communeManager.room.roomManager.resourcesInStoringStructures
-        const minStoredEnergy = terminalResourceTargets[RESOURCE_ENERGY].min(this.communeManager) * 1.1
+        const resourcesInStoringStructures =
+            this.communeManager.room.roomManager.resourcesInStoringStructures
+        const minStoredEnergy =
+            terminalResourceTargets[RESOURCE_ENERGY].min(this.communeManager) * 1.1
         const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
         const budget = Math.min(
             storedEnergy - minStoredEnergy,
             this.communeManager.room.terminal.store[RESOURCE_ENERGY],
         )
-
 
         let lowestScore = Infinity
         let bestRequestID: string
@@ -187,18 +183,12 @@ export class TerminalManager {
 
             const minStoredResource =
                 terminalResourceTargets[request.resourceType].min(this.communeManager) * 1.1
-            const storedResource =
-            resourcesInStoringStructures[
-                    request.resourceType
-                ] || 0
+            const storedResource = resourcesInStoringStructures[request.resourceType] || 0
             if (storedResource <= minStoredResource) continue
 
             const sendAmount = marketUtils.findLargestTransactionAmount(
                 budget,
-                Math.min(
-                    request.amount,
-                    storedResource - minStoredResource
-                ),
+                Math.min(request.amount, storedResource - minStoredResource),
                 this.communeManager.room.name,
                 request.roomName,
             )

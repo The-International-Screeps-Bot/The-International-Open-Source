@@ -50,9 +50,10 @@ import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
+import { marketOrdersManager } from 'international/marketOrders'
 
 export function originalLoop() {
-    if (global.userScript && Game.flags['usersScriptFirstRun']) global.userScript()
+    if (global.userScript) global.userScript.initialRun()
     if (Game.flags.deactivate) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
@@ -76,7 +77,7 @@ export function originalLoop() {
         requestsManager.run()
 
         if (global.collectivizer) global.collectivizer.run()
-        if (global.userScript && !Game.flags['usersScriptFirstRun']) global.userScript()
+        if (global.userScript) global.userScript.run()
         playerManager.run()
         roomsManager.initRun()
         creepOrganizer.run()
@@ -85,7 +86,7 @@ export function originalLoop() {
         roomPruningManager.run()
         flagManager.run()
         constructionSiteManager.run()
-        collectiveManager.orderManager()
+        marketOrdersManager.run()
 
         roomsManager.run()
 
@@ -94,8 +95,9 @@ export function originalLoop() {
         statsManager.internationalEndTick()
 
         collectiveManager.advancedGeneratePixel()
-        collectiveManager.advancedSellPixels()
+        marketOrdersManager.advancedSellPixels()
 
+        if (global.userScript) global.userScript.endRun()
         endTickManager.run()
     })
 }

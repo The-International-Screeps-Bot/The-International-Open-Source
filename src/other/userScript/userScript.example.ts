@@ -1,7 +1,15 @@
-// IMPORTANT: If you want to use the userScript, copy this file, name it userScript.ts, and rename userScriptExample() to userScript()
-global.userScriptExample = function() {
+// IMPORTANT: If you want to use the userScript, copy this file, name it userScript.ts, and rename references to userScriptExample to userScript and UserScriptExample to UserScript
 
-    // Your custom code here
+class UserScriptExample implements UserScriptTemplate {
+    initialRun() {
+        return true
+    }
+    run() {
 
+    }
+    endRun() {
 
+    }
 }
+
+global.userScriptExample = new UserScriptExample()
