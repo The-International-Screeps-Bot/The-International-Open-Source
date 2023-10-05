@@ -42,15 +42,19 @@ export class HaulerNeedManager {
     }
 
     private sourceNeed() {
-        const { room } = this.communeManager
+        const room = this.communeManager.room
+        const packedSourcePaths = Memory.rooms[room.name][RoomMemoryKeys.communeSourcePaths]
 
-        if (room.roomManager.hubLink && room.roomManager.hubLink.RCLActionable) {
+        const hubLink = room.roomManager.hubLink
+        if (hubLink && hubLink.RCLActionable) {
+            // There is a valid hubLink
+
             for (let index in room.find(FIND_SOURCES)) {
                 const sourceLink = room.communeManager.sourceLinks[index]
                 if (sourceLink && sourceLink.RCLActionable) continue
 
                 this.communeManager.haulerNeed += findCarryPartsRequired(
-                    room.roomManager.communeSourceHarvestPositions[index].length + 3,
+                    packedSourcePaths[index].length / packedPosLength + 3,
                     room.estimatedSourceIncome[index] * 1.1,
                 )
             }
@@ -58,14 +62,11 @@ export class HaulerNeedManager {
             return
         }
 
-        // No valid hubLink
+        // There is no valid hubLink
 
         for (let index in room.find(FIND_SOURCES)) {
-            const sourceLink = room.communeManager.sourceLinks[index]
-            if (sourceLink && sourceLink.RCLActionable) continue
-
             this.communeManager.haulerNeed += findCarryPartsRequired(
-                room.roomManager.communeSourcePaths[index].length + 3,
+                packedSourcePaths[index].length / packedPosLength + 3,
                 room.estimatedSourceIncome[index] * 1.1,
             )
         }
@@ -80,24 +81,33 @@ export class HaulerNeedManager {
 
         if (room.roomManager.controllerContainer) {
             this.communeManager.haulerNeed += findCarryPartsRequired(
-                room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
+                Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.upgradePath].length /
+                    packedPosLength +
+                    3,
                 this.communeManager.upgradeStrength * 1.1,
             )
             return
         }
+
+        this.controllerNeedLink()
+    }
+
+    private controllerNeedLink() {
+        const controllerLink = this.communeManager.controllerLink
+        if (!controllerLink || !controllerLink.RCLActionable) return
+
+        const hubLink = this.communeManager.room.roomManager.hubLink
+        // No need to haul if there is a valid hubLink
+        if (hubLink && hubLink.RCLActionable) return
 
         // There is a viable controllerLink but we need to haul to it
 
-        if (
-            this.communeManager.controllerLink &&
-            this.communeManager.controllerLink.RCLActionable &&
-            (!room.roomManager.hubLink || !room.roomManager.hubLink.RCLActionable)
-        ) {
-            this.communeManager.haulerNeed += findCarryPartsRequired(
-                room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
-                this.communeManager.upgradeStrength * 1.1,
-            )
-            return
-        }
+        this.communeManager.haulerNeed += findCarryPartsRequired(
+            Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.upgradePath].length /
+                packedPosLength +
+                3,
+            this.communeManager.upgradeStrength * 1.1,
+        )
+        return
     }
 }
