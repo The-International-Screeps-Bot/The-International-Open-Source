@@ -2,7 +2,7 @@
 
 class UserScriptExample implements UserScriptTemplate {
     initialRun() {
-        return true
+
     }
     run() {
 
