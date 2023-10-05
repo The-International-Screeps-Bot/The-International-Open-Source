@@ -1,5 +1,13 @@
-import { CombatRequestKeys, CreepRoomLogisticsRequestKeys, DepositRequestKeys, HaulRequestKeys, NukeRequestKeys, PowerRequestKeys, RoomLogisticsRequestTypes, WorkRequestKeys } from "international/constants"
-
+import {
+    CombatRequestKeys,
+    CreepRoomLogisticsRequestKeys,
+    DepositRequestKeys,
+    HaulRequestKeys,
+    NukeRequestKeys,
+    PowerRequestKeys,
+    RoomLogisticsRequestTypes,
+    WorkRequestKeys,
+} from 'international/constants'
 
 export interface CreepRoomLogisticsRequest {
     [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
@@ -44,7 +52,19 @@ export interface RoomLogisticsRequest {
     // personalAmount?: number
 }
 
-export interface findNewRoomLogisticsRequestArgs {
+export interface CreateRoomLogisticsRequestArgs {
+    type: RoomLogisticsRequestTypes
+    target: AnyStoreStructure | Creep | Tombstone | Ruin | Resource
+    resourceType?: ResourceConstant
+    onlyFull?: boolean
+    /**
+     * Lower priority is more preferable
+     */
+    priority?: number
+    maxAmount?: number
+}
+
+export interface FindNewRoomLogisticsRequestArgs {
     types?: Set<RoomLogisticsRequestTypes>
     /**
      * Use this to command certain resourceTypes

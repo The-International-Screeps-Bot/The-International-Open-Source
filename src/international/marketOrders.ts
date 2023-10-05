@@ -1,5 +1,6 @@
 import { getAvgPrice } from 'utils/utils'
 import { PlayerMemoryKeys, RoomMemoryKeys } from './constants'
+import { collectiveManager } from './collective'
 
 class MarketOrdersManager {
     run() {
@@ -147,6 +148,10 @@ class MarketOrdersManager {
         const unorganizedOrders = this.allOrdersUnorganized
 
         for (const order of unorganizedOrders) {
+
+            // Make sure the order isn't coming from a room we own
+            if (collectiveManager.communes.has(order.roomName)) continue
+
             const roomMemory = Memory.rooms[order.roomName]
             // Filter out orders from players we hate
             if (

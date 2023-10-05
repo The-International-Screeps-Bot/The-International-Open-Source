@@ -34,7 +34,8 @@ import {
     CreepRoomLogisticsRequest,
     PowerTask,
     RoomLogisticsRequest,
-    findNewRoomLogisticsRequestArgs,
+    FindNewRoomLogisticsRequestArgs,
+    CreateRoomLogisticsRequestArgs,
 } from 'types/roomRequests'
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
 
@@ -1013,10 +1014,10 @@ declare global {
         roomLogisticsRequestManager(): void
 
         findRoomLogisticsRequest(
-            args?: findNewRoomLogisticsRequestArgs,
+            args?: FindNewRoomLogisticsRequestArgs,
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticsRequestTypes(
-            args?: findNewRoomLogisticsRequestArgs,
+            args?: FindNewRoomLogisticsRequestArgs,
         ): Set<RoomLogisticsRequestTypes>
         canAcceptRoomLogisticsRequest(
             requestType: RoomLogisticsRequestTypes,
@@ -1032,8 +1033,8 @@ declare global {
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
-        runRoomLogisticsRequestAdvanced(args?: findNewRoomLogisticsRequestArgs): Result
-        runRoomLogisticsRequestsAdvanced(args?: findNewRoomLogisticsRequestArgs): boolean
+        runRoomLogisticsRequestAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
+        runRoomLogisticsRequestsAdvanced(args?: FindNewRoomLogisticsRequestArgs): boolean
 
         runRoomLogisticsRequest(): Result
         runRoomLogisticsRequests(): boolean
