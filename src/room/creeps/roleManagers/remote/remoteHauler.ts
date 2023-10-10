@@ -1,5 +1,6 @@
 import {
     CreepMemoryKeys,
+    CreepRoomLogisticsRequestKeys,
     customColors,
     packedPosLength,
     relayOffsets,
@@ -40,7 +41,7 @@ export class RemoteHauler extends Creep {
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
                     Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
-                        RoomMemoryKeys.remoteSourceFastFillerPaths
+                        this.commune.communeManager.remoteResourcePathType
                     ][creepMemory[CreepMemoryKeys.sourceIndex]].length /
                         packedPosLength
             )
@@ -116,7 +117,7 @@ export class RemoteHauler extends Creep {
         // Make sure we have enough life to get there
 
         const pathLength =
-            remoteMemory[this.commune.communeManager.remoteSourcePathType][sourceIndex].length /
+            remoteMemory[this.commune.communeManager.remoteResourcePathType][sourceIndex].length /
             packedPosLength
         if (pathLength >= this.ticksToLive) return false
 
@@ -260,7 +261,7 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath:
                         Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
-                            RoomMemoryKeys.remoteSourceFastFillerPaths
+                            this.commune.communeManager.remoteResourcePathType
                         ][creepMemory[CreepMemoryKeys.sourceIndex]],
                     remoteName: creepMemory[CreepMemoryKeys.remote],
                 },
@@ -282,7 +283,7 @@ export class RemoteHauler extends Creep {
                     // If the target is near the creep
 
                     const targetPos = findObjectWithID(request.targetID).pos
-                    return getRange(targetPos, this.pos) <= 1
+                    return getRange(targetPos, this.pos) <= 0
                 },
             })
 
@@ -317,7 +318,7 @@ export class RemoteHauler extends Creep {
                     {
                         packedPath:
                             Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
-                                RoomMemoryKeys.remoteSourceFastFillerPaths
+                                this.commune.communeManager.remoteResourcePathType
                             ][creepMemory[CreepMemoryKeys.sourceIndex]],
                         remoteName: creepMemory[CreepMemoryKeys.remote],
                     },
@@ -359,7 +360,7 @@ export class RemoteHauler extends Creep {
             {
                 packedPath: reversePosList(
                     Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
-                        RoomMemoryKeys.remoteSourceFastFillerPaths
+                        this.commune.communeManager.remoteResourcePathType
                     ][creepMemory[CreepMemoryKeys.sourceIndex]],
                 ),
                 remoteName: creepMemory[CreepMemoryKeys.remote],
@@ -459,9 +460,9 @@ export class RemoteHauler extends Creep {
                 },
                 {
                     packedPath: reversePosList(
-                        Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceFastFillerPaths][
-                            creepMemory[CreepMemoryKeys.sourceIndex]
-                        ],
+                        Memory.rooms[this.room.name][
+                            this.commune.communeManager.remoteResourcePathType
+                        ][creepMemory[CreepMemoryKeys.sourceIndex]],
                     ),
                     remoteName: this.room.name,
                 },
@@ -522,7 +523,7 @@ export class RemoteHauler extends Creep {
                 {
                     packedPath: reversePosList(
                         Memory.rooms[this.memory[CreepMemoryKeys.remote]][
-                            RoomMemoryKeys.remoteSourceFastFillerPaths
+                            this.commune.communeManager.remoteResourcePathType
                         ][this.memory[CreepMemoryKeys.sourceIndex]],
                     ),
                     remoteName: this.memory[CreepMemoryKeys.remote],
@@ -558,7 +559,7 @@ export class RemoteHauler extends Creep {
             {
                 packedPath:
                     Memory.rooms[this.memory[CreepMemoryKeys.remote]][
-                        RoomMemoryKeys.remoteSourceFastFillerPaths
+                        this.commune.communeManager.remoteResourcePathType
                     ][this.memory[CreepMemoryKeys.sourceIndex]],
                 loose: true,
             },
@@ -581,6 +582,13 @@ export class RemoteHauler extends Creep {
         if (creepAtPos.movedResource) return false
         if (!creepAtPos.freeNextStore) return false
         if (creepAtPos.freeNextStore !== this.usedNextStore) return false
+        const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
+        if (logisticsRequest) {
+
+            const target = findObjectWithID(logisticsRequest[CreepRoomLogisticsRequestKeys.target])
+            // Don't relay if they are close to our logistics target
+            if (getRange(target.pos, creepAtPos.pos) <= 1) return false
+        }
 
         this.transfer(creepAtPos, RESOURCE_ENERGY)
 
@@ -734,7 +742,7 @@ export class RemoteHauler extends Creep {
 
         const moveCoord = this.moveRequest
             ? unpackCoord(this.moveRequest)
-            : unpackPosAt(creepMemory[CreepMemoryKeys.path])
+            : unpackPosAt(creepMemory[CreepMemoryKeys.path], 1)
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
             this.relayCardinal(moveCoord)
@@ -756,9 +764,9 @@ export class RemoteHauler extends Creep {
             if (
                 Memory.rooms[this.memory[CreepMemoryKeys.remote]] &&
                 Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceHarvestPositions] &&
-                Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceFastFillerPaths].length > this.memory[CreepMemoryKeys.sourceIndex] + 1
+                Memory.rooms[this.memory[CreepMemoryKeys.remote]][this.commune.communeManager.remoteResourcePathType].length > this.memory[CreepMemoryKeys.sourceIndex] + 1
             )
-                returnTripTime = Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteSourceFastFillerPaths][this.memory[CreepMemoryKeys.sourceIndex]].length * 1.1
+                returnTripTime = Memory.rooms[this.memory[CreepMemoryKeys.remote]][this.commune.communeManager.remoteResourcePathType][this.memory[CreepMemoryKeys.sourceIndex]].length * 1.1
         }
         if (this.ticksToLive <= returnTripTime) this.room.visual.text('🕒', this.pos)
          */

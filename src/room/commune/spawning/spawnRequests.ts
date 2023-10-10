@@ -1067,7 +1067,7 @@ export class SpawnRequestsManager {
 
             const harvesterPriority = this.minRemotePriority + priorityIncrement
 
-            // Construct requests for remoteSourceHarvester0s
+            // Construct requests for remoteSourceHarvesters
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
@@ -1088,14 +1088,14 @@ export class SpawnRequestsManager {
                         return {
                             role,
                             defaultParts: [CARRY],
-                            extraParts: [WORK, MOVE],
-                            partsMultiplier,
+                            extraParts: [WORK, MOVE, WORK, MOVE],
+                            partsMultiplier: Math.ceil(partsMultiplier / 2),
                             spawnGroup,
                             threshold: 0.1,
                             minCreeps: 1,
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 150 * 6,
-                            minCost: 200,
+                            minCost: 350,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,

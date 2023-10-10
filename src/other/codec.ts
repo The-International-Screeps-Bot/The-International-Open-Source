@@ -10,7 +10,7 @@ import { encode, decode } from 'base32768'
 export const packCache: StringMap<string> = {}
 export const unpackCache: StringMap<string> = {}
 
-function getPackCacheKey(key: string): any {
+function getPackCacheKey(key: string) {
     return packCache[key]
 }
 function setPackCacheKey(key: string, value: any): void {

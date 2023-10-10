@@ -295,12 +295,11 @@ export class TowerManager {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
                     type: RoomLogisticsRequestTypes.transfer,
-                    priority:
-                        3 +
-                        scalePriority(
-                            structure.store.getCapacity(RESOURCE_ENERGY),
-                            structure.reserveStore.energy,
-                        ),
+                    priority: scalePriority(
+                        structure.store.getCapacity(RESOURCE_ENERGY),
+                        structure.reserveStore.energy,
+                        20,
+                    ),
                 })
             }
 

@@ -44,7 +44,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     rampartUpkeepCost,
-    RemoteSourcePathTypes,
+    RemoteResourcePathTypes,
     Result,
     ReservedCoordTypes,
     RoomStatsKeys,
@@ -146,7 +146,7 @@ export class CommuneManager {
     haulerNeed: number
     mineralHarvestStrength: number
     upgradeStrength: number
-    remoteSourcePathType: RemoteSourcePathTypes
+    remoteResourcePathType: RemoteResourcePathTypes
 
     constructor() {
         this.constructionManager = new ConstructionManager(this)
@@ -266,16 +266,16 @@ export class CommuneManager {
 
         // identify the remoteSourcePathType
 
-        if (!this.remoteSourcePathType || randomTick()) {
+        if (!this.remoteResourcePathType || randomTick()) {
             if (this.storingStructures.length) {
                 /* this.remoteSourcePathType = RoomMemoryKeys.remoteSourceHubPaths */
-                this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
+                this.remoteResourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
             } else {
-                this.remoteSourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
+                this.remoteResourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
             }
         }
 
-        Memory.rooms[this.room.name][this.remoteSourcePathType]
+        Memory.rooms[this.room.name][this.remoteResourcePathType]
 
         // For each role, construct an array for creepsFromRoom
 
@@ -978,12 +978,6 @@ export class CommuneManager {
     _spawningStructuresByNeed: SpawningStructures
     get spawningStructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
-
-        if (this.spawningStructuresByNeedIDs && !this.room.roomManager.structureUpdate) {
-            return (this._spawningStructuresByNeed = this.spawningStructuresByNeedIDs.map(ID =>
-                findObjectWithID(ID),
-            ))
-        }
 
         // mark coords in range 1 of reserved source harvest positions
         // mark coords in range of valid fastFiller position

@@ -38,11 +38,15 @@ export class HaulerSizeManager {
             ) +
                 this.communeManager.room.roomManager.structures.spawn.length * 2) *
             BODYPART_COST[CARRY]
-
+/*
         let diff
-        if (newMinHaulerCost < roomMemory[RoomMemoryKeys.minHaulerCost])
+        if (newMinHaulerCost < roomMemory[RoomMemoryKeys.minHaulerCost]) {
+
             diff = (newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost]) / 2
-        else diff = newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost]
+        }
+        // Otherwise
+        else diff = newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost] */
+        const diff = (newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost]) / 2
 
         roomMemory[RoomMemoryKeys.minHaulerCost] += Math.floor(diff)
         roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time

@@ -115,14 +115,15 @@ export class RemotesManager {
                 if (
                     isReserved &&
                     remote.controller.reservation.ticksToEnd >=
-                        Math.min(
-                            remoteMemory[RoomMemoryKeys.remoteControllerPath].length *
-                                packedPosLength *
-                                5,
-                            2500,
+                        Math.max(
+                            (remoteMemory[RoomMemoryKeys.remoteControllerPath].length /
+                                packedPosLength) *
+                                3,
+                            500,
                         )
-                )
+                ) {
                     remoteMemory[RoomMemoryKeys.remoteReserver] = 0
+                }
             }
 
             if (remote) {
@@ -200,7 +201,8 @@ export class RemotesManager {
 
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                 const remoteSourcePathLength =
-                    remoteMemory[this.communeManager.remoteSourcePathType].length / packedPosLength
+                    remoteMemory[this.communeManager.remoteResourcePathType].length /
+                    packedPosLength
                 const hasContainer = remoteMemory[RoomMemoryKeys.hasContainer][i]
                 if (hasContainer) {
                     // account for repair cost for container

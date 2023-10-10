@@ -1,4 +1,5 @@
 import {
+    Result,
     RoomMemoryKeys,
     RoomTypes,
     dynamicScoreRoomRange,
@@ -28,7 +29,7 @@ type FloodForCoordCheck = (
     coord: Coord,
     packedCoord: number,
     generation?: number,
-) => boolean | 'stop'
+) => boolean | Result.stop
 
 export const roomUtils = {
     abandonRemote(roomName: string, time: number) {
@@ -134,7 +135,7 @@ export const roomUtils = {
 
                     // Custom check for the coord
                     const checkResult = coordCheck(adjacentCoord, packedAdjacentCoord, depth)
-                    if (checkResult === 'stop') return adjacentCoord
+                    if (checkResult === Result.stop) return adjacentCoord
                     if (!checkResult) continue
 
                     nextGeneration.push(coord)

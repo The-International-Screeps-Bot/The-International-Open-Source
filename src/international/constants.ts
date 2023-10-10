@@ -317,7 +317,7 @@ export enum RoomMemoryKeys {
     keeperLairCoords,
 }
 
-export type RemoteSourcePathTypes =
+export type RemoteResourcePathTypes =
     | RoomMemoryKeys.remoteSourceFastFillerPaths
     | RoomMemoryKeys.remoteSourceHubPaths
 
@@ -1260,6 +1260,14 @@ export const terminalResourceTargets: Partial<{ [key in ResourceConstant]: Resou
             return communeManager.storingStructuresCapacity * 0.01
         },
     },
+    [RESOURCE_COMPOSITE]: {
+        min: function (communeManager) {
+            return 0
+        },
+        max: function (communeManager) {
+            return communeManager.storingStructuresCapacity * 0.01
+        },
+    },
 }
 
 export const antifaRoles: (
@@ -1585,6 +1593,7 @@ export enum RoomStatsKeys {
     TotalCreepCount = 'tcc',
     PowerCreepCount = 'pcc',
     SpawnUsagePercentage = 'su',
+    MinHaulerCost = 'mhc',
 
     GameTime = 'gt',
     RemoteCount = 'rc',

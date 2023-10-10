@@ -59,13 +59,13 @@ export class ControllerUpgrader extends Creep {
                 creep.advancedUpgradeController()
                 continue
             }
-
+/*
             const cSiteTarget = creep.room.roomManager.cSiteTarget
             if (cSiteTarget && !creep.room.roomManager.enemyAttackers.length) {
                 creep.advancedBuild()
                 continue
             }
-
+ */
             creep.advancedUpgradeController()
         }
     }

@@ -53,14 +53,15 @@ import { requestsManager } from 'international/requests'
 import { marketOrdersManager } from 'international/marketOrders'
 
 export function originalLoop() {
+
+    memHack.run()
+
     if (global.userScript) global.userScript.initialRun()
     if (Game.flags.deactivate) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
         return
     }
-
-    memHack.run()
 
     profiler.wrap((): void => {
         migrationManager.run()
@@ -92,7 +93,7 @@ export function originalLoop() {
 
         mapVisualsManager.run()
         simpleAllies.endRun()
-        statsManager.internationalEndTick()
+        statsManager.internationalEndRun()
 
         collectiveManager.advancedGeneratePixel()
         marketOrdersManager.advancedSellPixels()

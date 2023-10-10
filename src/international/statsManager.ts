@@ -95,6 +95,10 @@ export interface CommuneStats extends RoomStats {
      * Spawn Usage as a decimal
      */
     su: number
+    /**
+     * hauler size
+     */
+    mhc: number
 }
 
 const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
@@ -156,6 +160,7 @@ export class StatsManager {
                 [RoomStatsKeys.RemoteEnergyInputHarvest]: 0,
                 [RoomStatsKeys.RemoteEnergyOutputRepairOther]: 0,
                 [RoomStatsKeys.RemoteEnergyOutputBuild]: 0,
+                [RoomStatsKeys.MinHaulerCost]: 0,
             })
 
             if (Memory.stats.rooms[roomName]) return
@@ -163,6 +168,8 @@ export class StatsManager {
             Memory.stats.rooms[roomName] = roomStats
             return
         }
+
+        // Otherwise configure the remote
 
         this.stats[RoomTypes.remote][roomName] = {
             [RoomStatsKeys.RemoteEnergyStored]: 0,
@@ -172,11 +179,11 @@ export class StatsManager {
         }
     }
 
-    roomPreTick(roomName: string, roomType: number) {
+    roomInitialRun(roomName: string, roomType: number) {
         this.roomConfig(roomName, roomType)
     }
 
-    private roomCommuneFinalEndTick(roomName: string, forceUpdate: boolean = false) {
+    private roomCommuneEndRun(roomName: string, forceUpdate: boolean = false) {
         const room = Game.rooms[roomName]
         const roomMemory = Memory.rooms[roomName]
         const interTickRoomStats = Memory.stats.rooms[roomName]
@@ -205,6 +212,7 @@ export class StatsManager {
         roomStats[RoomStatsKeys.CreepCount] = room.myCreepsAmount
         roomStats[RoomStatsKeys.TotalCreepCount] = room.creepsFromRoomAmount
         roomStats[RoomStatsKeys.PowerCreepCount] = room.myPowerCreepsAmount
+        roomStats[RoomStatsKeys.MinHaulerCost] = roomMemory[RoomMemoryKeys.minHaulerCost]
 
         const spawns = room.roomManager.structures.spawn
         if (spawns.length > 0) {
@@ -268,7 +276,7 @@ export class StatsManager {
     }
     internationalConfig() {
         Memory.stats = {
-            lastReset: 0,
+            lastReset: global.lastReset,
             tickLength: 0,
             lastTick: Game.time,
             lastTickTimestamp: 0,
@@ -305,22 +313,23 @@ export class StatsManager {
         }
 
         this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
-        this.internationalEndTick()
+        this.internationalEndRun()
     }
 
     tickInit() {
         this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
     }
 
-    internationalEndTick() {
+    internationalEndRun() {
         // Run communes one last time to update stats
 
-        for (const roomName in this.stats[RoomTypes.commune]) {
-            if (!collectiveManager.communes.has(roomName)) {
+        for (const roomName in Memory.stats.rooms) {
+            if (!this.stats[RoomTypes.commune][roomName]) {
                 Memory.stats.rooms[roomName] = undefined
+                continue
             }
 
-            this.roomCommuneFinalEndTick(roomName)
+            this.roomCommuneEndRun(roomName)
         }
 
         const timestamp = Date.now()
@@ -365,7 +374,7 @@ export class StatsManager {
         let usedCPU =
             Memory.stats.lastTick === undefined || Memory.stats.lastTick + 1 === Game.time
                 ? Game.cpu.getUsed()
-                : CPUMaxPerTick
+                : Game.cpu.limit
 
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
@@ -389,8 +398,8 @@ export class StatsManager {
         if (!dataPoint) dataPoint = 0
 
         const timeStep = Game.time - Memory.stats.lastTick
-        
-        avg -= avg / averagedOverTickCount * timeStep
+
+        avg -= (avg / averagedOverTickCount) * timeStep
         avg += dataPoint / timeStep / averagedOverTickCount
 
         return roundTo(avg, precision)

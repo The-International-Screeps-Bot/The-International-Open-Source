@@ -174,7 +174,7 @@ export class RemoteHarvester extends Creep {
 
                 // The smaller of the source path length or the creep's remaining lifetime
                 const creditLifetime = Math.min(
-                    remoteMemory[this.commune.communeManager.remoteSourcePathType].length /
+                    remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths].length /
                         packedPosLength,
                     this.ticksToLive,
                 )
@@ -278,7 +278,7 @@ export class RemoteHarvester extends Creep {
             // Give our energy to the container so it doesn't drop on the ground
 
             if (
-                getRange(this.pos, container.pos) === 0 &&
+                getRange(this.pos, container.pos) === 1 &&
                 this.store.getFreeCapacity() <= this.parts.work
             ) {
                 this.transfer(container, RESOURCE_ENERGY)

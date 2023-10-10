@@ -301,7 +301,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     let path: RoomPosition[]
     if (this.spawning) path = []
 
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.creeps[this.name] || Memory.powerCreeps[this.name]
 
     // If there is a path in the creep's memory and it isn't spawning
 
@@ -734,7 +734,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if ((creepAtPos as Creep).fatigue > 0) {
         this.moved = 'wait'
 
-        delete room.moveRequests[this.moved]
+        /* delete room.moveRequests[this.moved] */
         delete this.moveRequest
         return
     }
@@ -971,6 +971,29 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                     })
 
             return
+        }
+
+        if (creepAtPos.actionCoord) {
+            // No point in swapping to get to the same target
+            if (this.actionCoord && areCoordsEqual(this.actionCoord, creepAtPos.actionCoord)) {
+                delete this.moveRequest
+                return
+            }
+
+            // If swapping will get it closer or equal range to its actionCoord
+            if (
+                getRange(this.pos, creepAtPos.actionCoord) <=
+                getRange(creepAtPos.pos, creepAtPos.actionCoord)
+            ) {
+                // Run creep's moveRequest, trading places with creepAtPos
+
+                this.runMoveRequest()
+
+                creepAtPos.moveRequest = packedCoord
+                room.moveRequests[packedCoord] = [creepAtPos.name]
+                creepAtPos.runMoveRequest()
+                return
+            }
         }
 
         creepAtPos.recurseMoveRequest(queue)

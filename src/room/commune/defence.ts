@@ -6,6 +6,7 @@ import {
     impassibleStructureTypesSet,
     ourImpassibleStructuresSet,
     PlayerMemoryKeys,
+    Result,
     roomDimensions,
     RoomMemoryKeys,
     safemodeTargets,
@@ -162,7 +163,7 @@ export class DefenceManager {
                 enemyCreep.combatStrength.melee ||
                 enemyCreep.combatStrength.dismantle
             )
-                return 'stop'
+                return Result.stop
 
             return true
         })
@@ -201,10 +202,10 @@ export class DefenceManager {
                 const enemyCreep = findObjectWithID(enemyCreepID)
                 if (isAlly(enemyCreep.name)) return true
                 // We only need to protect our controller from claim creeps
-                if (enemyCreep.parts.claim) return 'stop'
+                if (!enemyCreep.parts.claim) return true
 
                 // We identified an enemy claimed near our controller!
-                return true
+                return Result.stop
             },
         )
 
@@ -331,17 +332,24 @@ export class DefenceManager {
 
         if (!room.towerInferiority) return
 
+        const hasTowers = !!room.roomManager.structures.tower.length
+
         let onlyInvader = true
         let minDamage = 0
         let minMeleeHeal = 0
         let minRangedHeal = 0
 
         for (const enemyCreep of room.roomManager.enemyAttackers) {
-            minDamage += Math.max(enemyCreep.combatStrength.heal, Math.ceil(enemyCreep.hits / 50))
+
+            if (enemyCreep.owner.username === 'Invader') {
+                // If we have towers, don't care about the invader
+                if (hasTowers) continue
+            }
+            else onlyInvader = false
+
+            minDamage += Math.max(enemyCreep.combatStrength.heal * 1.2, Math.ceil(enemyCreep.hits / 50))
             minMeleeHeal += enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged
             minRangedHeal += enemyCreep.combatStrength.ranged
-
-            if (onlyInvader && enemyCreep.owner.username !== 'Invader') onlyInvader = false
         }
 
         // If we have towers and it's only invaders, we don't need a defence request

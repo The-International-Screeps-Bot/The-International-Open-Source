@@ -2087,7 +2087,7 @@ export class CommunePlanner {
                 this.roadCoords[packAsNum(coord)] = 255
 
                 coord = structureCoords[0]
-                this.setBasePlansXY(coord.x, coord.y, STRUCTURE_FACTORY, 7)
+                // this.setBasePlansXY(coord.x, coord.y, STRUCTURE_FACTORY, 7)
                 this.baseCoords[packAsNum(coord)] = 255
                 this.roadCoords[packAsNum(coord)] = 255
 

@@ -1009,7 +1009,7 @@ export class Quad {
     get combatStrength() {
         if (this._combatStrength) return this._combatStrength
 
-        this._combatStrength = {
+        const combatStrength = {
             dismantle: 0,
             melee: 0,
             ranged: 0,
@@ -1017,14 +1017,17 @@ export class Quad {
         }
 
         for (const member of this.members) {
-            for (const key in this._combatStrength) {
+
+            const memberCombatStrength = member.combatStrength
+
+            for (const key in combatStrength) {
                 const combatType = key as keyof CombatStrength
 
-                this._combatStrength[combatType] = member.combatStrength[combatType]
+                combatStrength[combatType] += memberCombatStrength[combatType]
             }
         }
 
-        return this._combatStrength
+        return this._combatStrength = combatStrength
     }
 
     _defenceStrength: number

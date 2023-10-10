@@ -38,6 +38,7 @@ import {
     CreateRoomLogisticsRequestArgs,
 } from 'types/roomRequests'
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
+import { StatsMemory } from 'types/stats'
 
 declare global {
     interface ProfilerData {
@@ -351,7 +352,7 @@ declare global {
 
         nukeRequests: { [roomName: string]: Partial<NukeRequest> }
 
-        stats: Partial<Stats>
+        stats: Partial<StatsMemory>
 
         players: { [playerName: string]: Partial<PlayerMemory> }
 
@@ -1434,7 +1435,7 @@ declare global {
         [CreepMemoryKeys.targetID]: Id<Structure | Creep | PowerCreep | Tombstone | Ruin>
     }
 
-    interface PowerCreepMemory {
+    interface PowerCreepMemory extends CreepMemory {
         [PowerCreepMemoryKeys.commune]: string
         [PowerCreepMemoryKeys.task]: keyof Operator
         [PowerCreepMemoryKeys.taskTarget]: Id<Structure | Source>

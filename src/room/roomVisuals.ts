@@ -471,9 +471,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyResourceRequestsDataVisuals(y: number) {
-
         if (!simpleAllies.allySegmentData) {
-
             return y
         }
 
@@ -526,9 +524,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyCombatRequestsDataVisuals(y: number) {
-
         if (!simpleAllies.allySegmentData) {
-
             return y
         }
 
@@ -585,9 +581,7 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyWorkRequestsDataVisuals(y: number) {
-
         if (!simpleAllies.allySegmentData) {
-
             return y
         }
 
@@ -778,7 +772,7 @@ export class RoomVisualsManager {
             if (remoteMemory[RoomMemoryKeys.commune] !== this.roomManager.room.name) continue
 
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
-            const pathType = this.roomManager.room.communeManager.remoteSourcePathType
+            const pathType = this.roomManager.room.communeManager.remoteResourcePathType
             const row: any[] = []
 
             row.push(remoteName)

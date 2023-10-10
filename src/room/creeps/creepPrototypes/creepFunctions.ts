@@ -261,7 +261,7 @@ Creep.prototype.advancedUpgradeController = function () {
         const upgradePos = this.room.roomManager.upgradePositions.find(
             pos =>
                 arePositionsEqual(this.pos, pos) &&
-                this.room.roomManager.reservedCoords.has(packCoord(pos)) === undefined,
+                !this.room.roomManager.reservedCoords.has(packCoord(pos))
         )
         if (!upgradePos) {
             const upgradePos = this.findUpgradePos()

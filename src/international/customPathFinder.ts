@@ -1,6 +1,7 @@
 import { BasePlans } from 'room/construction/basePlans'
 import {
     CreepMemoryKeys,
+    RemoteResourcePathTypes,
     ReservedCoordTypes,
     Result,
     RoomMemoryKeys,
@@ -88,7 +89,10 @@ export interface CustomPathFinderArgs {
      */
     myRampartWeight?: number
 
-    weightStructurePlans?: boolean
+    weightCommuneStructurePlans?: boolean
+    weightRemoteStructurePlans?: {
+        remoteResourcePathType: RemoteResourcePathTypes
+    }
 
     minReservedCoordType?: ReservedCoordTypes
 }
@@ -171,7 +175,7 @@ function generateRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>
 }
 
 function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
-    if (!args.weightStructurePlans) return
+    if (!args.weightCommuneStructurePlans) return
 
     if (!args.weightCoords) args.weightCoords = {}
 
@@ -186,8 +190,9 @@ function weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<
 }
 
 function weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: string) {
-    const roomMemory = Memory.rooms[roomName]
+    if (!args.weightCommuneStructurePlans) return false
 
+    const roomMemory = Memory.rooms[roomName]
     if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return false
 
     const room = Game.rooms[roomName]
@@ -260,10 +265,12 @@ function weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: strin
 }
 
 function weightRemoteStructurePlans(args: CustomPathFinderArgs, roomName: string) {
-    const roomMemory = Memory.rooms[roomName]
+    if (!args.weightRemoteStructurePlans.remoteResourcePathType) return false
 
+    const roomMemory = Memory.rooms[roomName]
     if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
-    for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
+
+    for (const packedPath of roomMemory[args.weightRemoteStructurePlans.remoteResourcePathType]) {
         const path = unpackPosList(packedPath)
 
         for (const pos of path) {
@@ -274,8 +281,8 @@ function weightRemoteStructurePlans(args: CustomPathFinderArgs, roomName: string
 
     // Prefer to avoid the best source harvest pos
     for (const packedPositions of roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions]) {
-        const positions = unpackPosList(packedPositions)
-        const packedCoord = packCoord(positions[positions.length - 1])
+        const pos = unpackPosAt(packedPositions, 0)
+        const packedCoord = packCoord(pos)
 
         const currentWeight = args.weightCoords[roomName][packedCoord] || 0
         args.weightCoords[roomName][packedCoord] = Math.max(20, currentWeight)
@@ -387,7 +394,6 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
             if (args.creep) {
-
                 const creepMemory = Memory.creeps[args.creep.name]
                 if (
                     (!creepMemory[CreepMemoryKeys.squadMembers] ||
@@ -454,12 +460,9 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             }
 
             if (args.avoidKeeperLairs) {
-
                 if (roomMemory[RoomMemoryKeys.type] === RoomTypes.sourceKeeper) {
-
                     const lairCoords = unpackCoordList(roomMemory[RoomMemoryKeys.keeperLairCoords])
                     for (const lairCoord of lairCoords) {
-
                         forCoordsAroundRange(lairCoord, 4, coord => {
                             costs.set(coord.x, coord.y, 255)
                         })

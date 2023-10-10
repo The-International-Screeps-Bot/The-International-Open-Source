@@ -24,6 +24,7 @@ import {
     packedPosLength,
     maxRemotePathDistance,
     RoomLogisticsRequestTypes,
+    remoteRoles,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -415,6 +416,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
         }
 
+        scoutingRoom.creepsOfRemote[this.name] = {}
+        for (const role of remoteRoles) scoutingRoom.creepsOfRemote[this.name][role] = []
+
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
         roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
@@ -512,6 +516,9 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
     }
 
+    scoutingRoom.creepsOfRemote[this.name] = {}
+    for (const role of remoteRoles) scoutingRoom.creepsOfRemote[this.name][role] = []
+
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
     roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
@@ -589,13 +596,7 @@ Room.prototype.scoutEnemyRoom = function () {
     )
 
     // Combat request creation
-
-    this.createAttackCombatRequest({
-        [CombatRequestKeys.maxTowerDamage]: Math.ceil(
-            this.roomManager.structures.tower.length * TOWER_POWER_ATTACK * 1.1,
-        ),
-        [CombatRequestKeys.minDamage]: 50,
-    })
+    this.createAttackCombatRequest()
 
     roomMemory[RoomMemoryKeys.type] = RoomTypes.enemy
     return roomMemory[RoomMemoryKeys.type]
@@ -703,11 +704,16 @@ Room.prototype.createAttackCombatRequest = function (opts) {
         )
     )
         return
-    if (global.settings.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
+
+    if (global.settings.nonAggressionPlayers.includes(Memory.rooms[RoomMemoryKeys.owner])) return
 
     request = Memory.combatRequests[this.name] = {
         [CombatRequestKeys.type]: 'attack',
     }
+
+    request[CombatRequestKeys.maxTowerDamage] = Math.ceil(
+        this.roomManager.structures.tower.length * TOWER_POWER_ATTACK * 1.1,
+    )
 
     request[CombatRequestKeys.minDamage] = 10
     request[CombatRequestKeys.minMeleeHeal] = 10
@@ -782,14 +788,16 @@ Room.prototype.createDefendCombatRequest = function (opts) {
         5000 + Math.floor(Math.random() * 5000),
     )
 
+    const enemySquadData = this.roomManager.enemySquadData
+
+    request[CombatRequestKeys.minRangedHeal] = Math.max(enemySquadData.highestRangedDamage, 1)
+    request[CombatRequestKeys.minMeleeHeal] = Math.max(enemySquadData.highestMeleeDamage, 1)
+    request[CombatRequestKeys.minDamage] = enemySquadData.highestHeal * 1.2
+
     if (opts) {
         Object.assign(request, opts)
         return
     }
-
-    request[CombatRequestKeys.minDamage] = 40
-    request[CombatRequestKeys.minMeleeHeal] = 10
-    request[CombatRequestKeys.minRangedHeal] = 10
 }
 
 Room.prototype.distanceTransform = function (

@@ -155,6 +155,7 @@ export class RoomManager {
         delete this._myDamagedCreeps
         delete this._myDamagedPowerCreeps
         delete this._allyDamagedCreeps
+        this._enemyCreepPositions = undefined
         delete this._notMyConstructionSites
         delete this._allyConstructionSitesByType
         delete this._dismantleTargets
@@ -208,7 +209,7 @@ export class RoomManager {
 
         const roomType = roomMemory[RoomMemoryKeys.type]
         if (roomTypesUsedForStats.includes(roomType)) {
-            statsManager.roomPreTick(room.name, roomType)
+            statsManager.roomInitialRun(room.name, roomType)
         }
 
         room.moveRequests = {}
@@ -377,8 +378,10 @@ export class RoomManager {
                 goals: [{ pos: anchor, range: 3 }],
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
-                weightStructurePlans: true,
-                avoidStationaryPositions: true,
+                weightCommuneStructurePlans: true,
+                weightRemoteStructurePlans: {
+                    remoteResourcePathType: commune.communeManager.remoteResourcePathType,
+                },
             })
 
             for (const pos of path) {
@@ -405,22 +408,33 @@ export class RoomManager {
         const stampAnchors = commune.roomManager.stampAnchors
         if (!stampAnchors) throw Error('no stampAnchors for ' + commune.name)
 
-        const hubAnchor = new RoomPosition(
-            stampAnchors.hub[0].x,
-            stampAnchors.hub[0].y,
-            commune.name,
-        )
+        let goalPos: RoomPosition
+        const basePlans = this.basePlans
+
+        forAdjacentCoords(stampAnchors.hub[0], coord => {
+            const planData = basePlans.get(packCoord(coord))
+            for (const plan of planData) {
+                if (plan.structureType !== STRUCTURE_STORAGE) continue
+
+                goalPos = new RoomPosition(coord.x, coord.y, this.room.name)
+            }
+        })
+
+        basePlans.get(packCoord(stampAnchors.hub[0]))
+
         const sourcePaths: RoomPosition[][] = []
 
         for (const positions of packedRemoteSourceHarvestPositions) {
             const origin = unpackPosAt(positions, 0)
             const path = customFindPath({
                 origin,
-                goals: [{ pos: hubAnchor, range: 1 }],
+                goals: [{ pos: goalPos, range: 1 }],
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
-                weightStructurePlans: true,
-                avoidStationaryPositions: true,
+                weightCommuneStructurePlans: true,
+                weightRemoteStructurePlans: {
+                    remoteResourcePathType: commune.communeManager.remoteResourcePathType,
+                },
             })
 
             for (const pos of path) {
@@ -484,8 +498,10 @@ export class RoomManager {
             goals: [{ pos: anchor, range: 3 }],
             typeWeights: remoteTypeWeights,
             plainCost: defaultRoadPlanningPlainCost,
-            weightStructurePlans: true,
-            avoidStationaryPositions: true,
+            weightCommuneStructurePlans: true,
+            weightRemoteStructurePlans: {
+                remoteResourcePathType: commune.communeManager.remoteResourcePathType,
+            },
         })
 
         for (const pos of path) {
@@ -734,13 +750,16 @@ export class RoomManager {
                 }).length,
         )
 
+        /*
         // Make the closest pos the last to be chosen
-
-        positions.push(positions.shift())
+        positions.push(positions.shift()) */
 
         // Make the center pos the first to be chosen (we want upgraders to stand on the container)
         const controllerLink = this.room.communeManager.controllerLink
-        if (!controllerLink || !controllerLink.RCLActionable) positions.unshift(centerUpgradePos)
+        if (!controllerLink) {
+            positions.shift()
+            positions.unshift(centerUpgradePos)
+        }
 
         return (this._upgradePositions = positions)
     }
@@ -927,9 +946,8 @@ export class RoomManager {
         const communeManager = this.room.communeManager
         if (communeManager) {
             communeManager.spawningStructuresByPriorityIDs = undefined
-            communeManager.spawningStructuresByNeedIDs = undefined
             communeManager._fastFillerSpawnEnergyCapacity = undefined
-            communeManager.sourceLinkIDs = undefined
+            communeManager.sourceLinkIDs = []
         }
 
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
@@ -1433,7 +1451,7 @@ export class RoomManager {
     get remoteNamesByEfficacy() {
         if (this._remoteNamesByEfficacy) return this._remoteNamesByEfficacy
 
-        const pathType = this.room.communeManager.remoteSourcePathType
+        const pathType = this.room.communeManager.remoteResourcePathType
 
         // Filter rooms that have some sourceEfficacies recorded
 
@@ -1443,14 +1461,11 @@ export class RoomManager {
             },
         )
 
-        // Sort the remotes based on the average source efficacy
-
-        return remoteNamesByEfficacy.sort(function (a1, b1) {
+        // Sort the remotes based on lowest source efficacy
+        return remoteNamesByEfficacy.sort(function (roomName1, roomName2) {
             return (
-                Memory.rooms[a1][pathType].reduce((a2, b2) => a2 + b2.length, 0) /
-                    Memory.rooms[a1][pathType].length -
-                Memory.rooms[b1][pathType].reduce((a2, b2) => a2 + b2.length, 0) /
-                    Memory.rooms[b1][pathType].length
+                Math.min(...Memory.rooms[roomName1][pathType].map(packedPath => packedPath.length)) -
+                Math.min(...Memory.rooms[roomName2][pathType].map(packedPath => packedPath.length))
             )
         })
     }
@@ -1476,17 +1491,28 @@ export class RoomManager {
             }
         }
 
+        const pathType = this.room.communeManager.remoteResourcePathType
+
+        // If we can do reserving, prefer rooms with more efficient reserving and utility
+        if (this.room.energyCapacityAvailable >= BODYPART_COST[CLAIM] + BODYPART_COST[MOVE]) {
+
+            let score = 0
+
+            // associate score for source with accompaning costs
+
+            // prefer based on rough energy / tick
+            // reserver cost is 650 / claimer lifetime - real path distance / source count
+            //
+
+        }
+
         return remoteSourceIndexesByEfficacy.sort(function (a, b) {
             const aSplit = a.split(' ')
             const bSplit = b.split(' ')
 
             return (
-                Memory.rooms[aSplit[0]][RoomMemoryKeys.remoteSourceFastFillerPaths][
-                    parseInt(aSplit[1])
-                ].length -
-                Memory.rooms[bSplit[0]][RoomMemoryKeys.remoteSourceFastFillerPaths][
-                    parseInt(bSplit[1])
-                ].length
+                Memory.rooms[aSplit[0]][pathType][parseInt(aSplit[1])].length -
+                Memory.rooms[bSplit[0]][pathType][parseInt(bSplit[1])].length
             )
         })
     }

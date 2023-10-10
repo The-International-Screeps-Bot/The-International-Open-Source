@@ -13,6 +13,7 @@ import {
     RoomMemoryKeys,
     RoomTypes,
     PlayerMemoryKeys,
+    CPUMaxPerTick,
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
 import { debugUtils } from 'debug/debugUtils'
@@ -848,7 +849,9 @@ export function isAlly(playerName: string) {
 }
 
 export function outOfBucket() {
-    Memory.stats.lastTick = Game.time
+
+    Memory.stats.cpu.usage = CPUMaxPerTick
+
     collectiveManager.logs = ''
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
         type: LogTypes.warning,
