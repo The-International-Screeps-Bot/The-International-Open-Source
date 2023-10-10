@@ -372,10 +372,10 @@ export class StatsManager {
 
         // If the code wasn't ran or was properly ran last tick, assign cpu as normal. Otherwise assume we ran out of cpu
         let usedCPU =
-            Memory.stats.lastTick === undefined || Memory.stats.lastTick + 1 === Game.time
+            Memory.stats.lastTick + 1 >= Game.time
                 ? Game.cpu.getUsed()
-                // limit * time step from last stats recording
-                : Game.cpu.limit * (Game.time - Memory.stats.lastTick)
+                : // limit * time step from last stats recording
+                  Game.cpu.limit * (Game.time - Memory.stats.lastTick)
 
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
