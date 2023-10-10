@@ -374,7 +374,8 @@ export class StatsManager {
         let usedCPU =
             Memory.stats.lastTick === undefined || Memory.stats.lastTick + 1 === Game.time
                 ? Game.cpu.getUsed()
-                : Game.cpu.limit
+                // limit * time step from last stats recording
+                : Game.cpu.limit * (Game.time - Memory.stats.lastTick)
 
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
@@ -397,6 +398,7 @@ export class StatsManager {
         if (!avg) avg = 0
         if (!dataPoint) dataPoint = 0
 
+        // time step from last stats recording
         const timeStep = Game.time - Memory.stats.lastTick
 
         avg -= (avg / averagedOverTickCount) * timeStep
