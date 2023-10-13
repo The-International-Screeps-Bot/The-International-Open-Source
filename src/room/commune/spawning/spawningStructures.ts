@@ -203,7 +203,7 @@ export class SpawningStructuresManager {
 
         request.body = []
 
-        if (request.role === 'hauler' || request.role === 'remoteHauler') {
+        if (request.role === 'hauler') {
             const ratio =
                 (request.bodyPartCounts[CARRY] + request.bodyPartCounts[WORK]) /
                 request.bodyPartCounts[MOVE]

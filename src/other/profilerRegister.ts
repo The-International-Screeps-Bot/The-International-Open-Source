@@ -26,6 +26,11 @@ import { simpleAllies } from 'international/simpleAllies'
 import { PlayerManager } from 'international/players'
 import { customFindPath } from 'international/customPathFinder'
 import { flagManager } from 'international/flags'
+import { roomUtils } from 'room/roomUtils'
+import { creepUtils } from 'room/creeps/creepUtils'
+import { debugUtils } from 'debug/debugUtils'
+import { spawnUtils } from 'room/commune/spawning/spawnUtils'
+import { marketUtils } from 'room/commune/terminal/marketUtils'
 
 // Classes
 
@@ -54,7 +59,12 @@ profiler.registerClass(PlayerManager, 'PlayerManager')
 profiler.registerObject(creepOrganizer, 'creepOrganizer')
 profiler.registerObject(requestsManager, 'requestsManager')
 profiler.registerObject(simpleAllies, 'simpleAllies')
-profiler.registerFN(flagManager, 'flagManager')
+profiler.registerObject(flagManager, 'flagManager')
+profiler.registerObject(roomUtils, 'roomUtils')
+profiler.registerObject(creepUtils, 'creepUtils')
+profiler.registerObject(debugUtils, 'debugUtils')
+profiler.registerObject(spawnUtils, 'spawnUtils')
+profiler.registerObject(marketUtils, 'marketUtils')
 
 // Functions
 

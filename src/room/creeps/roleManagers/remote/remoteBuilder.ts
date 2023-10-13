@@ -15,7 +15,6 @@ import {
     areCoordsEqual,
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
-import { RemoteHauler } from './remoteHauler'
 import { indexOf } from 'lodash'
 
 export class RemoteBuilder extends Creep {

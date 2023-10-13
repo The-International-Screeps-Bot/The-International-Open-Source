@@ -4,7 +4,6 @@ import {
     containerUpkeepCost,
     customColors,
     rampartUpkeepCost,
-    RemoteHarvesterRolesBySourceIndex,
     roadUpkeepCost,
     packedPosLength,
     decayCosts,
@@ -338,7 +337,6 @@ export class SpawnRequestsManager {
 
                 let totalFastFillerEnergy = 0
                 for (const container of this.communeManager.room.roomManager.fastFillerContainers) {
-
                     totalFastFillerEnergy += container.store.energy
                 }
 
@@ -585,10 +583,8 @@ export class SpawnRequestsManager {
                         (REPAIR_POWER * 0.3)
                 }
 
-                customLog('e', partsMultiplier)
+                /* customLog('e', partsMultiplier) */
                 const role = 'maintainer'
-
-                // If all RCL 3 extensions are build
 
                 if (this.communeManager.hasSufficientRoads) {
                     return {
@@ -726,9 +722,7 @@ export class SpawnRequestsManager {
 
                 // There are no fastFiller containers
 
-                if (
-                    !this.communeManager.room.roomManager.fastFillerContainers.length
-                ) {
+                if (!this.communeManager.room.roomManager.fastFillerContainers.length) {
                     return {
                         role,
                         defaultParts: [],
@@ -1172,13 +1166,13 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    const role = 'remoteHauler'
+                    const role = 'hauler'
 
                     const partsMultiplier =
-                        remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] -
+                        remoteMemory[RoomMemoryKeys.haulers][sourceIndex] -
                         this.communeManager.haulerCarryParts
                     this.communeManager.haulerCarryParts -=
-                        remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
+                        remoteMemory[RoomMemoryKeys.haulers][sourceIndex]
                     if (partsMultiplier <= 0) return false
 
                     this.activeRemotePriority = Math.max(
@@ -1246,7 +1240,7 @@ export class SpawnRequestsManager {
 
             const totalRemoteNeed =
                 Math.max(remoteMemory[RoomMemoryKeys.remoteBuilder], 0) +
-                Math.max(remoteMemory[RoomMemoryKeys.remoteReserver], 0) +
+                Math.max(remoteMemory[RoomMemoryKeys.remoteReservers], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteCoreAttacker], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteDismantler], 0)
 
@@ -1299,7 +1293,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     // If there are no data for this.communeManager.room this.communeManager.room, inform false
 
-                    if (remoteMemory[RoomMemoryKeys.remoteReserver] <= 0) return false
+                    if (remoteMemory[RoomMemoryKeys.remoteReservers] <= 0) return false
 
                     let cost = 650
 
@@ -1324,7 +1318,7 @@ export class SpawnRequestsManager {
                         role: 'remoteReserver',
                         defaultParts: [],
                         extraParts: [MOVE, CLAIM],
-                        partsMultiplier: remoteMemory[RoomMemoryKeys.remoteReserver],
+                        partsMultiplier: remoteMemory[RoomMemoryKeys.remoteReservers],
                         spawnGroup:
                             this.communeManager.room.creepsOfRemote[remoteName].remoteReserver,
                         maxCreeps:

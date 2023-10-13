@@ -81,7 +81,7 @@ export class RemoteReserver extends Creep {
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
-            if (remoteMemory[RoomMemoryKeys.remoteReserver] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys.remoteReservers] <= 0) continue
 
             this.assignRemote(remoteName)
             return true
@@ -120,7 +120,7 @@ export class RemoteReserver extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteReserver] -=
+        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteReservers] -=
             this.parts.claim
     }
 

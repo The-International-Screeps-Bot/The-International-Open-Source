@@ -269,8 +269,8 @@ export enum RoomMemoryKeys {
     commune,
     maxSourceIncome,
     remoteSourceHarvesters,
-    remoteHaulers,
-    remoteReserver,
+    haulers,
+    remoteReservers,
     remoteCoreAttacker,
     remoteBuilder,
     remoteDismantler,
@@ -437,7 +437,6 @@ export const creepRoles: CreepRoles[] = [
     'meleeDefender',
     'rangedDefender',
     'remoteSourceHarvester',
-    'remoteHauler',
     'remoteReserver',
     'remoteDefender',
     'remoteCoreAttacker',
@@ -464,7 +463,6 @@ export const roomLogisticsRoles: Set<CreepRoles> = new Set([
     'maintainer',
     'controllerUpgrader',
     'remoteSourceHarvester',
-    'remoteHauler',
     'hubHauler',
     'allyVanguard',
 ])
@@ -488,7 +486,6 @@ export const powerCreepClassNames: PowerClassConstant[] = ['operator']
  * Which role gets priority in which circumstance. Lowest to highest
  */
 export enum TrafficPriorities {
-    remoteHauler,
     hauler,
     requestHauler,
     scout,
@@ -1287,24 +1284,13 @@ export const antifaRoles: (
 /**
  * Roles for which to provide spawnGroups for based on their shared remoteName
  */
-export const remoteRoles: /* | 'remoteSourceHarvester' */
+export const remoteRoles:
 ('remoteReserver' | 'remoteDefender' | 'remoteCoreAttacker' | 'remoteDismantler')[] = [
-    /* 'remoteSourceHarvester', */
     'remoteReserver',
     'remoteDefender',
     'remoteCoreAttacker',
     'remoteDismantler',
 ]
-
-export enum RemoteHarvesterRolesBySourceIndex {
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
-}
-
-export enum RemoteHaulerRolesBySourceIndex {
-    remoteHauler0,
-    remoteHauler1,
-}
 
 export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
@@ -1312,7 +1298,7 @@ export const CPUMaxPerTick = 500
 /**
  * Roles that should attempt relaying
  */
-export const relayRoles: Set<CreepRoles> = new Set(['hauler', 'remoteHauler'])
+export const relayRoles: Set<CreepRoles> = new Set(['hauler'])
 
 /**
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests

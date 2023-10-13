@@ -43,12 +43,12 @@ export class RemotesManager {
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
                 remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][i] = 0
-                remoteMemory[RoomMemoryKeys.remoteHaulers][i] = 0
+                remoteMemory[RoomMemoryKeys.haulers][i] = 0
 
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][i] = 0
                 remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][i] = 0
             }
-            remoteMemory[RoomMemoryKeys.remoteReserver] = 0
+            remoteMemory[RoomMemoryKeys.remoteReservers] = 0
 
             // If the room isn't a remote, remove it from the remotes array
 
@@ -89,7 +89,7 @@ export class RemotesManager {
                 remoteMemory[RoomMemoryKeys.maxSourceIncome][i] =
                     SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME
             }
-            remoteMemory[RoomMemoryKeys.remoteReserver] = 5
+            remoteMemory[RoomMemoryKeys.remoteReservers] = 5
 
             // Get the remote
 
@@ -122,7 +122,7 @@ export class RemotesManager {
                             500,
                         )
                 ) {
-                    remoteMemory[RoomMemoryKeys.remoteReserver] = 0
+                    remoteMemory[RoomMemoryKeys.remoteReservers] = 0
                 }
             }
 
@@ -240,7 +240,7 @@ export class RemotesManager {
                 for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
                 }
-                remoteMemory[RoomMemoryKeys.remoteReserver] = 0
+                remoteMemory[RoomMemoryKeys.remoteReservers] = 0
             }
         }
     }
@@ -278,7 +278,7 @@ export class RemotesManager {
 
                 // Find the number of carry parts required for the source, and add it to the remoteHauler need
 
-                remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex] += findCarryPartsRequired(
+                remoteMemory[RoomMemoryKeys.haulers][sourceIndex] += findCarryPartsRequired(
                     (remoteMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex].length /
                         packedPosLength) *
                         2,

@@ -132,9 +132,13 @@ export class CommuneManager {
      */
     remoteSourceHarvesters: { [remote: string]: string[][] }
     /**
-     * The total amount of carry parts for hauler and remoteHaulers
+     * The total amount of carry parts for haulers
      */
     haulerCarryParts: number
+    /**
+     * The total amount of carry parts for haulers presently responding to requests in the commune
+     */
+    communeHaulerCarryParts: number
     towerAttackTarget: Creep
     /**
      * Arguments for construction spawn requests. Defined by the spawnRequest manager on run().
@@ -250,6 +254,7 @@ export class CommuneManager {
 
         room.creepsOfRemote = {}
         this.haulerCarryParts = 0
+        this.communeHaulerCarryParts = 0
         this.remoteSourceHarvesters = {}
 
         for (let index = roomMemory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {

@@ -40,8 +40,6 @@ export class SourceHarvester extends Creep {
         )
             return false
 
-        // Record creep as isDying
-
         return true
     }
 

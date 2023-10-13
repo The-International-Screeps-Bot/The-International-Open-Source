@@ -394,7 +394,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         roomMemory[RoomMemoryKeys.maxSourceIncome] = []
         roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
-        roomMemory[RoomMemoryKeys.remoteHaulers] = []
+        roomMemory[RoomMemoryKeys.haulers] = []
         roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
         roomMemory[RoomMemoryKeys.hasContainer] = []
         roomMemory[RoomMemoryKeys.disableSources] = []
@@ -412,7 +412,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         scoutingRoom.communeManager.remoteSourceHarvesters[this.name] = []
         for (const i in packedRemoteSources) {
-
             scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
         }
 
@@ -494,7 +493,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     roomMemory[RoomMemoryKeys.maxSourceIncome] = []
     roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
-    roomMemory[RoomMemoryKeys.remoteHaulers] = []
+    roomMemory[RoomMemoryKeys.haulers] = []
     roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
     roomMemory[RoomMemoryKeys.hasContainer] = []
     roomMemory[RoomMemoryKeys.disableSources] = []
@@ -512,7 +511,6 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     scoutingRoom.communeManager.remoteSourceHarvesters[this.name] = []
     for (const i in packedRemoteSources) {
-
         scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
     }
 

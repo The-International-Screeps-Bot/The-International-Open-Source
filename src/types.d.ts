@@ -167,7 +167,6 @@ declare global {
         | 'meleeDefender'
         | 'rangedDefender'
         | 'remoteSourceHarvester'
-        | 'remoteHauler'
         | 'remoteReserver'
         | 'remoteDefender'
         | 'remoteCoreAttacker'
@@ -1345,8 +1344,8 @@ declare global {
         [RoomMemoryKeys.commune]: string
         [RoomMemoryKeys.maxSourceIncome]: number[]
         [RoomMemoryKeys.remoteSourceHarvesters]: number[]
-        [RoomMemoryKeys.remoteHaulers]: number[]
-        [RoomMemoryKeys.remoteReserver]: number
+        [RoomMemoryKeys.haulers]: number[]
+        [RoomMemoryKeys.remoteReservers]: number
         [RoomMemoryKeys.remoteCoreAttacker]: number
         [RoomMemoryKeys.remoteBuilder]: number
         [RoomMemoryKeys.remoteDismantler]: number

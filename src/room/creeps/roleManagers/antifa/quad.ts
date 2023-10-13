@@ -201,6 +201,11 @@ export class Quad {
 
             const kiteResult = this.rangedKite()
             if (kiteResult === Result.action) return true
+            if (kiteResult === Result.stop) {
+
+                
+                return true
+            }
 
             this.advancedTransform()
 
@@ -980,7 +985,8 @@ export class Quad {
 
         if (stay) {
             this.leader.room.visual.text('stay', this.leader.pos)
-            return Result.action
+
+            return Result.stop
         }
 
         // There is no need to kite

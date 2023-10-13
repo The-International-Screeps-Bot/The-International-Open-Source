@@ -781,7 +781,7 @@ export class RoomVisualsManager {
                 row.push(remoteMemory[pathType][sourceIndex].length / packedPosLength)
             else row.push('unknown')
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
-            row.push(remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.haulers][sourceIndex])
             row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
             if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] !== undefined)
                 row.push(
@@ -797,7 +797,7 @@ export class RoomVisualsManager {
                     ) *
                         2,
             )
-            row.push(remoteMemory[RoomMemoryKeys.remoteReserver])
+            row.push(remoteMemory[RoomMemoryKeys.remoteReservers])
             row.push(
                 remoteMemory[RoomMemoryKeys.remoteCoreAttacker] ||
                     remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '',
