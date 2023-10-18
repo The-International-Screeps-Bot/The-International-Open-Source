@@ -72,6 +72,9 @@ export class CollectiveManager extends Sleepable {
      * Room names that have controllers we own
      */
     communes: Set<string>
+    communesForWorkRequests: Set<string>
+    communesForCombatRequests: Set<string>
+    communesForHaulRequests: Set<string>
 
     /**
      * Updates values to be present for this tick
@@ -98,6 +101,9 @@ export class CollectiveManager extends Sleepable {
         this.creepCount = 0
         this.powerCreepCount = 0
         this.communes = new Set()
+        this.communesForWorkRequests = new Set()
+        this.communesForCombatRequests = new Set()
+        this.communesForHaulRequests = new Set()
 
         // delete
 

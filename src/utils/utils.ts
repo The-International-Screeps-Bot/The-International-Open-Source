@@ -501,7 +501,7 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
     return undefined
 }
 
-export function findClosestRoomName(start: string, targets: string[]) {
+export function findClosestRoomName(start: string, targets: Iterable<string>) {
     let minRange = Infinity
     let closest = undefined
 
@@ -880,5 +880,5 @@ export function getMe() {
 }
 
 export const utils = {
-    
+
 }

@@ -28,12 +28,13 @@ export class RequestsManager {
         // Subtract the number of workRequests with responders
 
         for (const roomName in Memory.workRequests) {
-            if (!Memory.workRequests[roomName][WorkRequestKeys.responder]) continue
+            const request = Memory.workRequests[roomName]
+            if (!request[WorkRequestKeys.responder]) continue
 
             reservedGCL -= 1
         }
 
-        const communesForResponding = []
+        const communesForResponding = new Set<string>()
 
         for (const roomName of collectiveManager.communes) {
             if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) continue
@@ -43,7 +44,7 @@ export class RequestsManager {
             const room = Game.rooms[roomName]
             if (!room.roomManager.structures.spawn.length) continue
 
-            communesForResponding.push(roomName)
+            communesForResponding.add(roomName)
         }
 
         // Update dynamicScores if necessary
@@ -71,34 +72,37 @@ export class RequestsManager {
                 continue
             }
 
-            delete request[WorkRequestKeys.abandon]
+            request[WorkRequestKeys.abandon] = undefined
 
+            if (!global.settings.autoClaim) continue
+            // If there is not enough reserved GCL to make a new request
+            if (reservedGCL <= 0) continue
+            if (collectiveManager.communes.size >= collectiveManager.maxCommunes) continue
             if (
                 request[WorkRequestKeys.responder] &&
                 collectiveManager.communes.has(request[WorkRequestKeys.responder])
-            )
+            ) {
+
                 continue
-
-            if (!global.settings.autoClaim) continue
-
-            // If there is not enough reserved GCL to make a new request
-
-            if (reservedGCL <= 0) continue
-            if (collectiveManager.communes.size >= collectiveManager.maxCommunes) continue
+            }
 
             // If the requested room is no longer neutral
 
             const type = Memory.rooms[roomName][RoomMemoryKeys.type]
 
             if (type !== RoomTypes.neutral && type !== RoomTypes.commune) {
-                // Delete the request
-
+                // Wait on the request
                 Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
                 continue
             }
 
             const communeName = findClosestRoomName(roomName, communesForResponding)
-            if (!communeName) break
+            if (!communeName) {
+
+                // Wait on the request
+                Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
+                continue
+            }
 
             // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
 
@@ -123,7 +127,7 @@ export class RequestsManager {
 
             reservedGCL -= 1
 
-            communesForResponding.splice(indexOf(communesForResponding, communeName), 1)
+            communesForResponding.delete(communeName)
         }
     }
 
@@ -221,8 +225,10 @@ export class RequestsManager {
             request[CombatRequestKeys.responder] = communeName
 
             collectiveManager.creepsByCombatRequest[requestName] = {}
-            for (const role of antifaRoles)
+            for (const role of antifaRoles) {
+
                 collectiveManager.creepsByCombatRequest[requestName][role] = []
+            }
         }
     }
 
@@ -245,14 +251,13 @@ export class RequestsManager {
                 if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName))
                     continue
 
+
                 const room = Game.rooms[roomName]
+                if (room.controller.level < 4) continue
                 if (!room.roomManager.structures.spawn.length) continue
 
+                if (!room.communeManager.storingStructures.length) continue
                 // Ensure we aren't responding to too many requests for our energy level
-
-                if (room.controller.level < 4) continue
-                if (!room.storage) continue
-
                 if (
                     room.roomManager.resourcesInStoringStructures.energy /
                         (20000 + room.controller.level * 1000) <

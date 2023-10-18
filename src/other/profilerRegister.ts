@@ -60,6 +60,7 @@ import { BasePlans } from 'room/construction/basePlans'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { minCutToExit } from 'room/construction/minCut'
+import { FeatureFlagManager } from 'international/featureFlags'
 
 // Classes
 
@@ -71,6 +72,7 @@ profiler.registerClass(CreepOrganizer, 'CreepOrganizer')
 profiler.registerClass(PowerCreepOrganizer, 'PowerCreepOrganizer')
 profiler.registerClass(SimpleAllies, 'SimpleAllies')
 profiler.registerClass(FlagManager, 'FlagManager')
+profiler.registerClass(FeatureFlagManager, 'FeatureFlagManager')
 profiler.registerClass(MarketOrdersManager, 'MarketOrdersManager')
 profiler.registerClass(ConstructionManager, 'ConstructionSiteManager')
 profiler.registerClass(GarbageCollector, 'GarbageCollector')
