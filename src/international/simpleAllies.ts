@@ -108,7 +108,7 @@ export interface SegmentData {
     commands: any[]
 }
 
-class SimpleAllies {
+export class SimpleAllies {
     /**
      * The intra-tick index for tracking IDs assigned to requests
      */

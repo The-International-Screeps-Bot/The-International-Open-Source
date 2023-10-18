@@ -1,6 +1,7 @@
 import {
     CreepMemoryKeys,
     ReservedCoordTypes,
+    Result,
     RoomLogisticsRequestTypes,
     customColors,
     offsetsByDirection,
@@ -9,7 +10,7 @@ import {
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
-import { LogTypes, customLog } from 'utils/logging'
+import { LogTypes, customLog, stringifyLog } from 'utils/logging'
 import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
@@ -25,7 +26,6 @@ export class SpawningStructuresManager {
     inactiveSpawns: StructureSpawn[]
     activeSpawns: StructureSpawn[]
 
-    spawnRequests: SpawnRequest[]
     spawnIndex: number
 
     constructor(communeManager: CommuneManager) {
@@ -82,9 +82,6 @@ export class SpawningStructuresManager {
         this.visualizeRequests()
         this.test()
         this.runSpawning()
-
-        // Clear out potentially active and stale spawnRequests
-        this.spawnRequests = undefined
     }
 
     private runSpawning() {
@@ -93,26 +90,23 @@ export class SpawningStructuresManager {
             return
         }
 
-        // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
-        if (!this.communeManager.spawnRequestsArgs.length)
-            this.communeManager.spawnRequestsManager.run()
+        const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
 
         this.spawnIndex = this.inactiveSpawns.length - 1
 
-        for (const spawnRequestArgs of this.communeManager.spawnRequestsArgs) {
-            this.spawnRequests = []
-            this.constructSpawnRequests(spawnRequestArgs)
+        for (const spawnRequestArgs of spawnRequestsArgs) {
+
+            const spawnRequests = this.constructSpawnRequests(spawnRequestArgs)
 
             // Loop through priorities inside requestsByPriority
 
-            for (let i = 0; i < this.spawnRequests.length; i++) {
-                if (!this.runSpawnRequest(i)) return
+            for (const spawnRequest of spawnRequests) {
+                if (this.runSpawnRequest(spawnRequest) !== Result.success) return
             }
         }
     }
 
-    private runSpawnRequest(index: number): false | void {
-        const request = this.spawnRequests[index]
+    private runSpawnRequest(request: SpawnRequest): Result {
 
         // We're trying to build a creep larger than this room can spawn
         // If this is ran then there is a bug in spawnRequest creation
@@ -128,7 +122,7 @@ export class SpawningStructuresManager {
                 },
             )
 
-            return false
+            return Result.fail
         }
 
         if (request.cost > this.communeManager.nextSpawnEnergyAvailable) {
@@ -141,10 +135,10 @@ export class SpawningStructuresManager {
                     type: LogTypes.warning,
                 },
             )
-            return false
+            return Result.fail
         }
 
-        this.configSpawnRequest(index)
+        this.configSpawnRequest(request)
 
         // Try to find inactive spawn, if can't, stop the loop
 
@@ -168,7 +162,7 @@ export class SpawningStructuresManager {
                 },
             )
 
-            return false
+            return Result.fail
         }
 
         // Spawn the creep for real
@@ -185,7 +179,7 @@ export class SpawningStructuresManager {
                 },
             )
 
-            return false
+            return Result.fail
         }
 
         // Record in stats the costs
@@ -195,11 +189,13 @@ export class SpawningStructuresManager {
 
         // Record spawn usage and check if there is another spawn
         this.spawnIndex -= 1
-        if (this.spawnIndex < 0) return false
+        if (this.spawnIndex < 0) return Result.stop
+
+        // Otherwise we succeeded
+        return Result.success
     }
 
-    private configSpawnRequest(index: number) {
-        const request = this.spawnRequests[index]
+    private configSpawnRequest(request: SpawnRequest) {
 
         request.body = []
 
@@ -280,16 +276,14 @@ export class SpawningStructuresManager {
     }
 
     private constructSpawnRequests(args: SpawnRequestArgs) {
-        if (!args) return
 
         if (args.minCreeps !== undefined) {
             // We know how many creeps we want, do them seperately and uniformly
-            this.spawnRequestIndividually(args)
-            return
+            return this.spawnRequestIndividually(args)
         }
 
         // We don't know how many creeps we want
-        this.spawnRequestByGroup(args)
+        return this.spawnRequestByGroup(args)
     }
 
     private findMaxCostPerCreep(maxCostPerCreep: number) {
@@ -316,8 +310,8 @@ export class SpawningStructuresManager {
         tier: number,
         cost: number,
         memory: any,
-    ) {
-        this.spawnRequests.push({
+    ): SpawnRequest {
+        return {
             role,
             priority,
             defaultParts,
@@ -327,11 +321,11 @@ export class SpawningStructuresManager {
             extraOpts: {
                 memory,
             },
-        })
+        }
     }
 
     private spawnRequestIndividually(args: SpawnRequestArgs) {
-        // Get the maxCostPerCreep
+        const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
             this.findMaxCostPerCreep(args.maxCostPerCreep),
@@ -462,7 +456,7 @@ export class SpawningStructuresManager {
 
             // Create a spawnRequest using previously constructed information
 
-            this.createSpawnRequest(
+            const request = this.createSpawnRequest(
                 args.priority,
                 args.role,
                 args.defaultParts.length,
@@ -471,15 +465,18 @@ export class SpawningStructuresManager {
                 cost,
                 args.memoryAdditions,
             )
+            spawnRequests.push(request)
 
             // Reduce the number of minCreeps
 
             args.minCreeps -= 1
         }
+
+        return spawnRequests
     }
 
     private spawnRequestByGroup(args: SpawnRequestArgs) {
-        // Get the maxCostPerCreep
+        const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
             this.findMaxCostPerCreep(args.maxCostPerCreep),
@@ -507,7 +504,7 @@ export class SpawningStructuresManager {
 
         // If there aren't enough requested parts to justify spawning a creep, stop
 
-        if (totalExtraParts < maxPartsPerCreep * (args.threshold || 0.25)) return
+        if (totalExtraParts < maxPartsPerCreep * (args.threshold || 0.25)) return spawnRequests
 
         if (!args.maxCreeps) {
             args.maxCreeps = Number.MAX_SAFE_INTEGER
@@ -527,7 +524,7 @@ export class SpawningStructuresManager {
             customLog('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
                 type: LogTypes.error,
             })
-            return
+            return spawnRequests
         }
 
         while (totalExtraParts >= args.extraParts.length && args.maxCreeps > 0) {
@@ -633,7 +630,7 @@ export class SpawningStructuresManager {
 
             // Create a spawnRequest using previously constructed information
 
-            this.createSpawnRequest(
+            const request = this.createSpawnRequest(
                 args.priority,
                 args.role,
                 args.defaultParts.length,
@@ -642,11 +639,14 @@ export class SpawningStructuresManager {
                 cost,
                 args.memoryAdditions,
             )
+            spawnRequests.push(request)
 
             // Decrease maxCreeps counter
 
             args.maxCreeps -= 1
         }
+
+        return spawnRequests
     }
 
     createPowerTasks() {
@@ -675,17 +675,22 @@ export class SpawningStructuresManager {
      * Spawn request debugging
      */
     private test() {
+/*
+        const args = this.communeManager.spawnRequestsManager.run()
+        stringifyLog('spawn request args', args)
+        stringifyLog('request', this.constructSpawnRequests(args[0]))
+ */
         return
-        // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
-        if (!this.communeManager.spawnRequestsArgs.length)
-            this.communeManager.spawnRequestsManager.run()
 
         this.testArgs()
         this.testRequests()
     }
 
     private testArgs() {
-        for (const request of this.communeManager.spawnRequestsArgs) {
+
+        const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
+
+        for (const request of spawnRequestsArgs) {
             if (request.role === 'remoteSourceHarvester') {
                 customLog(
                     'SPAWN REQUEST ARGS',
@@ -711,16 +716,13 @@ export class SpawningStructuresManager {
         const headers = ['role', 'priority', 'cost']
         const data: any[][] = []
 
-        // Try to generate spawnRequests if there are none - we probably haven't tried yet this tick
-        if (!this.communeManager.spawnRequestsArgs.length)
-            this.communeManager.spawnRequestsManager.run()
+        const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
 
-        for (const requestArgs of this.communeManager.spawnRequestsArgs) {
-            this.spawnRequests = []
-            this.constructSpawnRequests(requestArgs)
+        for (const requestArgs of spawnRequestsArgs) {
 
-            for (let i = 0; i < this.spawnRequests.length; i++) {
-                const request = this.spawnRequests[i]
+            const spawnRequests = this.constructSpawnRequests(requestArgs)
+
+            for (const request of spawnRequests) {
 
                 const row: any[] = []
                 row.push(requestArgs.role)
@@ -730,9 +732,6 @@ export class SpawningStructuresManager {
                 data.push(row)
             }
         }
-
-        // Reset spawn requests so we can still use them normally for spawning
-        this.spawnRequests = undefined
 
         const height = 3 + data.length
 

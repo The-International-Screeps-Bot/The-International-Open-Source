@@ -131,6 +131,7 @@ export class CommuneManager {
      * Organized by remote and sourceIndex
      */
     remoteSourceHarvesters: { [remote: string]: string[][] }
+    communeHaulers: string[]
     /**
      * The total amount of carry parts for haulers
      */
@@ -140,10 +141,6 @@ export class CommuneManager {
      */
     communeHaulerCarryParts: number
     towerAttackTarget: Creep
-    /**
-     * Arguments for construction spawn requests. Defined by the spawnRequest manager on run().
-     */
-    spawnRequestsArgs: SpawnRequestArgs[]
     /**
      * The carry parts needed to effectively run the commune
      */
@@ -239,7 +236,6 @@ export class CommuneManager {
             roomMemory[RoomMemoryKeys.combatRequests] = []
         if (!roomMemory[RoomMemoryKeys.haulRequests]) roomMemory[RoomMemoryKeys.haulRequests] = []
 
-        this.spawnRequestsArgs = []
         this.upgradeStrength = 0
         this.mineralHarvestStrength = 0
         this.haulerNeed = 0
@@ -256,31 +252,9 @@ export class CommuneManager {
         this.haulerCarryParts = 0
         this.communeHaulerCarryParts = 0
         this.remoteSourceHarvesters = {}
+        this.communeHaulers = []
 
-        for (let index = roomMemory[RoomMemoryKeys.remotes].length - 1; index >= 0; index -= 1) {
-            const remoteName = roomMemory[RoomMemoryKeys.remotes][index]
-            const remoteMemory = Memory.rooms[remoteName]
-
-            room.creepsOfRemote[remoteName] = {}
-            for (const role of remoteRoles) room.creepsOfRemote[remoteName][role] = []
-
-            this.remoteSourceHarvesters[remoteName] = []
-            for (const index in remoteMemory[RoomMemoryKeys.remoteSources])
-                this.remoteSourceHarvesters[remoteName].push([])
-        }
-
-        // identify the remoteSourcePathType
-
-        if (!this.remoteResourcePathType || randomTick()) {
-            if (this.storingStructures.length) {
-                /* this.remoteSourcePathType = RoomMemoryKeys.remoteSourceHubPaths */
-                this.remoteResourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
-            } else {
-                this.remoteResourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
-            }
-        }
-
-        Memory.rooms[this.room.name][this.remoteResourcePathType]
+        this.remotesManager.update()
 
         // For each role, construct an array for creepsFromRoom
 

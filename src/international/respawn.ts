@@ -3,7 +3,7 @@ import { customLog } from 'utils/logging'
 /**
  * Credit to SemperRabbit for this nice piece of code!
  */
-class RespawnManager {
+export class RespawnManager {
     run() {
         if (!this.hasRespawned()) return
 

@@ -103,7 +103,7 @@ export class AllyVanguard extends Creep {
         if (
             this.runRoomLogisticsRequestsAdvanced({
                 resourceTypes: new Set([RESOURCE_ENERGY]),
-            })
+            }) === Result.success
         )
             return true
 

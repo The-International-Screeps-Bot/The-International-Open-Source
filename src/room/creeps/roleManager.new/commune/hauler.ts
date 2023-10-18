@@ -6,15 +6,7 @@ class HaulerManager extends DefaultRoleManager {
     // Allows for the pattern: instance.manager.run(instance)
     manager = this
 
-    run(room: Room) {
-
-        for (const creepName of room.myCreeps[this.role]) {
-
-            this.runCreep(Game.creeps[creepName])
-        }
-    }
-
-    runCreep(creep: Creep) {
+    run(creep: Creep) {
 
         creep.passiveRenew()
         creep.runRoomLogisticsRequestsAdvanced()

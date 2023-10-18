@@ -62,15 +62,17 @@ export class SpawnRequestsManager {
         this.requestHauler()
         this.antifa()
 
-        this.communeManager.spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
-            args => args,
+        const spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
+            args => !!args,
         ) as SpawnRequestArgs[]
 
         // Sort in descending priority
 
-        this.communeManager.spawnRequestsArgs.sort((a, b) => {
+        spawnRequestsArgs.sort((a, b) => {
             return a.priority - b.priority
         })
+
+        return spawnRequestsArgs
     }
 
     private sourceHarvester() {
@@ -225,7 +227,6 @@ export class SpawnRequestsManager {
                 // Construct the required carry parts
 
                 const partsMultiplier = this.communeManager.haulerNeed
-
                 const role = 'hauler'
 
                 // If all RCL 3 extensions are built
@@ -240,6 +241,7 @@ export class SpawnRequestsManager {
                         maxCostPerCreep:
                             this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
                         priority,
+                        spawnGroup: this.communeManager.communeHaulers,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
                         },
@@ -254,6 +256,7 @@ export class SpawnRequestsManager {
                     minCost: 100,
                     maxCostPerCreep: this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
                     priority,
+                    spawnGroup: this.communeManager.communeHaulers,
                     memoryAdditions: {},
                 }
             })(),
@@ -1049,15 +1052,11 @@ export class SpawnRequestsManager {
             if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
             if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
 
             priorityIncrement += 1
 
             const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
-
-            /*
-            const remoteHaulerNeed = remoteMemory[RoomMemoryKeys.remoteHaulers][sourceIndex]
-            const harvesterPriority = this.minRemotePriority + priorityIncrement + (remoteHaulerNeed > 0 ? 1 : 100)
- */
 
             const harvesterPriority = this.minRemotePriority + priorityIncrement
 
@@ -1235,6 +1234,7 @@ export class SpawnRequestsManager {
             const remoteMemory = Memory.rooms[remoteName]
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 

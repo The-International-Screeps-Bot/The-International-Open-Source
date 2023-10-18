@@ -77,6 +77,9 @@ export class CollectiveManager extends Sleepable {
      * Updates values to be present for this tick
      */
     update() {
+
+        // initalize or re-initialize
+
         this.creepsByCombatRequest = {}
         this.creepsByHaulRequest = {}
         this.unspawnedPowerCreepNames = []
@@ -111,6 +114,10 @@ export class CollectiveManager extends Sleepable {
         this._minCredits = undefined
         this._resourcesInStoringStructures = undefined
         this._maxCSitesPerRoom = undefined
+
+        //
+
+        this.updateMinHaulerCostError()
     }
 
     newCustomCreepID() {
@@ -145,6 +152,13 @@ export class CollectiveManager extends Sleepable {
         // Try to generate a pixel
 
         Game.cpu.generatePixel()
+    }
+
+    updateMinHaulerCostError() {
+        // cpu limit is potentially variable if GCL changes
+        const targetCPU = (Game.cpu.limit * 0.9) / 100
+        // How far off we are from our ideal cpu usage
+        Memory.minHaulerCostError = roundTo(targetCPU - Memory.stats.cpu.usage / Game.cpu.limit, 4)
     }
 
     /**

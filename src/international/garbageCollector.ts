@@ -5,7 +5,7 @@ import { packCache, unpackCache } from 'other/codec'
 /**
  * Intended to clean Memory, global, segments from stale data
  */
-class GarbageCollector extends Sleepable {
+export class GarbageCollector extends Sleepable {
     // Clean rooms that haven't been scouted in 100k ticks
     cleanRoomThreshold = 100000
     sleepFor = 100000

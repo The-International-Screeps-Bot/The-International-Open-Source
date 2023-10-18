@@ -4,7 +4,7 @@ import { CollectiveManager, collectiveManager } from './collective'
 /**
  * Tracks and records constructionSites and thier age, deleting old sites
  */
-class ConstructionSiteManager extends Sleepable {
+export class ConstructionSiteManager extends Sleepable {
     run() {
         if (this.isSleepingResponsive()) return
 

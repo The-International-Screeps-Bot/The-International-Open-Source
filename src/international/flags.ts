@@ -3,7 +3,7 @@ import { RoomMemoryKeys, RoomTypes, customColors } from './constants'
 import { collectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
 
-class FlagManager {
+export class FlagManager {
     run() {
         for (const flagName in Game.flags) {
             const flagNameParts = flagName.split(' ')

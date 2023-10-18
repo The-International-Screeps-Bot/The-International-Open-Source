@@ -15,7 +15,7 @@ import { statsManager } from './statsManager'
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled
  */
-class MapVisualsManager {
+export class MapVisualsManager {
     run() {
         if (!global.settings.mapVisuals) return
 

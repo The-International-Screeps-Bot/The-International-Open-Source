@@ -982,7 +982,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
 
             // If swapping will get it closer or equal range to its actionCoord
             if (
-                getRange(this.pos, creepAtPos.actionCoord) <=
+                getRange(this.pos, creepAtPos.actionCoord) <
                 getRange(creepAtPos.pos, creepAtPos.actionCoord)
             ) {
                 // Run creep's moveRequest, trading places with creepAtPos

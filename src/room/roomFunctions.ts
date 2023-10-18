@@ -25,6 +25,7 @@ import {
     maxRemotePathDistance,
     RoomLogisticsRequestTypes,
     remoteRoles,
+    RemoteResourcePathTypes,
 } from 'international/constants'
 import {
     advancedFindDistance,
@@ -335,15 +336,27 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
         const packedRemoteSourceHarvestPositions =
             this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
-        const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
-            scoutingRoom,
-            packedRemoteSourceHarvestPositions,
-            pathsThrough,
-        )
+        const packedRemoteSourcePaths = {
+            [RoomMemoryKeys.remoteSourceFastFillerPaths]: this.roomManager.findRemoteSourceFastFillerPaths(
+                scoutingRoom,
+                packedRemoteSourceHarvestPositions,
+                pathsThrough,
+            ),
+            [RoomMemoryKeys.remoteSourceHubPaths]: this.roomManager.findRemoteSourceHubPaths(
+                scoutingRoom,
+                packedRemoteSourceHarvestPositions,
+                pathsThrough,
+            ),
+        }
 
-        for (const packedPath of packedRemoteSourcePaths) {
+        for (const key in packedRemoteSourcePaths) {
+
+            const pathName = key as unknown as RemoteResourcePathTypes
+            const packedPath = packedRemoteSourcePaths[pathName]
+
             if (!packedPath.length) {
-                return roomMemory[RoomMemoryKeys.type]
+                disable = true
+                break
             }
             const unpackedLength = packedPath.length / packedPosLength
 
@@ -359,7 +372,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
             pathsThrough,
         )
         if (!packedRemoteControllerPath.length) {
-            return roomMemory[RoomMemoryKeys.type]
+            disable = true
         }
         if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance)
             disable = true
@@ -380,11 +393,20 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         // Successful remote value generation, now assign them
 
+        // reconcile old data
+
+        const oldCommuneMemory = Memory.rooms[roomMemory[RoomMemoryKeys.commune]]
+        const index = oldCommuneMemory[RoomMemoryKeys.remotes].indexOf(this.name)
+        oldCommuneMemory[RoomMemoryKeys.remotes].splice(index, 1)
+
+        //
+
         roomMemory[RoomMemoryKeys.disable] = disable
 
         roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
         roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
-        roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] = packedRemoteSourcePaths
+        roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] = packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceFastFillerPaths]
+        roomMemory[RoomMemoryKeys.remoteSourceHubPaths] = packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceHubPaths]
         roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
         roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
         // No reason to have the room or commune in the list - would result is uneeded searches
@@ -409,14 +431,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
         // Add the room's name to the scoutingRoom's remotes data
-
-        scoutingRoom.communeManager.remoteSourceHarvesters[this.name] = []
-        for (const i in packedRemoteSources) {
-            scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
-        }
-
-        scoutingRoom.creepsOfRemote[this.name] = {}
-        for (const role of remoteRoles) scoutingRoom.creepsOfRemote[this.name][role] = []
+        roomUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
@@ -437,15 +452,31 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         scoutingRoom,
         packedRemoteSources,
     )
-    const packedRemoteSourcePaths = this.roomManager.findRemoteSourcePaths(
-        scoutingRoom,
-        packedRemoteSourceHarvestPositions,
-        pathsThrough,
-    )
-    for (const packedPath of packedRemoteSourcePaths) {
+    const packedRemoteSourcePaths = {
+        [RoomMemoryKeys.remoteSourceFastFillerPaths]: this.roomManager.findRemoteSourceFastFillerPaths(
+            scoutingRoom,
+            packedRemoteSourceHarvestPositions,
+            pathsThrough,
+        ),
+        [RoomMemoryKeys.remoteSourceHubPaths]: this.roomManager.findRemoteSourceHubPaths(
+            scoutingRoom,
+            packedRemoteSourceHarvestPositions,
+            pathsThrough,
+        ),
+    }
+
+    for (const key in packedRemoteSourcePaths) {
+
+        const pathName = key as unknown as RemoteResourcePathTypes
+        const packedPath = packedRemoteSourcePaths[pathName]
+
         if (!packedPath.length) {
-            return roomMemory[RoomMemoryKeys.type]
+            disable = true
+            break
         }
+
+        const unpackedLength = packedPath.length / packedPosLength
+        if (unpackedLength > maxRemotePathDistance) disable = true
     }
 
     const packedRemoteControllerPositions =
@@ -456,15 +487,20 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         pathsThrough,
     )
     if (!packedRemoteControllerPath.length) {
-        return roomMemory[RoomMemoryKeys.type]
+        disable = true
     }
     if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) disable = true
 
+/*
     roomMemory[RoomMemoryKeys.roads] = []
     roomMemory[RoomMemoryKeys.roadsQuota] = []
 
     let sourceIndex = 0
-    for (const packedPath of packedRemoteSourcePaths) {
+    for (const key in packedRemoteSourcePaths) {
+
+        const pathName = key as unknown as RemoteResourcePathTypes
+        const packedPath = packedRemoteSourcePaths[pathName]
+
         roomMemory[RoomMemoryKeys.roads][sourceIndex] = 0
         roomMemory[RoomMemoryKeys.roadsQuota][sourceIndex] = 0
 
@@ -478,12 +514,15 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         if (path.length > maxRemotePathDistance) disable = true
     }
+ */
+    // Accept remote as own
 
     roomMemory[RoomMemoryKeys.disable] = disable
 
     roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
     roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
-    roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] = packedRemoteSourcePaths
+    roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] = packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceFastFillerPaths]
+    roomMemory[RoomMemoryKeys.remoteSourceHubPaths] = packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceHubPaths]
     roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
     roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
     // No reason to have the room or commune in the list - would result is uneeded searches
@@ -508,14 +547,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
     // Add the room's name to the scoutingRoom's remotes data
-
-    scoutingRoom.communeManager.remoteSourceHarvesters[this.name] = []
-    for (const i in packedRemoteSources) {
-        scoutingRoom.communeManager.remoteSourceHarvesters[this.name].push([])
-    }
-
-    scoutingRoom.creepsOfRemote[this.name] = {}
-    for (const role of remoteRoles) scoutingRoom.creepsOfRemote[this.name][role] = []
+    roomUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name

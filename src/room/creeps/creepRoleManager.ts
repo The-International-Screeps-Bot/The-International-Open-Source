@@ -32,7 +32,7 @@ export class CreepRoleManager {
         if (!this.roomManager.room.myCreeps[role].length) return
 
         const roleCPUStart = Game.cpu.getUsed()
-
+        console.log(role)
         creepClasses[role].roleManager(this.roomManager.room, this.roomManager.room.myCreeps[role])
 
         // Log role stats

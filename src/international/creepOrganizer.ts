@@ -6,7 +6,7 @@ import { packCoord } from 'other/codec'
 import { statsManager } from './statsManager'
 import { creepUtils } from 'room/creeps/creepUtils'
 
-class CreepOrganizer {
+export class CreepOrganizer {
     constructor() {}
 
     public run() {

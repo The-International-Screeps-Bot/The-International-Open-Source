@@ -8,13 +8,7 @@ class BuilderManager extends DefaultRoleManager {
     // Allows for the pattern: instance.manager.run(instance)
     manager = this
 
-    runInitial(room: Room) {
-        for (const creepName of room.myCreeps[this.role]) {
-            this.runInitialCreep(Game.creeps[creepName])
-        }
-    }
-
-    runInitialCreep(creep: Creep) {
+    runInitial(creep: Creep) {
         if (!creep.room.roomManager.cSiteTarget) return
         if (!creep.room.communeManager.buildersMakeRequests) return
         if (creep.usedReserveStore > creep.store.getCapacity() * 0.5) return
@@ -26,13 +20,7 @@ class BuilderManager extends DefaultRoleManager {
         })
     }
 
-    run(room: Room) {
-        for (const creepName of room.myCreeps[this.role]) {
-            this.runCreep(Game.creeps[creepName])
-        }
-    }
-
-    runCreep(creep: Creep) {
+    run(creep: Creep) {
         if (creep.advancedBuild() === Result.fail) {
             creep.advancedRecycle()
         }

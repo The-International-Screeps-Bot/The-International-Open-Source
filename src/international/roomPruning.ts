@@ -3,7 +3,7 @@ import { findLowestScore, randomIntRange } from '../utils/utils'
 import { Sleepable } from 'utils/Sleepable'
 import { collectiveManager } from './collective'
 
-class RoomPruningManager extends Sleepable {
+export class RoomPruningManager extends Sleepable {
     sleepFor = randomIntRange(50000, 100000)
     run() {
         if (this.isSleepingResponsive()) return

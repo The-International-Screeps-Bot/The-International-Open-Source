@@ -6,7 +6,7 @@ import { collectiveManager } from './collective'
 /**
  * Handles logging, stat recording, and more at the end of the tick
  */
-class EndTickManager {
+export class EndTickManager {
     run() {
         if (!global.settings.logging) return
 
@@ -30,6 +30,7 @@ class EndTickManager {
             {
                 type: LogTypes.info,
                 position: 1,
+                BGColor: CPUColor,
             },
         )
 

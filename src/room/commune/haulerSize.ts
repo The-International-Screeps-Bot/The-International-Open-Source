@@ -42,6 +42,7 @@ export class HaulerSizeManager {
                 this.communeManager.room.roomManager.structures.spawn.length * 2) *
             BODYPART_COST[CARRY]
         */
+        /*
         const newMinHaulerCost = Math.max(
             Math.floor(
                 this.communeManager.room.energyCapacityAvailable *
@@ -53,6 +54,13 @@ export class HaulerSizeManager {
         const diff = (newMinHaulerCost - roomMemory[RoomMemoryKeys.minHaulerCost]) / 2
 
         roomMemory[RoomMemoryKeys.minHaulerCost] += Math.floor(diff)
+        roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time
+ */
+
+        roomMemory[RoomMemoryKeys.minHaulerCost] -= Math.min(
+            Math.floor((roomMemory[RoomMemoryKeys.minHaulerCost] * Memory.minHaulerCostError) / 2),
+            this.communeManager.room.energyCapacityAvailable,
+        )
         roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time
     }
 }

@@ -20,6 +20,14 @@ import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
 import { roomUtils } from 'room/roomUtils'
 
+type RemoteSourcePathTypes =
+    | RoomMemoryKeys.remoteSourceFastFillerPaths
+    | RoomMemoryKeys.remoteSourceHubPaths
+const remoteSourcePathTypes: RemoteSourcePathTypes[] = [
+    RoomMemoryKeys.remoteSourceFastFillerPaths,
+    RoomMemoryKeys.remoteSourceHubPaths,
+]
+
 export class RemotesManager {
     communeManager: CommuneManager
 
@@ -27,7 +35,29 @@ export class RemotesManager {
         this.communeManager = communeManager
     }
 
-    public initRun() {
+    update() {
+        const roomMemory = Memory.rooms[this.communeManager.room.name]
+
+        for (const remoteName of roomMemory[RoomMemoryKeys.remotes]) {
+
+            roomUtils.updateCreepsOfRemoteName(remoteName, this.communeManager)
+        }
+
+        this.updateRemoteResourcePathType()
+    }
+
+
+    private updateRemoteResourcePathType() {
+        if (this.communeManager.remoteResourcePathType !== undefined && !randomTick()) return
+
+        if (this.communeManager.room.storage && this.communeManager.room.storage.RCLActionable) {
+            this.communeManager.remoteResourcePathType = RoomMemoryKeys.remoteSourceHubPaths
+            return
+        }
+        this.communeManager.remoteResourcePathType = RoomMemoryKeys.remoteSourceFastFillerPaths
+    }
+
+    initRun() {
         const { room } = this.communeManager
 
         // Loop through the commune's remote names
@@ -199,6 +229,8 @@ export class RemotesManager {
                 )
             }
 
+                    console.log(this.communeManager.remoteResourcePathType)
+
             for (const i in remoteMemory[RoomMemoryKeys.remoteSources]) {
                 const remoteSourcePathLength =
                     remoteMemory[this.communeManager.remoteResourcePathType].length /
@@ -245,7 +277,7 @@ export class RemotesManager {
         }
     }
 
-    public run() {
+    run() {
         // Loop through the commune's remote names
 
         for (const remoteName of this.communeManager.room.memory[RoomMemoryKeys.remotes]) {
@@ -331,7 +363,7 @@ export class RemotesManager {
         const roomMemory = Memory.rooms[remoteName]
         if (!randomTick(20) && roomMemory[RoomMemoryKeys.disable]) return false
 
-        let disabledSources = this.manageMaxDistance(remoteName)
+        let disabledSources = this.manageSourcesUse(remoteName)
         if (disabledSources >= roomMemory[RoomMemoryKeys.remoteSources].length) {
             roomMemory[RoomMemoryKeys.disable] = true
             return false
@@ -376,7 +408,7 @@ export class RemotesManager {
                 remoteMemory[RoomMemoryKeys.abandonRemote]
             )
                 continue
-            console.log(remoteName2)
+
             // We want to abandon if the remote paths through the specified remote
             if (!remoteMemory2[RoomMemoryKeys.pathsThrough].includes(remoteName)) continue
 
@@ -386,23 +418,43 @@ export class RemotesManager {
         remoteMemory[RoomMemoryKeys.recursedAbandonment] = true
     }
 
-    private manageMaxDistance(remoteName: string) {
+    private manageSourcesUse(remoteName: string) {
         let disabledSources = 0
         const roomMemory = Memory.rooms[remoteName]
 
-        // Also do for: roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]
+        for (const pathType of remoteSourcePathTypes) {
+            for (const index in roomMemory[pathType]) {
+                if (this.manageSourceUse(remoteName, index, pathType)) continue
 
-        for (const index in roomMemory[RoomMemoryKeys.remoteSourceHubPaths]) {
-            const path = roomMemory[RoomMemoryKeys.remoteSourceHubPaths][index]
-
-            if (path.length / packedPosLength <= maxRemotePathDistance) {
-                continue
+                disabledSources += 1
+                roomMemory[RoomMemoryKeys.disableSources][index] = true
             }
-
-            disabledSources += 1
-            roomMemory[RoomMemoryKeys.disableSources][index] = true
         }
 
         return disabledSources
+    }
+
+    private manageSourceUse(
+        remoteName: string,
+        sourceIndex: string,
+        pathType: RemoteSourcePathTypes,
+    ) {
+        const roomMemory = Memory.rooms[remoteName]
+        const packedPath = roomMemory[pathType][parseInt(sourceIndex)]
+
+        if (packedPath.length / packedPosLength > maxRemotePathDistance) {
+            return false
+        }
+
+        const path = unpackPosList(packedPath)
+        for (const pos of path) {
+            if (!Memory.rooms[pos.roomName][RoomMemoryKeys.owner]) continue
+
+            // the room has an owner
+
+            return false
+        }
+
+        return true
     }
 }

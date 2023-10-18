@@ -15,7 +15,7 @@ import {
 import { indexOf } from 'lodash'
 
 // Should adsorb the request content of tickInit
-class RequestsManager {
+export class RequestsManager {
     run() {
         this.runWorkRequests()
         this.runCombatRequests()

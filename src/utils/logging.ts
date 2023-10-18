@@ -9,7 +9,7 @@ const customColors = {
     darkBlue: '#02007d',
     black: '#000000',
     yellow: '#f5cf95',
-    lightyellow: '#f7f7b4',
+    lightYellow: '#f7f7b4',
     red: '#d10000',
     green: '#00d137',
     brown: '#aa7253',
@@ -21,7 +21,6 @@ const customColors = {
 
 export enum LogTypes {
     info,
-    infoWarning,
     warning,
     error,
     debug,
@@ -31,33 +30,30 @@ const logTypeProperties = {
     [LogTypes.info]: {
         textColor: customColors.black,
         BGColor: customColors.white,
-        preface: '(Info) ',
-    },
-    [LogTypes.infoWarning]: {
-        textColor: customColors.black,
-        BGColor: customColors.lightyellow,
-        preface: '(Info!!!) ',
+        preface: '(Info)   ',
     },
     [LogTypes.warning]: {
         textColor: customColors.black,
-        BGColor: customColors.yellow,
-        preface: '(Warning) ',
+        BGColor: customColors.lightYellow,
+        preface: '(Warning)',
     },
     [LogTypes.error]: {
         textColor: customColors.white,
         BGColor: customColors.red,
-        preface: '(Error) ',
+        preface: '  (Error)',
     },
     [LogTypes.debug]: {
         textColor: customColors.white,
         BGColor: customColors.lightBlue,
-        preface: '(Debug) ',
+        preface: '  (Debug)',
     },
 }
 
 interface LogOpts {
     type?: LogTypes
     position?: number
+    BGColor?: string
+    textColor?: string
 }
 
 const positionPaddingPixels = 8
@@ -71,22 +67,20 @@ export function customLog(title: any, message?: any, opts?: LogOpts) {
     const logType = opts.type ?? LogTypes.info
     const logProperties = logTypeProperties[logType]
 
-    const defaultPrefaceLength = 10;
-    let actualPreface = logProperties.preface;
-    const prefaceDiff = defaultPrefaceLength - actualPreface.length;
-    if (prefaceDiff > 0) {
-        actualPreface = ' '.repeat(prefaceDiff) + actualPreface;
-    }
+    const BGColor = opts.BGColor ?? logProperties.BGColor
+    const textColor = opts.textColor ?? logProperties.textColor
 
     // Create the title
     collectiveManager.logs += `<div class='log' style='width: 100vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${
-        logProperties.BGColor
-    };'><div style='padding: 3px; font-size: 14px; font-weight: bold; color: ${
-        logProperties.textColor
-    };'>${actualPreface} ${title}:</div>`
+        BGColor
+    }; margin-left: ${
+        (opts.position ?? 0) * positionPaddingPixels
+    }px;'><div style='padding: 3px; font-size: 14px; font-weight: 600; color: ${
+        textColor
+    };'>${logProperties.preface} ${title}:</div>`
 
     collectiveManager.logs += `<div style='background-color: rgb(0, 0, 0, 0.15); border-radius:5px; padding: 1px 10px 1px 10px; font-size: 14px; font-weight: 200; color: ${
-        logProperties.textColor
+        textColor
     };'>${message ?? ''}</div></div>`
 }
 

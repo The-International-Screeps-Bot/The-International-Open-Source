@@ -54,7 +54,7 @@ import { RoomVisualsManager } from './roomVisuals'
 import { statsManager } from 'international/statsManager'
 import { CommunePlanner } from './communePlanner'
 import { TombstoneManager } from './tombstones'
-import { RuinManager } from './ruins'
+import { RuinsManager } from './ruins'
 import {
     packCoord,
     packPosList,
@@ -104,7 +104,7 @@ export class RoomManager {
     containerManager: ContainerManager
     droppedResourceManager: DroppedResourceManager
     tombstoneManager: TombstoneManager
-    ruinManager: RuinManager
+    ruinManager: RuinsManager
 
     creepRoleManager: CreepRoleManager
     powerCreepRoleManager: PowerCreepRoleManager
@@ -116,7 +116,7 @@ export class RoomManager {
         this.containerManager = new ContainerManager(this)
         this.droppedResourceManager = new DroppedResourceManager(this)
         this.tombstoneManager = new TombstoneManager(this)
-        this.ruinManager = new RuinManager(this)
+        this.ruinManager = new RuinsManager(this)
 
         this.creepRoleManager = new CreepRoleManager(this)
         this.powerCreepRoleManager = new PowerCreepRoleManager(this)
@@ -361,7 +361,7 @@ export class RoomManager {
         return sourceHarvestPositions.map(positions => packPosList(positions))
     }
 
-    findRemoteSourcePaths(
+    findRemoteSourceFastFillerPaths(
         commune: Room,
         packedRemoteSourceHarvestPositions: string[],
         pathsThrough: Set<string>,
@@ -380,7 +380,7 @@ export class RoomManager {
                 plainCost: defaultRoadPlanningPlainCost,
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
-                    remoteResourcePathType: commune.communeManager.remoteResourcePathType,
+                    remoteResourcePathType: RoomMemoryKeys.remoteSourceFastFillerPaths,
                 },
             })
 
@@ -409,18 +409,19 @@ export class RoomManager {
         if (!stampAnchors) throw Error('no stampAnchors for ' + commune.name)
 
         let goalPos: RoomPosition
-        const basePlans = this.basePlans
+        const basePlans = commune.roomManager.basePlans
 
         forAdjacentCoords(stampAnchors.hub[0], coord => {
             const planData = basePlans.get(packCoord(coord))
             for (const plan of planData) {
                 if (plan.structureType !== STRUCTURE_STORAGE) continue
 
-                goalPos = new RoomPosition(coord.x, coord.y, this.room.name)
+                goalPos = new RoomPosition(coord.x, coord.y, commune.name)
+                return Result.stop
             }
-        })
 
-        basePlans.get(packCoord(stampAnchors.hub[0]))
+            return undefined
+        })
 
         const sourcePaths: RoomPosition[][] = []
 
@@ -433,7 +434,7 @@ export class RoomManager {
                 plainCost: defaultRoadPlanningPlainCost,
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
-                    remoteResourcePathType: commune.communeManager.remoteResourcePathType,
+                    remoteResourcePathType: RoomMemoryKeys.remoteSourceHubPaths,
                 },
             })
 
@@ -500,7 +501,7 @@ export class RoomManager {
             plainCost: defaultRoadPlanningPlainCost,
             weightCommuneStructurePlans: true,
             weightRemoteStructurePlans: {
-                remoteResourcePathType: commune.communeManager.remoteResourcePathType,
+                remoteResourcePathType: RoomMemoryKeys.remoteSourceFastFillerPaths,
             },
         })
 
@@ -1464,7 +1465,9 @@ export class RoomManager {
         // Sort the remotes based on lowest source efficacy
         return remoteNamesByEfficacy.sort(function (roomName1, roomName2) {
             return (
-                Math.min(...Memory.rooms[roomName1][pathType].map(packedPath => packedPath.length)) -
+                Math.min(
+                    ...Memory.rooms[roomName1][pathType].map(packedPath => packedPath.length),
+                ) -
                 Math.min(...Memory.rooms[roomName2][pathType].map(packedPath => packedPath.length))
             )
         })
@@ -1495,7 +1498,6 @@ export class RoomManager {
 
         // If we can do reserving, prefer rooms with more efficient reserving and utility
         if (this.room.energyCapacityAvailable >= BODYPART_COST[CLAIM] + BODYPART_COST[MOVE]) {
-
             let score = 0
 
             // associate score for source with accompaning costs
@@ -1503,7 +1505,6 @@ export class RoomManager {
             // prefer based on rough energy / tick
             // reserver cost is 650 / claimer lifetime - real path distance / source count
             //
-
         }
 
         return remoteSourceIndexesByEfficacy.sort(function (a, b) {
@@ -1576,14 +1577,14 @@ export class RoomManager {
         if (this._fastFillerContainers) return this._fastFillerContainers
 
         if (this.fastFillerContainerIDs && !this.structureUpdate) {
-            let fastFillerContainers = this.fastFillerContainerIDs.map(ID => findObjectWithID(ID))
+            const fastFillerContainers = this.fastFillerContainerIDs.map(ID => findObjectWithID(ID))
             return (this._fastFillerContainers = fastFillerContainers)
         }
 
         const anchor = this.anchor
         if (!anchor) throw Error('no anchor')
 
-        let potentialFastFillerContainers = [
+        const potentialFastFillerContainers = [
             this.room.findStructureAtXY<StructureContainer>(
                 anchor.x - 2,
                 anchor.y,
@@ -1595,7 +1596,7 @@ export class RoomManager {
                 structure => structure.structureType === STRUCTURE_CONTAINER,
             ),
         ]
-        let fastFillerContainers: StructureContainer[] = []
+        const fastFillerContainers: StructureContainer[] = []
         for (const container of potentialFastFillerContainers) {
             if (!container) continue
 

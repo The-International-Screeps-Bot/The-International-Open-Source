@@ -3,7 +3,7 @@ import { scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
 import { RoomLogisticsRequestTypes } from 'international/constants'
 
-export class RuinManager {
+export class RuinsManager {
     roomManager: RoomManager
 
     constructor(roomManager: RoomManager) {

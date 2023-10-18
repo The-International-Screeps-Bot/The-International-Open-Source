@@ -2023,12 +2023,13 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 }
 
 Creep.prototype.runRoomLogisticsRequestsAdvanced = function (args) {
-    if (this.spawning) return false
+    if (this.spawning) return Result.noAction
 
-    if (this.runRoomLogisticsRequestAdvanced(args) !== Result.success) return false
+    const result = this.runRoomLogisticsRequestAdvanced(args)
+    if (result !== Result.success) return result
 
     this.runRoomLogisticsRequestAdvanced(args)
-    return true
+    return Result.success
 }
 
 Creep.prototype.runRoomLogisticsRequest = function () {

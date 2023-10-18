@@ -340,6 +340,8 @@ declare global {
          */
         constructionSites: { [ID: string]: number }
 
+        minHaulerCostError: number
+
         /**
          *
          */
@@ -1034,7 +1036,7 @@ declare global {
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
         runRoomLogisticsRequestAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
-        runRoomLogisticsRequestsAdvanced(args?: FindNewRoomLogisticsRequestArgs): boolean
+        runRoomLogisticsRequestsAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
 
         runRoomLogisticsRequest(): Result
         runRoomLogisticsRequests(): boolean
@@ -1254,14 +1256,12 @@ declare global {
     }
 
     interface Resource {
-        // Getters
+        // Getters and setters
 
         _nextAmount: number
-
         nextAmount: number
 
         _reserveAmount: number
-
         reserveAmount: number
     }
 

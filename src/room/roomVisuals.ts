@@ -17,6 +17,7 @@ import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from '
 import { simpleAllies, AllyRequestTypes } from 'international/simpleAllies'
 import { collectiveManager } from 'international/collective'
 import { playerManager } from 'international/players'
+import { unpackCoord } from 'other/codec'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -41,6 +42,7 @@ export class RoomVisualsManager {
         this.controllerVisuals()
         this.spawnVisuals()
         this.cSiteTargetVisuals()
+        this.reservedCoordsVisuals()
     }
 
     private controllerVisuals() {
@@ -184,6 +186,16 @@ export class RoomVisualsManager {
         // If the constructionTarget exists, show visuals for it
 
         if (constructionTarget) this.roomManager.room.visual.text('🚧', constructionTarget.pos)
+    }
+
+    private reservedCoordsVisuals() {
+
+        for (const [packedCoord] of this.roomManager.reservedCoords) {
+
+            const coord = unpackCoord(packedCoord)
+
+            this.roomManager.room.coordVisual(coord.x, coord.y)
+        }
     }
 
     private baseVisuals() {

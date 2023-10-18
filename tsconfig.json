@@ -5,7 +5,7 @@
         "module": "esnext",
         "lib": ["es2019", "dom"],
         "target": "es2019",
-        "moduleResolution": "node",
+        "moduleResolution": "Node",
         "outDir": "dist",
         "baseUrl": "src/",
         "strict": true,

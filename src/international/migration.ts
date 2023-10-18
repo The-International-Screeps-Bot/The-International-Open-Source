@@ -3,7 +3,7 @@ import { RoomMemoryKeys, RoomTypes } from './constants'
 /**
  * Migrate version by performing actions, if required
  */
-class MigrationManager {
+export class MigrationManager {
     public run() {
         if (Memory.breakingVersion === global.settings.breakingVersion) return
 

@@ -31,33 +31,23 @@ class ControllerUpgraderManager extends DefaultRoleManager {
     }
  */
 
-    runUpdate(room: Room) {
-        for (const creepName of room.myCreeps[this.role]) {
-            this.initialRunCreep(Game.creeps[creepName])
-        }
+    /**
+     * Runs when the creep is spawning
+     */
+    runSpawning(creep: Creep) {
+
+
     }
 
-    runUpdateCreep(creep: Creep) {
+    runUpdate(creep: Creep) {
         creep.room.communeManager.upgradeStrength += creep.room.communeManager.upgradeStrength
     }
 
-    runInitial(room: Room) {
-        for (const creepName of room.myCreeps[this.role]) {
-            this.initialRunCreep(Game.creeps[creepName])
-        }
-    }
-
-    initialRunCreep(creep: Creep) {
+    initialRun(creep: Creep) {
 
     }
 
-    run(room: Room) {
-        for (const creepName of room.myCreeps[this.role]) {
-            this.runCreep(Game.creeps[creepName])
-        }
-    }
-
-    runCreep(creep: Creep) {
+    run(creep: Creep) {
         /*         if (this.shouldBuild(creep)) {
             creep.advancedBuild();
             return;

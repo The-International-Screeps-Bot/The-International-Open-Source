@@ -45,7 +45,7 @@ class RoomsManager {
     run() {
 
         for (const roomName in Game.rooms) {
-
+            console.log(roomName)
             const room = Game.rooms[roomName]
             room.roomManager.run()
 

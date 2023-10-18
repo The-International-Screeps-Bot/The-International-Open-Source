@@ -28,7 +28,7 @@ class InitManager {
 
         Memory.breakingVersion = global.settings.breakingVersion
         Memory.me = getMe()
-            /* (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
+        /* (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
             'username' */
 
@@ -38,6 +38,7 @@ class InitManager {
         Memory.chantIndex = 0
         Memory.lastConfig = Game.time
         Memory.constructionSites = {}
+        Memory.minHaulerCostError = 0
         Memory.players = {}
         Memory.workRequests = {}
         Memory.combatRequests = {}

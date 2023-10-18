@@ -14,6 +14,7 @@ import {
     RoomTypes,
     PlayerMemoryKeys,
     CPUMaxPerTick,
+    Result,
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
 import { debugUtils } from 'debug/debugUtils'
@@ -667,13 +668,13 @@ export function tryErrorMapped<T>(callback: () => T): T {
     return undefined
 }
 
-export function forAdjacentCoords(startCoord: Coord, f: (near: Coord) => void) {
+export function forAdjacentCoords(startCoord: Coord, f: (near: Coord) => Result.stop | void) {
     for (let x = startCoord.x - 1; x <= startCoord.x + 1; x += 1) {
         for (let y = startCoord.y - 1; y <= startCoord.y + 1; y += 1) {
             if (x == startCoord.x && y === startCoord.y) continue
             if (isXYExit(x, y)) continue
 
-            f({ x, y })
+            if (f({ x, y }) === Result.stop) return
         }
     }
 }
@@ -681,7 +682,7 @@ export function forAdjacentCoords(startCoord: Coord, f: (near: Coord) => void) {
 /**
  * Excludes center around range
  */
-export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord: Coord) => void) {
+export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord: Coord) => Result.stop | void) {
     for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
         for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
             if (x == startCoord.x && y === startCoord.y) continue
@@ -689,7 +690,7 @@ export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            f({ x, y })
+            if (f({ x, y }) === Result.stop) return
         }
     }
 }
@@ -697,14 +698,14 @@ export function forCoordsAroundRange(startCoord: Coord, range: number, f: (coord
 /**
  * includes center around range
  */
-export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Coord) => void) {
+export function forCoordsInRange(startCoord: Coord, range: number, f: (coord: Coord) => Result.stop | void) {
     for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
         for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
             // Iterate if the pos doesn't map onto a room
 
             if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            f({ x, y })
+            if (f({ x, y }) === Result.stop) return
         }
     }
 }
@@ -876,4 +877,8 @@ export function getMe() {
     }
 
     throw Error('Could not find me')
+}
+
+export const utils = {
+    
 }

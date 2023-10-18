@@ -68,13 +68,10 @@ export class Hauler extends Creep {
         // We don't have a valid remote
         this.removeRemote()
 
-        if (!Memory.creeps[this.name][CreepMemoryKeys.remote]) {
-
-            const commune = this.commune
-            if (this.room.name == commune.name) {
-
-                commune.communeManager.communeHaulerCarryParts += this.parts.carry
-            }
+        const commune = this.commune
+        if (Memory.creeps[this.name][CreepMemoryKeys.taskRoom] === commune.name) {
+            commune.communeManager.communeHaulerCarryParts += this.parts.carry
+            commune.communeManager.communeHaulers.push(this.name)
         }
     }
 
@@ -155,6 +152,7 @@ export class Hauler extends Creep {
 
         creepMemory[CreepMemoryKeys.remote] = remoteName
         creepMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
+        creepMemory[CreepMemoryKeys.taskRoom] = undefined
 
         this.applyRemote()
     }
@@ -488,9 +486,130 @@ export class Hauler extends Creep {
     }
 
     deliverResources?() {
-        if (this.room.name === this.commune.name) {
-            // Try to renew the creep
+        const commune = this.commune
 
+        if (commune.communeManager.remoteResourcePathType === RoomMemoryKeys.remoteSourceHubPaths) {
+            if (this.room.name === commune.name) {
+                this.passiveRenew()
+
+                const logisticsResult = this.runRoomLogisticsRequestAdvanced({
+                    types: new Set([RoomLogisticsRequestTypes.transfer]),
+                    resourceTypes: new Set([RESOURCE_ENERGY]),
+                    conditions: request => {
+                        // If the target is near the creep
+
+                        const targetPos = findObjectWithID(request.targetID).pos
+                        return getRange(targetPos, this.pos) <= 1
+                    },
+                })
+
+                if (logisticsResult !== Result.success) {
+
+                    if (getRange(this.pos, commune.storage.pos) <= 1) return true
+
+                    this.createMoveRequestByPath(
+                        {
+                            origin: this.pos,
+                            goals: [
+                                {
+                                    pos: commune.storage.pos,
+                                    range: 1,
+                                },
+                            ],
+                            avoidEnemyRanges: true,
+                            typeWeights: {
+                                [RoomTypes.enemy]: Infinity,
+                                [RoomTypes.ally]: Infinity,
+                                [RoomTypes.sourceKeeper]: Infinity,
+                                [RoomTypes.enemyRemote]: Infinity,
+                                [RoomTypes.allyRemote]: Infinity,
+                            },
+                        },
+                        {
+                            packedPath:
+                                Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                                    commune.communeManager.remoteResourcePathType
+                                ][this.memory[CreepMemoryKeys.sourceIndex]],
+                        },
+                    )
+                    return true
+                }
+
+                // We haven't emptied ourselves yet
+                if (!this.needsResources()) return true
+                this.removeRemote()
+                if (!this.findRemote()) return false
+
+                this.message += this.memory[CreepMemoryKeys.remote]
+
+                const sourceHarvestPos = unpackPosAt(
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                        RoomMemoryKeys.remoteSourceHarvestPositions
+                    ][this.memory[CreepMemoryKeys.sourceIndex]],
+                )
+
+                this.createMoveRequestByPath(
+                    {
+                        origin: this.pos,
+                        goals: [
+                            {
+                                pos: sourceHarvestPos,
+                                range: 1,
+                            },
+                        ],
+                        avoidEnemyRanges: true,
+                        typeWeights: {
+                            [RoomTypes.enemy]: Infinity,
+                            [RoomTypes.ally]: Infinity,
+                            [RoomTypes.sourceKeeper]: Infinity,
+                            [RoomTypes.enemyRemote]: Infinity,
+                            [RoomTypes.allyRemote]: Infinity,
+                        },
+                    },
+                    {
+                        packedPath: reversePosList(
+                            Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                                commune.communeManager.remoteResourcePathType
+                            ][this.memory[CreepMemoryKeys.sourceIndex]],
+                        ),
+                        remoteName: this.memory[CreepMemoryKeys.remote],
+                    },
+                )
+
+                return false
+            }
+
+            this.message += commune.name
+
+            this.createMoveRequestByPath(
+                {
+                    origin: this.pos,
+                    goals: [
+                        {
+                            pos: commune.storage.pos,
+                            range: 1,
+                        },
+                    ],
+                    avoidEnemyRanges: true,
+                    typeWeights: {
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.sourceKeeper]: Infinity,
+                        [RoomTypes.enemyRemote]: Infinity,
+                        [RoomTypes.allyRemote]: Infinity,
+                    },
+                },
+                {
+                    packedPath:
+                        Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                            commune.communeManager.remoteResourcePathType
+                        ][this.memory[CreepMemoryKeys.sourceIndex]],
+                },
+            )
+            return true
+        }
+
+        if (this.room.name === commune.name) {
             this.passiveRenew()
 
             this.runRoomLogisticsRequestsAdvanced({
@@ -532,7 +651,7 @@ export class Hauler extends Creep {
                 {
                     packedPath: reversePosList(
                         Memory.rooms[this.memory[CreepMemoryKeys.remote]][
-                            this.commune.communeManager.remoteResourcePathType
+                            commune.communeManager.remoteResourcePathType
                         ][this.memory[CreepMemoryKeys.sourceIndex]],
                     ),
                     remoteName: this.memory[CreepMemoryKeys.remote],
@@ -542,9 +661,9 @@ export class Hauler extends Creep {
             return false
         }
 
-        this.message += this.commune.name
+        this.message += commune.name
 
-        const anchor = this.commune.roomManager.anchor
+        const anchor = commune.roomManager.anchor
         if (!anchor) throw Error('No anchor for hauler ' + this.room.name)
 
         this.createMoveRequestByPath(
@@ -568,7 +687,7 @@ export class Hauler extends Creep {
             {
                 packedPath:
                     Memory.rooms[this.memory[CreepMemoryKeys.remote]][
-                        this.commune.communeManager.remoteResourcePathType
+                        commune.communeManager.remoteResourcePathType
                     ][this.memory[CreepMemoryKeys.sourceIndex]],
                 loose: true,
             },
@@ -652,12 +771,16 @@ export class Hauler extends Creep {
         creepMemory[CreepMemoryKeys.sourceIndex] = creepAtPosMemory[CreepMemoryKeys.sourceIndex]
         creepAtPosMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
 
+        const taskRoom = creepMemory[CreepMemoryKeys.taskRoom]
+        creepMemory[CreepMemoryKeys.taskRoom] = creepAtPosMemory[CreepMemoryKeys.taskRoom]
+        creepAtPosMemory[CreepMemoryKeys.taskRoom] = taskRoom
+
         //
 
         this.getResources()
 
         const hauler = creepAtPos as Hauler
-        hauler.deliverResources()
+        if (creepAtPosMemory[CreepMemoryKeys.remote]) hauler.deliverResources()
 
         /*
         for (const creep of [this, creepAtPos]) {
@@ -688,10 +811,10 @@ export class Hauler extends Creep {
                 y: moveCoord.y + offset.y,
             }
 
-            if (this.relayCoord(coord)) return true
+            if (this.relayCoord(coord)) return Result.action
         }
 
-        return false
+        return Result.noAction
     }
 
     relayDiagonal?(moveCoord: Coord) {
@@ -715,10 +838,10 @@ export class Hauler extends Creep {
 
             if (coord.x !== moveCoord.x && coord.y !== moveCoord.y) continue
             */
-            if (this.relayCoord(coord)) return true
+            if (this.relayCoord(coord)) return Result.action
         }
 
-        return false
+        return Result.noAction
     }
 
     relay?() {
@@ -730,9 +853,9 @@ export class Hauler extends Creep {
             (!creepMemory[CreepMemoryKeys.path] ||
                 creepMemory[CreepMemoryKeys.path].length / packedPosLength < 2)
         )
-            return
-        if (this.movedResource) return
-        if (!this.nextStore.energy) return
+            return Result.noAction
+        if (this.movedResource) return Result.noAction
+        if (!this.nextStore.energy) return Result.noAction
 
         // Don't relay too close to the source position unless we are fatigued
 
@@ -746,54 +869,49 @@ export class Hauler extends Creep {
                 this.pos,
             ) <= 1
         )
-            return
+            return Result.noAction
 
         const moveCoord = this.moveRequest
             ? unpackCoord(this.moveRequest)
             : unpackPosAt(creepMemory[CreepMemoryKeys.path], 1)
 
         if (this.pos.x === moveCoord.x || this.pos.y === moveCoord.y) {
-            this.relayCardinal(moveCoord)
-            return
+            return this.relayCardinal(moveCoord)
         }
 
-        this.relayDiagonal(moveCoord)
+        return this.relayDiagonal(moveCoord)
     }
 
     travelToCommune?() {
         if (this.room.name === this.commune.name) {
-
             return Result.success
         }
 
         const anchor = this.commune.roomManager.anchor
         if (!anchor) throw Error('no anchor for hauler')
 
-        this.createMoveRequest(
-            {
-                origin: this.pos,
-                goals: [
-                    {
-                        pos: anchor,
-                        range: 3,
-                    },
-                ],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    [RoomTypes.enemy]: Infinity,
-                    [RoomTypes.ally]: Infinity,
-                    [RoomTypes.sourceKeeper]: Infinity,
-                    [RoomTypes.enemyRemote]: Infinity,
-                    [RoomTypes.allyRemote]: Infinity,
+        this.createMoveRequest({
+            origin: this.pos,
+            goals: [
+                {
+                    pos: anchor,
+                    range: 3,
                 },
+            ],
+            avoidEnemyRanges: true,
+            typeWeights: {
+                [RoomTypes.enemy]: Infinity,
+                [RoomTypes.ally]: Infinity,
+                [RoomTypes.sourceKeeper]: Infinity,
+                [RoomTypes.enemyRemote]: Infinity,
+                [RoomTypes.allyRemote]: Infinity,
             },
-        )
+        })
 
         return Result.action
     }
 
     runRestrictedCommuneLogistics?() {
-
         // let it respond to its remote
         if (Memory.creeps[this.name][CreepMemoryKeys.remote]) return Result.fail
         // We aren't in the commune
@@ -812,19 +930,29 @@ export class Hauler extends Creep {
             if (this.parts[MOVE] / this.body.length >= 0.5) return Result.fail
         }
 
+        // success, we are working for the commune now
+
+        const creepMemory = Memory.creeps[this.name]
+        if (!creepMemory[CreepMemoryKeys.taskRoom]) {
+            creepMemory[CreepMemoryKeys.taskRoom] = this.room.name
+            this.commune.communeManager.communeHaulerCarryParts += this.parts.carry
+        }
+
         return this.runCommuneLogistics()
     }
 
     runCommuneLogistics?() {
-
         this.passiveRenew()
-        this.runRoomLogisticsRequestsAdvanced()
+        if (this.runRoomLogisticsRequestsAdvanced() !== Result.success) {
+            this.relay()
+            return Result.action
+        }
 
         return Result.success
     }
 
     run?() {
-        if (this.runRestrictedCommuneLogistics() !== Result.fail) {
+        if (this.runRestrictedCommuneLogistics() === Result.success) {
             return
         }
 

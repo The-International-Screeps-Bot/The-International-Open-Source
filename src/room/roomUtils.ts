@@ -5,6 +5,7 @@ import {
     dynamicScoreRoomRange,
     maxControllerLevel,
     preferredCommuneRange,
+    remoteRoles,
     roomTypeProperties,
     roomTypes,
 } from 'international/constants'
@@ -20,6 +21,7 @@ import {
     roomNameFromRoomXY,
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
+import { CommuneManager } from './commune/commune'
 
 /**
  * considers a position being flooded
@@ -201,5 +203,19 @@ export const roomUtils = {
                 Game.map.getRoomLinearDistance(roomName, a) -
                 Game.map.getRoomLinearDistance(roomName, b),
         )[0]
-    }
+    },
+    updateCreepsOfRemoteName(remoteName: string, communeManager: CommuneManager) {
+
+        const remoteMemory = Memory.rooms[remoteName]
+
+        communeManager.room.creepsOfRemote[remoteName] = {}
+        for (const role of remoteRoles) {
+            communeManager.room.creepsOfRemote[remoteName][role] = []
+        }
+
+        communeManager.remoteSourceHarvesters[remoteName] = []
+        for (const index in remoteMemory[RoomMemoryKeys.remoteSources]) {
+            communeManager.remoteSourceHarvesters[remoteName].push([])
+        }
+    },
 }

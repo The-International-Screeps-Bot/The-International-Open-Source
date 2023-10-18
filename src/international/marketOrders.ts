@@ -2,7 +2,7 @@ import { getAvgPrice } from 'utils/utils'
 import { PlayerMemoryKeys, RoomMemoryKeys } from './constants'
 import { collectiveManager } from './collective'
 
-class MarketOrdersManager {
+export class MarketOrdersManager {
     run() {
         this._allOrdersUnorganized = undefined
         this._myOrders = undefined
