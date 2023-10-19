@@ -8,7 +8,7 @@ export class Claimer extends Creep {
     initRun() {
         if (this.isDying()) return
 
-        const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
         if (!request) return
 
         request[WorkRequestKeys.claimer] -= 1
@@ -64,9 +64,9 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            creep.message = creep.memory[CreepMemoryKeys.taskRoom]
+            creep.message = creep.memory[CreepMemoryKeys.workRequest]
 
-            if (room.name === creep.memory[CreepMemoryKeys.taskRoom]) {
+            if (room.name === creep.memory[CreepMemoryKeys.workRequest]) {
                 creep.claimRoom()
                 continue
             }
@@ -78,7 +78,7 @@ export class Claimer extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]),
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.workRequest]),
                             range: 25,
                         },
                     ],
@@ -92,7 +92,7 @@ export class Claimer extends Creep {
                     },
                 }) === Result.fail
             ) {
-                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
+                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.workRequest]]
                 if (request) request[WorkRequestKeys.abandon] = 20000
             }
         }

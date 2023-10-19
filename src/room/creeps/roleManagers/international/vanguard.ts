@@ -30,7 +30,7 @@ export class Vanguard extends Creep {
         if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined)
             this.room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
 
-        const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
         if (!request) return
 
         request[WorkRequestKeys.vanguard] -= this.parts.work
@@ -139,11 +139,11 @@ export class Vanguard extends Creep {
 
     run?() {
         const creepMemory = Memory.creeps[this.name]
-        this.message = creepMemory[CreepMemoryKeys.taskRoom]
+        this.message = creepMemory[CreepMemoryKeys.workRequest]
 
         if (
-            this.room.name === creepMemory[CreepMemoryKeys.taskRoom] ||
-            !creepMemory[CreepMemoryKeys.taskRoom]
+            this.room.name === creepMemory[CreepMemoryKeys.workRequest] ||
+            !creepMemory[CreepMemoryKeys.workRequest]
         ) {
             if (!this.room.communeManager) return
 
@@ -200,7 +200,7 @@ export class Vanguard extends Creep {
                 origin: this.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]),
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.workRequest]),
                         range: 25,
                     },
                 ],
@@ -212,7 +212,7 @@ export class Vanguard extends Creep {
                 },
             }) === Result.fail
         ) {
-            const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
+            const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
             if (request) request[WorkRequestKeys.abandon] = 20000
         }
     }

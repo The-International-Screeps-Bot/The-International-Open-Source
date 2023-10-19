@@ -1504,7 +1504,7 @@ export class SpawnRequestsManager {
                         minCost: 650,
                         priority: 8.1,
                         memoryAdditions: {
-                            [CreepMemoryKeys.taskRoom]: requestName,
+                            [CreepMemoryKeys.workRequest]: requestName,
                         },
                     }
                 })(),
@@ -1532,7 +1532,7 @@ export class SpawnRequestsManager {
                         minCost: 250,
                         priority: 8.2,
                         memoryAdditions: {
-                            [CreepMemoryKeys.taskRoom]: requestName,
+                            [CreepMemoryKeys.workRequest]: requestName,
                         },
                     }
                 })(),
@@ -1554,7 +1554,7 @@ export class SpawnRequestsManager {
                         minCost: 250,
                         priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
                         memoryAdditions: {
-                            [CreepMemoryKeys.taskRoom]: requestName,
+                            [CreepMemoryKeys.workRequest]: requestName,
                         },
                     }
                 })(),

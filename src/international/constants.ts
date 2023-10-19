@@ -161,6 +161,7 @@ export enum CreepMemoryKeys {
     taskRoom,
     getPulled,
     combatRequest,
+    workRequest,
     flee,
     squadMoveType,
     sleepFor,

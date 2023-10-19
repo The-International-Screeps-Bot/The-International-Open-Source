@@ -1418,6 +1418,7 @@ declare global {
         [CreepMemoryKeys.taskRoom]: string
         [CreepMemoryKeys.getPulled]: boolean
         [CreepMemoryKeys.combatRequest]: string
+        [CreepMemoryKeys.workRequest]: string
         /**
          * Wether the creep is/was trying to flee for their designated
          */

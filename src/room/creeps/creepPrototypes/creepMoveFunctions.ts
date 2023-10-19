@@ -1001,7 +1001,6 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     }
 
     // Otherwise the creepAtPos has no moveRequest, try to shove
-
     if (creepAtPos.shove(new Set([packedCoord]))) {
         this.room.visual.text('S', creepAtPos.pos)
         this.runMoveRequest()

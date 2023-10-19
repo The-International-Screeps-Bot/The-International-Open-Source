@@ -22,7 +22,7 @@ export class AllyVanguard extends Creep {
     }
 
     initRun() {
-        const request = Memory.workRequests[this.memory[CreepMemoryKeys.taskRoom]]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
 
         if (!request) return
 
@@ -175,12 +175,12 @@ export class AllyVanguard extends Creep {
             return
         }
 
-        if (room.name !== this.memory[CreepMemoryKeys.taskRoom]) {
+        if (room.name !== this.memory[CreepMemoryKeys.workRequest]) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [
                     {
-                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.taskRoom]),
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.workRequest]),
                         range: 25,
                     },
                 ],
@@ -205,7 +205,7 @@ export class AllyVanguard extends Creep {
 
             const creep: AllyVanguard = Game.creeps[creepName]
 
-            const request = creep.memory[CreepMemoryKeys.taskRoom]
+            const request = creep.memory[CreepMemoryKeys.workRequest]
 
             creep.message = request
 
@@ -227,7 +227,7 @@ export class AllyVanguard extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.taskRoom]),
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.workRequest]),
                             range: 25,
                         },
                     ],
@@ -239,7 +239,7 @@ export class AllyVanguard extends Creep {
                     },
                 }) === Result.fail
             ) {
-                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.taskRoom]]
+                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.workRequest]]
                 if (request) request[WorkRequestKeys.abandon] = 20000
             }
         }
