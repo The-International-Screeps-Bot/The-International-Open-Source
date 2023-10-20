@@ -62,92 +62,95 @@ import { Operator } from 'room/creeps/powerCreeps/operator'
 import { minCutToExit } from 'room/construction/minCut'
 import { FeatureFlagManager } from 'international/featureFlags'
 
-// Classes
+export function profilerRegister() {
 
-profiler.registerClass(CollectiveManager, 'CollectiveManager')
-profiler.registerClass(StatsManager, 'StatsManager')
-profiler.registerClass(PlayerManager, 'PlayerManager')
-profiler.registerClass(RequestsManager, 'RequestsManager')
-profiler.registerClass(CreepOrganizer, 'CreepOrganizer')
-profiler.registerClass(PowerCreepOrganizer, 'PowerCreepOrganizer')
-profiler.registerClass(SimpleAllies, 'SimpleAllies')
-profiler.registerClass(FlagManager, 'FlagManager')
-profiler.registerClass(FeatureFlagManager, 'FeatureFlagManager')
-profiler.registerClass(MarketOrdersManager, 'MarketOrdersManager')
-profiler.registerClass(ConstructionManager, 'ConstructionSiteManager')
-profiler.registerClass(GarbageCollector, 'GarbageCollector')
-profiler.registerClass(EndTickManager, 'EndTickManager')
-profiler.registerClass(MapVisualsManager, 'MapVisualsManager')
-profiler.registerClass(MigrationManager, 'MigrationManager')
-profiler.registerClass(RoomPruningManager, 'RoomPruningManager')
-profiler.registerClass(ErrorExporter, 'ErrorExporter')
-profiler.registerClass(RespawnManager, 'RespawnManager')
-profiler.registerClass(BasePlans, 'BasePlans')
-profiler.registerClass(RampartPlans, 'RampartPlans')
+    // Classes
 
-// Room classes
+    profiler.registerClass(CollectiveManager, 'CollectiveManager')
+    profiler.registerClass(StatsManager, 'StatsManager')
+    profiler.registerClass(PlayerManager, 'PlayerManager')
+    profiler.registerClass(RequestsManager, 'RequestsManager')
+    profiler.registerClass(CreepOrganizer, 'CreepOrganizer')
+    profiler.registerClass(PowerCreepOrganizer, 'PowerCreepOrganizer')
+    profiler.registerClass(SimpleAllies, 'SimpleAllies')
+    profiler.registerClass(FlagManager, 'FlagManager')
+    profiler.registerClass(FeatureFlagManager, 'FeatureFlagManager')
+    profiler.registerClass(MarketOrdersManager, 'MarketOrdersManager')
+    profiler.registerClass(ConstructionManager, 'ConstructionSiteManager')
+    profiler.registerClass(GarbageCollector, 'GarbageCollector')
+    profiler.registerClass(EndTickManager, 'EndTickManager')
+    profiler.registerClass(MapVisualsManager, 'MapVisualsManager')
+    profiler.registerClass(MigrationManager, 'MigrationManager')
+    profiler.registerClass(RoomPruningManager, 'RoomPruningManager')
+    profiler.registerClass(ErrorExporter, 'ErrorExporter')
+    profiler.registerClass(RespawnManager, 'RespawnManager')
+    profiler.registerClass(BasePlans, 'BasePlans')
+    profiler.registerClass(RampartPlans, 'RampartPlans')
 
-profiler.registerClass(CommuneManager, 'CommuneManager')
-profiler.registerClass(RoomManager, 'RoomManager')
-profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
-profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
-profiler.registerClass(TerminalManager, 'TerminalManager')
-profiler.registerClass(LabManager, 'LabManager')
-profiler.registerClass(FactoryManager, 'FactoryManager')
-profiler.registerClass(CommunePlanner, 'CommunePlanner')
-profiler.registerClass(ConstructionManager, 'ConstructionManager')
-profiler.registerClass(ObserverManager, 'ObserverManager')
-profiler.registerClass(RemotesManager, 'RemotesManager')
-profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
-profiler.registerClass(SourceManager, 'SourceManager')
-profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
-profiler.registerClass(Quad, 'Quad')
-profiler.registerClass(DynamicSquad, 'DynamicSquad')
-profiler.registerClass(Duo, 'Duo')
-profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
-profiler.registerClass(ContainerManager, 'ContainerManager')
-profiler.registerClass(DroppedResourceManager, 'DroppedResourceManager')
-profiler.registerClass(RuinsManager, 'RuinManager')
-profiler.registerClass(TombstoneManager, 'TombstoneManager')
-profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
-profiler.registerClass(LinkManager, 'LinkManager')
-profiler.registerClass(StoringStructuresManager, 'StoringStructuresManager')
-profiler.registerClass(TowerManager, 'TowerManager')
-profiler.registerClass(DefenceManager, 'DefenceManager')
-profiler.registerClass(PowerSpawnsManager, 'PowerSpawnsManager')
-profiler.registerClass(NukerManager, 'NukerManager')
-profiler.registerClass(CombatRequestManager, 'CombatRequestManager')
-profiler.registerClass(HaulerSizeManager, 'HaulerSize')
-profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
-profiler.registerClass(Operator, 'Operator')
+    // Room classes
 
-// Objects
+    profiler.registerClass(CommuneManager, 'CommuneManager')
+    profiler.registerClass(RoomManager, 'RoomManager')
+    profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
+    profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
+    profiler.registerClass(TerminalManager, 'TerminalManager')
+    profiler.registerClass(LabManager, 'LabManager')
+    profiler.registerClass(FactoryManager, 'FactoryManager')
+    profiler.registerClass(CommunePlanner, 'CommunePlanner')
+    profiler.registerClass(ConstructionManager, 'ConstructionManager')
+    profiler.registerClass(ObserverManager, 'ObserverManager')
+    profiler.registerClass(RemotesManager, 'RemotesManager')
+    profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
+    profiler.registerClass(SourceManager, 'SourceManager')
+    profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
+    profiler.registerClass(Quad, 'Quad')
+    profiler.registerClass(DynamicSquad, 'DynamicSquad')
+    profiler.registerClass(Duo, 'Duo')
+    profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
+    profiler.registerClass(ContainerManager, 'ContainerManager')
+    profiler.registerClass(DroppedResourceManager, 'DroppedResourceManager')
+    profiler.registerClass(RuinsManager, 'RuinManager')
+    profiler.registerClass(TombstoneManager, 'TombstoneManager')
+    profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
+    profiler.registerClass(LinkManager, 'LinkManager')
+    profiler.registerClass(StoringStructuresManager, 'StoringStructuresManager')
+    profiler.registerClass(TowerManager, 'TowerManager')
+    profiler.registerClass(DefenceManager, 'DefenceManager')
+    profiler.registerClass(PowerSpawnsManager, 'PowerSpawnsManager')
+    profiler.registerClass(NukerManager, 'NukerManager')
+    profiler.registerClass(CombatRequestManager, 'CombatRequestManager')
+    profiler.registerClass(HaulerSizeManager, 'HaulerSize')
+    profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
+    profiler.registerClass(Operator, 'Operator')
 
-profiler.registerObject(debugUtils, 'debugUtils')
-profiler.registerObject(utils, 'utils')
-profiler.registerObject(marketUtils, 'marketUtils')
+    // Objects
 
-// Room objects
+    profiler.registerObject(debugUtils, 'debugUtils')
+    profiler.registerObject(utils, 'utils')
+    profiler.registerObject(marketUtils, 'marketUtils')
 
-profiler.registerObject(spawnUtils, 'spawnUtils')
-profiler.registerObject(roomUtils, 'roomUtils')
-profiler.registerObject(creepUtils, 'creepUtils')
+    // Room objects
 
-// Functions
+    profiler.registerObject(spawnUtils, 'spawnUtils')
+    profiler.registerObject(roomUtils, 'roomUtils')
+    profiler.registerObject(creepUtils, 'creepUtils')
 
-profiler.registerFN(originalLoop, 'loop')
-profiler.registerFN(customFindPath, 'customFindPath')
-profiler.registerFN(outOfBucket, 'outOfBucket')
+    // Functions
 
-// Room functions
+    profiler.registerFN(originalLoop, 'loop')
+    profiler.registerFN(customFindPath, 'customFindPath')
+    profiler.registerFN(outOfBucket, 'outOfBucket')
 
-profiler.registerFN(minCutToExit, 'minCutToExit')
+    // Room functions
 
-// conditional or complicated
+    profiler.registerFN(minCutToExit, 'minCutToExit')
 
-if (global.userScript) profiler.registerFN(global.userScript, 'userScript')
-if (global.collectivizer) profiler.registerClass(global.collectivizer, 'collectivizer')
+    // conditional or complicated
 
-for (const creepClass of new Set(Object.values(creepClasses))) {
-    profiler.registerClass(creepClass, creepClass.toString().match(/ (\w+)/)[1])
+    if (global.userScript) profiler.registerFN(global.userScript, 'userScript')
+    if (global.collectivizer) profiler.registerClass(global.collectivizer, 'collectivizer')
+
+    for (const creepClass of new Set(Object.values(creepClasses))) {
+        profiler.registerClass(creepClass, creepClass.toString().match(/ (\w+)/)[1])
+    }
 }
