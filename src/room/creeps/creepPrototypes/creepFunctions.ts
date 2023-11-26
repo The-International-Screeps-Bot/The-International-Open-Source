@@ -58,6 +58,7 @@ import { customFindPath } from 'international/customPathFinder'
 import { creepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
 import { CreepRoomLogisticsRequest, RoomLogisticsRequest } from 'types/roomRequests'
+import { customLog, stringifyLog } from 'utils/logging'
 
 Creep.prototype.update = function () {}
 
@@ -1486,10 +1487,11 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     if (this.memory[CreepMemoryKeys.roomLogisticsRequests][0])
         return this.memory[CreepMemoryKeys.roomLogisticsRequests][0]
 
-    delete this.noDelivery
+    if (args) this.noDelivery = args.noDelivery
+    else this.noDelivery = undefined
 
     const types = this.findRoomLogisticsRequestTypes(args)
-    if (!types.size) return Result.fail
+    if (types === Result.fail) return Result.fail
 
     let lowestScore = Infinity
     let bestRequest: RoomLogisticsRequest | 0
@@ -1653,6 +1655,9 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     if (args && args.types) {
         if (args.types.has(RoomLogisticsRequestTypes.transfer) && this.hasNonEnergyResource()) {
+
+            if (args && args.noDelivery) return Result.fail
+
             this.noDelivery = true
             return new Set([RoomLogisticsRequestTypes.transfer])
         }
@@ -1671,6 +1676,9 @@ Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
     }
 
     if (this.hasNonEnergyResource()) {
+
+        if (args && args.noDelivery) return Result.fail
+
         this.noDelivery = true
         return new Set([RoomLogisticsRequestTypes.transfer])
     }
@@ -1710,11 +1718,9 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
             if (this.noDelivery) return false
 
             // There are no practical storing structures to deliver from
-
             if (this.room.name !== this.commune.name) return false
 
             // We don't have space to get any
-
             if (this.freeNextStore <= 0) return false
             /*
             // Try to find a sufficient withdraw or offer task
@@ -1910,7 +1916,7 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
 
 Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     const request = this.findRoomLogisticsRequest(args)
-    if (!request) return Result.fail
+    if (!request) return Result.noAction
 
     /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
     const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
@@ -1930,7 +1936,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
         if (result === Result.fail) {
 
             this.room.roomManager.roomLogisticsBlacklistCoords.add(packCoord(target.pos))
-            Result.success
+            Result.fail
         }
 
         return Result.action
@@ -1956,6 +1962,9 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     }
 
     if (request[CreepRoomLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+
+        stringifyLog('tried to resolve request for ' + this.name, request)
+
         const result = this.transfer(
             target as AnyStoreStructure | Creep,
             request[CreepRoomLogisticsRequestKeys.resourceType],
@@ -2026,7 +2035,7 @@ Creep.prototype.runRoomLogisticsRequestsAdvanced = function (args) {
     if (this.spawning) return Result.noAction
 
     const result = this.runRoomLogisticsRequestAdvanced(args)
-    if (result !== Result.success) return result
+    if (result === Result.action) return result
 
     this.runRoomLogisticsRequestAdvanced(args)
     return Result.success

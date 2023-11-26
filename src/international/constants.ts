@@ -292,7 +292,6 @@ export enum RoomMemoryKeys {
     remoteSourceHubPaths,
     clearedEnemyStructures,
     lastStructureCheck,
-    roadsQuota,
     roads,
     remoteSourceCredit,
     remoteSourceCreditChange,

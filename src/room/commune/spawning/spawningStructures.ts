@@ -11,7 +11,7 @@ import {
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 import { LogTypes, customLog, stringifyLog } from 'utils/logging'
-import { findAdjacentCoordsToCoord, getRange, newID } from 'utils/utils'
+import { findAdjacentCoordsToCoord, getRange, newID, utils } from 'utils/utils'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawnUtils'
@@ -20,6 +20,7 @@ import { spawnUtils } from './spawnUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { debugUtils } from 'debug/debugUtils'
 import { SpawnRequest, SpawnRequestArgs } from 'types/spawnRequest'
+import { spawnRequestUtils } from './spawnRequestUtils'
 
 export class SpawningStructuresManager {
     communeManager: CommuneManager
@@ -95,7 +96,6 @@ export class SpawningStructuresManager {
         this.spawnIndex = this.inactiveSpawns.length - 1
 
         for (const spawnRequestArgs of spawnRequestsArgs) {
-
             const spawnRequests = this.constructSpawnRequests(spawnRequestArgs)
 
             // Loop through priorities inside requestsByPriority
@@ -107,7 +107,6 @@ export class SpawningStructuresManager {
     }
 
     private runSpawnRequest(request: SpawnRequest): Result {
-
         // We're trying to build a creep larger than this room can spawn
         // If this is ran then there is a bug in spawnRequest creation
 
@@ -129,8 +128,10 @@ export class SpawningStructuresManager {
             customLog(
                 'Failed to spawn: not enough energy',
                 `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
-                    this.communeManager.nextSpawnEnergyAvailable
-                } / ${request.cost}, body: ${JSON.stringify(request.bodyPartCounts)}`,
+                    request.cost
+                } / ${this.communeManager.nextSpawnEnergyAvailable}, body: ${JSON.stringify(
+                    request.bodyPartCounts,
+                )}`,
                 {
                     type: LogTypes.warning,
                 },
@@ -152,11 +153,20 @@ export class SpawningStructuresManager {
         // If creep can't be spawned
 
         if (testSpawnResult !== OK) {
-            // Log the error and stop the loop
+            if (testSpawnResult === ERR_NOT_ENOUGH_ENERGY) {
+                customLog(
+                    'Failed to spawn: dryrun failed',
+                    `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}, body: (${request.body.length}) ${request.body}`,
+                    {
+                        type: LogTypes.error,
+                    },
+                )
+                return Result.fail
+            }
 
             customLog(
                 'Failed to spawn: dryrun failed',
-                `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost}, body: (${request.body.length}) ${request.body}`,
+                `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}, body: (${request.body.length}) ${request.body}`,
                 {
                     type: LogTypes.error,
                 },
@@ -196,7 +206,6 @@ export class SpawningStructuresManager {
     }
 
     private configSpawnRequest(request: SpawnRequest) {
-
         request.body = []
 
         if (request.role === 'hauler') {
@@ -276,377 +285,13 @@ export class SpawningStructuresManager {
     }
 
     private constructSpawnRequests(args: SpawnRequestArgs) {
-
         if (args.minCreeps !== undefined) {
             // We know how many creeps we want, do them seperately and uniformly
-            return this.spawnRequestIndividually(args)
+            return spawnRequestUtils.spawnRequestIndividually(this.communeManager.room, args)
         }
 
         // We don't know how many creeps we want
-        return this.spawnRequestByGroup(args)
-    }
-
-    private findMaxCostPerCreep(maxCostPerCreep: number) {
-        if (!maxCostPerCreep) maxCostPerCreep = this.communeManager.room.energyCapacityAvailable
-
-        // If there are missing a type of basic eco creep
-        if (
-            this.communeManager.room.myCreeps.sourceHarvester.length === 0 ||
-            this.communeManager.room.myCreeps.hauler.length === 0
-        ) {
-            // We need a basic eco, just spawn whatever we can that's acceptable
-            return Math.min(maxCostPerCreep, this.communeManager.room.energyAvailable)
-        }
-
-        // We have a basic eco, try to have creeps meet the prescribed cost
-        return Math.min(maxCostPerCreep, this.communeManager.room.energyCapacityAvailable)
-    }
-
-    private createSpawnRequest(
-        priority: number,
-        role: CreepRoles,
-        defaultParts: number,
-        bodyPartCounts: { [key in PartsByPriority]: number },
-        tier: number,
-        cost: number,
-        memory: any,
-    ): SpawnRequest {
-        return {
-            role,
-            priority,
-            defaultParts,
-            bodyPartCounts,
-            tier,
-            cost,
-            extraOpts: {
-                memory,
-            },
-        }
-    }
-
-    private spawnRequestIndividually(args: SpawnRequestArgs) {
-        const spawnRequests: SpawnRequest[] = []
-
-        const maxCostPerCreep = Math.max(
-            this.findMaxCostPerCreep(args.maxCostPerCreep),
-            args.minCost,
-        )
-
-        // So long as minCreeps is more than the current number of creeps
-
-        while (
-            args.minCreeps >
-            (args.spawnGroup
-                ? args.spawnGroup.length
-                : this.communeManager.room.creepsFromRoom[args.role].length)
-        ) {
-            // Construct important imformation for the spawnRequest
-
-            let bodyPartCounts: { [key in PartsByPriority]: number } = {
-                tough: 0,
-                claim: 0,
-                attack: 0,
-                ranged_attack: 0,
-                secondaryTough: 0,
-                work: 0,
-                carry: 0,
-                move: 0,
-                secondaryAttack: 0,
-                heal: 0,
-            }
-
-            let tier = 0
-            let cost = 0
-
-            let partCost
-
-            // If there are defaultParts
-
-            if (args.defaultParts.length) {
-                tier += 1
-
-                // Loop through defaultParts
-
-                for (const part of args.defaultParts) {
-                    partCost = BODYPART_COST[part]
-                    if (cost + partCost > maxCostPerCreep) break
-
-                    cost += partCost
-                    bodyPartCounts[part] += 1
-                }
-            }
-
-            // If there are extraParts
-
-            if (args.extraParts.length) {
-                // Use the partsMultiplier to decide how many extraParts are needed on top of the defaultParts, at a max of 50
-
-                let remainingAllowedParts = Math.min(
-                    50 - args.defaultParts.length,
-                    args.extraParts.length * args.partsMultiplier,
-                )
-
-                // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
-
-                while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
-                    const addedParts: BodyPartConstant[] = []
-
-                    // Loop through each part in extraParts
-
-                    for (const part of args.extraParts) {
-                        // And add the part's cost to the cost
-
-                        cost += BODYPART_COST[part]
-
-                        // Otherwise add the part the the body
-
-                        addedParts.push(part)
-
-                        // Reduce remainingAllowedParts
-
-                        remainingAllowedParts -= 1
-                    }
-
-                    // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts
-
-                    if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-                        // Assign partIndex as the length of extraParts
-
-                        let partIndex = args.extraParts.length - 1
-
-                        while (partIndex >= 0) {
-                            const part = args.extraParts[partIndex]
-
-                            // Get the cost of the part
-
-                            partCost = BODYPART_COST[part]
-
-                            // If the cost minus partCost is below minCost, stop the loop
-
-                            if (cost - partCost < args.minCost) break
-
-                            // And remove the part's cost to the cost
-
-                            cost -= partCost
-
-                            // Remove the last part in the body
-
-                            addedParts.pop()
-
-                            // Increase remainingAllowedParts
-
-                            remainingAllowedParts += 1
-
-                            // Decrease the partIndex
-
-                            partIndex -= 1
-                        }
-
-                        // Increase tier by a percentage (2 decimals) of the extraParts it added
-
-                        tier += Math.floor((addedParts.length / args.extraParts.length) * 100) / 100
-                        for (const part of addedParts) bodyPartCounts[part] += 1
-                        break
-                    }
-
-                    tier += 1
-                    for (const part of addedParts) bodyPartCounts[part] += 1
-                }
-            }
-
-            // Create a spawnRequest using previously constructed information
-
-            const request = this.createSpawnRequest(
-                args.priority,
-                args.role,
-                args.defaultParts.length,
-                bodyPartCounts,
-                tier,
-                cost,
-                args.memoryAdditions,
-            )
-            spawnRequests.push(request)
-
-            // Reduce the number of minCreeps
-
-            args.minCreeps -= 1
-        }
-
-        return spawnRequests
-    }
-
-    private spawnRequestByGroup(args: SpawnRequestArgs) {
-        const spawnRequests: SpawnRequest[] = []
-
-        const maxCostPerCreep = Math.max(
-            this.findMaxCostPerCreep(args.maxCostPerCreep),
-            args.minCost,
-        )
-
-        // Find the totalExtraParts using the partsMultiplier
-
-        let totalExtraParts = Math.floor(args.extraParts.length * args.partsMultiplier)
-
-        // Construct from totalExtraParts at a max of 50 - number of defaultParts
-
-        const maxPartsPerCreep = Math.min(50 - args.defaultParts.length, totalExtraParts)
-
-        // Loop through creep names of the requested role
-
-        for (const creepName of args.spawnGroup ||
-            this.communeManager.room.creepsFromRoom[args.role]) {
-            const creep = Game.creeps[creepName]
-
-            // Take away the amount of parts the creep with the name has from totalExtraParts
-
-            totalExtraParts -= creep.body.length - creep.defaultParts
-        }
-
-        // If there aren't enough requested parts to justify spawning a creep, stop
-
-        if (totalExtraParts < maxPartsPerCreep * (args.threshold || 0.25)) return spawnRequests
-
-        if (!args.maxCreeps) {
-            args.maxCreeps = Number.MAX_SAFE_INTEGER
-        }
-
-        // Subtract maxCreeps by the existing number of creeps of this role
-        else {
-            args.maxCreeps -= args.spawnGroup
-                ? args.spawnGroup.length
-                : this.communeManager.room.creepsFromRoom[args.role].length
-        }
-
-        // So long as there are totalExtraParts left to assign
-
-        // Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
-        if (args.extraParts.length == 0) {
-            customLog('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
-                type: LogTypes.error,
-            })
-            return spawnRequests
-        }
-
-        while (totalExtraParts >= args.extraParts.length && args.maxCreeps > 0) {
-            // Construct important imformation for the spawnRequest
-
-            let bodyPartCounts: { [key in PartsByPriority]: number } = {
-                tough: 0,
-                claim: 0,
-                attack: 0,
-                ranged_attack: 0,
-                secondaryTough: 0,
-                work: 0,
-                carry: 0,
-                move: 0,
-                secondaryAttack: 0,
-                heal: 0,
-            }
-            let tier = 0
-            let cost = 0
-
-            let partCost
-
-            // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
-
-            let remainingAllowedParts = maxPartsPerCreep
-
-            // If there are defaultParts
-
-            if (args.defaultParts.length) {
-                // Increment tier
-
-                tier += 1
-
-                // Loop through defaultParts
-
-                for (const part of args.defaultParts) {
-                    partCost = BODYPART_COST[part]
-                    if (cost + partCost > maxCostPerCreep) break
-
-                    cost += partCost
-                    bodyPartCounts[part] += 1
-                }
-            }
-
-            // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
-
-            while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
-                const addedParts: BodyPartConstant[] = []
-
-                for (const part of args.extraParts) {
-                    cost += BODYPART_COST[part]
-                    addedParts.push(part)
-
-                    remainingAllowedParts -= 1
-                    totalExtraParts -= 1
-                }
-
-                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
-
-                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
-                    // Assign partIndex as the length of extraParts
-
-                    let partIndex = args.extraParts.length - 1
-
-                    // So long as partIndex is greater or equal to 0
-
-                    while (partIndex >= 0) {
-                        const part = args.extraParts[partIndex]
-
-                        partCost = BODYPART_COST[part]
-                        if (cost - partCost < args.minCost) break
-
-                        // And remove the part's cost to the cost
-
-                        cost -= partCost
-
-                        // Remove the last part in the body
-
-                        addedParts.pop()
-
-                        // Increase remainingAllowedParts and totalExtraParts
-
-                        remainingAllowedParts += 1
-                        totalExtraParts += 1
-
-                        // Decrease the partIndex
-
-                        partIndex -= 1
-                    }
-
-                    // Increase tier by a percentage (2 decimals) of the extraParts it added
-
-                    tier += Math.floor((addedParts.length / args.extraParts.length) * 100) / 100
-                    for (const part of addedParts) bodyPartCounts[part] += 1
-                    break
-                }
-
-                tier += 1
-                for (const part of addedParts) {
-                    bodyPartCounts[part] += 1
-                }
-            }
-
-            // Create a spawnRequest using previously constructed information
-
-            const request = this.createSpawnRequest(
-                args.priority,
-                args.role,
-                args.defaultParts.length,
-                bodyPartCounts,
-                tier,
-                cost,
-                args.memoryAdditions,
-            )
-            spawnRequests.push(request)
-
-            // Decrease maxCreeps counter
-
-            args.maxCreeps -= 1
-        }
-
-        return spawnRequests
+        return spawnRequestUtils.spawnRequestByGroup(this.communeManager.room, args)
     }
 
     createPowerTasks() {
@@ -675,7 +320,7 @@ export class SpawningStructuresManager {
      * Spawn request debugging
      */
     private test() {
-/*
+        /*
         const args = this.communeManager.spawnRequestsManager.run()
         stringifyLog('spawn request args', args)
         stringifyLog('request', this.constructSpawnRequests(args[0]))
@@ -687,7 +332,6 @@ export class SpawningStructuresManager {
     }
 
     private testArgs() {
-
         const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
 
         for (const request of spawnRequestsArgs) {
@@ -719,11 +363,9 @@ export class SpawningStructuresManager {
         const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
 
         for (const requestArgs of spawnRequestsArgs) {
-
             const spawnRequests = this.constructSpawnRequests(requestArgs)
 
             for (const request of spawnRequests) {
-
                 const row: any[] = []
                 row.push(requestArgs.role)
                 row.push(requestArgs.priority)

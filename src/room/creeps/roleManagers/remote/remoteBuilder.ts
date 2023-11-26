@@ -60,9 +60,10 @@ export class RemoteBuilder extends Creep {
 
         const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
+        if (remoteMemory[RoomMemoryKeys.disable]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
 
         return true
     }
@@ -78,9 +79,10 @@ export class RemoteBuilder extends Creep {
             const remoteName = splitRemoteInfo[0]
 
             const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
-            if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) continue
 
             this.assignRemote(remoteName)
             return true

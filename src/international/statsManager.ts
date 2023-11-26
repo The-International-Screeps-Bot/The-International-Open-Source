@@ -376,11 +376,11 @@ export class StatsManager {
                 ? Game.cpu.getUsed()
                 : // limit * time step from last stats recording
                   Game.cpu.limit * (Game.time - Memory.stats.lastTick)
-
+        /* customLog('STATS' + (Game.time - Memory.stats.lastTick), usedCPU) */
         Memory.stats.cpu = {
             bucket: Game.cpu.bucket,
             limit: Game.cpu.limit,
-            usage: this.average(Memory.stats.cpu.usage, usedCPU),
+            usage: this.averageMarginalTimeStep(Memory.stats.cpu.usage, usedCPU),
         }
 
         // Make sure this runs last
@@ -403,6 +403,24 @@ export class StatsManager {
 
         avg -= (avg / averagedOverTickCount) * timeStep
         avg += dataPoint / timeStep / averagedOverTickCount
+
+        return roundTo(avg, precision)
+    }
+
+    /**
+     * average but don't account for time skips
+     */
+    private averageMarginalTimeStep(
+        avg: number,
+        dataPoint: number,
+        averagedOverTickCount: number = 1000,
+        precision: number = 8,
+    ) {
+        if (!avg) avg = 0
+        if (!dataPoint) dataPoint = 0
+
+        avg -= avg / averagedOverTickCount
+        avg += dataPoint / averagedOverTickCount
 
         return roundTo(avg, precision)
     }

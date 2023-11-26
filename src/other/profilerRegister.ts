@@ -135,6 +135,8 @@ export function profilerRegister() {
     profiler.registerObject(roomUtils, 'roomUtils')
     profiler.registerObject(creepUtils, 'creepUtils')
 
+    profiler.registerFunctionsObject('creepUtils', creepUtils)
+
     // Functions
 
     profiler.registerFN(originalLoop, 'loop')

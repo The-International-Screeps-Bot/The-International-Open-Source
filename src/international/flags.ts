@@ -47,8 +47,8 @@ export class FlagManager {
         const data: any[][] = []
 
         for (const transaction of Game.market.incomingTransactions) {
-            const roomFromMemory = Memory.rooms[transaction.from]
-            const roomToMemory = Memory.rooms[transaction.to]
+            const roomFromMemory = Memory.rooms[transaction.from] || {} as RoomMemory
+            const roomToMemory = Memory.rooms[transaction.to] || {} as RoomMemory
 
             data.push([
                 transaction.from +
@@ -114,8 +114,8 @@ export class FlagManager {
         const data: any[][] = []
 
         for (const transaction of Game.market.outgoingTransactions) {
-            const roomFromMemory = Memory.rooms[transaction.from]
-            const roomToMemory = Memory.rooms[transaction.to]
+            const roomFromMemory = Memory.rooms[transaction.from] || {} as RoomMemory
+            const roomToMemory = Memory.rooms[transaction.to] || {} as RoomMemory
 
             data.push([
                 transaction.from +

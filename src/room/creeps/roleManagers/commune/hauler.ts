@@ -81,10 +81,11 @@ export class Hauler extends Creep {
 
         const remoteMemory = Memory.rooms[remoteName]
 
-        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
-        if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
+        if (remoteMemory[RoomMemoryKeys.disable]) return false
         if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
+        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
+        if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
 
         return true
     }
@@ -99,11 +100,13 @@ export class Hauler extends Creep {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const remoteMemory = Memory.rooms[remoteName]
+
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 
             const sourceIndex = parseInt(splitRemoteInfo[1])
-
             if (!this.isRemoteValid(remoteName, sourceIndex)) continue
 
             /* this.room.visual.text((this.freeNextStore + remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex]).toString(), this.pos.x, this.pos.y + 0.5) */
@@ -116,14 +119,12 @@ export class Hauler extends Creep {
 
     isRemoteValid?(remoteName: string, sourceIndex: number) {
         const remoteMemory = Memory.rooms[remoteName]
-
-        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
-        if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
+        const commune = this.commune
 
         // Make sure we have enough life to get there
 
         const pathLength =
-            remoteMemory[this.commune.communeManager.remoteResourcePathType][sourceIndex].length /
+            remoteMemory[commune.communeManager.remoteResourcePathType][sourceIndex].length /
             packedPosLength
         if (pathLength >= this.ticksToLive) return false
 
@@ -134,6 +135,15 @@ export class Hauler extends Creep {
             this.freeNextStore
         ) {
             return false
+        }
+
+        // If we do roads but the remote doesn't - change to be a low-priority search later
+        if (Memory.creeps[this.name][CreepMemoryKeys.preferRoads]) {
+
+            const roadsQuota = remoteMemory[commune.communeManager.remoteResourcePathType][sourceIndex].length / packedPosLength
+
+            // See if there are roads close enough or more than the quota
+            if (remoteMemory[RoomMemoryKeys.roads][sourceIndex] < roadsQuota * 0.9) return false
         }
 
         return true
@@ -153,6 +163,7 @@ export class Hauler extends Creep {
         creepMemory[CreepMemoryKeys.remote] = remoteName
         creepMemory[CreepMemoryKeys.sourceIndex] = sourceIndex
         creepMemory[CreepMemoryKeys.taskRoom] = undefined
+        creepMemory[CreepMemoryKeys.roomLogisticsRequests] = []
 
         this.applyRemote()
     }
@@ -344,7 +355,7 @@ export class Hauler extends Creep {
         )
 
         this.message += creepMemory[CreepMemoryKeys.remote]
-
+        console.log(creepMemory[CreepMemoryKeys.remote])
         this.createMoveRequestByPath(
             {
                 origin: this.pos,
@@ -492,9 +503,10 @@ export class Hauler extends Creep {
             if (this.room.name === commune.name) {
                 this.passiveRenew()
 
-                const logisticsResult = this.runRoomLogisticsRequestAdvanced({
+                this.runRoomLogisticsRequestAdvanced({
                     types: new Set([RoomLogisticsRequestTypes.transfer]),
                     resourceTypes: new Set([RESOURCE_ENERGY]),
+                    noDelivery: true,
                     conditions: request => {
                         // If the target is near the creep
 
@@ -503,7 +515,8 @@ export class Hauler extends Creep {
                     },
                 })
 
-                if (logisticsResult !== Result.success) {
+                // We haven't emptied ourselves yet
+                if (!this.needsResources()) {
 
                     if (getRange(this.pos, commune.storage.pos) <= 1) return true
 
@@ -534,9 +547,6 @@ export class Hauler extends Creep {
                     )
                     return true
                 }
-
-                // We haven't emptied ourselves yet
-                if (!this.needsResources()) return true
                 this.removeRemote()
                 if (!this.findRemote()) return false
 
@@ -756,9 +766,11 @@ export class Hauler extends Creep {
 
         // Trade room logistics requests
 
-        creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests] =
-            creepMemory[CreepMemoryKeys.roomLogisticsRequests]
-        creepMemory[CreepMemoryKeys.roomLogisticsRequests] = []
+        const creepAtPosRequests = Array.from(creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests])
+        creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests] = Array.from(
+            creepMemory[CreepMemoryKeys.roomLogisticsRequests],
+        )
+        creepMemory[CreepMemoryKeys.roomLogisticsRequests] = creepAtPosRequests
 
         // Trade remotes and sourceIndexes
         // Delete from creepAtPos because it is returning home, not responding to a remote
@@ -795,8 +807,9 @@ export class Hauler extends Creep {
         */
 
         if (this.moveRequest) this.room.targetVisual(this.pos, unpackCoord(this.moveRequest), true)
-        if (creepAtPos.moveRequest)
+        if (creepAtPos.moveRequest) {
             creepAtPos.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
+        }
 
         return true
     }
@@ -860,14 +873,15 @@ export class Hauler extends Creep {
         // Don't relay too close to the source position unless we are fatigued
 
         if (
-            !this.fatigue &&
-            creepMemory[CreepMemoryKeys.remote] === this.room.name &&
-            getRange(
-                this.room.roomManager.remoteSourceHarvestPositions[
-                    creepMemory[CreepMemoryKeys.sourceIndex]
-                ][0],
-                this.pos,
-            ) <= 1
+            creepMemory[CreepMemoryKeys.taskRoom] === this.room.name ||
+            (!this.fatigue &&
+                creepMemory[CreepMemoryKeys.remote] === this.room.name &&
+                getRange(
+                    this.room.roomManager.remoteSourceHarvestPositions[
+                        creepMemory[CreepMemoryKeys.sourceIndex]
+                    ][0],
+                    this.pos,
+                ) <= 1)
         )
             return Result.noAction
 
@@ -943,6 +957,7 @@ export class Hauler extends Creep {
 
     runCommuneLogistics?() {
         this.passiveRenew()
+
         if (this.runRoomLogisticsRequestsAdvanced() !== Result.success) {
             this.relay()
             return Result.action
@@ -952,7 +967,7 @@ export class Hauler extends Creep {
     }
 
     run?() {
-        if (this.runRestrictedCommuneLogistics() === Result.success) {
+        if (this.runRestrictedCommuneLogistics() !== Result.fail) {
             return
         }
 

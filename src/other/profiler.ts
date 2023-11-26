@@ -180,6 +180,14 @@ function profileObjectFunctions(object, label) {
     })
 }
 
+function profileFunctionsObject(name: string, obj: {[functionName: string]: any}) {
+
+    for (const functionName in obj) {
+
+        wrapFunction(functionName, object[functionName])
+    }
+}
+
 function profileFunction(fn, functionName) {
     const fnName = functionName || fn.name
     if (!fnName) {
@@ -496,6 +504,7 @@ const profiler = {
     callgrind: Profiler.callgrind,
 
     registerObject: profileObjectFunctions,
+    registerFunctionsObject: profileFunctionsObject,
     registerFN: profileFunction,
     registerClass: profileObjectFunctions,
 }

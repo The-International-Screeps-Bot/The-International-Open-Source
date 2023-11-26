@@ -9,11 +9,13 @@ interface FeatureFlagConfig {
 }
 
 export class FeatureFlagManager {
-    private readonly flags: FeatureFlagConfig // An object to hold the flag configuration
-
-    constructor(config: FeatureFlagConfig) {
-        this.flags = config // Set the flag configuration when creating a new instance
+    // An object to hold the flag configuration
+    flags: FeatureFlagConfig = {
+        [Feature.testFeatureEnabled]: false,
+        [Feature.testFeatureDisabled]: false,
     }
+
+    constructor() {}
 
     // Method to check if a combination of feature flags are turned on
     areFlagsOn(flags: Feature[]): boolean {
@@ -21,7 +23,4 @@ export class FeatureFlagManager {
     }
 }
 
-export const FeatureFlags = new FeatureFlagManager({
-    [Feature.testFeatureEnabled]: false,
-    [Feature.testFeatureDisabled]: false,
-})
+export const featureFlagManager = new FeatureFlagManager()

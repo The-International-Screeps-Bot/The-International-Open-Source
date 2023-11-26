@@ -83,10 +83,11 @@ export class RemoteHarvester extends Creep {
 
         const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
 
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
+        if (remoteMemory[RoomMemoryKeys.disable]) return false
+        if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
-        if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
 
         return true
     }
@@ -94,8 +95,6 @@ export class RemoteHarvester extends Creep {
     isRemoteValid?(remoteName: string, sourceIndex: number) {
         const remoteMemory = Memory.rooms[remoteName]
 
-        if (remoteMemory[RoomMemoryKeys.enemyReserved]) return false
-        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         // Make sure there are enough harvest positions for us
         if (
             this.commune.communeManager.remoteSourceHarvesters[remoteName][sourceIndex].length >=
@@ -122,6 +121,10 @@ export class RemoteHarvester extends Creep {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
             const remoteMemory = Memory.rooms[remoteName]
+
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 

@@ -93,12 +93,12 @@ export function originalLoop() {
 
         mapVisualsManager.run()
         simpleAllies.endRun()
+        marketOrdersManager.advancedSellPixels()
+        if (global.userScript) global.userScript.endRun()
         statsManager.internationalEndRun()
 
         collectiveManager.advancedGeneratePixel()
-        marketOrdersManager.advancedSellPixels()
 
-        if (global.userScript) global.userScript.endRun()
         endTickManager.run()
     })
 }

@@ -77,11 +77,13 @@ export class RemoteReserver extends Creep {
         const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
         for (const remoteName of remoteNamesByEfficacy) {
             const remoteMemory = Memory.rooms[remoteName]
+
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            if (remoteMemory[RoomMemoryKeys.remoteReservers] <= 0) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 
-            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
-            if (remoteMemory[RoomMemoryKeys.remoteReservers] <= 0) continue
 
             this.assignRemote(remoteName)
             return true
@@ -96,9 +98,10 @@ export class RemoteReserver extends Creep {
 
         const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
 
+        if (remoteMemory[RoomMemoryKeys.disable]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
         if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
         if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
-        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
 
         return true
     }

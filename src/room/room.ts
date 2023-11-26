@@ -146,7 +146,6 @@ export class RoomManager {
         delete this._communeSources
         delete this._remoteSources
         delete this._mineral
-        delete this._structureUpdate
         delete this.checkedCSiteUpdate
         delete this._structures
         delete this._cSites
@@ -161,7 +160,6 @@ export class RoomManager {
         delete this._dismantleTargets
         delete this._destructibleStructures
         delete this._combatStructureTargets
-        delete this._fastFillerPositions
         delete this._remoteNamesByEfficacy
         delete this._remoteSourceIndexesByEfficacy
 
@@ -364,6 +362,7 @@ export class RoomManager {
     findRemoteSourceFastFillerPaths(
         commune: Room,
         packedRemoteSourceHarvestPositions: string[],
+        weightCoords: {[packedCoord: string]: number},
         pathsThrough: Set<string>,
     ) {
         const anchor = commune.roomManager.anchor
@@ -378,6 +377,9 @@ export class RoomManager {
                 goals: [{ pos: anchor, range: 3 }],
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
+                weightCoords: {
+                    [this.room.name]:weightCoords
+                },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
                     remoteResourcePathType: RoomMemoryKeys.remoteSourceFastFillerPaths,
@@ -403,6 +405,7 @@ export class RoomManager {
     findRemoteSourceHubPaths(
         commune: Room,
         packedRemoteSourceHarvestPositions: string[],
+        weightCoords: {[packedCoord: string]: number},
         pathsThrough: Set<string>,
     ) {
         const stampAnchors = commune.roomManager.stampAnchors
@@ -432,6 +435,9 @@ export class RoomManager {
                 goals: [{ pos: goalPos, range: 1 }],
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
+                weightCoords: {
+                    [this.room.name]:weightCoords
+                },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
                     remoteResourcePathType: RoomMemoryKeys.remoteSourceHubPaths,
@@ -488,6 +494,7 @@ export class RoomManager {
     findRemoteControllerPath(
         commune: Room,
         packedRemoteControllerPositions: string,
+        weightCoords: {[packedCoord: string]: number},
         pathsThrough: Set<string>,
     ) {
         const anchor = commune.roomManager.anchor
@@ -499,6 +506,9 @@ export class RoomManager {
             goals: [{ pos: anchor, range: 3 }],
             typeWeights: remoteTypeWeights,
             plainCost: defaultRoadPlanningPlainCost,
+            weightCoords: {
+                [this.room.name]:weightCoords
+            },
             weightCommuneStructurePlans: true,
             weightRemoteStructurePlans: {
                 remoteResourcePathType: RoomMemoryKeys.remoteSourceFastFillerPaths,
@@ -941,11 +951,13 @@ export class RoomManager {
 
         this._structureCoords = undefined
         this._upgradePositions = undefined
+        this._fastFillerPositions = undefined
         this.sourceContainerIDs = undefined
         this.fastFillerContainerIDs = undefined
 
         const communeManager = this.room.communeManager
         if (communeManager) {
+            communeManager.actionableSpawningStructuresIDs = undefined
             communeManager.spawningStructuresByPriorityIDs = undefined
             communeManager._fastFillerSpawnEnergyCapacity = undefined
             communeManager.sourceLinkIDs = []
@@ -1386,7 +1398,7 @@ export class RoomManager {
 
     _fastFillerPositions: RoomPosition[]
     get fastFillerPositions() {
-        if (this._fastFillerPositions) return this._fastFillerPositions
+        if (this._fastFillerPositions && !this.structureUpdate) return this._fastFillerPositions
 
         const anchor = this.anchor
         if (!anchor) throw Error('no anchor')

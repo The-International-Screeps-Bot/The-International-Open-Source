@@ -900,12 +900,19 @@ export class CommuneManager {
         return (this._fastFillerSpawnEnergyCapacity = fastFillerSpawnEnergyCapacity)
     }
 
+    actionableSpawningStructuresIDs: Id<StructureSpawn | StructureExtension>[]
     _actionableSpawningStructures: SpawningStructures
     /**
      * RCL actionable spawns and extensions
      */
     get actionableSpawningStructures() {
         if (this._actionableSpawningStructures) return this._actionableSpawningStructures
+
+        if (this.actionableSpawningStructuresIDs) {
+            return (this._actionableSpawningStructures = this.actionableSpawningStructuresIDs.map(
+                ID => findObjectWithID(ID),
+            ))
+        }
 
         const structures = this.room.roomManager.structures
 
@@ -915,6 +922,9 @@ export class CommuneManager {
             structure => structure.RCLActionable,
         )
 
+        this.actionableSpawningStructuresIDs = actionableSpawningStructures.map(
+            structure => structure.id,
+        )
         return (this._actionableSpawningStructures = actionableSpawningStructures)
     }
 
@@ -953,7 +963,7 @@ export class CommuneManager {
         return (this._spawningStructuresByPriority = spawningStructuresByPriority)
     }
 
-    spawningStructuresByNeedIDs: Id<StructureExtension | StructureSpawn>[]
+    spawningStructuresByNeedCoords: Id<StructureExtension | StructureSpawn>[]
     _spawningStructuresByNeed: SpawningStructures
     get spawningStructuresByNeed() {
         if (this._spawningStructuresByNeed) return this._spawningStructuresByNeed
@@ -997,7 +1007,22 @@ export class CommuneManager {
     }
 
     private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
-        const fastFillerLink = this.room.roomManager.fastFillerLink
+        const fastFillerPositions = this.room.roomManager.fastFillerPositions
+        for (const pos of fastFillerPositions) {
+            // Make sure the position is reserved (presumably by a fastFiller)
+
+            const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+            if (!reserveType) continue
+            if (reserveType < ReservedCoordTypes.dying) continue
+
+            // register structures the fastFiller should be able to fill
+            forCoordsAroundRange(pos, 1, coord => {
+                ignoreCoords.add(packCoord(coord))
+            })
+        }
+
+        return ignoreCoords
+        /* const fastFillerLink = this.room.roomManager.fastFillerLink
         if (
             fastFillerLink &&
             fastFillerLink.RCLActionable &&
@@ -1063,6 +1088,7 @@ export class CommuneManager {
         // There are no valid links or containers in the fastFiller
 
         return ignoreCoords
+         */
     }
 
     /**

@@ -36,6 +36,7 @@ export class SpawnRequestsManager {
      * The min priority to be placed after active remotes
      */
     activeRemotePriority: number
+    minHaulerCost: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -45,9 +46,13 @@ export class SpawnRequestsManager {
         this.rawSpawnRequestsArgs = []
         this.spawnEnergyCapacity = this.communeManager.room.energyCapacityAvailable
         this.activeRemotePriority = this.minRemotePriority
+        this.minHaulerCost = Math.min(
+            Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.minHaulerCost],
+            this.spawnEnergyCapacity,
+        )
 
         this.sourceHarvester()
-        this.hauler()
+        this.haulerForCommune()
         this.remoteSourceRoles()
         this.generalRemoteRoles()
         this.mineralHarvester()
@@ -85,6 +90,7 @@ export class SpawnRequestsManager {
                     const role = 'sourceHarvester'
                     const spawnGroup = this.communeManager.room.creepsOfSource[sourceIndex]
                     const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
+                    const maxCostPerCreep = this.communeManager.room.myCreeps.sourceHarvester.length ? this.spawnEnergyCapacity : this.communeManager.room.energyAvailable
 
                     if (this.spawnEnergyCapacity >= 850) {
                         let defaultParts: BodyPartConstant[] = [CARRY]
@@ -118,6 +124,7 @@ export class SpawnRequestsManager {
                             minCreeps: 1,
                             minCost: 300,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
@@ -135,6 +142,7 @@ export class SpawnRequestsManager {
                             minCreeps: 1,
                             minCost: 250,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
@@ -152,6 +160,7 @@ export class SpawnRequestsManager {
                             minCreeps: 1,
                             minCost: 200,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
@@ -169,6 +178,7 @@ export class SpawnRequestsManager {
                             minCreeps: 1,
                             minCost: 300,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
@@ -186,6 +196,7 @@ export class SpawnRequestsManager {
                             minCreeps: 1,
                             minCost: 150,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
@@ -208,6 +219,7 @@ export class SpawnRequestsManager {
                         ),
                         minCost: 200,
                         priority,
+                        maxCostPerCreep,
                         spawnGroup: spawnGroup,
                         memoryAdditions: {
                             [CreepMemoryKeys.sourceIndex]: sourceIndex,
@@ -219,7 +231,7 @@ export class SpawnRequestsManager {
         }
     }
 
-    private hauler() {
+    private haulerForCommune() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 const priority = 0.5
@@ -228,6 +240,7 @@ export class SpawnRequestsManager {
 
                 const partsMultiplier = this.communeManager.haulerNeed
                 const role = 'hauler'
+                const maxCostPerCreep = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
 
                 // If all RCL 3 extensions are built
 
@@ -238,8 +251,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier / 2,
                         minCost: 150,
-                        maxCostPerCreep:
-                            this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
+                        maxCostPerCreep,
                         priority,
                         spawnGroup: this.communeManager.communeHaulers,
                         memoryAdditions: {
@@ -254,7 +266,7 @@ export class SpawnRequestsManager {
                     extraParts: [CARRY, MOVE],
                     partsMultiplier,
                     minCost: 100,
-                    maxCostPerCreep: this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
+                    maxCostPerCreep,
                     priority,
                     spawnGroup: this.communeManager.communeHaulers,
                     memoryAdditions: {},
@@ -588,14 +600,13 @@ export class SpawnRequestsManager {
 
                 /* customLog('e', partsMultiplier) */
                 const role = 'maintainer'
-
+                customLog('maintainer', partsMultiplier + ', ' + maxCreeps + ', ' + this.spawnEnergyCapacity)
                 if (this.communeManager.hasSufficientRoads) {
                     return {
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE, WORK],
                         partsMultiplier,
-
                         maxCreeps,
                         minCost: 200,
                         priority,
@@ -610,7 +621,6 @@ export class SpawnRequestsManager {
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
                     partsMultiplier,
-
                     maxCreeps,
                     minCost: 250,
                     priority,
@@ -1048,11 +1058,11 @@ export class SpawnRequestsManager {
             const remoteName = splitRemoteInfo[0]
 
             const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
             if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
-            if (remoteMemory[RoomMemoryKeys.disable]) continue
 
             priorityIncrement += 1
 
@@ -1183,19 +1193,21 @@ export class SpawnRequestsManager {
 
                     const priority = this.minRemotePriority + priorityIncrement
 
+
+
                     /*
                     // If all RCL 3 extensions are built
                     if (this.spawnEnergyCapacity >= 800) {
-
-                        const cost = Math.floor(this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost] / 150) * 150
 
                             return {
                                 defaultParts: [],
                                 extraParts: [CARRY, CARRY, MOVE],
                                 threshold: 0,
                                 partsMultiplier: partsMultiplier / 2,
-                                minCost: cost,
-                                maxCostPerCreep: cost,
+                                minCost: Math.floor(
+                                    this.minHaulerCost / 150,
+                                ) * 150,
+                                maxCostPerCreep: this.minHaulerCost,
                                 priority,
                                 memoryAdditions: {
                                     [CreepMemoryKeys.preferRoads]: true,
@@ -1204,11 +1216,6 @@ export class SpawnRequestsManager {
                     }
                     */
 
-                    const cost =
-                        Math.floor(
-                            this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost] / 100,
-                        ) * 100
-
                     return {
                         role,
                         defaultParts: [],
@@ -1216,8 +1223,10 @@ export class SpawnRequestsManager {
                         spawnGroup: [],
                         threshold: 0,
                         partsMultiplier,
-                        minCost: cost,
-                        maxCostPerCreep: cost,
+                        minCost: Math.floor(
+                            this.minHaulerCost / 100,
+                        ) * 100,
+                        maxCostPerCreep: this.minHaulerCost,
                         priority,
                         memoryAdditions: {},
                     }
@@ -1232,9 +1241,10 @@ export class SpawnRequestsManager {
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
             const remoteName = remoteNamesByEfficacy[index]
             const remoteMemory = Memory.rooms[remoteName]
+
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
-            if (remoteMemory[RoomMemoryKeys.disable]) continue
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 
@@ -1243,9 +1253,6 @@ export class SpawnRequestsManager {
                 Math.max(remoteMemory[RoomMemoryKeys.remoteReservers], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteCoreAttacker], 0) +
                 Math.max(remoteMemory[RoomMemoryKeys.remoteDismantler], 0)
-
-            // If there is a need for any econ creep, inform the index
-
             if (totalRemoteNeed <= 0) continue
 
             // Construct requests for remoteBuilders
@@ -1580,8 +1587,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, MOVE],
                         partsMultiplier: 100,
                         minCost: 100,
-                        maxCostPerCreep:
-                            this.communeManager.room.memory[RoomMemoryKeys.minHaulerCost],
+                        maxCostPerCreep: this.minHaulerCost,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.haulRequest]: requestName,

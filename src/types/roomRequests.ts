@@ -70,6 +70,7 @@ export interface FindNewRoomLogisticsRequestArgs {
      * Use this to command certain resourceTypes
      */
     resourceTypes?: Set<ResourceConstant>
+    noDelivery?: boolean
     /**
      * DO NOT USE THIS TO COMMAND CERTAIN RESOURCETYPES, instead use resourceTypes
      */

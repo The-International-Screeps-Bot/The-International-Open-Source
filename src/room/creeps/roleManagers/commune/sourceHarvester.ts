@@ -171,6 +171,12 @@ export class SourceHarvester extends Creep {
 
     maintainContainer?(sourceContainer: StructureContainer): boolean {
         if (this.worked) return false
+        const source = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
+        if (
+            source.energy * ENERGY_REGEN_TIME >
+            source.ticksToRegeneration * source.energyCapacity * 0.9
+        ) return false
+
         if (!sourceContainer) {
             if (this.nextStore.energy < this.parts.work) {
                 if (this.movedResource) return false

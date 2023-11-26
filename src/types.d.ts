@@ -1020,7 +1020,7 @@ declare global {
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticsRequestTypes(
             args?: FindNewRoomLogisticsRequestArgs,
-        ): Set<RoomLogisticsRequestTypes>
+        ): Set<RoomLogisticsRequestTypes> | Result.fail
         canAcceptRoomLogisticsRequest(
             requestType: RoomLogisticsRequestTypes,
             requestID: string,
@@ -1366,7 +1366,6 @@ declare global {
         [RoomMemoryKeys.remoteSourceHubPaths]: string[]
         [RoomMemoryKeys.clearedEnemyStructures]: boolean
         [RoomMemoryKeys.lastStructureCheck]: number
-        [RoomMemoryKeys.roadsQuota]: number[]
         [RoomMemoryKeys.roads]: number[]
         [RoomMemoryKeys.remoteSourceCredit]: number[]
         [RoomMemoryKeys.remoteSourceCreditChange]: number[]

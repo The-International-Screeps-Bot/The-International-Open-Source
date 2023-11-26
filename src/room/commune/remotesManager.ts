@@ -441,6 +441,7 @@ export class RemotesManager {
     ) {
         const roomMemory = Memory.rooms[remoteName]
         const packedPath = roomMemory[pathType][parseInt(sourceIndex)]
+        if (!packedPath.length) return false
 
         if (packedPath.length / packedPosLength > maxRemotePathDistance) {
             return false

@@ -57,10 +57,15 @@ export class HaulerSizeManager {
         roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time
  */
 
-        roomMemory[RoomMemoryKeys.minHaulerCost] -= Math.min(
-            Math.floor((roomMemory[RoomMemoryKeys.minHaulerCost] * Memory.minHaulerCostError) / 2),
-            this.communeManager.room.energyCapacityAvailable,
+        roomMemory[RoomMemoryKeys.minHaulerCost] -= Math.floor(
+            (roomMemory[RoomMemoryKeys.minHaulerCost] * Memory.minHaulerCostError) / 2,
         )
+
+        roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(
+            roomMemory[RoomMemoryKeys.minHaulerCost],
+            BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE]
+        )
+
         roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time
     }
 }
