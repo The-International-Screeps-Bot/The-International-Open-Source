@@ -1199,15 +1199,17 @@ export class SpawnRequestsManager {
                     // If all RCL 3 extensions are built
                     if (this.spawnEnergyCapacity >= 800) {
 
+                            const cost = Math.floor(
+                                this.minHaulerCost / 150,
+                            ) * 150
+
                             return {
                                 defaultParts: [],
                                 extraParts: [CARRY, CARRY, MOVE],
                                 threshold: 0,
                                 partsMultiplier: partsMultiplier / 2,
-                                minCost: Math.floor(
-                                    this.minHaulerCost / 150,
-                                ) * 150,
-                                maxCostPerCreep: this.minHaulerCost,
+                                minCost: cost,
+                                maxCostPerCreep: cost,
                                 priority,
                                 memoryAdditions: {
                                     [CreepMemoryKeys.preferRoads]: true,
@@ -1216,6 +1218,10 @@ export class SpawnRequestsManager {
                     }
                     */
 
+                    const cost = Math.floor(
+                        this.minHaulerCost / 100,
+                    ) * 100
+
                     return {
                         role,
                         defaultParts: [],
@@ -1223,10 +1229,8 @@ export class SpawnRequestsManager {
                         spawnGroup: [],
                         threshold: 0,
                         partsMultiplier,
-                        minCost: Math.floor(
-                            this.minHaulerCost / 100,
-                        ) * 100,
-                        maxCostPerCreep: this.minHaulerCost,
+                        minCost: cost,
+                        maxCostPerCreep: cost,
                         priority,
                         memoryAdditions: {},
                     }

@@ -167,6 +167,7 @@ export enum CreepMemoryKeys {
     sleepFor,
     sleepTime,
     targetID,
+    previousRelayer,
 }
 
 export enum PowerCreepMemoryKeys {

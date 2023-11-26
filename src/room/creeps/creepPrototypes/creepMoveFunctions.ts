@@ -763,9 +763,16 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     }
  */
     if (creepAtPos.moved) {
-        if (creepAtPos.moved === 'moved') {
+
+        // might not be what we want. uncomment if (more) stuck bugs appear
+/*         if (creepAtPos.moved === 'moved') {
             delete this.moveRequest
             this.moved = 'moved'
+            return
+        } */
+        if (creepAtPos.moved === 'moved') {
+
+            this.runMoveRequest()
             return
         }
 

@@ -58,6 +58,12 @@ export class Hauler extends Creep {
             return
         }
 
+        const creepMemory = Memory.creeps[this.name]
+        if (creepMemory[CreepMemoryKeys.previousRelayer] && creepMemory[CreepMemoryKeys.previousRelayer][1] - 1 > Game.time) {
+
+            creepMemory[CreepMemoryKeys.previousRelayer] = undefined
+        }
+
         this.commune.communeManager.haulerCarryParts += this.parts.carry
 
         if (this.hasValidRemote()) {
@@ -69,7 +75,7 @@ export class Hauler extends Creep {
         this.removeRemote()
 
         const commune = this.commune
-        if (Memory.creeps[this.name][CreepMemoryKeys.taskRoom] === commune.name) {
+        if (creepMemory[CreepMemoryKeys.taskRoom] === commune.name) {
             commune.communeManager.communeHaulerCarryParts += this.parts.carry
             commune.communeManager.communeHaulers.push(this.name)
         }
@@ -718,6 +724,10 @@ export class Hauler extends Creep {
 
         if (creepAtPos.role !== 'hauler') return false
         if (creepAtPos.movedResource) return false
+
+        const creepMemory = Memory.creeps[this.name]
+        if (creepMemory[CreepMemoryKeys.previousRelayer] && creepMemory[CreepMemoryKeys.previousRelayer][0] === creepAtPos.name) return false
+
         if (!creepAtPos.freeNextStore) return false
         if (creepAtPos.freeNextStore !== this.usedNextStore) return false
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
@@ -756,13 +766,16 @@ export class Hauler extends Creep {
         delete this.moved
         delete creepAtPos.moved
 
-        const creepMemory = Memory.creeps[this.name]
         const creepAtPosMemory = Memory.creeps[creepAtPos.name]
 
         // Delete path data so they repath with their new targets
 
         delete creepMemory[CreepMemoryKeys.path]
         delete creepAtPosMemory[CreepMemoryKeys.path]
+
+        // record relaying information to avoid swapping
+
+        creepMemory[CreepMemoryKeys.previousRelayer] = [creepAtPos.name, Game.time]
 
         // Trade room logistics requests
 

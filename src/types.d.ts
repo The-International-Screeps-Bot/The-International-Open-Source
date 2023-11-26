@@ -1432,6 +1432,8 @@ declare global {
          * An ambigious target the creep is after, probably for target locking
          */
         [CreepMemoryKeys.targetID]: Id<Structure | Creep | PowerCreep | Tombstone | Ruin>
+        // The name of the trader and tick for the previos relay action
+        [CreepMemoryKeys.previousRelayer]: [string, number]
     }
 
     interface PowerCreepMemory extends CreepMemory {
