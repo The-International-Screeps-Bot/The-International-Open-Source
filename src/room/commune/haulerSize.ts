@@ -1,5 +1,6 @@
 import { CPUBucketCapacity, RoomMemoryKeys, haulerUpdateDefault } from 'international/constants'
 import { CommuneManager } from './commune'
+import { randomIntRange } from 'utils/utils'
 
 export class HaulerSizeManager {
     communeManager: CommuneManager
@@ -72,6 +73,6 @@ export class HaulerSizeManager {
             this.communeManager.room.energyCapacityAvailable * 1.2,
         )
 
-        roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time
+        roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(0, 10)
     }
 }
