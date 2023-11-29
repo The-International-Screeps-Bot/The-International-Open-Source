@@ -369,6 +369,7 @@ export class StatsManager {
         }
         Memory.stats.creeps = collectiveManager.creepCount
         Memory.stats.powerCreeps = collectiveManager.powerCreepCount
+        Memory.stats.defaultMinPathCacheTime = collectiveManager.defaultMinPathCacheTime
 
         // If the code wasn't ran or was properly ran last tick, assign cpu as normal. Otherwise assume we ran out of cpu
         let usedCPU =

@@ -63,7 +63,13 @@ export class HaulerSizeManager {
 
         roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(
             roomMemory[RoomMemoryKeys.minHaulerCost],
-            BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE]
+            BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE],
+        )
+
+        // don't let it exceed the max possible cost by too much (will take awhile to match delta)
+        roomMemory[RoomMemoryKeys.minHaulerCost] = Math.min(
+            roomMemory[RoomMemoryKeys.minHaulerCost],
+            this.communeManager.room.energyCapacityAvailable * 1.2,
         )
 
         roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time

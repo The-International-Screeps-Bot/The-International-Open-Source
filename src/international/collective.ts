@@ -80,7 +80,6 @@ export class CollectiveManager extends Sleepable {
      * Updates values to be present for this tick
      */
     update() {
-
         // initalize or re-initialize
 
         this.creepsByCombatRequest = {}
@@ -162,7 +161,7 @@ export class CollectiveManager extends Sleepable {
 
     updateMinHaulerCostError() {
         // cpu limit is potentially variable if GCL changes
-        const targetCPU = (Game.cpu.limit * 0.9) / 100
+        const targetCPU = (Game.cpu.limit * 0.9) / Game.cpu.limit
         // How far off we are from our ideal cpu usage
         Memory.minHaulerCostError = roundTo(targetCPU - Memory.stats.cpu.usage / Game.cpu.limit, 4)
     }
@@ -217,7 +216,7 @@ export class CollectiveManager extends Sleepable {
 
     _defaultMinCacheAmount: number
 
-    get defaultMinCacheAmount() {
+    get defaultMinPathCacheTime() {
         if (this._defaultMinCacheAmount !== undefined) return this._defaultMinCacheAmount
 
         const avgCPUUsagePercent = Memory.stats.cpu.usage / Game.cpu.limit

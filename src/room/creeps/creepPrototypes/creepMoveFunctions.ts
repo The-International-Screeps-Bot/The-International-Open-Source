@@ -296,7 +296,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     // Assign default args
 
     if (!args.origin) args.origin = this.pos
-    if (!opts.cacheAmount) opts.cacheAmount = collectiveManager.defaultMinCacheAmount
+    if (!opts.cacheAmount) opts.cacheAmount = collectiveManager.defaultMinPathCacheTime
 
     let path: RoomPosition[]
     if (this.spawning) path = []
@@ -763,15 +763,13 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     }
  */
     if (creepAtPos.moved) {
-
         // might not be what we want. uncomment if (more) stuck bugs appear
-/*         if (creepAtPos.moved === 'moved') {
+        /*         if (creepAtPos.moved === 'moved') {
             delete this.moveRequest
             this.moved = 'moved'
             return
         } */
         if (creepAtPos.moved === 'moved') {
-
             this.runMoveRequest()
             return
         }

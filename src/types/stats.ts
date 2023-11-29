@@ -49,4 +49,5 @@ export interface StatsMemory {
     constructionSites: number
     creeps: number
     powerCreeps: number
+    defaultMinPathCacheTime: number
 }
