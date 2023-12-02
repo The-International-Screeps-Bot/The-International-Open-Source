@@ -90,7 +90,9 @@ export class SpawnRequestsManager {
                     const role = 'sourceHarvester'
                     const spawnGroup = this.communeManager.room.creepsOfSource[sourceIndex]
                     const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
-                    const maxCostPerCreep = this.communeManager.room.myCreeps.sourceHarvester.length ? this.spawnEnergyCapacity : this.communeManager.room.energyAvailable
+                    const maxCostPerCreep = this.communeManager.room.myCreeps.sourceHarvester.length
+                        ? this.spawnEnergyCapacity
+                        : this.communeManager.room.energyAvailable
 
                     if (this.spawnEnergyCapacity >= 850) {
                         let defaultParts: BodyPartConstant[] = [CARRY]
@@ -240,18 +242,22 @@ export class SpawnRequestsManager {
 
                 const partsMultiplier = this.communeManager.haulerNeed
                 const role = 'hauler'
-                const maxCostPerCreep = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
-
+                /*                 const cost = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
+                 */
                 // If all RCL 3 extensions are built
 
                 if (this.communeManager.hasSufficientRoads) {
+                    const cost = this.communeManager.room.myCreeps.hauler.length
+                        ? Math.floor(this.minHaulerCost / 150) * 150
+                        : this.communeManager.room.energyAvailable
+
                     return {
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier / 2,
-                        minCost: 150,
-                        maxCostPerCreep,
+                        minCost: cost,
+                        maxCostPerCreep: cost,
                         priority,
                         spawnGroup: this.communeManager.communeHaulers,
                         memoryAdditions: {
@@ -260,13 +266,17 @@ export class SpawnRequestsManager {
                     }
                 }
 
+                const cost = this.communeManager.room.myCreeps.hauler.length
+                ? Math.floor(this.minHaulerCost / 100) * 100
+                : this.communeManager.room.energyAvailable
+
                 return {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE],
                     partsMultiplier,
-                    minCost: 100,
-                    maxCostPerCreep,
+                    minCost: cost,
+                    maxCostPerCreep: cost,
                     priority,
                     spawnGroup: this.communeManager.communeHaulers,
                     memoryAdditions: {},
@@ -600,7 +610,10 @@ export class SpawnRequestsManager {
 
                 /* customLog('e', partsMultiplier) */
                 const role = 'maintainer'
-                customLog('maintainer', partsMultiplier + ', ' + maxCreeps + ', ' + this.spawnEnergyCapacity)
+                customLog(
+                    'maintainer',
+                    partsMultiplier + ', ' + maxCreeps + ', ' + this.spawnEnergyCapacity,
+                )
                 if (this.communeManager.hasSufficientRoads) {
                     return {
                         role,
@@ -1193,8 +1206,6 @@ export class SpawnRequestsManager {
 
                     const priority = this.minRemotePriority + priorityIncrement
 
-
-
                     /*
                     // If all RCL 3 extensions are built
                     if (this.spawnEnergyCapacity >= 800) {
@@ -1218,9 +1229,7 @@ export class SpawnRequestsManager {
                     }
                     */
 
-                    const cost = Math.floor(
-                        this.minHaulerCost / 100,
-                    ) * 100
+                    const cost = Math.floor(this.minHaulerCost / 100) * 100
 
                     return {
                         role,

@@ -2,6 +2,8 @@ import { statsManager } from 'international/statsManager'
 import { CommuneManager } from './commune'
 import { customLog } from 'utils/logging'
 import { collectiveManager } from 'international/collective'
+import { RoomLogisticsRequestTypes } from 'international/constants'
+import { scalePriority } from 'utils/utils'
 
 export class PowerSpawnsManager {
     communeManager: CommuneManager
@@ -41,6 +43,57 @@ export class PowerSpawnsManager {
             creep.spawn(this.powerSpawn)
             collectiveManager.unspawnedPowerCreepNames.pop()
             return
+        }
+    }
+
+    private createRoomLogisticsRequests() {
+
+        // Make sure we have a reasonable amount of energy and power
+
+        const resourcesInStoringStructures = this.communeManager.room.roomManager.resourcesInStoringStructures
+
+        // Make sure we have a reasonable amount of power to process
+        if (
+            resourcesInStoringStructures.power <
+            this.powerSpawn.store.getCapacity(RESOURCE_POWER)
+        )
+            return
+        // Make sure we have enough energy -- don't process power if our economy is struggling or reovering
+        if (
+            resourcesInStoringStructures.energy <
+            this.communeManager.minStoredEnergy
+        )
+            return
+
+        // energy
+
+        this.communeManager.room.createRoomLogisticsRequest({
+            target: this.powerSpawn,
+            /* onlyFull: true, */
+            type: RoomLogisticsRequestTypes.offer,
+            priority: scalePriority(
+                this.powerSpawn.store.getCapacity(RESOURCE_ENERGY),
+                this.powerSpawn.usedReserveStore,
+                10,
+                true,
+            ),
+        })
+
+        // fulfill power if less than half
+
+        if (this.powerSpawn.reserveStore[RESOURCE_POWER] < this.powerSpawn.store.getCapacity(RESOURCE_POWER) * 0.5) {
+
+            this.communeManager.room.createRoomLogisticsRequest({
+                target: this.powerSpawn,
+                /* onlyFull: true, */
+                type: RoomLogisticsRequestTypes.offer,
+                priority: scalePriority(
+                    this.powerSpawn.store.getCapacity(RESOURCE_ENERGY),
+                    this.powerSpawn.usedReserveStore,
+                    10,
+                    true,
+                ),
+            })
         }
     }
 }

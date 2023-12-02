@@ -163,9 +163,9 @@ export class CombatRequestManager {
 
         const hasTowers = !!room.roomManager.structures.tower.length
 
-        let minDamage = 0
-        let minMeleeHeal = 0
-        let minRangedHeal = 0
+        let minDamage = 1
+        let minMeleeHeal = 1
+        let minRangedHeal = 1
 
         for (const enemyCreep of room.roomManager.enemyAttackers) {
             // If we have tower(s) and its an invader, don't care about it
