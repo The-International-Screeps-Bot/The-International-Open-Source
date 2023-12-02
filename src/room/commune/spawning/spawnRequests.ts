@@ -26,6 +26,11 @@ import { CommuneManager } from '../commune'
 import { customLog } from 'utils/logging'
 import { SpawnRequestArgs } from 'types/spawnRequest'
 
+interface SpawningHaulerCosts {
+    maxCost: number
+    minCost: number
+}
+
 export class SpawnRequestsManager {
     communeManager: CommuneManager
 
@@ -124,7 +129,7 @@ export class SpawnRequestsManager {
                             extraParts: [],
                             partsMultiplier: 1,
                             minCreeps: 1,
-                            minCost: 300,
+                            minCostPerCreep: 300,
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
@@ -142,7 +147,7 @@ export class SpawnRequestsManager {
                             extraParts: [WORK, MOVE, WORK],
                             partsMultiplier: 3,
                             minCreeps: 1,
-                            minCost: 250,
+                            minCostPerCreep: 250,
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
@@ -160,7 +165,7 @@ export class SpawnRequestsManager {
                             extraParts: [WORK, MOVE, WORK],
                             partsMultiplier: 3,
                             minCreeps: 1,
-                            minCost: 200,
+                            minCostPerCreep: 200,
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
@@ -178,7 +183,7 @@ export class SpawnRequestsManager {
                             extraParts: [WORK],
                             partsMultiplier: 6,
                             minCreeps: 1,
-                            minCost: 300,
+                            minCostPerCreep: 300,
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
@@ -196,7 +201,7 @@ export class SpawnRequestsManager {
                             extraParts: [WORK],
                             partsMultiplier: 6,
                             minCreeps: 1,
-                            minCost: 150,
+                            minCostPerCreep: 150,
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
@@ -219,7 +224,7 @@ export class SpawnRequestsManager {
                                 sourceIndex
                             ].length,
                         ),
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         maxCostPerCreep,
                         spawnGroup: spawnGroup,
@@ -244,20 +249,19 @@ export class SpawnRequestsManager {
                 const role = 'hauler'
                 /*                 const cost = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
                  */
+
                 // If all RCL 3 extensions are built
 
                 if (this.communeManager.hasSufficientRoads) {
-                    const cost = this.communeManager.room.myCreeps.hauler.length
-                        ? Math.floor(this.minHaulerCost / 150) * 150
-                        : this.communeManager.room.energyAvailable
+                    const { maxCost, minCost } = this.findCommuneHaulerCosts(150)
 
                     return {
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier / 2,
-                        minCost: cost,
-                        maxCostPerCreep: cost,
+                        minCostPerCreep: minCost,
+                        maxCostPerCreep: maxCost,
                         priority,
                         spawnGroup: this.communeManager.communeHaulers,
                         memoryAdditions: {
@@ -266,23 +270,42 @@ export class SpawnRequestsManager {
                     }
                 }
 
-                const cost = this.communeManager.room.myCreeps.hauler.length
-                ? Math.floor(this.minHaulerCost / 100) * 100
-                : this.communeManager.room.energyAvailable
+                const { maxCost, minCost } = this.findCommuneHaulerCosts(100)
 
                 return {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE],
                     partsMultiplier,
-                    minCost: cost,
-                    maxCostPerCreep: cost,
+                    minCostPerCreep: minCost,
+                    maxCostPerCreep: maxCost,
                     priority,
                     spawnGroup: this.communeManager.communeHaulers,
                     memoryAdditions: {},
                 }
             })(),
         )
+    }
+
+    private findCommuneHaulerCosts(costStep: number): SpawningHaulerCosts {
+        if (this.communeManager.room.myCreeps.hauler.length) {
+
+            // have all haulers be the same size; their max allowed size
+
+            const maxCost = Math.floor(this.minHaulerCost / costStep) * costStep
+            const minCost = maxCost
+
+            return {
+                maxCost,
+                minCost,
+            }
+        }
+        // there are no haulers, consider that in spawning cost limitations
+
+        return {
+            maxCost: this.communeManager.room.energyAvailable,
+            minCost: costStep,
+        }
     }
 
     private mineralHarvester() {
@@ -309,7 +332,7 @@ export class SpawnRequestsManager {
                     extraParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
                     partsMultiplier: 4,
                     minCreeps: this.communeManager.room.roomManager.mineralHarvestPositions.length,
-                    minCost,
+                    minCostPerCreep: minCost,
                     priority: this.activeRemotePriority + 1,
                     memoryAdditions: {
                         [CreepMemoryKeys.preferRoads]: true,
@@ -341,7 +364,7 @@ export class SpawnRequestsManager {
                     extraParts: [CARRY],
                     partsMultiplier: 8,
                     minCreeps: 1,
-                    minCost: 300,
+                    minCostPerCreep: 300,
                     priority: 7,
                     memoryAdditions: {},
                 }
@@ -380,7 +403,7 @@ export class SpawnRequestsManager {
                     extraParts: [],
                     partsMultiplier: 1,
                     minCreeps: fastFillerPositionsCount,
-                    minCost: 150,
+                    minCostPerCreep: 150,
                     priority,
                     memoryAdditions: {},
                 }
@@ -455,7 +478,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: Math.max(requiredStrength / strength, 1),
-                        minCost: 260,
+                        minCostPerCreep: 260,
                         priority,
                         threshold: 0.1,
                         memoryAdditions: {},
@@ -518,7 +541,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: Math.max(requiredStrength / strength, 1),
-                        minCost: 260,
+                        minCostPerCreep: 260,
                         priority,
                         threshold: 0.1,
                         memoryAdditions: {},
@@ -621,7 +644,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, MOVE, WORK],
                         partsMultiplier,
                         maxCreeps,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -635,7 +658,7 @@ export class SpawnRequestsManager {
                     extraParts: [MOVE, CARRY, MOVE, WORK],
                     partsMultiplier,
                     maxCreeps,
-                    minCost: 250,
+                    minCostPerCreep: 250,
                     priority,
                     memoryAdditions: {},
                 }
@@ -704,7 +727,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
                         maxCreeps,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -721,7 +744,7 @@ export class SpawnRequestsManager {
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
                         maxCreeps,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -738,7 +761,7 @@ export class SpawnRequestsManager {
                         extraParts: [WORK, MOVE, CARRY, MOVE],
                         partsMultiplier: partsMultiplier,
                         maxCreeps,
-                        minCost: 250,
+                        minCostPerCreep: 250,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -755,7 +778,7 @@ export class SpawnRequestsManager {
                         extraParts: [WORK, CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier,
                         maxCreeps,
-                        minCost: 250,
+                        minCostPerCreep: 250,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -769,7 +792,7 @@ export class SpawnRequestsManager {
                     extraParts: [CARRY, MOVE, WORK, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
                     maxCreeps,
-                    minCost: 300,
+                    minCostPerCreep: 300,
                     priority,
                     memoryAdditions: {
                         [CreepMemoryKeys.preferRoads]: true,
@@ -802,7 +825,7 @@ export class SpawnRequestsManager {
                             partsMultiplier: 1,
                             threshold,
                             minCreeps: 1,
-                            minCost: 200,
+                            minCostPerCreep: 200,
                             priority,
                             memoryAdditions: {},
                         }
@@ -815,7 +838,7 @@ export class SpawnRequestsManager {
                         partsMultiplier: 1,
                         threshold,
                         minCreeps: 1,
-                        minCost: 250,
+                        minCostPerCreep: 250,
                         priority,
                         memoryAdditions: {},
                     }
@@ -913,7 +936,7 @@ export class SpawnRequestsManager {
                             partsMultiplier: 1,
                             threshold,
                             minCreeps: 1,
-                            minCost: 300,
+                            minCostPerCreep: 300,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -955,7 +978,7 @@ export class SpawnRequestsManager {
                             partsMultiplier,
                             threshold,
                             maxCreeps,
-                            minCost: 200,
+                            minCostPerCreep: 200,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -975,7 +998,7 @@ export class SpawnRequestsManager {
                             threshold,
 
                             maxCreeps,
-                            minCost: 250,
+                            minCostPerCreep: 250,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -997,7 +1020,7 @@ export class SpawnRequestsManager {
                             threshold,
 
                             maxCreeps,
-                            minCost: 250,
+                            minCostPerCreep: 250,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -1016,7 +1039,7 @@ export class SpawnRequestsManager {
                         threshold,
 
                         maxCreeps,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -1035,7 +1058,7 @@ export class SpawnRequestsManager {
                         partsMultiplier,
                         threshold,
                         maxCreeps: Infinity,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -1050,7 +1073,7 @@ export class SpawnRequestsManager {
                     partsMultiplier,
                     threshold,
                     maxCreeps: Infinity,
-                    minCost: 250,
+                    minCostPerCreep: 250,
                     priority,
                     memoryAdditions: {},
                 }
@@ -1111,7 +1134,7 @@ export class SpawnRequestsManager {
                             minCreeps: 1,
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 150 * 6,
-                            minCost: 350,
+                            minCostPerCreep: 350,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -1134,7 +1157,7 @@ export class SpawnRequestsManager {
 
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 250 * 3,
-                            minCost: 300,
+                            minCostPerCreep: 300,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -1155,7 +1178,7 @@ export class SpawnRequestsManager {
 
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 400 * 2,
-                            minCost: 300,
+                            minCostPerCreep: 300,
                             priority,
                             memoryAdditions: {
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -1175,7 +1198,7 @@ export class SpawnRequestsManager {
 
                         maxCreeps: sourcePositionsAmount,
                         maxCostPerCreep: 50 + 250 * 3,
-                        minCost: 300,
+                        minCostPerCreep: 300,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
@@ -1238,7 +1261,7 @@ export class SpawnRequestsManager {
                         spawnGroup: [],
                         threshold: 0,
                         partsMultiplier,
-                        minCost: cost,
+                        minCostPerCreep: cost,
                         maxCostPerCreep: cost,
                         priority,
                         memoryAdditions: {},
@@ -1298,7 +1321,7 @@ export class SpawnRequestsManager {
                         maxCreeps:
                             remoteMemory[RoomMemoryKeys.remoteControllerPositions].length /
                             packedPosLength,
-                        minCost: 250,
+                        minCostPerCreep: 250,
                         priority: this.minRemotePriority + 0.1,
                         memoryAdditions: {
                             [CreepMemoryKeys.remote]: remoteName,
@@ -1344,7 +1367,7 @@ export class SpawnRequestsManager {
                         maxCreeps:
                             remoteMemory[RoomMemoryKeys.remoteControllerPositions].length /
                             packedPosLength,
-                        minCost: cost,
+                        minCostPerCreep: cost,
                         priority,
                         memoryAdditions: {
                             [CreepMemoryKeys.remote]: remoteName,
@@ -1442,7 +1465,7 @@ export class SpawnRequestsManager {
                             this.communeManager.room.creepsOfRemote[remoteName].remoteCoreAttacker,
                         /* minCreeps: 1, */
                         maxCreeps: 3,
-                        minCost: cost * extraParts.length,
+                        minCostPerCreep: cost * extraParts.length,
                         priority: this.minRemotePriority - 2,
                         memoryAdditions: {
                             [CreepMemoryKeys.remote]: remoteName,
@@ -1472,7 +1495,7 @@ export class SpawnRequestsManager {
                         spawnGroup:
                             this.communeManager.room.creepsOfRemote[remoteName].remoteDismantler,
                         minCreeps: 1,
-                        minCost: cost * 2,
+                        minCostPerCreep: cost * 2,
                         priority: this.minRemotePriority - 1,
                         memoryAdditions: {
                             [CreepMemoryKeys.remote]: remoteName,
@@ -1496,7 +1519,7 @@ export class SpawnRequestsManager {
                     extraParts: [MOVE],
                     partsMultiplier: 1,
                     minCreeps,
-                    minCost: 50,
+                    minCostPerCreep: 50,
                     priority: this.activeRemotePriority + 0.3,
                     memoryAdditions: {},
                 }
@@ -1521,7 +1544,7 @@ export class SpawnRequestsManager {
                         extraParts: [MOVE, MOVE, MOVE, MOVE],
                         partsMultiplier: 1,
                         minCreeps: 1,
-                        minCost: 650,
+                        minCostPerCreep: 650,
                         priority: 8.1,
                         memoryAdditions: {
                             [CreepMemoryKeys.workRequest]: requestName,
@@ -1549,7 +1572,7 @@ export class SpawnRequestsManager {
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                         partsMultiplier: request[WorkRequestKeys.vanguard],
                         maxCreeps,
-                        minCost: 250,
+                        minCostPerCreep: 250,
                         priority: 8.2,
                         memoryAdditions: {
                             [CreepMemoryKeys.workRequest]: requestName,
@@ -1571,7 +1594,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
                         partsMultiplier: request[WorkRequestKeys.allyVanguard],
-                        minCost: 250,
+                        minCostPerCreep: 250,
                         priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
                         memoryAdditions: {
                             [CreepMemoryKeys.workRequest]: requestName,
@@ -1599,7 +1622,7 @@ export class SpawnRequestsManager {
                         defaultParts: [],
                         extraParts: [CARRY, MOVE],
                         partsMultiplier: 100,
-                        minCost: 100,
+                        minCostPerCreep: 100,
                         maxCostPerCreep: this.minHaulerCost,
                         priority,
                         memoryAdditions: {
@@ -1781,7 +1804,7 @@ export class SpawnRequestsManager {
                             defaultParts: [],
                             extraParts,
                             partsMultiplier: 1,
-                            minCost,
+                            minCostPerCreep: minCost,
                             priority,
                             spawnGroup,
                             minCreeps: request[CombatRequestKeys.quadQuota] * 4,

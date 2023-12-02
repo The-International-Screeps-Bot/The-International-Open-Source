@@ -15,7 +15,7 @@ export interface SpawnRequestArgs {
     /**
      * The absolute minimum cost the creep may be spawned with
      */
-    minCost: number
+    minCostPerCreep: number
     /**
      * The priority of spawning, where 0 is greatest, and Infinity is least
      */

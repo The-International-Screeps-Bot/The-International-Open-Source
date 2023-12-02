@@ -1,6 +1,6 @@
-import { SpawnRequest } from "types/spawnRequest"
-import { LogTypes, customLog } from "utils/logging"
-import { SpawnRequestArgs } from "types/spawnRequest"
+import { SpawnRequest } from 'types/spawnRequest'
+import { LogTypes, customLog } from 'utils/logging'
+import { SpawnRequestArgs } from 'types/spawnRequest'
 
 export const spawnRequestUtils = {
     createSpawnRequest(
@@ -29,16 +29,14 @@ export const spawnRequestUtils = {
 
         const maxCostPerCreep = Math.max(
             args.maxCostPerCreep ?? room.energyCapacityAvailable,
-            args.minCost,
+            args.minCostPerCreep,
         )
 
         // So long as minCreeps is more than the current number of creeps
 
         while (
             args.minCreeps >
-            (args.spawnGroup
-                ? args.spawnGroup.length
-                : room.creepsFromRoom[args.role].length)
+            (args.spawnGroup ? args.spawnGroup.length : room.creepsFromRoom[args.role].length)
         ) {
             // Construct important imformation for the spawnRequest
 
@@ -123,7 +121,7 @@ export const spawnRequestUtils = {
 
                             // If the cost minus partCost is below minCost, stop the loop
 
-                            if (cost - partCost < args.minCost) break
+                            if (cost - partCost < args.minCostPerCreep) break
 
                             // And remove the part's cost to the cost
 
@@ -179,7 +177,7 @@ export const spawnRequestUtils = {
 
         const maxCostPerCreep = Math.max(
             args.maxCostPerCreep ?? room.energyCapacityAvailable,
-            args.minCost,
+            args.minCostPerCreep,
         )
 
         // Find the totalExtraParts using the partsMultiplier
@@ -192,8 +190,7 @@ export const spawnRequestUtils = {
 
         // Loop through creep names of the requested role
 
-        for (const creepName of args.spawnGroup ||
-            room.creepsFromRoom[args.role]) {
+        for (const creepName of args.spawnGroup || room.creepsFromRoom[args.role]) {
             const creep = Game.creeps[creepName]
 
             // Take away the amount of parts the creep with the name has from totalExtraParts
@@ -294,7 +291,7 @@ export const spawnRequestUtils = {
                         const part = args.extraParts[partIndex]
 
                         partCost = BODYPART_COST[part]
-                        if (cost - partCost < args.minCost) break
+                        if (cost - partCost < args.minCostPerCreep) break
 
                         // And remove the part's cost to the cost
 
@@ -346,5 +343,5 @@ export const spawnRequestUtils = {
         }
 
         return spawnRequests
-    }
+    },
 }
