@@ -908,6 +908,7 @@ export class CommunePlanner {
             const packedCoord = packAsNum(adjPos)
             if (this.terrainCoords[packedCoord] === 255) continue
 
+            this.roadCoords[packedCoord] = 20
             this.baseCoords[packedCoord] = 255
             mineralHarvestPositions.push(adjPos)
         }

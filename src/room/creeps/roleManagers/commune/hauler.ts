@@ -59,7 +59,7 @@ export class Hauler extends Creep {
         }
 
         const creepMemory = Memory.creeps[this.name]
-        if (creepMemory[CreepMemoryKeys.previousRelayer] && creepMemory[CreepMemoryKeys.previousRelayer][1] - 1 > Game.time) {
+        if (creepMemory[CreepMemoryKeys.previousRelayer] && Game.time > creepMemory[CreepMemoryKeys.previousRelayer][1] + 1) {
 
             creepMemory[CreepMemoryKeys.previousRelayer] = undefined
         }

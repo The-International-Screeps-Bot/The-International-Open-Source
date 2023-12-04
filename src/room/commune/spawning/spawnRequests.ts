@@ -300,6 +300,7 @@ export class SpawnRequestsManager {
                 minCost,
             }
         }
+        
         // there are no haulers, consider that in spawning cost limitations
 
         return {

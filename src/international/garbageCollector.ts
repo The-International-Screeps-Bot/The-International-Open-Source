@@ -7,7 +7,7 @@ import { packCache, unpackCache } from 'other/codec'
  */
 export class GarbageCollector extends Sleepable {
     // Clean rooms that haven't been scouted in 100k ticks
-    cleanRoomThreshold = 100000
+    cleanRoomThreshold = 300000
     sleepFor = 100000
     run() {
         if (this.isSleepingResponsive()) return
