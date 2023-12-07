@@ -5,6 +5,9 @@ import { encode, decode } from 'base32768'
 import { allStructureTypes } from 'international/constants'
 
 export class BasePlans {
+    /**
+     * doesn't cover the entire room grid, only coords that have plans
+     */
     map: { [packedCoord: string]: BasePlanCoord[] }
 
     constructor(map?: { [packedCoord: string]: BasePlanCoord[] }) {

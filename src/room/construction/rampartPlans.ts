@@ -4,6 +4,9 @@ import { encode, decode } from 'base32768'
 import { allStructureTypes } from 'international/constants'
 
 export class RampartPlans {
+    /**
+     * doesn't cover the entire room grid, only coords that have plans
+     */
     map: { [packedCoord: string]: RampartPlanCoord }
 
     constructor(map?: { [packedCoord: string]: RampartPlanCoord }) {

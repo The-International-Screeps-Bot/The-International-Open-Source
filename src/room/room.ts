@@ -411,16 +411,23 @@ export class RoomManager {
         const stampAnchors = commune.roomManager.stampAnchors
         if (!stampAnchors) throw Error('no stampAnchors for ' + commune.name)
 
+        const basePlans = commune.roomManager.basePlans
         let goalPos: RoomPosition
 
-        // See if there is a storage adjacent to the hub. If so, set the goalPos as the hub pos
+        // find the coord of the planned storage and make that the goal
 
-        if (commune.storage && getRange(commune.storage.pos, stampAnchors.hub[0]) === 1) {
+        forAdjacentCoords(stampAnchors.hub[0], coord => {
+            const coordData = basePlans.map[packCoord(coord)]
+            if (!coordData) return undefined
 
-            goalPos = commune.storage.pos
-        }
+            for (const data of coordData) {
+                if (data.structureType !== STRUCTURE_STORAGE) continue
 
-        if (!goalPos) return []
+                goalPos = new RoomPosition(coord.x, coord.y, commune.name)
+                return Result.stop
+            }
+            return undefined
+        })
 
         const sourcePaths: RoomPosition[][] = []
 
