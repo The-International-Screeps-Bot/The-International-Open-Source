@@ -36,6 +36,7 @@ export class Hauler extends Creep {
         const creepMemory = Memory.creeps[this.name]
 
         if (creepMemory[CreepMemoryKeys.remote]) {
+            if (creepMemory[CreepMemoryKeys.sourceIndex] === undefined) throw Error('has remote but no sourceIndex')
             if (
                 this.ticksToLive >
                 this.body.length * CREEP_SPAWN_TIME +
@@ -768,10 +769,11 @@ export class Hauler extends Creep {
 
         const creepAtPosMemory = Memory.creeps[creepAtPos.name]
 
-        // Delete path data so they repath with their new targets
+        // Trade paths so they might reuse them
 
-        delete creepMemory[CreepMemoryKeys.path]
-        delete creepAtPosMemory[CreepMemoryKeys.path]
+        const path = creepMemory[CreepMemoryKeys.path]
+        creepMemory[CreepMemoryKeys.path] = creepAtPosMemory[CreepMemoryKeys.path]
+        creepAtPosMemory[CreepMemoryKeys.path] = path
 
         // record relaying information to avoid swapping
 
