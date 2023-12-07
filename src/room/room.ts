@@ -290,7 +290,7 @@ export class RoomManager {
         this.roomVisualsManager.run()
     }
 
-    private test() {}
+    private test() { }
 
     /**
      * Debug
@@ -362,7 +362,7 @@ export class RoomManager {
     findRemoteSourceFastFillerPaths(
         commune: Room,
         packedRemoteSourceHarvestPositions: string[],
-        weightCoords: {[packedCoord: string]: number},
+        weightCoords: { [packedCoord: string]: number },
         pathsThrough: Set<string>,
     ) {
         const anchor = commune.roomManager.anchor
@@ -378,7 +378,7 @@ export class RoomManager {
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
                 weightCoords: {
-                    [this.room.name]:weightCoords
+                    [this.room.name]: weightCoords
                 },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
@@ -405,7 +405,7 @@ export class RoomManager {
     findRemoteSourceHubPaths(
         commune: Room,
         packedRemoteSourceHarvestPositions: string[],
-        weightCoords: {[packedCoord: string]: number},
+        weightCoords: { [packedCoord: string]: number },
         pathsThrough: Set<string>,
     ) {
         const stampAnchors = commune.roomManager.stampAnchors
@@ -415,7 +415,7 @@ export class RoomManager {
 
         // See if there is a storage adjacent to the hub. If so, set the goalPos as the hub pos
 
-        if (getRange(commune.storage.pos, stampAnchors.hub[0]) === 1) {
+        if (commune.storage && getRange(commune.storage.pos, stampAnchors.hub[0]) === 1) {
 
             goalPos = commune.storage.pos
         }
@@ -432,7 +432,7 @@ export class RoomManager {
                 typeWeights: remoteTypeWeights,
                 plainCost: defaultRoadPlanningPlainCost,
                 weightCoords: {
-                    [this.room.name]:weightCoords
+                    [this.room.name]: weightCoords
                 },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
@@ -490,7 +490,7 @@ export class RoomManager {
     findRemoteControllerPath(
         commune: Room,
         packedRemoteControllerPositions: string,
-        weightCoords: {[packedCoord: string]: number},
+        weightCoords: { [packedCoord: string]: number },
         pathsThrough: Set<string>,
     ) {
         const anchor = commune.roomManager.anchor
@@ -503,7 +503,7 @@ export class RoomManager {
             typeWeights: remoteTypeWeights,
             plainCost: defaultRoadPlanningPlainCost,
             weightCoords: {
-                [this.room.name]:weightCoords
+                [this.room.name]: weightCoords
             },
             weightCommuneStructurePlans: true,
             weightRemoteStructurePlans: {
@@ -1122,9 +1122,9 @@ export class RoomManager {
             const enemyAttackers = this.notMyCreeps.enemy.filter(function (creep) {
                 return (
                     creep.parts.attack +
-                        creep.parts.ranged_attack +
-                        creep.parts.work +
-                        creep.parts.heal >
+                    creep.parts.ranged_attack +
+                    creep.parts.work +
+                    creep.parts.heal >
                     0
                 )
             })
@@ -1435,14 +1435,14 @@ export class RoomManager {
 
             if (
                 adjacentStructuresByType[STRUCTURE_CONTAINER] +
-                    adjacentStructuresByType[STRUCTURE_LINK] ===
+                adjacentStructuresByType[STRUCTURE_LINK] ===
                 0
             )
                 continue
 
             if (
                 adjacentStructuresByType[STRUCTURE_SPAWN] +
-                    adjacentStructuresByType[STRUCTURE_EXTENSION] ===
+                adjacentStructuresByType[STRUCTURE_EXTENSION] ===
                 0
             )
                 continue
