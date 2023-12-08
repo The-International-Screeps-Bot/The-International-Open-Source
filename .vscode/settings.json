@@ -26,12 +26,8 @@
     "typescript.tsdk": "./node_modules/typescript/lib",
     "eslint.enable": true,
     "git.ignoreLimitWarning": true,
-    "spellright.language": [
-        "en"
-    ],
-    "spellright.documentTypes": [
-        "latex",
-        "plaintext"
-    ],
-    "compile-hero.disable-compile-files-on-did-save-code": true
+    "spellright.language": ["en"],
+    "spellright.documentTypes": ["latex", "plaintext"],
+    "compile-hero.disable-compile-files-on-did-save-code": true,
+    "editor.tabSize": 2
 }
