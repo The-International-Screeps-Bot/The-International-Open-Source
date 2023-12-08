@@ -280,7 +280,7 @@ export const spawnRequestUtils = {
 
                 // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
-                if (cost > maxCostPerCreep /*|| remainingAllowedParts < 0*/) {
+                if (cost > maxCostPerCreep) {
                     // Assign partIndex as the length of extraParts
 
                     let partIndex = args.extraParts.length - 1
