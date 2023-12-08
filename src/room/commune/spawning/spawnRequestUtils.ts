@@ -200,7 +200,7 @@ export const spawnRequestUtils = {
 
         // If there aren't enough requested parts to justify spawning a creep, stop
 
-        if (totalExtraParts < maxPartsPerCreep * (args.threshold || 0.25)) return spawnRequests
+        if (totalExtraParts < maxPartsPerCreep * (args.threshold ?? 0.25)) return spawnRequests
 
         if (args.maxCreeps === undefined) {
             args.maxCreeps = Number.MAX_SAFE_INTEGER
@@ -267,7 +267,7 @@ export const spawnRequestUtils = {
 
             // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
-            while (cost < maxCostPerCreep && remainingAllowedParts > 0) {
+            while (cost < maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
                 const addedParts: BodyPartConstant[] = []
 
                 for (const part of args.extraParts) {
@@ -280,7 +280,7 @@ export const spawnRequestUtils = {
 
                 // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
-                if (cost > maxCostPerCreep || remainingAllowedParts < 0) {
+                if (cost > maxCostPerCreep /*|| remainingAllowedParts < 0*/) {
                     // Assign partIndex as the length of extraParts
 
                     let partIndex = args.extraParts.length - 1
@@ -291,14 +291,13 @@ export const spawnRequestUtils = {
                         const part = args.extraParts[partIndex]
 
                         partCost = BODYPART_COST[part]
+                        // if it's not expensive enough and we have enough parts
                         if (cost - partCost < args.minCostPerCreep) break
 
                         // And remove the part's cost to the cost
-
                         cost -= partCost
 
                         // Remove the last part in the body
-
                         addedParts.pop()
 
                         // Increase remainingAllowedParts and totalExtraParts
@@ -306,8 +305,7 @@ export const spawnRequestUtils = {
                         remainingAllowedParts += 1
                         totalExtraParts += 1
 
-                        // Decrease the partIndex
-
+                        // Setup to handle the next part
                         partIndex -= 1
                     }
 

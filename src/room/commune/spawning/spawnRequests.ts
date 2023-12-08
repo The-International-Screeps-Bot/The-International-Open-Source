@@ -259,6 +259,7 @@ export class SpawnRequestsManager {
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, CARRY, MOVE],
+                        threshold: 0,
                         partsMultiplier: partsMultiplier / 2,
                         minCostPerCreep: minCost,
                         maxCostPerCreep: maxCost,
@@ -276,6 +277,7 @@ export class SpawnRequestsManager {
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE],
+                    threshold: 0,
                     partsMultiplier,
                     minCostPerCreep: minCost,
                     maxCostPerCreep: maxCost,
@@ -300,7 +302,7 @@ export class SpawnRequestsManager {
                 minCost,
             }
         }
-        
+
         // there are no haulers, consider that in spawning cost limitations
 
         return {

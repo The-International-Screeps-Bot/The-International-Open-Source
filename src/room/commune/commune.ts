@@ -349,6 +349,14 @@ export class CommuneManager {
     }
 
     private test() {
+
+        const spawnEnergyCapacity = this.room.energyCapacityAvailable
+        const minHaulerCost = Math.min(
+            Memory.rooms[this.room.name][RoomMemoryKeys.minHaulerCost],
+            spawnEnergyCapacity,
+        )
+        customLog('Spawning stuff', spawnEnergyCapacity + ', ' + minHaulerCost)
+
         /* this.room.visualizeCostMatrix(this.room.defaultCostMatrix) */
 
         /*
