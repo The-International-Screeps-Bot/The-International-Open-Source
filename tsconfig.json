@@ -18,6 +18,7 @@
         "esModuleInterop": true,
         "sourceMap": true,
         "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
     },
     "exclude": ["node_modules", "dist", "docs"],
     "typedocOptions": {

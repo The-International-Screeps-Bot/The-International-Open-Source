@@ -1415,12 +1415,15 @@ export class RoomManager {
         ]
         const structureCoords = this.structureCoords
 
+        const fastFillerLink = this.fastFillerLink
+        const hubLink = this.hubLink
+        const sufficientLink = fastFillerLink && fastFillerLink.RCLActionable && hubLink && hubLink.RCLActionable
+
         for (const pos of rawFastFillerPositions) {
-            const adjacentStructuresByType: Partial<Record<StructureConstant, number>> = {
+            const adjacentStructuresOfTypes: Partial<Record<StructureConstant, number>> = {
                 spawn: 0,
                 extension: 0,
                 container: 0,
-                link: 0,
             }
 
             forAdjacentCoords(pos, adjacentCoord => {
@@ -1430,26 +1433,25 @@ export class RoomManager {
                 for (const ID of structuresAtCoord) {
                     const structure = findObjectWithID(ID)
 
-                    if (adjacentStructuresByType[structure.structureType] === undefined) continue
+                    if (adjacentStructuresOfTypes[structure.structureType] === undefined) continue
 
                     // Increase structure amount for this structureType on the adjacentPos
 
-                    adjacentStructuresByType[structure.structureType] += 1
+                    adjacentStructuresOfTypes[structure.structureType] += 1
                 }
             })
 
             // If there is containers and spawning structures, make it an offial fastFillerPosition
 
             if (
-                adjacentStructuresByType[STRUCTURE_CONTAINER] +
-                adjacentStructuresByType[STRUCTURE_LINK] ===
-                0
+                !sufficientLink &&
+                adjacentStructuresOfTypes[STRUCTURE_CONTAINER] === 0
             )
                 continue
 
             if (
-                adjacentStructuresByType[STRUCTURE_SPAWN] +
-                adjacentStructuresByType[STRUCTURE_EXTENSION] ===
+                adjacentStructuresOfTypes[STRUCTURE_SPAWN] +
+                adjacentStructuresOfTypes[STRUCTURE_EXTENSION] ===
                 0
             )
                 continue
