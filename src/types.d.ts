@@ -341,6 +341,8 @@ declare global {
         constructionSites: { [ID: string]: number }
 
         minHaulerCostError: number
+        minHaulerCost: number
+        minHaulerCostUpdate: number
 
         /**
          *
@@ -1140,12 +1142,12 @@ declare global {
     interface Structure {
         // Getters
 
-        _RCLActionable: boolean
+        _isRCLActionable: boolean
 
         /**
          * Wether the structure is disable or not by the room's controller level
          */
-        readonly RCLActionable: boolean
+        readonly isRCLActionable: boolean
     }
 
     interface StructureSpawn {

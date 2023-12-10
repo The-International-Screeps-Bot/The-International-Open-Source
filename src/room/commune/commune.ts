@@ -144,7 +144,7 @@ export class CommuneManager {
     /**
      * The carry parts needed to effectively run the commune
      */
-    haulerNeed: number
+    communeHaulerNeed: number
     mineralHarvestStrength: number
     upgradeStrength: number
     remoteResourcePathType: RemoteResourcePathTypes
@@ -238,7 +238,7 @@ export class CommuneManager {
 
         this.upgradeStrength = 0
         this.mineralHarvestStrength = 0
-        this.haulerNeed = 0
+        this.communeHaulerNeed = 0
         this.nextSpawnEnergyAvailable = room.energyAvailable
 
         if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
@@ -614,7 +614,7 @@ export class CommuneManager {
 
         this._maxUpgradeStrength = 0
 
-        if (hubLink && hubLink.RCLActionable) {
+        if (hubLink && hubLink.isRCLActionable) {
             const range = getRange(upgradeStructure.pos, hubLink.pos)
 
             // Increase strength by throughput
@@ -626,7 +626,7 @@ export class CommuneManager {
             const sourceLink = sourceLinks[i]
 
             if (!sourceLink) continue
-            if (!sourceLink.RCLActionable) continue
+            if (!sourceLink.isRCLActionable) continue
 
             const range = getRange(sourceLink.pos, upgradeStructure.pos)
 
@@ -685,10 +685,10 @@ export class CommuneManager {
         // We can use links
 
         const controllerLink = this.controllerLink
-        if (!controllerLink || !controllerLink.RCLActionable) return false
+        if (!controllerLink || !controllerLink.isRCLActionable) return false
 
         const hubLink = this.room.roomManager.hubLink
-        if (!hubLink || !hubLink.RCLActionable) return false
+        if (!hubLink || !hubLink.isRCLActionable) return false
 
         return (this._upgradeStructure = controllerLink)
     }
@@ -891,7 +891,7 @@ export class CommuneManager {
         let fastFillerSpawnEnergyCapacity = 0
 
         for (const structure of this.actionableSpawningStructures) {
-            if (!structure.RCLActionable) continue
+            if (!structure.isRCLActionable) continue
             // Outside of the fastFiller
             if (getRange(structure.pos, anchor) > 2) continue
 
@@ -920,7 +920,7 @@ export class CommuneManager {
         let actionableSpawningStructures: SpawningStructures = structures.spawn
         actionableSpawningStructures = actionableSpawningStructures.concat(structures.extension)
         actionableSpawningStructures = actionableSpawningStructures.filter(
-            structure => structure.RCLActionable,
+            structure => structure.isRCLActionable,
         )
 
         this.actionableSpawningStructuresIDs = actionableSpawningStructures.map(

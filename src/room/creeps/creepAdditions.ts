@@ -374,7 +374,7 @@ const additions = {
             this._grossTowerDamage = 0
 
             for (const tower of this.room.roomManager.structures.tower) {
-                if (!tower.RCLActionable) continue
+                if (!tower.isRCLActionable) continue
                 if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
 
                 this._grossTowerDamage = towerFunctions.estimateDamageGross(tower, this.pos)

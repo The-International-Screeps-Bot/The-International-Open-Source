@@ -20,7 +20,7 @@ export class TerminalManager {
     preTickRun() {
         const { terminal } = this.communeManager.room
         if (!terminal) return
-        if (!terminal.RCLActionable) return
+        if (!terminal.isRCLActionable) return
 
         this.createTerminalRequests()
     }
@@ -32,7 +32,7 @@ export class TerminalManager {
         // Stop if there is no terminal
 
         if (!terminal) return
-        if (!terminal.RCLActionable) return
+        if (!terminal.isRCLActionable) return
         if (terminal.cooldown > 0) return
 
         if (this.respondToTerminalRequests() === Result.action) return

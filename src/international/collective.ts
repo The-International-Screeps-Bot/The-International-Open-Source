@@ -19,6 +19,8 @@ import {
     RoomMemoryKeys,
     minerals,
     PlayerMemoryKeys,
+    maxSpawnEnergyCapacity,
+    haulerUpdateDefault,
 } from './constants'
 
 /**
@@ -111,6 +113,12 @@ export class CollectiveManager extends Sleepable {
         this._defaultMinCacheAmount = undefined
         this.internationalDataVisuals = undefined
 
+        //
+
+        this.updateMinHaulerCost()
+
+        // Run this stuff every so often
+
         if (this.isSleepingResponsive()) return
 
         // delete
@@ -122,7 +130,7 @@ export class CollectiveManager extends Sleepable {
 
         //
 
-        this.updateMinHaulerCostError()
+
     }
 
     newCustomCreepID() {
@@ -159,11 +167,31 @@ export class CollectiveManager extends Sleepable {
         Game.cpu.generatePixel()
     }
 
-    updateMinHaulerCostError() {
+    updateMinHaulerCost() {
+
+        if (Game.time - Memory.minHaulerCostUpdate < haulerUpdateDefault) return
+
         // cpu limit is potentially variable if GCL changes
         const targetCPU = (Game.cpu.limit * 0.9) / Game.cpu.limit
         // How far off we are from our ideal cpu usage
         Memory.minHaulerCostError = roundTo(targetCPU - Memory.stats.cpu.usage / Game.cpu.limit, 4)
+
+        Memory.minHaulerCost -= Math.floor(
+            (Memory.minHaulerCost * Memory.minHaulerCostError) / 2,
+        )
+
+        Memory.minHaulerCost = Math.max(
+            Memory.minHaulerCost,
+            BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE],
+        )
+
+        // don't let it exceed the max possible cost by too much (otherwise will take awhile to match delta in some circumstances)
+        Memory.minHaulerCost = Math.min(
+            Memory.minHaulerCost,
+            BODYPART_COST[MOVE] * MAX_CREEP_SIZE * 1.2,
+        )
+
+        Memory.minHaulerCostUpdate = Game.time
     }
 
     /**

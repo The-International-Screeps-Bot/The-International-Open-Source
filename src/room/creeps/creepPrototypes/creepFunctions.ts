@@ -251,7 +251,7 @@ Creep.prototype.advancedUpgradeController = function () {
         room.roomManager.controllerContainer
     const controllerLink = room.communeManager.controllerLink
 
-    if (!controllerStructure && controllerLink && controllerLink.RCLActionable)
+    if (!controllerStructure && controllerLink && controllerLink.isRCLActionable)
         controllerStructure = controllerLink
 
     // If there is a controllerContainer
@@ -980,7 +980,7 @@ Creep.prototype.hasNonEnergyResource = function () {
 Creep.prototype.findRecycleTarget = function () {
     const { room } = this
 
-    const spawns = room.roomManager.structures.spawn.filter(spawn => spawn.RCLActionable)
+    const spawns = room.roomManager.structures.spawn.filter(spawn => spawn.isRCLActionable)
 
     if (!spawns.length) return false
 
@@ -1118,7 +1118,7 @@ Creep.prototype.passiveRenew = function () {
             getRangeXY(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
             !spawn.renewed &&
             !spawn.spawning &&
-            spawn.RCLActionable,
+            spawn.isRCLActionable,
     )
     if (!spawn) return
 

@@ -1661,6 +1661,10 @@ export const preferredCommuneRange = 5.5
 export const defaultDataDecay = 0.99999
 export const revolutionary = 'MarvinTMB'
 export const maxSegmentsOpen = 10
+/**
+ * The max possible spawn energy capacity rooms can have
+ */
+export const maxSpawnEnergyCapacity = CONTROLLER_STRUCTURES[STRUCTURE_SPAWN][maxControllerLevel] * SPAWN_ENERGY_CAPACITY + CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][8] * EXTENSION_ENERGY_CAPACITY[maxControllerLevel]
 
 /**
  * Non-zero types of reserved registered coordinates

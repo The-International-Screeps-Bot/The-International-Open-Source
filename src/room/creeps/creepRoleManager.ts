@@ -2,10 +2,11 @@ import './creepPrototypes/creepFunctions'
 import './creepPrototypes/creepMoveFunctions'
 
 import { creepRoles, customColors } from 'international/constants'
-import { customLog } from 'utils/logging'
+import { LogTypes, customLog } from 'utils/logging'
 import { RoomManager } from 'room/room'
 import { statsManager } from 'international/statsManager'
 import { creepClasses } from './creepClasses'
+import ErrorExporter from 'other/ErrorExporter'
 
 export class CreepRoleManager {
     roomManager: RoomManager
@@ -23,7 +24,10 @@ export class CreepRoleManager {
     public run() {
         const { room } = this.roomManager
 
-        for (const role of creepRoles) this.runManager(role)
+        for (const role of creepRoles) {
+
+            this.runManager(role)
+        }
     }
 
     private runManager(role: CreepRoles) {

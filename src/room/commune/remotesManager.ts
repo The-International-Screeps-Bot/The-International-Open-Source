@@ -50,7 +50,7 @@ export class RemotesManager {
     private updateRemoteResourcePathType() {
         if (this.communeManager.remoteResourcePathType !== undefined && !randomTick()) return
 
-        if (this.communeManager.room.storage && this.communeManager.room.storage.RCLActionable) {
+        if (this.communeManager.room.storage && this.communeManager.room.storage.isRCLActionable) {
             this.communeManager.remoteResourcePathType = RoomMemoryKeys.remoteSourceHubPaths
             return
         }

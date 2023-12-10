@@ -48,7 +48,7 @@ export class SpawningStructuresManager {
 
         for (const spawn of spawns) {
             if (spawn.renewed) continue
-            if (!spawn.RCLActionable) continue
+            if (!spawn.isRCLActionable) continue
 
             if (spawn.spawning) {
                 const creep = Game.creeps[spawn.spawning.name]
@@ -287,7 +287,7 @@ export class SpawningStructuresManager {
     private constructSpawnRequests(args: SpawnRequestArgs) {
         if (args.minCreeps !== undefined) {
             // We know how many creeps we want, do them seperately and uniformly
-            return spawnRequestUtils.spawnRequestIndividually(this.communeManager.room, args)
+            return spawnRequestUtils.spawnRequestUniformly(this.communeManager.room, args)
         }
 
         // We don't know how many creeps we want

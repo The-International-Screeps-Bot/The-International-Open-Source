@@ -33,7 +33,7 @@ export class TowerManager {
     run() {
         const { room } = this.communeManager
 
-        const towers = room.roomManager.structures.tower.filter(tower => tower.RCLActionable)
+        const towers = room.roomManager.structures.tower.filter(tower => tower.isRCLActionable)
         if (!towers.length) {
             room.towerInferiority = room.roomManager.notMyCreeps.enemy.length > 0
             return

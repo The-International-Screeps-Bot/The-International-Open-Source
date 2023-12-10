@@ -24,7 +24,10 @@ export const spawnRequestUtils = {
             },
         }
     },
-    spawnRequestIndividually(room: Room, args: SpawnRequestArgs) {
+    /**
+     * Generally, all creeps will have the same bodies
+     */
+    spawnRequestUniformly(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
@@ -267,7 +270,7 @@ export const spawnRequestUtils = {
 
             // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
-            while (cost < maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
+            while (cost < maxCostPerCreep && (cost < args.minCostPerCreep || remainingAllowedParts - args.extraParts.length >= 0)) {
                 const addedParts: BodyPartConstant[] = []
 
                 for (const part of args.extraParts) {

@@ -15,11 +15,11 @@ export class HaulerNeedManager {
         this.sourceNeed()
         this.controllerNeed()
 
-        this.communeManager.haulerNeed += findCarryPartsRequired(
+        this.communeManager.communeHaulerNeed += findCarryPartsRequired(
             room.memory[RoomMemoryKeys.mineralPath].length / packedPosLength + 3,
             (this.communeManager.mineralHarvestStrength / EXTRACTOR_COOLDOWN) * 1.1,
         )
-        this.communeManager.haulerNeed += room.roomManager.structures.lab.length
+        this.communeManager.communeHaulerNeed += room.roomManager.structures.lab.length
 
         const extensions =
             room.roomManager.structures.extension.length -
@@ -34,11 +34,11 @@ export class HaulerNeedManager {
             (room.controller.level >= 4 && room.storage) ||
             (room.terminal && room.controller.level >= 6)
         ) {
-            this.communeManager.haulerNeed += Memory.stats.rooms[room.name].eosp / 10
-            this.communeManager.haulerNeed += Memory.stats.rooms[room.name].su * 8
+            this.communeManager.communeHaulerNeed += Memory.stats.rooms[room.name].eosp / 10
+            this.communeManager.communeHaulerNeed += Memory.stats.rooms[room.name].su * 8
         }
 
-        this.communeManager.haulerNeed = Math.round(this.communeManager.haulerNeed)
+        this.communeManager.communeHaulerNeed = Math.round(this.communeManager.communeHaulerNeed)
     }
 
     private sourceNeed() {
@@ -46,14 +46,14 @@ export class HaulerNeedManager {
         const packedSourcePaths = Memory.rooms[room.name][RoomMemoryKeys.communeSourcePaths]
 
         const hubLink = room.roomManager.hubLink
-        if (hubLink && hubLink.RCLActionable) {
+        if (hubLink && hubLink.isRCLActionable) {
             // There is a valid hubLink
 
             for (let index in room.find(FIND_SOURCES)) {
                 const sourceLink = room.communeManager.sourceLinks[index]
-                if (sourceLink && sourceLink.RCLActionable) continue
+                if (sourceLink && sourceLink.isRCLActionable) continue
 
-                this.communeManager.haulerNeed += findCarryPartsRequired(
+                this.communeManager.communeHaulerNeed += findCarryPartsRequired(
                     packedSourcePaths[index].length / packedPosLength + 3,
                     room.estimatedSourceIncome[index] * 1.1,
                 )
@@ -65,7 +65,7 @@ export class HaulerNeedManager {
         // There is no valid hubLink
 
         for (let index in room.find(FIND_SOURCES)) {
-            this.communeManager.haulerNeed += findCarryPartsRequired(
+            this.communeManager.communeHaulerNeed += findCarryPartsRequired(
                 packedSourcePaths[index].length / packedPosLength + 3,
                 room.estimatedSourceIncome[index] * 1.1,
             )
@@ -80,7 +80,7 @@ export class HaulerNeedManager {
         // There is a viable controllerContainer
 
         if (room.roomManager.controllerContainer) {
-            this.communeManager.haulerNeed += findCarryPartsRequired(
+            this.communeManager.communeHaulerNeed += findCarryPartsRequired(
                 Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.upgradePath].length /
                     packedPosLength +
                     3,
@@ -94,15 +94,15 @@ export class HaulerNeedManager {
 
     private controllerNeedLink() {
         const controllerLink = this.communeManager.controllerLink
-        if (!controllerLink || !controllerLink.RCLActionable) return
+        if (!controllerLink || !controllerLink.isRCLActionable) return
 
         const hubLink = this.communeManager.room.roomManager.hubLink
         // No need to haul if there is a valid hubLink
-        if (hubLink && hubLink.RCLActionable) return
+        if (hubLink && hubLink.isRCLActionable) return
 
         // There is a viable controllerLink but we need to haul to it
 
-        this.communeManager.haulerNeed += findCarryPartsRequired(
+        this.communeManager.communeHaulerNeed += findCarryPartsRequired(
             Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.upgradePath].length /
                 packedPosLength +
                 3,

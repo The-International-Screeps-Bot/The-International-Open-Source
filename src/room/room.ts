@@ -1416,14 +1416,13 @@ export class RoomManager {
         const structureCoords = this.structureCoords
 
         const fastFillerLink = this.fastFillerLink
-        const hubLink = this.hubLink
-        const sufficientLink = fastFillerLink && fastFillerLink.RCLActionable && hubLink && hubLink.RCLActionable
+        const sufficientLink = fastFillerLink && fastFillerLink.isRCLActionable
 
         for (const pos of rawFastFillerPositions) {
             const adjacentStructuresOfTypes: Partial<Record<StructureConstant, number>> = {
-                spawn: 0,
-                extension: 0,
-                container: 0,
+                [STRUCTURE_SPAWN]: 0,
+                [STRUCTURE_EXTENSION]: 0,
+                [STRUCTURE_CONTAINER]: 0
             }
 
             forAdjacentCoords(pos, adjacentCoord => {
@@ -2235,7 +2234,7 @@ export class RoomManager {
 
         for (const structure of storingStructures) {
             if (!structure) continue
-            if (!structure.RCLActionable) continue
+            if (!structure.isRCLActionable) continue
 
             for (const key in structure.store) {
                 const resourceType = key as ResourceConstant

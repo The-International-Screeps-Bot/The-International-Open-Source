@@ -128,7 +128,7 @@ export class FastFiller extends Creep {
             }
 
             let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = []
-            if (room.roomManager.fastFillerLink && room.roomManager.fastFillerLink.RCLActionable)
+            if (room.roomManager.fastFillerLink && room.roomManager.fastFillerLink.isRCLActionable)
                 fastFillerStoringStructures.push(room.roomManager.fastFillerLink)
             fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 

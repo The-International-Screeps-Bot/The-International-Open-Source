@@ -273,7 +273,7 @@ export class SourceHarvester extends Creep {
 
         const sourceLink =
             this.room.communeManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
-        if (sourceLink && sourceLink.RCLActionable) return false
+        if (sourceLink && sourceLink.isRCLActionable) return false
 
         // If the creep isn't full enough to justify a request
 

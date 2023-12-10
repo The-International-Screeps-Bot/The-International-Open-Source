@@ -245,7 +245,9 @@ export class SpawnRequestsManager {
 
                 // Construct the required carry parts
 
-                const partsMultiplier = this.communeManager.haulerNeed
+                const partsMultiplier = this.communeManager.communeHaulerNeed - this.communeManager.communeHaulerCarryParts
+                if (partsMultiplier <= 0) return false
+
                 const role = 'hauler'
                 /*                 const cost = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
                  */
@@ -264,7 +266,7 @@ export class SpawnRequestsManager {
                         minCostPerCreep: minCost,
                         maxCostPerCreep: maxCost,
                         priority,
-                        spawnGroup: this.communeManager.communeHaulers,
+                        spawnGroup: [],
                         memoryAdditions: {
                             [CreepMemoryKeys.preferRoads]: true,
                         },
@@ -282,7 +284,7 @@ export class SpawnRequestsManager {
                     minCostPerCreep: minCost,
                     maxCostPerCreep: maxCost,
                     priority,
-                    spawnGroup: this.communeManager.communeHaulers,
+                    spawnGroup: [],
                     memoryAdditions: {},
                 }
             })(),
@@ -357,7 +359,7 @@ export class SpawnRequestsManager {
                     (!this.communeManager.room.roomManager.hubLink ||
                         this.communeManager.room.roomManager.structures.link.length < 2) &&
                     (!this.communeManager.room.terminal ||
-                        !this.communeManager.room.terminal.RCLActionable)
+                        !this.communeManager.room.terminal.isRCLActionable)
                 )
                     return false
 
@@ -949,7 +951,7 @@ export class SpawnRequestsManager {
 
                     const controllerLink = this.communeManager.controllerLink
                     const maxCreeps =
-                        controllerLink && controllerLink.RCLActionable
+                        controllerLink && controllerLink.isRCLActionable
                             ? this.communeManager.room.roomManager.upgradePositions.length
                             : this.communeManager.room.roomManager.upgradePositions.length - 1
 
@@ -1243,6 +1245,7 @@ export class SpawnRequestsManager {
                             return {
                                 defaultParts: [],
                                 extraParts: [CARRY, CARRY, MOVE],
+                                spawnGroup: [],
                                 threshold: 0,
                                 partsMultiplier: partsMultiplier / 2,
                                 minCost: cost,

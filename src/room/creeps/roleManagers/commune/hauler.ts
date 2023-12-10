@@ -948,7 +948,7 @@ export class Hauler extends Creep {
 
         // If there is no need for more commune haulers
         if (
-            this.commune.communeManager.haulerNeed <
+            this.commune.communeManager.communeHaulerNeed <
             this.commune.communeManager.communeHaulerCarryParts
         ) {
             return Result.fail

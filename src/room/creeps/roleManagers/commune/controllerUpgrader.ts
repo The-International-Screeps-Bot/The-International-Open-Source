@@ -60,7 +60,7 @@ export class ControllerUpgrader extends Creep {
                 continue
             }
 
-            if ((room.storage && room.storage.RCLActionable) || (room.terminal && room.terminal.RCLActionable)) {
+            if ((room.storage && room.storage.isRCLActionable) || (room.terminal && room.terminal.isRCLActionable)) {
 
                 const cSiteTarget = creep.room.roomManager.cSiteTarget
                 if (cSiteTarget && !creep.room.roomManager.enemyAttackers.length) {
