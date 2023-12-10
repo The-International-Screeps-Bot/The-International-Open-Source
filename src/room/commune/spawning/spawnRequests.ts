@@ -24,7 +24,9 @@ import { packPos, unpackPosList } from 'other/codec'
 import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
 import { customLog } from 'utils/logging'
-import { SpawnRequestArgs } from 'types/spawnRequest'
+import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
+import { spawnUtils } from './spawnUtils'
+import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
 
 interface SpawningHaulerCosts {
     maxCost: number
@@ -124,11 +126,12 @@ export class SpawnRequestsManager {
                         }
 
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts,
                             extraParts: [],
                             partsMultiplier: 1,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 300,
                             priority,
                             maxCostPerCreep,
@@ -142,11 +145,12 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 800) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [CARRY],
                             extraParts: [WORK, MOVE, WORK],
                             partsMultiplier: 3,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 250,
                             priority,
                             maxCostPerCreep,
@@ -160,11 +164,12 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 750) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [],
                             extraParts: [WORK, MOVE, WORK],
                             partsMultiplier: 3,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 200,
                             priority,
                             maxCostPerCreep,
@@ -178,11 +183,12 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 600) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [MOVE, CARRY],
                             extraParts: [WORK],
                             partsMultiplier: 6,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 300,
                             priority,
                             maxCostPerCreep,
@@ -196,11 +202,12 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 550) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [MOVE],
                             extraParts: [WORK],
                             partsMultiplier: 6,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 150,
                             priority,
                             maxCostPerCreep,
@@ -213,11 +220,11 @@ export class SpawnRequestsManager {
                     }
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [MOVE, CARRY],
                         extraParts: [WORK],
                         partsMultiplier: 6,
-
                         maxCreeps: Math.min(
                             3,
                             this.communeManager.room.roomManager.communeSourceHarvestPositions[
@@ -258,10 +265,11 @@ export class SpawnRequestsManager {
                     const { maxCost, minCost } = this.findCommuneHaulerCosts(150)
 
                     return {
+                        type: SpawnRequestTypes.groupUniform,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, CARRY, MOVE],
-                        threshold: 0,
+                        partsQuota: partsMultiplier * 3,
                         partsMultiplier: partsMultiplier / 2,
                         minCostPerCreep: minCost,
                         maxCostPerCreep: maxCost,
@@ -276,10 +284,11 @@ export class SpawnRequestsManager {
                 const { maxCost, minCost } = this.findCommuneHaulerCosts(100)
 
                 return {
+                    type: SpawnRequestTypes.groupUniform,
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE],
-                    threshold: 0,
+                    partsQuota: partsMultiplier * 2,
                     partsMultiplier,
                     minCostPerCreep: minCost,
                     maxCostPerCreep: maxCost,
@@ -332,11 +341,12 @@ export class SpawnRequestsManager {
                 if (this.spawnEnergyCapacity < minCost) return false
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role: 'mineralHarvester',
                     defaultParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
                     extraParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
                     partsMultiplier: 4,
-                    minCreeps: this.communeManager.room.roomManager.mineralHarvestPositions.length,
+                    creepsQuota: this.communeManager.room.roomManager.mineralHarvestPositions.length,
                     minCostPerCreep: minCost,
                     priority: this.activeRemotePriority + 1,
                     memoryAdditions: {
@@ -364,11 +374,12 @@ export class SpawnRequestsManager {
                     return false
 
                 return {
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'hubHauler',
                     defaultParts: [MOVE],
                     extraParts: [CARRY],
                     partsMultiplier: 8,
-                    minCreeps: 1,
+                    creepsQuota: 1,
                     minCostPerCreep: 300,
                     priority: 7,
                     memoryAdditions: {},
@@ -403,11 +414,12 @@ export class SpawnRequestsManager {
                 else defaultParts = [CARRY, MOVE, CARRY]
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role: 'fastFiller',
                     defaultParts,
                     extraParts: [],
                     partsMultiplier: 1,
-                    minCreeps: fastFillerPositionsCount,
+                    creepsQuota: fastFillerPositionsCount,
                     minCostPerCreep: 150,
                     priority,
                     memoryAdditions: {},
@@ -479,6 +491,7 @@ export class SpawnRequestsManager {
                     const strength = ATTACK_POWER
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts,
@@ -542,6 +555,7 @@ export class SpawnRequestsManager {
                     const strength = RANGED_ATTACK_POWER
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts,
@@ -644,6 +658,7 @@ export class SpawnRequestsManager {
                 )
                 if (this.communeManager.hasSufficientRoads) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE, WORK],
@@ -658,6 +673,7 @@ export class SpawnRequestsManager {
                 }
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role,
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
@@ -727,6 +743,7 @@ export class SpawnRequestsManager {
                 // If there is an rcl actionable storage or terminal
                 if (actionableStoringStructure) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
@@ -744,6 +761,7 @@ export class SpawnRequestsManager {
 
                 if (this.spawnEnergyCapacity >= 600) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
@@ -761,6 +779,7 @@ export class SpawnRequestsManager {
 
                 if (this.spawnEnergyCapacity >= 550) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [WORK, MOVE, CARRY, MOVE],
@@ -778,6 +797,7 @@ export class SpawnRequestsManager {
 
                 if (!this.communeManager.room.roomManager.fastFillerContainers.length) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE],
@@ -792,6 +812,7 @@ export class SpawnRequestsManager {
                 }
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, CARRY, MOVE],
@@ -824,12 +845,13 @@ export class SpawnRequestsManager {
 
                     if (this.communeManager.hasSufficientRoads) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [CARRY, WORK, MOVE],
                             extraParts: [],
                             partsMultiplier: 1,
                             threshold,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 200,
                             priority,
                             memoryAdditions: {},
@@ -837,12 +859,13 @@ export class SpawnRequestsManager {
                     }
 
                     return {
+                        type: SpawnRequestTypes.individualUniform,
                         role,
                         defaultParts: [CARRY, MOVE, WORK, MOVE],
                         extraParts: [],
                         partsMultiplier: 1,
                         threshold,
-                        minCreeps: 1,
+                        creepsQuota: 1,
                         minCostPerCreep: 250,
                         priority,
                         memoryAdditions: {},
@@ -908,6 +931,7 @@ export class SpawnRequestsManager {
 
                     if (this.communeManager.room.controller.level === 8) {
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [],
                             extraParts: [
@@ -940,7 +964,7 @@ export class SpawnRequestsManager {
                             ],
                             partsMultiplier: 1,
                             threshold,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             minCostPerCreep: 300,
                             priority,
                             memoryAdditions: {
@@ -960,6 +984,7 @@ export class SpawnRequestsManager {
                         if (partsMultiplier === 0) return false
 
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [],
                             extraParts: [
@@ -996,12 +1021,12 @@ export class SpawnRequestsManager {
                         if (partsMultiplier === 0) return false
 
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [CARRY, CARRY],
                             extraParts: [WORK, MOVE, WORK, WORK, WORK],
                             partsMultiplier,
                             threshold,
-
                             maxCreeps,
                             minCostPerCreep: 250,
                             priority,
@@ -1018,12 +1043,12 @@ export class SpawnRequestsManager {
                         if (partsMultiplier === 0) return false
 
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [CARRY, CARRY],
                             extraParts: [WORK, MOVE, WORK, WORK, WORK, WORK, MOVE, WORK],
                             partsMultiplier,
                             threshold,
-
                             maxCreeps,
                             minCostPerCreep: 250,
                             priority,
@@ -1037,12 +1062,12 @@ export class SpawnRequestsManager {
                     if (partsMultiplier === 0) return false
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
                         partsMultiplier,
                         threshold,
-
                         maxCreeps,
                         minCostPerCreep: 200,
                         priority,
@@ -1057,6 +1082,7 @@ export class SpawnRequestsManager {
 
                 if (this.spawnEnergyCapacity >= 800) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE, WORK],
@@ -1072,6 +1098,7 @@ export class SpawnRequestsManager {
                 }
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role,
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
@@ -1130,13 +1157,14 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 950) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [CARRY],
                             extraParts: [WORK, MOVE, WORK, MOVE],
                             partsMultiplier: Math.ceil(partsMultiplier / 2),
                             spawnGroup,
                             threshold: 0.1,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 150 * 6,
                             minCostPerCreep: 350,
@@ -1153,6 +1181,7 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 650) {
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [CARRY],
                             extraParts: [WORK, WORK, MOVE],
@@ -1174,6 +1203,7 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity >= 450) {
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [CARRY],
                             extraParts: [WORK, WORK, MOVE, WORK, MOVE],
@@ -1194,6 +1224,7 @@ export class SpawnRequestsManager {
                     }
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, WORK, MOVE],
@@ -1261,6 +1292,7 @@ export class SpawnRequestsManager {
                     const cost = Math.floor(this.minHaulerCost / 100) * 100
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE],
@@ -1318,6 +1350,7 @@ export class SpawnRequestsManager {
                         return false
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'remoteBuilder',
                         defaultParts: [],
                         extraParts: [WORK, MOVE, CARRY, MOVE],
@@ -1364,6 +1397,7 @@ export class SpawnRequestsManager {
                     this.activeRemotePriority = Math.max(this.activeRemotePriority, priority + 0.1)
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'remoteReserver',
                         defaultParts: [],
                         extraParts: [MOVE, CLAIM],
@@ -1463,6 +1497,7 @@ export class SpawnRequestsManager {
                     const extraParts = [ATTACK, MOVE]
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'remoteCoreAttacker',
                         defaultParts: [],
                         extraParts,
@@ -1494,13 +1529,14 @@ export class SpawnRequestsManager {
                     const extraParts = [WORK, MOVE]
 
                     return {
+                        type: SpawnRequestTypes.individualUniform,
                         role: 'remoteDismantler',
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: 50 / extraParts.length,
                         spawnGroup:
                             this.communeManager.room.creepsOfRemote[remoteName].remoteDismantler,
-                        minCreeps: 1,
+                        creepsQuota: 1,
                         minCostPerCreep: cost * 2,
                         priority: this.minRemotePriority - 1,
                         memoryAdditions: {
@@ -1520,11 +1556,12 @@ export class SpawnRequestsManager {
                 else minCreeps = 2
 
                 return {
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'scout',
                     defaultParts: [],
                     extraParts: [MOVE],
                     partsMultiplier: 1,
-                    minCreeps,
+                    creepsQuota: minCreeps,
                     minCostPerCreep: 50,
                     priority: this.activeRemotePriority + 0.3,
                     memoryAdditions: {},
@@ -1545,11 +1582,12 @@ export class SpawnRequestsManager {
                     if (request[WorkRequestKeys.claimer] <= 0) return false
 
                     return {
+                        type: SpawnRequestTypes.individualUniform,
                         role: 'claimer',
                         defaultParts: [CLAIM, MOVE],
                         extraParts: [MOVE, MOVE, MOVE, MOVE],
                         partsMultiplier: 1,
-                        minCreeps: 1,
+                        creepsQuota: 1,
                         minCostPerCreep: 650,
                         priority: 8.1,
                         memoryAdditions: {
@@ -1573,6 +1611,7 @@ export class SpawnRequestsManager {
                     }
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'vanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
@@ -1596,6 +1635,7 @@ export class SpawnRequestsManager {
                     if (request[WorkRequestKeys.allyVanguard] <= 0) return false
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'allyVanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
@@ -1624,6 +1664,7 @@ export class SpawnRequestsManager {
                     )
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'requestHauler',
                         defaultParts: [],
                         extraParts: [CARRY, MOVE],
@@ -1806,6 +1847,7 @@ export class SpawnRequestsManager {
                         if (!extraParts.length) return false
 
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [],
                             extraParts,
@@ -1813,7 +1855,7 @@ export class SpawnRequestsManager {
                             minCostPerCreep: minCost,
                             priority,
                             spawnGroup,
-                            minCreeps: request[CombatRequestKeys.quadQuota] * 4,
+                            creepsQuota: request[CombatRequestKeys.quadQuota] * 4,
                             memoryAdditions: {
                                 [CreepMemoryKeys.combatRequest]: requestName,
                                 [CreepMemoryKeys.squadSize]: 4,

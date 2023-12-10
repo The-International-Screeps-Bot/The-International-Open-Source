@@ -2,7 +2,9 @@ import { SpawnRequest } from 'types/spawnRequest'
 import { LogTypes, customLog } from 'utils/logging'
 import { SpawnRequestArgs } from 'types/spawnRequest'
 
-export const spawnRequestUtils = {
+export type SpawnRequestConstructor = (room: Room, args: SpawnRequestArgs) => SpawnRequest[]
+
+export const spawnRequestConstructors = {
     createSpawnRequest(
         priority: number,
         role: CreepRoles,
@@ -27,7 +29,7 @@ export const spawnRequestUtils = {
     /**
      * Generally, all creeps will have the same bodies
      */
-    spawnRequestUniformly(room: Room, args: SpawnRequestArgs) {
+    spawnRequestIndividualUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
@@ -38,7 +40,7 @@ export const spawnRequestUtils = {
         // So long as minCreeps is more than the current number of creeps
 
         while (
-            args.minCreeps >
+            args.creepsQuota >
             (args.spawnGroup ? args.spawnGroup.length : room.creepsFromRoom[args.role].length)
         ) {
             // Construct important imformation for the spawnRequest
@@ -157,7 +159,7 @@ export const spawnRequestUtils = {
 
             // Create a spawnRequest using previously constructed information
 
-            const request = this.createSpawnRequest(
+            const request = spawnRequestConstructors.createSpawnRequest(
                 args.priority,
                 args.role,
                 args.defaultParts.length,
@@ -168,14 +170,12 @@ export const spawnRequestUtils = {
             )
             spawnRequests.push(request)
 
-            // Reduce the number of minCreeps
-
-            args.minCreeps -= 1
+            args.creepsQuota -= 1
         }
 
         return spawnRequests
     },
-    spawnRequestByGroup(room: Room, args: SpawnRequestArgs) {
+    spawnRequestGroupDiverse(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
@@ -325,7 +325,7 @@ export const spawnRequestUtils = {
 
             // Create a spawnRequest using previously constructed information
 
-            const request = this.createSpawnRequest(
+            const request = spawnRequestConstructors.createSpawnRequest(
                 args.priority,
                 args.role,
                 args.defaultParts.length,
@@ -336,8 +336,96 @@ export const spawnRequestUtils = {
             )
             spawnRequests.push(request)
 
-            // Decrease maxCreeps counter
+            args.maxCreeps -= 1
+        }
 
+        return spawnRequests
+    },
+    spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
+        const spawnRequests: SpawnRequest[] = []
+
+        const maxCostPerCreep = Math.max(
+            args.maxCostPerCreep ?? room.energyCapacityAvailable,
+            args.minCostPerCreep,
+        )
+
+        // Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
+        if (args.extraParts.length == 0) {
+            customLog('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
+                type: LogTypes.error,
+            })
+            return spawnRequests
+        }
+
+        // Run if we haven't yet fulfilled the parts quota and can still add more creeps
+        while (args.partsQuota > 0 && args.maxCreeps > 0) {
+            // Construct important imformation for the spawnRequest
+
+            let bodyPartCounts: { [key in PartsByPriority]: number } = {
+                tough: 0,
+                claim: 0,
+                attack: 0,
+                ranged_attack: 0,
+                secondaryTough: 0,
+                work: 0,
+                carry: 0,
+                move: 0,
+                secondaryAttack: 0,
+                heal: 0,
+            }
+            let partsCount = 0
+            let tier = 0
+            let cost = 0
+
+            // Apply default parts if there are any
+
+            if (args.defaultParts.length) {
+
+                tier += 1
+
+                for (const part of args.defaultParts) {
+                    const partCost = BODYPART_COST[part]
+                    if (cost + partCost > maxCostPerCreep) break
+
+                    cost += partCost
+                    bodyPartCounts[part] += 1
+                    partsCount += 1
+                }
+            }
+
+            // So long as the cost is less than the maxCostPerCreep and the size is below max size
+
+            while (cost < maxCostPerCreep && partsCount + args.extraParts.length <= MAX_CREEP_SIZE) {
+
+                for (const part of args.extraParts) {
+
+                    const partCost = BODYPART_COST[part]
+                    // If the new cost will make us too expensive and we already fulfill the min cost, stop
+                    if (cost + partCost > maxCostPerCreep && cost > args.minCostPerCreep) break
+
+                    cost += BODYPART_COST[part]
+                    partsCount += 1
+                    bodyPartCounts[part] += 1
+                }
+
+                tier += 1
+            }
+
+            // Create a spawnRequest using previously constructed information
+
+            const request = spawnRequestConstructors.createSpawnRequest(
+                args.priority,
+                args.role,
+                args.defaultParts.length,
+                bodyPartCounts,
+                tier,
+                cost,
+                args.memoryAdditions,
+            )
+            spawnRequests.push(request)
+
+            // Prepare values for next iteration check
+            args.partsQuota -= partsCount
             args.maxCreeps -= 1
         }
 

@@ -19,8 +19,14 @@ import './spawnRequests'
 import { spawnUtils } from './spawnUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { debugUtils } from 'debug/debugUtils'
-import { SpawnRequest, SpawnRequestArgs } from 'types/spawnRequest'
-import { spawnRequestUtils } from './spawnRequestUtils'
+import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
+import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
+
+export const spawnRequestConstructorsByType: {[key in SpawnRequestTypes]: SpawnRequestConstructor } = {
+    [SpawnRequestTypes.individualUniform]: spawnRequestConstructors.spawnRequestIndividualUniform,
+    [SpawnRequestTypes.groupDiverse]: spawnRequestConstructors.spawnRequestGroupDiverse,
+    [SpawnRequestTypes.groupUniform]: spawnRequestConstructors.spawnRequestGroupUniform,
+}
 
 export class SpawningStructuresManager {
     communeManager: CommuneManager
@@ -95,8 +101,8 @@ export class SpawningStructuresManager {
 
         this.spawnIndex = this.inactiveSpawns.length - 1
 
-        for (const spawnRequestArgs of spawnRequestsArgs) {
-            const spawnRequests = this.constructSpawnRequests(spawnRequestArgs)
+        for (const requestArgs of spawnRequestsArgs) {
+            const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](this.communeManager.room, requestArgs)
 
             // Loop through priorities inside requestsByPriority
 
@@ -284,16 +290,6 @@ export class SpawningStructuresManager {
         return directions
     }
 
-    private constructSpawnRequests(args: SpawnRequestArgs) {
-        if (args.minCreeps !== undefined) {
-            // We know how many creeps we want, do them seperately and uniformly
-            return spawnRequestUtils.spawnRequestUniformly(this.communeManager.room, args)
-        }
-
-        // We don't know how many creeps we want
-        return spawnRequestUtils.spawnRequestByGroup(this.communeManager.room, args)
-    }
-
     createPowerTasks() {
         if (!this.communeManager.room.myPowerCreepsAmount) return
 
@@ -323,7 +319,7 @@ export class SpawningStructuresManager {
         /*
         const args = this.communeManager.spawnRequestsManager.run()
         stringifyLog('spawn request args', args)
-        stringifyLog('request', this.constructSpawnRequests(args[0]))
+        stringifyLog('request', spawnRequestConstructorsByType[requestArgs.type](this.communeManager.room, args[0]))
  */
         return
 
@@ -363,7 +359,7 @@ export class SpawningStructuresManager {
         const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
 
         for (const requestArgs of spawnRequestsArgs) {
-            const spawnRequests = this.constructSpawnRequests(requestArgs)
+            const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](this.communeManager.room, requestArgs)
 
             for (const request of spawnRequests) {
                 const row: any[] = []

@@ -1,4 +1,5 @@
 export interface SpawnRequestArgs {
+    type: SpawnRequestTypes
     role: CreepRoles
     /**
      * Parts that should be attempted to be implemented once
@@ -8,6 +9,10 @@ export interface SpawnRequestArgs {
      * Parts that should be attempted to be implemented based on the partsMultiplier
      */
     extraParts: BodyPartConstant[]
+    /**
+     * The amount of parts we want spawned at a minimum
+     */
+    partsQuota?: number
     /**
      * The number of times to attempt to duplicate extraParts
      */
@@ -35,7 +40,7 @@ export interface SpawnRequestArgs {
     /**
      *
      */
-    minCreeps?: number | undefined
+    creepsQuota?: number | undefined
     /**
      *
      */
@@ -62,4 +67,19 @@ export interface SpawnRequest {
     tier: number
     cost: number
     extraOpts: SpawnOptions
+}
+
+export enum SpawnRequestTypes {
+    /**
+     * Spawn a set number of creeps at a set size
+     */
+    individualUniform,
+    /**
+     * Spawn enough parts to exactly fulfill the defined need, given a treshold has been passed
+     */
+    groupDiverse,
+    /**
+     * Has no above 0 threshold. If there is need for a creep, spawn the biggest one(s) we can given our max cost and need
+     */
+    groupUniform,
 }
