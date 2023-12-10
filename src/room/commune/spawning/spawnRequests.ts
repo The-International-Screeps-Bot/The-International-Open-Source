@@ -317,7 +317,7 @@ export class SpawnRequestsManager {
         // there are no haulers, consider that in spawning cost limitations
 
         return {
-            maxCost: this.communeManager.room.energyAvailable,
+            maxCost: Math.floor(this.communeManager.room.energyAvailable / costStep) * costStep,
             minCost: costStep,
         }
     }
@@ -341,7 +341,7 @@ export class SpawnRequestsManager {
                 if (this.spawnEnergyCapacity < minCost) return false
 
                 return {
-                    type: SpawnRequestTypes.groupDiverse,
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'mineralHarvester',
                     defaultParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
                     extraParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
@@ -414,7 +414,7 @@ export class SpawnRequestsManager {
                 else defaultParts = [CARRY, MOVE, CARRY]
 
                 return {
-                    type: SpawnRequestTypes.groupDiverse,
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'fastFiller',
                     defaultParts,
                     extraParts: [],
@@ -931,7 +931,7 @@ export class SpawnRequestsManager {
 
                     if (this.communeManager.room.controller.level === 8) {
                         return {
-                            type: SpawnRequestTypes.groupDiverse,
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [],
                             extraParts: [

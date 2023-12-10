@@ -353,7 +353,7 @@ export class SpawningStructuresManager {
     private visualizeRequests() {
         if (!Game.flags.spawnRequestVisuals) return
 
-        const headers = ['role', 'priority', 'cost']
+        const headers = ['role', 'priority', 'cost', 'parts']
         const data: any[][] = []
 
         const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
@@ -365,7 +365,8 @@ export class SpawningStructuresManager {
                 const row: any[] = []
                 row.push(requestArgs.role)
                 row.push(requestArgs.priority)
-                row.push(`${this.communeManager.nextSpawnEnergyAvailable} / ${request.cost}`)
+                row.push(`${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}`)
+                row.push(request.body)
 
                 data.push(row)
             }
