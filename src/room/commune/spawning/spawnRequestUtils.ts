@@ -244,8 +244,6 @@ export const spawnRequestUtils = {
             let tier = 0
             let cost = 0
 
-            let partCost
-
             // Construct from totalExtraParts at a max of 50, at equal to extraOpts's length
 
             let remainingAllowedParts = maxPartsPerCreep
@@ -260,7 +258,7 @@ export const spawnRequestUtils = {
                 // Loop through defaultParts
 
                 for (const part of args.defaultParts) {
-                    partCost = BODYPART_COST[part]
+                    const partCost = BODYPART_COST[part]
                     if (cost + partCost > maxCostPerCreep) break
 
                     cost += partCost
@@ -270,16 +268,16 @@ export const spawnRequestUtils = {
 
             // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
 
-            while (cost < maxCostPerCreep && (cost < args.minCostPerCreep || remainingAllowedParts - args.extraParts.length >= 0)) {
+            while (cost < maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
                 const addedParts: BodyPartConstant[] = []
 
                 for (const part of args.extraParts) {
                     cost += BODYPART_COST[part]
                     addedParts.push(part)
-
-                    remainingAllowedParts -= 1
-                    totalExtraParts -= 1
                 }
+
+                remainingAllowedParts -= args.extraParts.length
+                totalExtraParts -= args.extraParts.length
 
                 // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
 
@@ -293,7 +291,7 @@ export const spawnRequestUtils = {
                     while (partIndex >= 0) {
                         const part = args.extraParts[partIndex]
 
-                        partCost = BODYPART_COST[part]
+                        const partCost = BODYPART_COST[part]
                         // if it's not expensive enough and we have enough parts
                         if (cost - partCost < args.minCostPerCreep) break
 
