@@ -24,14 +24,17 @@ export interface ResourceRequest {
 }
 
 export interface DefenseRequest {
+    roomName: string
     priority: number
 }
 
 export interface AttackRequest {
+    roomName: string
     priority: number
 }
 
 export interface PlayerRequest {
+    playerName: string
     /**
      * The amount you think your team should hate the player. Hate should probably affect combat aggression and targetting
      */
@@ -45,6 +48,7 @@ export interface PlayerRequest {
 export type WorkRequestType = 'build' | 'upgrade' | 'repair'
 
 export interface WorkRequest {
+    roomName: string
     priority: number
     workType: WorkRequestType
 }
@@ -70,6 +74,7 @@ export interface EconRequest {
 }
 
 export interface RoomRequest {
+    roomName: string
     /**
      * The player who owns this room. If there is no owner, the room probably isn't worth making a request about
      */
@@ -89,13 +94,13 @@ export interface RoomRequest {
 }
 
 export interface AllyRequests {
-    resource: {[ID: string]: ResourceRequest}
-    defense: {[roomName: string]: DefenseRequest}
-    attack: {[roomName: string]: AttackRequest}
-    player: {[playerName: string]: PlayerRequest}
-    work: {[roomName: string]: WorkRequest}
-    econ: EconRequest
-    room: {[roomName: string]: RoomRequest}
+    resource?: ResourceRequest[]
+    defense?: DefenseRequest[]
+    attack?: AttackRequest[]
+    player?: PlayerRequest[]
+    work?: WorkRequest[]
+    econ?: EconRequest
+    room?: RoomRequest[]
 }
 /**
  * Having data we pass into the segment being an object allows us to send additional information outside of requests
@@ -123,12 +128,12 @@ export class SimpleAllies {
     initRun() {
         // Reset the data of myRequests
         this.myRequests = {
-            resource: {},
-            defense: {},
-            attack: {},
-            player: {},
-            work: {},
-            room: {},
+            resource: [],
+            defense: [],
+            attack: [],
+            player: [],
+            work: [],
+            room: [],
         }
         this.requestID = 0
 
@@ -191,13 +196,13 @@ export class SimpleAllies {
         for (const ID in collectiveManager.terminalRequests) {
             const request = collectiveManager.terminalRequests[ID]
 
-            this.myRequests.resource[this.newRequestID()] = {
+            this.myRequests.resource.push({
                 roomName: request.roomName,
                 resourceType: request.resource,
                 amount: request.amount,
                 terminal: true,
                 priority: request.priority,
-            }
+            })
         }
     }
 
@@ -205,34 +210,31 @@ export class SimpleAllies {
 
     requestResource(args: ResourceRequest) {
 
-        const ID = this.newRequestID()
-        this.myRequests.resource[ID] = args
+        this.myRequests.resource.push(args)
     }
 
     requestDefense(
-        roomName: string,
         args: DefenseRequest
     ) {
 
-        this.myRequests.defense[roomName] = args
+        this.myRequests.defense.push(args)
     }
 
     requestAttack(
-        roomName: string,
         args: AttackRequest
     ) {
 
-        this.myRequests.attack[roomName] = args
+        this.myRequests.attack.push(args)
     }
 
-    requestPlayer(playerName: string, args: PlayerRequest) {
+    requestPlayer(args: PlayerRequest) {
 
-        this.myRequests.player[playerName] = args
+        this.myRequests.player.push(args)
     }
 
-    requestWork(roomName: string, args: WorkRequest) {
+    requestWork(args: WorkRequest) {
 
-        this.myRequests.work[roomName] = args
+        this.myRequests.work.push(args)
     }
 
     requestEcon(args: EconRequest) {
@@ -240,14 +242,9 @@ export class SimpleAllies {
         this.myRequests.econ = args
     }
 
-    requestRoom(roomName: string, args: RoomRequest) {
+    requestRoom(args: RoomRequest) {
 
-        this.myRequests.room[roomName] = args
-    }
-
-    private newRequestID() {
-
-        return (this.requestID += 1).toString()
+        this.myRequests.room.push(args)
     }
 }
 

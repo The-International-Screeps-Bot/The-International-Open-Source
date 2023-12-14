@@ -434,6 +434,7 @@ export class CommuneManager {
 
     get estimatedEnergyIncome() {
         const roomStats = Memory.stats.rooms[this.room.name]
+        
         return roundTo(
             roomStats[RoomStatsKeys.EnergyInputHarvest] +
                 roomStats[RoomStatsKeys.RemoteEnergyInputHarvest] +
