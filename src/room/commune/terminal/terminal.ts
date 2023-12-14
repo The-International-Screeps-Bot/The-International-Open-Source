@@ -157,7 +157,7 @@ export class TerminalManager {
         return Result.action
     }
 
-    private findBestAllyRequest(): [ResourceRequest, string, number] {
+    private findBestAllyRequest(): [ResourceRequest, number] {
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
         const minStoredEnergy =
@@ -174,12 +174,12 @@ export class TerminalManager {
         let amount: number
 
         const allyResourceRequests = simpleAllies.allySegmentData.requests.resource
-        for (const ID in allyResourceRequests) {
-            const request = allyResourceRequests[ID]
+        for (const request of allyResourceRequests) {
 
             // Don't respond to requests for this room
             if (request.roomName === this.communeManager.room.name) continue
             if (!terminalResourceTargets[request.resourceType]) continue
+            if (Math.floor(request.amount) <= 0) continue
 
             const minStoredResource =
                 terminalResourceTargets[request.resourceType].min(this.communeManager) * 1.1
@@ -203,11 +203,10 @@ export class TerminalManager {
 
             amount = sendAmount
             bestRequest = request
-            bestRequestID = ID
             lowestScore = score
         }
 
-        return [bestRequest, bestRequestID, amount]
+        return [bestRequest, amount]
     }
 
     private respondToAllyRequests() {
@@ -223,7 +222,7 @@ export class TerminalManager {
         )
             return false
 
-        const [request, ID, amount] = this.findBestAllyRequest()
+        const [request, amount] = this.findBestAllyRequest()
         if (!request) return Result.noAction
 
         this.communeManager.room.terminal.send(
@@ -236,7 +235,7 @@ export class TerminalManager {
 
         // Remove the request so other rooms don't try to respond to it
 
-        delete simpleAllies.allySegmentData.requests.resource[ID]
+        request.amount -= amount
         return Result.action
     }
 

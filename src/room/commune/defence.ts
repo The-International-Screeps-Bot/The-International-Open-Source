@@ -367,9 +367,10 @@ export class DefenceManager {
 
         if (!global.settings.allyCommunication) return
 
-        simpleAllies.myRequests.defense[room.name] = {
+        simpleAllies.myRequests.defense.push({
+            roomName: room.name,
             priority: 1,
-        }
+        })
     }
 
     private findPresentThreat() {
