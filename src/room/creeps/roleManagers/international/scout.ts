@@ -19,21 +19,23 @@ export class Scout extends Creep {
     }
 
     initRun() {
-        if (!this.memory[CreepMemoryKeys.scoutTarget]) return
+        if (!Memory.creeps[this.name][CreepMemoryKeys.scoutTarget]) return
 
-        this.commune.scoutTargets.add(this.memory[CreepMemoryKeys.scoutTarget])
+        this.commune.scoutTargets.add(Memory.creeps[this.name][CreepMemoryKeys.scoutTarget])
     }
 
     /**
      * Finds a room name for the scout to target
      */
     findScoutTarget?(): boolean {
-        if (this.memory[CreepMemoryKeys.scoutTarget]) return true
+        const creepMemory = Memory.creeps[this.name]
+        if (creepMemory[CreepMemoryKeys.scoutTarget]) return true
 
         const scoutTarget = this.findBestScoutTarget()
         if (!scoutTarget) return false
 
-        this.commune.scoutTargets.add(this.memory[CreepMemoryKeys.scoutTarget])
+        creepMemory[CreepMemoryKeys.signTarget] = scoutTarget
+        this.commune.scoutTargets.add(scoutTarget)
         return true
     }
 
@@ -44,7 +46,6 @@ export class Scout extends Creep {
         this.unscoutedRooms = []
 
         // Get information about the room's exits
-
         const exits = Game.map.describeExits(this.room.name)
 
         // Loop through each adjacent room recording scouted and unscouted rooms
@@ -74,8 +75,6 @@ export class Scout extends Creep {
                 this.scoutedRooms.push(roomName)
                 continue
             }
-
-            // Otherwise add it to unscouted rooms
 
             this.unscoutedRooms.push(roomName)
         }
@@ -153,16 +152,15 @@ export class Scout extends Creep {
      * Tries to sign a room's controller depending on the situation
      */
     advancedSignController?(): boolean {
-        const { controller } = this.room
+        const controller = this.room.controller
         if (!controller) return true
 
         const roomMemory = Memory.rooms[this.room.name]
 
-        // If the room isn't a commune or our scoutTarget, skip it
-
+        // If the room isn't a commune or our sign target, don't try to sign it
         if (
             roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune &&
-            this.room.name !== this.memory[CreepMemoryKeys.signTarget]
+            Memory.creeps[this.name][CreepMemoryKeys.signTarget] !== this.room.name
         )
             return true
 
@@ -172,33 +170,26 @@ export class Scout extends Creep {
 
         let signMessage: string
 
-        // If the room is owned by an enemy or an ally
+        // If the room is reserved or owned by an enemy or an ally
 
-        if (controller.owner && controller.owner.username !== Memory.me)
-            return true
-
+        if (controller.owner && controller.owner.username !== Memory.me) return true
         if (controller.reservation && controller.reservation.username !== Memory.me) return true
 
         // If the room is a commune
 
         if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
             // If the room already has a correct sign
-
             if (controller.sign && controller.sign.text === communeSign) return true
 
             // Otherwise assign the signMessage the commune sign
-
             signMessage = communeSign
         }
-
         // Otherwise if the room is not a commune
         else {
             // If the room already has a correct sign
-
             if (controller.sign && nonCommuneSigns.includes(controller.sign.text)) return true
 
             // And assign the message according to the index of randomSign
-
             signMessage = nonCommuneSigns[Math.floor(Math.random() * nonCommuneSigns.length)]
         }
 
@@ -215,8 +206,12 @@ export class Scout extends Creep {
                     plainCost: 1,
                     swampCost: 1,
                 }) === Result.fail
-            )
+            ) {
+
+                // The controller is ineccessible, drop the target
+                Memory.creeps[this.name][CreepMemoryKeys.signTarget] = false
                 return true
+            }
 
             this.message = this.moveRequest
 
@@ -267,8 +262,6 @@ export class Scout extends Creep {
             creep.message = `🔭${creep.memory[CreepMemoryKeys.scoutTarget].toString()}`
 
             if (!creep.advancedSignController()) continue
-
-            creep.memory[CreepMemoryKeys.signTarget] = creep.memory[CreepMemoryKeys.scoutTarget]
 
             // Try to go to the scoutTarget
 

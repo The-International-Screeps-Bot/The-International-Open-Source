@@ -1407,7 +1407,7 @@ declare global {
         [CreepMemoryKeys.structureTarget]: Id<Structure<BuildableStructureConstant>>
         [CreepMemoryKeys.remote]: string
         [CreepMemoryKeys.scoutTarget]: string
-        [CreepMemoryKeys.signTarget]: string
+        [CreepMemoryKeys.signTarget]: string | false
         [CreepMemoryKeys.roomLogisticsRequests]: CreepRoomLogisticsRequest[]
         [CreepMemoryKeys.needsResources]: boolean
         [CreepMemoryKeys.squadSize]: number
