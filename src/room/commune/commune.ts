@@ -434,7 +434,7 @@ export class CommuneManager {
 
     get estimatedEnergyIncome() {
         const roomStats = Memory.stats.rooms[this.room.name]
-        
+
         return roundTo(
             roomStats[RoomStatsKeys.EnergyInputHarvest] +
                 roomStats[RoomStatsKeys.RemoteEnergyInputHarvest] +
@@ -494,6 +494,12 @@ export class CommuneManager {
     }
 
     get storedEnergyUpgradeThreshold() {
+/*
+        if (this.room.terminal && this.room.controller.level >= 6) {
+
+
+        }
+ */
         return Math.floor(this.minStoredEnergy * 1.3)
     }
 

@@ -61,6 +61,8 @@ import { RampartPlans } from 'room/construction/rampartPlans'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { minCutToExit } from 'room/construction/minCut'
 import { FeatureFlagManager } from 'international/featureFlags'
+import { ConstructionSiteManager } from 'international/constructionSiteManager'
+import { TransactionsManager } from 'international/transactions'
 
 export function profilerRegister() {
 
@@ -76,7 +78,8 @@ export function profilerRegister() {
     profiler.registerClass(FlagManager, 'FlagManager')
     profiler.registerClass(FeatureFlagManager, 'FeatureFlagManager')
     profiler.registerClass(MarketOrdersManager, 'MarketOrdersManager')
-    profiler.registerClass(ConstructionManager, 'ConstructionSiteManager')
+    profiler.registerClass(ConstructionSiteManager, 'ConstructionSiteManager')
+    profiler.registerClass(TransactionsManager, 'TransactionsManager')
     profiler.registerClass(GarbageCollector, 'GarbageCollector')
     profiler.registerClass(EndTickManager, 'EndTickManager')
     profiler.registerClass(MapVisualsManager, 'MapVisualsManager')

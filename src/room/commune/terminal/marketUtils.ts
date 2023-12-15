@@ -3,7 +3,7 @@ import { findLowestScore, getAvgPrice } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 import { marketOrdersManager } from 'international/marketOrders'
-import { Result } from 'international/constants'
+import { Result, RoomStatsKeys } from 'international/constants'
 
 export const marketUtils = {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
@@ -30,11 +30,12 @@ export const marketUtils = {
             )
             if (result !== OK) return Result.fail
 
-            if (result === OK && resourceType === 'energy') {
-                statsManager.updateStat(room.name, 'eos', amount)
-            } else if (result === OK && resourceType === 'battery') {
-                statsManager.updateStat(room.name, 'eos', amount * 10)
-            }
+            // Success
+
+            const roomsStats = Memory.stats.rooms[room.name]
+
+            const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
+            roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] = transactionCost
 
             return Result.success
         }
@@ -60,11 +61,7 @@ export const marketUtils = {
         })
         if (result !== OK) return Result.fail
 
-        if (result === OK && resourceType === 'energy') {
-            statsManager.updateStat(room.name, 'eos', amount)
-        } else if (result === OK && resourceType === 'battery') {
-            statsManager.updateStat(room.name, 'eos', amount * 10)
-        }
+        // Success
 
         return Result.success
     },
@@ -96,11 +93,13 @@ export const marketUtils = {
             )
             if (result !== OK) return Result.fail
 
-            if (result === OK && resourceType === 'energy') {
-                statsManager.updateStat(room.name, 'eib', amount)
-            } else if (result === OK && resourceType === 'battery') {
-                statsManager.updateStat(room.name, 'eib', amount * 10)
-            }
+            // Success
+
+            const roomsStats = Memory.stats.rooms[room.name]
+
+            const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
+            roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] = transactionCost
+
             return Result.success
         }
 
@@ -124,11 +123,7 @@ export const marketUtils = {
         })
         if (result !== OK) return Result.fail
 
-        if (result === OK && resourceType === 'energy') {
-            statsManager.updateStat(room.name, 'eib', amount)
-        } else if (result === OK && resourceType === 'battery') {
-            statsManager.updateStat(room.name, 'eib', amount * 10)
-        }
+        // Success
 
         return Result.success
     },

@@ -21,6 +21,12 @@ export class MigrationManager {
             Memory.breakingVersion += 1
         }
 
+        if (Memory.breakingVersion === 115) {
+
+            Memory.recordedTransactions = new Set()
+            Memory.breakingVersion += 1
+        }
+
         if (Memory.breakingVersion < global.settings.breakingVersion) {
             global.killCreeps()
             global.clearMemory()

@@ -51,6 +51,7 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 import { marketOrdersManager } from 'international/marketOrders'
+import { transactionsManager } from 'international/transactions'
 
 export function originalLoop() {
 
@@ -75,6 +76,7 @@ export function originalLoop() {
         wasm.collaborator()
 
         roomsManager.updateRun()
+        transactionsManager.run()
         requestsManager.run()
 
         if (global.collectivizer) global.collectivizer.run()

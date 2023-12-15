@@ -340,6 +340,11 @@ declare global {
          */
         constructionSites: { [ID: string]: number }
 
+        /**
+         * keys of the transactions' IDs
+         */
+        recordedTransactions: Set<string>
+
         minHaulerCostError: number
         minHaulerCost: number
         minHaulerCostUpdate: number

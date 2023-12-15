@@ -38,6 +38,7 @@ class InitManager {
         Memory.chantIndex = 0
         Memory.lastConfig = Game.time
         Memory.constructionSites = {}
+        Memory.recordedTransactions = new Set()
         Memory.minHaulerCostError = 0
         Memory.minHaulerCost = BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE]
         Memory.minHaulerCostUpdate = Game.time

@@ -99,6 +99,15 @@ export interface CommuneStats extends RoomStats {
      * hauler size
      */
     mhc: number
+    /**
+     * energy out transactions costs
+     */
+    eotc: number
+
+    // Better way to define shortform types
+
+    [RoomStatsKeys.EnergyTerminalSentDomestic]: number
+    [RoomStatsKeys.EnergyTerminalSentOther]: number
 }
 
 const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
@@ -127,6 +136,9 @@ const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
     RoomStatsKeys.RemoteEnergyInputHarvest,
     RoomStatsKeys.RemoteEnergyOutputRepairOther,
     RoomStatsKeys.RemoteEnergyOutputBuild,
+    RoomStatsKeys.EnergyOutputTransactionCosts,
+    RoomStatsKeys.EnergyTerminalSentDomestic,
+    RoomStatsKeys.EnergyTerminalSentOther,
 ])
 
 export class StatsManager {
@@ -161,6 +173,9 @@ export class StatsManager {
                 [RoomStatsKeys.RemoteEnergyOutputRepairOther]: 0,
                 [RoomStatsKeys.RemoteEnergyOutputBuild]: 0,
                 [RoomStatsKeys.MinHaulerCost]: 0,
+                [RoomStatsKeys.EnergyOutputTransactionCosts]: 0,
+                [RoomStatsKeys.EnergyTerminalSentDomestic]: 0,
+                [RoomStatsKeys.EnergyTerminalSentOther]: 0,
             })
 
             if (Memory.stats.rooms[roomName]) return

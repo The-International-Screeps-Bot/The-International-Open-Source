@@ -1581,6 +1581,9 @@ export enum RoomStatsKeys {
     PowerCreepCount = 'pcc',
     SpawnUsagePercentage = 'su',
     MinHaulerCost = 'mhc',
+    EnergyOutputTransactionCosts = 'eotc',
+    EnergyTerminalSentDomestic = 'etsd',
+    EnergyTerminalSentOther = 'etso',
 
     GameTime = 'gt',
     RemoteCount = 'rc',

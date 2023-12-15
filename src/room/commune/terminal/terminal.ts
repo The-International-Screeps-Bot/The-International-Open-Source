@@ -1,4 +1,4 @@
-import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
+import { minerals, Result, RoomMemoryKeys, RoomStatsKeys, terminalResourceTargets } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { newID, roundTo } from 'utils/utils'
 import './marketUtils'
@@ -152,6 +152,11 @@ export class TerminalManager {
             request.roomName,
             'Terminal request',
         )
+
+        // Consequences
+
+        request.amount -= amount
+
         delete collectiveManager.terminalRequests[ID]
         this.communeManager.room.terminal.intended = true
         return Result.action
@@ -231,9 +236,10 @@ export class TerminalManager {
             request.roomName,
             'Ally request',
         )
-        this.communeManager.room.terminal.intended = true
 
-        // Remove the request so other rooms don't try to respond to it
+        // Consequences
+
+        this.communeManager.room.terminal.intended = true
 
         request.amount -= amount
         return Result.action

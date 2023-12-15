@@ -174,10 +174,7 @@ export class Scout extends Creep {
 
         // If the room is owned by an enemy or an ally
 
-        if (
-            roomMemory[RoomMemoryKeys.type] === RoomTypes.ally ||
-            roomMemory[RoomMemoryKeys.type] === RoomTypes.enemy
-        )
+        if (controller.owner && controller.owner.username !== Memory.me)
             return true
 
         if (controller.reservation && controller.reservation.username !== Memory.me) return true
