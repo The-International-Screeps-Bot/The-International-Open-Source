@@ -12,7 +12,7 @@ import './other/profilerRegister'
 import { memHack } from 'other/memHack'
 import { customLog } from 'utils/logging'
 import { findCPUOf, outOfBucket, randomIntRange } from 'utils/utils'
-import { CPUMaxPerTick, customColors } from 'international/constants'
+import { CPUMaxPerTick, Result, customColors } from 'international/constants'
 import { CommuneManager } from 'room/commune/commune'
 import { initManager } from './international/init'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
@@ -52,17 +52,19 @@ import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 import { marketOrdersManager } from 'international/marketOrders'
 import { transactionsManager } from 'international/transactions'
+import { segmentsManager } from 'international/segments'
 
 export function originalLoop() {
 
     memHack.run()
+    if (segmentsManager.run() === Result.stop) return
 
-    if (global.userScript) global.userScript.initialRun()
     if (Game.flags.deactivate) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
         outOfBucket()
         return
     }
+    if (global.userScript) global.userScript.initialRun()
 
     profiler.wrap((): void => {
         migrationManager.run()

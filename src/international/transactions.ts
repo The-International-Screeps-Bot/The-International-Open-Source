@@ -1,8 +1,12 @@
+import { Sleepable } from "utils/sleepable"
 import { RoomStatsKeys } from "./constants"
+import { randomIntRange } from "utils/utils"
 
-export class TransactionsManager {
-
+export class TransactionsManager extends Sleepable {
+  sleepFor = randomIntRange(50, 100)
+  
   run() {
+    if (this.isSleepingResponsive()) return
 
     const currentTransactionIDs = this.findCurrentTransactions()
     this.pruneRecordedTransactions(currentTransactionIDs)

@@ -1,6 +1,6 @@
 import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
 import { findLowestScore, randomIntRange } from '../utils/utils'
-import { Sleepable } from 'utils/Sleepable'
+import { Sleepable } from 'utils/sleepable'
 import { collectiveManager } from './collective'
 
 export class RoomPruningManager extends Sleepable {

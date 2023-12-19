@@ -14,7 +14,7 @@ import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 import { collectiveManager } from 'international/collective'
-import { Sleepable } from 'utils/Sleepable'
+import { Sleepable } from 'utils/sleepable'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
     STRUCTURE_EXTENSION,

@@ -6,7 +6,6 @@ import { LogTypes, customLog } from 'utils/logging'
 import { RoomManager } from 'room/room'
 import { statsManager } from 'international/statsManager'
 import { creepClasses } from './creepClasses'
-import ErrorExporter from 'other/ErrorExporter'
 
 export class CreepRoleManager {
     roomManager: RoomManager

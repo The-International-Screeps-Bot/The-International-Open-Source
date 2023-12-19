@@ -854,8 +854,8 @@ Room.prototype.createDefendCombatRequest = function (opts) {
 
     request[CombatRequestKeys.inactionTimer] = 0
     request[CombatRequestKeys.inactionTimerMax] = randomRange(
-        5000,
-        5000 + Math.floor(Math.random() * 5000),
+        2000,
+        3000,
     )
 
     const enemySquadData = this.roomManager.enemySquadData

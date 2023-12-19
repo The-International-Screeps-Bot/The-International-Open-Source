@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { SourceMapConsumer } from 'source-map'
-import ErrorExporter from './ErrorExporter'
+import { errorExporter } from './ErrorExporter'
 
 export class ErrorMapper {
     // Cache consumer
@@ -95,7 +95,7 @@ export class ErrorMapper {
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${stack}</p>`)
                         if (global.settings.errorExporting)
-                            ErrorExporter.addErrorToSegment(stack, global.settings.breakingVersion)
+                            errorExporter.addErrorToSegment(stack, global.settings.breakingVersion)
                     }
                 } else {
                     // can't handle it

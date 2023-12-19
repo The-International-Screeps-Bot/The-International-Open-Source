@@ -1,4 +1,4 @@
-import { Sleepable } from 'utils/Sleepable'
+import { Sleepable } from 'utils/sleepable'
 import { RoomMemoryKeys, codecCacheLength } from './constants'
 import { packCache, unpackCache } from 'other/codec'
 

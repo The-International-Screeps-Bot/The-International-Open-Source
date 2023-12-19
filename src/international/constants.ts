@@ -1710,3 +1710,9 @@ export enum WorkTypes {
 }
 
 export const codecCacheLength = 99999
+
+export enum SegmentIDs {
+    General = 0,
+    BasePlans = 1,
+    Errors = 10,
+}

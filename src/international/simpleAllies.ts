@@ -105,7 +105,7 @@ export interface AllyRequests {
 /**
  * Having data we pass into the segment being an object allows us to send additional information outside of requests
  */
-export interface SegmentData {
+export interface SimpleAlliesSegment {
     /**
      * Requests of the new system
      */
@@ -115,7 +115,7 @@ export interface SegmentData {
 
 export class SimpleAllies {
     myRequests: Partial<AllyRequests> = {}
-    allySegmentData: SegmentData
+    allySegmentData: SimpleAlliesSegment
     currentAlly: string
 
     /**
@@ -175,7 +175,7 @@ export class SimpleAllies {
 
         this.allyRequestsFromMyTerminalRequests()
 
-        const newSegmentData: SegmentData = {
+        const newSegmentData: SimpleAlliesSegment = {
             requests: this.myRequests as AllyRequests,
             commands: collectiveManager.myCommands,
         }

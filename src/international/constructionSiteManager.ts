@@ -1,4 +1,4 @@
-import { Sleepable } from 'utils/Sleepable'
+import { Sleepable } from 'utils/sleepable'
 import { CollectiveManager, collectiveManager } from './collective'
 
 /**

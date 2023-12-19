@@ -362,7 +362,7 @@ export class DefenceManager {
             [CombatRequestKeys.minMeleeHeal]: minMeleeHeal,
             [CombatRequestKeys.minRangedHeal]: minRangedHeal,
             [CombatRequestKeys.quadQuota]: 1,
-            [CombatRequestKeys.inactionTimerMax]: onlyInvader ? 1 : undefined,
+            [CombatRequestKeys.inactionTimerMax]: onlyInvader ? 1 : randomIntRange(2000, 3000),
         })
 
         if (!global.settings.allyCommunication) return

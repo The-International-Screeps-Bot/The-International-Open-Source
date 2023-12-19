@@ -144,8 +144,16 @@ export class CombatRequestManager {
         if (!requestRoom.roomManager.notMyCreeps.enemy.length) {
             request[CombatRequestKeys.inactionTimer] -= 1
             this.manageInaction(requestName, index)
-        } else
+        } else {
+
+            if (!request[CombatRequestKeys.inactionTimerMax]) {
+
+                this.communeManager.deleteCombatRequest(requestName, index)
+                return
+            }
+
             request[CombatRequestKeys.inactionTimer] = request[CombatRequestKeys.inactionTimerMax]
+        }
     }
 
     private defendRequest(requestName: string, index: number) {
@@ -189,8 +197,16 @@ export class CombatRequestManager {
         if (!requestRoom.roomManager.enemyDamageThreat) {
             request[CombatRequestKeys.inactionTimer] -= 1
             this.manageInaction(requestName, index)
-        } else
+        } else {
+
+            if (!request[CombatRequestKeys.inactionTimerMax]) {
+
+                this.communeManager.deleteCombatRequest(requestName, index)
+                return
+            }
+
             request[CombatRequestKeys.inactionTimer] = request[CombatRequestKeys.inactionTimerMax]
+        }
     }
 
     private manageInaction(requestName: string, index: number) {
