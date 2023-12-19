@@ -369,7 +369,7 @@ export class StatsManager {
 
         const heapStatistics = Game.cpu.getHeapStatistics()
         Memory.stats.heapUsage = roundTo(
-            heapStatistics.total_heap_size / heapStatistics.heap_size_limit,
+            (heapStatistics.total_heap_size + heapStatistics.externally_allocated_size) / heapStatistics.heap_size_limit,
             2,
         )
         Memory.stats.gcl = {

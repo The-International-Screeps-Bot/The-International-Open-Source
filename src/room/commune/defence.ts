@@ -353,7 +353,7 @@ export class DefenceManager {
         }
 
         // If we have towers and it's only invaders, we don't need a defence request
-        if (onlyInvader && room.roomManager.structures.tower.length) return
+        if (onlyInvader && hasTowers) return
 
         // There is tower inferiority, make a defend request
 

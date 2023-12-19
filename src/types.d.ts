@@ -343,7 +343,7 @@ declare global {
         /**
          * keys of the transactions' IDs
          */
-        recordedTransactions: Set<string>
+        recordedTransactionIDs: {[ID: string]: 1}
 
         minHaulerCostError: number
         minHaulerCost: number

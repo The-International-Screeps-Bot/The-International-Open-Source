@@ -32,20 +32,20 @@ export class TransactionsManager {
    */
   private pruneRecordedTransactions(currentTransactionIDs: Set<string>) {
 
-    for (const transactionID of Memory.recordedTransactions) {
+    for (const transactionID in Memory.recordedTransactionIDs) {
       // only delete if it isn't in current data
       if (currentTransactionIDs.has(transactionID)) continue
 
-      Memory.recordedTransactions.delete(transactionID)
+      Memory.recordedTransactionIDs.transactionID = undefined
     }
   }
 
   private registerTransaction(transaction: Transaction) {
 
     // don't register already registered orders
-    if (Memory.recordedTransactions.has(transaction.transactionId)) return
+    if (Memory.recordedTransactionIDs[transaction.transactionId]) return
 
-    Memory.recordedTransactions.add(transaction.transactionId)
+    Memory.recordedTransactionIDs[transaction.transactionId] = 1
 
     this.processTransaction(transaction)
   }
@@ -56,31 +56,39 @@ export class TransactionsManager {
 
     if (transaction.sender.username === Memory.me) {
 
-      if (transaction.order) {
-
-        Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyOutputSold] += transaction.amount
-      }
-
-      const isDomestic = this.isDomestic(transaction.from, transaction.to)
-      if (isDomestic) {
-
-        Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyTerminalSentDomestic] += transaction.amount
-      }
-      // Not a domestic trade
-      else {
-        Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyTerminalSentOther] += transaction.amount
-      }
-
-
+      this.processTransactionMySend(transaction)
     }
     if (transaction.recipient.username === Memory.me) {
 
-      if (transaction.order) {
+      this.processTransactionMyReceive(transaction)
+    }
+  }
 
-        Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyInputBought] += transaction.amount
-      }
+  private processTransactionMySend(transaction: Transaction) {
 
+    if (transaction.order) {
 
+      Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyOutputSold] += transaction.amount
+      return
+    }
+
+    const isDomestic = this.isDomestic(transaction.from, transaction.to)
+    if (isDomestic) {
+
+      Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyTerminalSentDomestic] += transaction.amount
+    }
+    // Not a domestic trade
+    else {
+      Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyTerminalSentOther] += transaction.amount
+    }
+  }
+
+  private processTransactionMyReceive(transaction: Transaction) {
+
+    if (transaction.order) {
+
+      Memory.stats.rooms[transaction.to][RoomStatsKeys.EnergyInputBought] += transaction.amount
+      return
     }
   }
 
