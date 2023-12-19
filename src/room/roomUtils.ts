@@ -140,7 +140,7 @@ export const roomUtils = {
                     if (checkResult === Result.stop) return adjacentCoord
                     if (!checkResult) continue
 
-                    nextGeneration.push(coord)
+                    nextGeneration.push(adjacentCoord)
                 }
             }
 

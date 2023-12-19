@@ -159,9 +159,9 @@ export class DefenceManager {
             if (isAlly(enemyCreep.name)) return true
             // If it can deal damage, safemode
             if (
-                enemyCreep.combatStrength.ranged ||
-                enemyCreep.combatStrength.melee ||
-                enemyCreep.combatStrength.dismantle
+                enemyCreep.combatStrength.ranged > 0 ||
+                enemyCreep.combatStrength.melee > 0 ||
+                enemyCreep.combatStrength.dismantle > 0
             )
                 return Result.stop
 

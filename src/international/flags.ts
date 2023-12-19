@@ -1,7 +1,10 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { RoomMemoryKeys, RoomTypes, customColors } from './constants'
+import { Result, RoomMemoryKeys, RoomTypes, customColors, ourImpassibleStructuresSet } from './constants'
 import { collectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
+import { roomUtils } from 'room/roomUtils'
+import { packCoord } from 'other/codec'
+import { findObjectWithID, isAlly } from 'utils/utils'
 
 export class FlagManager {
     run() {
@@ -268,6 +271,93 @@ export class FlagManager {
         global.deleteCombatRequest(roomName)
 
         flag.remove()
+    }
+
+    private defenceFloodAnchor(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) return
+
+        const anchor = room.roomManager.anchor
+        if (!anchor) {
+            throw Error('no anchor')
+        }
+
+        const terrain = Game.map.getRoomTerrain(room.name)
+        const rampartPlans = room.roomManager.rampartPlans
+        roomUtils.floodFillFor(room.name, [anchor], coord => {
+            // Ignore terrain that protects us
+            if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
+
+            const planData = rampartPlans.getXY(coord.x, coord.y)
+            if (planData) {
+                // Filter out non-mincut ramparts
+                if (planData.buildForNuke || planData.coversStructure) {
+
+                    room.coordVisual(coord.x, coord.y)
+                    return true
+                }
+
+                // Don't flood past mincut ramparts
+                return false
+            }
+            room.coordVisual(coord.x, coord.y)
+            // See if there is an enemy creep
+            const enemyCreepID = room.roomManager.enemyCreepPositions[packCoord(coord)]
+            if (!enemyCreepID) return true
+
+            const enemyCreep = findObjectWithID(enemyCreepID)
+            if (isAlly(enemyCreep.name)) return true
+            // If it can deal damage, safemode
+            if (
+                enemyCreep.combatStrength.ranged > 0 ||
+                enemyCreep.combatStrength.melee > 0 ||
+                enemyCreep.combatStrength.dismantle > 0
+            )
+                return Result.stop
+
+            return true
+        })
+    }
+
+    private defenceFloodController(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) return
+
+        const terrain = Game.map.getRoomTerrain(room.name)
+        roomUtils.floodFillFor(
+            room.name,
+            [room.controller.pos],
+            (coord, packedCoord, depth) => {
+                // See if we should even consider the coord
+
+                // Ignore terrain that protects us
+                if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
+
+                // Don't go out of range 2 from controller
+                if (depth > 2) return false
+
+                // Ignore structures that protect us
+                if (room.coordHasStructureTypes(coord, ourImpassibleStructuresSet)) return false
+
+                // Past this point we should always add this coord to the next generation
+                room.coordVisual(coord.x, coord.y)
+                // See if there is an enemy creep
+                const enemyCreepID = room.roomManager.enemyCreepPositions[packCoord(coord)]
+                if (!enemyCreepID) return true
+
+                const enemyCreep = findObjectWithID(enemyCreepID)
+                if (isAlly(enemyCreep.name)) return true
+                // We only need to protect our controller from claim creeps
+                if (!enemyCreep.parts.claim) return true
+
+                // We identified an enemy claimed near our controller!
+                return Result.stop
+            },
+        )
     }
 }
 
