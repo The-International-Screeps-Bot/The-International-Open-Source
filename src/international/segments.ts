@@ -6,7 +6,7 @@ class SegmentsManager {
     // See if our dumby segment is alive
 
     const sampleSegment = RawMemory.segments[SegmentIDs.General]
-    if (sampleSegment === undefined || !sampleSegment.length) {
+    if (sampleSegment === undefined) {
 
       // We can assume that no segments are alive: set them alive and ask the bot to stop everything else for the current tick
 
@@ -16,6 +16,8 @@ class SegmentsManager {
           SegmentIDs.BasePlans,
           SegmentIDs.Errors
         ])
+
+      console.log('activating segments, should take one tick')
       return Result.stop
     }
 
