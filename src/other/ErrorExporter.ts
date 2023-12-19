@@ -2,6 +2,9 @@ import { SegmentIDs } from "international/constants"
 
 RawMemory.setActiveSegments([SegmentIDs.Errors])
 
+/**
+ * Rather cpu intensive and unavoidably inefficient. Try to avoid this needing to ba called
+ */
 export class ErrorExporter {
     public getSegmentData(): ErrorsSegment {
         const segment = RawMemory.segments[SegmentIDs.Errors]

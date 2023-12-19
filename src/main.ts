@@ -103,6 +103,7 @@ export function originalLoop() {
 
         collectiveManager.advancedGeneratePixel()
 
+        segmentsManager.endRun()
         endTickManager.run()
     })
 }
