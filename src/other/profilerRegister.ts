@@ -7,7 +7,6 @@ import { TerminalManager } from 'room/commune/terminal/terminal'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
 import { StatsManager } from 'international/statsManager'
-import { CommunePlanner } from 'room/communePlanner'
 import { ConstructionManager } from 'room/construction/construction'
 import { ObserverManager } from 'room/commune/observer'
 import { RemotesManager } from 'room/commune/remotesManager'
@@ -63,6 +62,7 @@ import { minCutToExit } from 'room/construction/minCut'
 import { FeatureFlagManager } from 'international/featureFlags'
 import { ConstructionSiteManager } from 'international/constructionSiteManager'
 import { TransactionsManager } from 'international/transactions'
+import { CommunePlanner } from 'room/construction/communePlanner'
 
 export function profilerRegister() {
 

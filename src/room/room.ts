@@ -52,7 +52,7 @@ import { EndTickCreepManager } from './creeps/endTickCreepManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import { RoomVisualsManager } from './roomVisuals'
 import { statsManager } from 'international/statsManager'
-import { CommunePlanner } from './communePlanner'
+import { CommunePlanner } from './construction/communePlanner'
 import { TombstoneManager } from './tombstones'
 import { RuinsManager } from './ruins'
 import {

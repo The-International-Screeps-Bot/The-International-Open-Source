@@ -39,6 +39,7 @@ import {
 } from 'types/roomRequests'
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
 import { StatsMemory } from 'types/stats'
+import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
 
 declare global {
     interface ProfilerData {
@@ -100,12 +101,6 @@ declare global {
         | 'move'
         | 'secondaryAttack'
         | 'heal'
-
-    interface ResourceTarget {
-        conditions?(communeManager: CommuneManager): any
-        min(communeManager?: CommuneManager): number
-        max(communeManager?: CommuneManager): number
-    }
 
     type SquadTypes = 'duo' | 'quad' | 'dynamic'
     type SquadCombatTypes = 'rangedAttack' | 'attack' | 'dismantle'
@@ -365,6 +360,13 @@ declare global {
         players: { [playerName: string]: Partial<PlayerMemory> }
 
         masterPlan: { resources?: { [key in ResourceConstant]?: number } }
+
+        networks: {
+            towers: {
+                weightLayers: WeightLayers
+                weightsByID: WeightsByID
+            }
+        }
 
         // Other
 

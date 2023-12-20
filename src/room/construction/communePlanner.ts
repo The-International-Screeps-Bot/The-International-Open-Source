@@ -56,12 +56,12 @@ import {
 } from 'other/codec'
 import 'other/RoomVisual'
 import { CommuneManager } from 'room/commune/commune'
-import { RoomManager } from './room'
-import { BasePlans } from './construction/basePlans'
-import { RampartPlans } from './construction/rampartPlans'
-import { minCutToExit } from './construction/minCut'
+import { RoomManager } from '../room'
+import { BasePlans } from './basePlans'
+import { RampartPlans } from './rampartPlans'
+import { minCutToExit } from './minCut'
 import { customFindPath } from 'international/customPathFinder'
-import { towerFunctions } from './commune/towers'
+import { towerFunctions } from '../commune/towers'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 8

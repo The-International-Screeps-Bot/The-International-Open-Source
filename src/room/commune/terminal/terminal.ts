@@ -1,10 +1,10 @@
-import { minerals, Result, RoomMemoryKeys, RoomStatsKeys, terminalResourceTargets } from 'international/constants'
+import { minerals, Result, RoomMemoryKeys, RoomStatsKeys } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { newID, roundTo } from 'utils/utils'
 import './marketUtils'
 import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/simpleAllies'
 import { collectiveManager } from 'international/collective'
-import { CommuneManager } from 'room/commune/commune'
+import { CommuneManager, ResourceTargets } from 'room/commune/commune'
 import { marketUtils } from './marketUtils'
 import { marketOrdersManager } from 'international/marketOrders'
 
@@ -18,45 +18,44 @@ export class TerminalManager {
     }
 
     preTickRun() {
-        const { terminal } = this.communeManager.room
-        if (!terminal) return
-        if (!terminal.isRCLActionable) return
+        const room = this.communeManager.room
+        if (!room.terminal) return
+        if (!room.terminal.isRCLActionable) return
 
-        this.createTerminalRequests()
+        const resourceTargets = this.communeManager.resourceTargets
+
+        this.createTerminalRequests(room, resourceTargets)
     }
 
     run() {
         const { room } = this.communeManager
-        const { terminal } = room
 
         // Stop if there is no terminal
 
-        if (!terminal) return
-        if (!terminal.isRCLActionable) return
-        if (terminal.cooldown > 0) return
+        if (!room.terminal) return
+        if (!room.terminal.isRCLActionable) return
+        if (room.terminal.cooldown > 0) return
 
-        if (this.respondToTerminalRequests() === Result.action) return
-        if (this.respondToAllyRequests() === Result.action) return
+        const resourceTargets = this.communeManager.resourceTargets
+
+        if (this.respondToTerminalRequests(room, resourceTargets) === Result.action) return
+        if (this.respondToAllyRequests(room, resourceTargets) === Result.action) return
 
         // Check if the market is disabled by us or the server
 
         if (!global.settings.marketUsage) return
         if (!marketOrdersManager.isMarketFunctional) return
 
-        this.manageResources()
+        if (this.manageResources(room, resourceTargets) === Result.action) return
     }
 
-    private createTerminalRequests() {
-        const { room } = this.communeManager
-        const { terminal } = room
+    private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
 
-        for (const key in terminalResourceTargets) {
+        for (const key in resourceTargets) {
             const resource = key as ResourceConstant
-            const resourceTarget = terminalResourceTargets[resource]
-            let targetAmount = resourceTarget.min(this.communeManager)
+            const resourceTarget = resourceTargets[resource]
+            let targetAmount = resourceTarget.min
             if (targetAmount <= 0) continue
-            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager))
-                continue
 
             // We have enough
 
@@ -68,7 +67,7 @@ export class TerminalManager {
             const priority = roundTo(1 - storedResourceAmount / targetAmount, 2)
             const amount = Math.min(
                 targetAmount - storedResourceAmount,
-                terminal.store.getFreeCapacity(),
+                room.terminal.store.getFreeCapacity(),
             )
 
             const ID = newID()
@@ -82,11 +81,11 @@ export class TerminalManager {
         }
     }
 
-    private findBestTerminalRequest(): [TerminalRequest, string, number] {
+    private findBestTerminalRequest(room: Room, resourceTargets: ResourceTargets): [TerminalRequest, string, number] {
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
         const minStoredEnergy =
-            terminalResourceTargets[RESOURCE_ENERGY].min(this.communeManager) * 1.1
+            resourceTargets[RESOURCE_ENERGY].min * 1.1
         const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
         const budget = Math.min(
             storedEnergy - minStoredEnergy,
@@ -103,10 +102,10 @@ export class TerminalManager {
 
             // Don't respond to requests for this room
             if (request.roomName === this.communeManager.room.name) continue
-            if (!terminalResourceTargets[request.resource]) continue
+            if (!resourceTargets[request.resource]) continue
 
             const minStoredResource =
-                terminalResourceTargets[request.resource].min(this.communeManager) * 1.1
+                resourceTargets[request.resource].min * 1.1
             const storedResource = resourcesInStoringStructures[request.resource] || 0
             if (storedResource <= minStoredResource) continue
 
@@ -134,7 +133,7 @@ export class TerminalManager {
         return [bestRequest, bestRequestID, amount]
     }
 
-    private respondToTerminalRequests() {
+    private respondToTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
         // We don't have enough energy to help other rooms
 
         if (
@@ -143,7 +142,7 @@ export class TerminalManager {
         )
             return Result.noAction
 
-        const [request, ID, amount] = this.findBestTerminalRequest()
+        const [request, ID, amount] = this.findBestTerminalRequest(room, resourceTargets)
         if (!request) return Result.noAction
 
         this.communeManager.room.terminal.send(
@@ -162,11 +161,11 @@ export class TerminalManager {
         return Result.action
     }
 
-    private findBestAllyRequest(): [ResourceRequest, number] {
+    private findBestAllyRequest(room: Room, resourceTargets: ResourceTargets): [ResourceRequest, number] {
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
         const minStoredEnergy =
-            terminalResourceTargets[RESOURCE_ENERGY].min(this.communeManager) * 1.1
+            resourceTargets[RESOURCE_ENERGY].min * 1.1
         const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
         const budget = Math.min(
             storedEnergy - minStoredEnergy,
@@ -183,11 +182,11 @@ export class TerminalManager {
 
             // Don't respond to requests for this room
             if (request.roomName === this.communeManager.room.name) continue
-            if (!terminalResourceTargets[request.resourceType]) continue
+            if (!resourceTargets[request.resourceType]) continue
             if (Math.floor(request.amount) <= 0) continue
 
             const minStoredResource =
-                terminalResourceTargets[request.resourceType].min(this.communeManager) * 1.1
+                resourceTargets[request.resourceType].min * 1.1
             const storedResource = resourcesInStoringStructures[request.resourceType] || 0
             if (storedResource <= minStoredResource) continue
 
@@ -214,7 +213,7 @@ export class TerminalManager {
         return [bestRequest, amount]
     }
 
-    private respondToAllyRequests() {
+    private respondToAllyRequests(room: Room, resourceTargets: ResourceTargets) {
         if (!global.settings.allyCommunication) return Result.noAction
         if (!simpleAllies.allySegmentData) return Result.noAction
         if (!simpleAllies.allySegmentData.requests) return Result.noAction
@@ -227,7 +226,7 @@ export class TerminalManager {
         )
             return false
 
-        const [request, amount] = this.findBestAllyRequest()
+        const [request, amount] = this.findBestAllyRequest(room, resourceTargets)
         if (!request) return Result.noAction
 
         this.communeManager.room.terminal.send(
@@ -245,42 +244,48 @@ export class TerminalManager {
         return Result.action
     }
 
-    private manageResources() {
-        const { room } = this.communeManager
-        const { terminal } = room
+    private manageResources(room: Room, resourceTargets: ResourceTargets) {
 
-        for (const key in terminalResourceTargets) {
-            const resource = key as ResourceConstant
-            const resourceTarget = terminalResourceTargets[resource]
-            if (resourceTarget.conditions && !resourceTarget.conditions(this.communeManager))
-                continue
+        for (const key in resourceTargets) {
+            const resourceType = key as ResourceConstant
 
-            let min = resourceTarget.min(this.communeManager)
+            if (this.manageResource(room, resourceType, resourceTargets) === Result.action) {
+                return Result.action
+            }
+        }
 
-            // We don't have enough
+        return Result.noAction
+    }
 
-            if (terminal.store[resource] < min) {
-                if (Game.market.credits < collectiveManager.minCredits) continue
+    private manageResource(room: Room, resourceType: ResourceConstant, resourceTargets: ResourceTargets) {
 
-                min *= 1.2
+        const resourceTarget = resourceTargets[resourceType]
 
-                if (marketUtils.advancedBuy(room, resource, min - terminal.store[resource], min))
-                    return
-                continue
+        let min = resourceTarget.min
+
+        // We don't have enough
+
+        if (room.terminal.store[resourceType] < min * 1.1) {
+            if (Game.market.credits < collectiveManager.minCredits) return Result.noAction
+
+            if (marketUtils.advancedBuy(room, resourceType, min - room.terminal.store[resourceType]) === Result.success) {
+                return Result.action
             }
 
-            let max = resourceTarget.max(this.communeManager)
-
-            // We have enough
-
-            if (terminal.store[resource] < max) continue
-
-            max *= 0.8
-
-            // Try to sell the excess amount
-
-            if (marketUtils.advancedSell(room, resource, terminal.store[resource] - max, max))
-                return
+            return Result.noAction
         }
+
+        let max = resourceTarget.max
+
+        // If we don't have too much, stop
+
+        if (room.terminal.store[resourceType] * 1.1 < max) return Result.noAction
+
+        // Try to sell the excess amount
+        if (marketUtils.advancedSell(room, resourceType, room.terminal.store[resourceType] - max) === Result.success) {
+            return Result.action
+        }
+
+        return Result.noAction
     }
 }

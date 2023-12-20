@@ -6,13 +6,13 @@ import { marketOrdersManager } from 'international/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
 export const marketUtils = {
-    advancedSell(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
+    advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
             marketOrdersManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
-        if (amount <= targetAmount * 0.5) return false
+        if (amount <= 0) return false
 
         const order = marketOrdersManager.getBuyOrder(resourceType)
 
@@ -65,13 +65,13 @@ export const marketUtils = {
 
         return Result.success
     },
-    advancedBuy(room: Room, resourceType: ResourceConstant, amount: number, targetAmount: number) {
+    advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
             marketOrdersManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
-        if (amount <= targetAmount * 0.5) return false
+        if (amount <= 0) return false
 
         const order = marketOrdersManager.getSellOrder(
             resourceType,

@@ -94,6 +94,8 @@ import { LogTypes, customLog } from 'utils/logging'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { SpawnRequestArgs } from 'types/spawnRequest'
 
+export type ResourceTargets = Partial<{ [key in ResourceConstant]: ResourceTarget }>
+
 export class CommuneManager {
     static communeManagers: { [roomName: string]: CommuneManager } = {}
 
@@ -194,6 +196,7 @@ export class CommuneManager {
             delete this._upgradeStructure
             delete this._storedEnergyBuildThreshold
             delete this._hasSufficientRoads
+            delete this._resourceTargets
         }
 
         this.room = room
@@ -1124,4 +1127,152 @@ export class CommuneManager {
     //         barricadeDamageOverTime[packedCoord] = rampart.hits
     //     }
     // }
+
+    _resourceTargets: ResourceTargets
+    get resourceTargets() {
+        if (this._resourceTargets) return this._resourceTargets
+
+        const resourceTargets: ResourceTargets = {}
+        const storingStructuresCapacity = this.storingStructuresCapacity
+        let min: number
+
+        resourceTargets[RESOURCE_BATTERY].min = this.room.roomManager.factory ? storingStructuresCapacity * 0.005 : 0
+        resourceTargets[RESOURCE_BATTERY].max = storingStructuresCapacity * 0.015
+
+        min = resourceTargets[RESOURCE_ENERGY].min = this.energyMinResourceTarget(storingStructuresCapacity)
+        resourceTargets[RESOURCE_ENERGY].max = Math.max(storingStructuresCapacity * 0.2, this.minStoredEnergy, min)
+
+        // minerals
+
+        resourceTargets[RESOURCE_HYDROGEN].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_HYDROGEN].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_OXYGEN].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_OXYGEN].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_UTRIUM].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_UTRIUM].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_KEANIUM].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_KEANIUM].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_LEMERGIUM].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_LEMERGIUM].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_ZYNTHIUM].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_ZYNTHIUM].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_CATALYST].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_CATALYST].max = storingStructuresCapacity * 0.027
+
+        // Boosts
+
+        resourceTargets[RESOURCE_UTRIUM_HYDRIDE].min = 0
+        resourceTargets[RESOURCE_UTRIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_UTRIUM_OXIDE].min = 0
+        resourceTargets[RESOURCE_UTRIUM_OXIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_KEANIUM_HYDRIDE].min = 0
+        resourceTargets[RESOURCE_KEANIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_KEANIUM_OXIDE].min = 0
+        resourceTargets[RESOURCE_KEANIUM_OXIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_LEMERGIUM_HYDRIDE].min = 0
+        resourceTargets[RESOURCE_LEMERGIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_LEMERGIUM_OXIDE].min = 0
+        resourceTargets[RESOURCE_LEMERGIUM_OXIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_ZYNTHIUM_HYDRIDE].min = 0
+        resourceTargets[RESOURCE_ZYNTHIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_ZYNTHIUM_OXIDE].min = 0
+        resourceTargets[RESOURCE_ZYNTHIUM_OXIDE].max = storingStructuresCapacity * 0.01
+
+        resourceTargets[RESOURCE_GHODIUM_HYDRIDE].min = 0
+        resourceTargets[RESOURCE_GHODIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+
+        // other raw
+
+        resourceTargets[RESOURCE_POWER].min = this.room.roomManager.powerSpawn ? storingStructuresCapacity * 0.002 : 0
+        resourceTargets[RESOURCE_POWER].max = storingStructuresCapacity * 0.015
+
+        resourceTargets[RESOURCE_OPS].min = storingStructuresCapacity * 0.01
+        resourceTargets[RESOURCE_OPS].max = storingStructuresCapacity * 0.027
+
+        resourceTargets[RESOURCE_METAL].min = 0
+        resourceTargets[RESOURCE_METAL].max = 0
+
+        resourceTargets[RESOURCE_BIOMASS].min = 0
+        resourceTargets[RESOURCE_BIOMASS].max = 0
+
+        resourceTargets[RESOURCE_SILICON].min = 0
+        resourceTargets[RESOURCE_SILICON].max = 0
+
+        resourceTargets[RESOURCE_MIST].min = 0
+        resourceTargets[RESOURCE_MIST].max = 0
+
+        // commodities
+        // low level
+
+        resourceTargets[RESOURCE_GHODIUM_MELT].min = 0
+        resourceTargets[RESOURCE_GHODIUM_MELT].max = 0
+
+        resourceTargets[RESOURCE_COMPOSITE].min = 0
+        resourceTargets[RESOURCE_COMPOSITE].max = 0
+
+        resourceTargets[RESOURCE_CRYSTAL].min = 0
+        resourceTargets[RESOURCE_CRYSTAL].max = 0
+
+        resourceTargets[RESOURCE_LIQUID].min = 0
+        resourceTargets[RESOURCE_LIQUID].max = 0
+
+        // tier 1 commodities
+
+        resourceTargets[RESOURCE_ALLOY].min = 0
+        resourceTargets[RESOURCE_ALLOY].max = 0
+
+        resourceTargets[RESOURCE_CELL].min = 0
+        resourceTargets[RESOURCE_CELL].max = 0
+
+        resourceTargets[RESOURCE_WIRE].min = 0
+        resourceTargets[RESOURCE_WIRE].max = 0
+
+        resourceTargets[RESOURCE_CONDENSATE].min = 0
+        resourceTargets[RESOURCE_CONDENSATE].max = 0
+
+        // tier 2
+
+        // tier 3
+
+        // tier 4
+
+        // tier 5
+
+        return this._resourceTargets = resourceTargets
+    }
+
+    private energyMinResourceTarget(storingStructuresCapacity: number) {
+
+        if (this.room.controller.level < 8) {
+            if (collectiveManager.funnelOrder[0] === this.room.name) {
+                return Math.min(this.minStoredEnergy + this.upgradeTargetDistance(), storingStructuresCapacity / 2)
+            }
+            return this.storedEnergyUpgradeThreshold * 1.2
+        }
+
+        return this.minStoredEnergy
+    }
+
+    private upgradeTargetDistance() {
+
+        return this.room.controller.progressTotal - this.room.controller.progress
+    }
+}
+
+interface ResourceTarget {
+    min: number
+    max: number
 }
