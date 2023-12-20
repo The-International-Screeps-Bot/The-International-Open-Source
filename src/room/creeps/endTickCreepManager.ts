@@ -140,6 +140,9 @@ export class EndTickCreepManager {
         randomOf(creeps).say(currentChant, true)
     }
 
+    /**
+     * Seems to be pretty CPU friendly
+     */
     private runDeadChant() {
         const usedNames: Set<string> = new Set()
 

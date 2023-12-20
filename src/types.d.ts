@@ -407,22 +407,6 @@ declare global {
         [K in keyof T]: { key: K; value: T[K] }
     }[keyof T]
 
-    interface RoomGlobal {
-        // Containers
-
-        sourceContainers: Id<StructureContainer>[]
-        fastFillerContainerLeft: Id<StructureContainer> | undefined
-        fastFillerContainerRight: Id<StructureContainer> | undefined
-        controllerContainer: Id<StructureContainer> | undefined
-        mineralContainer: Id<StructureContainer> | undefined
-
-        // Links
-
-        controllerLink: Id<StructureLink> | undefined
-        fastFillerLink: Id<StructureLink> | undefined
-        hubLink: Id<StructureLink> | undefined
-    }
-
     interface EnemySquadData {
         /**
          * enemy attack + rangedAttack damage
