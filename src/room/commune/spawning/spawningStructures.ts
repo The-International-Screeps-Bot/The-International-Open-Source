@@ -291,7 +291,7 @@ export class SpawningStructuresManager {
     }
 
     createPowerTasks() {
-        if (!this.communeManager.room.myPowerCreepsAmount) return
+        if (!this.communeManager.room.myPowerCreeps.length) return
 
         // There is a vivid benefit to powering spawns
 

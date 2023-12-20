@@ -280,7 +280,7 @@ export class TowerManager {
     }
 
     private createPowerTasks() {
-        if (!this.communeManager.room.myPowerCreepsAmount) return
+        if (!this.communeManager.room.myPowerCreeps.length) return
 
         for (const tower of this.communeManager.room.roomManager.structures.tower) {
             this.communeManager.room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)

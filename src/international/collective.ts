@@ -1,7 +1,6 @@
 import { Sleepable } from 'utils/sleepable'
 import {
     createPosMap,
-    getAvgPrice,
     packXYAsNum,
     randomIntRange,
     randomRange,

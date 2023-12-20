@@ -43,7 +43,7 @@ export class SourceManager {
     }
 
     private createPowerTasks() {
-        if (!this.communeManager.room.myPowerCreepsAmount) return
+        if (!this.communeManager.room.myPowerCreeps.length) return
 
         for (const source of this.sources) {
             this.communeManager.room.createPowerTask(source, PWR_REGEN_SOURCE, 10)
