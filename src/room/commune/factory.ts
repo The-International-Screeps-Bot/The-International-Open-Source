@@ -151,7 +151,7 @@ export class FactoryManager {
                 | DepositConstant
 
             const min = Math.min(
-                resourceTargets[materialResourceType].min,
+                resourceTargets.min[materialResourceType],
                 (components[materialResourceType] / COMMODITIES[resourceType].amount) * minAmount,
             )
             const currentAmount = resourcesInStoringStructures[materialResourceType]
@@ -293,7 +293,7 @@ export class FactoryManager {
         const resourceTargets = this.communeManager.resourceTargets
 
         for (const resourceType of stuffToMake) {
-            const max = resourceTargets[resourceType].max
+            const max = resourceTargets.max[resourceType]
             const currentAmount = resourcesInStoringStructures[resourceType]
             // Make sure we are sufficiently low on the resource before wanting to produce more
             if (currentAmount * 1.1 >= max) continue

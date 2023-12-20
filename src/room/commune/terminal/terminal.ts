@@ -52,15 +52,14 @@ export class TerminalManager {
     private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
 
         for (const key in resourceTargets) {
-            const resource = key as ResourceConstant
-            const resourceTarget = resourceTargets[resource]
-            let targetAmount = resourceTarget.min
+            const resourceType = key as ResourceConstant
+            let targetAmount = resourceTargets.min[resourceType]
             if (targetAmount <= 0) continue
 
             // We have enough
 
             const storedResourceAmount =
-                this.communeManager.room.roomManager.resourcesInStoringStructures[resource] || 0
+                this.communeManager.room.roomManager.resourcesInStoringStructures[resourceType] || 0
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)
@@ -74,7 +73,7 @@ export class TerminalManager {
 
             collectiveManager.terminalRequests[ID] = {
                 priority,
-                resource: resource,
+                resource: resourceType,
                 amount,
                 roomName: room.name,
             }
@@ -85,7 +84,7 @@ export class TerminalManager {
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
         const minStoredEnergy =
-            resourceTargets[RESOURCE_ENERGY].min * 1.1
+            resourceTargets.min[RESOURCE_ENERGY] * 1.1
         const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
         const budget = Math.min(
             storedEnergy - minStoredEnergy,
@@ -102,10 +101,10 @@ export class TerminalManager {
 
             // Don't respond to requests for this room
             if (request.roomName === this.communeManager.room.name) continue
-            if (!resourceTargets[request.resource]) continue
+            if (resourceTargets.min[request.resource] === undefined) continue
 
             const minStoredResource =
-                resourceTargets[request.resource].min * 1.1
+                resourceTargets.min[request.resource] * 1.1
             const storedResource = resourcesInStoringStructures[request.resource] || 0
             if (storedResource <= minStoredResource) continue
 
@@ -165,7 +164,7 @@ export class TerminalManager {
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
         const minStoredEnergy =
-            resourceTargets[RESOURCE_ENERGY].min * 1.1
+            resourceTargets.min[RESOURCE_ENERGY] * 1.1
         const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
         const budget = Math.min(
             storedEnergy - minStoredEnergy,
@@ -182,11 +181,11 @@ export class TerminalManager {
 
             // Don't respond to requests for this room
             if (request.roomName === this.communeManager.room.name) continue
-            if (!resourceTargets[request.resourceType]) continue
+            if (resourceTargets.min[request.resourceType] === undefined) continue
             if (Math.floor(request.amount) <= 0) continue
 
             const minStoredResource =
-                resourceTargets[request.resourceType].min * 1.1
+                resourceTargets.min[request.resourceType] * 1.1
             const storedResource = resourcesInStoringStructures[request.resourceType] || 0
             if (storedResource <= minStoredResource) continue
 
@@ -259,9 +258,7 @@ export class TerminalManager {
 
     private manageResource(room: Room, resourceType: ResourceConstant, resourceTargets: ResourceTargets) {
 
-        const resourceTarget = resourceTargets[resourceType]
-
-        let min = resourceTarget.min
+        let min = resourceTargets.min[resourceType]
 
         // We don't have enough
 
@@ -275,7 +272,7 @@ export class TerminalManager {
             return Result.noAction
         }
 
-        let max = resourceTarget.max
+        let max = resourceTargets.max[resourceType]
 
         // If we don't have too much, stop
 

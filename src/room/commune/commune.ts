@@ -94,7 +94,10 @@ import { LogTypes, customLog } from 'utils/logging'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { SpawnRequestArgs } from 'types/spawnRequest'
 
-export type ResourceTargets = Partial<{ [key in ResourceConstant]: ResourceTarget }>
+export type ResourceTargets = {
+    min: Partial<{[key in ResourceConstant]: number }>
+    max: Partial<{[key in ResourceConstant]: number }>
+}
 
 export class CommuneManager {
     static communeManagers: { [roomName: string]: CommuneManager } = {}
@@ -1132,116 +1135,120 @@ export class CommuneManager {
     get resourceTargets() {
         if (this._resourceTargets) return this._resourceTargets
 
-        const resourceTargets: ResourceTargets = {}
+        const resourceTargets: ResourceTargets = {
+            min: {},
+            max: {},
+        }
         const storingStructuresCapacity = this.storingStructuresCapacity
         let min: number
+        let resourceType: ResourceConstant
 
-        resourceTargets[RESOURCE_BATTERY].min = this.room.roomManager.factory ? storingStructuresCapacity * 0.005 : 0
-        resourceTargets[RESOURCE_BATTERY].max = storingStructuresCapacity * 0.015
+        resourceTargets.min[RESOURCE_BATTERY] = this.room.roomManager.factory ? storingStructuresCapacity * 0.005 : 0
+        resourceTargets.max[RESOURCE_BATTERY] = storingStructuresCapacity * 0.015
 
-        min = resourceTargets[RESOURCE_ENERGY].min = this.energyMinResourceTarget(storingStructuresCapacity)
-        resourceTargets[RESOURCE_ENERGY].max = Math.max(storingStructuresCapacity * 0.2, this.minStoredEnergy, min)
+        min = resourceTargets.min[RESOURCE_ENERGY] = this.energyMinResourceTarget(storingStructuresCapacity)
+        resourceTargets.max[RESOURCE_ENERGY] = Math.max(storingStructuresCapacity * 0.2, this.minStoredEnergy, min)
 
         // minerals
 
-        resourceTargets[RESOURCE_HYDROGEN].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_HYDROGEN].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_HYDROGEN] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_HYDROGEN] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_OXYGEN].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_OXYGEN].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_OXYGEN] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_OXYGEN] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_UTRIUM].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_UTRIUM].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_UTRIUM] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_UTRIUM] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_KEANIUM].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_KEANIUM].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_KEANIUM] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_KEANIUM] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_LEMERGIUM].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_LEMERGIUM].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_LEMERGIUM] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_LEMERGIUM] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_ZYNTHIUM].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_ZYNTHIUM].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_ZYNTHIUM] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_ZYNTHIUM] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_CATALYST].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_CATALYST].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_CATALYST] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_CATALYST] = storingStructuresCapacity * 0.027
 
         // Boosts
 
-        resourceTargets[RESOURCE_UTRIUM_HYDRIDE].min = 0
-        resourceTargets[RESOURCE_UTRIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_UTRIUM_HYDRIDE] = 0
+        resourceTargets.max[RESOURCE_UTRIUM_HYDRIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_UTRIUM_OXIDE].min = 0
-        resourceTargets[RESOURCE_UTRIUM_OXIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_UTRIUM_OXIDE] = 0
+        resourceTargets.max[RESOURCE_UTRIUM_OXIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_KEANIUM_HYDRIDE].min = 0
-        resourceTargets[RESOURCE_KEANIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_KEANIUM_HYDRIDE] = 0
+        resourceTargets.max[RESOURCE_KEANIUM_HYDRIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_KEANIUM_OXIDE].min = 0
-        resourceTargets[RESOURCE_KEANIUM_OXIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_KEANIUM_OXIDE] = 0
+        resourceTargets.max[RESOURCE_KEANIUM_OXIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_LEMERGIUM_HYDRIDE].min = 0
-        resourceTargets[RESOURCE_LEMERGIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_LEMERGIUM_HYDRIDE] = 0
+        resourceTargets.max[RESOURCE_LEMERGIUM_HYDRIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_LEMERGIUM_OXIDE].min = 0
-        resourceTargets[RESOURCE_LEMERGIUM_OXIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_LEMERGIUM_OXIDE] = 0
+        resourceTargets.max[RESOURCE_LEMERGIUM_OXIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_ZYNTHIUM_HYDRIDE].min = 0
-        resourceTargets[RESOURCE_ZYNTHIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_ZYNTHIUM_HYDRIDE] = 0
+        resourceTargets.max[RESOURCE_ZYNTHIUM_HYDRIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_ZYNTHIUM_OXIDE].min = 0
-        resourceTargets[RESOURCE_ZYNTHIUM_OXIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_ZYNTHIUM_OXIDE] = 0
+        resourceTargets.max[RESOURCE_ZYNTHIUM_OXIDE] = storingStructuresCapacity * 0.01
 
-        resourceTargets[RESOURCE_GHODIUM_HYDRIDE].min = 0
-        resourceTargets[RESOURCE_GHODIUM_HYDRIDE].max = storingStructuresCapacity * 0.01
+        resourceTargets.min[RESOURCE_GHODIUM_HYDRIDE] = 0
+        resourceTargets.max[RESOURCE_GHODIUM_HYDRIDE] = storingStructuresCapacity * 0.01
 
         // other raw
 
-        resourceTargets[RESOURCE_POWER].min = this.room.roomManager.powerSpawn ? storingStructuresCapacity * 0.002 : 0
-        resourceTargets[RESOURCE_POWER].max = storingStructuresCapacity * 0.015
+        resourceTargets.min[RESOURCE_POWER] = this.room.roomManager.powerSpawn ? storingStructuresCapacity * 0.002 : 0
+        resourceTargets.max[RESOURCE_POWER] = storingStructuresCapacity * 0.015
 
-        resourceTargets[RESOURCE_OPS].min = storingStructuresCapacity * 0.01
-        resourceTargets[RESOURCE_OPS].max = storingStructuresCapacity * 0.027
+        resourceTargets.min[RESOURCE_OPS] = storingStructuresCapacity * 0.01
+        resourceTargets.max[RESOURCE_OPS] = storingStructuresCapacity * 0.027
 
-        resourceTargets[RESOURCE_METAL].min = 0
-        resourceTargets[RESOURCE_METAL].max = 0
+        resourceTargets.min[RESOURCE_METAL] = 0
+        resourceTargets.max[RESOURCE_METAL] = 0
 
-        resourceTargets[RESOURCE_BIOMASS].min = 0
-        resourceTargets[RESOURCE_BIOMASS].max = 0
+        resourceTargets.min[RESOURCE_BIOMASS] = 0
+        resourceTargets.max[RESOURCE_BIOMASS] = 0
 
-        resourceTargets[RESOURCE_SILICON].min = 0
-        resourceTargets[RESOURCE_SILICON].max = 0
+        resourceTargets.min[RESOURCE_SILICON] = 0
+        resourceTargets.max[RESOURCE_SILICON] = 0
 
-        resourceTargets[RESOURCE_MIST].min = 0
-        resourceTargets[RESOURCE_MIST].max = 0
+        resourceTargets.min[RESOURCE_MIST] = 0
+        resourceTargets.max[RESOURCE_MIST] = 0
 
         // commodities
         // low level
 
-        resourceTargets[RESOURCE_GHODIUM_MELT].min = 0
-        resourceTargets[RESOURCE_GHODIUM_MELT].max = 0
+        resourceTargets.min[RESOURCE_GHODIUM_MELT] = 0
+        resourceTargets.max[RESOURCE_GHODIUM_MELT] = 0
 
-        resourceTargets[RESOURCE_COMPOSITE].min = 0
-        resourceTargets[RESOURCE_COMPOSITE].max = 0
+        resourceTargets.min[RESOURCE_COMPOSITE] = 0
+        resourceTargets.max[RESOURCE_COMPOSITE] = 0
 
-        resourceTargets[RESOURCE_CRYSTAL].min = 0
-        resourceTargets[RESOURCE_CRYSTAL].max = 0
+        resourceTargets.min[RESOURCE_CRYSTAL] = 0
+        resourceTargets.max[RESOURCE_CRYSTAL] = 0
 
-        resourceTargets[RESOURCE_LIQUID].min = 0
-        resourceTargets[RESOURCE_LIQUID].max = 0
+        resourceTargets.min[RESOURCE_LIQUID] = 0
+        resourceTargets.max[RESOURCE_LIQUID] = 0
 
         // tier 1 commodities
 
-        resourceTargets[RESOURCE_ALLOY].min = 0
-        resourceTargets[RESOURCE_ALLOY].max = 0
+        resourceTargets.min[RESOURCE_ALLOY] = 0
+        resourceTargets.max[RESOURCE_ALLOY] = 0
 
-        resourceTargets[RESOURCE_CELL].min = 0
-        resourceTargets[RESOURCE_CELL].max = 0
+        resourceTargets.min[RESOURCE_CELL] = 0
+        resourceTargets.max[RESOURCE_CELL] = 0
 
-        resourceTargets[RESOURCE_WIRE].min = 0
-        resourceTargets[RESOURCE_WIRE].max = 0
+        resourceTargets.min[RESOURCE_WIRE] = 0
+        resourceTargets.max[RESOURCE_WIRE] = 0
 
-        resourceTargets[RESOURCE_CONDENSATE].min = 0
-        resourceTargets[RESOURCE_CONDENSATE].max = 0
+        resourceTargets.min[RESOURCE_CONDENSATE] = 0
+        resourceTargets.max[RESOURCE_CONDENSATE] = 0
 
         // tier 2
 
