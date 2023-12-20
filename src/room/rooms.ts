@@ -56,7 +56,7 @@ class RoomsManager {
 
             customLog(
                 `<a style="cursor: pointer;color:inherit; text-decoration:underline;" href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
-                `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreepsAmount}`,
+                `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreeps.length}`,
                 {
                     type: LogTypes.info,
                     position: 2,

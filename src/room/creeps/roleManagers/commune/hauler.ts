@@ -62,7 +62,7 @@ export class Hauler extends Creep {
         // If there is insufficient CPU to renew, inform false
 
         if (this.body.length > 10) return
-        if (!room.myCreeps.fastFiller.length) return
+        if (!room.myCreepsByRole.fastFiller.length) return
         // only renew if we are the same as the desired hauler cost
         if (this.cost !== Memory.rooms[room.name][RoomMemoryKeys.minHaulerCost]) return
 

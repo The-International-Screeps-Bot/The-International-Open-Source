@@ -224,9 +224,9 @@ export class StatsManager {
             }
         }
 
-        roomStats[RoomStatsKeys.CreepCount] = room.myCreepsAmount
+        roomStats[RoomStatsKeys.CreepCount] = room.myCreeps.length
         roomStats[RoomStatsKeys.TotalCreepCount] = room.creepsFromRoomAmount
-        roomStats[RoomStatsKeys.PowerCreepCount] = room.myPowerCreepsAmount
+        roomStats[RoomStatsKeys.PowerCreepCount] = room.myPowerCreeps.length
         roomStats[RoomStatsKeys.MinHaulerCost] = roomMemory[RoomMemoryKeys.minHaulerCost]
 
         const spawns = room.roomManager.structures.spawn

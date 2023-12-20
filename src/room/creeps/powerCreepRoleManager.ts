@@ -26,15 +26,15 @@ export class PowerCreepRoleManager {
 
         // Get the amount of creeps with the role
 
-        const creepsOfRoleAmount = this.roomManager.room.myPowerCreeps[className].length
+        const creepsOfRoleAmount = this.roomManager.room.myPowerCreepsByRole[className].length
 
         // If there are no creeps for this manager, iterate
 
-        if (!this.roomManager.room.myPowerCreeps[className].length) return
+        if (!this.roomManager.room.myPowerCreepsByRole[className].length) return
 
         // Run manager
 
-        managers[className](this.roomManager.room, this.roomManager.room.myPowerCreeps[className])
+        managers[className](this.roomManager.room, this.roomManager.room.myPowerCreepsByRole[className])
 
         // Log className cpu
 

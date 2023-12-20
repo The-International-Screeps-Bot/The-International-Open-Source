@@ -257,7 +257,7 @@ export class HubHauler extends Creep {
         if (
             controllerLink &&
             controllerLink.store.getCapacity(RESOURCE_ENERGY) *
-                (linkReceiveTreshold * (room.myCreeps.controllerUpgrader.length ? 2 : 1)) >
+                (linkReceiveTreshold * (room.myCreepsByRole.controllerUpgrader.length ? 2 : 1)) >
                 controllerLink.store.energy
         )
             return false

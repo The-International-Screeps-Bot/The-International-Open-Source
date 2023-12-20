@@ -435,25 +435,17 @@ declare global {
 
         estimatedSourceIncome: number[]
 
+        myCreeps: Creep[]
+        myPowerCreeps: PowerCreep[]
         /**
          * An object with keys of roles with properties of arrays of creep names belonging to the role
          */
-        myCreeps: { [key in CreepRoles]?: string[] }
-
-        /**
-         * The number of my creeps in the room
-         */
-        myCreepsAmount: number
+        myCreepsByRole: { [key in CreepRoles]?: string[] }
 
         /**
          * An object with keys of roles with properties of arrays of power creep names belonging to the role
          */
-        myPowerCreeps: { [key in PowerClassConstant]?: string[] }
-
-        /**
-         * The number of my power creeps in the room
-         */
-        myPowerCreepsAmount: number
+        myPowerCreepsByRole: { [key in PowerClassConstant]?: string[] }
 
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room

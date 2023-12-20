@@ -216,14 +216,14 @@ export class RoomManager {
 
         // Single tick properties
 
-        room.myCreeps = {}
-        for (const role of creepRoles) room.myCreeps[role] = []
+        room.myCreeps = []
+        room.myPowerCreeps = []
 
-        room.myPowerCreeps = {}
-        for (const className of powerCreepClassNames) room.myPowerCreeps[className] = []
+        room.myCreepsByRole = {}
+        for (const role of creepRoles) room.myCreepsByRole[role] = []
 
-        room.myCreepsAmount = 0
-        room.myPowerCreepsAmount = 0
+        room.myPowerCreepsByRole = {}
+        for (const className of powerCreepClassNames) room.myPowerCreepsByRole[className] = []
 
         room.partsOfRoles = {}
         room.powerTasks = {}
@@ -878,7 +878,7 @@ export class RoomManager {
             totalX += 25
         }
 
-        for (const creepName of this.room.myCreeps.builder) {
+        for (const creepName of this.room.myCreepsByRole.builder) {
             const pos = Game.creeps[creepName].pos
 
             totalX += pos.x
@@ -1148,9 +1148,7 @@ export class RoomManager {
     get myDamagedCreeps() {
         if (this._myDamagedCreeps) return this._myDamagedCreeps
 
-        const myDamagedCreeps = this.room.find(FIND_MY_CREEPS, {
-            filter: creep => creep.hits < creep.hitsMax,
-        })
+        const myDamagedCreeps = this.room.myCreeps.filter(creep => creep.hits < creep.hitsMax) 
 
         return (this._myDamagedCreeps = myDamagedCreeps)
     }
@@ -1159,9 +1157,7 @@ export class RoomManager {
     get myDamagedPowerCreeps() {
         if (this._myDamagedPowerCreeps) return this._myDamagedPowerCreeps
 
-        const myDamagedPowerCreeps = this.room.find(FIND_MY_POWER_CREEPS, {
-            filter: creep => creep.hits < creep.hitsMax,
-        })
+        const myDamagedPowerCreeps = this.room.myPowerCreeps.filter(creep => creep.hits < creep.hitsMax)
 
         return (this._myDamagedPowerCreeps = myDamagedPowerCreeps)
     }

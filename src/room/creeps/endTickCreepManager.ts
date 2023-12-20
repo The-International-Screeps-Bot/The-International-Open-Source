@@ -22,7 +22,7 @@ export class EndTickCreepManager {
 
     public run() {
         const { room } = this.roomManager
-        if (!this.roomManager.room.myCreepsAmount) return
+        if (!this.roomManager.room.myCreeps.length) return
 
         if (
             Memory.rooms[room.name][RoomMemoryKeys.type] === RoomTypes.commune &&
@@ -87,7 +87,7 @@ export class EndTickCreepManager {
         // Power creeps go first
 
         for (const className of powerCreepClassNames) {
-            for (const creepName of this.roomManager.room.myPowerCreeps[className]) {
+            for (const creepName of this.roomManager.room.myPowerCreepsByRole[className]) {
                 const creep = Game.powerCreeps[creepName]
 
                 creep.endRun()
@@ -99,8 +99,8 @@ export class EndTickCreepManager {
 
         // Normal creeps go second
 
-        for (const role in this.roomManager.room.myCreeps) {
-            for (const creepName of this.roomManager.room.myCreeps[role as CreepRoles]) {
+        for (const role in this.roomManager.room.myCreepsByRole) {
+            for (const creepName of this.roomManager.room.myCreepsByRole[role as CreepRoles]) {
                 const creep = Game.creeps[creepName]
 
                 creep.endRun()
@@ -122,14 +122,8 @@ export class EndTickCreepManager {
         const currentChant = chant[Memory.chantIndex]
         if (!currentChant) return
 
-        let creeps: (Creep | PowerCreep)[] = this.roomManager.room.find(FIND_MY_POWER_CREEPS, {
-            filter: creep => !creep.isOnExit,
-        })
-        creeps = creeps.concat(
-            this.roomManager.room.find(FIND_MY_CREEPS, {
-                filter: creep => !creep.isOnExit,
-            }),
-        )
+        let creeps: (Creep | PowerCreep)[] = this.roomManager.room.myCreeps
+        creeps = creeps.concat(this.roomManager.room.myPowerCreeps)
         if (!creeps.length) return
 
         const usedNames = this.runDeadChant()

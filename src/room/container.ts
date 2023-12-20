@@ -22,7 +22,7 @@ export class ContainerManager {
     }
 
     private runFastFillerContainers() {
-        if (!this.roomManager.room.myCreeps.fastFiller.length) return
+        if (!this.roomManager.room.myCreepsByRole.fastFiller.length) return
 
         const fastFillerContainers = this.roomManager.fastFillerContainers
 

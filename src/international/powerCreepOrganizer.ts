@@ -35,7 +35,7 @@ export class PowerCreepOrganizer {
             return
         }
 
-        collectiveManager.powerCreepCount
+        collectiveManager.powerCreepCount += 1
 
         // Get the creep's role
 
@@ -54,11 +54,11 @@ export class PowerCreepOrganizer {
 
         // Organize creep in its room by its role
 
-        room.myPowerCreeps[className].push(creepName)
+        room.myPowerCreepsByRole[className].push(creepName)
 
         // Record the creep's presence in the room
 
-        room.myPowerCreepsAmount += 1
+        room.myPowerCreeps.push(creep)
 
         creep.initRun()
     }

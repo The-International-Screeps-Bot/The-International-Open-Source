@@ -637,7 +637,7 @@ export class LabManager {
             amount += lab.mineralAmount
         }
 
-        for (const name of this.communeManager.room.myCreeps.hauler) {
+        for (const name of this.communeManager.room.myCreepsByRole.hauler) {
             amount += Game.creeps[name].store[resource]
         }
 

@@ -1062,7 +1062,7 @@ Creep.prototype.activeRenew = function () {
 
     // If there is insufficient CPU to renew, inform false
 
-    if (!room.myCreeps.fastFiller.length) return
+    if (!room.myCreepsByRole.fastFiller.length) return
     if (this.isDying()) return
 
     // If the creep's age is less than the benefit from renewing, inform false
@@ -1099,7 +1099,7 @@ Creep.prototype.passiveRenew = function () {
     // If there is insufficient CPU to renew, inform false
 
     if (this.body.length > 10) return
-    if (!room.myCreeps.fastFiller.length) return
+    if (!room.myCreepsByRole.fastFiller.length) return
     if (this.isDying()) return
 
     // If the creep's age is less than the benefit from renewing, inform false
@@ -1281,11 +1281,10 @@ Creep.prototype.aggressiveHeal = function () {
         }
     }
 
-    const healTargets = room
-        .find(FIND_MY_CREEPS)
+    const healTargets = room.myCreeps
         .concat(room.roomManager.notMyCreeps.ally)
         .filter(function (creep) {
-            return creep.hitsMax > creep.hits
+            return creep.hits < creep.hitsMax
         })
 
     if (!healTargets.length) return false

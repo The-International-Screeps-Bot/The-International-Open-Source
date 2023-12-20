@@ -1660,7 +1660,7 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 Room.prototype.createRoomLogisticsRequest = function (args) {
     // Don't make requests when there is nobody to respond
 
-    if (!this.myCreepsAmount) return Result.noAction
+    if (!this.myCreeps.length) return Result.noAction
     if (this.roomManager.roomLogisticsBlacklistCoords.has(packCoord(args.target.pos)))
         return Result.noAction
 

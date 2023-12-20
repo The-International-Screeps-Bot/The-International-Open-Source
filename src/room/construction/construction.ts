@@ -83,7 +83,7 @@ export class ConstructionManager extends Sleepable {
         if (collectiveManager.constructionSiteCount >= MAX_CONSTRUCTION_SITES) return false
 
         // If there are builders and enough cSites, stop
-        if (this.room.myCreeps.builder.length) {
+        if (this.room.myCreepsByRole.builder.length) {
             if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return false
 
             return true

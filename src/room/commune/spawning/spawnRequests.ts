@@ -97,7 +97,7 @@ export class SpawnRequestsManager {
                     const role = 'sourceHarvester'
                     const spawnGroup = this.communeManager.room.creepsOfSource[sourceIndex]
                     const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
-                    const maxCostPerCreep = this.communeManager.room.myCreeps.sourceHarvester.length
+                    const maxCostPerCreep = this.communeManager.room.myCreepsByRole.sourceHarvester.length
                         ? this.spawnEnergyCapacity
                         : this.communeManager.room.energyAvailable
 
@@ -303,7 +303,7 @@ export class SpawnRequestsManager {
     }
 
     private findCommuneHaulerMaxCost(costStep: number): number {
-        if (this.communeManager.room.myCreeps.hauler.length) {
+        if (this.communeManager.room.myCreepsByRole.hauler.length) {
 
             // have all haulers be the same size; their max allowed size
 
@@ -440,7 +440,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'meleeDefender'
 
-                    if (this.communeManager.room.myCreeps[role].length * 1.75 > enemyCreeps.length)
+                    if (this.communeManager.room.myCreepsByRole[role].length * 1.75 > enemyCreeps.length)
                         return false
 
                     // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
@@ -460,7 +460,7 @@ export class SpawnRequestsManager {
                     requiredStrength *= 1.5
 
                     const priority = Math.min(
-                        minPriority + this.communeManager.room.myCreeps[role].length * 0.5,
+                        minPriority + this.communeManager.room.myCreepsByRole[role].length * 0.5,
                         maxPriority,
                     )
                     /*
@@ -505,7 +505,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'rangedDefender'
 
-                    if (this.communeManager.room.myCreeps[role].length * 1.75 > enemyCreeps.length)
+                    if (this.communeManager.room.myCreepsByRole[role].length * 1.75 > enemyCreeps.length)
                         return false
 
                     // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
@@ -524,7 +524,7 @@ export class SpawnRequestsManager {
                     requiredStrength *= 0.3
 
                     const priority = Math.min(
-                        maxPriority - 1 + this.communeManager.room.myCreeps[role].length * 1,
+                        maxPriority - 1 + this.communeManager.room.myCreepsByRole[role].length * 1,
                         maxPriority,
                     )
                     /*
