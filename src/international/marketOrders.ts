@@ -8,10 +8,11 @@ export class MarketManager {
         this._myOrders = undefined
         this._orders = undefined
         this._myOrdersCount = undefined
+        this.resourceHistory ??= {}
 
         if (randomTick(100)) {
 
-            delete this.resourceHistory
+            this.resourceHistory = {}
         }
 
         this.pruneMyOrders()
@@ -328,7 +329,7 @@ export class MarketManager {
         return (this._isMarketFunctional = !!this.allOrdersUnorganized.length)
     }
 
-    private resourceHistory: {[key in MarketResourceConstant]: {[days: string]: number}}
+    private resourceHistory: Partial<{[key in MarketResourceConstant]: {[days: string]: number}}>
     /**
      * Finds the average trading price of a resourceType over a set amount of days
      */

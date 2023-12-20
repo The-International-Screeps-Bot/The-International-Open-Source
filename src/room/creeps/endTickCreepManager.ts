@@ -143,27 +143,28 @@ export class EndTickCreepManager {
         const tombstones = this.roomManager.room.find(FIND_TOMBSTONES, {
             filter: tombstone => tombstone.deathTime + 3 > Game.time,
         })
-        if (tombstones.length) {
-            for (const tombstone of tombstones) {
-                let chant: string
-                if (
-                    tombstone.creep.owner.username === Memory.me ||
-                    global.settings.allies.includes(tombstone.creep.owner.username)
-                ) {
-                    chant = randomOf(friendlyDieChants)
-                } else {
-                    chant = randomOf(enemyDieChants)
-                }
+        if (!tombstones.length) return usedNames
 
-                forCoordsInRange(tombstone.pos, 4, coord => {
-                    const creepName = this.roomManager.room.creepPositions[packCoord(coord)]
-                    if (!creepName) return
-
-                    usedNames.add(creepName)
-                    Game.creeps[creepName].say(chant, true)
-                })
+        for (const tombstone of tombstones) {
+            let chant: string
+            if (
+                tombstone.creep.owner.username === Memory.me ||
+                global.settings.allies.includes(tombstone.creep.owner.username)
+            ) {
+                chant = randomOf(friendlyDieChants)
+            } else {
+                chant = randomOf(enemyDieChants)
             }
+
+            forCoordsInRange(tombstone.pos, 4, coord => {
+                const creepName = this.roomManager.room.creepPositions[packCoord(coord)]
+                if (!creepName) return
+
+                usedNames.add(creepName)
+                Game.creeps[creepName].say(chant, true)
+            })
         }
+
 
         return usedNames
     }

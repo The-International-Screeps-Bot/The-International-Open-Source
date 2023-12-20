@@ -63,6 +63,7 @@ import { FeatureFlagManager } from 'international/featureFlags'
 import { ConstructionSiteManager } from 'international/constructionSiteManager'
 import { TransactionsManager } from 'international/transactions'
 import { CommunePlanner } from 'room/construction/communePlanner'
+import { packBasePlanCoord, packCoord, packCoordList, packId, packIdList, packPos, packPosList, packRampartPlanCoord, packRoomName, packStampAnchors, packXYAsCoord, packXYAsPos, reversePosList, unpackBasePlanCoords, unpackCoord, unpackCoordAsPos, unpackCoordList, unpackCoordListAsPosList, unpackId, unpackIdList, unpackPos, unpackPosAt, unpackPosList, unpackRampartPlanCoord, unpackRoomName, unpackStampAnchors } from './codec'
 
 export function profilerRegister() {
 
@@ -145,6 +146,35 @@ export function profilerRegister() {
     profiler.registerFN(originalLoop, 'loop')
     profiler.registerFN(customFindPath, 'customFindPath')
     profiler.registerFN(outOfBucket, 'outOfBucket')
+
+    // codec functions
+
+    profiler.registerFN(packId, 'packId')
+    profiler.registerFN(unpackId, 'unpackId')
+    profiler.registerFN(packIdList, 'packIdList')
+    profiler.registerFN(unpackIdList, 'unpackIdList')
+    profiler.registerFN(packCoord, 'packCoord')
+    profiler.registerFN(packXYAsCoord, 'packXYAsCoord')
+    profiler.registerFN(unpackCoord, 'unpackCoord')
+    profiler.registerFN(unpackCoordAsPos, 'unpackCoordAsPos')
+    profiler.registerFN(reversePosList, 'reversePosList')
+    profiler.registerFN(packCoordList, 'packCoordList')
+    profiler.registerFN(unpackCoordList, 'unpackCoordList')
+    profiler.registerFN(unpackCoordListAsPosList, 'unpackCoordListAsPosList')
+    profiler.registerFN(packRoomName, 'packRoomName')
+    profiler.registerFN(unpackRoomName, 'unpackRoomName')
+    profiler.registerFN(packPos, 'packPos')
+    profiler.registerFN(packXYAsPos, 'packXYAsPos')
+    profiler.registerFN(unpackPos, 'unpackPos')
+    profiler.registerFN(packPosList, 'packPosList')
+    profiler.registerFN(unpackPosList, 'unpackPosList')
+    profiler.registerFN(unpackPosAt, 'unpackPosAt')
+    profiler.registerFN(packBasePlanCoord, 'packBasePlanCoord')
+    profiler.registerFN(unpackBasePlanCoords, 'unpackBasePlanCoords')
+    profiler.registerFN(packRampartPlanCoord, 'packRampartPlanCoord')
+    profiler.registerFN(unpackRampartPlanCoord, 'unpackRampartPlanCoord')
+    profiler.registerFN(packStampAnchors, 'packStampAnchors')
+    profiler.registerFN(unpackStampAnchors, 'unpackStampAnchors')
 
     // Room functions
 

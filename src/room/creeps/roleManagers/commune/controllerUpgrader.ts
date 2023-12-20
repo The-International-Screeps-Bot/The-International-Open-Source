@@ -1,4 +1,5 @@
 import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
+import { creepUtils } from 'room/creeps/creepUtils'
 
 export class ControllerUpgrader extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -50,7 +51,7 @@ export class ControllerUpgrader extends Creep {
 
             const creep: ControllerUpgrader = Game.creeps[creepName]
             const creepMemory = Memory.creeps[creep.name]
-
+/*
             if (
                 creepMemory[CreepMemoryKeys.targetID] === room.controller.id ||
                 room.controller.ticksToDowngrade <
@@ -68,8 +69,8 @@ export class ControllerUpgrader extends Creep {
                     continue
                 }
             }
-
-            creep.advancedUpgradeController()
+ */
+            creepUtils.advancedUpgradeController(creep)
         }
     }
 }

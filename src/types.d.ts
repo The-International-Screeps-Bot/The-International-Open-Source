@@ -750,13 +750,6 @@ declare global {
          */
         advancedHarvestSource(source: Source): boolean
 
-        findUpgradePos(): RoomPosition | false
-
-        /**
-         * Attempts multiple methods to upgrade the controller
-         */
-        advancedUpgradeController(): boolean
-
         advancedBuild(): number
         builderGetEnergy(): number
 

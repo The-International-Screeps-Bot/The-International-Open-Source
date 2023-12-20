@@ -1,4 +1,5 @@
 import { RoomMemoryKeys, creepRoles, packedPosLength } from 'international/constants'
+import { creepUtils } from 'room/creeps/creepUtils'
 import { DefaultRoleManager } from 'room/creeps/defaultRoleManager'
 
 class ControllerUpgraderManager extends DefaultRoleManager {
@@ -52,7 +53,7 @@ class ControllerUpgraderManager extends DefaultRoleManager {
             creep.advancedBuild();
             return;
         } */
-        creep.advancedUpgradeController()
+        creepUtils.advancedUpgradeController(creep)
     }
 }
 

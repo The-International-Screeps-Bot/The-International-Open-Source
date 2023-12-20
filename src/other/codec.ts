@@ -187,7 +187,7 @@ export function unpackCoordListAsPosList(packedCoords: string, roomName: string)
 /**
  * Packs a roomName as Base32768 string.
  */
-function packRoomName(roomName: string) {
+export function packRoomName(roomName: string) {
     const coordinateRegex = /(E|W)(\d+)(N|S)(\d+)/g
     const match = coordinateRegex.exec(roomName)!
 
@@ -215,7 +215,7 @@ function packRoomName(roomName: string) {
 /**
  * Unpack room name
  */
-function unpackRoomName(q: number, x: number, y: number) {
+export function unpackRoomName(q: number, x: number, y: number) {
     let roomName: string
     switch (q) {
         case 0:
