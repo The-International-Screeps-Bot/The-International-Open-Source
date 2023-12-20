@@ -21,31 +21,6 @@ import { debugUtils } from 'debug/debugUtils'
 import { LogTypes, customLog } from './logging'
 
 /**
- * Finds the average trading price of a resourceType over a set amount of days
- */
-export function getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
-    // Get the market history for the specified resourceType
-
-    const history = Game.market.getHistory(resourceType)
-    if (!history.length) return 1
-
-    // Init the totalPrice
-
-    let totalPrice = 0
-
-    // Iterate through each index less than days
-
-    for (let index = 0; index <= days; index += 1) {
-        if (!history[index]) continue
-        totalPrice += history[index].avgPrice
-    }
-
-    // Inform the totalPrice divided by the days
-
-    return totalPrice / days
-}
-
-/**
  * Uses a provided ID to find an object associated with it
  */
 export function findObjectWithID<T extends Id<any>>(ID: T): fromId<T> | undefined {

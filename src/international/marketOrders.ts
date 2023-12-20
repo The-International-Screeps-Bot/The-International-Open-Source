@@ -1,13 +1,23 @@
-import { getAvgPrice } from 'utils/utils'
-import { PlayerMemoryKeys, RoomMemoryKeys } from './constants'
+import { findHighestScore, randomTick } from 'utils/utils'
+import { PlayerMemoryKeys, Result, RoomMemoryKeys } from './constants'
 import { collectiveManager } from './collective'
 
-export class MarketOrdersManager {
+export class MarketManager {
     run() {
         this._allOrdersUnorganized = undefined
         this._myOrders = undefined
         this._orders = undefined
         this._myOrdersCount = undefined
+
+        if (randomTick(100)) {
+
+            delete this.resourceHistory
+        }
+
+        this.pruneMyOrders()
+    }
+
+    private pruneMyOrders() {
 
         // If there is sufficiently few orders
 
@@ -25,35 +35,101 @@ export class MarketOrdersManager {
     /**
      * Finds the cheapest sell order
      */
-    getSellOrder(resourceType: MarketResourceConstant, maxPrice = getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders.sell?.[resourceType] || []
+    getShardSellOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, minPrice = this.getAvgPrice(resourceType) * 0.8) {
+        const orders = this.orders.buy[resourceType]
+        if (!orders) return Result.fail
 
-        let bestOrder: Order
+        let bestOrderID: string
+        let bestOrderCost = Infinity
 
         for (const order of orders) {
-            if (order.price >= maxPrice) continue
+            if (order.price > minPrice) continue
+            if (order.price >= bestOrderCost) continue
 
-            if (order.price < (bestOrder ? bestOrder.price : Infinity)) bestOrder = order
+            // we found a better order
+
+            bestOrderID = order.id
+            bestOrderCost = order.price
         }
 
-        return bestOrder
+        if (!bestOrderID) return Result.fail
+
+        return Game.market.getOrderById(bestOrderID)
     }
 
     /**
      * Finds the most expensive buy order
      */
-    getBuyOrder(resourceType: MarketResourceConstant, minPrice = getAvgPrice(resourceType) * 0.8) {
-        const orders = this.orders.buy?.[resourceType] || []
+    getShardBuyOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, minPrice = this.getAvgPrice(resourceType) * 0.8) {
+        const orders = this.orders.buy[resourceType]
+        if (!orders) return Result.fail
 
-        let bestOrder: Order
+        let bestOrderID: string
+        let bestOrderCost = 0
 
         for (const order of orders) {
-            if (order.price <= minPrice) continue
+            if (order.price < minPrice) continue
+            if (order.price <= bestOrderCost) continue
 
-            if (order.price > (bestOrder ? bestOrder.price : 0)) bestOrder = order
+            // we found a better order
+
+            bestOrderID = order.id
+            bestOrderCost = order.price
         }
 
-        return bestOrder
+        if (!bestOrderID) return Result.fail
+
+        return Game.market.getOrderById(bestOrderID)
+    }
+
+    /**
+     * Finds the cheapest sell order
+     */
+    getGlobalSellOrder(resourceType: MarketResourceConstant, minPrice = this.getAvgPrice(resourceType) * 0.8) {
+        const orders = this.orders.buy[resourceType]
+        if (!orders) return Result.fail
+
+        let bestOrderID: string
+        let bestOrderCost = Infinity
+
+        for (const order of orders) {
+            if (order.price > minPrice) continue
+            if (order.price >= bestOrderCost) continue
+
+            // we found a better order
+
+            bestOrderID = order.id
+            bestOrderCost = order.price
+        }
+
+        if (!bestOrderID) return Result.fail
+
+        return Game.market.getOrderById(bestOrderID)
+    }
+
+    /**
+     * Finds the most expensive buy order
+     */
+    getGlobalBuyOrder(resourceType: MarketResourceConstant, minPrice = this.getAvgPrice(resourceType) * 0.8) {
+        const orders = this.orders.buy[resourceType]
+        if (!orders) return Result.fail
+
+        let bestOrderID: string
+        let bestOrderPrice = 0
+
+        for (const order of orders) {
+            if (order.price < minPrice) continue
+            if (order.price <= bestOrderPrice) continue
+
+            // we found a better order
+
+            bestOrderID = order.id
+            bestOrderPrice = order.price
+        }
+
+        if (!bestOrderID) return Result.fail
+
+        return Game.market.getOrderById(bestOrderID)
     }
 
     /**
@@ -64,14 +140,14 @@ export class MarketOrdersManager {
 
         if (Game.resources[PIXEL] === 0) return
 
-        const avgPrice = getAvgPrice(PIXEL, 7)
+        const avgPrice = this.getAvgPrice(PIXEL, 7)
 
         const minPrice = avgPrice * 0.8
         /*
         log('minPixelPrice', minPrice)
         log('avgPixelPrice', avgPrice)
         */
-        const buyOrder = this.getBuyOrder(PIXEL, minPrice)
+        const buyOrder = this.getGlobalBuyOrder(PIXEL, minPrice)
 
         if (buyOrder) {
             Game.market.deal(buyOrder.id, Math.min(buyOrder.amount, Game.resources[PIXEL]))
@@ -83,7 +159,8 @@ export class MarketOrdersManager {
             o => o.type == 'sell' && o.resourceType == PIXEL,
         )
 
-        const sellOrder = this.getSellOrder(PIXEL, Infinity)
+        const sellOrder = this.getGlobalSellOrder(PIXEL, Infinity)
+        if (!sellOrder) return
         let price: number
 
         if (sellOrder.price < avgPrice) {
@@ -138,7 +215,7 @@ export class MarketOrdersManager {
 
         /* if (this._orders) return this._orders */
 
-        const orders: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>> = {
+        const orders: Record<string, Partial<Record<MarketResourceConstant, Order[]>>> = {
             buy: {},
             sell: {},
         }
@@ -243,13 +320,44 @@ export class MarketOrdersManager {
 
     _isMarketFunctional: boolean
     /**
-     * Determines if there is functional based on history
+     * Determines if it is functional based on the existence of orders
      */
     get isMarketFunctional() {
         if (this._isMarketFunctional !== undefined) return this._isMarketFunctional
 
         return (this._isMarketFunctional = !!this.allOrdersUnorganized.length)
     }
+
+    private resourceHistory: {[key in MarketResourceConstant]: {[days: string]: number}}
+    /**
+     * Finds the average trading price of a resourceType over a set amount of days
+     */
+    getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
+        if (this.resourceHistory[resourceType] && this.resourceHistory[resourceType][days]) {
+
+            return this.resourceHistory[resourceType][days]
+        }
+
+        // Get the market history for the specified resourceType
+
+        const history = Game.market.getHistory(resourceType)
+        if (!history.length) return 1
+
+        let totalPrice = 0
+
+        // For every day of history, add to the total price
+
+        for (let index = 0; index <= days; index += 1) {
+            if (!history[index]) continue
+            totalPrice += history[index].avgPrice
+        }
+
+        // Inform the average price
+        const avgPrice = totalPrice / days
+        //cache the result
+        this.resourceHistory[resourceType][days]
+        return avgPrice
+    }
 }
 
-export const marketOrdersManager = new MarketOrdersManager()
+export const marketManager = new MarketManager()

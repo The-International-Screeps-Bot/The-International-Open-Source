@@ -1,20 +1,20 @@
 import { customLog } from 'utils/logging'
-import { findLowestScore, getAvgPrice } from 'utils/utils'
+import { findLowestScore } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
-import { marketOrdersManager } from 'international/marketOrders'
+import { marketManager } from 'international/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
 export const marketUtils = {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
-            marketOrdersManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
+            marketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
         if (amount <= 0) return false
 
-        const order = marketOrdersManager.getBuyOrder(resourceType)
+        const order = marketManager.getShardBuyOrder(room.name, resourceType, amount)
 
         if (order) {
             const dealAmount = this.findLargestTransactionAmount(
@@ -42,14 +42,14 @@ export const marketUtils = {
 
         if (mySpecificOrders.length) return false
         if (Game.market.credits < collectiveManager.minCredits) return false
-        if (marketOrdersManager.myOrdersCount === MARKET_MAX_ORDERS) return false
+        if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        const orders = marketOrdersManager.orders[ORDER_SELL][resourceType]
+        const orders = marketManager.orders[ORDER_SELL][resourceType]
         if (!orders) return false
 
         const price = Math.max(
             Math.min(...orders.map(o => o.price)) * 0.99,
-            getAvgPrice(resourceType) * 0.8,
+            marketManager.getAvgPrice(resourceType) * 0.8,
         )
 
         const result = Game.market.createOrder({
@@ -67,15 +67,16 @@ export const marketUtils = {
     },
     advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
-            marketOrdersManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
+            marketManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
         for (const order of mySpecificOrders) amount -= order.remainingAmount
 
         if (amount <= 0) return false
 
-        const order = marketOrdersManager.getSellOrder(
+        const order = marketManager.getShardSellOrder(
+            room.name,
             resourceType,
-            getAvgPrice(resourceType) * 1.2,
+            marketManager.getAvgPrice(resourceType) * 1.2,
         )
 
         if (order) {
@@ -104,14 +105,14 @@ export const marketUtils = {
         }
 
         if (mySpecificOrders.length) return false
-        if (marketOrdersManager.myOrdersCount === MARKET_MAX_ORDERS) return false
+        if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        const orders = marketOrdersManager.orders[ORDER_BUY][resourceType]
+        const orders = marketManager.orders[ORDER_BUY][resourceType]
         if (!orders) return false
 
         const price = Math.min(
             Math.max(...orders.map(o => o.price)) * 1.01,
-            getAvgPrice(resourceType) * 1.2,
+            marketManager.getAvgPrice(resourceType) * 1.2,
         )
 
         const result = Game.market.createOrder({

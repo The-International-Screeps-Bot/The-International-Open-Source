@@ -49,7 +49,7 @@ import { ConstructionManager } from 'room/construction/construction'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
-import { marketOrdersManager } from 'international/marketOrders'
+import { marketManager } from 'international/marketOrders'
 import { transactionsManager } from 'international/transactions'
 import { segmentsManager } from 'international/segments'
 
@@ -90,13 +90,13 @@ export function originalLoop() {
         roomPruningManager.run()
         flagManager.run()
         constructionSiteManager.run()
-        marketOrdersManager.run()
+        marketManager.run()
 
         roomsManager.run()
 
         mapVisualsManager.run()
         simpleAllies.endRun()
-        marketOrdersManager.advancedSellPixels()
+        marketManager.advancedSellPixels()
         if (global.userScript) global.userScript.endRun()
         statsManager.internationalEndRun()
 

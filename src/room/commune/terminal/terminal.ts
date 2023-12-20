@@ -6,7 +6,7 @@ import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/s
 import { collectiveManager } from 'international/collective'
 import { CommuneManager, ResourceTargets } from 'room/commune/commune'
 import { marketUtils } from './marketUtils'
-import { marketOrdersManager } from 'international/marketOrders'
+import { marketManager } from 'international/marketOrders'
 
 export class TerminalManager {
     communeManager: CommuneManager
@@ -44,7 +44,7 @@ export class TerminalManager {
         // Check if the market is disabled by us or the server
 
         if (!global.settings.marketUsage) return
-        if (!marketOrdersManager.isMarketFunctional) return
+        if (!marketManager.isMarketFunctional) return
 
         if (this.manageResources(room, resourceTargets) === Result.action) return
     }

@@ -252,8 +252,8 @@ export class SpawnRequestsManager {
 
                 // Construct the required carry parts
 
-                const partsMultiplier = this.communeManager.communeHaulerNeed - this.communeManager.communeHaulerCarryParts
-                if (partsMultiplier <= 0) return false
+                const carryPartsNeed = this.communeManager.communeHaulerNeed - this.communeManager.communeHaulerCarryParts
+                if (carryPartsNeed <= 0) return false
 
                 const role = 'hauler'
                 /*                 const cost = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
@@ -262,16 +262,17 @@ export class SpawnRequestsManager {
                 // If all RCL 3 extensions are built
 
                 if (this.communeManager.hasSufficientRoads) {
-                    const { maxCost, minCost } = this.findCommuneHaulerCosts(150)
+                    const costStep = 150
+                    const maxCost = this.findCommuneHaulerMaxCost(costStep)
 
                     return {
                         type: SpawnRequestTypes.groupUniform,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, CARRY, MOVE],
-                        partsQuota: partsMultiplier * 3,
-                        partsMultiplier: partsMultiplier / 2,
-                        minCostPerCreep: minCost,
+                        partsQuota: carryPartsNeed * 3,
+                        partsMultiplier: carryPartsNeed / 2,
+                        minCostPerCreep: costStep,
                         maxCostPerCreep: maxCost,
                         priority,
                         spawnGroup: [],
@@ -281,16 +282,17 @@ export class SpawnRequestsManager {
                     }
                 }
 
-                const { maxCost, minCost } = this.findCommuneHaulerCosts(100)
+                const costStep = 100
+                const maxCost = this.findCommuneHaulerMaxCost(costStep)
 
                 return {
                     type: SpawnRequestTypes.groupUniform,
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE],
-                    partsQuota: partsMultiplier * 2,
-                    partsMultiplier,
-                    minCostPerCreep: minCost,
+                    partsQuota: carryPartsNeed * 2,
+                    partsMultiplier: carryPartsNeed,
+                    minCostPerCreep: costStep,
                     maxCostPerCreep: maxCost,
                     priority,
                     spawnGroup: [],
@@ -300,26 +302,19 @@ export class SpawnRequestsManager {
         )
     }
 
-    private findCommuneHaulerCosts(costStep: number): SpawningHaulerCosts {
+    private findCommuneHaulerMaxCost(costStep: number): number {
         if (this.communeManager.room.myCreeps.hauler.length) {
 
             // have all haulers be the same size; their max allowed size
 
             const maxCost = Math.floor(this.minHaulerCost / costStep) * costStep
-            const minCost = maxCost
-
-            return {
-                maxCost,
-                minCost,
-            }
+            return maxCost
         }
 
         // there are no haulers, consider that in spawning cost limitations
 
-        return {
-            maxCost: Math.floor(this.communeManager.room.energyAvailable / costStep) * costStep,
-            minCost: costStep,
-        }
+        const maxCost = Math.floor(this.communeManager.room.energyAvailable / costStep) * costStep
+        return maxCost
     }
 
     private mineralHarvester() {

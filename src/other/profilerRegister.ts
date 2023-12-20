@@ -31,7 +31,7 @@ import { debugUtils } from 'debug/debugUtils'
 import { spawnUtils } from 'room/commune/spawning/spawnUtils'
 import { marketUtils } from 'room/commune/terminal/marketUtils'
 import { CollectiveManager } from 'international/collective'
-import { MarketOrdersManager } from 'international/marketOrders'
+import { MarketManager } from 'international/marketOrders'
 import { GarbageCollector } from 'international/garbageCollector'
 import { EndTickManager } from 'international/endTick'
 import { EndTickCreepManager } from 'room/creeps/endTickCreepManager'
@@ -77,7 +77,7 @@ export function profilerRegister() {
     profiler.registerClass(SimpleAllies, 'SimpleAllies')
     profiler.registerClass(FlagManager, 'FlagManager')
     profiler.registerClass(FeatureFlagManager, 'FeatureFlagManager')
-    profiler.registerClass(MarketOrdersManager, 'MarketOrdersManager')
+    profiler.registerClass(MarketManager, 'MarketOrdersManager')
     profiler.registerClass(ConstructionSiteManager, 'ConstructionSiteManager')
     profiler.registerClass(TransactionsManager, 'TransactionsManager')
     profiler.registerClass(GarbageCollector, 'GarbageCollector')

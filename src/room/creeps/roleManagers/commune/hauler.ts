@@ -9,12 +9,14 @@ import {
     packedPosLength,
     relayOffsets,
 } from 'international/constants'
+import { statsManager } from 'international/statsManager'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
 import { customLog } from 'utils/logging'
 import {
     findClosestObject,
     findObjectWithID,
     getRange,
+    getRangeXY,
     randomIntRange,
     randomTick,
 } from 'utils/utils'
@@ -51,6 +53,44 @@ export class Hauler extends Creep {
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
         return true
+    }
+
+    passiveRenew() {
+
+        const { room } = this
+
+        // If there is insufficient CPU to renew, inform false
+
+        if (this.body.length > 10) return
+        if (!room.myCreeps.fastFiller.length) return
+        // only renew if we are the same as the desired hauler cost
+        if (this.cost !== Memory.rooms[room.name][RoomMemoryKeys.minHaulerCost]) return
+
+        // If the creep's age is less than the benefit from renewing, inform false
+
+        const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
+        if (CREEP_LIFE_TIME - this.ticksToLive < Math.floor(600 / this.body.length)) return
+
+        // Get the room's spawns, stopping if there are none
+
+        const spawns = room.roomManager.structures.spawn
+
+        // Get a spawn in range of 1, informing false if there are none
+
+        const spawn = spawns.find(
+            spawn =>
+                getRangeXY(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
+                !spawn.renewed &&
+                !spawn.spawning &&
+                spawn.isRCLActionable,
+        )
+        if (!spawn) return
+
+        const result = spawn.renewCreep(this)
+        if (result === OK) {
+            statsManager.updateStat(this.room.name, 'eosp', energyCost)
+            spawn.renewed = true
+        }
     }
 
     initRun() {

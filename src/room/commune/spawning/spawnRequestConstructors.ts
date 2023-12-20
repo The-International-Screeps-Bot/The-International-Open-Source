@@ -346,16 +346,18 @@ export const spawnRequestConstructors = {
 
         // Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
         if (args.extraParts.length == 0) {
-            customLog('spawnRequestByGroup', '0 length extraParts?' + JSON.stringify(args), {
-                type: LogTypes.error,
-            })
-            return spawnRequests
+            throw Error('extraParts of length 0 for ' + room.name + ' and role ' + args.role)
         }
 
         const maxCostPerCreep = Math.max(
             args.maxCostPerCreep ?? room.energyCapacityAvailable,
             args.minCostPerCreep,
         )
+        if (maxCostPerCreep < args.minCostPerCreep) {
+
+            customLog('maxCostPerCreep is less than minCostPerCreep, unable to continue spawn request for role: ' + args.role)
+            return spawnRequests
+        }
 
         if (args.maxCreeps === undefined) {
             args.maxCreeps = Number.MAX_SAFE_INTEGER
@@ -409,7 +411,7 @@ export const spawnRequestConstructors = {
 
                     const partCost = BODYPART_COST[part]
                     // If the new cost will make us too expensive and we already fulfill the min cost, stop
-                    if (cost + partCost > maxCostPerCreep && cost >= args.minCostPerCreep) {
+                    if (cost + partCost > maxCostPerCreep /* && cost >= args.minCostPerCreep */) {
                         stop = true
                         break
                     }
