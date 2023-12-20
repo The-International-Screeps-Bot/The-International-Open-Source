@@ -860,12 +860,16 @@ export class CommuneManager {
                 coord,
                 structure => structure.structureType === STRUCTURE_LINK,
             ) as StructureLink | false
-            links.push(structure)
+
+            if (structure) {
+
+                links.push(structure)
+                this.sourceLinkIDs.push(structure.id)
+                continue
+            }
+
+            links.push(false)
             this.sourceLinkIDs.push(false)
-
-            if (!structure) continue
-
-            this.sourceLinkIDs.push(structure.id)
         }
 
         return (this._sourceLinks = links)

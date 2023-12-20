@@ -5,6 +5,7 @@ import { CombatRequestTypes } from 'types/internationalRequests'
 import { roomUtils } from 'room/roomUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
+import { customLog } from 'utils/logging'
 
 export class FlagManager {
     run() {
@@ -358,6 +359,57 @@ export class FlagManager {
                 return Result.stop
             },
         )
+    }
+
+    private communeSourceVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) return
+
+        const roomMemory = Memory.rooms[room.name]
+
+        const sourceIDs = roomMemory[RoomMemoryKeys.communeSources]
+        for (let sourceIndex = 0; sourceIndex < sourceIDs.length; sourceIndex++) {
+
+            const source = findObjectWithID(sourceIDs[sourceIndex])
+            room.visual.text(sourceIndex.toString(), source.pos)
+        }
+
+        const stampAnchors = room.roomManager.stampAnchors
+        if (stampAnchors) {
+
+            for (let sourceIndex = 0; sourceIndex < stampAnchors.sourceLink.length; sourceIndex++) {
+
+                const coord = stampAnchors.sourceLink[sourceIndex]
+                room.visual.text(sourceIndex.toString(), coord.x, coord.y)
+            }
+        }
+    }
+
+    private communeSourceStructureVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) return
+
+        const roomMemory = Memory.rooms[room.name]
+
+        const containers = room.roomManager.sourceContainers
+        for (let sourceIndex = 0; sourceIndex < containers.length; sourceIndex++) {
+
+            const container = containers[sourceIndex]
+            room.visual.text(sourceIndex.toString(), container.pos)
+        }
+
+        const links = room.communeManager.sourceLinks
+        customLog('links', links)
+        for (let sourceIndex = 0; sourceIndex < links.length; sourceIndex++) {
+
+            const link = links[sourceIndex]
+            if (!link) continue
+            room.visual.text(sourceIndex.toString(), link.pos)
+        }
     }
 }
 

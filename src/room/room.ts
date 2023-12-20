@@ -963,7 +963,7 @@ export class RoomManager {
             communeManager.actionableSpawningStructuresIDs = undefined
             communeManager.spawningStructuresByPriorityIDs = undefined
             communeManager._fastFillerSpawnEnergyCapacity = undefined
-            communeManager.sourceLinkIDs = []
+            communeManager.sourceLinkIDs = undefined
         }
 
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
