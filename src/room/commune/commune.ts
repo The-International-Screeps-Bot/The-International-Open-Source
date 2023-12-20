@@ -1269,9 +1269,9 @@ export class CommuneManager {
 
         if (this.room.controller.level < 8) {
             if (collectiveManager.funnelOrder[0] === this.room.name) {
-                return Math.min(this.minStoredEnergy + this.upgradeTargetDistance(), storingStructuresCapacity / 2)
+                return Math.min(this.storedEnergyUpgradeThreshold * 1.2 + this.upgradeTargetDistance(), storingStructuresCapacity / 2)
             }
-            return this.storedEnergyUpgradeThreshold * 1.2
+            return Math.min(this.storedEnergyUpgradeThreshold * 1.2, storingStructuresCapacity / 2)
         }
 
         return this.minStoredEnergy
@@ -1281,9 +1281,4 @@ export class CommuneManager {
 
         return this.room.controller.progressTotal - this.room.controller.progress
     }
-}
-
-interface ResourceTarget {
-    min: number
-    max: number
 }

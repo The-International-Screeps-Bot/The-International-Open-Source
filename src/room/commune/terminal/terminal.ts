@@ -51,7 +51,7 @@ export class TerminalManager {
 
     private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
 
-        for (const key in resourceTargets) {
+        for (const key in resourceTargets.min) {
             const resourceType = key as ResourceConstant
             let targetAmount = resourceTargets.min[resourceType]
             if (targetAmount <= 0) continue
@@ -245,7 +245,7 @@ export class TerminalManager {
 
     private manageResources(room: Room, resourceTargets: ResourceTargets) {
 
-        for (const key in resourceTargets) {
+        for (const key in resourceTargets.min) {
             const resourceType = key as ResourceConstant
 
             if (this.manageResource(room, resourceType, resourceTargets) === Result.action) {

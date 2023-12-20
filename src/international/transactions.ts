@@ -1,10 +1,11 @@
 import { Sleepable } from "utils/sleepable"
 import { RoomStatsKeys } from "./constants"
 import { randomIntRange } from "utils/utils"
+import { collectiveManager } from "./collective"
 
 export class TransactionsManager extends Sleepable {
   sleepFor = randomIntRange(50, 100)
-  
+
   run() {
     if (this.isSleepingResponsive()) return
 
@@ -101,7 +102,7 @@ export class TransactionsManager extends Sleepable {
    */
   private isDomestic(from: string, to: string) {
 
-    return (from === to && from === Memory.me)
+    return (collectiveManager.communes.has(from) && collectiveManager.communes.has(to))
   }
 }
 

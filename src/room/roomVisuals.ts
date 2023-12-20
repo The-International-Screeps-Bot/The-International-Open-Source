@@ -314,7 +314,7 @@ export class RoomVisualsManager {
         const avgSpawn = totalSpawn / collectiveManager.communes.size
 
         data[0].push(
-            totalEstimatedIncome,
+            totalEstimatedIncome.toFixed(2),
             totalCommuneEnergyHarvested.toFixed(2),
             totalRemoteEnergyHarvested.toFixed(2),
             totalUpgrade.toFixed(2),
