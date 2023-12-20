@@ -1,4 +1,4 @@
-import { minerals, Result, RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
+import { minerals, Result, RoomMemoryKeys } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { newID, roundTo } from 'utils/utils'
 import './marketUtils'
