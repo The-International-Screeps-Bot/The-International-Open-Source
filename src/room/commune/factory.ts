@@ -1,5 +1,5 @@
-import { RoomMemoryKeys, terminalResourceTargets } from 'international/constants'
-import { CommuneManager } from './commune'
+import { RoomMemoryKeys } from 'international/constants'
+import { CommuneManager, ResourceTargets } from './commune'
 
 const BASE_RESOURCES = [
     'energy',
@@ -25,7 +25,7 @@ export class FactoryManager {
     }
 
     run() {
-        this.factory = this.communeManager.room.roomManager.structures.factory[0]
+        this.factory = this.communeManager.room.roomManager.factory
 
         if (!this.factory) return
         if (this.factory.cooldown > 0) return
@@ -128,6 +128,7 @@ export class FactoryManager {
         resourceType: keyof typeof COMMODITIES,
         minAmount: number,
         resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>,
+        resourceTargets: ResourceTargets
     ) {
         // We know we can't produce a commodity if we don't have the power level
         if (
@@ -150,7 +151,7 @@ export class FactoryManager {
                 | DepositConstant
 
             const min = Math.min(
-                terminalResourceTargets[materialResourceType].min(this.communeManager),
+                resourceTargets[materialResourceType].min,
                 (components[materialResourceType] / COMMODITIES[resourceType].amount) * minAmount,
             )
             const currentAmount = resourcesInStoringStructures[materialResourceType]
@@ -168,6 +169,7 @@ export class FactoryManager {
                     materialResourceType as keyof typeof COMMODITIES,
                     Math.floor(components[materialResourceType] / minAmount),
                     resourcesInStoringStructures,
+                    resourceTargets,
                 )
                 if (!hasSufficientMaterials) return false
             }
@@ -288,9 +290,10 @@ export class FactoryManager {
 
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
+        const resourceTargets = this.communeManager.resourceTargets
 
         for (const resourceType of stuffToMake) {
-            const max = terminalResourceTargets[resourceType].max(this.communeManager)
+            const max = resourceTargets[resourceType].max
             const currentAmount = resourcesInStoringStructures[resourceType]
             // Make sure we are sufficiently low on the resource before wanting to produce more
             if (currentAmount * 1.1 >= max) continue
@@ -299,6 +302,7 @@ export class FactoryManager {
                 resourceType,
                 max - currentAmount,
                 resourcesInStoringStructures,
+                resourceTargets
             )
             // Make sure we have enough component-materials to make the end product
             if (!currentlyHaveAllMaterials) continue
