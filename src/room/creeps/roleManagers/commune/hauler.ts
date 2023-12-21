@@ -913,6 +913,7 @@ export class Hauler extends Creep {
     }
 
     relay?() {
+
         // If there is no easy way to know what coord the creep is trying to go to next
 
         const creepMemory = Memory.creeps[this.name]
@@ -928,7 +929,7 @@ export class Hauler extends Creep {
         // Don't relay too close to the source position unless we are fatigued
 
         if (
-            creepMemory[CreepMemoryKeys.taskRoom] === this.room.name ||
+            creepMemory[CreepMemoryKeys.taskRoom] !== this.room.name &&
             (!this.fatigue &&
                 creepMemory[CreepMemoryKeys.remote] === this.room.name &&
                 getRange(
@@ -1049,9 +1050,10 @@ export class Hauler extends Creep {
 
         // Otherwise if the creep doesn't need resources
 
-        // If the creep has a remoteName, delete it and delete it's fulfilled needs
+        if (this.deliverResources()) {
 
-        if (this.deliverResources()) this.relay()
+            this.relay()
+        }
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {
