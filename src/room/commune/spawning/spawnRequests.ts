@@ -1559,7 +1559,9 @@ export class SpawnRequestsManager {
                     creepsQuota: minCreeps,
                     minCostPerCreep: 50,
                     priority: this.activeRemotePriority + 0.3,
-                    memoryAdditions: {},
+                    memoryAdditions: {
+                        [CreepMemoryKeys.signTarget]: this.communeManager.room.name,
+                    },
                 }
             })(),
         )

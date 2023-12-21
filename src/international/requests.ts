@@ -1,4 +1,4 @@
-import { advancedFindDistance, findClosestRoomName, randomRange } from 'utils/utils'
+import { advancedFindDistance, findClosestRoomName, randomIntRange, randomRange } from 'utils/utils'
 import { collectiveManager } from './collective'
 import { roomUtils } from 'room/roomUtils'
 import {
@@ -13,16 +13,104 @@ import {
     maxWorkRequestDistance,
 } from './constants'
 import { indexOf } from 'lodash'
+import { Sleepable } from 'utils/sleepable'
 
 // Should adsorb the request content of tickInit
-export class RequestsManager {
+export class RequestsManager extends Sleepable {
+
+    sleepFor = randomIntRange(100, 200)
+
     run() {
+
+        this.updateWorkRequests()
+        this.updateCombatRequests()
+        this.updateHaulRequests()
+
+        if (this.isSleepingResponsive()) return
+
         this.runWorkRequests()
         this.runCombatRequests()
         this.runHaulRequests()
     }
 
+    // update requests
+
+    private updateWorkRequests() {
+
+        const runThreshold = randomRange(19000, 20000)
+
+        for (const roomName in Memory.workRequests) {
+
+            const request = Memory.workRequests[roomName]
+
+            if (request[WorkRequestKeys.abandon] > 0) {
+                request[WorkRequestKeys.abandon] -= 1
+                continue
+            }
+
+            // otherwise abandon is worthless. Let's delete it to save (a bit of) memory
+
+            delete request[WorkRequestKeys.abandon]
+
+            // update dynamic score if enough time has passed
+
+            const roomMemory = Memory.rooms[roomName]
+            if (
+                Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
+            ) {
+
+                roomUtils.findDynamicScore(roomName)
+            }
+        }
+    }
+
+    private updateCombatRequests() {
+
+        for (const requestName in Memory.combatRequests) {
+            const request = Memory.combatRequests[requestName]
+
+            if (request[CombatRequestKeys.responder]) {
+                collectiveManager.creepsByCombatRequest[requestName] = {}
+                for (const role of antifaRoles)
+                    collectiveManager.creepsByCombatRequest[requestName][role] = []
+                request[CombatRequestKeys.quads] = 0
+                continue
+            }
+
+            if (request[CombatRequestKeys.abandon]) {
+
+                request[CombatRequestKeys.abandon] -= 1
+                continue
+            }
+
+            delete request[CombatRequestKeys.abandon]
+
+        }
+    }
+
+    private updateHaulRequests() {
+
+        for (const requestName in Memory.haulRequests) {
+            const request = Memory.haulRequests[requestName]
+
+            if (request[HaulRequestKeys.abandon] > 0) {
+
+                request[HaulRequestKeys.abandon] -= 1
+                continue
+            }
+
+            delete request[HaulRequestKeys.abandon]
+
+
+        }
+    }
+
+    // run requests
+
     private runWorkRequests() {
+        if (!global.settings.autoClaim) return
+        if (collectiveManager.communes.size >= collectiveManager.maxCommunes) return
+
         let reservedGCL = Game.gcl.level - collectiveManager.communes.size
 
         // Subtract the number of workRequests with responders
@@ -34,11 +122,12 @@ export class RequestsManager {
             reservedGCL -= 1
         }
 
+        if (reservedGCL <= 0) return
+
         const communesForResponding = new Set<string>()
 
         for (const roomName of collectiveManager.communes) {
             if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) continue
-
             if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
 
             const room = Game.rooms[roomName]
@@ -47,37 +136,15 @@ export class RequestsManager {
             communesForResponding.add(roomName)
         }
 
-        // Update dynamicScores if necessary
-
-        for (const roomName in Memory.workRequests) {
-            const roomMemory = Memory.rooms[roomName]
-            if (
-                Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] <
-                randomRange(19000, 20000)
-            )
-                continue
-
-            roomUtils.findDynamicScore(roomName)
-        }
-
         // Assign and abandon workRequests, in order of score
 
         for (const roomName of collectiveManager.workRequestsByScore) {
             const request = Memory.workRequests[roomName]
 
             if (!request) continue
-
-            if (request[WorkRequestKeys.abandon] > 0) {
-                request[WorkRequestKeys.abandon] -= 1
-                continue
-            }
-
-            request[WorkRequestKeys.abandon] = undefined
-
-            if (!global.settings.autoClaim) continue
+            if (request[WorkRequestKeys.abandon]) continue
             // If there is not enough reserved GCL to make a new request
-            if (reservedGCL <= 0) continue
-            if (collectiveManager.communes.size >= collectiveManager.maxCommunes) continue
+            if (reservedGCL <= 0) return
             if (
                 request[WorkRequestKeys.responder] &&
                 collectiveManager.communes.has(request[WorkRequestKeys.responder])
@@ -134,16 +201,6 @@ export class RequestsManager {
     private runCombatRequests() {
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
-
-            if (request[CombatRequestKeys.abandon]) request[CombatRequestKeys.abandon] -= 1
-
-            if (request[CombatRequestKeys.responder]) {
-                collectiveManager.creepsByCombatRequest[requestName] = {}
-                for (const role of antifaRoles)
-                    collectiveManager.creepsByCombatRequest[requestName][role] = []
-                request[CombatRequestKeys.quads] = 0
-                continue
-            }
 
             if (request[CombatRequestKeys.abandon]) continue
 
@@ -236,8 +293,6 @@ export class RequestsManager {
         for (const requestName in Memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
 
-            if (request[HaulRequestKeys.abandon]) request[HaulRequestKeys.abandon] -= 1
-
             if (request[HaulRequestKeys.responder]) {
                 collectiveManager.creepsByHaulRequest[requestName] = []
                 continue
@@ -248,9 +303,10 @@ export class RequestsManager {
             const communes = []
 
             for (const roomName of collectiveManager.communes) {
-                if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName))
-                    continue
+                if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) {
 
+                    continue
+                }
 
                 const room = Game.rooms[roomName]
                 if (room.controller.level < 4) continue

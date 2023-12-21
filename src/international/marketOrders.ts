@@ -22,9 +22,7 @@ export class MarketManager {
 
         // If there is sufficiently few orders
 
-        if (MARKET_MAX_ORDERS * 0.8 > this.myOrdersCount) return
-
-        // Loop through my orders
+        if (this.myOrdersCount < MARKET_MAX_ORDERS * 0.8) return
 
         for (const ID in Game.market.orders) {
             // If the order is inactive (it likely has no remaining resources), delete it
@@ -36,7 +34,7 @@ export class MarketManager {
     /**
      * Finds the cheapest sell order
      */
-    getShardSellOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, minPrice = this.getAvgPrice(resourceType) * 0.8) {
+    getShardSellOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
         const orders = this.orders.buy[resourceType]
         if (!orders) return Result.fail
 
@@ -44,7 +42,7 @@ export class MarketManager {
         let bestOrderCost = Infinity
 
         for (const order of orders) {
-            if (order.price > minPrice) continue
+            if (order.price > maxPrice) continue
             if (order.price >= bestOrderCost) continue
 
             // we found a better order
@@ -86,7 +84,7 @@ export class MarketManager {
     /**
      * Finds the cheapest sell order
      */
-    getGlobalSellOrder(resourceType: MarketResourceConstant, minPrice = this.getAvgPrice(resourceType) * 0.8) {
+    getGlobalSellOrder(resourceType: MarketResourceConstant, maxPrice = this.getAvgPrice(resourceType) * 0.8) {
         const orders = this.orders.buy[resourceType]
         if (!orders) return Result.fail
 
@@ -94,7 +92,7 @@ export class MarketManager {
         let bestOrderCost = Infinity
 
         for (const order of orders) {
-            if (order.price > minPrice) continue
+            if (order.price > maxPrice) continue
             if (order.price >= bestOrderCost) continue
 
             // we found a better order
@@ -237,13 +235,12 @@ export class MarketManager {
                 roomMemory[RoomMemoryKeys.owner] &&
                 Memory.players[roomMemory[RoomMemoryKeys.owner]] &&
                 Memory.players[roomMemory[RoomMemoryKeys.owner]][PlayerMemoryKeys.hate] > 0
-            )
-                continue
+            ) {
 
-            if (!orders[order.type][order.resourceType]) {
-                orders[order.type][order.resourceType] = [order]
                 continue
             }
+
+            orders[order.type][order.resourceType] ??= [order]
 
             // Assign the order to a resource-ordered location
 
@@ -356,6 +353,7 @@ export class MarketManager {
         // Inform the average price
         const avgPrice = totalPrice / days
         //cache the result
+        this.resourceHistory[resourceType] ??= {}
         this.resourceHistory[resourceType][days]
         return avgPrice
     }

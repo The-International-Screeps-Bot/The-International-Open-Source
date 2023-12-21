@@ -1,6 +1,6 @@
 import { minerals, Result, RoomMemoryKeys, RoomStatsKeys } from 'international/constants'
 import { customLog } from 'utils/logging'
-import { newID, roundTo } from 'utils/utils'
+import { newID, roundTo, utils } from 'utils/utils'
 import './marketUtils'
 import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/simpleAllies'
 import { collectiveManager } from 'international/collective'
@@ -44,6 +44,8 @@ export class TerminalManager {
         // Check if the market is disabled by us or the server
 
         if (!global.settings.marketUsage) return
+        // only run every terminal cooldown interval, to have every terminal share the same required data (reduces CPU costs)
+        if (utils.isTickInterval(TERMINAL_COOLDOWN)) return
         if (!marketManager.isMarketFunctional) return
 
         if (this.manageResources(room, resourceTargets) === Result.action) return

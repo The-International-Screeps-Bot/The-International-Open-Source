@@ -855,5 +855,8 @@ export function getMe() {
 }
 
 export const utils = {
+    isTickInterval(interval: number) {
 
+        return (Game.time % interval === 0)
+    }
 }

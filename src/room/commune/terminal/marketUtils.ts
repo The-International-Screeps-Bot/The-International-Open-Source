@@ -154,4 +154,23 @@ export const marketUtils = {
 
         return Math.floor(amount)
     },
+    advancedDeal(room: Room, order: Order, amount: number) {
+
+        const dealAmount = this.findLargestTransactionAmount(
+            room.terminal.store.energy * 0.75,
+            amount,
+            room.name,
+            order.roomName,
+        )
+
+        const result = Game.market.deal(
+            order.id,
+            Math.min(dealAmount, order.remainingAmount),
+            room.name,
+        )
+        if (result !== OK) return Result.fail
+
+        // the deal was an apparent success
+        return Result.success
+    }
 }
