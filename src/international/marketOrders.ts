@@ -84,7 +84,7 @@ export class MarketManager {
     /**
      * Finds the cheapest sell order
      */
-    getGlobalSellOrder(resourceType: MarketResourceConstant, maxPrice = this.getAvgPrice(resourceType) * 0.8) {
+    getGlobalSellOrder(resourceType: MarketResourceConstant, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
         const orders = this.orders.buy[resourceType]
         if (!orders) return Result.fail
 

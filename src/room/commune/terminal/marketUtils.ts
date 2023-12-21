@@ -76,7 +76,7 @@ export const marketUtils = {
         const order = marketManager.getShardSellOrder(
             room.name,
             resourceType,
-            marketManager.getAvgPrice(resourceType) * 1.2,
+            amount
         )
 
         if (order) {
