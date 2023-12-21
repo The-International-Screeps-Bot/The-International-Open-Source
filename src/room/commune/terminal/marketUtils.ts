@@ -16,7 +16,7 @@ export const marketUtils = {
 
         const order = marketManager.getShardBuyOrder(room.name, resourceType, amount)
 
-        if (order) {
+        if (order !== Result.fail) {
             const dealAmount = this.findLargestTransactionAmount(
                 room.terminal.store.energy * 0.75,
                 amount,
@@ -79,7 +79,7 @@ export const marketUtils = {
             amount
         )
 
-        if (order) {
+        if (order !== Result.fail) {
             const dealAmount = this.findLargestTransactionAmount(
                 room.terminal.store.energy * 0.75,
                 amount,
