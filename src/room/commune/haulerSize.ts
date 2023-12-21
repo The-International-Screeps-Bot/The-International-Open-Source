@@ -16,7 +16,7 @@ export class HaulerSizeManager {
 
         if (roomMemory[RoomMemoryKeys.minHaulerCost] === undefined) {
 
-            roomMemory[RoomMemoryKeys.minHaulerCost] = Memory.minHaulerCost
+            roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 100 * this.communeManager.room.roomManager.structures.spawn.length)
             roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(1500, 3000)
             return
         }
@@ -29,7 +29,7 @@ export class HaulerSizeManager {
     private updateMinHaulerCost() {
         const roomMemory = Memory.rooms[this.communeManager.room.name]
 
-        roomMemory[RoomMemoryKeys.minHaulerCost] = Memory.minHaulerCost
+        roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 100 * this.communeManager.room.roomManager.structures.spawn.length)
         roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(0, 10)
     }
 }
