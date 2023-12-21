@@ -153,7 +153,10 @@ export class SourceHarvester extends Creep {
         })
         if (!structure) return false
 
-        return this.advancedTransfer(structure as AnyStoreStructure)
+        const result = this.transfer(structure, RESOURCE_ENERGY)
+
+        if (result !== OK) return false
+        return true
     }
 
     transferToSourceLink?(): boolean {
@@ -166,7 +169,10 @@ export class SourceHarvester extends Creep {
 
         // Try to transfer to the sourceLink and inform true
 
-        return this.advancedTransfer(sourceLink)
+        const result = this.transfer(sourceLink, RESOURCE_ENERGY)
+
+        if (result !== OK) return false
+        return true
     }
 
     maintainContainer?(sourceContainer: StructureContainer): boolean {

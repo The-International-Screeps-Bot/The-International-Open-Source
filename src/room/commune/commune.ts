@@ -989,7 +989,7 @@ export class CommuneManager {
         // mark coords in range 1 of reserved source harvest positions
         // mark coords in range of valid fastFiller position
 
-        let ignoreCoords = new Set<string>()
+        let ignoreCoords = new Set<number>()
 
         // source extensions
 
@@ -1010,7 +1010,7 @@ export class CommuneManager {
                 })
                 if (!structure) return
 
-                ignoreCoords.add(packCoord(coord))
+                ignoreCoords.add(packAsNum(coord))
             })
         }
 
@@ -1018,13 +1018,13 @@ export class CommuneManager {
 
         // Filter out structures that have ignored coords
         const spawningStructuresByNeed = this.actionableSpawningStructures.filter(structure => {
-            return !ignoreCoords.has(packCoord(structure.pos))
+            return !ignoreCoords.has(packAsNum(structure.pos))
         })
 
         return (this._spawningStructuresByNeed = spawningStructuresByNeed)
     }
 
-    private findFastFillerIgnoreCoords(ignoreCoords: Set<string>) {
+    private findFastFillerIgnoreCoords(ignoreCoords: Set<number>) {
         const fastFillerPositions = this.room.roomManager.fastFillerPositions
         for (const pos of fastFillerPositions) {
             // Make sure the position is reserved (presumably by a fastFiller)
@@ -1035,7 +1035,7 @@ export class CommuneManager {
 
             // register structures the fastFiller should be able to fill
             forCoordsAroundRange(pos, 1, coord => {
-                ignoreCoords.add(packCoord(coord))
+                ignoreCoords.add(packAsNum(coord))
             })
         }
 

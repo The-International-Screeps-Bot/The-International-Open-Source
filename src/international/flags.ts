@@ -402,8 +402,13 @@ export class FlagManager {
             room.visual.text(sourceIndex.toString(), container.pos)
         }
 
+        const stampAnchors = room.roomManager.stampAnchors
+        if (!stampAnchors) return
+
+        customLog('sourceLinks stampAnchors', JSON.stringify(stampAnchors.sourceLink))
+
         const links = room.communeManager.sourceLinks
-        customLog('links', links)
+        customLog('sourceLinks', links)
         for (let sourceIndex = 0; sourceIndex < links.length; sourceIndex++) {
 
             const link = links[sourceIndex]

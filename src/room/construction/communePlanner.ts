@@ -1107,8 +1107,6 @@ export class CommunePlanner {
     private sourceStructures() {
         if (this.sourceStructureCoords) return
 
-        this.stampAnchors.sourceExtension = []
-
         const fastFillerAnchor = new RoomPosition(
             this.stampAnchors.fastFiller[0].x,
             this.stampAnchors.fastFiller[0].y,
@@ -1164,11 +1162,6 @@ export class CommunePlanner {
                 this.baseCoords[packedAdjCoord] = 255
                 this.roadCoords[packedAdjCoord] = 255
             })
-
-            this.stampAnchors.sourceExtension = this.stampAnchors.sourceExtension.concat(
-                sourceStructureCoords[i],
-            )
-            this.stampAnchors.sourceExtension.pop()
         }
 
         this.sourceStructureCoords = sourceStructureCoords
@@ -1200,12 +1193,18 @@ export class CommunePlanner {
                 closestRange = range
             }
 
-            if (!closestCoordIndex) continue
+            if (!closestCoordIndex) {
+
+                // add a position that we won't use to fill the index
+                sourceLinkCoords.push(this.sourceStructureCoords[i][0])
+                continue
+            }
 
             const closestCoord = this.sourceStructureCoords[i][closestCoordIndex]
             this.sourceStructureCoords[i].splice(closestCoordIndex, 1)
 
             sourceLinkCoords.push(closestCoord)
+            this.setBasePlansXY(closestCoord.x, closestCoord.y, STRUCTURE_LINK)
 
             const packedCoord = packAsNum(closestCoord)
             this.baseCoords[packedCoord] = 255
@@ -1224,11 +1223,6 @@ export class CommunePlanner {
                 this.baseCoords[packedCoord] = 255
                 this.roadCoords[packedCoord] = 255
             }
-        }
-
-        /* sourceLinkCoords.reverse() */
-        for (const coord of sourceLinkCoords) {
-            this.setBasePlansXY(coord.x, coord.y, STRUCTURE_LINK)
         }
 
         this.stampAnchors.sourceExtension = sourceExtensionCoords
