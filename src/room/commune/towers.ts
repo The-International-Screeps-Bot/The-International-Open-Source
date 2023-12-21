@@ -15,12 +15,13 @@ import {
     isXYInBorder,
     randomTick,
     scalePriority,
+    utils,
 } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { playerManager } from 'international/players'
 
-const minTowerRampartRepairTreshold = 400
+const minTowerRampartRepairTreshold = RAMPART_DECAY_AMOUNT * 1.5
 
 export class TowerManager {
     communeManager: CommuneManager
@@ -47,16 +48,21 @@ export class TowerManager {
             this.actionableTowerIDs.push(tower.id)
         }
 
-        if (randomTick()) {
+        const isTickInterval = utils.isTickInterval(10)
+        if (isTickInterval) {
             delete this._towerRampartRepairThreshold
         }
 
         this.createRoomLogisticsRequests()
 
         if (this.attackEnemyCreeps()) return
-        if (this.healCreeps()) return
-        if (this.repairRamparts()) return
-        if (this.repairGeneral()) return
+
+        if (room.roomManager.enemyAttackers.length || isTickInterval) {
+
+            if (this.healCreeps()) return
+            if (this.repairRamparts()) return
+            if (this.repairGeneral()) return
+        }
     }
 
     private trackEnemySquads() {}
@@ -259,7 +265,6 @@ export class TowerManager {
 
     private repairGeneral() {
         if (!this.actionableTowerIDs.length) return false
-        if (!randomTick(100)) return false
 
         const structures = this.findGeneralRepairTargets()
         if (!structures.length) return false
