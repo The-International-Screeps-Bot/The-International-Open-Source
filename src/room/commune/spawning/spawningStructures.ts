@@ -303,6 +303,9 @@ export class SpawningStructuresManager {
     }
 
     createRoomLogisticsRequests() {
+        // If all spawning structures are 100% filled, no need to go further
+        if (this.communeManager.room.energyAvailable === this.communeManager.room.energyCapacityAvailable) return
+
         for (const structure of this.communeManager.spawningStructuresByNeed) {
             this.communeManager.room.createRoomLogisticsRequest({
                 target: structure,

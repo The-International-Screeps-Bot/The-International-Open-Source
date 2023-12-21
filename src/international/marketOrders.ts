@@ -1,6 +1,7 @@
 import { findHighestScore, randomTick } from 'utils/utils'
 import { PlayerMemoryKeys, Result, RoomMemoryKeys } from './constants'
 import { collectiveManager } from './collective'
+import { customLog } from 'utils/logging'
 
 export class MarketManager {
     run() {
@@ -35,10 +36,10 @@ export class MarketManager {
      * Finds the cheapest sell order
      */
     getShardSellOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders.buy[resourceType]
+        const orders = this.orders.sell[resourceType]
         if (!orders) return Result.fail
 
-        let bestOrderID: string
+        let bestOrder: Order
         let bestOrderCost = Infinity
 
         for (const order of orders) {
@@ -47,13 +48,12 @@ export class MarketManager {
 
             // we found a better order
 
-            bestOrderID = order.id
+            bestOrder = order
             bestOrderCost = order.price
         }
 
-        if (!bestOrderID) return Result.fail
-
-        return Game.market.getOrderById(bestOrderID)
+        if (!bestOrder) return Result.fail
+        return bestOrder
     }
 
     /**
@@ -63,7 +63,7 @@ export class MarketManager {
         const orders = this.orders.buy[resourceType]
         if (!orders) return Result.fail
 
-        let bestOrderID: string
+        let bestOrder: Order
         let bestOrderCost = 0
 
         for (const order of orders) {
@@ -72,23 +72,23 @@ export class MarketManager {
 
             // we found a better order
 
-            bestOrderID = order.id
+            bestOrder = order
             bestOrderCost = order.price
         }
 
-        if (!bestOrderID) return Result.fail
+        if (!bestOrder) return Result.fail
 
-        return Game.market.getOrderById(bestOrderID)
+        return bestOrder
     }
 
     /**
      * Finds the cheapest sell order
      */
     getGlobalSellOrder(resourceType: MarketResourceConstant, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders.buy[resourceType]
+        const orders = this.orders.sell[resourceType]
         if (!orders) return Result.fail
 
-        let bestOrderID: string
+        let bestOrder: Order
         let bestOrderCost = Infinity
 
         for (const order of orders) {
@@ -97,13 +97,13 @@ export class MarketManager {
 
             // we found a better order
 
-            bestOrderID = order.id
+            bestOrder = order
             bestOrderCost = order.price
         }
 
-        if (!bestOrderID) return Result.fail
+        if (!bestOrder) return Result.fail
 
-        return Game.market.getOrderById(bestOrderID)
+        return bestOrder
     }
 
     /**
@@ -113,7 +113,7 @@ export class MarketManager {
         const orders = this.orders.buy[resourceType]
         if (!orders) return Result.fail
 
-        let bestOrderID: string
+        let bestOrder: Order
         let bestOrderPrice = 0
 
         for (const order of orders) {
@@ -122,13 +122,13 @@ export class MarketManager {
 
             // we found a better order
 
-            bestOrderID = order.id
+            bestOrder = order
             bestOrderPrice = order.price
         }
 
-        if (!bestOrderID) return Result.fail
+        if (!bestOrder) return Result.fail
 
-        return Game.market.getOrderById(bestOrderID)
+        return bestOrder
     }
 
     /**
