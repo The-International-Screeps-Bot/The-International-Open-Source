@@ -1244,12 +1244,12 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'hauler'
 
-                    const partsMultiplier =
+                    const carryPartsNeed =
                         remoteMemory[RoomMemoryKeys.haulers][sourceIndex] -
                         this.communeManager.haulerCarryParts
                     this.communeManager.haulerCarryParts -=
                         remoteMemory[RoomMemoryKeys.haulers][sourceIndex]
-                    if (partsMultiplier <= 0) return false
+                    if (carryPartsNeed <= 0) return false
 
                     this.activeRemotePriority = Math.max(
                         this.activeRemotePriority,
@@ -1261,7 +1261,7 @@ export class SpawnRequestsManager {
                     const priority = this.minRemotePriority + priorityIncrement
 
                     /*
-                    // If all RCL 3 extensions are built
+                    // If all RCL 3 extensions are built (we're ready for roads)
                     if (this.spawnEnergyCapacity >= 800) {
 
                             const cost = Math.floor(
@@ -1273,8 +1273,8 @@ export class SpawnRequestsManager {
                                 extraParts: [CARRY, CARRY, MOVE],
                                 spawnGroup: [],
                                 threshold: 0,
-                                partsMultiplier: partsMultiplier / 2,
-                                minCost: cost,
+                                partsMultiplier: carryPartsNeed / 2,
+                                minCost: 150,
                                 maxCostPerCreep: cost,
                                 priority,
                                 memoryAdditions: {
@@ -1284,18 +1284,20 @@ export class SpawnRequestsManager {
                     }
                     */
 
-                    const cost = Math.floor(this.minHaulerCost / 100) * 100
+                    const costStep = 100
+                    const cost = Math.floor(this.minHaulerCost / costStep) * costStep
 
                     return {
-                        type: SpawnRequestTypes.groupDiverse,
+                        type: SpawnRequestTypes.groupUniform,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE],
                         spawnGroup: [],
                         threshold: 0,
-                        partsMultiplier,
-                        minCostPerCreep: cost,
+                        partsQuota: carryPartsNeed * 2,
+                        partsMultiplier: carryPartsNeed,
                         maxCostPerCreep: cost,
+                        minCostPerCreep: costStep,
                         priority,
                         memoryAdditions: {},
                     }
