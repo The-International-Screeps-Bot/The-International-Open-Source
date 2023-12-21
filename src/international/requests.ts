@@ -42,6 +42,7 @@ export class RequestsManager extends Sleepable {
         for (const roomName in Memory.workRequests) {
 
             const request = Memory.workRequests[roomName]
+            if (request[WorkRequestKeys.responder]) continue
 
             if (request[WorkRequestKeys.abandon] > 0) {
                 request[WorkRequestKeys.abandon] -= 1
@@ -92,6 +93,11 @@ export class RequestsManager extends Sleepable {
 
         for (const requestName in Memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
+
+            if (request[HaulRequestKeys.responder]) {
+                collectiveManager.creepsByHaulRequest[requestName] = []
+                continue
+            }
 
             if (request[HaulRequestKeys.abandon] > 0) {
 
@@ -203,6 +209,8 @@ export class RequestsManager extends Sleepable {
             const request = Memory.combatRequests[requestName]
 
             if (request[CombatRequestKeys.abandon]) continue
+            if (request[CombatRequestKeys.responder] &&
+                collectiveManager.communes.has(request[CombatRequestKeys.responder])) continue
 
             // Filter communes that don't have the combatRequest target already
 
@@ -293,10 +301,9 @@ export class RequestsManager extends Sleepable {
         for (const requestName in Memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
 
-            if (request[HaulRequestKeys.responder]) {
-                collectiveManager.creepsByHaulRequest[requestName] = []
-                continue
-            }
+            if (request[HaulRequestKeys.abandon]) continue
+            if (request[HaulRequestKeys.responder] &&
+                collectiveManager.communes.has(request[HaulRequestKeys.responder])) continue
 
             // Filter communes that don't have the combatRequest target already
 

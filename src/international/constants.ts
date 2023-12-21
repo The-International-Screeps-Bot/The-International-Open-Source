@@ -101,6 +101,8 @@ export enum CombatRequestKeys {
      */
     type,
     responder,
+    dynamicSquads,
+    dynamicSquadQuota
 }
 
 export enum CreepRoomLogisticsRequestKeys {

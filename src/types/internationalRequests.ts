@@ -32,6 +32,8 @@ export interface CombatRequest {
     [CombatRequestKeys.abandonments]: number
     [CombatRequestKeys.type]: CombatRequestTypes
     [CombatRequestKeys.responder]: string
+    [CombatRequestKeys.dynamicSquads]: number
+    [CombatRequestKeys.dynamicSquadQuota]: number
 }
 
 export interface NukeRequest {
