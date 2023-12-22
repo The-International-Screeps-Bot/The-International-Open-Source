@@ -57,6 +57,7 @@ export class RequestsManager extends Sleepable {
 
             const roomMemory = Memory.rooms[roomName]
             if (
+                !roomMemory[RoomMemoryKeys.dynamicScore] ||
                 Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
             ) {
 

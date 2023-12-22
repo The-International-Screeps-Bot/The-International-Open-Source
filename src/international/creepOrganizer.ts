@@ -5,6 +5,7 @@ import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { statsManager } from './statsManager'
 import { creepUtils } from 'room/creeps/creepUtils'
+import { creepDataManager } from 'room/creeps/creepData'
 
 export class CreepOrganizer {
     constructor() {}
@@ -70,6 +71,9 @@ export class CreepOrganizer {
             creep.suicide()
             return
         }
+
+        // initialize inter-tick data for the creep if it isn't already
+        creepDataManager.creepsData[creep.name] ??= {}
 
         creep.update()
 

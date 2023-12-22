@@ -767,18 +767,23 @@ export class Hauler extends Creep {
         if (creepAtPos.movedResource) return false
 
         const creepMemory = Memory.creeps[this.name]
+        // ensure we aren't relaying with the same creep as last tick
         if (creepMemory[CreepMemoryKeys.previousRelayer] && creepMemory[CreepMemoryKeys.previousRelayer][0] === creepAtPos.name) return false
 
-        if (!creepAtPos.freeNextStore) return false
-        if (creepAtPos.freeNextStore !== this.usedNextStore) return false
+        // ensure the creep receiving creep is empty
+        if (creepAtPos.usedNextStore > 0) return false
+
+        /* let amount: number | undefined */
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
         if (logisticsRequest) {
             const target = findObjectWithID(logisticsRequest[CreepRoomLogisticsRequestKeys.target])
             // Don't relay if they are close to our logistics target
             if (getRange(target.pos, creepAtPos.pos) <= 1) return false
+
+            /* amount = logisticsRequest[CreepRoomLogisticsRequestKeys.amount] */
         }
 
-        this.transfer(creepAtPos, RESOURCE_ENERGY)
+        this.transfer(creepAtPos, RESOURCE_ENERGY/* , amount */)
 
         this.movedResource = true
         creepAtPos.movedResource = true
@@ -844,10 +849,15 @@ export class Hauler extends Creep {
 
         //
 
-        this.getResources()
+        if (creepMemory[CreepMemoryKeys.taskRoom]) {
+
+            this.runCommuneLogistics()
+        }
+        else this.getResources()
 
         const hauler = creepAtPos as Hauler
-        if (creepAtPosMemory[CreepMemoryKeys.remote]) hauler.deliverResources()
+        if (creepAtPosMemory[CreepMemoryKeys.taskRoom]) hauler.runCommuneLogistics()
+        else if (creepAtPosMemory[CreepMemoryKeys.remote]) hauler.deliverResources()
 
         /*
         for (const creep of [this, creepAtPos]) {
@@ -924,7 +934,12 @@ export class Hauler extends Creep {
         )
             return Result.noAction
         if (this.movedResource) return Result.noAction
-        if (!this.nextStore.energy) return Result.noAction
+
+        const creepEnergy = this.store.getUsedCapacity(RESOURCE_ENERGY)
+        // ensure we have energy
+        if (creepEnergy <= 0) return Result.noAction
+        // ensure energy is our only resource
+        if (creepEnergy !== this.store.getUsedCapacity()) return Result.noAction
 
         // Don't relay too close to the source position unless we are fatigued
 

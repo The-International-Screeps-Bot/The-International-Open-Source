@@ -21,6 +21,7 @@ import {
     maxSpawnEnergyCapacity,
     haulerUpdateDefault,
 } from './constants'
+import { customLog } from 'utils/logging'
 
 /**
  * Handles inter room and non-room matters

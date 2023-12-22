@@ -380,6 +380,9 @@ export class RoomManager {
                 weightCoords: {
                     [this.room.name]: weightCoords
                 },
+                weightCoordMapsForRoomName(roomName) {
+                    return roomUtils.diagonalCoords(roomName, commune)
+                },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
                     remoteResourcePathType: RoomMemoryKeys.remoteSourceFastFillerPaths,
@@ -440,6 +443,9 @@ export class RoomManager {
                 plainCost: defaultRoadPlanningPlainCost,
                 weightCoords: {
                     [this.room.name]: weightCoords
+                },
+                weightCoordMapsForRoomName(roomName) {
+                    return roomUtils.diagonalCoords(roomName, commune)
                 },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
@@ -511,6 +517,9 @@ export class RoomManager {
             plainCost: defaultRoadPlanningPlainCost,
             weightCoords: {
                 [this.room.name]: weightCoords
+            },
+            weightCoordMapsForRoomName(roomName) {
+                return roomUtils.diagonalCoords(roomName, commune)
             },
             weightCommuneStructurePlans: true,
             weightRemoteStructurePlans: {
@@ -1148,7 +1157,7 @@ export class RoomManager {
     get myDamagedCreeps() {
         if (this._myDamagedCreeps) return this._myDamagedCreeps
 
-        const myDamagedCreeps = this.room.myCreeps.filter(creep => creep.hits < creep.hitsMax) 
+        const myDamagedCreeps = this.room.myCreeps.filter(creep => creep.hits < creep.hitsMax)
 
         return (this._myDamagedCreeps = myDamagedCreeps)
     }

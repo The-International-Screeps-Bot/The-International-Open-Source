@@ -70,6 +70,7 @@ export class TransactionsManager extends Sleepable {
   }
 
   private processTransactionMySend(transaction: Transaction) {
+    if (!collectiveManager.communes.has(transaction.from)) return
 
     if (transaction.order) {
 
@@ -89,6 +90,7 @@ export class TransactionsManager extends Sleepable {
   }
 
   private processTransactionMyReceive(transaction: Transaction) {
+    if (!collectiveManager.communes.has(transaction.to)) return
 
     if (transaction.order) {
 

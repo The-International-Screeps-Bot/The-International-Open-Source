@@ -2,10 +2,12 @@ import {
     Result,
     RoomMemoryKeys,
     RoomTypes,
+    defaultSwampCost,
     dynamicScoreRoomRange,
     maxControllerLevel,
     preferredCommuneRange,
     remoteRoles,
+    roomDimensions,
     roomTypeProperties,
     roomTypes,
 } from 'international/constants'
@@ -18,6 +20,7 @@ import {
     getRange,
     makeRoomCoord,
     packAsNum,
+    packXYAsNum,
     roomNameFromRoomXY,
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
@@ -218,4 +221,37 @@ export const roomUtils = {
             communeManager.remoteSourceHarvesters[remoteName].push([])
         }
     },
+    diagonalCoords(roomName: string, commune: Room) {
+
+        const anchor = commune.roomManager.anchor
+        if (!anchor) throw Error('no anchor for room: ' + roomName)
+
+        const diagonalCoords = new Uint8Array(2500)
+        const terrain = Game.map.getRoomTerrain(roomName)
+
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue
+
+                // Calculate the position of the cell relative to the anchor
+
+                const relX = x - anchor.x
+                const relY = y - anchor.y
+
+                // Check if the cell is part of a diagonal line
+                if (Math.abs(relX - 3 * relY) % 2 !== 0 && Math.abs(relX + 3 * relY) % 2 !== 0)
+                    continue
+
+                const packedCoord = packXYAsNum(x, y)
+
+                if (terrain.get(x, y) === TERRAIN_MASK_SWAMP) {
+                    diagonalCoords[packedCoord] = 3 * defaultSwampCost
+                    continue
+                }
+                diagonalCoords[packedCoord] = 4
+            }
+        }
+
+        return diagonalCoords
+    }
 }

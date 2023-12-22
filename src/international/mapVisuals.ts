@@ -121,6 +121,16 @@ export class MapVisualsManager {
                     for (const sourceIndex in roomMemory[
                         RoomMemoryKeys.remoteSourceFastFillerPaths
                     ]) {
+
+                        // Get the income based on the reservation of the room and remoteHarvester need
+
+                        const income = Math.min(
+                            roomMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] *
+                                HARVEST_POWER,
+                            roomMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
+                        )
+
+                        if (!roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex]) continue
                         const path = unpackPosList(
                             roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths][sourceIndex],
                         )
@@ -130,14 +140,6 @@ export class MapVisualsManager {
                             strokeWidth: 1.2,
                             opacity: 0.3,
                         })
-
-                        // Get the income based on the reservation of the room and remoteHarvester need
-
-                        const income = Math.min(
-                            roomMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex] *
-                                HARVEST_POWER,
-                            roomMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex],
-                        )
 
                         const pos = path[0]
                         const remoteSourceHarvesters =

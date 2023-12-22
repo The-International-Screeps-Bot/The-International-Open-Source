@@ -152,12 +152,13 @@ Object.defineProperties(Creep.prototype, {
             if (this._upgradeStrength !== undefined) return this._upgradeStrength
 
             this._upgradeStrength = this.parts.work
+            const boosts = this.boosts
 
-            if (this.boosts.XGH2O > 0)
+            if (boosts.XGH2O > 0)
                 return (this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController)
-            else if (this.boosts.GH2O > 0)
+            if (boosts.GH2O > 0)
                 return (this._upgradeStrength *= BOOSTS.upgrade.GH2O.upgradeController)
-            else if (this.boosts.GH > 0)
+            if (boosts.GH > 0)
                 return (this._upgradeStrength *= BOOSTS.upgrade.GH.upgradeController)
 
             return this._upgradeStrength
@@ -215,9 +216,11 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._defenceStrength) return this._defenceStrength
 
-            if (this.boosts.XGHO2 > 0) return (this._defenceStrength = BOOSTS.tough.XGHO2.damage)
-            else if (this.boosts.GHO2 > 0) return (this._defenceStrength = BOOSTS.tough.GHO2.damage)
-            else if (this.boosts.GO > 0) return (this._defenceStrength = BOOSTS.tough.GO.damage)
+            const boosts = this.boosts
+
+            if (boosts.XGHO2 > 0) return (this._defenceStrength = BOOSTS.tough.XGHO2.damage)
+            if (boosts.GHO2 > 0) return (this._defenceStrength = BOOSTS.tough.GHO2.damage)
+            if (boosts.GO > 0) return (this._defenceStrength = BOOSTS.tough.GO.damage)
 
             return 1
         },

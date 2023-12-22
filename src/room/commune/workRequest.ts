@@ -37,19 +37,19 @@ export class WorkRequestManager {
 
     public run() {
         const { room } = this.communeManager
+        const roomMemory = Memory.rooms[room.name]
 
-        const requestName = room.memory[RoomMemoryKeys.workRequest]
+        const requestName = roomMemory[RoomMemoryKeys.workRequest]
         if (!requestName) return
 
         const request = Memory.workRequests[requestName]
-
         // If the workRequest doesn't exist anymore somehow, stop trying to do anything with it
-
         if (!request) {
-            delete room.memory[RoomMemoryKeys.workRequest]
+            delete roomMemory[RoomMemoryKeys.workRequest]
             return
         }
 
+        // if we have no spawn, stop
         if (!room.roomManager.structures.spawn.length) {
             this.stopResponse(true)
             return

@@ -1196,7 +1196,7 @@ export class CommunePlanner {
             if (!closestCoordIndex) {
 
                 // add a position that we won't use to fill the index
-                sourceLinkCoords.push(this.sourceStructureCoords[i][0])
+                sourceLinkCoords.push({ x: 0, y: 0 })
                 continue
             }
 

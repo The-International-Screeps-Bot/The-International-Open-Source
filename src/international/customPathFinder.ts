@@ -63,6 +63,8 @@ export interface CustomPathFinderArgs {
      */
     defaultCostMatrixes?(roomName: string): CostMatrix[]
 
+    weightCoordMapsForRoomName?(roomName: string): Uint8Array
+
     weightCoordMaps?: CoordMap[]
 
     /**
@@ -359,6 +361,24 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             }
 
             if (args.defaultCostMatrix) return costs
+
+            if (args.weightCoordMapsForRoomName) {
+
+                const coordMap = args.weightCoordMapsForRoomName(roomName)
+                if (coordMap) {
+
+                    for (const index in coordMap) {
+                        const packedCoord = parseInt(index)
+
+                        if (coordMap[packedCoord] === 0) continue
+
+                        const coord = unpackNumAsCoord(packedCoord)
+                        if (costs.get(coord.x, coord.y) === 255) continue
+
+                        costs.set(coord.x, coord.y, coordMap[packedCoord])
+                    }
+                }
+            }
 
             // Weight positions
 
