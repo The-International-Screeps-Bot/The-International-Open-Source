@@ -160,11 +160,9 @@ export class RequestsManager extends Sleepable {
                 continue
             }
 
-            // If the requested room is no longer neutral
-
             const type = Memory.rooms[roomName][RoomMemoryKeys.type]
-
-            if (type !== RoomTypes.neutral && type !== RoomTypes.commune) {
+            // if someone else has acquired the room
+            if (type === RoomTypes.ally || type === RoomTypes.enemy || type === RoomTypes.allyRemote || type === RoomTypes.enemyRemote) {
                 // Wait on the request
                 Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
                 continue

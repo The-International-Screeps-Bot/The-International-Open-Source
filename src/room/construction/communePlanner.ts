@@ -3276,6 +3276,10 @@ export class CommunePlanner {
         const plan = planAttempts[this.findBestPlanIndex(planAttempts)] as BasePlanAttempt
         const roomMemory = Memory.rooms[this.room.name]
 
+        roomMemory[RoomMemoryKeys.mineralType] = this.room.roomManager.mineral.mineralType
+
+        // plan values
+
         roomMemory[RoomMemoryKeys.score] = plan.score
         roomMemory[RoomMemoryKeys.basePlans] = plan.basePlans
         roomMemory[RoomMemoryKeys.rampartPlans] = plan.rampartPlans

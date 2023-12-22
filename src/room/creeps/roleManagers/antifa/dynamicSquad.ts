@@ -11,6 +11,13 @@ import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils
 import { Antifa } from './antifa'
 import { CustomPathFinderArgs } from 'international/customPathFinder'
 
+interface MembersByType {
+    melee: Antifa
+    healer: Antifa
+    ranger: Antifa
+    dismantler: Antifa
+}
+
 /**
  * A squad of a semi-dynamic size
  * Accepts at most 1 of each: antifaRangedAttacker, antifaAttacker, antifaHealer, antifaDismantler
@@ -18,6 +25,7 @@ import { CustomPathFinderArgs } from 'international/customPathFinder'
 export class DynamicSquad {
     members: Antifa[] = []
     memberNames: string[] = []
+    membersByType: MembersByType
 
     constructor(memberNames: string[]) {
         for (const memberName of memberNames) {
@@ -38,6 +46,12 @@ export class DynamicSquad {
 
     run() {
 
-        
+        this.membersByType = {
+            melee: this.members[0],
+            healer: this.members[0],
+            ranger: this.members[0],
+            dismantler: this.members[0],
+        }
     }
 }
+

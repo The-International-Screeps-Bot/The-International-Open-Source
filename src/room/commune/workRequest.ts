@@ -56,7 +56,7 @@ export class WorkRequestManager {
         }
 
         const type = Memory.rooms[requestName][RoomMemoryKeys.type]
-        if (type !== RoomTypes.neutral && type !== RoomTypes.commune && type !== RoomTypes.remote) {
+        if (type === RoomTypes.ally || type === RoomTypes.enemy || type === RoomTypes.allyRemote || type === RoomTypes.enemyRemote) {
             // Delete the request so long as the new type isn't ally
 
             this.stopResponse(type !== RoomTypes.ally)

@@ -22,7 +22,7 @@ export interface CreepData {
  * Handles cached data for creeps we own
  */
 export class CreepDataManager {
-  creepsData: {[creepName: string]: CreepData }
+  creepsData: {[creepName: string]: CreepData } = {}
 
   run() {
 

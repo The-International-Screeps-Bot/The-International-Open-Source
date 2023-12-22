@@ -278,7 +278,11 @@ export class FlagManager {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const room = Game.rooms[roomName]
-        if (!room) return
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
 
         const anchor = room.roomManager.anchor
         if (!anchor) {
@@ -326,7 +330,11 @@ export class FlagManager {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const room = Game.rooms[roomName]
-        if (!room) return
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
 
         const terrain = Game.map.getRoomTerrain(room.name)
         roomUtils.floodFillFor(
@@ -365,7 +373,11 @@ export class FlagManager {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const room = Game.rooms[roomName]
-        if (!room) return
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
 
         const roomMemory = Memory.rooms[room.name]
 
@@ -391,7 +403,11 @@ export class FlagManager {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const room = Game.rooms[roomName]
-        if (!room) return
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
 
         const roomMemory = Memory.rooms[room.name]
 
@@ -415,6 +431,14 @@ export class FlagManager {
             if (!link) continue
             room.visual.text(sourceIndex.toString(), link.pos)
         }
+    }
+
+    private calculateDynamicScore(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+
+        const dynamicScore = roomUtils.findDynamicScore(roomName)
+        customLog('dynamic score for ' + roomName, dynamicScore)
     }
 }
 

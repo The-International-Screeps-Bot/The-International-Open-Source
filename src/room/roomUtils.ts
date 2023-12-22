@@ -25,6 +25,7 @@ import {
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
+import { customLog } from 'utils/logging'
 
 /**
  * considers a position being flooded
@@ -114,6 +115,8 @@ export const roomUtils = {
 
         roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
         roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
+
+        return dynamicScore
     },
     floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
         const visitedCoords = new Uint8Array(2500)
