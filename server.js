@@ -27,10 +27,10 @@ const ports = getPorts()
 const options = { stdio: 'inherit' }
 const botPath = join(__dirname, 'dist')
 console.log('START')
-execSync(
-    `npx screeps-grafana-go_carbon setup && npx screeps-grafana-go_carbon --grafanaPort=${ports.grafanaPort} --relayPort=${ports.relayPort} --force ${argv.debug ? '--debug' : ''} --deleteLogs --deleteWhisper`,
-    options,
-)
+// execSync(
+//     `npx screeps-grafana-go_carbon setup && npx screeps-grafana-go_carbon --grafanaPort=${ports.grafanaPort} --relayPort=${ports.relayPort} --force ${argv.debug ? '--debug' : ''} --deleteLogs --deleteWhisper`,
+//     options,
+// )
 execSync('npm run build', options)
 execSync(
     `npx screeps-performance-server --maxTickCount=${argv.maxTicks || 20000} --maxBots=10 --botFilePath=${botPath} --steamKey=${
@@ -40,5 +40,5 @@ execSync(
     } --deleteLogs --tickDuration=${argv.tickDuration || 250} --logFilter='Error:'`,
     options,
 )
-if (argv.stopGrafana) execSync('npx screeps-grafana stop')
+// if (argv.stopGrafana) execSync('npx screeps-grafana stop')
 console.log('END')
