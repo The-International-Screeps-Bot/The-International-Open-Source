@@ -35,6 +35,7 @@ console.log('START')
 // )
 
 function customCopyFile(src, dest, searchText, replaceText) {
+    if (fs.existsSync(dest)) return;
     const text = fs.readFileSync(src, 'utf8')
 
     const regex = new RegExp(searchText, 'g')
@@ -48,7 +49,7 @@ execSync('npm run build', options)
 
 const cmdString = `npx screeps-performance-server --maxTickCount=${argv.maxTicks || 20000} --maxBots=10 --botFilePath=${botPath} --steamKey=${
     process.env.STEAM_KEY
-} --exportUrl=${process.env.EXPORT_API_URL} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force ${
+} --discordWebHookUrl=${process.env.EXPORT_DISCORD_WEBHOOK_URL} --pasteBinUrlDevKey=${process.env.EXPORT_PASTEBIN_KEY} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force ${
     argv.debug ? '--debug' : ''
 } --deleteLogs --tickDuration=${argv.tickDuration || 250} --logFilter='Error:'`;
 execSync(
