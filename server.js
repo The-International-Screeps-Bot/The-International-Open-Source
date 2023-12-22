@@ -35,6 +35,7 @@ console.log('START')
 // )
 
 function customCopyFile(src, dest, searchText, replaceText) {
+    if (fs.existsSync(dest)) return;
     const text = fs.readFileSync(src, 'utf8')
 
     const regex = new RegExp(searchText, 'g')
