@@ -35,4 +35,9 @@ export class DynamicSquad {
             combatRequest[CombatRequestKeys.dynamicSquads] += 1
         }
     }
+
+    run() {
+
+        
+    }
 }
