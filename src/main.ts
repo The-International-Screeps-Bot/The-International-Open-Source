@@ -51,6 +51,7 @@ import { requestsManager } from 'international/requests'
 import { marketManager } from 'international/marketOrders'
 import { transactionsManager } from 'international/transactions'
 import { segmentsManager } from 'international/segments'
+import { creepDataManager } from 'room/creeps/creepData'
 
 export function originalLoop() {
 
@@ -84,6 +85,7 @@ export function originalLoop() {
         playerManager.run()
         roomsManager.initRun()
         creepOrganizer.run()
+        creepDataManager.run()
         powerCreepOrganizer.run()
 
         roomPruningManager.run()
