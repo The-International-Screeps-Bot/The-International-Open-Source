@@ -414,7 +414,9 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
             // The pather is a creep, it isn't in a quad, and it hasn't already weighted roads
 
             if (args.creep) {
-                const creepMemory = Memory.creeps[args.creep.name]
+
+                const creepMemory = Memory.creeps[args.creep.name] || Memory.powerCreeps[args.creep.name]
+
                 if (
                     (!creepMemory[CreepMemoryKeys.squadMembers] ||
                         creepMemory[CreepMemoryKeys.squadMembers].length < 3) &&

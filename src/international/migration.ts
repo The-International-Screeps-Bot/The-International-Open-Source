@@ -20,6 +20,10 @@ export class MigrationManager {
             Memory.nukeRequests = {}
             Memory.breakingVersion += 1
         }
+        if (Memory.breakingVersion === 118) {
+            Memory.players = {}
+            Memory.breakingVersion += 2
+        }
 
         if (Memory.breakingVersion < global.settings.breakingVersion) {
             global.killCreeps()
