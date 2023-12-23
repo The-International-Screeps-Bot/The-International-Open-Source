@@ -313,7 +313,7 @@ export class FlagManager {
             if (!enemyCreepID) return true
 
             const enemyCreep = findObjectWithID(enemyCreepID)
-            if (isAlly(enemyCreep.name)) return true
+            if (isAlly(enemyCreep.owner.username)) return true
             // If it can deal damage, safemode
             if (
                 enemyCreep.combatStrength.ranged > 0 ||
@@ -359,7 +359,7 @@ export class FlagManager {
                 if (!enemyCreepID) return true
 
                 const enemyCreep = findObjectWithID(enemyCreepID)
-                if (isAlly(enemyCreep.name)) return true
+                if (isAlly(enemyCreep.owner.username)) return true
                 // We only need to protect our controller from claim creeps
                 if (!enemyCreep.parts.claim) return true
 
