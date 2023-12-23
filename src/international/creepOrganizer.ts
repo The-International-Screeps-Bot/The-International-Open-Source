@@ -1,36 +1,29 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
-import { customLog } from './utils'
-import { internationalManager, InternationalManager } from './international'
+import { customLog } from 'utils/logging'
+import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
-import { globalStatsUpdater } from './statsManager'
+import { statsManager } from './statsManager'
+import { creepUtils } from 'room/creeps/creepUtils'
+import { creepDataManager } from 'room/creeps/creepData'
 
-class CreepOrganizer {
+export class CreepOrganizer {
     constructor() {}
 
     public run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
         // Loop through all of my creeps
 
         for (const creepName in Memory.creeps) {
-            this.processCreep(creepName)
+            this.organizeCreep(creepName)
         }
 
-        if (Memory.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Creep Organizer', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: InternationalStatNames = 'cocu'
-            globalStatsUpdater('', statName, cpuUsed, true)
+        // Initial run after all creeps have been updated
+        for (const creepName in Game.creeps) {
+            Game.creeps[creepName].initRun()
         }
     }
+    private organizeCreep(creepName: string) {
 
-    private processCreep(creepName: string) {
         let creep = Game.creeps[creepName]
 
         // If creep doesn't exist
@@ -41,6 +34,8 @@ class CreepOrganizer {
             delete Memory.creeps[creepName]
             return
         }
+
+        collectiveManager.creepCount += 1
 
         // Get the creep's role
 
@@ -56,10 +51,10 @@ class CreepOrganizer {
 
         // Organize creep in its room by its role
 
-        creep.room.myCreeps[role].push(creepName)
-        creep.room.myCreepsAmount += 1
+        creep.room.myCreeps.push(creep)
+        creep.room.myCreepsByRole[role].push(creepName)
 
-        internationalManager.customCreepIDs[creep.customID] = true
+        collectiveManager.customCreepIDs[creep.customID] = true
 
         // Add the creep's name to the position in its room
 
@@ -77,11 +72,14 @@ class CreepOrganizer {
             return
         }
 
-        creep.preTickManager()
+        // initialize inter-tick data for the creep if it isn't already
+        creepDataManager.creepsData[creep.name] ??= {}
 
-        // If the creep isn't dying, organize by its roomFrom and role
+        creep.update()
 
-        if (!creep.dying) commune.creepsFromRoom[role].push(creepName)
+        // If the creep isn't isDying, organize by its roomFrom and role
+
+        if (!creep.isDying()) commune.creepsFromRoom[role].push(creepName)
         commune.creepsFromRoomAmount += 1
     }
 }

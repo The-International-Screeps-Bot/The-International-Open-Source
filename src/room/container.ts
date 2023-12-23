@@ -1,5 +1,6 @@
-import { controllerDowngradeUpgraderNeed, customColors } from 'international/constants'
-import { customLog, scalePriority } from 'international/utils'
+import { RoomLogisticsRequestTypes, customColors } from 'international/constants'
+import { customLog } from 'utils/logging'
+import { scalePriority } from 'utils/utils'
 import { RoomManager } from './room'
 
 export class ContainerManager {
@@ -14,7 +15,6 @@ export class ContainerManager {
     }
 
     runCommune() {
-
         this.runSourceContainers()
         this.runFastFillerContainers()
         this.runControllerContainer()
@@ -22,75 +22,99 @@ export class ContainerManager {
     }
 
     private runFastFillerContainers() {
-        if (!this.roomManager.room.myCreeps.fastFiller.length) return
+        if (!this.roomManager.room.myCreepsByRole.fastFiller.length) return
 
-        const fastFillerContainers = [
-            this.roomManager.room.fastFillerContainerLeft,
-            this.roomManager.room.fastFillerContainerRight,
-        ]
+        const fastFillerContainers = this.roomManager.fastFillerContainers
 
         for (const container of fastFillerContainers) {
-            if (!container) continue
-            if (container.reserveStore.energy > container.store.getCapacity() * 0.8) continue
+            if (container.reserveStore.energy > container.store.getCapacity() * 0.9) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                type: 'transfer',
+                type: RoomLogisticsRequestTypes.transfer,
                 onlyFull: true,
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20),
+                priority: scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore.energy,
+                    20,
+                ),
             })
 
-            if (container.reserveStore.energy < container.store.getCapacity() * 0.6) continue
+            if (container.reserveStore.energy < container.store.getCapacity() * 0.5) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
                 maxAmount: container.reserveStore.energy * 0.5,
                 onlyFull: true,
-                type: 'offer',
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 10, true),
+                type: RoomLogisticsRequestTypes.offer,
+                priority: scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore.energy,
+                    10,
+                    true,
+                ),
             })
         }
     }
 
     private runSourceContainers() {
-        for (const container of this.roomManager.room.sourceContainers) {
+        for (const container of this.roomManager.sourceContainers) {
+            if (!container) continue
+
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 onlyFull: true,
-                priority: scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20, true),
+                priority: scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore.energy,
+                    20,
+                    true,
+                ),
             })
         }
     }
 
     private runControllerContainer() {
-        const container = this.roomManager.room.controllerContainer
+        const container = this.roomManager.controllerContainer
         if (!container) return
 
-        if (container.usedReserveStore > container.store.getCapacity() * 0.75) return
+        if (container.usedReserveStore > container.store.getCapacity() * 0.9) return
 
-        let priority = this.roomManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed ? 0 : 50
+        let priority =
+            this.roomManager.room.controller.ticksToDowngrade <
+            this.roomManager.room.communeManager.controllerDowngradeUpgradeThreshold
+                ? 0
+                : 50
         priority += scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20)
 
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
-            type: 'transfer',
+            type: RoomLogisticsRequestTypes.transfer,
+            onlyFull: true,
             priority,
         })
     }
 
     private runMineralContainer() {
-        const container = this.roomManager.room.mineralContainer
+        const container = this.roomManager.mineralContainer
         if (!container) return
 
-        const resourceType = this.roomManager.room.mineral.mineralType
+        const resourceType = this.roomManager.mineral.mineralType
 
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             resourceType,
-            type: 'withdraw',
+            type: RoomLogisticsRequestTypes.withdraw,
             onlyFull: true,
-            priority: 20 + scalePriority(container.store.getCapacity(), container.reserveStore[resourceType], 20, true),
+            priority:
+                20 +
+                scalePriority(
+                    container.store.getCapacity(),
+                    container.reserveStore[resourceType],
+                    20,
+                    true,
+                ),
         })
     }
 }

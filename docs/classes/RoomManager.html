@@ -1,0 +1,2593 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>the-international-screeps-bot documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	   <link rel="stylesheet" href="../styles/style.css">
+        <link rel="stylesheet" href="../styles/dark.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top d-block d-sm-none">
+            <a href="../" class="navbar-brand">the-international-screeps-bot documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content class">
+                   <div class="content-data">
+
+
+
+
+
+
+
+
+
+
+
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Classes</li>
+  <li class="breadcrumb-item" >RoomManager</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a href="#info" 
+                class="nav-link"
+                class="nav-link active"
+                role="tab" id="info-tab" data-bs-toggle="tab" data-link="info">Info</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="info">
+        <p class="comment">
+            <h3>File</h3>
+        </p>
+        <p class="comment">
+            <code>src/room/room.ts</code>
+        </p>
+
+
+
+
+
+
+            <section data-compodoc="block-index">
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#_anchor" >_anchor</a>
+                            </li>
+                            <li>
+                                <a href="#_centerUpgradePos" >_centerUpgradePos</a>
+                            </li>
+                            <li>
+                                <a href="#_communeSourceHarvestPositions" >_communeSourceHarvestPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_communeSourcePaths" >_communeSourcePaths</a>
+                            </li>
+                            <li>
+                                <a href="#_communeSources" >_communeSources</a>
+                            </li>
+                            <li>
+                                <a href="#_cSiteCoords" >_cSiteCoords</a>
+                            </li>
+                            <li>
+                                <a href="#_cSites" >_cSites</a>
+                            </li>
+                            <li>
+                                <a href="#_deadCreepNames" >_deadCreepNames</a>
+                            </li>
+                            <li>
+                                <a href="#_enemyCreepPositions" >_enemyCreepPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_enemySquadData" >_enemySquadData</a>
+                            </li>
+                            <li>
+                                <a href="#_events" >_events</a>
+                            </li>
+                            <li>
+                                <a href="#_generalRepairStructures" >_generalRepairStructures</a>
+                            </li>
+                            <li>
+                                <a href="#_mineral" >_mineral</a>
+                            </li>
+                            <li>
+                                <a href="#_mineralHarvestPositions" >_mineralHarvestPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_nukeTargetCoords" >_nukeTargetCoords</a>
+                            </li>
+                            <li>
+                                <a href="#_remoteControllerPath" >_remoteControllerPath</a>
+                            </li>
+                            <li>
+                                <a href="#_remoteControllerPositions" >_remoteControllerPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_remoteSourceHarvestPositions" >_remoteSourceHarvestPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_remoteSourcePaths" >_remoteSourcePaths</a>
+                            </li>
+                            <li>
+                                <a href="#_remoteSources" >_remoteSources</a>
+                            </li>
+                            <li>
+                                <a href="#_sourceHarvestPositions" >_sourceHarvestPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_stampAnchors" >_stampAnchors</a>
+                            </li>
+                            <li>
+                                <a href="#_structureCoords" >_structureCoords</a>
+                            </li>
+                            <li>
+                                <a href="#_structures" >_structures</a>
+                            </li>
+                            <li>
+                                <a href="#_upgradePositions" >_upgradePositions</a>
+                            </li>
+                            <li>
+                                <a href="#_usedControllerCoords" >_usedControllerCoords</a>
+                            </li>
+                            <li>
+                                <a href="#_usedPositions" >_usedPositions</a>
+                            </li>
+                            <li>
+                                <a href="#_usedStationaryCoords" >_usedStationaryCoords</a>
+                            </li>
+                            <li>
+                                <a href="#allStructureIDs" >allStructureIDs</a>
+                            </li>
+                            <li>
+                                <a href="#checkedCSiteUpdate" >checkedCSiteUpdate</a>
+                            </li>
+                            <li>
+                                <a href="#checkedStructureUpdate" >checkedStructureUpdate</a>
+                            </li>
+                            <li>
+                                <a href="#communePlanner" >communePlanner</a>
+                            </li>
+                            <li>
+                                <a href="#containerManager" >containerManager</a>
+                            </li>
+                            <li>
+                                <a href="#creepRoleManager" >creepRoleManager</a>
+                            </li>
+                            <li>
+                                <a href="#cSiteIDs" >cSiteIDs</a>
+                            </li>
+                            <li>
+                                <a href="#droppedResourceManager" >droppedResourceManager</a>
+                            </li>
+                            <li>
+                                <a href="#endTickCreepManager" >endTickCreepManager</a>
+                            </li>
+                            <li>
+                                <a href="#powerCreepRoleManager" >powerCreepRoleManager</a>
+                            </li>
+                            <li>
+                                <a href="#recurseMoveRequestOrder" >recurseMoveRequestOrder</a>
+                            </li>
+                            <li>
+                                <a href="#room" >room</a>
+                            </li>
+                            <li>
+                                <a href="#roomVisualsManager" >roomVisualsManager</a>
+                            </li>
+                            <li>
+                                <a href="#ruinManager" >ruinManager</a>
+                            </li>
+                            <li>
+                                <a href="#runMoveRequestOrder" >runMoveRequestOrder</a>
+                            </li>
+                            <li>
+                                <a href="#tombstoneManager" >tombstoneManager</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#findRemoteControllerPath" >findRemoteControllerPath</a>
+                            </li>
+                            <li>
+                                <a href="#findRemoteControllerPositions" >findRemoteControllerPositions</a>
+                            </li>
+                            <li>
+                                <a href="#findRemoteSourceFastFillerPaths" >findRemoteSourceFastFillerPaths</a>
+                            </li>
+                            <li>
+                                <a href="#findRemoteSourceHarvestPositions" >findRemoteSourceHarvestPositions</a>
+                            </li>
+                            <li>
+                                <a href="#findRemoteSourceHubPaths" >findRemoteSourceHubPaths</a>
+                            </li>
+                            <li>
+                                <a href="#findRemoteSources" >findRemoteSources</a>
+                            </li>
+                            <li>
+                                <a href="#isStartRoom" >isStartRoom</a>
+                            </li>
+                            <li>
+                                <a href="#preTickRun" >preTickRun</a>
+                            </li>
+                            <li>
+                                <a href="#run" >run</a>
+                            </li>
+                            <li>
+                                <a href="#update" >update</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <h6><b>Accessors</b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <ul class="index-list">
+                                <li>
+                                    <a href="#anchor" >anchor</a>
+                                </li>
+                                <li>
+                                    <a href="#mineral" >mineral</a>
+                                </li>
+                                <li>
+                                    <a href="#nukeTargetCoords" >nukeTargetCoords</a>
+                                </li>
+                                <li>
+                                    <a href="#stampAnchors" >stampAnchors</a>
+                                </li>
+                                <li>
+                                    <a href="#communeSources" >communeSources</a>
+                                </li>
+                                <li>
+                                    <a href="#remoteSources" >remoteSources</a>
+                                </li>
+                                <li>
+                                    <a href="#sourceHarvestPositions" >sourceHarvestPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#communeSourceHarvestPositions" >communeSourceHarvestPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#remoteSourceHarvestPositions" >remoteSourceHarvestPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#communeSourcePaths" >communeSourcePaths</a>
+                                </li>
+                                <li>
+                                    <a href="#remoteSourcePaths" >remoteSourcePaths</a>
+                                </li>
+                                <li>
+                                    <a href="#centerUpgradePos" >centerUpgradePos</a>
+                                </li>
+                                <li>
+                                    <a href="#upgradePositions" >upgradePositions</a>
+                                </li>
+                                <li>
+                                    <a href="#mineralHarvestPositions" >mineralHarvestPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#generalRepairStructures" >generalRepairStructures</a>
+                                </li>
+                                <li>
+                                    <a href="#remoteControllerPositions" >remoteControllerPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#usedControllerCoords" >usedControllerCoords</a>
+                                </li>
+                                <li>
+                                    <a href="#remoteControllerPath" >remoteControllerPath</a>
+                                </li>
+                                <li>
+                                    <a href="#usedPositions" >usedPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#cSiteTarget" >cSiteTarget</a>
+                                </li>
+                                <li>
+                                    <a href="#usedStationaryCoords" >usedStationaryCoords</a>
+                                </li>
+                                <li>
+                                    <a href="#structureUpdate" >structureUpdate</a>
+                                </li>
+                                <li>
+                                    <a href="#structureCoords" >structureCoords</a>
+                                </li>
+                                <li>
+                                    <a href="#structures" >structures</a>
+                                </li>
+                                <li>
+                                    <a href="#cSiteUpdate" >cSiteUpdate</a>
+                                </li>
+                                <li>
+                                    <a href="#cSiteCoords" >cSiteCoords</a>
+                                </li>
+                                <li>
+                                    <a href="#cSites" >cSites</a>
+                                </li>
+                                <li>
+                                    <a href="#enemyCreepPositions" >enemyCreepPositions</a>
+                                </li>
+                                <li>
+                                    <a href="#enemySquadData" >enemySquadData</a>
+                                </li>
+                                <li>
+                                    <a href="#events" >events</a>
+                                </li>
+                                <li>
+                                    <a href="#deadCreepNames" >deadCreepNames</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+        </tbody>
+    </table>
+</section>
+
+            <section data-compodoc="block-constructor">
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor()</code>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+</section>
+
+            <section data-compodoc="block-properties">
+    
+    <h3 id="inputs">
+        Properties
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_anchor"></a>
+                    <span class="name">
+                        <span ><b>_anchor</b></span>
+                        <a href="#_anchor"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_centerUpgradePos"></a>
+                    <span class="name">
+                        <span ><b>_centerUpgradePos</b></span>
+                        <a href="#_centerUpgradePos"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_communeSourceHarvestPositions"></a>
+                    <span class="name">
+                        <span ><b>_communeSourceHarvestPositions</b></span>
+                        <a href="#_communeSourceHarvestPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[][]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_communeSourcePaths"></a>
+                    <span class="name">
+                        <span ><b>_communeSourcePaths</b></span>
+                        <a href="#_communeSourcePaths"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[][]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_communeSources"></a>
+                    <span class="name">
+                        <span ><b>_communeSources</b></span>
+                        <a href="#_communeSources"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Source[]</code>
+
+                    </td>
+                </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Sources sorted by optimal commune utilization</p>
+</div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_cSiteCoords"></a>
+                    <span class="name">
+                        <span ><b>_cSiteCoords</b></span>
+                        <a href="#_cSiteCoords"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Map&lt;string | Id[]&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_cSites"></a>
+                    <span class="name">
+                        <span ><b>_cSites</b></span>
+                        <a href="#_cSites"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Partial&lt;Record&lt;StructureConstant, ConstructionSite[]&gt;&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_deadCreepNames"></a>
+                    <span class="name">
+                        <span ><b>_deadCreepNames</b></span>
+                        <a href="#_deadCreepNames"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../interfaces/DeadCreepNames.html" target="_self" >DeadCreepNames</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_enemyCreepPositions"></a>
+                    <span class="name">
+                        <span ><b>_enemyCreepPositions</b></span>
+                        <a href="#_enemyCreepPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>literal type</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_enemySquadData"></a>
+                    <span class="name">
+                        <span ><b>_enemySquadData</b></span>
+                        <a href="#_enemySquadData"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>EnemySquadData</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_events"></a>
+                    <span class="name">
+                        <span ><b>_events</b></span>
+                        <a href="#_events"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>literal type</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_generalRepairStructures"></a>
+                    <span class="name">
+                        <span ><b>_generalRepairStructures</b></span>
+                        <a href="#_generalRepairStructures"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>(StructureContainer | StructureRoad)[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_mineral"></a>
+                    <span class="name">
+                        <span ><b>_mineral</b></span>
+                        <a href="#_mineral"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Mineral</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_mineralHarvestPositions"></a>
+                    <span class="name">
+                        <span ><b>_mineralHarvestPositions</b></span>
+                        <a href="#_mineralHarvestPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_nukeTargetCoords"></a>
+                    <span class="name">
+                        <span ><b>_nukeTargetCoords</b></span>
+                        <a href="#_nukeTargetCoords"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Uint8Array</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_remoteControllerPath"></a>
+                    <span class="name">
+                        <span ><b>_remoteControllerPath</b></span>
+                        <a href="#_remoteControllerPath"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_remoteControllerPositions"></a>
+                    <span class="name">
+                        <span ><b>_remoteControllerPositions</b></span>
+                        <a href="#_remoteControllerPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_remoteSourceHarvestPositions"></a>
+                    <span class="name">
+                        <span ><b>_remoteSourceHarvestPositions</b></span>
+                        <a href="#_remoteSourceHarvestPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[][]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_remoteSourcePaths"></a>
+                    <span class="name">
+                        <span ><b>_remoteSourcePaths</b></span>
+                        <a href="#_remoteSourcePaths"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[][]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_remoteSources"></a>
+                    <span class="name">
+                        <span ><b>_remoteSources</b></span>
+                        <a href="#_remoteSources"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Source[]</code>
+
+                    </td>
+                </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Sources sorted for optimal remotes utilization</p>
+</div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_sourceHarvestPositions"></a>
+                    <span class="name">
+                        <span ><b>_sourceHarvestPositions</b></span>
+                        <a href="#_sourceHarvestPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[][]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_stampAnchors"></a>
+                    <span class="name">
+                        <span ><b>_stampAnchors</b></span>
+                        <a href="#_stampAnchors"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>StampAnchors</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_structureCoords"></a>
+                    <span class="name">
+                        <span ><b>_structureCoords</b></span>
+                        <a href="#_structureCoords"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Map&lt;string | Id[]&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_structures"></a>
+                    <span class="name">
+                        <span ><b>_structures</b></span>
+                        <a href="#_structures"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Partial&lt;OrganizedStructures&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_upgradePositions"></a>
+                    <span class="name">
+                        <span ><b>_upgradePositions</b></span>
+                        <a href="#_upgradePositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>RoomPosition[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_usedControllerCoords"></a>
+                    <span class="name">
+                        <span ><b>_usedControllerCoords</b></span>
+                        <a href="#_usedControllerCoords"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Set&lt;string&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_usedPositions"></a>
+                    <span class="name">
+                        <span ><b>_usedPositions</b></span>
+                        <a href="#_usedPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Set&lt;string&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="_usedStationaryCoords"></a>
+                    <span class="name">
+                        <span ><b>_usedStationaryCoords</b></span>
+                        <a href="#_usedStationaryCoords"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Set&lt;string&gt;</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="allStructureIDs"></a>
+                    <span class="name">
+                        <span ><b>allStructureIDs</b></span>
+                        <a href="#allStructureIDs"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Id&lt;Structure&lt;StructureConstant&gt;&gt;[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="checkedCSiteUpdate"></a>
+                    <span class="name">
+                        <span ><b>checkedCSiteUpdate</b></span>
+                        <a href="#checkedCSiteUpdate"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="checkedStructureUpdate"></a>
+                    <span class="name">
+                        <span ><b>checkedStructureUpdate</b></span>
+                        <a href="#checkedStructureUpdate"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="communePlanner"></a>
+                    <span class="name">
+                        <span ><b>communePlanner</b></span>
+                        <a href="#communePlanner"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/CommunePlanner.html" target="_self" >CommunePlanner</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="containerManager"></a>
+                    <span class="name">
+                        <span ><b>containerManager</b></span>
+                        <a href="#containerManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/ContainerManager.html" target="_self" >ContainerManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="creepRoleManager"></a>
+                    <span class="name">
+                        <span ><b>creepRoleManager</b></span>
+                        <a href="#creepRoleManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/CreepRoleManager.html" target="_self" >CreepRoleManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="cSiteIDs"></a>
+                    <span class="name">
+                        <span ><b>cSiteIDs</b></span>
+                        <a href="#cSiteIDs"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Id&lt;ConstructionSite&lt;BuildableStructureConstant&gt;&gt;[]</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="droppedResourceManager"></a>
+                    <span class="name">
+                        <span ><b>droppedResourceManager</b></span>
+                        <a href="#droppedResourceManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/DroppedResourceManager.html" target="_self" >DroppedResourceManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="endTickCreepManager"></a>
+                    <span class="name">
+                        <span ><b>endTickCreepManager</b></span>
+                        <a href="#endTickCreepManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/EndTickCreepManager.html" target="_self" >EndTickCreepManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="powerCreepRoleManager"></a>
+                    <span class="name">
+                        <span ><b>powerCreepRoleManager</b></span>
+                        <a href="#powerCreepRoleManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/PowerCreepRoleManager.html" target="_self" >PowerCreepRoleManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="recurseMoveRequestOrder"></a>
+                    <span class="name">
+                        <span ><b>recurseMoveRequestOrder</b></span>
+                        <a href="#recurseMoveRequestOrder"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>0</code>
+                    </td>
+                </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Incremental order of recursive move request attempts</p>
+</div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="room"></a>
+                    <span class="name">
+                        <span ><b>room</b></span>
+                        <a href="#room"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>    <code>Room</code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="roomVisualsManager"></a>
+                    <span class="name">
+                        <span ><b>roomVisualsManager</b></span>
+                        <a href="#roomVisualsManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/RoomVisualsManager.html" target="_self" >RoomVisualsManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ruinManager"></a>
+                    <span class="name">
+                        <span ><b>ruinManager</b></span>
+                        <a href="#ruinManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/RuinManager.html" target="_self" >RuinManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="runMoveRequestOrder"></a>
+                    <span class="name">
+                        <span ><b>runMoveRequestOrder</b></span>
+                        <a href="#runMoveRequestOrder"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Default value : </i><code>0</code>
+                    </td>
+                </tr>
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-description"><p>Incremental order of move request runs</p>
+</div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="tombstoneManager"></a>
+                    <span class="name">
+                        <span ><b>tombstoneManager</b></span>
+                        <a href="#tombstoneManager"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="../classes/TombstoneManager.html" target="_self" >TombstoneManager</a></code>
+
+                    </td>
+                </tr>
+
+
+        </tbody>
+    </table>
+</section>
+
+            <section data-compodoc="block-methods">
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findRemoteControllerPath"></a>
+                    <span class="name">
+                        <span ><b>findRemoteControllerPath</b></span>
+                        <a href="#findRemoteControllerPath"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>findRemoteControllerPath(commune: Room, packedRemoteControllerPositions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, pathsThrough: Set<string>)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>commune</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>packedRemoteControllerPositions</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>pathsThrough</td>
+                                    <td>
+                                            <code>Set&lt;string&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findRemoteControllerPositions"></a>
+                    <span class="name">
+                        <span ><b>findRemoteControllerPositions</b></span>
+                        <a href="#findRemoteControllerPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>findRemoteControllerPositions(commune: Room)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>commune</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findRemoteSourceFastFillerPaths"></a>
+                    <span class="name">
+                        <span ><b>findRemoteSourceFastFillerPaths</b></span>
+                        <a href="#findRemoteSourceFastFillerPaths"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>findRemoteSourceFastFillerPaths(commune: Room, packedRemoteSourceHarvestPositions: string[], pathsThrough: Set<string>)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>commune</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>packedRemoteSourceHarvestPositions</td>
+                                    <td>
+                                            <code>string[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>pathsThrough</td>
+                                    <td>
+                                            <code>Set&lt;string&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findRemoteSourceHarvestPositions"></a>
+                    <span class="name">
+                        <span ><b>findRemoteSourceHarvestPositions</b></span>
+                        <a href="#findRemoteSourceHarvestPositions"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>findRemoteSourceHarvestPositions(commune: Room, packedRemoteSources: Id<Source>[])</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>commune</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>packedRemoteSources</td>
+                                    <td>
+                                            <code>Id&lt;Source&gt;[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findRemoteSourceHubPaths"></a>
+                    <span class="name">
+                        <span ><b>findRemoteSourceHubPaths</b></span>
+                        <a href="#findRemoteSourceHubPaths"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>findRemoteSourceHubPaths(commune: Room, packedRemoteSourceHarvestPositions: string[], pathsThrough: Set<string>)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>commune</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>packedRemoteSourceHarvestPositions</td>
+                                    <td>
+                                            <code>string[]</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>pathsThrough</td>
+                                    <td>
+                                            <code>Set&lt;string&gt;</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="findRemoteSources"></a>
+                    <span class="name">
+                        <span ><b>findRemoteSources</b></span>
+                        <a href="#findRemoteSources"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>findRemoteSources(commune: Room)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>commune</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="isStartRoom"></a>
+                    <span class="name">
+                        <span ><b>isStartRoom</b></span>
+                        <a href="#isStartRoom"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>isStartRoom()</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="preTickRun"></a>
+                    <span class="name">
+                        <span ><b>preTickRun</b></span>
+                        <a href="#preTickRun"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>preTickRun()</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="run"></a>
+                    <span class="name">
+                        <span ><b>run</b></span>
+                        <a href="#run"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>run()</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="update"></a>
+                    <span class="name">
+                        <span ><b>update</b></span>
+                        <a href="#update"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>update(room: Room)</code>
+                </td>
+            </tr>
+
+
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>room</td>
+                                    <td>
+                                            <code>Room</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+
+
+
+
+            <section data-compodoc="block-accessors">
+    <h3 id="accessors">
+        Accessors
+    </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="anchor"></a>
+                        <span class="name"><b>anchor</b><a href="#anchor"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>anchor()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="mineral"></a>
+                        <span class="name"><b>mineral</b><a href="#mineral"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>mineral()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="nukeTargetCoords"></a>
+                        <span class="name"><b>nukeTargetCoords</b><a href="#nukeTargetCoords"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>nukeTargetCoords()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="stampAnchors"></a>
+                        <span class="name"><b>stampAnchors</b><a href="#stampAnchors"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>stampAnchors()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="communeSources"></a>
+                        <span class="name"><b>communeSources</b><a href="#communeSources"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>communeSources()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="remoteSources"></a>
+                        <span class="name"><b>remoteSources</b><a href="#remoteSources"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>remoteSources()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="sourceHarvestPositions"></a>
+                        <span class="name"><b>sourceHarvestPositions</b><a href="#sourceHarvestPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>sourceHarvestPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="communeSourceHarvestPositions"></a>
+                        <span class="name"><b>communeSourceHarvestPositions</b><a href="#communeSourceHarvestPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>communeSourceHarvestPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="remoteSourceHarvestPositions"></a>
+                        <span class="name"><b>remoteSourceHarvestPositions</b><a href="#remoteSourceHarvestPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>remoteSourceHarvestPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="communeSourcePaths"></a>
+                        <span class="name"><b>communeSourcePaths</b><a href="#communeSourcePaths"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>communeSourcePaths()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="remoteSourcePaths"></a>
+                        <span class="name"><b>remoteSourcePaths</b><a href="#remoteSourcePaths"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>remoteSourcePaths()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="centerUpgradePos"></a>
+                        <span class="name"><b>centerUpgradePos</b><a href="#centerUpgradePos"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>centerUpgradePos()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="upgradePositions"></a>
+                        <span class="name"><b>upgradePositions</b><a href="#upgradePositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>upgradePositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="mineralHarvestPositions"></a>
+                        <span class="name"><b>mineralHarvestPositions</b><a href="#mineralHarvestPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>mineralHarvestPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="generalRepairStructures"></a>
+                        <span class="name"><b>generalRepairStructures</b><a href="#generalRepairStructures"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>generalRepairStructures()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="remoteControllerPositions"></a>
+                        <span class="name"><b>remoteControllerPositions</b><a href="#remoteControllerPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>remoteControllerPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="usedControllerCoords"></a>
+                        <span class="name"><b>usedControllerCoords</b><a href="#usedControllerCoords"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>usedControllerCoords()</code></span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-description"><p>Positions around the controller used for reserving, claiming, and downgrading</p>
+</div>
+
+                        </td>
+                    </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="remoteControllerPath"></a>
+                        <span class="name"><b>remoteControllerPath</b><a href="#remoteControllerPath"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>remoteControllerPath()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="usedPositions"></a>
+                        <span class="name"><b>usedPositions</b><a href="#usedPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>usedPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="cSiteTarget"></a>
+                        <span class="name"><b>cSiteTarget</b><a href="#cSiteTarget"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>cSiteTarget()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="usedStationaryCoords"></a>
+                        <span class="name"><b>usedStationaryCoords</b><a href="#usedStationaryCoords"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>usedStationaryCoords()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="structureUpdate"></a>
+                        <span class="name"><b>structureUpdate</b><a href="#structureUpdate"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>structureUpdate()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="structureCoords"></a>
+                        <span class="name"><b>structureCoords</b><a href="#structureCoords"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>structureCoords()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="structures"></a>
+                        <span class="name"><b>structures</b><a href="#structures"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>structures()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="cSiteUpdate"></a>
+                        <span class="name"><b>cSiteUpdate</b><a href="#cSiteUpdate"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>cSiteUpdate()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="cSiteCoords"></a>
+                        <span class="name"><b>cSiteCoords</b><a href="#cSiteCoords"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>cSiteCoords()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="cSites"></a>
+                        <span class="name"><b>cSites</b><a href="#cSites"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>cSites()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="enemyCreepPositions"></a>
+                        <span class="name"><b>enemyCreepPositions</b><a href="#enemyCreepPositions"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>enemyCreepPositions()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="enemySquadData"></a>
+                        <span class="name"><b>enemySquadData</b><a href="#enemySquadData"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>enemySquadData()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="events"></a>
+                        <span class="name"><b>events</b><a href="#events"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>events()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="deadCreepNames"></a>
+                        <span class="name"><b>deadCreepNames</b><a href="#deadCreepNames"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>deadCreepNames()</code></span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+</section>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'class';
+            var COMPODOC_CURRENT_PAGE_URL = 'RoomManager.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+
+       <script src="../js/menu-wc.js" defer></script>
+       <script nomodule src="../js/menu-wc_es5.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

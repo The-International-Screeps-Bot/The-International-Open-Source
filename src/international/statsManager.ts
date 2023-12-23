@@ -1,374 +1,299 @@
-import { customColors, InternationalStatNamesEnum, RoomStatNamesEnum } from './constants'
-import { customLog } from './utils'
+import { roundTo } from 'utils/utils'
+import { CPUMaxPerTick, customColors, RoomMemoryKeys, RoomStatsKeys, RoomTypes } from './constants'
+import { customLog, LogTypes } from 'utils/logging'
+import { collectiveManager } from './collective'
 
-const CPUUsers: CpuUsers = {
-    [InternationalStatNamesEnum.InternationalManagerCPUUsage]: 0,
-    [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: 0,
-    [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: 0,
-    [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: 0,
-    [InternationalStatNamesEnum.TickConfigCPUUsage]: 0,
-    [InternationalStatNamesEnum.RoomManagerCPUUsage]: 0,
-    [InternationalStatNamesEnum.StatsManagerCPUUsage]: 0,
+export interface RoomStats {
+    /**
+     * Game Time
+     */
+    gt: number
+    /**
+     * Remote Count
+     */
+    rc: number
+    /**
+     * Remote Energy Stored
+     */
+    res: number
+    /**
+     * Remote Energy Input Harvest
+     */
+    reih: number
+    /**
+     * Remote Energy Output Repair Other (non-barricade structures)
+     */
+    reoro: number
+    /**
+     * Remote Energy Output Build
+     */
+    reob: number
 }
 
-function GetLevelOfStatName(statName: RoomCommuneStatNames): number {
-    const roomStatsLevel = Memory.roomStats
-    switch (statName) {
-        case RoomStatNamesEnum.SpawnUsagePercentage:
-        case RoomStatNamesEnum.EnergyInputHarvest:
-            if (roomStatsLevel >= 1) return 1
-            else return 0
-        case RoomStatNamesEnum.CreepCount:
-        case RoomStatNamesEnum.TotalCreepCount:
-        case RoomStatNamesEnum.PowerCreepCount:
-        case RoomStatNamesEnum.ControllerLevel:
-        case RoomStatNamesEnum.BatteriesStoredTimes10:
-        case RoomStatNamesEnum.EnergyStored:
-            if (roomStatsLevel >= 1) return 1.5
-            else return 0
-        case RoomStatNamesEnum.MineralsHarvested:
-        case RoomStatNamesEnum.EnergyInputBought:
-        case RoomStatNamesEnum.EnergyOutputSold:
-        case RoomStatNamesEnum.EnergyOutputUpgrade:
-        case RoomStatNamesEnum.EnergyOutputBuild:
-        case RoomStatNamesEnum.EnergyOutputRepairOther:
-        case RoomStatNamesEnum.EnergyOutputRepairWallOrRampart:
-        case RoomStatNamesEnum.EnergyOutputSpawn:
-        case RoomStatNamesEnum.EnergyOutputPower:
-        case RoomStatNamesEnum.RemoteCount:
-        case RoomStatNamesEnum.RemoteEnergyStored:
-        case RoomStatNamesEnum.RemoteEnergyInputHarvest:
-        case RoomStatNamesEnum.RemoteEnergyOutputRepairOther:
-        case RoomStatNamesEnum.RemoteEnergyOutputBuild:
-            if (roomStatsLevel >= 2) return 2
-            else return 0
-        case RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage:
-        case RoomStatNamesEnum.RemoteConstructionManagerCPUUsage:
-        case RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage:
-        case RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage:
-        case RoomStatNamesEnum.AllyCreepRequestManangerCPUUsage:
-        case RoomStatNamesEnum.ClaimRequestManagerCPUUsage:
-        case RoomStatNamesEnum.TowerManagerCPUUsage:
-        case RoomStatNamesEnum.SpawnManagerCPUUsage:
-        case RoomStatNamesEnum.CombatRequestManagerCPUUsage:
-        case RoomStatNamesEnum.DefenceManagerCPUUsage:
-        case RoomStatNamesEnum.SpawnRequestsManagerCPUUsage:
-        case RoomStatNamesEnum.RoomCPUUsage:
-        case RoomStatNamesEnum.RoomVisualsManagerCPUUsage:
-        case RoomStatNamesEnum.ConstructionManagerCPUUsage:
-        case RoomStatNamesEnum.RoleManagerCPUUsage:
-        case RoomStatNamesEnum.RoleManagerPerCreepCPUUsage:
-        case RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage:
-        case RoomStatNamesEnum.EndTickCreepManagerCPUUsage:
-        case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
-        case RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage:
-        case RoomStatNamesEnum.RemoteRoomCPUUsage:
-            if (Memory.CPULogging === true) return 3
-            else return 0
-        default:
-            return 0
-    }
+export interface CommuneStats extends RoomStats {
+    /**
+     * Controller Level
+     */
+    cl: number
+    /**
+     * Energy Input Harvest
+     */
+    eih: number
+    /**
+     * Energy Input Bought
+     */
+    eib?: number
+    /**
+     * Energy Output Upgrade
+     */
+    eou: number
+    /**
+     * Energy Output Repair Other (non-barricade structures)
+     */
+    eoro: number
+    /**
+     * Energy Output Repair Wall or Rampart
+     */
+    eorwr: number
+    /**
+     * Energy Output Build
+     */
+    eob: number
+    /**
+     * Energy Output Sold
+     */
+    eos: number
+    /**
+     * Energy Output Spawn
+     */
+    eosp: number
+    /**
+     * Energy Output Power
+     */
+    eop: number
+    /**
+     * Minerals Harvested
+     */
+    mh: number
+    /**
+     * Energy Stored
+     */
+    es: number
+    /**
+     * Creep Count
+     */
+    cc: number
+    /**
+     * Total Creep Count
+     */
+    tcc: number
+    /**
+     * Power Creep Count
+     */
+    pcc: number
+    /**
+     * Spawn Usage as a decimal
+     */
+    su: number
+    /**
+     * hauler size
+     */
+    mhc: number
+    /**
+     * energy out transactions costs
+     */
+    eotc: number
+
+    // Better way to define shortform types
+
+    [RoomStatsKeys.EnergyTerminalSentDomestic]: number
+    [RoomStatsKeys.EnergyTerminalSentOther]: number
 }
 
-function GetRemoteStatsName(name: RoomCommuneStatNames): RoomStatNames {
-    switch (name) {
-        case RoomStatNamesEnum.EnergyStored:
-        case RoomStatNamesEnum.EnergyInputHarvest:
-        case RoomStatNamesEnum.EnergyOutputRepairOther:
-        case RoomStatNamesEnum.EnergyOutputBuild:
-        case RoomStatNamesEnum.RoomCPUUsage:
-        case RoomStatNamesEnum.RoomVisualsManagerCPUUsage:
-        case RoomStatNamesEnum.ConstructionManagerCPUUsage:
-        case RoomStatNamesEnum.RoleManagerPerCreepCPUUsage:
-        case RoomStatNamesEnum.EndTickCreepManagerCPUUsage:
-        case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
-        case RoomStatNamesEnum.PowerRoleManagerCPUUsage:
-            return ('r' + name) as RoomStatNames
-        default:
-            return name as RoomStatNames
-    }
-}
+const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
+    RoomStatsKeys.EnergyStored,
+    RoomStatsKeys.EnergyInputHarvest,
+    RoomStatsKeys.EnergyOutputRepairOther,
+    RoomStatsKeys.EnergyOutputBuild,
+])
+
+/**
+ * Names of stats to average for
+ */
+const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
+    RoomStatsKeys.SpawnUsagePercentage,
+    RoomStatsKeys.EnergyInputHarvest,
+    RoomStatsKeys.MineralsHarvested,
+    RoomStatsKeys.EnergyInputBought,
+    RoomStatsKeys.EnergyOutputSold,
+    RoomStatsKeys.EnergyOutputUpgrade,
+    RoomStatsKeys.EnergyOutputBuild,
+    RoomStatsKeys.EnergyOutputRepairOther,
+    RoomStatsKeys.EnergyOutputRepairWallOrRampart,
+    RoomStatsKeys.EnergyOutputSpawn,
+    RoomStatsKeys.EnergyOutputPower,
+    RoomStatsKeys.RemoteEnergyStored,
+    RoomStatsKeys.RemoteEnergyInputHarvest,
+    RoomStatsKeys.RemoteEnergyOutputRepairOther,
+    RoomStatsKeys.RemoteEnergyOutputBuild,
+    RoomStatsKeys.EnergyOutputTransactionCosts,
+    RoomStatsKeys.EnergyTerminalSentDomestic,
+    RoomStatsKeys.EnergyTerminalSentOther,
+])
 
 export class StatsManager {
-    roomConfig(roomName: string, roomType: string) {
-        const remoteLevel1: Partial<RoomStats> = {
-            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
-            [RoomStatNamesEnum.GameTime]: 0,
-            [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
+    stats: {
+        [roomType in RoomTypes.commune | RoomTypes.remote]: {
+            [roomName: string]: Partial<RoomStats | CommuneStats>
         }
-        const remoteLevel2: Partial<RoomStats> = {
-            ...remoteLevel1,
-            [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
-            [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
-            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
-        }
-        const remoteLevel3: Partial<RoomStats> = {
-            [RoomStatNamesEnum.RemoteRoomCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoomCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoleManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]: 0,
-        }
+    }
 
-        const communeLevel1: Partial<RoomCommuneStats> = {
-            [RoomStatNamesEnum.SpawnUsagePercentage]: 0,
-            [RoomStatNamesEnum.EnergyInputHarvest]: 0,
-            [RoomStatNamesEnum.CreepCount]: 0,
-            [RoomStatNamesEnum.TotalCreepCount]: 0,
-            [RoomStatNamesEnum.PowerCreepCount]: 0,
-            [RoomStatNamesEnum.ControllerLevel]: 0,
-            [RoomStatNamesEnum.BatteriesStoredTimes10]: 0,
-            [RoomStatNamesEnum.EnergyStored]: 0,
-            [RoomStatNamesEnum.GameTime]: 0,
-        }
-        const communeLevel2: Partial<RoomCommuneStats> = {
-            ...communeLevel1,
-            [RoomStatNamesEnum.MineralsHarvested]: 0,
-            [RoomStatNamesEnum.EnergyInputBought]: 0,
-            [RoomStatNamesEnum.EnergyOutputSold]: 0,
-            [RoomStatNamesEnum.EnergyOutputUpgrade]: 0,
-            [RoomStatNamesEnum.EnergyOutputBuild]: 0,
-            [RoomStatNamesEnum.EnergyOutputRepairOther]: 0,
-            [RoomStatNamesEnum.EnergyOutputRepairWallOrRampart]: 0,
-            [RoomStatNamesEnum.EnergyOutputSpawn]: 0,
-            [RoomStatNamesEnum.EnergyOutputPower]: 0,
-            [RoomStatNamesEnum.RemoteCount]: 0,
-            [RoomStatNamesEnum.RemoteEnergyStored]: 0,
-            [RoomStatNamesEnum.RemoteEnergyInputHarvest]: 0,
-            [RoomStatNamesEnum.RemoteEnergyOutputRepairOther]: 0,
-            [RoomStatNamesEnum.RemoteEnergyOutputBuild]: 0,
-        }
-        const communeLevel3: Partial<RoomCommuneStats> = {
-            [RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoleManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RoleManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RoleManagerPerCreepCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]: 0,
-            [RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.PowerRoleManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]: 0,
-            [RoomStatNamesEnum.PowerRoleManagerPerCreepCPUUsage]: 0,
-            [RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]: 0,
-            [RoomStatNamesEnum.AllyCreepRequestManangerCPUUsage]: 0,
-            [RoomStatNamesEnum.ClaimRequestManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.TowerManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.SpawnManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.CombatRequestManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.DefenceManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.SpawnRequestsManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.RoomCPUUsage]: 0,
-            [RoomStatNamesEnum.RoomVisualsManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.ConstructionManagerCPUUsage]: 0,
-            [RoomStatNamesEnum.EndTickCreepManagerCPUUsage]: 0,
-        }
-        const roomStats = Memory.roomStats
-        let stats = undefined
-        if (roomType === 'commune') {
-            switch (roomStats) {
-                case 1:
-                    stats = communeLevel1
-                    break
-                case 2:
-                    stats = communeLevel2
-                    break
-                default:
-                    stats = communeLevel1
-                    break
-            }
+    private roomConfig(roomName: string, roomType: number) {
+        if (roomType === RoomTypes.commune) {
+            const roomStats = (this.stats[RoomTypes.commune][roomName] = {
+                [RoomStatsKeys.SpawnUsagePercentage]: 0,
+                [RoomStatsKeys.EnergyInputHarvest]: 0,
+                [RoomStatsKeys.CreepCount]: 0,
+                [RoomStatsKeys.TotalCreepCount]: 0,
+                [RoomStatsKeys.PowerCreepCount]: 0,
+                [RoomStatsKeys.ControllerLevel]: 0,
+                [RoomStatsKeys.EnergyStored]: 0,
+                [RoomStatsKeys.MineralsHarvested]: 0,
+                [RoomStatsKeys.EnergyInputBought]: 0,
+                [RoomStatsKeys.EnergyOutputSold]: 0,
+                [RoomStatsKeys.EnergyOutputUpgrade]: 0,
+                [RoomStatsKeys.EnergyOutputBuild]: 0,
+                [RoomStatsKeys.EnergyOutputRepairOther]: 0,
+                [RoomStatsKeys.EnergyOutputRepairWallOrRampart]: 0,
+                [RoomStatsKeys.EnergyOutputSpawn]: 0,
+                [RoomStatsKeys.EnergyOutputPower]: 0,
+                [RoomStatsKeys.RemoteCount]: 0,
+                [RoomStatsKeys.RemoteEnergyStored]: 0,
+                [RoomStatsKeys.RemoteEnergyInputHarvest]: 0,
+                [RoomStatsKeys.RemoteEnergyOutputRepairOther]: 0,
+                [RoomStatsKeys.RemoteEnergyOutputBuild]: 0,
+                [RoomStatsKeys.MinHaulerCost]: 0,
+                [RoomStatsKeys.EnergyOutputTransactionCosts]: 0,
+                [RoomStatsKeys.EnergyTerminalSentDomestic]: 0,
+                [RoomStatsKeys.EnergyTerminalSentOther]: 0,
+            })
 
-            if (Memory.CPULogging === true) {
-                stats = {
-                    ...stats,
-                    ...communeLevel3,
-                }
-            }
+            if (Memory.stats.rooms[roomName]) return
 
-            if (stats) {
-                global.roomStats.commune[roomName] = stats
-                if (!Memory.stats.rooms[roomName]) Memory.stats.rooms[roomName] = stats
-            }
+            Memory.stats.rooms[roomName] = roomStats
             return
         }
 
-        switch (roomStats) {
-            case 1:
-                stats = remoteLevel1
-                break
-            case 2:
-                stats = remoteLevel2
-                break
-            default:
-                stats = remoteLevel1
-                break
-        }
+        // Otherwise configure the remote
 
-        if (Memory.CPULogging === true) {
-            stats = {
-                ...stats,
-                ...remoteLevel3,
-            }
+        this.stats[RoomTypes.remote][roomName] = {
+            [RoomStatsKeys.RemoteEnergyStored]: 0,
+            [RoomStatsKeys.RemoteEnergyInputHarvest]: 0,
+            [RoomStatsKeys.RemoteEnergyOutputRepairOther]: 0,
+            [RoomStatsKeys.RemoteEnergyOutputBuild]: 0,
         }
-
-        if (stats) global.roomStats.remote[roomName] = stats
     }
 
-    roomPreTick(roomName: string, roomType: RoomTypes) {
+    roomInitialRun(roomName: string, roomType: number) {
         this.roomConfig(roomName, roomType)
     }
 
-    roomEndTick(roomName: string, roomType: RoomTypes) {
-        if (roomType === 'commune') {
-            const globalStats = global.roomStats.commune[roomName] as RoomCommuneStats
-            if (globalStats) {
-                globalStats[RoomStatNamesEnum.GameTime] = Game.time
-            }
-        } else if (roomType === 'remote') {
-            const globalStats = global.roomStats.remote[roomName] as RoomStats
-            if (globalStats) {
-                globalStats[RoomStatNamesEnum.GameTime] = Game.time
-            }
-        }
-    }
-
-    roomCommuneFinalEndTick(roomName: string, room?: Room, forceUpdate: boolean = false) {
+    private roomCommuneEndRun(roomName: string, forceUpdate: boolean = false) {
+        const room = Game.rooms[roomName]
         const roomMemory = Memory.rooms[roomName]
-        const roomStats = Memory.stats.rooms[roomName]
-        const globalCommuneStats = global.roomStats.commune[roomName] as RoomCommuneStats
+        const interTickRoomStats = Memory.stats.rooms[roomName]
+        const roomStats = this.stats[RoomTypes.commune][roomName] as CommuneStats
 
-        if (globalCommuneStats.gt !== Game.time && !forceUpdate) {
-            customLog('StatsManager', `RoomCommuneFinalEndTick: ${roomName} stats not updated`, {
-                textColor: customColors.white,
-                bgColor: customColors.red,
-            })
-            return
-        }
         const each250Ticks = Game.time % 250 === 0
 
-        Object.entries(global.roomStats.remote)
-            .filter(([roomName]) => roomMemory.remotes.includes(roomName))
-            .forEach(([remoteRoomName, remoteRoomStats]) => {
-                if (globalCommuneStats[RoomStatNamesEnum.GameTime] === Game.time) {
-                    globalCommuneStats[RoomStatNamesEnum.RemoteCount] += 1
-                    globalCommuneStats[RoomStatNamesEnum.RemoteEnergyInputHarvest] +=
-                        remoteRoomStats[RoomStatNamesEnum.RemoteEnergyInputHarvest]
-                    globalCommuneStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther] +=
-                        remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputRepairOther]
-                    globalCommuneStats[RoomStatNamesEnum.RemoteEnergyOutputBuild] +=
-                        remoteRoomStats[RoomStatNamesEnum.RemoteEnergyOutputBuild]
+        const remotes = roomMemory[RoomMemoryKeys.remotes]
+        for (const remoteRoomName of remotes) {
+            const remoteRoomStats = this.stats[RoomTypes.remote][remoteRoomName]
+            if (!remoteRoomStats) continue
 
-                    // CPU
-                    if (Memory.CPULogging === true) {
-                        globalCommuneStats[RoomStatNamesEnum.RemoteRoomCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemoteRoomCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemoteRoomVisualsManagerCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemoteConstructionManagerCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemoteConstructionManagerCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemoteRoleManagerCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemoteRoleManagerCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemoteRoleManagerPerCreepCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemoteEndTickCreepManagerCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemotePowerRoleManangerCPUUsage]
-                        globalCommuneStats[RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage] +=
-                            remoteRoomStats[RoomStatNamesEnum.RemotePowerRoleManagerPerCreepCPUUsage]
-                    }
+            roomStats[RoomStatsKeys.RemoteCount] += 1
+            roomStats[RoomStatsKeys.RemoteEnergyInputHarvest] +=
+                remoteRoomStats[RoomStatsKeys.RemoteEnergyInputHarvest]
+            roomStats[RoomStatsKeys.RemoteEnergyOutputRepairOther] +=
+                remoteRoomStats[RoomStatsKeys.RemoteEnergyOutputRepairOther]
+            roomStats[RoomStatsKeys.RemoteEnergyOutputBuild] +=
+                remoteRoomStats[RoomStatsKeys.RemoteEnergyOutputBuild]
 
-                    if (each250Ticks)
-                        globalCommuneStats[RoomStatNamesEnum.RemoteEnergyStored] +=
-                            Game.rooms[remoteRoomName]?.resourcesInStoringStructures.energy || 0
-                }
-            })
-        if (room) {
-            globalCommuneStats[RoomStatNamesEnum.CreepCount] = room.myCreepsAmount
-            globalCommuneStats[RoomStatNamesEnum.TotalCreepCount] = room.creepsFromRoomAmount
-            globalCommuneStats[RoomStatNamesEnum.PowerCreepCount] = room.myPowerCreepsAmount
-
-            const spawns = room.structures.spawn
-            if (spawns.length > 0)
-                globalCommuneStats.su =
-                    spawns.reduce(
-                        (sum, spawn) =>
-                            sum +
-                            ((spawn.spawning && spawn.spawning.remainingTime) || spawn.renewed || !spawn.RCLActionable
-                                ? 1
-                                : 0),
-                        0,
-                    ) / spawns.length
-
-            if (each250Ticks || forceUpdate) {
-                if (room.controller && room.controller.my) {
-                    const progressPercentage = room.controller.progress / room.controller.progressTotal
-                    globalCommuneStats.cl =
-                        progressPercentage < 1 ? room.controller.level + progressPercentage : room.controller.level
-                }
-                globalCommuneStats[RoomStatNamesEnum.EnergyStored] = room.resourcesInStoringStructures.energy
-                globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
-                    room.resourcesInStoringStructures.battery * 10
-            } else {
-                globalCommuneStats[RoomStatNamesEnum.EnergyStored] = roomStats[RoomStatNamesEnum.EnergyStored]
-                globalCommuneStats[RoomStatNamesEnum.BatteriesStoredTimes10] =
-                    roomStats[RoomStatNamesEnum.BatteriesStoredTimes10]
-                globalCommuneStats[RoomStatNamesEnum.ControllerLevel] = roomStats[RoomStatNamesEnum.ControllerLevel]
+            if (each250Ticks) {
+                roomStats[RoomStatsKeys.RemoteEnergyStored] += 0
             }
         }
 
-        const activeGlobalStatNames = Object.keys(globalCommuneStats) as (keyof RoomCommuneStats)[]
-        const activeStatNames = Object.keys(roomStats) as (keyof RoomCommuneStats)[]
-        const nonActiveStats = activeStatNames.filter(
-            stat => !activeGlobalStatNames.includes(stat),
-        ) as (keyof RoomCommuneStats)[]
+        roomStats[RoomStatsKeys.CreepCount] = room.myCreeps.length
+        roomStats[RoomStatsKeys.TotalCreepCount] = room.creepsFromRoomAmount
+        roomStats[RoomStatsKeys.PowerCreepCount] = room.myPowerCreeps.length
+        roomStats[RoomStatsKeys.MinHaulerCost] = roomMemory[RoomMemoryKeys.minHaulerCost]
 
-        nonActiveStats.forEach(name => {
-            delete globalCommuneStats[name]
-            delete roomStats[name]
-        })
+        const spawns = room.roomManager.structures.spawn
+        if (spawns.length > 0) {
+            let spawningSpawnsCount = 0
 
-        activeGlobalStatNames.forEach(name => {
-            const statLevel = GetLevelOfStatName(name)
-            if (statLevel > 0) {
-                let globalValue = globalCommuneStats[name]
-                const value = roomStats[name]
-                if (!value) roomStats[name] = 0
-                if (!globalValue) globalValue = 0
+            for (const spawn of spawns) {
+                if (!spawn.spawning && !spawn.renewed) continue
 
-                switch (statLevel) {
-                    // level 1 w average
-                    case 1:
-                        roomStats[name] = this.average(value, globalValue)
-                        break
-                    // level 1 wo average
-                    case 1.5:
-                        roomStats[name] = this.round(globalValue)
-                        break
-                    // level 2 w average
-                    case 2:
-                        if (forceUpdate || (Memory.roomStats && Memory.roomStats >= 2))
-                            roomStats[name] = this.average(value, globalValue)
-                        else roomStats[name] = 0
-                        break
-                    case 3:
-                        if (forceUpdate || Memory.CPULogging === true) {
-                            roomStats[name] = this.average(value, globalValue)
-                        } else roomStats[name] = 0
-                        break
-                    default:
-                        break
-                }
+                spawningSpawnsCount += 1
             }
-        })
+
+            roomStats[RoomStatsKeys.SpawnUsagePercentage] = spawningSpawnsCount / spawns.length
+        }
+
+        if (room.controller && room.controller.my) {
+            const progressPercentage = room.controller.progress / room.controller.progressTotal
+            roomStats.cl =
+                progressPercentage < 1
+                    ? room.controller.level + progressPercentage
+                    : room.controller.level
+        }
+
+        /*         if (each250Ticks || forceUpdate) {
+            const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
+            roomStats[RoomStatNamesEnum.EnergyStored] =
+                (resourcesInStoringStructures.energy || 0) +
+                (resourcesInStoringStructures.battery || 0) * 10
+        } else {
+            roomStats[RoomStatNamesEnum.EnergyStored] =
+                interTickRoomStats[RoomStatNamesEnum.EnergyStored]
+        } */
+        const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
+        roomStats[RoomStatsKeys.EnergyStored] =
+            (resourcesInStoringStructures.energy || 0) +
+            (resourcesInStoringStructures.battery || 0) * 10
+
+        // delete legacy stat key value pairs
+
+        for (const key in interTickRoomStats) {
+            const statName = key as keyof CommuneStats
+            if (roomStats[statName]) continue
+
+            roomStats[statName] = undefined
+        }
+
+        // implement average tick stats into inter tick stats
+
+        for (const key in roomStats) {
+            const statName = key as keyof CommuneStats
+
+            if (averageStatNames.has(statName)) {
+                let globalValue = roomStats[statName] || 0
+                let value = interTickRoomStats[statName] || 0
+
+                interTickRoomStats[statName] = this.average(value, globalValue)
+                continue
+            }
+
+            interTickRoomStats[statName] = roomStats[statName]
+        }
     }
     internationalConfig() {
         Memory.stats = {
-            lastReset: 0,
+            lastReset: global.lastReset,
             tickLength: 0,
+            lastTick: Game.time,
             lastTickTimestamp: 0,
             resources: {
                 pixels: 0,
@@ -397,29 +322,38 @@ export class StatsManager {
                 progressTotal: 0,
             },
             rooms: {},
-            constructionSiteCount: 0,
-            CPUUsers,
+            constructionSites: 0,
+            creeps: 0,
+            powerCreeps: 0,
         }
 
-        global.roomStats = { commune: {}, remote: {} }
-        global.CPUUsers = CPUUsers
-        this.internationalEndTick()
+        this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
+        this.internationalEndRun()
     }
 
-    internationalPreTick() {
-        global.CPUUsers = CPUUsers
-        global.roomStats = { commune: {}, remote: {} }
+    tickInit() {
+        this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
     }
 
-    internationalEndTick() {
-        const managerCPUStart = Game.cpu.getUsed()
+    internationalEndRun() {
+        // Run communes one last time to update stats
+
+        for (const roomName in Memory.stats.rooms) {
+            if (!this.stats[RoomTypes.commune][roomName]) {
+                Memory.stats.rooms[roomName] = undefined
+                continue
+            }
+
+            this.roomCommuneEndRun(roomName)
+        }
+
         const timestamp = Date.now()
 
         global.lastReset = (global.lastReset || 0) + 1
         Memory.stats.lastReset = global.lastReset
         Memory.stats.tickLength = timestamp - Memory.stats.lastTickTimestamp
         Memory.stats.lastTickTimestamp = timestamp
-        Memory.stats.constructionSiteCount = global.constructionSitesCount || 0
+        Memory.stats.constructionSites = collectiveManager.constructionSiteCount || 0
 
         Memory.stats.resources = {
             pixels: Game.resources[PIXEL],
@@ -427,14 +361,17 @@ export class StatsManager {
             accessKeys: Game.resources[ACCESS_KEY],
             credits: Game.market.credits,
         }
-        Memory.stats.cpu = {
-            bucket: Game.cpu.bucket,
-            limit: Game.cpu.limit,
-            usage: this.average(Memory.stats.cpu.usage, Game.cpu.getUsed()),
-        }
-        Memory.stats.memory.usage = Math.floor(RawMemory.get().length / 1000)
-        Memory.stats.heapUsage =
-            Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
+
+        Memory.stats.memory.usage = roundTo(
+            Math.floor(RawMemory.get().length / 1000) / Memory.stats.memory.limit,
+            8,
+        )
+
+        const heapStatistics = Game.cpu.getHeapStatistics()
+        Memory.stats.heapUsage = roundTo(
+            (heapStatistics.total_heap_size + heapStatistics.externally_allocated_size) / heapStatistics.heap_size_limit,
+            2,
+        )
         Memory.stats.gcl = {
             progress: Game.gcl.progress,
             progressTotal: Game.gcl.progressTotal,
@@ -445,105 +382,83 @@ export class StatsManager {
             progressTotal: Game.gpl.progressTotal,
             level: Game.gpl.level,
         }
+        Memory.stats.creeps = collectiveManager.creepCount
+        Memory.stats.powerCreeps = collectiveManager.powerCreepCount
+        Memory.stats.defaultMinPathCacheTime = collectiveManager.defaultMinPathCacheTime
 
-        const globalRoomKeys = Object.keys(global.roomStats.commune)
-        const notCheckedCommuneRooms = Object.keys(Memory.stats.rooms).filter(room => !globalRoomKeys.includes(room))
-        globalRoomKeys.forEach(roomName => {
-            this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName])
-        })
-
-        notCheckedCommuneRooms.forEach(roomName => {
-            const roomType = Memory.rooms[roomName].T
-            if (roomType === 'commune') {
-                this.roomConfig(roomName, roomType)
-                this.roomCommuneFinalEndTick(roomName, Game.rooms[roomName], true)
-            } else {
-                delete Memory.stats.rooms[roomName]
-            }
-        })
-        delete global.roomStats
-
-        if (Memory.CPULogging === true && Memory.stats.CPUUsers !== undefined) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            const CPUUsers = Memory.stats.CPUUsers
-            Memory.stats.CPUUsers = {
-                [InternationalStatNamesEnum.InternationalManagerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.InternationalManagerCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.InternationalManagerCPUUsage],
-                ),
-                [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.CreepOrganizerCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.CreepOrganizerCPUUsage],
-                ),
-                [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.MapVisualsManangerCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.MapVisualsManangerCPUUsage],
-                ),
-                [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage],
-                ),
-                [InternationalStatNamesEnum.TickConfigCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.TickConfigCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.TickConfigCPUUsage],
-                ),
-                [InternationalStatNamesEnum.RoomManagerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.RoomManagerCPUUsage],
-                    global.CPUUsers[InternationalStatNamesEnum.RoomManagerCPUUsage],
-                ),
-                [InternationalStatNamesEnum.StatsManagerCPUUsage]: this.average(
-                    CPUUsers[InternationalStatNamesEnum.StatsManagerCPUUsage],
-                    cpuUsed,
-                ),
-            }
-            customLog('Stats Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-        } else {
-            Memory.stats.CPUUsers = {
-                [InternationalStatNamesEnum.InternationalManagerCPUUsage]: undefined,
-                [InternationalStatNamesEnum.CreepOrganizerCPUUsage]: undefined,
-                [InternationalStatNamesEnum.MapVisualsManangerCPUUsage]: undefined,
-                [InternationalStatNamesEnum.PowerCreepOrganizerCPUUsage]: undefined,
-                [InternationalStatNamesEnum.TickConfigCPUUsage]: undefined,
-                [InternationalStatNamesEnum.RoomManagerCPUUsage]: undefined,
-                [InternationalStatNamesEnum.StatsManagerCPUUsage]: undefined,
-            }
+        // If the code wasn't ran or was properly ran last tick, assign cpu as normal. Otherwise assume we ran out of cpu
+        let usedCPU =
+            Memory.stats.lastTick + 1 >= Game.time
+                ? Game.cpu.getUsed()
+                : // limit * time step from last stats recording
+                  Game.cpu.limit * (Game.time - Memory.stats.lastTick)
+        /* customLog('STATS' + (Game.time - Memory.stats.lastTick), usedCPU) */
+        Memory.stats.cpu = {
+            bucket: Game.cpu.bucket,
+            limit: Game.cpu.limit,
+            usage: this.averageMarginalTimeStep(Memory.stats.cpu.usage, usedCPU),
         }
+
+        // Make sure this runs last
+        Memory.stats.lastTick = Game.time
+
+        this.stats = undefined
     }
 
-    round(value: number, decimals: number = 8) {
-        const multiplier = Math.pow(10, decimals || 0)
-        return Math.round(value * multiplier) / multiplier
-    }
-
-    average(avg: number, number: number, averagedOverTickCount: number = 1000, precision?: number) {
+    private average(
+        avg: number,
+        dataPoint: number,
+        averagedOverTickCount: number = 1000,
+        precision: number = 8,
+    ) {
         if (!avg) avg = 0
-        if (!number) number = 0
+        if (!dataPoint) dataPoint = 0
+
+        // time step from last stats recording
+        const timeStep = Game.time - Memory.stats.lastTick
+
+        avg -= (avg / averagedOverTickCount) * timeStep
+        avg += dataPoint / timeStep / averagedOverTickCount
+
+        return roundTo(avg, precision)
+    }
+
+    /**
+     * average but don't account for time skips
+     */
+    private averageMarginalTimeStep(
+        avg: number,
+        dataPoint: number,
+        averagedOverTickCount: number = 1000,
+        precision: number = 8,
+    ) {
+        if (!avg) avg = 0
+        if (!dataPoint) dataPoint = 0
+
         avg -= avg / averagedOverTickCount
-        avg += number / averagedOverTickCount
-        return this.round(avg, precision)
+        avg += dataPoint / averagedOverTickCount
+
+        return roundTo(avg, precision)
+    }
+
+    updateStat(roomName: string, name: string, value: number) {
+        if (!this.stats) return
+
+        let roomStatName = name as keyof RoomStats
+
+        if (this.stats[RoomTypes.commune][roomName]) {
+            ;(this.stats[RoomTypes.commune][roomName] as CommuneStats)[roomStatName] += value
+            return
+        }
+
+        if (this.stats[RoomTypes.remote][roomName]) {
+            if (remoteStatNames.has(roomStatName)) {
+                roomStatName = ('r' + roomStatName) as keyof RoomStats
+            }
+
+            ;(this.stats[RoomTypes.remote][roomName] as RoomStats)[roomStatName] += value
+        }
     }
 }
 
 export const statsManager = new StatsManager()
-export const globalStatsUpdater = function (
-    roomName: string,
-    name: string,
-    value: number,
-    nonRoomStat: boolean = false,
-) {
-    if (nonRoomStat) {
-        global.CPUUsers[name as InternationalStatNamesEnum] = value
-        return
-    }
-    const roomStatName = name as RoomStatNames
-    const updateStats = GetLevelOfStatName(roomStatName) > 0
-    if (updateStats && global.roomStats) {
-        if (global.roomStats.commune[roomName])
-            (global.roomStats.commune[roomName] as RoomCommuneStats)[roomStatName] += value
-        else if (global.roomStats.remote[roomName])
-            (global.roomStats.remote[roomName] as RoomStats)[GetRemoteStatsName(roomStatName)] += value
-    }
-}

@@ -1,54 +1,432 @@
+import { packCoord } from 'other/codec'
+import { collectiveManager } from './collective'
+import { CommuneManager } from 'room/commune/commune'
+
+export enum PlayerMemoryKeys {
+    /**
+     * Generally how good their offense is
+     */
+    offensiveThreat,
+    /**
+     * Generally how good their defense is
+     */
+    defensiveStrength,
+    /**
+     * How much we want them dead
+     */
+    hate,
+    /**
+     * The last time we were attacked by them
+     */
+    lastAttackedBy,
+    /**
+     * the positive, non-zero value for which to weight enemy exit retreat threat
+     */
+    rangeFromExitWeight,
+    relationship,
+    /**
+     * The positive reputation we've determined for the player.
+     * Effects response to ally requests and such
+     */
+    reputation,
+    /**
+     * The last time this player was seen. Used for garbage collection, to remove old players
+     */
+    lastSeen,
+}
+
+export const playerDecayKeys = new Set([
+    PlayerMemoryKeys.offensiveThreat,
+    PlayerMemoryKeys.defensiveStrength,
+    PlayerMemoryKeys.hate,
+])
+
+export enum WorkRequestKeys {
+    claimer,
+    vanguard,
+    abandon,
+    responder,
+    priority,
+    allyVanguard,
+    forAlly,
+    hauler,
+}
+
+export enum HaulRequestKeys {
+    type,
+    distance,
+    timer,
+    priority,
+    abandon,
+    responder,
+}
+
+export enum NukeRequestKeys {
+    x,
+    y,
+    responder,
+    priority,
+}
+
+export enum DepositRequestKeys {
+    depositHarvester,
+    depositHauler,
+    abandon,
+    responder,
+    /**
+     * The type of resource the deposit provides
+     */
+    type,
+}
+
+export enum CombatRequestKeys {
+    abandon,
+    rangedAttack,
+    attack,
+    dismantle,
+    downgrade,
+    minDamage,
+    minMeleeHeal,
+    minRangedHeal,
+    maxTowerDamage,
+    quads,
+    priority,
+    quadQuota,
+    inactionTimerMax,
+    inactionTimer,
+    maxThreat,
+    abandonments,
+    /**
+     * The type of attack request
+     */
+    type,
+    responder,
+    dynamicSquads,
+    dynamicSquadQuota
+}
+
+export enum CreepRoomLogisticsRequestKeys {
+    type,
+    target,
+    resourceType,
+    amount,
+    onlyFull,
+    noReserve,
+}
+
+export enum RoomLogisticsRequestTypes {
+    /**
+     * Asks for resources to be transferred
+     */
+    transfer,
+    /**
+     * Asks for resources to be withdrawn
+     */
+    withdraw,
+    /**
+     * A dropped resource asking to be picked up
+     */
+    pickup,
+    /**
+     * Offering to be picked up but not trying to get rid of the resource
+     */
+    offer,
+}
+
+export type SleepFor = 'any' | 'noMove'
+
+export enum CreepMemoryKeys {
+    preferRoads,
+    sourceIndex,
+    dying,
+    packedCoord,
+    path,
+    goalPos,
+    usedPathForGoal,
+    lastCache,
+    structureTarget,
+    remote,
+    scoutTarget,
+    signTarget,
+    roomLogisticsRequests,
+    needsResources,
+    squadSize,
+    squadType,
+    squadCombatType,
+    isSquadFormed,
+    squadMembers,
+    quadBulldozeTargets,
+    haulRequest,
+    ticksWaited,
+    recycleTarget,
+    rampartOnlyShoving,
+    rampartTarget,
+    taskRoom,
+    getPulled,
+    combatRequest,
+    workRequest,
+    flee,
+    squadMoveType,
+    sleepFor,
+    sleepTime,
+    targetID,
+    previousRelayer,
+}
+
+export enum PowerCreepMemoryKeys {
+    commune,
+    /**
+     * The name of the method queued for operation
+     */
+    task,
+    taskTarget,
+    /**
+     * The type of power the creep should use
+     */
+    taskPower,
+    taskRoom,
+}
+
+export enum PowerRequestKeys {
+    target,
+    type,
+    cooldown,
+}
+
+export enum RoomTypes {
+    commune,
+    remote,
+    ally,
+    allyRemote,
+    neutral,
+    enemy,
+    enemyRemote,
+    sourceKeeper,
+    center,
+    highway,
+    intersection,
+}
+
+export enum RoomMemoryKeys {
+    type,
+    lastScout,
+    /**
+     * Tells (mostly civilians) if the room is safe (non-undefined number) and what tick it will refresh
+     */
+    danger,
+    portalsTo,
+
+    // Types specific
+
+    owner,
+    RCL,
+    powerEnabled,
+    constructionSiteTarget,
+    stampAnchors,
+    roadQuota,
+    communeSources,
+    communeSourceHarvestPositions,
+    communeSourcePaths,
+    mineralPath,
+    mineralPositions,
+    centerUpgradePos,
+    upgradePositions,
+    upgradePath,
+    basePlans,
+    rampartPlans,
+    mineral,
+    mineralType,
+    /**
+     * A valuation of base plan score. Lower is better
+     */
+    score,
+    /**
+     * A valuation of base plan score with changing variables. Lower is better
+     */
+    dynamicScore,
+    dynamicScoreUpdate,
+    communePlanned,
+
+    // Commune
+
+    remotes,
+    powerBanks,
+    deposits,
+    workRequest,
+    combatRequests,
+    haulRequests,
+    nukeRequest,
+    threatened,
+    lastAttackedBy,
+    minHaulerCost,
+    minHaulerCostUpdate,
+    greatestRCL,
+    /**
+     * Wether or not we are trying to have the room go from commune to neutral
+     */
+    abandonCommune,
+    marketData,
+    factoryProduct,
+    factoryUsableResources,
+
+    // Remote
+
+    commune,
+    maxSourceIncome,
+    remoteSourceHarvesters,
+    haulers,
+    remoteReservers,
+    remoteCoreAttacker,
+    remoteBuilder,
+    remoteDismantler,
+    abandonRemote,
+    recursedAbandonment,
+    disable,
+    disableSources,
+    enemyReserved,
+    invaderCore,
+    disableCachedPaths,
+    remotePlanned,
+    remoteStampAnchors,
+    remoteControllerPath,
+    remoteControllerPositions,
+    remoteSources,
+    remoteSourceHarvestPositions,
+    remoteSourceFastFillerPaths,
+    remoteSourceHubPaths,
+    clearedEnemyStructures,
+    lastStructureCheck,
+    roads,
+    remoteSourceCredit,
+    remoteSourceCreditChange,
+    remoteSourceCreditReservation,
+    hasContainer,
+    /**
+     * The names of the rooms the remote has paths through to get to the commune
+     */
+    pathsThrough,
+
+    // Ally
+
+    // Enemy
+
+    terminal,
+    towers,
+    energy,
+    defensiveStrength,
+    offensiveThreat,
+
+    // Source Keeper
+
+    keeperLairCoords,
+}
+
+export type RemoteResourcePathTypes =
+    | RoomMemoryKeys.remoteSourceFastFillerPaths
+    | RoomMemoryKeys.remoteSourceHubPaths
+
 // General
 
 export const mmoShardNames = new Set(['shard0', 'shard1', 'shard2', 'shard3'])
 
 export const roomTypeProperties: Set<keyof RoomMemory> = new Set([
-    'remotes',
-    'deposits',
-    'powerBanks',
-    'NC',
-    'PC',
-    'MHC',
-    'HU',
-    'AT',
-    'LAT',
-    'Ab',
-    'S',
+    // Commune
 
-    'CN',
-    'RE',
-    'data',
+    RoomMemoryKeys.remotes,
+    RoomMemoryKeys.deposits,
+    RoomMemoryKeys.powerBanks,
+    RoomMemoryKeys.minHaulerCost,
+    RoomMemoryKeys.minHaulerCostUpdate,
+    RoomMemoryKeys.threatened,
+    RoomMemoryKeys.lastAttackedBy,
+    RoomMemoryKeys.abandonCommune,
+    RoomMemoryKeys.score,
+    RoomMemoryKeys.dynamicScore,
+    RoomMemoryKeys.dynamicScoreUpdate,
+    RoomMemoryKeys.clearedEnemyStructures,
 
-    'owner',
-    'level',
+    // Remote
 
-    'powerEnabled',
-    'towers',
-    'hasTerminal',
-    'energy',
-    'OS',
-    'DS',
+    RoomMemoryKeys.commune,
+    RoomMemoryKeys.remoteSourceFastFillerPaths,
+    RoomMemoryKeys.remoteSourceHubPaths,
+    RoomMemoryKeys.remoteSourceCredit,
+    RoomMemoryKeys.remoteSourceCreditChange,
+    RoomMemoryKeys.remoteSourceCreditReservation,
+    RoomMemoryKeys.abandonRemote,
+    RoomMemoryKeys.recursedAbandonment,
+    RoomMemoryKeys.pathsThrough,
+    RoomMemoryKeys.disableSources,
 
-    'portalsTo',
+    // Ally and Enemy
+
+    RoomMemoryKeys.owner,
+    RoomMemoryKeys.RCL,
+
+    // Enemy
+
+    RoomMemoryKeys.powerEnabled,
+    RoomMemoryKeys.towers,
+    RoomMemoryKeys.terminal,
+    RoomMemoryKeys.energy,
+    RoomMemoryKeys.offensiveThreat,
+    RoomMemoryKeys.defensiveStrength,
 ])
 
 export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
-    commune: new Set(['remotes', 'deposits', 'powerBanks', 'PC', 'MHC', 'HU', 'AT', 'LAT', 'Ab', 'S']),
-    remote: new Set(['CN', 'RE', 'data', 'NC', 'PC']),
-    ally: new Set(['owner', 'level', 'NC', 'PC']),
-    allyRemote: new Set(['owner', 'NC', 'PC']),
-    enemy: new Set(['owner', 'level', 'powerEnabled', 'towers', 'hasTerminal', 'energy', 'NC', 'PC', 'OS', 'DS']),
-    enemyRemote: new Set(['owner', 'NC', 'PC']),
-    neutral: new Set(['NC', 'PC']),
-    keeper: new Set(['owner']),
-    keeperCenter: new Set(['owner']),
-    highway: new Set([]),
-    intersection: new Set(['portalsTo']),
+    [RoomTypes.commune]: new Set([
+        RoomMemoryKeys.remotes,
+        RoomMemoryKeys.deposits,
+        RoomMemoryKeys.powerBanks,
+        RoomMemoryKeys.minHaulerCost,
+        RoomMemoryKeys.minHaulerCostUpdate,
+        RoomMemoryKeys.threatened,
+        RoomMemoryKeys.lastAttackedBy,
+        RoomMemoryKeys.abandonCommune,
+        RoomMemoryKeys.score,
+        RoomMemoryKeys.dynamicScore,
+        RoomMemoryKeys.dynamicScoreUpdate,
+        RoomMemoryKeys.clearedEnemyStructures,
+    ]),
+    [RoomTypes.remote]: new Set([
+        RoomMemoryKeys.commune,
+        RoomMemoryKeys.remoteSourceFastFillerPaths,
+        RoomMemoryKeys.remoteSourceHubPaths,
+        RoomMemoryKeys.remoteSourceCredit,
+        RoomMemoryKeys.remoteSourceCreditChange,
+        RoomMemoryKeys.remoteSourceCreditReservation,
+        RoomMemoryKeys.abandonRemote,
+        RoomMemoryKeys.recursedAbandonment,
+        RoomMemoryKeys.pathsThrough,
+    ]),
+    [RoomTypes.ally]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.RCL]),
+    [RoomTypes.allyRemote]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.enemy]: new Set([
+        RoomMemoryKeys.owner,
+        RoomMemoryKeys.RCL,
+        RoomMemoryKeys.powerEnabled,
+        RoomMemoryKeys.towers,
+        RoomMemoryKeys.terminal,
+        RoomMemoryKeys.energy,
+        RoomMemoryKeys.offensiveThreat,
+        RoomMemoryKeys.defensiveStrength,
+    ]),
+    [RoomTypes.enemyRemote]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.neutral]: new Set([]),
+    [RoomTypes.intersection]: new Set([]),
+    [RoomTypes.sourceKeeper]: new Set([RoomMemoryKeys.owner, RoomMemoryKeys.keeperLairCoords]),
+    [RoomTypes.center]: new Set([RoomMemoryKeys.owner]),
+    [RoomTypes.highway]: new Set([]),
 }
 
-export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set(['keeper', 'keeperCenter', 'highway', 'intersection'])
+export const constantRoomTypes: Set<Partial<RoomTypes>> = new Set([
+    RoomTypes.sourceKeeper,
+    RoomTypes.center,
+    RoomTypes.highway,
+    RoomTypes.intersection,
+])
 
-export const roomTypesUsedForStats = ['commune', 'remote']
+export const roomTypesUsedForStats = [RoomTypes.commune, RoomTypes.remote]
 
 export const creepRoles: CreepRoles[] = [
     'sourceHarvester',
@@ -62,13 +440,12 @@ export const creepRoles: CreepRoles[] = [
     'fastFiller',
     'meleeDefender',
     'rangedDefender',
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
-    'remoteHauler',
+    'remoteSourceHarvester',
     'remoteReserver',
     'remoteDefender',
     'remoteCoreAttacker',
     'remoteDismantler',
+    'remoteBuilder',
     'scout',
     'claimer',
     'vanguard',
@@ -84,21 +461,35 @@ export const creepRoles: CreepRoles[] = [
  * Roles that will interact with the room logistics system
  */
 export const roomLogisticsRoles: Set<CreepRoles> = new Set([
+    'sourceHarvester',
     'hauler',
     'builder',
     'maintainer',
     'controllerUpgrader',
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
-    'remoteHauler',
+    'remoteSourceHarvester',
     'hubHauler',
     'allyVanguard',
 ])
 
+export const communeCreepRoles: Set<CreepRoles> = new Set([
+    'sourceHarvester',
+    'hauler',
+    'builder',
+    'maintainer',
+    'controllerUpgrader',
+    'hubHauler',
+    'fastFiller',
+    'mineralHarvester',
+    'meleeDefender',
+    'rangedDefender',
+])
+
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
 
+/**
+ * Which role gets priority in which circumstance. Lowest to highest
+ */
 export enum TrafficPriorities {
-    remoteHauler,
     hauler,
     requestHauler,
     scout,
@@ -106,11 +497,11 @@ export enum TrafficPriorities {
     fastFiller,
     sourceHarvester,
     mineralHarvester,
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
-    remoteReserver,
-    remoteDismantler,
+    remoteSourceHarvester,
     remoteCoreAttacker,
+    remoteDismantler,
+    remoteReserver,
+    remoteBuilder,
     vanguard,
     allyVanguard,
     controllerUpgrader,
@@ -127,30 +518,36 @@ export enum TrafficPriorities {
     antifaRangedAttacker,
 }
 
+export const version = `v2.${global.settings.breakingVersion}.0`
+
 // Set of messages to randomly apply to commune rooms
 
-export const communeSign = 'A commune of the proletariat. Bourgeoisie not welcome here!'
+export const communeSign =
+    'A commune of the proletariat. Bourgeoisie not welcome here! Now Collectivized. ' + version
 
-// Set of messages to randomly apply to non-commune rooms
-
+/**
+ * Set of messages to randomly apply to non-commune rooms
+ */
 export const nonCommuneSigns = [
     'The top 1% have more money than the poorest 4.5 billion',
     'McDonalds workers in the US make $10/hour. In Denmark, as a result of unions, they make $22/hour',
     'We have democracy in our policial system, should we not have it in our companies too?',
     'Workers of the world, unite; you have nothing to lose but your chains!',
-    'Real democracy requires democracy in the workplace - Richard Wolff',
+    'Real democracy requires democracy in the workplace',
     'Adults spend a combined 13 years of their life under a dictatorship: the workplace',
     'Socialism is about worker ownership over the workplace',
-    'Are trans women women? Yes. Obviously.',
+    'Are trans women women? Yes.',
     'Advancing the LGBTQ+ agenda <3',
     'Does Jeff Bezos work 56,000 times harder than his average worker? Because he gets paid like it',
+    'We already eat from the trashcan all the time. The name of this trash is ideology - Slavoj Zizek',
+    'Religion is the opium of the people - Karl Marx',
 ]
 
 export const chant = [
     'Creeps',
     'of',
     Game.shard.name,
-    'unite',
+    'unite,',
     'you',
     'have',
     'nothing',
@@ -160,18 +557,23 @@ export const chant = [
     'your',
     'chains!',
     undefined,
-    'Die',
-    'Tigga',
-    'die!',
+    'PEACE',
+    'LAND',
+    'ENERGY',
     undefined,
-    'Read',
-    'Das',
-    'Kapital',
-    'on',
-    'marxists',
-    '.org',
+    'Democracy',
+    'is non-',
+    'negotiable!',
     undefined,
 ]
+/**
+ * What to say when one of our creeps dies
+ */
+export const friendlyDieChants = ['✊', '🛠️']
+/**
+ * What to say an enemy creep dies
+ */
+export const enemyDieChants = ['☮️', '❤️']
 
 export const roomDimensions = 50
 
@@ -199,6 +601,28 @@ export const allStructureTypes: StructureConstant[] = [
     STRUCTURE_INVADER_CORE,
 ]
 
+export const buildableStructureTypes: BuildableStructureConstant[] = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_ROAD,
+    STRUCTURE_WALL,
+    STRUCTURE_RAMPART,
+    STRUCTURE_LINK,
+    STRUCTURE_STORAGE,
+    STRUCTURE_TOWER,
+    STRUCTURE_OBSERVER,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_EXTRACTOR,
+    STRUCTURE_LAB,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_CONTAINER,
+    STRUCTURE_NUKER,
+    STRUCTURE_FACTORY,
+]
+export const buildableStructuresSet: Set<BuildableStructureConstant> = new Set(
+    buildableStructureTypes,
+)
+
 export const impassibleStructureTypes: StructureConstant[] = [
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
@@ -220,19 +644,18 @@ export const impassibleStructureTypes: StructureConstant[] = [
 ]
 
 export const impassibleStructureTypesSet = new Set(impassibleStructureTypes)
-export const rampartSet: Set<StructureConstant> = new Set([STRUCTURE_RAMPART])
 
-export const structureTypesByBuildPriority: StructureConstant[] = [
+export const defaultStructureTypesByBuildPriority: StructureConstant[] = [
+    STRUCTURE_RAMPART,
+    STRUCTURE_WALL,
     STRUCTURE_SPAWN,
     STRUCTURE_EXTENSION,
     STRUCTURE_CONTAINER,
     STRUCTURE_ROAD,
     STRUCTURE_STORAGE,
     STRUCTURE_TOWER,
-    STRUCTURE_WALL,
-    STRUCTURE_RAMPART,
-    STRUCTURE_LINK,
     STRUCTURE_TERMINAL,
+    STRUCTURE_LINK,
     STRUCTURE_EXTRACTOR,
     STRUCTURE_LAB,
     STRUCTURE_FACTORY,
@@ -241,45 +664,42 @@ export const structureTypesByBuildPriority: StructureConstant[] = [
     STRUCTURE_OBSERVER,
 ]
 
-export const structureTypesByNumber = {
-    empty: 0,
-    spawn: 1,
-    extension: 2,
-    container: 3,
-    tower: 4,
-    storage: 5,
-    road: 6,
-    wall: 7,
-    rampart: 8,
-    terminal: 9,
-    extractor: 10,
-    link: 11,
-    lab: 12,
-    factory: 13,
-    powerSpawn: 14,
-    nuker: 15,
-    observer: 16,
-}
+export const structureTypesToProtect: StructureConstant[] = [
+    STRUCTURE_SPAWN,
+    STRUCTURE_TOWER,
+    STRUCTURE_LAB,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_STORAGE,
+    STRUCTURE_FACTORY,
+    STRUCTURE_NUKER,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_OBSERVER,
+    STRUCTURE_LINK,
+]
+export const structureTypesToProtectSet = new Set(structureTypesToProtect)
 
-export const numbersByStructureTypes = {
-    0: 'empty',
-    1: STRUCTURE_SPAWN,
-    2: STRUCTURE_EXTENSION,
-    3: STRUCTURE_CONTAINER,
-    4: STRUCTURE_TOWER,
-    5: STRUCTURE_STORAGE,
-    6: STRUCTURE_ROAD,
-    7: STRUCTURE_WALL,
-    8: STRUCTURE_RAMPART,
-    9: STRUCTURE_TERMINAL,
-    10: STRUCTURE_EXTRACTOR,
-    11: STRUCTURE_LINK,
-    12: STRUCTURE_LAB,
-    13: STRUCTURE_FACTORY,
-    14: STRUCTURE_POWER_SPAWN,
-    15: STRUCTURE_NUKER,
-    16: STRUCTURE_OBSERVER,
-}
+export const storingStructureTypesSet: Set<StructureConstant> = new Set([
+    STRUCTURE_STORAGE,
+    STRUCTURE_TERMINAL,
+])
+
+/**
+ * Our structure types that enemies can't walk on
+ */
+export const ourImpassibleStructures = impassibleStructureTypes.concat(STRUCTURE_RAMPART)
+export const ourImpassibleStructuresSet = new Set(ourImpassibleStructures)
+
+export const combatTargetStructureTypes: Set<StructureConstant> = new Set([
+    STRUCTURE_SPAWN,
+    STRUCTURE_TOWER,
+    STRUCTURE_EXTENSION,
+    STRUCTURE_STORAGE,
+    STRUCTURE_TERMINAL,
+    STRUCTURE_POWER_SPAWN,
+    STRUCTURE_FACTORY,
+    STRUCTURE_NUKER,
+    STRUCTURE_OBSERVER,
+])
 
 export const customColors = {
     white: '#ffffff',
@@ -289,7 +709,7 @@ export const customColors = {
     lightBlue: '#0f66fc',
     darkBlue: '#02007d',
     black: '#000000',
-    yellow: '#d8f100',
+    yellow: '#ABB400',
     red: '#d10000',
     green: '#00d137',
     brown: '#aa7253',
@@ -321,7 +741,7 @@ export const remoteStamps: Record<RemoteStampTypes, Stamp> = {
 export const stamps: Record<StampTypes, Stamp> = {
     fastFiller: {
         offset: 3,
-        protectionOffset: 7,
+        protectionOffset: 6,
         size: 4,
         structures: {
             extension: [
@@ -384,99 +804,70 @@ export const stamps: Record<StampTypes, Stamp> = {
     hub: {
         offset: 2,
         protectionOffset: 5,
-        size: 3,
+        size: 0,
         structures: {
-            road: [
-                { x: 1, y: 1 },
-                { x: 2, y: 0 },
-                { x: 3, y: 0 },
-                { x: 0, y: 3 },
-                { x: 0, y: 2 },
-                { x: 1, y: 4 },
-                { x: 2, y: 4 },
-                { x: 4, y: 2 },
-                { x: 4, y: 1 },
-                { x: 3, y: 3 },
-            ],
-            link: [{ x: 2, y: 3 }],
-            factory: [{ x: 2, y: 1 }],
-            nuker: [{ x: 1, y: 2 }],
-            terminal: [{ x: 1, y: 3 }],
-            storage: [{ x: 3, y: 1 }],
-            powerSpawn: [{ x: 3, y: 2 }],
-            empty: [{ x: 2, y: 2 }],
-        },
-    },
-    extensions: {
-        offset: 2,
-        protectionOffset: 4,
-        size: 3,
-        structures: {
-            extension: [
-                { x: 1, y: 2 },
-                { x: 2, y: 1 },
-                { x: 2, y: 3 },
-                { x: 2, y: 2 },
-                { x: 3, y: 2 },
-            ],
-            road: [
-                { x: 1, y: 3 },
-                { x: 0, y: 2 },
-                { x: 1, y: 1 },
-                { x: 2, y: 0 },
-                { x: 3, y: 1 },
-                { x: 4, y: 2 },
-                { x: 3, y: 3 },
-                { x: 2, y: 4 },
-            ],
-        },
-    },
-    labs: {
-        offset: 1,
-        protectionOffset: 5,
-        size: 2,
-        asymmetry: 1,
-        structures: {
-            road: [
-                { x: 2, y: 2 },
-                { x: 1, y: 1 },
-            ],
-            lab: [
-                { x: 0, y: 1 },
-                { x: 0, y: 2 },
-                { x: 1, y: 2 },
-                { x: 1, y: 3 },
-                { x: 2, y: 3 },
+            storage: [
                 { x: 1, y: 0 },
-                { x: 2, y: 0 },
+                { x: 0, y: 1 },
                 { x: 2, y: 1 },
-                { x: 3, y: 1 },
-                { x: 3, y: 2 },
+                { x: 1, y: 2 },
             ],
         },
     },
-    tower: {
+    gridExtension: {
         offset: 0,
-        protectionOffset: 2,
-        size: 1,
-        structures: {
-            tower: [{ x: 0, y: 0 }],
-        },
-    },
-    extension: {
-        offset: 0,
-        protectionOffset: 0,
+        protectionOffset: 4,
         size: 1,
         structures: {
             extension: [{ x: 0, y: 0 }],
         },
     },
+    inputLab: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            lab: [{ x: 0, y: 0 }],
+        },
+    },
+    outputLab: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            lab: [{ x: 0, y: 0 }],
+        },
+    },
+    tower: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            tower: [{ x: 0, y: 0 }],
+        },
+    },
     observer: {
         offset: 0,
-        protectionOffset: 0,
+        protectionOffset: 4,
         size: 1,
         structures: {
             observer: [{ x: 0, y: 0 }],
+        },
+    },
+    nuker: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            nuker: [{ x: 0, y: 0 }],
+        },
+    },
+    powerSpawn: {
+        offset: 0,
+        protectionOffset: 4,
+        size: 1,
+        structures: {
+            powerSpawn: [{ x: 0, y: 0 }],
         },
     },
     sourceLink: {
@@ -519,25 +910,34 @@ export const stamps: Record<StampTypes, Stamp> = {
             road: [{ x: 0, y: 0 }],
         },
     },
-    rampart: {
+    minCutRampart: {
         offset: 0,
         protectionOffset: 0,
         size: 1,
         structures: {
             rampart: [{ x: 0, y: 0 }],
         },
-    },/*
-    gridExtension: {
+    },
+    onboardingRampart: {
         offset: 0,
         protectionOffset: 0,
         size: 1,
         structures: {
-            extension: [{ x: 0, y: 0 }],
+            rampart: [{ x: 0, y: 0 }],
         },
-    } */
+    },
+    shieldRampart: {
+        offset: 0,
+        protectionOffset: 0,
+        size: 1,
+        structures: {
+            rampart: [{ x: 0, y: 0 }],
+        },
+    },
 }
+export const stampKeys = Object.keys(stamps) as StampTypes[]
 
-export const minerals: Partial<ResourceConstant[]> = [
+export const minerals: Partial<MineralConstant[]> = [
     RESOURCE_HYDROGEN,
     RESOURCE_OXYGEN,
     RESOURCE_UTRIUM,
@@ -547,353 +947,13 @@ export const minerals: Partial<ResourceConstant[]> = [
     RESOURCE_CATALYST,
 ]
 export const boosts = [RESOURCE_CATALYZED_GHODIUM_ACID]
-export const dismantleBoosts = [RESOURCE_ZYNTHIUM_HYDRIDE, RESOURCE_ZYNTHIUM_ACID, RESOURCE_CATALYZED_ZYNTHIUM_ACID]
+export const dismantleBoosts = [
+    RESOURCE_ZYNTHIUM_HYDRIDE,
+    RESOURCE_ZYNTHIUM_ACID,
+    RESOURCE_CATALYZED_ZYNTHIUM_ACID,
+]
 export const dismantleBoostsSet = new Set(dismantleBoosts)
 export const allResources = new Set(RESOURCES_ALL)
-
-/**
- * The percent of the terminal to fill with each resource
- */
-export const terminalResourceTargets: ResourceTarget[] = [
-    {
-        resource: RESOURCE_BATTERY,
-        conditions: function (communeManager) {
-            return communeManager.room.structures.factory.length
-        },
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.005
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.015
-        },
-    },
-    {
-        resource: RESOURCE_ENERGY,
-        min: function (communeManager) {
-            if (communeManager.room.controller.level < 8) {
-                return communeManager.storedEnergyUpgradeThreshold * 1.2
-            }
-
-            return communeManager.minStoredEnergy
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.2
-        },
-    },
-    {
-        resource: RESOURCE_HYDROGEN,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_OXYGEN,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_UTRIUM,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_KEANIUM,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_LEMERGIUM,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_ZYNTHIUM,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_CATALYST,
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.027
-        },
-    },
-    {
-        resource: RESOURCE_OXIDANT,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_REDUCTANT,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_ZYNTHIUM_BAR,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_LEMERGIUM_BAR,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_UTRIUM_BAR,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_KEANIUM_BAR,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_PURIFIER,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_GHODIUM_MELT,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.01
-        },
-    },
-    {
-        resource: RESOURCE_POWER,
-        conditions: function (communeManager) {
-            return communeManager.room.structures.powerSpawn.length
-        },
-        min: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.002
-        },
-        max: function (communeManager) {
-            return communeManager.storingStructuresCapacity * 0.015
-        },
-    },
-    {
-        resource: RESOURCE_METAL,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_BIOMASS,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_SILICON,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_MIST,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_ALLOY,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_CELL,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_WIRE,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-    {
-        resource: RESOURCE_CONDENSATE,
-        min: function (communeManager) {
-            return 0
-        },
-        max: function (communeManager) {
-            return 0
-        },
-    },
-]
-
-export enum PlayerData {
-    /**
-     * Generally how good their offense is
-     */
-    offensiveStrength,
-    /**
-     * Generally how good their defense is
-     */
-    defensiveStrength,
-    /**
-     * How much we want them dead
-     */
-    hate,
-    /**
-     * The last time we were attacked by them
-     */
-    lastAttack,
-}
-
-export enum RemoteData {
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
-    remoteHauler0,
-    remoteHauler1,
-    remoteReserver,
-    remoteCoreAttacker,
-    remoteBuilder,
-    remoteDismantler,
-    minDamage,
-    minHeal,
-    enemyReserved,
-    invaderCore,
-    abandon,
-    onlyInvader,
-    disableCachedPaths,
-    /**
-     * Wether or not we are
-     */
-    active,
-}
-
-export enum ClaimRequestData {
-    claimer,
-    vanguard,
-    minDamage,
-    minHeal,
-    abandon,
-    score,
-}
-
-export enum CombatRequestData {
-    abandon,
-    rangedAttack,
-    attack,
-    dismantle,
-    downgrade,
-    minDamage,
-    minMeleeHeal,
-    minRangedHeal,
-    maxTowerDamage,
-    quads,
-    priority,
-    quadQuota,
-    inactionTimerMax,
-    inactionTimer,
-    maxThreat,
-    abandonments,
-}
-
-export enum HaulRequestData {
-    transfer,
-    distance,
-    timer,
-    priority,
-    abandon,
-}
-
-export enum AllyCreepRequestData {
-    allyVanguard,
-    abandon,
-}
-
-export enum DepositNeeds {
-    depositHarvester,
-    depositHauler,
-}
-
-export const remoteHarvesterRoles: ('remoteSourceHarvester0' | 'remoteSourceHarvester1')[] = [
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
-]
-
-export const remoteHaulerRoles: ('remoteHauler0' | 'remoteHauler1')[] = ['remoteHauler0', 'remoteHauler1']
 
 export const antifaRoles: (
     | 'antifaRangedAttacker'
@@ -901,64 +961,37 @@ export const antifaRoles: (
     | 'antifaHealer'
     | 'antifaDismantler'
     | 'antifaDowngrader'
-)[] = ['antifaRangedAttacker', 'antifaAttacker', 'antifaHealer', 'antifaDismantler', 'antifaDowngrader']
+)[] = [
+    'antifaRangedAttacker',
+    'antifaAttacker',
+    'antifaHealer',
+    'antifaDismantler',
+    'antifaDowngrader',
+]
 
 /**
  * Roles for which to provide spawnGroups for based on their shared remoteName
  */
-export const remoteRoles: (
-    | 'remoteSourceHarvester0'
-    | 'remoteSourceHarvester1'
-    | 'remoteReserver'
-    | 'remoteDefender'
-    | 'remoteCoreAttacker'
-    | 'remoteDismantler'
-)[] = [
-    'remoteSourceHarvester0',
-    'remoteSourceHarvester1',
+export const remoteRoles:
+('remoteReserver' | 'remoteDefender' | 'remoteCoreAttacker' | 'remoteDismantler')[] = [
     'remoteReserver',
     'remoteDefender',
     'remoteCoreAttacker',
     'remoteDismantler',
 ]
 
-export enum RemoteHarvesterRolesBySourceIndex {
-    remoteSourceHarvester0,
-    remoteSourceHarvester1,
-}
-
-export enum RemoteHaulerRolesBySourceIndex {
-    remoteHauler0,
-    remoteHauler1,
-}
-
 export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
-
-export const CPUBucketRenewThreshold = 5000
-export const prefferedCommuneRange = 6
 
 /**
  * Roles that should attempt relaying
  */
-export const relayRoles: Set<CreepRoles> = new Set(['hauler', 'remoteHauler'])
-
-// The dowwngrade timer for when upgrading the controller is required
-
-export const controllerDowngradeUpgraderNeed = 10000
+export const relayRoles: Set<CreepRoles> = new Set(['hauler'])
 
 /**
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
  */
 export const cacheAmountModifier = 25
-
-export const minHarvestWorkRatio = 1.66666666667
-
-export const UNWALKABLE = -1
-export const NORMAL = 0
-export const PROTECTED = 1
-export const TO_EXIT = 2
-export const EXIT = 3
 
 /**
  * Which structures should be safemoded when attacked
@@ -969,6 +1002,7 @@ export const safemodeTargets: StructureConstant[] = [
     STRUCTURE_STORAGE,
     STRUCTURE_TERMINAL,
 ]
+export const safemodeTargetsSet = new Set(safemodeTargets)
 
 /**
  * The number of ticks to wait between hauler size updates
@@ -1085,27 +1119,51 @@ export const relayOffsets = {
     ],
 }
 
-const allowedSquadCombinations: { [squadSize: string]: Partial<Record<CreepRoles, Set<CreepRoles>>> } = {
-    2: {
-        antifaRangedAttacker: new Set(['antifaRangedAttacker']),
-        antifaAttacker: new Set(['antifaHealer']),
-        antifaDismantler: new Set(['antifaHealer']),
-        antifaHealer: new Set(['antifaAttacker', 'antifaDismantler']),
+export const squadQuotas: Partial<{
+    [key in SquadTypes]: Partial<{ [key in CreepRoles]: Partial<{ [key in CreepRoles]: number }> }>
+}> = {
+    duo: {
+        antifaAttacker: {
+            antifaAttacker: 1,
+            antifaHealer: 1,
+        },
+        antifaDismantler: {
+            antifaDismantler: 1,
+            antifaHealer: 1,
+        },
     },
-    4: {
-        antifaRangedAttacker: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
-        antifaAttacker: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
-        antifaDismantler: new Set(['antifaRangedAttacker', 'antifaAttacker', 'antifaDismantler']),
+    quad: {
+        antifaRangedAttacker: {
+            antifaRangedAttacker: 4,
+        },
+        antifaAttacker: {
+            antifaAttacker: 1,
+            antifaHealer: 3,
+        },
+        antifaDismantler: {
+            antifaDismantler: 1,
+            antifaHealer: 3,
+        },
+    },
+    dynamic: {
+        antifaRangedAttacker: {
+            antifaAttacker: 1,
+            antifaHealer: 1,
+            antifaRangedAttacker: 1,
+            antifaDismantler: 1,
+        },
     },
 }
 
-export { allowedSquadCombinations }
-
 export const defaultPlainCost = 1
-export const defaultRoadPlanningPlainCost = 2
-export const defaultSwampCost = 3
+export const defaultRoadPlanningPlainCost = 3
+export const defaultSwampCost = 5
 export const defaultCreepSwampCost = 8
 
+/**
+ * @constant 1 4
+ * @constant 2 3
+ */
 export const quadAttackMemberOffsets = [
     {
         x: 0,
@@ -1124,131 +1182,42 @@ export const quadAttackMemberOffsets = [
         y: 0,
     },
 ]
+export const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
-export const quadTransformOffsets: Record<QuadTransformTypes, { x: number; y: number }[]> = {
-    none: [
-        {
-            x: 0,
-            y: 0,
-        },
-        {
-            x: 0,
-            y: 0,
-        },
-        {
-            x: 0,
-            y: 0,
-        },
-        {
-            x: 0,
-            y: 0,
-        },
-    ],
-    rotateLeft: [
-        {
-            x: 0,
-            y: 1,
-        },
-        {
-            x: 1,
-            y: 0,
-        },
-        {
-            x: 0,
-            y: -1,
-        },
-        {
-            x: -1,
-            y: 0,
-        },
-    ],
-    rotateRight: [
-        {
-            x: 1,
-            y: 0,
-        },
-        {
-            x: 0,
-            y: -1,
-        },
-        {
-            x: -1,
-            y: 0,
-        },
-        {
-            x: 0,
-            y: 1,
-        },
-    ],
-    tradeHorizontal: [
-        {
-            x: 1,
-            y: 0,
-        },
-        {
-            x: 1,
-            y: 0,
-        },
-        {
-            x: -1,
-            y: 0,
-        },
-        {
-            x: -1,
-            y: 0,
-        },
-    ],
-    tradeVertical: [
-        {
-            x: 0,
-            y: 1,
-        },
-        {
-            x: 0,
-            y: -1,
-        },
-        {
-            x: 0,
-            y: -1,
-        },
-        {
-            x: 0,
-            y: 1,
-        },
-    ],
+export enum Result {
+    fail,
+    success,
+    action,
+    noAction,
+    stop,
 }
-
-export const quadTransformIndexes: { [key in QuadTransformTypes]: number[] } = {
-    none: [0, 1, 2, 3],
-    rotateLeft: [1, 2, 3, 0],
-    rotateRight: [3, 2, 1, 0],
-    tradeHorizontal: [3, 2, 1, 0],
-    tradeVertical: [1, 0, 3, 2],
-}
-
-export const RESULT_FAIL = 0
-export const RESULT_SUCCESS = 1
-export const RESULT_ACTION = 2
-export const RESULT_NO_ACTION = 3
-/**
- * Wether there was success or fail is irrelevant. Stop future action
- */
-export const RESULT_STOP = 4
 
 export const maxRemoteRoomDistance = 5
-export const offsetsByDirection = [, [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]]
+// Past this it's probably not efficient
+export const maxRemotePathDistance = 250
+export const offsetsByDirection = [
+    ,
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1],
+]
 
 export const towerPowers = [PWR_OPERATE_TOWER, PWR_DISRUPT_TOWER]
 
-export const remoteTypeWeights: Partial<{ [key in RoomTypes]: number }> = {
-    keeper: Infinity,
-    enemy: Infinity,
-    enemyRemote: Infinity,
-    ally: Infinity,
-    allyRemote: Infinity,
+export const remoteTypeWeights: Partial<{ [key: string]: number }> = {
+    [RoomTypes.sourceKeeper]: Infinity,
+    [RoomTypes.enemy]: Infinity,
+    [RoomTypes.enemyRemote]: Infinity,
+    [RoomTypes.ally]: Infinity,
+    [RoomTypes.allyRemote]: Infinity,
 }
 
-export const maxClaimRequestDistance = 10
+export const maxWorkRequestDistance = 10
 export const maxCombatDistance = 20
 export const maxHaulDistance = 15
 
@@ -1280,7 +1249,7 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
 
 export const rangedMassAttackMultiplierByRange = [1, 1, 0.4, 0.1]
 
-export enum RoomStatNamesEnum {
+export enum RoomStatsKeys {
     ControllerLevel = 'cl',
     EnergyInputHarvest = 'eih',
     EnergyInputBought = 'eib',
@@ -1298,21 +1267,10 @@ export enum RoomStatNamesEnum {
     TotalCreepCount = 'tcc',
     PowerCreepCount = 'pcc',
     SpawnUsagePercentage = 'su',
-    AllyCreepRequestManangerCPUUsage = 'acrmcu',
-    ClaimRequestManagerCPUUsage = 'clrmcu',
-    TowerManagerCPUUsage = 'tmcu',
-    SpawnManagerCPUUsage = 'smcu',
-    CombatRequestManagerCPUUsage = 'cormcu',
-    DefenceManagerCPUUsage = 'dmcu',
-    SpawnRequestsManagerCPUUsage = 'srmcu',
-    RoomCPUUsage = 'rocu',
-    RoomVisualsManagerCPUUsage = 'rvmcu',
-    ConstructionManagerCPUUsage = 'cmcu',
-    RoleManagerCPUUsage = 'rolmcu',
-    RoleManagerPerCreepCPUUsage = 'rolmpccu',
-    EndTickCreepManagerCPUUsage = 'etcmcu',
-    PowerRoleManagerCPUUsage = 'prmcu',
-    PowerRoleManagerPerCreepCPUUsage = 'prmpccu',
+    MinHaulerCost = 'mhc',
+    EnergyOutputTransactionCosts = 'eotc',
+    EnergyTerminalSentDomestic = 'etsd',
+    EnergyTerminalSentOther = 'etso',
 
     GameTime = 'gt',
     RemoteCount = 'rc',
@@ -1320,26 +1278,7 @@ export enum RoomStatNamesEnum {
     RemoteEnergyInputHarvest = 'reih',
     RemoteEnergyOutputRepairOther = 'reoro',
     RemoteEnergyOutputBuild = 'reob',
-    RemoteRoomCPUUsage = 'rrocu',
-    RemoteRoomVisualsManagerCPUUsage = 'rrvmcu',
-    RemoteConstructionManagerCPUUsage = 'rcmcu',
-    RemoteRoleManagerCPUUsage = 'rrolmcu',
-    RemoteRoleManagerPerCreepCPUUsage = 'rrolmpccu',
-    RemoteEndTickCreepManagerCPUUsage = 'retcmcu',
-    RemotePowerRoleManangerCPUUsage = 'rprmcu',
-    RemotePowerRoleManagerPerCreepCPUUsage = 'rprmpccu',
 }
-
-export enum InternationalStatNamesEnum {
-    InternationalManagerCPUUsage = 'imcu',
-    CreepOrganizerCPUUsage = 'cocu',
-    MapVisualsManangerCPUUsage = 'mvmcu',
-    PowerCreepOrganizerCPUUsage = 'pccu',
-    TickConfigCPUUsage = 'tccu',
-    RoomManagerCPUUsage = 'roomcu',
-    StatsManagerCPUUsage = 'smcu',
-}
-
 
 export const packedPosLength = 3
 export const packedCoordLength = 2
@@ -1368,8 +1307,8 @@ export const adjacentOffsets = [
         y: -1,
     },
     {
-        x: -1,
-        y: 0,
+        x: 0,
+        y: -1,
     },
     {
         x: 1,
@@ -1385,7 +1324,7 @@ export const adjacentOffsets = [
     },
     {
         x: 0,
-        y: -1,
+        y: 1,
     },
     {
         x: -1,
@@ -1396,3 +1335,71 @@ export const adjacentOffsets = [
         y: 0,
     },
 ]
+export const defaultMinCutDepth = 7
+/* export const defaultMineralPriority = {
+    [H]:
+}
+ */
+export const decayCosts: Partial<{ [key in BuildableStructureConstant]: number }> = {
+    [STRUCTURE_ROAD]: roadUpkeepCost,
+    [STRUCTURE_CONTAINER]: containerUpkeepCost,
+}
+
+export const dynamicScoreRoomRange = 8
+export const maxControllerLevel = 8
+export const preferredCommuneRange = 5.5
+export const defaultDataDecay = 0.99999
+export const revolutionary = 'MarvinTMB'
+export const maxSegmentsOpen = 10
+/**
+ * The max possible spawn energy capacity rooms can have
+ */
+export const maxSpawnEnergyCapacity = CONTROLLER_STRUCTURES[STRUCTURE_SPAWN][maxControllerLevel] * SPAWN_ENERGY_CAPACITY + CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][8] * EXTENSION_ENERGY_CAPACITY[maxControllerLevel]
+
+/**
+ * Non-zero types of reserved registered coordinates
+ */
+export enum ReservedCoordTypes {
+    /**
+     * The creep is trying to spawn onto this coord
+     */
+    spawning,
+    /**
+     * The notable reserved coord reserver is dying
+     */
+    dying,
+    /**
+     * Probably a more temporary reserved coord that need not be considered in all situations
+     */
+    normal,
+    /**
+     * Probably a more permanent reserved coord that should be considered in more situations
+     */
+    important,
+    /**
+     * Probably a position very important to combat related coordinate reservation
+     */
+    necessary,
+}
+
+/**
+ * Types of work intents
+ */
+export enum WorkTypes {
+    harvest,
+    repair,
+    build,
+    upgrade,
+    dismantle,
+    heal,
+    attack,
+    attackController,
+}
+
+export const codecCacheLength = 99999
+
+export enum SegmentIDs {
+    General = 0,
+    BasePlans = 1,
+    Errors = 10,
+}

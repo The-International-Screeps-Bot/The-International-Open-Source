@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "builds main.js, without sending it anywhere"
+		},
+		{
+			"type": "npm",
+			"script": "push-mmo",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: push mmo",
+			"detail": "builders main.js, sending it to mmo"
+		},
+		{
+			"type": "npm",
+			"script": "push-pserver",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: push private server",
+			"detail": "builds main.js, sending it to a private server"
+		}
+	]
+}

@@ -1,33 +1,71 @@
-import { RemoteData } from 'international/constants'
-import { randomTick } from 'international/utils'
+import {
+    CreepMemoryKeys,
+    ReservedCoordTypes,
+    Result,
+    RoomMemoryKeys,
+    RoomTypes,
+    packedPosLength,
+} from 'international/constants'
+import { getRange, randomTick } from 'utils/utils'
+import {
+    packCoord,
+    reversePosList,
+    unpackCoordAsPos,
+    unpackPosAt,
+    unpackPosList,
+} from 'other/codec'
 
 export class RemoteReserver extends Creep {
-    public get dying(): boolean {
-        // Inform as dying if creep is already recorded as dying
+    constructor(creepID: Id<Creep>) {
+        super(creepID)
+    }
 
-        if (this._dying !== undefined) return this._dying
-
+    public isDying(): boolean {
         // Stop if creep is spawning
 
         if (this.spawning) return false
 
-        if (this.memory.RN) {
-            if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + Memory.rooms[this.memory.RN].RE) return false
+        if (this.memory[CreepMemoryKeys.remote]) {
+            if (
+                this.ticksToLive >
+                this.body.length * CREEP_SPAWN_TIME +
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                        RoomMemoryKeys.remoteControllerPath
+                    ].length /
+                        packedPosLength
+            )
+                return false
         } else if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-        return (this._dying = true)
+        return true
     }
 
-    hasValidRemote?() {
-        if (!this.memory.RN) return false
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
+        }
+    }
 
-        const remoteMemory = Memory.rooms[this.memory.RN]
+    initRun() {
+        if (randomTick() && !this.getActiveBodyparts(MOVE)) {
+            this.suicide()
+            return
+        }
 
-        if (remoteMemory.T !== 'remote') return false
-        if (remoteMemory.CN !== this.commune.name) return false
-        if (remoteMemory.data[RemoteData.abandon]) return false
+        if (!this.hasValidRemote()) {
+            this.removeRemote()
+            return
+        }
 
-        return true
+        // We have a valid remote
+
+        this.applyRemote()
+        this.controllerAction()
     }
 
     /**
@@ -36,48 +74,167 @@ export class RemoteReserver extends Creep {
     findRemote?() {
         if (this.hasValidRemote()) return true
 
-        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
+        for (const remoteName of remoteNamesByEfficacy) {
+            const remoteMemory = Memory.rooms[remoteName]
 
-        let roomMemory
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            if (remoteMemory[RoomMemoryKeys.remoteReservers] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 
-        for (const roomName of remoteNamesByEfficacy) {
-            roomMemory = Memory.rooms[roomName]
 
-            if (roomMemory.data[RemoteData.remoteReserver] <= 0) continue
-
-            this.memory.RN = roomName
-            roomMemory.data[RemoteData.remoteReserver] -= 1
-
+            this.assignRemote(remoteName)
             return true
         }
 
         return false
     }
 
-    preTickManager() {
-        if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
+    hasValidRemote?() {
+        const creepMemory = Memory.creeps[this.name]
+        if (!creepMemory[CreepMemoryKeys.remote]) return false
 
-        const role = this.role as 'remoteReserver'
+        const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
 
-        if (!this.findRemote()) return
-        if (this.dying) return
+        if (remoteMemory[RoomMemoryKeys.disable]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
+        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
+        if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
 
-        // Reduce remote need
+        return true
+    }
 
-        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
+    assignRemote?(remoteName: string) {
+        const creepMemory = Memory.creeps[this.name]
+        creepMemory[CreepMemoryKeys.remote] = remoteName
 
+        this.applyRemote()
+    }
+
+    applyRemote?() {
+        const creepMemory = Memory.creeps[this.name]
         const commune = this.commune
+        const remoteName = creepMemory[CreepMemoryKeys.remote]
 
-        // Add the creep to creepsOfRemote relative to its remote
+        if (commune.creepsOfRemote[remoteName])
+            commune.creepsOfRemote[remoteName][this.role].push(this.name)
 
-        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+        if (this.isDying()) return
+
+        Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteReservers] -=
+            this.parts.claim
     }
 
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
+    removeRemote?() {
+        const creepMemory = Memory.creeps[this.name]
+
+        delete creepMemory[CreepMemoryKeys.remote]
     }
 
-    static remoteReserverManager(room: Room, creepsOfRole: string[]) {
+    controllerAction?() {
+        if (this.room.name !== Memory.creeps[this.name][CreepMemoryKeys.remote]) return Result.fail
+        if (getRange(this.room.controller.pos, this.pos) > 1) return Result.fail
+
+        // The controller is reserved by someone else
+        if (
+            this.room.controller.reservation &&
+            this.room.controller.reservation.username !== Memory.me
+        ) {
+            this.attackController(this.room.controller)
+            return Result.action
+        }
+
+        // Nobody is reserving - we should
+        this.reserveController(this.room.controller)
+        return Result.success
+    }
+
+    findControllerPos?() {
+        const creepMemory = Memory.creeps[this.name]
+        let packedCoord = creepMemory[CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            return unpackCoordAsPos(packedCoord, this.room.name)
+        }
+
+        const reservedCoords = this.room.roomManager.reservedCoords
+        const usePos = this.room.roomManager.remoteControllerPositions.find(pos => {
+            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+        })
+        if (!usePos) return false
+
+        packedCoord = packCoord(usePos)
+
+        creepMemory[CreepMemoryKeys.packedCoord] = packedCoord
+        this.room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
+
+        return usePos
+    }
+
+    travelToController?() {
+        const usePos = this.findControllerPos()
+        if (!usePos) return Result.fail
+
+        this.actionCoord = this.room.controller.pos
+        if (getRange(this.pos, usePos) === 0) return Result.success
+
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: usePos,
+                        range: 0,
+                    },
+                ],
+            },
+            {
+                packedPath: reversePosList(
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                        RoomMemoryKeys.remoteControllerPath
+                    ],
+                ),
+                remoteName: this.memory[CreepMemoryKeys.remote],
+            },
+        )
+
+        return Result.action
+    }
+
+    runRemote?() {
+        if (this.travelToController() !== Result.success) return
+    }
+
+    outsideRemote?() {
+        const controllerPos = unpackPosAt(
+            Memory.rooms[Memory.creeps[this.name][CreepMemoryKeys.remote]][
+                RoomMemoryKeys.remoteControllerPositions
+            ],
+        )
+
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: controllerPos,
+                        range: 0,
+                    },
+                ],
+            },
+            {
+                packedPath: reversePosList(
+                    Memory.rooms[this.memory[CreepMemoryKeys.remote]][
+                        RoomMemoryKeys.remoteControllerPath
+                    ],
+                ),
+                remoteName: this.memory[CreepMemoryKeys.remote],
+            },
+        )
+    }
+
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RemoteReserver = Game.creeps[creepName]
 
@@ -86,6 +243,9 @@ export class RemoteReserver extends Creep {
             if (!creep.findRemote()) {
                 // If the room is the creep's commune
 
+                creep.message = '❌ Remote'
+
+                /*
                 if (room.name === creep.commune.name) {
                     // Advanced recycle and iterate
 
@@ -104,41 +264,20 @@ export class RemoteReserver extends Creep {
                         },
                     ],
                 })
-
+ */
                 continue
             }
 
-            creep.message = creep.memory.RN
+            creep.message = creep.memory[CreepMemoryKeys.remote]
 
             // If the creep is in the remote
 
-            if (room.name === creep.memory.RN) {
-                // Try to reserve the controller
-
-                creep.advancedReserveController()
+            if (room.name === creep.memory[CreepMemoryKeys.remote]) {
+                creep.runRemote()
                 continue
             }
 
-            // Otherwise, make a moveRequest to it
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
-                        range: 25,
-                    },
-                ],
-                avoidEnemyRanges: true,
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-                avoidAbandonedRemotes: true,
-            })
+            creep.outsideRemote()
         }
     }
 }

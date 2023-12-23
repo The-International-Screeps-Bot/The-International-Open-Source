@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { SourceMapConsumer } from 'source-map'
-import ErrorExporter from './ErrorExporter'
-import { settings } from '../international/settings'
+import { errorExporter } from './ErrorExporter'
+
 export class ErrorMapper {
     // Cache consumer
     private static _consumer?: SourceMapConsumer
@@ -81,12 +81,21 @@ export class ErrorMapper {
                     if ('sim' in Game.rooms) {
                         const message = `Source maps don't work in the simulator - displaying original error`
                         // @ts-ignore
-                        console.log(`<p style='color:#bb3d3d;'>${message}<br>${_.escape(e.stack)}</p>`)
+                        console.log(
+                            `<p style='color:#bb3d3d;'>${message}<br>${_.escape(e.stack)}</p>`,
+                        )
+                    } else if (Game.cpu.bucket < Game.cpu.tickLimit) {
+                        const message = `Out of CPU - displaying original error`
+                        // @ts-ignore
+                        console.log(
+                            `<p style='color:#bb3d3d;'>${message}<br>${_.escape(e.stack)}</p>`,
+                        )
                     } else {
                         const stack = _.escape(this.sourceMappedStackTrace(e))
                         // @ts-ignore
                         console.log(`<p style='color:#bb3d3d;'>${stack}</p>`)
-                        if (Memory.errorExporting) ErrorExporter.addErrorToSegment(stack, settings.breakingVersion)
+                        if (global.settings.errorExporting)
+                            errorExporter.addErrorToSegment(stack, global.settings.breakingVersion)
                     }
                 } else {
                     // can't handle it

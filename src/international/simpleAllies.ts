@@ -1,187 +1,246 @@
-export enum AllyRequestTypes {
-    /**
-     * Tell allies to send below a certain amount of resources a room
-     */
-    resource,
-    /**
-     * Tell allies to defend a room
-     */
-    defense,
-    /**
-     * Tell allies to attack a room
-     */
-    attack,
-    /**
-     * No support from this code, I have no clue what this is for
-     */
-    execute,
-    /**
-     * Tell allies they should hate a player a specific amount
-     */
-    hate,
-    /**
-     * No support from this code, I strongly suggest utilizing resource requests for this cause
-     */
-    funnel,
-    /**
-     * Request help in building a room's structures
-     */
-    build,
-}
+import { collectiveManager } from "./collective"
+import { maxSegmentsOpen } from "./constants"
 
-interface AllyRequest {
-    requestType: AllyRequestTypes
-    roomName?: string
-    playerName?: string
-    resourceType?: ResourceConstant
-    maxAmount?: number
-    /**
-     * A number representing the need of the request, where 1 is highest and 0 is lowest
-     */
+export type AllyRequestTypes =     'resource' |
+'defense' |
+'attack' |
+'player' |
+'work' |
+'econ' |
+'room'
+
+export interface ResourceRequest {
     priority: number
+    roomName: string
+    resourceType: ResourceConstant
     /**
-     * The minimum amount of damage a squad needs
+     * How much they want of the resource. If the responder sends only a portion of what you ask for, that's fine
      */
-    minDamage?: number
+    amount: number
     /**
-     * The minimum amount of heal a ranged squad needs
+     * If the bot has no terminal, allies should instead haul the resources to us
      */
-    minRangedHeal?: number
-    /**
-     * The minimum amount of heal a melee squad needs
-     */
-    minMeleeHeal?: number
-    /**
-     * How much hate to increase or decrease a player by
-     */
-    hateAmount?: number
+    terminal?: boolean
 }
 
+export interface DefenseRequest {
+    roomName: string
+    priority: number
+}
+
+export interface AttackRequest {
+    roomName: string
+    priority: number
+}
+
+export interface PlayerRequest {
+    playerName: string
+    /**
+     * The amount you think your team should hate the player. Hate should probably affect combat aggression and targetting
+     */
+    hate?: number
+    /**
+     * The last time this player has attacked you
+     */
+    lastAttackedBy?: number
+}
+
+export type WorkRequestType = 'build' | 'upgrade' | 'repair'
+
+export interface WorkRequest {
+    roomName: string
+    priority: number
+    workType: WorkRequestType
+}
+
+export interface EconRequest {
+    /**
+     * total credits the bot has. Should be 0 if there is no market on the server
+     */
+    credits: number
+    /**
+     * the maximum amount of energy the bot is willing to share with allies. Should never be more than the amount of energy the bot has in storing structures
+     */
+    sharableEnergy: number
+    /**
+     * The average energy income the bot has calculated over the last 100 ticks
+     * Optional, as some bots might not be able to calculate this easily.
+     */
+    energyIncome?: number
+    /**
+     * The number of mineral nodes the bot has access to, probably used to inform expansion
+     */
+    mineralNodes?: { [key in MineralConstant]: number }
+}
+
+export interface RoomRequest {
+    roomName: string
+    /**
+     * The player who owns this room. If there is no owner, the room probably isn't worth making a request about
+     */
+    playerName: string
+    /**
+     * The last tick your scouted this room to acquire the data you are now sharing
+     */
+    lastScout: number
+    rcl: number
+    /**
+     * The amount of stored energy the room has. storage + terminal + factory should be sufficient
+     */
+    energy: number
+    towers: number
+    avgRamprtHits: number
+    terminal: boolean
+}
+
+export interface AllyRequests {
+    resource?: ResourceRequest[]
+    defense?: DefenseRequest[]
+    attack?: AttackRequest[]
+    player?: PlayerRequest[]
+    work?: WorkRequest[]
+    econ?: EconRequest
+    room?: RoomRequest[]
+}
 /**
- * Contains functions and methods useful for ally trading. Ensure allyTrading in Memory is enabled, as well as no other values or in the designated simpleAlliesSegment before usage
+ * Having data we pass into the segment being an object allows us to send additional information outside of requests
  */
-class AllyManager {
+export interface SimpleAlliesSegment {
     /**
-     * An array of the requests you have made this tick
+     * Requests of the new system
      */
-    myRequests: AllyRequest[]
+    requests: AllyRequests
+    commands: any[]
+}
+
+export class SimpleAllies {
+    myRequests: Partial<AllyRequests> = {}
+    allySegmentData: SimpleAlliesSegment
+    currentAlly: string
 
     /**
-     * An array of all the current requests made by other allies
+     * To call before any requests are made or responded to. Configures some required values and gets ally requests
      */
-    allyRequests: AllyRequest[]
-
-    /**
-     * Gets allyRequests, sets up requirements to use the foreign segment
-     */
-    getAllyRequests() {
-        if (!Memory.allyTrading) return
-
-        const allyArray = Array.from(Memory.allyPlayers)
-        if (!allyArray.length) return
-
-        // Run every so often, increasing based on ally count
-
-        if (Game.time % (10 + allyArray.length) >= allyArray.length) return
-
-        const currentAllyName = allyArray[Game.time % allyArray.length]
-
-        //
-
-        if (RawMemory.foreignSegment && RawMemory.foreignSegment.username === currentAllyName) {
-            // Get the allyRequests and record them in the allyManager
-
-            this.allyRequests = JSON.parse(RawMemory.foreignSegment.data)
+    initRun() {
+        // Reset the data of myRequests
+        this.myRequests = {
+            resource: [],
+            defense: [],
+            attack: [],
+            player: [],
+            work: [],
+            room: [],
         }
 
-        const nextAllyName = allyArray[(Game.time + 1) % allyArray.length]
-        RawMemory.setActiveForeignSegment(nextAllyName, Memory.simpleAlliesSegment)
+        this.readAllySegment()
     }
-    /**
-     * To call before any requests are made. Configures some required values
-     */
-    tickConfig() {
-        // Initialize myRequests and allyRequests
 
-        this.myRequests = []
-        this.allyRequests = []
+    /**
+     * Try to get segment data from our current ally. If successful, assign to the instane
+     */
+    readAllySegment() {
+        if (!global.settings.allies.length) {
+            throw Error("Failed to find an ally for simpleAllies, you probably have none :(")
+        }
+
+        this.currentAlly = global.settings.allies[Game.time % global.settings.allies.length]
+
+        // Make a request to read the data of the next ally in the list, for next tick
+        const nextAllyName = global.settings.allies[(Game.time + 1) % global.settings.allies.length]
+        RawMemory.setActiveForeignSegment(nextAllyName, global.settings.allySegmentID)
+
+        // Maybe the code didn't run last tick, so we didn't set a new read segment
+        if (!RawMemory.foreignSegment) return
+        if (RawMemory.foreignSegment.username !== this.currentAlly) return
+
+        // Protect from errors as we try to get ally segment data
+        try {
+            this.allySegmentData = JSON.parse(RawMemory.foreignSegment.data)
+        } catch (err) {
+            console.log('Error in getting requests for simpleAllies', this.currentAlly)
+        }
+
+        console.log('data',this.allySegmentData)
     }
 
     /**
      * To call after requests have been made, to assign requests to the next ally
      */
-    endTickManager() {
-        if (!Memory.allyTrading) return
+    endRun() {
 
-        if (Object.keys(RawMemory.segments).length < 10) {
-            // Assign myRequests to the public segment
-            RawMemory.segments[Memory.simpleAlliesSegment] = JSON.stringify(this.myRequests || [])
-            RawMemory.setPublicSegments([Memory.simpleAlliesSegment])
+        // Make sure we don't have too many segments open
+        if (Object.keys(RawMemory.segments).length >= maxSegmentsOpen) {
+            throw Error('Too many segments open: simpleAllies')
+        }
+
+        this.allyRequestsFromMyTerminalRequests()
+
+        const newSegmentData: SimpleAlliesSegment = {
+            requests: this.myRequests as AllyRequests,
+            commands: collectiveManager.myCommands,
+        }
+
+        RawMemory.segments[global.settings.allySegmentID] = JSON.stringify(newSegmentData)
+        RawMemory.setPublicSegments([global.settings.allySegmentID])
+    }
+
+    /**
+     * Convert unfilfilled terminal requests to ally requests, so they can respond to them. The goal is to prioritize internal sending over ally sending
+     */
+    private allyRequestsFromMyTerminalRequests() {
+        for (const ID in collectiveManager.terminalRequests) {
+            const request = collectiveManager.terminalRequests[ID]
+
+            this.myRequests.resource.push({
+                roomName: request.roomName,
+                resourceType: request.resource,
+                amount: request.amount,
+                terminal: true,
+                priority: request.priority,
+            })
         }
     }
 
-    requestAttack(
-        roomName: string,
-        playerName: string,
-        minDamage: number = 0,
-        minMeleeHeal: number = 0,
-        minRangedHeal: number = 0,
-        priority: number = 0,
-    ) {
-        this.myRequests.push({
-            requestType: AllyRequestTypes.attack,
-            roomName,
-            playerName,
-            minDamage,
-            minMeleeHeal,
-            minRangedHeal,
-            priority,
-        })
+    // Request methods
+
+    requestResource(args: ResourceRequest) {
+
+        this.myRequests.resource.push(args)
     }
 
     requestDefense(
-        roomName: string,
-        minDamage: number = 0,
-        minMeleeHeal: number = 0,
-        minRangedHeal: number = 0,
-        priority: number = 0,
+        args: DefenseRequest
     ) {
-        this.myRequests.push({
-            requestType: AllyRequestTypes.defense,
-            roomName,
-            minDamage,
-            minMeleeHeal,
-            minRangedHeal,
-            priority,
-        })
+
+        this.myRequests.defense.push(args)
     }
 
-    requestHate(playerName: string, hateAmount: number, priority: number = 0) {
-        this.myRequests.push({
-            requestType: AllyRequestTypes.hate,
-            playerName,
-            hateAmount,
-            priority,
-        })
+    requestAttack(
+        args: AttackRequest
+    ) {
+
+        this.myRequests.attack.push(args)
     }
 
-    requestResource(roomName: string, resourceType: ResourceConstant, maxAmount: number, priority: number = 0) {
-        this.myRequests.push({
-            requestType: AllyRequestTypes.resource,
-            resourceType,
-            maxAmount,
-            roomName,
-            priority,
-        })
+    requestPlayer(args: PlayerRequest) {
+
+        this.myRequests.player.push(args)
     }
 
-    requestBuild(roomName: string, priority: number = 0) {
-        this.myRequests.push({
-            requestType: AllyRequestTypes.build,
-            roomName,
-            priority,
-        })
+    requestWork(args: WorkRequest) {
+
+        this.myRequests.work.push(args)
+    }
+
+    requestEcon(args: EconRequest) {
+
+        this.myRequests.econ = args
+    }
+
+    requestRoom(args: RoomRequest) {
+
+        this.myRequests.room.push(args)
     }
 }
 
-export const allyManager = new AllyManager()
+export const simpleAllies = new SimpleAllies()

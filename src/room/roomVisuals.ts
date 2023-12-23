@@ -1,21 +1,23 @@
 import {
-    ClaimRequestData,
-    CombatRequestData,
-    HaulRequestData,
+    WorkRequestKeys,
+    CombatRequestKeys,
+    HaulRequestKeys,
     customColors,
-    NORMAL,
-    PROTECTED,
-    RemoteData,
     roomDimensions,
     stamps,
     packedPosLength,
+    RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
-import { customLog, findObjectWithID, unpackNumAsCoord } from 'international/utils'
+import { statsManager } from 'international/statsManager'
+import { customLog } from 'utils/logging'
+import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
-import { allyManager, AllyRequestTypes } from 'international/simpleAllies'
-import { internationalManager } from 'international/international'
+import { simpleAllies, AllyRequestTypes } from 'international/simpleAllies'
+import { collectiveManager } from 'international/collective'
+import { playerManager } from 'international/players'
+import { unpackCoord } from 'other/codec'
 
 export class RoomVisualsManager {
     roomManager: RoomManager
@@ -26,35 +28,21 @@ export class RoomVisualsManager {
 
     public run() {
         const { room } = this.roomManager
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         this.roomVisuals()
         this.baseVisuals()
         this.dataVisuals()
-
-        // If CPU logging is enabled, log the CPU used by this.roomManager.room manager
-
-        if (Memory.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Room Visuals Manager', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'rvmcu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
-        }
     }
 
     private roomVisuals() {
         // Stop if roomVisuals are disabled
 
-        if (!Memory.roomVisuals) return
+        if (!global.settings.roomVisuals) return
 
         this.controllerVisuals()
         this.spawnVisuals()
         this.cSiteTargetVisuals()
+        this.reservedCoordsVisuals()
     }
 
     private controllerVisuals() {
@@ -70,7 +58,8 @@ export class RoomVisualsManager {
             if (this.roomManager.room.controller.level < 8)
                 this.roomManager.room.visual.text(
                     `%${(
-                        (this.roomManager.room.controller.progress / this.roomManager.room.controller.progressTotal) *
+                        (this.roomManager.room.controller.progress /
+                            this.roomManager.room.controller.progressTotal) *
                         100
                     ).toFixed(2)}`,
                     this.roomManager.room.controller.pos.x,
@@ -109,7 +98,11 @@ export class RoomVisualsManager {
                     return customColors.lightBlue
                 }
 
-                if (Memory.allyPlayers.includes(this.roomManager.room.controller.reservation.username)) {
+                if (
+                    global.settings.allies.includes(
+                        this.roomManager.room.controller.reservation.username,
+                    )
+                ) {
                     return customColors.green
                 }
 
@@ -136,7 +129,7 @@ export class RoomVisualsManager {
     private spawnVisuals() {
         // Get the spawns in the room
 
-        const spawns = this.roomManager.room.structures.spawn
+        const spawns = this.roomManager.structures.spawn
 
         // Loop through them
 
@@ -182,66 +175,57 @@ export class RoomVisualsManager {
     private cSiteTargetVisuals() {
         // If there is not a CSTID, stop
 
-        if (!this.roomManager.room.memory.CSTID) return
+        if (!this.roomManager.room.memory[RoomMemoryKeys.constructionSiteTarget]) return
 
         // Convert the construction target ID into a game object
 
-        const constructionTarget = findObjectWithID(this.roomManager.room.memory.CSTID)
+        const constructionTarget = findObjectWithID(
+            this.roomManager.room.memory[RoomMemoryKeys.constructionSiteTarget],
+        )
 
         // If the constructionTarget exists, show visuals for it
 
         if (constructionTarget) this.roomManager.room.visual.text('🚧', constructionTarget.pos)
     }
 
-    private baseVisuals() {
-        if (!Memory.baseVisuals) return
+    private reservedCoordsVisuals() {
 
-        if (!this.roomManager.room.memory.PC) return
+        for (const [packedCoord] of this.roomManager.reservedCoords) {
 
-        for (const stampType in stamps) {
-            const stamp = stamps[stampType as StampTypes]
+            const coord = unpackCoord(packedCoord)
 
-            for (const packedStampAnchor of this.roomManager.room.memory.stampAnchors[stampType as StampTypes]) {
-                const stampAnchor = unpackNumAsCoord(packedStampAnchor)
-
-                for (const structureType in stamp.structures) {
-                    if (structureType === 'empty') continue
-
-                    for (const pos of stamp.structures[structureType]) {
-                        // Re-assign the pos's x and y to align with the offset
-
-                        const x = pos.x + stampAnchor.x - stamp.offset
-                        const y = pos.y + stampAnchor.y - stamp.offset
-
-                        this.roomManager.room.visual.structure(x, y, structureType as StructureConstant, {
-                            opacity: 0.3,
-                        })
-                    }
-                }
-            }
+            this.roomManager.room.coordVisual(coord.x, coord.y)
         }
+    }
 
-        this.roomManager.room.visual.connectRoads({
-            opacity: 0.3,
-        })
+    private baseVisuals() {
+        if (!global.settings.baseVisuals) return
+
+        const roomMemory = Memory.rooms[this.roomManager.room.name]
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return
+        if (!roomMemory[RoomMemoryKeys.communePlanned]) return
+
+        this.roomManager.room.communeManager.constructionManager.visualize()
     }
 
     private dataVisuals() {
+        if (!global.settings.dataVisuals) return
 
-        if (!Memory.dataVisuals) return
+        if (!collectiveManager.communes.has(this.roomManager.room.name)) return
 
-        if (!global.communes.has(this.roomManager.room.name)) return
-
-        this.remoteDataVisuals(this.generalDataVisuals(1))
+        this.remoteDataVisuals(this.statDataVisuals(this.generalDataVisuals(1)))
     }
 
     public internationalDataVisuals() {
-
-        this.internationalAllyBuildRequestsDataVisuals(
+        this.internationalAllyWorkRequestsDataVisuals(
             this.internationalAllyCombatRequestsDataVisuals(
                 this.internationalAllyResourceRequestsDataVisuals(
                     this.internationalRequestsDataVisuals(
-                        this.internationalTerminalRequestsDataVisuals(this.internationalGeneralDataVisuals(1)),
+                        this.internationalTerminalRequestsDataVisuals(
+                            this.internationalStatDataVisuals(
+                                this.internationalGeneralDataVisuals(1),
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -249,8 +233,50 @@ export class RoomVisualsManager {
     }
 
     private internationalGeneralDataVisuals(y: number) {
-        const headers: any[] = [
-            'estimatedIncome',
+        const headers = ['funnelOrder', 'highestThreat', 'minCredits', 'last config']
+
+        const data: any[][] = [[]]
+
+        data[0].push(
+            collectiveManager.funnelOrder.slice(0, 3),
+            playerManager.highestThreat,
+            collectiveManager.minCredits,
+            Game.time - Memory.lastConfig,
+        )
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'International',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalStatDataVisuals(y: number) {
+        const headers = [
+            'est. income',
             'commune harvest',
             'remote harvest',
             'upgrade',
@@ -280,22 +306,22 @@ export class RoomVisualsManager {
             totalRemoteEnergyHarvested += roomStats.reih
             totalUpgrade += roomStats.eou
             totalBuild += roomStats.eob
-            totalRepairOther = roomStats.eoro
-            totalBarricadeRepair = roomStats.eorwr
-            totalSpawn = roomStats.su
+            totalRepairOther += roomStats.eoro
+            totalBarricadeRepair += roomStats.eorwr
+            totalSpawn += roomStats.su
         }
 
-        totalSpawn = totalSpawn / Object.keys(Memory.stats.rooms).length
+        const avgSpawn = totalSpawn / collectiveManager.communes.size
 
         data[0].push(
-            totalEstimatedIncome,
+            totalEstimatedIncome.toFixed(2),
             totalCommuneEnergyHarvested.toFixed(2),
             totalRemoteEnergyHarvested.toFixed(2),
             totalUpgrade.toFixed(2),
             totalBuild.toFixed(2),
             totalRepairOther.toFixed(2),
             totalBarricadeRepair.toFixed(2),
-            totalSpawn.toFixed(2),
+            avgSpawn.toFixed(2),
         )
 
         const height = 3 + data.length
@@ -329,29 +355,38 @@ export class RoomVisualsManager {
     }
 
     private internationalRequestsDataVisuals(y: number) {
-        const headers: any[] = ['requestName', 'type', 'responderName', 'abandon']
+        const headers = ['requestName', 'type', 'responderName', 'abandon']
 
         const data: any[][] = []
 
-        for (const requestName in Memory.claimRequests) {
-            const request = Memory.claimRequests[requestName]
+        for (const requestName in Memory.workRequests) {
+            const request = Memory.workRequests[requestName]
 
-            if (!request.responder) continue
+            if (!request[WorkRequestKeys.responder]) continue
 
-            const row: any[] = [requestName, 'default', request.responder, request.data[ClaimRequestData.abandon]]
+            const row: any[] = [
+                requestName,
+                'default',
+                request[WorkRequestKeys.responder],
+                request[WorkRequestKeys.abandon],
+            ]
             data.push(row)
         }
 
         for (const requestName in Memory.combatRequests) {
             const request = Memory.combatRequests[requestName]
 
-            if (request.T !== 'defend' && !request.responder) continue
+            if (
+                request[CombatRequestKeys.type] !== 'defend' &&
+                !request[CombatRequestKeys.responder]
+            )
+                continue
 
             const row: any[] = [
                 requestName,
-                request.T,
-                request.responder || 'none',
-                request.data[CombatRequestData.abandon],
+                request[CombatRequestKeys.type],
+                request[CombatRequestKeys.responder] || 'none',
+                request[CombatRequestKeys.abandon],
             ]
             data.push(row)
         }
@@ -359,13 +394,13 @@ export class RoomVisualsManager {
         for (const requestName in Memory.haulRequests) {
             const request = Memory.haulRequests[requestName]
 
-            if (!request.responder) continue
+            if (!request[HaulRequestKeys.responder]) continue
 
             const row: any[] = [
                 requestName,
-                request.data[HaulRequestData.transfer] ? 'transfer' : 'withdraw',
-                request.responder,
-                request.data[HaulRequestData.abandon],
+                request[HaulRequestKeys.type],
+                request[HaulRequestKeys.responder],
+                request[HaulRequestKeys.abandon],
             ]
             data.push(row)
         }
@@ -401,14 +436,19 @@ export class RoomVisualsManager {
     }
 
     private internationalTerminalRequestsDataVisuals(y: number) {
-        const headers: any[] = ['roomName', 'resource', 'amount', 'priority']
+        const headers = ['roomName', 'resource', 'amount', 'priority']
 
         const data: any[][] = []
 
-        for (const ID in internationalManager.terminalRequests) {
-            const request = internationalManager.terminalRequests[ID]
+        for (const ID in collectiveManager.terminalRequests) {
+            const request = collectiveManager.terminalRequests[ID]
 
-            const row: any[] = [request.roomName, request.resource, request.amount, request.priority]
+            const row: any[] = [
+                request.roomName,
+                request.resource,
+                request.amount,
+                request.priority,
+            ]
             data.push(row)
         }
 
@@ -443,63 +483,22 @@ export class RoomVisualsManager {
     }
 
     private internationalAllyResourceRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'resource', 'amount', 'priority']
-
-        const data: any[][] = []
-
-        for (const request of allyManager.allyRequests) {
-            if (request.requestType !== AllyRequestTypes.resource) continue
-
-            const row: any[] = [request.roomName, request.resourceType, request.maxAmount, request.priority.toFixed(2)]
-            data.push(row)
-            continue
+        if (!simpleAllies.allySegmentData) {
+            return y
         }
 
-        const height = 3 + data.length
-
-        Dashboard({
-            config: {
-                room: this.roomManager.room.name,
-            },
-            widgets: [
-                {
-                    pos: {
-                        x: 1,
-                        y,
-                    },
-                    width: 47,
-                    height,
-                    widget: Rectangle({
-                        data: Table(() => ({
-                            data,
-                            config: {
-                                label: 'Ally Resource Requests',
-                                headers,
-                            },
-                        })),
-                    }),
-                },
-            ],
-        })
-
-        return y + height
-    }
-
-    private internationalAllyCombatRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'type', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
+        const headers = ['room', 'resource', 'amount', 'priority']
 
         const data: any[][] = []
 
-        for (const request of allyManager.allyRequests) {
-            if (request.requestType !== AllyRequestTypes.attack && request.requestType !== AllyRequestTypes.defense)
-                continue
+        const requests = simpleAllies.allySegmentData.requests.resource
+        for (const ID in requests) {
+            const request = requests[ID]
 
             const row: any[] = [
                 request.roomName,
-                AllyRequestTypes[request.requestType],
-                request.minDamage,
-                request.minMeleeHeal,
-                request.minRangedHeal,
+                request.resourceType,
+                request.amount,
                 request.priority.toFixed(2),
             ]
             data.push(row)
@@ -524,7 +523,7 @@ export class RoomVisualsManager {
                         data: Table(() => ({
                             data,
                             config: {
-                                label: 'Ally Combat Requests',
+                                label: 'Incoming Ally Resource Requests',
                                 headers,
                             },
                         })),
@@ -536,15 +535,29 @@ export class RoomVisualsManager {
         return y + height
     }
 
-    private internationalAllyBuildRequestsDataVisuals(y: number) {
-        const headers: any[] = ['room', 'priority']
+    private internationalAllyCombatRequestsDataVisuals(y: number) {
+        if (!simpleAllies.allySegmentData) {
+            return y
+        }
+
+        const headers = ['room', 'minDamage', 'minMeleeHeal', 'minRangedHeal', 'priority']
 
         const data: any[][] = []
 
-        for (const request of allyManager.allyRequests) {
-            if (request.requestType !== AllyRequestTypes.build) continue
+        const defenseRequests = simpleAllies.allySegmentData.requests.defense
+        for (const roomName in defenseRequests) {
+            const request = defenseRequests[roomName]
 
-            const row: any[] = [request.roomName, request.priority.toFixed(2)]
+            const row: any[] = [roomName, request.priority.toFixed(2)]
+            data.push(row)
+            continue
+        }
+
+        const attackRequests = simpleAllies.allySegmentData.requests.attack
+        for (const roomName in attackRequests) {
+            const request = attackRequests[roomName]
+
+            const row: any[] = [roomName, request.priority.toFixed(2)]
             data.push(row)
             continue
         }
@@ -567,7 +580,55 @@ export class RoomVisualsManager {
                         data: Table(() => ({
                             data,
                             config: {
-                                label: 'Ally Build Requests',
+                                label: 'Incoming Ally Combat Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
+    private internationalAllyWorkRequestsDataVisuals(y: number) {
+        if (!simpleAllies.allySegmentData) {
+            return y
+        }
+
+        const headers = ['room', 'type', 'priority']
+
+        const data: any[][] = []
+
+        const requests = simpleAllies.allySegmentData.requests.work
+        for (const roomName in requests) {
+            const request = requests[roomName]
+
+            const row: any[] = [roomName, request.workType, request.priority.toFixed(2)]
+            data.push(row)
+            continue
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Incoming Ally Build Requests',
                                 headers,
                             },
                         })),
@@ -580,37 +641,29 @@ export class RoomVisualsManager {
     }
 
     private generalDataVisuals(y: number) {
-        const headers: any[] = [
+        const headers = [
             'energy',
             'minEnergy',
             'minRampartHits',
-            'estimatedIncome',
-            'CHarvest',
-            'RHarvest',
-            'upgrade',
-            'build',
-            'rep Other',
-            'rep barricade',
+            'threatened',
+            'last attacked',
+            'upgrade thresh',
+            'build thresh',
             'inferiority',
-            'spawn util',
         ]
 
-        const roomStats = Memory.stats.rooms[this.roomManager.room.name]
+        const roomMemory = Memory.rooms[this.roomManager.room.name]
 
         const data: any[][] = [
             [
-                this.roomManager.room.resourcesInStoringStructures.energy || 0,
+                this.roomManager.resourcesInStoringStructures.energy || 0,
                 this.roomManager.room.communeManager.minStoredEnergy,
                 this.roomManager.room.communeManager.minRampartHits,
-                this.roomManager.room.communeManager.estimatedEnergyIncome,
-                roomStats.eih.toFixed(2),
-                roomStats.reih.toFixed(2),
-                roomStats.eou.toFixed(2),
-                roomStats.eob.toFixed(2),
-                roomStats.eoro.toFixed(2),
-                roomStats.eorwr.toFixed(2),
+                roomMemory[RoomMemoryKeys.threatened].toFixed(2),
+                roomMemory[RoomMemoryKeys.lastAttackedBy],
+                this.roomManager.room.communeManager.storedEnergyUpgradeThreshold,
+                this.roomManager.room.communeManager.storedEnergyBuildThreshold,
                 this.roomManager.room.towerInferiority || 'false',
-                roomStats.su.toFixed(2) + '%',
             ],
         ]
 
@@ -644,28 +697,128 @@ export class RoomVisualsManager {
         return y + height
     }
 
+    statDataVisuals(y: number) {
+        const headers = [
+            'estimatedIncome',
+            'CHarvest',
+            'RHarvest',
+            'upgrade',
+            'build',
+            'rep Other',
+            'rep barricade',
+            'barricades cost',
+            'spawn util',
+        ]
+
+        const roomStats = Memory.stats.rooms[this.roomManager.room.name]
+
+        const data: any[][] = [
+            [
+                this.roomManager.room.communeManager.estimatedEnergyIncome,
+                roomStats.eih.toFixed(2),
+                roomStats.reih.toFixed(2),
+                roomStats.eou.toFixed(2),
+                roomStats.eob.toFixed(2),
+                roomStats.eoro.toFixed(2),
+                roomStats.eorwr.toFixed(2),
+                this.roomManager.room.communeManager.rampartsMaintenanceCost,
+                (roomStats.su * 100).toFixed(2) + '%',
+            ],
+        ]
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: this.roomManager.room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Stats',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+
+        return y + height
+    }
+
     requestDataVisuals(y: number) {}
 
     private remoteDataVisuals(y: number) {
-        const headers: any[] = ['remote', 'sourceIndex', 'efficacy', 'harvester', 'hauler', 'reserver', 'abandoned']
+        const headers = [
+            'room',
+            'sourceIndex',
+            '📈',
+            '⚡⛏️',
+            'hauler',
+            '⚡',
+            'Δ⚡',
+            '⚡Reserved',
+            'reserver',
+            'coreAttacker',
+            '❌',
+            '🛑',
+        ]
         const data: any[][] = []
 
-        for (const remoteInfo of this.roomManager.room.remoteSourceIndexesByEfficacy) {
+        for (const remoteInfo of this.roomManager.remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
-            const remoteMemory = Memory.rooms[remoteName]
-            const remoteData = remoteMemory.data
 
+            const remoteMemory = Memory.rooms[remoteName]
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.roomManager.room.name) continue
+
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+            const pathType = this.roomManager.room.communeManager.remoteResourcePathType
             const row: any[] = []
 
             row.push(remoteName)
             row.push(sourceIndex)
-            row.push(remoteMemory.SPs[sourceIndex].length / packedPosLength)
-            row.push(remoteData[RemoteData[`remoteSourceHarvester${sourceIndex}`]])
-            row.push(remoteData[RemoteData[`remoteHauler${sourceIndex}`]])
-            row.push(remoteData[RemoteData.remoteReserver])
-            row.push(remoteData[RemoteData.abandon])
+            if (remoteMemory[pathType][sourceIndex])
+                row.push(remoteMemory[pathType][sourceIndex].length / packedPosLength)
+            else row.push('unknown')
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.haulers][sourceIndex])
+            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
+            if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] !== undefined)
+                row.push(
+                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2),
+                )
+            else row.push('unknown')
+            row.push(
+                remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
+                    '/' +
+                    Math.round(
+                        (remoteMemory[pathType][sourceIndex].length / packedPosLength) *
+                            remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
+                    ) *
+                        2,
+            )
+            row.push(remoteMemory[RoomMemoryKeys.remoteReservers])
+            row.push(
+                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] ||
+                    remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '',
+            )
+            row.push(
+                remoteMemory[RoomMemoryKeys.abandonRemote] ||
+                    remoteMemory[RoomMemoryKeys.abandonRemote] + '',
+            )
+            row.push(remoteMemory[RoomMemoryKeys.disable] ? 'OFF' : 'ON')
 
             data.push(row)
         }

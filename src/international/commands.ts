@@ -1,4 +1,5 @@
-import { allStructureTypes, AllyCreepRequestData, ClaimRequestData, CombatRequestData } from './constants'
+import { collectiveManager } from './collective'
+import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys, RoomTypes } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
 
@@ -7,20 +8,20 @@ global.clearGlobal = function () {
 
     Game.cpu?.halt()
 }
-global.CG = global.clearGlobal
 
-global.clearMemory = function (avoidKeys = []) {
+/**
+ * Delete properties in Memory
+ * @param includeSettings Skip settings deletion unless specified
+ */
+global.clearMemory = function () {
     // Clear all properties in memory
 
     for (const key in Memory) {
-        if (avoidKeys.includes(key)) continue
-
         delete Memory[key as keyof typeof Memory]
     }
 
     return 'Cleared all of Memory'
 }
-global.CM = global.clearMemory
 
 global.killCreeps = function (roles?) {
     // Cancel spawning in communes
@@ -30,7 +31,8 @@ global.killCreeps = function (roles?) {
 
         if (!room.controller || !room.controller.my) continue
 
-        for (const spawn of room.structures.spawn) {
+        for (const spawnName in Game.spawns) {
+            const spawn = Game.spawns[spawnName]
             if (!spawn.spawning) continue
 
             // If there are specific role requirements and the creep doesn't meet them
@@ -51,8 +53,6 @@ global.killCreeps = function (roles?) {
 
     return `Killed an total of ${killedCreepCount} creeps ${roles ? `with the roles ${roles}` : ''}`
 }
-global.marxistLeninism = global.killCreeps
-global.genocide = global.killCreeps
 
 global.removeCSites = function (removeInProgress, types?) {
     let removedCSCount = 0
@@ -67,16 +67,16 @@ global.removeCSites = function (removeInProgress, types?) {
         if (cSite.remove() === OK) removedCSCount += 1
     }
 
-    return `Removed a total of ${removedCSCount} construction sites ${types ? `with the types ${types}` : ''}`
+    return `Removed a total of ${removedCSCount} construction sites ${
+        types ? `with the types ${types}` : ''
+    }`
 }
 
 global.destroyStructures = function (roomName, types?) {
-
     if (!roomName) {
+        if (collectiveManager.communes.size > 1) return 'Provide a room name'
 
-        if (global.communes.size > 1) return 'Provide a room name'
-
-        roomName = Array.from(global.communes)[0]
+        roomName = Array.from(collectiveManager.communes)[0]
     }
 
     // Get the room with the roomName
@@ -90,12 +90,15 @@ global.destroyStructures = function (roomName, types?) {
     for (const structureType of allStructureTypes) {
         // If types is constructed and the part isn't in types, iterate
 
-        if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))
+        if (
+            (types && !types.includes(structureType)) ||
+            (importantStructures.includes(structureType) && !types)
+        )
             continue
 
         // Get the structures of the type and destroy
 
-        const structures = room.structures[structureType]
+        const structures = room.roomManager.structures[structureType]
         for (const structure of structures) {
             if (structure.destroy() === OK) destroyedStructureCount += 1
         }
@@ -112,7 +115,7 @@ global.destroyCommuneStructures = function (types?) {
     let log = ``
     let destroyedStructureCount: number
 
-    for (const roomName of global.communes) {
+    for (const roomName of collectiveManager.communes) {
         // Get the room with the roomName
 
         const room = Game.rooms[roomName]
@@ -124,12 +127,15 @@ global.destroyCommuneStructures = function (types?) {
         for (const structureType of allStructureTypes) {
             // If types is constructed and the part isn't in types, iterate
 
-            if ((types && !types.includes(structureType)) || (importantStructures.includes(structureType) && !types))
+            if (
+                (types && !types.includes(structureType)) ||
+                (importantStructures.includes(structureType) && !types)
+            )
                 continue
 
             // Get the structures of the type
 
-            const structures = room.structures[structureType]
+            const structures = room.roomManager.structures[structureType]
 
             // Loop through the structures
 
@@ -147,38 +153,62 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (requestName, communeName) {
-    if (!Memory.claimRequests[requestName]) {
-        Memory.claimRequests[requestName] = {
-            responder: communeName,
-            data: [0],
+global.claim = function (requestName, communeName, priority = 0) {
+    if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
+    if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== true)
+        return 'Planning not completed for ' + requestName
+
+    if (!Memory.workRequests[requestName]) {
+        Memory.workRequests[requestName] = {
+            [WorkRequestKeys.responder]: communeName,
         }
     }
 
-    const request = Memory.claimRequests[requestName]
+    const request = Memory.workRequests[requestName]
 
-    request.data[ClaimRequestData.score] = 0
-    request.data[ClaimRequestData.abandon] = 0
+    request[WorkRequestKeys.priority] = priority
+    request[WorkRequestKeys.abandon] = 0
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        roomMemory.claimRequest = requestName
-        request.responder = communeName
+        if (roomMemory[RoomMemoryKeys.workRequest])
+            delete Memory.workRequests[roomMemory[RoomMemoryKeys.workRequest]][
+                WorkRequestKeys.responder
+            ]
+
+        roomMemory[RoomMemoryKeys.workRequest] = requestName
+        request[WorkRequestKeys.responder] = communeName
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} claimRequest for ${requestName}`
+    return `${
+        communeName ? `${communeName} is responding to the` : `created`
+    } workRequest for ${requestName}`
 }
-global.deleteClaimRequests = function () {
+
+global.deleteWorkRequest = function (roomName) {
+    const request = Memory.workRequests[roomName]
+    if (!request) return `There is so claim request for ${roomName}`
+
+    if (request[WorkRequestKeys.responder]) {
+        delete Memory.rooms[request[WorkRequestKeys.responder]][RoomMemoryKeys.workRequest]
+    }
+
+    delete Memory.workRequests[roomName]
+    return `Deleted claim request for ${roomName}`
+}
+
+global.deleteWorkRequests = function () {
     let deleteCount = 0
 
-    for (const requestName in Memory.claimRequests) {
-        const request = Memory.claimRequests[requestName]
+    for (const requestName in Memory.workRequests) {
+        const request = Memory.workRequests[requestName]
 
         deleteCount += 1
-        if (request.responder) delete Memory.rooms[request.responder].claimRequest
-        delete Memory.claimRequests[requestName]
+        if (request[WorkRequestKeys.responder])
+            delete Memory.rooms[request[WorkRequestKeys.responder]][RoomMemoryKeys.workRequest]
+        delete Memory.workRequests[requestName]
     }
 
     return `Deleted ${deleteCount} claim requests`
@@ -186,91 +216,74 @@ global.deleteClaimRequests = function () {
 
 global.combat = function (requestName, type, opts, communeName) {
     if (!Memory.combatRequests[requestName]) {
-        const request = Memory.combatRequests[requestName] = {
-            T: type || 'attack',
-            data: [0],
-        }
-
-        for (const key in CombatRequestData) request.data[key] = 0
+        const request = (Memory.combatRequests[requestName] = {
+            [CombatRequestKeys.type]: type || 'attack',
+        })
     }
 
-    const request = Memory.combatRequests[requestName]
+    let request = Memory.combatRequests[requestName]
 
-    request.data[CombatRequestData.abandon] = 0
-    request.data[CombatRequestData.inactionTimer] = 0
+    request[CombatRequestKeys.abandon] = 0
+    request[CombatRequestKeys.inactionTimer] = 0
 
-    for (const key in opts) {
-        request.data[CombatRequestData[key as keyof typeof CombatRequestData]] =
-            opts[key as keyof typeof CombatRequestData]
-    }
+    Object.assign(request, opts)
 
     if (communeName) {
         const roomMemory = Memory.rooms[communeName]
         if (!roomMemory) return `No memory for ${communeName}`
 
-        request.responder = communeName
-        roomMemory.combatRequests.push(requestName)
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return `${communeName} is not of room type commune`
+
+        // Assign values
+
+        request[CombatRequestKeys.responder] = communeName
+        if (!roomMemory[RoomMemoryKeys.combatRequests].includes(requestName)) {
+
+            roomMemory[RoomMemoryKeys.combatRequests].push(requestName)
+        }
     }
 
-    return `${communeName ? `${communeName} is responding to the` : `created`} combatRequest for ${requestName}`
+    return `${
+        communeName ? `${communeName} is responding to the` : `created`
+    } combatRequest for ${requestName}`
 }
 
 global.deleteCombatRequest = function (requestName) {
-    if (!Memory.combatRequests[requestName]) return 'No combatRequest for that room'
+    const request = Memory.combatRequests[requestName]
+    if (!request) return 'No combatRequest for that room'
 
     // If responder, remove from its memory
 
-    const responder = Memory.combatRequests[requestName].responder
+    const responder = request[CombatRequestKeys.responder]
     if (responder)
-        Memory.rooms[responder].combatRequests.splice(Memory.rooms[responder].combatRequests.indexOf(requestName), 1)
+        Memory.rooms[responder][RoomMemoryKeys.combatRequests].splice(
+            Memory.rooms[responder][RoomMemoryKeys.combatRequests].indexOf(requestName),
+            1,
+        )
 
     delete Memory.combatRequests[requestName]
 
     return `deleted combatRequest for ${requestName}`
 }
-global.DCR = global.deleteCombatRequest
-
-global.allyCreepRequest = function (requestName, communeName?) {
-    if (!Memory.allyCreepRequests[requestName]) {
-        Memory.allyCreepRequests[requestName] = {
-            responder: communeName,
-            data: [0],
-        }
-    }
-
-    const request = Memory.allyCreepRequests[requestName]
-
-    request.data[AllyCreepRequestData.abandon] = 0
-
-    if (communeName) {
-        const roomMemory = Memory.rooms[communeName]
-        if (!roomMemory) return `No memory for ${communeName}`
-
-        roomMemory.allyCreepRequest = requestName
-    }
-
-    return `${communeName ? `${communeName} is responding to the` : `created`} allyCreepRequest for ${requestName}`
-}
-global.ACR = global.allyCreepRequest
 
 global.deleteBasePlans = function (roomName) {
     if (!roomName) {
-        if (global.communes.size > 1) return 'Provide a room name'
+        if (collectiveManager.communes.size > 1) return 'Provide a room name'
 
-        roomName = Array.from(global.communes)[0]
+        roomName = Array.from(collectiveManager.communes)[0]
     }
 
     const room = Game.rooms[roomName]
     if (!room) return 'No vision in ' + roomName
 
-    delete room.memory.PC
-    delete room.memory.stampAnchors
+    delete room.memory[RoomMemoryKeys.communePlanned]
+    room.roomManager._basePlans = undefined
 
     return 'Deleted base plans for ' + roomName
 }
 
-global.usedHeap = function() {
-
-    const usedHeap = Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
+global.usedHeap = function () {
+    const usedHeap =
+        Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
     return (usedHeap * 100).toFixed(2) + '%'
 }

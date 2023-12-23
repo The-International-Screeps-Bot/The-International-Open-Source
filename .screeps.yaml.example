@@ -1,0 +1,24 @@
+servers:
+  mmo:
+    host: screeps.com
+    secure: true
+    token: "YOUR TOKEN https://screeps.com/season/#!/account/auth-tokens"
+    branch: "default"
+  season:
+    host: screeps.com
+    secure: true
+    token: 'YOUR TOKEN https://screeps.com/season/#!/account/auth-tokens'
+    path: /season
+  pserver:
+    host: 127.0.0.1
+    port: 21025
+    secure: false
+    username: "your username (case sensitive!)"
+    password: "your password"
+    branch: "default"
+  perf:
+    host: 127.0.0.1
+    username: "W1N1"
+    password: "password"
+    branch: "default"
+# add your own servers

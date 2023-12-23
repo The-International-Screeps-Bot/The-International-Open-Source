@@ -1,5 +1,11 @@
-import { ClaimRequestData } from 'international/constants'
-import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import {
+    WorkRequestKeys,
+    CreepMemoryKeys,
+    Result,
+    RoomTypes,
+    ReservedCoordTypes,
+} from 'international/constants'
+import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class Vanguard extends Creep {
@@ -7,15 +13,27 @@ export class Vanguard extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
-        if (this.dying) return
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
+        }
+    }
 
-        if (this.memory.SI !== undefined) this.room.creepsOfSource[this.memory.SI].push(this.name)
+    initRun() {
+        if (this.isDying()) return
 
-        const request = Memory.claimRequests[this.memory.TRN]
+        if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined)
+            this.room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
+
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
         if (!request) return
 
-        request.data[ClaimRequestData.vanguard] -= this.parts.work
+        request[WorkRequestKeys.vanguard] -= this.parts.work
     }
 
     /**
@@ -26,12 +44,14 @@ export class Vanguard extends Creep {
 
         this.message = '🚬'
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findCommuneSourceHarvestPos(
+            this.memory[CreepMemoryKeys.sourceIndex],
+        )
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
+        if (getRange(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -51,12 +71,13 @@ export class Vanguard extends Creep {
         return true
     }
 
-    upgradeRoom?() {
+    upgradeRoom?(conditions?: () => boolean) {
+        if (conditions && !conditions()) return false
+
         const { controller } = this.room
+        Memory.creeps[this.name][CreepMemoryKeys.targetID] = controller.id
 
-        if (controller.level >= 2 && controller.ticksToDowngrade > 5000) return false
-
-        if (getRangeOfCoords(this.pos, controller.pos) > 3) {
+        if (getRange(this.pos, controller.pos) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: controller.pos, range: 3 }],
@@ -66,30 +87,40 @@ export class Vanguard extends Creep {
         }
 
         this.upgradeController(controller)
+
+        if (this.store.energy - this.parts.work * UPGRADE_CONTROLLER_POWER <= 0) {
+            delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
+        }
+
         return true
     }
 
-    repairRampart?() {
-        if (this.room.cSites.rampart.length) {
-            const cSite = this.room.cSites.rampart[0]
-
-            if (getRangeOfCoords(this.pos, cSite.pos) > 3) {
-                this.createMoveRequest({
-                    origin: this.pos,
-                    goals: [{ pos: cSite.pos, range: 3 }],
-                })
-
-                return true
+    findRampartTarget?() {
+        const creepMemory = Memory.creeps[this.name]
+        if (creepMemory[CreepMemoryKeys.targetID]) {
+            const rampartTarget = Game.getObjectById(
+                creepMemory[CreepMemoryKeys.targetID],
+            ) as StructureRampart
+            if (rampartTarget && rampartTarget instanceof StructureRampart) {
+                return rampartTarget
             }
-
-            this.build(cSite)
-            return true
         }
 
-        const rampartTarget = this.room.structures.rampart.find(rampart => rampart.hits < 20000)
+        const rampartTarget = this.room.roomManager.structures.rampart.find(
+            rampart => rampart.hits < 20000,
+        )
+
+        return rampartTarget
+    }
+
+    repairRampart?() {
+        const rampartTarget = this.findRampartTarget()
         if (!rampartTarget) return false
 
-        if (getRangeOfCoords(this.pos, rampartTarget.pos) > 3) {
+        const creepMemory = Memory.creeps[this.name]
+        creepMemory[CreepMemoryKeys.targetID] = rampartTarget.id
+
+        if (getRange(this.pos, rampartTarget.pos) > 3) {
             this.createMoveRequest({
                 origin: this.pos,
                 goals: [{ pos: rampartTarget.pos, range: 3 }],
@@ -99,19 +130,29 @@ export class Vanguard extends Creep {
         }
 
         this.repair(rampartTarget)
+
+        if (this.store.energy - this.parts.work * REPAIR_POWER * REPAIR_COST <= 0) {
+            delete creepMemory[CreepMemoryKeys.targetID]
+        }
         return true
     }
 
     run?() {
-        this.message = this.memory.TRN
+        const creepMemory = Memory.creeps[this.name]
+        this.message = creepMemory[CreepMemoryKeys.workRequest]
 
-        if (this.room.name === this.memory.TRN || !this.memory.TRN) {
+        if (
+            this.room.name === creepMemory[CreepMemoryKeys.workRequest] ||
+            !creepMemory[CreepMemoryKeys.workRequest]
+        ) {
+            if (!this.room.communeManager) return
+
             if (this.needsResources()) {
                 // Define the creep's sourceName
 
-                if (!this.findOptimalSourceIndex()) return
+                if (!this.findCommuneSourceIndex()) return
 
-                const sourceIndex = this.memory.SI
+                const sourceIndex = creepMemory[CreepMemoryKeys.sourceIndex]
 
                 // Try to move to source. If creep moved then iterate
 
@@ -119,16 +160,36 @@ export class Vanguard extends Creep {
 
                 // Try to normally harvest. Iterate if creep harvested
 
-                if (this.advancedHarvestSource(this.room.sources[sourceIndex])) return
+                if (this.advancedHarvestSource(this.room.roomManager.communeSources[sourceIndex]))
+                    return
                 return
             }
 
-            delete this.memory.SI
-            delete this.memory.PC
+            delete creepMemory[CreepMemoryKeys.sourceIndex]
+            delete creepMemory[CreepMemoryKeys.packedCoord]
 
-            if (this.upgradeRoom()) return
+            if (
+                this.upgradeRoom(() => {
+                    if (creepMemory[CreepMemoryKeys.targetID] === this.room.controller.id)
+                        return true
+                    if (
+                        this.room.controller.ticksToDowngrade <=
+                        this.room.communeManager.controllerDowngradeUpgradeThreshold
+                    )
+                        return true
+                    if (this.room.controller.level < 2) return true
+
+                    return false
+                })
+            )
+                return
             if (this.repairRampart()) return
-            if (this.room.cSiteTarget && this.advancedBuildCSite(this.room.cSiteTarget)) return
+            if (
+                this.room.roomManager.cSiteTarget &&
+                this.advancedBuildCSite(this.room.roomManager.cSiteTarget)
+            )
+                return
+            if (this.upgradeRoom()) return
             return
         }
 
@@ -137,21 +198,26 @@ export class Vanguard extends Creep {
         if (
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.workRequest]),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
                 typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
+                    [RoomTypes.enemy]: Infinity,
+                    [RoomTypes.ally]: Infinity,
+                    [RoomTypes.sourceKeeper]: Infinity,
                 },
-            }) === 'unpathable'
+            }) === Result.fail
         ) {
-            const request = Memory.claimRequests[this.memory.TRN]
-            if (request) request.data[ClaimRequestData.abandon] = 20000
+            const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
+            if (request) request[WorkRequestKeys.abandon] = 20000
         }
     }
 
-    static vanguardManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {

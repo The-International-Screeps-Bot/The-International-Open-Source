@@ -1,23 +1,38 @@
-import { globalStatsUpdater } from 'international/statsManager'
-import { getRange, getRangeOfCoords } from 'international/utils'
+import {
+    CreepMemoryKeys,
+    ReservedCoordTypes,
+    Result,
+    RoomMemoryKeys,
+} from 'international/constants'
+import { statsManager } from 'international/statsManager'
+import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 
 export class MineralHarvester extends Creep {
-    preTickManager() {
-        this.room.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+        }
     }
 
-    advancedHarvestMineral?(mineral: Mineral): boolean {
+    initRun() {
+        this.room.communeManager.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
+    }
+
+    advancedHarvestMineral?(mineral: Mineral) {
         this.message = '🚬'
 
         // Unpack the creep's packedHarvestPos
 
         const harvestPos = this.findMineralHarvestPos()
-        if (!harvestPos) return true
+        if (!harvestPos) return Result.fail
+
+        this.actionCoord = this.room.roomManager.mineral.pos
 
         // If the creep is not standing on the harvestPos
 
-        if (getRangeOfCoords(this.pos, harvestPos) > 0) {
+        if (getRange(this.pos, harvestPos) > 0) {
             this.message = '⏩M'
 
             // Make a move request to it
@@ -29,47 +44,59 @@ export class MineralHarvester extends Creep {
                     avoidEnemyRanges: true,
                 },
                 {
-                    packedPath: reversePosList(this.room.memory.MPa),
+                    packedPath: reversePosList(this.room.memory[RoomMemoryKeys.mineralPath]),
                     loose: true,
                 },
             )
 
-            // And inform false
-
-            return true
+            return Result.action
         }
 
         // Harvest the mineral, informing the result if it didn't succeed
 
-        if (this.harvest(mineral) !== OK) return true
+        if (this.harvest(mineral) !== OK) return Result.fail
 
         // Find amount of minerals harvested and record it in data
 
-        const mineralsHarvested = Math.min(this.parts.work * HARVEST_MINERAL_POWER, mineral.mineralAmount)
-        globalStatsUpdater(this.room.name, 'mh', mineralsHarvested)
+        const mineralsHarvested = Math.min(
+            this.parts.work * HARVEST_MINERAL_POWER,
+            mineral.mineralAmount,
+        )
+        this.reserveStore[mineral.mineralType] += mineralsHarvested
+        statsManager.updateStat(this.room.name, 'mh', mineralsHarvested)
 
         this.message = `⛏️${mineralsHarvested}`
-        return true
+        return Result.success
     }
 
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
 
-    static mineralHarvesterManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: MineralHarvester = Game.creeps[creepName]
 
             // Get the mineral
 
-            const mineral = room.mineral
+            const mineral = room.roomManager.mineral
 
             if (mineral.mineralAmount === 0) {
                 creep.advancedRecycle()
                 continue
             }
 
-            creep.advancedHarvestMineral(mineral)
+            if (creep.advancedHarvestMineral(mineral) !== Result.success) continue
+
+            const mineralContainer = room.roomManager.mineralContainer
+            if (
+                mineralContainer &&
+                // No need to transfer if we're on top of the container
+                !areCoordsEqual(mineralContainer.pos, creep.pos) &&
+                creep.reserveStore[mineral.mineralType] >= creep.store.getCapacity()
+            ) {
+                creep.transfer(mineralContainer, mineral.mineralType)
+            }
         }
     }
 }

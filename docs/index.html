@@ -1,0 +1,181 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>the-international-screeps-bot documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+	   <link rel="stylesheet" href="./styles/style.css">
+        <link rel="stylesheet" href="./styles/dark.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top d-block d-sm-none">
+            <a href="./" class="navbar-brand">the-international-screeps-bot documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content getting-started">
+                   <div class="content-data">
+
+<div align="center">
+
+<img src="https://user-images.githubusercontent.com/48334001/189508568-fb2c91e5-e348-48c7-87ec-6626a81e1330.png" align="center">
+</div>
+
+<p><a href="https://forthebadge.com"><img src="https://forthebadge.com/images/badges/built-with-love.svg" alt="Badge" class="img-responsive"></a>
+<a href="https://forthebadge.com"><img src="https://forthebadge.com/images/badges/open-source.svg" alt="Badge" class="img-responsive"></a>
+<a href="https://forthebadge.com"><img src="https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg" alt="Badge" class="img-responsive"></a></p>
+<p><a href="https://github.com/The-International-Screeps-Bot/The-International-Open-Source/actions/workflows/CD.yml"><img src="https://github.com/The-International-Screeps-Bot/The-International-Open-Source/actions/workflows/CD.yml/badge.svg?branch=Development" alt="Badge" class="img-responsive"></a></p>
+<h2>About</h2>
+<p>The International is my bot for <a href="https://screeps.com/">Screeps</a>, thematically based after <a href="https://en.wikipedia.org/wiki/Communism">communist</a> aesthetics. Owned rooms are called communes, offensive and defensive forces are called the Red Army, economic workers are known as the Proletariat, and the Revolutionaries establish new communes and rebuild destroyed ones.</p>
+<p>This bot can provide experienced and new players a reference for when they get stuck, need inspiration, or want to laugh at some terrible code. Comments are used commonly, and code is structured so it can be easily understood, replicated, and expanded upon. Please follow similar guidelines if you make a pull request 🙂.</p>
+<p>Feel welcome to fork it and otherwise use it, however do not be overly aggressive on the Screeps world, especially to newer players. The bot is intended to be automated, but can perform manual actions via the console. It has an information panel showing progress, events, economy, military, and more.</p>
+<p>If you have specific questions or want to discuss the bot, please join our discord server.</p>
+<p><a href="https://discord.gg/5QubDsB786"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord link" class="img-responsive"></a></p>
+<p><img src="https://user-images.githubusercontent.com/48334001/183549645-07cd2907-2e2f-443f-bcba-b70bce5fa28d.png" alt="Screenshot 2022-08-08 221219" class="img-responsive">
+<img src="https://user-images.githubusercontent.com/48334001/232357947-7febd5e6-da7a-4f4f-b3fe-92bad7bb9005.png" alt="map visuals" class="img-responsive">
+<img src="images/grafana.png" alt="Information panel" class="img-responsive"></p>
+<h2>Progress and Design</h2>
+<p><a href="http://pandascreeps.com">Grafana board</a></p>
+<p><a href="https://www.youtube.com/playlist?list=PLGlzrjCmziEj7hQZSwcmkXkMXgkQXUQ6C">Videos</a></p>
+<p><a href="https://screeps.com/a/#!/profile/MarvinTMB">MarvinTMB&#39;s screeps profile</a></p>
+<p><a href="https://github.com/The-International-Screeps-Bot/The-International-Open-Source/issues">Plans and bugs</a></p>
+<p><a href="https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki">Wiki</a></p>
+<h2>Requirements</h2>
+<p>Please read the about section before installing and using this bot.</p>
+<p>First you&#39;ll want to download or fork the repository. Start by selecting a branch: Main is more stable but is often behind on features and improvements, while Development has more bugs, features and optimizations.</p>
+<h3>NPM</h3>
+<p>Ensure you have downloaded <a href="https://nodejs.org/en/">Node</a></p>
+<p><strong>Make sure your node version is below 17.0.0</strong></p>
+<p>You can check your node version with:</p>
+<div><pre class="line-numbers"><code class="language-powershell">node -v
+</code></pre></div><p>If your node version is too recent, you can change it with NVM:</p>
+<p>Linux/MacOS <a href="https://github.com/nvm-sh/nvm">nvm</a></p>
+<p>Windows <a href="https://github.com/coreybutler/nvm-windows">nvm-windows</a></p>
+<p>After making sure you have correct node version go to the project folder (not in src), you&#39;ll want to install the dependencies like so:</p>
+<div><pre class="line-numbers"><code class="language-powershell">npm i
+</code></pre></div><p>And that&#39;s it. Join our <a href="https://discord.gg/5QubDsB786">discord server</a> if you need help.</p>
+<h2>Usage</h2>
+<p>Before you use this bot, please consider two things. First, if you&#39;re a new player and especially one that wants to learn programming, JS, or TS, then this is not the place to start. I strongly encourage you to start your own bot and achieve a decent economy before using or contributing to this bot.</p>
+<p>Secondly, DO NOT USE THIS BOT TO BULLY. Do not attack noobs, taking their remotes or claimed rooms. This is a fun game where people often program their own bots from scratch, so it is entirely fun-ruining and incredibly rude to pick on those who aren&#39;t using an open source bot like this one. If you find yourself against another open source bot, or a bot that can put up a fair fight against you, then best of luck. Please feel welcome to share experiences or ask questions in the <a href="https://discord.gg/5QubDsB786">discord server</a>.</p>
+<p>To begin, you need to decide what branch to use. Main is generally old but stable, while Development is less stable but more up to date. If you want to find bugs or test new features, Development is for you.</p>
+<p>Using <a href="https://rollupjs.org/guide/en/">rollup</a> we will translate the code into a single js file, which will be used in environments set in <code>.screeps.yaml</code> file (see below if you don&#39;t have one yet). This compiles the code so it can be run by Screeps while we develop using folders and typescript.</p>
+<p>First, you&#39;ll need to set up your settings. In <code>/src</code> you&#39;ll find the <code>settings.example.ts</code> file. Please copy the folder and rename its clone to <code>settings.ts</code>. Then change the <code>settingsExample</code> definition to <code>settings</code>. You can then add your own prefences, including checks based on the name of the shard for server-specific settings. These same instructions with an example is included in the file.</p>
+<p>Next, rename <code>.screeps.yaml.example</code> to <code>.screeps.yaml</code> and fill in the required information for each environment you want to run the bot in. For the official server, replace the <code>token</code> with an <a href="https://docs.screeps.com/auth-tokens.html">API token</a> for your account. On private servers, edit <em>(or copy and rename)</em> the <code>pserver</code> section with <code>host</code> set to your server domain or IP then complete <code>username</code> and <code>password</code> with your credentials on this server. For more information about this file, check the <a href="https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md">screeps unified credentials file</a> spec.</p>
+<p>Running <code>rollup -c</code> will compile your code and do a &quot;dry run&quot;, preparing the code for upload but not actually pushing it. Running <code>rollup -c --environment DEST:mmo</code> will compile your code, and then upload it to a screeps server using the <code>mmo</code> config from <code>.screeps.yaml</code>.</p>
+<p>You can use <code>-cw</code> instead of <code>-c</code> to automatically re-run when your source code changes - for example, <code>rollup -cw --environment DEST:main</code> will automatically upload your code to the <code>mmo</code> configuration every time your code is changed.</p>
+<p>Finally, there are also NPM scripts that serve as aliases for these commands in <code>package.json</code> for IDE integration. Running <code>npm run push-mmo</code> is equivalent to <code>rollup -c --environment DEST:mmo</code>, and <code>npm run watch-pserver</code> is equivalent to <code>rollup -cw --dest pserver</code>.</p>
+<h4>Important! To upload code to a private server, you must have <a href="https://github.com/ScreepsMods/screepsmod-auth">screepsmod-auth</a> installed and configured!</h4>
+<p>For more information, please go to the <a href="https://github.com/CarsonBurke/The-International-Screeps-Bot/wiki/Usage">wiki</a></p>
+<h3>Grafana</h3>
+<p>Soon to be added again when PandaMaster fixes the new ScreepsPlus replacement site!</p>
+<h3>Private server</h3>
+<p>To run the bot on an performance checking server, run <code>npm run server</code> and check out <code>localhost:21025</code> (server) and <code>localhost:3000</code> (grafana) in your browser. Alternatives with in-depth instructions can be found at <a href="https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki/Using-a-private-server">Using a Private Server</a></p>
+<p>For the performance server users, its always RoomName as email and password is <code>password</code>.</p>
+<p>If you&#39;d like to use rollup to compile to a private server, you&#39;ll need to download and configure <a href="https://github.com/ScreepsMods/screepsmod-auth">screepsmod-auth</a> to push your code.</p>
+<p>I&#39;d also suggest using this less-laggy tool <a href="https://github.com/laverdet/screeps-steamless-client">steamless-client</a> to watch your private server run from the comfort of your browser.</p>
+<h3>Advanced usage</h3>
+<p>If you want to run custom code without conflicting with the project&#39;s source - say, if you want to commit or make pull requests - it&#39;s recommended you use the userScript folder. Head to <code>src/other/userScript/userScript.example.ts</code> and follow the instructions at the top of the file.</p>
+<h2>Contribution</h2>
+<p>We&#39;re a huge fan of teamwork, and many useful features of this bot have been added by contributors.</p>
+<p>If you want to join us in development for this bot, please join our <a href="https://discord.gg/5QubDsB786">discord server</a> and share what you&#39;re working on, or hoping to add. We&#39;re happy to review issues, merge pull requests, and add collaborators!</p>
+<p><strong>Please use the development branch for pull requests, commits, etc.</strong></p>
+<p>An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO, SimplyAlex, shu for their essential contribution to this project.</p>
+<h2>Support</h2>
+<p>If you&#39;d like to support the project, Carson Burke (AKA MarvinTMB) is happy to accept single time or monthly donations through the following links.</p>
+<p><a href="https://paypal.me/carsonburke22">Paypal</a></p>
+<p><a href="https://www.patreon.com/Marvin22">Patreon</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+          <label class="dark-mode-switch">
+               <input type="checkbox">
+               <span class="slider">
+                    <svg class="slider-icon" viewBox="0 0 24 24" fill="none" height="20" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                    </svg>
+               </span>
+          </label>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 0;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'getting-started';
+            var COMPODOC_CURRENT_PAGE_URL = 'index.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="./js/libs/custom-elements.min.js"></script>
+       <script src="./js/libs/lit-html.js"></script>
+
+       <script src="./js/menu-wc.js" defer></script>
+       <script nomodule src="./js/menu-wc_es5.js" defer></script>
+
+       <script src="./js/libs/bootstrap-native.js"></script>
+
+       <script src="./js/libs/es6-shim.min.js"></script>
+       <script src="./js/libs/EventDispatcher.js"></script>
+       <script src="./js/libs/promise.min.js"></script>
+       <script src="./js/libs/zepto.min.js"></script>
+
+       <script src="./js/compodoc.js"></script>
+
+       <script src="./js/tabs.js"></script>
+       <script src="./js/menu.js"></script>
+       <script src="./js/libs/clipboard.min.js"></script>
+       <script src="./js/libs/prism.js"></script>
+       <script src="./js/sourceCode.js"></script>
+          <script src="./js/search/search.js"></script>
+          <script src="./js/search/lunr.min.js"></script>
+          <script src="./js/search/search-lunr.js"></script>
+          <script src="./js/search/search_index.js"></script>
+       <script src="./js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

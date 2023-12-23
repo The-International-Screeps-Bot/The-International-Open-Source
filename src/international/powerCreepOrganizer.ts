@@ -1,19 +1,15 @@
 import { creepClasses } from 'room/creeps/creepClasses'
 import { customColors, remoteRoles } from './constants'
-import { customLog } from './utils'
-import { internationalManager, InternationalManager } from './international'
+import { customLog } from 'utils/logging'
+import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
-import { globalStatsUpdater } from './statsManager'
+import { statsManager } from './statsManager'
 
-class PowerCreepOrganizer {
+export class PowerCreepOrganizer {
     constructor() {}
 
     public run() {
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
-
         // Clear non-existent creeps from memory
 
         for (const creepName in Memory.powerCreeps) {
@@ -27,16 +23,6 @@ class PowerCreepOrganizer {
         for (const creepName in Game.powerCreeps) {
             this.processCreep(creepName)
         }
-
-        if (Memory.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            customLog('Power Creep Organizer', cpuUsed.toFixed(2), {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: InternationalStatNames = 'pccu'
-            globalStatsUpdater('', statName, cpuUsed, true)
-        }
     }
 
     private processCreep(creepName: string) {
@@ -45,9 +31,11 @@ class PowerCreepOrganizer {
         // If the creep isn't spawned
 
         if (!creep.ticksToLive) {
-            internationalManager.unspawnedPowerCreepNames.push(creep.name)
+            collectiveManager.unspawnedPowerCreepNames.push(creep.name)
             return
         }
+
+        collectiveManager.powerCreepCount += 1
 
         // Get the creep's role
 
@@ -66,13 +54,13 @@ class PowerCreepOrganizer {
 
         // Organize creep in its room by its role
 
-        room.myPowerCreeps[className].push(creepName)
+        room.myPowerCreepsByRole[className].push(creepName)
 
         // Record the creep's presence in the room
 
-        room.myPowerCreepsAmount += 1
+        room.myPowerCreeps.push(creep)
 
-        creep.preTickManager()
+        creep.initRun()
     }
 }
 

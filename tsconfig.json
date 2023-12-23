@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
+        "allowJs": true,
         "experimentalDecorators": true,
         "module": "esnext",
-        "lib": ["es2019"],
+        "lib": ["es2019", "dom"],
         "target": "es2019",
-        "moduleResolution": "node",
+        "moduleResolution": "Node",
         "outDir": "dist",
         "baseUrl": "src/",
         "strict": true,
@@ -15,7 +16,12 @@
         "allowUnreachableCode": true,
         "strictNullChecks": false,
         "esModuleInterop": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
     },
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["node_modules", "dist", "docs"],
+    "typedocOptions": {
+        "out": "./docs"
+    }
 }

@@ -1,200 +1,88 @@
 import {
-    CombatRequestData,
+    CombatRequestKeys,
+    CreepMemoryKeys,
+    Result,
+    RoomMemoryKeys,
+    RoomTypes,
+    WorkTypes,
     customColors,
-    numbersByStructureTypes,
+    packedQuadAttackMemberOffsets,
     quadAttackMemberOffsets,
-    quadTransformIndexes,
-    quadTransformOffsets,
     rangedMassAttackMultiplierByRange,
     roomDimensions,
 } from 'international/constants'
 import {
     areCoordsEqual,
     arePositionsEqual,
-    customLog,
     doesCoordExist,
     doesXYExist,
     findClosestObject,
     findCoordsInsideRect,
     findObjectWithID,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
-    isCoordExit,
+    isExit,
     isXYExit,
-} from 'international/utils'
-import { find, transform } from 'lodash'
+    packAsNum,
+    findHighestScore,
+    sortBy,
+    unpackNumAsCoord,
+    forCoordsInRange,
+    packXYAsNum,
+} from 'utils/utils'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { Antifa } from './antifa'
+import { CustomPathFinderArgs, PathGoal } from 'international/customPathFinder'
+import { LogTypes, customLog } from 'utils/logging'
+import { RoomManager } from 'room/room'
+
+const rangedFleeRange = 5
+const meleeFleeRange = 3
+
+interface EnemyThreatData {
+    coords: Uint8Array
+    goals: PathGoal[]
+}
 
 export class Quad {
     /**
      *
      */
-    type: 'transport' | 'attack'
+    moveType: SquadMoveTypes
     /**
      * All squad members, where index 0 is the leader
      */
     members: Antifa[] = []
+    /**
+     * @constant 1 2
+     * @constant 3 4
+     * @description where 1 is leader and 2, 3, 4 are squad members
+     */
+    memberNames: string[] = []
     leader: Antifa
     membersByCoord: { [packedCoord: string]: Antifa }
 
     target: Structure | Creep
 
-    _combatStrength: CombatStrength
-
-    get combatStrength() {
-        if (this._combatStrength) return this._combatStrength
-
-        this._combatStrength = {
-            dismantle: 0,
-            melee: 0,
-            ranged: 0,
-            heal: 0,
-        }
-
-        for (const member of this.members) {
-            for (const key in this._combatStrength) {
-                const combatType = key as keyof CombatStrength
-
-                this._combatStrength[combatType] = member.combatStrength[combatType]
-            }
-        }
-
-        return this._combatStrength
-    }
-
-    _enemyThreatCoords: Set<string>
-
-    get enemyThreatCoords() {
-        if (this._enemyThreatCoords) return this._enemyThreatCoords
-
-        this._enemyThreatCoords = new Set()
-
-        const enemyAttackers: Creep[] = []
-        const enemyRangedAttackers: Creep[] = []
-
-        for (const enemyCreep of this.leader.room.enemyAttackers) {
-            // We have sufficient superiority to ignore kiting this creep
-
-            if (
-                this.combatStrength.heal + this.combatStrength.melee + this.combatStrength.ranged >
-                (enemyCreep.combatStrength.heal + enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged) *
-                    1.2
-            )
-                continue
-
-            // Segregate by ranged
-
-            if (enemyCreep.parts.ranged_attack) {
-                enemyRangedAttackers.push(enemyCreep)
-                continue
-            }
-
-            // Segregate by melee
-
-            enemyAttackers.push(enemyCreep)
-        }
-
-        for (const enemyAttacker of enemyAttackers) {
-            // Construct rect and get positions inside
-
-            const coords = findCoordsInsideRect(
-                enemyAttacker.pos.x - 2,
-                enemyAttacker.pos.y - 2,
-                enemyAttacker.pos.x + 2,
-                enemyAttacker.pos.y + 2,
-            )
-
-            for (const coord of coords) this._enemyThreatCoords.add(packCoord(coord))
-        }
-
-        for (const enemyAttacker of enemyRangedAttackers) {
-            // Construct rect and get positions inside
-
-            const coords = findCoordsInsideRect(
-                enemyAttacker.pos.x - 3,
-                enemyAttacker.pos.y - 3,
-                enemyAttacker.pos.x + 3,
-                enemyAttacker.pos.y + 3,
-            )
-
-            for (const coord of coords) this._enemyThreatCoords.add(packCoord(coord))
-        }
-
-        for (const packedCoord of this._enemyThreatCoords) {
-            const coord = unpackCoord(packedCoord)
-
-            this.leader.room.visual.circle(coord.x, coord.y, { fill: customColors.red })
-        }
-
-        return this._enemyThreatCoords
-    }
-
-    _enemyThreatGoals: PathGoal[]
-
-    get enemyThreatGoals() {
-        this._enemyThreatGoals = []
-
-        for (const enemyCreep of this.leader.room.enemyAttackers) {
-            // The enemy is weak enough to be ignored
-
-            if (
-                (enemyCreep.combatStrength.ranged + enemyCreep.combatStrength.melee + enemyCreep.combatStrength.heal) *
-                    1.2 <
-                this.combatStrength.ranged + this.combatStrength.melee + this.combatStrength.heal
-            )
-                continue
-
-            if (enemyCreep.parts.ranged_attack) {
-                this._enemyThreatGoals.push({
-                    pos: enemyCreep.pos,
-                    range: 5,
-                })
-                continue
-            }
-
-            if (!enemyCreep.parts.attack) continue
-
-            this._enemyThreatGoals.push({
-                pos: enemyCreep.pos,
-                range: 3,
-            })
-        }
-
-        return this._enemyThreatGoals
-    }
-
-    get canMove() {
-        for (const member of this.members) {
-            if (!member.canMove) return false
-        }
-        return true
-    }
-
-    get willMove() {
-        for (const member of this.members) {
-            if (!member.canMove) return false
-            if (member.moveRequest) return false
-        }
-
-        return true
-    }
-
     constructor(memberNames: string[]) {
         for (const memberName of memberNames) {
             const member = Game.creeps[memberName]
             this.members.push(member)
+            this.memberNames.push(memberName)
 
             member.squad = this
             member.squadRan = true
         }
 
         this.leader = this.members[0]
+        this.moveType = this.leader.memory[CreepMemoryKeys.squadMoveType]
 
         this.sortMembersByCoord()
 
-        if (Memory.combatRequests[this.leader.memory.CRN])
-            Memory.combatRequests[this.leader.memory.CRN].data[CombatRequestData.quads] += 1
+        if (Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]])
+            Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]][
+                CombatRequestKeys.quads
+            ] += 1
     }
 
     sortMembersByCoord() {
@@ -214,7 +102,8 @@ export class Quad {
             packXYAsCoord(this.leader.pos.x + 1, this.leader.pos.y),
         ]
 
-        for (const packedCoord of packedMemberCoords) {
+        for (let i = 0; i < packedMemberCoords.length; i++) {
+            const packedCoord = packedMemberCoords[i]
             const member = unsortedMembersByCoord[packedCoord]
             if (!member) continue
 
@@ -223,7 +112,7 @@ export class Quad {
     }
 
     run() {
-        this.leader.message = this.type
+        this.leader.message = this.moveType
 
         this.passiveHealQuad()
 
@@ -233,35 +122,41 @@ export class Quad {
             this.passiveRangedAttack()
             return
         }
+        /* else this.advancedTransform() */
 
         this.leader.message = 'IF'
 
-        if (this.leader.room.enemyDamageThreat && this.runCombat()) return
+        if (this.leader.room.roomManager.enemyDamageThreat && this.runCombat()) return
 
         this.passiveRangedAttack()
 
         this.createMoveRequest({
             goals: [
                 {
-                    pos: new RoomPosition(25, 25, this.leader.memory.CRN),
+                    pos: new RoomPosition(
+                        25,
+                        25,
+                        this.leader.memory[CreepMemoryKeys.combatRequest],
+                    ),
                     range: 25,
                 },
             ],
             typeWeights: {
-                enemy: Infinity,
-                ally: Infinity,
-                keeper: 5,
-                enemyRemote: 5,
-                allyRemote: 5,
-                neutral: 2,
+                [RoomTypes.enemy]: Infinity,
+                [RoomTypes.ally]: 2,
+                [RoomTypes.sourceKeeper]: 5,
+                [RoomTypes.enemyRemote]: 3,
+                [RoomTypes.allyRemote]: 3,
+                [RoomTypes.neutral]: 2,
             },
         })
     }
 
     runCombatRoom() {
-        if (this.leader.room.name !== this.leader.memory.CRN) return false
+        if (this.leader.room.name !== this.leader.memory[CreepMemoryKeys.combatRequest])
+            return false
         /*
-        if (!this.leader.room.enemyDamageThreat) {
+        if (!this.leader.room.roomManager.enemyDamageThreat) {
             for (const member of this.members) member.runCombat()
             return true
         }
@@ -277,24 +172,49 @@ export class Quad {
     }
 
     runCombat() {
-        if (this.leader.memory.SCT === 'rangedAttack') {
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
             this.passiveRangedAttack()
 
-            const nearbyThreat = this.leader.room.enemyAttackers.find(
+            const nearbyThreat = this.leader.room.roomManager.enemyAttackers.find(
                 enemyCreep =>
-                    this.findMinRange(enemyCreep.pos) <= 4 &&
+                    this.findMinRange(enemyCreep.pos) <= 6 &&
                     (enemyCreep.combatStrength.ranged || enemyCreep.combatStrength.melee),
             )
-            if (nearbyThreat) this.advancedTransform()
+            if (
+                nearbyThreat &&
+                !nearbyThreat.room.findStructureAtCoord(
+                    nearbyThreat.pos,
+                    structure => structure.structureType === STRUCTURE_RAMPART,
+                )
+            ) {
+                this.target = nearbyThreat
+                this.target.room.targetVisual(this.leader.pos, this.target.pos, true)
+                /*
+                // If we are not threatened, try to transform optimally
 
-            this.rangedKite()
+                const enemyThreatCoords = this.enemyThreatDataRanged.coords
+                if (!this.members.find(member => enemyThreatCoords[packAsNum(member.pos)])) {
+                    this.advancedTransform()
+                }
+                */
+            }
+
+            const kiteResult = this.rangedKite()
+            if (kiteResult === Result.action) return true
+            if (kiteResult === Result.stop) {
+
+                
+                return true
+            }
+
+            this.advancedTransform()
 
             if (this.bulldoze()) return true
-            if (this.advancedRangedAttack()) return true
             if (this.rangedAttackStructures()) return true
+            if (this.advancedRangedAttack()) return true
             return false
         }
-        if (this.leader.memory.SCT === 'attack') {
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') {
             if (this.advancedAttack()) return false
         }
 
@@ -305,7 +225,13 @@ export class Quad {
     getInFormation(): boolean {
         if (this.leader.isOnExit) return true
 
-        if (this.leader.room.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >= 254) {
+        /* this.leader.room.visualizeCostMatrix(this.leader.room.roomManager.quadCostMatrix) */
+
+        if (
+            this.leader.room.roomManager.quadCostMatrix.get(this.leader.pos.x, this.leader.pos.y) >=
+            50
+        ) {
+            this.leader.room.coordVisual(this.leader.pos.x, this.leader.pos.y)
             /*
             this.leader.createMoveRequest({
                 goals: [
@@ -323,14 +249,15 @@ export class Quad {
 
         let inFormation = true
 
-        if (this.type === 'transport') {
+        if (this.moveType === 'transport') {
             let lastMember = this.leader
 
             for (let i = 1; i < this.members.length; i++) {
                 const member = this.members[i]
 
                 if (
-                    getRange(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) <= 1 &&
+                    getRangeXY(member.pos.x, lastMember.pos.x, member.pos.y, lastMember.pos.y) <=
+                        1 &&
                     member.room.name === lastMember.room.name
                 ) {
                     lastMember = member
@@ -370,7 +297,7 @@ export class Quad {
                 y: this.leader.pos.y + offset.y,
             }
 
-            if (isCoordExit(goalCoord)) return true
+            if (isExit(goalCoord)) return true
             if (!doesCoordExist(goalCoord)) return true
 
             const goalPos = new RoomPosition(goalCoord.x, goalCoord.y, this.leader.room.name)
@@ -397,16 +324,13 @@ export class Quad {
 
         if (newLeader) {
             this.members[newLeaderIndex] = this.leader
+            this.memberNames[newLeaderIndex] = this.leader.name
             this.members[0] = newLeader
+            this.memberNames[0] = newLeader.name
             this.leader = newLeader
 
-            const memberNames: string[] = []
             for (const member of this.members) {
-                memberNames.push(member.name)
-            }
-
-            for (const member of this.members) {
-                member.memory.SMNs = memberNames
+                member.memory[CreepMemoryKeys.squadMembers] = this.memberNames
             }
         }
 
@@ -417,14 +341,14 @@ export class Quad {
         for (const member of this.members) member.moved = 'moved'
     }
 
-    createMoveRequest(opts: MoveRequestOpts, moveLeader = this.leader) {
+    createMoveRequest(opts: CustomPathFinderArgs, moveLeader = this.leader) {
         if (!this.willMove) {
             for (const member1 of this.members) {
                 if (!member1.fatigue) continue
 
                 for (const member2 of this.members) {
                     if (member2.name === member1.name) continue
-
+                    member1.room.targetVisual(member1.pos, member2.pos, true)
                     member2.pull(member1)
                 }
             }
@@ -433,7 +357,7 @@ export class Quad {
             return false
         }
 
-        if (this.type === 'transport') {
+        if (this.moveType === 'transport') {
             if (!moveLeader.createMoveRequest(opts)) return false
 
             let lastMember = moveLeader
@@ -450,7 +374,9 @@ export class Quad {
 
         // Attack mode
 
-        opts.weightCostMatrixes = ['quadCostMatrix']
+        opts.defaultCostMatrixes = function (roomName) {
+            return [RoomManager.roomManagers[roomName].quadCostMatrix]
+        }
         moveLeader.createMoveRequest(opts)
 
         if (!moveLeader.moveRequest) return false
@@ -476,7 +402,8 @@ export class Quad {
 
             if (!doesCoordExist(goalCoord)) continue
 
-            if (member.room.quadCostMatrix.get(goalCoord.x, goalCoord.y) >= 255) continue
+            if (member.room.roomManager.quadCostMatrix.get(goalCoord.x, goalCoord.y) >= 255)
+                continue
 
             member.assignMoveRequest(goalCoord)
         }
@@ -484,104 +411,123 @@ export class Quad {
         return true
     }
 
-    transform(transformType: QuadTransformTypes) {
+    private scoreMemberTransform(memberName: string, coord: Coord) {
+        const member = Game.creeps[memberName]
+        let score = (1 - member.defenceStrength) * 5000
+        const range = getRangeXY(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
         /*
-        if (!this.canMove) {
-            this.holdFormation()
-            return false
+        const range = getRangeXY(this.target.pos.x, coord.x, this.target.pos.y, coord.y)
+
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
+            score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
+
+            return score
         }
+
+        if (range > 1) return score
  */
-        const transformOffsets = quadTransformOffsets[transformType]
-        const newIndexes = quadTransformIndexes[transformType]
-        const membersByCoordArray = Object.values(this.membersByCoord)
-        const newMemberNames: string[] = []
 
-        for (let i = 0; i < membersByCoordArray.length; i++) {
-            const member = membersByCoordArray[i]
-            if (!member) continue
-
-            const offset = transformOffsets[i]
-            member.assignMoveRequest({ x: member.pos.x + offset.x, y: member.pos.y + offset.y })
-
-            const newIndex = newIndexes[i]
-            newMemberNames[newIndex] = member.name
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'rangedAttack') {
+            score += member.combatStrength.ranged
+            return score / range
         }
 
-        for (const member of this.members) {
-            member.memory.SMNs = newMemberNames
+        if (this.leader.memory[CreepMemoryKeys.squadCombatType] === 'attack') {
+            score += member.combatStrength.melee
+            return score / range
         }
 
-        return true
+        // Dismantle type
+
+        score += member.combatStrength.dismantle
+        return score / range
     }
 
-    randomTransform() {
-        const quadTransformKeys = Object.keys(quadTransformIndexes)
-        return this.transform(
-            quadTransformKeys[Math.floor(Math.random() * quadTransformKeys.length)] as QuadTransformTypes,
-        )
-    }
-
-    scoreTransform(transformType: QuadTransformTypes) {
-        let score = 0
-        const transformOffsets = quadTransformOffsets[transformType]
-        const membersByCoordArray = Object.values(this.membersByCoord)
-
-        for (let i = 0; i < membersByCoordArray.length; i++) {
-            const member = membersByCoordArray[i]
-            if (!member) continue
-
-            const offset = transformOffsets[i]
-
-            score += (1 - member.defenceStrength) * 5000
-
-            const range = getRange(
-                this.target.pos.x,
-                member.pos.x + offset.x,
-                this.target.pos.y,
-                member.pos.y + offset.y,
-            )
-
-            if (this.leader.memory.SCT === 'rangedAttack') {
-                score += rangedMassAttackMultiplierByRange[range] * member.combatStrength.ranged || 0
-
-                continue
-            }
-
-            if (this.leader.memory.SCT === 'attack') {
-                score += member.combatStrength.melee
-                continue
-            }
-
-            // Dismantle type
-
-            score += member.combatStrength.dismantle
-            continue
-        }
-        customLog(transformType, score)
-        return score
-    }
-
-    advancedTransform(): boolean {
+    /**
+     * Loop through every offset
+     * Loop through each offset and find the member which has the highest score on it
+     * Score each offset's sum of member scores, identifying the best offset
+     * implement offset
+     */
+    private advancedTransform(): boolean {
         if (!this.willMove) return false
-
         if (!this.target) return false
 
-        let highestScore = 0
-        let bestTransformName: QuadTransformTypes
+        let bestTransform: string[]
+        let bestScore = 0
 
-        for (const transformType in quadTransformOffsets) {
-            const score = this.scoreTransform(transformType as QuadTransformTypes)
-
-            if (score <= highestScore) continue
-
-            highestScore = score
-            bestTransformName = transformType as QuadTransformTypes
+        for (const member of this.members) {
+            bestScore += this.scoreMemberTransform(member.name, member.pos)
         }
 
-        customLog('FOUND TRANSFORM', bestTransformName)
+        const originalScore = bestScore
 
-        if (bestTransformName === 'none') return true
-        return this.transform(bestTransformName)
+        for (
+            let i = 0;
+            i < Math.min(quadAttackMemberOffsets.length, this.memberNames.length);
+            i++
+        ) {
+            const transform: string[] = []
+            const memberNames = new Set(this.memberNames)
+            let score = 0
+
+            const packedOffsets = sortBy(
+                Array.from(packedQuadAttackMemberOffsets).splice(0, this.memberNames.length),
+                packedOffset => {
+                    const offset = unpackCoord(packedOffset)
+                    const coord = {
+                        x: this.leader.pos.x + offset.x,
+                        y: this.leader.pos.y + offset.y,
+                    }
+
+                    return getRange(this.target.pos, coord)
+                },
+            )
+
+            for (const packedOffset of packedOffsets) {
+                const offset = unpackCoord(packedOffset)
+                const coord = {
+                    x: this.leader.pos.x + offset.x,
+                    y: this.leader.pos.y + offset.y,
+                }
+
+                const j = packedQuadAttackMemberOffsets.indexOf(packedOffset)
+
+                let bestMemberScore = -1
+                let bestMemberName: string
+
+                for (const memberName of memberNames) {
+                    const memberScore = this.scoreMemberTransform(memberName, coord)
+                    if (memberScore <= bestMemberScore) continue
+
+                    bestMemberScore = memberScore
+                    bestMemberName = memberName
+                }
+
+                score += bestMemberScore
+                memberNames.delete(bestMemberName)
+                transform[j] = bestMemberName
+            }
+
+            if (score <= bestScore) continue
+
+            bestScore = score
+            bestTransform = transform
+        }
+
+        if (originalScore === bestScore) return false
+
+        for (let i = 0; i < bestTransform.length; i++) {
+            const memberName = bestTransform[i]
+            const goal = {
+                x: quadAttackMemberOffsets[i].x + this.leader.pos.x,
+                y: quadAttackMemberOffsets[i].y + this.leader.pos.y,
+            }
+
+            Game.creeps[memberName].assignMoveRequest(goal)
+            Memory.creeps[memberName][CreepMemoryKeys.squadMembers] = bestTransform
+        }
+        return true
     }
 
     passiveHealQuad() {
@@ -602,7 +548,7 @@ export class Quad {
                 if (member.worked) continue
 
                 member.heal(lowestHitsMember)
-                member.worked = true
+                member.worked = WorkTypes.heal
             }
 
             return
@@ -615,7 +561,7 @@ export class Quad {
         // Inform true if there are enemy threats in range
 
         if (
-            this.leader.room.enemyAttackers.find(
+            this.leader.room.roomManager.enemyAttackers.find(
                 enemyCreep =>
                     (enemyCreep.combatStrength.ranged && this.findMinRange(enemyCreep.pos) <= 3) ||
                     (enemyCreep.combatStrength.melee && this.findMinRange(enemyCreep.pos) <= 1),
@@ -629,8 +575,8 @@ export class Quad {
         if (!controller) return false
         if (!controller.owner) return false
         if (controller.owner.username === Memory.me) return false
-        if (Memory.allyPlayers.includes(controller.owner.username)) return false
-        if (!this.leader.room.structures.tower.length) return false
+        if (global.settings.allies.includes(controller.owner.username)) return false
+        if (!this.leader.room.roomManager.structures.tower.length) return false
 
         return true
     }
@@ -650,7 +596,7 @@ export class Quad {
             const memberHealer = notHealedMembers[memberIndex]
 
             memberHealer.heal(member)
-            memberHealer.worked = true
+            memberHealer.worked = WorkTypes.heal
 
             notHealedMembers.splice(memberIndex, 1)
         }
@@ -658,18 +604,13 @@ export class Quad {
         return true
     }
 
-    /**
-     * Attack viable targets without moving
-     */
-    passiveRangedAttack() {
-        const attackingMemberNames = new Set(this.leader.memory.SMNs)
-
-        // Sort enemies by number of members that can attack them
+    private rangedAttackEnemyCreeps(attackingMemberNames: Set<string>) {
+        // Get enemies by damage members can deal
 
         const enemyTargetsWithDamage: Map<Id<Creep>, number> = new Map()
         const enemyTargetsWithAntifa: Map<Id<Creep>, Id<Antifa>[]> = new Map()
 
-        for (const enemyCreep of this.leader.room.unprotectedEnemyCreeps) {
+        for (const enemyCreep of this.leader.room.roomManager.unprotectedEnemyCreeps) {
             const memberIDsInRange: Id<Antifa>[] = []
 
             let netDamage = -1 * enemyCreep.combatStrength.heal
@@ -677,7 +618,7 @@ export class Quad {
             for (const memberName of attackingMemberNames) {
                 const member = Game.creeps[memberName]
 
-                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 3) continue
+                if (getRange(member.pos, enemyCreep.pos) > 3) continue
 
                 netDamage += member.combatStrength.ranged
 
@@ -704,54 +645,115 @@ export class Quad {
                 const member = findObjectWithID(memberID)
                 if (!attackingMemberNames.has(member.name)) continue
 
-                if (getRangeOfCoords(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
+                if (getRange(member.pos, enemyCreep.pos) > 1) member.rangedAttack(enemyCreep)
                 else member.rangedMassAttack()
                 member.ranged = true
 
                 attackingMemberNames.delete(member.name)
             }
 
-            if (!attackingMemberNames.size) return
+            if (!attackingMemberNames.size) return attackingMemberNames
         }
 
-        // If there is a target and there are members left that can attack, attack the target
+        return attackingMemberNames
+    }
 
-        if (!this.target) return
+    private rangedAttackEnemyStructures(attackingMemberNames: Set<string>) {
+        if (
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+        )
+            return attackingMemberNames
 
+        for (const structure of this.leader.room.find(FIND_STRUCTURES)) {
+            for (const memberName of attackingMemberNames) {
+                const member = Game.creeps[memberName]
+
+                const range = getRange(member.pos, structure.pos)
+                if (range > 3) continue
+
+                if (!(structure as OwnedStructure).owner || range > 1) {
+                    member.rangedAttack(structure)
+                } else member.rangedMassAttack()
+
+                member.ranged = true
+                attackingMemberNames.delete(member.name)
+            }
+            if (!attackingMemberNames.size) return attackingMemberNames
+        }
+
+        return attackingMemberNames
+    }
+
+    private rangedAttackTarget(attackingMemberNames: Set<string>) {
         for (const memberName of attackingMemberNames) {
             const member = Game.creeps[memberName]
 
-            const range = getRangeOfCoords(member.pos, this.target.pos)
+            const range = getRange(member.pos, this.target.pos)
             if (range > 3) continue
 
-            if (range === 1) member.rangedMassAttack()
-            else member.rangedAttack(this.target)
+            if (!(this.target as OwnedStructure).owner || range > 1) {
+                member.rangedAttack(this.target)
+            } else member.rangedMassAttack()
+
+            member.ranged = true
+            attackingMemberNames.delete(member.name)
         }
+
+        return attackingMemberNames
     }
+
+    /**
+     * Attack viable targets without moving
+     */
+    passiveRangedAttack() {
+        let attackingMemberNames = new Set(this.memberNames)
+
+        if (this.target && this.target instanceof Creep) {
+            attackingMemberNames = this.rangedAttackTarget(attackingMemberNames)
+            if (!attackingMemberNames.size) return
+        }
+
+        attackingMemberNames = this.rangedAttackEnemyCreeps(attackingMemberNames)
+        if (!attackingMemberNames.size) return
+
+        // If there is a target, even though it isn't a creep, try to attack it
+        if (this.target) {
+            attackingMemberNames = this.rangedAttackTarget(attackingMemberNames)
+            if (!attackingMemberNames.size) return
+        }
+
+        attackingMemberNames = this.rangedAttackEnemyStructures(attackingMemberNames)
+        if (!attackingMemberNames.size) return
+    }
+
+    private rangedAttackAttackers() {}
+
+    private rangedAttackEnemies() {}
 
     advancedRangedAttack() {
         const { room } = this.leader
 
-        let enemyCreeps = room.enemyAttackers.filter(function (creep) {
+        let enemyCreeps = room.roomManager.enemyAttackers.filter(function (creep) {
             return !creep.isOnExit
         })
 
-        if (!room.enemyAttackers.length) enemyCreeps = room.enemyAttackers
+        if (!room.roomManager.enemyAttackers.length) enemyCreeps = room.roomManager.enemyAttackers
 
         // If there are none
 
         if (!enemyCreeps.length) {
-            enemyCreeps = room.enemyCreeps.filter(function (creep) {
+            enemyCreeps = room.roomManager.notMyCreeps.enemy.filter(function (creep) {
                 return !creep.isOnExit
             })
 
-            if (!enemyCreeps.length) enemyCreeps = room.enemyCreeps
+            if (!enemyCreeps.length) enemyCreeps = room.roomManager.notMyCreeps.enemy
             if (!enemyCreeps.length) return false
 
             this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-            if (Memory.roomVisuals)
+            if (global.settings.roomVisuals)
                 this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
                     color: customColors.green,
                     opacity: 0.3,
@@ -786,7 +788,7 @@ export class Quad {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyCreeps)
-        if (Memory.roomVisuals)
+        if (global.settings.roomVisuals)
             this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
                 color: customColors.green,
                 opacity: 0.3,
@@ -849,13 +851,18 @@ export class Quad {
     }
 
     bulldoze() {
-        const request = Memory.combatRequests[this.leader.memory.CRN]
+        const request = Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]]
         if (!request) return false
-        if (request.T === 'defend') return false
+        if (request[CombatRequestKeys.type] === 'defend') return false
+        if (
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+        )
+            return false
 
         let bulldozeTarget: Structure
-        this.leader.memory.QBTIDs = []
-        let quadBulldozeTargetIDs = this.leader.memory.QBTIDs || []
+        this.leader.memory[CreepMemoryKeys.quadBulldozeTargets] = []
+        let quadBulldozeTargetIDs = this.leader.memory[CreepMemoryKeys.quadBulldozeTargets] || []
 
         for (let i = 0; i < quadBulldozeTargetIDs.length; i++) {
             const ID = quadBulldozeTargetIDs[i]
@@ -870,8 +877,8 @@ export class Quad {
 
         if (!bulldozeTarget) {
             let bulldozeTargets: Structure[] = []
-            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.spawn)
-            bulldozeTargets = bulldozeTargets.concat(this.leader.room.structures.tower)
+            bulldozeTargets = bulldozeTargets.concat(this.leader.room.roomManager.structures.spawn)
+            bulldozeTargets = bulldozeTargets.concat(this.leader.room.roomManager.structures.tower)
 
             if (!bulldozeTargets.length) return false
 
@@ -902,17 +909,25 @@ export class Quad {
     }
 
     rangedAttackStructures() {
-        const request = Memory.combatRequests[this.leader.memory.CRN]
+        const request = Memory.combatRequests[this.leader.memory[CreepMemoryKeys.combatRequest]]
         if (!request) return false
-        if (request.T === 'defend') return false
+        if (request[CombatRequestKeys.type] === 'defend') return false
+        if (
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.commune ||
+            Memory.rooms[this.leader.room.name][RoomMemoryKeys.type] === RoomTypes.remote
+        )
+            return false
 
-        const structures = this.leader.room.combatStructureTargets
+        const structures = this.leader.room.roomManager.combatStructureTargets
 
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (Memory.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, { color: customColors.green, opacity: 0.3 })
+        if (global.settings.roomVisuals)
+            this.leader.room.visual.line(this.leader.pos, structure.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+            })
 
         const range = this.findMinRange(structure.pos)
 
@@ -939,32 +954,211 @@ export class Quad {
     }
 
     rangedKite() {
-        if (!this.willMove) return
+        if (!this.willMove) return Result.noAction
+
+        const enemyThreatDataRanged = this.enemyThreatDataRanged
+        let stay: undefined | true
 
         for (const member of this.members) {
-            if (!this.enemyThreatCoords.has(packCoord(member.pos))) continue
+            const coordThreat = enemyThreatDataRanged.coords[packAsNum(member.pos)]
+            if (coordThreat === 0) continue
+            if (coordThreat === 1) {
+                stay = true
+                continue
+            }
 
             this.leader.room.errorVisual(member.pos, true)
+            /* delete this.leader.memory[CreepMemoryKeys.path] */
             this.createMoveRequest(
                 {
                     origin: this.leader.pos,
-                    goals: this.leader.room.enemyThreatGoals,
+                    goals: enemyThreatDataRanged.goals,
                     flee: true,
                 },
                 /* member, */
             )
-            return
+            this.leader.room.visual.text('kited', this.leader.pos)
+            return Result.action
         }
+
+        // We don't want to flee but we shouldn't move
+
+        if (stay) {
+            this.leader.room.visual.text('stay', this.leader.pos)
+
+            return Result.stop
+        }
+
+        // There is no need to kite
+        return Result.success
     }
 
     findMinRange(coord: Coord) {
         let minRange = Infinity
 
         for (const member of this.members) {
-            const range = getRangeOfCoords(member.pos, coord)
+            const range = getRange(member.pos, coord)
             if (range < minRange) minRange = range
         }
 
         return minRange
+    }
+
+    setMoveType(type: SquadMoveTypes) {
+        this.moveType = type
+        for (const memberName of this.memberNames) {
+            Memory.creeps[memberName][CreepMemoryKeys.squadMoveType] = type
+        }
+    }
+
+    _combatStrength: CombatStrength
+    get combatStrength() {
+        if (this._combatStrength) return this._combatStrength
+
+        const combatStrength = {
+            dismantle: 0,
+            melee: 0,
+            ranged: 0,
+            heal: 0,
+        }
+
+        for (const member of this.members) {
+
+            const memberCombatStrength = member.combatStrength
+
+            for (const key in combatStrength) {
+                const combatType = key as keyof CombatStrength
+
+                combatStrength[combatType] += memberCombatStrength[combatType]
+            }
+        }
+
+        return this._combatStrength = combatStrength
+    }
+
+    _defenceStrength: number
+    get defenceStrength() {
+        if (this._defenceStrength !== undefined) return this._defenceStrength
+
+        return (this._defenceStrength = findHighestScore(
+            this.members,
+            member => member.defenceStrength,
+        ))
+    }
+
+    _hits: number
+    get hits() {
+        if (this._hits !== undefined) return this._hits
+
+        return (this._hits = findHighestScore(this.members, member => member.hits))
+    }
+
+    _enemyThreatDataRanged: EnemyThreatData
+
+    /**
+     * Score identifies speed of death. Lower values are better
+     * Be scared of enemies we can die faster from
+     */
+    get enemyThreatDataRanged() {
+        if (this._enemyThreatDataRanged) return this._enemyThreatDataRanged
+
+        this._enemyThreatDataRanged = {
+            coords: new Uint8Array(2500),
+            goals: [],
+        }
+
+        for (const enemyCreep of this.leader.room.roomManager.enemyAttackers) {
+            // Plus one to account for non-leader squad members
+
+            if (getRange(enemyCreep.pos, this.leader.pos) > rangedFleeRange + 1) continue
+
+            const enemyRanged = enemyCreep.combatStrength.ranged
+            const enemyHeal = enemyCreep.combatStrength.heal
+            const enemyDefence = enemyCreep.defenceStrength
+            const enemyHits = enemyCreep.hits
+
+            // Ranged
+
+            let squadDeathSpeed =
+                enemyRanged * this.defenceStrength - this.combatStrength.heal / this.hits
+            let enemyDeathSpeed =
+                this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
+
+            if (squadDeathSpeed > enemyDeathSpeed) {
+                forCoordsInRange(enemyCreep.pos, rangedFleeRange, coord => {
+                    const packedCoord = packAsNum(coord)
+                    const currentValue = this._enemyThreatDataRanged.coords[packedCoord]
+                    if (currentValue === 255) return
+
+                    if (getRange(enemyCreep.pos, coord) < rangedFleeRange) {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 255
+                    } else {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 1
+                    }
+                })
+
+                this._enemyThreatDataRanged.goals.push({
+                    pos: enemyCreep.pos,
+                    range: 10,
+                })
+                continue
+            }
+
+            // Melee
+
+            squadDeathSpeed =
+                (enemyRanged + enemyCreep.combatStrength.melee) * this.defenceStrength -
+                this.combatStrength.heal / this.hits
+            enemyDeathSpeed =
+                this.combatStrength.ranged * 0.9 * enemyDefence - enemyHeal / enemyHits
+
+            if (squadDeathSpeed > enemyDeathSpeed) {
+                forCoordsInRange(enemyCreep.pos, meleeFleeRange, coord => {
+                    const packedCoord = packAsNum(coord)
+                    const currentValue = this._enemyThreatDataRanged.coords[packedCoord]
+                    if (currentValue === 255) return
+
+                    if (getRange(enemyCreep.pos, coord) < meleeFleeRange) {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 255
+                    } else {
+                        this._enemyThreatDataRanged.coords[packedCoord] = 1
+                    }
+                })
+
+                this._enemyThreatDataRanged.goals.push({
+                    pos: enemyCreep.pos,
+                    range: 10,
+                })
+                continue
+            }
+        }
+        /*
+        for (let x = 0; x < roomDimensions; x++) {
+            for (let y = 0; y < roomDimensions; y++) {
+                const weight = this._enemyThreatDataRanged.coords[packXYAsNum(x, y)]
+                if (weight === 0) continue
+
+                let color = weight === 255 ? customColors.red : customColors.yellow
+                this.leader.room.visual.circle(x, y, { fill: color })
+            }
+        }
+ */
+        return this._enemyThreatDataRanged
+    }
+
+    get canMove() {
+        for (const member of this.members) {
+            if (!member.canMove) return false
+        }
+        return true
+    }
+
+    get willMove() {
+        for (const member of this.members) {
+            if (!member.canMove) return false
+            if (member.moveRequest) return false
+        }
+
+        return true
     }
 }

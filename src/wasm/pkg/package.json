@@ -1,0 +1,14 @@
+{
+  "name": "commiebot-wasm",
+  "version": "0.0.0",
+  "files": [
+    "commiebot_wasm_bg.wasm",
+    "commiebot_wasm.js",
+    "commiebot_wasm.d.ts"
+  ],
+  "module": "commiebot_wasm.js",
+  "types": "commiebot_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

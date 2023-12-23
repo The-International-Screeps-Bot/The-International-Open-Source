@@ -375,10 +375,9 @@ RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
             this.roads.push([x, y])
             break
         case STRUCTURE_RAMPART:
-            this.circle(x, y, {
-                radius: 0.5,
-                fill: 'rgb(78, 104, 79)',
-                stroke: 'rgb(106, 180, 107)',
+            this.rect(x - 0.5, y - 0.5, 1, 1, {
+                fill: opts.fill || 'rgb(78, 104, 79)',
+                stroke: opts.fill || 'rgb(106, 180, 107)',
                 strokeWidth: 0.12,
                 opacity: opts.opacity,
             })
@@ -469,6 +468,15 @@ RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
             this.rect(x - 0.17, y + 0.07, 0.34, 0.2, {
                 fill: colors.energy,
                 opacity: opts.opacity,
+            })
+            break
+        case STRUCTURE_EXTRACTOR:
+            this.circle(x, y, {
+                radius: 0.65,
+                opacity: opts.opacity,
+                stroke: '#47b165',
+                strokeWidth: 0.12,
+                fill: 'transparent',
             })
             break
         default:

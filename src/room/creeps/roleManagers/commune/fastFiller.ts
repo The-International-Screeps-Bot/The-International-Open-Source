@@ -1,14 +1,26 @@
-import { findClosestPos, getRange, getRangeOfCoords } from 'international/utils'
-import { packCoord, packPos, unpackCoordAsPos, unpackPos } from 'other/codec'
+import { CreepMemoryKeys, ReservedCoordTypes } from 'international/constants'
+import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
+import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 
 export class FastFiller extends Creep {
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
+        }
+    }
+
     travelToFastFiller?(): boolean {
         const fastFillerPos = this.findFastFillerPos()
         if (!fastFillerPos) return true
 
         // If the this is standing on the fastFillerPos, inform false
 
-        if (getRangeOfCoords(this.pos, fastFillerPos) === 0) return false
+        if (getRange(this.pos, fastFillerPos) === 0) return false
 
         // Otherwise, make a move request to it
 
@@ -31,22 +43,23 @@ export class FastFiller extends Creep {
 
         // Stop if the creep already has a packedFastFillerPos
 
-        if (this.memory.PC) return unpackCoordAsPos(this.memory.PC, room.name)
+        if (this.memory[CreepMemoryKeys.packedCoord])
+            return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
 
         // Get usedFastFillerPositions
 
-        const usedFastFillerCoords = room.usedFastFillerCoords
+        const reservedCoords = room.roomManager.reservedCoords
 
-        const openFastFillerPositions = room.fastFillerPositions.filter(
-            pos => !usedFastFillerCoords.has(packCoord(pos)),
-        )
+        const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(pos => {
+            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+        })
         if (!openFastFillerPositions.length) return false
 
         const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
         const packedCoord = packCoord(fastFillerPos)
 
-        this.memory.PC = packedCoord
-        room._usedFastFillerCoords.add(packedCoord)
+        this.memory[CreepMemoryKeys.packedCoord] = packedCoord
+        room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return fastFillerPos
     }
@@ -69,10 +82,7 @@ export class FastFiller extends Creep {
             }
         }
 
-        const fastFillerContainers: StructureContainer[] = []
-
-        if (room.fastFillerContainerLeft) fastFillerContainers.push(room.fastFillerContainerLeft)
-        if (room.fastFillerContainerRight) fastFillerContainers.push(room.fastFillerContainerRight)
+        const fastFillerContainers = this.room.roomManager.fastFillerContainers
 
         // If all spawningStructures are filled, inform false
 
@@ -86,7 +96,7 @@ export class FastFiller extends Creep {
 
                 // Otherwise, if the structure is not in range 1 to the this
 
-                if (getRangeOfCoords(this.pos, structure.pos) > 1) {
+                if (getRange(this.pos, structure.pos) > 1) {
                     fastFillerContainers.splice(i, 1)
                     continue
                 }
@@ -100,24 +110,26 @@ export class FastFiller extends Creep {
                         if (resourceType === RESOURCE_ENERGY) continue
 
                         this.message = 'WCR'
-
                         this.withdraw(structure, resourceType as ResourceConstant)
-
                         return true
                     }
                 }
 
                 // Otherwise, if there is insufficient energy in the structure, iterate
 
-                if (structure.store.getUsedCapacity(RESOURCE_ENERGY) < structure.store.getCapacity() * 0.5) continue
+                if (
+                    structure.store.getUsedCapacity(RESOURCE_ENERGY) <
+                    structure.store.getCapacity() * 0.5
+                )
+                    continue
 
                 this.withdraw(structure, RESOURCE_ENERGY)
                 return true
             }
 
             let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = []
-            if (room.fastFillerLink && room.fastFillerLink.RCLActionable)
-                fastFillerStoringStructures.push(room.fastFillerLink)
+            if (room.roomManager.fastFillerLink && room.roomManager.fastFillerLink.isRCLActionable)
+                fastFillerStoringStructures.push(room.roomManager.fastFillerLink)
             fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 
             // Loop through each fastFillerStoringStructure
@@ -125,7 +137,7 @@ export class FastFiller extends Creep {
             for (const structure of fastFillerStoringStructures) {
                 // Otherwise, if the structure is not in range 1 to the this
 
-                if (getRangeOfCoords(this.pos, structure.pos) > 1) continue
+                if (getRange(this.pos, structure.pos) > 1) continue
 
                 // If there is a non-energy resource in the structure
 
@@ -168,7 +180,11 @@ export class FastFiller extends Creep {
 
             // If the structureType is an extension or spawn, iterate
 
-            if (structure.structureType !== STRUCTURE_SPAWN && structure.structureType !== STRUCTURE_EXTENSION) continue
+            if (
+                structure.structureType !== STRUCTURE_SPAWN &&
+                structure.structureType !== STRUCTURE_EXTENSION
+            )
+                continue
 
             if (structure.nextStore.energy >= structure.store.getCapacity(RESOURCE_ENERGY)) continue
 
@@ -203,7 +219,7 @@ export class FastFiller extends Creep {
         super(creepID)
     }
 
-    static fastFillerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: FastFiller = Game.creeps[creepName]
 

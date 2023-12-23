@@ -41,7 +41,7 @@ If you have specific questions or want to discuss the bot, please join our disco
 
 Please read the about section before installing and using this bot.
 
-First you'll want to download or fork the repository.
+First you'll want to download or fork the repository. Start by selecting a branch: Main is more stable but is often behind on features and improvements, while Development has more bugs, features and optimizations.
 
 ### NPM
 
@@ -60,10 +60,11 @@ Linux/MacOS [nvm](https://github.com/nvm-sh/nvm)
 
 Windows [nvm-windows](https://github.com/coreybutler/nvm-windows)
 
-After making sure you have correct node version go to the project folder (not src), you'll want to install the devDependencies like so:
+After making sure you have correct node version go to the project folder (not in src), you'll want to install the dependencies like so:
 
 ```powershell
 npm i
+
 ```
 
 And that's it. Join our [discord server](https://discord.gg/5QubDsB786) if you need help.
@@ -76,27 +77,40 @@ Secondly, DO NOT USE THIS BOT TO BULLY. Do not attack noobs, taking their remote
 
 To begin, you need to decide what branch to use. Main is generally old but stable, while Development is less stable but more up to date. If you want to find bugs or test new features, Development is for you.
 
-Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in the screeps.json file. This reduces cpu usage, and compiles the code so it can be run by Screeps while we develop using folders and typescript.
+Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in `.screeps.yaml` file (see below if you don't have one yet). This compiles the code so it can be run by Screeps while we develop using folders and typescript.
 
-First, rename example.screeps.json to screeps.json and fill in the required information for each environment you want to run the bot in.
+First, you'll need to set up your settings. In `/src` you'll find the `settings.example.ts` file. Please copy the file and rename its clone to `settings.ts`. Then change the `settingsExample` definition to `settings`. You can then add your own prefences, including checks based on the name of the shard for server-specific settings. These same instructions with an example are included in the file.
 
-To then run the bot, use the command `npm run push-mmo` replacing mmo with the environment you want to compile to. This wiil initially compile to the environment, as well as automatically compiling and pushing to the environment on code changes.
+Next, rename `.screeps.yaml.example` to `.screeps.yaml` and fill in the required information for each environment you want to run the bot in. For the official server, replace the `token` with an [API token](https://docs.screeps.com/auth-tokens.html) for your account. On private servers, edit _(or copy and rename)_ the `pserver` section with `host` set to your server domain or IP then complete `username` and `password` with your credentials on this server. For more information about this file, check the [screeps unified credentials file](https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md) spec.
+
+Running `rollup -c` will compile your code and do a "dry run", preparing the code for upload but not actually pushing it. Running `rollup -c --environment DEST:mmo` will compile your code, and then upload it to a screeps server using the `mmo` config from `.screeps.yaml`.
+
+You can use `-cw` instead of `-c` to automatically re-run when your source code changes - for example, `rollup -cw --environment DEST:main` will automatically upload your code to the `mmo` configuration every time your code is changed.
+
+Finally, there are also NPM scripts that serve as aliases for these commands in `package.json` for IDE integration. Running `npm run push-mmo` is equivalent to `rollup -c --environment DEST:mmo`, and `npm run watch-pserver` is equivalent to `rollup -cw --dest pserver`.
+
+#### Important! To upload code to a private server, you must have [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) installed and configured!
 
 For more information, please go to the [wiki](https://github.com/CarsonBurke/The-International-Screeps-Bot/wiki/Usage)
 
 ### Grafana
 
-Soon to be added again when PandaMaster fixes the new ScreepsPlus replacement site!
+Use `https://pandascreeps.com` for Stats hosting
 
 ### Private server
 
 To run the bot on an performance checking server, run `npm run server` and check out `localhost:21025` (server) and `localhost:3000` (grafana) in your browser. Alternatives with in-depth instructions can be found at [Using a Private Server](https://github.com/The-International-Screeps-Bot/The-International-Open-Source/wiki/Using-a-private-server)
 
-For the performance server users its always RoomName as email and password is `password`.
+For the performance server users, its always RoomName as email and password is `password`.
 
 If you'd like to use rollup to compile to a private server, you'll need to download and configure [screepsmod-auth](https://github.com/ScreepsMods/screepsmod-auth) to push your code.
 
 I'd also suggest using this less-laggy tool [steamless-client](https://github.com/laverdet/screeps-steamless-client) to watch your private server run from the comfort of your browser.
+
+
+### Advanced usage
+
+If you want to run custom code without conflicting with the project's source - say, if you want to commit or make pull requests - it's recommended you use the userScript folder. Head to `src/other/userScript/userScript.example.ts` and follow the instructions at the top of the file.
 
 ## Contribution
 
@@ -106,7 +120,7 @@ If you want to join us in development for this bot, please join our [discord ser
 
 **Please use the development branch for pull requests, commits, etc.**
 
-An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO for their essential contribution to this project.
+An extra special thanks to Panda Master, Allorrian, Plaid Rabbit, Aerics, and DefaultO, SimplyAlex, shu for their essential contribution to this project.
 
 ## Support
 

@@ -1,49 +1,50 @@
-import { randomIntRange } from "./utils"
+import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
+import { findLowestScore, randomIntRange } from '../utils/utils'
+import { Sleepable } from 'utils/sleepable'
+import { collectiveManager } from './collective'
 
-class RoomPruningManager {
-    sleepTime = randomIntRange(50000, 100000)
-    lastAttempt: number
-
+export class RoomPruningManager extends Sleepable {
+    sleepFor = randomIntRange(50000, 100000)
     run() {
-        return
-
-        if (this.lastAttempt + this.sleepTime > Game.time) return
+        if (this.isSleepingResponsive()) return
 
         // Make sure all rooms are max RCL
         // Temple rooms?
 
-        let highestScore = 0
-        let highestScoreCommuneName: string
+        let rooms = 0
+        let highestCommuneScore = 0
+        let highestCommuneScoreCommuneName: string
 
-        for (const roomName of global.communes) {
-
+        for (const roomName of collectiveManager.communes) {
             const room = Game.rooms[roomName]
+            if (room.controller.level < maxControllerLevel) return
 
-            if (room.controller.level < 8) {
+            rooms += 1
 
-                this.lastAttempt = Game.time
-                return
-            }
+            const roomMemory = Memory.rooms[roomName]
+            const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
 
-            const score = Memory.rooms[roomName].S
-            if (score <= highestScore) continue
+            if (score <= highestCommuneScore) continue
 
-            highestScore = score
-            highestScoreCommuneName = roomName
+            highestCommuneScore = score
+            highestCommuneScoreCommuneName = roomName
         }
 
-        // Find the lowest scoring claimRequest that is also lower than the highest scoring commune
+        // Have multiple rooms before we unclaim
+        if (rooms <= 1) return
 
-        let lowestScore = 0
-        let lowestScoreClaimRequestName: string
+        // Find the lowest scoring workRequest
+        const lowestWorkRequestScore = findLowestScore(
+            Object.keys(Memory.workRequests),
+            roomName =>
+                Memory.rooms[roomName][RoomMemoryKeys.score] +
+                Memory.rooms[roomName][RoomMemoryKeys.dynamicScore],
+        )
+        // The best work request must be better than our worst commune
+        if (lowestWorkRequestScore >= highestCommuneScore) return
 
-        /*
-        for (const )
-        */
-
-        Memory.rooms[highestScoreCommuneName].Ab = true
+        Memory.rooms[highestCommuneScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
     }
 }
-
 
 export const roomPruningManager = new RoomPruningManager()

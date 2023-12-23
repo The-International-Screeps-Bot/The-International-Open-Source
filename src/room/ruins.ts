@@ -1,7 +1,9 @@
-import { customLog, scalePriority } from 'international/utils'
+import { customLog } from 'utils/logging'
+import { scalePriority } from 'utils/utils'
 import { RoomManager } from 'room/room'
+import { RoomLogisticsRequestTypes } from 'international/constants'
 
-export class RuinManager {
+export class RuinsManager {
     roomManager: RoomManager
 
     constructor(roomManager: RoomManager) {
@@ -18,7 +20,7 @@ export class RuinManager {
                 this.roomManager.room.createRoomLogisticsRequest({
                     target: ruin,
                     resourceType: resourceType,
-                    type: 'withdraw',
+                    type: RoomLogisticsRequestTypes.withdraw,
                     priority: Math.max(5, 20 - amount / 200),
                 })
             }
@@ -35,7 +37,7 @@ export class RuinManager {
             this.roomManager.room.createRoomLogisticsRequest({
                 target: ruin,
                 resourceType: resourceType,
-                type: 'withdraw',
+                type: RoomLogisticsRequestTypes.withdraw,
                 priority: Math.max(5, 20 - amount / 200),
             })
         }

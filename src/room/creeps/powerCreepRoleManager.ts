@@ -1,6 +1,6 @@
 import { customColors, powerCreepClassNames } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
-import { customLog } from 'international/utils'
+import { statsManager } from 'international/statsManager'
+import { customLog } from 'utils/logging'
 import { RoomManager } from 'room/room'
 import { Operator } from './powerCreeps/operator'
 
@@ -17,28 +17,8 @@ export class PowerCreepRoleManager {
 
     public run() {
         const { room } = this.roomManager
-        // If CPU logging is enabled, get the CPU used at the start
-
-        if (Memory.CPULogging === true) var managerCPUStart = Game.cpu.getUsed()
 
         for (const className of powerCreepClassNames) this.runManager(className)
-
-        // If CPU logging is enabled, log the CPU used by this manager
-
-        if (Memory.CPULogging === true) {
-            const cpuUsed = Game.cpu.getUsed() - managerCPUStart
-            const cpuUsed2 = this.roomManager.room.myCreepsAmount
-                ? (Game.cpu.getUsed() - managerCPUStart) / this.roomManager.room.myCreepsAmount
-                : 0
-            customLog('Power Role Manager', `CPU: ${cpuUsed.toFixed(2)}, CPU Per Creep: ${cpuUsed2.toFixed(2)}`, {
-                textColor: customColors.white,
-                bgColor: customColors.lightBlue,
-            })
-            const statName: RoomCommuneStatNames = 'prmcu'
-            const statName2: RoomCommuneStatNames = 'prmpccu'
-            globalStatsUpdater(room.name, statName, cpuUsed)
-            globalStatsUpdater(room.name, statName2, cpuUsed2)
-        }
     }
 
     private runManager(className: PowerClassConstant) {
@@ -46,24 +26,25 @@ export class PowerCreepRoleManager {
 
         // Get the amount of creeps with the role
 
-        const creepsOfRoleAmount = this.roomManager.room.myPowerCreeps[className].length
+        const creepsOfRoleAmount = this.roomManager.room.myPowerCreepsByRole[className].length
 
         // If there are no creeps for this manager, iterate
 
-        if (!this.roomManager.room.myPowerCreeps[className].length) return
+        if (!this.roomManager.room.myPowerCreepsByRole[className].length) return
 
         // Run manager
 
-        managers[className](this.roomManager.room, this.roomManager.room.myPowerCreeps[className])
+        managers[className](this.roomManager.room, this.roomManager.room.myPowerCreepsByRole[className])
 
         // Log className cpu
 
         customLog(
             `${className}s`,
-            `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(2)}, CPU Per Creep: ${(
-                (Game.cpu.getUsed() - roleCPUStart) /
-                creepsOfRoleAmount
-            ).toFixed(2)}`,
+            `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(
+                2,
+            )}, CPU Per Creep: ${((Game.cpu.getUsed() - roleCPUStart) / creepsOfRoleAmount).toFixed(
+                2,
+            )}`,
             undefined,
         )
     }

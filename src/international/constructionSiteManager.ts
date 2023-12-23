@@ -1,56 +1,56 @@
-import { InternationalManager } from './international'
+import { Sleepable } from 'utils/sleepable'
+import { CollectiveManager, collectiveManager } from './collective'
 
-let cSiteID
-let cSite
-let cSiteAge
+/**
+ * Tracks and records constructionSites and thier age, deleting old sites
+ */
+export class ConstructionSiteManager extends Sleepable {
+    run() {
+        if (this.isSleepingResponsive()) return
 
-InternationalManager.prototype.constructionSiteManager = function () {
-    // Loop through my sites
+        collectiveManager.constructionSiteCount = 0
 
-    for (cSiteID in Game.constructionSites) {
-        // If the site's ID is stored in Memory's constructionSites, iterate
+        // Initialize uninitialized construction sites
 
-        if (Memory.constructionSites[cSiteID]) continue
+        for (const cSiteID in Game.constructionSites) {
+            // If the site's ID is stored in Memory's constructionSites, iterate
+            if (Memory.constructionSites[cSiteID]) continue
 
-        // Otherwise store it in Memory's constructionSties
-
-        Memory.constructionSites[cSiteID] = 0
-    }
-
-    // Loop through recorded site IDs
-
-    for (cSiteID in Memory.constructionSites) {
-        // Try to find the site using the recorded ID
-
-        cSite = Game.constructionSites[cSiteID]
-
-        // If the site with the recorded ID doesn't exist
-
-        if (!cSite) {
-            // Delete it from memory and iterate
-
-            delete Memory.constructionSites[cSiteID]
-            continue
+            // Otherwise store it in Memory's constructionSties
+            Memory.constructionSites[cSiteID] = 0
         }
 
-        // Find the site's age
+        // Update and manage construction sites
 
-        cSiteAge = Memory.constructionSites[cSiteID]
+        for (const cSiteID in Memory.constructionSites) {
 
-        // If the site is past a certain age in respect to progress
+            // Try to find the site using the recorded ID
+            const cSite = Game.constructionSites[cSiteID]
 
-        if (cSiteAge > 20000 + cSiteAge * cSite.progress) {
-            // Remove the site from the world
+            // If the site with the recorded ID doesn't exist, remove it
 
-            Game.constructionSites[cSiteID].remove()
+            if (!cSite) {
+                Memory.constructionSites[cSiteID] = undefined
+                continue
+            }
 
-            // Delete the site from memory
+            const cSiteAge = Memory.constructionSites[cSiteID]
 
-            delete Memory.constructionSites[cSiteID]
+            // If the site is past a certain age with respect to progress, delete it
+
+            if (cSiteAge > 20000 + cSiteAge * cSite.progress) {
+                // Remove the site from the world
+
+                Game.constructionSites[cSiteID].remove()
+                Memory.constructionSites[cSiteID] = undefined
+            }
+
+            // Otherwise increase the constructionSite's age
+            Memory.constructionSites[cSiteID] += 1 * this.sleepFor
+
+            collectiveManager.constructionSiteCount += 1
         }
-
-        // Otherwise increase the constructionSite's age
-
-        Memory.constructionSites[cSiteID] += 1
     }
 }
+
+export const constructionSiteManager = new ConstructionSiteManager()

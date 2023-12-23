@@ -1,16 +1,18 @@
-import { RemoteData } from 'international/constants'
-import { findObjectWithID, getRange, randomTick } from 'international/utils'
+import {
+    CreepMemoryKeys,
+    Result,
+    RoomMemoryKeys,
+    RoomTypes,
+    remoteTypeWeights,
+} from 'international/constants'
+import { findObjectWithID, getRangeXY, randomTick } from 'utils/utils'
 
 export class RemoteDismantler extends Creep {
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
 
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
-
+    public isDying() {
         // Stop if creep is spawning
 
         if (this.spawning) return false
@@ -19,38 +21,44 @@ export class RemoteDismantler extends Creep {
 
         if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME) return false
 
-        // Record creep as dying
+        // Record creep as isDying
 
-        return (this._dying = true)
+        return true
     }
 
-    preTickManager() {
-        if (!this.findRemote()) return
+    initRun() {
         if (randomTick() && !this.getActiveBodyparts(MOVE)) this.suicide()
+        if (!this.findRemote()) return
+
+        this.assignRemote()
+    }
+
+    assignRemote?() {
+        if (this.isDying()) return
 
         const role = this.role as 'remoteDismantler'
 
-        if (this.dying) return
-
         // Reduce remote need
 
-        Memory.rooms[this.memory.RN].data[RemoteData[role]] -= 1
+        Memory.rooms[this.memory[CreepMemoryKeys.remote]][RoomMemoryKeys[role]] -= 1
 
         const commune = this.commune
 
         // Add the creep to creepsOfRemote relative to its remote
 
-        if (commune.creepsOfRemote[this.memory.RN]) commune.creepsOfRemote[this.memory.RN][role].push(this.name)
+        if (commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]])
+            commune.creepsOfRemote[this.memory[CreepMemoryKeys.remote]][role].push(this.name)
     }
 
     hasValidRemote?() {
-        if (!this.memory.RN) return false
+        if (!this.memory[CreepMemoryKeys.remote]) return false
 
-        const remoteMemory = Memory.rooms[this.memory.RN]
+        const remoteMemory = Memory.rooms[this.memory[CreepMemoryKeys.remote]]
 
-        if (remoteMemory.T !== 'remote') return false
-        if (remoteMemory.CN !== this.commune.name) return false
-        if (remoteMemory.data[RemoteData.abandon]) return false
+        if (remoteMemory[RoomMemoryKeys.disable]) return false
+        if (remoteMemory[RoomMemoryKeys.abandonRemote]) return false
+        if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return false
+        if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) return false
 
         return true
     }
@@ -61,24 +69,26 @@ export class RemoteDismantler extends Creep {
     findRemote?() {
         if (this.hasValidRemote()) return true
 
-        // Otherwise, get the creep's role
+        const creepMemory = Memory.creeps[this.name]
 
         const role = 'remoteDismantler'
-
-        // Get remotes by their efficacy
-
-        const remoteNamesByEfficacy = this.commune.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.commune.roomManager.remoteNamesByEfficacy
 
         // Loop through each remote name
 
         for (const roomName of remoteNamesByEfficacy) {
-            const roomMemory = Memory.rooms[roomName]
-            if (roomMemory.data[RemoteData[role]] <= 0) continue
+            const remoteMemory = Memory.rooms[roomName]
+
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            if (remoteMemory[RoomMemoryKeys[role]] <= 0) continue
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
 
             // Otherwise assign the remote to the creep and inform true
 
-            this.memory.RN = roomName
-            roomMemory.data[RemoteData[role]] -= 1
+            creepMemory[CreepMemoryKeys.remote] = roomName
+            this.assignRemote()
 
             return true
         }
@@ -97,18 +107,18 @@ export class RemoteDismantler extends Creep {
         if (
             this.room.controller &&
             this.room.controller.owner &&
-            Memory.allyPlayers.includes(this.room.controller.owner.username)
+            global.settings.allies.includes(this.room.controller.owner.username)
         )
             return true
 
         let target
         let range
 
-        if (this.memory.dismantleTarget) {
-            target = findObjectWithID(this.memory.dismantleTarget)
+        if (this.memory[CreepMemoryKeys.structureTarget]) {
+            target = findObjectWithID(this.memory[CreepMemoryKeys.structureTarget])
 
             if (target) {
-                range = getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
+                range = getRangeXY(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
 
                 if (range > 1) {
                     this.createMoveRequest({
@@ -130,12 +140,12 @@ export class RemoteDismantler extends Creep {
             }
         }
 
-        const targets = room.dismantleTargets
+        const targets = room.roomManager.dismantleTargets
 
         if (targets.length) {
             target = this.pos.findClosestByPath(targets, { ignoreRoads: true, ignoreCreeps: true })
 
-            range = getRange(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
+            range = getRangeXY(this.pos.x, target.pos.x, this.pos.y, target.pos.y)
 
             if (range > 1) {
                 this.createMoveRequest({
@@ -152,7 +162,9 @@ export class RemoteDismantler extends Creep {
                 return true
             }
 
-            this.memory.dismantleTarget = target.id
+            this.memory[CreepMemoryKeys.structureTarget] = target.id as Id<
+                Structure<BuildableStructureConstant>
+            >
 
             this.dismantle(target)
             return true
@@ -161,7 +173,7 @@ export class RemoteDismantler extends Creep {
         return false
     }
 
-    static remoteDismantlerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         for (const creepName of creepsOfRole) {
             const creep: RemoteDismantler = Game.creeps[creepName]
 
@@ -177,13 +189,16 @@ export class RemoteDismantler extends Creep {
                     continue
                 }
 
+                const anchor = creep.commune.roomManager.anchor
+                if (!anchor) throw Error('No anchor for remoteDismantler ' + creep.room.name)
+
                 // Otherwise, have the creep make a moveRequest to its commune and iterate
 
                 creep.createMoveRequest({
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: creep.commune.anchor,
+                            pos: anchor,
                             range: 5,
                         },
                     ],
@@ -192,34 +207,34 @@ export class RemoteDismantler extends Creep {
                 continue
             }
 
-            creep.message = creep.memory.RN
+            const creepMemory = Memory.creeps[creep.name]
+            creep.message = creepMemory[CreepMemoryKeys.remote]
 
             // If the creep is its remote
 
-            if (room.name === creep.memory.RN) {
+            if (room.name === creepMemory[CreepMemoryKeys.remote]) {
                 if (creep.advancedDismantle()) continue
                 continue
             }
 
-            // Otherwise, create a moveRequest to its remote
-
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [
-                    {
-                        pos: new RoomPosition(25, 25, creep.memory.RN),
-                        range: 25,
-                    },
-                ],
-                typeWeights: {
-                    enemy: Infinity,
-                    ally: Infinity,
-                    keeper: Infinity,
-                    enemyRemote: Infinity,
-                    allyRemote: Infinity,
-                },
-                avoidAbandonedRemotes: true,
-            })
+            if (
+                creep.createMoveRequest({
+                    origin: creep.pos,
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creepMemory[CreepMemoryKeys.remote]),
+                            range: 25,
+                        },
+                    ],
+                    typeWeights: remoteTypeWeights,
+                    avoidDanger: true,
+                }) === Result.fail
+            ) {
+                Memory.rooms[creepMemory[CreepMemoryKeys.remote]][
+                    RoomMemoryKeys.abandonRemote
+                ] = 1500
+                delete creepMemory[CreepMemoryKeys.remote]
+            }
         }
     }
 }

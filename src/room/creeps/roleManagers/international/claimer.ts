@@ -1,21 +1,21 @@
-import { ClaimRequestData } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'international/constants'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
         super(creepID)
     }
 
-    preTickManager() {
-        if (this.dying) return
+    initRun() {
+        if (this.isDying()) return
 
-        const request = Memory.claimRequests[this.memory.TRN]
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
         if (!request) return
 
-        request.data[ClaimRequestData.claimer] -= 1
+        request[WorkRequestKeys.claimer] -= 1
     }
 
     /**
-     * Claims a room specified in the creep's commune claimRequest
+     * Claims a room specified in the creep's commune workRequest
      */
     claimRoom?(): void {
         const creep = this
@@ -51,10 +51,12 @@ export class Claimer extends Creep {
 
         // Otherwise, claim the controller. If the successful, remove claimerNeed
 
-        creep.claimController(room.controller)
+        if (!creep.claimController(room.controller)) return
+
+        // We claimed the controller
     }
 
-    static claimerManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {
@@ -62,9 +64,9 @@ export class Claimer extends Creep {
 
             const creep: Claimer = Game.creeps[creepName]
 
-            creep.message = creep.memory.TRN
+            creep.message = creep.memory[CreepMemoryKeys.workRequest]
 
-            if (room.name === creep.memory.TRN) {
+            if (room.name === creep.memory[CreepMemoryKeys.workRequest]) {
                 creep.claimRoom()
                 continue
             }
@@ -74,19 +76,24 @@ export class Claimer extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.workRequest]),
+                            range: 25,
+                        },
+                    ],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: creep.parts.move >= 5 ? 1 : undefined,
                     typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.sourceKeeper]: Infinity,
                     },
-                }) === 'unpathable'
+                }) === Result.fail
             ) {
-                const request = Memory.claimRequests[creep.memory.TRN]
-                if (request) request.data[ClaimRequestData.abandon] = 20000
+                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.workRequest]]
+                if (request) request[WorkRequestKeys.abandon] = 20000
             }
         }
     }

@@ -1,5 +1,6 @@
 import { allResources, customColors } from 'international/constants'
-import { customLog, findObjectWithID } from 'international/utils'
+import { customLog } from 'utils/logging'
+import { findObjectWithID } from 'utils/utils'
 
 Object.defineProperties(RoomObject.prototype, {
     effectsData: {
@@ -28,7 +29,6 @@ Object.defineProperties(RoomObject.prototype, {
     },
     nextStore: {
         get(this: AnyStoreStructure) {
-
             if (this._nextStore) return this._nextStore
 
             const parent = this
@@ -36,11 +36,9 @@ Object.defineProperties(RoomObject.prototype, {
 
             this._nextStore = new Proxy(referenceStore, {
                 get(target: CustomStore, resourceType: ResourceConstant) {
-
                     return target[resourceType] ?? 0
                 },
                 set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
-
                     if (parent._usedNextStore !== undefined) {
                         parent._usedNextStore += newAmount - (target[resourceType] ?? 0)
                     }
@@ -56,14 +54,12 @@ Object.defineProperties(RoomObject.prototype, {
     },
     usedNextStore: {
         get(this: RoomObject & { store?: StoreDefinition }) {
-
             if (this._usedNextStore !== undefined) return this._usedNextStore
 
             this._usedNextStore = 0
-            const keys = Object.keys(this.nextStore)
 
-            for (let i = 0; i < keys.length; i++) {
-                this._usedNextStore += this.nextStore[keys[i] as ResourceConstant]
+            for (const key in this.nextStore) {
+                this._usedNextStore += this.nextStore[key as ResourceConstant]
             }
 
             return this._usedNextStore
@@ -86,7 +82,6 @@ Object.defineProperties(RoomObject.prototype, {
                     return target[resourceType] ?? 0
                 },
                 set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
-
                     if (parent._usedReserveStore !== undefined) {
                         parent._usedReserveStore += newAmount - (target[resourceType] ?? 0)
                     }
@@ -106,10 +101,9 @@ Object.defineProperties(RoomObject.prototype, {
             if (this._usedReserveStore !== undefined) return this._usedReserveStore
 
             this._usedReserveStore = 0
-            const keys = Object.keys(this.reserveStore)
 
-            for (let i = 0; i < keys.length; i++) {
-                this._usedReserveStore += this.reserveStore[keys[i] as ResourceConstant]
+            for (const key in this.reserveStore) {
+                this._usedReserveStore += this.reserveStore[key as ResourceConstant]
             }
 
             return this._usedReserveStore

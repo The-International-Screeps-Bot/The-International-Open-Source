@@ -1,32 +1,37 @@
 import {
-    AllyCreepRequestData,
-    ClaimRequestData,
-    CombatRequestData,
+    WorkRequestKeys,
+    CombatRequestKeys,
     containerUpkeepCost,
-    controllerDowngradeUpgraderNeed,
-    minHarvestWorkRatio,
     customColors,
-    numbersByStructureTypes,
     rampartUpkeepCost,
-    RemoteData,
-    remoteHarvesterRoles,
-    RemoteHarvesterRolesBySourceIndex,
-    remoteHaulerRoles,
     roadUpkeepCost,
     packedPosLength,
+    decayCosts,
+    CreepMemoryKeys,
+    RoomMemoryKeys,
+    RoomTypes,
 } from 'international/constants'
 import {
-    customLog,
     findCarryPartsRequired,
     findLinkThroughput,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     randomRange,
-} from 'international/utils'
-import { internationalManager } from 'international/international'
-import { unpackPosList } from 'other/codec'
-import { globalStatsUpdater } from 'international/statsManager'
+    roundTo,
+} from 'utils/utils'
+import { collectiveManager } from 'international/collective'
+import { packPos, unpackPosList } from 'other/codec'
+import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
+import { customLog } from 'utils/logging'
+import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
+import { spawnUtils } from './spawnUtils'
+import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
+
+interface SpawningHaulerCosts {
+    maxCost: number
+    minCost: number
+}
 
 export class SpawnRequestsManager {
     communeManager: CommuneManager
@@ -34,7 +39,11 @@ export class SpawnRequestsManager {
     rawSpawnRequestsArgs: (SpawnRequestArgs | false)[]
     spawnEnergyCapacity: number
     minRemotePriority = 9
-    remoteHaulerNeed: number
+    /**
+     * The min priority to be placed after active remotes
+     */
+    activeRemotePriority: number
+    minHaulerCost: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -43,9 +52,16 @@ export class SpawnRequestsManager {
     run() {
         this.rawSpawnRequestsArgs = []
         this.spawnEnergyCapacity = this.communeManager.room.energyCapacityAvailable
+        this.activeRemotePriority = this.minRemotePriority
+        this.minHaulerCost = Math.min(
+            Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.minHaulerCost],
+            this.spawnEnergyCapacity,
+        )
 
         this.sourceHarvester()
-        this.hauler()
+        this.haulerForCommune()
+        this.remoteSourceRoles()
+        this.generalRemoteRoles()
         this.mineralHarvester()
         this.hubHauler()
         this.fastFiller()
@@ -53,47 +69,45 @@ export class SpawnRequestsManager {
         this.maintainers()
         this.builders()
         this.controllerUpgraders()
-        this.remoteSourceHarvesters()
-        this.generalRemoteRoles()
-        this.remoteHaulers()
         this.scout()
-        this.claimRequestRoles()
-        this.allyVanguard()
+        this.workRequestRoles()
         this.requestHauler()
         this.antifa()
 
-        this.communeManager.room.spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
-            args => args,
+        const spawnRequestsArgs = this.rawSpawnRequestsArgs.filter(
+            args => !!args,
         ) as SpawnRequestArgs[]
 
         // Sort in descending priority
 
-        this.communeManager.room.spawnRequestsArgs.sort((a, b) => {
+        spawnRequestsArgs.sort((a, b) => {
             return a.priority - b.priority
         })
+
+        return spawnRequestsArgs
     }
 
     private sourceHarvester() {
-        const mostOptimalSource = this.communeManager.room.sourcesByEfficacy[0]
-
-        for (let sourceIndex = 0; sourceIndex < this.communeManager.room.sources.length; sourceIndex++) {
+        const sources = this.communeManager.room.roomManager.communeSources
+        for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
             // Construct requests for sourceHarvesters
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     const role = 'sourceHarvester'
-
                     const spawnGroup = this.communeManager.room.creepsOfSource[sourceIndex]
+                    const priority = (sourceIndex === 0 ? 0 : 1) + spawnGroup.length
+                    const maxCostPerCreep = this.communeManager.room.myCreepsByRole.sourceHarvester.length
+                        ? this.spawnEnergyCapacity
+                        : this.communeManager.room.energyAvailable
 
-                    const priority = (mostOptimalSource.index === sourceIndex ? 0 : 1) + spawnGroup.length
-
-                    if (this.spawnEnergyCapacity >= 800) {
+                    if (this.spawnEnergyCapacity >= 850) {
                         let defaultParts: BodyPartConstant[] = [CARRY]
                         let workAmount = 6
 
                         // Account for power regenerating sources
 
-                        const source = this.communeManager.room.sources[sourceIndex]
+                        const source = sources[sourceIndex]
                         const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
                         if (effect) {
                             workAmount += Math.round(
@@ -106,92 +120,124 @@ export class SpawnRequestsManager {
                         if (workAmount % 2 !== 0) defaultParts.push(MOVE)
 
                         for (let i = 1; i <= workAmount; i++) {
-                            if (i % 2 === 0) defaultParts.push(MOVE)
                             defaultParts.push(WORK)
-                            if (i % 5 === 0) defaultParts.push(CARRY)
+                            if (i % 2 === 0) defaultParts.push(MOVE)
+                            if (i + (1 % 5) === 0) defaultParts.push(CARRY)
                         }
 
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts,
                             extraParts: [],
                             partsMultiplier: 1,
-                            minCreeps: 1,
-                            minCost: 300,
+                            creepsQuota: 1,
+                            minCostPerCreep: 300,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.preferRoads]: true,
+                            },
+                        }
+                    }
+
+                    if (this.spawnEnergyCapacity >= 800) {
+                        return {
+                            type: SpawnRequestTypes.individualUniform,
+                            role,
+                            defaultParts: [CARRY],
+                            extraParts: [WORK, MOVE, WORK],
+                            partsMultiplier: 3,
+                            creepsQuota: 1,
+                            minCostPerCreep: 250,
+                            priority,
+                            maxCostPerCreep,
+                            spawnGroup: spawnGroup,
+                            memoryAdditions: {
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
 
                     if (this.spawnEnergyCapacity >= 750) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [],
                             extraParts: [WORK, MOVE, WORK],
                             partsMultiplier: 3,
-                            minCreeps: 1,
-                            minCost: 200,
+                            creepsQuota: 1,
+                            minCostPerCreep: 200,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
 
                     if (this.spawnEnergyCapacity >= 600) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [MOVE, CARRY],
                             extraParts: [WORK],
                             partsMultiplier: 6,
-                            minCreeps: 1,
-                            minCost: 300,
+                            creepsQuota: 1,
+                            minCostPerCreep: 300,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
 
-                    //Only Spawn one larger creep if we have the ability to mine using one large creep
-                    if (this.communeManager.room.sourceContainers[sourceIndex] && this.spawnEnergyCapacity >= 650) {
+                    if (this.spawnEnergyCapacity >= 550) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [MOVE],
                             extraParts: [WORK],
                             partsMultiplier: 6,
-                            minCreeps: 1,
-                            minCost: 150,
+                            creepsQuota: 1,
+                            minCostPerCreep: 150,
                             priority,
+                            maxCostPerCreep,
                             spawnGroup: spawnGroup,
                             memoryAdditions: {
-                                SI: sourceIndex,
-                                R: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [MOVE, CARRY],
                         extraParts: [WORK],
                         partsMultiplier: 6,
-                        minCreeps: undefined,
-                        maxCreeps: Math.min(3, this.communeManager.room.sourcePositions[sourceIndex].length),
-                        minCost: 200,
+                        maxCreeps: Math.min(
+                            3,
+                            this.communeManager.room.roomManager.communeSourceHarvestPositions[
+                                sourceIndex
+                            ].length,
+                        ),
+                        minCostPerCreep: 200,
                         priority,
+                        maxCostPerCreep,
                         spawnGroup: spawnGroup,
                         memoryAdditions: {
-                            SI: sourceIndex,
-                            R: true,
+                            [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 })(),
@@ -199,87 +245,107 @@ export class SpawnRequestsManager {
         }
     }
 
-    private hauler() {
+    private haulerForCommune() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                const priority = Math.min(
-                    0.5 + this.communeManager.room.creepsFromRoom.hauler.length / 2,
-                    this.minRemotePriority - 2,
-                )
+                const priority = 0.5
 
                 // Construct the required carry parts
 
-                const partsMultiplier = this.communeManager.room.haulerNeed
+                const carryPartsNeed = this.communeManager.communeHaulerNeed - this.communeManager.communeHaulerCarryParts
+                if (carryPartsNeed <= 0) return false
 
                 const role = 'hauler'
+                /*                 const cost = this.communeManager.room.myCreeps.hauler.length ? this.minHaulerCost : this.communeManager.room.energyAvailable
+                 */
 
                 // If all RCL 3 extensions are built
 
-                if (this.spawnEnergyCapacity >= 800) {
+                if (this.communeManager.hasSufficientRoads) {
+                    const costStep = 150
+                    const maxCost = this.findCommuneHaulerMaxCost(costStep)
+
                     return {
+                        type: SpawnRequestTypes.groupUniform,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, CARRY, MOVE],
-                        partsMultiplier: partsMultiplier / 2,
-                        minCost: 150,
-                        maxCostPerCreep: this.communeManager.room.memory.MHC,
+                        partsQuota: carryPartsNeed * 3,
+                        partsMultiplier: carryPartsNeed / 2,
+                        minCostPerCreep: costStep,
+                        maxCostPerCreep: maxCost,
                         priority,
+                        spawnGroup: [],
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
+                const costStep = 100
+                const maxCost = this.findCommuneHaulerMaxCost(costStep)
+
                 return {
+                    type: SpawnRequestTypes.groupUniform,
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE],
-                    partsMultiplier,
-                    minCost: 100,
-                    maxCostPerCreep: this.communeManager.room.memory.MHC,
+                    partsQuota: carryPartsNeed * 2,
+                    partsMultiplier: carryPartsNeed,
+                    minCostPerCreep: costStep,
+                    maxCostPerCreep: maxCost,
                     priority,
+                    spawnGroup: [],
                     memoryAdditions: {},
                 }
             })(),
         )
     }
 
+    private findCommuneHaulerMaxCost(costStep: number): number {
+        if (this.communeManager.room.myCreepsByRole.hauler.length) {
+
+            // have all haulers be the same size; their max allowed size
+
+            const maxCost = Math.floor(this.minHaulerCost / costStep) * costStep
+            return maxCost
+        }
+
+        // there are no haulers, consider that in spawning cost limitations
+
+        const maxCost = Math.floor(this.communeManager.room.energyAvailable / costStep) * costStep
+        return maxCost
+    }
+
     private mineralHarvester() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 if (this.communeManager.room.controller.level < 6) return false
-                if (!this.communeManager.room.structures.extractor.length) return false
-                if (!this.communeManager.room.mineralContainer) return false
+                if (!this.communeManager.room.roomManager.structures.extractor.length) return false
+                if (!this.communeManager.room.roomManager.mineralContainer) return false
                 if (!this.communeManager.room.storage) return false
-                if (this.communeManager.room.resourcesInStoringStructures.energy < 40000) return false
+                if (
+                    this.communeManager.room.roomManager.resourcesInStoringStructures.energy < 40000
+                )
+                    return false
                 if (!this.communeManager.room.terminal) return false
                 if (this.communeManager.room.terminal.store.getFreeCapacity() <= 10000) return false
-                if (this.communeManager.room.mineral.mineralAmount === 0) return false
+                if (this.communeManager.room.roomManager.mineral.mineralAmount === 0) return false
 
-                const minCost = 900
+                const minCost = 850
                 if (this.spawnEnergyCapacity < minCost) return false
 
                 return {
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'mineralHarvester',
-                    defaultParts: [],
-                    extraParts: [
-                        MOVE,
-                        MOVE,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                        WORK,
-                    ] /* [WORK, WORK, MOVE, WORK, WORK, MOVE, WORK, MOVE, CARRY, CARRY, MOVE, WORK] */,
-                    partsMultiplier: /* 4 */ 5,
-                    minCreeps: 1,
-                    minCost,
-                    priority: 10 + this.communeManager.room.creepsFromRoom.mineralHarvester.length * 3,
+                    defaultParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY],
+                    extraParts: [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK],
+                    partsMultiplier: 4,
+                    creepsQuota: this.communeManager.room.roomManager.mineralHarvestPositions.length,
+                    minCostPerCreep: minCost,
+                    priority: this.activeRemotePriority + 1,
                     memoryAdditions: {
-                        R: true,
+                        [CreepMemoryKeys.preferRoads]: true,
                     },
                 }
             })(),
@@ -295,18 +361,21 @@ export class SpawnRequestsManager {
                 // There is no hubLink and another link, or no terminal
 
                 if (
-                    (!this.communeManager.room.hubLink || this.communeManager.room.structures.link.length < 2) &&
-                    (!this.communeManager.room.terminal || !this.communeManager.room.terminal.RCLActionable)
+                    (!this.communeManager.room.roomManager.hubLink ||
+                        this.communeManager.room.roomManager.structures.link.length < 2) &&
+                    (!this.communeManager.room.terminal ||
+                        !this.communeManager.room.terminal.isRCLActionable)
                 )
                     return false
 
                 return {
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'hubHauler',
                     defaultParts: [MOVE],
                     extraParts: [CARRY],
                     partsMultiplier: 8,
-                    minCreeps: 1,
-                    minCost: 300,
+                    creepsQuota: 1,
+                    minCostPerCreep: 300,
                     priority: 7,
                     memoryAdditions: {},
                 }
@@ -319,32 +388,34 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 // Get the fastFiller positions, if there are none, inform false
 
-                const fastFillerPositionsCount = this.communeManager.room.fastFillerPositions.length
+                const fastFillerPositionsCount =
+                    this.communeManager.room.roomManager.fastFillerPositions.length
                 if (!fastFillerPositionsCount) return false
 
                 let priority = 0.75
 
                 let totalFastFillerEnergy = 0
-                if (this.communeManager.room.fastFillerContainerLeft)
-                    totalFastFillerEnergy += this.communeManager.room.fastFillerContainerLeft.store.energy
-                if (this.communeManager.room.fastFillerContainerRight)
-                    totalFastFillerEnergy += this.communeManager.room.fastFillerContainerRight.store.energy
+                for (const container of this.communeManager.room.roomManager.fastFillerContainers) {
+                    totalFastFillerEnergy += container.store.energy
+                }
 
                 if (totalFastFillerEnergy < 1000) priority = 1.25
 
                 let defaultParts: BodyPartConstant[]
                 if (this.communeManager.room.controller.level >= 8)
                     defaultParts = [CARRY, MOVE, CARRY, CARRY, CARRY, CARRY]
-                else if (this.communeManager.room.controller.level >= 7) defaultParts = [CARRY, MOVE, CARRY, CARRY]
+                else if (this.communeManager.room.controller.level >= 7)
+                    defaultParts = [CARRY, MOVE, CARRY, CARRY]
                 else defaultParts = [CARRY, MOVE, CARRY]
 
                 return {
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'fastFiller',
                     defaultParts,
                     extraParts: [],
                     partsMultiplier: 1,
-                    minCreeps: fastFillerPositionsCount,
-                    minCost: 150,
+                    creepsQuota: fastFillerPositionsCount,
+                    minCostPerCreep: 150,
                     priority,
                     memoryAdditions: {},
                 }
@@ -353,8 +424,6 @@ export class SpawnRequestsManager {
     }
 
     private defenders() {
-        const { enemyAttackers } = this.communeManager.room
-
         // Construct requests for meleeDefenders
 
         if (this.communeManager.room.towerInferiority) {
@@ -363,32 +432,38 @@ export class SpawnRequestsManager {
             const minPriority = 6
             const maxPriority = this.minRemotePriority - 1
 
+            const enemyCreeps = this.communeManager.room.roomManager.notMyCreeps.enemy
+
             // Melee defender
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     const role = 'meleeDefender'
 
-                    if (this.communeManager.room.myCreeps[role].length * 1.75 > enemyAttackers.length) return false
+                    if (this.communeManager.room.myCreepsByRole[role].length * 1.75 > enemyCreeps.length)
+                        return false
 
                     // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
-                        requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
-                        if (!this.communeManager.room.structures.tower.length)
+                        requiredStrength +=
+                            this.communeManager.room.roomManager.totalEnemyCombatStrength.heal
+                        if (!this.communeManager.room.roomManager.structures.tower.length) {
                             requiredStrength +=
-                                this.communeManager.room.totalEnemyCombatStrength.melee +
-                                this.communeManager.room.totalEnemyCombatStrength.ranged
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength
+                                    .melee +
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength.ranged
+                        }
                     }
 
                     requiredStrength *= 1.5
 
                     const priority = Math.min(
-                        minPriority + this.communeManager.room.myCreeps[role].length * 0.5,
+                        minPriority + this.communeManager.room.myCreepsByRole[role].length * 0.5,
                         maxPriority,
                     )
-
+                    /*
                     // If all RCL 3 extensions are build
 
                     if (this.spawnEnergyCapacity >= 800) {
@@ -402,20 +477,23 @@ export class SpawnRequestsManager {
                             partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                             minCost: 210,
                             priority,
+                            threshold: 0.1,
                             memoryAdditions: {},
                         }
                     }
-
+ */
                     const extraParts = [ATTACK, MOVE]
                     const strength = ATTACK_POWER
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: Math.max(requiredStrength / strength, 1),
-                        minCost: 260,
+                        minCostPerCreep: 260,
                         priority,
+                        threshold: 0.1,
                         memoryAdditions: {},
                     }
                 })(),
@@ -427,24 +505,29 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     const role = 'rangedDefender'
 
-                    if (this.communeManager.room.myCreeps[role].length * 1.75 > enemyAttackers.length) return false
+                    if (this.communeManager.room.myCreepsByRole[role].length * 1.75 > enemyCreeps.length)
+                        return false
 
                     // If towers, spawn based on healStrength. If no towers, use attackStrength and healStrength
 
                     let requiredStrength = 1
                     if (!this.communeManager.room.controller.safeMode) {
-                        requiredStrength += this.communeManager.room.totalEnemyCombatStrength.heal
-                        if (!this.communeManager.room.structures.tower.length)
+                        requiredStrength +=
+                            this.communeManager.room.roomManager.totalEnemyCombatStrength.heal
+                        if (!this.communeManager.room.roomManager.structures.tower.length) {
                             requiredStrength +=
-                                this.communeManager.room.totalEnemyCombatStrength.melee +
-                                this.communeManager.room.totalEnemyCombatStrength.ranged
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength
+                                    .melee +
+                                this.communeManager.room.roomManager.totalEnemyCombatStrength.ranged
+                        }
                     }
+                    requiredStrength *= 0.3
 
                     const priority = Math.min(
-                        minPriority - 0.1 + this.communeManager.room.myCreeps[role].length * 0.75,
+                        maxPriority - 1 + this.communeManager.room.myCreepsByRole[role].length * 1,
                         maxPriority,
                     )
-
+                    /*
                     // If all RCL 3 extensions are build
 
                     if (this.spawnEnergyCapacity >= 800) {
@@ -458,20 +541,23 @@ export class SpawnRequestsManager {
                             partsMultiplier: Math.max(requiredStrength / strength / 2, 1),
                             minCost: 210,
                             priority,
+                            threshold: 0.1,
                             memoryAdditions: {},
                         }
                     }
-
+ */
                     const extraParts = [RANGED_ATTACK, MOVE]
                     const strength = RANGED_ATTACK_POWER
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: Math.max(requiredStrength / strength, 1),
-                        minCost: 260,
+                        minCostPerCreep: 260,
                         priority,
+                        threshold: 0.1,
                         memoryAdditions: {},
                     }
                 })(),
@@ -482,16 +568,17 @@ export class SpawnRequestsManager {
     private maintainers() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                // Filter possibleRepairTargets with less than 1/5 health, stopping if there are none
+                const generalRepairStructures =
+                    this.communeManager.room.roomManager.generalRepairStructures
+                const repairTargets = generalRepairStructures.filter(
+                    structure => structure.hitsMax * 0.2 >= structure.hits,
+                )
 
-                let repairTargets: Structure<BuildableStructureConstant>[] = this.communeManager.room.structures.road
-                repairTargets = repairTargets.concat(this.communeManager.room.structures.container)
-
-                repairTargets = repairTargets.filter(structure => structure.hitsMax * 0.2 >= structure.hits)
                 // Get ramparts below their max hits
 
-                const repairRamparts = this.communeManager.room.structures.rampart.filter(
-                    rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits,
+                const repairRamparts = this.communeManager.rampartRepairTargets.filter(
+                    rampart =>
+                        rampart.hits < this.communeManager.room.communeManager.minRampartHits,
                 )
 
                 // If there are no ramparts or repair targets
@@ -500,85 +587,94 @@ export class SpawnRequestsManager {
 
                 let priority: number
 
-                if (repairTargets.length || this.communeManager.room.towerInferiority) {
+                if (
+                    repairTargets.length ||
+                    this.communeManager.room.towerInferiority ||
+                    !this.communeManager.storingStructures.length
+                ) {
                     priority = Math.min(
                         6 + this.communeManager.room.creepsFromRoom.maintainer.length * 0.5,
                         this.minRemotePriority - 0.5,
                     )
                 } else {
-                    priority = this.minRemotePriority + 0.5
+                    priority = this.activeRemotePriority
                 }
 
                 // Construct the partsMultiplier
 
                 let partsMultiplier = 1
 
-                // For each road, add a multiplier
+                for (const structure of repairTargets) {
+                    partsMultiplier += decayCosts[structure.structureType]
+                }
 
-                partsMultiplier += this.communeManager.room.structures.road.length * roadUpkeepCost * 2
-
-                // For each container, add a multiplier
-
-                partsMultiplier += this.communeManager.room.structures.container.length * containerUpkeepCost * 2
+                partsMultiplier *= 2
 
                 // Extra considerations if a storage is present
 
                 let maxCreeps = Infinity
+                const enemyAttackers = this.communeManager.room.roomManager.enemyAttackers
 
-                if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
-                    if (
-                        repairRamparts.length / this.communeManager.room.structures.rampart.length < 0.2 &&
-                        this.communeManager.room.totalEnemyCombatStrength.melee +
-                            this.communeManager.room.totalEnemyCombatStrength.ranged <=
-                            0
-                    ) {
+                if (
+                    this.communeManager.room.storage &&
+                    this.communeManager.room.controller.level >= 4
+                ) {
+                    if (repairRamparts.length <= 0 && !enemyAttackers.length) {
                         maxCreeps = 1
                     }
 
                     // For every x energy in storage, add 1 multiplier
 
                     partsMultiplier += Math.pow(
-                        this.communeManager.room.resourcesInStoringStructures.energy /
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy /
                             (16000 + this.communeManager.room.controller.level * 1000),
-                        2,
+                        1.8,
                     )
                 }
 
                 // For every attackValue, add a multiplier
 
-                partsMultiplier +=
-                    (this.communeManager.room.totalEnemyCombatStrength.melee +
-                        this.communeManager.room.totalEnemyCombatStrength.ranged) /
-                    (REPAIR_POWER / 3)
+                if (enemyAttackers.length) {
+                    const totalEnemyCombatStrength =
+                        this.communeManager.room.roomManager.totalEnemyCombatStrength
 
+                    partsMultiplier +=
+                        (totalEnemyCombatStrength.melee +
+                            totalEnemyCombatStrength.ranged * 1.6 +
+                            totalEnemyCombatStrength.dismantle) /
+                        (REPAIR_POWER * 0.3)
+                }
+
+                /* customLog('e', partsMultiplier) */
                 const role = 'maintainer'
-
-                // If all RCL 3 extensions are build
-
-                if (this.spawnEnergyCapacity >= 800) {
+                customLog(
+                    'maintainer',
+                    partsMultiplier + ', ' + maxCreeps + ', ' + this.spawnEnergyCapacity,
+                )
+                if (this.communeManager.hasSufficientRoads) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE, WORK],
                         partsMultiplier,
-                        minCreeps: undefined,
                         maxCreeps,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role,
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
                     partsMultiplier,
-                    minCreeps: undefined,
                     maxCreeps,
-                    minCost: 250,
+                    minCostPerCreep: 250,
                     priority,
                     memoryAdditions: {},
                 }
@@ -595,24 +691,35 @@ export class SpawnRequestsManager {
 
                 if (!this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
-                const priority = this.minRemotePriority + 0.5
+                let priority: number
+                if (this.communeManager.storingStructures.length) {
+                    priority = this.activeRemotePriority + 0.1
+                } else {
+                    priority = this.minRemotePriority - 0.5
+                }
+
                 let partsMultiplier = 0
 
-                // If there is an active storage
+                const actionableStoringStructure =
+                    (this.communeManager.room.storage &&
+                        this.communeManager.room.controller.level >= 4) ||
+                    (this.communeManager.room.terminal &&
+                        this.communeManager.room.controller.level >= 6)
 
-                if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
-                    // If the storage is sufficiently full, provide x amount per y enemy in storage
+                // If there is an rcl actionable storage or terminal
+                if (actionableStoringStructure) {
+                    // If the storage is sufficiently full, increase parts wanted porportionately
 
                     if (
-                        this.communeManager.room.resourcesInStoringStructures.energy <
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
                         this.communeManager.room.communeManager.storedEnergyBuildThreshold
                     )
                         return false
 
                     partsMultiplier += Math.pow(
-                        this.communeManager.room.resourcesInStoringStructures.energy /
-                            (15000 + this.communeManager.room.controller.level * 1000),
-                        2,
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy /
+                            (20000 + this.communeManager.room.controller.level * 1200),
+                        1.7,
                     )
                 }
 
@@ -626,73 +733,90 @@ export class SpawnRequestsManager {
                 }
 
                 const role = 'builder'
+                const maxCreeps = 15
 
-                // If there is a storage or terminal
-
-                if (this.communeManager.room.storage || this.communeManager.room.terminal) {
+                // If there is an rcl actionable storage or terminal
+                if (actionableStoringStructure) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
-                        minCreeps: undefined,
-                        maxCreeps: Infinity,
-                        minCost: 200,
+                        maxCreeps,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
                 // If all RCL 3 extensions are build
 
-                if (this.spawnEnergyCapacity >= 800) {
+                if (this.spawnEnergyCapacity >= 600) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, WORK, MOVE],
                         partsMultiplier: partsMultiplier,
-                        maxCreeps: Infinity,
-                        minCost: 200,
+                        maxCreeps,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
+                        },
+                    }
+                }
+
+                // If almost all RCL 3 extensions are build
+
+                if (this.spawnEnergyCapacity >= 550) {
+                    return {
+                        type: SpawnRequestTypes.groupDiverse,
+                        role,
+                        defaultParts: [],
+                        extraParts: [WORK, MOVE, CARRY, MOVE],
+                        partsMultiplier: partsMultiplier,
+                        maxCreeps,
+                        minCostPerCreep: 250,
+                        priority,
+                        memoryAdditions: {
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
                 // There are no fastFiller containers
 
-                if (
-                    !this.communeManager.room.fastFillerContainerLeft &&
-                    !this.communeManager.room.fastFillerContainerRight
-                ) {
+                if (!this.communeManager.room.roomManager.fastFillerContainers.length) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE],
                         partsMultiplier: partsMultiplier,
-                        maxCreeps: Infinity,
-                        minCost: 250,
+                        maxCreeps,
+                        minCostPerCreep: 250,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role,
                     defaultParts: [],
                     extraParts: [CARRY, MOVE, WORK, CARRY, MOVE],
                     partsMultiplier: partsMultiplier,
-                    minCreeps: undefined,
-                    maxCreeps: Infinity,
-                    minCost: 300,
+                    maxCreeps,
+                    minCostPerCreep: 300,
                     priority,
                     memoryAdditions: {
-                        R: true,
+                        [CreepMemoryKeys.preferRoads]: true,
                     },
                 }
             })(),
@@ -702,179 +826,207 @@ export class SpawnRequestsManager {
     private controllerUpgraders() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                let partsMultiplier = 1
-                let maxCreeps = this.communeManager.room.upgradePositions.length - 1
+                const threshold = 0.05
+                const role = 'controllerUpgrader'
 
                 // If there is a storage, prefer needed remote creeps over upgraders
 
-                let priority: number
-                if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
-                    priority = this.minRemotePriority + 0.5
-                } else priority = this.minRemotePriority - 1
+                if (
+                    this.communeManager.room.controller.level === 1 ||
+                    this.communeManager.room.controller.ticksToDowngrade <=
+                        this.communeManager.controllerDowngradeUpgradeThreshold
+                ) {
+                    const priority = 5
 
-                // If there are enemyAttackers and the controller isn't soon to downgrade
+                    if (this.communeManager.hasSufficientRoads) {
+                        return {
+                            type: SpawnRequestTypes.individualUniform,
+                            role,
+                            defaultParts: [CARRY, WORK, MOVE],
+                            extraParts: [],
+                            partsMultiplier: 1,
+                            threshold,
+                            creepsQuota: 1,
+                            minCostPerCreep: 200,
+                            priority,
+                            memoryAdditions: {},
+                        }
+                    }
+
+                    return {
+                        type: SpawnRequestTypes.individualUniform,
+                        role,
+                        defaultParts: [CARRY, MOVE, WORK, MOVE],
+                        extraParts: [],
+                        partsMultiplier: 1,
+                        threshold,
+                        creepsQuota: 1,
+                        minCostPerCreep: 250,
+                        priority,
+                        memoryAdditions: {},
+                    }
+                }
+
+                let priority: number
+                if (this.communeManager.storingStructures.length) {
+                    priority = this.activeRemotePriority + 0.2
+                } else {
+                    priority = this.minRemotePriority - 1
+                }
+
+                // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
 
                 if (
-                    this.communeManager.room.controller.ticksToDowngrade > controllerDowngradeUpgraderNeed &&
-                    this.communeManager.room.towerInferiority
+                    this.communeManager.room.towerInferiority ||
+                    this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0
                 )
                     return false
 
-                // If there is a storage
+                let partsMultiplier = 1
 
-                if (this.communeManager.room.storage && this.communeManager.room.controller.level >= 4) {
-                    // If the storage is sufficiently full, provide x amount per y energy in storage
+                // Storing structures logic
+
+                if (
+                    (this.communeManager.room.storage &&
+                        this.communeManager.room.controller.level >= 4) ||
+                    (this.communeManager.room.terminal &&
+                        this.communeManager.room.controller.level >= 6)
+                ) {
+                    // If storing structures are sufficiently full, provide x amount per y energy in storage
 
                     if (
-                        this.communeManager.room.resourcesInStoringStructures.energy >=
+                        this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
                         this.communeManager.room.communeManager.storedEnergyUpgradeThreshold
+                    ) {
+                        return false
+                    }
+                    partsMultiplier = Math.pow(
+                        (this.communeManager.room.roomManager.resourcesInStoringStructures.energy -
+                            this.communeManager.room.communeManager.storedEnergyUpgradeThreshold *
+                                0.5) /
+                            (6000 + this.communeManager.room.controller.level * 2000),
+                        2,
                     )
-                        partsMultiplier = Math.pow(
-                            (this.communeManager.room.resourcesInStoringStructures.energy -
-                                this.communeManager.room.communeManager.storedEnergyUpgradeThreshold * 0.5) /
-                                (6000 + this.communeManager.room.controller.level * 2000),
-                            2,
-                        )
-                    // Otherwise, set partsMultiplier to 0
-                    else partsMultiplier = 0
                 }
-                // Otherwise if there is no storage
+
+                // Otherwise if there is no storing structure
                 else {
                     partsMultiplier += this.communeManager.estimatedEnergyIncome * 0.75
                 }
 
-                // Get the controllerLink and baseLink
-
-                const controllerLink = this.communeManager.room.controllerLink
-
-                // If the controllerLink is defined
-
-                if (controllerLink && controllerLink.RCLActionable) {
-                    maxCreeps -= 1
-
-                    const hubLink = this.communeManager.room.hubLink
-                    const sourceLinks = this.communeManager.room.sourceLinks
-
-                    // If there are transfer links, max out partMultiplier to their ability
-
-                    if ((hubLink && hubLink.RCLActionable) || sourceLinks.find(link => link && link.RCLActionable)) {
-                        let maxPartsMultiplier = 0
-
-                        if (hubLink && hubLink.RCLActionable) {
-                            // Get the range between the controllerLink and hubLink
-
-                            const range = getRangeOfCoords(controllerLink.pos, hubLink.pos)
-
-                            // Limit partsMultiplier at the range with a multiplier
-
-                            maxPartsMultiplier += findLinkThroughput(range) * 0.7
-                        }
-
-                        for (let i = 0; i < sourceLinks.length; i++) {
-                            const sourceLink = sourceLinks[i]
-
-                            if (!sourceLink.RCLActionable) continue
-
-                            // Get the range between the controllerLink and hubLink
-
-                            const range = getRangeOfCoords(sourceLink.pos, controllerLink.pos)
-
-                            // Limit partsMultiplier at the range with a multiplier
-
-                            maxPartsMultiplier +=
-                                findLinkThroughput(range, this.communeManager.room.estimatedSourceIncome[i]) * 0.7
-                        }
-
-                        partsMultiplier = Math.min(partsMultiplier, maxPartsMultiplier)
-                    }
-                }
-
-                // If there are construction sites of my ownership in the this.communeManager.room, set multiplier to 1
-
-                if (this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) partsMultiplier = 0
-
-                const threshold = 0.05
-                const role = 'controllerUpgrader'
+                partsMultiplier = Math.min(partsMultiplier, this.communeManager.maxUpgradeStrength)
+                if (partsMultiplier <= 0) return false
 
                 // If the controllerContainer or controllerLink exists
 
-                if (this.communeManager.room.controllerContainer || (controllerLink && controllerLink.RCLActionable)) {
+                const upgradeStructure = this.communeManager.upgradeStructure
+
+                if (upgradeStructure) {
                     // If the controller is level 8
 
                     if (this.communeManager.room.controller.level === 8) {
-                        let extraParts: BodyPartConstant[]
-
-                        // If the controller is near to downgrading
-
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                            extraParts = [CARRY, WORK, MOVE]
-                        else if (partsMultiplier === 0) return false
-                        else
-                            extraParts = [
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                WORK,
-                                CARRY,
-                                CARRY,
-                                CARRY,
-                                MOVE,
-                                MOVE,
-                                MOVE,
-                                MOVE,
-                                MOVE,
-                                MOVE,
-                                MOVE,
-                                MOVE,
-                            ]
-
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [],
-                            extraParts,
+                            extraParts: [
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                CARRY,
+                                CARRY,
+                                CARRY,
+                                MOVE,
+                                MOVE,
+                                MOVE,
+                                MOVE,
+                                MOVE,
+                                MOVE,
+                                MOVE,
+                                MOVE,
+                            ],
                             partsMultiplier: 1,
                             threshold,
-                            minCreeps: 1,
-                            minCost: 300,
+                            creepsQuota: 1,
+                            minCostPerCreep: 300,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
+                            },
+                        }
+                    }
+
+                    const controllerLink = this.communeManager.controllerLink
+                    const maxCreeps =
+                        controllerLink && controllerLink.isRCLActionable
+                            ? this.communeManager.room.roomManager.upgradePositions.length
+                            : this.communeManager.room.roomManager.upgradePositions.length - 1
+
+                    if (this.spawnEnergyCapacity >= 1400) {
+                        partsMultiplier = Math.round(partsMultiplier / 12)
+                        if (partsMultiplier === 0) return false
+
+                        return {
+                            type: SpawnRequestTypes.groupDiverse,
+                            role,
+                            defaultParts: [],
+                            extraParts: [
+                                MOVE,
+                                CARRY,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                MOVE,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                                MOVE,
+                                WORK,
+                                WORK,
+                                WORK,
+                                WORK,
+                            ],
+                            partsMultiplier,
+                            threshold,
+                            maxCreeps,
+                            minCostPerCreep: 200,
+                            priority,
+                            memoryAdditions: {
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
 
                     if (this.spawnEnergyCapacity >= 1000) {
-                        // If the controller is near to downgrading, set partsMultiplier to x
-
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                            partsMultiplier = Math.max(partsMultiplier, 4)
-
                         partsMultiplier = Math.round(partsMultiplier / 4)
                         if (partsMultiplier === 0) return false
 
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [CARRY, CARRY],
                             extraParts: [WORK, MOVE, WORK, WORK, WORK],
                             partsMultiplier,
                             threshold,
-                            minCreeps: undefined,
                             maxCreeps,
-                            minCost: 250,
+                            minCostPerCreep: 250,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
@@ -882,84 +1034,73 @@ export class SpawnRequestsManager {
                     // Otherwise if the this.spawnEnergyCapacity is more than 800
 
                     if (this.spawnEnergyCapacity >= 800) {
-                        // If the controller is near to downgrading, set partsMultiplier to x
-
-                        if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                            partsMultiplier = Math.max(partsMultiplier, 6)
-
                         partsMultiplier = Math.round(partsMultiplier / 6)
                         if (partsMultiplier === 0) return false
 
                         return {
+                            type: SpawnRequestTypes.groupDiverse,
                             role,
                             defaultParts: [CARRY, CARRY],
                             extraParts: [WORK, MOVE, WORK, WORK, WORK, WORK, MOVE, WORK],
                             partsMultiplier,
                             threshold,
-                            minCreeps: undefined,
                             maxCreeps,
-                            minCost: 250,
+                            minCostPerCreep: 250,
                             priority,
                             memoryAdditions: {
-                                R: true,
+                                [CreepMemoryKeys.preferRoads]: true,
                             },
                         }
                     }
-
-                    // If the controller is near to downgrading, set partsMultiplier to x
-
-                    if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
-                        partsMultiplier = Math.max(partsMultiplier, 4)
 
                     partsMultiplier = Math.round(partsMultiplier / 4)
                     if (partsMultiplier === 0) return false
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, MOVE, WORK, WORK, WORK],
                         partsMultiplier,
                         threshold,
-                        minCreeps: undefined,
                         maxCreeps,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
-                // If the controller is near to downgrading, set partsMultiplier to x
-
-                if (this.communeManager.room.controller.ticksToDowngrade < controllerDowngradeUpgraderNeed)
+                if (this.communeManager.room.controller.level < 2)
                     partsMultiplier = Math.max(partsMultiplier, 1)
-                if (this.communeManager.room.controller.level < 2) partsMultiplier = Math.max(partsMultiplier, 1)
 
                 if (this.spawnEnergyCapacity >= 800) {
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [],
                         extraParts: [CARRY, MOVE, WORK],
                         partsMultiplier,
                         threshold,
                         maxCreeps: Infinity,
-                        minCost: 200,
+                        minCostPerCreep: 200,
                         priority,
                         memoryAdditions: {
-                            R: true,
+                            [CreepMemoryKeys.preferRoads]: true,
                         },
                     }
                 }
 
                 return {
+                    type: SpawnRequestTypes.groupDiverse,
                     role,
                     defaultParts: [],
                     extraParts: [MOVE, CARRY, MOVE, WORK],
                     partsMultiplier,
                     threshold,
                     maxCreeps: Infinity,
-                    minCost: 250,
+                    minCostPerCreep: 250,
                     priority,
                     memoryAdditions: {},
                 }
@@ -967,72 +1108,198 @@ export class SpawnRequestsManager {
         )
     }
 
-    private remoteSourceHarvesters() {
-        for (const remoteInfo of this.communeManager.room.remoteSourceIndexesByEfficacy) {
+    /**
+     * Spawn for roles that are per-source
+     */
+    private remoteSourceRoles() {
+        let priorityIncrement = 0
+
+        const remoteSourceIndexesByEfficacy =
+            this.communeManager.room.roomManager.remoteSourceIndexesByEfficacy
+        for (const remoteInfo of remoteSourceIndexesByEfficacy) {
             const splitRemoteInfo = remoteInfo.split(' ')
             const remoteName = splitRemoteInfo[0]
-            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
             const remoteMemory = Memory.rooms[remoteName]
-            const remoteData = Memory.rooms[remoteName].data
-            const remote = Game.rooms[remoteName]
-            const priority =
-                Math.round((this.minRemotePriority + 1 + remoteMemory.SPs[sourceIndex].length / 100) * 100) / 100
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
+            if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
 
-            const role = RemoteHarvesterRolesBySourceIndex[sourceIndex] as
-                | 'remoteSourceHarvester0'
-                | 'remoteSourceHarvester1'
+            priorityIncrement += 1
 
-            // If there are no data for this.communeManager.room this.communeManager.room, inform false
+            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
 
-            if (remoteData[RemoteData[role]] <= 0) continue
+            const harvesterPriority = this.minRemotePriority + priorityIncrement
 
-            const sourcePositionsAmount = remote
-                ? remote.sourcePositions.length
-                : unpackPosList(remoteMemory.SP[sourceIndex]).length
-
-            // Construct requests for remoteSourceHarvester0s
+            // Construct requests for remoteSourceHarvesters
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
+                    const partsMultiplier =
+                        remoteMemory[RoomMemoryKeys.maxSourceIncome][sourceIndex] -
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex]
+                    if (partsMultiplier <= 0) return false
+
+                    const role = 'remoteSourceHarvester'
+                    const priority = harvesterPriority
+                    const spawnGroup =
+                        this.communeManager.remoteSourceHarvesters[remoteName][sourceIndex]
+                    const sourcePositionsAmount =
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvestPositions][sourceIndex]
+                            .length / packedPosLength
+
                     if (this.spawnEnergyCapacity >= 950) {
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [CARRY],
-                            extraParts: [WORK, MOVE],
-                            partsMultiplier: remoteData[RemoteData[role]],
-                            spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                            extraParts: [WORK, MOVE, WORK, MOVE],
+                            partsMultiplier: Math.ceil(partsMultiplier / 2),
+                            spawnGroup,
                             threshold: 0.1,
-                            minCreeps: 1,
+                            creepsQuota: 1,
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 150 * 6,
-                            minCost: 200,
+                            minCostPerCreep: 350,
                             priority,
                             memoryAdditions: {
-                                R: true,
-                                SI: sourceIndex,
-                                RN: remoteName,
+                                [CreepMemoryKeys.preferRoads]: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.remote]: remoteName,
+                            },
+                        }
+                    }
+
+                    // We can start reserving
+
+                    if (this.spawnEnergyCapacity >= 650) {
+                        return {
+                            type: SpawnRequestTypes.groupDiverse,
+                            role,
+                            defaultParts: [CARRY],
+                            extraParts: [WORK, WORK, MOVE],
+                            partsMultiplier: Math.ceil(partsMultiplier / 2),
+                            spawnGroup,
+                            threshold: 0.1,
+
+                            maxCreeps: sourcePositionsAmount,
+                            maxCostPerCreep: 50 + 250 * 3,
+                            minCostPerCreep: 300,
+                            priority,
+                            memoryAdditions: {
+                                [CreepMemoryKeys.preferRoads]: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.remote]: remoteName,
+                            },
+                        }
+                    }
+
+                    if (this.spawnEnergyCapacity >= 450) {
+                        return {
+                            type: SpawnRequestTypes.groupDiverse,
+                            role,
+                            defaultParts: [CARRY],
+                            extraParts: [WORK, WORK, MOVE, WORK, MOVE],
+                            partsMultiplier: Math.floor(partsMultiplier / 2),
+                            spawnGroup,
+                            threshold: 0.1,
+
+                            maxCreeps: sourcePositionsAmount,
+                            maxCostPerCreep: 50 + 400 * 2,
+                            minCostPerCreep: 300,
+                            priority,
+                            memoryAdditions: {
+                                [CreepMemoryKeys.preferRoads]: true,
+                                [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                                [CreepMemoryKeys.remote]: remoteName,
                             },
                         }
                     }
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role,
                         defaultParts: [CARRY],
                         extraParts: [WORK, WORK, MOVE],
-                        partsMultiplier: remoteData[RemoteData[role]],
-                        spawnGroup: this.communeManager.room.creepsOfRemote[remoteName][role],
+                        partsMultiplier: Math.ceil(partsMultiplier / 2),
+                        spawnGroup,
                         threshold: 0.1,
-                        minCreeps: undefined,
+
                         maxCreeps: sourcePositionsAmount,
                         maxCostPerCreep: 50 + 250 * 3,
-                        minCost: 300,
+                        minCostPerCreep: 300,
                         priority,
                         memoryAdditions: {
-                            R: true,
-                            SI: sourceIndex,
-                            RN: remoteName,
+                            [CreepMemoryKeys.preferRoads]: true,
+                            [CreepMemoryKeys.sourceIndex]: sourceIndex,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
+                    }
+                })(),
+            )
+
+            this.rawSpawnRequestsArgs.push(
+                ((): SpawnRequestArgs | false => {
+                    const role = 'hauler'
+
+                    const carryPartsNeed =
+                        remoteMemory[RoomMemoryKeys.haulers][sourceIndex] -
+                        this.communeManager.haulerCarryParts
+                    this.communeManager.haulerCarryParts -=
+                        remoteMemory[RoomMemoryKeys.haulers][sourceIndex]
+                    if (carryPartsNeed <= 0) return false
+
+                    this.activeRemotePriority = Math.max(
+                        this.activeRemotePriority,
+                        harvesterPriority + 0.1,
+                    )
+
+                    // Lower priority - more preference - than remote harvesters
+
+                    const priority = this.minRemotePriority + priorityIncrement
+
+                    /*
+                    // If all RCL 3 extensions are built (we're ready for roads)
+                    if (this.spawnEnergyCapacity >= 800) {
+
+                            const cost = Math.floor(
+                                this.minHaulerCost / 150,
+                            ) * 150
+
+                            return {
+                                defaultParts: [],
+                                extraParts: [CARRY, CARRY, MOVE],
+                                spawnGroup: [],
+                                threshold: 0,
+                                partsMultiplier: carryPartsNeed / 2,
+                                minCost: 150,
+                                maxCostPerCreep: cost,
+                                priority,
+                                memoryAdditions: {
+                                    [CreepMemoryKeys.preferRoads]: true,
+                                },
+                            }
+                    }
+                    */
+
+                    const costStep = 100
+                    const cost = Math.floor(this.minHaulerCost / costStep) * costStep
+
+                    return {
+                        type: SpawnRequestTypes.groupUniform,
+                        role,
+                        defaultParts: [],
+                        extraParts: [CARRY, MOVE],
+                        spawnGroup: [],
+                        threshold: 0,
+                        partsQuota: carryPartsNeed * 2,
+                        partsMultiplier: carryPartsNeed,
+                        maxCostPerCreep: cost,
+                        minCostPerCreep: costStep,
+                        priority,
+                        memoryAdditions: {},
                     }
                 })(),
             )
@@ -1040,72 +1307,72 @@ export class SpawnRequestsManager {
     }
 
     private generalRemoteRoles() {
-        this.remoteHaulerNeed = 0
-
-        const remoteNamesByEfficacy = this.communeManager.room.remoteNamesBySourceEfficacy
+        const remoteNamesByEfficacy = this.communeManager.room.roomManager.remoteNamesByEfficacy
 
         for (let index = 0; index < remoteNamesByEfficacy.length; index += 1) {
             const remoteName = remoteNamesByEfficacy[index]
-            const remoteData = Memory.rooms[remoteName].data
+            const remoteMemory = Memory.rooms[remoteName]
+
+            if (remoteMemory[RoomMemoryKeys.disable]) continue
+            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+            if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
 
             // Add up econ data for this.communeManager.room this.communeManager.room
 
             const totalRemoteNeed =
-                Math.max(remoteData[RemoteData.remoteHauler0], 0) +
-                Math.max(remoteData[RemoteData.remoteHauler1], 0) +
-                Math.max(remoteData[RemoteData.remoteReserver], 0) +
-                Math.max(remoteData[RemoteData.remoteCoreAttacker], 0) +
-                Math.max(remoteData[RemoteData.remoteDismantler], 0) +
-                Math.max(remoteData[RemoteData.minDamage], 0) +
-                Math.max(remoteData[RemoteData.minHeal], 0)
-
-            const remoteMemory = Memory.rooms[remoteName]
-
-            if (!remoteMemory.data[RemoteData.enemyReserved] && !remoteMemory.data[RemoteData.abandon]) {
-                const remote = Game.rooms[remoteName]
-                const isReserved =
-                    remote && remote.controller.reservation && remote.controller.reservation.username === Memory.me
-
-                // Loop through each index of sourceEfficacies
-
-                for (let index = 0; index < remoteMemory.SIDs.length; index += 1) {
-                    // Get the income based on the reservation of the this.communeManager.room and remoteHarvester need
-                    // Multiply remote harvester need by 1.6~ to get 3 to 5 and 6 to 10, converting work part need to income expectation
-
-                    const income = Math.max(
-                        (isReserved ? 10 : 5) -
-                            Math.floor(
-                                Math.max(remoteMemory.data[RemoteData[remoteHarvesterRoles[index]]], 0) *
-                                    minHarvestWorkRatio,
-                            ),
-                        0,
-                    )
-
-                    // Find the number of carry parts required for the source, and add it to the remoteHauler need
-
-                    this.remoteHaulerNeed += findCarryPartsRequired(
-                        remoteMemory.SPs[index].length / packedPosLength,
-                        income,
-                    )
-                }
-            }
-
-            // If there is a need for any econ creep, inform the index
-
+                Math.max(remoteMemory[RoomMemoryKeys.remoteBuilder], 0) +
+                Math.max(remoteMemory[RoomMemoryKeys.remoteReservers], 0) +
+                Math.max(remoteMemory[RoomMemoryKeys.remoteCoreAttacker], 0) +
+                Math.max(remoteMemory[RoomMemoryKeys.remoteDismantler], 0)
             if (totalRemoteNeed <= 0) continue
+
+            // Construct requests for remoteBuilders
+
+            this.rawSpawnRequestsArgs.push(
+                ((): SpawnRequestArgs | false => {
+                    return false
+
+                    // If there are no data for this.communeManager.room this.communeManager.room, inform false
+
+                    if (remoteMemory[RoomMemoryKeys.remoteBuilder] <= 0) return false
+
+                    // If there are insufficient harvesters for the remote's sources
+
+                    if (
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvesters].reduce(
+                            (partialSum, val) => partialSum + val,
+                            0,
+                        ) === 0
+                    )
+                        return false
+
+                    return {
+                        type: SpawnRequestTypes.groupDiverse,
+                        role: 'remoteBuilder',
+                        defaultParts: [],
+                        extraParts: [WORK, MOVE, CARRY, MOVE],
+                        partsMultiplier: remoteMemory[RoomMemoryKeys.remoteBuilder],
+                        spawnGroup:
+                            this.communeManager.room.creepsOfRemote[remoteName].remoteBuilder,
+                        maxCreeps:
+                            remoteMemory[RoomMemoryKeys.remoteControllerPositions].length /
+                            packedPosLength,
+                        minCostPerCreep: 250,
+                        priority: this.minRemotePriority + 0.1,
+                        memoryAdditions: {
+                            [CreepMemoryKeys.remote]: remoteName,
+                        },
+                    }
+                })(),
+            )
 
             // Construct requests for remoteReservers
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    // If there are insufficient harvesters for the remote's sources
+                    // If there are no data for this.communeManager.room this.communeManager.room, inform false
 
-                    if (
-                        Math.max(remoteData[RemoteData.remoteSourceHarvester0], 0) +
-                            Math.max(remoteData[RemoteData.remoteSourceHarvester1], 0) >
-                        0
-                    )
-                        return false
+                    if (remoteMemory[RoomMemoryKeys.remoteReservers] <= 0) return false
 
                     let cost = 650
 
@@ -1113,34 +1380,47 @@ export class SpawnRequestsManager {
 
                     if (this.spawnEnergyCapacity < cost) return false
 
-                    // If there are no data for this.communeManager.room this.communeManager.room, inform false
+                    // If there are insufficient harvesters for the remote's sources
 
-                    if (remoteData[RemoteData.remoteReserver] <= 0) return false
+                    if (
+                        remoteMemory[RoomMemoryKeys.remoteSourceHarvesters].reduce(
+                            (partialSum, val) => partialSum + val,
+                            0,
+                        ) === 0
+                    )
+                        return false
+
+                    const priority = this.minRemotePriority + 0.1
+                    this.activeRemotePriority = Math.max(this.activeRemotePriority, priority + 0.1)
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'remoteReserver',
                         defaultParts: [],
                         extraParts: [MOVE, CLAIM],
-                        partsMultiplier: 6,
-                        spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteReserver,
-                        minCreeps: 1,
-                        maxCreeps: Infinity,
-                        minCost: cost,
-                        priority: this.minRemotePriority + 0.1,
+                        partsMultiplier: remoteMemory[RoomMemoryKeys.remoteReservers],
+                        spawnGroup:
+                            this.communeManager.room.creepsOfRemote[remoteName].remoteReserver,
+                        maxCreeps:
+                            remoteMemory[RoomMemoryKeys.remoteControllerPositions].length /
+                            packedPosLength,
+                        minCostPerCreep: cost,
+                        priority,
                         memoryAdditions: {
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
             )
 
             // Construct requests for remoteDefenders
-
+            /*
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     // If there are no related data
 
                     if (remoteData[RemoteData.minDamage] + remoteData[RemoteData.minHeal] <= 0) return false
+                    if (this.communeManager.room.towerInferiority) return false
 
                     let minRangedAttackCost = 0
 
@@ -1150,8 +1430,10 @@ export class SpawnRequestsManager {
                             (remoteData[RemoteData.minDamage] / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
                     }
 
-                    const rangedAttackAmount =
-                        minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])
+                    const rangedAttackAmount = Math.max(
+                        Math.floor(minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE])),
+                        1,
+                    )
 
                     let minHealCost = 0
 
@@ -1161,16 +1443,16 @@ export class SpawnRequestsManager {
                             (remoteData[RemoteData.minHeal] / HEAL_POWER) * BODYPART_COST[MOVE]
                     }
 
-                    const healAmount = minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE])
+                    const healAmount = Math.floor(minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
                     if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                        Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                         return false
                     }
 
                     const minCost = minRangedAttackCost + minHealCost
                     if (minCost > this.spawnEnergyCapacity) {
-                        Memory.rooms[remoteName].data[RemoteData.abandon] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
                         return false
                     }
 
@@ -1196,7 +1478,7 @@ export class SpawnRequestsManager {
                         memoryAdditions: {},
                     }
                 })(),
-            )
+            ) */
 
             // Construct requests for remoteCoreAttackers
 
@@ -1204,7 +1486,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     // If there are no related data
 
-                    if (remoteData[RemoteData.remoteCoreAttacker] <= 0) return false
+                    if (remoteMemory[RoomMemoryKeys.remoteCoreAttacker] <= 0) return false
 
                     // Define the minCost and strength
 
@@ -1212,16 +1494,19 @@ export class SpawnRequestsManager {
                     const extraParts = [ATTACK, MOVE]
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'remoteCoreAttacker',
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: 50 / extraParts.length,
-                        spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteCoreAttacker,
-                        minCreeps: 1,
-                        minCost: cost * extraParts.length,
+                        spawnGroup:
+                            this.communeManager.room.creepsOfRemote[remoteName].remoteCoreAttacker,
+                        /* minCreeps: 1, */
+                        maxCreeps: 3,
+                        minCostPerCreep: cost * extraParts.length,
                         priority: this.minRemotePriority - 2,
                         memoryAdditions: {
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
@@ -1233,7 +1518,7 @@ export class SpawnRequestsManager {
                 ((): SpawnRequestArgs | false => {
                     // If there are no related data
 
-                    if (remoteData[RemoteData.remoteDismantler] <= 0) return false
+                    if (remoteMemory[RoomMemoryKeys.remoteDismantler] <= 0) return false
 
                     // Define the minCost and strength
 
@@ -1241,109 +1526,71 @@ export class SpawnRequestsManager {
                     const extraParts = [WORK, MOVE]
 
                     return {
+                        type: SpawnRequestTypes.individualUniform,
                         role: 'remoteDismantler',
                         defaultParts: [],
                         extraParts,
                         partsMultiplier: 50 / extraParts.length,
-                        spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteDismantler,
-                        minCreeps: 1,
-                        minCost: cost * 2,
+                        spawnGroup:
+                            this.communeManager.room.creepsOfRemote[remoteName].remoteDismantler,
+                        creepsQuota: 1,
+                        minCostPerCreep: cost * 2,
                         priority: this.minRemotePriority - 1,
                         memoryAdditions: {
-                            RN: remoteName,
+                            [CreepMemoryKeys.remote]: remoteName,
                         },
                     }
                 })(),
             )
         }
-    }
-
-    private remoteHaulers() {
-        this.rawSpawnRequestsArgs.push(
-            ((): SpawnRequestArgs | false => {
-                if (this.remoteHaulerNeed === 0) return false
-
-                const partsMultiplier = this.remoteHaulerNeed
-                const role = 'remoteHauler'
-
-                /*
-                // If all RCL 3 extensions are built
-                if (this.spawnEnergyCapacity >= 800) {
-                        partsMultiplier = this.remoteHaulerNeed / 2
-                        return {
-                            defaultParts: [],
-                            extraParts: [CARRY, CARRY, MOVE],
-                            threshold: 0.1,
-                            partsMultiplier,
-                            maxCreeps: Infinity,
-                            minCost: 150,
-                            maxCostPerCreep: this.communeManager.room.memory.MHC,
-                            priority: this.minRemotePriority,
-                            memoryAdditions: {
-                                role: 'remoteHauler',
-                                R: true,
-                            },
-                        }
-                }
-                */
-
-                return {
-                    role,
-                    defaultParts: [],
-                    extraParts: [CARRY, MOVE],
-                    threshold: 0.1,
-                    partsMultiplier,
-                    minCost: 100,
-                    maxCostPerCreep: this.communeManager.room.memory.MHC,
-                    priority: this.minRemotePriority,
-                    memoryAdditions: {},
-                }
-            })(),
-        )
     }
 
     private scout() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
                 let minCreeps: number
-                if (this.communeManager.room.structures.observer.length) minCreeps = 1
+                if (this.communeManager.room.roomManager.structures.observer.length) minCreeps = 1
                 else minCreeps = 2
 
                 return {
+                    type: SpawnRequestTypes.individualUniform,
                     role: 'scout',
                     defaultParts: [],
                     extraParts: [MOVE],
                     partsMultiplier: 1,
-                    minCreeps,
-                    minCost: 50,
-                    priority: 5,
-                    memoryAdditions: {},
+                    creepsQuota: minCreeps,
+                    minCostPerCreep: 50,
+                    priority: this.activeRemotePriority + 0.3,
+                    memoryAdditions: {
+                        [CreepMemoryKeys.signTarget]: this.communeManager.room.name,
+                    },
                 }
             })(),
         )
     }
 
-    private claimRequestRoles() {
-        if (this.communeManager.room.memory.claimRequest) {
-            const requestName = this.communeManager.room.memory.claimRequest
-            const request = Memory.claimRequests[requestName]
+    private workRequestRoles() {
+        if (this.communeManager.room.memory[RoomMemoryKeys.workRequest]) {
+            const requestName = this.communeManager.room.memory[RoomMemoryKeys.workRequest]
+            const request = Memory.workRequests[requestName]
 
             // Construct requests for claimers
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (request.data[ClaimRequestData.claimer] <= 0) return false
+                    if (request[WorkRequestKeys.claimer] <= 0) return false
 
                     return {
+                        type: SpawnRequestTypes.individualUniform,
                         role: 'claimer',
                         defaultParts: [CLAIM, MOVE],
                         extraParts: [MOVE, MOVE, MOVE, MOVE],
                         partsMultiplier: 1,
-                        minCreeps: 1,
-                        minCost: 650,
+                        creepsQuota: 1,
+                        minCostPerCreep: 650,
                         priority: 8.1,
                         memoryAdditions: {
-                            TRN: requestName,
+                            [CreepMemoryKeys.workRequest]: requestName,
                         },
                     }
                 })(),
@@ -1353,45 +1600,50 @@ export class SpawnRequestsManager {
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
-                    if (request.data[ClaimRequestData.vanguard] <= 0) return false
+                    if (request[WorkRequestKeys.vanguard] <= 0) return false
+
+                    let maxCreeps = 0
+                    for (const packedPositions of Memory.rooms[requestName][
+                        RoomMemoryKeys.communeSourceHarvestPositions
+                    ]) {
+                        maxCreeps += packedPositions.length
+                    }
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'vanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                        partsMultiplier: request.data[ClaimRequestData.vanguard],
-                        minCost: 250,
+                        partsMultiplier: request[WorkRequestKeys.vanguard],
+                        maxCreeps,
+                        minCostPerCreep: 250,
                         priority: 8.2,
                         memoryAdditions: {
-                            TRN: requestName,
+                            [CreepMemoryKeys.workRequest]: requestName,
                         },
                     }
                 })(),
             )
-        }
-    }
 
-    private allyVanguard() {
-        if (this.communeManager.room.memory.allyCreepRequest) {
-            const allyCreepRequestNeeds =
-                Memory.allyCreepRequests[this.communeManager.room.memory.allyCreepRequest].data
-
-            // Requests for vanguard
+            // allyVanguard
 
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     // If there is no vanguard need
 
-                    if (allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard] <= 0) return false
+                    if (request[WorkRequestKeys.allyVanguard] <= 0) return false
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'allyVanguard',
                         defaultParts: [],
                         extraParts: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
-                        partsMultiplier: allyCreepRequestNeeds[AllyCreepRequestData.allyVanguard],
-                        minCost: 250,
+                        partsMultiplier: request[WorkRequestKeys.allyVanguard],
+                        minCostPerCreep: 250,
                         priority: 10 + this.communeManager.room.creepsFromRoom.allyVanguard.length,
-                        memoryAdditions: {},
+                        memoryAdditions: {
+                            [CreepMemoryKeys.workRequest]: requestName,
+                        },
                     }
                 })(),
             )
@@ -1399,7 +1651,7 @@ export class SpawnRequestsManager {
     }
 
     private requestHauler() {
-        for (const requestName of this.communeManager.room.memory.haulRequests) {
+        for (const requestName of this.communeManager.room.memory[RoomMemoryKeys.haulRequests]) {
             const request = Memory.haulRequests[requestName]
             if (!request) continue
 
@@ -1411,15 +1663,16 @@ export class SpawnRequestsManager {
                     )
 
                     return {
+                        type: SpawnRequestTypes.groupDiverse,
                         role: 'requestHauler',
                         defaultParts: [],
                         extraParts: [CARRY, MOVE],
                         partsMultiplier: 100,
-                        minCost: 100,
-                        maxCostPerCreep: this.communeManager.room.memory.MHC,
+                        minCostPerCreep: 100,
+                        maxCostPerCreep: this.minHaulerCost,
                         priority,
                         memoryAdditions: {
-                            HRN: requestName,
+                            [CreepMemoryKeys.haulRequest]: requestName,
                         },
                     }
                 })(),
@@ -1428,49 +1681,67 @@ export class SpawnRequestsManager {
     }
 
     private antifa() {
-        let priority = 8
+        let priority = this.minRemotePriority
 
-        for (let i = this.communeManager.room.memory.combatRequests.length - 1; i >= 0; i -= 1) {
-            const requestName = Memory.rooms[this.communeManager.room.name].combatRequests[i]
+        for (
+            let i = this.communeManager.room.memory[RoomMemoryKeys.combatRequests].length - 1;
+            i >= 0;
+            i -= 1
+        ) {
+            const requestName =
+                Memory.rooms[this.communeManager.room.name][RoomMemoryKeys.combatRequests][i]
             const request = Memory.combatRequests[requestName]
 
             if (!request) continue
 
-            if (request.data[CombatRequestData.abandon] > 0) continue
+            if (request[CombatRequestKeys.abandon] > 0) continue
 
-            priority += 0.01
+            priority -= 0.01
 
             //
 
-            const minRangedAttackCost = this.communeManager.room.communeManager.findMinRangedAttackCost(
-                request.data[CombatRequestData.minDamage],
-            )
+            const minRangedAttackCost =
+                this.communeManager.room.communeManager.findMinRangedAttackCost(
+                    request[CombatRequestKeys.minDamage],
+                )
             const rangedAttackAmount = Math.floor(
                 minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
             )
 
             const minAttackCost = this.communeManager.room.communeManager.findMinMeleeAttackCost(
-                request.data[CombatRequestData.minDamage],
+                request[CombatRequestKeys.minDamage],
             )
-            const attackAmount = Math.floor(minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]))
+            const attackAmount = Math.floor(
+                minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]),
+            )
 
             const minMeleeHealCost = this.communeManager.room.communeManager.findMinHealCost(
-                request.data[CombatRequestData.minMeleeHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
+                request[CombatRequestKeys.minMeleeHeal] +
+                    (request[CombatRequestKeys.maxTowerDamage] || 0),
             )
-            const meleeHealAmount = Math.floor(minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
+            const meleeHealAmount = Math.floor(
+                minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
+            )
 
             const minRangedHealCost = this.communeManager.room.communeManager.findMinHealCost(
-                request.data[CombatRequestData.minRangedHeal] + (request.data[CombatRequestData.maxTowerDamage] || 0),
+                request[CombatRequestKeys.minRangedHeal] +
+                    (request[CombatRequestKeys.maxTowerDamage] || 0),
             )
-            const rangedHealAmount = Math.floor(minRangedHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
+            const rangedHealAmount = Math.floor(
+                minRangedHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
+            )
 
             const minDismantleCost =
-                request.data[CombatRequestData.dismantle] * BODYPART_COST[WORK] +
-                    request.data[CombatRequestData.dismantle] * BODYPART_COST[MOVE] || 0
+                request[CombatRequestKeys.dismantle] * BODYPART_COST[WORK] +
+                    request[CombatRequestKeys.dismantle] * BODYPART_COST[MOVE] || 0
 
-            if (request.T === 'attack' || request.T === 'defend') {
+            if (
+                request[CombatRequestKeys.type] === 'attack' ||
+                request[CombatRequestKeys.type] === 'defend'
+            ) {
                 if (
-                    minRangedAttackCost + minRangedHealCost > this.communeManager.room.energyCapacityAvailable ||
+                    minRangedAttackCost + minRangedHealCost >
+                        this.communeManager.room.energyCapacityAvailable ||
                     minAttackCost > this.communeManager.room.energyCapacityAvailable ||
                     (rangedAttackAmount + rangedHealAmount) * 2 > 50 ||
                     attackAmount * 2 > 50
@@ -1485,12 +1756,20 @@ export class SpawnRequestsManager {
                     ((): SpawnRequestArgs | false => {
                         // We currently have enough quads
 
-                        if (request.data[CombatRequestData.quads] >= request.data[CombatRequestData.quadQuota])
+                        if (
+                            request[CombatRequestKeys.quads] >= request[CombatRequestKeys.quadQuota]
+                        )
                             return false
 
                         const role = 'antifaRangedAttacker'
 
-                        const spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                        let spawnGroup: string[]
+
+                        if (collectiveManager.creepsByCombatRequest[requestName]) {
+                            spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                        }
+                        spawnGroup = []
+
                         const minCost = minRangedAttackCost + minRangedHealCost
                         const extraParts: BodyPartConstant[] = []
 
@@ -1518,14 +1797,16 @@ export class SpawnRequestsManager {
                             const tradeType = tradeTypes[partType]
                             const ratio = tradeType.amount / totalTradeableParts
 
-                            let localTradeAmount = Math.ceil(tradeType.amount * ratio * 1.5)
+                            let localTradeAmount = Math.ceil(tradeType.amount * ratio * 0.75)
                             if (localTradeAmount >= tradeAmount) continue
 
                             function findCost() {
                                 return (
-                                    (tradeType.amount + localTradeAmount) * BODYPART_COST[partType] +
+                                    (tradeType.amount + localTradeAmount) *
+                                        BODYPART_COST[partType] +
                                     (tradeTypes[tradeType.other].amount - localTradeAmount) *
-                                        BODYPART_COST[tradeType.other]
+                                        BODYPART_COST[tradeType.other] +
+                                    totalTradeableParts * BODYPART_COST[MOVE]
                                 )
                             }
 
@@ -1540,7 +1821,7 @@ export class SpawnRequestsManager {
 
                         if (
                             this.communeManager.room.squadRequests.size <
-                            (request.data[CombatRequestData.quads] + 1) * 4 - 2
+                            (request[CombatRequestKeys.quads] + 1) * 4 - 2
                         ) {
                             for (let i = 0; i < rangedAttackAmount + tradeAmount; i++) {
                                 extraParts.push(RANGED_ATTACK, MOVE)
@@ -1565,19 +1846,21 @@ export class SpawnRequestsManager {
                         if (!extraParts.length) return false
 
                         return {
+                            type: SpawnRequestTypes.individualUniform,
                             role,
                             defaultParts: [],
                             extraParts,
                             partsMultiplier: 1,
-                            minCost,
+                            minCostPerCreep: minCost,
                             priority,
                             spawnGroup,
-                            minCreeps: request.data[CombatRequestData.quadQuota] * 4,
+                            creepsQuota: request[CombatRequestKeys.quadQuota] * 4,
                             memoryAdditions: {
-                                CRN: requestName,
-                                SS: 4,
-                                ST: 'quad',
-                                SCT: 'rangedAttack',
+                                [CreepMemoryKeys.combatRequest]: requestName,
+                                [CreepMemoryKeys.squadSize]: 4,
+                                [CreepMemoryKeys.squadType]: 'quad',
+                                [CreepMemoryKeys.squadCombatType]: 'rangedAttack',
+                                [CreepMemoryKeys.squadMoveType]: 'attack',
                             },
                         }
                     })(),
@@ -1588,8 +1871,10 @@ export class SpawnRequestsManager {
             // Harass
 
             if (
-                minRangedAttackCost + minRangedHealCost > this.communeManager.room.energyCapacityAvailable ||
-                minAttackCost + minMeleeHealCost > this.communeManager.room.energyCapacityAvailable ||
+                minRangedAttackCost + minRangedHealCost >
+                    this.communeManager.room.energyCapacityAvailable ||
+                minAttackCost + minMeleeHealCost >
+                    this.communeManager.room.energyCapacityAvailable ||
                 minAttackCost > this.communeManager.room.energyCapacityAvailable
             ) {
                 this.communeManager.room.communeManager.deleteCombatRequest(requestName, i)
@@ -1602,7 +1887,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaRangedAttacker'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
 
@@ -1637,11 +1922,11 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaDismantler'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minDismantleCost
                     let extraParts: BodyPartConstant[] = []
 
-                    const workAmount = request.data[CombatRequestData.dismantle]
+                    const workAmount = request[CombatRequestKeys.dismantle]
 
                     for (let i = 0; i < workAmount; i++) {
                         extraParts.push(WORK, MOVE)
@@ -1670,7 +1955,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaAttacker'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minAttackCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1700,7 +1985,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaHealer'
-                    spawnGroup = internationalManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minMeleeHealCost
                     let extraParts: BodyPartConstant[] = []
 

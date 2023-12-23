@@ -1,6 +1,14 @@
-import { communeSign, nonCommuneSigns } from 'international/constants'
-import { cleanRoomMemory, findClosestCommuneName, getRange, getRangeOfCoords } from 'international/utils'
+import {
+    CreepMemoryKeys,
+    Result,
+    RoomMemoryKeys,
+    RoomTypes,
+    communeSign,
+    nonCommuneSigns,
+} from 'international/constants'
+import { getRangeXY, getRange, randomOf } from 'utils/utils'
 import { partial } from 'lodash'
+import { roomNameUtils } from 'room/roomNameUtils'
 
 export class Scout extends Creep {
     scoutedRooms?: string[]
@@ -10,23 +18,23 @@ export class Scout extends Creep {
         super(creepID)
     }
 
-    preTickManager() {
-        if (!this.memory.scT) return
+    initRun() {
+        if (!Memory.creeps[this.name][CreepMemoryKeys.scoutTarget]) return
 
-        this.commune.scoutTargets.add(this.memory.scT)
+        this.commune.scoutTargets.add(Memory.creeps[this.name][CreepMemoryKeys.scoutTarget])
     }
 
     /**
      * Finds a room name for the scout to target
      */
     findScoutTarget?(): boolean {
-        if (this.memory.scT) return true
+        const creepMemory = Memory.creeps[this.name]
+        if (creepMemory[CreepMemoryKeys.scoutTarget]) return true
 
         const scoutTarget = this.findBestScoutTarget()
         if (!scoutTarget) return false
 
-        this.commune.scoutTargets.add(this.memory.scT)
-
+        this.commune.scoutTargets.add(scoutTarget)
         return true
     }
 
@@ -37,7 +45,6 @@ export class Scout extends Creep {
         this.unscoutedRooms = []
 
         // Get information about the room's exits
-
         const exits = Game.map.describeExits(this.room.name)
 
         // Loop through each adjacent room recording scouted and unscouted rooms
@@ -53,18 +60,20 @@ export class Scout extends Creep {
 
             // Iterate if the room statuses aren't the same
 
-            if (Game.map.getRoomStatus(roomName).status !== Game.map.getRoomStatus(this.room.name).status) continue
+            if (
+                Game.map.getRoomStatus(roomName).status !==
+                Game.map.getRoomStatus(this.room.name).status
+            )
+                continue
 
             // If the room has memory and a LST
 
-            if (Memory.rooms[roomName] && Memory.rooms[roomName].LST) {
+            if (Memory.rooms[roomName] && Memory.rooms[roomName][RoomMemoryKeys.lastScout]) {
                 // Add it to scoutedRooms and iterate
 
                 this.scoutedRooms.push(roomName)
                 continue
             }
-
-            // Otherwise add it to unscouted rooms
 
             this.unscoutedRooms.push(roomName)
         }
@@ -83,10 +92,10 @@ export class Scout extends Creep {
                 if (range > lowestRange) continue
 
                 lowestRange = range
-                this.memory.scT = roomName
+                this.memory[CreepMemoryKeys.scoutTarget] = roomName
             }
 
-            return this.memory.scT
+            return this.memory[CreepMemoryKeys.scoutTarget]
         }
 
         // Find the room scouted longest ago
@@ -94,14 +103,14 @@ export class Scout extends Creep {
         let lowestLastScoutTick = Infinity
 
         for (const roomName of this.scoutedRooms) {
-            const lastScoutTick = Memory.rooms[roomName].LST
+            const lastScoutTick = Memory.rooms[roomName][RoomMemoryKeys.lastScout]
             if (lastScoutTick > lowestLastScoutTick) continue
 
             lowestLastScoutTick = lastScoutTick
-            this.memory.scT = roomName
+            this.memory[CreepMemoryKeys.scoutTarget] = roomName
         }
 
-        return this.memory.scT
+        return this.memory[CreepMemoryKeys.scoutTarget]
     }
 
     // THIS SHOULD BE A ROOM FUNCTION BASED OFF Room.advancedScout
@@ -109,30 +118,30 @@ export class Scout extends Creep {
     recordDeposits?(): void {
         const { room } = this
 
-        if (room.memory.T != 'highway') return
+        if (room.memory[RoomMemoryKeys.type] != RoomTypes.highway) return
 
         // Make sure the room has a commune
 
-        if (room.memory.CN) {
-            if (!global.communes.has(room.memory.CN)) {
-                room.memory.CN = findClosestCommuneName(room.name)
+        if (room.memory[RoomMemoryKeys.commune]) {
+            if (!collectiveManager.communes.has(room.memory[RoomMemoryKeys.commune])) {
+                room.memory[RoomMemoryKeys.commune] = findClosestCommuneName(room.name)
             }
         } else {
-            room.memory.CN = findClosestCommuneName(room.name)
+            room.memory[RoomMemoryKeys.commune] = findClosestCommuneName(room.name)
         }
 
-        const communeMemory = Memory.rooms[room.memory.CN]
+        const communeMemory = Memory.rooms[room.memory[RoomMemoryKeys.commune]]
 
         const deposits = room.find(FIND_DEPOSITS)
 
         // Filter deposits that haven't been assigned a commune and are viable
 
         const unAssignedDeposits = deposits.filter(function (deposit) {
-            return !communeMemory.deposits[deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
+            return !communeMemory[RoomMemoryKeys.deposits][deposit.id] && deposit.lastCooldown <= 100 && deposit.ticksToDecay > 500
         })
 
         for (const deposit of unAssignedDeposits)
-            communeMemory.deposits[deposit.id] = {
+            communeMemory[RoomMemoryKeys.deposits][deposit.id] = {
                 decay: deposit.ticksToDecay,
                 needs: [1, 1],
             }
@@ -142,13 +151,15 @@ export class Scout extends Creep {
      * Tries to sign a room's controller depending on the situation
      */
     advancedSignController?(): boolean {
-        const { room } = this
-
-        const { controller } = room
-
+        const controller = this.room.controller
         if (!controller) return true
 
-        if (room.name !== this.memory.siT) return true
+        const roomMemory = Memory.rooms[this.room.name]
+
+        // If the room isn't a commune or our sign target, don't try to sign it
+        if (Memory.creeps[this.name][CreepMemoryKeys.signTarget] !== this.room.name) {
+            return true
+        }
 
         this.message = '🔤'
 
@@ -156,62 +167,60 @@ export class Scout extends Creep {
 
         let signMessage: string
 
-        // If the room is owned by an enemy or an ally
+        // If the room is reserved or owned by an enemy or an ally
 
-        if (room.memory.T === 'ally' || room.memory.T === 'enemy') return true
-
+        if (controller.owner && controller.owner.username !== Memory.me) return true
         if (controller.reservation && controller.reservation.username !== Memory.me) return true
 
         // If the room is a commune
 
-        if (room.memory.T === 'commune') {
+        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
             // If the room already has a correct sign
-
-            if (controller.sign && communeSign.startsWith(controller.sign.text)) return true
+            if (controller.sign && controller.sign.text === communeSign) return true
 
             // Otherwise assign the signMessage the commune sign
-
             signMessage = communeSign
         }
-
         // Otherwise if the room is not a commune
         else {
             // If the room already has a correct sign
-
             if (controller.sign && nonCommuneSigns.includes(controller.sign.text)) return true
 
             // And assign the message according to the index of randomSign
-
-            signMessage = nonCommuneSigns[Math.floor(Math.random() * nonCommuneSigns.length)]
+            signMessage = randomOf(nonCommuneSigns)
         }
 
         // If the controller is not in range
 
-        if (getRangeOfCoords(this.pos, controller.pos) > 1) {
+        if (getRange(this.pos, controller.pos) > 1) {
             // Request to move to the controller and inform false
 
             if (
                 this.createMoveRequest({
                     origin: this.pos,
-                    goals: [{ pos: room.controller.pos, range: 1 }],
+                    goals: [{ pos: this.room.controller.pos, range: 1 }],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) === 'unpathable'
-            )
-                return true
+                }) === Result.fail
+            ) {
 
-            this.message = this.moveRequest.toString()
+                // The controller is ineccessible, drop the target
+                delete Memory.creeps[this.name][CreepMemoryKeys.signTarget]
+                return true
+            }
+
+            this.message = this.moveRequest
 
             return false
         }
 
         // Otherwise Try to sign the controller, informing the result
 
-        return this.signController(room.controller, signMessage) === OK
+        return this.signController(this.room.controller, signMessage) === OK
     }
 
-    static scoutManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {
@@ -223,9 +232,8 @@ export class Scout extends Creep {
 
             if (creep.ticksToLive === CREEP_LIFE_TIME - 1) creep.notifyWhenAttacked(false)
 
-            // If the creep is in the scoutTarget
-
-            if (creep.memory.scT === room.name) {
+            const creepMemory = Memory.creeps[creepName]
+            if (creepMemory[CreepMemoryKeys.scoutTarget] === room.name) {
                 creep.message = '👁️'
 
                 // Get information about the room
@@ -234,11 +242,11 @@ export class Scout extends Creep {
 
                 // Clean the room's memory
 
-                cleanRoomMemory(room.name)
+                roomNameUtils.cleanMemory(room.name)
 
                 // And delete the creep's scoutTarget
 
-                delete creep.memory.scT
+                delete creepMemory[CreepMemoryKeys.scoutTarget]
             }
 
             // If there is no scoutTarget, find one
@@ -247,11 +255,10 @@ export class Scout extends Creep {
 
             // Say the scoutTarget
 
-            creep.message = `🔭${creep.memory.scT.toString()}`
+            creep.message = `🔭${creepMemory[CreepMemoryKeys.scoutTarget].toString()}`
 
             if (!creep.advancedSignController()) continue
-
-            creep.memory.siT = creep.memory.scT
+            delete creepMemory[CreepMemoryKeys.signTarget]
 
             // Try to go to the scoutTarget
 
@@ -260,22 +267,30 @@ export class Scout extends Creep {
                     origin: creep.pos,
                     goals: [
                         {
-                            pos: new RoomPosition(25, 25, creep.memory.scT),
+                            pos: new RoomPosition(
+                                25,
+                                25,
+                                creepMemory[CreepMemoryKeys.scoutTarget],
+                            ),
                             range: 25,
                         },
                     ],
                     avoidEnemyRanges: true,
                     plainCost: 1,
                     swampCost: 1,
-                }) === 'unpathable'
+                }) === Result.fail
             ) {
-                let roomMemory: Partial<RoomMemory> = Memory.rooms[creep.memory.scT]
-                if (!roomMemory) roomMemory = (Memory.rooms[creep.memory.scT] as Partial<RoomMemory>) = {}
+                let roomMemory: Partial<RoomMemory> =
+                    Memory.rooms[creepMemory[CreepMemoryKeys.scoutTarget]]
+                if (!roomMemory)
+                    roomMemory = (Memory.rooms[
+                        creepMemory[CreepMemoryKeys.scoutTarget]
+                    ] as Partial<RoomMemory>) = {}
 
-                roomMemory.T = 'neutral'
-                roomMemory.LST = Game.time
+                roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
+                roomMemory[RoomMemoryKeys.lastScout] = Game.time
 
-                delete creep.memory.scT
+                delete creepMemory[CreepMemoryKeys.scoutTarget]
             }
         }
     }

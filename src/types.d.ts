@@ -2,20 +2,46 @@ import { CommuneManager } from './room/commune/commune'
 import { RoomManager } from './room/room'
 import { Duo } from './room/creeps/roleManagers/antifa/duo'
 import { Quad } from './room/creeps/roleManagers/antifa/quad'
-import { CombatRequestData } from 'international/constants'
+import {
+    WorkRequestKeys,
+    CombatRequestKeys,
+    CreepMemoryKeys,
+    CreepRoomLogisticsRequestKeys,
+    DepositRequestKeys,
+    HaulRequestKeys,
+    NukeRequestKeys,
+    PlayerMemoryKeys,
+    PowerCreepMemoryKeys,
+    PowerRequestKeys,
+    RoomMemoryKeys,
+    RoomTypes,
+    SleepFor,
+    Result,
+    PlayerRelationship,
+    ReservedCoordTypes,
+    WorkTypes,
+    creepRoles,
+} from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
-import { MeleeDefender } from 'room/creeps/roleManagers/commune/meleeDefender'
-import { Settings } from 'international/settings'
-import { Dynamic } from 'room/creeps/roleManagers/antifa/dynamic'
+import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
+import { Settings } from 'international/settingsDefault'
+import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { BasePlans } from 'room/construction/basePlans'
+import { CustomPathFinderArgs } from 'international/customPathFinder'
+import { CombatRequest, HaulRequest, NukeRequest, WorkRequest } from 'types/internationalRequests'
+import { PlayerMemory } from 'types/players'
+import {
+    CreepRoomLogisticsRequest,
+    PowerTask,
+    RoomLogisticsRequest,
+    FindNewRoomLogisticsRequestArgs,
+    CreateRoomLogisticsRequestArgs,
+} from 'types/roomRequests'
+import { UserScriptTemplate } from 'other/userScript/userScript.example'
+import { StatsMemory } from 'types/stats'
+import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
 
 declare global {
-    interface ProfilerMemory {
-        data: { [name: string]: ProfilerData }
-        start?: number
-        total: number
-    }
-
     interface ProfilerData {
         calls: number
         time: number
@@ -30,24 +56,26 @@ declare global {
         toString(): string
     }
 
+    interface Collaborator {
+        run(): void
+    }
+
     interface Coord {
         x: number
         y: number
     }
 
-    interface RoomCoord extends Coord {
-        /**
-         * The name of the room
-         */
-        x: number
-        y: number
-    }
+    interface RoomCoord extends Coord {}
 
     interface Rect {
         x1: number
         y1: number
         x2: number
         y2: number
+    }
+
+    interface CostMatrix {
+        _bits: Uint8Array
     }
 
     interface Colors {
@@ -74,30 +102,30 @@ declare global {
         | 'secondaryAttack'
         | 'heal'
 
-    interface ResourceTarget {
-        resource: ResourceConstant
-        conditions?(communeManager: CommuneManager): any
-        min(communeManager?: CommuneManager): number
-        max(communeManager?: CommuneManager): number
-    }
+    type SquadTypes = 'duo' | 'quad' | 'dynamic'
+    type SquadCombatTypes = 'rangedAttack' | 'attack' | 'dismantle'
+    type SquadMoveTypes = 'transport' | 'attack'
 
     type RemoteStampTypes = 'road' | 'container'
 
     type StampTypes =
         | 'fastFiller'
         | 'hub'
-        | 'extensions'
-        | 'labs'
+        | 'inputLab'
+        | 'outputLab'
         | 'tower'
-        | 'extension'
         | 'observer'
         | 'sourceLink'
         | 'sourceExtension'
         | 'container'
         | 'extractor'
         | 'road'
-        | 'rampart'
-        /* | 'gridExtension' */
+        | 'minCutRampart'
+        | 'onboardingRampart'
+        | 'shieldRampart'
+        | 'gridExtension'
+        | 'nuker'
+        | 'powerSpawn'
 
     interface Stamp {
         offset: number
@@ -111,7 +139,11 @@ declare global {
         asymmetry?: number
     }
 
-    type StampAnchors = Partial<Record<StampTypes, RoomPosition[]>>
+    type StampAnchors = Partial<Record<StampTypes, Coord[]>>
+    /**
+     * key of packed stamp type with values of packed coord list
+     */
+    type PackedStampAnchors = Partial<{ [packedStampType: string]: string }>
 
     type PosMap<T> = T[]
 
@@ -129,13 +161,12 @@ declare global {
         | 'fastFiller'
         | 'meleeDefender'
         | 'rangedDefender'
-        | 'remoteSourceHarvester0'
-        | 'remoteSourceHarvester1'
-        | 'remoteHauler'
+        | 'remoteSourceHarvester'
         | 'remoteReserver'
         | 'remoteDefender'
         | 'remoteCoreAttacker'
         | 'remoteDismantler'
+        | 'remoteBuilder'
         | 'scout'
         | 'claimer'
         | 'vanguard'
@@ -147,7 +178,6 @@ declare global {
         | 'antifaDowngrader'
 
     interface TerminalRequest {
-        ID: string
         /**
          * Preference from 0-1 where 1 is least prefered
          */
@@ -158,101 +188,55 @@ declare global {
     }
 
     interface BasePlanCoord {
-        structureType: StructureConstant
+        structureType: BuildableStructureConstant
         minRCL: number
     }
 
     interface RampartPlanCoord {
         minRCL: number
         /**
-         * Flase or truthy number
+         * A boolean integer
          */
         coversStructure: number
         /**
-         * Flase or truthy number
+         * A boolean integer. buildForNuke cannot be true if buildForThreat is true
          */
         buildForNuke: number
         /**
-         * Flase or truthy number
+         * A boolean integer. buildForThreat cannot be true if buildForNuke is true
          */
         buildForThreat: number
+        /**
+         * A boolean integer
+         */
+        needsStoringStructure: number
     }
 
-    type QuadTransformTypes = 'none' | 'rotateLeft' | 'rotateRight' | 'tradeHorizontal' | 'tradeVertical'
-
-    interface PathGoal {
-        pos: RoomPosition
-        range: number
-    }
-
-    interface PathOpts {
-        /**
-         * Not required when pathing for creeps
-         */
-        origin?: RoomPosition
-        goals: PathGoal[]
-        /**
-         * room types as keys to weight based on properties
-         */
-        typeWeights?: { [weight: string]: number }
-        plainCost?: number
-        swampCost?: number
-        maxRooms?: number
-        flee?: boolean
-        creep?: Creep
-
-        avoidAbandonedRemotes?: boolean
-
-        weightStructures?: Partial<{ [key in StructureConstant]: number }>
-
-        /**
-         * An object with keys of weights and values of positions
-         */
-
-        weightCoords?: { [roomName: string]: { [packedCoord: string]: number } }
-
-        /**
-         * The name of the costMatrix to weight. Will apply minimal alterations in use
-         */
-        weightCostMatrix?: string
-
-        /**
-         * The names of the costMatrixes to weight. Will apply onto cost matrix in use
-         */
-        weightCostMatrixes?: string[]
-
-        weightCoordMaps?: CoordMap[]
-
-        /**
-         *
-         */
-        avoidEnemyRanges?: boolean
-
-        avoidStationaryPositions?: boolean
-
-        /**
-         *
-         */
-        avoidImpassibleStructures?: boolean
-
-        /**
-         * Marks creeps not owned by the bot as avoid
-         */
-        avoidNotMyCreeps?: boolean
-
-        /**
-         * Weight my ramparts by this value
-         */
-        myRampartWeight?: number
-
-        weightStructurePlans?: boolean
-    }
+    type QuadTransformTypes =
+        | 'none'
+        | 'rotateLeft'
+        | 'rotateRight'
+        | 'tradeHorizontal'
+        | 'tradeVertical'
 
     interface BasePlanAttempt {
-        stampAnchors: Partial<{ [key in StampTypes]: Coord[] }>
         score: number
-        basePlans: { [packedCoord: string]: string }
-        rampartPlans: { [packedCoord: string]: string }
+        stampAnchors: PackedStampAnchors
+        basePlans: string
+        rampartPlans: string
+        roadQuota: number[]
+        communeSources: Id<Source>[]
+        sourceHarvestPositions: string[]
+        sourcePaths: string[]
+        mineralHarvestPositions: string
+        mineralPath: string
+        centerUpgradePos: string
+        upgradePath: string
+    }
+
+    interface RCLPlannedStructureType {
+        structures: number
+        minRCL: number
     }
 
     interface CombatStrength {
@@ -260,6 +244,17 @@ declare global {
         melee: number
         ranged: number
         heal: number
+    }
+
+    interface FindClosestPos {
+        coordMap: CoordMap
+        sources: Coord[]
+        targetCondition(coord: Coord): boolean
+        /**
+         * Wether or not to attempt a cardinal flood
+         */
+        cardinalFlood?: boolean
+        visuals?: boolean
     }
 
     interface FindClosestPosOfValueOpts {
@@ -292,8 +287,12 @@ declare global {
         asymOffset: number
     }
 
-    interface MoveRequestOpts extends PathOpts {
+    interface MoveRequestOpts {
         cacheAmount?: number
+        /**
+         * Allow for assigning reservedCoord of a type on successful pathfind
+         */
+        reserveCoord?: ReservedCoordTypes
     }
 
     interface MoveRequestByPathOpts {
@@ -310,504 +309,10 @@ declare global {
         y: number
     }
 
-    interface SpawnRequestArgs {
-        role: CreepRoles
-        /**
-         * Parts that should be attempted to be implemented once
-         */
-        defaultParts: BodyPartConstant[]
-        /**
-         * Parts that should be attempted to be implemented based on the partsMultiplier
-         */
-        extraParts: BodyPartConstant[]
-        /**
-         * The number of times to attempt to duplicate extraParts
-         */
-        partsMultiplier: number
-        /**
-         * The absolute minimum cost the creep may be spawned with
-         */
-        minCost: number
-        /**
-         * The priority of spawning, where 0 is greatest, and Infinity is least
-         */
-        priority: number
-        /**
-         * Properties to apply to the creep on top of the defaults
-         */
-        memoryAdditions: Partial<CreepMemory>
-        /**
-         * The specific group of which to compare the creep amount to
-         */
-        spawnGroup?: string[]
-        /**
-         *
-         */
-        threshold?: number
-        /**
-         *
-         */
-        minCreeps?: number | undefined
-        /**
-         *
-         */
-        maxCreeps?: number | undefined
-        /**
-         * The absolute max cost a creep may be applied with
-         */
-        maxCostPerCreep?: number | undefined
-    }
+    type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals' | 'spawnRequestVisuals'
 
-    interface SpawnRequestSkeleton {
-        role: CreepRoles
-        priority: number
-        defaultParts: number
-        bodyPartCounts: { [key in PartsByPriority]: number }
-    }
-
-    interface SpawnRequest {
-        role: CreepRoles
-        priority: number
-        defaultParts: number
-        bodyPartCounts: { [key in PartsByPriority]: number }
-        body?: BodyPartConstant[]
-        tier: number
-        cost: number
-        extraOpts: SpawnOptions
-    }
-
-    type FlagNames = 'disableTowerAttacks' | 'internationalDataVisuals'
-
-    type RoomLogisticsRequestTypes = 'transfer' | 'withdraw' | 'pickup' | 'offer'
-
-    interface RoomLogisticsRequest {
-        ID: string
-        type: RoomLogisticsRequestTypes
-        /**
-         * Consider in weighting the task, lower is more preffered
-         */
-        priority?: number
-        targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-        resourceType: ResourceConstant
-        amount: number
-        /**
-         * If the responder should only take the task if it will use its full capacity. Default is false
-         */
-        onlyFull?: boolean
-        /**
-         * The ID of a roomLogisticsTask or store structure
-         */
-        delivery?: Id<AnyStoreStructure> | string
-        /**
-         * Wether the responder should interact with reserveStore of the target
-         */
-        noReserve?: boolean
-    }
-
-    interface CreateRoomLogisticsRequestArgs {
-        type: RoomLogisticsRequestTypes
-        target: AnyStoreStructure | Creep | Tombstone | Ruin | Resource
-        resourceType?: ResourceConstant
-        onlyFull?: boolean
-        priority?: number
-        maxAmount?: number
-    }
-
-    interface findNewRoomLogisticsRequestArgs {
-        types?: Set<RoomLogisticsRequestTypes>
-        /**
-         * Use this to command certain resourceTypes
-         */
-        resourceTypes?: Set<ResourceConstant>
-        /**
-         * DO NOT USE THIS TO COMMAND CERTAIN RESOURCETYPES, instead use resourceTypes
-         */
-        conditions?(request: RoomLogisticsRequest): any
-    }
-
-    interface CreepRoomLogisticsRequest {
-        /**
-         * The Type of logistic task
-         */
-        T: RoomLogisticsRequestTypes
-        /**
-         * Target ID
-         */
-        TID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-        /**
-         * The Resource Type involved
-         */
-        RT: ResourceConstant
-        /**
-         * The Amount of resources involved
-         */
-        A: number
-        /**
-         * Only Full, if they want a responder only if fully filled
-         */
-        OF?: boolean
-        /**
-         * No reserve, if the creep shouldn't interact with the reserveStore of the target
-         */
-        NR?: boolean
-    }
-
-    interface PowerTask {
-        taskID: string
-        targetID: Id<Structure | Source>
-        powerType: PowerConstant
-        packedCoord: string
-        cooldown: number
-        priority: number
-    }
-
-    interface PackedPowerTask {
-        /**
-         * Target ID
-         */
-        TID: Id<Structure | Source>
-        /**
-         * Power Type
-         */
-        PT: PowerConstant
-        /**
-         * Cooldown
-         */
-        C: number
-    }
-
-    type CombatRequestTypes = 'attack' | 'harass' | 'defend'
-
-    interface ClaimRequest {
-        /**
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface AllyCreepRequest {
-        /**
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface CombatRequest {
-        /**
-         * The Type of attack request
-         */
-        T: CombatRequestTypes
-        /**request
-         * The name of the room responding to the request
-         */
-        responder?: string
-        data: number[]
-    }
-
-    interface HaulRequest {
-        data: number[]
-        responder?: string
-    }
-
-    interface ControllerLevel {
-        level: number
-        progress: number
-        progressTotal: number
-    }
-    interface RoomStats {
-        /**
-         * Game Time
-         */
-        gt: number
-        /**
-         * Remote Count
-         */
-        rc: number
-        /**
-         * Remote Energy Stored
-         */
-        res: number
-        /**
-         * Remote Energy Input Harvest
-         */
-        reih: number
-        /**
-         * Remote Energy Output Repair Other (non-barricade structures)
-         */
-        reoro: number
-        /**
-         * Remote Energy Output Build
-         */
-        reob: number
-        /**
-         * Remote Room CPU Usage
-         */
-        rrocu: number
-        /**
-         * Remote Room Visuals Manager CPU Usage
-         */
-        rrvmcu: number
-        /**
-         * Remote Construction Manager CPU Usage
-         */
-        rcmcu: number
-        /**
-         * Remote Role Manager CPU Usage
-         */
-        rrolmcu: number
-        /**
-         * Remote Role Manager Per Creep CPU Usage
-         */
-        rrolmpccu: number
-        /**
-         * Remote End Tick Creep Manager CPU Usage
-         */
-        retcmcu: number
-        /**
-         * Remote Power Role Manager CPU Usage
-         */
-        rprmcu: number
-        /**
-         * Remote Power Role Manager Per Creep CPU Usage
-         */
-        rprmpccu: number
-    }
-
-    interface RoomCommuneStats extends RoomStats {
-        /**
-         * Controller Level
-         */
-        cl: number
-        /**
-         * Energy Input Harvest
-         */
-        eih: number
-        /**
-         * Energy Input Bought
-         */
-        eib?: number
-        /**
-         * Energy Output Upgrade
-         */
-        eou: number
-        /**
-         * Energy Output Repair Other (non-barricade structures)
-         */
-        eoro: number
-        /**
-         * Energy Output Repair Wall or Rampart
-         */
-        eorwr: number
-        /**
-         * Energy Output Build
-         */
-        eob: number
-        /**
-         * Energy Output Sold
-         */
-        eos: number
-        /**
-         * Energy Output Spawn
-         */
-        eosp: number
-        /**
-         * Energy Output Power
-         */
-        eop: number
-        /**
-         * Minerals Harvested
-         */
-        mh: number
-        /**
-         * Energy Stored
-         */
-        es: number
-
-        /**
-         * Batteries Stored *10
-         */
-        bes: number
-        /**
-         * Creep Count
-         */
-        cc: number
-        /**
-         * Total Creep Count
-         */
-        tcc: number
-        /**
-         * Power Creep Count
-         */
-        pcc: number
-        /**
-         * Spawn Usage as a decimal
-         */
-        su: number
-        /**
-         * Ally Creep Request Manager CPU Usage
-         */
-        acrmcu: number
-        /**
-         * Claim Request Manager CPU Usage
-         */
-        clrmcu: number
-        /**
-         * Tower Manager CPU Usage
-         */
-        tmcu: number
-        /**
-         * Spawn Manager CPU Usage
-         */
-        smcu: number
-        /**
-         * Combat Request Manager CPU Usage
-         */
-        cormcu: number
-        /**
-         * Defence Manager CPU Usage
-         */
-        dmcu: number
-        /**
-         * Spawn Request Manager CPU Usage
-         */
-        srmcu: number
-        /**
-         * Room CPU Usage
-         */
-        rocu: number
-        /**
-         * Room Visuals Manager CPU Usage
-         */
-        rvmcu: number
-        /**
-         * Construction Manager CPU Usage
-         */
-        cmcu: number
-        /**
-         * Role Manager CPU Usage
-         */
-        rolmcu: number
-        /**
-         * Role Manager Per Creep CPU Usage
-         */
-        rolmpccu: number
-        /**
-         * End Tick Creep Manager CPU Usage
-         */
-        etcmcu: number
-        /**
-         * Power Role Manager CPU Usage
-         */
-        prmcu: number
-        /**
-         * Power Role Manager Per Creep CPU Usage
-         */
-        prmpccu: number
-    }
-
-    interface CpuUsers {
-        /**
-         * International Manager CPU Usage
-         */
-        imcu: number
-
-        /**
-         * Creep Organizer CPU Usage
-         */
-        cocu: number
-
-        /**
-         * Map Visuals Manager CPU Usage
-         */
-        mvmcu: number
-
-        /**
-         * Power Creep Organizer CPU Usage
-         */
-        pccu: number
-
-        /**
-         * Tick Config CPU Usage
-         */
-        tccu: number
-
-        /**
-         * Room Manager CPU Usage
-         */
-        roomcu: number
-
-        /**
-         * Stats Manager CPU Usage
-         */
-        smcu: number
-    }
-
-    type InternationalStatNames = keyof CpuUsers
-    type RoomStatNames = keyof RoomStats
-    type RoomCommuneStatNames = keyof RoomCommuneStats
-
-    interface Stats {
-        lastReset: number
-
-        lastTickTimestamp: number
-        tickLength: number
-
-        communeCount: number
-
-        resources: {
-            pixels: number
-            cpuUnlocks: number
-            accessKeys: number
-            credits: number
-        }
-
-        cpu: {
-            bucket: number
-            usage: number
-            limit: number
-        }
-
-        memory: {
-            usage: number
-            limit: number
-        }
-
-        heapUsage: number
-        gcl: ControllerLevel
-
-        gpl: ControllerLevel
-        rooms: { [roomName: string]: Partial<RoomCommuneStats> }
-        constructionSiteCount: number
-        CPUUsers: CpuUsers
-    }
-
-    type StatsRoomTypes = 'commune' | 'remote'
-
-    type RoomTypes =
-        | 'commune'
-        | 'remote'
-        | 'ally'
-        | 'allyRemote'
-        | 'enemy'
-        | 'enemyRemote'
-        | 'neutral'
-        | 'keeper'
-        | 'keeperCenter'
-        | 'highway'
-        | 'intersection'
-
-    interface PlayerInfo {
-        data: number[]
-    }
-
-    interface ShardVisionMemory {
-        shards?: { [shardName: string]: number }
-        lastSeen: number
-    }
-
-    interface Memory extends Settings {
+    interface Memory {
+        breakingVersion: number
         /**
          * The name of the user
          */
@@ -821,26 +326,47 @@ declare global {
         chantIndex: number
 
         /**
+         * the tick of the last holistic configuration opperation
+         */
+        lastConfig: number
+
+        /**
          * An object of constrctionsSites with keys of site IDs and properties of the site's age
          */
         constructionSites: { [ID: string]: number }
 
         /**
+         * keys of the transactions' IDs
+         */
+        recordedTransactionIDs: {[ID: string]: 1}
+
+        minHaulerCostError: number
+        minHaulerCost: number
+        minHaulerCostUpdate: number
+
+        /**
          *
          */
-        claimRequests: { [roomName: string]: ClaimRequest }
+        workRequests: { [roomName: string]: Partial<WorkRequest> }
 
-        combatRequests: { [roomName: string]: CombatRequest }
+        combatRequests: { [roomName: string]: Partial<CombatRequest> }
 
-        haulRequests: { [roomName: string]: HaulRequest }
+        haulRequests: { [roomName: string]: Partial<HaulRequest> }
 
-        allyCreepRequests: { [roomName: string]: AllyCreepRequest }
+        nukeRequests: { [roomName: string]: Partial<NukeRequest> }
 
-        stats: Partial<Stats>
+        stats: Partial<StatsMemory>
 
-        players: { [playerName: string]: Partial<PlayerInfo> }
+        players: { [playerName: string]: Partial<PlayerMemory> }
 
         masterPlan: { resources?: { [key in ResourceConstant]?: number } }
+
+        networks: {
+            towers: {
+                weightLayers: WeightLayers
+                weightsByID: WeightsByID
+            }
+        }
 
         // Other
 
@@ -877,46 +403,21 @@ declare global {
         invaderCore: StructureInvaderCore[]
     }
 
-    interface RoomGlobal {
-        [key: string]: any
+    type InterfaceToKV<T> = {
+        [K in keyof T]: { key: K; value: T[K] }
+    }[keyof T]
 
-        //
-
-        stampAnchors: StampAnchors
-
-        // Paths
-
-        source1PathLength: number
-        source2PathLength: number
-        upgradePathLength: number
-
-        // Containers
-
-        sourceContainers: Id<StructureContainer>[]
-        fastFillerContainerLeft: Id<StructureContainer> | undefined
-        fastFillerContainerRight: Id<StructureContainer> | undefined
-        controllerContainer: Id<StructureContainer> | undefined
-        mineralContainer: Id<StructureContainer> | undefined
-
-        centerUpgradePos: RoomPosition | false
-        upgradePositions: RoomPosition[]
-
-        allStructureIDs: Id<Structure>[]
-        allCSiteIDs: Id<ConstructionSite>[]
-
-        structureCoords: Map<string, Id<Structure>[]>
-        cSiteCoords: Map<string, Id<ConstructionSite>[]>
-
-        // Links
-
-        sourceLinks: Id<StructureLink>[]
-        controllerLink: Id<StructureLink> | undefined
-        fastFillerLink: Id<StructureLink> | undefined
-        hubLink: Id<StructureLink> | undefined
-
-        //
-
-        defaultCostMatrix: number[]
+    interface EnemySquadData {
+        /**
+         * enemy attack + rangedAttack damage
+         */
+        highestMeleeDamage: number
+        highestRangedDamage: number
+        /**
+         * Accounts for defence
+         */
+        highestHeal: number
+        highestDismantle: number
     }
 
     interface TotalEnemyCombatStrength {
@@ -934,25 +435,17 @@ declare global {
 
         estimatedSourceIncome: number[]
 
+        myCreeps: Creep[]
+        myPowerCreeps: PowerCreep[]
         /**
          * An object with keys of roles with properties of arrays of creep names belonging to the role
          */
-        myCreeps: { [key in CreepRoles]?: string[] }
-
-        /**
-         * The number of my creeps in the room
-         */
-        myCreepsAmount: number
+        myCreepsByRole: { [key in CreepRoles]?: string[] }
 
         /**
          * An object with keys of roles with properties of arrays of power creep names belonging to the role
          */
-        myPowerCreeps: { [key in PowerClassConstant]?: string[] }
-
-        /**
-         * The number of my power creeps in the room
-         */
-        myPowerCreepsAmount: number
+        myPowerCreepsByRole: { [key in PowerClassConstant]?: string[] }
 
         /**
          * An object with keys of roles and properties of the number of creeps with the role from this room
@@ -973,11 +466,6 @@ declare global {
          * A set of roomNames representing the targets stof scouts from this commune
          */
         scoutTargets: Set<string>
-
-        /**
-         * Arguments for construction spawn requests
-         */
-        spawnRequestsArgs: SpawnRequestArgs[]
 
         /**
          * Tile types as defined by the rampartPlanner
@@ -1021,23 +509,16 @@ declare global {
          */
         squadRequests: Set<string>
 
-        roomLogisticsRequests: { [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest } }
+        roomLogisticsRequests: {
+            [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
+        }
         powerTasks: { [ID: string]: PowerTask }
 
         attackingDefenderIDs: Set<Id<Creep>>
         defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
         defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
-        towerAttackTarget: Creep
 
-        upgradeStrength: number
-        mineralHarvestStrength: number
-
-        /**
-         * The carry parts needed to effectively run the commune
-         */
-        haulerNeed: number
-
-        usedRampartIDs: Set<Id<StructureRampart>>
+        usedRampartIDs: Map<Id<StructureRampart>, Id<Creep>>
 
         // Functions
 
@@ -1052,39 +533,34 @@ declare global {
         targetVisual(coord1: Coord, coord2: Coord, visualize?: boolean): void
 
         /**
-         * Generates a path between two positions
-         */
-        advancedFindPath(opts: PathOpts): RoomPosition[]
-
-        /**
          * Tries to delete a task with the provided ID and response state
          */
         deleteTask(taskID: any, responder: boolean): void
 
-        scoutByRoomName(): RoomTypes | false
+        scoutByRoomName(): number | false
 
-        scoutRemote(scoutingRoom?: Room): RoomTypes | false
-        scoutEnemyReservedRemote(): RoomTypes | false
-        scoutEnemyUnreservedRemote(): RoomTypes | false
-        scoutMyRemote(scoutingRoom: Room): RoomTypes | false
+        scoutRemote(scoutingRoom?: Room): number | false
+        scoutEnemyReservedRemote(): number | false
+        scoutEnemyUnreservedRemote(): number | false
+        scoutMyRemote(scoutingRoom: Room): number | false
 
-        scoutEnemyRoom(): RoomTypes
+        scoutEnemyRoom(): number
 
-        basicScout(): RoomTypes
+        basicScout(): number
 
         /**
          * Finds the type of a room and initializes its custom properties
          * @param scoutingRoom The room that is performing the scout operation
          */
-        advancedScout(scoutingRoom: Room): RoomTypes
+        advancedScout(scoutingRoom: Room): number
 
         makeRemote(scoutingRoom: Room): boolean
 
-        createAttackCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
+        createAttackCombatRequest(opts?: Partial<CombatRequest>): void
 
-        createHarassCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
+        createHarassCombatRequest(opts?: Partial<CombatRequest>): void
 
-        createDefendCombatRequest(opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>): void
+        createDefendCombatRequest(opts?: Partial<CombatRequest>): void
 
         /**
          * Finds the score of rooms for potential communes
@@ -1124,24 +600,9 @@ declare global {
         ): CoordMap
 
         /**
-         * Gets ranges from for each position from a certain point
+         * Flood fills a room until it finds one of a set of positions
          */
-        floodFill(seeds: Coord[], coordMap: CoordMap, visuals?: boolean): CoordMap
-
-        /**
-         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified
-         */
-        findClosestPosOfValue(opts: FindClosestPosOfValueOpts): RoomPosition | false
-
-        /**
-         * Flood fills a room until it finds the closest pos with a value greater than or equal to the one specified, that does not infringe on disabled tiles
-         */
-        findClosestPosOfValueAsym(opts: FindClosestPosOfValueOptsAsym): RoomPosition | false
-
-        /**
-         *
-         */
-        pathVisual(path: RoomPosition[], color: keyof Colors, visualize?: boolean): void
+        findClosestPos(opts: FindClosestPos): RoomPosition | false
 
         errorVisual(coord: Coord, visualize?: boolean): void
 
@@ -1198,303 +659,60 @@ declare global {
 
         coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
-        createPowerTask(target: Structure | Source, powerType: PowerConstant, priority: number): PowerTask | false
+        createPowerTask(
+            target: Structure | Source,
+            powerType: PowerConstant,
+            priority: number,
+        ): PowerTask | false
 
         highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
 
         createRoomLogisticsRequest(args: CreateRoomLogisticsRequestArgs): void
 
-        partsOfRoles: Partial<{ [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }> }>
+        partsOfRoles: Partial<{
+            [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }>
+        }>
 
         getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>
 
-        createClaimRequest(): boolean
+        createWorkRequest(): boolean
 
         findSwampPlainsRatio(): number
 
-        // General roomFunctions
-
-        claimRequestManager(): void
-        combatRequestManager(): void
-
-        allyCreepRequestManager(): void
-
-        trafficManager(): void
-
         // Spawn functions
 
-        constructSpawnRequests(opts: SpawnRequestArgs | false): void
-
-        findMaxCostPerCreep(maxCostPerCreep: number): number
-
-        createSpawnRequest(
-            priority: number,
-            role: CreepRoles,
-            defaultParts: number,
-            bodyPartCounts: { [key in PartsByPriority]: number },
-            tier: number,
-            cost: number,
-            memory: any,
-        ): void
-
-        spawnRequestIndividually(opts: SpawnRequestArgs): void
-
-        spawnRequestByGroup(opts: SpawnRequestArgs): void
-
-        // Market functions
-
-        advancedSell(resourceType: ResourceConstant, amount: number, targetAmount: number): boolean
-
-        advancedBuy(resourceType: ResourceConstant, amount: number, targetAmount: number): boolean
-
-        // Construction functions
-
-        remoteConstructionManager(): void
-
-        remotePlanner(commune: Room): boolean
-
-        clearOtherStructures(): void
-
-        remoteConstructionPlacement(): void
-
-        communeConstructionPlacement(): void
-
-        findStructureAtCoord<T extends StructureConstant>(coord: Coord, structureType: T): Structure | false
-        findStructureAtXY<T extends StructureConstant>(x: number, y: number, structureType: T): Structure | false
-
-        findStructureInsideRect(
-            x1: number,
-            y1: number,
-            x2: number,
-            y2: number,
-            condition: (structure: Structure) => boolean,
-        ): Structure | false
-        // Room Getters
-
-        readonly global: Partial<RoomGlobal>
-
-        _anchor: RoomPosition | undefined
-        readonly anchor: RoomPosition | undefined
-
-        // Resources
-
-        _sources: Source[]
-        readonly sources: Source[]
-
-        _sourcesByEfficacy: Source[]
-        readonly sourcesByEfficacy: Source[]
-
-        _mineral: Mineral
-        readonly mineral: Mineral
-
-        // Creeps
-
-        _enemyCreeps: Creep[]
-        readonly enemyCreeps: Creep[]
-
-        _enemyAttackers: Creep[]
-        readonly enemyAttackers: Creep[]
-
-        _allyCreeps: Creep[]
-        readonly allyCreeps: Creep[]
-
-        _myDamagedCreeps: Creep[]
-        readonly myDamagedCreeps: Creep[]
-
-        _myDamagedPowerCreeps: PowerCreep[]
-        readonly myDamagedPowerCreeps: PowerCreep[]
-
-        _allyDamagedCreeps: Creep[]
-        readonly allyDamagedCreeps: Creep[]
-
-        // Buildings
-
-        _structureUpdate: boolean
-        readonly structureUpdate: boolean
-        readonly structureCoords: Map<string, Id<Structure>[]>
-
-        _structures: Partial<OrganizedStructures>
-        readonly structures: OrganizedStructures
-
-        _cSiteUpdate: boolean
-        readonly cSiteUpdate: boolean
-        readonly cSiteCoords: Map<string, Id<ConstructionSite>[]>
-
-        _cSites: Partial<Record<StructureConstant, ConstructionSite[]>>
-        readonly cSites: Record<StructureConstant, ConstructionSite[]>
-
-        _enemyCSites: ConstructionSite[]
-        readonly enemyCSites: ConstructionSite[]
-
-        _allyCSites: ConstructionSite[]
-        readonly allyCSites: ConstructionSite[]
-
-        _allyCSitesByType: Partial<Record<StructureConstant, ConstructionSite[]>>
-        readonly allyCSitesByType: Record<StructureConstant, ConstructionSite[]>
-
-        readonly cSiteTarget: ConstructionSite | undefined
-
-        _spawningStructures: SpawningStructures
-        readonly spawningStructures: SpawningStructures
-
-        _spawningStructuresByPriority: SpawningStructures
-        readonly spawningStructuresByPriority: SpawningStructures
-
-        _spawningStructuresByNeed: SpawningStructures
-        readonly spawningStructuresByNeed: SpawningStructures
-
-        _taskNeedingSpawningStructures: SpawningStructures
-        readonly taskNeedingSpawningStructures: SpawningStructures
-
-        _dismantleTargets: Structure[]
-
-        readonly dismantleTargets: Structure[]
-
-        _destructableStructures: Structure[]
-
-        readonly destructableStructures: Structure[]
-
-        _combatStructureTargets: Structure[]
-
-        readonly combatStructureTargets: Structure[]
-
-        // Resource info
-
-        _sourcePositions: RoomPosition[][]
-
-        readonly sourcePositions: RoomPosition[][]
-
-        _usedSourceCoords: Set<string>[]
-
-        readonly usedSourceCoords: Set<string>[]
-
-        _sourcePaths: RoomPosition[][]
-
-        readonly sourcePaths: RoomPosition[][]
-
-        readonly centerUpgradePos: RoomPosition | false
-
-        readonly upgradePositions: RoomPosition[]
-
-        _usedUpgradeCoords: Set<string>
-        readonly usedUpgradeCoords: Set<string>
-
-        _controllerPositions: RoomPosition[]
-        readonly controllerPositions: RoomPosition[]
-
-        readonly upgradePathLength: number
-
-        _mineralPositions: RoomPosition[]
-        readonly mineralPositions: RoomPosition[]
-
-        _usedMineralCoords: Set<string>
-        readonly usedMineralCoords: Set<string>
-
-        _mineralPath: RoomPosition[]
-        readonly mineralPath: RoomPosition[]
-
-        _fastFillerPositions: RoomPosition[]
-        readonly fastFillerPositions: RoomPosition[]
-
-        _usedFastFillerCoords: Set<string>
-        readonly usedFastFillerCoords: Set<string>
-
-        _remoteNamesBySourceEfficacy: string[]
-        readonly remoteNamesBySourceEfficacy: string[]
-
-        _remoteSourceIndexesByEfficacy: string[]
-        readonly remoteSourceIndexesByEfficacy: string[]
-
-        // Container
-
-        _sourceContainers: StructureContainer[]
-        readonly sourceContainers: StructureContainer[]
-
-        _sourceLinks: StructureLink[]
-        readonly sourceLinks: StructureLink[]
-
-        _fastFillerContainerLeft: StructureContainer | false
-        readonly fastFillerContainerLeft: StructureContainer | undefined
-
-        _fastFillerContainerRight: StructureContainer | false
-        readonly fastFillerContainerRight: StructureContainer | undefined
-
-        _controllerContainer: StructureContainer | false
-        readonly controllerContainer: StructureContainer | undefined
-
-        _mineralContainer: StructureContainer | false
-        readonly mineralContainer: StructureContainer | false
-
-        // Links
-
-        _controllerLink: StructureLink | false
-        readonly controllerLink: StructureLink | false
-
-        _fastFillerLink: StructureLink | false
-        readonly fastFillerLink: StructureLink | false
-
-        _hubLink: StructureLink | false
-        readonly hubLink: StructureLink | false
-
-        _droppedEnergy: Resource[]
-        readonly droppedEnergy: Resource[]
-
-        _droppedResources: Resource[]
-        readonly droppedResources: Resource[]
-
-        _actionableWalls: StructureWall[]
-        readonly actionableWalls: StructureWall[]
-
-        _quadCostMatrix: CostMatrix
-        readonly quadCostMatrix: CostMatrix
-
-        _quadBulldozeCostMatrix: CostMatrix
-        readonly quadBulldozeCostMatrix: CostMatrix
-
-        _enemyDamageThreat: boolean
-        readonly enemyDamageThreat: boolean
-
-        _enemyThreatCoords: Set<string>
-        readonly enemyThreatCoords: Set<string>
-
-        _enemyThreatGoals: PathGoal[]
-        readonly enemyThreatGoals: PathGoal[]
-
-        _flags: Partial<{ [key in FlagNames]: Flag }>
-        readonly flags: { [key in FlagNames]: Flag }
-
-        _defensiveRamparts: StructureRampart[]
-        readonly defensiveRamparts: StructureRampart[]
-
-        _factory: StructureFactory
-        readonly factory: StructureFactory
-
-        _powerSpawn: StructurePowerSpawn
-        readonly powerSpawn: StructurePowerSpawn
-
-        _nuker: StructureNuker
-        readonly nuker: StructureNuker
-
-        _observer: StructureObserver
-        readonly observer: StructureObserver
-
-        _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
-        readonly resourcesInStoringStructures: { [key in ResourceConstant]: number }
-
-        _unprotectedEnemyCreeps: Creep[]
-        readonly unprotectedEnemyCreeps: Creep[]
-
-        _exitCoords: Set<string>
-        readonly exitCoords: Set<string>
-
-        _advancedLogistics: boolean
-        readonly advancedLogistics: boolean
-
-        _defaultCostMatrix: CostMatrix
-        readonly defaultCostMatrix: CostMatrix
-
-        _totalEnemyCombatStrength: TotalEnemyCombatStrength
-        readonly totalEnemyCombatStrength: TotalEnemyCombatStrength
+        // structure functions
+
+        findStructureAtCoord<T extends Structure>(
+            coord: Coord,
+            conditions: (structure: T) => boolean,
+        ): T | false
+        findStructureAtXY<T extends Structure>(
+            x: number,
+            y: number,
+            conditions: (structure: T) => boolean,
+        ): T | false
+
+        findCSiteAtCoord<T extends ConstructionSite>(
+            coord: Coord,
+            conditions: (cSite: T) => boolean,
+        ): T | false
+        findCSiteAtXY<T extends ConstructionSite>(
+            x: number,
+            y: number,
+            conditions: (cSite: T) => boolean,
+        ): T | false
+
+        findStructureInRange<T extends Structure>(
+            startCoord: Coord,
+            range: number,
+            condition: (structure: T) => boolean,
+        ): T | false
+
+        /**
+         * Generates a square visual at the specified coordinate
+         */
+        coordVisual(x: number, y: number, fill?: string): void
     }
 
     interface DepositRecord {
@@ -1502,234 +720,24 @@ declare global {
         needs: number[]
     }
 
-    interface RoomMemory {
-        /**
-         * A packed representation of the center of the fastFiller
-         */
-        anchor: number
-
-        /**
-         * Base Plan Attempts
-         */
-        BPAs: BasePlanAttempt[]
-
-        /**
-         * Type of a room that generally describes properties of the room
-         */
-        T: RoomTypes
-
-        /**
-         * A set of names of remotes controlled by this room
-         */
-        remotes: string[]
-
-        /**
-         * Not Claimable, if the room can be constructed by the base planner
-         */
-        NC: boolean
-
-        /**
-         * Source IDs of the sources in the room
-         */
-        SIDs: Id<Source>[]
-
-        /**
-         * The ID of the mineral
-         */
-        MID: Id<Mineral>
-
-        /**
-         * Commune Name
-         */
-        CN: string
-
-        /**
-         * Reservation Efficacy, the path distance from the remote's sources to its commune
-         */
-        RE: number
-
-        /**
-         * abandoned, true if a commune is to be unclaimed ASAP
-         */
-        Ab: boolean
-
-        /**
-         * A list of needs the remote wants met
-         */
-        data: number[]
-
-        /**
-         * The room owner
-         */
-        owner: string
-
-        /**
-         * The controller's level
-         */
-        level: number
-
-        powerEnabled: boolean
-
-        /**
-         * Wether the room has a terminal
-         */
-        terminal: boolean
-
-        /**
-         * The number of towers in the room
-         */
-        towers: number
-
-        /**
-         * The amount of stored energy in the room
-         */
-        energy: number
-
-        /**
-         * A set of roomNames that portals in this room go to
-         */
-        portalsTo: string[]
-
-        /**
-         * Last Scouted Tick, the last tick the room was scouted at
-         */
-        LST: number | undefined
-
-        /**
-         * The room name of the commune's claim target
-         */
-        claimRequest: string
-
-        /**
-         * The room names of the requests this room is responding to
-         */
-        combatRequests: string[]
-
-        /**
-         * The room names of the requests this room is responding to
-         */
-        haulRequests: string[]
-
-        /**
-         * The room name of the room's ally creep target
-         */
-        allyCreepRequest: string
-
-        CSTID: Id<ConstructionSite>
-
-        stampAnchors: Partial<Record<StampTypes, number[]>>
-
-        /**
-         * Stamp Anchors
-         */
-        SA: Partial<{ [key in StampTypes]: string }>
-
-        powerBanks: { [roomName: string]: number[] }
-
-        deposits: Record<Id<Deposit>, DepositRecord>
-
-        /**
-         * Planning Completed, Wether or not commune planning has been completed for the room
-         */
-        PC: boolean
-
-        /**
-         * Remote Planned, wether or not remote planning has been completed for the room
-         */
-        RP: boolean
-
-        /**
-         * Remote Stamp Anchors
-         */
-        RSA: Partial<Record<RemoteStampTypes, string>>
-
-        /**
-         * Source Positions, packed positions around sources where harvesters can sit
-         */
-        SP: string[]
-
-        /**
-         * Source Paths
-         */
-        SPs: string[]
-        /**
-         * Mineral Path
-         */
-        MPa: string
-
-        /**
-         * Mineral Positions, packed positions around the mineral where harvesters can sit
-         */
-        MP: string
-
-        /**
-         * Controller Positions, packed positions around the controller where reservers and downgraders can sit
-         */
-        CP: string
-
-        /**
-         * Defensive Strength
-         */
-        DS: number
-
-        /**
-         * Offensive Strength
-         */
-        OS: number
-
-        /**
-         * Attack Threat, how much a commune is concerned about enemy attackers
-         */
-        AT: number
-
-        /**
-         * Last Attack Tick, how many ticks have passed since the last attack
-         */
-        LAT: number
-
-        /**
-         * Minimum Hauler Cost, what the maxCost of a hauler should be to accomidate for CPU usage
-         */
-        MHC: number
-
-        /**
-         * Hauler Update, how many ticks ago the hauler size was updated
-         */
-        HU: number
-
-        /**
-         * Greatest Room Controller Level
-         */
-        GRCL: number
-
-        /**
-         * The score for claim evaluation
-         */
-        S: number
-
-        hasTerminal: boolean
-
-        factoryProduct: CommodityConstant | MineralConstant | RESOURCE_ENERGY | RESOURCE_GHODIUM
-        factoryUsableResources: (CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY)[]
-
-        marketData: {
-            [RESOURCE_ENERGY]?: number
-            sellAvg?: { [key in ResourceConstant]?: number }
-            buyAvg?: { [key in ResourceConstant]?: number }
-            aquire?: { [key in ResourceConstant]?: number }
-        }
-    }
-
     interface IdealSquadMembers {}
 
     interface CreepFunctions {
-        preTickManager(): void
+        update(): void
 
-        endTickManager(): void
+        initRun(): void
+
+        endRun(): void
+
+        isDying(): boolean
 
         advancedPickup(target: Resource): boolean
 
-        advancedTransfer(target: Creep | AnyStoreStructure, resourceType?: ResourceConstant, amount?: number): boolean
+        advancedTransfer(
+            target: Creep | AnyStoreStructure,
+            resourceType?: ResourceConstant,
+            amount?: number,
+        ): boolean
 
         advancedWithdraw(
             target: Creep | AnyStoreStructure | Tombstone | Ruin,
@@ -1741,13 +749,6 @@ declare global {
          * Harvests a source and informs the result, while recording the result if successful
          */
         advancedHarvestSource(source: Source): boolean
-
-        findUpgradePos(): RoomPosition | false
-
-        /**
-         * Attempts multiple methods to upgrade the controller
-         */
-        advancedUpgradeController(): boolean
 
         advancedBuild(): number
         builderGetEnergy(): number
@@ -1775,32 +776,46 @@ declare global {
          */
         findRepairTarget(): Structure<BuildableStructureConstant> | false
 
-        findOptimalSourceIndex(): boolean
+        /**
+         * Find a source index when not necessarily in a commune or remote
+         */
+        findSourceIndex(): boolean
+        findCommuneSourceIndex(): boolean
+        findRemoteSourceIndex(): boolean
 
-        findSourcePos(sourceIndex: number): false | RoomPosition
+        /**
+         * Find a source harvest pos when not necessarily in a commune or remote
+         */
+        findSourceHarvestPos(sourceIndex: number): RoomPosition | false
+        findCommuneSourceHarvestPos(sourceIndex: number): false | RoomPosition
+        findRemoteSourceHarvestPos(sourceIndex: number): false | RoomPosition
 
         findMineralHarvestPos(): false | RoomPosition
 
         /**
          *
          */
-        needsNewPath(goalPos: RoomPosition, cacheAmount: number, path: RoomPosition[] | undefined): boolean
+        needsNewPath(
+            path: RoomPosition[] | undefined,
+            args: CustomPathFinderArgs,
+            opts?: MoveRequestOpts,
+        ): boolean
 
         /**
          *
          */
-        createMoveRequestByPath(opts: MoveRequestOpts, pathOpts: MoveRequestByPathOpts): boolean | 'unpathable'
+        createMoveRequestByPath(args: CustomPathFinderArgs, pathOpts: MoveRequestByPathOpts): number
 
         /**
          *
          */
-        createMoveRequest(opts: MoveRequestOpts): boolean | 'unpathable'
+        createMoveRequest(args: CustomPathFinderArgs, opts?: MoveRequestOpts): number
 
         assignMoveRequest(coord: Coord): void
 
-        findShoveCoord(avoidPackedPositions: Set<string>, goalCoord?: Coord): Coord
+        findShoveCoord(avoidPackedCoords: Set<string>, targetCoord?: Coord): Coord
 
-        shove(shoverPos: RoomPosition): boolean
+        shove(avoidPackedCoords?: Set<string>): boolean
 
         /**
          * Try to enforce a moveRequest and inform the result
@@ -1815,7 +830,7 @@ declare global {
         avoidEnemyThreatCoords(): boolean
 
         /**
-         * Decides if the creep needs to get more resources or not
+         * Decides if the creep needs to get more resources or not. DO NOT USE FOR CREEPS THAT PERFORM MULTIPLE TRANSACTIONS PER TICK
          */
         needsResources(): boolean
 
@@ -1859,29 +874,34 @@ declare global {
         /**
          * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
          */
-        moved?: string | 'moved' | 'yield'
+        moved?: string | 'moved' | 'wait'
 
         /**
          * The creep's opts when trying to make a moveRequest intra tick
          */
-        pathOpts: PathOpts
+        pathOpts: CustomPathFinderArgs
 
         /**
          * Wether the creep is allowed accept room logistics requests that require delivery
          */
         noDelivery: boolean
 
-        _dying: boolean
         /**
-         * Wether the creep is as old as the time it takes to respawn, or is past a role-based threshold
+         * The coordinate the creep would prefer to be shoved towards, if it is to be shoved
          */
-        readonly dying: boolean
+        actionCoord: Coord
 
         _macroHealStrength: number
         /**
          * The heal strength of the creep alongside its neighbours that we dopn't own
          */
         readonly macroHealStrength: number
+
+        _reserveHits: number
+        /**
+         * The max possible hits - accounting for nearby healers - subtracted by damage attempts
+         */
+        reserveHits: number
 
         _grossTowerDamage: number
         /**
@@ -1909,6 +929,9 @@ declare global {
 
         _isOnExit: boolean
         readonly isOnExit: boolean
+
+        _exitTo: string | boolean
+        readonly exitTo: string | boolean
     }
 
     // Creeps
@@ -1917,19 +940,14 @@ declare global {
         combatTarget: Creep
 
         /**
-         * Wether the creep did a harvest, build, upgrade, dismantle, or repair this tick
+         * Wether the creep did a harvest, build, upgrade, dismantle, repair, heal, attack this tick
          */
-        worked: boolean
+        worked: WorkTypes
 
         /**
          * Wether the creep rangedHealed or rangedAttacked this tick
          */
         ranged: boolean
-
-        /**
-         * Wether the creep healed or attacked this tick
-         */
-        meleed: boolean
 
         /**
          * Whether the creep is actively pulling another creep or not
@@ -1944,7 +962,7 @@ declare global {
         /**
          * The squad the creep belongs to
          */
-        squad: Duo | Quad | Dynamic | undefined
+        squad: Duo | Quad | DynamicSquad | undefined
 
         /**
          * Wether the squad has ran yet
@@ -1955,6 +973,11 @@ declare global {
          * The ID of the spawn the creep is spawning in, if it is spawning
          */
         spawnID: Id<StructureSpawn>
+
+        /**
+         * The change to a value the creep opperated this tick
+         */
+        dataChange: number
 
         // Creep Functions
 
@@ -1970,9 +993,16 @@ declare global {
 
         roomLogisticsRequestManager(): void
 
-        findRoomLogisticsRequest(args?: findNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
-        findRoomLogisticsRequestTypes(args?: findNewRoomLogisticsRequestArgs): Set<RoomLogisticsRequestTypes>
-        canAcceptRoomLogisticsRequest(requestType: RoomLogisticsRequestTypes, requestID: string): boolean
+        findRoomLogisticsRequest(
+            args?: FindNewRoomLogisticsRequestArgs,
+        ): CreepRoomLogisticsRequest | 0
+        findRoomLogisticsRequestTypes(
+            args?: FindNewRoomLogisticsRequestArgs,
+        ): Set<RoomLogisticsRequestTypes> | Result.fail
+        canAcceptRoomLogisticsRequest(
+            requestType: RoomLogisticsRequestTypes,
+            requestID: string,
+        ): boolean
         createBackupStoringStructuresRoomLogisticsRequest(
             types?: Set<RoomLogisticsRequestTypes>,
             resourceTypes?: Set<ResourceConstant>,
@@ -1983,10 +1013,10 @@ declare global {
         ): CreepRoomLogisticsRequest | 0
         findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
-        runRoomLogisticsRequestAdvanced(args?: findNewRoomLogisticsRequestArgs): number
-        runRoomLogisticsRequestsAdvanced(args?: findNewRoomLogisticsRequestArgs): boolean
+        runRoomLogisticsRequestAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
+        runRoomLogisticsRequestsAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
 
-        runRoomLogisticsRequest(): number
+        runRoomLogisticsRequest(): Result
         runRoomLogisticsRequests(): boolean
 
         findCreepRoomLogisticsRequestAmount(
@@ -2009,7 +1039,7 @@ declare global {
 
         _role: CreepRoles
         /**
-         * The lifetime designation that boardly describes what the creep should do
+         * The lifetime designation that broadly describes what the creep should do
          */
         readonly role: CreepRoles
 
@@ -2038,7 +1068,6 @@ declare global {
         readonly strength: number
 
         _upgradeStrength: number
-
         readonly upgradeStrength: number
 
         _combatStrength: CombatStrength
@@ -2073,162 +1102,6 @@ declare global {
         readonly idealSquadMembers: IdealSquadMembers
     }
 
-    interface CreepMemoryTemplate {
-        /**
-         * Task Room Name, the name of the room the creep is trying to perform a task in
-         */
-        TRN: string
-    }
-
-    interface CreepMemory extends CreepMemoryTemplate {
-        /**
-         * Wether the creep is old enough to need a replacement
-         */
-        D: boolean
-
-        /**
-         * The Source Index of recorded sources in the room
-         */
-        SI: number
-
-        /**
-         * The creep's packed coord for a designated target
-         */
-        PC: string
-
-        /**
-         * Last Cache, the last time a path was cached in memory
-         */
-        LC: number
-
-        /**
-         * A packed pos list desciring where the creep neeeds to move to get to its goal
-         */
-        P: string
-
-        /**
-         * Goal Pos, the position the creep is or has tried to path to
-         */
-        GP: string
-
-        /**
-         * Whether the creep is intended to move on its own or not
-         */
-        getPulled: boolean
-
-        /**
-         * The target for which the creep should repair
-         */
-        repairTarget: Id<Structure<BuildableStructureConstant>>
-
-        /**
-         * Scout Target, the name of the room the scout is trying to scout
-         */
-        scT: string
-
-        /**
-         * Sign Target, the name of the room the scout is trying to sign
-         */
-        siT: string
-
-        /**
-         * Remote Name of the room the creep is remoting for
-         */
-        RN: string
-
-        /**
-         * The target ID of the task (for hubHaulers)
-         */
-        taskTarget: Id<Creep | AnyStoreStructure>
-
-        /**
-         * Room Logistics Requests
-         */
-        RLRs: CreepRoomLogisticsRequest[]
-
-        /**
-         * The target for which the creep should dismantle
-         */
-        dismantleTarget: Id<Structure>
-
-        /**
-         * Wether or not the creep Needs Resources
-         */
-        NR: boolean
-
-        /**
-         * Roads, wether or not the creep should use roads
-         */
-        R: boolean
-
-        /**
-         * The rampart repair quota the creep currently has decided on
-         */
-        quota: number
-
-        /**
-         * Squad Size of the squad the creep is attempting to form
-         */
-        SS: number | undefined
-
-        /**
-         * Squad type
-         */
-        ST: 'duo' | 'quad' | 'dynamic'
-
-        /**
-         * Squad Type the combat method the creep's squad is attempting
-         */
-        SCT: 'rangedAttack' | 'attack' | 'dismantle'
-
-        /**
-         * Squad Formed, wether the creep has joined a squad or not
-         */
-        SF: boolean
-
-        /**
-         * Squad Member Names
-         */
-        SMNs: string[]
-
-        /**
-         * Quad Bulldoze Targets
-         */
-        QBTIDs: Id<Structure>[]
-
-        /**
-         * Combat Request Name, the name of the room the creep should do combat in
-         */
-        CRN?: string
-
-        /**
-         * Haul Request Name, the name of the room the creep should do hauling for
-         */
-        HRN?: string
-
-        /**
-         * Recycle Target, the spawn ID the creep is going to recycle
-         */
-        RecT: Id<StructureSpawn | StructureContainer> | undefined
-
-        /**
-         * Ticks Waited for an arbitrary event
-         */
-        TW: number
-
-        /**
-         * Rampart Only Shoving, informs wether the creep must be shoved to viable ramparts or not
-         */
-        ROS: boolean
-
-        /**
-         * Rampart ID, the ID of the rampart the creep is trying to sit under
-         */
-        RID: Id<StructureRampart>
-    }
-
-    // PowerCreeps
-
     interface PowerCreep extends CreepFunctions, CreepProperties {
         /**
          * Wether the creep has used a power this tick
@@ -2240,41 +1113,17 @@ declare global {
         readonly powerCooldowns: Partial<Map<PowerConstant, number>>
     }
 
-    interface PowerCreepMemory extends CreepMemoryTemplate {
-        /**
-         * Commune Name
-         */
-        CN: string
-
-        /**
-         * Task name, the method for which the creep is trying to run inter tick
-         */
-        TN: keyof Operator
-
-        /**
-         * Task target ID, the ID of the target the creep is targeting for its task
-         */
-        TTID: Id<Structure | Source>
-
-        /**
-         * Power Type
-         */
-        PT: PowerConstant
-    }
-
     // Structures
 
     interface Structure {
-        nextHits: number
-
         // Getters
 
-        _RCLActionable: boolean
+        _isRCLActionable: boolean
 
         /**
          * Wether the structure is disable or not by the room's controller level
          */
-        readonly RCLActionable: boolean
+        readonly isRCLActionable: boolean
     }
 
     interface StructureSpawn {
@@ -2287,12 +1136,6 @@ declare global {
          * Wether the structure has been transfered or withdrawn from
          */
         hasHadResourcesMoved: boolean
-
-        // Functions
-
-        testSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
-
-        advancedSpawn(spawnRequest: SpawnRequest, ID: number): ScreepsReturnCode
     }
 
     interface StructureExtension {
@@ -2300,10 +1143,6 @@ declare global {
          * Wether the structure has been transfered or withdrawn from
          */
         hasHadResourcesMoved: boolean
-    }
-
-    interface StructureTower {
-        intended: boolean
     }
 
     interface StructureTerminal {
@@ -2361,14 +1200,19 @@ declare global {
         _nextStore: Partial<CustomStore>
 
         /**
-         * The estimated store values next tick
+         * The estimated store values next tick. Values can be negative
          */
         readonly nextStore: Partial<CustomStore>
 
         _usedNextStore: number
-
+        /**
+         * Can be negative
+         */
         readonly usedNextStore: number
 
+        /**
+         * Can be negative
+         */
         readonly freeNextStore: number
 
         _reserveStore: Partial<CustomStore>
@@ -2390,62 +1234,239 @@ declare global {
     }
 
     interface Resource {
-        // Getters
+        // Getters and setters
 
         _nextAmount: number
-
         nextAmount: number
 
         _reserveAmount: number
-
         reserveAmount: number
     }
 
     interface Source {
-        /**
-         * The index of the source in room.sources
+        communeIndex: number | undefined
+        remoteIndex: number | undefined
+    }
+
+    // Memory value types
+
+    interface RoomMemory {
+        [RoomMemoryKeys.type]: RoomTypes
+        [RoomMemoryKeys.lastScout]: number
+        [RoomMemoryKeys.danger]?: number
+        /***
+         * The destination roomNames of each portal
          */
-        index: number
+        [RoomMemoryKeys.portalsTo]: string[]
+
+        // Types specific
+
+        [RoomMemoryKeys.owner]: string
+        [RoomMemoryKeys.RCL]: number
+        [RoomMemoryKeys.powerEnabled]: boolean
+        [RoomMemoryKeys.constructionSiteTarget]: Id<ConstructionSite>
+        [RoomMemoryKeys.stampAnchors]: PackedStampAnchors
+        [RoomMemoryKeys.roadQuota]: number[]
+        [RoomMemoryKeys.communeSources]: Id<Source>[]
+        [RoomMemoryKeys.communeSourceHarvestPositions]: string[]
+        [RoomMemoryKeys.communeSourcePaths]: string[]
+        [RoomMemoryKeys.mineralPath]: string
+        [RoomMemoryKeys.mineralPositions]: string
+        [RoomMemoryKeys.centerUpgradePos]: string
+        [RoomMemoryKeys.upgradePositions]: string
+        [RoomMemoryKeys.upgradePath]: string
+        [RoomMemoryKeys.basePlans]: string
+        [RoomMemoryKeys.rampartPlans]: string
+        [RoomMemoryKeys.mineral]: Id<Mineral>
+        [RoomMemoryKeys.mineralType]: MineralConstant
+        [RoomMemoryKeys.score]: number
+        [RoomMemoryKeys.dynamicScore]: number
+        [RoomMemoryKeys.dynamicScoreUpdate]: number
+        [RoomMemoryKeys.communePlanned]: boolean
+
+        // Commune
+
+        [RoomMemoryKeys.remotes]: string[]
+        [RoomMemoryKeys.powerBanks]: { [roomName: string]: number[] }
+        [RoomMemoryKeys.deposits]: Record<Id<Deposit>, DepositRecord>
+        [RoomMemoryKeys.workRequest]: string
+        [RoomMemoryKeys.combatRequests]: string[]
+        [RoomMemoryKeys.haulRequests]: string[]
+        [RoomMemoryKeys.nukeRequest]: string
+        [RoomMemoryKeys.threatened]: number
+        [RoomMemoryKeys.lastAttackedBy]: number
+        [RoomMemoryKeys.minHaulerCost]: number
+        [RoomMemoryKeys.minHaulerCostUpdate]: number
+        [RoomMemoryKeys.greatestRCL]: number
+        [RoomMemoryKeys.abandonCommune]: boolean
+        [RoomMemoryKeys.marketData]: {
+            [RESOURCE_ENERGY]?: number
+            sellAvg?: { [key in ResourceConstant]?: number }
+            buyAvg?: { [key in ResourceConstant]?: number }
+            aquire?: { [key in ResourceConstant]?: number }
+        }
+        [RoomMemoryKeys.factoryProduct]:
+            | CommodityConstant
+            | MineralConstant
+            | RESOURCE_ENERGY
+            | RESOURCE_GHODIUM
+        [RoomMemoryKeys.factoryUsableResources]: (
+            | CommodityConstant
+            | MineralConstant
+            | RESOURCE_GHODIUM
+            | RESOURCE_ENERGY
+        )[]
+
+        // Remote
+
+        [RoomMemoryKeys.commune]: string
+        [RoomMemoryKeys.maxSourceIncome]: number[]
+        [RoomMemoryKeys.remoteSourceHarvesters]: number[]
+        [RoomMemoryKeys.haulers]: number[]
+        [RoomMemoryKeys.remoteReservers]: number
+        [RoomMemoryKeys.remoteCoreAttacker]: number
+        [RoomMemoryKeys.remoteBuilder]: number
+        [RoomMemoryKeys.remoteDismantler]: number
+        [RoomMemoryKeys.abandonRemote]: number
+        [RoomMemoryKeys.recursedAbandonment]: boolean
+        [RoomMemoryKeys.disable]: boolean
+        [RoomMemoryKeys.disableSources]: boolean[]
+        [RoomMemoryKeys.enemyReserved]: boolean
+        [RoomMemoryKeys.invaderCore]: number
+        [RoomMemoryKeys.disableCachedPaths]: boolean
+        [RoomMemoryKeys.remotePlanned]: boolean
+        [RoomMemoryKeys.remoteStampAnchors]: PackedStampAnchors
+        [RoomMemoryKeys.remoteControllerPath]: string
+        [RoomMemoryKeys.remoteControllerPositions]: string
+        [RoomMemoryKeys.remoteSources]: Id<Source>[]
+        [RoomMemoryKeys.remoteSourceHarvestPositions]: string[]
+        [RoomMemoryKeys.remoteSourceFastFillerPaths]: string[]
+        [RoomMemoryKeys.remoteSourceHubPaths]: string[]
+        [RoomMemoryKeys.clearedEnemyStructures]: boolean
+        [RoomMemoryKeys.lastStructureCheck]: number
+        [RoomMemoryKeys.roads]: number[]
+        [RoomMemoryKeys.remoteSourceCredit]: number[]
+        [RoomMemoryKeys.remoteSourceCreditChange]: number[]
+        [RoomMemoryKeys.remoteSourceCreditReservation]: number[]
+        [RoomMemoryKeys.hasContainer]: boolean[]
+        [RoomMemoryKeys.pathsThrough]: string[]
+
+        // Ally
+
+        // Enemy
+
+        [RoomMemoryKeys.terminal]: boolean
+        [RoomMemoryKeys.towers]: number
+        [RoomMemoryKeys.energy]: number
+        [RoomMemoryKeys.defensiveStrength]: number
+        [RoomMemoryKeys.offensiveThreat]: number
+
+        // Source Keeper
+
+        [RoomMemoryKeys.keeperLairCoords]: string
+    }
+
+    interface CreepMemory {
+        [CreepMemoryKeys.preferRoads]: boolean
+        [CreepMemoryKeys.sourceIndex]: number
+        [CreepMemoryKeys.dying]: boolean
+        [CreepMemoryKeys.packedCoord]: string
+        [CreepMemoryKeys.path]: string
+        [CreepMemoryKeys.goalPos]: string
+        [CreepMemoryKeys.usedPathForGoal]: string
+        [CreepMemoryKeys.lastCache]: number
+        [CreepMemoryKeys.structureTarget]: Id<Structure<BuildableStructureConstant>>
+        [CreepMemoryKeys.remote]: string
+        [CreepMemoryKeys.scoutTarget]: string
+        [CreepMemoryKeys.signTarget]: string | false
+        [CreepMemoryKeys.roomLogisticsRequests]: CreepRoomLogisticsRequest[]
+        [CreepMemoryKeys.needsResources]: boolean
+        [CreepMemoryKeys.squadSize]: number
+        [CreepMemoryKeys.squadType]: SquadTypes
+        [CreepMemoryKeys.squadCombatType]: SquadCombatTypes
+        [CreepMemoryKeys.isSquadFormed]: boolean
+        [CreepMemoryKeys.squadMembers]: string[]
+        [CreepMemoryKeys.quadBulldozeTargets]: Id<Structure>[]
+        [CreepMemoryKeys.haulRequest]: string
+        [CreepMemoryKeys.ticksWaited]: number
+        [CreepMemoryKeys.recycleTarget]: Id<StructureSpawn | StructureContainer> | undefined
+        [CreepMemoryKeys.rampartOnlyShoving]: boolean
+        [CreepMemoryKeys.rampartTarget]: Id<StructureRampart>
+        [CreepMemoryKeys.taskRoom]: string
+        [CreepMemoryKeys.getPulled]: boolean
+        [CreepMemoryKeys.combatRequest]: string
+        [CreepMemoryKeys.workRequest]: string
+        /**
+         * Wether the creep is/was trying to flee for their designated
+         */
+        [CreepMemoryKeys.flee]: boolean
+        [CreepMemoryKeys.squadMoveType]: SquadMoveTypes
+        /**
+         * A command to wait until the designated tick to perform an specified action
+         */
+        [CreepMemoryKeys.sleepFor]: SleepFor
+        [CreepMemoryKeys.sleepTime]: number
+        /**
+         * An ambigious target the creep is after, probably for target locking
+         */
+        [CreepMemoryKeys.targetID]: Id<Structure | Creep | PowerCreep | Tombstone | Ruin>
+        // The name of the trader and tick for the previos relay action
+        [CreepMemoryKeys.previousRelayer]: [string, number]
+    }
+
+    interface PowerCreepMemory extends CreepMemory {
+        [PowerCreepMemoryKeys.commune]: string
+        [PowerCreepMemoryKeys.task]: keyof Operator
+        [PowerCreepMemoryKeys.taskTarget]: Id<Structure | Source>
+        [PowerCreepMemoryKeys.taskPower]: PowerConstant
+        [PowerCreepMemoryKeys.taskRoom]: string
+    }
+
+    interface UserScriptTemplate {
+        /**
+         * Run at the start of the tick
+         */
+        initialRun(): void
+        /**
+         * Run at the middle of the tick
+         */
+        run(): void
+        /**
+         * Run at the end of the tick
+         */
+        endRun(): void
     }
 
     // Global
 
     namespace NodeJS {
         interface Global {
-            [key: string]: any
+            // User custom
+
+            collectivizer: TCollectivizer
+
+            settings: Settings
+            // Intentionally unused
+            settingsExample: Settings
+
+            userScript: UserScriptTemplate
+            // intentionally unused
+            userScriptExample: UserScriptTemplate
+
+            //
+
+            Memory: Memory
+
             /**
              * Whether global is constructed or not
              */
             constructed: true | undefined
 
-            /**
-             * A strings to custom log as rich text
-             */
-            logs: string
-
-            /**
-             * The number of construction sites placed by the bot
-             */
-            constructionSitesCount: number
-
             packedRoomNames: { [roomName: string]: string }
 
             unpackedRoomNames: { [roomName: string]: string }
-            roomStats: { [roomType in StatsRoomTypes]: { [roomName: string]: Partial<RoomStats | RoomCommuneStats> } }
-            CPUUsers: CpuUsers
-
-            terrainCoords: { [roomName: string]: CoordMap }
 
             lastReset: number
-
-            /**
-             * Room names that have controllers we own
-             */
-            communes: Set<string>
-
-            roomManagers: { [roomName: string]: RoomManager }
-
-            communeManagers: { [roomName: string]: CommuneManager }
 
             // Command functions
 
@@ -2457,7 +1478,7 @@ declare global {
             /**
              * Deletes all properties of Memory
              */
-            clearMemory(avoidKeys?: string[]): string
+            clearMemory(): string
 
             /**
              * Kills all creeps owned by the bot
@@ -2481,12 +1502,18 @@ declare global {
 
             /**
              * Responds, or if needed, creates, a claim request for a specified room, by a specified room
-             * @param requestName The roomName of the claimRequest to respond to
-             * @param commune The commune to respond to the claimRequest
+             * @param requestName The roomName of the workRequest to respond to
+             * @param commune The commune to respond to the workRequest
              */
-            claim(requestName: string, communeName?: string): string
+            claim(requestName: string, communeName?: string, score?: number): string
 
-            deleteClaimRequests(): string
+            /**
+             * Deletes workRequests for a specified room, if there are any
+             * @param roomName The roomName of the workRequest to delete
+             */
+            deleteWorkRequest(roomName: string): string
+
+            deleteWorkRequests(): string
 
             /**
              * Responds, or if needed, creates, an attack request for a specified room, by a specified room
@@ -2494,7 +1521,7 @@ declare global {
             combat(
                 requestName: string,
                 type: CombatRequestTypes,
-                opts?: Partial<{ [key in keyof typeof CombatRequestData]: CombatRequestData }>,
+                opts?: Partial<{ [key in keyof typeof CombatRequestKeys]: CombatRequestKeys }>,
                 communeName?: string,
             ): string
 
@@ -2502,11 +1529,6 @@ declare global {
              * Deletes combatRequests for a specified room, if there are any
              */
             deleteCombatRequest(requestName: string): string
-
-            /**
-             * Creates an allyCreepRequest for a specified room, that can optionally be assigned to a specified commune
-             */
-            allyCreepRequest(requestName: string, communeName?: string): string
 
             deleteBasePlans(roomName?: string): string
 

@@ -1,13 +1,20 @@
-import { RESULT_ACTION, RESULT_FAIL, RESULT_NO_ACTION, RESULT_SUCCESS } from 'international/constants'
-import { globalStatsUpdater } from 'international/statsManager'
 import {
-    customLog,
+    CreepMemoryKeys,
+    packedPosLength,
+    ReservedCoordTypes,
+    Result,
+    RoomLogisticsRequestTypes,
+    RoomMemoryKeys,
+    WorkTypes,
+} from 'international/constants'
+import { statsManager } from 'international/statsManager'
+import {
     findCoordsInsideRect,
     findObjectWithID,
+    getRangeXY,
     getRange,
-    getRangeOfCoords,
     scalePriority,
-} from 'international/utils'
+} from 'utils/utils'
 import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
 
@@ -16,95 +23,107 @@ export class SourceHarvester extends Creep {
         super(creepID)
     }
 
-    public get dying() {
-        // Inform as dying if creep is already recorded as dying
-
-        if (this._dying !== undefined) return this._dying
-
+    public isDying() {
         // Stop if creep is spawning
 
         if (this.spawning) return false
 
         // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
 
-        if (this.ticksToLive > this.body.length * CREEP_SPAWN_TIME + (this.room.sourcePaths[this.memory.SI].length - 1))
+        if (
+            this.ticksToLive >
+            this.body.length * CREEP_SPAWN_TIME +
+                this.room.memory[RoomMemoryKeys.communeSourcePaths][
+                    this.memory[CreepMemoryKeys.sourceIndex]
+                ].length /
+                    packedPosLength
+        )
             return false
 
-        // Record creep as dying
-
-        return (this._dying = true)
+        return true
     }
 
-    preTickManager() {
-        const { room } = this
-
-        if (this.memory.SI !== undefined && !this.dying) room.creepsOfSource[this.memory.SI].push(this.name)
-
-        // Unpack the harvestPos
-
-        const harvestPos = this.findSourcePos(this.memory.SI)
-        if (!harvestPos) return
-
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) {
-            this.advancedHarvestSource(this.room.sources[this.memory.SI])
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
         }
     }
 
-    travelToSource?(): number {
-        if (this.worked) return RESULT_SUCCESS
+    initRun() {
+        const { room } = this
 
+        if (this.memory[CreepMemoryKeys.sourceIndex] !== undefined && !this.isDying())
+            room.creepsOfSource[this.memory[CreepMemoryKeys.sourceIndex]].push(this.name)
+
+        const source =
+            this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
+
+        if (getRange(this.pos, source.pos) <= 1) {
+            this.advancedHarvestSource(source)
+        }
+    }
+
+    buildContainer?() {}
+
+    travelToSource?(): number {
         this.message = '🚬'
 
         // Unpack the harvestPos
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
-        if (!harvestPos) return RESULT_FAIL
+        const harvestPos = this.findCommuneSourceHarvestPos(
+            this.memory[CreepMemoryKeys.sourceIndex],
+        )
+        if (!harvestPos) return Result.fail
+
+        this.actionCoord =
+            this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]].pos
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return RESULT_SUCCESS
+        if (getRange(this.pos, harvestPos) === 0) return Result.success
 
         // If the creep's movement type is pull
 
-        if (this.memory.getPulled) return RESULT_NO_ACTION
+        if (this.memory[CreepMemoryKeys.getPulled]) return Result.noAction
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
-        this.message = `⏩${this.memory.SI}`
+        this.message = `⏩${this.memory[CreepMemoryKeys.sourceIndex]}`
 
-        if (this.memory.PC === packCoord(this.room.sourcePositions[this.memory.SI][0])) {
-            this.createMoveRequestByPath(
-                {
-                    origin: this.pos,
-                    goals: [
-                        {
-                            pos: harvestPos,
-                            range: 0,
-                        },
-                    ],
-                    avoidEnemyRanges: true,
-                },
-                {
-                    packedPath: reversePosList(this.room.memory.SPs[this.memory.SI]),
-                    loose: true,
-                },
-            )
-
-            return RESULT_ACTION
+        if (
+            !this.room.memory[RoomMemoryKeys.communeSourcePaths][
+                this.memory[CreepMemoryKeys.sourceIndex]
+            ]
+        ) {
+            throw Error('no path for sourceHarvester ' + this.room.name)
         }
 
-        this.createMoveRequest({
-            origin: this.pos,
-            goals: [
-                {
-                    pos: harvestPos,
-                    range: 0,
-                },
-            ],
-            avoidEnemyRanges: true,
-        })
+        this.createMoveRequestByPath(
+            {
+                origin: this.pos,
+                goals: [
+                    {
+                        pos: harvestPos,
+                        range: 0,
+                    },
+                ],
+                avoidEnemyRanges: true,
+            },
+            {
+                packedPath: reversePosList(
+                    this.room.memory[RoomMemoryKeys.communeSourcePaths][
+                        this.memory[CreepMemoryKeys.sourceIndex]
+                    ],
+                ),
+            },
+        )
 
-        return RESULT_ACTION
+        return Result.action
     }
 
     transferToSourceStructures?(): boolean {
@@ -124,21 +143,20 @@ export class SourceHarvester extends Creep {
 
         if (room.energyAvailable === room.energyCapacityAvailable) return false
 
-        const structure = room.findStructureInsideRect(
-            this.pos.x - 1,
-            this.pos.y - 1,
-            this.pos.x + 1,
-            this.pos.y + 1,
-            structure => {
-                return (
-                    structure.structureType === STRUCTURE_EXTENSION &&
-                    (structure as AnyStoreStructure).store.getCapacity(RESOURCE_ENERGY) - structure.nextStore.energy > 0
-                )
-            },
-        )
+        const structure = room.findStructureInRange(this.pos, 1, structure => {
+            return (
+                structure.structureType === STRUCTURE_EXTENSION &&
+                (structure as AnyStoreStructure).store.getCapacity(RESOURCE_ENERGY) -
+                    structure.nextStore.energy >
+                    0
+            )
+        })
         if (!structure) return false
 
-        return this.advancedTransfer(structure as AnyStoreStructure)
+        const result = this.transfer(structure, RESOURCE_ENERGY)
+
+        if (result !== OK) return false
+        return true
     }
 
     transferToSourceLink?(): boolean {
@@ -146,17 +164,52 @@ export class SourceHarvester extends Creep {
 
         // Find the sourceLink for the creep's source, Inform false if the link doesn't exist
 
-        const sourceLink = room.sourceLinks[this.memory.SI]
+        const sourceLink = room.communeManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
         if (!sourceLink) return false
 
         // Try to transfer to the sourceLink and inform true
 
-        return this.advancedTransfer(sourceLink)
+        const result = this.transfer(sourceLink, RESOURCE_ENERGY)
+
+        if (result !== OK) return false
+        return true
     }
 
-    repairSourceContainer?(sourceContainer: StructureContainer): boolean {
+    maintainContainer?(sourceContainer: StructureContainer): boolean {
         if (this.worked) return false
-        if (!sourceContainer) return false
+        const source = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
+        if (
+            source.energy * ENERGY_REGEN_TIME >
+            source.ticksToRegeneration * source.energyCapacity * 0.9
+        ) return false
+
+        if (!sourceContainer) {
+            if (this.nextStore.energy < this.parts.work) {
+                if (this.movedResource) return false
+
+                const result = this.runRoomLogisticsRequestAdvanced({
+                    resourceTypes: new Set([RESOURCE_ENERGY]),
+                    types: new Set<RoomLogisticsRequestTypes>([
+                        RoomLogisticsRequestTypes.withdraw,
+                        RoomLogisticsRequestTypes.pickup,
+                        RoomLogisticsRequestTypes.offer,
+                    ]),
+                    conditions: request => {
+                        getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+                    },
+                })
+                if (result !== Result.success) return false
+            }
+
+            const cSite = this.room.findCSiteAtCoord(
+                this.pos,
+                cSite => cSite.structureType === STRUCTURE_CONTAINER,
+            )
+            if (!cSite) return false
+
+            this.build(cSite)
+            return true
+        }
 
         // Get the creep's number of work parts
 
@@ -164,12 +217,27 @@ export class SourceHarvester extends Creep {
 
         // If the sourceContainer doesn't need repairing, inform false
 
-        if (sourceContainer.hitsMax - sourceContainer.hits < workPartCount * REPAIR_POWER) return false
+        if (sourceContainer.hitsMax - sourceContainer.hits < workPartCount * REPAIR_POWER)
+            return false
 
         // If the creep doesn't have enough energy and it hasn't yet moved resources, withdraw from the sourceContainer
 
-        if (this.nextStore.energy < workPartCount && !this.movedResource)
-            this.withdraw(sourceContainer, RESOURCE_ENERGY)
+        if (this.nextStore.energy < workPartCount) {
+            if (this.movedResource) return false
+
+            const result = this.runRoomLogisticsRequestAdvanced({
+                resourceTypes: new Set([RESOURCE_ENERGY]),
+                types: new Set<RoomLogisticsRequestTypes>([
+                    RoomLogisticsRequestTypes.withdraw,
+                    RoomLogisticsRequestTypes.pickup,
+                    RoomLogisticsRequestTypes.offer,
+                ]),
+                conditions: request => {
+                    getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+                },
+            })
+            if (result !== Result.success) return false
+        }
 
         // Try to repair the target
 
@@ -180,7 +248,7 @@ export class SourceHarvester extends Creep {
         if (repairResult === OK) {
             // Record that the creep has worked
 
-            this.worked = true
+            this.worked = WorkTypes.repair
 
             // Find the repair amount by finding the smaller of the creep's work and the progress left for the cSite divided by repair power
 
@@ -191,7 +259,7 @@ export class SourceHarvester extends Creep {
             )
 
             // Add repair points to total repairPoints counter and say the success
-            globalStatsUpdater(this.room.name, 'eoro', energySpentOnRepairs)
+            statsManager.updateStat(this.room.name, 'eoro', energySpentOnRepairs)
             this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
 
             // Inform success
@@ -205,11 +273,13 @@ export class SourceHarvester extends Creep {
     }
 
     transferToNearbyCreep?(): boolean {
-        const sourceContainer = this.room.sourceContainers[this.memory.SI]
+        const sourceContainer =
+            this.room.roomManager.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]]
         if (sourceContainer) return false
 
-        const sourceLink = this.room.sourceLinks[this.memory.SI]
-        if (sourceLink && sourceLink.RCLActionable) return false
+        const sourceLink =
+            this.room.communeManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
+        if (sourceLink && sourceLink.isRCLActionable) return false
 
         // If the creep isn't full enough to justify a request
 
@@ -217,24 +287,26 @@ export class SourceHarvester extends Creep {
 
         this.room.createRoomLogisticsRequest({
             target: this,
-            type: 'withdraw',
-            priority: scalePriority(this.store.getCapacity(), this.reserveStore.energy, 5, true),
+            type: RoomLogisticsRequestTypes.withdraw,
+            priority: 100,
         })
         return true
     }
 
     run?() {
-        if (this.travelToSource() !== RESULT_SUCCESS) return
+        if (this.travelToSource() !== Result.success) return
         if (this.transferToSourceStructures()) return
 
         // Try to repair the sourceContainer
 
-        this.repairSourceContainer(this.room.sourceContainers[this.memory.SI])
+        this.maintainContainer(
+            this.room.roomManager.sourceContainers[this.memory[CreepMemoryKeys.sourceIndex]],
+        )
 
         if (this.transferToNearbyCreep()) return
     }
 
-    static sourceHarvesterManager(room: Room, creepsOfRole: string[]): void | boolean {
+    static roleManager(room: Room, creepsOfRole: string[]): void | boolean {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {

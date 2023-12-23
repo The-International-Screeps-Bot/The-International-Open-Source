@@ -1,18 +1,36 @@
-import { AllyCreepRequestData } from 'international/constants'
-import { findObjectWithID, getRange, getRangeOfCoords } from 'international/utils'
+import {
+    WorkRequestKeys,
+    CreepMemoryKeys,
+    RoomMemoryKeys,
+    RoomTypes,
+    Result,
+    ReservedCoordTypes,
+} from 'international/constants'
+import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 
 export class AllyVanguard extends Creep {
-    preTickManager() {
-        const request = Memory.claimRequests[this.memory.TRN]
+    update() {
+        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+        if (packedCoord) {
+            if (this.isDying()) {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+            } else {
+                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+            }
+        }
+    }
+
+    initRun() {
+        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
 
         if (!request) return
 
-        request.data[AllyCreepRequestData.allyVanguard] -= this.parts.work
+        request[WorkRequestKeys.allyVanguard] -= this.parts.work
     }
 
     findRemote?(): boolean {
-        if (this.memory.RN) return true
+        if (this.memory[CreepMemoryKeys.remote]) return true
 
         const { room } = this
 
@@ -27,15 +45,15 @@ export class AllyVanguard extends Creep {
 
             if (
                 !roomMemory ||
-                roomMemory.T === 'enemy' ||
-                roomMemory.T === 'enemyRemote' ||
-                roomMemory.T === 'keeper' ||
-                roomMemory.T === 'ally' ||
-                roomMemory.T === 'allyRemote'
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.enemy ||
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.enemyRemote ||
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.sourceKeeper ||
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.ally ||
+                roomMemory[RoomMemoryKeys.type] === RoomTypes.allyRemote
             )
                 continue
 
-            this.memory.RN = roomName
+            this.memory[CreepMemoryKeys.remote] = roomName
             return true
         }
 
@@ -49,10 +67,15 @@ export class AllyVanguard extends Creep {
 
         if (!this.findRemote()) return
 
-        if (room.name !== this.memory.RN) {
+        if (room.name !== this.memory[CreepMemoryKeys.remote]) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory.RN), range: 25 }],
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.remote]),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -61,9 +84,9 @@ export class AllyVanguard extends Creep {
 
         // Define the creep's sourceName
 
-        if (!this.findOptimalSourceIndex()) return
+        if (!this.findSourceIndex()) return
 
-        const sourceIndex = this.memory.SI
+        const sourceIndex = this.memory[CreepMemoryKeys.sourceIndex]
 
         // Try to move to source. If creep moved then iterate
 
@@ -71,16 +94,16 @@ export class AllyVanguard extends Creep {
 
         // Try to normally harvest. Iterate if creep harvested
 
-        if (this.advancedHarvestSource(room.sources[sourceIndex])) return
+        if (this.advancedHarvestSource(room.find(FIND_SOURCES)[sourceIndex])) return
     }
 
     getEnergyFromRoom?(): boolean {
-        const { room } = this
+        if (this.room.controller.owner) return false
 
         if (
             this.runRoomLogisticsRequestsAdvanced({
                 resourceTypes: new Set([RESOURCE_ENERGY]),
-            })
+            }) === Result.success
         )
             return true
 
@@ -88,9 +111,9 @@ export class AllyVanguard extends Creep {
 
         // Define the creep's sourceName
 
-        if (!this.findOptimalSourceIndex()) return true
+        if (!this.findSourceIndex()) return true
 
-        const sourceIndex = this.memory.SI
+        const sourceIndex = this.memory[CreepMemoryKeys.sourceIndex]
 
         // Try to move to source. If creep moved then iterate
 
@@ -98,7 +121,7 @@ export class AllyVanguard extends Creep {
 
         // Try to normally harvest. Iterate if creep harvested
 
-        if (this.advancedHarvestSource(room.sources[sourceIndex])) return true
+        if (this.advancedHarvestSource(this.room.find(FIND_SOURCES)[sourceIndex])) return true
 
         return true
     }
@@ -107,16 +130,14 @@ export class AllyVanguard extends Creep {
      *
      */
     travelToSource?(sourceIndex: number): boolean {
-        const { room } = this
-
         this.message = '🚬'
 
-        const harvestPos = this.findSourcePos(this.memory.SI)
+        const harvestPos = this.findSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
         if (!harvestPos) return true
 
         // If the creep is at the creep's packedHarvestPos, inform false
 
-        if (getRangeOfCoords(this.pos, harvestPos) === 0) return false
+        if (getRange(this.pos, harvestPos) === 0) return false
 
         // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 
@@ -126,29 +147,26 @@ export class AllyVanguard extends Creep {
             origin: this.pos,
             goals: [
                 {
-                    pos: new RoomPosition(harvestPos.x, harvestPos.y, room.name),
+                    pos: harvestPos,
                     range: 0,
                 },
             ],
-            avoidEnemyRanges: true,
         })
 
         return true
     }
 
     /**
-     * Builds a spawn in the creep's commune claimRequest
+     * Builds a spawn in the creep's commune workRequest
      */
     buildRoom?(): void {
         const { room } = this
 
         if (this.needsResources()) {
-            if (this.memory.RN) {
+            if (this.memory[CreepMemoryKeys.remote]) {
                 this.getEnergyFromRemote()
                 return
             }
-
-            // If there is a controller and it's owned or reserved
 
             if (!this.getEnergyFromRoom()) {
                 this.getEnergyFromRemote()
@@ -157,10 +175,15 @@ export class AllyVanguard extends Creep {
             return
         }
 
-        if (room.name !== this.memory.TRN) {
+        if (room.name !== this.memory[CreepMemoryKeys.workRequest]) {
             this.createMoveRequest({
                 origin: this.pos,
-                goals: [{ pos: new RoomPosition(25, 25, this.memory.TRN), range: 25 }],
+                goals: [
+                    {
+                        pos: new RoomPosition(25, 25, this.memory[CreepMemoryKeys.workRequest]),
+                        range: 25,
+                    },
+                ],
                 avoidEnemyRanges: true,
             })
 
@@ -174,7 +197,7 @@ export class AllyVanguard extends Creep {
         super(creepID)
     }
 
-    static allyVanguardManager(room: Room, creepsOfRole: string[]) {
+    static roleManager(room: Room, creepsOfRole: string[]) {
         // Loop through the names of the creeps of the role
 
         for (const creepName of creepsOfRole) {
@@ -182,11 +205,15 @@ export class AllyVanguard extends Creep {
 
             const creep: AllyVanguard = Game.creeps[creepName]
 
-            const request = creep.memory.TRN
+            const request = creep.memory[CreepMemoryKeys.workRequest]
 
             creep.message = request
 
-            if (room.name === request || (creep.memory.RN && room.name === creep.memory.RN)) {
+            if (
+                room.name === request ||
+                (creep.memory[CreepMemoryKeys.remote] &&
+                    room.name === creep.memory[CreepMemoryKeys.remote])
+            ) {
                 creep.buildRoom()
                 continue
             }
@@ -198,17 +225,22 @@ export class AllyVanguard extends Creep {
             if (
                 creep.createMoveRequest({
                     origin: creep.pos,
-                    goals: [{ pos: new RoomPosition(25, 25, creep.memory.TRN), range: 25 }],
+                    goals: [
+                        {
+                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.workRequest]),
+                            range: 25,
+                        },
+                    ],
                     avoidEnemyRanges: true,
                     typeWeights: {
-                        enemy: Infinity,
-                        ally: Infinity,
-                        keeper: Infinity,
+                        [RoomTypes.enemy]: Infinity,
+                        [RoomTypes.ally]: Infinity,
+                        [RoomTypes.sourceKeeper]: Infinity,
                     },
-                }) === 'unpathable'
+                }) === Result.fail
             ) {
-                const request = Memory.claimRequests[creep.memory.TRN]
-                if (request) request.data[AllyCreepRequestData.abandon] = 20000
+                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.workRequest]]
+                if (request) request[WorkRequestKeys.abandon] = 20000
             }
         }
     }
