@@ -1,27 +1,27 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "experimentalDecorators": true,
-        "module": "esnext",
-        "lib": ["es2019", "dom"],
-        "target": "es2019",
-        "moduleResolution": "Node",
-        "outDir": "dist",
-        "baseUrl": "src/",
-        "strict": true,
-        "noImplicitAny": true,
-        "removeComments": true,
-        "noImplicitReturns": true,
-        "allowSyntheticDefaultImports": true,
-        "allowUnreachableCode": true,
-        "strictNullChecks": false,
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-    },
-    "exclude": ["node_modules", "dist", "docs"],
-    "typedocOptions": {
-        "out": "./docs"
-    }
+  "compilerOptions": {
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "module": "esnext",
+    "lib": ["es2019", "dom"],
+    "target": "es2019",
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "baseUrl": "src/",
+    "strict": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "noImplicitReturns": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": true,
+    "strictNullChecks": false,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": ["node_modules", "dist", "docs"],
+  "typedocOptions": {
+    "out": "./docs"
+  }
 }

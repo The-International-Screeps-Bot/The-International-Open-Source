@@ -69,5 +69,5 @@ export default {
 
         // warn about everything else
         console.warn(warning.message)
-    }
+    },
 }
