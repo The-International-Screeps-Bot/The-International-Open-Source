@@ -21,7 +21,7 @@ export class PlayerManager extends Sleepable {
 
             for (const key of playerDecayKeys) {
                 if ((player[key] as number) < 1) continue
-                ;(player[key] as number) *= defaultDataDecay / this.sleepFor
+                    ;(player[key] as number) *= defaultDataDecay / this.sleepFor
             }
 
             // So long as the player has attacked at some point, record it
@@ -37,12 +37,14 @@ export class PlayerManager extends Sleepable {
     }
 
     initPlayer(playerName: string) {
-        return (Memory.players[playerName] = {
-            [PlayerMemoryKeys.offensiveThreat]: 0,
-            [PlayerMemoryKeys.defensiveStrength]: 0,
-            [PlayerMemoryKeys.hate]: 0,
-            [PlayerMemoryKeys.rangeFromExitWeight]: 0.5,
-        })
+        const relationship = global.settings.allies.includes(playerName) ? 'ally':'enemy'
+            return (Memory.players[playerName] = {
+                [PlayerMemoryKeys.offensiveThreat]: 0,
+                [PlayerMemoryKeys.defensiveStrength]: 0,
+                [PlayerMemoryKeys.hate]: 0,
+                [PlayerMemoryKeys.rangeFromExitWeight]: 0.5,
+                [PlayerMemoryKeys.relationship]: relationship
+            })
     }
 
     /**
