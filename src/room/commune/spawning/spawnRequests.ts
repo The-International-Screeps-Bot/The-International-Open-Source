@@ -122,7 +122,7 @@ export class SpawnRequestsManager {
                         for (let i = 1; i <= workAmount; i++) {
                             defaultParts.push(WORK)
                             if (i % 2 === 0) defaultParts.push(MOVE)
-                            if (i + (1 % 5) === 0) defaultParts.push(CARRY)
+                            if ((i + 1) % 5 === 0) defaultParts.push(CARRY)
                         }
 
                         return {

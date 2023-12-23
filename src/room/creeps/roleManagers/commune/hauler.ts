@@ -773,17 +773,17 @@ export class Hauler extends Creep {
         // ensure the creep receiving creep is empty
         if (creepAtPos.usedNextStore > 0) return false
 
-        /* let amount: number | undefined */
+        let amount: number | undefined
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
         if (logisticsRequest) {
             const target = findObjectWithID(logisticsRequest[CreepRoomLogisticsRequestKeys.target])
             // Don't relay if they are close to our logistics target
             if (getRange(target.pos, creepAtPos.pos) <= 1) return false
 
-            /* amount = logisticsRequest[CreepRoomLogisticsRequestKeys.amount] */
+            amount = logisticsRequest[CreepRoomLogisticsRequestKeys.amount]
         }
 
-        this.transfer(creepAtPos, RESOURCE_ENERGY/* , amount */)
+        this.transfer(creepAtPos, RESOURCE_ENERGY, amount)
 
         this.movedResource = true
         creepAtPos.movedResource = true
@@ -797,7 +797,7 @@ export class Hauler extends Creep {
         log('creepAtPos Energy', creepAtPos.freeNextStore)
         log('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
         */
-        const nextEnergy = Math.min(this.store.energy, creepAtPos.freeNextStore)
+        const nextEnergy = amount ?? Math.min(this.store.energy, creepAtPos.freeNextStore)
         this.nextStore.energy -= nextEnergy
         creepAtPos.nextStore.energy += nextEnergy
         /*
@@ -823,6 +823,7 @@ export class Hauler extends Creep {
         // record relaying information to avoid swapping
 
         creepMemory[CreepMemoryKeys.previousRelayer] = [creepAtPos.name, Game.time]
+        creepAtPosMemory[CreepMemoryKeys.previousRelayer] = [this.name, Game.time]
 
         // Trade room logistics requests
 
