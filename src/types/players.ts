@@ -1,6 +1,9 @@
 import { PlayerMemoryKeys } from "international/constants"
 
-export type PlayerRelationship = 'ally' | 'enemy'
+export enum PlayerRelationships {
+    ally,
+    enemy,
+}
 
 export interface PlayerMemory {
     [PlayerMemoryKeys.offensiveThreat]: number
@@ -8,7 +11,7 @@ export interface PlayerMemory {
     [PlayerMemoryKeys.hate]: number
     [PlayerMemoryKeys.lastAttackedBy]: number
     [PlayerMemoryKeys.rangeFromExitWeight]: number
-    [PlayerMemoryKeys.relationship]: PlayerRelationship
+    [PlayerMemoryKeys.relationship]: PlayerRelationships
     [PlayerMemoryKeys.reputation]: number
     [PlayerMemoryKeys.lastSeen]: number
 }

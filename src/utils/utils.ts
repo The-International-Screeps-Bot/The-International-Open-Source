@@ -19,6 +19,7 @@ import {
 import { collectiveManager } from '../international/collective'
 import { debugUtils } from 'debug/debugUtils'
 import { LogTypes, customLog } from './logging'
+import { PlayerRelationships } from 'types/players'
 
 /**
  * Uses a provided ID to find an object associated with it
@@ -814,21 +815,16 @@ export function visualizePath(
 }
 
 /**
- * Linearly checks if a given player name matches one of our allies
+ * Efficiently checks if a given player name matches one of our allies
  */
 export function isAlly(playerName: string) {
-    //Invaders are not our allies
-    if (playerName === 'Invader') return false
 
     const playerMemory = Memory.players[playerName]
-    //If PlayerMemory does not exist they are not an ally, as ally memory is always present
+    // If PlayerMemory does not exist they are not an ally, as ally memory is always present
     if (!playerMemory) return false
 
-    //if the player is not an ally return false
-    if (playerMemory[PlayerMemoryKeys.relationship] !== 'ally') return false
-
-    //all checks passed, they are an ally
-    return true
+    // Wether or not they are recorded as an ally
+    return playerMemory[PlayerMemoryKeys.relationship] === PlayerRelationships.ally
 }
 
 export function outOfBucket() {
