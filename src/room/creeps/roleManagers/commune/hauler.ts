@@ -5,6 +5,7 @@ import {
     RoomLogisticsRequestTypes,
     RoomMemoryKeys,
     RoomTypes,
+    SleepFor,
     customColors,
     packedPosLength,
     relayOffsets,
@@ -262,7 +263,7 @@ export class Hauler extends Creep {
                         ],
                     }) === Result.fail
                 ) {
-                    creepMemory[CreepMemoryKeys.sleepFor] = 'any'
+                    creepMemory[CreepMemoryKeys.sleepFor] = SleepFor.any
                     creepMemory[CreepMemoryKeys.sleepTime] = Game.time + randomIntRange(10, 50)
                 }
             }
@@ -1052,7 +1053,7 @@ export class Hauler extends Creep {
         const creepMemory = Memory.creeps[this.name]
 
         if (
-            creepMemory[CreepMemoryKeys.sleepFor] === 'any' &&
+            creepMemory[CreepMemoryKeys.sleepFor] === SleepFor.any &&
             creepMemory[CreepMemoryKeys.sleepTime] > Game.time
         ) {
             this.message = '😴'

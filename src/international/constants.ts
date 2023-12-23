@@ -133,7 +133,10 @@ export enum RoomLogisticsRequestTypes {
     offer,
 }
 
-export type SleepFor = 'any' | 'noMove'
+export enum SleepFor {
+    any,
+    move,
+}
 
 export enum CreepMemoryKeys {
     preferRoads,

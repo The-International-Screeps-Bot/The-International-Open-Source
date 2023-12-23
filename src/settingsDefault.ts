@@ -115,7 +115,7 @@ export interface Settings {
  * Default global.settings. DO NOT MODIFY for personal use; instead, include your preferences in global.settings.ts
  */
 export const defaultSettings: Settings = {
-    breakingVersion: 120,
+    breakingVersion: 121,
     roomVisuals: false,
     baseVisuals: false,
     dataVisuals: false,

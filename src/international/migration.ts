@@ -24,6 +24,11 @@ export class MigrationManager {
             Memory.players = {}
             Memory.breakingVersion += 2
         }
+        if (Memory.breakingVersion === 120) {
+
+            global.killCreeps()
+            Memory.breakingVersion += 1
+        }
 
         if (Memory.breakingVersion < global.settings.breakingVersion) {
             global.killCreeps()
