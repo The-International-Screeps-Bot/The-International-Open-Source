@@ -37,7 +37,7 @@ type FloodForCoordCheck = (
     generation?: number,
 ) => boolean | Result.stop
 
-export const roomUtils = {
+export const roomNameUtils = {
     abandonRemote(roomName: string, time: number) {
         const roomMemory = Memory.rooms[roomName]
 

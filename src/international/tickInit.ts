@@ -31,7 +31,7 @@ import { indexOf } from 'lodash'
 import { CommuneManager } from 'room/commune/commune'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
 import { RoomManager } from 'room/room'
-import { roomUtils } from 'room/roomUtils'
+import { roomNameUtils } from 'room/roomNameUtils'
 
 class TickInit {
     configGeneral() {

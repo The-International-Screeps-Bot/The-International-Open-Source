@@ -59,7 +59,7 @@ import {
 import { posix } from 'path'
 import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
-import { roomUtils } from './roomUtils'
+import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 
 /**
@@ -451,7 +451,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
         // Add the room's name to the scoutingRoom's remotes data
-        roomUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+        roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
         Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
@@ -587,7 +587,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
     // Add the room's name to the scoutingRoom's remotes data
-    roomUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+    roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
@@ -1529,7 +1529,7 @@ Room.prototype.createWorkRequest = function () {
     if (this.find(FIND_SOURCES).length < 2) return false
     if (Memory.workRequests[this.name]) return false
 
-    roomUtils.findDynamicScore(this.name)
+    roomNameUtils.findDynamicScore(this.name)
 
     const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
     if (communePlanned === false) return false

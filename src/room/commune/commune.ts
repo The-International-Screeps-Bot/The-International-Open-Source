@@ -89,7 +89,7 @@ import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { has } from 'lodash'
-import { roomUtils } from 'room/roomUtils'
+import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { SpawnRequestArgs } from 'types/spawnRequest'
@@ -210,7 +210,7 @@ export class CommuneManager {
         if (roomMemory[RoomMemoryKeys.abandonCommune] === true) {
             room.controller.unclaim()
             roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-            roomUtils.cleanMemory(room.name)
+            roomNameUtils.cleanMemory(room.name)
 
             for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
                 cSite.remove()
@@ -398,7 +398,7 @@ export class CommuneManager {
         const remoteMemory = Memory.rooms[remoteName]
 
         remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-        roomUtils.cleanMemory(remoteName)
+        roomNameUtils.cleanMemory(remoteName)
     }
 
     findMinRangedAttackCost(minDamage: number = 10) {
@@ -964,7 +964,7 @@ export class CommuneManager {
         const structuresToSort: SpawningStructures = []
 
         for (const structure of this.actionableSpawningStructures) {
-            if (roomUtils.isSourceSpawningStructure(this.room.name, structure)) {
+            if (roomNameUtils.isSourceSpawningStructure(this.room.name, structure)) {
                 spawningStructuresByPriority.push(structure)
             }
 

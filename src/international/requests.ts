@@ -1,6 +1,6 @@
 import { advancedFindDistance, findClosestRoomName, randomIntRange, randomRange } from 'utils/utils'
 import { collectiveManager } from './collective'
-import { roomUtils } from 'room/roomUtils'
+import { roomNameUtils } from 'room/roomNameUtils'
 import {
     CombatRequestKeys,
     HaulRequestKeys,
@@ -61,7 +61,7 @@ export class RequestsManager extends Sleepable {
                 Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
             ) {
 
-                roomUtils.findDynamicScore(roomName)
+                roomNameUtils.findDynamicScore(roomName)
             }
         }
     }

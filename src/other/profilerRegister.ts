@@ -25,7 +25,7 @@ import { SimpleAllies } from 'international/simpleAllies'
 import { PlayerManager } from 'international/players'
 import { customFindPath } from 'international/customPathFinder'
 import { FlagManager } from 'international/flags'
-import { roomUtils } from 'room/roomUtils'
+import { roomNameUtils } from 'room/roomNameUtils'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { debugUtils } from 'debug/debugUtils'
 import { spawnUtils } from 'room/commune/spawning/spawnUtils'
@@ -136,7 +136,7 @@ export function profilerRegister() {
     // Room objects
 
     profiler.registerObject(spawnUtils, 'spawnUtils')
-    profiler.registerObject(roomUtils, 'roomUtils')
+    profiler.registerObject(roomNameUtils, 'roomUtils')
     profiler.registerObject(creepUtils, 'creepUtils')
 
     profiler.registerFunctionsObject('creepUtils', creepUtils)

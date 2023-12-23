@@ -18,7 +18,7 @@ import {
 } from 'utils/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
-import { roomUtils } from 'room/roomUtils'
+import { roomNameUtils } from 'room/roomNameUtils'
 
 type RemoteSourcePathTypes =
     | RoomMemoryKeys.remoteSourceFastFillerPaths
@@ -40,7 +40,7 @@ export class RemotesManager {
 
         for (const remoteName of roomMemory[RoomMemoryKeys.remotes]) {
 
-            roomUtils.updateCreepsOfRemoteName(remoteName, this.communeManager)
+            roomNameUtils.updateCreepsOfRemoteName(remoteName, this.communeManager)
         }
 
         this.updateRemoteResourcePathType()
@@ -202,7 +202,7 @@ export class RemotesManager {
                     })
                     remoteMemory[RoomMemoryKeys.danger] =
                         Game.time + randomRange(score, score + 100)
-                    roomUtils.abandonRemote(remoteName, randomRange(score, score + 100))
+                    roomNameUtils.abandonRemote(remoteName, randomRange(score, score + 100))
                     continue
                 }
 
@@ -412,7 +412,7 @@ export class RemotesManager {
             // We want to abandon if the remote paths through the specified remote
             if (!remoteMemory2[RoomMemoryKeys.pathsThrough].includes(remoteName)) continue
 
-            roomUtils.abandonRemote(remoteName2, remoteMemory[RoomMemoryKeys.abandonRemote])
+            roomNameUtils.abandonRemote(remoteName2, remoteMemory[RoomMemoryKeys.abandonRemote])
         }
 
         remoteMemory[RoomMemoryKeys.recursedAbandonment] = true

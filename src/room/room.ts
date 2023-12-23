@@ -68,7 +68,7 @@ import {
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { PathGoal, customFindPath } from 'international/customPathFinder'
-import { roomUtils } from './roomUtils'
+import { roomNameUtils } from './roomNameUtils'
 import { collectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
 
@@ -202,7 +202,7 @@ export class RoomManager {
         // If it hasn't been scouted for 100~ ticks
         if (Game.time - roomMemory[RoomMemoryKeys.lastScout] > Math.floor(Math.random() * 200)) {
             room.basicScout()
-            roomUtils.cleanMemory(room.name)
+            roomNameUtils.cleanMemory(room.name)
         }
 
         const roomType = roomMemory[RoomMemoryKeys.type]
@@ -248,7 +248,7 @@ export class RoomManager {
         if (!room.controller.my) {
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-                roomUtils.cleanMemory(room.name)
+                roomNameUtils.cleanMemory(room.name)
             }
             return
         }
@@ -381,7 +381,7 @@ export class RoomManager {
                     [this.room.name]: weightCoords
                 },
                 weightCoordMapsForRoomName(roomName) {
-                    return roomUtils.diagonalCoords(roomName, commune)
+                    return roomNameUtils.diagonalCoords(roomName, commune)
                 },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
@@ -445,7 +445,7 @@ export class RoomManager {
                     [this.room.name]: weightCoords
                 },
                 weightCoordMapsForRoomName(roomName) {
-                    return roomUtils.diagonalCoords(roomName, commune)
+                    return roomNameUtils.diagonalCoords(roomName, commune)
                 },
                 weightCommuneStructurePlans: true,
                 weightRemoteStructurePlans: {
@@ -519,7 +519,7 @@ export class RoomManager {
                 [this.room.name]: weightCoords
             },
             weightCoordMapsForRoomName(roomName) {
-                return roomUtils.diagonalCoords(roomName, commune)
+                return roomNameUtils.diagonalCoords(roomName, commune)
             },
             weightCommuneStructurePlans: true,
             weightRemoteStructurePlans: {

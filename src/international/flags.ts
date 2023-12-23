@@ -2,7 +2,7 @@ import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { Result, RoomMemoryKeys, RoomTypes, customColors, ourImpassibleStructuresSet } from './constants'
 import { collectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
-import { roomUtils } from 'room/roomUtils'
+import { roomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
@@ -291,7 +291,7 @@ export class FlagManager {
 
         const terrain = Game.map.getRoomTerrain(room.name)
         const rampartPlans = room.roomManager.rampartPlans
-        roomUtils.floodFillFor(room.name, [anchor], coord => {
+        roomNameUtils.floodFillFor(room.name, [anchor], coord => {
             // Ignore terrain that protects us
             if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
@@ -337,7 +337,7 @@ export class FlagManager {
         }
 
         const terrain = Game.map.getRoomTerrain(room.name)
-        roomUtils.floodFillFor(
+        roomNameUtils.floodFillFor(
             room.name,
             [room.controller.pos],
             (coord, packedCoord, depth) => {
@@ -437,7 +437,7 @@ export class FlagManager {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
 
-        const dynamicScore = roomUtils.findDynamicScore(roomName)
+        const dynamicScore = roomNameUtils.findDynamicScore(roomName)
         customLog('dynamic score for ' + roomName, dynamicScore)
     }
 }
