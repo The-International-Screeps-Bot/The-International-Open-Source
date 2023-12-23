@@ -2,6 +2,7 @@ import { isNumber } from 'lodash'
 import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from './constants'
 import { randomTick } from '../utils/utils'
 import { Sleepable } from '../utils/sleepable'
+import { PlayerRelationships } from 'types/players'
 
 export class PlayerManager extends Sleepable {
     /**
@@ -20,8 +21,11 @@ export class PlayerManager extends Sleepable {
             // Decay specified numberical values over time
 
             for (const key of playerDecayKeys) {
-                if ((player[key] as number) < 1) continue
-                ;(player[key] as number) *= defaultDataDecay / this.sleepFor
+                if ((player[key] as number) < 1) {
+                    continue
+                }
+
+                (player[key] as number) *= defaultDataDecay / this.sleepFor
             }
 
             // So long as the player has attacked at some point, record it
@@ -37,12 +41,22 @@ export class PlayerManager extends Sleepable {
     }
 
     initPlayer(playerName: string) {
+
         return (Memory.players[playerName] = {
             [PlayerMemoryKeys.offensiveThreat]: 0,
             [PlayerMemoryKeys.defensiveStrength]: 0,
             [PlayerMemoryKeys.hate]: 0,
             [PlayerMemoryKeys.rangeFromExitWeight]: 0.5,
+            [PlayerMemoryKeys.relationship]: this.findInitialRelationship(playerName)
         })
+    }
+
+    private findInitialRelationship(playerName: string) {
+
+        const isAlly = global.settings.allies.includes(playerName)
+        if (isAlly) return PlayerRelationships.ally
+        // They are not an ally, so they are an enemy
+        return PlayerRelationships.enemy
     }
 
     /**

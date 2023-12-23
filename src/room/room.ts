@@ -1276,12 +1276,12 @@ export class RoomManager {
         }
 
         for (const tombstone of this.room.find(FIND_TOMBSTONES)) {
-            if (tombstone.creep.name === Memory.me) {
+            if (tombstone.creep.owner.username === Memory.me) {
                 deadCreepNames.my.add(tombstone.creep.name)
                 continue
             }
 
-            if (isAlly(tombstone.creep.name)) {
+            if (isAlly(tombstone.creep.owner.username)) {
                 deadCreepNames.ally.add(tombstone.creep.name)
             }
 
