@@ -489,7 +489,7 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
             if (creepAtPos.fatigue > 0) return
             if (creepAtPos.moved) return
             if (creepAtPos.moveRequest) return
-            if (!this.getActiveBodyparts(MOVE)) return
+            if (creepAtPos.getActiveBodyparts(MOVE)) return
         }
 
         /*
