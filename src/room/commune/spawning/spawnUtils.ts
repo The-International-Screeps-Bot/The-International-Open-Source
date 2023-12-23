@@ -1,14 +1,12 @@
 import { creepRoles } from 'international/constants'
-import { collectiveManager } from 'international/collective'
-import { customLog } from 'utils/logging'
-import { newID } from 'utils/utils'
 import { SpawnRequest } from 'types/spawnRequest'
 
-export const spawnUtils = {
-    testSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
-        return spawn.spawnCreep(spawnRequest.body, requestID.toString(), { dryRun: true })
-    },
-    advancedSpawn: function (spawn: StructureSpawn, spawnRequest: SpawnRequest, requestID: number) {
+export class SpawnUtils {
+    testSpawn(spawn: StructureSpawn, body: BodyPartConstant[], requestID: number) {
+        return spawn.spawnCreep(body, requestID.toString(), { dryRun: true })
+    }
+
+    advancedSpawn(spawn: StructureSpawn, spawnRequest: SpawnRequest, body: BodyPartConstant[], requestID: number) {
         spawnRequest.extraOpts.energyStructures =
             spawn.room.communeManager.spawningStructuresByPriority
 
@@ -20,6 +18,9 @@ export const spawnUtils = {
             requestID,
         ].join('_')
 
-        return spawn.spawnCreep(spawnRequest.body, creepName, spawnRequest.extraOpts)
-    },
+        const spawnResult = spawn.spawnCreep(body, creepName, spawnRequest.extraOpts as SpawnOptions)
+        return spawnResult
+    }
 }
+
+export const spawnUtils = new SpawnUtils()

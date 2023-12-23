@@ -857,9 +857,35 @@ export function getMe() {
     throw Error('Could not find me')
 }
 
-export const utils = {
+export class Utils {
     isTickInterval(interval: number) {
 
         return (Game.time % interval === 0)
     }
+    /**
+     *
+     * @returns [score, index]
+     */
+    findIndexWithLowestScore<T>(
+        iter: T[],
+        f: (val: T) => number | false,
+    ): [number, number] {
+        let lowestScore = Infinity
+        let bestIndex: number
+
+        for (let i = 0; i < iter.length; i++) {
+            const val = iter[i]
+
+            const score = f(val)
+            if (score === false) continue
+            if (score >= lowestScore) continue
+
+            lowestScore = score
+            bestIndex = i
+        }
+
+        return [lowestScore, bestIndex]
+    }
 }
+
+export const utils = new Utils()

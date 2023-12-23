@@ -11,7 +11,7 @@ import {
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 import { LogTypes, customLog, stringifyLog } from 'utils/logging'
-import { findAdjacentCoordsToCoord, getRange, newID, utils } from 'utils/utils'
+import { findAdjacentCoordsToCoord, findLowestScore, findWithLowestScore, getRange, newID, utils } from 'utils/utils'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { CommuneManager } from '../commune'
 import './spawnUtils'
@@ -32,8 +32,6 @@ export class SpawningStructuresManager {
     communeManager: CommuneManager
     inactiveSpawns: StructureSpawn[]
     activeSpawns: StructureSpawn[]
-
-    spawnIndex: number
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
@@ -99,8 +97,6 @@ export class SpawningStructuresManager {
 
         const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
 
-        this.spawnIndex = this.inactiveSpawns.length - 1
-
         for (const requestArgs of spawnRequestsArgs) {
             const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](this.communeManager.room, requestArgs)
 
@@ -113,6 +109,7 @@ export class SpawningStructuresManager {
     }
 
     private runSpawnRequest(request: SpawnRequest): Result {
+
         // We're trying to build a creep larger than this room can spawn
         // If this is ran then there is a bug in spawnRequest creation
 
@@ -145,16 +142,17 @@ export class SpawningStructuresManager {
             return Result.fail
         }
 
-        this.configSpawnRequest(request)
+        const body = this.constructBodyFromSpawnRequest(request)
 
         // Try to find inactive spawn, if can't, stop the loop
 
-        const spawn = this.inactiveSpawns[this.spawnIndex]
+        const spawnIndex = this.findSpawnIndexForSpawnRequest(request)
+        const spawn = this.inactiveSpawns[spawnIndex]
         const ID = collectiveManager.newCustomCreepID()
 
         // See if creep can be spawned
 
-        const testSpawnResult = spawnUtils.testSpawn(spawn, request, ID)
+        const testSpawnResult = spawnUtils.testSpawn(spawn, body, ID)
 
         // If creep can't be spawned
 
@@ -162,7 +160,7 @@ export class SpawningStructuresManager {
             if (testSpawnResult === ERR_NOT_ENOUGH_ENERGY) {
                 customLog(
                     'Failed to spawn: dryrun failed',
-                    `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}, body: (${request.body.length}) ${request.body}`,
+                    `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
                     {
                         type: LogTypes.error,
                     },
@@ -172,7 +170,7 @@ export class SpawningStructuresManager {
 
             customLog(
                 'Failed to spawn: dryrun failed',
-                `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}, body: (${request.body.length}) ${request.body}`,
+                `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
                 {
                     type: LogTypes.error,
                 },
@@ -184,7 +182,7 @@ export class SpawningStructuresManager {
         // Spawn the creep for real
 
         request.extraOpts.directions = this.findDirections(spawn.pos)
-        const result = spawnUtils.advancedSpawn(spawn, request, ID)
+        const result = spawnUtils.advancedSpawn(spawn, request, body, ID)
         if (result !== OK) {
             customLog(
                 'Failed to spawn: spawning failed',
@@ -198,21 +196,37 @@ export class SpawningStructuresManager {
             return Result.fail
         }
 
+        // Otherwise we succeeded
         // Record in stats the costs
 
         this.communeManager.nextSpawnEnergyAvailable -= request.cost
         statsManager.updateStat(this.communeManager.room.name, 'eosp', request.cost)
 
-        // Record spawn usage and check if there is another spawn
-        this.spawnIndex -= 1
-        if (this.spawnIndex < 0) return Result.stop
+        // The spawn we intented to spawn should no longer be considered inactive
+        this.inactiveSpawns.splice(spawnIndex, 1)
 
-        // Otherwise we succeeded
+        // We probably used up the last remaining inactive spawn, so don't try again this tick
+        if (!this.inactiveSpawns.length) return Result.stop
+
         return Result.success
     }
 
-    private configSpawnRequest(request: SpawnRequest) {
-        request.body = []
+    private findSpawnIndexForSpawnRequest(request: SpawnRequest) {
+
+        if (request.spawnTarget) {
+
+            const [score, index] = utils.findIndexWithLowestScore(this.inactiveSpawns, spawn => {
+                return getRange(spawn.pos, request.spawnTarget)
+            })
+
+            return index
+        }
+
+        return 0
+    }
+
+    private constructBodyFromSpawnRequest(request: SpawnRequest) {
+        let body: BodyPartConstant[] = []
 
         if (request.role === 'hauler') {
             const ratio =
@@ -220,16 +234,16 @@ export class SpawningStructuresManager {
                 request.bodyPartCounts[MOVE]
 
             for (let i = -1; i < request.bodyPartCounts[CARRY] - 1; i++) {
-                request.body.push(CARRY)
-                if (i % ratio === 0) request.body.push(MOVE)
+                body.push(CARRY)
+                if (i % ratio === 0) body.push(MOVE)
             }
 
             for (let i = -1; i < request.bodyPartCounts[WORK] - 1; i++) {
-                request.body.push(WORK)
-                if (i % ratio === 0) request.body.push(MOVE)
+                body.push(WORK)
+                if (i % ratio === 0) body.push(MOVE)
             }
 
-            return
+            return body
         }
 
         const endParts: BodyPartConstant[] = []
@@ -255,7 +269,7 @@ export class SpawningStructuresManager {
             } else priorityPartsCount = request.bodyPartCounts[part] - 1
 
             for (let i = 0; i < priorityPartsCount; i++) {
-                request.body.push(part)
+                body.push(part)
             }
 
             if (skipEndPart) continue
@@ -264,7 +278,8 @@ export class SpawningStructuresManager {
             endParts.push(part)
         }
 
-        request.body = request.body.concat(endParts)
+        body = body.concat(endParts)
+        return body
     }
 
     private findDirections(pos: RoomPosition) {
@@ -369,7 +384,6 @@ export class SpawningStructuresManager {
                 row.push(requestArgs.role)
                 row.push(requestArgs.priority)
                 row.push(`${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}`)
-                row.push(request.body)
 
                 data.push(row)
             }

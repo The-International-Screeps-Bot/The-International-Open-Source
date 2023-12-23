@@ -1,3 +1,5 @@
+import { DeepPartial } from "./utilityTypes"
+
 export interface SpawnRequestArgs {
     type: SpawnRequestTypes
     role: CreepRoles
@@ -49,6 +51,10 @@ export interface SpawnRequestArgs {
      * The absolute max cost a creep may be applied with
      */
     maxCostPerCreep?: number | undefined
+    /**
+     * The position for which the spawning creep would like to be closest too
+     */
+    spawnTarget?: Coord
 }
 
 export interface SpawnRequestSkeleton {
@@ -63,10 +69,10 @@ export interface SpawnRequest {
     priority: number
     defaultParts: number
     bodyPartCounts: { [key in PartsByPriority]: number }
-    body?: BodyPartConstant[]
+    spawnTarget?: Coord
     tier: number
     cost: number
-    extraOpts: SpawnOptions
+    extraOpts: DeepPartial<SpawnOptions>
 }
 
 export enum SpawnRequestTypes {

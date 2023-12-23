@@ -90,6 +90,10 @@ export class SpawnRequestsManager {
     private sourceHarvester() {
         const sources = this.communeManager.room.roomManager.communeSources
         for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+
+            const source = sources[sourceIndex]
+            const spawnTarget = source.pos
+
             // Construct requests for sourceHarvesters
 
             this.rawSpawnRequestsArgs.push(
@@ -107,7 +111,6 @@ export class SpawnRequestsManager {
 
                         // Account for power regenerating sources
 
-                        const source = sources[sourceIndex]
                         const effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
                         if (effect) {
                             workAmount += Math.round(
@@ -136,6 +139,7 @@ export class SpawnRequestsManager {
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
+                            spawnTarget,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -155,6 +159,7 @@ export class SpawnRequestsManager {
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
+                            spawnTarget,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -174,6 +179,7 @@ export class SpawnRequestsManager {
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
+                            spawnTarget,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -193,6 +199,7 @@ export class SpawnRequestsManager {
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
+                            spawnTarget,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -212,6 +219,7 @@ export class SpawnRequestsManager {
                             priority,
                             maxCostPerCreep,
                             spawnGroup: spawnGroup,
+                            spawnTarget,
                             memoryAdditions: {
                                 [CreepMemoryKeys.sourceIndex]: sourceIndex,
                                 [CreepMemoryKeys.preferRoads]: true,
@@ -235,6 +243,7 @@ export class SpawnRequestsManager {
                         priority,
                         maxCostPerCreep,
                         spawnGroup: spawnGroup,
+                        spawnTarget,
                         memoryAdditions: {
                             [CreepMemoryKeys.sourceIndex]: sourceIndex,
                             [CreepMemoryKeys.preferRoads]: true,
@@ -392,6 +401,9 @@ export class SpawnRequestsManager {
                     this.communeManager.room.roomManager.fastFillerPositions.length
                 if (!fastFillerPositionsCount) return false
 
+                const anchor = this.communeManager.room.roomManager.anchor
+                if (!anchor) throw Error('no anchor for room ' + this.communeManager.room.name)
+
                 let priority = 0.75
 
                 let totalFastFillerEnergy = 0
@@ -417,6 +429,7 @@ export class SpawnRequestsManager {
                     creepsQuota: fastFillerPositionsCount,
                     minCostPerCreep: 150,
                     priority,
+                    spawnTarget: anchor,
                     memoryAdditions: {},
                 }
             })(),

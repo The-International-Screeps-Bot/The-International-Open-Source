@@ -4,28 +4,7 @@ import { SpawnRequestArgs } from 'types/spawnRequest'
 
 export type SpawnRequestConstructor = (room: Room, args: SpawnRequestArgs) => SpawnRequest[]
 
-export const spawnRequestConstructors = {
-    createSpawnRequest(
-        priority: number,
-        role: CreepRoles,
-        defaultParts: number,
-        bodyPartCounts: { [key in PartsByPriority]: number },
-        tier: number,
-        cost: number,
-        memory: any,
-    ): SpawnRequest {
-        return {
-            role,
-            priority,
-            defaultParts,
-            bodyPartCounts,
-            tier,
-            cost,
-            extraOpts: {
-                memory,
-            },
-        }
-    },
+export class SpawnRequestConstructors {
     /**
      * Generally, all creeps will have the same bodies
      */
@@ -159,22 +138,24 @@ export const spawnRequestConstructors = {
 
             // Create a spawnRequest using previously constructed information
 
-            const request = spawnRequestConstructors.createSpawnRequest(
-                args.priority,
-                args.role,
-                args.defaultParts.length,
+            spawnRequests.push({
+                role: args.role,
+                priority: args.priority,
+                defaultParts: args.defaultParts.length,
                 bodyPartCounts,
+                spawnTarget: args.spawnTarget,
                 tier,
                 cost,
-                args.memoryAdditions,
-            )
-            spawnRequests.push(request)
+                extraOpts: {
+                    memory: args.memoryAdditions,
+                },
+            })
 
             args.creepsQuota -= 1
         }
 
         return spawnRequests
-    },
+    }
     spawnRequestGroupDiverse(room: Room, args: SpawnRequestArgs) {
 
         const spawnRequests: SpawnRequest[] = []
@@ -325,22 +306,24 @@ export const spawnRequestConstructors = {
 
             // Create a spawnRequest using previously constructed information
 
-            const request = spawnRequestConstructors.createSpawnRequest(
-                args.priority,
-                args.role,
-                args.defaultParts.length,
+            spawnRequests.push({
+                role: args.role,
+                priority: args.priority,
+                defaultParts: args.defaultParts.length,
                 bodyPartCounts,
+                spawnTarget: args.spawnTarget,
                 tier,
                 cost,
-                args.memoryAdditions,
-            )
-            spawnRequests.push(request)
+                extraOpts: {
+                    memory: args.memoryAdditions,
+                },
+            })
 
             args.maxCreeps -= 1
         }
 
         return spawnRequests
-    },
+    }
     spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
@@ -426,16 +409,18 @@ export const spawnRequestConstructors = {
 
             // Create a spawnRequest using previously constructed information
 
-            const request = spawnRequestConstructors.createSpawnRequest(
-                args.priority,
-                args.role,
-                args.defaultParts.length,
+            spawnRequests.push({
+                role: args.role,
+                priority: args.priority,
+                defaultParts: args.defaultParts.length,
                 bodyPartCounts,
+                spawnTarget: args.spawnTarget,
                 tier,
                 cost,
-                args.memoryAdditions,
-            )
-            spawnRequests.push(request)
+                extraOpts: {
+                    memory: args.memoryAdditions,
+                },
+            })
 
             // Prepare values for next iteration check
             args.partsQuota -= partsCount
@@ -443,5 +428,7 @@ export const spawnRequestConstructors = {
         }
 
         return spawnRequests
-    },
+    }
 }
+
+export const spawnRequestConstructors = new SpawnRequestConstructors()
