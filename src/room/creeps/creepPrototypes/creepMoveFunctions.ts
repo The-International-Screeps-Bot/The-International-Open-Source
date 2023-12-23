@@ -61,7 +61,7 @@ PowerCreep.prototype.needsNewPath = Creep.prototype.needsNewPath = function (
 
     // Inform true if there is no lastCache value in the creep's memory
 
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.creeps[this.name] || Memory.powerCreeps[this.name]
     if (!creepMemory[CreepMemoryKeys.lastCache]) return true
     if (creepMemory[CreepMemoryKeys.flee] !== args.flee) return true
 
