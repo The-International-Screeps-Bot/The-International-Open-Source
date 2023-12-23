@@ -817,10 +817,17 @@ export function visualizePath(
  * Linearly checks if a given player name matches one of our allies
  */
 export function isAlly(playerName: string) {
+    //Invaders are not our allies
+    if (playerName === 'Invader') return false
+
     const playerMemory = Memory.players[playerName]
+    //If PlayerMemory does not exist they are not an ally, as ally memory is always present
     if (!playerMemory) return false
 
+    //if the player is not an ally return false
     if (playerMemory[PlayerMemoryKeys.relationship] !== 'ally') return false
+
+    //all checks passed, they are an ally
     return true
 }
 
