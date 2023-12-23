@@ -6,6 +6,7 @@ import { roomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
+import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructures'
 
 export class FlagManager {
     run() {
@@ -439,6 +440,62 @@ export class FlagManager {
 
         const dynamicScore = roomNameUtils.findDynamicScore(roomName)
         customLog('dynamic score for ' + roomName, dynamicScore)
+    }
+
+    private spawnRequestVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const headers = ['role', 'priority', 'cost', 'parts']
+        const data: any[][] = []
+
+        const spawnRequestsArgs = room.communeManager.spawnRequestsManager.run()
+
+        for (const requestArgs of spawnRequestsArgs) {
+            const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](room, requestArgs)
+
+            for (const request of spawnRequests) {
+                const row: any[] = []
+                row.push(requestArgs.role)
+                row.push(requestArgs.priority)
+                row.push(`${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}`)
+
+                data.push(row)
+            }
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Spawn Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
     }
 }
 

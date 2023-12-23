@@ -84,7 +84,6 @@ export class SpawningStructuresManager {
         // There are no spawns
         if (!this.communeManager.room.roomManager.structures.spawn.length) return
 
-        this.visualizeRequests()
         this.test()
         this.runSpawning()
     }
@@ -364,56 +363,4 @@ export class SpawningStructuresManager {
     }
 
     private testRequests() {}
-
-    /**
-     * Debug
-     */
-    private visualizeRequests() {
-        if (!Game.flags.spawnRequestVisuals) return
-
-        const headers = ['role', 'priority', 'cost', 'parts']
-        const data: any[][] = []
-
-        const spawnRequestsArgs = this.communeManager.spawnRequestsManager.run()
-
-        for (const requestArgs of spawnRequestsArgs) {
-            const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](this.communeManager.room, requestArgs)
-
-            for (const request of spawnRequests) {
-                const row: any[] = []
-                row.push(requestArgs.role)
-                row.push(requestArgs.priority)
-                row.push(`${request.cost} / ${this.communeManager.nextSpawnEnergyAvailable}`)
-
-                data.push(row)
-            }
-        }
-
-        const height = 3 + data.length
-
-        Dashboard({
-            config: {
-                room: this.communeManager.room.name,
-            },
-            widgets: [
-                {
-                    pos: {
-                        x: 1,
-                        y: 1,
-                    },
-                    width: 47,
-                    height,
-                    widget: Rectangle({
-                        data: Table(() => ({
-                            data,
-                            config: {
-                                label: 'Spawn Requests',
-                                headers,
-                            },
-                        })),
-                    }),
-                },
-            ],
-        })
-    }
 }
