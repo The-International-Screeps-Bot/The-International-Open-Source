@@ -1,4 +1,4 @@
-import { defaultSettings } from "./settingsDefault";
+import { defaultSettings } from './settingsDefault'
 
 // IMPORTANT: To setup your settings, copy this file, name it settings.ts, and rename settingsExample to settings
 
@@ -6,11 +6,11 @@ import { defaultSettings } from "./settingsDefault";
  * Edit these settings to your preference
  */
 global.settingsExample = {
-    // Assigns the default settings
-    ...defaultSettings,
-    // Your preferences here
-    roomVisuals: false,
-    // etc...
+  // Assigns the default settings
+  ...defaultSettings,
+  // Your preferences here
+  roomVisuals: true,
+  // etc...
 }
 
 // Some examples for what you would have in settings.ts

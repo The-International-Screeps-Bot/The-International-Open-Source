@@ -20,6 +20,7 @@
         "watch-mmo": "rollup -cw --environment DEST:mmo",
         "watch-pserver": "rollup -cw --environment DEST:pserver",
         "server": "node server",
+        "server-debug": "node server --debug",
         "test": "jest",
         "test-watch": "jest --watch",
         "test-cov": "jest --coverage",
