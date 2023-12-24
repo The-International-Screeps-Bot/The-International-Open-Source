@@ -582,7 +582,8 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (avoidPackedCoords
         avoidPackedCoords.add(packCoord(this.pos))
         avoidPackedCoords.add(packedShoveCoord)
 
-        if (!Game.creeps[creepAtPosName].shove(avoidPackedCoords)) return false
+        const creepAtPos = Game.creeps[creepAtPosName] || Game.powerCreeps[creepAtPosName]
+        if (!creepAtPos.shove(avoidPackedCoords)) return false
     }
 
     this.assignMoveRequest(shoveCoord)

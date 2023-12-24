@@ -72,7 +72,7 @@ export interface SpawnRequest {
     spawnTarget?: Coord
     tier: number
     cost: number
-    extraOpts: DeepPartial<SpawnOptions>
+    extraOpts: SpawnOptions
 }
 
 export enum SpawnRequestTypes {

@@ -147,7 +147,7 @@ export class SpawnRequestConstructors {
                 tier,
                 cost,
                 extraOpts: {
-                    memory: args.memoryAdditions,
+                    memory: args.memoryAdditions as CreepMemory,
                 },
             })
 
@@ -315,7 +315,7 @@ export class SpawnRequestConstructors {
                 tier,
                 cost,
                 extraOpts: {
-                    memory: args.memoryAdditions,
+                    memory: args.memoryAdditions as CreepMemory,
                 },
             })
 
@@ -418,7 +418,7 @@ export class SpawnRequestConstructors {
                 tier,
                 cost,
                 extraOpts: {
-                    memory: args.memoryAdditions,
+                    memory: args.memoryAdditions as CreepMemory,
                 },
             })
 
