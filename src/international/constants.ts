@@ -487,6 +487,13 @@ export const communeCreepRoles: Set<CreepRoles> = new Set([
     'rangedDefender',
 ])
 
+export enum PowerCreepTasks {
+    advancedEnablePower,
+    advancedGenerateOps,
+    advancedRenew,
+    transferOps,
+}
+
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
 
 /**

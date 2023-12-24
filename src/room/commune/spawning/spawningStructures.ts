@@ -18,8 +18,7 @@ import './spawnUtils'
 import './spawnRequests'
 import { spawnUtils } from './spawnUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { debugUtils } from 'debug/debugUtils'
-import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
+import { BodyPartCounts, SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
 import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
 
 export const spawnRequestConstructorsByType: {[key in SpawnRequestTypes]: SpawnRequestConstructor } = {
@@ -141,7 +140,7 @@ export class SpawningStructuresManager {
             return Result.fail
         }
 
-        const body = this.constructBodyFromSpawnRequest(request)
+        const body = this.constructBodyFromSpawnRequest(request.role, request.bodyPartCounts)
 
         // Try to find inactive spawn, if can't, stop the loop
 
@@ -185,7 +184,7 @@ export class SpawningStructuresManager {
         if (result !== OK) {
             customLog(
                 'Failed to spawn: spawning failed',
-                `error: ${result}, request: ${debugUtils.stringify(request)}`,
+                `error: ${result}, request: ${global.debugUtils.stringify(request)}`,
                 {
                     type: LogTypes.error,
                     position: 3,
@@ -224,20 +223,20 @@ export class SpawningStructuresManager {
         return 0
     }
 
-    private constructBodyFromSpawnRequest(request: SpawnRequest) {
+    private constructBodyFromSpawnRequest(role: CreepRoles, bodyPartCounts: BodyPartCounts) {
         let body: BodyPartConstant[] = []
 
-        if (request.role === 'hauler') {
+        if (role === 'hauler') {
             const ratio =
-                (request.bodyPartCounts[CARRY] + request.bodyPartCounts[WORK]) /
-                request.bodyPartCounts[MOVE]
+                (bodyPartCounts[CARRY] + bodyPartCounts[WORK]) /
+                bodyPartCounts[MOVE]
 
-            for (let i = -1; i < request.bodyPartCounts[CARRY] - 1; i++) {
+            for (let i = -1; i < bodyPartCounts[CARRY] - 1; i++) {
                 body.push(CARRY)
                 if (i % ratio === 0) body.push(MOVE)
             }
 
-            for (let i = -1; i < request.bodyPartCounts[WORK] - 1; i++) {
+            for (let i = -1; i < bodyPartCounts[WORK] - 1; i++) {
                 body.push(WORK)
                 if (i % ratio === 0) body.push(MOVE)
             }
@@ -251,21 +250,21 @@ export class SpawningStructuresManager {
             const partType = partsByPriority[partIndex]
             const part = partsByPriorityPartType[partType]
 
-            if (!request.bodyPartCounts[part]) continue
+            if (!bodyPartCounts[part]) continue
 
             let skipEndPart: boolean
 
             let priorityPartsCount: number
             if (partType === RANGED_ATTACK) {
-                priorityPartsCount = request.bodyPartCounts[part]
+                priorityPartsCount = bodyPartCounts[part]
                 skipEndPart = true
             } else if (partType === ATTACK || partType === TOUGH) {
-                priorityPartsCount = Math.ceil(request.bodyPartCounts[part] / 2)
+                priorityPartsCount = Math.ceil(bodyPartCounts[part] / 2)
                 skipEndPart = true
             } else if (partType === 'secondaryTough' || partType === 'secondaryAttack') {
-                priorityPartsCount = Math.floor(request.bodyPartCounts[part] / 2)
+                priorityPartsCount = Math.floor(bodyPartCounts[part] / 2)
                 skipEndPart = true
-            } else priorityPartsCount = request.bodyPartCounts[part] - 1
+            } else priorityPartsCount = bodyPartCounts[part] - 1
 
             for (let i = 0; i < priorityPartsCount; i++) {
                 body.push(part)

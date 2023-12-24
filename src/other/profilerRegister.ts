@@ -27,7 +27,6 @@ import { customFindPath } from 'international/customPathFinder'
 import { FlagManager } from 'international/flags'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { creepUtils } from 'room/creeps/creepUtils'
-import { debugUtils } from 'debug/debugUtils'
 import { spawnUtils } from 'room/commune/spawning/spawnUtils'
 import { marketUtils } from 'room/commune/terminal/marketUtils'
 import { CollectiveManager } from 'international/collective'
@@ -129,7 +128,7 @@ export function profilerRegister() {
 
     // Objects
 
-    profiler.registerObject(debugUtils, 'debugUtils')
+    profiler.registerObject(global.debugUtils, 'debugUtils')
     profiler.registerObject(utils, 'utils')
     profiler.registerObject(marketUtils, 'marketUtils')
 

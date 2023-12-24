@@ -1,4 +1,4 @@
-import { Result, customColors, PowerCreepMemoryKeys } from 'international/constants'
+import { Result, customColors, PowerCreepMemoryKeys, PowerCreepTasks } from 'international/constants'
 import { PowerTask } from 'types/roomRequests'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
@@ -46,6 +46,7 @@ export class Operator extends PowerCreep {
         if (this.findRenewTask()) return true
         if (this.findEnablePowerTask()) return true
         if (this.findGenerateOpsTask()) return true
+        if (this.findTransferOpsTask()) return true
         return false
     }
 
@@ -54,11 +55,11 @@ export class Operator extends PowerCreep {
 
         if (!this.room.roomManager.powerSpawn) return false
 
-        this.memory[PowerCreepMemoryKeys.task] = 'advancedRenew'
+        this.memory[PowerCreepMemoryKeys.task] = PowerCreepTasks.advancedRenew
         return true
     }
 
-    advancedRenew?() {
+    [PowerCreepTasks.advancedRenew]?() {
         const powerSpawn = this.room.roomManager.powerSpawn
         if (!powerSpawn) return Result.fail
 
@@ -88,11 +89,11 @@ export class Operator extends PowerCreep {
 
         if (controller.isPowerEnabled) return false
 
-        this.memory[PowerCreepMemoryKeys.task] = 'advancedEnablePower'
+        this.memory[PowerCreepMemoryKeys.task] = PowerCreepTasks.advancedEnablePower
         return true
     }
 
-    advancedEnablePower?() {
+    [PowerCreepTasks.advancedEnablePower]?() {
         const { controller } = this.room
         if (!controller || controller.isPowerEnabled) return Result.noAction
 
@@ -124,17 +125,44 @@ export class Operator extends PowerCreep {
 
         if (power.cooldown) return false
 
-        this.memory[PowerCreepMemoryKeys.task] = 'advancedGenerateOps'
+        this.memory[PowerCreepMemoryKeys.task] = PowerCreepTasks.advancedGenerateOps
         return true
     }
 
-    advancedGenerateOps?() {
+    [PowerCreepTasks.advancedGenerateOps]?() {
         this.message = 'AGO'
 
         if (this.powered) return false
 
         this.usePower(PWR_GENERATE_OPS)
         this.powered = true
+        return true
+    }
+
+    findTransferOpsTask?() {
+
+        const storedOps = this.store.getUsedCapacity(RESOURCE_OPS)
+        if (storedOps <= this.store.getCapacity() * 0.8) return false
+
+        // We are sufficiently full of ops
+
+        const storingStructure = this.room.communeManager.storingStructures[0]
+        if (!storingStructure) return false
+
+        this.memory[PowerCreepMemoryKeys.task] = PowerCreepTasks.transferOps
+        return true
+    }
+
+    [PowerCreepTasks.transferOps]?() {
+
+        // We are sufficiently full of ops
+
+        const storingStructure = this.room.communeManager.storingStructures[0]
+        if (!storingStructure) return false
+
+        const transferAmount = this.store.getUsedCapacity(RESOURCE_OPS) * 0.5
+
+        this.advancedTransfer(storingStructure, RESOURCE_OPS, transferAmount)
         return true
     }
 

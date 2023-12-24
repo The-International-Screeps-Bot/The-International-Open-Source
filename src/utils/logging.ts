@@ -1,4 +1,3 @@
-import { debugUtils } from 'debug/debugUtils'
 import { collectiveManager } from 'international/collective'
 const customColors = {
     white: '#ffffff',
@@ -85,5 +84,5 @@ export function customLog(title: any, message?: any, opts?: LogOpts) {
 }
 
 export function stringifyLog(title: any, message: any, opts?: LogOpts) {
-    return customLog(title, debugUtils.stringify(message), opts)
+    return customLog(title, global.debugUtils.stringify(message), opts)
 }

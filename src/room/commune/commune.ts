@@ -1211,7 +1211,7 @@ export class CommuneManager {
         resourceTargets.max[RESOURCE_POWER] = storingStructuresCapacity * 0.015
 
         resourceTargets.min[RESOURCE_OPS] = storingStructuresCapacity * 0.01
-        resourceTargets.max[RESOURCE_OPS] = storingStructuresCapacity * 0.027
+        resourceTargets.max[RESOURCE_OPS] = storingStructuresCapacity * 0.02
 
         resourceTargets.min[RESOURCE_METAL] = 0
         resourceTargets.max[RESOURCE_METAL] = 0

@@ -21,6 +21,7 @@ import {
     ReservedCoordTypes,
     WorkTypes,
     creepRoles,
+    PowerCreepTasks,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -1416,7 +1417,7 @@ declare global {
 
     interface PowerCreepMemory extends CreepMemory {
         [PowerCreepMemoryKeys.commune]: string
-        [PowerCreepMemoryKeys.task]: keyof Operator
+        [PowerCreepMemoryKeys.task]: PowerCreepTasks
         [PowerCreepMemoryKeys.taskTarget]: Id<Structure | Source>
         [PowerCreepMemoryKeys.taskPower]: PowerConstant
         [PowerCreepMemoryKeys.taskRoom]: string
@@ -1467,6 +1468,8 @@ declare global {
             unpackedRoomNames: { [roomName: string]: string }
 
             lastReset: number
+
+            debugUtils: DebugUtils
 
             // Command functions
 

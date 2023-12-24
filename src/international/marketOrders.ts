@@ -1,4 +1,4 @@
-import { findHighestScore, randomTick } from 'utils/utils'
+import { findHighestScore, randomTick, utils } from 'utils/utils'
 import { PlayerMemoryKeys, Result, RoomMemoryKeys } from './constants'
 import { collectiveManager } from './collective'
 import { customLog } from 'utils/logging'
@@ -15,6 +15,10 @@ export class MarketManager {
 
             this.resourceHistory = {}
         }
+        if (utils.isTickInterval(1000)) {
+
+            this.optimizeMyOrders()
+        }
 
         this.pruneMyOrders()
     }
@@ -29,6 +33,49 @@ export class MarketManager {
             // If the order is inactive (it likely has no remaining resources), delete it
 
             if (!Game.market.orders[ID].active) Game.market.cancelOrder(ID)
+        }
+    }
+
+    private optimizeMyOrders(): void {
+
+        const myOrders = Game.market.orders
+        for (const ID in myOrders) {
+            // If the order is inactive (it likely has no remaining resources), delete it
+
+            const order = myOrders[ID]
+            if (!order.active) {
+
+                Game.market.cancelOrder(ID)
+                continue
+            }
+
+            if (order.type === ORDER_BUY) {
+
+                const orders = marketManager.orders[ORDER_BUY][order.resourceType]
+                if (!orders) continue
+
+                const newPrice = Math.min(
+                    Math.max(...orders.map(o => o.price)) * 1.01,
+                    marketManager.getAvgPrice(order.resourceType) * 1.2,
+                )
+                if (order.price === newPrice) continue
+
+                Game.market.changeOrderPrice(ID, newPrice)
+                continue
+            }
+
+            // The order type is sell
+
+            const orders = marketManager.orders[ORDER_SELL][order.resourceType]
+            if (!orders) continue
+
+            const newPrice = Math.min(
+                Math.min(...orders.map(o => o.price)) * 0.99,
+                marketManager.getAvgPrice(order.resourceType) * 0.8,
+            )
+            if (order.price === newPrice) continue
+
+            Game.market.changeOrderPrice(ID, newPrice)
         }
     }
 

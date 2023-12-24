@@ -5,7 +5,7 @@ import { statsManager } from 'international/statsManager'
 import { marketManager } from 'international/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
-export const marketUtils = {
+class MarketUtils {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
             marketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
@@ -64,7 +64,7 @@ export const marketUtils = {
         // Success
 
         return Result.success
-    },
+    }
     advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
             marketManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
@@ -127,7 +127,7 @@ export const marketUtils = {
         // Success
 
         return Result.success
-    },
+    }
     /**
      * Finds the largest possible transaction amount given a budget and starting amount
      * @param budget The number of energy willing to be invested in the trade
@@ -153,7 +153,7 @@ export const marketUtils = {
         }
 
         return Math.floor(amount)
-    },
+    }
     advancedDeal(room: Room, order: Order, amount: number) {
 
         const dealAmount = this.findLargestTransactionAmount(
@@ -174,3 +174,5 @@ export const marketUtils = {
         return Result.success
     }
 }
+
+export const marketUtils = new MarketUtils()

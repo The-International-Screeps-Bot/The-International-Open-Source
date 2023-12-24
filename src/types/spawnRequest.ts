@@ -64,6 +64,8 @@ export interface SpawnRequestSkeleton {
     bodyPartCounts: { [key in PartsByPriority]: number }
 }
 
+export type BodyPartCounts = { [key in PartsByPriority]: number }
+
 export interface SpawnRequest {
     role: CreepRoles
     priority: number

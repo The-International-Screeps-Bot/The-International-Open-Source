@@ -17,7 +17,6 @@ import {
     Result,
 } from '../international/constants'
 import { collectiveManager } from '../international/collective'
-import { debugUtils } from 'debug/debugUtils'
 import { LogTypes, customLog } from './logging'
 import { PlayerRelationships } from 'types/players'
 

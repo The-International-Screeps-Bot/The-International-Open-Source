@@ -1,6 +1,7 @@
 import './settings'
 import './other/userScript/userScript'
 import './international/commands'
+import './debug/debugUtils'
 import { collectiveManager } from './international/collective'
 import { roomsManager } from 'room/rooms'
 import './room/resourceAdditions'

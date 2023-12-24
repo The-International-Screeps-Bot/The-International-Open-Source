@@ -1,4 +1,4 @@
-export const debugUtils = {
+class DebugUtils {
     /**
      * Deeply stringifies values with some added benefits
      */
@@ -65,7 +65,7 @@ export const debugUtils = {
         }
 
         return recStringify(v, 0)
-    },
+    }
     /**
      * I don't fully understand what this does or what it is meant to do
      */
@@ -117,5 +117,7 @@ export const debugUtils = {
             }
             return string
         }
-    },
+    }
 }
+
+global.debugUtils = new DebugUtils()

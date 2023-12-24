@@ -83,7 +83,7 @@ PowerCreep.prototype.isDying = function () {
     return this.ticksToLive < POWER_CREEP_LIFE_TIME / 5
 }
 
-Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
+PowerCreep.prototype.advancedTransfer = Creep.prototype.advancedTransfer = function (target, resourceType = RESOURCE_ENERGY, amount) {
     // If creep isn't in transfer range
 
     if (this.pos.getRangeTo(target.pos) > 1) {
