@@ -94,11 +94,30 @@ export class CombatRequestManager {
             this.manageAbandonment(requestName, index)
             return
         }
-
+/*
         const enemySquadData = requestRoom.roomManager.enemySquadData
 
         request[CombatRequestKeys.minRangedHeal] = Math.max(enemySquadData.highestRangedDamage, 1)
         request[CombatRequestKeys.minDamage] = enemySquadData.highestHeal * 1.2
+ */
+
+        const towers = requestRoom.roomManager.structures.tower
+
+        let minDamage = 1
+        let minMeleeHeal = towers.length ? (towers.length * TOWER_POWER_ATTACK) : 1
+        let minRangedHeal = towers.length ? (towers.length * TOWER_POWER_ATTACK) : 1
+
+        for (const enemyCreep of room.roomManager.enemyAttackers) {
+            // If we have tower(s) and its an invader, don't care about it
+
+            minDamage += Math.max(enemyCreep.combatStrength.heal * 1.2, Math.ceil(enemyCreep.hits / 50))
+            minMeleeHeal += enemyCreep.combatStrength.melee + enemyCreep.combatStrength.ranged
+            minRangedHeal += enemyCreep.combatStrength.ranged
+        }
+
+        request[CombatRequestKeys.minRangedHeal] = Math.max(request[CombatRequestKeys.minRangedHeal], minRangedHeal)
+        request[CombatRequestKeys.minMeleeHeal] = Math.max(request[CombatRequestKeys.minRangedHeal], minMeleeHeal)
+        request[CombatRequestKeys.minDamage] = Math.max(request[CombatRequestKeys.minRangedHeal], minDamage)
 
         // If there are no enemyCreeps
         if (

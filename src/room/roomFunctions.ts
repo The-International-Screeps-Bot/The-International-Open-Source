@@ -767,14 +767,6 @@ Room.prototype.createAttackCombatRequest = function (opts) {
         return
     }
 
-    if (
-        !this.roomManager.notMyCreeps.enemy.length &&
-        !this.find(FIND_HOSTILE_STRUCTURES).find(
-            structure => structure.structureType !== STRUCTURE_CONTROLLER,
-        )
-    )
-        return
-
     if (global.settings.nonAggressionPlayers.includes(Memory.rooms[RoomMemoryKeys.owner])) return
 
     request = Memory.combatRequests[this.name] = {

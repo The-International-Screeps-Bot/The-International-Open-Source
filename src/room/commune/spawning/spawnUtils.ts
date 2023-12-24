@@ -18,7 +18,7 @@ export class SpawnUtils {
             requestID,
         ].join('_')
 
-        const spawnResult = spawn.spawnCreep(body, creepName, spawnRequest.extraOpts as SpawnOptions)
+        const spawnResult = spawn.spawnCreep(body, creepName, spawnRequest.extraOpts)
         return spawnResult
     }
 }
