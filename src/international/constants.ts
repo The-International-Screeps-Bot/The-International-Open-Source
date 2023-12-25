@@ -1407,8 +1407,6 @@ export enum WorkTypes {
     attackController,
 }
 
-export const codecCacheLength = 99999
-
 export enum SegmentIDs {
     General = 0,
     BasePlans = 1,

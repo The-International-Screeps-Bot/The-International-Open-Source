@@ -3,7 +3,6 @@ import {
     buildableStructureTypes,
     packedPosLength,
     stampKeys,
-    // codecCacheLength,
 } from 'international/constants'
 import { encode, decode } from 'base32768'
 
