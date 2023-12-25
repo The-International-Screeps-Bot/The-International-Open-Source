@@ -28,11 +28,6 @@ import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRe
 import { spawnUtils } from './spawnUtils'
 import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
 
-interface SpawningHaulerCosts {
-    maxCost: number
-    minCost: number
-}
-
 export class SpawnRequestsManager {
     communeManager: CommuneManager
 

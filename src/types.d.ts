@@ -1413,6 +1413,7 @@ declare global {
         [CreepMemoryKeys.targetID]: Id<Structure | Creep | PowerCreep | Tombstone | Ruin>
         // The name of the trader and tick for the previos relay action
         [CreepMemoryKeys.previousRelayer]: [string, number]
+        [CreepMemoryKeys.stationary]: boolean
     }
 
     interface PowerCreepMemory extends CreepMemory {
@@ -1472,6 +1473,8 @@ declare global {
             debugUtils: DebugUtils
 
             // Command functions
+
+            stringify(v: any, maxDepth: number): void
 
             /**
              * Deletes all properties of global

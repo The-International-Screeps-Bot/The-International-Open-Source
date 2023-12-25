@@ -65,7 +65,7 @@ const boostsInOrder: MineralBoostConstant[] = [
     RESOURCE_ZYNTHIUM_ALKALIDE,
     RESOURCE_ZYNTHIUM_OXIDE,
 
-    // damage taken
+    // defence
 
     RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
     RESOURCE_GHODIUM_ALKALIDE,
