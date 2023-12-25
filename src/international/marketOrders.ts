@@ -55,7 +55,6 @@ export class MarketManager {
                 if (!orders) continue
 
                 const newPrice = Math.min(
-                    Math.max(...orders.map(o => o.price)) * 1.01,
                     marketManager.getAvgPrice(order.resourceType) * 1.2,
                 )
                 if (order.price === newPrice) continue
@@ -70,7 +69,6 @@ export class MarketManager {
             if (!orders) continue
 
             const newPrice = Math.min(
-                Math.min(...orders.map(o => o.price)) * 0.99,
                 marketManager.getAvgPrice(order.resourceType) * 0.8,
             )
             if (order.price === newPrice) continue
