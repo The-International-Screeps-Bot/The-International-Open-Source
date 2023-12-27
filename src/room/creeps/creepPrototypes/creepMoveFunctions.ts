@@ -15,7 +15,7 @@ import {
     communeCreepRoles,
     ReservedCoordTypes,
 } from 'international/constants'
-import { customFindPath } from 'international/customPathFinder'
+import { customPathFinder } from 'international/customPathFinder'
 import { collectiveManager } from 'international/collective'
 import {
     areCoordsEqual,
@@ -340,7 +340,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
         // Generate a new path
 
-        path = customFindPath(args)
+        path = customPathFinder.findPath(args)
         if (!path.length && !this.spawning) return Result.fail
 
         // Limit the path's length to the cacheAmount

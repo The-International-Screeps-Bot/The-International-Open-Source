@@ -23,7 +23,6 @@ import { CreepOrganizer } from 'international/creepOrganizer'
 import { RequestsManager } from 'international/requests'
 import { SimpleAllies } from 'international/simpleAllies'
 import { PlayerManager } from 'international/players'
-import { customFindPath } from 'international/customPathFinder'
 import { FlagManager } from 'international/flags'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { creepUtils } from 'room/creeps/creepUtils'
@@ -63,6 +62,7 @@ import { ConstructionSiteManager } from 'international/constructionSiteManager'
 import { TransactionsManager } from 'international/transactions'
 import { CommunePlanner } from 'room/construction/communePlanner'
 import { packBasePlanCoord, packCoord, packCoordList, packId, packIdList, packPos, packPosList, packRampartPlanCoord, packRoomName, packStampAnchors, packXYAsCoord, packXYAsPos, reversePosList, unpackBasePlanCoords, unpackCoord, unpackCoordAsPos, unpackCoordList, unpackCoordListAsPosList, unpackId, unpackIdList, unpackPos, unpackPosAt, unpackPosList, unpackRampartPlanCoord, unpackRoomName, unpackStampAnchors } from './codec'
+import { CustomPathFinder } from 'international/customPathFinder'
 
 export function profilerRegister() {
 
@@ -125,6 +125,7 @@ export function profilerRegister() {
     profiler.registerClass(HaulerSizeManager, 'HaulerSize')
     profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
     profiler.registerClass(Operator, 'Operator')
+    profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
 
     // Objects
 
@@ -143,7 +144,6 @@ export function profilerRegister() {
     // Functions
 
     profiler.registerFN(originalLoop, 'loop')
-    profiler.registerFN(customFindPath, 'customFindPath')
     profiler.registerFN(outOfBucket, 'outOfBucket')
 
     // codec functions

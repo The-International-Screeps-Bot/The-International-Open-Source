@@ -402,6 +402,11 @@ export class MarketManager {
         this.resourceHistory[resourceType][days]
         return avgPrice
     }
+
+    decidePrice(resourceType: ResourceConstant, priority: number, startTick: number = Game.time) {
+
+        
+    }
 }
 
 export const marketManager = new MarketManager()

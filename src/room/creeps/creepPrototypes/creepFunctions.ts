@@ -54,11 +54,11 @@ import {
 } from 'other/codec'
 import { creepClasses } from '../creepClasses'
 import { statsManager } from 'international/statsManager'
-import { customFindPath } from 'international/customPathFinder'
 import { creepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
 import { CreepRoomLogisticsRequest, RoomLogisticsRequest } from 'types/roomRequests'
 import { customLog, stringifyLog } from 'utils/logging'
+import { customPathFinder } from 'international/customPathFinder'
 
 Creep.prototype.update = function () {}
 
@@ -1104,7 +1104,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
     )
         return this.memory[CreepMemoryKeys.quadBulldozeTargets]
 
-    const path = customFindPath({
+    const path = customPathFinder.findPath({
         origin: this.pos,
         goals: [
             {

@@ -56,7 +56,6 @@ import {
     unpackPosList,
 } from 'other/codec'
 import { posix } from 'path'
-import { customFindPath } from 'international/customPathFinder'
 import { playerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
@@ -275,7 +274,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // loop through sourceNames
 
     for (const source of this.find(FIND_SOURCES)) {
-        const path = customFindPath({
+        const path = customPathFinder.findPath({
             origin: source.pos,
             goals: [{ pos: anchor, range: 4 }],
             typeWeights: {
@@ -309,7 +308,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         newSourceEfficaciesTotal += newSourceEfficacy
     }
 
-    const newReservationEfficacy = customFindPath({
+    const newReservationEfficacy = customPathFinder.findPath({
         origin: this.controller.pos,
         goals: [{ pos: anchor, range: 4 }],
         typeWeights: {

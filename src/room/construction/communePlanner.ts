@@ -60,7 +60,7 @@ import { RoomManager } from '../room'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 import { minCutToExit } from './minCut'
-import { customFindPath } from 'international/customPathFinder'
+import { customPathFinder } from 'international/customPathFinder'
 import { towerFunctions } from '../commune/towers'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
@@ -637,7 +637,7 @@ export class CommunePlanner {
         // Paths for grid groups
 
         for (const leaderCoord of groupLeaders) {
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
                 weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords, this.baseCoords],
@@ -713,7 +713,7 @@ export class CommunePlanner {
         // Paths for exit groups
 
         for (const group of exitGroups) {
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
                 goals: [{ pos: anchor, range: 3 }],
                 weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords],
@@ -927,7 +927,7 @@ export class CommunePlanner {
         sortBy(
             sources,
             ({ pos }) =>
-                customFindPath({
+                customPathFinder.findPath({
                     origin: pos,
                     goals: [
                         {
@@ -992,7 +992,7 @@ export class CommunePlanner {
             sortBy(
                 sourceHarvestPositions[i],
                 origin =>
-                    customFindPath({
+                    customPathFinder.findPath({
                         origin,
                         goals: [
                             {
@@ -1020,7 +1020,7 @@ export class CommunePlanner {
         for (const i in this.communeSources) {
             const origin = sourceHarvestPositions[i][0]
 
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: origin,
                 goals: [
                     {
@@ -1057,7 +1057,7 @@ export class CommunePlanner {
         sortBy(
             this.mineralHarvestPositions,
             origin =>
-                customFindPath({
+                customPathFinder.findPath({
                     origin,
                     goals: [
                         {
@@ -1070,7 +1070,7 @@ export class CommunePlanner {
                 }).length,
         )
 
-        const path = customFindPath({
+        const path = customPathFinder.findPath({
             origin: this.mineralHarvestPositions[0],
             goals: [{ pos: goal, range: 1 }],
             weightCoordMaps: [this.diagonalCoords, this.roadCoords],
@@ -1117,7 +1117,7 @@ export class CommunePlanner {
         for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
             const closestHarvestPos = this.sourceHarvestPositions[i][0]
 
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: closestHarvestPos,
                 goals: [
                     {
@@ -1786,7 +1786,7 @@ export class CommunePlanner {
         let shortestPath: RoomPosition[]
 
         for (const source of sources) {
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: source.pos,
                 goals: [{ pos: this.room.controller.pos, range: 1 }],
                 plainCost: defaultRoadPlanningPlainCost,
@@ -1802,7 +1802,7 @@ export class CommunePlanner {
         // Avg path between sources, if more than 1
 
         if (sources.length > 1) {
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: sources[0].pos,
                 goals: [{ pos: sources[1].pos, range: 1 }],
                 plainCost: defaultRoadPlanningPlainCost,
@@ -1856,7 +1856,7 @@ export class CommunePlanner {
                 sortBy(
                     sources,
                     ({ pos }) =>
-                        customFindPath({
+                        customPathFinder.findPath({
                             origin: pos,
                             goals: [
                                 {
@@ -1873,7 +1873,7 @@ export class CommunePlanner {
                 sortBy(
                     fastFillerCoords,
                     ({ x, y }) =>
-                        customFindPath({
+                        customPathFinder.findPath({
                             origin: new RoomPosition(
                                 x + stampAnchor.x - stampOffset,
                                 y + stampAnchor.y - stampOffset,
@@ -1982,7 +1982,7 @@ export class CommunePlanner {
         let closestSourceDistance = Infinity
 
         for (const source of this.room.find(FIND_SOURCES)) {
-            const range = customFindPath({
+            const range = customPathFinder.findPath({
                 origin: source.pos,
                 goals: [
                     {
@@ -2005,7 +2005,7 @@ export class CommunePlanner {
             pathOrigin = closestSource.pos
         }
 
-        const path = customFindPath({
+        const path = customPathFinder.findPath({
             origin: pathOrigin,
             goals: [{ pos: fastFillerPos, range: 3 }],
             weightCoordMaps: [this.roadCoords],
@@ -2086,7 +2086,7 @@ export class CommunePlanner {
                 this.baseCoords[packAsNum(coord)] = 255
                 this.roadCoords[packAsNum(coord)] = 255
 
-                const path = customFindPath({
+                const path = customPathFinder.findPath({
                     origin: new RoomPosition(stampAnchor.x, stampAnchor.y, this.room.name),
                     goals: [{ pos: fastFillerPos, range: 3 }],
                     weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
@@ -2198,7 +2198,7 @@ export class CommunePlanner {
                 sortBy(
                     this.outputLabCoords,
                     ({ x, y }) =>
-                        customFindPath({
+                        customPathFinder.findPath({
                             origin: new RoomPosition(x, y, this.room.name),
                             goals: [
                                 {
@@ -2259,7 +2259,7 @@ export class CommunePlanner {
         for (let i = this.stampAnchors.gridExtension.length - 1; i >= 0; i -= 5) {
             const coord = this.stampAnchors.gridExtension[i]
 
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: new RoomPosition(coord.x, coord.y, this.room.name),
                 goals: [{ pos: hubAnchorPos, range: 2 }],
                 weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
@@ -2285,7 +2285,7 @@ export class CommunePlanner {
         for (let i = this.communeSources.length - 1; i >= 0; i -= 1) {
             const origin = this.sourceHarvestPositions[i][0]
 
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: origin,
                 goals: [
                     {
@@ -2306,7 +2306,7 @@ export class CommunePlanner {
             sourcePaths.push(path)
         }
 
-        const upgradePath = customFindPath({
+        const upgradePath = customPathFinder.findPath({
             origin: this.centerUpgradePos,
             goals: [
                 {
@@ -2453,7 +2453,7 @@ export class CommunePlanner {
             this.room.name,
         )
 
-        let path = customFindPath({
+        let path = customPathFinder.findPath({
             origin: hubAnchor,
             goals: [
                 {
@@ -2793,7 +2793,7 @@ export class CommunePlanner {
 
             // Path from the hubAnchor to the cloestPosToAnchor
 
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
                 goals: [{ pos: hubAnchorPos, range: 2 }],
                 weightCoordMaps: [this.diagonalCoords, this.roadCoords, this.unprotectedCoords],
@@ -3039,7 +3039,7 @@ export class CommunePlanner {
         for (const coord of this.bestTowerCoords) {
             const minRCL = this.basePlans.getXY(coord.x, coord.y)[0].minRCL
 
-            const path = customFindPath({
+            const path = customPathFinder.findPath({
                 origin: new RoomPosition(coord.x, coord.y, this.room.name),
                 goals: [
                     {
