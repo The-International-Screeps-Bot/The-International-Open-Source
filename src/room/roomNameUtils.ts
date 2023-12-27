@@ -13,15 +13,12 @@ import {
 } from 'international/constants'
 import { collectiveManager } from 'international/collective'
 import {
-    advancedFindDistance,
     findAdjacentCoordsToCoord,
     forAdjacentCoords,
     forRoomNamesAroundRangeXY,
     getRange,
-    makeRoomCoord,
     packAsNum,
     packXYAsNum,
-    roomNameFromRoomXY,
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
@@ -37,7 +34,7 @@ type FloodForCoordCheck = (
     generation?: number,
 ) => boolean | Result.stop
 
-export const roomNameUtils = {
+export class RoomNameUtils {
     abandonRemote(roomName: string, time: number) {
         const roomMemory = Memory.rooms[roomName]
 
@@ -45,7 +42,7 @@ export const roomNameUtils = {
 
         roomMemory[RoomMemoryKeys.abandonRemote] = time
         delete roomMemory[RoomMemoryKeys.recursedAbandonment]
-    },
+    }
     findDynamicScore(roomName: string) {
         let dynamicScore = 0
 
@@ -53,14 +50,14 @@ export const roomNameUtils = {
         let communeScore = 0
         let allyScore = 0
 
-        const roomCoord = makeRoomCoord(roomName)
+        const roomCoord = this.pack(roomName)
         forRoomNamesAroundRangeXY(roomCoord.x, roomCoord.y, dynamicScoreRoomRange, (x, y) => {
-            const searchRoomName = roomNameFromRoomXY(x, y)
+            const searchRoomName = this.unpackXY(x, y)
             const searchRoomMemory = Memory.rooms[searchRoomName]
             if (!searchRoomMemory) return
 
             if (searchRoomMemory[RoomMemoryKeys.type] === RoomTypes.enemy) {
-                const score = advancedFindDistance(roomName, searchRoomName)
+                const score = this.advancedFindDistance(roomName, searchRoomName)
                 if (score <= closestEnemy) return
 
                 closestEnemy = score
@@ -74,7 +71,7 @@ export const roomNameUtils = {
                 const score =
                     Math.pow(
                         Math.abs(
-                            advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
+                            this.advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
                         ),
                         1.8,
                     ) +
@@ -89,7 +86,7 @@ export const roomNameUtils = {
                 const score =
                     Math.pow(
                         Math.abs(
-                            advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
+                            this.advancedFindDistance(roomName, searchRoomName) - preferredCommuneRange,
                         ),
                         1.5,
                     ) +
@@ -117,7 +114,7 @@ export const roomNameUtils = {
         roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 
         return dynamicScore
-    },
+    }
     floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
         const visitedCoords = new Uint8Array(2500)
 
@@ -156,8 +153,8 @@ export const roomNameUtils = {
         }
 
         return false
-    },
-    floodFillCardinalFor() {},
+    }
+    floodFillCardinalFor() {}
     isSourceSpawningStructure(roomName: string, structure: StructureExtension | StructureSpawn) {
         const packedSourceHarvestPositions =
             Memory.rooms[roomName][RoomMemoryKeys.communeSourceHarvestPositions]
@@ -168,7 +165,7 @@ export const roomNameUtils = {
         }
 
         return false
-    },
+    }
     /**
      * Removes roomType-based values in the room's memory that don't match its type
      */
@@ -184,7 +181,7 @@ export const roomNameUtils = {
 
             delete roomMemory[key as unknown as keyof RoomMemory]
         }
-    },
+    }
     /**
      * Finds the name of the closest commune, exluding the specified roomName
      */
@@ -202,14 +199,14 @@ export const roomNameUtils = {
                 Game.map.getRoomLinearDistance(roomName, a) -
                 Game.map.getRoomLinearDistance(roomName, b),
         )[0]
-    },
+    }
     findClosestClaimType(roomName: string) {
         return Array.from(collectiveManager.communes).sort(
             (a, b) =>
                 Game.map.getRoomLinearDistance(roomName, a) -
                 Game.map.getRoomLinearDistance(roomName, b),
         )[0]
-    },
+    }
     updateCreepsOfRemoteName(remoteName: string, communeManager: CommuneManager) {
 
         const remoteMemory = Memory.rooms[remoteName]
@@ -223,7 +220,7 @@ export const roomNameUtils = {
         for (const index in remoteMemory[RoomMemoryKeys.remoteSources]) {
             communeManager.remoteSourceHarvesters[remoteName].push([])
         }
-    },
+    }
     diagonalCoords(roomName: string, commune: Room) {
 
         const anchor = commune.roomManager.anchor
@@ -257,4 +254,68 @@ export const roomNameUtils = {
 
         return diagonalCoords
     }
+    pack(roomName: string) {
+        // Find the numbers in the room's name
+
+        let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/)
+
+        return {
+            x: cx === 'W' ? ~x : parseInt(x),
+            y: cy === 'S' ? ~y : parseInt(y),
+        }
+    }
+
+    unpackXY(x: number, y: number) {
+        return (
+            (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
+        )
+    }
+
+    unpack(roomCoord: RoomCoord) {
+        return this.unpackXY(roomCoord.x, roomCoord.y)
+    }
+    /**
+     * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
+     */
+    advancedFindDistance(
+        originRoomName: string,
+        goalRoomName: string,
+        opts: {
+            typeWeights?: { [key: string]: number }
+            avoidDanger?: boolean
+        } = {},
+    ) {
+        // Try to find a route from the origin room to the goal room
+
+        const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
+            routeCallback(roomName) {
+
+                // If the goal is in the room
+                if (roomName === goalRoomName) return 1
+
+                const roomMemory = Memory.rooms[roomName]
+                if (!roomMemory) return 10
+
+                if (opts.avoidDanger && roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
+                    if (roomMemory[RoomMemoryKeys.abandonRemote]) {
+                        return 10
+                    }
+                }
+
+                // If the type is in typeWeights, inform the weight for the type
+                if (opts.typeWeights && opts.typeWeights[roomMemory[RoomMemoryKeys.type]])
+                    return opts.typeWeights[roomMemory[RoomMemoryKeys.type]]
+
+                return 1
+            },
+        })
+
+        // If findRouteResult didn't work, inform a path length of Infinity
+
+        if (findRouteResult === ERR_NO_PATH) return Infinity
+
+        return findRouteResult.length
+    }
 }
+
+export const roomNameUtils = new RoomNameUtils()

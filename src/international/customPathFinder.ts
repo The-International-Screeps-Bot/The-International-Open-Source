@@ -609,3 +609,12 @@ function generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>)
 
     return pathFinderResult.path
 }
+
+export class CustomPathFinder {
+    findPath(args: CustomPathFinderArgs) {
+
+
+    }
+}
+
+export const customPathFinder = new CustomPathFinder()

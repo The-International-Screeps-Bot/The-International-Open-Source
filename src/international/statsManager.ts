@@ -108,6 +108,7 @@ export interface CommuneStats extends RoomStats {
 
     [RoomStatsKeys.EnergyTerminalSentDomestic]: number
     [RoomStatsKeys.EnergyTerminalSentOther]: number
+    [RoomStatsKeys.BatteriesStoredTimes10]: number
 }
 
 const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
@@ -158,6 +159,7 @@ export class StatsManager {
                 [RoomStatsKeys.PowerCreepCount]: 0,
                 [RoomStatsKeys.ControllerLevel]: 0,
                 [RoomStatsKeys.EnergyStored]: 0,
+                [RoomStatsKeys.BatteriesStoredTimes10]: 0,
                 [RoomStatsKeys.MineralsHarvested]: 0,
                 [RoomStatsKeys.EnergyInputBought]: 0,
                 [RoomStatsKeys.EnergyOutputSold]: 0,
@@ -261,8 +263,9 @@ export class StatsManager {
         } */
         const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
         roomStats[RoomStatsKeys.EnergyStored] =
-            (resourcesInStoringStructures.energy || 0) +
-            (resourcesInStoringStructures.battery || 0) * 10
+            (resourcesInStoringStructures.energy || 0)
+            roomStats[RoomStatsKeys.BatteriesStoredTimes10] =
+            (resourcesInStoringStructures.battery * 10 || 0)
 
         // delete legacy stat key value pairs
 

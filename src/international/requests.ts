@@ -1,4 +1,4 @@
-import { advancedFindDistance, findClosestRoomName, randomIntRange, randomRange } from 'utils/utils'
+import { findClosestRoomName, randomIntRange, randomRange } from 'utils/utils'
 import { collectiveManager } from './collective'
 import { roomNameUtils } from 'room/roomNameUtils'
 import {
@@ -180,7 +180,7 @@ export class RequestsManager extends Sleepable {
 
             if (
                 Game.map.getRoomLinearDistance(communeName, roomName) > maxWorkRequestDistance ||
-                advancedFindDistance(communeName, roomName, {
+                roomNameUtils.advancedFindDistance(communeName, roomName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
@@ -271,7 +271,7 @@ export class RequestsManager extends Sleepable {
 
             if (
                 Game.map.getRoomLinearDistance(communeName, requestName) > maxCombatDistance ||
-                advancedFindDistance(communeName, requestName, {
+                roomNameUtils.advancedFindDistance(communeName, requestName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,
@@ -337,7 +337,7 @@ export class RequestsManager extends Sleepable {
 
             if (
                 Game.map.getRoomLinearDistance(communeName, requestName) > maxHaulDistance ||
-                advancedFindDistance(communeName, requestName, {
+                roomNameUtils.advancedFindDistance(communeName, requestName, {
                     typeWeights: {
                         keeper: Infinity,
                         enemy: Infinity,

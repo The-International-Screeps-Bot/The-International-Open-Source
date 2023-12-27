@@ -9,7 +9,6 @@ import {
     maxRemotePathDistance,
 } from 'international/constants'
 import {
-    advancedFindDistance,
     findCarryPartsRequired,
     findLowestScore,
     getRange,
@@ -380,13 +379,13 @@ export class RemotesManager {
     }
 
     private isRemoteBlocked(remoteName: string) {
-        const safeDistance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+        const safeDistance = roomNameUtils.advancedFindDistance(this.communeManager.room.name, remoteName, {
             typeWeights: remoteTypeWeights,
             avoidDanger: true,
         })
         if (safeDistance > maxRemoteRoomDistance) return true
 
-        const distance = advancedFindDistance(this.communeManager.room.name, remoteName, {
+        const distance = roomNameUtils.advancedFindDistance(this.communeManager.room.name, remoteName, {
             typeWeights: remoteTypeWeights,
         })
         if (Math.round(safeDistance * 0.75) > distance) return true

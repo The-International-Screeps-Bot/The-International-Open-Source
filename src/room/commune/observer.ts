@@ -1,7 +1,8 @@
 import { customLog } from 'utils/logging'
-import { makeRoomCoord, randomTick, roomNameFromRoomXY } from 'utils/utils'
+import { randomTick } from 'utils/utils'
 import { CommuneManager } from './commune'
 import { RoomMemoryKeys } from 'international/constants'
+import { roomNameUtils } from 'room/roomNameUtils'
 
 export class ObserverManager {
     communeManager: CommuneManager
@@ -27,7 +28,7 @@ export class ObserverManager {
     }
 
     findScoutTarget() {
-        const roomCoord = makeRoomCoord(this.communeManager.room.name)
+        const roomCoord = roomNameUtils.pack(this.communeManager.room.name)
 
         let highestScore = 0
 
@@ -38,7 +39,7 @@ export class ObserverManager {
 
         for (let x = x1; x <= x2; x += 1) {
             for (let y = y1; y <= y2; y += 1) {
-                const roomName = roomNameFromRoomXY(x, y)
+                const roomName = roomNameUtils.unpackXY(x, y)
 
                 // Ensure the statuses are the same
 

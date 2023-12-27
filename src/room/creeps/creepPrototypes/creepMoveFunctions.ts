@@ -410,7 +410,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
 
     if (this.spawning) {
         const spawn = findObjectWithID(this.spawnID)
-        if (!spawn) throw Error('Could not find spawn with ID ' + this.spawnID)
+        if (!spawn) throw Error('Could not find spawn with ID ' + this.spawnID + ', ' + this.name + ', ' + this.ticksToLive)
 
         // Ensure we aren't using the default direction
 

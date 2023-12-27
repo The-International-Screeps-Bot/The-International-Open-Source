@@ -26,7 +26,6 @@ import {
     roomTypesUsedForStats,
 } from 'international/constants'
 import {
-    advancedFindDistance,
     findClosestObject,
     findHighestScore,
     findObjectWithID,
@@ -36,12 +35,9 @@ import {
     getRange,
     getRangeXY,
     isAlly,
-    makeRoomCoord,
     packAsNum,
     packXYAsNum,
     randomTick,
-    roomNameFromRoomCoord,
-    roomNameFromRoomXY,
     sortBy,
 } from 'utils/utils'
 import { CommuneManager } from './commune/commune'

@@ -17,7 +17,6 @@ import {
     RoomTypes,
 } from './constants'
 import {
-    advancedFindDistance,
     createPosMap,
     findCarryPartsRequired,
     findClosestRoomName,

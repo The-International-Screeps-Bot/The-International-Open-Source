@@ -137,57 +137,6 @@ export function newID() {
     return (Memory.ID += 1).toString()
 }
 
-interface AdvancedFindDistanceOpts {
-    typeWeights?: { [key: string]: number }
-    avoidDanger?: boolean
-}
-
-/**
- * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
- */
-export function advancedFindDistance(
-    originRoomName: string,
-    goalRoomName: string,
-    opts: AdvancedFindDistanceOpts = {},
-) {
-    // Try to find a route from the origin room to the goal room
-
-    const findRouteResult = Game.map.findRoute(originRoomName, goalRoomName, {
-        routeCallback(roomName) {
-            const roomMemory = Memory.rooms[roomName]
-            if (!roomMemory) {
-                if (roomName === goalRoomName) return 1
-                return 50
-            }
-
-            if (opts.avoidDanger && roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
-                if (roomMemory[RoomMemoryKeys.abandonRemote]) {
-                    return 30
-                }
-            }
-
-            // If the goal is in the room
-
-            if (roomName === goalRoomName) return 1
-
-            // If the type is in typeWeights, inform the weight for the type
-
-            if (opts.typeWeights && opts.typeWeights[roomMemory[RoomMemoryKeys.type]])
-                return opts.typeWeights[roomMemory[RoomMemoryKeys.type]]
-
-            return 1
-        },
-    })
-
-    // If findRouteResult didn't work, inform a path length of Infinity
-
-    if (findRouteResult === ERR_NO_PATH) return Infinity
-
-    // inform the path's length
-
-    return findRouteResult.length
-}
-
 /**
  *
  * @param distance The number of tiles between the hauling target and source
@@ -555,27 +504,6 @@ export function scalePriority(
     }
 
     return (amount / capacity) * multiplier
-}
-
-export function makeRoomCoord(roomName: string) {
-    // Find the numbers in the room's name
-
-    let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/)
-
-    return {
-        x: cx === 'W' ? ~x : parseInt(x),
-        y: cy === 'S' ? ~y : parseInt(y),
-    }
-}
-
-export function roomNameFromRoomXY(x: number, y: number) {
-    return (
-        (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
-    )
-}
-
-export function roomNameFromRoomCoord(roomCoord: RoomCoord) {
-    return roomNameFromRoomXY(roomCoord.x, roomCoord.y)
 }
 
 export function forRoomNamesInRangeXY(

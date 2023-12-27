@@ -7,10 +7,6 @@ import {
     roomDimensions,
     packedPosLength,
 } from './constants'
-import { customLog } from 'utils/logging'
-import { makeRoomCoord, roomNameFromRoomCoord } from '../utils/utils'
-import { CollectiveManager } from './collective'
-import { statsManager } from './statsManager'
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled
@@ -233,7 +229,7 @@ export class MapVisualsManager {
         })
         */
         /*
-        const roomCoord = makeRoomCoord(roomName)
+        const roomCoord = roomNameUtils.pack(roomName)
         Game.map.visual.text(('x: ' + roomCoord.x + ', y: ' + roomCoord.y).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,

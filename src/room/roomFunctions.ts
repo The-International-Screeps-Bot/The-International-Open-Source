@@ -28,7 +28,6 @@ import {
     RemoteResourcePathTypes,
 } from 'international/constants'
 import {
-    advancedFindDistance,
     areCoordsEqual,
     createPosMap,
     findAdjacentCoordsToCoord,
@@ -251,7 +250,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // Find distance from scoutingRoom
 
     if (distance <= maxRemoteRoomDistance)
-        distance = advancedFindDistance(scoutingRoom.name, this.name, {
+        distance = roomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
             typeWeights: {
                 keeper: Infinity,
                 enemy: Infinity,

@@ -13,7 +13,6 @@ import {
     isXYExit,
     isXYInBorder,
     isXYInRoom,
-    makeRoomCoord,
     packAsNum,
     packXYAsNum,
     randomIntRange,
