@@ -17,25 +17,25 @@ import { RoomManager } from 'room/room'
 import { collectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
 
-export const creepUtils = {
+export class CreepUtils {
     expandName(creepName: string) {
         return creepName.split('_')
-    },
+    }
     roleName(creepName: string) {
         return creepRoles[parseInt(creepName[0])]
-    },
+    }
     roleCreep(creep: Creep) {
         if (creep._role) return creep._role
 
         return (creep._role = this.roleName(creep.name))
-    },
+    }
     /**
      * Overhead logic ran for dead creeps
      */
     runDead(creepName: string) {
         const creepMemory = Memory.creeps[creepName]
         const role = this.roleName(creepName)
-    },
+    }
     runRepair(creep: Creep, target: Structure) {
         // If we've already schedhuled a work intent, don't try to do another
         if (creep.worked) return Result.noAction
@@ -62,7 +62,7 @@ export const creepUtils = {
         // Estimate the target's nextHits so we can target creeps accordingly
         target.nextHits = Math.min(target.nextHits + workParts * REPAIR_POWER, target.hitsMax)
         return Result.success
-    },
+    }
     repairCommune(creep: Creep) {
         if (creep.needsResources()) {
             if (
@@ -160,8 +160,8 @@ export const creepUtils = {
         })
 
         return true
-    },
-    repairCommuneStationary(creep: Creep) {},
+    }
+    repairCommuneStationary(creep: Creep) {}
     repairNearby(creep: Creep) {
         // If the this has no energy, inform false
 
@@ -184,7 +184,7 @@ export const creepUtils = {
         // Otherwise we repaired successfully
 
         return Result.success
-    },
+    }
     findEnergySpentOnConstruction(creep: Creep, cSite: ConstructionSite, workParts: number) {
         const energySpent = Math.min(
             workParts * BUILD_POWER,
@@ -194,7 +194,7 @@ export const creepUtils = {
         )
 
         return energySpent
-    },
+    }
     advancedUpgradeController(creep: Creep) {
 
         const creepMemory = Memory.creeps[creep.name]
@@ -383,7 +383,7 @@ export const creepUtils = {
         // Inform false
 
         return false
-    },
+    }
     findUpgradePosWeak(creep: Creep): RoomPosition | undefined {
 
         const upgradePos = creep.room.roomManager.upgradePositions.find(
@@ -392,7 +392,7 @@ export const creepUtils = {
                 !creep.room.roomManager.reservedCoords.has(packCoord(pos))
         )
         return upgradePos
-    },
+    }
     findUpgradePosStrong(creep: Creep): RoomPosition | undefined {
 
         const creepMemory = Memory.creeps[creep.name]
@@ -424,3 +424,5 @@ export const creepUtils = {
         return upgradePos
     }
 }
+
+export const creepUtils = new CreepUtils()

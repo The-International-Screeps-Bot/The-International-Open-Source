@@ -5,7 +5,7 @@ import { statsManager } from 'international/statsManager'
 import { marketManager } from 'international/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
-class MarketUtils {
+export class MarketUtils {
     advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
         const mySpecificOrders =
             marketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []

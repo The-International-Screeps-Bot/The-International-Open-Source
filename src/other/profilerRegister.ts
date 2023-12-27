@@ -18,16 +18,16 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { originalLoop } from 'main'
 import { creepClasses } from 'room/creeps/creepClasses'
-import { outOfBucket, utils } from 'utils/utils'
+import { Utils, outOfBucket, utils } from 'utils/utils'
 import { CreepOrganizer } from 'international/creepOrganizer'
 import { RequestsManager } from 'international/requests'
 import { SimpleAllies } from 'international/simpleAllies'
 import { PlayerManager } from 'international/players'
 import { FlagManager } from 'international/flags'
-import { roomNameUtils } from 'room/roomNameUtils'
-import { creepUtils } from 'room/creeps/creepUtils'
-import { spawnUtils } from 'room/commune/spawning/spawnUtils'
-import { marketUtils } from 'room/commune/terminal/marketUtils'
+import { RoomNameUtils, roomNameUtils } from 'room/roomNameUtils'
+import { CreepUtils, creepUtils } from 'room/creeps/creepUtils'
+import { SpawnUtils, spawnUtils } from 'room/commune/spawning/spawnUtils'
+import { MarketUtils, marketUtils } from 'room/commune/terminal/marketUtils'
 import { CollectiveManager } from 'international/collective'
 import { MarketManager } from 'international/marketOrders'
 import { GarbageCollector } from 'international/garbageCollector'
@@ -89,6 +89,10 @@ export function profilerRegister() {
     profiler.registerClass(RespawnManager, 'RespawnManager')
     profiler.registerClass(BasePlans, 'BasePlans')
     profiler.registerClass(RampartPlans, 'RampartPlans')
+    profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
+    profiler.registerClass(MarketUtils, 'MarketUtils')
+    profiler.registerClass(Utils, 'Utils')
+    profiler.registerClass(CreepUtils, 'CreepUtils')
 
     // Room classes
 
@@ -125,21 +129,16 @@ export function profilerRegister() {
     profiler.registerClass(HaulerSizeManager, 'HaulerSize')
     profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
     profiler.registerClass(Operator, 'Operator')
-    profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
+    profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
+    profiler.registerClass(SpawnUtils, 'SpawnUtils')
 
     // Objects
 
     profiler.registerObject(global.debugUtils, 'debugUtils')
-    profiler.registerObject(utils, 'utils')
-    profiler.registerObject(marketUtils, 'marketUtils')
 
     // Room objects
 
-    profiler.registerObject(spawnUtils, 'spawnUtils')
-    profiler.registerObject(roomNameUtils, 'roomUtils')
-    profiler.registerObject(creepUtils, 'creepUtils')
 
-    profiler.registerFunctionsObject('creepUtils', creepUtils)
 
     // Functions
 
