@@ -409,8 +409,10 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     creepMemory[CreepMemoryKeys.path] = packPosList(path)
 
     if (this.spawning) {
+        if (!this.spawnID) return Result.success
+
         const spawn = findObjectWithID(this.spawnID)
-        if (!spawn) throw Error('Could not find spawn with ID ' + this.spawnID + ', ' + this.name + ', ' + this.ticksToLive)
+        if (!spawn) return Result.success
 
         // Ensure we aren't using the default direction
 
