@@ -164,7 +164,9 @@ export class CustomPathFinder {
 
         for (const goal of args.goals) {
             // If the goal is in the same room as the origin
-            if (args.origin.roomName === goal.pos.roomName) continue
+            if (args.origin.roomName === goal.pos.roomName) {
+                return allowedRoomNames
+            }
 
             if (searchedGoalRoomNames.has(goal.pos.roomName)) continue
             searchedGoalRoomNames.add(goal.pos.roomName)
