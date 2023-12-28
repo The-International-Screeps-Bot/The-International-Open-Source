@@ -26,29 +26,32 @@ export class ContainerManager {
         if (!fastFillerContainers.length) return
 
         for (const container of fastFillerContainers) {
-            if (container.reserveStore.energy > container.store.getCapacity() * 0.9) continue
+            const energy = container.reserveStore.energy
+            const capacity = container.store.getCapacity()
+
+            if (energy > capacity * 0.9) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
                 type: RoomLogisticsRequestTypes.transfer,
                 onlyFull: true,
                 priority: scalePriority(
-                    container.store.getCapacity(),
-                    container.reserveStore.energy,
+                    capacity,
+                    energy,
                     20,
                 ),
             })
 
-            if (container.reserveStore.energy < container.store.getCapacity() * 0.5) continue
+            if (energy < capacity * 0.5) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
                 target: container,
-                maxAmount: container.reserveStore.energy * 0.5,
+                maxAmount: energy * 0.5,
                 onlyFull: true,
                 type: RoomLogisticsRequestTypes.offer,
                 priority: scalePriority(
-                    container.store.getCapacity(),
-                    container.reserveStore.energy,
+                    capacity,
+                    energy,
                     10,
                     true,
                 ),

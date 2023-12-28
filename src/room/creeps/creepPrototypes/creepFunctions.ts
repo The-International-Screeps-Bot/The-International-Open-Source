@@ -434,13 +434,17 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 }
 
 Creep.prototype.findNewRepairTarget = function () {
+
+    const enemyAttackers = !!this.room.roomManager.enemyAttackers.length
+    let repairThreshold = enemyAttackers ? 0.15 : 0.3
+
     let lowestScore = Infinity
     let bestTarget
 
     for (const structure of this.room.roomManager.generalRepairStructures) {
         // If above 30% of max hits
 
-        if (structure.nextHits / structure.hitsMax > 0.3) continue
+        if (structure.nextHits / structure.hitsMax > repairThreshold) continue
 
         const score =
             getRange(this.pos, structure.pos) + (structure.nextHits / structure.hitsMax) * 20
