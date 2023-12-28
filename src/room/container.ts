@@ -22,9 +22,8 @@ export class ContainerManager {
     }
 
     private runFastFillerContainers() {
-        if (!this.roomManager.room.myCreepsByRole.fastFiller.length) return
-
         const fastFillerContainers = this.roomManager.fastFillerContainers
+        if (!fastFillerContainers.length) return
 
         for (const container of fastFillerContainers) {
             if (container.reserveStore.energy > container.store.getCapacity() * 0.9) continue
