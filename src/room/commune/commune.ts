@@ -93,6 +93,7 @@ import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { SpawnRequestArgs } from 'types/spawnRequest'
+import { communeUtils } from './communeUtils'
 
 export type ResourceTargets = {
     min: Partial<{[key in ResourceConstant]: number }>
@@ -246,6 +247,8 @@ export class CommuneManager {
         } else if (room.controller.level > roomMemory[RoomMemoryKeys.greatestRCL]) {
             roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
         }
+
+        communeUtils.getRCLUpdate(room)
 
         if (!roomMemory[RoomMemoryKeys.combatRequests])
             roomMemory[RoomMemoryKeys.combatRequests] = []
