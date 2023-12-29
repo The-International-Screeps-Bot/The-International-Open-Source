@@ -554,29 +554,6 @@ export const nonCommuneSigns = [
     'Religion is the opium of the people - Karl Marx',
 ]
 
-export const chant = [
-    'Creeps',
-    'of',
-    Game.shard.name,
-    'unite,',
-    'you',
-    'have',
-    'nothing',
-    'to',
-    'lose',
-    'but',
-    'your',
-    'chains!',
-    undefined,
-    'PEACE',
-    'LAND',
-    'ENERGY',
-    undefined,
-    'Democracy',
-    'is non-',
-    'negotiable!',
-    undefined,
-]
 /**
  * What to say when one of our creeps dies
  */
@@ -710,6 +687,11 @@ export const combatTargetStructureTypes: Set<StructureConstant> = new Set([
     STRUCTURE_FACTORY,
     STRUCTURE_NUKER,
     STRUCTURE_OBSERVER,
+])
+
+export const generalRepairStructureTypes = new Set([
+    STRUCTURE_ROAD,
+    STRUCTURE_CONTAINER,
 ])
 
 export const customColors = {

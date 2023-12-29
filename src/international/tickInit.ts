@@ -1,6 +1,5 @@
 import {
     antifaRoles,
-    chant,
     WorkRequestKeys,
     CombatRequestKeys,
     creepRoles,
@@ -38,7 +37,7 @@ class TickInit {
         // Chant logic
 
         if (global.settings.creepChant) {
-            if (Memory.chantIndex >= chant.length - 1) Memory.chantIndex = 0
+            if (Memory.chantIndex >= global.settings.creepChant.length - 1) Memory.chantIndex = 0
             else Memory.chantIndex += 1
         }
     }

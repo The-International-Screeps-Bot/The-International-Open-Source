@@ -21,6 +21,7 @@ import {
     findLowestScore,
     roundTo,
     forCoordsAroundRange,
+    utils,
 } from 'utils/utils'
 import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
@@ -180,6 +181,11 @@ export class CommuneManager {
     }
 
     update(room: Room) {
+
+        // non manager
+
+        //
+
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
@@ -193,10 +199,14 @@ export class CommuneManager {
         delete this._spawningStructuresByNeed
 
         if (randomTick()) {
-            delete this._maxUpgradeStrength
             delete this._minRampartHits
-            delete this._upgradeStructure
             delete this._storedEnergyBuildThreshold
+        }
+
+        if (utils.isTickInterval(100)) {
+
+            delete this._maxUpgradeStrength
+            delete this._upgradeStructure
             delete this._hasSufficientRoads
             delete this._resourceTargets
         }

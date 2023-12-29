@@ -63,6 +63,10 @@ import { TransactionsManager } from 'international/transactions'
 import { CommunePlanner } from 'room/construction/communePlanner'
 import { packBasePlanCoord, packCoord, packCoordList, packId, packIdList, packPos, packPosList, packRampartPlanCoord, packRoomName, packStampAnchors, packXYAsCoord, packXYAsPos, reversePosList, unpackBasePlanCoords, unpackCoord, unpackCoordAsPos, unpackCoordList, unpackCoordListAsPosList, unpackId, unpackIdList, unpackPos, unpackPosAt, unpackPosList, unpackRampartPlanCoord, unpackRoomName, unpackStampAnchors } from './codec'
 import { CustomPathFinder } from 'international/customPathFinder'
+import { RoomUtils } from 'room/roomUtils'
+import { CommuneUtils } from 'room/commune/communeUtils'
+import { RoomDataManager } from 'room/roomData'
+import { CommuneDataManager } from 'room/commune/communeData'
 
 export function profilerRegister() {
 
@@ -131,6 +135,10 @@ export function profilerRegister() {
     profiler.registerClass(Operator, 'Operator')
     profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
     profiler.registerClass(SpawnUtils, 'SpawnUtils')
+    profiler.registerClass(RoomUtils, 'RoomUtils')
+    profiler.registerClass(CommuneUtils, 'CommuneUtils')
+    profiler.registerClass(RoomDataManager, 'RoomDataManager')
+    profiler.registerClass(CommuneDataManager, 'CommuneDataManager')
 
     // Objects
 

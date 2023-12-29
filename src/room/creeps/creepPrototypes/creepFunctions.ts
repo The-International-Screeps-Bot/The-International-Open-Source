@@ -59,6 +59,7 @@ import { RoomManager } from 'room/room'
 import { CreepRoomLogisticsRequest, RoomLogisticsRequest } from 'types/roomRequests'
 import { customLog, stringifyLog } from 'utils/logging'
 import { customPathFinder } from 'international/customPathFinder'
+import { communeUtils } from 'room/commune/communeUtils'
 
 Creep.prototype.update = function () {}
 
@@ -436,12 +437,13 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 Creep.prototype.findNewRepairTarget = function () {
 
     const enemyAttackers = !!this.room.roomManager.enemyAttackers.length
-    let repairThreshold = enemyAttackers ? 0.15 : 0.3
+    let repairThreshold = enemyAttackers ? 0.1 : 0.2
 
     let lowestScore = Infinity
     let bestTarget
 
-    for (const structure of this.room.roomManager.generalRepairStructures) {
+    const structures = communeUtils.getGeneralRepairStructures(this.room)
+    for (const structure of structures) {
         // If above 30% of max hits
 
         if (structure.nextHits / structure.hitsMax > repairThreshold) continue

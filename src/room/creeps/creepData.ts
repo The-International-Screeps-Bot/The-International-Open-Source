@@ -4,34 +4,34 @@ import { utils } from "utils/utils"
 export type Boosts = Partial<{[ key in MineralBoostConstant]: number }>
 
 export interface CreepData {
-  parts?: Partial<{[key in BodyPartConstant]: number }>
+  parts: Partial<{[key in BodyPartConstant]: number }>
   /**
    * update when applying boosts
    */
-  upgradeStrength?: number
+  upgradeStrength: number
   /**
    * update when applying boosts
    */
-  boosts?: Boosts
+  boosts: Boosts
   /**
    * update when applying boosts
    */
-  defenceStrength?: number
+  defenceStrength: number
 }
 /**
  * Handles cached data for creeps we own
  */
 export class CreepDataManager {
-  creepsData: {[creepName: string]: CreepData } = {}
+  creepsData: {[creepName: string]: Partial<CreepData> } = {}
 
-  run() {
+  updateData() {
 
     if (utils.isTickInterval(15)) {
       this.updateCreeps()
     }
   }
 
-  updateCreeps() {
+  private updateCreeps() {
 
     for (const creepName in Game.creeps) {
 

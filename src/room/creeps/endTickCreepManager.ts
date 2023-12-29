@@ -1,7 +1,6 @@
 import {
     RoomMemoryKeys,
     RoomTypes,
-    chant,
     customColors,
     enemyDieChants,
     friendlyDieChants,
@@ -119,7 +118,7 @@ export class EndTickCreepManager {
     private runChant() {
         if (!global.settings.creepChant) return
 
-        const currentChant = chant[Memory.chantIndex]
+        const currentChant = global.settings.creepChant[Memory.chantIndex]
         if (!currentChant) return
 
         let creeps: (Creep | PowerCreep)[] = this.roomManager.room.myCreeps

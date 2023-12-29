@@ -27,7 +27,6 @@ export class RoomVisualsManager {
     }
 
     public run() {
-        const { room } = this.roomManager
 
         this.roomVisuals()
         this.baseVisuals()

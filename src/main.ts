@@ -53,6 +53,8 @@ import { marketManager } from 'international/market/marketOrders'
 import { transactionsManager } from 'international/transactions'
 import { segmentsManager } from 'international/segments'
 import { creepDataManager } from 'room/creeps/creepData'
+import { communeDataManager } from 'room/commune/communeData'
+import { roomDataManager } from 'room/roomData'
 
 export function originalLoop() {
 
@@ -78,6 +80,8 @@ export function originalLoop() {
         wasm.collaborator()
 
         roomsManager.updateRun()
+        roomDataManager.updateRooms()
+        communeDataManager.updateCommunes()
         transactionsManager.run()
         requestsManager.run()
 
@@ -86,7 +90,7 @@ export function originalLoop() {
         playerManager.run()
         roomsManager.initRun()
         creepOrganizer.run()
-        creepDataManager.run()
+        creepDataManager.updateData()
         powerCreepOrganizer.run()
 
         roomPruningManager.run()

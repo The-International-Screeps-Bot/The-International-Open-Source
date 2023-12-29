@@ -27,6 +27,7 @@ import { customLog } from 'utils/logging'
 import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
 import { spawnUtils } from './spawnUtils'
 import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
+import { communeUtils } from '../communeUtils'
 
 export class SpawnRequestsManager {
     communeManager: CommuneManager
@@ -576,10 +577,9 @@ export class SpawnRequestsManager {
     private maintainers() {
         this.rawSpawnRequestsArgs.push(
             ((): SpawnRequestArgs | false => {
-                const generalRepairStructures =
-                    this.communeManager.room.roomManager.generalRepairStructures
+                const generalRepairStructures = communeUtils.getGeneralRepairStructures(this.communeManager.room)
                 const repairTargets = generalRepairStructures.filter(
-                    structure => structure.hitsMax * 0.2 >= structure.hits,
+                    structure => structure.hitsMax * 0.3 >= structure.hits,
                 )
 
                 // Get ramparts below their max hits

@@ -16,6 +16,7 @@ import { packCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
 import { RoomManager } from 'room/room'
 import { collectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
+import { communeUtils } from 'room/commune/communeUtils'
 
 export class CreepUtils {
     expandName(creepName: string) {
@@ -171,7 +172,7 @@ export class CreepUtils {
 
         const workPartCount = creep.parts.work
         // At some point we should compare this search with flat searching positions around the creep
-        const structure = creep.room.roomManager.generalRepairStructures.find(structure => {
+        const structure = communeUtils.getGeneralRepairStructures(creep.room).find(structure => {
             return (
                 getRange(structure.pos, creep.pos) <= 3 &&
                 structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER

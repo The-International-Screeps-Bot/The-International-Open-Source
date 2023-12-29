@@ -138,7 +138,6 @@ export class RoomManager {
     update(room: Room) {
         delete this._structureUpdate
         delete this.checkedCSiteUpdate
-        delete this._generalRepairStructures
         delete this._communeSources
         delete this._remoteSources
         delete this._mineral
@@ -791,47 +790,6 @@ export class RoomManager {
         if (!packedPositions) throw Error('No mineral harvest positions ' + this.room.name)
 
         return (this._mineralHarvestPositions = unpackPosList(packedPositions))
-    }
-
-    _generalRepairStructures: (StructureContainer | StructureRoad)[]
-    get generalRepairStructures() {
-        // THIS CODE WON'T WORK FOR HIGHWAY ROOMS! FIX!
-
-        if (this._generalRepairStructures) return this._generalRepairStructures
-
-        const generalRepairStructures: (StructureContainer | StructureRoad)[] = []
-
-        const roomType = this.room.memory[RoomMemoryKeys.type]
-        if (roomType === RoomTypes.commune) {
-            const structures = this.structures
-            const relevantStructures = (
-                structures.container as (StructureContainer | StructureRoad)[]
-            ).concat(structures.road)
-            const basePlans = this.basePlans
-            const RCL = this.room.controller.level
-
-            for (const structure of relevantStructures) {
-                const coordData = basePlans.map[packCoord(structure.pos)]
-                if (!coordData) continue
-
-                for (const data of coordData) {
-                    if (data.minRCL > RCL) continue
-                    if (data.structureType !== structure.structureType) break
-
-                    generalRepairStructures.push(structure)
-                    break
-                }
-            }
-
-            return (this._generalRepairStructures = generalRepairStructures)
-        }
-        if (roomType === RoomTypes.remote) {
-            return (this._generalRepairStructures = generalRepairStructures)
-        }
-
-        // Non-commune non-remote
-
-        return (this._generalRepairStructures = generalRepairStructures)
     }
 
     _remoteControllerPositions: RoomPosition[]

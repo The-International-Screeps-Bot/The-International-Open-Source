@@ -87,7 +87,7 @@ export interface Settings {
     /**
      * Wether or not creeps should chant slogans
      */
-    creepChant: boolean
+    creepChant: string[]
 
     /**
      * The public segment number (0-99) that you and your allies are using
@@ -134,7 +134,29 @@ export const defaultSettings: Settings = {
     marketUsage: true,
     logging: Game.shard.name === 'performanceServer' ? 0 : 1,
     creepSay: true,
-    creepChant: true,
+    creepChant: [
+        'Creeps',
+        'of',
+        Game.shard.name,
+        'unite,',
+        'you',
+        'have',
+        'nothing',
+        'to',
+        'lose',
+        'but',
+        'your',
+        'chains!',
+        undefined,
+        'PEACE',
+        'LAND',
+        'ENERGY',
+        undefined,
+        'Democracy',
+        'is non-',
+        'negotiable!',
+        undefined,
+    ],
     allySegmentID: 90,
     errorExporting: true,
     structureMigration: true,
