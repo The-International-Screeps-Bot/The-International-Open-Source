@@ -651,7 +651,7 @@ export class LabManager {
     }
 
     private createInputRoomLogisticsRequests() {
-        let inputLabs = this.inputLabs
+        const inputLabs = this.inputLabs
         for (let i = 0; i < inputLabs.length; i++) {
             const lab = inputLabs[i]
             const resourceType = this.inputResources[i]

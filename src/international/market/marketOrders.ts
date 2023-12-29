@@ -1,13 +1,12 @@
 import { findHighestScore, randomTick, utils } from 'utils/utils'
-import { PlayerMemoryKeys, Result, RoomMemoryKeys } from './constants'
-import { collectiveManager } from './collective'
+import { PlayerMemoryKeys, Result, RoomMemoryKeys } from '../constants'
+import { collectiveManager } from '../collective'
 import { customLog } from 'utils/logging'
 
 export class MarketManager {
     run() {
-        this._allOrdersUnorganized = undefined
         this._myOrders = undefined
-        this._orders = undefined
+        this.cachedOrders = {}
         this._myOrdersCount = undefined
         this.resourceHistory ??= {}
 
@@ -51,7 +50,7 @@ export class MarketManager {
 
             if (order.type === ORDER_BUY) {
 
-                const orders = marketManager.orders[ORDER_BUY][order.resourceType]
+                const orders = this.getOrders(order.resourceType, ORDER_BUY)
                 if (!orders) continue
 
                 const newPrice = Math.min(
@@ -65,7 +64,7 @@ export class MarketManager {
 
             // The order type is sell
 
-            const orders = marketManager.orders[ORDER_SELL][order.resourceType]
+            const orders = this.getOrders(order.resourceType, ORDER_SELL)
             if (!orders) continue
 
             const newPrice = Math.min(
@@ -81,7 +80,7 @@ export class MarketManager {
      * Finds the cheapest sell order
      */
     getShardSellOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders.sell[resourceType]
+        const orders = this.getOrders(resourceType, ORDER_SELL)
         if (!orders) return Result.fail
 
         let bestOrder: Order
@@ -105,7 +104,7 @@ export class MarketManager {
      * Finds the most expensive buy order
      */
     getShardBuyOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, minPrice = this.getAvgPrice(resourceType) * 0.8) {
-        const orders = this.orders.buy[resourceType]
+        const orders = this.getOrders(resourceType, ORDER_BUY)
         if (!orders) return Result.fail
 
         let bestOrder: Order
@@ -130,7 +129,7 @@ export class MarketManager {
      * Finds the cheapest sell order
      */
     getGlobalSellOrder(resourceType: MarketResourceConstant, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
-        const orders = this.orders.sell[resourceType]
+        const orders = this.getOrders(resourceType, ORDER_SELL)
         if (!orders) return Result.fail
 
         let bestOrder: Order
@@ -155,7 +154,7 @@ export class MarketManager {
      * Finds the most expensive buy order
      */
     getGlobalBuyOrder(resourceType: MarketResourceConstant, minPrice = this.getAvgPrice(resourceType) * 0.8) {
-        const orders = this.orders.buy[resourceType]
+        const orders = this.getOrders(resourceType, ORDER_BUY)
         if (!orders) return Result.fail
 
         let bestOrder: Order
@@ -239,36 +238,30 @@ export class MarketManager {
         })
     }
 
-    _allOrdersUnorganized: Order[]
-    get allOrdersUnorganized() {
-        if (this._allOrdersUnorganized) return this._allOrdersUnorganized
-
-        return this._allOrdersUnorganized = Game.market.getAllOrders()
-    }
+    /**
+     * intra-tick cached orders sorted by resourceType and trade type
+     */
+    cachedOrders: CachedMarketOrders
 
     /**
-     * Existing other-player orders ordered by order type and resourceType
+     * orders created by other players that we are on acceptable terms with, for a specified resource and trade type
+     * See engine: https://github.com/screeps/engine/blob/7ee5b8e24b16b6b31727a83db15f676f5061a114/src/game/market.js#L13
+     * It seems that there is caching for each resource, but nothing else. So we will use that cache while also organizing by order type (BUY or SELL)
      */
-    _orders?: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
+    getOrders(resourceType: MarketResourceConstant, orderType: MarketOrderTypes) {
 
-    /**
-     * Gets existing other-player orders ordered by order type and resourceType
-     */
-    get orders() {
-        // If _orders are already defined, inform them
+        if (this.cachedOrders[resourceType]) {
 
-        /* if (this._orders) return this._orders */
-
-        const orders: Record<string, Partial<Record<MarketResourceConstant, Order[]>>> = {
-            buy: {},
-            sell: {},
+            return this.cachedOrders[resourceType][orderType]
         }
 
-        // Get the market's order and loop through them
+        const ordersByType: CachedMarketOrders[MarketResourceConstant] = {
+            [ORDER_BUY]: [],
+            [ORDER_SELL]: [],
+        }
 
-        const unorganizedOrders = this.allOrdersUnorganized
-
-        for (const order of unorganizedOrders) {
+        const orders = Game.market.getAllOrders({  })
+        for (const order of orders) {
 
             // Make sure the order isn't coming from a room we own
             if (collectiveManager.communes.has(order.roomName)) continue
@@ -277,7 +270,6 @@ export class MarketManager {
             // Filter out orders from players we hate
             if (
                 roomMemory &&
-                roomMemory[RoomMemoryKeys.owner] &&
                 Memory.players[roomMemory[RoomMemoryKeys.owner]] &&
                 Memory.players[roomMemory[RoomMemoryKeys.owner]][PlayerMemoryKeys.hate] > 0
             ) {
@@ -285,14 +277,11 @@ export class MarketManager {
                 continue
             }
 
-            orders[order.type][order.resourceType] ??= [order]
-
-            // Assign the order to a resource-ordered location
-
-            orders[order.type][order.resourceType].push(order)
+            ordersByType[order.type as MarketOrderTypes].push(order)
         }
 
-        return (this._orders = orders)
+        this.cachedOrders[resourceType] = ordersByType
+        return ordersByType[orderType]
     }
 
     /**
@@ -368,7 +357,7 @@ export class MarketManager {
     get isMarketFunctional() {
         if (this._isMarketFunctional !== undefined) return this._isMarketFunctional
 
-        return (this._isMarketFunctional = !!this.allOrdersUnorganized.length)
+        return (this._isMarketFunctional = !!Game.market.getAllOrders().length)
     }
 
     private resourceHistory: Partial<{[key in MarketResourceConstant]: {[days: string]: number}}>
@@ -405,8 +394,16 @@ export class MarketManager {
 
     decidePrice(resourceType: ResourceConstant, priority: number, startTick: number = Game.time) {
 
-        
+
     }
 }
 
 export const marketManager = new MarketManager()
+
+export type MarketOrderTypes = ORDER_BUY | ORDER_SELL
+
+export type CachedMarketOrders = Partial<{
+        [key in MarketResourceConstant]: {
+            [key in MarketOrderTypes]: Order[]
+        }
+    }>

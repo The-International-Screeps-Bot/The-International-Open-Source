@@ -1,5 +1,5 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { Result, RoomMemoryKeys, RoomTypes, customColors, ourImpassibleStructuresSet } from './constants'
+import { Result, RoomLogisticsRequestTypes, RoomMemoryKeys, RoomTypes, customColors, ourImpassibleStructuresSet } from './constants'
 import { collectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
 import { roomNameUtils } from 'room/roomNameUtils'
@@ -489,6 +489,126 @@ export class FlagManager {
                             data,
                             config: {
                                 label: 'Spawn Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+    }
+
+    private labDataVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const headers = [
+            'Lab output',
+            'Lab input 1',
+            'Lab input 2',
+            'Lab reverse',
+        ]
+        const data: any[][] = []
+
+        const labManager = room.communeManager.labManager
+        const row = [
+            labManager.outputResource,
+            labManager.inputResources[0],
+            labManager.inputResources[1],
+            labManager.outputResource,
+        ]
+        data.push(row)
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Lab Data',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+    }
+
+    private roomLogisticsDataVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const headers = [
+            'type',
+            'resourceType',
+            'amount',
+            'priority',
+            'position',
+        ]
+        const data: any[][] = []
+
+        for (const key in room.roomLogisticsRequests) {
+
+            const requestType = key as unknown as RoomLogisticsRequestTypes
+            const requests = room.roomLogisticsRequests[requestType]
+            for (const ID in requests) {
+
+                const request = requests[ID]
+                const row: any[] = [
+                    request.type,
+                    request.resourceType,
+                    request.amount,
+                    request.priority,
+                    findObjectWithID(request.targetID).pos,
+                ]
+                data.push(row)
+            }
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Room Logistics Requests',
                                 headers,
                             },
                         })),

@@ -22,6 +22,7 @@ import {
     WorkTypes,
     creepRoles,
     PowerCreepTasks,
+    RoomLogisticsRequestTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'

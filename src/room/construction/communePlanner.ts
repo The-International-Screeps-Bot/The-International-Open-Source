@@ -3292,10 +3292,16 @@ export class CommunePlanner {
         roomMemory[RoomMemoryKeys.mineralPath] = plan.mineralPath
         roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
         roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
+
         roomMemory[RoomMemoryKeys.communePlanned] = true
 
         // Delete uneeded plan data from global to free up space
-        delete this.planAttempts
+        /* delete this.planAttempts */
+        for (var key in this){
+            if (this.hasOwnProperty(key)){
+                delete this[key];
+            }
+        }
     }
     private visualizeGrid() {
         for (let x = 0; x < roomDimensions; x++) {

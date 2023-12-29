@@ -781,6 +781,8 @@ export class CommuneManager {
 
     private _rampartRepairTargets: StructureRampart[]
     get rampartRepairTargets() {
+        if (this._rampartRepairTargets) return this._rampartRepairTargets
+
         const rampartRepairTargets: StructureRampart[] = []
         const rampartPlans = this.room.roomManager.rampartPlans
 

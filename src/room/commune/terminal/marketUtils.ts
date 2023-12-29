@@ -2,7 +2,7 @@ import { customLog } from 'utils/logging'
 import { findLowestScore } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
-import { marketManager } from 'international/marketOrders'
+import { marketManager } from 'international/market/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
 export class MarketUtils {

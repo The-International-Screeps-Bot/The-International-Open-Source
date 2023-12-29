@@ -6,7 +6,7 @@ import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/s
 import { collectiveManager } from 'international/collective'
 import { CommuneManager, ResourceTargets } from 'room/commune/commune'
 import { marketUtils } from './marketUtils'
-import { marketManager } from 'international/marketOrders'
+import { marketManager } from 'international/market/marketOrders'
 
 export class TerminalManager {
     communeManager: CommuneManager
