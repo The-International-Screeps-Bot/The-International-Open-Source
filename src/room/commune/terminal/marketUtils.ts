@@ -44,7 +44,7 @@ export class MarketUtils {
         if (Game.market.credits < collectiveManager.minCredits) return false
         if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        const orders = marketManager.orders[ORDER_SELL][resourceType]
+        const orders = marketManager.getOrders(resourceType, ORDER_SELL)
         if (!orders) return false
 
         const price = Math.max(
@@ -107,7 +107,7 @@ export class MarketUtils {
         if (mySpecificOrders.length) return false
         if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        const orders = marketManager.orders[ORDER_BUY][resourceType]
+        const orders = marketManager.getOrders(resourceType, ORDER_BUY)
         if (!orders) return false
 
         const price = Math.min(
