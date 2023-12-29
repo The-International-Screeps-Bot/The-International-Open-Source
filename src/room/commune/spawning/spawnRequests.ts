@@ -584,7 +584,7 @@ export class SpawnRequestsManager {
 
                 // Get ramparts below their max hits
 
-                const repairRamparts = this.communeManager.rampartRepairTargets.filter(
+                const repairRamparts = communeUtils.getRampartRepairTargets(this.communeManager.room).filter(
                     rampart =>
                         rampart.hits < this.communeManager.room.communeManager.minRampartHits,
                 )

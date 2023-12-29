@@ -190,7 +190,6 @@ export class CommuneManager {
         delete this._minStoredEnergy
         delete this._storingStructures
         delete this._maxCombatRequests
-        delete this._rampartRepairTargets
         delete this._defensiveRamparts
         delete this._sourceLinks
         delete this._controllerLink
@@ -790,44 +789,6 @@ export class CommuneManager {
         }
 
         return (this._defensiveRamparts = ramparts)
-    }
-
-    private _rampartRepairTargets: StructureRampart[]
-    get rampartRepairTargets() {
-        if (this._rampartRepairTargets) return this._rampartRepairTargets
-
-        const rampartRepairTargets: StructureRampart[] = []
-        const rampartPlans = this.room.roomManager.rampartPlans
-
-        for (const structure of this.room.roomManager.structures.rampart) {
-            const data = rampartPlans.map[packCoord(structure.pos)]
-            if (!data) continue
-
-            if (data.minRCL > this.room.controller.level) continue
-            if (
-                data.coversStructure &&
-                !this.room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
-            ) {
-                continue
-            }
-
-            if (data.buildForNuke) {
-                if (!this.room.roomManager.nukeTargetCoords[packAsNum(structure.pos)]) continue
-
-                rampartRepairTargets.push(structure)
-                continue
-            }
-            if (data.buildForThreat) {
-                if (!this.buildSecondMincutLayer) continue
-
-                rampartRepairTargets.push(structure)
-                continue
-            }
-
-            rampartRepairTargets.push(structure)
-        }
-
-        return (this._rampartRepairTargets = rampartRepairTargets)
     }
 
     /**

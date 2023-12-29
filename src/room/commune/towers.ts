@@ -20,6 +20,7 @@ import {
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { playerManager } from 'international/players'
+import { communeUtils } from './communeUtils'
 
 const minTowerRampartRepairTreshold = RAMPART_DECAY_AMOUNT * 1.5
 
@@ -219,7 +220,7 @@ export class TowerManager {
         const { room } = this.communeManager
         const ramparts = room.roomManager.enemyAttackers.length
             ? room.communeManager.defensiveRamparts
-            : room.communeManager.rampartRepairTargets
+            : communeUtils.getRampartRepairTargets(room)
 
         const [score, rampart] = findWithLowestScore(ramparts, rampart => {
             let score = rampart.hits

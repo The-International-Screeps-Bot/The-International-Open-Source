@@ -419,7 +419,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 Creep.prototype.findNewRampartRepairTarget = function () {
     const ramparts = this.room.roomManager.enemyAttackers.length
         ? this.room.communeManager.defensiveRamparts
-        : this.room.communeManager.rampartRepairTargets
+        : communeUtils.getRampartRepairTargets(this.room)
 
     const [score, bestTarget] = findWithLowestScore(ramparts, structure => {
         if (structure.nextHits / structure.hitsMax > 0.9) return false

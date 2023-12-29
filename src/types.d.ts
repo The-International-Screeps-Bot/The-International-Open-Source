@@ -523,6 +523,7 @@ declare global {
         usedRampartIDs: Map<Id<StructureRampart>, Id<Creep>>
 
         generalRepairStructures: (StructureRoad | StructureContainer)[]
+        rampartRepairStructures: StructureRampart[]
 
         // Commune
 

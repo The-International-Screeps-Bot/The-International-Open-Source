@@ -5,7 +5,8 @@ interface CommuneData {
    * The last registered room controller level for the commune
    */
   registeredRCL: number
-  generalRepairStructureCoords: Set<number>
+  generalRepairStructureCoords: Set<string>
+  rampartRepairStructureCoords: Set<string>
 }
 
 /**

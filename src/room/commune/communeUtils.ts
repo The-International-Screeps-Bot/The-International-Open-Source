@@ -1,8 +1,8 @@
-import { packCoord } from "other/codec"
+import { packCoord, unpackCoord } from "other/codec"
 import { communeDataManager } from "./communeData"
 import { roomDataManager } from "room/roomData"
 import { packAsNum, unpackNumAsCoord } from "utils/utils"
-import { Result, generalRepairStructureTypes } from "international/constants"
+import { Result, generalRepairStructureTypes, structureTypesToProtectSet } from "international/constants"
 
 export class CommuneUtils {
   getRCLUpdate(room: Room) {
@@ -14,6 +14,7 @@ export class CommuneUtils {
     }
     // If things haven't been registered yet
     if (data.registeredRCL === undefined) {
+      data.registeredRCL = room.controller.level
       return
     }
 
@@ -25,8 +26,8 @@ export class CommuneUtils {
     const communeData = communeDataManager.data[room.name]
     /* const roomData = roomDataManager.data[room.name] */
 
-    delete communeData.registeredRCL
     delete communeData.generalRepairStructureCoords
+    delete communeData.rampartRepairStructureCoords
 
     communeData.registeredRCL = room.controller.level
   }
@@ -34,55 +35,132 @@ export class CommuneUtils {
   getGeneralRepairStructures(room: Room) {
     if (room.generalRepairStructures) return room.generalRepairStructures
 
-    const generalRepairStructures: (StructureContainer | StructureRoad)[] = []
-    if (this.getGeneralRepairStructuresFromCoords(room, generalRepairStructures) === Result.success) {
-      return generalRepairStructures
+    const repairTargets = this.getGeneralRepairStructuresFromCoords(room)
+    if (repairTargets.length) {
+      room.generalRepairStructures = repairTargets
+      return repairTargets
     }
 
-    const structureCoords = new Set<number>()
-    const structures = room.roomManager.structures
-    const relevantStructures = (
-        structures.container as (StructureContainer | StructureRoad)[]
-    ).concat(structures.road)
+    const structureCoords = new Set<string>()
     const basePlans = room.roomManager.basePlans
     const RCL = room.controller.level
 
-    for (const structure of relevantStructures) {
-        const coordData = basePlans.map[packCoord(structure.pos)]
-        if (!coordData) continue
+    for (const packedCoord in basePlans.map) {
 
-        for (const data of coordData) {
-            if (data.minRCL > RCL) continue
-            if (data.structureType !== structure.structureType) break
+      const coordData = basePlans.map[packedCoord]
+      for (const data of coordData) {
+        if (data.minRCL > RCL) continue
+        if (!generalRepairStructureTypes.has(data.structureType as (STRUCTURE_ROAD | STRUCTURE_CONTAINER))) break
 
-            generalRepairStructures.push(structure)
-            structureCoords.add(packAsNum(structure.pos))
-            break
-        }
+        structureCoords.add(packedCoord)
+
+        const coord = unpackCoord(packedCoord)
+        const structure = room.findStructureAtCoord<StructureContainer | StructureRoad>(coord, structure => generalRepairStructureTypes.has(structure.structureType))
+        if (!structure) continue
+
+        repairTargets.push(structure)
+        break
+      }
     }
 
     communeDataManager.data[room.name].generalRepairStructureCoords = structureCoords
 
-    room.generalRepairStructures = generalRepairStructures
-    return generalRepairStructures
+    room.generalRepairStructures = repairTargets
+    return repairTargets
   }
 
-  private getGeneralRepairStructuresFromCoords(room: Room, generalRepairStructures: (StructureContainer | StructureRoad)[]) {
+  private getGeneralRepairStructuresFromCoords(room: Room) {
 
+    const repairTargets: (StructureContainer | StructureRoad)[] = []
     const structureCoords = communeDataManager.data[room.name].generalRepairStructureCoords
-    if (!structureCoords) return Result.fail
+    if (!structureCoords) return repairTargets
 
     for (const packedCoord of structureCoords) {
 
-      const coord = unpackNumAsCoord(packedCoord)
+      const coord = unpackCoord(packedCoord)
 
       const structure = room.findStructureAtCoord<StructureContainer | StructureRoad>(coord, structure => generalRepairStructureTypes.has(structure.structureType))
-      if (!structure) return Result.fail
+      if (!structure) return []
 
-      generalRepairStructures.push(structure)
+      repairTargets.push(structure)
     }
 
-    return Result.success
+    return repairTargets
+  }
+
+  getRampartRepairTargets(room: Room) {
+    if (room.rampartRepairStructures) return room.rampartRepairStructures
+
+    const repairTargets = this.getRampartRepairTargetsFromCoords(room)
+    if (repairTargets.length) {
+      room.rampartRepairStructures = repairTargets
+      return repairTargets
+    }
+
+    const structureCoords = new Set<string>()
+    const rampartPlans = room.roomManager.rampartPlans
+    const RCL = room.controller.level
+    const buildSecondMincutLayer = room.communeManager.buildSecondMincutLayer
+    const nukeTargetCoords = room.roomManager.nukeTargetCoords
+
+    for (const packedCoord in rampartPlans.map) {
+
+      const data = rampartPlans.map[packedCoord]
+      if (data.minRCL > RCL) continue
+
+      structureCoords.add(packedCoord)
+
+      const coord = unpackCoord(packedCoord)
+      const structure = room.findStructureAtCoord<StructureRampart>(coord, structure => structure.structureType === STRUCTURE_RAMPART)
+      if (!structure) continue
+
+      if (
+        data.coversStructure &&
+        !room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
+      ) {
+          continue
+      }
+
+      if (data.buildForNuke) {
+          if (!nukeTargetCoords[packAsNum(structure.pos)]) continue
+
+          repairTargets.push(structure)
+          continue
+      }
+      if (data.buildForThreat) {
+          if (!buildSecondMincutLayer) continue
+
+          repairTargets.push(structure)
+          continue
+      }
+
+      repairTargets.push(structure)
+      break
+    }
+
+    communeDataManager.data[room.name].rampartRepairStructureCoords = structureCoords
+
+    room.rampartRepairStructures
+    return repairTargets
+  }
+
+  private getRampartRepairTargetsFromCoords(room: Room) {
+
+    const repairTargets: StructureRampart[] = []
+    const structureCoords = communeDataManager.data[room.name].generalRepairStructureCoords
+    if (!structureCoords) repairTargets
+
+    for (const packedCoord of structureCoords) {
+
+      const coord = unpackCoord(packedCoord)
+
+      const structure = room.findStructureAtCoord<StructureRampart>(coord, structure => structure.structureType === STRUCTURE_RAMPART)
+      if (!structure) return []
+
+      repairTargets.push(structure)
+    }
+
+    return repairTargets
   }
 }
 
