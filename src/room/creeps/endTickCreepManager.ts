@@ -1,4 +1,5 @@
 import {
+    MovedTypes,
     RoomMemoryKeys,
     RoomTypes,
     customColors,
@@ -32,7 +33,7 @@ export class EndTickCreepManager {
 
                 if (!creep.moveRequest) continue
                 if (!room.moveRequests[creep.moveRequest]) {
-                    creep.moved = 'moved'
+                    creep.moved = MovedTypes.moved
                     continue
                 }
 

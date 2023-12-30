@@ -1,6 +1,7 @@
 import {
     CreepMemoryKeys,
     CreepRoomLogisticsRequestKeys,
+    MovedTypes,
     Result,
     RoomLogisticsRequestTypes,
     RoomMemoryKeys,
@@ -539,7 +540,7 @@ export class Hauler extends Creep {
 
         // We are next to the source
 
-        this.moved = 'wait'
+        this.moved = MovedTypes.wait
 
         return !this.needsResources()
     }

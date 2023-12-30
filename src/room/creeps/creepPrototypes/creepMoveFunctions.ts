@@ -14,6 +14,7 @@ import {
     Result,
     communeCreepRoles,
     ReservedCoordTypes,
+    MovedTypes,
 } from 'international/constants'
 import { customPathFinder } from 'international/customPathFinder'
 import { collectiveManager } from 'international/collective'
@@ -166,7 +167,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.moved) return Result.noAction
     if (this.fatigue > 0) return Result.noAction
     if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
-        this.moved = 'moved'
+        this.moved = MovedTypes.moved
         return Result.noAction
     }
 
@@ -237,7 +238,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
             /* this.room.visual.text(pos.roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
 
             this.memory[CreepMemoryKeys.path] = packedPath
-            this.moved = 'moved'
+            this.moved = MovedTypes.moved
             return Result.success
         }
 
@@ -287,7 +288,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moved) return Result.noAction
     if (this.fatigue > 0) return Result.noAction
     if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
-        this.moved = 'moved'
+        this.moved = MovedTypes.moved
         return Result.noAction
     }
     /*
@@ -451,7 +452,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     }
 
     if (path[0].roomName !== this.room.name) {
-        this.moved = 'moved'
+        this.moved = MovedTypes.moved
         return Result.success
     }
     this.assignMoveRequest(path[0])
@@ -669,7 +670,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     if (this.spawning) return
     if (!this.moveRequest) return
     if (!room.moveRequests[this.moveRequest]) {
-        this.moved = 'moved'
+        this.moved = MovedTypes.moved
         return
     }
 
@@ -736,7 +737,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // if creepAtPos is fatigued it is useless to us
 
     if ((creepAtPos as Creep).fatigue > 0) {
-        this.moved = 'wait'
+        this.moved = MovedTypes.wait
 
         /* delete room.moveRequests[this.moved] */
         delete this.moveRequest
@@ -773,15 +774,15 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             this.moved = 'moved'
             return
         } */
-        if (creepAtPos.moved === 'moved') {
+        if (creepAtPos.moved === MovedTypes.moved) {
             this.runMoveRequest()
             return
         }
 
-        if (creepAtPos.moved === 'wait') {
+        if (creepAtPos.moved === MovedTypes.wait) {
             if (creepAtPos instanceof PowerCreep) {
                 delete this.moveRequest
-                this.moved = 'wait'
+                this.moved = MovedTypes.wait
                 return
             }
 
@@ -814,7 +815,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             }
 
             delete this.moveRequest
-            this.moved = 'wait'
+            this.moved = MovedTypes.wait
             return
         }
 
@@ -923,13 +924,13 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
                 this.runMoveRequest()
 
                 delete creepAtPos.moveRequest
-                creepAtPos.moved = 'moved'
+                creepAtPos.moved = MovedTypes.moved
 
                 return
             }
 
             delete this.moveRequest
-            this.moved = 'moved'
+            this.moved = MovedTypes.moved
 
             creepAtPos.runMoveRequest()
             return

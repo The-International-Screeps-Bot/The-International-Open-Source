@@ -23,6 +23,7 @@ import {
     creepRoles,
     PowerCreepTasks,
     RoomLogisticsRequestTypes,
+    MovedTypes,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -876,9 +877,9 @@ declare global {
         movedResource: boolean
 
         /**
-         * The packed coord the creep is trying to act upon, if it exists. -1 means the move attempt failed
+         * The packed coord the creep is trying to act upon, or the action it has decided on
          */
-        moved?: string | 'moved' | 'wait'
+        moved?: string | MovedTypes
 
         /**
          * The creep's opts when trying to make a moveRequest intra tick

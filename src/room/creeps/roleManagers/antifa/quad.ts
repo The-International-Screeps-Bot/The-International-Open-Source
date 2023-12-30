@@ -1,6 +1,7 @@
 import {
     CombatRequestKeys,
     CreepMemoryKeys,
+    MovedTypes,
     Result,
     RoomMemoryKeys,
     RoomTypes,
@@ -203,7 +204,7 @@ export class Quad {
             if (kiteResult === Result.action) return true
             if (kiteResult === Result.stop) {
 
-                
+
                 return true
             }
 
@@ -338,7 +339,7 @@ export class Quad {
     }
 
     holdFormation() {
-        for (const member of this.members) member.moved = 'moved'
+        for (const member of this.members) member.moved = MovedTypes.moved
     }
 
     createMoveRequest(opts: CustomPathFinderArgs, moveLeader = this.leader) {

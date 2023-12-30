@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, RoomTypes, customColors, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, MovedTypes, RoomTypes, customColors, roomDimensions } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils/utils'
 import { Antifa } from './antifa'
 import { CustomPathFinderArgs } from 'international/customPathFinder'
@@ -123,7 +123,7 @@ export class Duo {
     }
 
     holdFormation() {
-        for (const member of this.members) member.moved = 'moved'
+        for (const member of this.members) member.moved = MovedTypes.moved
     }
 
     createMoveRequest(opts: CustomPathFinderArgs, moveLeader = this.leader) {

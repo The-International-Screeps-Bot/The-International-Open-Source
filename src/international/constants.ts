@@ -1394,3 +1394,8 @@ export enum SegmentIDs {
     BasePlans = 1,
     Errors = 10,
 }
+
+export enum MovedTypes {
+    moved = 1,
+    wait,
+}
