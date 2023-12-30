@@ -7,6 +7,7 @@ import {
 } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
+import { creepUtils } from 'room/creeps/creepUtils'
 
 export class Vanguard extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -160,8 +161,10 @@ export class Vanguard extends Creep {
 
                 // Try to normally harvest. Iterate if creep harvested
 
-                if (this.advancedHarvestSource(this.room.roomManager.communeSources[sourceIndex]))
+                const source = this.room.roomManager.communeSources[sourceIndex]
+                if (creepUtils.harvestSource(this, source) === Result.success) {
                     return
+                }
                 return
             }
 

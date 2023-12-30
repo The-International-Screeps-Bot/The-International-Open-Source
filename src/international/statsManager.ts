@@ -145,7 +145,7 @@ const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
 export class StatsManager {
     stats: {
         [roomType in RoomTypes.commune | RoomTypes.remote]: {
-            [roomName: string]: Partial<RoomStats | CommuneStats>
+            [roomName: string]: Partial<CommuneStats>
         }
     }
 
@@ -444,23 +444,30 @@ export class StatsManager {
         return roundTo(avg, precision)
     }
 
-    updateStat(roomName: string, name: string, value: number) {
-        if (!this.stats) return
-
-        let roomStatName = name as keyof RoomStats
+    updateStat(roomName: string, statName: (keyof RoomStats | keyof CommuneStats), value: number) {
 
         if (this.stats[RoomTypes.commune][roomName]) {
-            ;(this.stats[RoomTypes.commune][roomName] as CommuneStats)[roomStatName] += value
+            this.updateCommuneStat(roomName, statName as keyof CommuneStats, value)
             return
         }
 
         if (this.stats[RoomTypes.remote][roomName]) {
-            if (remoteStatNames.has(roomStatName)) {
-                roomStatName = ('r' + roomStatName) as keyof RoomStats
+            if (remoteStatNames.has(statName)) {
+                statName = ('r' + statName) as keyof RoomStats
             }
 
-            ;(this.stats[RoomTypes.remote][roomName] as RoomStats)[roomStatName] += value
+            this.updateRemoteStat(roomName, statName, value)
         }
+    }
+
+    updateCommuneStat(roomName: string, statName: keyof CommuneStats, value: number) {
+
+        this.stats[RoomTypes.commune][roomName][statName] += value
+    }
+
+    updateRemoteStat(roomName: string, statName: (keyof RoomStats | keyof CommuneStats), value: number) {
+
+        this.stats[RoomTypes.remote][roomName][statName] += value
     }
 }
 

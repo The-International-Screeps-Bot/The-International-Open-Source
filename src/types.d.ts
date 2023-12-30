@@ -754,11 +754,6 @@ declare global {
             amount?: number,
         ): boolean
 
-        /**
-         * Harvests a source and informs the result, while recording the result if successful
-         */
-        advancedHarvestSource(source: Source): boolean
-
         advancedBuild(): number
         builderGetEnergy(): number
 

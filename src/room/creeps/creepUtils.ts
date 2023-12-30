@@ -4,6 +4,8 @@ import {
     Result,
     RoomLogisticsRequestTypes,
     RoomMemoryKeys,
+    RoomStatsKeys,
+    WorkTypes,
     creepRoles,
     packedCoordLength,
     packedPosLength,
@@ -17,6 +19,7 @@ import { RoomManager } from 'room/room'
 import { collectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
 import { communeUtils } from 'room/commune/communeUtils'
+import { myCreepUtils } from './myCreepUtils'
 
 export class CreepUtils {
     expandName(creepName: string) {
@@ -423,6 +426,21 @@ export class CreepUtils {
         )
 
         return upgradePos
+    }
+    harvestSource(creep: Creep, source: Source) {
+        if (creep.harvest(source) !== OK) {
+            return Result.fail
+        }
+
+        creep.worked = WorkTypes.harvest
+
+        // Find the presumed energy harvested this tick
+        const energyHarvested = Math.min(myCreepUtils.parts(creep).work * HARVEST_POWER, source.energy)
+        creep.nextStore.energy += energyHarvested
+        // Record the harvest in stats
+        statsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyInputHarvest, energyHarvested)
+
+        return Result.success
     }
 }
 

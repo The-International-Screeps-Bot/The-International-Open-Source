@@ -187,31 +187,6 @@ Creep.prototype.advancedPickup = function (target) {
     return false
 }
 
-Creep.prototype.advancedHarvestSource = function (source) {
-    const harvestResult = this.harvest(source)
-
-    // Harvest the source, informing the result if it didn't succeed
-
-    if (harvestResult !== OK) {
-        this.message = `⛏️` + harvestResult
-        return false
-    }
-
-    // Record that the creep has worked
-
-    this.worked = WorkTypes.harvest
-
-    // Find amount of energy harvested and record it in data
-
-    const energyHarvested = Math.min(this.parts.work * HARVEST_POWER, source.energy)
-    this.nextStore.energy += energyHarvested
-
-    statsManager.updateStat(this.room.name, 'eih', energyHarvested)
-
-    this.message = `⛏️` + energyHarvested
-    return true
-}
-
 Creep.prototype.advancedBuild = function () {
     const cSiteTarget = this.room.roomManager.cSiteTarget
     if (!cSiteTarget) return Result.fail

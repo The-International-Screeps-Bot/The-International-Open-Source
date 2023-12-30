@@ -5,6 +5,7 @@ import {
     Result,
     RoomLogisticsRequestTypes,
     RoomMemoryKeys,
+    RoomStatsKeys,
     WorkTypes,
 } from 'international/constants'
 import { statsManager } from 'international/statsManager'
@@ -17,6 +18,7 @@ import {
 } from 'utils/utils'
 import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
+import { creepUtils } from 'room/creeps/creepUtils'
 
 export class SourceHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -64,7 +66,7 @@ export class SourceHarvester extends Creep {
             this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
 
         if (getRange(this.pos, source.pos) <= 1) {
-            this.advancedHarvestSource(source)
+            creepUtils.harvestSource(this, source)
         }
     }
 
@@ -259,7 +261,7 @@ export class SourceHarvester extends Creep {
             )
 
             // Add repair points to total repairPoints counter and say the success
-            statsManager.updateStat(this.room.name, 'eoro', energySpentOnRepairs)
+            statsManager.updateStat(this.room.name, RoomStatsKeys.EnergyOutputRepairOther, energySpentOnRepairs)
             this.message = `🔧${energySpentOnRepairs * REPAIR_POWER}`
 
             // Inform success
