@@ -43,13 +43,12 @@ export class CommuneUtils {
 
     const structureCoords = new Set<string>()
     const basePlans = room.roomManager.basePlans
-    const RCL = room.controller.level
 
     for (const packedCoord in basePlans.map) {
 
       const coordData = basePlans.map[packedCoord]
       for (const data of coordData) {
-        if (data.minRCL > RCL) continue
+        if (data.minRCL > room.controller.level) continue
         if (!generalRepairStructureTypes.has(data.structureType as (STRUCTURE_ROAD | STRUCTURE_CONTAINER))) break
 
         structureCoords.add(packedCoord)
@@ -93,7 +92,6 @@ export class CommuneUtils {
 
     const repairTargets: StructureRampart[] = []
     const rampartPlans = room.roomManager.rampartPlans
-    const RCL = room.controller.level
     const buildSecondMincutLayer = room.communeManager.buildSecondMincutLayer
     const nukeTargetCoords = room.roomManager.nukeTargetCoords
 
@@ -110,7 +108,7 @@ export class CommuneUtils {
       }
 
       if (data.buildForNuke) {
-          if (!room.roomManager.nukeTargetCoords[packAsNum(structure.pos)]) continue
+          if (!nukeTargetCoords[packAsNum(structure.pos)]) continue
 
           repairTargets.push(structure)
           continue
