@@ -1,3 +1,5 @@
+import { communeDataManager } from "./commune/communeData"
+
 interface RoomData {
 
 }
@@ -6,7 +8,7 @@ interface RoomData {
  * Handles cached data for rooms, including some overlapping data for communes and remotes
  */
 export class RoomDataManager {
-  data: {[roomName: string]: Partial<RoomData>}
+  data: {[roomName: string]: Partial<RoomData>} = {}
 
   updateRooms() {
     for (const roomName in Game.rooms) {
@@ -18,6 +20,11 @@ export class RoomDataManager {
   private updateRoom(room: Room) {
 
     this.data[room.name] ??= {}
+
+    if (room.controller && room.controller.my) {
+
+      communeDataManager.updateCommune(room)
+    }
   }
 }
 

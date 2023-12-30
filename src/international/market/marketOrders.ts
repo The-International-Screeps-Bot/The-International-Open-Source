@@ -81,7 +81,7 @@ export class MarketManager {
      */
     getShardSellOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
         const orders = this.getOrders(resourceType, ORDER_SELL)
-        if (!orders) return Result.fail
+        if (!orders.length) return Result.fail
 
         let bestOrder: Order
         let bestOrderCost = Infinity
@@ -105,7 +105,7 @@ export class MarketManager {
      */
     getShardBuyOrder(roomName: string, resourceType: MarketResourceConstant, amount: number, minPrice = this.getAvgPrice(resourceType) * 0.8) {
         const orders = this.getOrders(resourceType, ORDER_BUY)
-        if (!orders) return Result.fail
+        if (!orders.length) return Result.fail
 
         let bestOrder: Order
         let bestOrderCost = 0
@@ -130,7 +130,7 @@ export class MarketManager {
      */
     getGlobalSellOrder(resourceType: MarketResourceConstant, maxPrice = this.getAvgPrice(resourceType) * 1.2) {
         const orders = this.getOrders(resourceType, ORDER_SELL)
-        if (!orders) return Result.fail
+        if (!orders.length) return Result.fail
 
         let bestOrder: Order
         let bestOrderCost = Infinity
@@ -155,7 +155,7 @@ export class MarketManager {
      */
     getGlobalBuyOrder(resourceType: MarketResourceConstant, minPrice = this.getAvgPrice(resourceType) * 0.8) {
         const orders = this.getOrders(resourceType, ORDER_BUY)
-        if (!orders) return Result.fail
+        if (!orders.length) return Result.fail
 
         let bestOrder: Order
         let bestOrderPrice = 0
@@ -260,7 +260,7 @@ export class MarketManager {
             [ORDER_SELL]: [],
         }
 
-        const orders = Game.market.getAllOrders({  })
+        const orders = Game.market.getAllOrders({ resourceType })
         for (const order of orders) {
 
             // Make sure the order isn't coming from a room we own

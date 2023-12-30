@@ -147,8 +147,8 @@ export class CommuneUtils {
   private getRampartRepairTargetsFromCoords(room: Room) {
 
     const repairTargets: StructureRampart[] = []
-    const structureCoords = communeDataManager.data[room.name].generalRepairStructureCoords
-    if (!structureCoords) repairTargets
+    const structureCoords = communeDataManager.data[room.name].rampartRepairStructureCoords
+    if (!structureCoords) return repairTargets
 
     for (const packedCoord of structureCoords) {
 

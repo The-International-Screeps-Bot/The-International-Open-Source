@@ -15,15 +15,10 @@ interface CommuneData {
 export class CommuneDataManager {
   data: {[roomName: string]: Partial<CommuneData>} = {}
 
-  updateCommunes() {
-
-    for (const roomName of collectiveManager.communes) {
-
-      this.updateCommune(Game.rooms[roomName])
-    }
-  }
-
-  private updateCommune(room: Room) {
+  /**
+   * Handled by the RoomDataManager
+   */
+  updateCommune(room: Room) {
 
     this.data[room.name] ??= {}
   }
