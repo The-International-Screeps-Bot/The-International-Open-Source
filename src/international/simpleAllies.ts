@@ -53,6 +53,27 @@ export interface WorkRequest {
     workType: WorkRequestType
 }
 
+export const enum FunnelGoal {
+    GCL = 0,
+    RCL7 = 1,
+    RCL8 = 2
+}
+
+export interface FunnelRequest {
+    /**
+     * Amount of energy needed. Should be equal to energy that needs to be put into controller for achieving goal.
+     */
+    maxAmount: number;
+    /**
+     * What energy will be spent on. Room receiving energy should focus solely on achieving the goal.
+     */
+    goalType: FunnelGoal;
+    /**
+     * Room to which energy should be sent. If undefined resources can be sent to any of requesting player's rooms.
+     */
+    roomName?: string;
+}
+
 export interface EconRequest {
     /**
      * total credits the bot has. Should be 0 if there is no market on the server
@@ -94,14 +115,35 @@ export interface RoomRequest {
 }
 
 export interface AllyRequests {
-    resource?: ResourceRequest[]
-    defense?: DefenseRequest[]
-    attack?: AttackRequest[]
-    player?: PlayerRequest[]
-    work?: WorkRequest[]
+    resource: ResourceRequest[]
+    defense: DefenseRequest[]
+    attack: AttackRequest[]
+    player: PlayerRequest[]
+    work: WorkRequest[]
+    funnel: FunnelRequest[]
     econ?: EconRequest
-    room?: RoomRequest[]
+    room: RoomRequest[]
 }
+
+export interface DefenseResponse {
+    roomName: string
+}
+
+export interface AttackResponse {
+    roomName: string
+}
+
+export interface WorkResponse {
+    roomName: string
+}
+
+export interface AllyResponses {
+    // resource?: ResourceRequest[]
+    defense: DefenseResponse[]
+    attack: AttackResponse[]
+    work: WorkResponse[]
+}
+
 /**
  * Having data we pass into the segment being an object allows us to send additional information outside of requests
  */
@@ -113,24 +155,35 @@ export interface SimpleAlliesSegment {
     commands: any[]
 }
 
+const requestsSekelton: AllyRequests = {
+    resource: [],
+    defense: [],
+    attack: [],
+    player: [],
+    work: [],
+    funnel: [],
+    room: [],
+}
+
+const responsesSkeleton: AllyResponses = {
+    defense: [],
+    attack: [],
+    work: [],
+}
+
 export class SimpleAllies {
-    myRequests: Partial<AllyRequests> = {}
-    allySegmentData: SimpleAlliesSegment
-    currentAlly: string
+    myRequests: AllyRequests = {...requestsSekelton}
+    myResponses: AllyResponses = {...responsesSkeleton}
+    allySegmentData: Partial<SimpleAlliesSegment> = {}
+    currentAlly?: string
 
     /**
      * To call before any requests are made or responded to. Configures some required values and gets ally requests
      */
     initRun() {
         // Reset the data of myRequests
-        this.myRequests = {
-            resource: [],
-            defense: [],
-            attack: [],
-            player: [],
-            work: [],
-            room: [],
-        }
+        this.myRequests = {...requestsSekelton}
+        this.myResponses = {...responsesSkeleton}
 
         this.readAllySegment()
     }
@@ -230,6 +283,10 @@ export class SimpleAllies {
     requestWork(args: WorkRequest) {
 
         this.myRequests.work.push(args)
+    }
+
+    requestFunnel(args: FunnelRequest) {
+        this.myRequests.funnel.push(args)
     }
 
     requestEcon(args: EconRequest) {

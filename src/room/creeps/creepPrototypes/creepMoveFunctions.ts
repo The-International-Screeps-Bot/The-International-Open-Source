@@ -193,24 +193,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     const packedGoalPos = packPos(args.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
 
-    if (global.settings.roomVisuals) {
-        this.room.targetVisual(this.pos, args.goals[0].pos, true)
-
-        this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y, {
-            font: 0.4,
-        })
-        this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
-            font: 0.4,
-        })
-    }
-    /*
-    this.room.visual.text((posIndex || -1).toString(), this.pos.x, this.pos.y, {
-        font: 0.4,
-    })
-    this.room.visual.text(pathOpts.packedPath.length.toString(), this.pos.x, this.pos.y + 0.5, {
-        font: 0.4,
-    })
- */
     if (
         !isOnLastPos &&
         posIndex !== -1 &&
@@ -218,11 +200,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     ) {
         const packedPath = pathOpts.packedPath.slice(posIndex + packedPosLength)
         const pos = unpackPosAt(packedPath, 0)
-        /*
-        const path = unpackPosList(packedPath)
-        visualizePath(path)
- */
-        this.room.targetVisual(this.pos, pos)
 
         // If we're on an exit and the next pos is in the other room, wait
 
