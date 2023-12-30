@@ -1525,7 +1525,7 @@ Room.prototype.createWorkRequest = function () {
     if (communePlanned === false) return false
 
     if (communePlanned !== true) {
-        const result = this.roomManager.communePlanner.preTickRun()
+        const result = this.roomManager.communePlanner.preTickRun(this)
         if (result === Result.fail) {
             this.memory[RoomMemoryKeys.communePlanned] = false
             return false
