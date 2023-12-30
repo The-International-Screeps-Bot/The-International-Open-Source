@@ -18,16 +18,16 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { originalLoop } from 'main'
 import { creepClasses } from 'room/creeps/creepClasses'
-import { Utils, outOfBucket, utils } from 'utils/utils'
+import { Utils, outOfBucket } from 'utils/utils'
 import { CreepOrganizer } from 'international/creepOrganizer'
 import { RequestsManager } from 'international/requests'
 import { SimpleAllies } from 'international/simpleAllies'
 import { PlayerManager } from 'international/players'
 import { FlagManager } from 'international/flags'
-import { RoomNameUtils, roomNameUtils } from 'room/roomNameUtils'
-import { CreepUtils, creepUtils } from 'room/creeps/creepUtils'
-import { SpawnUtils, spawnUtils } from 'room/commune/spawning/spawnUtils'
-import { MarketUtils, marketUtils } from 'room/commune/terminal/marketUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
+import { SpawnUtils } from 'room/commune/spawning/spawnUtils'
+import { MarketUtils } from 'room/commune/terminal/marketUtils'
 import { CollectiveManager } from 'international/collective'
 import { MarketManager } from 'international/market/marketOrders'
 import { GarbageCollector } from 'international/garbageCollector'
@@ -67,6 +67,7 @@ import { RoomUtils } from 'room/roomUtils'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import { RoomDataManager } from 'room/roomData'
 import { CommuneDataManager } from 'room/commune/communeData'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export function profilerRegister() {
 
@@ -97,6 +98,7 @@ export function profilerRegister() {
     profiler.registerClass(MarketUtils, 'MarketUtils')
     profiler.registerClass(Utils, 'Utils')
     profiler.registerClass(CreepUtils, 'CreepUtils')
+    profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
 
     // Room classes
 
