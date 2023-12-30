@@ -91,38 +91,26 @@ export class CommuneUtils {
   getRampartRepairTargets(room: Room) {
     if (room.rampartRepairStructures) return room.rampartRepairStructures
 
-    const repairTargets = this.getRampartRepairTargetsFromCoords(room)
-    if (repairTargets.length) {
-      room.rampartRepairStructures = repairTargets
-      return repairTargets
-    }
-
-    const structureCoords = new Set<string>()
+    const repairTargets: StructureRampart[] = []
     const rampartPlans = room.roomManager.rampartPlans
     const RCL = room.controller.level
     const buildSecondMincutLayer = room.communeManager.buildSecondMincutLayer
     const nukeTargetCoords = room.roomManager.nukeTargetCoords
 
-    for (const packedCoord in rampartPlans.map) {
+    for (const structure of room.roomManager.structures.rampart) {
+      const data = rampartPlans.map[packCoord(structure.pos)]
+      if (!data) continue
 
-      const data = rampartPlans.map[packedCoord]
-      if (data.minRCL > RCL) continue
-
-      structureCoords.add(packedCoord)
-
-      const coord = unpackCoord(packedCoord)
-      const structure = room.findStructureAtCoord<StructureRampart>(coord, structure => structure.structureType === STRUCTURE_RAMPART)
-      if (!structure) continue
-
+      if (data.minRCL > room.controller.level) continue
       if (
-        data.coversStructure &&
-        !room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
+          data.coversStructure &&
+          !room.coordHasStructureTypes(structure.pos, structureTypesToProtectSet)
       ) {
           continue
       }
 
       if (data.buildForNuke) {
-          if (!nukeTargetCoords[packAsNum(structure.pos)]) continue
+          if (!room.roomManager.nukeTargetCoords[packAsNum(structure.pos)]) continue
 
           repairTargets.push(structure)
           continue
@@ -135,31 +123,9 @@ export class CommuneUtils {
       }
 
       repairTargets.push(structure)
-      break
-    }
-
-    communeDataManager.data[room.name].rampartRepairStructureCoords = structureCoords
-
-    room.rampartRepairStructures
-    return repairTargets
   }
 
-  private getRampartRepairTargetsFromCoords(room: Room) {
-
-    const repairTargets: StructureRampart[] = []
-    const structureCoords = communeDataManager.data[room.name].rampartRepairStructureCoords
-    if (!structureCoords) return repairTargets
-
-    for (const packedCoord of structureCoords) {
-
-      const coord = unpackCoord(packedCoord)
-
-      const structure = room.findStructureAtCoord<StructureRampart>(coord, structure => structure.structureType === STRUCTURE_RAMPART)
-      if (!structure) return []
-
-      repairTargets.push(structure)
-    }
-
+    room.rampartRepairStructures
     return repairTargets
   }
 }
