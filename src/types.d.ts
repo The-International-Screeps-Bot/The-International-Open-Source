@@ -800,15 +800,6 @@ declare global {
         /**
          *
          */
-        needsNewPath(
-            path: RoomPosition[] | undefined,
-            args: CustomPathFinderArgs,
-            opts?: MoveRequestOpts,
-        ): boolean
-
-        /**
-         *
-         */
         createMoveRequestByPath(args: CustomPathFinderArgs, pathOpts: MoveRequestByPathOpts): number
 
         /**

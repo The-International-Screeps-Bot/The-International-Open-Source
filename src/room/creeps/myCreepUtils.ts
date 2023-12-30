@@ -1,5 +1,8 @@
 import { Boosts, creepDataManager } from "./creepData"
 
+/**
+ * Utilities only creeps the bot owns should use
+ */
 export class MyCreepUtils {
   /**
    * provides a cached number of parts for creeps we own

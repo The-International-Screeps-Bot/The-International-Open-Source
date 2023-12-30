@@ -68,6 +68,7 @@ import { CommuneUtils } from 'room/commune/communeUtils'
 import { RoomDataManager } from 'room/roomData'
 import { CommuneDataManager } from 'room/commune/communeData'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
+import { CreepMoveUtils } from 'room/creeps/creepMoveUtils'
 
 export function profilerRegister() {
 
@@ -99,6 +100,7 @@ export function profilerRegister() {
     profiler.registerClass(Utils, 'Utils')
     profiler.registerClass(CreepUtils, 'CreepUtils')
     profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
+    profiler.registerClass(CreepMoveUtils, 'CreepMoveUtils')
 
     // Room classes
 

@@ -35,7 +35,7 @@ export class WorkRequestManager {
         }
     }
 
-    public run() {
+    run() {
         const { room } = this.communeManager
         const roomMemory = Memory.rooms[room.name]
 
