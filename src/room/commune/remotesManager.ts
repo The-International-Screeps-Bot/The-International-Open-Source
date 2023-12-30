@@ -14,6 +14,7 @@ import {
     getRange,
     randomRange,
     randomTick,
+    utils,
 } from 'utils/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
@@ -26,6 +27,8 @@ const remoteSourcePathTypes: RemoteSourcePathTypes[] = [
     RoomMemoryKeys.remoteSourceFastFillerPaths,
     RoomMemoryKeys.remoteSourceHubPaths,
 ]
+
+const manageUseInterval = randomRange(150, 200)
 
 export class RemotesManager {
     communeManager: CommuneManager
@@ -360,7 +363,13 @@ export class RemotesManager {
      */
     private manageUse(remoteName: string): boolean {
         const roomMemory = Memory.rooms[remoteName]
-        if (!randomTick(20) && roomMemory[RoomMemoryKeys.disable]) return false
+        // If we aren't on the inverval to check for use
+        if (!utils.isTickInterval(manageUseInterval)) {
+            // Inform the current state of things
+            return roomMemory[RoomMemoryKeys.disable]
+        }
+
+        // Otherwise see if the state needs to be updated
 
         let disabledSources = this.manageSourcesUse(remoteName)
         if (disabledSources >= roomMemory[RoomMemoryKeys.remoteSources].length) {
