@@ -47,17 +47,17 @@ export class CreepMoveUtils {
     let iterations = -1
 
     while (iterations < maxIterations) {
-
       const pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], iterations + 1)
       if (arePositionsEqual(creep.pos, pos)) {
-
-        creepMemory[CreepMemoryKeys.path].slice(iterations * packedPosLength)
+        creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice(
+          iterations * packedPosLength,
+        )
         return [pos, iterations]
       }
-      iterations += 1;
+      iterations += 1
     }
 
-    Result.fail
+    return Result.fail
   }
 
   findNewPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
@@ -129,6 +129,7 @@ export class CreepMoveUtils {
         return Result.success
     }
     creep.assignMoveRequest(path[0])
+    return Result.success
   }
 
   private registerSpawnDirections(creep: Creep, path: RoomPosition[]) {

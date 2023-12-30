@@ -298,7 +298,7 @@ export class CommuneManager {
     initRun() {
         this.preTickTest()
 
-        this.room.roomManager.communePlanner.preTickRun()
+        this.room.roomManager.communePlanner.preTickRun(this.room)
 
         const roomMemory = Memory.rooms[this.room.name]
         if (!roomMemory[RoomMemoryKeys.communePlanned]) return

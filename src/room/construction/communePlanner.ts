@@ -216,8 +216,9 @@ export class CommunePlanner {
         this.roomManager = roomManager
     }
 
-    preTickRun() {
-        this.room = this.roomManager.room
+    preTickRun(room: Room) {
+        this.roomManager = room.roomManager
+        this.room = room
 
         if (this.room.memory[RoomMemoryKeys.communePlanned] !== undefined) return Result.noAction
 

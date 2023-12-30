@@ -182,8 +182,20 @@ export class SimpleAllies {
      */
     initRun() {
         // Reset the data of myRequests
-        this.myRequests = {...requestsSekelton}
-        this.myResponses = {...responsesSkeleton}
+        this.myRequests = {
+            resource: [],
+            defense: [],
+            attack: [],
+            player: [],
+            work: [],
+            funnel: [],
+            room: [],
+        }
+        this.myResponses = {
+            defense: [],
+            attack: [],
+            work: [],
+        }
 
         this.readAllySegment()
     }
