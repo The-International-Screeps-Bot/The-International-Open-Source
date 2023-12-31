@@ -6,7 +6,6 @@ interface CommuneData {
    */
   registeredRCL: number
   generalRepairStructureCoords: Set<string>
-  rampartRepairStructureCoords: Set<string>
 }
 
 /**

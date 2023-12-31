@@ -579,7 +579,7 @@ export class SpawnRequestsManager {
             ((): SpawnRequestArgs | false => {
                 const generalRepairStructures = communeUtils.getGeneralRepairStructures(this.communeManager.room)
                 const repairTargets = generalRepairStructures.filter(
-                    structure => structure.hitsMax * 0.3 >= structure.hits,
+                    structure => structure.hitsMax * 0.15 >= structure.hits,
                 )
 
                 // Get ramparts below their max hits

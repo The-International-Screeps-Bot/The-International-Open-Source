@@ -27,7 +27,6 @@ export class CommuneUtils {
     /* const roomData = roomDataManager.data[room.name] */
 
     delete communeData.generalRepairStructureCoords
-    delete communeData.rampartRepairStructureCoords
 
     communeData.registeredRCL = room.controller.level
   }

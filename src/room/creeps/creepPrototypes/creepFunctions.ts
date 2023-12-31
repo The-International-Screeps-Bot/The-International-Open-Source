@@ -413,7 +413,7 @@ Creep.prototype.findNewRampartRepairTarget = function () {
 Creep.prototype.findNewRepairTarget = function () {
 
     const enemyAttackers = !!this.room.roomManager.enemyAttackers.length
-    let repairThreshold = enemyAttackers ? 0.1 : 0.2
+    let repairThreshold = enemyAttackers ? 0.1 : 0.3
 
     let lowestScore = Infinity
     let bestTarget
