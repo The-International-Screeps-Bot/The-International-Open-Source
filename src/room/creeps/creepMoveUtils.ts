@@ -73,6 +73,7 @@ export class CreepMoveUtils {
 
     // Cut the path based coords we skiped over
     creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice((firstIndex + 1) * packedPosLength)
+    if (!creepMemory[CreepMemoryKeys.path].length) return Result.fail
 
     // Second index
 
