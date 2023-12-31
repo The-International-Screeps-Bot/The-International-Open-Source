@@ -123,7 +123,7 @@ export class CommuneUtils {
       repairTargets.push(structure)
   }
 
-    room.rampartRepairStructures
+    room.rampartRepairStructures = repairTargets
     return repairTargets
   }
 }
