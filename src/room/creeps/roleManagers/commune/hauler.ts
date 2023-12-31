@@ -155,6 +155,8 @@ export class Hauler extends Creep {
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
+            // Ensure the creep and the remote have the same opinions on roads
+            if (!!remoteMemory[RoomMemoryKeys.roads].length !== Memory.creeps[this.name][CreepMemoryKeys.preferRoads]) continue
 
             const sourceIndex = parseInt(splitRemoteInfo[1])
             if (!this.isRemoteValid(remoteName, sourceIndex)) continue
@@ -780,14 +782,11 @@ export class Hauler extends Creep {
         // Ensure that they have the same opinions on roads
         if (creepMemory[CreepMemoryKeys.preferRoads] !== creepMemory[CreepMemoryKeys.preferRoads]) return false
 
-/*         let amount: number | undefined
-        const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
+        /* const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
         if (logisticsRequest) {
             const target = findObjectWithID(logisticsRequest[CreepRoomLogisticsRequestKeys.target])
             // Don't relay if they are close to our logistics target
             if (getRange(target.pos, creepAtPos.pos) <= 1) return false
-
-            amount = logisticsRequest[CreepRoomLogisticsRequestKeys.amount]
         } */
         if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
@@ -1004,13 +1003,13 @@ export class Hauler extends Creep {
     runRestrictedCommuneLogistics?() {
         const creepMemory = Memory.creeps[this.name]
         // let it respond to its remote
-        if (Memory.creeps[this.name][CreepMemoryKeys.remote]) return Result.fail
+        if (Memory.creeps[this.name][CreepMemoryKeys.remote]) return false
         // We aren't in the commune
-        if (this.room.name !== this.commune.name) return Result.fail
+        if (this.room.name !== this.commune.name) return false
 
         if (this.commune.communeManager.hasSufficientRoads) {
             // If we have a body not optimized for roads, try to respond to a remote instead
-            if (!creepMemory[CreepMemoryKeys.preferRoads]) return Result.fail
+            if (!creepMemory[CreepMemoryKeys.preferRoads]) return false
         }
 
         // If there is no need for more commune haulers
@@ -1018,7 +1017,7 @@ export class Hauler extends Creep {
             this.commune.communeManager.communeHaulerNeed <
             this.commune.communeManager.communeHaulerCarryParts
         ) {
-            return Result.stop
+            return false
         }
 
         // success, we are working for the commune now
@@ -1028,13 +1027,14 @@ export class Hauler extends Creep {
             this.commune.communeManager.communeHaulerCarryParts += myCreepUtils.parts(this).carry
         }
 
-        return this.runCommuneLogistics()
+        this.runCommuneLogistics()
+        return true
     }
 
     runCommuneLogistics?() {
         this.passiveRenew()
 
-        if (this.runRoomLogisticsRequestsAdvanced() !== Result.success) {
+        if (this.runRoomLogisticsRequestsAdvanced() === Result.action) {
             this.relay()
             return Result.action
         }
@@ -1043,7 +1043,7 @@ export class Hauler extends Creep {
     }
 
     run?() {
-        if (this.runRestrictedCommuneLogistics() !== Result.fail) {
+        if (this.runRestrictedCommuneLogistics() === true) {
             return
         }
 

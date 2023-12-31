@@ -698,6 +698,22 @@ export class FlagManager {
 
         room.visual.text('CS', controllerStructure.pos)
     }
+
+    private creepUsedStore(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        for (const creep of room.myCreeps) {
+
+            room.visual.text(creep.usedNextStore.toString(), creep.pos)
+        }
+    }
 }
 
 export const flagManager = new FlagManager()

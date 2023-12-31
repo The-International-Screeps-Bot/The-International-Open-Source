@@ -1823,6 +1823,9 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     return Result.action
   }
 
+  // If we already moved a resource this tick, then wait (presumably) until the next one to take any resoure-moving action
+  if (this.movedResource) return Result.noAction
+
   /*     log(
         'DOING REQUEST',
         request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + this.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + this.name,
