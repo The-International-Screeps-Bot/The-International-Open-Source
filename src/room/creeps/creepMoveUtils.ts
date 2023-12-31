@@ -64,17 +64,8 @@ export class CreepMoveUtils {
 
     let firstIndex = 0
     let pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], firstIndex)
-    const range = getRange(creep.pos, pos)
 
-    if (creepMemory[CreepMemoryKeys.path].length === 1 * packedPosLength) {
-
-      if (range <= 1) {
-        return pos
-      }
-
-      return Result.fail
-    }
-    else if (range === 1) {
+    if (getRange(creep.pos, pos) === 1) {
       return pos
     }
 

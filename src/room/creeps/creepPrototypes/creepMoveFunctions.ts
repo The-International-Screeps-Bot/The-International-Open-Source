@@ -56,11 +56,20 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     if (this.moveRequest) return Result.noAction
     if (this.moved) return Result.noAction
     if (this.fatigue > 0) return Result.noAction
-    if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
-        this.moved = MovedTypes.moved
-        return Result.noAction
-    }
+    if (this instanceof Creep) {
 
+        if (this.spawning) {
+            const spawn = findObjectWithID(this.spawnID)
+            if (!spawn) return Result.noAction
+
+            // Don't plan the path until we are nearly ready to be spawned
+            if (spawn.spawning.remainingTime > 1) return Result.noAction
+        }
+        if (!this.getActiveBodyparts(MOVE)) {
+            this.moved = MovedTypes.moved
+            return Result.noAction
+        }
+    }
     if (this.room.roomManager.enemyDamageThreat) return this.createMoveRequest(args)
 
     // const posIndex = pathOpts.packedPath.indexOf(packPos(this.pos))
@@ -76,10 +85,7 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
     }
 
     //
-    /*
-    const path = unpackPosList(pathOpts.packedPath)
-    for (const pos of path) new RoomVisual(pos.roomName).rect(pos.x - 0.5, pos.y - 0.5, 1, 1, { fill: customColors.lightBlue, opacity: 0.2 })
- */
+
     const packedGoalPos = packPos(args.goals[0].pos)
     const isOnLastPos = posIndex + packedPosLength === pathOpts.packedPath.length
 
@@ -94,15 +100,6 @@ PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequest
         // If we're on an exit and the next pos is in the other room, wait
 
         if (pos.roomName !== this.room.name) {
-            this.room.visual.text(pos.roomName, this.pos.x, this.pos.y - 0.5, { font: 0.3 })
-
-            this.room.visual.text(args.goals[0].pos.roomName, this.pos.x, this.pos.y - 1, {
-                font: 0.3,
-            })
-
-            /* const secondPos = unpackPosAt(pathOpts.packedPath, posIndex / packedPosLength - 1)
-            this.room.visual.text(secondPos.roomName, this.pos.x, this.pos.y - 1, { font: 0.3 }) */
-            /* this.room.visual.text(pos.roomName, this.pos.x, this.pos.y + 1, { font: 0.5 }) */
 
             this.memory[CreepMemoryKeys.path] = packedPath
             this.moved = MovedTypes.moved

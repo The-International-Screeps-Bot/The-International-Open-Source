@@ -1,6 +1,7 @@
 import {
     CreepMemoryKeys,
     CreepRoomLogisticsRequestKeys,
+    FlagNames,
     MovedTypes,
     Result,
     RoomLogisticsRequestTypes,
@@ -776,6 +777,9 @@ export class Hauler extends Creep {
         /* if (creepAtPos.store.getUsedCapacity() > 0) return false */
         if (creepAtPos.store.getUsedCapacity() > 0) return false
 
+        // Ensure that they have the same opinions on roads
+        if (creepMemory[CreepMemoryKeys.preferRoads] === creepMemory[CreepMemoryKeys.preferRoads]) return false
+
         let amount: number | undefined
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
         if (logisticsRequest) {
@@ -866,21 +870,12 @@ export class Hauler extends Creep {
         if (creepAtPosMemory[CreepMemoryKeys.taskRoom]) hauler.runCommuneLogistics()
         else if (creepAtPosMemory[CreepMemoryKeys.remote]) hauler.deliverResources()
 
-        /*
-        for (const creep of [this, creepAtPos]) {
+        if (Game.flags[FlagNames.debugRelay]) {
 
-            if (creep.moveRequest) {
-
-                const coord = unpackCoord(creep.moveRequest)
-
-                this.room.coordVisual(coord.x, coord.y)
+            if (this.moveRequest) this.room.targetVisual(this.pos, unpackCoord(this.moveRequest), true)
+            if (creepAtPos.moveRequest) {
+                creepAtPos.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
             }
-        }
-        */
-
-        if (this.moveRequest) this.room.targetVisual(this.pos, unpackCoord(this.moveRequest), true)
-        if (creepAtPos.moveRequest) {
-            creepAtPos.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
         }
 
         return true

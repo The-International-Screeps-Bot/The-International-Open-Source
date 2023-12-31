@@ -1,23 +1,9 @@
 import {
-    createPosMap,
-    findAdjacentCoordsToCoord,
-    findAdjacentCoordsToXY,
-    findClosestObject,
-    findCPUOf,
     findLinkThroughput,
     findObjectWithID,
-    forAdjacentCoords,
-    forCoordsInRange,
-    getRangeXY,
     getRange,
-    isXYExit,
-    isXYInBorder,
-    isXYInRoom,
     packAsNum,
-    packXYAsNum,
-    randomIntRange,
     randomTick,
-    unpackNumAsCoord,
     findLowestScore,
     roundTo,
     forCoordsAroundRange,
@@ -31,21 +17,11 @@ import './workRequest'
 import './combatRequest'
 import {
     creepRoles,
-    impassibleStructureTypesSet,
-    customColors,
-    remoteRoles,
-    roomDimensions,
-    stamps,
-    defaultRoadPlanningPlainCost,
-    adjacentOffsets,
     packedPosLength,
-    structureTypesToProtectSet,
-    buildableStructuresSet,
     RoomMemoryKeys,
     RoomTypes,
     rampartUpkeepCost,
     RemoteResourcePathTypes,
-    Result,
     ReservedCoordTypes,
     RoomStatsKeys,
 } from 'international/constants'
@@ -53,9 +29,6 @@ import './factory'
 import { LabManager } from './labs'
 import './towers'
 import './links'
-import { RoomVisualsManager } from '../roomVisuals'
-import { EndTickCreepManager } from '../creeps/endTickCreepManager'
-import { CreepRoleManager } from '../creeps/creepRoleManager'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
@@ -70,29 +43,17 @@ import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
 import {
     packCoord,
-    packXYAsCoord,
-    unpackCoord,
     unpackPosAt,
-    unpackPosList,
-    unpackStampAnchors,
 } from 'other/codec'
-import { ContainerManager } from '../container'
 import { StoringStructuresManager } from './storingStructures'
-import { DroppedResourceManager } from 'room/droppedResources'
 import { LinkManager } from './links'
-import { profiler } from 'other/profiler'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { ObserverManager } from './observer'
-import { decode, encode } from 'base32768'
 import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
-import { RampartPlans } from 'room/construction/rampartPlans'
-import { has } from 'lodash'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
-import { creepUtils } from 'room/creeps/creepUtils'
-import { SpawnRequestArgs } from 'types/spawnRequest'
 import { communeUtils } from './communeUtils'
 
 export type ResourceTargets = {
@@ -227,7 +188,6 @@ export class CommuneManager {
             return
         }
 
-        roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
         collectiveManager.communes.add(room.name)
 
         if (this.room.controller.safeMode) collectiveManager.safemodedCommuneName = this.room.name

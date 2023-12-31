@@ -234,26 +234,53 @@ export class RoomManager {
             [RoomLogisticsRequestTypes.pickup]: {},
         }
 
-        if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) return
-
-        // Check if the room is a commune
-
         if (!room.controller) return
-        if (!room.controller.my) {
+
+        // There is a controller
+
+        if (this.updatePotentialCommune(room) === true) return
+
+        // The room isn't a commune
+
+
+    }
+
+    /**
+     *
+     * @returns wether or not the room is a commune
+     */
+    private updatePotentialCommune(room: Room): boolean {
+
+        const roomMemory = Memory.rooms[room.name]
+
+        if (!this.room.controller.my) {
+
             if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
                 roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
                 roomNameUtils.cleanMemory(room.name)
             }
-            return
+            return false
         }
+
+        // If the type isn't a commune, make it so and clean its memory
+
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) {
+
+            roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
+            roomNameUtils.cleanMemory(room.name)
+        }
+
+        // If there is no communeManager for the room yet, make one and assign them together
 
         room.communeManager = CommuneManager.communeManagers[room.name]
         if (!room.communeManager) {
+
             room.communeManager = new CommuneManager()
             CommuneManager.communeManagers[room.name] = room.communeManager
         }
 
         room.communeManager.update(room)
+        return true
     }
 
     initRun() {

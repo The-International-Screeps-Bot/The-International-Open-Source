@@ -1402,5 +1402,6 @@ export enum MovedTypes {
 }
 
 export enum FlagNames {
-    debugMovement = 'debugMovement'
+    debugMovement = 'debugMovement',
+    debugRelay = 'debugRelay',
 }
