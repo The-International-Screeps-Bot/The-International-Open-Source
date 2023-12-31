@@ -1,31 +1,32 @@
 import {
-    allStructureTypes,
-    WorkRequestKeys,
-    CombatRequestKeys,
-    defaultPlainCost,
-    defaultSwampCost,
-    impassibleStructureTypes,
-    impassibleStructureTypesSet,
-    maxRampartGroupSize,
-    maxRemoteRoomDistance,
-    customColors,
-    PlayerMemoryKeys,
-    roomDimensions,
-    roomTypeProperties,
-    roomTypes,
-    constantRoomTypes,
-    stamps,
-    defaultStructureTypesByBuildPriority,
-    Result,
-    adjacentOffsets,
-    CreepMemoryKeys,
-    RoomMemoryKeys,
-    RoomTypes,
-    packedPosLength,
-    maxRemotePathDistance,
-    RoomLogisticsRequestTypes,
-    remoteRoles,
-    RemoteResourcePathTypes,
+  allStructureTypes,
+  WorkRequestKeys,
+  CombatRequestKeys,
+  defaultPlainCost,
+  defaultSwampCost,
+  impassibleStructureTypes,
+  impassibleStructureTypesSet,
+  maxRampartGroupSize,
+  maxRemoteRoomDistance,
+  customColors,
+  PlayerMemoryKeys,
+  roomDimensions,
+  roomTypeProperties,
+  roomTypes,
+  constantRoomTypes,
+  stamps,
+  defaultStructureTypesByBuildPriority,
+  Result,
+  adjacentOffsets,
+  CreepMemoryKeys,
+  RoomMemoryKeys,
+  RoomTypes,
+  packedPosLength,
+  maxRemotePathDistance,
+  RoomLogisticsRequestTypes,
+  remoteRoles,
+  RemoteResourcePathTypes,
+  FlagNames,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -1625,89 +1626,83 @@ Room.prototype.highestWeightedStoringStructures = function (resourceType) {
 }
 
 Room.prototype.createRoomLogisticsRequest = function (args) {
-    // Don't make requests when there is nobody to respond
+  // Don't make requests when there is nobody to respond
 
-    if (!this.myCreeps.length) return Result.noAction
-    if (this.roomManager.roomLogisticsBlacklistCoords.has(packCoord(args.target.pos)))
-        return Result.noAction
+  if (!this.myCreeps.length) return Result.noAction
+  if (this.roomManager.roomLogisticsBlacklistCoords.has(packCoord(args.target.pos)))
+    return Result.noAction
 
-    if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
-    // We should only handle energy until we have an active storage or terminal
-    else if (
-        args.resourceType !== RESOURCE_ENERGY &&
-        (!this.storage || this.controller.level < 4) &&
-        (!this.terminal || this.controller.level < 6)
+  if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
+  // We should only handle energy until we have an active storage or terminal
+  else if (
+    args.resourceType !== RESOURCE_ENERGY &&
+    (!this.storage || this.controller.level < 4) &&
+    (!this.terminal || this.controller.level < 6)
+  )
+    return Result.fail
+
+  let amount: number
+
+  // Make sure we are not infringing on the threshold
+
+  if (args.target instanceof Resource) {
+    amount = (args.target as Resource).reserveAmount
+
+    if (amount < 1) return Result.fail
+  } else if (args.type === RoomLogisticsRequestTypes.transfer) {
+    if (
+      args.target.reserveStore[args.resourceType] >=
+      args.target.store.getCapacity(args.resourceType)
     )
-        return Result.fail
+      return Result.fail
 
-    let amount: number
+    amount = args.target.freeReserveStoreOf(args.resourceType)
+    /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
+  }
 
-    // Make sure we are not infringing on the threshold
+  // Offer or withdraw types
+  else {
+    amount = args.target.reserveStore[args.resourceType]
 
-    if (args.target instanceof Resource) {
-        amount = (args.target as Resource).reserveAmount
+    // We don't have enough resources to make a request
 
-        if (amount < 1) return Result.fail
+    if (amount < 1) return Result.fail
+
+    if (args.maxAmount) amount = Math.min(amount, Math.round(args.maxAmount))
+  }
+
+  if (args.priority === undefined) args.priority = 1
+  else args.priority = Math.round(args.priority * 100) / 100
+
+  const ID = collectiveManager.newTickID()
+
+  if (Game.flags[FlagNames.debugRoomLogistics]) {
+    if (args.type === RoomLogisticsRequestTypes.offer) {
+      this.visual.text('O ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
+      this.visual.text(args.priority.toString(), args.target.pos)
     } else if (args.type === RoomLogisticsRequestTypes.transfer) {
-        if (
-            args.target.reserveStore[args.resourceType] >=
-            args.target.store.getCapacity(args.resourceType)
-        )
-            return Result.fail
-
-        amount = args.target.freeReserveStoreOf(args.resourceType)
-        /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
+      this.visual.text('T ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
+      this.visual.text(args.priority.toString(), args.target.pos)
+    } else if (args.type === RoomLogisticsRequestTypes.withdraw) {
+      this.visual.text('W ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
+      this.visual.text(args.priority.toString(), args.target.pos)
     }
+  }
 
-    // Offer or withdraw types
-    else {
-        amount = args.target.reserveStore[args.resourceType]
+  /* this.visual.text(args.priority.toString(), args.target.pos) */
+  /* this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
+  /* if (args.type === 'transfer') this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
 
-        // We don't have enough resources to make a request
-
-        if (amount < 1) return Result.fail
-
-        if (args.maxAmount) amount = Math.min(amount, Math.round(args.maxAmount))
-    }
-
-    if (args.priority === undefined) args.priority = 1
-    else args.priority = Math.round(args.priority * 100) / 100
-
-    const ID = collectiveManager.newTickID()
-
-    if (global.settings.roomLogisticsVisuals && args.type === RoomLogisticsRequestTypes.pickup) {
-        this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y)
-        this.visual.text(args.priority.toString(), args.target.pos, { font: 0.4 })
-    }
-
-    /* this.visual.text(args.priority.toString(), args.target.pos) */
-    /* this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
-    /* if (args.type === 'transfer') this.visual.resource(args.resourceType, args.target.pos.x, args.target.pos.y) */
-    /* if (args.type === 'offer') {
-
-        this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
-        this.visual.text(args.priority.toString(), args.target.pos)
-    } */
-    /* if (args.type === 'transfer') {
-
-        this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
-        this.visual.text(args.priority.toString(), args.target.pos)
-    } */
-    /* if (args.type === 'withdraw') {
-
-        this.visual.text(amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
-        this.visual.text(args.priority.toString(), args.target.pos)
-    } */
-    return (this.roomLogisticsRequests[args.type][ID] = {
-        ID,
-        type: args.type,
-        targetID: args.target.id,
-        resourceType: args.resourceType,
-        amount: amount,
-        priority: args.priority,
-        onlyFull: true || args.onlyFull,
-        noReserve: !this.roomManager.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
-    })
+  return (this.roomLogisticsRequests[args.type][ID] = {
+    ID,
+    type: args.type,
+    targetID: args.target.id,
+    resourceType: args.resourceType,
+    amount: amount,
+    priority: args.priority,
+    onlyFull: true || args.onlyFull,
+    noReserve: !this.roomManager.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
+  })
 }
 
 Room.prototype.findStructureAtCoord = function <T extends Structure>(

@@ -7,6 +7,7 @@ import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructures'
+import { roomUtils } from 'room/roomUtils'
 
 export class FlagManager {
     run() {
@@ -639,6 +640,63 @@ export class FlagManager {
                 },
             ],
         })
+    }
+
+    private diagonalCoords(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const roomMemory = Memory.rooms[room.name]
+        if (!roomMemory || !roomMemory[RoomMemoryKeys.commune]) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const commune = Game.rooms[roomMemory[RoomMemoryKeys.commune]]
+        if (!commune) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const diagonalCoords = roomNameUtils.diagonalCoords(room.name, commune)
+        room.visualizeCoordMap(diagonalCoords)
+    }
+
+    private controllerStructure(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        if (!room.communeManager) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const controllerStructure = room.communeManager.upgradeStructure
+        if (!controllerStructure) {
+
+            const centerUpgradePos = room.roomManager.centerUpgradePos
+            room.visual.text('X', centerUpgradePos)
+            return
+        }
+
+        // There is a controller structure
+
+        room.visual.text('CS', controllerStructure.pos)
     }
 }
 

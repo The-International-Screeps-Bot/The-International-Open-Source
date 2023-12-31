@@ -1,6 +1,8 @@
 import { getMe } from 'utils/utils'
 import { playerManager } from './players'
 import { statsManager } from './statsManager'
+import { PlayerMemoryKeys } from './constants'
+import { PlayerRelationships } from 'types/players'
 
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function
@@ -10,16 +12,7 @@ class InitManager {
         this.initMemory()
         this.initGlobal()
     }
-    /**
-     * Make sure we have configured memory for allies
-     */
-    initAllies() {
-        for (const playerName of global.settings.allies) {
-            if (Memory.players[playerName]) continue
 
-            playerManager.initPlayer(playerName)
-        }
-    }
     /**
      * Construct Memory if it isn't constructed yet
      */
@@ -48,10 +41,6 @@ class InitManager {
         Memory.haulRequests = {}
         Memory.nukeRequests = {}
         statsManager.internationalConfig()
-
-        //
-
-        this.initAllies()
     }
     /**
      * Construct global if it isn't constructed yet
@@ -63,6 +52,20 @@ class InitManager {
 
         global.packedRoomNames = {}
         global.unpackedRoomNames = {}
+
+        this.initPlayers()
+    }
+    private initPlayers() {
+
+        for (const playerName of global.settings.allies) {
+
+            const playerMemory = Memory.players[playerName]
+            if (!playerMemory) {
+                playerManager.initPlayer(playerName)
+            }
+
+            playerMemory[PlayerMemoryKeys.relationship] = PlayerRelationships.ally
+        }
     }
 }
 

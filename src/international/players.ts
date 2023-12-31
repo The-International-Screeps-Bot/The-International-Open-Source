@@ -34,9 +34,11 @@ export class PlayerManager extends Sleepable {
             }
 
             const threat = player[PlayerMemoryKeys.offensiveThreat]
-            if (threat <= this.highestThreat) continue
+            if (threat > this.highestThreat) {
+                this.highestThreat = threat
+            }
 
-            this.highestThreat = threat
+            
         }
     }
 

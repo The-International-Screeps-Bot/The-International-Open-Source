@@ -810,7 +810,7 @@ export class CommuneManager {
         return (this._sourceLinks = links)
     }
 
-    private controllerLinkID: Id<StructureLink>
+    controllerLinkID: Id<StructureLink>
     private _controllerLink: StructureLink | false
     get controllerLink() {
         if (this._controllerLink !== undefined) return this._controllerLink

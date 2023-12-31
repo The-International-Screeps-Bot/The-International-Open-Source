@@ -942,10 +942,7 @@ export class RoomManager {
         // Structures have been added, destroyed or aren't yet initialized
 
         this._structureCoords = undefined
-        this._upgradePositions = undefined
-        this._fastFillerPositions = undefined
         this.sourceContainerIDs = undefined
-        this.fastFillerContainerIDs = undefined
 
         const communeManager = this.room.communeManager
         if (communeManager) {
@@ -953,6 +950,10 @@ export class RoomManager {
             communeManager.spawningStructuresByPriorityIDs = undefined
             communeManager._fastFillerSpawnEnergyCapacity = undefined
             communeManager.sourceLinkIDs = undefined
+            
+            this.fastFillerContainerIDs = undefined
+            this._upgradePositions = undefined
+            this._fastFillerPositions = undefined
         }
 
         if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
@@ -1619,7 +1620,7 @@ export class RoomManager {
             const controllerContainer = findObjectWithID(this.controllerContainerID)
             if (controllerContainer) {
                 this._controllerContainer = controllerContainer
-                return this._controllerContainer
+                return controllerContainer
             }
         }
 

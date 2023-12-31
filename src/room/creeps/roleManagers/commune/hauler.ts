@@ -780,7 +780,7 @@ export class Hauler extends Creep {
         // Ensure that they have the same opinions on roads
         if (creepMemory[CreepMemoryKeys.preferRoads] !== creepMemory[CreepMemoryKeys.preferRoads]) return false
 
-        let amount: number | undefined
+/*         let amount: number | undefined
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
         if (logisticsRequest) {
             const target = findObjectWithID(logisticsRequest[CreepRoomLogisticsRequestKeys.target])
@@ -788,10 +788,10 @@ export class Hauler extends Creep {
             if (getRange(target.pos, creepAtPos.pos) <= 1) return false
 
             amount = logisticsRequest[CreepRoomLogisticsRequestKeys.amount]
-        }
-        if (creepAtPos.store.getFreeCapacity() !== (amount ?? this.store.getUsedCapacity(RESOURCE_ENERGY))) return false
+        } */
+        if (creepAtPos.store.getFreeCapacity() !== this.store.getUsedCapacity(RESOURCE_ENERGY)) return false
 
-        this.transfer(creepAtPos, RESOURCE_ENERGY, amount)
+        this.transfer(creepAtPos, RESOURCE_ENERGY)
 
         this.movedResource = true
         creepAtPos.movedResource = true
@@ -805,7 +805,7 @@ export class Hauler extends Creep {
         log('creepAtPos Energy', creepAtPos.freeNextStore)
         log('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
         */
-        const transferAmount = amount ?? Math.min(this.store.getUsedCapacity(RESOURCE_ENERGY), creepAtPos.store.getFreeCapacity())
+        const transferAmount = Math.min(this.store.getUsedCapacity(RESOURCE_ENERGY), creepAtPos.store.getFreeCapacity())
         this.reserveStore.energy -= transferAmount
         this.nextStore.energy -= transferAmount
         creepAtPos.reserveStore.energy += transferAmount
@@ -998,28 +998,31 @@ export class Hauler extends Creep {
         return Result.action
     }
 
+    /**
+     * Run commune logistics, but only for creeps intended for commune logistics
+     */
     runRestrictedCommuneLogistics?() {
+        const creepMemory = Memory.creeps[this.name]
         // let it respond to its remote
         if (Memory.creeps[this.name][CreepMemoryKeys.remote]) return Result.fail
         // We aren't in the commune
         if (this.room.name !== this.commune.name) return Result.fail
+
+        if (this.commune.communeManager.hasSufficientRoads) {
+            // If we have a body not optimized for roads, try to respond to a remote instead
+            if (!creepMemory[CreepMemoryKeys.preferRoads]) return Result.fail
+        }
 
         // If there is no need for more commune haulers
         if (
             this.commune.communeManager.communeHaulerNeed <
             this.commune.communeManager.communeHaulerCarryParts
         ) {
-            return Result.fail
-        }
-
-        if (this.commune.communeManager.hasSufficientRoads) {
-            // If we have a body not optimized for roads, try to respond to a remote instead
-            if (myCreepUtils.parts(this).move / this.body.length >= 0.5) return Result.fail
+            return Result.stop
         }
 
         // success, we are working for the commune now
 
-        const creepMemory = Memory.creeps[this.name]
         if (!creepMemory[CreepMemoryKeys.taskRoom]) {
             creepMemory[CreepMemoryKeys.taskRoom] = this.room.name
             this.commune.communeManager.communeHaulerCarryParts += myCreepUtils.parts(this).carry

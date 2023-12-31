@@ -54,6 +54,7 @@ export class CreepMoveUtils {
 
   /**
    * Similar to the game's moveByPath
+   * We need to also check if the next position is an opposite exit coord
    */
   private findMoveTarget(
     creep: Creep,
@@ -72,12 +73,13 @@ export class CreepMoveUtils {
     // Failed to use first index
 
     // Cut the path based coords we skiped over
-    creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice((firstIndex + 1) * packedPosLength)
+    creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice(packedPosLength)
     if (!creepMemory[CreepMemoryKeys.path].length) return Result.fail
 
     // Second index
 
     pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], firstIndex)
+    console.log(creepMemory[CreepMemoryKeys.path].length, creepMemory[CreepMemoryKeys.path])
     if (getRange(creep.pos, pos) === 1) {
       return pos
     }
@@ -85,7 +87,7 @@ export class CreepMoveUtils {
     // Failed to use second index
 
     // Cut the path based coords we skiped over
-    creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice((firstIndex + 1) * packedPosLength)
+    creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice(packedPosLength)
     return Result.fail
   }
 

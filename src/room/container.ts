@@ -91,7 +91,7 @@ export class ContainerManager {
                 ? 0
                 : 50
         priority += scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20)
-
+        
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             type: RoomLogisticsRequestTypes.transfer,
