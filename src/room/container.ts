@@ -29,6 +29,23 @@ export class ContainerManager {
             const energy = container.reserveStore.energy
             const capacity = container.store.getCapacity()
 
+            if (energy > capacity * 0.5) {
+
+                this.roomManager.room.createRoomLogisticsRequest({
+                    target: container,
+                    maxAmount: energy * 0.5,
+                    onlyFull: true,
+                    type: RoomLogisticsRequestTypes.offer,
+                    priority: scalePriority(
+                        capacity,
+                        energy,
+                        10,
+                        true,
+                    ),
+                })
+            }
+
+            // If we're sufficiently full, we don't need to ask for more
             if (energy > capacity * 0.9) continue
 
             this.roomManager.room.createRoomLogisticsRequest({
@@ -39,21 +56,6 @@ export class ContainerManager {
                     capacity,
                     energy,
                     20,
-                ),
-            })
-
-            if (energy < capacity * 0.5) continue
-
-            this.roomManager.room.createRoomLogisticsRequest({
-                target: container,
-                maxAmount: energy * 0.5,
-                onlyFull: true,
-                type: RoomLogisticsRequestTypes.offer,
-                priority: scalePriority(
-                    capacity,
-                    energy,
-                    10,
-                    true,
                 ),
             })
         }

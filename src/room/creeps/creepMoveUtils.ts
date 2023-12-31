@@ -1,4 +1,13 @@
-import { CreepMemoryKeys, MovedTypes, Result, customColors, defaultCreepSwampCost, defaultPlainCost, packedPosLength } from 'international/constants'
+import {
+  CreepMemoryKeys,
+  FlagNames,
+  MovedTypes,
+  Result,
+  customColors,
+  defaultCreepSwampCost,
+  defaultPlainCost,
+  packedPosLength,
+} from 'international/constants'
 import { CustomPathFinderArgs, PathGoal, customPathFinder } from 'international/customPathFinder'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosAt } from 'other/codec'
 import { areCoordsEqual, arePositionsEqual, findObjectWithID, getRange } from 'utils/utils'
@@ -8,8 +17,7 @@ import { areCoordsEqual, arePositionsEqual, findObjectWithID, getRange } from 'u
  */
 export class CreepMoveUtils {
   useExistingPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
-
-    if (creep.spawning) return Result.fail
+    if (creep.spawning) return Result.noAction
 
     const creepMemory = Memory.creeps[creep.name] || Memory.powerCreeps[creep.name]
 
@@ -21,47 +29,75 @@ export class CreepMoveUtils {
     if (!packedPath || !packedPath.length) return Result.fail
 
     // Make this more optimal in not redoing paths unecessarily
-    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), args.goals[0].pos)){
+    if (!areCoordsEqual(unpackPos(creepMemory[CreepMemoryKeys.goalPos]), args.goals[0].pos)) {
       return Result.fail
     }
 
     const moveTarget = this.findMoveTarget(creep, creepMemory)
     if (moveTarget === Result.fail) return Result.fail
-    if (getRange(creep.pos, moveTarget[0]) > 1) return Result.fail
 
     // If we're on an exit and we want to go to the other side, wait for it to toggle
-    if (moveTarget[0].roomName !== creep.room.name) {
+    if (moveTarget.roomName !== creep.room.name) {
       creep.moved = MovedTypes.moved
       return Result.success
     }
 
+    if (Game.flags[FlagNames.debugMovement]) {
+      creep.room.visual.line(creep.pos, moveTarget, { color: customColors.lightBlue })
+    }
+
     // We've determined our existing path is sufficient. Move to the next position on it
 
-    creep.assignMoveRequest(moveTarget[0])
+    creep.assignMoveRequest(moveTarget)
     return Result.success
   }
 
-  private findMoveTarget(creep: Creep, creepMemory: CreepMemory | PowerCreepMemory): Result.fail | [RoomPosition, number] {
+  /**
+   * Similar to the game's moveByPath
+   */
+  private findMoveTarget(
+    creep: Creep,
+    creepMemory: CreepMemory | PowerCreepMemory,
+  ): Result.fail | RoomPosition {
 
-    const maxIterations = Math.min(creepMemory[CreepMemoryKeys.path].length / packedPosLength - 1, 1)
-    let iterations = -1
+    // First index
 
-    while (iterations < maxIterations) {
-      const pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], iterations + 1)
-      if (arePositionsEqual(creep.pos, pos)) {
-        creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice(
-          iterations * packedPosLength,
-        )
-        return [pos, iterations]
+    let firstIndex = 0
+    let pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], firstIndex)
+    const range = getRange(creep.pos, pos)
+
+    if (creepMemory[CreepMemoryKeys.path].length === 1 * packedPosLength) {
+
+      if (range <= 1) {
+        return pos
       }
-      iterations += 1
+
+      return Result.fail
+    }
+    else if (range === 1) {
+      return pos
     }
 
+    // Failed to use first index
+
+    // Cut the path based coords we skiped over
+    creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice((firstIndex + 1) * packedPosLength)
+
+    // Second index
+
+    pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], firstIndex)
+    if (getRange(creep.pos, pos) === 1) {
+      return pos
+    }
+
+    // Failed to use second index
+
+    // Cut the path based coords we skiped over
+    creepMemory[CreepMemoryKeys.path] = creepMemory[CreepMemoryKeys.path].slice((firstIndex + 1) * packedPosLength)
     return Result.fail
   }
 
   findNewPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
-
     // Assign the creep to the args
 
     args.creep = creep
@@ -72,37 +108,39 @@ export class CreepMoveUtils {
     args.avoidStationaryPositions = true
 
     // If there is no safemode
-
     if (!creep.room.controller || !creep.room.controller.safeMode) args.avoidNotMyCreeps = true
 
     const creepMemory = Memory.creeps[creep.name] || Memory.powerCreeps[creep.name]
     if (creepMemory[CreepMemoryKeys.preferRoads]) {
-        args.plainCost ??= defaultPlainCost * 2
-        args.swampCost ??= defaultCreepSwampCost * 2
+      args.plainCost ??= defaultPlainCost * 2
+      args.swampCost ??= defaultCreepSwampCost * 2
     }
 
     // Generate a new path
     const path = customPathFinder.findPath(args)
-    if (!path.length && !creep.spawning) return Result.fail
+    if (!path.length) return Result.fail
 
     // Limit the path's length to the cacheAmount
-
     path.splice(opts.cacheAmount)
 
-    // Show that a new path has been created
-
-    if (global.settings.roomVisuals)
-        creep.room.visual.text('NP', path[0], {
-            align: 'center',
-            color: customColors.lightBlue,
-            opacity: 0.5,
-            font: 0.5,
-        })
+    if (Game.flags[FlagNames.debugMovement]) {
+      creep.room.visual.text('NP', creep.pos, {
+        align: 'center',
+        color: customColors.lightBlue,
+        opacity: 0.7,
+        font: 0.7,
+      })
+    }
 
     return path
   }
 
-  useNewPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts, path: RoomPosition[]) {
+  useNewPath(
+    creep: Creep,
+    args: CustomPathFinderArgs,
+    opts: MoveRequestOpts,
+    path: RoomPosition[],
+  ) {
     // Set the creep's pathOpts to reflect this moveRequest's args
     creep.pathOpts = args
 
@@ -126,14 +164,13 @@ export class CreepMoveUtils {
     // If we're on an exit and we want to go to the other side, wait for it to toggle
     if (path[0].roomName !== creep.room.name) {
       creep.moved = MovedTypes.moved
-        return Result.success
+      return Result.success
     }
     creep.assignMoveRequest(path[0])
     return Result.success
   }
 
   private registerSpawnDirections(creep: Creep, path: RoomPosition[]) {
-
     if (!creep.spawnID) return
 
     const spawn = findObjectWithID(creep.spawnID)
@@ -146,29 +183,29 @@ export class CreepMoveUtils {
     const adjacentCoords: Coord[] = []
 
     for (let x = spawn.pos.x - 1; x <= spawn.pos.x + 1; x += 1) {
-        for (let y = spawn.pos.y - 1; y <= spawn.pos.y + 1; y += 1) {
-            if (spawn.pos.x === x && spawn.pos.y === y) continue
+      for (let y = spawn.pos.y - 1; y <= spawn.pos.y + 1; y += 1) {
+        if (spawn.pos.x === x && spawn.pos.y === y) continue
 
-            const coord = { x, y }
+        const coord = { x, y }
 
-            /* if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue */
+        /* if (room.coordHasStructureTypes(coord, impassibleStructureTypesSet)) continue */
 
-            // Otherwise ass the x and y to positions
+        // Otherwise ass the x and y to positions
 
-            adjacentCoords.push(coord)
-        }
+        adjacentCoords.push(coord)
+      }
     }
 
     // Sort by distance from the first pos in the path
 
     adjacentCoords.sort((a, b) => {
-        return getRange(a, path[0]) - getRange(b, path[0])
+      return getRange(a, path[0]) - getRange(b, path[0])
     })
 
     const directions: DirectionConstant[] = []
 
     for (const coord of adjacentCoords) {
-        directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
+      directions.push(spawn.pos.getDirectionTo(coord.x, coord.y))
     }
 
     spawn.spawning.setDirections(directions)

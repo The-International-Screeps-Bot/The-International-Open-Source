@@ -153,9 +153,19 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
     if (this.moveRequest) return Result.noAction
     if (this.moved) return Result.noAction
     if (this.fatigue > 0) return Result.noAction
-    if (this instanceof Creep && !this.getActiveBodyparts(MOVE)) {
-        this.moved = MovedTypes.moved
-        return Result.noAction
+    if (this instanceof Creep) {
+
+        if (this.spawning) {
+            const spawn = findObjectWithID(this.spawnID)
+            if (!spawn) return Result.noAction
+
+            // Don't plan the path until we are nearly ready to be spawned
+            if (spawn.spawning.remainingTime > 1) return Result.noAction
+        }
+        if (!this.getActiveBodyparts(MOVE)) {
+            this.moved = MovedTypes.moved
+            return Result.noAction
+        }
     }
 
     // Assign default args

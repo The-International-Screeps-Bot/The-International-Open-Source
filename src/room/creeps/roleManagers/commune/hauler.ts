@@ -14,9 +14,7 @@ import {
 import { statsManager } from 'international/statsManager'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
-import { customLog } from 'utils/logging'
 import {
-    findClosestObject,
     findObjectWithID,
     getRange,
     getRangeXY,
@@ -775,6 +773,7 @@ export class Hauler extends Creep {
         if (creepMemory[CreepMemoryKeys.previousRelayer] && creepMemory[CreepMemoryKeys.previousRelayer][0] === creepAtPos.name) return false
 
         // ensure the creep receiving creep is empty
+        /* if (creepAtPos.store.getUsedCapacity() > 0) return false */
         if (creepAtPos.store.getUsedCapacity() > 0) return false
 
         let amount: number | undefined
@@ -786,6 +785,7 @@ export class Hauler extends Creep {
 
             amount = logisticsRequest[CreepRoomLogisticsRequestKeys.amount]
         }
+        if (creepAtPos.store.getFreeCapacity() !== (amount ?? this.store.getUsedCapacity(RESOURCE_ENERGY))) return false
 
         this.transfer(creepAtPos, RESOURCE_ENERGY, amount)
 

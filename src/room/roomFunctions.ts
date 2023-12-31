@@ -44,6 +44,7 @@ import {
     doesCoordExist,
     findClosestObjectInRange,
     findClosestObject,
+    randomIntRange,
 } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import {
@@ -844,7 +845,7 @@ Room.prototype.createDefendCombatRequest = function (opts) {
     }
 
     request[CombatRequestKeys.inactionTimer] = 0
-    request[CombatRequestKeys.inactionTimerMax] = randomRange(
+    request[CombatRequestKeys.inactionTimerMax] = randomIntRange(
         2000,
         3000,
     )

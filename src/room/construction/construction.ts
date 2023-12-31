@@ -8,7 +8,7 @@ import {
     structureTypesToProtectSet,
 } from 'international/constants'
 import { customLog } from 'utils/logging'
-import { findObjectWithID, packAsNum, randomIntRange, randomTick } from 'utils/utils'
+import { findObjectWithID, packAsNum, randomIntRange, randomTick, utils } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
@@ -35,15 +35,15 @@ const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
     STRUCTURE_SPAWN,
     STRUCTURE_RAMPART,
 ])
+const constructionInterval = randomIntRange(70, 90)
 
-export class ConstructionManager extends Sleepable {
+export class ConstructionManager {
     communeManager: CommuneManager
     room: Room
     placedSites: number
-    sleepFor = randomIntRange(50, 100)
 
     constructor(communeManager: CommuneManager) {
-        super()
+
         this.communeManager = communeManager
     }
 
@@ -92,8 +92,7 @@ export class ConstructionManager extends Sleepable {
         // If there are no builders
 
         // Only run every so often
-        else if (this.room.controller.level !== 1 && this.isSleeping()) return false
-        this.sleepWhenDone()
+        else if (this.room.controller.level !== 1 && !utils.isTickInterval(constructionInterval)) return false
 
         // If there are too many construction sites
         if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= collectiveManager.maxCSitesPerRoom)

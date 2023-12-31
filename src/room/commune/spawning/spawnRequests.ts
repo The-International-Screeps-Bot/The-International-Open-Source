@@ -1453,13 +1453,13 @@ export class SpawnRequestsManager {
                     const healAmount = Math.floor(minHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]))
 
                     if ((rangedAttackAmount + healAmount) * 2 > 50) {
-                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomIntRange(1000, 1500)
                         return false
                     }
 
                     const minCost = minRangedAttackCost + minHealCost
                     if (minCost > this.spawnEnergyCapacity) {
-                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomRange(1000, 1500)
+                        Memory.rooms[remoteName][RoomMemoryKeys.abandonRemote] = randomIntRange(1000, 1500)
                         return false
                     }
 

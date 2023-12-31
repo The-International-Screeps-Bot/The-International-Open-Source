@@ -1400,3 +1400,7 @@ export enum MovedTypes {
     moved = 1,
     wait,
 }
+
+export enum FlagNames {
+    debugMovement = 'debugMovement'
+}

@@ -37,7 +37,7 @@ export class RequestsManager extends Sleepable {
 
     private updateWorkRequests() {
 
-        const runThreshold = randomRange(19000, 20000)
+        const runThreshold = randomIntRange(19000, 20000)
 
         for (const roomName in Memory.workRequests) {
 

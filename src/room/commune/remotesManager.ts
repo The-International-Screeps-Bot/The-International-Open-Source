@@ -12,6 +12,7 @@ import {
     findCarryPartsRequired,
     findLowestScore,
     getRange,
+    randomIntRange,
     randomRange,
     randomTick,
     utils,
@@ -28,7 +29,7 @@ const remoteSourcePathTypes: RemoteSourcePathTypes[] = [
     RoomMemoryKeys.remoteSourceHubPaths,
 ]
 
-const manageUseInterval = randomRange(150, 200)
+const manageUseInterval = randomIntRange(150, 200)
 
 export class RemotesManager {
     communeManager: CommuneManager
@@ -203,8 +204,8 @@ export class RemotesManager {
                         return creep.ticksToLive
                     })
                     remoteMemory[RoomMemoryKeys.danger] =
-                        Game.time + randomRange(score, score + 100)
-                    roomNameUtils.abandonRemote(remoteName, randomRange(score, score + 100))
+                        Game.time + randomIntRange(score, score + 100)
+                    roomNameUtils.abandonRemote(remoteName, randomIntRange(score, score + 100))
                     continue
                 }
 
