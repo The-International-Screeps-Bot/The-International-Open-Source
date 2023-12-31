@@ -381,6 +381,7 @@ export class FlagManager {
         }
 
         const roomMemory = Memory.rooms[room.name]
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return
 
         const sourceIDs = roomMemory[RoomMemoryKeys.communeSources]
         for (let sourceIndex = 0; sourceIndex < sourceIDs.length; sourceIndex++) {
@@ -411,6 +412,7 @@ export class FlagManager {
         }
 
         const roomMemory = Memory.rooms[room.name]
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return
 
         const containers = room.roomManager.sourceContainers
         for (let sourceIndex = 0; sourceIndex < containers.length; sourceIndex++) {
@@ -431,6 +433,27 @@ export class FlagManager {
             const link = links[sourceIndex]
             if (!link) continue
             room.visual.text(sourceIndex.toString(), link.pos)
+        }
+    }
+
+    private remoteSourceVisuals(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const roomMemory = Memory.rooms[room.name]
+        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.remote) return
+
+        const sourceIDs = roomMemory[RoomMemoryKeys.remoteSources]
+        for (let sourceIndex = 0; sourceIndex < sourceIDs.length; sourceIndex++) {
+
+            const source = findObjectWithID(sourceIDs[sourceIndex])
+            room.visual.text(sourceIndex.toString(), source.pos)
         }
     }
 

@@ -59,6 +59,7 @@ import { posix } from 'path'
 import { playerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
+import { myCreepUtils } from './creeps/myCreepUtils'
 
 /**
     @param pos1 pos of the object performing the action
@@ -1488,31 +1489,6 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
     // Inform positions
 
     return positions
-}
-
-Room.prototype.getPartsOfRole = function (role) {
-    if (this.partsOfRoles[role]) return this.partsOfRoles[role]
-
-    this.partsOfRoles[role] = {}
-
-    // Loop through every creepName in the creepsFromRoom of the specified role
-
-    for (const creepName of this.creepsFromRoom[role]) {
-        const creep = Game.creeps[creepName]
-
-        for (const key in creep.parts) {
-            const partType = key as BodyPartConstant
-
-            if (!this.partsOfRoles[role][partType]) {
-                this.partsOfRoles[role][partType] = 1
-                continue
-            }
-
-            this.partsOfRoles[role][partType] += 1
-        }
-    }
-
-    return this.partsOfRoles[role]
 }
 
 Room.prototype.createWorkRequest = function () {

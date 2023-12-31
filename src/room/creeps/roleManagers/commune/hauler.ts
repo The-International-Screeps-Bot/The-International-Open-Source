@@ -13,6 +13,7 @@ import {
 } from 'international/constants'
 import { statsManager } from 'international/statsManager'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
+import { myCreepUtils } from 'room/creeps/myCreepUtils'
 import { customLog } from 'utils/logging'
 import {
     findClosestObject,
@@ -107,7 +108,8 @@ export class Hauler extends Creep {
             creepMemory[CreepMemoryKeys.previousRelayer] = undefined
         }
 
-        this.commune.communeManager.haulerCarryParts += this.parts.carry
+        const carryParts = myCreepUtils.parts(this).carry
+        this.commune.communeManager.haulerCarryParts += carryParts
 
         if (this.hasValidRemote()) {
             this.applyRemote()
@@ -119,7 +121,7 @@ export class Hauler extends Creep {
 
         const commune = this.commune
         if (creepMemory[CreepMemoryKeys.taskRoom] === commune.name) {
-            commune.communeManager.communeHaulerCarryParts += this.parts.carry
+            commune.communeManager.communeHaulerCarryParts += carryParts
             commune.communeManager.communeHaulers.push(this.name)
         }
     }
@@ -773,7 +775,7 @@ export class Hauler extends Creep {
         if (creepMemory[CreepMemoryKeys.previousRelayer] && creepMemory[CreepMemoryKeys.previousRelayer][0] === creepAtPos.name) return false
 
         // ensure the creep receiving creep is empty
-        if (creepAtPos.usedNextStore > 0) return false
+        if (creepAtPos.store.getUsedCapacity() > 0) return false
 
         let amount: number | undefined
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
@@ -799,9 +801,11 @@ export class Hauler extends Creep {
         log('creepAtPos Energy', creepAtPos.freeNextStore)
         log('nextEnergy', Math.min(this.store.energy, creepAtPos.freeNextStore))
         */
-        const nextEnergy = amount ?? Math.min(this.store.energy, creepAtPos.freeNextStore)
-        this.nextStore.energy -= nextEnergy
-        creepAtPos.nextStore.energy += nextEnergy
+        const transferAmount = amount ?? Math.min(this.store.getUsedCapacity(RESOURCE_ENERGY), creepAtPos.store.getFreeCapacity())
+        this.reserveStore.energy -= transferAmount
+        this.nextStore.energy -= transferAmount
+        creepAtPos.reserveStore.energy += transferAmount
+        creepAtPos.nextStore.energy += transferAmount
         /*
         log('this needs res', this.needsResources())
         log('creepAtPos need res', creepAtPos.needsResources())
@@ -1015,7 +1019,7 @@ export class Hauler extends Creep {
 
         if (this.commune.communeManager.hasSufficientRoads) {
             // If we have a body not optimized for roads, try to respond to a remote instead
-            if (this.parts[MOVE] / this.body.length >= 0.5) return Result.fail
+            if (myCreepUtils.parts(this).move / this.body.length >= 0.5) return Result.fail
         }
 
         // success, we are working for the commune now
@@ -1023,7 +1027,7 @@ export class Hauler extends Creep {
         const creepMemory = Memory.creeps[this.name]
         if (!creepMemory[CreepMemoryKeys.taskRoom]) {
             creepMemory[CreepMemoryKeys.taskRoom] = this.room.name
-            this.commune.communeManager.communeHaulerCarryParts += this.parts.carry
+            this.commune.communeManager.communeHaulerCarryParts += myCreepUtils.parts(this).carry
         }
 
         return this.runCommuneLogistics()

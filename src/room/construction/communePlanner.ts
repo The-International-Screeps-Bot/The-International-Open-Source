@@ -15,6 +15,7 @@ import {
     buildableStructureTypes,
     structureTypesToProtectSet,
     RoomMemoryKeys,
+    basePlanCPUBucketThreshold,
 } from 'international/constants'
 import {
     areCoordsEqual,
@@ -223,8 +224,11 @@ export class CommunePlanner {
         if (this.room.memory[RoomMemoryKeys.communePlanned] !== undefined) return Result.noAction
 
         // Stop if there isn't sufficient CPU
-
         if (Game.cpu.bucket < CPUMaxPerTick) return Result.noAction
+        if (collectiveManager.communes.size <= 1 && Game.cpu.bucket < basePlanCPUBucketThreshold) {
+            return Result.noAction
+        }
+
 
         if (this.recording) this.record()
 

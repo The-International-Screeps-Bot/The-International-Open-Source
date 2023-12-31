@@ -147,23 +147,6 @@ Object.defineProperties(Creep.prototype, {
             return this._netTowerDamage
         },
     },
-    upgradeStrength: {
-        get() {
-            if (this._upgradeStrength !== undefined) return this._upgradeStrength
-
-            this._upgradeStrength = this.parts.work
-            const boosts = this.boosts
-
-            if (boosts.XGH2O > 0)
-                return (this._upgradeStrength *= BOOSTS.work.XGH2O.upgradeController)
-            if (boosts.GH2O > 0)
-                return (this._upgradeStrength *= BOOSTS.upgrade.GH2O.upgradeController)
-            if (boosts.GH > 0)
-                return (this._upgradeStrength *= BOOSTS.upgrade.GH.upgradeController)
-
-            return this._upgradeStrength
-        },
-    },
     combatStrength: {
         get() {
             if (this._combatStrength) return this._combatStrength
@@ -260,7 +243,7 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._canMove !== undefined) return this._canMove
 
-            return (this._canMove = !this.fatigue && !this.spawning && this.parts.move > 0)
+            return (this._canMove = !this.fatigue && !this.spawning && this.getActiveBodyparts(MOVE) > 0)
         },
     },
     idealSquadMembers: {

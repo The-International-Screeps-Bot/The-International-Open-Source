@@ -1,4 +1,5 @@
 import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'international/constants'
+import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class Claimer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -33,7 +34,7 @@ export class Claimer extends Creep {
                 goals: [{ pos: room.controller.pos, range: 1 }],
                 avoidEnemyRanges: true,
                 plainCost: 1,
-                swampCost: creep.parts.move >= 5 ? 1 : undefined,
+                swampCost: myCreepUtils.parts(this).move >= 5 ? 1 : undefined,
             })
 
             return
@@ -84,7 +85,7 @@ export class Claimer extends Creep {
                     ],
                     avoidEnemyRanges: true,
                     plainCost: 1,
-                    swampCost: creep.parts.move >= 5 ? 1 : undefined,
+                    swampCost: myCreepUtils.parts(creep).move >= 5 ? 1 : undefined,
                     typeWeights: {
                         [RoomTypes.enemy]: Infinity,
                         [RoomTypes.ally]: Infinity,

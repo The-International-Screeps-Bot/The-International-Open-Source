@@ -8,6 +8,7 @@ import {
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { creepUtils } from 'room/creeps/creepUtils'
+import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class Vanguard extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -34,7 +35,7 @@ export class Vanguard extends Creep {
         const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
         if (!request) return
 
-        request[WorkRequestKeys.vanguard] -= this.parts.work
+        request[WorkRequestKeys.vanguard] -= myCreepUtils.parts(this).work
     }
 
     /**
@@ -89,7 +90,7 @@ export class Vanguard extends Creep {
 
         this.upgradeController(controller)
 
-        if (this.store.energy - this.parts.work * UPGRADE_CONTROLLER_POWER <= 0) {
+        if (this.store.energy - myCreepUtils.parts(this).work * UPGRADE_CONTROLLER_POWER <= 0) {
             delete Memory.creeps[this.name][CreepMemoryKeys.targetID]
         }
 
@@ -132,7 +133,7 @@ export class Vanguard extends Creep {
 
         this.repair(rampartTarget)
 
-        if (this.store.energy - this.parts.work * REPAIR_POWER * REPAIR_COST <= 0) {
+        if (this.store.energy - myCreepUtils.parts(this).work * REPAIR_POWER * REPAIR_COST <= 0) {
             delete creepMemory[CreepMemoryKeys.targetID]
         }
         return true

@@ -975,6 +975,7 @@ export const remoteRoles:
 
 export const CPUBucketCapacity = 10000
 export const CPUMaxPerTick = 500
+export const basePlanCPUBucketThreshold = CPUBucketCapacity * 0.5
 
 /**
  * Roles that should attempt relaying

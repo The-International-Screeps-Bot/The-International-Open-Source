@@ -207,7 +207,7 @@ export class SpawnRequestConstructors {
 
         // So long as there are totalExtraParts left to assign
 
-        while (totalExtraParts > args.extraParts.length && args.maxCreeps > 0) {
+        while (totalExtraParts >= args.extraParts.length && args.maxCreeps > 0) {
             // Construct important imformation for the spawnRequest
 
             let bodyPartCounts: { [key in PartsByPriority]: number } = {
@@ -247,61 +247,30 @@ export class SpawnRequestConstructors {
                 }
             }
 
-            // So long as the cost is less than the maxCostPerCreep and there are remainingAllowedParts
+            let stop = false
 
+            // So long as the cost is less than the maxCostPerCreep and the size is below max size
             while (cost < maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
-                const addedParts: BodyPartConstant[] = []
-
-                for (const part of args.extraParts) {
-                    cost += BODYPART_COST[part]
-                    addedParts.push(part)
-                }
-
-                remainingAllowedParts -= args.extraParts.length
-                totalExtraParts -= args.extraParts.length
-
-                // If the cost is more than the maxCostPerCreep or there are negative remainingAllowedParts or the body is more than 50
-
-                if (cost > maxCostPerCreep) {
-                    // Assign partIndex as the length of extraParts
-
-                    let partIndex = args.extraParts.length - 1
-
-                    // So long as partIndex is greater or equal to 0
-
-                    while (partIndex >= 0) {
-                        const part = args.extraParts[partIndex]
-
-                        const partCost = BODYPART_COST[part]
-                        // if it's not expensive enough and we have enough parts
-                        if (cost - partCost < args.minCostPerCreep) break
-
-                        // And remove the part's cost to the cost
-                        cost -= partCost
-
-                        // Remove the last part in the body
-                        addedParts.pop()
-
-                        // Increase remainingAllowedParts and totalExtraParts
-
-                        remainingAllowedParts += 1
-                        totalExtraParts += 1
-
-                        // Setup to handle the next part
-                        partIndex -= 1
-                    }
-
-                    // Increase tier by a percentage (2 decimals) of the extraParts it added
-
-                    tier += Math.floor((addedParts.length / args.extraParts.length) * 100) / 100
-                    for (const part of addedParts) bodyPartCounts[part] += 1
-                    break
-                }
 
                 tier += 1
-                for (const part of addedParts) {
+
+                for (const part of args.extraParts) {
+
+                    const partCost = BODYPART_COST[part]
+                    // If the new cost will make us too expensive and we already fulfill the min cost, stop
+                    if (cost + partCost > maxCostPerCreep && cost >= args.minCostPerCreep) {
+                        stop = true
+                        break
+                    }
+
+                    cost += BODYPART_COST[part]
                     bodyPartCounts[part] += 1
+
+                    remainingAllowedParts -= 1
+                    totalExtraParts -= 1
                 }
+
+                if (stop) break
             }
 
             // Create a spawnRequest using previously constructed information

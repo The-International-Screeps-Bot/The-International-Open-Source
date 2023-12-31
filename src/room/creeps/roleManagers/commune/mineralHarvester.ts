@@ -7,6 +7,7 @@ import {
 import { statsManager } from 'international/statsManager'
 import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'
+import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class MineralHarvester extends Creep {
     update() {
@@ -17,7 +18,7 @@ export class MineralHarvester extends Creep {
     }
 
     initRun() {
-        this.room.communeManager.mineralHarvestStrength += this.parts.work * HARVEST_MINERAL_POWER
+        this.room.communeManager.mineralHarvestStrength += myCreepUtils.parts(this).work * HARVEST_MINERAL_POWER
     }
 
     advancedHarvestMineral?(mineral: Mineral) {
@@ -59,7 +60,7 @@ export class MineralHarvester extends Creep {
         // Find amount of minerals harvested and record it in data
 
         const mineralsHarvested = Math.min(
-            this.parts.work * HARVEST_MINERAL_POWER,
+            myCreepUtils.parts(this).work * HARVEST_MINERAL_POWER,
             mineral.mineralAmount,
         )
         this.reserveStore[mineral.mineralType] += mineralsHarvested

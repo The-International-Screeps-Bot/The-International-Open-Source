@@ -262,6 +262,7 @@ export class CustomPathFinder {
         if (!args.weightCommuneStructurePlans) return false
 
         const roomMemory = Memory.rooms[roomName]
+        if (!roomMemory) return false
         if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return false
 
         const room = Game.rooms[roomName]

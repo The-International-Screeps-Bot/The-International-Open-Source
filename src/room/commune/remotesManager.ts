@@ -98,7 +98,7 @@ export class RemotesManager {
             // The room is closed or is now a respawn or novice zone
 
             if (
-                randomTick(20) &&
+                utils.isTickInterval(100) &&
                 Game.map.getRoomStatus(remoteName).status !==
                     Game.map.getRoomStatus(room.name).status
             ) {
@@ -106,7 +106,7 @@ export class RemotesManager {
                 continue
             }
 
-            if (remoteMemory[RoomMemoryKeys.abandonRemote] > 0) {
+            if (remoteMemory[RoomMemoryKeys.abandonRemote] !== undefined && remoteMemory[RoomMemoryKeys.abandonRemote] > 0) {
                 if (!remoteMemory[RoomMemoryKeys.recursedAbandonment]) {
                     this.recurseAbandonment(remoteName)
                 }
@@ -269,7 +269,7 @@ export class RemotesManager {
             if (
                 (remoteMemory[RoomMemoryKeys.enemyReserved] &&
                     remoteMemory[RoomMemoryKeys.invaderCore]) ||
-                remoteMemory[RoomMemoryKeys.remoteDismantler]
+                remoteMemory[RoomMemoryKeys.remoteDismantler] > 0
             ) {
                 for (const i in remoteMemory[RoomMemoryKeys.maxSourceIncome]) {
                     remoteMemory[RoomMemoryKeys.maxSourceIncome][i] = 0
@@ -366,7 +366,7 @@ export class RemotesManager {
         // If we aren't on the inverval to check for use
         if (!utils.isTickInterval(manageUseInterval)) {
             // Inform the current state of things
-            return roomMemory[RoomMemoryKeys.disable]
+            return !roomMemory[RoomMemoryKeys.disable]
         }
 
         // Otherwise see if the state needs to be updated

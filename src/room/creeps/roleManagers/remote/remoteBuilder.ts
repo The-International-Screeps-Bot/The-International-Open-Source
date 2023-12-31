@@ -16,6 +16,7 @@ import {
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
+import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class RemoteBuilder extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -52,7 +53,7 @@ export class RemoteBuilder extends Creep {
 
         // Record response
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] += this.parts.work
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] += myCreepUtils.parts(this).work
     }
 
     hasValidRemote?() {
@@ -99,7 +100,7 @@ export class RemoteBuilder extends Creep {
 
         if (this.isDying()) return
 
-        Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] += this.parts.work
+        Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] += myCreepUtils.parts(this).work
     }
 
     removeRemote?() {
@@ -108,7 +109,7 @@ export class RemoteBuilder extends Creep {
         if (!this.isDying()) {
             const remoteName = creepMemory[CreepMemoryKeys.remote]
 
-            Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] -= this.parts.work
+            Memory.rooms[remoteName][RoomMemoryKeys.remoteBuilder] -= myCreepUtils.parts(this).work
         }
 
         delete creepMemory[CreepMemoryKeys.remote]

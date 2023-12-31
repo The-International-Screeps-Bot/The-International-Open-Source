@@ -45,7 +45,7 @@ export class CreepUtils {
         if (creep.worked) return Result.noAction
         if (creep.repair(target) !== OK) return Result.fail
 
-        const workParts = creep.parts.work
+        const workParts = myCreepUtils.parts(creep).work
         // Estimate the repair cost, assuming it goes through
         const energySpentOnRepair = Math.min(
             workParts,
@@ -92,7 +92,7 @@ export class CreepUtils {
 
         // Otherwise if we don't need resources and can maintain
 
-        const workPartCount = creep.parts.work
+        const workPartCount = myCreepUtils.parts(creep).work
         let repairTarget = creep.findRepairTarget()
 
         if (!repairTarget) {
@@ -173,7 +173,7 @@ export class CreepUtils {
 
         creep.message += '🗺️'
 
-        const workPartCount = creep.parts.work
+        const workPartCount = myCreepUtils.parts(creep).work
         // At some point we should compare this search with flat searching positions around the creep
         const structure = communeUtils.getGeneralRepairStructures(creep.room).find(structure => {
             return (
@@ -189,7 +189,7 @@ export class CreepUtils {
 
         return Result.success
     }
-    findEnergySpentOnConstruction(creep: Creep, cSite: ConstructionSite, workParts: number) {
+    findEnergySpentOnConstruction(creep: Creep, cSite: ConstructionSite, workParts: number = myCreepUtils.parts(creep).work) {
         const energySpent = Math.min(
             workParts * BUILD_POWER,
             // In private servers sometimes progress can be greater than progress total
@@ -247,7 +247,7 @@ export class CreepUtils {
 
             creep.actionCoord = creep.room.roomManager.centerUpgradePos
 
-            const workPartCount = creep.parts.work
+            const workPartCount = myCreepUtils.parts(creep).work
             const controllerRange = getRange(creep.pos, controller.pos)
 
             if (controllerRange <= 3 && creep.nextStore.energy > 0) {
@@ -373,7 +373,7 @@ export class CreepUtils {
 
             const energySpentOnUpgrades = Math.min(
                 creep.nextStore.energy,
-                creep.parts.work * UPGRADE_CONTROLLER_POWER,
+                myCreepUtils.parts(creep).work * UPGRADE_CONTROLLER_POWER,
             )
 
             statsManager.updateStat(creep.room.name, 'eou', energySpentOnUpgrades)
@@ -427,7 +427,7 @@ export class CreepUtils {
 
         return upgradePos
     }
-    harvestSource(creep: Creep, source: Source) {
+    harvestSource(creep: Creep, source: Source, workParts: number = myCreepUtils.parts(creep).work) {
         if (creep.harvest(source) !== OK) {
             return Result.fail
         }
@@ -435,7 +435,7 @@ export class CreepUtils {
         creep.worked = WorkTypes.harvest
 
         // Find the presumed energy harvested this tick
-        const energyHarvested = Math.min(myCreepUtils.parts(creep).work * HARVEST_POWER, source.energy)
+        const energyHarvested = Math.min(workParts * HARVEST_POWER, source.energy)
         creep.nextStore.energy += energyHarvested
         // Record the harvest in stats
         statsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyInputHarvest, energyHarvested)

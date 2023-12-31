@@ -60,6 +60,7 @@ import { CreepRoomLogisticsRequest, RoomLogisticsRequest } from 'types/roomReque
 import { customLog, stringifyLog } from 'utils/logging'
 import { customPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
+import { myCreepUtils } from '../myCreepUtils'
 
 Creep.prototype.update = function () {}
 
@@ -289,7 +290,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
     const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(
         this,
         cSite,
-        this.parts.work,
+        myCreepUtils.parts(this).work,
     )
 
     this.nextStore.energy -= energySpentOnConstruction
@@ -371,7 +372,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
         const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(
             this,
             cSiteTarget,
-            this.parts.work,
+            myCreepUtils.parts(this).work,
         )
 
         this.nextStore.energy -= energySpentOnConstruction

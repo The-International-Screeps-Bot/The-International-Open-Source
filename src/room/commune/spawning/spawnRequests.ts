@@ -1133,7 +1133,7 @@ export class SpawnRequestsManager {
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.communeManager.room.name) continue
             if (remoteMemory[RoomMemoryKeys.enemyReserved]) continue
-            if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
+            if (remoteMemory[RoomMemoryKeys.abandonRemote] > 0) continue
 
             priorityIncrement += 1
 
@@ -1210,10 +1210,9 @@ export class SpawnRequestsManager {
                             role,
                             defaultParts: [CARRY],
                             extraParts: [WORK, WORK, MOVE, WORK, MOVE],
-                            partsMultiplier: Math.floor(partsMultiplier / 2),
+                            partsMultiplier: Math.floor(partsMultiplier / 3),
                             spawnGroup,
                             threshold: 0.1,
-
                             maxCreeps: sourcePositionsAmount,
                             maxCostPerCreep: 50 + 400 * 2,
                             minCostPerCreep: 300,

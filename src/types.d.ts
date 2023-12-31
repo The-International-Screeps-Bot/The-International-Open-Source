@@ -683,8 +683,6 @@ declare global {
             [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }>
         }>
 
-        getPartsOfRole(role: CreepRoles): Partial<{ [key in BodyPartConstant]: number }>
-
         createWorkRequest(): boolean
 
         findSwampPlainsRatio(): number
@@ -1062,9 +1060,6 @@ declare global {
          * A numerical measurement of the combat abilites of the creep
          */
         readonly strength: number
-
-        _upgradeStrength: number
-        readonly upgradeStrength: number
 
         _combatStrength: CombatStrength
 

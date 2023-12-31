@@ -220,7 +220,6 @@ export class RoomManager {
         room.myPowerCreepsByRole = {}
         for (const className of powerCreepClassNames) room.myPowerCreepsByRole[className] = []
 
-        room.partsOfRoles = {}
         room.powerTasks = {}
 
         room.creepsOfSource = []
