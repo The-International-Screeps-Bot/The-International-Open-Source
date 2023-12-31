@@ -778,7 +778,7 @@ export class Hauler extends Creep {
         if (creepAtPos.store.getUsedCapacity() > 0) return false
 
         // Ensure that they have the same opinions on roads
-        if (creepMemory[CreepMemoryKeys.preferRoads] === creepMemory[CreepMemoryKeys.preferRoads]) return false
+        if (creepMemory[CreepMemoryKeys.preferRoads] !== creepMemory[CreepMemoryKeys.preferRoads]) return false
 
         let amount: number | undefined
         const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
