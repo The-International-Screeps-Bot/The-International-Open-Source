@@ -1405,4 +1405,5 @@ export enum FlagNames {
   debugMovement = 'debugMovement',
   debugRelay = 'debugRelay',
   debugRoomLogistics = 'debugRoomLogistics',
+  debugCreepLogistics = 'debugCreepLogistics'
 }

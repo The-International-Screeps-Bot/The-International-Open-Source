@@ -1,13 +1,14 @@
 import { Sleepable } from "utils/sleepable"
 import { RoomStatsKeys } from "./constants"
-import { randomIntRange } from "utils/utils"
+import { randomIntRange, utils } from "utils/utils"
 import { collectiveManager } from "./collective"
 
-export class TransactionsManager extends Sleepable {
-  sleepFor = randomIntRange(50, 100)
+const processTransactionsInterval = randomIntRange(50, 100)
+
+export class TransactionsManager {
 
   run() {
-    if (this.isSleepingResponsive()) return
+    if (!utils.isTickInterval(processTransactionsInterval)) return
 
     const currentTransactionIDs = this.findCurrentTransactions()
     this.pruneRecordedTransactions(currentTransactionIDs)
@@ -41,7 +42,7 @@ export class TransactionsManager extends Sleepable {
       // only delete if it isn't in current data
       if (currentTransactionIDs.has(transactionID)) continue
 
-      Memory.recordedTransactionIDs.transactionID = undefined
+      delete Memory.recordedTransactionIDs[transactionID]
     }
   }
 

@@ -2,7 +2,11 @@ import { minerals, Result, RoomMemoryKeys, RoomStatsKeys } from 'international/c
 import { customLog } from 'utils/logging'
 import { newID, roundTo, utils } from 'utils/utils'
 import './marketUtils'
-import { simpleAllies, AllyRequestTypes, ResourceRequest } from 'international/simpleAllies'
+import {
+  simpleAllies,
+  AllyRequestTypes,
+  ResourceRequest,
+} from 'international/simpleAllies/simpleAllies'
 import { collectiveManager } from 'international/collective'
 import { CommuneManager, ResourceTargets } from 'room/commune/commune'
 import { marketUtils } from './marketUtils'
@@ -66,7 +70,7 @@ export class TerminalManager {
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)
-            const priority = roundTo(1 - storedResourceAmount / targetAmount, 2)
+            const priority = roundTo(1 - storedResourceAmount / targetAmount / 2, 2)
             const amount = Math.min(
                 targetAmount - storedResourceAmount,
                 room.terminal.store.getFreeCapacity(),

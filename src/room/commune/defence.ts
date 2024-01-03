@@ -12,7 +12,7 @@ import {
     safemodeTargets,
 } from 'international/constants'
 import { playerManager } from 'international/players'
-import { simpleAllies } from 'international/simpleAllies'
+import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { statsManager } from 'international/statsManager'
 import {
     findObjectWithID,

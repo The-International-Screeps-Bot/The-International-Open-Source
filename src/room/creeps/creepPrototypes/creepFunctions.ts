@@ -20,6 +20,7 @@ import {
   ReservedCoordTypes,
   WorkTypes,
   RoomLogisticsRequestTypes,
+  FlagNames,
 } from 'international/constants'
 import {
   areCoordsEqual,
@@ -1678,7 +1679,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
   /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
   const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
-  this.room.targetVisual(this.pos, target.pos)
+  if (Game.flags[FlagNames.debugCreepLogistics]) this.room.targetVisual(this.pos, target.pos, true)
   if (getRange(target.pos, this.pos) > 1) {
     const result = this.createMoveRequest({
       origin: this.pos,
@@ -1700,7 +1701,16 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
   }
 
   // If we already moved a resource this tick, then wait (presumably) until the next one to take any resoure-moving action
-  if (this.movedResource) return Result.noAction
+  if (this.movedResource) {
+
+    this.room.visual.text('MR', this.pos)
+    return Result.noAction
+  }
+
+  if (Game.flags[FlagNames.debugCreepLogistics]) {
+
+    this.room.visual.text(request[CreepRoomLogisticsRequestKeys.amount].toString(), this.pos)
+  }
 
   /*     log(
         'DOING REQUEST',
