@@ -1,4 +1,4 @@
-import { findClosestRoomName, randomIntRange, randomRange } from 'utils/utils'
+import { findClosestRoomName, randomIntRange, randomRange, utils } from 'utils/utils'
 import { collectiveManager } from './collective'
 import { roomNameUtils } from 'room/roomNameUtils'
 import {
@@ -14,6 +14,9 @@ import {
 } from './constants'
 import { indexOf } from 'lodash'
 import { Sleepable } from 'utils/sleepable'
+import { util } from 'chai'
+
+const runRequestInverval = randomIntRange(100, 200)
 
 // Should adsorb the request content of tickInit
 export class RequestsManager extends Sleepable {
@@ -26,7 +29,7 @@ export class RequestsManager extends Sleepable {
         this.updateCombatRequests()
         this.updateHaulRequests()
 
-        if (this.isSleepingResponsive()) return
+        if (utils.isTickInterval(runRequestInverval)) return
 
         this.runWorkRequests()
         this.runCombatRequests()

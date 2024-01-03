@@ -458,6 +458,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
         roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
 
+        roomNameUtils.cleanMemory(this.name)
+
         return roomMemory[RoomMemoryKeys.type]
     }
 
@@ -593,6 +595,8 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
     roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
+
+    roomNameUtils.cleanMemory(this.name)
 
     return roomMemory[RoomMemoryKeys.type]
 }

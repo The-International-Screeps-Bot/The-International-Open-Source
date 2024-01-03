@@ -53,6 +53,8 @@ export class TerminalManager {
 
     private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
 
+        const resourcesInStoringStructures =
+          this.communeManager.room.roomManager.resourcesInStoringStructures
         for (const key in resourceTargets.min) {
             const resourceType = key as ResourceConstant
             let targetAmount = resourceTargets.min[resourceType]
@@ -60,8 +62,7 @@ export class TerminalManager {
 
             // We have enough
 
-            const storedResourceAmount =
-                this.communeManager.room.roomManager.resourcesInStoringStructures[resourceType] || 0
+            const storedResourceAmount = resourcesInStoringStructures[resourceType] || 0
             if (storedResourceAmount >= targetAmount) continue
 
             targetAmount = Math.floor(targetAmount * 1.1)

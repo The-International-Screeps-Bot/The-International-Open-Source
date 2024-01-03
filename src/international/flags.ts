@@ -642,7 +642,7 @@ export class FlagManager {
         })
     }
 
-    private workRequestsByScore(flagName: string, flagNameParts: string[]) {
+    private workRequestVisuals(flagName: string, flagNameParts: string[]) {
         const flag = Game.flags[flagName]
         const roomName = flagNameParts[1] || flag.pos.roomName
         const room = Game.rooms[roomName]

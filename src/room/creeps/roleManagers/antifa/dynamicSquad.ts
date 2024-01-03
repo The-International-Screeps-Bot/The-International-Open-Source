@@ -53,5 +53,35 @@ export class DynamicSquad {
             dismantler: this.members[0],
         }
     }
+
+    private isInFormation() {
+
+        const members = Object.values(this.membersByType)
+        /**
+         * The last valid index
+         */
+        let previousIndex = 0
+
+        for (let i = 0; i < members.length; i++) {
+
+            const member = members[i]
+            if (!member) continue
+
+            const previousMember = members
+        }
+    }
+
+    private getInFormation() {
+
+
+    }
+
+    /**
+     * create a move request while in formation
+     */
+    private createMoveRequest() {
+
+
+    }
 }
 

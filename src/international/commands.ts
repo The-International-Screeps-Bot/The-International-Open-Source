@@ -1,3 +1,4 @@
+import { roomNameUtils } from 'room/roomNameUtils'
 import { collectiveManager } from './collective'
 import { allStructureTypes, WorkRequestKeys, CombatRequestKeys, RoomMemoryKeys, RoomTypes } from './constants'
 
@@ -153,7 +154,7 @@ global.destroyCommuneStructures = function (types?) {
     return log + ` ${types ? `with the types ${types}` : ''}`
 }
 
-global.claim = function (requestName, communeName, priority = 0) {
+global.claim = function (requestName, communeName, priority = 0, override?: boolean) {
     if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
     if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== true)
         return 'Planning not completed for ' + requestName
@@ -180,6 +181,12 @@ global.claim = function (requestName, communeName, priority = 0) {
 
         roomMemory[RoomMemoryKeys.workRequest] = requestName
         request[WorkRequestKeys.responder] = communeName
+    }
+
+    if (override) {
+
+        Memory.rooms[requestName][RoomMemoryKeys.type] = RoomTypes.neutral
+        roomNameUtils.cleanMemory(requestName)
     }
 
     return `${

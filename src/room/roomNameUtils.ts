@@ -19,6 +19,7 @@ import {
     getRange,
     packAsNum,
     packXYAsNum,
+    roundTo,
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
@@ -98,7 +99,7 @@ export class RoomNameUtils {
             }
         })
 
-        dynamicScore += Math.round(Math.pow(closestEnemy, -0.8) * 25)
+        if (closestEnemy > 0) dynamicScore += Math.round(Math.pow(closestEnemy, -0.8) * 25)
         dynamicScore += Math.round(communeScore * 50)
         dynamicScore += allyScore
 
@@ -110,6 +111,8 @@ export class RoomNameUtils {
             collectiveManager.mineralNodes[mineralType] - collectiveManager.avgCommunesPerMineral
         dynamicScore += mineralScore * 40
 
+        dynamicScore = roundTo(dynamicScore, 2)
+        /* customLog('Dynamic scores', `enemy ${closestEnemy} commune ${communeScore} ally ${allyScore} mineralScore ${mineralScore} val1 ${Math.round(Math.pow(closestEnemy, -0.8) * 25)} val2 ${Math.round(communeScore * 50)} val3 ${mineralScore * 40} val4 ${dynamicScore}`) */
         roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
         roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 

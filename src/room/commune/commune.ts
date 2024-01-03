@@ -1108,8 +1108,15 @@ export class CommuneManager {
         resourceTargets.min[RESOURCE_ZYNTHIUM] = storingStructuresCapacity * 0.01
         resourceTargets.max[RESOURCE_ZYNTHIUM] = storingStructuresCapacity * 0.027
 
-        resourceTargets.min[RESOURCE_CATALYST] = storingStructuresCapacity * 0.01
-        resourceTargets.max[RESOURCE_CATALYST] = storingStructuresCapacity * 0.027
+        if (Game.shard.name === 'swc') {
+
+            resourceTargets.min[RESOURCE_CATALYST] = storingStructuresCapacity * 0
+            resourceTargets.max[RESOURCE_CATALYST] = storingStructuresCapacity * 0.01
+        }
+        else {
+            resourceTargets.min[RESOURCE_CATALYST] = storingStructuresCapacity * 0.01
+            resourceTargets.max[RESOURCE_CATALYST] = storingStructuresCapacity * 0.027
+        }
 
         // Boosts
 
