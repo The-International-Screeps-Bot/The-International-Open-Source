@@ -1,18 +1,18 @@
 import {
-    CreepMemoryKeys,
-    ReservedCoordTypes,
-    Result,
-    RoomMemoryKeys,
-    RoomTypes,
-    packedPosLength,
+  CreepMemoryKeys,
+  ReservedCoordTypes,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+  packedPosLength,
 } from 'international/constants'
 import { getRange, randomTick } from 'utils/utils'
 import {
-    packCoord,
-    reversePosList,
-    unpackCoordAsPos,
-    unpackPosAt,
-    unpackPosList,
+  packCoord,
+  reversePosList,
+  unpackCoordAsPos,
+  unpackPosAt,
+  unpackPosList,
 } from 'other/codec'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
@@ -229,6 +229,35 @@ export class RemoteReserver extends Creep {
     )
   }
 
+  travelToCommune?() {
+    if (this.room.name === this.commune.name && !this.isOnExit) {
+      return Result.success
+    }
+
+    const anchor = this.commune.roomManager.anchor
+    if (!anchor) throw Error('no anchor for hauler')
+
+    this.createMoveRequest({
+      origin: this.pos,
+      goals: [
+        {
+          pos: anchor,
+          range: 3,
+        },
+      ],
+      avoidEnemyRanges: true,
+      typeWeights: {
+        [RoomTypes.enemy]: Infinity,
+        [RoomTypes.ally]: Infinity,
+        [RoomTypes.sourceKeeper]: Infinity,
+        [RoomTypes.enemyRemote]: Infinity,
+        [RoomTypes.allyRemote]: Infinity,
+      },
+    })
+
+    return Result.action
+  }
+
   static roleManager(room: Room, creepsOfRole: string[]) {
     for (const creepName of creepsOfRole) {
       const creep: RemoteReserver = Game.creeps[creepName]
@@ -240,26 +269,7 @@ export class RemoteReserver extends Creep {
 
         creep.message = '❌ Remote'
 
-        /*
-                if (room.name === creep.commune.name) {
-                    // Advanced recycle and iterate
-
-                    creep.advancedRecycle()
-                    continue
-                }
-
-                // Otherwise, have the creep make a moveRequest to its commune and iterate
-
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: creep.commune.anchor,
-                            range: 5,
-                        },
-                    ],
-                })
- */
+        creep.travelToCommune()
         continue
       }
 

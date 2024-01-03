@@ -21,6 +21,7 @@ import {
     getRangeXY,
     randomIntRange,
     randomTick,
+    utils,
 } from 'utils/utils'
 
 export class Hauler extends Creep {
@@ -96,7 +97,7 @@ export class Hauler extends Creep {
     }
 
     initRun() {
-        if (randomTick() && (!this.getActiveBodyparts(MOVE) || !this.getActiveBodyparts(CARRY))) {
+        if (utils.isTickInterval(10) && this.getActiveBodyparts(CARRY) === 0) {
             this.suicide()
             return
         }
@@ -155,13 +156,10 @@ export class Hauler extends Creep {
             if (remoteMemory[RoomMemoryKeys.abandonRemote]) continue
             if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
             if (remoteMemory[RoomMemoryKeys.commune] !== this.commune.name) continue
-            // Ensure the creep and the remote have the same opinions on roads
-            if (!!remoteMemory[RoomMemoryKeys.roads].length !== Memory.creeps[this.name][CreepMemoryKeys.preferRoads]) continue
 
             const sourceIndex = parseInt(splitRemoteInfo[1])
             if (!this.isRemoteValid(remoteName, sourceIndex)) continue
 
-            /* this.room.visual.text((this.freeNextStore + remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex]).toString(), this.pos.x, this.pos.y + 0.5) */
             this.assignRemote(remoteName, sourceIndex)
             return true
         }
@@ -170,35 +168,44 @@ export class Hauler extends Creep {
     }
 
     isRemoteValid?(remoteName: string, sourceIndex: number) {
-        const remoteMemory = Memory.rooms[remoteName]
-        const commune = this.commune
+      const remoteMemory = Memory.rooms[remoteName]
 
-        // Make sure we have enough life to get there
+      // Ensure the creep and the remote have the same opinions on roads
+      if (
+        !!(remoteMemory[RoomMemoryKeys.roads][sourceIndex]) !=
+        !!Memory.creeps[this.name][CreepMemoryKeys.preferRoads]
+      )
+        return false
 
+      const commune = this.commune
+
+      // Make sure we have enough life to get there
+      /*
         const pathLength =
             remoteMemory[commune.communeManager.remoteResourcePathType][sourceIndex].length /
             packedPosLength
         if (pathLength >= this.ticksToLive) return false
+ */
+      // Make sure we have enough free space to keep reservation below credit
+      if (
+        remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] -
+          remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] <
+        this.freeNextStore
+      ) {
+        return false
+      }
 
-        // Make sure we have enough free space to keep reservation below credit
-        if (
-            remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex] -
-                remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] <
-            this.freeNextStore
-        ) {
-            return false
-        }
+      // If we do roads but the remote doesn't - change to be a low-priority search later
+      if (Memory.creeps[this.name][CreepMemoryKeys.preferRoads]) {
+        const roadsQuota =
+          remoteMemory[commune.communeManager.remoteResourcePathType][sourceIndex].length /
+          packedPosLength
 
-        // If we do roads but the remote doesn't - change to be a low-priority search later
-        if (Memory.creeps[this.name][CreepMemoryKeys.preferRoads]) {
+        // See if there are roads close enough or more than the quota
+        if (remoteMemory[RoomMemoryKeys.roads][sourceIndex] < roadsQuota * 0.9) return false
+      }
 
-            const roadsQuota = remoteMemory[commune.communeManager.remoteResourcePathType][sourceIndex].length / packedPosLength
-
-            // See if there are roads close enough or more than the quota
-            if (remoteMemory[RoomMemoryKeys.roads][sourceIndex] < roadsQuota * 0.9) return false
-        }
-
-        return true
+      return true
     }
 
     isCurrentRemoteValid?() {
@@ -969,7 +976,7 @@ export class Hauler extends Creep {
     }
 
     travelToCommune?() {
-        if (this.room.name === this.commune.name) {
+        if (this.room.name === this.commune.name && !this.isOnExit) {
             return Result.success
         }
 

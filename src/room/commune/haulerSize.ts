@@ -16,7 +16,7 @@ export class HaulerSizeManager {
 
         if (roomMemory[RoomMemoryKeys.minHaulerCost] === undefined) {
 
-            roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 100 * this.communeManager.room.roomManager.structures.spawn.length)
+            roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 200 * this.communeManager.room.roomManager.structures.spawn.length)
             roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(1500, 3000)
             return
         }

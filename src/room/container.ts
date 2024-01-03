@@ -46,18 +46,19 @@ export class ContainerManager {
             }
 
             // If we're sufficiently full, we don't need to ask for more
-            if (energy > capacity * 0.9) continue
+            if (energy < capacity * 0.6) {
 
-            this.roomManager.room.createRoomLogisticsRequest({
-                target: container,
-                type: RoomLogisticsRequestTypes.transfer,
-                onlyFull: true,
-                priority: scalePriority(
-                    capacity,
-                    energy,
-                    20,
-                ),
-            })
+                this.roomManager.room.createRoomLogisticsRequest({
+                    target: container,
+                    type: RoomLogisticsRequestTypes.transfer,
+                    onlyFull: true,
+                    priority: scalePriority(
+                        capacity,
+                        energy,
+                        20,
+                    ),
+                })
+            }
         }
     }
 
@@ -91,7 +92,7 @@ export class ContainerManager {
                 ? 0
                 : 50
         priority += scalePriority(container.store.getCapacity(), container.reserveStore.energy, 20)
-        
+
         this.roomManager.room.createRoomLogisticsRequest({
             target: container,
             type: RoomLogisticsRequestTypes.transfer,

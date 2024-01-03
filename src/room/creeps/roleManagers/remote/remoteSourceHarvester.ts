@@ -1,21 +1,22 @@
 import {
-    CreepMemoryKeys,
-    packedPosLength,
-    ReservedCoordTypes,
-    Result,
-    RoomLogisticsRequestTypes,
-    RoomMemoryKeys,
-    RoomTypes,
-    WorkTypes,
+  CreepMemoryKeys,
+  packedPosLength,
+  ReservedCoordTypes,
+  Result,
+  RoomLogisticsRequestTypes,
+  RoomMemoryKeys,
+  RoomTypes,
+  WorkTypes,
 } from 'international/constants'
 import {
-    findCarryPartsRequired,
-    findObjectWithID,
-    getRangeXY,
-    getRange,
-    randomTick,
-    scalePriority,
-    areCoordsEqual,
+  findCarryPartsRequired,
+  findObjectWithID,
+  getRangeXY,
+  getRange,
+  randomTick,
+  scalePriority,
+  areCoordsEqual,
+  utils,
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
@@ -61,7 +62,7 @@ export class RemoteHarvester extends Creep {
   }
 
   initRun(): void {
-    if (randomTick() && this.getActiveBodyparts(MOVE) === 0) {
+    if (utils.isTickInterval(10) && this.getActiveBodyparts(MOVE) === 0) {
       this.suicide()
       return
     }
@@ -69,7 +70,7 @@ export class RemoteHarvester extends Creep {
     const creepMemory = Memory.creeps[this.name]
     if (!creepMemory[CreepMemoryKeys.remote]) return
 
-    if (!this.shouldRemoveRemote()) {
+    if (!this.shouldKeepRemote()) {
       this.removeRemote()
       return
     }
@@ -82,7 +83,7 @@ export class RemoteHarvester extends Creep {
     return
   }
 
-  shouldRemoveRemote?() {
+  shouldKeepRemote?() {
     const creepMemory = Memory.creeps[this.name]
     const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
 
@@ -457,6 +458,35 @@ export class RemoteHarvester extends Creep {
     return Result.action
   }
 
+  travelToCommune?() {
+    if (this.room.name === this.commune.name && !this.isOnExit) {
+      return Result.success
+    }
+
+    const anchor = this.commune.roomManager.anchor
+    if (!anchor) throw Error('no anchor for hauler')
+
+    this.createMoveRequest({
+      origin: this.pos,
+      goals: [
+        {
+          pos: anchor,
+          range: 3,
+        },
+      ],
+      avoidEnemyRanges: true,
+      typeWeights: {
+        [RoomTypes.enemy]: Infinity,
+        [RoomTypes.ally]: Infinity,
+        [RoomTypes.sourceKeeper]: Infinity,
+        [RoomTypes.enemyRemote]: Infinity,
+        [RoomTypes.allyRemote]: Infinity,
+      },
+    })
+
+    return Result.action
+  }
+
   static roleManager(room: Room, creepsOfRole: string[]) {
     for (const creepName of creepsOfRole) {
       const creep: RemoteHarvester = Game.creeps[creepName] as RemoteHarvester
@@ -465,28 +495,8 @@ export class RemoteHarvester extends Creep {
 
       if (!creep.findRemote()) {
         creep.message = '❌ Remote'
-        /*
-                // If the room is the creep's commune
 
-                if (room.name === creep.commune.name) {
-                    // Advanced recycle and iterate
-
-                    creep.advancedRecycle()
-                    continue
-                }
-
-                // Otherwise, have the creep make a moveRequest to its commune and iterate
-
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: creep.commune.anchor,
-                            range: 5,
-                        },
-                    ],
-                })
- */
+        creep.travelToCommune()
         continue
       }
 

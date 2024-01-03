@@ -34,7 +34,6 @@ import { customLog, LogTypes } from 'utils/logging'
 export class DefenceManager {
     communeManager: CommuneManager
 
-    presentThreat: number
     threatByPlayers: Map<string, number>
 
     constructor(communeManager: CommuneManager) {
@@ -374,12 +373,13 @@ export class DefenceManager {
     }
 
     private findPresentThreat() {
-        this.presentThreat = 0
-        this.threatByPlayers = new Map()
 
         const { room } = this.communeManager
 
-        if (!room.towerInferiority) return
+        if (!room.towerInferiority) return false
+
+        let presentThreat = 0
+        this.threatByPlayers = new Map()
 
         for (const enemyCreep of room.roomManager.enemyAttackers) {
             let threat = 0
@@ -391,7 +391,7 @@ export class DefenceManager {
             threat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
 
             threat = Math.floor(threat)
-            this.presentThreat += threat
+            presentThreat += threat
 
             const playerName = enemyCreep.owner.username
             if (playerName === 'Invader') continue
@@ -404,25 +404,30 @@ export class DefenceManager {
 
             this.threatByPlayers.set(playerName, threat)
         }
+
+        return presentThreat
     }
 
     manageThreat() {
         const { room } = this.communeManager
 
-        this.findPresentThreat()
+        const presentThreat = this.findPresentThreat()
         const roomMemory = Memory.rooms[room.name]
 
-        if (!this.presentThreat) {
+        if (!presentThreat) {
             // Reduce attack threat over time
             if (roomMemory[RoomMemoryKeys.threatened] > 0)
                 roomMemory[RoomMemoryKeys.threatened] *= defaultDataDecay
 
-            if (roomMemory[RoomMemoryKeys.lastAttackedBy]) roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
+            if (roomMemory[RoomMemoryKeys.lastAttackedBy] !== undefined) roomMemory[RoomMemoryKeys.lastAttackedBy] += 1
+            return
         }
+
+        // There is a present threat
 
         roomMemory[RoomMemoryKeys.threatened] = Math.max(
             roomMemory[RoomMemoryKeys.threatened],
-            this.presentThreat,
+            presentThreat,
             playerManager.highestThreat / 3,
         )
 

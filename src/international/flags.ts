@@ -1,5 +1,5 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { Result, RoomLogisticsRequestTypes, RoomMemoryKeys, RoomTypes, customColors, ourImpassibleStructuresSet } from './constants'
+import { Result, RoomLogisticsRequestTypes, RoomMemoryKeys, RoomTypes, WorkRequestKeys, customColors, ourImpassibleStructuresSet } from './constants'
 import { collectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
 import { roomNameUtils } from 'room/roomNameUtils'
@@ -633,6 +633,78 @@ export class FlagManager {
                             data,
                             config: {
                                 label: 'Room Logistics Requests',
+                                headers,
+                            },
+                        })),
+                    }),
+                },
+            ],
+        })
+    }
+
+    private workRequestsByScore(flagName: string, flagNameParts: string[]) {
+        const flag = Game.flags[flagName]
+        const roomName = flagNameParts[1] || flag.pos.roomName
+        const room = Game.rooms[roomName]
+        if (!room) {
+
+            flag.setColor(COLOR_RED)
+            return
+        }
+
+        const headers = [
+            'roomName',
+            'static score',
+            'dynamic score',
+            'responder',
+            'abandon'
+        ]
+        const data: any[][] = []
+
+        const workRequests = Object.keys(Memory.workRequests).sort((a, b) => {
+            const aScore = (Memory.rooms[a][RoomMemoryKeys.score] +
+                Memory.rooms[a][RoomMemoryKeys.dynamicScore])
+
+            const bScore = (Memory.rooms[b][RoomMemoryKeys.score] +
+                    Memory.rooms[b][RoomMemoryKeys.dynamicScore])
+
+            return aScore - bScore
+        })
+
+        for (const requestRoomName of workRequests) {
+
+            const roomMemory = Memory.rooms[requestRoomName]
+            const request = Memory.workRequests[requestRoomName]
+
+            const row = [
+                requestRoomName,
+                roomMemory[RoomMemoryKeys.score],
+                roomMemory[RoomMemoryKeys.dynamicScore],
+                request[WorkRequestKeys.responder],
+                request[WorkRequestKeys.abandon],
+            ]
+            data.push(row)
+        }
+
+        const height = 3 + data.length
+
+        Dashboard({
+            config: {
+                room: room.name,
+            },
+            widgets: [
+                {
+                    pos: {
+                        x: 1,
+                        y: 1,
+                    },
+                    width: 47,
+                    height,
+                    widget: Rectangle({
+                        data: Table(() => ({
+                            data,
+                            config: {
+                                label: 'Work Requests',
                                 headers,
                             },
                         })),
