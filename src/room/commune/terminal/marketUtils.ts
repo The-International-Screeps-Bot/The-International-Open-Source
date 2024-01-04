@@ -99,7 +99,7 @@ export class MarketUtils {
             const roomsStats = Memory.stats.rooms[room.name]
 
             const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
-            roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] = transactionCost
+            roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] += transactionCost
 
             return Result.success
         }
