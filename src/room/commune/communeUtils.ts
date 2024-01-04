@@ -142,9 +142,12 @@ export class CommuneUtils {
     // Container
 
     if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
-      return (maxUpgradeStrength =
+      maxUpgradeStrength =
         upgradeStructure.store.getCapacity() /
-        (4 + room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength))
+        (4 + room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength)
+
+      data.maxUpgradeStrength = maxUpgradeStrength
+      return maxUpgradeStrength
     }
 
     // Link
@@ -157,10 +160,10 @@ export class CommuneUtils {
     maxUpgradeStrength = 0
 
     if (hubLink && hubLink.isRCLActionable) {
-      const range = getRange(upgradeStructure.pos, hubLink.pos)
+      // Add a bit of extra range because of inherent limitations of withdrawing and transferring
+      const range = getRange(upgradeStructure.pos, hubLink.pos) + 3
 
       // Increase strength by throughput
-
       maxUpgradeStrength += findLinkThroughput(range) * 0.7
     }
 

@@ -477,7 +477,6 @@ export const roomLogisticsRoles: Set<CreepRoles> = new Set([
 
 export const communeCreepRoles: Set<CreepRoles> = new Set([
     'sourceHarvester',
-    'hauler',
     'builder',
     'maintainer',
     'controllerUpgrader',

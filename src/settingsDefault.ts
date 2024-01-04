@@ -10,16 +10,6 @@ export interface Settings {
     roomVisuals: boolean
 
     /**
-     * Wether the bot should generate base room visuals
-     */
-    baseVisuals: boolean
-
-    /**
-     * Wether or not to generate data visuals
-     */
-    dataVisuals: boolean
-
-    /**
      * Wether the bot should generate map visuals
      */
     mapVisuals: boolean
@@ -117,8 +107,6 @@ export interface Settings {
 export const defaultSettings: Settings = {
     breakingVersion: 122,
     roomVisuals: false,
-    baseVisuals: false,
-    dataVisuals: false,
     mapVisuals: false,
     allies: [
         'MarvinTMB'

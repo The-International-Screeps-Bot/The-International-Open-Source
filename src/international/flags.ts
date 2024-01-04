@@ -7,6 +7,7 @@ import {
   WorkRequestKeys,
   customColors,
   ourImpassibleStructuresSet,
+  packedPosLength,
 } from './constants'
 import { collectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
@@ -583,7 +584,6 @@ export class FlagManager {
 
     const outputLabs = labManager.outputLabs
     for (const lab of outputLabs) {
-
       room.visual.resource(labManager.outputResource, lab.pos.x, lab.pos.y)
     }
   }
@@ -771,6 +771,127 @@ export class FlagManager {
     for (const creep of room.myCreeps) {
       room.visual.text(creep.usedNextStore.toString(), creep.pos)
     }
+  }
+
+  private remoteDataVisuals(flagName: string, flagNameParts: string[]) {
+    const flag = Game.flags[flagName]
+    const roomName = flagNameParts[1] || flag.pos.roomName
+    const room = Game.rooms[roomName]
+    if (!room || !room.communeManager) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    const headers = [
+      'room',
+      'sourceIndex',
+      '📈',
+      '⚡⛏️',
+      'hauler',
+      '⚡',
+      'Δ⚡',
+      '⚡Reserved',
+      'reserver',
+      'coreAttacker',
+      '❌',
+      '🛑',
+    ]
+    const data: any[][] = []
+
+    for (const remoteInfo of room.roomManager.remoteSourceIndexesByEfficacy) {
+      const splitRemoteInfo = remoteInfo.split(' ')
+      const remoteName = splitRemoteInfo[0]
+
+      const remoteMemory = Memory.rooms[remoteName]
+      if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
+      if (remoteMemory[RoomMemoryKeys.commune] !== room.roomManager.room.name) continue
+
+      const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
+      const pathType = room.communeManager.remoteResourcePathType
+      const row: any[] = []
+
+      row.push(remoteName)
+      row.push(sourceIndex)
+      if (remoteMemory[pathType][sourceIndex])
+        row.push(remoteMemory[pathType][sourceIndex].length / packedPosLength)
+      else row.push('unknown')
+      row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
+      row.push(remoteMemory[RoomMemoryKeys.haulers][sourceIndex])
+      row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
+      if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] !== undefined)
+        row.push(remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2))
+      else row.push('unknown')
+      row.push(
+        remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
+          '/' +
+          Math.round(
+            (remoteMemory[pathType][sourceIndex].length / packedPosLength) *
+              remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
+          ) *
+            2,
+      )
+      row.push(remoteMemory[RoomMemoryKeys.remoteReservers])
+      row.push(
+        remoteMemory[RoomMemoryKeys.remoteCoreAttacker] ||
+          remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '',
+      )
+      row.push(
+        remoteMemory[RoomMemoryKeys.abandonRemote] ||
+          remoteMemory[RoomMemoryKeys.abandonRemote] + '',
+      )
+      row.push(remoteMemory[RoomMemoryKeys.disable] ? 'OFF' : 'ON')
+
+      data.push(row)
+    }
+
+    const height = 3 + data.length
+
+    Dashboard({
+      config: {
+        room: room.name,
+      },
+      widgets: [
+        {
+          pos: {
+            x: 1,
+            y: 1,
+          },
+          width: 47,
+          height,
+          widget: Rectangle({
+            data: Table(() => ({
+              data,
+              config: {
+                label: 'Remotes',
+                headers,
+              },
+            })),
+          }),
+        },
+      ],
+    })
+  }
+
+  private baseVisuals(flagName: string, flagNameParts: string[]) {
+    const flag = Game.flags[flagName]
+    const roomName = flagNameParts[1] || flag.pos.roomName
+    const room = Game.rooms[roomName]
+    if (!room || !room.communeManager) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    const roomMemory = Memory.rooms[room.name]
+    if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) {
+        flag.setColor(COLOR_RED)
+        return
+      }
+    if (!roomMemory[RoomMemoryKeys.communePlanned]) {
+        flag.setColor(COLOR_RED)
+        return
+      }
+
+    room.communeManager.constructionManager.visualize()
   }
 }
 

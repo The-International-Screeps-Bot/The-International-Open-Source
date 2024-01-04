@@ -1,7 +1,9 @@
-import { findHighestScore, randomTick, utils } from 'utils/utils'
+import { findHighestScore, randomIntRange, randomTick, utils } from 'utils/utils'
 import { PlayerMemoryKeys, Result, RoomMemoryKeys } from '../constants'
 import { collectiveManager } from '../collective'
 import { customLog } from 'utils/logging'
+
+const optimizeOrdersInterval = randomIntRange(900, 1000)
 
 export class MarketManager {
     run() {
@@ -14,7 +16,7 @@ export class MarketManager {
 
             this.resourceHistory = {}
         }
-        if (utils.isTickInterval(1000)) {
+        if (utils.isTickInterval(optimizeOrdersInterval)) {
 
             this.optimizeMyOrders()
         }

@@ -139,31 +139,27 @@ export class HubHauler extends Creep {
         if (!terminal) return false
 
         // If the storage is sufficiently full
-
-        if (storage.freeNextStore < this.store.getCapacity()) return false
+        if (storage.store.getFreeCapacity() < this.store.getCapacity()) return false
 
         // If the terminal exists and isn't power disabled
-
         if (terminal.effectsData.get(PWR_DISRUPT_TERMINAL)) return false
 
         for (const key in terminal.store) {
             const resourceType = key as ResourceConstant
 
             // If there is not sufficient resources to justify moving
-
             if (terminal.store[resourceType] < this.store.getCapacity()) continue
 
-            // If the terminal is sufficiently balanced compared to the storage
-
+            // If the weighted storage store is more than the terminal's, stop
             if (
-                terminal.store[resourceType] <
-                storage.store[resourceType] * 0.3 + this.store.getCapacity()
+                storage.store[resourceType] / 3 >
+                terminal.store[resourceType] + this.store.getCapacity() * 2
             )
                 continue
 
             this.message += 'RST ' + resourceType
 
-            let amount = this.freeNextStore
+            let amount = this.store.getFreeCapacity()
 
             this.createCreepRoomLogisticsRequest(
                 RoomLogisticsRequestTypes.withdraw,
@@ -184,6 +180,7 @@ export class HubHauler extends Creep {
     }
 
     /**
+     * storage -> terminal
      * @returns If a reservation was made or not
      */
     reserveTerminalTransfer?(): boolean {
@@ -195,27 +192,24 @@ export class HubHauler extends Creep {
         if (!terminal) return false
 
         // If the terminal is sufficiently full
-
-        if (terminal.freeNextStore < this.store.getCapacity()) return false
+        if (terminal.store.getFreeCapacity() < this.store.getCapacity()) return false
 
         for (const key in storage.store) {
             const resourceType = key as ResourceConstant
 
             // If there is not sufficient resources to justify moving
-
             if (storage.store[resourceType] < this.store.getCapacity()) continue
 
-            // If the storage is sufficiently balanced compared to the storage
-
+            // If the weighted storage store is less than the terminal's, stop
             if (
-                storage.store[resourceType] * 0.3 <
-                terminal.store[resourceType] + this.store.getCapacity()
+                storage.store[resourceType] / 3 + this.store.getCapacity() * 2 <
+                terminal.store[resourceType]
             )
                 continue
 
             this.message += 'RTT ' + resourceType
 
-            let amount = this.freeNextStore
+            let amount = this.store.getFreeCapacity()
 
             this.createCreepRoomLogisticsRequest(
                 RoomLogisticsRequestTypes.withdraw,
@@ -303,13 +297,12 @@ export class HubHauler extends Creep {
         if (!hubLink) return false
 
         // If there is a sufficient cooldown (there is no point filling a link that can do nothing)
-
         if (hubLink.cooldown >= 6) return false
 
         // If there is unsufficient space to justify a fill
-
-        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.energy)
+        if (hubLink.store.getCapacity(RESOURCE_ENERGY) * linkSendThreshold < hubLink.store.getUsedCapacity(RESOURCE_ENERGY)) {
             return false
+        }
 
         const { controllerLink } = room.communeManager
         const fastFillerLink = this.room.roomManager.fastFillerLink
@@ -327,7 +320,7 @@ export class HubHauler extends Creep {
         )
             return false
 
-        const amount = Math.min(this.freeNextStore, hubLink.store.getFreeCapacity(RESOURCE_ENERGY))
+        const amount = Math.min(this.store.getFreeCapacity(), hubLink.store.getFreeCapacity(RESOURCE_ENERGY))
 
         // Find a provider
 
@@ -345,7 +338,7 @@ export class HubHauler extends Creep {
             RoomLogisticsRequestTypes.transfer,
             hubLink.id,
             Math.min(
-                this.freeNextStore + this.store.energy,
+                this.freeNextStore + this.store.getUsedCapacity(RESOURCE_ENERGY),
                 hubLink.store.getFreeCapacity(RESOURCE_ENERGY),
             ),
         )

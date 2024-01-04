@@ -29,8 +29,6 @@ export class RoomVisualsManager {
     public run() {
 
         this.roomVisuals()
-        this.baseVisuals()
-        this.dataVisuals()
     }
 
     private roomVisuals() {
@@ -195,24 +193,6 @@ export class RoomVisualsManager {
 
             this.roomManager.room.coordVisual(coord.x, coord.y)
         }
-    }
-
-    private baseVisuals() {
-        if (!global.settings.baseVisuals) return
-
-        const roomMemory = Memory.rooms[this.roomManager.room.name]
-        if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) return
-        if (!roomMemory[RoomMemoryKeys.communePlanned]) return
-
-        this.roomManager.room.communeManager.constructionManager.visualize()
-    }
-
-    private dataVisuals() {
-        if (!global.settings.dataVisuals) return
-
-        if (!collectiveManager.communes.has(this.roomManager.room.name)) return
-
-        this.remoteDataVisuals(this.statDataVisuals(this.generalDataVisuals(1)))
     }
 
     public internationalDataVisuals() {
@@ -756,99 +736,4 @@ export class RoomVisualsManager {
     }
 
     requestDataVisuals(y: number) {}
-
-    private remoteDataVisuals(y: number) {
-        const headers = [
-            'room',
-            'sourceIndex',
-            '📈',
-            '⚡⛏️',
-            'hauler',
-            '⚡',
-            'Δ⚡',
-            '⚡Reserved',
-            'reserver',
-            'coreAttacker',
-            '❌',
-            '🛑',
-        ]
-        const data: any[][] = []
-
-        for (const remoteInfo of this.roomManager.remoteSourceIndexesByEfficacy) {
-            const splitRemoteInfo = remoteInfo.split(' ')
-            const remoteName = splitRemoteInfo[0]
-
-            const remoteMemory = Memory.rooms[remoteName]
-            if (remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote) continue
-            if (remoteMemory[RoomMemoryKeys.commune] !== this.roomManager.room.name) continue
-
-            const sourceIndex = parseInt(splitRemoteInfo[1]) as 0 | 1
-            const pathType = this.roomManager.room.communeManager.remoteResourcePathType
-            const row: any[] = []
-
-            row.push(remoteName)
-            row.push(sourceIndex)
-            if (remoteMemory[pathType][sourceIndex])
-                row.push(remoteMemory[pathType][sourceIndex].length / packedPosLength)
-            else row.push('unknown')
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceHarvesters][sourceIndex])
-            row.push(remoteMemory[RoomMemoryKeys.haulers][sourceIndex])
-            row.push(remoteMemory[RoomMemoryKeys.remoteSourceCredit][sourceIndex].toFixed(2))
-            if (remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex] !== undefined)
-                row.push(
-                    remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex].toFixed(2),
-                )
-            else row.push('unknown')
-            row.push(
-                remoteMemory[RoomMemoryKeys.remoteSourceCreditReservation][sourceIndex] +
-                    '/' +
-                    Math.round(
-                        (remoteMemory[pathType][sourceIndex].length / packedPosLength) *
-                            remoteMemory[RoomMemoryKeys.remoteSourceCreditChange][sourceIndex],
-                    ) *
-                        2,
-            )
-            row.push(remoteMemory[RoomMemoryKeys.remoteReservers])
-            row.push(
-                remoteMemory[RoomMemoryKeys.remoteCoreAttacker] ||
-                    remoteMemory[RoomMemoryKeys.remoteCoreAttacker] + '',
-            )
-            row.push(
-                remoteMemory[RoomMemoryKeys.abandonRemote] ||
-                    remoteMemory[RoomMemoryKeys.abandonRemote] + '',
-            )
-            row.push(remoteMemory[RoomMemoryKeys.disable] ? 'OFF' : 'ON')
-
-            data.push(row)
-        }
-
-        const height = 3 + data.length
-
-        Dashboard({
-            config: {
-                room: this.roomManager.room.name,
-            },
-            widgets: [
-                {
-                    pos: {
-                        x: 1,
-                        y,
-                    },
-                    width: 47,
-                    height,
-                    widget: Rectangle({
-                        data: Table(() => ({
-                            data,
-                            config: {
-                                label: 'Remotes',
-                                headers,
-                            },
-                        })),
-                    }),
-                },
-            ],
-        })
-
-        return y + height
-    }
 }

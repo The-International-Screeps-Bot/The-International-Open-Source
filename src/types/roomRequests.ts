@@ -42,6 +42,10 @@ export interface RoomLogisticsRequest {
      * Wether the responder should interact with reserveStore of the target
      */
     noReserve?: boolean
+    /**
+     * If true, responders have to be in range 1 on acceptance of the task
+     */
+    passive?: boolean
     // /**
     //  * The estimated income, positive or negative that is expected per tick for the request target
     //  */

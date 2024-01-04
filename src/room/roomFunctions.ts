@@ -1616,16 +1616,18 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
 }
 
 Room.prototype.highestWeightedStoringStructures = function (resourceType) {
-    if (!this.storage && this.terminal) return false
+    if (!this.storage && !this.terminal) return false
 
     if (!this.storage) return this.terminal
     if (!this.terminal) return this.storage
 
     if (
-        this.storage.store.getUsedCapacity(resourceType) * 3 >
-        this.terminal.store.getUsedCapacity(resourceType)
-    )
-        return this.storage
+      this.storage.store.getUsedCapacity(resourceType) / 3 >
+      this.terminal.store.getUsedCapacity(resourceType)
+    ) {
+    return this.storage
+    }
+
     return this.terminal
 }
 
