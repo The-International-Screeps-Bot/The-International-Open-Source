@@ -6,6 +6,7 @@ interface CommuneData {
    */
   registeredRCL: number
   generalRepairStructureCoords: Set<string>
+  maxUpgradeStrength: number
 }
 
 /**

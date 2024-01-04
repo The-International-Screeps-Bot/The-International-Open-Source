@@ -950,7 +950,7 @@ export class RoomManager {
             communeManager.spawningStructuresByPriorityIDs = undefined
             communeManager._fastFillerSpawnEnergyCapacity = undefined
             communeManager.sourceLinkIDs = undefined
-            
+
             this.fastFillerContainerIDs = undefined
             this._upgradePositions = undefined
             this._fastFillerPositions = undefined
@@ -1377,6 +1377,8 @@ export class RoomManager {
                 return (this._combatStructureTargets = [])
             if (controller.reservation && isAlly(controller.reservation.username))
                 return (this._combatStructureTargets = [])
+
+            return this._combatStructureTargets = []
         }
 
         const combatStructureTargets = this.room.find(FIND_STRUCTURES, {

@@ -8,6 +8,7 @@ import { statsManager } from 'international/statsManager'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { creepUtils } from 'room/creeps/creepUtils'
+import { creepProcs } from 'room/creeps/creepProcs'
 
 export class Maintainer extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -36,8 +37,8 @@ export class Maintainer extends Creep {
         const rampartCSite = this.room.find(FIND_MY_CONSTRUCTION_SITES).find(site => site.structureType === STRUCTURE_RAMPART)
         if (rampartCSite && this.advancedBuildCSite(rampartCSite) !== Result.fail) return
         */
-        if (creepUtils.repairCommune(this)) return
-        if (creepUtils.repairNearby(this)) return
+        if (creepProcs.repairCommune(this)) return
+        if (creepProcs.repairNearby(this)) return
     }
 
     static roleManager(room: Room, creepsOfRole: string[]) {

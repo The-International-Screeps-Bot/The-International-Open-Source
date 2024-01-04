@@ -1,4 +1,5 @@
 import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
+import { creepProcs } from 'room/creeps/creepProcs'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
@@ -71,7 +72,7 @@ export class ControllerUpgrader extends Creep {
                 }
             }
  */
-            creepUtils.advancedUpgradeController(creep)
+            creepProcs.advancedUpgradeController(creep)
         }
     }
 }

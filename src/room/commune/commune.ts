@@ -55,6 +55,7 @@ import { ConstructionManager } from 'room/construction/construction'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { communeUtils } from './communeUtils'
+import { communeProc } from './communeProcs'
 
 export type ResourceTargets = {
     min: Partial<{[key in ResourceConstant]: number }>
@@ -166,7 +167,6 @@ export class CommuneManager {
 
         if (utils.isTickInterval(100)) {
 
-            delete this._maxUpgradeStrength
             delete this._upgradeStructure
             delete this._hasSufficientRoads
             delete this._resourceTargets
@@ -207,7 +207,7 @@ export class CommuneManager {
             roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
         }
 
-        communeUtils.getRCLUpdate(room)
+        communeProc.getRCLUpdate(room)
 
         if (!roomMemory[RoomMemoryKeys.combatRequests])
             roomMemory[RoomMemoryKeys.combatRequests] = []
@@ -574,60 +574,11 @@ export class CommuneManager {
         )
     }
 
-    private _maxUpgradeStrength: number
-    get maxUpgradeStrength() {
-        if (this._maxUpgradeStrength !== undefined) return this._maxUpgradeStrength
-
-        const upgradeStructure = this.upgradeStructure
-        if (!upgradeStructure) return this.findNudeMaxUpgradeStrength()
-
-        // Container
-
-        if (upgradeStructure.structureType === STRUCTURE_CONTAINER) {
-            return (this._maxUpgradeStrength =
-                upgradeStructure.store.getCapacity() /
-                (4 + this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength))
-        }
-
-        // Link
-
-        const hubLink = this.room.roomManager.hubLink
-        const sourceLinks = this.sourceLinks
-
-        // If there are transfer links, max out partMultiplier to their ability
-
-        this._maxUpgradeStrength = 0
-
-        if (hubLink && hubLink.isRCLActionable) {
-            const range = getRange(upgradeStructure.pos, hubLink.pos)
-
-            // Increase strength by throughput
-
-            this._maxUpgradeStrength += findLinkThroughput(range) * 0.7
-        }
-
-        for (let i = 0; i < sourceLinks.length; i++) {
-            const sourceLink = sourceLinks[i]
-
-            if (!sourceLink) continue
-            if (!sourceLink.isRCLActionable) continue
-
-            const range = getRange(sourceLink.pos, upgradeStructure.pos)
-
-            // Increase strength by throughput
-
-            this._maxUpgradeStrength +=
-                findLinkThroughput(range, this.room.estimatedSourceIncome[i]) * 0.7
-        }
-
-        return this._maxUpgradeStrength
-    }
-
     /**
      * The max upgrade strength when we have no local storing structure
      */
     findNudeMaxUpgradeStrength() {
-        return (this._maxUpgradeStrength = 100)
+        return 100
     }
 
     private _hasSufficientRoads: boolean

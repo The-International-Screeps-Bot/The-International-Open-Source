@@ -1,15 +1,9 @@
 import {
     CombatRequestKeys,
-    CreepMemoryKeys,
-    Result,
-    RoomTypes,
-    customColors,
-    roomDimensions,
-    squadQuotas,
+    CreepMemoryKeys
 } from 'international/constants'
-import { findClosestObject, getRangeXY, getRange, isExit, isXYExit, utils } from 'utils/utils'
+import { findClosestObject, getRange, utils } from 'utils/utils'
 import { Antifa } from './antifa'
-import { CustomPathFinderArgs } from 'international/customPathFinder'
 
 interface MembersByType {
   melee: Antifa
@@ -52,11 +46,81 @@ export class DynamicSquad {
       dismantler: this.members[0],
     }
 
-
+    if (this.runCombatRoom()) return
 
     if (!this.getInFormation()) return
 
 
+  }
+
+  private runCombatRoom() {
+
+    this.runMelee()
+    this.runHealer()
+    this.runRanger()
+    this.runDismantler()
+    return true
+  }
+
+  private runMelee() {
+
+    const melee = this.membersByType.melee
+    if (!melee) return
+
+
+  }
+
+  private runHealer() {
+
+    const healer = this.membersByType.healer
+    if (!healer) return
+
+    const melee = this.membersByType.melee
+    if (melee) {
+
+        if (getRange(healer.pos, melee.pos) <= 1) {
+
+            if (melee.hits < melee.hitsMax) {
+                healer.heal(melee)
+                healer.assignMoveRequest(melee.pos)
+            }
+            return
+
+            healer.createMoveRequest({
+                origin: healer.pos,
+                goals: [
+                  {
+                    pos: melee.pos,
+                    range: 1,
+                  },
+                ],
+              })
+        }
+        return
+    }
+
+    // There is no melee
+
+    healer.say('no M')
+  }
+
+  private runRanger() {
+
+    const ranger = this.membersByType.ranger
+    if (!ranger) return
+
+
+  }
+
+  private runDismantler() {
+
+    const dismantler = this.membersByType.dismantler
+    if (!dismantler) return
+    /*
+    const structure = findClosestObject(dismantler.pos, dismantler.room.roomManager.combatStructureTargets)
+    if (!structure) return */
+
+    dismantler.advancedDismantle()
   }
 
   private getInFormation() {

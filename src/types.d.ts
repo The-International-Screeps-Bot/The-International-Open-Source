@@ -431,296 +431,296 @@ declare global {
     }
 
     interface Room {
+      /**
+       * The names of creeps harvesting each source
+       */
+      creepsOfSource: string[][]
+
+      estimatedSourceIncome: number[]
+
+      myCreeps: Creep[]
+      myPowerCreeps: PowerCreep[]
+      /**
+       * An object with keys of roles with properties of arrays of creep names belonging to the role
+       */
+      myCreepsByRole: { [key in CreepRoles]?: string[] }
+
+      /**
+       * An object with keys of roles with properties of arrays of power creep names belonging to the role
+       */
+      myPowerCreepsByRole: { [key in PowerClassConstant]?: string[] }
+
+      /**
+       * An object with keys of roles and properties of the number of creeps with the role from this room
+       */
+      creepsFromRoom: Partial<{ [key in CreepRoles]: string[] }>
+
+      /**
+       * The cumulative amount of creeps with a communeName value of this room's name
+       */
+      creepsFromRoomAmount: number
+
+      /**
+       * An object with keys of roles and properties of the number of creeps with the role from this room
+       */
+      creepsOfRemote: { [remoteName: string]: Partial<{ [key in CreepRoles]: string[] }> }
+
+      /**
+       * A set of roomNames representing the targets stof scouts from this commune
+       */
+      scoutTargets: Set<string>
+
+      /**
+       * Tile types as defined by the rampartPlanner
+       */
+      tileCoords: CoordMap
+
+      unprotectedCoords: CoordMap
+
+      /**
+       * Wether the towers can sufficiently deal with the enemy threat in the room
+       */
+      towerInferiority: boolean
+
+      baseCoords: CoordMap
+
+      rampartCoords: CoordMap
+
+      roadCoords: CoordMap
+
+      /**
+       * A matrix with indexes of packed coords and values of creep names
+       */
+      creepPositions: { [packedCoord: string]: string }
+
+      /**
+       * A matrix with indexes of packed coords and values of creep names
+       */
+      powerCreepPositions: { [packedCoord: string]: string }
+
+      /**
+       * A matrix with indexes of packed coords and values of creep names
+       */
+      moveRequests: { [packedCoord: string]: string[] }
+
+      roomManager: RoomManager
+
+      communeManager: CommuneManager
+
+      /**
+       * The names of creeps looking to join a squad
+       */
+      squadRequests: Set<string>
+
+      roomLogisticsRequests: {
+        [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
+      }
+      powerTasks: { [ID: string]: PowerTask }
+
+      attackingDefenderIDs: Set<Id<Creep>>
+      defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
+      defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
+
+      usedRampartIDs: Map<Id<StructureRampart>, Id<Creep>>
+
+      generalRepairStructures: (StructureRoad | StructureContainer)[]
+      rampartRepairStructures: StructureRampart[]
+
+      considerFunneled: boolean
+
+      // Commune
+
+      // Functions
+
+      /**
+       *
+       * @param pos1 The position of the thing performing the action
+       * @param pos2 The position of the thing getting intereacted with
+       * @param type The type of interaction, success if not provided
+       */
+      actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
+
+      targetVisual(coord1: Coord, coord2: Coord, visualize?: boolean): void
+
+      /**
+       * Tries to delete a task with the provided ID and response state
+       */
+      deleteTask(taskID: any, responder: boolean): void
+
+      scoutByRoomName(): number | false
+
+      scoutRemote(scoutingRoom?: Room): number | false
+      scoutEnemyReservedRemote(): number | false
+      scoutEnemyUnreservedRemote(): number | false
+      scoutMyRemote(scoutingRoom: Room): number | false
+
+      scoutEnemyRoom(): number
+
+      basicScout(): number
+
+      /**
+       * Finds the type of a room and initializes its custom properties
+       * @param scoutingRoom The room that is performing the scout operation
+       */
+      advancedScout(scoutingRoom: Room): number
+
+      makeRemote(scoutingRoom: Room): boolean
+
+      createAttackCombatRequest(opts?: Partial<CombatRequest>): void
+
+      createHarassCombatRequest(opts?: Partial<CombatRequest>): void
+
+      createDefendCombatRequest(opts?: Partial<CombatRequest>): void
+
+      /**
+       * Finds the score of rooms for potential communes
+       */
+      findScore(): void
+
+      /**
+       * Finds open spaces in a room and records them in a cost matrix
+       */
+      distanceTransform(
+        initialCoords?: CoordMap,
+        visuals?: boolean,
         /**
-         * The names of creeps harvesting each source
+         * The smallest number to convert into an avoid value
          */
-        creepsOfSource: string[][]
+        minAvoid?: number,
+        x1?: number,
+        y1?: number,
+        x2?: number,
+        y2?: number,
+      ): CoordMap
 
-        estimatedSourceIncome: number[]
-
-        myCreeps: Creep[]
-        myPowerCreeps: PowerCreep[]
+      /**
+       * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
+       */
+      diagonalDistanceTransform(
+        initialCoords?: CoordMap,
+        visuals?: boolean,
         /**
-         * An object with keys of roles with properties of arrays of creep names belonging to the role
+         * The smallest number to convert into an avoid value
          */
-        myCreepsByRole: { [key in CreepRoles]?: string[] }
-
-        /**
-         * An object with keys of roles with properties of arrays of power creep names belonging to the role
-         */
-        myPowerCreepsByRole: { [key in PowerClassConstant]?: string[] }
-
-        /**
-         * An object with keys of roles and properties of the number of creeps with the role from this room
-         */
-        creepsFromRoom: Partial<{ [key in CreepRoles]: string[] }>
-
-        /**
-         * The cumulative amount of creeps with a communeName value of this room's name
-         */
-        creepsFromRoomAmount: number
-
-        /**
-         * An object with keys of roles and properties of the number of creeps with the role from this room
-         */
-        creepsOfRemote: { [remoteName: string]: Partial<{ [key in CreepRoles]: string[] }> }
-
-        /**
-         * A set of roomNames representing the targets stof scouts from this commune
-         */
-        scoutTargets: Set<string>
-
-        /**
-         * Tile types as defined by the rampartPlanner
-         */
-        tileCoords: CoordMap
-
-        unprotectedCoords: CoordMap
-
-        /**
-         * Wether the towers can sufficiently deal with the enemy threat in the room
-         */
-        towerInferiority: boolean
-
-        baseCoords: CoordMap
-
-        rampartCoords: CoordMap
-
-        roadCoords: CoordMap
-
-        /**
-         * A matrix with indexes of packed coords and values of creep names
-         */
-        creepPositions: { [packedCoord: string]: string }
-
-        /**
-         * A matrix with indexes of packed coords and values of creep names
-         */
-        powerCreepPositions: { [packedCoord: string]: string }
-
-        /**
-         * A matrix with indexes of packed coords and values of creep names
-         */
-        moveRequests: { [packedCoord: string]: string[] }
-
-        roomManager: RoomManager
-
-        communeManager: CommuneManager
-
-        /**
-         * The names of creeps looking to join a squad
-         */
-        squadRequests: Set<string>
-
-        roomLogisticsRequests: {
-            [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
-        }
-        powerTasks: { [ID: string]: PowerTask }
-
-        attackingDefenderIDs: Set<Id<Creep>>
-        defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
-        defenderEnemyTargetsWithDefender: Map<Id<Creep>, Id<Creep>[]>
-
-        usedRampartIDs: Map<Id<StructureRampart>, Id<Creep>>
-
-        generalRepairStructures: (StructureRoad | StructureContainer)[]
-        rampartRepairStructures: StructureRampart[]
-
-        // Commune
-
-
-
-        // Functions
-
-        /**
-         *
-         * @param pos1 The position of the thing performing the action
-         * @param pos2 The position of the thing getting intereacted with
-         * @param type The type of interaction, success if not provided
-         */
-        actionVisual(pos1: RoomPosition, pos2: RoomPosition, type?: string): void
-
-        targetVisual(coord1: Coord, coord2: Coord, visualize?: boolean): void
-
-        /**
-         * Tries to delete a task with the provided ID and response state
-         */
-        deleteTask(taskID: any, responder: boolean): void
-
-        scoutByRoomName(): number | false
-
-        scoutRemote(scoutingRoom?: Room): number | false
-        scoutEnemyReservedRemote(): number | false
-        scoutEnemyUnreservedRemote(): number | false
-        scoutMyRemote(scoutingRoom: Room): number | false
-
-        scoutEnemyRoom(): number
-
-        basicScout(): number
-
-        /**
-         * Finds the type of a room and initializes its custom properties
-         * @param scoutingRoom The room that is performing the scout operation
-         */
-        advancedScout(scoutingRoom: Room): number
-
-        makeRemote(scoutingRoom: Room): boolean
-
-        createAttackCombatRequest(opts?: Partial<CombatRequest>): void
-
-        createHarassCombatRequest(opts?: Partial<CombatRequest>): void
-
-        createDefendCombatRequest(opts?: Partial<CombatRequest>): void
-
-        /**
-         * Finds the score of rooms for potential communes
-         */
-        findScore(): void
-
-        /**
-         * Finds open spaces in a room and records them in a cost matrix
-         */
-        distanceTransform(
-            initialCoords?: CoordMap,
-            visuals?: boolean,
-            /**
-             * The smallest number to convert into an avoid value
-             */
-            minAvoid?: number,
-            x1?: number,
-            y1?: number,
-            x2?: number,
-            y2?: number,
-        ): CoordMap
-
-        /**
-         * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
-         */
-        diagonalDistanceTransform(
-            initialCoords?: CoordMap,
-            visuals?: boolean,
-            /**
-             * The smallest number to convert into an avoid value
-             */
-            minAvoid?: number,
-            x1?: number,
-            y1?: number,
-            x2?: number,
-            y2?: number,
-        ): CoordMap
-
-        /**
-         * Flood fills a room until it finds one of a set of positions
-         */
-        findClosestPos(opts: FindClosestPos): RoomPosition | false
-
-        errorVisual(coord: Coord, visualize?: boolean): void
-
-        /**
-         * Finds and records a construction site for builders to target
-         */
-        findAllyCSiteTargetID(creep: Creep): boolean
-
-        /**
-         * Groups positions with contigiousness, structured similarily to a flood fill
-         */
-        groupRampartPositions(rampartPositions: number[]): RoomPosition[][]
-
-        findUnprotectedCoords(visuals?: boolean): void
-
-        /**
-         *
-         */
-        findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
-
-        /**
-         *
-         */
-        findAdjacentPositions(rx: number, ry: number): RoomPosition[]
-
-        /**
-         *
-         */
-        createPullTask(creator: Structure | Creep | Resource): void
-
-        /**
-         *
-         */
-        createPickupTasks(creator: Structure | Creep | Resource): void
-
-        /**
-         *
-         */
-        createOfferTasks(creator: Structure | Creep | Resource): void
-
-        /**
-         *
-         */
-        createTransferTasks(creator: Structure | Creep | Resource): void
-
-        /**
-         *
-         */
-        createWithdrawTasks(creator: Structure | Creep | Resource): void
-
-        visualizeCoordMap(coordMap: CoordMap, color?: boolean, magnification?: number): void
-
-        visualizeCostMatrix(cm: CostMatrix, color?: boolean, magnification?: number): void
-
-        coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
-
-        createPowerTask(
-            target: Structure | Source,
-            powerType: PowerConstant,
-            priority: number,
-        ): PowerTask | false
-
-        highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
-
-        createRoomLogisticsRequest(args: CreateRoomLogisticsRequestArgs): void
-
-        partsOfRoles: Partial<{
-            [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }>
-        }>
-
-        createWorkRequest(): boolean
-
-        findSwampPlainsRatio(): number
-
-        // Spawn functions
-
-        // structure functions
-
-        findStructureAtCoord<T extends Structure>(
-            coord: Coord,
-            conditions: (structure: T) => boolean,
-        ): T | false
-        findStructureAtXY<T extends Structure>(
-            x: number,
-            y: number,
-            conditions: (structure: T) => boolean,
-        ): T | false
-
-        findCSiteAtCoord<T extends ConstructionSite>(
-            coord: Coord,
-            conditions: (cSite: T) => boolean,
-        ): T | false
-        findCSiteAtXY<T extends ConstructionSite>(
-            x: number,
-            y: number,
-            conditions: (cSite: T) => boolean,
-        ): T | false
-
-        findStructureInRange<T extends Structure>(
-            startCoord: Coord,
-            range: number,
-            condition: (structure: T) => boolean,
-        ): T | false
-
-        /**
-         * Generates a square visual at the specified coordinate
-         */
-        coordVisual(x: number, y: number, fill?: string): void
+        minAvoid?: number,
+        x1?: number,
+        y1?: number,
+        x2?: number,
+        y2?: number,
+      ): CoordMap
+
+      /**
+       * Flood fills a room until it finds one of a set of positions
+       */
+      findClosestPos(opts: FindClosestPos): RoomPosition | false
+
+      errorVisual(coord: Coord, visualize?: boolean): void
+
+      /**
+       * Finds and records a construction site for builders to target
+       */
+      findAllyCSiteTargetID(creep: Creep): boolean
+
+      /**
+       * Groups positions with contigiousness, structured similarily to a flood fill
+       */
+      groupRampartPositions(rampartPositions: number[]): RoomPosition[][]
+
+      findUnprotectedCoords(visuals?: boolean): void
+
+      /**
+       *
+       */
+      findPositionsInsideRect(x1: number, y1: number, x2: number, y2: number): RoomPosition[]
+
+      /**
+       *
+       */
+      findAdjacentPositions(rx: number, ry: number): RoomPosition[]
+
+      /**
+       *
+       */
+      createPullTask(creator: Structure | Creep | Resource): void
+
+      /**
+       *
+       */
+      createPickupTasks(creator: Structure | Creep | Resource): void
+
+      /**
+       *
+       */
+      createOfferTasks(creator: Structure | Creep | Resource): void
+
+      /**
+       *
+       */
+      createTransferTasks(creator: Structure | Creep | Resource): void
+
+      /**
+       *
+       */
+      createWithdrawTasks(creator: Structure | Creep | Resource): void
+
+      visualizeCoordMap(coordMap: CoordMap, color?: boolean, magnification?: number): void
+
+      visualizeCostMatrix(cm: CostMatrix, color?: boolean, magnification?: number): void
+
+      coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
+
+      createPowerTask(
+        target: Structure | Source,
+        powerType: PowerConstant,
+        priority: number,
+      ): PowerTask | false
+
+      highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
+
+      createRoomLogisticsRequest(args: CreateRoomLogisticsRequestArgs): void
+
+      partsOfRoles: Partial<{
+        [key in CreepRoles]: Partial<{ [key in BodyPartConstant]: number }>
+      }>
+
+      createWorkRequest(): boolean
+
+      findSwampPlainsRatio(): number
+
+      // Spawn functions
+
+      // structure functions
+
+      findStructureAtCoord<T extends Structure>(
+        coord: Coord,
+        conditions: (structure: T) => boolean,
+      ): T | false
+      findStructureAtXY<T extends Structure>(
+        x: number,
+        y: number,
+        conditions: (structure: T) => boolean,
+      ): T | false
+
+      findCSiteAtCoord<T extends ConstructionSite>(
+        coord: Coord,
+        conditions: (cSite: T) => boolean,
+      ): T | false
+      findCSiteAtXY<T extends ConstructionSite>(
+        x: number,
+        y: number,
+        conditions: (cSite: T) => boolean,
+      ): T | false
+
+      findStructureInRange<T extends Structure>(
+        startCoord: Coord,
+        range: number,
+        condition: (structure: T) => boolean,
+      ): T | false
+
+      /**
+       * Generates a square visual at the specified coordinate
+       */
+      coordVisual(x: number, y: number, fill?: string): void
     }
 
     interface DepositRecord {

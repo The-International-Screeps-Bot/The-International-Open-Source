@@ -47,7 +47,7 @@ First you'll want to download or fork the repository. Start by selecting a branc
 
 Ensure you have downloaded [Node](https://nodejs.org/en/)
 
-**Make sure your node version is below 17.0.0**
+**Consider using Node version is 20.10.0 if you have issues**
 
 You can check your node version with:
 
@@ -64,7 +64,6 @@ After making sure you have correct node version go to the project folder (not in
 
 ```powershell
 npm i
-
 ```
 
 And that's it. Join our [discord server](https://discord.gg/5QubDsB786) if you need help.
@@ -80,6 +79,8 @@ To begin, you need to decide what branch to use. Main is generally old but stabl
 Using [rollup](https://rollupjs.org/guide/en/) we will translate the code into a single js file, which will be used in environments set in `.screeps.yaml` file (see below if you don't have one yet). This compiles the code so it can be run by Screeps while we develop using folders and typescript.
 
 First, you'll need to set up your settings. In `/src` you'll find the `settings.example.ts` file. Please copy the file and rename its clone to `settings.ts`. Then change the `settingsExample` definition to `settings`. You can then add your own prefences, including checks based on the name of the shard for server-specific settings. These same instructions with an example are included in the file.
+
+Head to `src/other/userScript/userScript.example.ts` and follow the instructions at the top of the file. It will be very similar to settings up `settings.ts`.
 
 Next, rename `.screeps.yaml.example` to `.screeps.yaml` and fill in the required information for each environment you want to run the bot in. For the official server, replace the `token` with an [API token](https://docs.screeps.com/auth-tokens.html) for your account. On private servers, edit _(or copy and rename)_ the `pserver` section with `host` set to your server domain or IP then complete `username` and `password` with your credentials on this server. For more information about this file, check the [screeps unified credentials file](https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md) spec.
 
@@ -110,7 +111,7 @@ I'd also suggest using this less-laggy tool [steamless-client](https://github.co
 
 ### Advanced usage
 
-If you want to run custom code without conflicting with the project's source - say, if you want to commit or make pull requests - it's recommended you use the userScript folder. Head to `src/other/userScript/userScript.example.ts` and follow the instructions at the top of the file.
+If you want to run custom code without conflicting with the project's source - say, if you want to commit or make pull requests - it's recommended you use the userScript folder.
 
 ## Contribution
 

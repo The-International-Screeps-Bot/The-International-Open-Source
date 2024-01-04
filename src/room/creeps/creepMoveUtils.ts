@@ -1,3 +1,4 @@
+import { collectiveManager } from 'international/collective'
 import {
   CreepMemoryKeys,
   FlagNames,
@@ -15,7 +16,44 @@ import { areCoordsEqual, arePositionsEqual, findObjectWithID, getRange } from 'u
 /**
  * Utilities involving the movement of creeps
  */
-export class CreepMoveUtils {
+export class CreepMoveProcs {
+  /**
+   * work in progress
+   */
+  createMoveRequest(creep: Creep, goals: PathGoal[], args: any, opts: any) {
+    // Stop if the we know the creep won't move
+
+    if (creep.moveRequest) return Result.noAction
+    if (creep.moved) return Result.noAction
+    if (creep.fatigue > 0) return Result.noAction
+
+    if (creep.spawning) {
+      const spawn = findObjectWithID(creep.spawnID)
+      if (!spawn) return Result.noAction
+
+      // Don't plan the path until we are nearly ready to be spawned
+      if (spawn.spawning.remainingTime > 1) return Result.noAction
+    }
+    if (!creep.getActiveBodyparts(MOVE)) {
+      creep.moved = MovedTypes.moved
+      return Result.noAction
+    }
+
+    // Assign default args
+
+    opts.cacheAmount ??= collectiveManager.defaultMinPathCacheTime
+
+    if (creepMoveProcs.useExistingPath(creep, args, opts) === Result.success) {
+      return Result.success
+    }
+
+    const path = creepMoveProcs.findNewPath(creep, args, opts)
+    if (path === Result.fail) return Result.fail
+
+    creepMoveProcs.useNewPath(creep, args, opts, path)
+    return Result.success
+  }
+
   useExistingPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
     if (creep.spawning) return Result.noAction
 
@@ -60,7 +98,6 @@ export class CreepMoveUtils {
     creep: Creep,
     creepMemory: CreepMemory | PowerCreepMemory,
   ): Result.fail | RoomPosition {
-
     // First index
 
     let firstIndex = 0
@@ -207,4 +244,4 @@ export class CreepMoveUtils {
   }
 }
 
-export const creepMoveUtils = new CreepMoveUtils()
+export const creepMoveProcs = new CreepMoveProcs()
