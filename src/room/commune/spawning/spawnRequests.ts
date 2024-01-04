@@ -871,8 +871,8 @@ export class SpawnRequestsManager {
         if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
           const funnelingRoomNames = collectiveManager.funnelingRoomNames
           if (
-            funnelingRoomNames.size > 0 &&
-            funnelingRoomNames.has(this.communeManager.room.name)
+            funnelingRoomNames.size === 0 ||
+            !funnelingRoomNames.has(this.communeManager.room.name)
           ) {
             return false
           }
