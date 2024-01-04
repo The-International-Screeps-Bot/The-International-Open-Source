@@ -152,8 +152,8 @@ export class HubHauler extends Creep {
 
             // If the weighted storage store is more than the terminal's, stop
             if (
-                storage.store[resourceType] / 3 >
-                terminal.store[resourceType] + this.store.getCapacity() * 2
+                storage.store[resourceType] / 3 + this.store.getCapacity() * 2 >
+                terminal.store[resourceType]
             )
                 continue
 
@@ -202,8 +202,8 @@ export class HubHauler extends Creep {
 
             // If the weighted storage store is less than the terminal's, stop
             if (
-                storage.store[resourceType] / 3 + this.store.getCapacity() * 2 <
-                terminal.store[resourceType]
+                storage.store[resourceType] / 3 <
+                terminal.store[resourceType] + this.store.getCapacity() * 2
             )
                 continue
 
