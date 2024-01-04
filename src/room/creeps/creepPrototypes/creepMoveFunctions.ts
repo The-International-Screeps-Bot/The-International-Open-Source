@@ -45,7 +45,7 @@ import {
 } from 'other/codec'
 import { customLog } from 'utils/logging'
 import { creepUtils } from '../creepUtils'
-import { creepMoveProcs } from '../creepMoveUtils'
+import { creepMoveProcs } from '../creepMoveProcs'
 
 PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (
   args,

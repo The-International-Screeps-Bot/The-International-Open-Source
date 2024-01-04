@@ -1188,6 +1188,7 @@ Creep.prototype.roomLogisticsRequestManager = function () {
     // Delete the request if the target is fulfilled
 
     if (target.freeNextStore < request[CreepRoomLogisticsRequestKeys.amount]) {
+      if (Game.flags[FlagNames.debugCreepLogistics]) customLog('not enough free store', this.name + ', ' + request[CreepRoomLogisticsRequestKeys.target] + ', ' + target.freeNextStore + ' < ' + request[CreepRoomLogisticsRequestKeys.amount])
       creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
       return
     }
@@ -1200,6 +1201,7 @@ Creep.prototype.roomLogisticsRequestManager = function () {
       request[CreepRoomLogisticsRequestKeys.amount],
     )
     if (request[CreepRoomLogisticsRequestKeys.amount] <= 0) {
+      if (Game.flags[FlagNames.debugCreepLogistics]) customLog('not enough amount', this.name + ', ' + request[CreepRoomLogisticsRequestKeys.target] + ', ' + request[CreepRoomLogisticsRequestKeys.amount])
       creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
       return
     }
@@ -1293,13 +1295,15 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     log('FINDING REQ', bestRequest + ', ' + Array.from(types), { position: 1 })
  */
   let creepRequest: CreepRoomLogisticsRequest | 0
-
+  customLog('no request', this.name)
   if (!bestRequest) {
     creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(
       types,
       args?.resourceTypes,
     )
-    if (!creepRequest) return Result.fail
+    customLog('try to find request', this.name + ', ' + creepRequest)
+    if (creepRequest === Result.fail) return Result.fail
+
   } else {
     creepRequest = {
       [CreepRoomLogisticsRequestKeys.type]: bestRequest.type,
@@ -1421,7 +1425,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
 Creep.prototype.findRoomLogisticsRequestTypes = function (args) {
   if (args && args.types) {
     if (args.types.has(RoomLogisticsRequestTypes.transfer) && this.hasNonEnergyResource()) {
-      if (args && args.noDelivery) return Result.fail
+      /* if (args && args.noDelivery) return Result.fail */
 
       this.noDelivery = true
       return new Set([RoomLogisticsRequestTypes.transfer])
@@ -1583,8 +1587,10 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequest = function (
 ) {
   if (this.room.name !== this.commune.name) return Result.fail
 
-  if (types.has(RoomLogisticsRequestTypes.transfer))
-    return this.createBackupStoringStructuresRoomLogisticsRequestTransfer()
+  if (types.has(RoomLogisticsRequestTypes.transfer)) {
+    const result = this.createBackupStoringStructuresRoomLogisticsRequestTransfer()
+    if (result !== Result.fail) return result
+  }
 
   if (this.role === 'hauler') return Result.fail
   return this.createBackupStoringStructuresRoomLogisticsRequestWithdraw(resourceTypes)
@@ -1594,11 +1600,12 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = func
   const storingStructures = this.commune.communeManager.storingStructures
   if (!storingStructures.length) return Result.fail
 
+  const nextStore = this.nextStore
   let resourceType: ResourceConstant
 
-  for (const key in this.store) {
+  for (const key in nextStore) {
     if (key === RESOURCE_ENERGY) continue
-    if (this.nextStore[key as ResourceConstant] <= 0) continue
+    if (nextStore[key as ResourceConstant] <= 0) continue
 
     resourceType = key as ResourceConstant
     break
@@ -1607,7 +1614,7 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = func
   if (!resourceType) return Result.fail
 
   const storingStructure = storingStructures.find(
-    structure => structure.freeReserveStore >= this.nextStore[resourceType],
+    structure => structure.freeReserveStore >= nextStore[resourceType],
   )
   if (!storingStructure) return Result.fail
   /* this.room.visual.text((this.nextStore[resourceType]).toString(), this.pos.x, this.pos.y, { color: customColors.red }) */
@@ -1615,7 +1622,7 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = func
     [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.transfer,
     [CreepRoomLogisticsRequestKeys.target]: storingStructure.id,
     [CreepRoomLogisticsRequestKeys.resourceType]: resourceType,
-    [CreepRoomLogisticsRequestKeys.amount]: this.nextStore[resourceType],
+    [CreepRoomLogisticsRequestKeys.amount]: nextStore[resourceType],
   }
 }
 
@@ -1702,8 +1709,10 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
   // If we already moved a resource this tick, then wait (presumably) until the next one to take any resoure-moving action
   if (this.movedResource) {
+    if (Game.flags[FlagNames.debugCreepLogistics]) {
+      this.room.visual.text('MR', this.pos)
+    }
 
-    this.room.visual.text('MR', this.pos)
     return Result.noAction
   }
 

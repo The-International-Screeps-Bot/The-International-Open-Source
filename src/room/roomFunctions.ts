@@ -1682,14 +1682,14 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
   if (Game.flags[FlagNames.debugRoomLogistics]) {
     if (args.type === RoomLogisticsRequestTypes.offer) {
-      this.visual.text('O ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
-      this.visual.text(args.priority.toString(), args.target.pos)
+      this.visual.text('O ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {font: '0.3'})
+      this.visual.text(args.priority.toString(), args.target.pos, {font: '0.3'})
     } else if (args.type === RoomLogisticsRequestTypes.transfer) {
-      this.visual.text('T ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
-      this.visual.text(args.priority.toString(), args.target.pos)
+      this.visual.text('T ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {font: '0.3'})
+      this.visual.text(args.priority.toString(), args.target.pos, {font: '0.3'})
     } else if (args.type === RoomLogisticsRequestTypes.withdraw) {
-      this.visual.text('W ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5)
-      this.visual.text(args.priority.toString(), args.target.pos)
+      this.visual.text('W ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {font: '0.3'})
+      this.visual.text(args.priority.toString(), args.target.pos, {font: '0.3'})
     }
   }
 
@@ -1704,8 +1704,10 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     resourceType: args.resourceType,
     amount: amount,
     priority: args.priority,
-    onlyFull: true || args.onlyFull,
-    noReserve: !this.roomManager.advancedLogistics || undefined, // Don't reserve if advancedLogistics is disabled
+    // onlyFull by default true
+    onlyFull: args.onlyFull /* ?? true */,
+    // Don't reserve if advancedLogistics is disabled
+    noReserve: !this.roomManager.advancedLogistics || undefined,
   })
 }
 

@@ -116,7 +116,7 @@ export class CreepMoveProcs {
     // Second index
 
     pos = unpackPosAt(creepMemory[CreepMemoryKeys.path], firstIndex)
-    console.log(creepMemory[CreepMemoryKeys.path].length, creepMemory[CreepMemoryKeys.path])
+
     if (getRange(creep.pos, pos) === 1) {
       return pos
     }

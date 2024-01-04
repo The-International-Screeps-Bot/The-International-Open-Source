@@ -231,7 +231,7 @@ export class LabManager {
     public get outputLabs() {
         if (this._outputLabs) return this._outputLabs
 
-        let boostingLabs = Object.values(this.labsByBoost)
+        let boostingLabs = Object.values(this.labsByBoost || {})
 
         return (this._outputLabs = this.communeManager.room.roomManager.structures.lab.filter(
             lab => !this.inputLabIDs.includes(lab.id) && !boostingLabs.includes(lab.id),
@@ -335,19 +335,6 @@ export class LabManager {
     private manageReactions() {
         if (this.inputLabs.length < 2) return
         if (!this.outputLabs.length) return
-
-        if (global.settings.roomVisuals) {
-            this.communeManager.room.visual.resource(
-                this.inputResources[0],
-                this.inputLabs[0].pos.x,
-                this.inputLabs[0].pos.y,
-            )
-            this.communeManager.room.visual.resource(
-                this.inputResources[1],
-                this.inputLabs[1].pos.x,
-                this.inputLabs[1].pos.y,
-            )
-        }
 
         if (randomTick(100)) delete this._deficits
         this.setCurrentReaction()
@@ -634,11 +621,11 @@ export class LabManager {
 
         for (const lab of this.communeManager.room.roomManager.structures.lab) {
             if (lab.mineralType !== resource) continue
-            amount += lab.mineralAmount
+            amount += lab.store.getUsedCapacity(lab.mineralType)
         }
 
         for (const name of this.communeManager.room.myCreepsByRole.hauler) {
-            amount += Game.creeps[name].store[resource]
+            amount += Game.creeps[name].store.getUsedCapacity(resource)
         }
 
         return amount

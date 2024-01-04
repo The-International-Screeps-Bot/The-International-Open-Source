@@ -574,6 +574,9 @@ export class Hauler extends Creep {
                     },
                 })
 
+                // If we tried to respond but weren't able to do so in a single tick, then we should wait to try again next tick
+                if (Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests].length) return true
+
                 // We haven't emptied ourselves yet
                 if (!this.needsResources()) {
 
