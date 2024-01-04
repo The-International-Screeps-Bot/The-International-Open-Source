@@ -6,173 +6,167 @@ import { marketManager } from 'international/market/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
 export class MarketUtils {
-    advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
-        const mySpecificOrders =
-            marketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
+  advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
+    const mySpecificOrders = marketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
-        for (const order of mySpecificOrders) amount -= order.remainingAmount
+    for (const order of mySpecificOrders) amount -= order.remainingAmount
 
-        if (amount <= 0) return false
+    if (amount <= 0) return false
 
-        const order = marketManager.getShardBuyOrder(room.name, resourceType, amount)
+    const order = marketManager.getShardBuyOrder(room.name, resourceType, amount)
 
-        if (order !== Result.fail) {
-            const dealAmount = this.findLargestTransactionAmount(
-                room.terminal.store.energy * 0.75,
-                amount,
-                room.name,
-                order.roomName,
-            )
-            const result = Game.market.deal(
-                order.id,
-                Math.min(dealAmount, order.remainingAmount),
-                room.name,
-            )
-            if (result !== OK) return Result.fail
+    if (order !== Result.fail) {
+      const dealAmount = this.findLargestTransactionAmount(
+        room.terminal.store.energy * 0.75,
+        amount,
+        room.name,
+        order.roomName,
+      )
+      const actualDealAmount = Math.min(dealAmount, order.remainingAmount)
+      const result = Game.market.deal(order.id, actualDealAmount, room.name)
+      if (result !== OK) return Result.fail
 
-            // Success
+      // Success
 
-            const roomsStats = Memory.stats.rooms[room.name]
+      const roomsStats = Memory.stats.rooms[room.name]
 
-            const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
-            roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] = transactionCost
+      const transactionCost = Game.market.calcTransactionCost(
+        actualDealAmount,
+        room.name,
+        order.roomName,
+      )
+      roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] += transactionCost
 
-            return Result.success
-        }
-
-        if (mySpecificOrders.length) return false
-        if (Game.market.credits < collectiveManager.minCredits) return false
-        if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
-
-        const orders = marketManager.getOrders(resourceType, ORDER_SELL)
-        if (!orders) return false
-
-        const price = Math.max(
-            Math.min(...orders.map(o => o.price)) * 0.99,
-            marketManager.getAvgPrice(resourceType) * 0.8,
-        )
-
-        const result = Game.market.createOrder({
-            roomName: room.name,
-            type: ORDER_SELL,
-            resourceType,
-            price,
-            totalAmount: amount,
-        })
-        if (result !== OK) return Result.fail
-
-        // Success
-
-        return Result.success
+      return Result.success
     }
-    advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
-        const mySpecificOrders =
-            marketManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
-        for (const order of mySpecificOrders) amount -= order.remainingAmount
+    if (mySpecificOrders.length) return false
+    if (Game.market.credits < collectiveManager.minCredits) return false
+    if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        if (amount <= 0) return false
+    const orders = marketManager.getOrders(resourceType, ORDER_SELL)
+    if (!orders) return false
 
-        const order = marketManager.getShardSellOrder(
-            room.name,
-            resourceType,
-            amount
-        )
+    const price = Math.max(
+      Math.min(...orders.map(o => o.price)) * 0.99,
+      marketManager.getAvgPrice(resourceType) * 0.8,
+    )
 
-        if (order !== Result.fail) {
-            const dealAmount = this.findLargestTransactionAmount(
-                room.terminal.store.energy * 0.75,
-                amount,
-                room.name,
-                order.roomName,
-            )
+    const result = Game.market.createOrder({
+      roomName: room.name,
+      type: ORDER_SELL,
+      resourceType,
+      price,
+      totalAmount: amount,
+    })
+    if (result !== OK) return Result.fail
 
-            const result = Game.market.deal(
-                order.id,
-                Math.min(dealAmount, order.remainingAmount),
-                room.name,
-            )
-            if (result !== OK) return Result.fail
+    // Success
 
-            // Success
+    return Result.success
+  }
+  advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
+    const mySpecificOrders = marketManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
-            const roomsStats = Memory.stats.rooms[room.name]
+    for (const order of mySpecificOrders) amount -= order.remainingAmount
 
-            const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
-            roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] = transactionCost
+    if (amount <= 0) return false
 
-            return Result.success
-        }
+    const order = marketManager.getShardSellOrder(room.name, resourceType, amount)
 
-        if (mySpecificOrders.length) return false
-        if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
+    if (order !== Result.fail) {
+      const dealAmount = this.findLargestTransactionAmount(
+        room.terminal.store.energy * 0.75,
+        amount,
+        room.name,
+        order.roomName,
+      )
 
-        const orders = marketManager.getOrders(resourceType, ORDER_BUY)
-        if (!orders) return false
+      const result = Game.market.deal(
+        order.id,
+        Math.min(dealAmount, order.remainingAmount),
+        room.name,
+      )
+      if (result !== OK) return Result.fail
 
-        const price = Math.min(
-            Math.max(...orders.map(o => o.price)) * 1.01,
-            marketManager.getAvgPrice(resourceType) * 1.2,
-        )
+      // Success
 
-        const result = Game.market.createOrder({
-            roomName: room.name,
-            type: ORDER_BUY,
-            resourceType,
-            price,
-            totalAmount: amount,
-        })
-        if (result !== OK) return Result.fail
+      const roomsStats = Memory.stats.rooms[room.name]
 
-        // Success
+      const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
+      roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] += transactionCost
 
-        return Result.success
+      return Result.success
     }
-    /**
-     * Finds the largest possible transaction amount given a budget and starting amount
-     * @param budget The number of energy willing to be invested in the trade
-     * @param amount The number of resources that would like to be traded
-     * @param roomName1
-     * @param roomName2
-     * @returns
-     */
-    findLargestTransactionAmount(
-        budget: number,
-        amount: number,
-        roomName1: string,
-        roomName2: string,
-    ) {
-        budget = Math.max(budget, 1)
 
-        // So long as the the transactions cost is more than the budget
+    if (mySpecificOrders.length) return false
+    if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
-        while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
-            // Decrease amount exponentially
+    const orders = marketManager.getOrders(resourceType, ORDER_BUY)
+    if (!orders) return false
 
-            amount = (amount - 1) * 0.8
-        }
+    const price = Math.min(
+      Math.max(...orders.map(o => o.price)) * 1.01,
+      marketManager.getAvgPrice(resourceType) * 1.2,
+    )
 
-        return Math.floor(amount)
+    const result = Game.market.createOrder({
+      roomName: room.name,
+      type: ORDER_BUY,
+      resourceType,
+      price,
+      totalAmount: amount,
+    })
+    if (result !== OK) return Result.fail
+
+    // Success
+
+    return Result.success
+  }
+  /**
+   * Finds the largest possible transaction amount given a budget and starting amount
+   * @param budget The number of energy willing to be invested in the trade
+   * @param amount The number of resources that would like to be traded
+   * @param roomName1
+   * @param roomName2
+   * @returns
+   */
+  findLargestTransactionAmount(
+    budget: number,
+    amount: number,
+    roomName1: string,
+    roomName2: string,
+  ) {
+    budget = Math.max(budget, 1)
+
+    // So long as the the transactions cost is more than the budget
+
+    while (Game.market.calcTransactionCost(amount, roomName1, roomName2) >= budget) {
+      // Decrease amount exponentially
+
+      amount = (amount - 1) * 0.8
     }
-    advancedDeal(room: Room, order: Order, amount: number) {
 
-        const dealAmount = this.findLargestTransactionAmount(
-            room.terminal.store.energy * 0.75,
-            amount,
-            room.name,
-            order.roomName,
-        )
+    return Math.floor(amount)
+  }
+  advancedDeal(room: Room, order: Order, amount: number) {
+    const dealAmount = this.findLargestTransactionAmount(
+      room.terminal.store.energy * 0.75,
+      amount,
+      room.name,
+      order.roomName,
+    )
 
-        const result = Game.market.deal(
-            order.id,
-            Math.min(dealAmount, order.remainingAmount),
-            room.name,
-        )
-        if (result !== OK) return Result.fail
+    const result = Game.market.deal(
+      order.id,
+      Math.min(dealAmount, order.remainingAmount),
+      room.name,
+    )
+    if (result !== OK) return Result.fail
 
-        // the deal was an apparent success
-        return Result.success
-    }
+    // the deal was an apparent success
+    return Result.success
+  }
 }
 
 export const marketUtils = new MarketUtils()
