@@ -60,6 +60,10 @@ export class MarketManager {
                 )
                 if (order.price === newPrice) continue
 
+                const absDiff = Math.abs(order.price - newPrice)
+                // Make sure the difference in price is substantial enough to justify a change
+                if (absDiff < order.price * 0.1) continue
+
                 Game.market.changeOrderPrice(ID, newPrice)
                 continue
             }
@@ -73,6 +77,10 @@ export class MarketManager {
                 marketManager.getAvgPrice(order.resourceType) * 0.8,
             )
             if (order.price === newPrice) continue
+
+            const absDiff = Math.abs(order.price - newPrice)
+            // Make sure the difference in price is substantial enough to justify a change
+            if (absDiff < order.price * 0.1) continue
 
             Game.market.changeOrderPrice(ID, newPrice)
         }
