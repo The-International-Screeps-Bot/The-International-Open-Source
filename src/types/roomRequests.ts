@@ -9,63 +9,64 @@ import {
     WorkRequestKeys,
 } from 'international/constants'
 
+export type RoomLogisticsTargets = AnyStoreStructure | Creep | Tombstone | Ruin | Resource
+
 export interface CreepRoomLogisticsRequest {
-    [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
-    [CreepRoomLogisticsRequestKeys.target]: Id<
-        AnyStoreStructure | Creep | Tombstone | Ruin | Resource
-    >
-    [CreepRoomLogisticsRequestKeys.resourceType]: ResourceConstant
-    [CreepRoomLogisticsRequestKeys.amount]: number
-    [CreepRoomLogisticsRequestKeys.onlyFull]?: boolean
-    [CreepRoomLogisticsRequestKeys.noReserve]?: boolean
+  [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
+  [CreepRoomLogisticsRequestKeys.target]: Id<RoomLogisticsTargets>
+  [CreepRoomLogisticsRequestKeys.resourceType]: ResourceConstant
+  [CreepRoomLogisticsRequestKeys.amount]: number
+  [CreepRoomLogisticsRequestKeys.onlyFull]?: boolean
+  [CreepRoomLogisticsRequestKeys.noReserve]?: boolean
+  [CreepRoomLogisticsRequestKeys.delivery]?: boolean
 }
 
 export interface RoomLogisticsRequest {
-    ID: string
-    type: RoomLogisticsRequestTypes
-    /**
-     * Consider in weighting the task, lower is more preffered
-     */
-    priority?: number
-    targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>
-    resourceType: ResourceConstant
-    amount: number
-    /**
-     * If the responder should only take the task if it will use its full capacity. Default is true
-     */
-    onlyFull?: boolean
-    /**
-     * The ID of a roomLogisticsTask or store structure
-     */
-    delivery?: Id<AnyStoreStructure> | string
-    /**
-     * Wether the responder should interact with reserveStore of the target
-     */
-    noReserve?: boolean
-    /**
-     * If true, responders have to be in range 1 on acceptance of the task
-     */
-    passive?: boolean
-    // /**
-    //  * The estimated income, positive or negative that is expected per tick for the request target
-    //  */
-    // income?: number
-    // /**
-    //  * The amount for the potential or actual responding creep
-    //  */
-    // personalAmount?: number
+  ID: string
+  type: RoomLogisticsRequestTypes
+  /**
+   * Consider in weighting the task, lower is more preffered
+   */
+  priority?: number
+  targetID: Id<RoomLogisticsTargets>
+  resourceType: ResourceConstant
+  amount: number
+  /**
+   * If the responder should only take the task if it will use its full capacity. Default is true
+   */
+  onlyFull?: boolean
+  /**
+   * The ID of a roomLogisticsTask or store structure
+   */
+  delivery?: Id<AnyStoreStructure> | string
+  /**
+   * Wether the responder should interact with reserveStore of the target
+   */
+  noReserve?: boolean
+  /**
+   * If true, responders have to be in range 1 on acceptance of the task
+   */
+  passive?: boolean
+  // /**
+  //  * The estimated income, positive or negative that is expected per tick for the request target
+  //  */
+  // income?: number
+  // /**
+  //  * The amount for the potential or actual responding creep
+  //  */
+  // personalAmount?: number
 }
 
 export interface CreateRoomLogisticsRequestArgs {
-    type: RoomLogisticsRequestTypes
-    target: AnyStoreStructure | Creep | Tombstone | Ruin | Resource
-    resourceType?: ResourceConstant
-    onlyFull?: boolean
-    /**
-     * Lower priority is more preferable
-     */
-    priority?: number
-    maxAmount?: number
+  type: RoomLogisticsRequestTypes
+  target: RoomLogisticsTargets
+  resourceType?: ResourceConstant
+  onlyFull?: boolean
+  /**
+   * Lower priority is more preferable. Priority infleunces preference for one request over another. 1 priority = 1 more range consideration
+   */
+  priority?: number
+  maxAmount?: number
 }
 
 export interface FindNewRoomLogisticsRequestArgs {

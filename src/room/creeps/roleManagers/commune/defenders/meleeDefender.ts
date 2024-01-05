@@ -18,7 +18,6 @@ import {
     randomTick,
     randomVal,
     getRangeEuc,
-    findWeightedRangeFromExit,
 } from 'utils/utils'
 import { packCoord } from 'other/codec'
 

@@ -350,7 +350,7 @@ declare global {
         /**
          *
          */
-        workRequests: { [roomName: string]: Partial<WorkRequest> }
+        workRequests: { [roomName: string]: WorkRequest }
 
         combatRequests: { [roomName: string]: Partial<CombatRequest> }
 
@@ -435,8 +435,6 @@ declare global {
        * The names of creeps harvesting each source
        */
       creepsOfSource: string[][]
-
-      estimatedSourceIncome: number[]
 
       myCreeps: Creep[]
       myPowerCreeps: PowerCreep[]
@@ -984,8 +982,6 @@ declare global {
         findQuadBulldozeTargets(goalCoord: RoomPosition): Id<Structure>[]
 
         manageSpawning(spawn: StructureSpawn): void
-
-        roomLogisticsRequestManager(): void
 
         findRoomLogisticsRequest(
             args?: FindNewRoomLogisticsRequestArgs,

@@ -207,6 +207,7 @@ export class CommuneManager {
             roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
         }
 
+        communeProc.registerFunneling(room)
         communeProc.getRCLUpdate(room)
 
         if (!roomMemory[RoomMemoryKeys.combatRequests])
@@ -268,7 +269,6 @@ export class CommuneManager {
         this.terminalManager.preTickRun()
         this.remotesManager.initRun()
         this.haulRequestManager.preTickRun()
-        this.sourceManager.preTickRun()
         this.workRequestManager.preTickRun()
     }
 
@@ -1031,13 +1031,12 @@ export class CommuneManager {
         }
         const storingStructuresCapacity = this.storingStructuresCapacity
         let min: number
-        let resourceType: ResourceConstant
 
         resourceTargets.min[RESOURCE_BATTERY] = this.room.roomManager.factory ? storingStructuresCapacity * 0.005 : 0
         resourceTargets.max[RESOURCE_BATTERY] = storingStructuresCapacity * 0.015
 
-        min = resourceTargets.min[RESOURCE_ENERGY] = this.energyMinResourceTarget(storingStructuresCapacity)
-        resourceTargets.max[RESOURCE_ENERGY] = Math.max(storingStructuresCapacity * 0.2, this.minStoredEnergy, min)
+        min = resourceTargets.min[RESOURCE_ENERGY] = this.storingStructuresCapacity * 0.9/* this.energyMinResourceTarget(storingStructuresCapacity) */
+        resourceTargets.max[RESOURCE_ENERGY] = Math.max(storingStructuresCapacity * 0.5, this.minStoredEnergy, min)
 
         // minerals
 

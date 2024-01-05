@@ -846,10 +846,8 @@ export class Hauler extends Creep {
 
         // Trade room logistics requests
 
-        const creepAtPosRequests = Array.from(creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests])
-        creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests] = Array.from(
-            creepMemory[CreepMemoryKeys.roomLogisticsRequests],
-        )
+        const creepAtPosRequests = [...(creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests])]
+        creepAtPosMemory[CreepMemoryKeys.roomLogisticsRequests] = [...creepMemory[CreepMemoryKeys.roomLogisticsRequests]]
         creepMemory[CreepMemoryKeys.roomLogisticsRequests] = creepAtPosRequests
 
         // Trade remotes and sourceIndexes

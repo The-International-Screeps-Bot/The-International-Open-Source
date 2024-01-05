@@ -10,6 +10,7 @@ import {
   structureTypesToProtectSet,
 } from 'international/constants'
 import { collectiveManager } from "international/collective"
+import { roomUtils } from "room/roomUtils"
 
 export class CommuneUtils {
   getGeneralRepairStructures(room: Room) {
@@ -177,11 +178,39 @@ export class CommuneUtils {
 
       // Increase strength by throughput
 
-      maxUpgradeStrength += findLinkThroughput(range, room.estimatedSourceIncome[i]) * 0.7
+      maxUpgradeStrength += findLinkThroughput(range, this.getEstimatedSourceIncome(room)[i]) * 0.7
     }
 
     data.maxUpgradeStrength = maxUpgradeStrength
     return maxUpgradeStrength
+  }
+
+  getEstimatedSourceIncome(room: Room) {
+    const data = communeDataManager.data[room.name]
+    if (data.estimatedCommuneSourceIncome !== undefined) return data.estimatedCommuneSourceIncome
+
+    const sources = roomUtils.getSources(room)
+    const estimatedIncome: number[] = []
+
+    for (let i = 0; i < sources.length; i += 1) {
+      const source = sources[i]
+
+      let effect = source.effectsData.get(PWR_DISRUPT_SOURCE) as PowerEffect
+      if (effect) continue
+
+      let income = SOURCE_ENERGY_CAPACITY / ENERGY_REGEN_TIME
+
+      effect = source.effectsData.get(PWR_REGEN_SOURCE) as PowerEffect
+      if (effect)
+        income +=
+          POWER_INFO[PWR_REGEN_SOURCE].effect[effect.level - 1] /
+          POWER_INFO[PWR_REGEN_SOURCE].period
+
+      estimatedIncome[i] = income
+    }
+
+    data.estimatedCommuneSourceIncome = estimatedIncome
+    return estimatedIncome
   }
 }
 

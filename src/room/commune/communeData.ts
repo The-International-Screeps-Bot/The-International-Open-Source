@@ -1,4 +1,5 @@
 import { collectiveManager } from "international/collective";
+import { utils } from "utils/utils";
 
 interface CommuneData {
   /**
@@ -7,6 +8,7 @@ interface CommuneData {
   registeredRCL: number
   generalRepairStructureCoords: Set<string>
   maxUpgradeStrength: number
+  estimatedCommuneSourceIncome: number[]
 }
 
 /**
@@ -21,6 +23,12 @@ export class CommuneDataManager {
   updateCommune(room: Room) {
 
     this.data[room.name] ??= {}
+    const data = this.data[room.name]
+
+    if (utils.isTickInterval(10)) {
+
+      delete data.estimatedCommuneSourceIncome
+    }
   }
 }
 

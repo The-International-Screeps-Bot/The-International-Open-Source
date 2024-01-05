@@ -90,7 +90,7 @@ export class TowerManager {
                     const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
                     if (
-                        findWeightedRangeFromExit(enemyCreep.pos, weight) * damage <
+                        /* findWeightedRangeFromExit(enemyCreep.pos, weight) *  */damage <
                         enemyCreep.hits
                     ) {
                         if (room.towerInferiority) return false

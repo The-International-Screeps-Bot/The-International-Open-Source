@@ -1144,105 +1144,6 @@ Creep.prototype.manageSpawning = function (spawn: StructureSpawn) {
   this.assignMoveRequest(coord)
 }
 
-Creep.prototype.roomLogisticsRequestManager = function () {
-  const creepMemory = Memory.creeps[this.name]
-  if (!creepMemory[CreepMemoryKeys.roomLogisticsRequests]) {
-    creepMemory[CreepMemoryKeys.roomLogisticsRequests] = []
-    return
-  }
-  if (!creepMemory[CreepMemoryKeys.roomLogisticsRequests].length) return
-
-  for (let i = creepMemory[CreepMemoryKeys.roomLogisticsRequests].length - 1; i >= 0; i--) {
-    const request = creepMemory[CreepMemoryKeys.roomLogisticsRequests][i]
-    const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
-    if (target) continue
-
-    creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(i, 1)
-  }
-
-  const request = creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
-  if (!request) return
-
-  const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
-
-  // If pickup type
-  if (target instanceof Resource) {
-    // Update in accordance to potential resource decay
-
-    request[CreepRoomLogisticsRequestKeys.amount] = Math.min(
-      Math.min(this.freeNextStore, target.nextAmount),
-      request[CreepRoomLogisticsRequestKeys.amount],
-    )
-    if (request[CreepRoomLogisticsRequestKeys.amount] <= 0) {
-      creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
-      return
-    }
-
-    if (!request[CreepRoomLogisticsRequestKeys.noReserve]) {
-      target.reserveAmount -= request[CreepRoomLogisticsRequestKeys.amount]
-    }
-    return
-  }
-
-  if (request[CreepRoomLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
-    // Delete the request if the target is fulfilled
-
-    if (target.freeNextStore < request[CreepRoomLogisticsRequestKeys.amount]) {
-      if (Game.flags[FlagNames.debugCreepLogistics]) customLog('not enough free store', this.name + ', ' + request[CreepRoomLogisticsRequestKeys.target] + ', ' + target.freeNextStore + ' < ' + request[CreepRoomLogisticsRequestKeys.amount])
-      creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
-      return
-    }
-
-    request[CreepRoomLogisticsRequestKeys.amount] = Math.min(
-      Math.min(
-        this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]],
-        target.freeNextStore,
-      ),
-      request[CreepRoomLogisticsRequestKeys.amount],
-    )
-    if (request[CreepRoomLogisticsRequestKeys.amount] <= 0) {
-      if (Game.flags[FlagNames.debugCreepLogistics]) customLog('not enough amount', this.name + ', ' + request[CreepRoomLogisticsRequestKeys.target] + ', ' + request[CreepRoomLogisticsRequestKeys.amount])
-      creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
-      return
-    }
-
-    if (!request[CreepRoomLogisticsRequestKeys.noReserve]) {
-      target.reserveStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-        request[CreepRoomLogisticsRequestKeys.amount]
-    }
-    return
-  }
-
-  // Withdraw or offer type
-
-  // Delete the request if the target doesn't have what we need
-
-  if (
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] <
-    request[CreepRoomLogisticsRequestKeys.amount]
-  ) {
-    creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
-    return
-  }
-
-  request[CreepRoomLogisticsRequestKeys.amount] = Math.min(
-    Math.min(
-      this.freeNextStore,
-      target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]],
-    ),
-    request[CreepRoomLogisticsRequestKeys.amount],
-  )
-  if (request[CreepRoomLogisticsRequestKeys.amount] <= 0) {
-    creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
-    return
-  }
-
-  if (!request[CreepRoomLogisticsRequestKeys.noReserve]) {
-    target.reserveStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-      request[CreepRoomLogisticsRequestKeys.amount]
-  }
-}
-
 Creep.prototype.findRoomLogisticsRequest = function (args) {
   const creepMemory = Memory.creeps[this.name]
   if (creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]) {
@@ -1283,7 +1184,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
       if (!this.canAcceptRoomLogisticsRequest(request.type, request.ID)) continue
 
       const targetPos = findObjectWithID(request.targetID).pos
-      const score = request.priority + getRange(targetPos, this.pos) / 20
+      const score = request.priority + getRange(targetPos, this.pos)
 
       if (score >= lowestScore) continue
 
@@ -1295,15 +1196,14 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     log('FINDING REQ', bestRequest + ', ' + Array.from(types), { position: 1 })
  */
   let creepRequest: CreepRoomLogisticsRequest | 0
-  customLog('no request', this.name)
+
   if (!bestRequest) {
     creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(
       types,
       args?.resourceTypes,
     )
-    customLog('try to find request', this.name + ', ' + creepRequest)
-    if (creepRequest === Result.fail) return Result.fail
 
+    if (creepRequest === Result.fail) return Result.fail
   } else {
     creepRequest = {
       [CreepRoomLogisticsRequestKeys.type]: bestRequest.type,
@@ -1314,7 +1214,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     }
 
     if (bestRequest.delivery) {
-      // This request will proceed the one we've accepted to provide for the delivery
+      // This request will preceed the one we've accepted to provide for the delivery
       let nextCreepRequest: CreepRoomLogisticsRequest
       const storingStructure = findObjectWithID(bestRequest.delivery as Id<AnyStoreStructure>)
 
@@ -1328,6 +1228,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
             creepRequest[CreepRoomLogisticsRequestKeys.amount],
           ),
           [CreepRoomLogisticsRequestKeys.noReserve]: bestRequest.noReserve,
+          [CreepRoomLogisticsRequestKeys.delivery]: true,
         }
       } else {
         // The delivery provider is
@@ -1349,6 +1250,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
           ),
           [CreepRoomLogisticsRequestKeys.noReserve]:
             creepRequest[CreepRoomLogisticsRequestKeys.noReserve],
+          [CreepRoomLogisticsRequestKeys.delivery]: true,
         }
 
         // Handle reservations for nextRequest
@@ -1527,12 +1429,16 @@ Creep.prototype.canAcceptRoomLogisticsRequest = function (requestType, requestID
       // If energy, make sure there is enough to fill us to full
 
       if (request.resourceType === RESOURCE_ENERGY) {
+        const minAmount = this.freeNextStore
+
         storingStructure = this.commune.communeManager.storingStructures.find(
-          structure => structure.reserveStore[request.resourceType] >= this.freeNextStore,
+          structure => structure.reserveStore[request.resourceType] >= minAmount,
         )
       } else {
+        const minAmount = Math.min(this.freeNextStore, request.amount)
+
         storingStructure = this.commune.communeManager.storingStructures.find(
-          structure => structure.reserveStore[request.resourceType] >= request.amount,
+          structure => structure.reserveStore[request.resourceType] >= minAmount,
         )
       }
 
@@ -1717,7 +1623,6 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
   }
 
   if (Game.flags[FlagNames.debugCreepLogistics]) {
-
     this.room.visual.text(request[CreepRoomLogisticsRequestKeys.amount].toString(), this.pos)
   }
 

@@ -1,14 +1,14 @@
 import { CombatRequestKeys, DepositRequestKeys, HaulRequestKeys, NukeRequestKeys, WorkRequestKeys } from "international/constants"
 
 export interface WorkRequest {
-    [WorkRequestKeys.claimer]: number
-    [WorkRequestKeys.vanguard]: number
-    [WorkRequestKeys.abandon]: number
-    [WorkRequestKeys.responder]: string
-    [WorkRequestKeys.priority]: number
-    [WorkRequestKeys.allyVanguard]: number
-    [WorkRequestKeys.forAlly]: boolean
-    [WorkRequestKeys.hauler]: boolean
+    [WorkRequestKeys.claimer]?: number
+    [WorkRequestKeys.vanguard]?: number
+    [WorkRequestKeys.abandon]?: number
+    [WorkRequestKeys.responder]?: string
+    [WorkRequestKeys.priority]?: number
+    [WorkRequestKeys.allyVanguard]?: number
+    [WorkRequestKeys.forAlly]?: boolean
+    [WorkRequestKeys.hauler]?: boolean
 }
 
 export type CombatRequestTypes = 'attack' | 'harass' | 'defend'

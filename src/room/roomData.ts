@@ -1,7 +1,7 @@
 import { communeDataManager } from "./commune/communeData"
 
 interface RoomData {
-
+  sourceIDs: Id<Source>[]
 }
 
 /**

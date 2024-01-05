@@ -643,14 +643,11 @@ export class LabManager {
             const lab = inputLabs[i]
             const resourceType = this.inputResources[i]
 
-            // We have the right resource or no resource
-
+            // If we have the right resource or no resource
             if (this.outputResource && (!lab.mineralType || lab.mineralType === resourceType)) {
-                // We have enough
-
+                // If we have enough
                 if (
-                    lab.mineralType &&
-                    lab.reserveStore[lab.mineralType] > lab.store.getCapacity(lab.mineralType) * 0.5
+                    lab.reserveStore[resourceType] > lab.store.getCapacity(resourceType) * 0.5
                 )
                     continue
 
@@ -663,8 +660,8 @@ export class LabManager {
                     priority:
                         50 +
                         scalePriority(
-                            lab.store.getCapacity(lab.mineralType),
-                            lab.reserveStore[lab.mineralType],
+                            lab.store.getCapacity(resourceType),
+                            lab.reserveStore[resourceType],
                             20,
                         ),
                 })

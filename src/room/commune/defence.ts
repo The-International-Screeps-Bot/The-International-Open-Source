@@ -318,7 +318,7 @@ export class DefenceManager {
                     playerManager.initPlayer(enemyCreep.owner.username)
                 const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
-                if (findWeightedRangeFromExit(enemyCreep.pos, weight) * damage < enemyCreep.hits)
+                if (/* findWeightedRangeFromExit(enemyCreep.pos, weight) *  */damage < enemyCreep.hits)
                     continue
             }
 

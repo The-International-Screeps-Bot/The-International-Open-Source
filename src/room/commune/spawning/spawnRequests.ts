@@ -871,7 +871,6 @@ export class SpawnRequestsManager {
         if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
           const funnelingRoomNames = collectiveManager.funnelingRoomNames
           if (
-            funnelingRoomNames.size === 0 ||
             !funnelingRoomNames.has(this.communeManager.room.name)
           ) {
             return false
@@ -879,7 +878,6 @@ export class SpawnRequestsManager {
         }
 
         // If there are enemyAttackers or construction sites and the controller isn't soon to downgrade
-
         if (
           this.communeManager.room.towerInferiority ||
           this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0

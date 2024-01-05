@@ -43,28 +43,6 @@ export class StoringStructuresManager {
                 type: RoomLogisticsRequestTypes.transfer,
                 priority: 100,
             })
-
-            /*
-            for (const resourceType of RESOURCES_ALL) {
-                this.communeManager.room.createRoomLogisticsRequest({
-                    target: structure,
-                    resourceType,
-                    onlyFull: true,
-                    type: 'offer',
-                    priority: 0,
-                })
-
-                if (!createTransfer) continue
-
-                this.communeManager.room.createRoomLogisticsRequest({
-                    target: structure,
-                    resourceType,
-                    onlyFull: true,
-                    type: 'transfer',
-                    priority: 10,
-                })
-            }
-             */
         }
     }
 }

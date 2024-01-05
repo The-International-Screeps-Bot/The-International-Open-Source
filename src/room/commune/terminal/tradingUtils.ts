@@ -1,11 +1,11 @@
 import { customLog } from 'utils/logging'
-import { findLowestScore } from 'utils/utils'
+import { findLowestScore, roundTo } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 import { marketManager } from 'international/market/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
-export class MarketUtils {
+export class TradingUtils {
   advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
     const mySpecificOrders = marketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
@@ -167,6 +167,20 @@ export class MarketUtils {
     // the deal was an apparent success
     return Result.success
   }
+
+  getPriority(currentAmount: number, targetAmount: number) {
+
+    // the / 2 is temporary
+    const priority = roundTo((1 - currentAmount / targetAmount) / 2, 2)
+    return priority
+  }
+
+  /**
+   * Inverse function of priority
+   */
+  getTargetAmountFromPriority(priority: number, currentAmount: number) {
+    return currentAmount / -((2 * priority) - 1)
+  }
 }
 
-export const marketUtils = new MarketUtils()
+export const tradingUtils = new TradingUtils()

@@ -46,6 +46,7 @@ import {
     findClosestObjectInRange,
     findClosestObject,
     randomIntRange,
+    roundTo,
 } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import {
@@ -1678,7 +1679,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
   }
 
   if (args.priority === undefined) args.priority = 1
-  else args.priority = Math.round(args.priority * 100) / 100
+  else args.priority = roundTo(args.priority / 20, 2)
 
   const ID = collectiveManager.newTickID()
 

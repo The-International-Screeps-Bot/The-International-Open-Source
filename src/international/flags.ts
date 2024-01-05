@@ -1,5 +1,7 @@
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import {
+  CombatRequestKeys,
+  HaulRequestKeys,
   Result,
   RoomLogisticsRequestTypes,
   RoomMemoryKeys,
@@ -883,15 +885,63 @@ export class FlagManager {
 
     const roomMemory = Memory.rooms[room.name]
     if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) {
-        flag.setColor(COLOR_RED)
-        return
-      }
+      flag.setColor(COLOR_RED)
+      return
+    }
     if (!roomMemory[RoomMemoryKeys.communePlanned]) {
-        flag.setColor(COLOR_RED)
-        return
-      }
+      flag.setColor(COLOR_RED)
+      return
+    }
 
     room.communeManager.constructionManager.visualize()
+  }
+
+  private terminalRequests(flagName: string, flagNameParts: string[]) {
+    const flag = Game.flags[flagName]
+    const roomName = flagNameParts[1] || flag.pos.roomName
+    const room = Game.rooms[roomName]
+    if (!room || !room.communeManager) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    const headers = ['roomName', 'resource', 'amount', 'priority']
+
+    const data: any[][] = []
+
+    for (const ID in collectiveManager.terminalRequests) {
+      const request = collectiveManager.terminalRequests[ID]
+
+      const row: any[] = [request.roomName, request.resource, request.amount, request.priority]
+      data.push(row)
+    }
+
+    const height = 3 + data.length
+
+    Dashboard({
+      config: {
+        room: room.name,
+      },
+      widgets: [
+        {
+          pos: {
+            x: 1,
+            y: 1,
+          },
+          width: 47,
+          height,
+          widget: Rectangle({
+            data: Table(() => ({
+              data,
+              config: {
+                label: 'My Terminal Requests',
+                headers,
+              },
+            })),
+          }),
+        },
+      ],
+    })
   }
 }
 

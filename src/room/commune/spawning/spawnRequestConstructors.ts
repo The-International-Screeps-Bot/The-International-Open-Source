@@ -1,6 +1,7 @@
 import { SpawnRequest } from 'types/spawnRequest'
 import { LogTypes, customLog } from 'utils/logging'
 import { SpawnRequestArgs } from 'types/spawnRequest'
+import { FlagNames } from 'international/constants'
 
 export type SpawnRequestConstructor = (room: Room, args: SpawnRequestArgs) => SpawnRequest[]
 
@@ -295,6 +296,10 @@ export class SpawnRequestConstructors {
     }
     spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
+
+        if (Game.flags[FlagNames.debugSpawning]) {
+            console.log('role', args.role, 'parts', args.partsQuota)
+        }
 
         // Guard against bad arguments, otherwise it can cause the block below to get into an infinate loop and crash.
         if (args.extraParts.length == 0) {

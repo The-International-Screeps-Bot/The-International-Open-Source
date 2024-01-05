@@ -312,7 +312,7 @@ export class CollectiveManager extends Sleepable {
       }
 
       // Consider it funneled
-
+      
       funnelingRoomNames.add(roomName)
     }
 

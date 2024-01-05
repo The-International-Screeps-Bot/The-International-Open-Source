@@ -106,12 +106,16 @@ export enum CombatRequestKeys {
 }
 
 export enum CreepRoomLogisticsRequestKeys {
-    type,
-    target,
-    resourceType,
-    amount,
-    onlyFull,
-    noReserve,
+  type,
+  target,
+  resourceType,
+  amount,
+  onlyFull,
+  noReserve,
+  /**
+   * true if there is a delivery request. Should be the following request in the creep's logistics queue
+   */
+  delivery,
 }
 
 export enum RoomLogisticsRequestTypes {
@@ -1404,5 +1408,6 @@ export enum FlagNames {
   debugMovement = 'debugMovement',
   debugRelay = 'debugRelay',
   debugRoomLogistics = 'debugRoomLogistics',
-  debugCreepLogistics = 'debugCreepLogistics'
+  debugCreepLogistics = 'debugCreepLogistics',
+  debugSpawning = 'debugSpawning',
 }

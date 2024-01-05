@@ -1,10 +1,11 @@
+import { roomUtils } from 'room/roomUtils'
 import { communeDataManager } from './communeData'
 import { communeUtils } from './communeUtils'
 
 /**
  * Minor processes for communes
  */
-class CommuneProc {
+export class CommuneProc {
   registerFunneling(room: Room) {
     // We need a terminal and for it be to active
     if (!room.terminal || room.controller.level < 6) return

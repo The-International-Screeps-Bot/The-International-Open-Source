@@ -6,6 +6,7 @@ import { packCoord } from 'other/codec'
 import { statsManager } from './statsManager'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { creepDataManager } from 'room/creeps/creepData'
+import { creepProcs } from 'room/creeps/creepProcs'
 
 export class CreepOrganizer {
     constructor() {}
@@ -60,7 +61,9 @@ export class CreepOrganizer {
 
         if (!creep.spawning) creep.room.creepPositions[packCoord(creep.pos)] = creep.name
 
-        if (roomLogisticsRoles.has(role)) creep.roomLogisticsRequestManager()
+        if (roomLogisticsRoles.has(role)) {
+            creepProcs.updateLogisticsRequests(creep)
+        }
 
         // Get the commune the creep is from
 

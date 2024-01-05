@@ -27,7 +27,7 @@ import { FlagManager } from 'international/flags'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { SpawnUtils } from 'room/commune/spawning/spawnUtils'
-import { MarketUtils } from 'room/commune/terminal/marketUtils'
+import { TradingUtils } from 'room/commune/terminal/tradingUtils'
 import { CollectiveManager } from 'international/collective'
 import { MarketManager } from 'international/market/marketOrders'
 import { GarbageCollector } from 'international/garbageCollector'
@@ -61,7 +61,34 @@ import { FeatureFlagManager } from 'international/featureFlags'
 import { ConstructionSiteManager } from 'international/constructionSiteManager'
 import { TransactionsManager } from 'international/transactions'
 import { CommunePlanner } from 'room/construction/communePlanner'
-import { packBasePlanCoord, packCoord, packCoordList, packId, packIdList, packPos, packPosList, packRampartPlanCoord, packRoomName, packStampAnchors, packXYAsCoord, packXYAsPos, reversePosList, unpackBasePlanCoords, unpackCoord, unpackCoordAsPos, unpackCoordList, unpackCoordListAsPosList, unpackId, unpackIdList, unpackPos, unpackPosAt, unpackPosList, unpackRampartPlanCoord, unpackRoomName, unpackStampAnchors } from './codec'
+import {
+  packBasePlanCoord,
+  packCoord,
+  packCoordList,
+  packId,
+  packIdList,
+  packPos,
+  packPosList,
+  packRampartPlanCoord,
+  packRoomName,
+  packStampAnchors,
+  packXYAsCoord,
+  packXYAsPos,
+  reversePosList,
+  unpackBasePlanCoords,
+  unpackCoord,
+  unpackCoordAsPos,
+  unpackCoordList,
+  unpackCoordListAsPosList,
+  unpackId,
+  unpackIdList,
+  unpackPos,
+  unpackPosAt,
+  unpackPosList,
+  unpackRampartPlanCoord,
+  unpackRoomName,
+  unpackStampAnchors,
+} from './codec'
 import { CustomPathFinder } from 'international/customPathFinder'
 import { RoomUtils } from 'room/roomUtils'
 import { CommuneUtils } from 'room/commune/communeUtils'
@@ -69,6 +96,7 @@ import { RoomDataManager } from 'room/roomData'
 import { CommuneDataManager } from 'room/commune/communeData'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepMoveProcs } from 'room/creeps/creepMoveProcs'
+import { CommuneProc } from 'room/commune/communeProcs'
 
 export function profilerRegister() {
   // Classes
@@ -95,7 +123,7 @@ export function profilerRegister() {
   profiler.registerClass(BasePlans, 'BasePlans')
   profiler.registerClass(RampartPlans, 'RampartPlans')
   profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
-  profiler.registerClass(MarketUtils, 'MarketUtils')
+  profiler.registerClass(TradingUtils, 'MarketUtils')
   profiler.registerClass(Utils, 'Utils')
   profiler.registerClass(CreepUtils, 'CreepUtils')
   profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
@@ -142,6 +170,7 @@ export function profilerRegister() {
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
   profiler.registerClass(RoomDataManager, 'RoomDataManager')
   profiler.registerClass(CommuneDataManager, 'CommuneDataManager')
+  profiler.registerClass(CommuneProc, 'CommuneProc')
 
   // Objects
 
