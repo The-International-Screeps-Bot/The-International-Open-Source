@@ -1,5 +1,5 @@
 import { roomNameUtils } from 'room/roomNameUtils'
-import { RoomMemoryKeys, RoomTypes } from './constants'
+import { RoomMemoryKeys, RoomTypes, SegmentIDs } from './constants'
 
 /**
  * Migrate version by performing actions, if required
@@ -37,6 +37,18 @@ export class MigrationManager {
 
       delete (Memory as any).recordedTransactionIDs
       delete (Memory as any).constructionSites
+      Memory.breakingVersion += 1
+    }
+    if (Memory.breakingVersion === 123) {
+
+      RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({
+
+      } as BasePlansSegment)
+
+      RawMemory.segments[SegmentIDs.IDs] = JSON.stringify({
+          constructionSites: {},
+          recordedTransactionIDs: {},
+      } as IDsSegment)
       Memory.breakingVersion += 1
     }
 
