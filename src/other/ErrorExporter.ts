@@ -1,7 +1,5 @@
 import { SegmentIDs } from "international/constants"
 
-RawMemory.setActiveSegments([SegmentIDs.errors])
-
 /**
  * Rather cpu intensive and unavoidably inefficient. Try to avoid this needing to ba called
  */
