@@ -3,6 +3,7 @@ import { IDUpdateInterval, RoomStatsKeys } from "./constants"
 import { randomIntRange, utils } from "utils/utils"
 import { collectiveManager } from "./collective"
 import { segmentsManager } from "./segments"
+import { statsManager } from "./statsManager"
 
 export class TransactionsManager {
 
@@ -76,18 +77,18 @@ export class TransactionsManager {
 
     if (transaction.order) {
 
-      Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyOutputSold] += transaction.amount
+      statsManager.updateCommuneStat(transaction.from, RoomStatsKeys.EnergyOutputSold, transaction.amount)
       return
     }
 
     const isDomestic = this.isDomestic(transaction.from, transaction.to)
     if (isDomestic) {
 
-      Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyTerminalSentDomestic] += transaction.amount
+      statsManager.updateCommuneStat(transaction.from, RoomStatsKeys.EnergyTerminalSentDomestic, transaction.amount)
     }
     // Not a domestic trade
     else {
-      Memory.stats.rooms[transaction.from][RoomStatsKeys.EnergyTerminalSentOther] += transaction.amount
+      statsManager.updateCommuneStat(transaction.from, RoomStatsKeys.EnergyTerminalSentOther, transaction.amount)
     }
   }
 
@@ -96,7 +97,7 @@ export class TransactionsManager {
 
     if (transaction.order) {
 
-      Memory.stats.rooms[transaction.to][RoomStatsKeys.EnergyInputBought] += transaction.amount
+      statsManager.updateCommuneStat(transaction.to, RoomStatsKeys.EnergyInputBought, transaction.amount)
       return
     }
   }

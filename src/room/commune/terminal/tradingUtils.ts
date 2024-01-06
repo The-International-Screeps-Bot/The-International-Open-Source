@@ -28,15 +28,13 @@ export class TradingUtils {
 
       // Success
 
-      const roomsStats = Memory.stats.rooms[room.name]
-
       const transactionCost = Game.market.calcTransactionCost(
         actualDealAmount,
         room.name,
         order.roomName,
       )
-      roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] += transactionCost
 
+      statsManager.updateCommuneStat(room.name, RoomStatsKeys.EnergyOutputTransactionCosts, transactionCost)
       return Result.success
     }
 
@@ -91,10 +89,8 @@ export class TradingUtils {
 
       // Success
 
-      const roomsStats = Memory.stats.rooms[room.name]
-
       const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
-      roomsStats[RoomStatsKeys.EnergyOutputTransactionCosts] += transactionCost
+      statsManager.updateCommuneStat(room.name, RoomStatsKeys.EnergyOutputTransactionCosts, transactionCost)
 
       return Result.success
     }
