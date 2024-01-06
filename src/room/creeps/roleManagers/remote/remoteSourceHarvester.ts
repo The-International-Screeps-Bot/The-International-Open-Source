@@ -392,10 +392,6 @@ export class RemoteHarvester extends Creep {
 
       if (this.obtainEnergyIfNeeded() !== Result.success) return Result.noAction
 
-      // Don't allow the construction site manager to remove the site for while we're building
-
-      Memory.constructionSites[cSite.id] = 0
-
       this.build(cSite)
       this.worked = WorkTypes.build
 

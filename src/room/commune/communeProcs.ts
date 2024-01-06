@@ -5,7 +5,7 @@ import { communeUtils } from './communeUtils'
 /**
  * Minor processes for communes
  */
-export class CommuneProc {
+export class CommuneProcs {
   registerFunneling(room: Room) {
     // We need a terminal and for it be to active
     if (!room.terminal || room.controller.level < 6) return
@@ -44,4 +44,4 @@ export class CommuneProc {
   }
 }
 
-export const communeProc = new CommuneProc()
+export const communeProcs = new CommuneProcs()

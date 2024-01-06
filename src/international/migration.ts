@@ -33,6 +33,12 @@ export class MigrationManager {
 
       Memory.breakingVersion += 1
     }
+    if (Memory.breakingVersion === 122) {
+
+      delete (Memory as any).recordedTransactionIDs
+      delete (Memory as any).constructionSites
+      Memory.breakingVersion += 1
+    }
 
     if (Memory.breakingVersion < global.settings.breakingVersion) {
       global.killCreeps()

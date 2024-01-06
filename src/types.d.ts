@@ -333,16 +333,6 @@ declare global {
          */
         lastConfig: number
 
-        /**
-         * An object of constrctionsSites with keys of site IDs and properties of the site's age
-         */
-        constructionSites: { [ID: string]: number }
-
-        /**
-         * keys of the transactions' IDs
-         */
-        recordedTransactionIDs: {[ID: string]: 1}
-
         minHaulerCostError: number
         minHaulerCost: number
         minHaulerCostUpdate: number

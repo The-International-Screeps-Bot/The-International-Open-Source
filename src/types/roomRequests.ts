@@ -1,12 +1,6 @@
 import {
-    CombatRequestKeys,
-    CreepRoomLogisticsRequestKeys,
-    DepositRequestKeys,
-    HaulRequestKeys,
-    NukeRequestKeys,
-    PowerRequestKeys,
-    RoomLogisticsRequestTypes,
-    WorkRequestKeys,
+  CreepRoomLogisticsRequestKeys, PowerRequestKeys,
+  RoomLogisticsRequestTypes
 } from 'international/constants'
 
 export type RoomLogisticsTargets = AnyStoreStructure | Creep | Tombstone | Ruin | Resource

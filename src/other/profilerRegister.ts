@@ -96,7 +96,11 @@ import { RoomDataManager } from 'room/roomData'
 import { CommuneDataManager } from 'room/commune/communeData'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepMoveProcs } from 'room/creeps/creepMoveProcs'
-import { CommuneProc } from 'room/commune/communeProcs'
+import { CommuneProcs } from 'room/commune/communeProcs'
+import { PowerCreepProcs } from 'room/creeps/powerCreeps/powerCreepProcs'
+import { PowerCreepUtils } from 'room/creeps/powerCreeps/powerCreepUtils'
+import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepLogiProcs } from 'room/creeps/creepLogiProcs'
 
 export function profilerRegister() {
   // Classes
@@ -125,9 +129,6 @@ export function profilerRegister() {
   profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
   profiler.registerClass(TradingUtils, 'MarketUtils')
   profiler.registerClass(Utils, 'Utils')
-  profiler.registerClass(CreepUtils, 'CreepUtils')
-  profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
-  profiler.registerClass(CreepMoveProcs, 'CreepMoveUtils')
 
   // Room classes
 
@@ -145,9 +146,6 @@ export function profilerRegister() {
   profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
   profiler.registerClass(SourceManager, 'SourceManager')
   profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
-  profiler.registerClass(Quad, 'Quad')
-  profiler.registerClass(DynamicSquad, 'DynamicSquad')
-  profiler.registerClass(Duo, 'Duo')
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
   profiler.registerClass(ContainerManager, 'ContainerManager')
   profiler.registerClass(DroppedResourceManager, 'DroppedResourceManager')
@@ -170,7 +168,22 @@ export function profilerRegister() {
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
   profiler.registerClass(RoomDataManager, 'RoomDataManager')
   profiler.registerClass(CommuneDataManager, 'CommuneDataManager')
-  profiler.registerClass(CommuneProc, 'CommuneProc')
+  profiler.registerClass(CommuneProcs, 'CommuneProc')
+
+  // Creep classes
+
+  profiler.registerClass(PowerCreepProcs, 'PowerCreepProcs')
+  profiler.registerClass(PowerCreepUtils, 'PowerCreepUtils')
+
+  profiler.registerClass(CreepProcs, 'CreepProcs')
+  profiler.registerClass(CreepMoveProcs, 'CreepMoveProcs')
+  profiler.registerClass(CreepLogiProcs, 'CreepLogiProcs')
+  profiler.registerClass(CreepUtils, 'CreepUtils')
+  profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
+
+  profiler.registerClass(Quad, 'Quad')
+  profiler.registerClass(DynamicSquad, 'DynamicSquad')
+  profiler.registerClass(Duo, 'Duo')
 
   // Objects
 

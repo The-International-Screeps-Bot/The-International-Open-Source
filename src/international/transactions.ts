@@ -1,33 +1,34 @@
 import { Sleepable } from "utils/sleepable"
-import { RoomStatsKeys } from "./constants"
+import { IDUpdateInterval, RoomStatsKeys } from "./constants"
 import { randomIntRange, utils } from "utils/utils"
 import { collectiveManager } from "./collective"
-
-const processTransactionsInterval = randomIntRange(50, 100)
+import { segmentsManager } from "./segments"
 
 export class TransactionsManager {
 
   run() {
-    if (!utils.isTickInterval(processTransactionsInterval)) return
+    if (!utils.isTickInterval(IDUpdateInterval)) return
 
-    const currentTransactionIDs = this.findCurrentTransactions()
-    this.pruneRecordedTransactions(currentTransactionIDs)
+    const recordedTransactionIDs = segmentsManager.IDs.recordedTransactionIDs
+
+    const currentTransactionIDs = this.registerCurrentTransactions(recordedTransactionIDs)
+    this.pruneRecordedTransactions(recordedTransactionIDs, currentTransactionIDs)
   }
 
-  private findCurrentTransactions() {
+  private registerCurrentTransactions(recordedTransactionIDs: RecordedTransactionIDs) {
 
     const currentTransactionIDs = new Set<string>()
 
     for (const transaction of Game.market.outgoingTransactions) {
 
       currentTransactionIDs.add(transaction.transactionId)
-      this.registerTransaction(transaction)
+      this.registerTransaction(recordedTransactionIDs, transaction)
     }
 
     for (const transaction of Game.market.incomingTransactions) {
 
       currentTransactionIDs.add(transaction.transactionId)
-      this.registerTransaction(transaction)
+      this.registerTransaction(recordedTransactionIDs, transaction)
     }
 
     return currentTransactionIDs
@@ -36,22 +37,22 @@ export class TransactionsManager {
   /**
    * Remove recorded transaction IDs that are no longer present in current data
    */
-  private pruneRecordedTransactions(currentTransactionIDs: Set<string>) {
+  private pruneRecordedTransactions(recordedTransactionIDs: RecordedTransactionIDs, currentTransactionIDs: Set<string>) {
 
-    for (const transactionID in Memory.recordedTransactionIDs) {
+    for (const transactionID in recordedTransactionIDs) {
       // only delete if it isn't in current data
       if (currentTransactionIDs.has(transactionID)) continue
 
-      delete Memory.recordedTransactionIDs[transactionID]
+      delete recordedTransactionIDs[transactionID]
     }
   }
 
-  private registerTransaction(transaction: Transaction) {
+  private registerTransaction(recordedTransactionIDs: RecordedTransactionIDs, transaction: Transaction) {
 
     // don't register already registered orders
-    if (Memory.recordedTransactionIDs[transaction.transactionId]) return
+    if (recordedTransactionIDs[transaction.transactionId]) return
 
-    Memory.recordedTransactionIDs[transaction.transactionId] = 1
+    recordedTransactionIDs[transaction.transactionId] = 1
 
     this.processTransaction(transaction)
   }

@@ -1,6 +1,7 @@
 import { packCoord } from 'other/codec'
 import { collectiveManager } from './collective'
 import { CommuneManager } from 'room/commune/commune'
+import { randomIntRange } from 'utils/utils'
 
 export enum PlayerMemoryKeys {
     /**
@@ -1394,9 +1395,13 @@ export enum WorkTypes {
 }
 
 export enum SegmentIDs {
-    General = 0,
-    BasePlans = 1,
-    Errors = 10,
+  general = 0,
+  basePlans = 1,
+  /**
+   * contains significant IDs such as construction sites and transaction IDs
+   */
+  IDs = 2,
+  errors = 10,
 }
 
 export enum MovedTypes {
@@ -1411,3 +1416,5 @@ export enum FlagNames {
   debugCreepLogistics = 'debugCreepLogistics',
   debugSpawning = 'debugSpawning',
 }
+
+export const IDUpdateInterval = randomIntRange(50, 100)
