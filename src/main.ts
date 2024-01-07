@@ -11,7 +11,6 @@ import './room/structureAdditions'
 import './room/creeps/creepAdditions'
 import './other/profilerRegister'
 import { memHack } from 'other/memHack'
-import { outOfBucket } from 'utils/utils'
 import { CPUMaxPerTick, Result } from 'international/constants'
 import { initManager } from './international/init'
 import { migrationManager } from 'international/migration'
@@ -37,6 +36,8 @@ import { transactionsManager } from 'international/transactions'
 import { segmentsManager } from 'international/segments'
 import { creepDataManager } from 'room/creeps/creepData'
 import { roomDataManager } from 'room/roomData'
+import { utils } from 'utils/utils'
+import { procs } from 'utils/procs'
 
 export function originalLoop() {
 
@@ -45,7 +46,7 @@ export function originalLoop() {
 
     if (Game.flags.deactivate) return
     if (Game.cpu.bucket < CPUMaxPerTick) {
-        outOfBucket()
+        procs.outOfBucket()
         return
     }
     if (global.userScript) global.userScript.initialRun()

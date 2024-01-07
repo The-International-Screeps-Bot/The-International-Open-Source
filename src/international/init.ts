@@ -2,7 +2,7 @@ import { getMe } from 'utils/utils'
 import { playerManager } from './players'
 import { statsManager } from './statsManager'
 import { PlayerMemoryKeys, SegmentIDs } from './constants'
-import { PlayerRelationships } from 'types/players'
+import { PlayerRelationships } from './constants'
 
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function

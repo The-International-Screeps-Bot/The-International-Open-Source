@@ -121,12 +121,13 @@ export class TerminalManager {
       if (ourPriority >= request.priority) continue
       const priorityDiff = request.priority - ourPriority
       // The request's priority must be 10% greater than our own
-      if (priorityDiff < 0.1) continue
+      if (priorityDiff < 0.15) continue
 
       const equivalentAmount = tradingUtils.getAmountFromPriority(
         request.priority,
         resourceTargets.min[request.resource],
       )
+
       const equivalentPriority = tradingUtils.getPriority(
         equivalentAmount,
         resourceTargets.min[request.resource],
@@ -141,11 +142,14 @@ export class TerminalManager {
         }, ${request.amount}, ${equivalentPriority} vs ${request.priority}, ${consequentSend}`,
       )
 
+      if (consequentSend < request.amount) continue
+
       const maxSendAmount = Math.floor(
         Math.min(
           storedResource * priorityDiff,
           request.amount,
-          room.terminal.store.getUsedCapacity(request.resource) / 2,
+          room.terminal.store.getUsedCapacity(request.resource),
+          equivalentAmount,
         ),
       )
 
@@ -154,7 +158,7 @@ export class TerminalManager {
         maxSendAmount,
         this.communeManager.room.name,
         request.roomName,
-      )
+      ) / 2
       customLog(
         'TERMINAL REQUEST ' + request.resource,
         maxSendAmount +
@@ -171,7 +175,7 @@ export class TerminalManager {
           ', ' +
           (storedResource - request.amount) * priorityDiff +
           ', ' +
-          tradingUtils.getTargetAmountFromPriority(priorityDiff, storedResource),
+          tradingUtils.getAmountFromPriority(priorityDiff, resourceTargets.min[request.resource]),
       )
       // Make sure we are fulfilling at least 10% of the request
       if (request.amount * 0.1 > sendAmount) continue

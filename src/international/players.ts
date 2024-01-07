@@ -2,7 +2,7 @@ import { isNumber } from 'lodash'
 import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from './constants'
 import { randomTick } from '../utils/utils'
 import { Sleepable } from '../utils/sleepable'
-import { PlayerRelationships } from 'types/players'
+import { PlayerRelationships } from './constants'
 
 export class PlayerManager extends Sleepable {
     /**
@@ -38,7 +38,7 @@ export class PlayerManager extends Sleepable {
                 this.highestThreat = threat
             }
 
-            
+
         }
     }
 

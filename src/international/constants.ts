@@ -3,6 +3,12 @@ import { collectiveManager } from './collective'
 import { CommuneManager } from 'room/commune/commune'
 import { randomIntRange } from 'utils/utils'
 
+export enum PlayerRelationships {
+    ally,
+    enemy,
+    noAggression
+}
+
 export enum PlayerMemoryKeys {
     /**
      * Generally how good their offense is

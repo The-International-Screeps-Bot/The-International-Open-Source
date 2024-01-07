@@ -1,24 +1,9 @@
 import { ErrorMapper } from 'other/ErrorMapper'
 import {
-    mmoShardNames,
-    customColors,
-    offsetsByDirection,
-    roomDimensions,
-    roomTypeProperties,
-    roomTypes,
-    allStructureTypes,
-    dynamicScoreRoomRange,
-    maxControllerLevel,
-    preferredCommuneRange,
-    RoomMemoryKeys,
-    RoomTypes,
-    PlayerMemoryKeys,
-    CPUMaxPerTick,
-    Result,
+  customColors, roomDimensions, PlayerMemoryKeys, Result
 } from '../international/constants'
-import { collectiveManager } from '../international/collective'
-import { LogTypes, customLog } from './logging'
-import { PlayerRelationships } from 'types/players'
+import { customLog } from './logging'
+import { PlayerRelationships } from 'international/constants'
 import { roomNameUtils } from 'room/roomNameUtils'
 
 /**
@@ -747,21 +732,11 @@ export function isAlly(playerName: string) {
   const playerMemory = Memory.players[playerName]
   // If PlayerMemory does not exist they are not an ally, as ally memory is always present
   if (!playerMemory) return false
+  // Don't consider ourselves as allies
+  if (playerName === Memory.me) return false
 
   // Wether or not they are recorded as an ally
   return playerMemory[PlayerMemoryKeys.relationship] === PlayerRelationships.ally
-}
-
-export function outOfBucket() {
-  collectiveManager.logs = ''
-  customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
-    type: LogTypes.warning,
-  })
-  console.log(
-    global.settings.logging
-      ? collectiveManager.logs
-      : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
-  )
 }
 
 /**

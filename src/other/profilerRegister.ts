@@ -18,7 +18,7 @@ import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
 import { Duo } from 'room/creeps/roleManagers/antifa/duo'
 import { originalLoop } from 'main'
 import { creepClasses } from 'room/creeps/creepClasses'
-import { Utils, outOfBucket } from 'utils/utils'
+import { Utils } from 'utils/utils'
 import { CreepOrganizer } from 'international/creepOrganizer'
 import { RequestsManager } from 'international/requests'
 import { SimpleAllies } from 'international/simpleAllies/simpleAllies'
@@ -101,6 +101,7 @@ import { PowerCreepProcs } from 'room/creeps/powerCreeps/powerCreepProcs'
 import { PowerCreepUtils } from 'room/creeps/powerCreeps/powerCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { CreepLogiProcs } from 'room/creeps/creepLogiProcs'
+import { Procs } from 'utils/procs'
 
 export function profilerRegister() {
   // Classes
@@ -129,6 +130,7 @@ export function profilerRegister() {
   profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
   profiler.registerClass(TradingUtils, 'MarketUtils')
   profiler.registerClass(Utils, 'Utils')
+  profiler.registerClass(Procs, 'Procs')
 
   // Room classes
 
@@ -194,7 +196,6 @@ export function profilerRegister() {
   // Functions
 
   profiler.registerFN(originalLoop, 'loop')
-  profiler.registerFN(outOfBucket, 'outOfBucket')
 
   // codec functions
 
