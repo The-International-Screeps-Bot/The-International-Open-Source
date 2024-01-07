@@ -3,6 +3,7 @@ import { PlayerMemoryKeys } from "international/constants"
 export enum PlayerRelationships {
     ally,
     enemy,
+    noAggression
 }
 
 export interface PlayerMemory {

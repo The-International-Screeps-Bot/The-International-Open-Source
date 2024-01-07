@@ -113,15 +113,33 @@ export class TerminalManager {
       /*       const minStoredResource = resourceTargets.min[request.resource] * 1.1
       if (storedResource <= minStoredResource) continue */
 
-      const ourPriority = tradingUtils.getPriority(
-        storedResource,
-        resourceTargets.min[request.resource],
+      const ourPriority = Math.max(
+        tradingUtils.getPriority(storedResource, resourceTargets.min[request.resource]),
+        0,
       )
       // Our priority should be lower
       if (ourPriority >= request.priority) continue
       const priorityDiff = request.priority - ourPriority
       // The request's priority must be 10% greater than our own
       if (priorityDiff < 0.1) continue
+
+      const equivalentAmount = tradingUtils.getAmountFromPriority(
+        request.priority,
+        resourceTargets.min[request.resource],
+      )
+      const equivalentPriority = tradingUtils.getPriority(
+        equivalentAmount,
+        resourceTargets.min[request.resource],
+      )
+
+      const consequentSend = storedResource - equivalentAmount
+
+      customLog(
+        'TERMINAL SEND SPECIAL VALUES',
+        `${equivalentAmount} vs ${storedResource} vs ${
+          Game.rooms[request.roomName].roomManager.resourcesInStoringStructures[request.resource]
+        }, ${request.amount}, ${equivalentPriority} vs ${request.priority}, ${consequentSend}`,
+      )
 
       const maxSendAmount = Math.floor(
         Math.min(
@@ -147,10 +165,13 @@ export class TerminalManager {
           ', ' +
           priorityDiff +
           ', ' +
+          ourPriority +
+          ', ' +
           (storedResource - request.amount) +
           ', ' +
-          (storedResource - request.amount) * priorityDiff + ', ' +
-          tradingUtils.getTargetAmountFromPriority(priorityDiff, storedResource)
+          (storedResource - request.amount) * priorityDiff +
+          ', ' +
+          tradingUtils.getTargetAmountFromPriority(priorityDiff, storedResource),
       )
       // Make sure we are fulfilling at least 10% of the request
       if (request.amount * 0.1 > sendAmount) continue
@@ -188,8 +209,6 @@ export class TerminalManager {
     )
 
     // Consequences
-
-    request.amount -= amount
 
     delete collectiveManager.terminalRequests[ID]
     this.communeManager.room.terminal.intended = true

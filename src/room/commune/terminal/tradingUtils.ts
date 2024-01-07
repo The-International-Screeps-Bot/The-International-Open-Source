@@ -34,7 +34,11 @@ export class TradingUtils {
         order.roomName,
       )
 
-      statsManager.updateCommuneStat(room.name, RoomStatsKeys.EnergyOutputTransactionCosts, transactionCost)
+      statsManager.updateCommuneStat(
+        room.name,
+        RoomStatsKeys.EnergyOutputTransactionCosts,
+        transactionCost,
+      )
       return Result.success
     }
 
@@ -90,7 +94,11 @@ export class TradingUtils {
       // Success
 
       const transactionCost = Game.market.calcTransactionCost(dealAmount, room.name, order.roomName)
-      statsManager.updateCommuneStat(room.name, RoomStatsKeys.EnergyOutputTransactionCosts, transactionCost)
+      statsManager.updateCommuneStat(
+        room.name,
+        RoomStatsKeys.EnergyOutputTransactionCosts,
+        transactionCost,
+      )
 
       return Result.success
     }
@@ -164,18 +172,24 @@ export class TradingUtils {
     return Result.success
   }
 
-  getPriority(currentAmount: number, targetAmount: number) {
-
+  getPriority(amount: number, targetAmount: number) {
     // the / 2 is temporary
-    const priority = roundTo((1 - currentAmount / targetAmount) / 2, 2)
+    const priority = roundTo(1 - amount / targetAmount, 2)
     return priority
   }
 
   /**
    * Inverse function of priority
    */
-  getTargetAmountFromPriority(priority: number, currentAmount: number) {
-    return currentAmount / -((2 * priority) - 1)
+  getTargetAmountFromPriority(priority: number, amount: number) {
+    return amount / -(priority - 1)
+  }
+
+  /**
+   * Inverse function of priority
+   */
+  getAmountFromPriority(priority: number, targetAmount: number) {
+    return targetAmount * -(priority - 1)
   }
 }
 
