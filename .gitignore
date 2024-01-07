@@ -5,7 +5,7 @@ collectivizer.ts
 
 src/other/userScript/*
 !userScript.example.ts
-settings.ts
+src/settings.ts
 .screeps.yaml
 
 # wasm-pack always puts a .gitignore in here; if you want to not ignore it,
