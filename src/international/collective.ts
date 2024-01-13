@@ -312,7 +312,7 @@ export class CollectiveManager extends Sleepable {
       }
 
       // Consider it funneled
-      
+
       funnelingRoomNames.add(roomName)
     }
 
@@ -333,9 +333,13 @@ export class CollectiveManager extends Sleepable {
       for (const key in resources) {
         const resource = key as unknown as ResourceConstant
 
-        if (!this._resourcesInStoringStructures[resource])
+        if (!this._resourcesInStoringStructures[resource]) {
           this._resourcesInStoringStructures[resource] = resources[resource]
-        this._resourcesInStoringStructures[resource] = resources[resource]
+          continue
+        }
+
+
+        this._resourcesInStoringStructures[resource] += resources[resource]
       }
     }
 

@@ -112,7 +112,7 @@ export enum CombatRequestKeys {
     dynamicSquadQuota
 }
 
-export enum CreepRoomLogisticsRequestKeys {
+export enum CreepLogisticsRequestKeys {
   type,
   target,
   resourceType,

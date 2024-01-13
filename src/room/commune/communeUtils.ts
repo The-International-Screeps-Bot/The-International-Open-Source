@@ -212,6 +212,17 @@ export class CommuneUtils {
     data.estimatedCommuneSourceIncome = estimatedIncome
     return estimatedIncome
   }
+
+  canTakeNewWorkRequest(roomName: string) {
+
+    if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) return false
+    if (Game.rooms[roomName].energyCapacityAvailable < 650) return false
+
+    const room = Game.rooms[roomName]
+    if (!room.roomManager.structures.spawn.length) return false
+
+    return true
+  }
 }
 
 export const communeUtils = new CommuneUtils()

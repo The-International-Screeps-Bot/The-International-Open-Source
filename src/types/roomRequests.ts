@@ -1,18 +1,19 @@
 import {
-  CreepRoomLogisticsRequestKeys, PowerRequestKeys,
-  RoomLogisticsRequestTypes
+  CreepLogisticsRequestKeys,
+  PowerRequestKeys,
+  RoomLogisticsRequestTypes,
 } from 'international/constants'
 
 export type RoomLogisticsTargets = AnyStoreStructure | Creep | Tombstone | Ruin | Resource
 
-export interface CreepRoomLogisticsRequest {
-  [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
-  [CreepRoomLogisticsRequestKeys.target]: Id<RoomLogisticsTargets>
-  [CreepRoomLogisticsRequestKeys.resourceType]: ResourceConstant
-  [CreepRoomLogisticsRequestKeys.amount]: number
-  [CreepRoomLogisticsRequestKeys.onlyFull]?: boolean
-  [CreepRoomLogisticsRequestKeys.noReserve]?: boolean
-  [CreepRoomLogisticsRequestKeys.delivery]?: boolean
+export interface CreepLogisticsRequest {
+  [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes
+  [CreepLogisticsRequestKeys.target]: Id<RoomLogisticsTargets>
+  [CreepLogisticsRequestKeys.resourceType]: ResourceConstant
+  [CreepLogisticsRequestKeys.amount]: number
+  [CreepLogisticsRequestKeys.onlyFull]?: boolean
+  [CreepLogisticsRequestKeys.noReserve]?: boolean
+  [CreepLogisticsRequestKeys.delivery]?: boolean
 }
 
 export interface RoomLogisticsRequest {

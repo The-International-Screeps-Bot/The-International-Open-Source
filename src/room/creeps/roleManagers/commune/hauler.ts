@@ -1,16 +1,16 @@
 import {
-    CreepMemoryKeys,
-    CreepRoomLogisticsRequestKeys,
-    FlagNames,
-    MovedTypes,
-    Result,
-    RoomLogisticsRequestTypes,
-    RoomMemoryKeys,
-    RoomTypes,
-    SleepFor,
-    customColors,
-    packedPosLength,
-    relayOffsets,
+  CreepMemoryKeys,
+  CreepLogisticsRequestKeys,
+  FlagNames,
+  MovedTypes,
+  Result,
+  RoomLogisticsRequestTypes,
+  RoomMemoryKeys,
+  RoomTypes,
+  SleepFor,
+  customColors,
+  packedPosLength,
+  relayOffsets,
 } from 'international/constants'
 import { statsManager } from 'international/statsManager'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'

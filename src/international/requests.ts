@@ -15,351 +15,364 @@ import {
 import { indexOf } from 'lodash'
 import { Sleepable } from 'utils/sleepable'
 import { util } from 'chai'
+import { WorkRequest } from 'types/internationalRequests'
+import { communeUtils } from 'room/commune/communeUtils'
 
 const runRequestInverval = randomIntRange(100, 200)
 
 // Should adsorb the request content of tickInit
 export class RequestsManager extends Sleepable {
+  sleepFor = randomIntRange(100, 200)
 
-    sleepFor = randomIntRange(100, 200)
+  run() {
+    this.updateWorkRequests()
+    this.updateCombatRequests()
+    this.updateHaulRequests()
 
-    run() {
+    if (utils.isTickInterval(runRequestInverval)) return
 
-        this.updateWorkRequests()
-        this.updateCombatRequests()
-        this.updateHaulRequests()
+    this.runWorkRequests()
+    this.runCombatRequests()
+    this.runHaulRequests()
+  }
 
-        if (utils.isTickInterval(runRequestInverval)) return
+  // update requests
 
-        this.runWorkRequests()
-        this.runCombatRequests()
-        this.runHaulRequests()
+  private updateWorkRequests() {
+    const runThreshold = randomIntRange(19000, 20000)
+
+    for (const roomName in Memory.workRequests) {
+      const request = Memory.workRequests[roomName]
+      if (request[WorkRequestKeys.responder]) continue
+
+      if (request[WorkRequestKeys.abandon] > 0) {
+        request[WorkRequestKeys.abandon] -= 1
+        continue
+      }
+
+      // otherwise abandon is worthless. Let's delete it to save (a bit of) memory
+
+      delete request[WorkRequestKeys.abandon]
+
+      // update dynamic score if enough time has passed
+
+      const roomMemory = Memory.rooms[roomName]
+      if (
+        !roomMemory[RoomMemoryKeys.dynamicScore] ||
+        Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
+      ) {
+        roomNameUtils.findDynamicScore(roomName)
+      }
+    }
+  }
+
+  private updateCombatRequests() {
+    for (const requestName in Memory.combatRequests) {
+      const request = Memory.combatRequests[requestName]
+
+      if (request[CombatRequestKeys.responder]) {
+        collectiveManager.creepsByCombatRequest[requestName] = {}
+        for (const role of antifaRoles)
+          collectiveManager.creepsByCombatRequest[requestName][role] = []
+        request[CombatRequestKeys.quads] = 0
+        continue
+      }
+
+      if (request[CombatRequestKeys.abandon]) {
+        request[CombatRequestKeys.abandon] -= 1
+        continue
+      }
+
+      delete request[CombatRequestKeys.abandon]
+    }
+  }
+
+  private updateHaulRequests() {
+    for (const requestName in Memory.haulRequests) {
+      const request = Memory.haulRequests[requestName]
+
+      if (request[HaulRequestKeys.responder]) {
+        collectiveManager.creepsByHaulRequest[requestName] = []
+        continue
+      }
+
+      if (request[HaulRequestKeys.abandon] > 0) {
+        request[HaulRequestKeys.abandon] -= 1
+        continue
+      }
+
+      delete request[HaulRequestKeys.abandon]
+    }
+  }
+
+  // run requests
+
+  private runWorkRequests() {
+    if (!global.settings.autoClaim) return
+    /* if (collectiveManager.communes.size >= collectiveManager.maxCommunes) return */
+
+    let reservedGCL = Game.gcl.level - collectiveManager.communes.size
+
+    // Subtract the number of workRequests with responders
+
+    for (const roomName in Memory.workRequests) {
+      const request = Memory.workRequests[roomName]
+      if (!request[WorkRequestKeys.responder]) continue
+
+      reservedGCL -= 1
     }
 
-    // update requests
+    /* if (reservedGCL <= 0) return */
 
-    private updateWorkRequests() {
+    const communesForResponding = new Set<string>()
 
-        const runThreshold = randomIntRange(19000, 20000)
+    for (const roomName of collectiveManager.communes) {
+      if (!communeUtils.canTakeNewWorkRequest(roomName)) continue
 
-        for (const roomName in Memory.workRequests) {
-
-            const request = Memory.workRequests[roomName]
-            if (request[WorkRequestKeys.responder]) continue
-
-            if (request[WorkRequestKeys.abandon] > 0) {
-                request[WorkRequestKeys.abandon] -= 1
-                continue
-            }
-
-            // otherwise abandon is worthless. Let's delete it to save (a bit of) memory
-
-            delete request[WorkRequestKeys.abandon]
-
-            // update dynamic score if enough time has passed
-
-            const roomMemory = Memory.rooms[roomName]
-            if (
-                !roomMemory[RoomMemoryKeys.dynamicScore] ||
-                Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
-            ) {
-
-                roomNameUtils.findDynamicScore(roomName)
-            }
-        }
+      communesForResponding.add(roomName)
     }
 
-    private updateCombatRequests() {
+    // Assign and abandon workRequests, in order of score
 
-        for (const requestName in Memory.combatRequests) {
-            const request = Memory.combatRequests[requestName]
+    const workRequests = collectiveManager.workRequestsByScore
+    for (const roomName of workRequests) {
+      const request = Memory.workRequests[roomName]
 
-            if (request[CombatRequestKeys.responder]) {
-                collectiveManager.creepsByCombatRequest[requestName] = {}
-                for (const role of antifaRoles)
-                    collectiveManager.creepsByCombatRequest[requestName][role] = []
-                request[CombatRequestKeys.quads] = 0
-                continue
-            }
+      if (!request) continue
+      if (!this.shouldWorkRequestGetResponse(request, roomName, reservedGCL)) {
+        continue
+      }
 
-            if (request[CombatRequestKeys.abandon]) {
+      // If there is not enough reserved GCL to make a new request
+      /* if (reservedGCL <= 0) return */
 
-                request[CombatRequestKeys.abandon] -= 1
-                continue
-            }
+      const type = Memory.rooms[roomName][RoomMemoryKeys.type]
+      // if someone else has acquired the room
+      if (
+        type === RoomTypes.ally ||
+        type === RoomTypes.enemy ||
+        type === RoomTypes.allyRemote ||
+        type === RoomTypes.enemyRemote
+      ) {
+        // Wait on the request
+        Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
+        continue
+      }
 
-            delete request[CombatRequestKeys.abandon]
+      const communeName = findClosestRoomName(roomName, communesForResponding)
+      if (!communeName) {
+        // Wait on the request
+        Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
+        continue
+      }
 
-        }
+      // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
+
+      if (
+        Game.map.getRoomLinearDistance(communeName, roomName) > maxWorkRequestDistance ||
+        roomNameUtils.advancedFindDistance(communeName, roomName, {
+          typeWeights: {
+            keeper: Infinity,
+            enemy: Infinity,
+            ally: Infinity,
+          },
+        }) > maxWorkRequestDistance
+      ) {
+        Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
+        continue
+      }
+
+      // Otherwise assign the request to the room, and record as such in Memory
+
+      Memory.rooms[communeName][RoomMemoryKeys.workRequest] = roomName
+      Memory.workRequests[roomName][WorkRequestKeys.responder] = communeName
+
+      reservedGCL -= 1
+
+      communesForResponding.delete(communeName)
+    }
+  }
+
+  private shouldWorkRequestGetResponse(request: WorkRequest, roomName: string, reservedGCL: number) {
+
+    // If there is no GCL left to claim with
+    if (Game.gcl.level <= reservedGCL) {
+
+      const room = Game.rooms[roomName]
+      // If we don't own the request room's contorller already, then we should stop
+      if (room && !room.controller.my) {
+        return false
+      }
     }
 
-    private updateHaulRequests() {
-
-        for (const requestName in Memory.haulRequests) {
-            const request = Memory.haulRequests[requestName]
-
-            if (request[HaulRequestKeys.responder]) {
-                collectiveManager.creepsByHaulRequest[requestName] = []
-                continue
-            }
-
-            if (request[HaulRequestKeys.abandon] > 0) {
-
-                request[HaulRequestKeys.abandon] -= 1
-                continue
-            }
-
-            delete request[HaulRequestKeys.abandon]
-
-
-        }
+    if (request[WorkRequestKeys.abandon]) return false
+    if (
+      request[WorkRequestKeys.responder] &&
+      collectiveManager.communes.has(request[WorkRequestKeys.responder])
+    ) {
+      return false
     }
+    return true
+  }
 
-    // run requests
+  private runCombatRequests() {
+    for (const requestName in Memory.combatRequests) {
+      const request = Memory.combatRequests[requestName]
 
-    private runWorkRequests() {
-        if (!global.settings.autoClaim) return
-        if (collectiveManager.communes.size >= collectiveManager.maxCommunes) return
+      if (request[CombatRequestKeys.abandon]) continue
+      if (
+        request[CombatRequestKeys.responder] &&
+        collectiveManager.communes.has(request[CombatRequestKeys.responder])
+      )
+        continue
 
-        let reservedGCL = Game.gcl.level - collectiveManager.communes.size
+      // Filter communes that don't have the combatRequest target already
 
-        // Subtract the number of workRequests with responders
+      const communes = []
 
-        for (const roomName in Memory.workRequests) {
-            const request = Memory.workRequests[roomName]
-            if (!request[WorkRequestKeys.responder]) continue
+      for (const roomName of collectiveManager.communes) {
+        /* if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue */
 
-            reservedGCL -= 1
+        // Ensure the combatRequest isn't responded to by the room the request is for
+
+        if (requestName === roomName) continue
+
+        const room = Game.rooms[roomName]
+        if (!room.roomManager.structures.spawn.length) continue
+
+        // Ensure we aren't responding to too many requests for our energy level
+
+        if (room.storage && room.controller.level >= 4) {
+          if (
+            room.memory[RoomMemoryKeys.combatRequests].length + 1 >=
+            room.communeManager.maxCombatRequests
+          )
+            continue
+        } else {
+          if (
+            room.memory[RoomMemoryKeys.combatRequests].length + 1 >=
+            room.communeManager.estimatedEnergyIncome / 10
+          )
+            continue
         }
 
-        if (reservedGCL <= 0) return
+        // Ensure we can afford the creeps required
 
-        const communesForResponding = new Set<string>()
+        const minRangedAttackCost = room.communeManager.findMinRangedAttackCost(
+          request[CombatRequestKeys.minDamage],
+        )
+        const minMeleeHealCost = room.communeManager.findMinHealCost(
+          request[CombatRequestKeys.minMeleeHeal] +
+            (request[CombatRequestKeys.maxTowerDamage] || 0),
+        )
+        const minRangedHealCost = room.communeManager.findMinHealCost(
+          request[CombatRequestKeys.minRangedHeal],
+        )
 
-        for (const roomName of collectiveManager.communes) {
-            if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) continue
-            if (Game.rooms[roomName].energyCapacityAvailable < 650) continue
+        if (minRangedAttackCost + minRangedHealCost > room.energyCapacityAvailable) continue
 
-            const room = Game.rooms[roomName]
-            if (!room.roomManager.structures.spawn.length) continue
+        const minAttackCost = room.communeManager.findMinMeleeAttackCost(
+          request[CombatRequestKeys.minDamage],
+        )
+        if (minAttackCost > room.energyCapacityAvailable) continue
 
-            communesForResponding.add(roomName)
-        }
+        communes.push(roomName)
+      }
 
-        // Assign and abandon workRequests, in order of score
+      const communeName = findClosestRoomName(requestName, communes)
+      if (!communeName) continue
 
-        for (const roomName of collectiveManager.workRequestsByScore) {
-            const request = Memory.workRequests[roomName]
+      // Run a more simple and less expensive check, then a more complex and expensive to confirm
 
-            if (!request) continue
-            if (request[WorkRequestKeys.abandon]) continue
-            // If there is not enough reserved GCL to make a new request
-            if (reservedGCL <= 0) return
-            if (
-                request[WorkRequestKeys.responder] &&
-                collectiveManager.communes.has(request[WorkRequestKeys.responder])
-            ) {
+      if (
+        Game.map.getRoomLinearDistance(communeName, requestName) > maxCombatDistance ||
+        roomNameUtils.advancedFindDistance(communeName, requestName, {
+          typeWeights: {
+            keeper: Infinity,
+            enemy: Infinity,
+            ally: Infinity,
+          },
+        }) > maxCombatDistance
+      ) {
+        request[CombatRequestKeys.abandon] = 20000
+        continue
+      }
 
-                continue
-            }
+      // Otherwise assign the request to the room, and record as such in Memory
 
-            const type = Memory.rooms[roomName][RoomMemoryKeys.type]
-            // if someone else has acquired the room
-            if (type === RoomTypes.ally || type === RoomTypes.enemy || type === RoomTypes.allyRemote || type === RoomTypes.enemyRemote) {
-                // Wait on the request
-                Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
-                continue
-            }
+      Memory.rooms[communeName][RoomMemoryKeys.combatRequests].push(requestName)
+      request[CombatRequestKeys.responder] = communeName
 
-            const communeName = findClosestRoomName(roomName, communesForResponding)
-            if (!communeName) {
-
-                // Wait on the request
-                Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
-                continue
-            }
-
-            // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
-
-            if (
-                Game.map.getRoomLinearDistance(communeName, roomName) > maxWorkRequestDistance ||
-                roomNameUtils.advancedFindDistance(communeName, roomName, {
-                    typeWeights: {
-                        keeper: Infinity,
-                        enemy: Infinity,
-                        ally: Infinity,
-                    },
-                }) > maxWorkRequestDistance
-            ) {
-                Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
-                continue
-            }
-
-            // Otherwise assign the request to the room, and record as such in Memory
-
-            Memory.rooms[communeName][RoomMemoryKeys.workRequest] = roomName
-            Memory.workRequests[roomName][WorkRequestKeys.responder] = communeName
-
-            reservedGCL -= 1
-
-            communesForResponding.delete(communeName)
-        }
+      collectiveManager.creepsByCombatRequest[requestName] = {}
+      for (const role of antifaRoles) {
+        collectiveManager.creepsByCombatRequest[requestName][role] = []
+      }
     }
+  }
 
-    private runCombatRequests() {
-        for (const requestName in Memory.combatRequests) {
-            const request = Memory.combatRequests[requestName]
+  private runHaulRequests() {
+    for (const requestName in Memory.haulRequests) {
+      const request = Memory.haulRequests[requestName]
 
-            if (request[CombatRequestKeys.abandon]) continue
-            if (request[CombatRequestKeys.responder] &&
-                collectiveManager.communes.has(request[CombatRequestKeys.responder])) continue
+      if (request[HaulRequestKeys.abandon]) continue
+      if (
+        request[HaulRequestKeys.responder] &&
+        collectiveManager.communes.has(request[HaulRequestKeys.responder])
+      )
+        continue
 
-            // Filter communes that don't have the combatRequest target already
+      // Filter communes that don't have the combatRequest target already
 
-            const communes = []
+      const communes = []
 
-            for (const roomName of collectiveManager.communes) {
-                /* if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue */
-
-                // Ensure the combatRequest isn't responded to by the room the request is for
-
-                if (requestName === roomName) continue
-
-                const room = Game.rooms[roomName]
-                if (!room.roomManager.structures.spawn.length) continue
-
-                // Ensure we aren't responding to too many requests for our energy level
-
-                if (room.storage && room.controller.level >= 4) {
-                    if (
-                        room.memory[RoomMemoryKeys.combatRequests].length + 1 >=
-                        room.communeManager.maxCombatRequests
-                    )
-                        continue
-                } else {
-                    if (
-                        room.memory[RoomMemoryKeys.combatRequests].length + 1 >=
-                        room.communeManager.estimatedEnergyIncome / 10
-                    )
-                        continue
-                }
-
-                // Ensure we can afford the creeps required
-
-                const minRangedAttackCost = room.communeManager.findMinRangedAttackCost(
-                    request[CombatRequestKeys.minDamage],
-                )
-                const minMeleeHealCost = room.communeManager.findMinHealCost(
-                    request[CombatRequestKeys.minMeleeHeal] +
-                        (request[CombatRequestKeys.maxTowerDamage] || 0),
-                )
-                const minRangedHealCost = room.communeManager.findMinHealCost(
-                    request[CombatRequestKeys.minRangedHeal],
-                )
-
-                if (minRangedAttackCost + minRangedHealCost > room.energyCapacityAvailable) continue
-
-                const minAttackCost = room.communeManager.findMinMeleeAttackCost(
-                    request[CombatRequestKeys.minDamage],
-                )
-                if (minAttackCost > room.energyCapacityAvailable) continue
-
-                communes.push(roomName)
-            }
-
-            const communeName = findClosestRoomName(requestName, communes)
-            if (!communeName) continue
-
-            // Run a more simple and less expensive check, then a more complex and expensive to confirm
-
-            if (
-                Game.map.getRoomLinearDistance(communeName, requestName) > maxCombatDistance ||
-                roomNameUtils.advancedFindDistance(communeName, requestName, {
-                    typeWeights: {
-                        keeper: Infinity,
-                        enemy: Infinity,
-                        ally: Infinity,
-                    },
-                }) > maxCombatDistance
-            ) {
-                request[CombatRequestKeys.abandon] = 20000
-                continue
-            }
-
-            // Otherwise assign the request to the room, and record as such in Memory
-
-            Memory.rooms[communeName][RoomMemoryKeys.combatRequests].push(requestName)
-            request[CombatRequestKeys.responder] = communeName
-
-            collectiveManager.creepsByCombatRequest[requestName] = {}
-            for (const role of antifaRoles) {
-
-                collectiveManager.creepsByCombatRequest[requestName][role] = []
-            }
+      for (const roomName of collectiveManager.communes) {
+        if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) {
+          continue
         }
+
+        const room = Game.rooms[roomName]
+        if (room.controller.level < 4) continue
+        if (!room.roomManager.structures.spawn.length) continue
+
+        if (!room.communeManager.storingStructures.length) continue
+        // Ensure we aren't responding to too many requests for our energy level
+        if (
+          room.roomManager.resourcesInStoringStructures.energy /
+            (20000 + room.controller.level * 1000) <
+          room.memory[RoomMemoryKeys.haulRequests].length
+        )
+          continue
+
+        communes.push(roomName)
+      }
+
+      const communeName = findClosestRoomName(requestName, communes)
+      if (!communeName) continue
+
+      // Run a more simple and less expensive check, then a more complex and expensive to confirm
+
+      if (
+        Game.map.getRoomLinearDistance(communeName, requestName) > maxHaulDistance ||
+        roomNameUtils.advancedFindDistance(communeName, requestName, {
+          typeWeights: {
+            keeper: Infinity,
+            enemy: Infinity,
+            ally: Infinity,
+          },
+        }) > maxHaulDistance
+      ) {
+        request[HaulRequestKeys.abandon] = 20000
+        continue
+      }
+
+      // Otherwise assign the request to the room, and record as such in Memory
+
+      Memory.rooms[communeName][RoomMemoryKeys.haulRequests].push(requestName)
+      request[HaulRequestKeys.responder] = communeName
+
+      collectiveManager.creepsByHaulRequest[requestName] = []
     }
-
-    private runHaulRequests() {
-        for (const requestName in Memory.haulRequests) {
-            const request = Memory.haulRequests[requestName]
-
-            if (request[HaulRequestKeys.abandon]) continue
-            if (request[HaulRequestKeys.responder] &&
-                collectiveManager.communes.has(request[HaulRequestKeys.responder])) continue
-
-            // Filter communes that don't have the combatRequest target already
-
-            const communes = []
-
-            for (const roomName of collectiveManager.communes) {
-                if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) {
-
-                    continue
-                }
-
-                const room = Game.rooms[roomName]
-                if (room.controller.level < 4) continue
-                if (!room.roomManager.structures.spawn.length) continue
-
-                if (!room.communeManager.storingStructures.length) continue
-                // Ensure we aren't responding to too many requests for our energy level
-                if (
-                    room.roomManager.resourcesInStoringStructures.energy /
-                        (20000 + room.controller.level * 1000) <
-                    room.memory[RoomMemoryKeys.haulRequests].length
-                )
-                    continue
-
-                communes.push(roomName)
-            }
-
-            const communeName = findClosestRoomName(requestName, communes)
-            if (!communeName) continue
-
-            // Run a more simple and less expensive check, then a more complex and expensive to confirm
-
-            if (
-                Game.map.getRoomLinearDistance(communeName, requestName) > maxHaulDistance ||
-                roomNameUtils.advancedFindDistance(communeName, requestName, {
-                    typeWeights: {
-                        keeper: Infinity,
-                        enemy: Infinity,
-                        ally: Infinity,
-                    },
-                }) > maxHaulDistance
-            ) {
-                request[HaulRequestKeys.abandon] = 20000
-                continue
-            }
-
-            // Otherwise assign the request to the room, and record as such in Memory
-
-            Memory.rooms[communeName][RoomMemoryKeys.haulRequests].push(requestName)
-            request[HaulRequestKeys.responder] = communeName
-
-            collectiveManager.creepsByHaulRequest[requestName] = []
-        }
-    }
+  }
 }
 
 export const requestsManager = new RequestsManager()

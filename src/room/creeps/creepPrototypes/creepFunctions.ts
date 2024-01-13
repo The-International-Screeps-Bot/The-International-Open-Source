@@ -15,7 +15,7 @@ import {
   Result,
   storingStructureTypesSet,
   CreepMemoryKeys,
-  CreepRoomLogisticsRequestKeys,
+  CreepLogisticsRequestKeys,
   RoomMemoryKeys,
   ReservedCoordTypes,
   WorkTypes,
@@ -57,7 +57,7 @@ import { creepClasses } from '../creepClasses'
 import { statsManager } from 'international/statsManager'
 import { creepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
-import { CreepRoomLogisticsRequest, RoomLogisticsRequest } from 'types/roomRequests'
+import { CreepLogisticsRequest, RoomLogisticsRequest } from 'types/roomRequests'
 import { customLog, stringifyLog } from 'utils/logging'
 import { customPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
@@ -1195,7 +1195,7 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
   /*
     log('FINDING REQ', bestRequest + ', ' + Array.from(types), { position: 1 })
  */
-  let creepRequest: CreepRoomLogisticsRequest | 0
+  let creepRequest: CreepLogisticsRequest | 0
 
   if (!bestRequest) {
     creepRequest = this.createBackupStoringStructuresRoomLogisticsRequest(
@@ -1206,30 +1206,33 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     if (creepRequest === Result.fail) return Result.fail
   } else {
     creepRequest = {
-      [CreepRoomLogisticsRequestKeys.type]: bestRequest.type,
-      [CreepRoomLogisticsRequestKeys.target]: bestRequest.targetID,
-      [CreepRoomLogisticsRequestKeys.resourceType]: bestRequest.resourceType,
-      [CreepRoomLogisticsRequestKeys.amount]: this.findRoomLogisticRequestAmount(bestRequest),
-      [CreepRoomLogisticsRequestKeys.noReserve]: bestRequest.noReserve,
+      [CreepLogisticsRequestKeys.type]: bestRequest.type,
+      [CreepLogisticsRequestKeys.target]: bestRequest.targetID,
+      [CreepLogisticsRequestKeys.resourceType]: bestRequest.resourceType,
+      [CreepLogisticsRequestKeys.amount]: this.findRoomLogisticRequestAmount(bestRequest),
+      [CreepLogisticsRequestKeys.noReserve]: bestRequest.noReserve,
     }
 
     if (bestRequest.delivery) {
       // This request will preceed the one we've accepted to provide for the delivery
-      let nextCreepRequest: CreepRoomLogisticsRequest
+      let nextCreepRequest: CreepLogisticsRequest
       const storingStructure = findObjectWithID(bestRequest.delivery as Id<AnyStoreStructure>)
 
       if (storingStructure) {
         nextCreepRequest = {
-          [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
-          [CreepRoomLogisticsRequestKeys.target]: storingStructure.id,
-          [CreepRoomLogisticsRequestKeys.resourceType]: bestRequest.resourceType,
-          [CreepRoomLogisticsRequestKeys.amount]: Math.min(
+          [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
+          [CreepLogisticsRequestKeys.target]: storingStructure.id,
+          [CreepLogisticsRequestKeys.resourceType]: bestRequest.resourceType,
+          [CreepLogisticsRequestKeys.amount]: Math.min(
             storingStructure.reserveStore[bestRequest.resourceType],
-            creepRequest[CreepRoomLogisticsRequestKeys.amount],
+            creepRequest[CreepLogisticsRequestKeys.amount],
           ),
-          [CreepRoomLogisticsRequestKeys.noReserve]: bestRequest.noReserve,
-          [CreepRoomLogisticsRequestKeys.delivery]: true,
+          [CreepLogisticsRequestKeys.noReserve]: bestRequest.noReserve,
+          [CreepLogisticsRequestKeys.delivery]: true,
         }
+
+        storingStructure.reserveStore[nextCreepRequest[CreepLogisticsRequestKeys.resourceType]] -=
+          nextCreepRequest[CreepLogisticsRequestKeys.amount]
       } else {
         // The delivery provider is
 
@@ -1241,27 +1244,26 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
           this.room.roomLogisticsRequests[RoomLogisticsRequestTypes.pickup][bestRequest.delivery]
 
         nextCreepRequest = {
-          [CreepRoomLogisticsRequestKeys.type]: nextRequest.type,
-          [CreepRoomLogisticsRequestKeys.target]: nextRequest.targetID,
-          [CreepRoomLogisticsRequestKeys.resourceType]: nextRequest.resourceType,
-          [CreepRoomLogisticsRequestKeys.amount]: Math.min(
+          [CreepLogisticsRequestKeys.type]: nextRequest.type,
+          [CreepLogisticsRequestKeys.target]: nextRequest.targetID,
+          [CreepLogisticsRequestKeys.resourceType]: nextRequest.resourceType,
+          [CreepLogisticsRequestKeys.amount]: Math.min(
             this.nextStore[nextRequest.resourceType] + this.freeNextStore,
-            creepRequest[CreepRoomLogisticsRequestKeys.amount],
+            creepRequest[CreepLogisticsRequestKeys.amount],
           ),
-          [CreepRoomLogisticsRequestKeys.noReserve]:
-            creepRequest[CreepRoomLogisticsRequestKeys.noReserve],
-          [CreepRoomLogisticsRequestKeys.delivery]: true,
+          [CreepLogisticsRequestKeys.noReserve]: creepRequest[CreepLogisticsRequestKeys.noReserve],
+          [CreepLogisticsRequestKeys.delivery]: true,
         }
 
         // Handle reservations for nextRequest
 
-        if (!creepRequest[CreepRoomLogisticsRequestKeys.noReserve]) {
+        if (!creepRequest[CreepLogisticsRequestKeys.noReserve]) {
           // delete the parent request if it has no more utility, otherwise, reduce its amount
 
-          if (nextRequest.amount === nextCreepRequest[CreepRoomLogisticsRequestKeys.amount]) {
+          if (nextRequest.amount === nextCreepRequest[CreepLogisticsRequestKeys.amount]) {
             delete this.room.roomLogisticsRequests[nextRequest.type][nextRequest.ID]
           } else {
-            nextRequest.amount -= nextCreepRequest[CreepRoomLogisticsRequestKeys.amount]
+            nextRequest.amount -= nextCreepRequest[CreepLogisticsRequestKeys.amount]
           }
 
           const target = findObjectWithID(nextRequest.targetID)
@@ -1269,12 +1271,12 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
           // Pickup type
 
           if (target instanceof Resource) {
-            target.reserveAmount -= nextCreepRequest[CreepRoomLogisticsRequestKeys.amount]
+            target.reserveAmount -= nextCreepRequest[CreepLogisticsRequestKeys.amount]
           } else {
             // Withdraw or offer type
 
-            target.reserveStore[nextCreepRequest[CreepRoomLogisticsRequestKeys.resourceType]] -=
-              nextCreepRequest[CreepRoomLogisticsRequestKeys.amount]
+            target.reserveStore[nextCreepRequest[CreepLogisticsRequestKeys.resourceType]] -=
+              nextCreepRequest[CreepLogisticsRequestKeys.amount]
           }
         }
       }
@@ -1285,41 +1287,41 @@ Creep.prototype.findRoomLogisticsRequest = function (args) {
     // delete the parent request if it has no more utility, otherwise, reduce its amount
 
     if (
-      !creepRequest[CreepRoomLogisticsRequestKeys.noReserve] &&
-      bestRequest.amount === creepRequest[CreepRoomLogisticsRequestKeys.amount]
+      !creepRequest[CreepLogisticsRequestKeys.noReserve] &&
+      bestRequest.amount === creepRequest[CreepLogisticsRequestKeys.amount]
     ) {
       delete this.room.roomLogisticsRequests[bestRequest.type][bestRequest.ID]
     } else {
-      bestRequest.amount -= creepRequest[CreepRoomLogisticsRequestKeys.amount]
+      bestRequest.amount -= creepRequest[CreepLogisticsRequestKeys.amount]
     }
   }
 
   creepMemory[CreepMemoryKeys.roomLogisticsRequests].push(creepRequest)
-  if (creepRequest[CreepRoomLogisticsRequestKeys.noReserve]) {
+  if (creepRequest[CreepLogisticsRequestKeys.noReserve]) {
     return creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
   }
 
-  const target = findObjectWithID(creepRequest[CreepRoomLogisticsRequestKeys.target])
+  const target = findObjectWithID(creepRequest[CreepLogisticsRequestKeys.target])
 
   // Pickup type
 
   if (target instanceof Resource) {
-    target.reserveAmount -= creepRequest[CreepRoomLogisticsRequestKeys.amount]
+    target.reserveAmount -= creepRequest[CreepLogisticsRequestKeys.amount]
 
     return creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
   }
 
-  if (creepRequest[CreepRoomLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
-    target.reserveStore[creepRequest[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      creepRequest[CreepRoomLogisticsRequestKeys.amount]
+  if (creepRequest[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+    target.reserveStore[creepRequest[CreepLogisticsRequestKeys.resourceType]] +=
+      creepRequest[CreepLogisticsRequestKeys.amount]
 
     return creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
   }
 
   // Withdraw or offer type
 
-  target.reserveStore[creepRequest[CreepRoomLogisticsRequestKeys.resourceType]] -=
-    creepRequest[CreepRoomLogisticsRequestKeys.amount]
+  target.reserveStore[creepRequest[CreepLogisticsRequestKeys.resourceType]] -=
+    creepRequest[CreepLogisticsRequestKeys.amount]
 
   return creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
 }
@@ -1525,10 +1527,10 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestTransfer = func
   if (!storingStructure) return Result.fail
   /* this.room.visual.text((this.nextStore[resourceType]).toString(), this.pos.x, this.pos.y, { color: customColors.red }) */
   return {
-    [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.transfer,
-    [CreepRoomLogisticsRequestKeys.target]: storingStructure.id,
-    [CreepRoomLogisticsRequestKeys.resourceType]: resourceType,
-    [CreepRoomLogisticsRequestKeys.amount]: nextStore[resourceType],
+    [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.transfer,
+    [CreepLogisticsRequestKeys.target]: storingStructure.id,
+    [CreepLogisticsRequestKeys.resourceType]: resourceType,
+    [CreepLogisticsRequestKeys.amount]: nextStore[resourceType],
   }
 }
 
@@ -1552,10 +1554,10 @@ Creep.prototype.createBackupStoringStructuresRoomLogisticsRequestWithdraw = func
 
   /* this.room.visual.text((this.nextStore[resourceType]).toString(), this.pos.x, this.pos.y, { color: customColors.red }) */
   return {
-    [CreepRoomLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
-    [CreepRoomLogisticsRequestKeys.target]: storingStructure.id,
-    [CreepRoomLogisticsRequestKeys.resourceType]: resourceType,
-    [CreepRoomLogisticsRequestKeys.amount]: this.freeNextStore,
+    [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
+    [CreepLogisticsRequestKeys.target]: storingStructure.id,
+    [CreepLogisticsRequestKeys.resourceType]: resourceType,
+    [CreepLogisticsRequestKeys.amount]: this.freeNextStore,
   }
 }
 
@@ -1572,9 +1574,9 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     if (request.delivery) {
       // Take extra energy in case its needed
 
-      if (request.resourceType === RESOURCE_ENERGY) {
+/*       if (request.resourceType === RESOURCE_ENERGY) {
         return this.nextStore[request.resourceType] + this.freeNextStore
-      }
+      } */
 
       return Math.min(request.amount, this.nextStore[request.resourceType] + this.freeNextStore)
     }
@@ -1591,7 +1593,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
   if (!request) return Result.noAction
 
   /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
-  const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
+  const target = findObjectWithID(request[CreepLogisticsRequestKeys.target])
   if (Game.flags[FlagNames.debugCreepLogistics]) this.room.targetVisual(this.pos, target.pos, true)
   if (getRange(target.pos, this.pos) > 1) {
     const result = this.createMoveRequest({
@@ -1623,7 +1625,7 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
   }
 
   if (Game.flags[FlagNames.debugCreepLogistics]) {
-    this.room.visual.text(request[CreepRoomLogisticsRequestKeys.amount].toString(), this.pos)
+    this.room.visual.text(request[CreepLogisticsRequestKeys.amount].toString(), this.pos)
   }
 
   /*     log(
@@ -1637,21 +1639,21 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     this.pickup(target)
     this.movedResource = true
 
-    this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextAmount -= request[CreepRoomLogisticsRequestKeys.amount]
+    this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextAmount -= request[CreepLogisticsRequestKeys.amount]
 
     this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return Result.success
   }
 
-  if (request[CreepRoomLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+  if (request[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
     stringifyLog('tried to resolve request for ' + this.name, request)
 
     const result = this.transfer(
       target as AnyStoreStructure | Creep,
-      request[CreepRoomLogisticsRequestKeys.resourceType],
-      request[CreepRoomLogisticsRequestKeys.amount],
+      request[CreepLogisticsRequestKeys.resourceType],
+      request[CreepLogisticsRequestKeys.amount],
     )
     if (result !== OK) {
       this.room.visual.text(result.toString(), this.pos)
@@ -1660,10 +1662,10 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
 
     this.movedResource = true
 
-    this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-      request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      request[CreepRoomLogisticsRequestKeys.amount]
+    this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
 
     this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return Result.success
@@ -1677,18 +1679,18 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
     if (
       target.transfer(
         this,
-        request[CreepRoomLogisticsRequestKeys.resourceType],
-        request[CreepRoomLogisticsRequestKeys.amount],
+        request[CreepLogisticsRequestKeys.resourceType],
+        request[CreepLogisticsRequestKeys.amount],
       ) !== OK
     )
       return Result.fail
 
     target.movedResource = true
 
-    this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-      request[CreepRoomLogisticsRequestKeys.amount]
+    this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+      request[CreepLogisticsRequestKeys.amount]
 
     this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return Result.action
@@ -1697,18 +1699,18 @@ Creep.prototype.runRoomLogisticsRequestAdvanced = function (args) {
   if (
     this.withdraw(
       target,
-      request[CreepRoomLogisticsRequestKeys.resourceType],
-      request[CreepRoomLogisticsRequestKeys.amount],
+      request[CreepLogisticsRequestKeys.resourceType],
+      request[CreepLogisticsRequestKeys.amount],
     ) !== OK
   )
     return Result.fail
 
   this.movedResource = true
 
-  this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-    request[CreepRoomLogisticsRequestKeys.amount]
-  target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-    request[CreepRoomLogisticsRequestKeys.amount]
+  this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+    request[CreepLogisticsRequestKeys.amount]
+  target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+    request[CreepLogisticsRequestKeys.amount]
 
   this.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
   return Result.success
@@ -1730,7 +1732,7 @@ Creep.prototype.runRoomLogisticsRequest = function () {
   if (!request) return Result.fail
 
   /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
-  const target = findObjectWithID(request[CreepRoomLogisticsRequestKeys.target])
+  const target = findObjectWithID(request[CreepLogisticsRequestKeys.target])
 
   if (getRange(target.pos, this.pos) > 1) {
     this.createMoveRequest({
@@ -1761,30 +1763,30 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     this.pickup(target)
     this.movedResource = true
 
-    this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextAmount -= request[CreepRoomLogisticsRequestKeys.amount]
+    this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextAmount -= request[CreepLogisticsRequestKeys.amount]
 
     creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return Result.success
   }
 
-  if (request[CreepRoomLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+  if (request[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
     if (
       this.transfer(
         target as AnyStoreStructure | Creep,
-        request[CreepRoomLogisticsRequestKeys.resourceType],
-        request[CreepRoomLogisticsRequestKeys.amount],
+        request[CreepLogisticsRequestKeys.resourceType],
+        request[CreepLogisticsRequestKeys.amount],
       ) !== OK
     )
       return Result.fail
 
     this.movedResource = true
 
-    this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-      request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      request[CreepRoomLogisticsRequestKeys.amount]
+    this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
 
     creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return Result.success
@@ -1798,18 +1800,18 @@ Creep.prototype.runRoomLogisticsRequest = function () {
     if (
       target.transfer(
         this,
-        request[CreepRoomLogisticsRequestKeys.resourceType],
-        request[CreepRoomLogisticsRequestKeys.amount],
+        request[CreepLogisticsRequestKeys.resourceType],
+        request[CreepLogisticsRequestKeys.amount],
       ) !== OK
     )
       return Result.fail
 
     this.movedResource = true
 
-    this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-      request[CreepRoomLogisticsRequestKeys.amount]
-    target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-      request[CreepRoomLogisticsRequestKeys.amount]
+    this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+      request[CreepLogisticsRequestKeys.amount]
 
     creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
     return Result.success
@@ -1818,18 +1820,18 @@ Creep.prototype.runRoomLogisticsRequest = function () {
   if (
     this.withdraw(
       target,
-      request[CreepRoomLogisticsRequestKeys.resourceType],
-      request[CreepRoomLogisticsRequestKeys.amount],
+      request[CreepLogisticsRequestKeys.resourceType],
+      request[CreepLogisticsRequestKeys.amount],
     ) !== OK
   )
     return Result.fail
 
   this.movedResource = true
 
-  this.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] +=
-    request[CreepRoomLogisticsRequestKeys.amount]
-  target.nextStore[request[CreepRoomLogisticsRequestKeys.resourceType]] -=
-    request[CreepRoomLogisticsRequestKeys.amount]
+  this.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+    request[CreepLogisticsRequestKeys.amount]
+  target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+    request[CreepLogisticsRequestKeys.amount]
 
   creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
   return Result.success
@@ -1899,10 +1901,10 @@ Creep.prototype.createCreepRoomLogisticsRequest = function (
   if (amount <= 0) return Result.fail
 
   this.memory[CreepMemoryKeys.roomLogisticsRequests].push({
-    [CreepRoomLogisticsRequestKeys.type]: type,
-    [CreepRoomLogisticsRequestKeys.target]: targetID,
-    [CreepRoomLogisticsRequestKeys.resourceType]: resourceType,
-    [CreepRoomLogisticsRequestKeys.amount]: amount,
+    [CreepLogisticsRequestKeys.type]: type,
+    [CreepLogisticsRequestKeys.target]: targetID,
+    [CreepLogisticsRequestKeys.resourceType]: resourceType,
+    [CreepLogisticsRequestKeys.amount]: amount,
   })
 
   return Result.success

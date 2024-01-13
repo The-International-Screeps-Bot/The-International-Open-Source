@@ -906,7 +906,6 @@ export class FlagManager {
     }
 
     const headers = ['roomName', 'resource', 'amount', 'priority']
-
     const data: any[][] = []
 
     for (const ID in collectiveManager.terminalRequests) {
@@ -935,6 +934,54 @@ export class FlagManager {
               data,
               config: {
                 label: 'My Terminal Requests',
+                headers,
+              },
+            })),
+          }),
+        },
+      ],
+    })
+  }
+
+  private internationalResources(flagName: string, flagNameParts: string[]) {
+    const flag = Game.flags[flagName]
+    const roomName = flagNameParts[1] || flag.pos.roomName
+    const room = Game.rooms[roomName]
+    if (!room) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    const headers = ['resource', 'amount']
+    const data: any[][] = []
+
+    const resourcesInStoringStructures = collectiveManager.resourcesInStoringStructures
+    for (const key in resourcesInStoringStructures) {
+      const resourceType = key as ResourceConstant
+
+      const row: any[] = [resourceType, resourcesInStoringStructures[resourceType]]
+      data.push(row)
+    }
+
+    const height = 3 + data.length
+
+    Dashboard({
+      config: {
+        room: room.name,
+      },
+      widgets: [
+        {
+          pos: {
+            x: 1,
+            y: 1,
+          },
+          width: 47,
+          height,
+          widget: Rectangle({
+            data: Table(() => ({
+              data,
+              config: {
+                label: 'My Resources',
                 headers,
               },
             })),

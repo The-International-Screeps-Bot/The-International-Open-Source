@@ -6,7 +6,7 @@ import {
   WorkRequestKeys,
   CombatRequestKeys,
   CreepMemoryKeys,
-  CreepRoomLogisticsRequestKeys,
+  CreepLogisticsRequestKeys,
   DepositRequestKeys,
   HaulRequestKeys,
   NukeRequestKeys,
@@ -34,7 +34,7 @@ import { CustomPathFinderArgs } from 'international/customPathFinder'
 import { CombatRequest, HaulRequest, NukeRequest, WorkRequest } from 'types/internationalRequests'
 import { PlayerMemory } from 'types/players'
 import {
-  CreepRoomLogisticsRequest,
+  CreepLogisticsRequest,
   PowerTask,
   RoomLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
@@ -973,7 +973,7 @@ declare global {
 
     manageSpawning(spawn: StructureSpawn): void
 
-    findRoomLogisticsRequest(args?: FindNewRoomLogisticsRequestArgs): CreepRoomLogisticsRequest | 0
+    findRoomLogisticsRequest(args?: FindNewRoomLogisticsRequestArgs): CreepLogisticsRequest | 0
     findRoomLogisticsRequestTypes(
       args?: FindNewRoomLogisticsRequestArgs,
     ): Set<RoomLogisticsRequestTypes> | Result.fail
@@ -984,11 +984,11 @@ declare global {
     createBackupStoringStructuresRoomLogisticsRequest(
       types?: Set<RoomLogisticsRequestTypes>,
       resourceTypes?: Set<ResourceConstant>,
-    ): CreepRoomLogisticsRequest | 0
-    createBackupStoringStructuresRoomLogisticsRequestTransfer(): CreepRoomLogisticsRequest | 0
+    ): CreepLogisticsRequest | 0
+    createBackupStoringStructuresRoomLogisticsRequestTransfer(): CreepLogisticsRequest | 0
     createBackupStoringStructuresRoomLogisticsRequestWithdraw(
       resourceTypes?: Set<ResourceConstant>,
-    ): CreepRoomLogisticsRequest | 0
+    ): CreepLogisticsRequest | 0
     findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
 
     runRoomLogisticsRequestAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
@@ -1354,7 +1354,7 @@ declare global {
     [CreepMemoryKeys.remote]: string
     [CreepMemoryKeys.scoutTarget]: string
     [CreepMemoryKeys.signTarget]: string | false
-    [CreepMemoryKeys.roomLogisticsRequests]: CreepRoomLogisticsRequest[]
+    [CreepMemoryKeys.roomLogisticsRequests]: CreepLogisticsRequest[]
     [CreepMemoryKeys.needsResources]: boolean
     [CreepMemoryKeys.squadSize]: number
     [CreepMemoryKeys.squadType]: SquadTypes
