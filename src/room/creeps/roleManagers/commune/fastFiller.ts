@@ -71,7 +71,7 @@ export class FastFiller extends Creep {
 
         // If the creep has a non-energy resource
 
-        if (this.usedStore() > this.store.energy) {
+        if (this.store.getUsedCapacity() > this.store.energy) {
             for (const resourceType in this.store) {
                 if (resourceType == RESOURCE_ENERGY) continue
 
@@ -103,7 +103,7 @@ export class FastFiller extends Creep {
 
                 // If there is a non-energy resource in a container
 
-                if (structure.usedStore() > structure.store.energy) {
+                if (structure.store.getUsedCapacity() > structure.store.energy) {
                     for (const key in structure.store) {
                         const resourceType = key as ResourceConstant
 

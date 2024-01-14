@@ -1,16 +1,15 @@
 import { NukeRequestKeys, Result, RoomLogisticsRequestTypes, RoomMemoryKeys } from 'international/constants'
 import { scalePriority } from 'utils/utils'
 import { CommuneManager } from './commune'
+import { roomObjectUtils } from 'room/roomObjectUtils'
 
 const nukerResources = [RESOURCE_ENERGY, RESOURCE_GHODIUM]
 
 export class NukerManager {
     communeManager: CommuneManager
-    nuker: StructureNuker
 
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
-        this.nuker = this.communeManager.room.roomManager.structures.nuker[0]
     }
 
     run() {
@@ -18,26 +17,27 @@ export class NukerManager {
         const requestName = roomMemory[RoomMemoryKeys.nukeRequest]
         if (!requestName) return
 
-        if (!this.nuker) {
+        const nuker = this.communeManager.room.roomManager.nuker
+        if (!nuker) {
             return
         }
 
-        if (this.createRoomLogisticsRequests() === Result.action) return
+        if (this.createRoomLogisticsRequests(nuker) === Result.action) return
 
         const request = Memory.nukeRequests[requestName]
-        this.nuker.launchNuke(
+        nuker.launchNuke(
             new RoomPosition(request[NukeRequestKeys.x], request[NukeRequestKeys.y], requestName),
         )
     }
 
-    private createRoomLogisticsRequests() {
+    private createRoomLogisticsRequests(nuker: StructureNuker) {
         let result = Result.noAction
 
         for (const resource of nukerResources) {
-            if (this.nuker.freeReserveStoreOf(resource) <= 0) continue
+            if (roomObjectUtils.freeReserveStoreOf(nuker, resource) <= 0) continue
 
             this.communeManager.room.createRoomLogisticsRequest({
-                target: this.nuker,
+                target: nuker,
                 type: RoomLogisticsRequestTypes.transfer,
                 priority: 100,
             })

@@ -101,6 +101,8 @@ import { PowerCreepProcs } from 'room/creeps/powerCreeps/powerCreepProcs'
 import { PowerCreepUtils } from 'room/creeps/powerCreeps/powerCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { Procs } from 'utils/procs'
+import { RoomObjectUtils } from 'room/roomObjectUtils'
+import { StructureUtils } from 'room/structureUtils'
 
 export function profilerRegister() {
   // Classes
@@ -170,6 +172,8 @@ export function profilerRegister() {
   profiler.registerClass(RoomDataManager, 'RoomDataManager')
   profiler.registerClass(CommuneDataManager, 'CommuneDataManager')
   profiler.registerClass(CommuneProcs, 'CommuneProc')
+  profiler.registerClass(RoomObjectUtils, 'RoomObjectUtils')
+  profiler.registerClass(StructureUtils, 'StructureUtils')
 
   // Creep classes
 

@@ -17,6 +17,7 @@ import {
   RoomLogisticsTargets,
 } from 'types/roomRequests'
 import { customLog } from 'utils/logging'
+import { roomObjectUtils } from 'room/roomObjectUtils'
 
 export class CreepProcs {
   advancedUpgradeController(creep: Creep) {
@@ -408,15 +409,15 @@ export class CreepProcs {
       return
     }
 
-    // transfer requests
-    if (request[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
-      this.updateTransferLogisticsRequest(creep, request)
-      return
-    }
-
     // If pickup type
     if (target instanceof Resource) {
       this.updatePickupLogisticsRequest(creep, request, target)
+      return
+    }
+
+    // transfer requests
+    if (request[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+      this.updateTransferLogisticsRequest(creep, request, target)
       return
     }
 
@@ -429,23 +430,33 @@ export class CreepProcs {
    *
    * @returns false if the request was deleted
    */
-  private updateTransferLogisticsRequest(creep: Creep, request: CreepLogisticsRequest) {
+  private updateTransferLogisticsRequest(
+    creep: Creep,
+    request: CreepLogisticsRequest,
+    target: RoomObject & { store: StoreDefinition },
+  ) {
     const creepMemory = Memory.creeps[creep.name]
-    const target = findObjectWithID(request[CreepLogisticsRequestKeys.target])
 
     // Delete the request if the target is fulfilled
 
-    if (target.freeNextStore < request[CreepLogisticsRequestKeys.amount]) {
+    const targetFreeNextStore = roomObjectUtils.freeNextStoreOf(
+      target,
+      request[CreepLogisticsRequestKeys.resourceType],
+    )
+    if (targetFreeNextStore < request[CreepLogisticsRequestKeys.amount]) {
       if (Game.flags[FlagNames.debugCreepLogistics]) {
-
-        creep.room.visual.text('❌TA1', creep.pos, { font: 0.2 })
+        creep.room.visual.text(
+          '❌TA1 ' + targetFreeNextStore + '/' + request[CreepLogisticsRequestKeys.amount],
+          creep.pos,
+          { font: 0.2 },
+        )
         customLog(
           'not enough free store',
           creep.name +
             ', ' +
             request[CreepLogisticsRequestKeys.target] +
             ', ' +
-            target.freeNextStore +
+            targetFreeNextStore +
             ' < ' +
             request[CreepLogisticsRequestKeys.amount],
         )
@@ -458,15 +469,20 @@ export class CreepProcs {
     request[CreepLogisticsRequestKeys.amount] = Math.min(
       Math.min(
         creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]],
-        target.freeNextStore,
+        targetFreeNextStore,
       ),
       request[CreepLogisticsRequestKeys.amount],
     )
     if (request[CreepLogisticsRequestKeys.amount] <= 0) {
-
       if (Game.flags[FlagNames.debugCreepLogistics]) {
-
-        creep.room.visual.text('❌TA2 ' + target.freeNextStore + ' ' + creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]], creep.pos, { font: 0.2 })
+        creep.room.visual.text(
+          '❌TA2 ' +
+            targetFreeNextStore +
+            ' ' +
+            creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]],
+          creep.pos,
+          { font: 0.2 },
+        )
         customLog(
           'not enough amount',
           creep.name +
@@ -499,11 +515,15 @@ export class CreepProcs {
     target: Resource,
   ) {
     const creepMemory = Memory.creeps[creep.name]
+    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+      creep,
+      request[CreepLogisticsRequestKeys.resourceType],
+    )
 
     // Update in accordance to potential resource decay
 
     request[CreepLogisticsRequestKeys.amount] = Math.min(
-      Math.min(creep.freeNextStore, target.nextAmount),
+      Math.min(creepFreeNextStore, target.nextAmount),
       request[CreepLogisticsRequestKeys.amount],
     )
     if (request[CreepLogisticsRequestKeys.amount] <= 0) {
@@ -538,9 +558,10 @@ export class CreepProcs {
       return false
     }
 
+    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(creep, request[CreepLogisticsRequestKeys.resourceType])
     request[CreepLogisticsRequestKeys.amount] = Math.min(
       Math.min(
-        creep.freeNextStore,
+        creepFreeNextStore,
         target.nextStore[request[CreepLogisticsRequestKeys.resourceType]],
       ),
       request[CreepLogisticsRequestKeys.amount],
@@ -586,8 +607,9 @@ export class CreepProcs {
     if (target instanceof Resource) {
       // Update in accordance to potential resource decay
 
+      const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(creep, request[CreepLogisticsRequestKeys.resourceType])
       request[CreepLogisticsRequestKeys.amount] = Math.min(
-        Math.min(creep.freeNextStore, target.nextAmount),
+        Math.min(creepFreeNextStore, target.nextAmount),
         request[CreepLogisticsRequestKeys.amount],
       )
       if (request[CreepLogisticsRequestKeys.amount] <= 0) {
@@ -624,9 +646,10 @@ export class CreepProcs {
       return false
     }
 
+    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(creep, request[CreepLogisticsRequestKeys.resourceType])
     request[CreepLogisticsRequestKeys.amount] = Math.min(
       Math.min(
-        creep.freeNextStore,
+        creepFreeNextStore,
         target.nextStore[request[CreepLogisticsRequestKeys.resourceType]],
       ),
       request[CreepLogisticsRequestKeys.amount],

@@ -310,7 +310,7 @@ export class FlagManager {
       const planData = rampartPlans.getXY(coord.x, coord.y)
       if (planData) {
         // Filter out non-mincut ramparts
-        if (planData.buildForNuke || planData.coversStructure) {
+        if (planData.buildForNuke || planData.coversStructure || planData.buildForThreat) {
           room.coordVisual(coord.x, coord.y)
           return true
         }

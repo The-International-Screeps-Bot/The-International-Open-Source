@@ -1097,6 +1097,7 @@ declare global {
 
     /**
      * Wether the structure is disable or not by the room's controller level
+     * @deprecated use structureUtils.isRCLActionable(structure) instead
      */
     readonly isRCLActionable: boolean
   }
@@ -1132,25 +1133,10 @@ declare global {
     // Functions
 
     /**
-     * Finds the present total store usage number of this RoomObject
-     * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
-     */
-    usedStore(resourceType?: ResourceConstant): number
-
-    /**
-     * Finds the total free store capacity of this RoomObject
-     * @param resourceType A resourceConstant to ensure proper querying of limit store RoomObjects
-     */
-    freeStore(): number
-
-    /**
      * Finds the total free store capacity of a specific resource for this RoomObject
+     * @deprecated either create a util without a prototype or use your brain to do the math yourself
      */
     freeSpecificStore(resourceType?: ResourceConstant): number
-
-    freeNextStoreOf(resourceType: ResourceConstant): number
-
-    freeReserveStoreOf(resourceType: ResourceConstant): number
 
     // RoomObject getters
 
@@ -1187,6 +1173,7 @@ declare global {
 
     /**
      * Can be negative
+     * @deprecated not an accurate measurement when store.getCapacity() without a resource arg often returns null
      */
     readonly freeNextStore: number
 
@@ -1201,6 +1188,9 @@ declare global {
 
     readonly usedReserveStore: number
 
+    /**
+     * @deprecated not an accurate measurement when store.getCapacity() without a resource arg often returns null
+     */
     readonly freeReserveStore: number
 
     _reservePowers: Set<PowerConstant>

@@ -315,7 +315,7 @@ export class TowerManager {
                 this.communeManager.room.createRoomLogisticsRequest({
                     target: structure,
                     maxAmount: structure.usedReserveStore - 100,
-                    /* onlyFull: true, */
+                    onlyFull: true,
                     type: RoomLogisticsRequestTypes.offer,
                     priority: scalePriority(
                         structure.store.getCapacity(RESOURCE_ENERGY),

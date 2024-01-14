@@ -34,8 +34,6 @@ import { customLog, LogTypes } from 'utils/logging'
 export class DefenceManager {
     communeManager: CommuneManager
 
-    threatByPlayers: Map<string, number>
-
     constructor(communeManager: CommuneManager) {
         this.communeManager = communeManager
     }
@@ -88,42 +86,6 @@ export class DefenceManager {
         if (!this.isBaseSafe()) return true
 
         return false
-
-        /*
-        // Otherwise if safeMode can be activated
-
-        // Get the previous tick's events
-
-        const eventLog = room.getEventLog()
-
-        // Loop through each eventItem
-
-        for (const eventItem of eventLog) {
-            // If the event wasn't an attack, iterate
-
-            if (eventItem.event !== EVENT_ATTACK) continue
-
-            // Otherwise get the target of the attack
-
-            const attackTarget = findObjectWithID(eventItem.data.targetId as Id<Structure | any>)
-
-            // If the attackTarget isn't a structure, iterate
-
-            if (!(attackTarget instanceof Structure)) continue
-
-            const structuresAtCoord = room.roomManager.structureCoords.get(
-                packCoord(attackTarget.pos),
-            )
-            if (
-                structuresAtCoord &&
-                structuresAtCoord.find(ID => findObjectWithID(ID).structureType === STRUCTURE_SPAWN)
-            )
-                return true
-
-            if (safemodeTargets.includes(attackTarget.structureType)) return true
-        }
-
-        return false */
     }
 
     private isSafe() {}
@@ -145,7 +107,7 @@ export class DefenceManager {
             const planData = rampartPlans.getXY(coord.x, coord.y)
             if (planData) {
                 // Filter out non-mincut ramparts
-                if (planData.buildForNuke || planData.coversStructure) return true
+                if (planData.buildForNuke || planData.coversStructure || planData.buildForThreat) return true
                 // Don't flood past mincut ramparts
                 return false
             }
@@ -378,31 +340,34 @@ export class DefenceManager {
 
         if (!room.towerInferiority) return false
 
-        let presentThreat = 0
-        this.threatByPlayers = new Map()
+        const presentThreat: PresentThreat = {
+            total: 0,
+            byPlayers: {}
+        }
 
         for (const enemyCreep of room.roomManager.enemyAttackers) {
-            let threat = 0
+            let creepThreat = 0
 
-            threat += enemyCreep.combatStrength.dismantle
-            threat += enemyCreep.combatStrength.melee * 1.2
-            threat += enemyCreep.combatStrength.ranged * 3.5
+            creepThreat += enemyCreep.combatStrength.dismantle
+            creepThreat += enemyCreep.combatStrength.melee * 1.2
+            creepThreat += enemyCreep.combatStrength.ranged * 3.5
 
-            threat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
+            creepThreat += enemyCreep.combatStrength.heal / enemyCreep.defenceStrength
 
-            threat = Math.floor(threat)
-            presentThreat += threat
+            creepThreat = Math.floor(creepThreat)
+
+            presentThreat.total += creepThreat
 
             const playerName = enemyCreep.owner.username
             if (playerName === 'Invader') continue
 
-            const threatByPlayer = this.threatByPlayers.get(enemyCreep.owner.username)
-            if (threatByPlayer) {
-                this.threatByPlayers.set(playerName, threatByPlayer + threat)
+            const playerThreat = presentThreat.byPlayers[enemyCreep.owner.username]
+            if (playerThreat) {
+                presentThreat.byPlayers[playerName] = playerThreat + creepThreat
                 continue
             }
 
-            this.threatByPlayers.set(playerName, threat)
+            presentThreat.byPlayers[playerName] = creepThreat
         }
 
         return presentThreat
@@ -427,15 +392,16 @@ export class DefenceManager {
 
         roomMemory[RoomMemoryKeys.threatened] = Math.max(
             roomMemory[RoomMemoryKeys.threatened],
-            presentThreat,
+            presentThreat.total,
             playerManager.highestThreat / 3,
         )
 
-        for (const [playerName, threat] of this.threatByPlayers) {
-            let player = Memory.players[playerName]
+        for (const playerName in presentThreat.byPlayers) {
+            const threat = presentThreat.byPlayers[playerName]
 
+            const player = Memory.players[playerName]
             if (!player) {
-                player = playerManager.initPlayer(playerName)
+                playerManager.initPlayer(playerName)
             }
 
             player[PlayerMemoryKeys.offensiveThreat] = Math.max(
@@ -449,4 +415,9 @@ export class DefenceManager {
         roomMemory[RoomMemoryKeys.lastAttackedBy] = 0
         return
     }
+}
+
+interface PresentThreat {
+    total: number
+    byPlayers: {[playerName: string]: number}
 }

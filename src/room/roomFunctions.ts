@@ -63,6 +63,7 @@ import { playerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 import { myCreepUtils } from './creeps/myCreepUtils'
+import { roomObjectUtils } from './roomObjectUtils'
 
 /**
     @param pos1 pos of the object performing the action
@@ -1663,7 +1664,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     )
       return Result.fail
 
-    amount = args.target.freeReserveStoreOf(args.resourceType)
+    amount = roomObjectUtils.freeReserveStoreOf(args.target, args.resourceType)
     /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
   }
 

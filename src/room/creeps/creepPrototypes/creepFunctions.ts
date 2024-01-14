@@ -62,6 +62,7 @@ import { customLog, stringifyLog } from 'utils/logging'
 import { customPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from '../myCreepUtils'
+import { roomObjectUtils } from 'room/roomObjectUtils'
 
 Creep.prototype.update = function () {}
 
@@ -1574,7 +1575,7 @@ Creep.prototype.findRoomLogisticRequestAmount = function (request) {
     if (request.delivery) {
       // Take extra energy in case its needed
 
-/*       if (request.resourceType === RESOURCE_ENERGY) {
+      /*       if (request.resourceType === RESOURCE_ENERGY) {
         return this.nextStore[request.resourceType] + this.freeNextStore
       } */
 
@@ -1869,9 +1870,10 @@ Creep.prototype.findCreepRoomLogisticsRequestAmount = function (
   if (type === RoomLogisticsRequestTypes.transfer) {
     // Delete the request if the target is fulfilled
 
-    if (target.freeNextStore < amount) return 0
+    const targetFreeReserveStore = roomObjectUtils.freeNextStoreOf(target, resourceType)
+    if (targetFreeReserveStore < amount) return 0
 
-    amount = Math.min(Math.min(this.nextStore[resourceType], target.freeNextStore), amount)
+    amount = Math.min(Math.min(this.nextStore[resourceType], targetFreeReserveStore), amount)
     if (amount <= 0) return amount
 
     target.reserveStore[resourceType] += amount
