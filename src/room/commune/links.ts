@@ -5,6 +5,7 @@ import {
 } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { CommuneManager } from './commune'
+import { structureUtils } from 'room/structureUtils'
 
 export class LinkManager {
     communeManager: CommuneManager
@@ -20,7 +21,7 @@ export class LinkManager {
         if (!this.communeManager.room.storage && !this.communeManager.room.terminal) {
 
             const controllerLink = this.communeManager.controllerLink
-            if (!controllerLink || !controllerLink.isRCLActionable) return
+            if (!controllerLink || !structureUtils.isRCLActionable(controllerLink)) return
 
             this.createControllerLinkRoomLogisticsRequest(controllerLink)
             return
@@ -31,14 +32,14 @@ export class LinkManager {
     }
 
     private sourcesToReceivers() {
-        const sourceLinks = this.communeManager.room.communeManager.sourceLinks.filter(link => link && link.isRCLActionable)
+        const sourceLinks = this.communeManager.room.communeManager.sourceLinks.filter(link => link && structureUtils.isRCLActionable(link))
         if (!sourceLinks.length) return
 
         let receiverLinks = [
             this.communeManager.room.roomManager.fastFillerLink,
             this.communeManager.room.roomManager.hubLink,
             this.communeManager.controllerLink,
-        ].filter(link => link && link.isRCLActionable)
+        ].filter(link => link && structureUtils.isRCLActionable(link))
 
         if (!receiverLinks.length) return
 
@@ -82,10 +83,10 @@ export class LinkManager {
 
     private hubToFastFiller() {
         const fastFillerLink = this.communeManager.room.roomManager.fastFillerLink
-        if (!fastFillerLink || !fastFillerLink.isRCLActionable) return
+        if (!fastFillerLink || !structureUtils.isRCLActionable(fastFillerLink)) return
 
         const hubLink = this.communeManager.room.roomManager.hubLink
-        if (!hubLink || !hubLink.isRCLActionable) {
+        if (!hubLink || !structureUtils.isRCLActionable(hubLink)) {
 
             this.createFastFillerLinkRoomLogisticsRequest(fastFillerLink)
             return
@@ -131,10 +132,10 @@ export class LinkManager {
 
     private hubToController() {
         const controllerLink = this.communeManager.controllerLink
-        if (!controllerLink || !controllerLink.isRCLActionable) return
+        if (!controllerLink || !structureUtils.isRCLActionable(controllerLink)) return
 
         const hubLink = this.communeManager.room.roomManager.hubLink
-        if (!hubLink || !hubLink.isRCLActionable) {
+        if (!hubLink || !structureUtils.isRCLActionable(hubLink)) {
             this.createControllerLinkRoomLogisticsRequest(controllerLink)
             return
         }

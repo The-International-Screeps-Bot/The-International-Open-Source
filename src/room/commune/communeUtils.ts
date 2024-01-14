@@ -11,6 +11,7 @@ import {
 } from 'international/constants'
 import { collectiveManager } from "international/collective"
 import { roomUtils } from "room/roomUtils"
+import { structureUtils } from "room/structureUtils"
 
 export class CommuneUtils {
   getGeneralRepairStructures(room: Room) {
@@ -160,7 +161,7 @@ export class CommuneUtils {
 
     maxUpgradeStrength = 0
 
-    if (hubLink && hubLink.isRCLActionable) {
+    if (hubLink && structureUtils.isRCLActionable(hubLink)) {
       // Add a bit of extra range because of inherent limitations of withdrawing and transferring
       const range = getRange(upgradeStructure.pos, hubLink.pos) + 3
 
@@ -172,7 +173,7 @@ export class CommuneUtils {
       const sourceLink = sourceLinks[i]
 
       if (!sourceLink) continue
-      if (!sourceLink.isRCLActionable) continue
+      if (!structureUtils.isRCLActionable(sourceLink)) continue
 
       const range = getRange(sourceLink.pos, upgradeStructure.pos)
 

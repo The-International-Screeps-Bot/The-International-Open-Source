@@ -1,6 +1,7 @@
 import { CreepMemoryKeys, ReservedCoordTypes } from 'international/constants'
 import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
+import { structureUtils } from 'room/structureUtils'
 
 export class FastFiller extends Creep {
     update() {
@@ -128,19 +129,19 @@ export class FastFiller extends Creep {
             }
 
             let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = []
-            if (room.roomManager.fastFillerLink && room.roomManager.fastFillerLink.isRCLActionable)
-                fastFillerStoringStructures.push(room.roomManager.fastFillerLink)
+
+            const fastFillerLink = room.roomManager.fastFillerLink
+            if (fastFillerLink && structureUtils.isRCLActionable(fastFillerLink))
+                fastFillerStoringStructures.push(fastFillerLink)
             fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 
-            // Loop through each fastFillerStoringStructure
+            // Find a storing structure to get energy from
 
             for (const structure of fastFillerStoringStructures) {
                 // Otherwise, if the structure is not in range 1 to the this
-
                 if (getRange(this.pos, structure.pos) > 1) continue
 
                 // If there is a non-energy resource in the structure
-
                 if (structure.nextStore.energy <= 0) continue
 
                 // Otherwise, withdraw from the structure and inform true

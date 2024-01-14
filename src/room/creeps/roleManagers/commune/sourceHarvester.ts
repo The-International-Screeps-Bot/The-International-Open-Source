@@ -20,6 +20,7 @@ import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { structureUtils } from 'room/structureUtils'
 
 export class SourceHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -279,7 +280,7 @@ export class SourceHarvester extends Creep {
 
         const sourceLink =
             this.room.communeManager.sourceLinks[this.memory[CreepMemoryKeys.sourceIndex]]
-        if (sourceLink && sourceLink.isRCLActionable) return false
+        if (sourceLink && structureUtils.isRCLActionable(sourceLink)) return false
 
         // If the creep isn't full enough to justify a request
 

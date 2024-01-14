@@ -21,6 +21,7 @@ import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { playerManager } from 'international/players'
 import { communeUtils } from './communeUtils'
+import { structureUtils } from 'room/structureUtils'
 
 const minTowerRampartRepairTreshold = RAMPART_DECAY_AMOUNT * 1.5
 
@@ -35,7 +36,7 @@ export class TowerManager {
     run() {
         const { room } = this.communeManager
 
-        const towers = room.roomManager.structures.tower.filter(tower => tower.isRCLActionable)
+        const towers = room.roomManager.structures.tower.filter(tower => structureUtils.isRCLActionable(tower))
         if (!towers.length) {
             room.towerInferiority = room.roomManager.notMyCreeps.enemy.length > 0
             return

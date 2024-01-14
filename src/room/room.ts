@@ -67,6 +67,7 @@ import { PathGoal, customPathFinder } from 'international/customPathFinder'
 import { roomNameUtils } from './roomNameUtils'
 import { collectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
+import { structureUtils } from './structureUtils'
 
 export interface InterpretedRoomEvent {
     eventType: EventConstant
@@ -1404,7 +1405,7 @@ export class RoomManager {
         const structureCoords = this.structureCoords
 
         const fastFillerLink = this.fastFillerLink
-        const sufficientLink = fastFillerLink && fastFillerLink.isRCLActionable
+        const sufficientLink = fastFillerLink && structureUtils.isRCLActionable(fastFillerLink)
 
         for (const pos of rawFastFillerPositions) {
             const adjacentStructuresOfTypes: Partial<Record<StructureConstant, number>> = {
@@ -2222,7 +2223,7 @@ export class RoomManager {
 
         for (const structure of storingStructures) {
             if (!structure) continue
-            if (!structure.isRCLActionable) continue
+            if (!structureUtils.isRCLActionable(structure)) continue
 
             for (const key in structure.store) {
                 const resourceType = key as ResourceConstant

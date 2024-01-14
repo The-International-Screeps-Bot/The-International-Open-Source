@@ -63,6 +63,7 @@ import { customPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from '../myCreepUtils'
 import { roomObjectUtils } from 'room/roomObjectUtils'
+import { structureUtils } from 'room/structureUtils'
 
 Creep.prototype.update = function () {}
 
@@ -737,7 +738,7 @@ Creep.prototype.hasNonEnergyResource = function () {
 Creep.prototype.findRecycleTarget = function () {
   const { room } = this
 
-  const spawns = room.roomManager.structures.spawn.filter(spawn => spawn.isRCLActionable)
+  const spawns = room.roomManager.structures.spawn.filter(spawn => structureUtils.isRCLActionable(spawn))
 
   if (!spawns.length) return false
 
@@ -875,7 +876,7 @@ Creep.prototype.passiveRenew = function () {
       getRangeXY(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
       !spawn.renewed &&
       !spawn.spawning &&
-      spawn.isRCLActionable,
+      structureUtils.isRCLActionable(spawn),
   )
   if (!spawn) return
 

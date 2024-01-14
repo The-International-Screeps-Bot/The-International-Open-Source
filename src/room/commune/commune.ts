@@ -56,6 +56,7 @@ import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { communeUtils } from './communeUtils'
 import { communeProcs } from './communeProcs'
+import { structureUtils } from 'room/structureUtils'
 
 export type ResourceTargets = {
   min: Partial<{ [key in ResourceConstant]: number }>
@@ -613,10 +614,10 @@ export class CommuneManager {
     // We can use links
 
     const controllerLink = this.controllerLink
-    if (!controllerLink || !controllerLink.isRCLActionable) return false
+    if (!controllerLink || ! structureUtils.isRCLActionable(controllerLink)) return false
 
     const hubLink = this.room.roomManager.hubLink
-    if (!hubLink || !hubLink.isRCLActionable) return false
+    if (!hubLink || !structureUtils.isRCLActionable(hubLink)) return false
 
     return (this._upgradeStructure = controllerLink)
   }
@@ -786,7 +787,7 @@ export class CommuneManager {
     let fastFillerSpawnEnergyCapacity = 0
 
     for (const structure of this.actionableSpawningStructures) {
-      if (!structure.isRCLActionable) continue
+      if (!structureUtils.isRCLActionable(structure)) continue
       // Outside of the fastFiller
       if (getRange(structure.pos, anchor) > 2) continue
 
@@ -815,7 +816,7 @@ export class CommuneManager {
     let actionableSpawningStructures: SpawningStructures = structures.spawn
     actionableSpawningStructures = actionableSpawningStructures.concat(structures.extension)
     actionableSpawningStructures = actionableSpawningStructures.filter(
-      structure => structure.isRCLActionable,
+      structure => structureUtils.isRCLActionable(structure),
     )
 
     this.actionableSpawningStructuresIDs = actionableSpawningStructures.map(

@@ -1093,13 +1093,11 @@ declare global {
   interface Structure {
     // Getters
 
-    _isRCLActionable: boolean
-
     /**
-     * Wether the structure is disable or not by the room's controller level
-     * @deprecated use structureUtils.isRCLActionable(structure) instead
+     * Wether the structure is disabled or not by the room's downgraded controller level
+     * @method structureUtils.isRCLActionable(structure)
      */
-    readonly isRCLActionable: boolean
+    isRCLActionable: boolean
   }
 
   interface StructureSpawn {

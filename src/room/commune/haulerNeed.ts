@@ -3,6 +3,7 @@ import { customLog } from 'utils/logging'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneManager } from './commune'
 import { communeUtils } from './communeUtils'
+import { structureUtils } from 'room/structureUtils'
 
 export class HaulerNeedManager {
     communeManager: CommuneManager
@@ -48,12 +49,12 @@ export class HaulerNeedManager {
         const estimatedSourceIncome = communeUtils.getEstimatedSourceIncome(room)
 
         const hubLink = room.roomManager.hubLink
-        if (hubLink && hubLink.isRCLActionable) {
+        if (hubLink && structureUtils.isRCLActionable(hubLink)) {
             // There is a valid hubLink
 
             for (let index in room.find(FIND_SOURCES)) {
                 const sourceLink = room.communeManager.sourceLinks[index]
-                if (sourceLink && sourceLink.isRCLActionable) continue
+                if (sourceLink && structureUtils.isRCLActionable(sourceLink)) continue
 
                 this.communeManager.communeHaulerNeed += findCarryPartsRequired(
                     packedSourcePaths[index].length / packedPosLength + 3,
@@ -96,11 +97,11 @@ export class HaulerNeedManager {
 
     private controllerNeedLink() {
         const controllerLink = this.communeManager.controllerLink
-        if (!controllerLink || !controllerLink.isRCLActionable) return
+        if (!controllerLink || !structureUtils.isRCLActionable(controllerLink)) return
 
         const hubLink = this.communeManager.room.roomManager.hubLink
         // No need to haul if there is a valid hubLink
-        if (hubLink && hubLink.isRCLActionable) return
+        if (hubLink && structureUtils.isRCLActionable(hubLink)) return
 
         // There is a viable controllerLink but we need to haul to it
 

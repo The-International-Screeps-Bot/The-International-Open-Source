@@ -28,6 +28,7 @@ import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRe
 import { spawnUtils } from './spawnUtils'
 import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
 import { communeUtils } from '../communeUtils'
+import { structureUtils } from 'room/structureUtils'
 
 export class SpawnRequestsManager {
   communeManager: CommuneManager
@@ -362,7 +363,7 @@ export class SpawnRequestsManager {
         if (
           (!this.communeManager.room.roomManager.hubLink ||
             this.communeManager.room.roomManager.structures.link.length < 2) &&
-          (!this.communeManager.room.terminal || !this.communeManager.room.terminal.isRCLActionable)
+          (!this.communeManager.room.terminal || !structureUtils.isRCLActionable(this.communeManager.room.terminal))
         )
           return false
 
@@ -975,7 +976,7 @@ export class SpawnRequestsManager {
 
           const controllerLink = this.communeManager.controllerLink
           const maxCreeps =
-            controllerLink && controllerLink.isRCLActionable
+            controllerLink && structureUtils.isRCLActionable(controllerLink)
               ? this.communeManager.room.roomManager.upgradePositions.length
               : this.communeManager.room.roomManager.upgradePositions.length - 1
 

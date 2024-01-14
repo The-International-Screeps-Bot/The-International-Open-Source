@@ -20,6 +20,7 @@ import { spawnUtils } from './spawnUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { BodyPartCounts, SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
 import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
+import { structureUtils } from 'room/structureUtils'
 
 export const spawnRequestConstructorsByType: {[key in SpawnRequestTypes]: SpawnRequestConstructor } = {
     [SpawnRequestTypes.individualUniform]: spawnRequestConstructors.spawnRequestIndividualUniform,
@@ -51,7 +52,7 @@ export class SpawningStructuresManager {
 
         for (const spawn of spawns) {
             if (spawn.renewed) continue
-            if (!spawn.isRCLActionable) continue
+            if (!structureUtils.isRCLActionable(spawn)) continue
 
             if (spawn.spawning) {
                 const creep = Game.creeps[spawn.spawning.name]

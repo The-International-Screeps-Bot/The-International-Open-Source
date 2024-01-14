@@ -18,6 +18,7 @@ import {
 } from 'types/roomRequests'
 import { customLog } from 'utils/logging'
 import { roomObjectUtils } from 'room/roomObjectUtils'
+import { structureUtils } from 'room/structureUtils'
 
 export class CreepProcs {
   advancedUpgradeController(creep: Creep) {
@@ -31,7 +32,7 @@ export class CreepProcs {
       creep.room.roomManager.controllerContainer
     const controllerLink = creep.room.communeManager.controllerLink
 
-    if (!controllerStructure && controllerLink && controllerLink.isRCLActionable)
+    if (!controllerStructure && controllerLink && structureUtils.isRCLActionable(controllerLink))
       controllerStructure = controllerLink
 
     // If there is a controllerContainer

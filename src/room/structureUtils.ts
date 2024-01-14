@@ -2,13 +2,13 @@ import { RoomMemoryKeys } from "international/constants"
 
 export class StructureUtils {
   isRCLActionable(structure: Structure) {
-    if (structure._isRCLActionable !== undefined) return structure._isRCLActionable
+    if (structure.isRCLActionable !== undefined) return structure.isRCLActionable
 
-    if (!structure.room.controller) return (structure._isRCLActionable = true)
+    if (!structure.room.controller) return (structure.isRCLActionable = true)
     if (Memory.rooms[structure.room.name][RoomMemoryKeys.greatestRCL] === structure.room.controller.level)
-        return (structure._isRCLActionable = true)
+        return (structure.isRCLActionable = true)
 
-    return (structure._isRCLActionable = structure.isActive())
+    return (structure.isRCLActionable = structure.isActive())
   }
 }
 

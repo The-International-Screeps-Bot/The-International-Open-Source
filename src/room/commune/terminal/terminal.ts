@@ -11,6 +11,7 @@ import { collectiveManager } from 'international/collective'
 import { CommuneManager, ResourceTargets } from 'room/commune/commune'
 import { tradingUtils } from './tradingUtils'
 import { marketManager } from 'international/market/marketOrders'
+import { structureUtils } from 'room/structureUtils'
 
 export class TerminalManager {
   communeManager: CommuneManager
@@ -24,7 +25,7 @@ export class TerminalManager {
   preTickRun() {
     const room = this.communeManager.room
     if (!room.terminal) return
-    if (!room.terminal.isRCLActionable) return
+    if (!structureUtils.isRCLActionable(room.terminal)) return
 
     const resourceTargets = this.communeManager.resourceTargets
 
@@ -36,7 +37,7 @@ export class TerminalManager {
 
     // Stop if there is no terminal
     if (!room.terminal) return
-    if (!room.terminal.isRCLActionable) return
+    if (!structureUtils.isRCLActionable(room.terminal)) return
     if (room.terminal.cooldown > 0) return
 
     const resourceTargets = this.communeManager.resourceTargets
