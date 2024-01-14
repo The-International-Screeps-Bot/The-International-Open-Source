@@ -1,14 +1,11 @@
 import { CommuneManager } from 'room/commune/commune'
 import { profiler } from './profiler'
 import { RoomManager } from 'room/room'
-import { SpawningStructuresManager } from 'room/commune/spawning/spawningStructures'
 import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
-import { TerminalManager } from 'room/commune/terminal/terminal'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
 import { StatsManager } from 'international/statsManager'
 import { ConstructionManager } from 'room/construction/construction'
-import { ObserverManager } from 'room/commune/observer'
 import { RemotesManager } from 'room/commune/remotesManager'
 import { HaulRequestManager } from 'room/commune/haulRequestManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
@@ -25,7 +22,6 @@ import { PlayerManager } from 'international/players'
 import { FlagManager } from 'international/flags'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { CreepUtils } from 'room/creeps/creepUtils'
-import { SpawnUtils } from 'room/commune/spawning/spawnUtils'
 import { TradingUtils } from 'room/commune/terminal/tradingUtils'
 import { CollectiveManager } from 'international/collective'
 import { MarketManager } from 'international/market/marketOrders'
@@ -35,12 +31,8 @@ import { EndTickCreepManager } from 'room/creeps/endTickCreepManager'
 import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { HaulerNeedManager } from 'room/commune/haulerNeed'
 import { LinkManager } from 'room/commune/links'
-import { StoringStructuresManager } from 'room/commune/storingStructures'
 import { DefenceManager } from 'room/commune/defence'
-import { PowerSpawnsManager } from 'room/commune/powerSpawn'
-import { NukerManager } from 'room/commune/nuker'
 import { CombatRequestManager } from 'room/commune/combatRequest'
-import { HaulerSizeManager } from 'room/commune/haulerSize'
 import { MapVisualsManager } from 'international/mapVisuals'
 import { MigrationManager } from 'international/migration'
 import { RoomPruningManager } from 'international/roomPruning'
@@ -105,6 +97,12 @@ import { TowerProcs } from 'room/commune/towerProcs'
 import { TowerUtils } from 'room/commune/towerUtils'
 import { SourceProcs } from 'room/sourceProcs'
 import { SourceUtils } from 'room/sourceUtils'
+import { TerminalProcs } from 'room/commune/terminal/terminalProcs'
+import { SpawningStructureProcs } from 'room/commune/spawning/spawningStructureProcs'
+import { SpawningStructureUtils } from 'room/commune/spawning/spawningStructureUtils'
+import { NukerProcs } from 'room/commune/nukerProcs'
+import { ObserverProcs } from 'room/commune/observerProcs'
+import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
 
 export function profilerRegister() {
   // Classes
@@ -139,30 +137,22 @@ export function profilerRegister() {
 
   profiler.registerClass(CommuneManager, 'CommuneManager')
   profiler.registerClass(RoomManager, 'RoomManager')
-  profiler.registerClass(SpawningStructuresManager, 'SpawningStructuresManager')
   profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
-  profiler.registerClass(TerminalManager, 'TerminalManager')
   profiler.registerClass(LabManager, 'LabManager')
   profiler.registerClass(FactoryManager, 'FactoryManager')
   profiler.registerClass(CommunePlanner, 'CommunePlanner')
   profiler.registerClass(ConstructionManager, 'ConstructionManager')
-  profiler.registerClass(ObserverManager, 'ObserverManager')
   profiler.registerClass(RemotesManager, 'RemotesManager')
   profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
   profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
   profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
   profiler.registerClass(LinkManager, 'LinkManager')
-  profiler.registerClass(StoringStructuresManager, 'StoringStructuresManager')
   profiler.registerClass(DefenceManager, 'DefenceManager')
-  profiler.registerClass(PowerSpawnsManager, 'PowerSpawnsManager')
-  profiler.registerClass(NukerManager, 'NukerManager')
   profiler.registerClass(CombatRequestManager, 'CombatRequestManager')
-  profiler.registerClass(HaulerSizeManager, 'HaulerSize')
   profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
   profiler.registerClass(Operator, 'Operator')
   profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
-  profiler.registerClass(SpawnUtils, 'SpawnUtils')
   profiler.registerClass(RoomUtils, 'RoomUtils')
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
   profiler.registerClass(RoomDataManager, 'RoomDataManager')
@@ -178,6 +168,12 @@ export function profilerRegister() {
   profiler.registerClass(TowerUtils, 'TowerUtils')
   profiler.registerClass(SourceProcs, 'SourceProcs')
   profiler.registerClass(SourceUtils, 'SourceUtils')
+  profiler.registerClass(TerminalProcs, 'TerminalProcs')
+  profiler.registerClass(SpawningStructureProcs, 'SpawningStructureProcs')
+  profiler.registerClass(SpawningStructureUtils, 'SpawningStructureUtils')
+  profiler.registerClass(NukerProcs, 'NukerProcs')
+  profiler.registerClass(ObserverProcs, 'ObserverProcs')
+  profiler.registerClass(PowerSpawnProcs, 'PowerSpawnProcs')
 
   // Creep classes
 

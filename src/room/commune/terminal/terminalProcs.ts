@@ -1,46 +1,31 @@
-import { minerals, Result, RoomMemoryKeys, RoomStatsKeys } from 'international/constants'
-import { customLog } from 'utils/logging'
-import { newID, roundTo, utils } from 'utils/utils'
-import './tradingUtils'
-import {
-  simpleAllies,
-  AllyRequestTypes,
-  ResourceRequest,
-} from 'international/simpleAllies/simpleAllies'
-import { collectiveManager } from 'international/collective'
-import { CommuneManager, ResourceTargets } from 'room/commune/commune'
-import { tradingUtils } from './tradingUtils'
-import { marketManager } from 'international/market/marketOrders'
-import { structureUtils } from 'room/structureUtils'
+import { collectiveManager } from "international/collective"
+import { Result } from "international/constants"
+import { marketManager } from "international/market/marketOrders"
+import { ResourceRequest, simpleAllies } from "international/simpleAllies/simpleAllies"
+import { structureUtils } from "room/structureUtils"
+import { customLog } from "utils/logging"
+import { newID, utils } from "utils/utils"
+import { ResourceTargets } from "../commune"
+import { tradingUtils } from "./tradingUtils"
 
-export class TerminalManager {
-  communeManager: CommuneManager
-  room: Room
-  terminal: StructureTerminal
-
-  constructor(communeManager: CommuneManager) {
-    this.communeManager = communeManager
-  }
-
-  preTickRun() {
-    const room = this.communeManager.room
+export class TerminalProcs {
+  preTickRun(room: Room) {
     if (!room.terminal) return
     if (!structureUtils.isRCLActionable(room.terminal)) return
 
-    const resourceTargets = this.communeManager.resourceTargets
+    const resourceTargets = room.communeManager.resourceTargets
 
     this.createTerminalRequests(room, resourceTargets)
   }
 
-  run() {
-    const { room } = this.communeManager
+  run(room: Room) {
 
     // Stop if there is no terminal
     if (!room.terminal) return
     if (!structureUtils.isRCLActionable(room.terminal)) return
     if (room.terminal.cooldown > 0) return
 
-    const resourceTargets = this.communeManager.resourceTargets
+    const resourceTargets = room.communeManager.resourceTargets
 
     if (this.respondToTerminalRequests(room, resourceTargets) === Result.action) return
     if (this.respondToAllyRequests(room, resourceTargets) === Result.action) return
@@ -57,7 +42,7 @@ export class TerminalManager {
 
   private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
     const resourcesInStoringStructures =
-      this.communeManager.room.roomManager.resourcesInStoringStructures
+      room.roomManager.resourcesInStoringStructures
     for (const key in resourceTargets.min) {
       const resourceType = key as ResourceConstant
       let targetAmount = resourceTargets.min[resourceType]
@@ -91,11 +76,11 @@ export class TerminalManager {
     resourceTargets: ResourceTargets,
   ): [TerminalRequest, string, number] {
     const resourcesInStoringStructures =
-      this.communeManager.room.roomManager.resourcesInStoringStructures
+      room.roomManager.resourcesInStoringStructures
     const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
     const budget = Math.min(
-      storedEnergy - this.communeManager.minStoredEnergy,
-      this.communeManager.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY),
+      storedEnergy - room.communeManager.minStoredEnergy,
+      room.terminal.store.getUsedCapacity(RESOURCE_ENERGY),
     )
 
     let lowestScore = Infinity
@@ -107,7 +92,7 @@ export class TerminalManager {
       const request = collectiveManager.terminalRequests[ID]
 
       // Don't respond to requests for this room
-      if (request.roomName === this.communeManager.room.name) continue
+      if (request.roomName === room.name) continue
       if (resourceTargets.min[request.resource] === undefined) continue
 
       const storedResource = resourcesInStoringStructures[request.resource] || 0
@@ -157,7 +142,7 @@ export class TerminalManager {
       const sendAmount = tradingUtils.findLargestTransactionAmount(
         budget,
         maxSendAmount,
-        this.communeManager.room.name,
+        room.name,
         request.roomName,
       ) / 2
       customLog(
@@ -182,7 +167,7 @@ export class TerminalManager {
       if (request.amount * 0.1 > sendAmount) continue
 
       const score =
-        Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) +
+        Game.map.getRoomLinearDistance(room.name, request.roomName) +
         request.priority * 100
       if (score >= lowestScore) continue
 
@@ -198,15 +183,15 @@ export class TerminalManager {
   private respondToTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
     // We don't have enough energy to help other rooms
     if (
-      this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
-      this.communeManager.minStoredEnergy
+      room.roomManager.resourcesInStoringStructures.energy <
+      room.communeManager.minStoredEnergy
     )
       return Result.noAction
 
     const [request, ID, amount] = this.findBestTerminalRequest(room, resourceTargets)
     if (!request) return Result.noAction
 
-    this.communeManager.room.terminal.send(
+    room.terminal.send(
       request.resource,
       amount,
       request.roomName,
@@ -216,7 +201,7 @@ export class TerminalManager {
     // Consequences
 
     delete collectiveManager.terminalRequests[ID]
-    this.communeManager.room.terminal.intended = true
+    room.terminal.intended = true
     return Result.action
   }
 
@@ -225,12 +210,12 @@ export class TerminalManager {
     resourceTargets: ResourceTargets,
   ): [ResourceRequest, number] {
     const resourcesInStoringStructures =
-      this.communeManager.room.roomManager.resourcesInStoringStructures
+      room.roomManager.resourcesInStoringStructures
     const minStoredEnergy = resourceTargets.min[RESOURCE_ENERGY] * 1.1
     const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
     const budget = Math.min(
       storedEnergy - minStoredEnergy,
-      this.communeManager.room.terminal.store[RESOURCE_ENERGY],
+      room.terminal.store[RESOURCE_ENERGY],
     )
 
     let lowestScore = Infinity
@@ -241,7 +226,7 @@ export class TerminalManager {
     const allyResourceRequests = simpleAllies.allySegmentData.requests.resource
     for (const request of allyResourceRequests) {
       // Don't respond to requests for this room
-      if (request.roomName === this.communeManager.room.name) continue
+      if (request.roomName === room.name) continue
       if (resourceTargets.min[request.resourceType] === undefined) continue
       if (Math.floor(request.amount) <= 0) continue
 
@@ -252,7 +237,7 @@ export class TerminalManager {
       const sendAmount = tradingUtils.findLargestTransactionAmount(
         budget,
         Math.min(request.amount, storedResource - minStoredResource),
-        this.communeManager.room.name,
+        room.name,
         request.roomName,
       )
 
@@ -260,7 +245,7 @@ export class TerminalManager {
       if (request.amount * 0.1 > sendAmount) continue
 
       const score =
-        Game.map.getRoomLinearDistance(this.communeManager.room.name, request.roomName) +
+        Game.map.getRoomLinearDistance(room.name, request.roomName) +
         request.priority * 100
       if (score >= lowestScore) continue
 
@@ -280,15 +265,15 @@ export class TerminalManager {
     // We don't have enough energy to help other rooms
 
     if (
-      this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
-      this.communeManager.minStoredEnergy
+      room.roomManager.resourcesInStoringStructures.energy <
+      room.communeManager.minStoredEnergy
     )
       return false
 
     const [request, amount] = this.findBestAllyRequest(room, resourceTargets)
     if (!request) return Result.noAction
 
-    this.communeManager.room.terminal.send(
+    room.terminal.send(
       request.resourceType,
       amount,
       request.roomName,
@@ -297,7 +282,7 @@ export class TerminalManager {
 
     // Consequences
 
-    this.communeManager.room.terminal.intended = true
+    room.terminal.intended = true
 
     request.amount -= amount
     return Result.action
@@ -354,3 +339,5 @@ export class TerminalManager {
     return Result.noAction
   }
 }
+
+export const terminalProcs = new TerminalProcs()

@@ -1,29 +1,28 @@
 import {
-    findLinkThroughput,
-    findObjectWithID,
-    getRange,
-    packAsNum,
-    randomTick,
-    findLowestScore,
-    roundTo,
-    forCoordsAroundRange,
-    utils,
+  findLinkThroughput,
+  findObjectWithID,
+  getRange,
+  packAsNum,
+  randomTick,
+  findLowestScore,
+  roundTo,
+  forCoordsAroundRange,
+  utils,
 } from 'utils/utils'
-import { TerminalManager } from './terminal/terminal'
 import './spawning/spawningStructures'
 
 import './defence'
 import './workRequest'
 import './combatRequest'
 import {
-    creepRoles,
-    packedPosLength,
-    RoomMemoryKeys,
-    RoomTypes,
-    rampartUpkeepCost,
-    RemoteResourcePathTypes,
-    ReservedCoordTypes,
-    RoomStatsKeys,
+  creepRoles,
+  packedPosLength,
+  RoomMemoryKeys,
+  RoomTypes,
+  rampartUpkeepCost,
+  RemoteResourcePathTypes,
+  ReservedCoordTypes,
+  RoomStatsKeys,
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -31,19 +30,14 @@ import './links'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
-import { PowerSpawnsManager } from './powerSpawn'
 import './haulerSize'
 import { DefenceManager } from './defence'
-import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
-import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
 import { packCoord, unpackPosAt } from 'other/codec'
-import { StoringStructuresManager } from './storingStructures'
 import { LinkManager } from './links'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
-import { ObserverManager } from './observer'
 import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { roomNameUtils } from 'room/roomNameUtils'
@@ -54,6 +48,10 @@ import { structureUtils } from 'room/structureUtils'
 import { logisticsProcs } from 'room/logisticsProcs'
 import { towerProcs } from './towerProcs'
 import { sourceProcs } from 'room/sourceProcs'
+import { terminalProcs } from './terminal/terminalProcs'
+import { spawningStructureProcs } from './spawning/spawningStructureProcs'
+import { observerProcs } from './observerProcs'
+import { powerSpawnProcs } from './powerSpawnProcs'
 
 export type ResourceTargets = {
   min: Partial<{ [key in ResourceConstant]: number }>
@@ -68,17 +66,11 @@ export class CommuneManager {
   constructionManager: ConstructionManager
   defenceManager: DefenceManager
 
-  storingStructuresManager: StoringStructuresManager
   linkManager: LinkManager
   labManager: LabManager
-  powerSpawningStructuresManager: PowerSpawnsManager
   spawnRequestsManager: SpawnRequestsManager
-  spawningStructuresManager: SpawningStructuresManager
 
-  observerManager: ObserverManager
-  terminalManager: TerminalManager
   remotesManager: RemotesManager
-  haulerSizeManager: HaulerSizeManager
 
   workRequestManager: WorkRequestManager
   combatRequestManager: CombatRequestManager
@@ -117,17 +109,11 @@ export class CommuneManager {
     this.constructionManager = new ConstructionManager(this)
     this.defenceManager = new DefenceManager(this)
 
-    this.storingStructuresManager = new StoringStructuresManager(this)
     this.linkManager = new LinkManager(this)
     this.labManager = new LabManager(this)
-    this.powerSpawningStructuresManager = new PowerSpawnsManager(this)
     this.spawnRequestsManager = new SpawnRequestsManager(this)
-    this.spawningStructuresManager = new SpawningStructuresManager(this)
 
-    this.observerManager = new ObserverManager(this)
-    this.terminalManager = new TerminalManager(this)
     this.remotesManager = new RemotesManager(this)
-    this.haulerSizeManager = new HaulerSizeManager(this)
 
     this.workRequestManager = new WorkRequestManager(this)
     this.combatRequestManager = new CombatRequestManager(this)
@@ -255,8 +241,8 @@ export class CommuneManager {
     if (!roomMemory[RoomMemoryKeys.communePlanned]) return
 
     this.constructionManager.preTickRun()
-    this.observerManager.preTickRun()
-    this.terminalManager.preTickRun()
+    observerProcs.preTickRun(this.room)
+    terminalProcs.preTickRun(this.room)
     this.remotesManager.initRun()
     this.haulRequestManager.preTickRun()
     this.workRequestManager.preTickRun()
@@ -270,7 +256,7 @@ export class CommuneManager {
     this.defenceManager.manageThreat()
     this.defenceManager.manageDefenceRequests()
 
-    this.terminalManager.run()
+    terminalProcs.run(this.room)
 
     this.workRequestManager.run()
     this.combatRequestManager.run()
@@ -280,8 +266,8 @@ export class CommuneManager {
     this.remotesManager.run()
     this.haulerNeedManager.run()
 
-    this.spawningStructuresManager.createRoomLogisticsRequests()
-    this.storingStructuresManager.run()
+    spawningStructureProcs.createRoomLogisticsRequests(this.room)
+    logisticsProcs.createCommuneStoringStructureLogisticsRequests(this.room)
     this.factoryManager.run()
     logisticsProcs.createCommuneContainerLogisticsRequests(this.room)
     logisticsProcs.createCommuneDroppedResourceLogisticsRequests(this.room)
@@ -289,16 +275,16 @@ export class CommuneManager {
     logisticsProcs.createCommuneRuinLogisticsRequests(this.room)
     this.linkManager.run()
     this.labManager.run()
-    this.powerSpawningStructuresManager.run()
-    this.spawningStructuresManager.organizeSpawns()
-    this.spawningStructuresManager.createPowerTasks()
+    powerSpawnProcs.run(this.room)
+    spawningStructureProcs.createPowerTasks(this.room)
 
     this.room.roomManager.creepRoleManager.run()
     this.room.roomManager.powerCreepRoleManager.run()
 
-    this.haulerSizeManager.run()
-    this.spawningStructuresManager.run()
+    communeProcs.tryUpdateMinHaulerCost(this.room)
+    spawningStructureProcs.tryRunSpawning(this.room)
 
+    spawningStructureProcs.tryRegisterSpawningMovement(this.room)
     this.room.roomManager.endTickCreepManager.run()
     this.room.roomManager.roomVisualsManager.run()
 

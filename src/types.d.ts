@@ -45,6 +45,7 @@ import {
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
 import { StatsMemory } from 'types/stats'
 import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
+import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureProcs'
 
 declare global {
   interface ProfilerData {
@@ -517,6 +518,8 @@ declare global {
     rampartRepairStructures: StructureRampart[]
 
     considerFunneled: boolean
+
+    organizedSpawns: OrganizedSpawns | false
 
     // Commune
 

@@ -195,6 +195,37 @@ export class LogisticsProcs {
       })
     }
   }
+
+  createCommuneStoringStructureLogisticsRequests(room: Room) {
+
+    const storingStructures: AnyStoreStructure[] = []
+
+    const storage = room.storage
+    if (storage) storingStructures.push(storage)
+
+    const terminal = room.terminal
+    if (terminal && !terminal.effectsData.get(PWR_DISRUPT_TERMINAL))
+        storingStructures.push(terminal)
+
+    for (const structure of storingStructures) {
+        room.createRoomLogisticsRequest({
+            target: structure,
+            onlyFull: true,
+            type: RoomLogisticsRequestTypes.offer,
+            priority: 0,
+        })
+
+        // We are close to full
+
+        if (structure.usedReserveStore > structure.store.getCapacity() * 0.9) continue
+
+        room.createRoomLogisticsRequest({
+            target: structure,
+            type: RoomLogisticsRequestTypes.transfer,
+            priority: 100,
+        })
+    }
+  }
 }
 
 export const logisticsProcs = new LogisticsProcs()

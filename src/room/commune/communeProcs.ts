@@ -1,7 +1,8 @@
 import { roomUtils } from 'room/roomUtils'
 import { communeDataManager } from './communeData'
 import { communeUtils } from './communeUtils'
-import { RoomLogisticsRequestTypes } from 'international/constants'
+import { RoomLogisticsRequestTypes, RoomMemoryKeys, haulerUpdateDefault } from 'international/constants'
+import { randomIntRange } from 'utils/utils'
 
 /**
  * Minor processes for communes
@@ -42,6 +43,26 @@ export class CommuneProcs {
     delete communeData.generalRepairStructureCoords
 
     communeData.registeredRCL = room.controller.level
+  }
+
+  tryUpdateMinHaulerCost(room: Room) {
+    const roomMemory = Memory.rooms[room.name]
+
+    // If there is no min hauler size
+
+    if (roomMemory[RoomMemoryKeys.minHaulerCost] === undefined) {
+
+        roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 200 * room.roomManager.structures.spawn.length)
+        roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(1500, 3000)
+        return
+    }
+
+    if (Game.time - roomMemory[RoomMemoryKeys.minHaulerCostUpdate] < haulerUpdateDefault) return
+
+    // update the min hauler cost
+
+    roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 100 * room.roomManager.structures.spawn.length)
+    roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(0, 10)
   }
 }
 

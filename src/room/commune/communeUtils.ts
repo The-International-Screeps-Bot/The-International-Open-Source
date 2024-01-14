@@ -12,6 +12,7 @@ import {
 import { collectiveManager } from "international/collective"
 import { roomUtils } from "room/roomUtils"
 import { structureUtils } from "room/structureUtils"
+import { OrganizedSpawns } from './spawning/spawningStructureProcs'
 
 export class CommuneUtils {
   getGeneralRepairStructures(room: Room) {
@@ -215,7 +216,6 @@ export class CommuneUtils {
   }
 
   canTakeNewWorkRequest(roomName: string) {
-
     if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) return false
     if (Game.rooms[roomName].energyCapacityAvailable < 650) return false
 
@@ -223,6 +223,39 @@ export class CommuneUtils {
     if (!room.roomManager.structures.spawn.length) return false
 
     return true
+  }
+
+  /**
+   * Find spawns that are inactive and active
+   * Assign spawnIDs to creeps
+   */
+  public getOrganizedSpawns(
+    room: Room,
+    spawns: StructureSpawn[] = room.roomManager.structures.spawn,
+  ): false | OrganizedSpawns {
+    if (room.organizedSpawns !== undefined) return room.organizedSpawns
+    // Find spawns that are and aren't spawning
+
+    const inactiveSpawns: StructureSpawn[] = []
+    const activeSpawns: StructureSpawn[] = []
+
+    for (const spawn of spawns) {
+      if (spawn.renewed) continue
+      if (!structureUtils.isRCLActionable(spawn)) continue
+
+      if (spawn.spawning) {
+        activeSpawns.push(spawn)
+        continue
+      }
+
+      inactiveSpawns.push(spawn)
+    }
+
+    room.organizedSpawns = {
+      activeSpawns,
+      inactiveSpawns,
+    }
+    return room.organizedSpawns
   }
 }
 
