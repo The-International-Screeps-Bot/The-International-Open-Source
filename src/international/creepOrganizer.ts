@@ -38,6 +38,8 @@ export class CreepOrganizer {
 
         collectiveManager.creepCount += 1
 
+        creepDataManager.initCreep(creepName)
+
         // Get the creep's role
 
         const { role } = creep

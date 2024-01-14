@@ -24,17 +24,22 @@ export interface CreepData {
 export class CreepDataManager {
   data: { [creepName: string]: Partial<CreepData> } = {}
 
+  initCreep(creepName: string) {
+    this.data[creepName] ??= {}
+  }
+
   updateCreeps() {
-    if (utils.isTickInterval(15)) {
-      for (const creepName in Game.creeps) {
-        this.updateCreep(creepName)
-      }
+    for (const creepName in this.data) {
+      this.updateCreep(creepName)
     }
   }
 
   private updateCreep(creepName: string) {
     const data = this.data[creepName]
     /* delete . */
+
+    if (utils.isTickInterval(15)) {
+    }
   }
 }
 

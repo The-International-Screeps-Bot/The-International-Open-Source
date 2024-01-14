@@ -32,7 +32,7 @@ Object.defineProperties(Creep.prototype, {
         get() {
             if (this._commune) return this._commune
 
-            return (this._commune = Game.rooms[this.nameData[2]])
+            return (this._commune = Game.rooms[this.nameData[1]])
         },
     },
     strength: {

@@ -71,8 +71,8 @@ export function originalLoop() {
     if (global.userScript) global.userScript.run()
     playerManager.run()
     roomsManager.initRun()
-    creepOrganizer.run()
     creepDataManager.updateCreeps()
+    creepOrganizer.run()
     powerCreepOrganizer.run()
 
     roomPruningManager.run()
