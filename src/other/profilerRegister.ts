@@ -11,7 +11,6 @@ import { ConstructionManager } from 'room/construction/construction'
 import { ObserverManager } from 'room/commune/observer'
 import { RemotesManager } from 'room/commune/remotesManager'
 import { HaulRequestManager } from 'room/commune/haulRequestManager'
-import { SourceManager } from 'room/commune/sourceManager'
 import { WorkRequestManager } from 'room/commune/workRequest'
 import { Quad } from 'room/creeps/roleManagers/antifa/quad'
 import { DynamicSquad } from 'room/creeps/roleManagers/antifa/dynamicSquad'
@@ -37,7 +36,6 @@ import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { HaulerNeedManager } from 'room/commune/haulerNeed'
 import { LinkManager } from 'room/commune/links'
 import { StoringStructuresManager } from 'room/commune/storingStructures'
-import { TowerManager } from 'room/commune/towers'
 import { DefenceManager } from 'room/commune/defence'
 import { PowerSpawnsManager } from 'room/commune/powerSpawn'
 import { NukerManager } from 'room/commune/nuker'
@@ -105,6 +103,8 @@ import { LogisticsProcs } from 'room/logisticsProcs'
 import { LogisticsUtils } from 'room/logisticsUtils'
 import { TowerProcs } from 'room/commune/towerProcs'
 import { TowerUtils } from 'room/commune/towerUtils'
+import { SourceProcs } from 'room/sourceProcs'
+import { SourceUtils } from 'room/sourceUtils'
 
 export function profilerRegister() {
   // Classes
@@ -149,13 +149,11 @@ export function profilerRegister() {
   profiler.registerClass(ObserverManager, 'ObserverManager')
   profiler.registerClass(RemotesManager, 'RemotesManager')
   profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
-  profiler.registerClass(SourceManager, 'SourceManager')
   profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
   profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
   profiler.registerClass(LinkManager, 'LinkManager')
   profiler.registerClass(StoringStructuresManager, 'StoringStructuresManager')
-  profiler.registerClass(TowerManager, 'TowerManager')
   profiler.registerClass(DefenceManager, 'DefenceManager')
   profiler.registerClass(PowerSpawnsManager, 'PowerSpawnsManager')
   profiler.registerClass(NukerManager, 'NukerManager')
@@ -178,6 +176,8 @@ export function profilerRegister() {
   profiler.registerClass(LogisticsUtils, 'LogisticsUtils')
   profiler.registerClass(TowerProcs, 'TowerProcs')
   profiler.registerClass(TowerUtils, 'TowerUtils')
+  profiler.registerClass(SourceProcs, 'SourceProcs')
+  profiler.registerClass(SourceUtils, 'SourceUtils')
 
   // Creep classes
 

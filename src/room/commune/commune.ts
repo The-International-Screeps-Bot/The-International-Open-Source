@@ -34,7 +34,6 @@ import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
 import { PowerSpawnsManager } from './powerSpawn'
 import './haulerSize'
-import { SourceManager } from './sourceManager'
 import { DefenceManager } from './defence'
 import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
@@ -58,6 +57,7 @@ import { communeProcs } from './communeProcs'
 import { structureUtils } from 'room/structureUtils'
 import { logisticsProcs } from 'room/logisticsProcs'
 import { towerProcs } from './towerProcs'
+import { sourceProcs } from 'room/sourceProcs'
 
 export type ResourceTargets = {
   min: Partial<{ [key in ResourceConstant]: number }>
@@ -78,7 +78,6 @@ export class CommuneManager {
   powerSpawningStructuresManager: PowerSpawnsManager
   spawnRequestsManager: SpawnRequestsManager
   spawningStructuresManager: SpawningStructuresManager
-  sourceManager: SourceManager
 
   observerManager: ObserverManager
   terminalManager: TerminalManager
@@ -128,7 +127,6 @@ export class CommuneManager {
     this.powerSpawningStructuresManager = new PowerSpawnsManager(this)
     this.spawnRequestsManager = new SpawnRequestsManager(this)
     this.spawningStructuresManager = new SpawningStructuresManager(this)
-    this.sourceManager = new SourceManager(this)
 
     this.observerManager = new ObserverManager(this)
     this.terminalManager = new TerminalManager(this)
@@ -283,7 +281,7 @@ export class CommuneManager {
     this.combatRequestManager.run()
     this.haulRequestManager.run()
 
-    this.sourceManager.run()
+    sourceProcs.createPowerTasks(this.room)
     this.remotesManager.run()
     this.haulerNeedManager.run()
 
