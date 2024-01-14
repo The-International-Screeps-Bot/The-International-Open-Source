@@ -1,12 +1,32 @@
 import { roomNameUtils } from 'room/roomNameUtils'
-import { RoomMemoryKeys, RoomTypes, SegmentIDs } from './constants'
+import { RoomMemoryKeys, RoomTypes, SegmentIDs, majorVersion } from './constants'
 
 /**
  * Migrate version by performing actions, if required
  */
 export class MigrationManager {
   public run() {
+    // We are at the right version, no need to migrate
     if (Memory.breakingVersion === global.settings.breakingVersion) return
+
+    // Try to do a soft migration
+    this.trySoftMigrations()
+
+    // If we have soft migrated to the latest version, we can stop
+    if (Memory.breakingVersion === global.settings.breakingVersion) {
+      return
+    }
+    // If the Memory's breaking version is more than the setting's, somebody messed up
+    if (Memory.breakingVersion > global.settings.breakingVersion) {
+      throw Error(`breakingVersion exceeds maximum published. Please downgrade to v${majorVersion}.${global.settings.breakingVersion}`)
+    }
+
+    // Otherwise, we are still not at the desired version. Do a breaking migration
+
+    this.hardMigration()
+  }
+
+  private trySoftMigrations() {
 
     if (Memory.breakingVersion === 89) {
       global.killCreeps()
@@ -51,12 +71,19 @@ export class MigrationManager {
       } as IDsSegment)
       Memory.breakingVersion += 1
     }
+    if (Memory.breakingVersion === 125) {
+      global.killCreeps()
+      Memory.breakingVersion += 1
+    }
+  }
 
-    if (Memory.breakingVersion < global.settings.breakingVersion) {
+  private hardMigration() {
+
+
       global.killCreeps()
       global.clearMemory()
       global.removeCSites()
-    }
+
   }
 }
 

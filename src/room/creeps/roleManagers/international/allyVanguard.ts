@@ -10,6 +10,7 @@ import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { creepProcs } from 'room/creeps/creepProcs'
 
 export class AllyVanguard extends Creep {
     update() {
@@ -104,11 +105,11 @@ export class AllyVanguard extends Creep {
         if (this.room.controller.owner) return false
 
         if (
-            this.runRoomLogisticsRequestsAdvanced({
-                resourceTypes: new Set([RESOURCE_ENERGY]),
-            }) === Result.success
+          creepProcs.runRoomLogisticsRequestAdvanced(this, {
+            resourceTypes: new Set([RESOURCE_ENERGY]),
+          }) === Result.success
         )
-            return true
+          return true
 
         if (!this.needsResources()) return true
 

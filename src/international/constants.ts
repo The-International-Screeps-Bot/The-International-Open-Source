@@ -186,6 +186,8 @@ export enum CreepMemoryKeys {
   targetID,
   previousRelayer,
   stationary,
+  defaultParts,
+  cost,
 }
 
 export enum PowerCreepMemoryKeys {
@@ -578,7 +580,8 @@ export enum TrafficPriorities {
   antifaRangedAttacker,
 }
 
-export const version = `v2.${global.settings.breakingVersion}.0`
+export const majorVersion = 2
+export const version = `v${majorVersion}.${global.settings.breakingVersion}`
 
 // Set of messages to randomly apply to commune rooms
 

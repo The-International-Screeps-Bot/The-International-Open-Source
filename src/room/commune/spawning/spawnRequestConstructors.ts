@@ -1,7 +1,7 @@
 import { SpawnRequest } from 'types/spawnRequest'
 import { LogTypes, customLog } from 'utils/logging'
 import { SpawnRequestArgs } from 'types/spawnRequest'
-import { FlagNames } from 'international/constants'
+import { CreepMemoryKeys, FlagNames } from 'international/constants'
 
 export type SpawnRequestConstructor = (room: Room, args: SpawnRequestArgs) => SpawnRequest[]
 
@@ -182,14 +182,15 @@ export class SpawnRequestConstructors {
 
         const maxPartsPerCreep = Math.min(50 - args.defaultParts.length, totalExtraParts)
 
-        // Loop through creep names of the requested role
+        // Add up non-default parts from the spawnGroup
 
         for (const creepName of args.spawnGroup || room.creepsFromRoom[args.role]) {
             const creep = Game.creeps[creepName]
 
             // Take away the amount of parts the creep with the name has from totalExtraParts
 
-            totalExtraParts -= creep.body.length - creep.defaultParts
+            const defaultParts = Memory.creeps[creepName][CreepMemoryKeys.defaultParts]
+            totalExtraParts -= creep.body.length - defaultParts
         }
 
         // If there aren't enough requested parts to justify spawning a creep, stop

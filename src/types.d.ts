@@ -755,19 +755,6 @@ declare global {
     advancedBuildAllyCSite(): boolean
 
     /**
-     *
-     */
-    findNewRampartRepairTarget(): StructureRampart | false
-    /**
-     *
-     */
-    findNewRepairTarget(): Structure<BuildableStructureConstant> | false
-    /**
-     *
-     */
-    findRepairTarget(): Structure<BuildableStructureConstant> | false
-
-    /**
      * Find a source index when not necessarily in a commune or remote
      */
     findSourceIndex(): boolean
@@ -826,8 +813,6 @@ declare global {
     advancedRecycle(): boolean
 
     advancedReserveController(): boolean
-
-    findCost(): number
 
     passiveHeal(): boolean
 
@@ -963,52 +948,9 @@ declare global {
 
     // Creep Functions
 
-    activeRenew(): void
-
-    passiveRenew(): void
-
     findBulzodeTargets(goalCoord: RoomPosition): Id<Structure>[]
 
     findQuadBulldozeTargets(goalCoord: RoomPosition): Id<Structure>[]
-
-    manageSpawning(spawn: StructureSpawn): void
-
-    findRoomLogisticsRequest(args?: FindNewRoomLogisticsRequestArgs): CreepLogisticsRequest | 0
-    findRoomLogisticsRequestTypes(
-      args?: FindNewRoomLogisticsRequestArgs,
-    ): Set<RoomLogisticsRequestTypes> | Result.fail
-    canAcceptRoomLogisticsRequest(
-      requestType: RoomLogisticsRequestTypes,
-      requestID: string,
-    ): boolean
-    createBackupStoringStructuresRoomLogisticsRequest(
-      types?: Set<RoomLogisticsRequestTypes>,
-      resourceTypes?: Set<ResourceConstant>,
-    ): CreepLogisticsRequest | 0
-    createBackupStoringStructuresRoomLogisticsRequestTransfer(): CreepLogisticsRequest | 0
-    createBackupStoringStructuresRoomLogisticsRequestWithdraw(
-      resourceTypes?: Set<ResourceConstant>,
-    ): CreepLogisticsRequest | 0
-    findRoomLogisticRequestAmount(request: RoomLogisticsRequest): number
-
-    runRoomLogisticsRequestAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
-    runRoomLogisticsRequestsAdvanced(args?: FindNewRoomLogisticsRequestArgs): Result
-
-    runRoomLogisticsRequest(): Result
-    runRoomLogisticsRequests(): boolean
-
-    findCreepRoomLogisticsRequestAmount(
-      type: RoomLogisticsRequestTypes,
-      targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
-      amount: number,
-      resourceType: ResourceConstant,
-    ): number
-    createCreepRoomLogisticsRequest(
-      type: RoomLogisticsRequestTypes,
-      targetID: Id<AnyStoreStructure | Creep | Tombstone | Ruin | Resource>,
-      amount: number,
-      resourceType?: ResourceConstant,
-    ): number
 
     // Creep Getters
 
@@ -1021,23 +963,13 @@ declare global {
      */
     readonly role: CreepRoles
 
-    _cost: number
-    /**
-     * The amount of energy required to spawn the creep
-     */
-    readonly cost: number
-
     _commune: Room | undefined
     /**
      * The name of the room the creep is from
      */
     readonly commune: Room | undefined
 
-    _defaultParts: number
-    readonly defaultParts: number
-
     _customID: number
-    readonly customID: number
 
     _strength: number
     /**
@@ -1379,6 +1311,8 @@ declare global {
     // The name of the trader and tick for the previos relay action
     [CreepMemoryKeys.previousRelayer]: [string, number]
     [CreepMemoryKeys.stationary]: boolean
+    [CreepMemoryKeys.defaultParts]: number
+    [CreepMemoryKeys.cost]: number
   }
 
   interface PowerCreepMemory extends CreepMemory {

@@ -1,50 +1,25 @@
 import {
-    defaultCreepSwampCost,
-    defaultPlainCost,
-    impassibleStructureTypes,
     impassibleStructureTypesSet,
-    customColors,
-    offsetsByDirection,
-    roomDimensions,
-    TrafficPriorities,
+    customColors, TrafficPriorities,
     packedPosLength,
-    CreepMemoryKeys,
-    RoomMemoryKeys,
-    RoomTypes,
-    Result,
+    CreepMemoryKeys, Result,
     communeCreepRoles,
     ReservedCoordTypes,
-    MovedTypes,
+    MovedTypes
 } from 'international/constants'
-import { customPathFinder } from 'international/customPathFinder'
 import { collectiveManager } from 'international/collective'
 import {
     areCoordsEqual,
-    arePositionsEqual,
-    findAdjacentCoordsToCoord,
-    findObjectWithID,
-    getRangeXY,
-    getRangeEuc,
-    getRangeEucXY,
-    getRange,
-    isExit,
-    forCoordsAroundRange,
-    forAdjacentCoords,
-    visualizePath,
+    arePositionsEqual, findObjectWithID, getRangeEuc, getRange,
+    isExit, forAdjacentCoords
 } from 'utils/utils'
 import {
     packCoord,
-    packPos,
-    packPosList,
-    packXYAsCoord,
-    unpackCoord,
-    unpackCoordAsPos,
+    packPos, unpackCoordAsPos,
     unpackPos,
     unpackPosAt,
-    unpackPosList,
+    unpackPosList
 } from 'other/codec'
-import { customLog } from 'utils/logging'
-import { creepUtils } from '../creepUtils'
 import { creepMoveProcs } from '../creepMoveProcs'
 
 PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (

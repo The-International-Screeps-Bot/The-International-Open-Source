@@ -1,5 +1,5 @@
 import { RoomManager } from 'room/room'
-import { findObjectWithID, getRange } from 'utils/utils'
+import { findClosestObject, findObjectWithID, forAdjacentCoords, getRange, getRangeXY } from 'utils/utils'
 import { myCreepUtils } from './myCreepUtils'
 import { statsManager } from 'international/statsManager'
 import {
@@ -8,17 +8,20 @@ import {
   FlagNames,
   Result,
   RoomLogisticsRequestTypes,
+  offsetsByDirection,
 } from 'international/constants'
 import { creepUtils } from './creepUtils'
 import { communeUtils } from 'room/commune/communeUtils'
 import {
   CreepLogisticsRequest,
+  FindNewRoomLogisticsRequestArgs,
   RoomLogisticsRequest,
   RoomLogisticsTargets,
 } from 'types/roomRequests'
-import { customLog } from 'utils/logging'
+import { customLog, stringifyLog } from 'utils/logging'
 import { roomObjectUtils } from 'room/roomObjectUtils'
 import { structureUtils } from 'room/structureUtils'
+import { packCoord } from 'other/codec'
 
 export class CreepProcs {
   advancedUpgradeController(creep: Creep) {
@@ -134,7 +137,7 @@ export class CreepProcs {
     // If the creep needs resources
 
     if (creep.needsResources()) {
-      creep.runRoomLogisticsRequestsAdvanced({
+      creepProcs.runRoomLogisticsRequestsAdvanced(creep, {
         types: new Set<RoomLogisticsRequestTypes>([
           RoomLogisticsRequestTypes.withdraw,
           RoomLogisticsRequestTypes.pickup,
@@ -254,7 +257,7 @@ export class CreepProcs {
       // Reset target so when we are full we search again
       delete Memory.creeps[creep.name][CreepMemoryKeys.structureTarget]
 
-      creep.runRoomLogisticsRequestsAdvanced({
+      creepProcs.runRoomLogisticsRequestsAdvanced(creep, {
         types: new Set<RoomLogisticsRequestTypes>([
           RoomLogisticsRequestTypes.withdraw,
           RoomLogisticsRequestTypes.offer,
@@ -269,7 +272,7 @@ export class CreepProcs {
     // Otherwise if we don't need resources and can maintain
 
     const workPartCount = myCreepUtils.parts(creep).work
-    let repairTarget = creep.findRepairTarget()
+    let repairTarget = creepUtils.findRepairTarget(creep)
 
     if (!repairTarget) {
       creep.message = '❌🔧'
@@ -305,8 +308,9 @@ export class CreepProcs {
 
     if (repairTarget.structureType === STRUCTURE_RAMPART) return true
     // Otherwise if it isn't a rampart and it will be viable to repair next tick
-    else if (repairTarget.hitsMax - repairTarget.nextHits >= workPartCount * REPAIR_POWER)
+    else if (repairTarget.hitsMax - repairTarget.nextHits >= workPartCount * REPAIR_POWER) {
       return true
+    }
 
     // Otherwise we need a new target
     delete Memory.creeps[creep.name][CreepMemoryKeys.structureTarget]
@@ -317,7 +321,7 @@ export class CreepProcs {
 
     // Find repair targets that don't include the current target, informing true if none were found
 
-    repairTarget = creep.findNewRepairTarget() || creep.findNewRampartRepairTarget()
+    repairTarget = creepUtils.findNewRepairTarget(creep) || creepUtils.findNewRampartRepairTarget(creep)
     if (!repairTarget) return true
 
     creep.actionCoord = repairTarget.pos
@@ -559,7 +563,10 @@ export class CreepProcs {
       return false
     }
 
-    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(creep, request[CreepLogisticsRequestKeys.resourceType])
+    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+      creep,
+      request[CreepLogisticsRequestKeys.resourceType],
+    )
     request[CreepLogisticsRequestKeys.amount] = Math.min(
       Math.min(
         creepFreeNextStore,
@@ -608,7 +615,10 @@ export class CreepProcs {
     if (target instanceof Resource) {
       // Update in accordance to potential resource decay
 
-      const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(creep, request[CreepLogisticsRequestKeys.resourceType])
+      const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+        creep,
+        request[CreepLogisticsRequestKeys.resourceType],
+      )
       request[CreepLogisticsRequestKeys.amount] = Math.min(
         Math.min(creepFreeNextStore, target.nextAmount),
         request[CreepLogisticsRequestKeys.amount],
@@ -647,7 +657,10 @@ export class CreepProcs {
       return false
     }
 
-    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(creep, request[CreepLogisticsRequestKeys.resourceType])
+    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+      creep,
+      request[CreepLogisticsRequestKeys.resourceType],
+    )
     request[CreepLogisticsRequestKeys.amount] = Math.min(
       Math.min(
         creepFreeNextStore,
@@ -674,6 +687,419 @@ export class CreepProcs {
 
     return true
   }
+
+  registerSpawning(creep: Creep, spawn: StructureSpawn) {
+    if (spawn.spawning.remainingTime > 1 || spawn.spawning.name.includes('shard')) return
+
+    const offset = offsetsByDirection[spawn.spawning.directions[0]]
+    const coord = {
+      x: creep.pos.x + offset[0],
+      y: creep.pos.y + offset[1],
+    }
+
+    creep.assignMoveRequest(coord)
+  }
+
+  runRoomLogisticsRequestAdvanced(creep: Creep, args?: FindNewRoomLogisticsRequestArgs) {
+    const request = creepUtils.findRoomLogisticsRequest(creep, args)
+    if (!request) return Result.noAction
+
+    /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
+    const target = findObjectWithID(request[CreepLogisticsRequestKeys.target])
+    if (Game.flags[FlagNames.debugCreepLogistics])
+      creep.room.targetVisual(creep.pos, target.pos, true)
+    if (getRange(target.pos, creep.pos) > 1) {
+      const result = creep.createMoveRequest({
+        origin: creep.pos,
+        goals: [{ pos: target.pos, range: 1 }],
+        defaultCostMatrix(roomName) {
+          const roomManager = RoomManager.roomManagers[roomName]
+          if (!roomManager) return false
+
+          return roomManager.defaultCostMatrix
+        },
+      })
+      // An enemy is probably blocking access to the logistics target
+      if (result === Result.fail) {
+        creep.room.roomManager.roomLogisticsBlacklistCoords.add(packCoord(target.pos))
+        Result.fail
+      }
+
+      return Result.action
+    }
+
+    // If we already moved a resource creep tick, then wait (presumably) until the next one to take any resoure-moving action
+    if (creep.movedResource) {
+      if (Game.flags[FlagNames.debugCreepLogistics]) {
+        creep.room.visual.text('MR', creep.pos)
+      }
+
+      return Result.noAction
+    }
+
+    if (Game.flags[FlagNames.debugCreepLogistics]) {
+      creep.room.visual.text(request[CreepLogisticsRequestKeys.amount].toString(), creep.pos)
+    }
+
+    /*     log(
+          'DOING REQUEST',
+          request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + creep.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + creep.name,
+          { position: 1 },
+      ) */
+    // Pickup type
+
+    if (target instanceof Resource) {
+      creep.pickup(target)
+      creep.movedResource = true
+
+      creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+        request[CreepLogisticsRequestKeys.amount]
+      target.nextAmount -= request[CreepLogisticsRequestKeys.amount]
+
+      creep.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+      return Result.success
+    }
+
+    if (request[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+      /* stringifyLog('tried to resolve request for ' + creep.name, request) */
+
+      const result = creep.transfer(
+        target as AnyStoreStructure | Creep,
+        request[CreepLogisticsRequestKeys.resourceType],
+        request[CreepLogisticsRequestKeys.amount],
+      )
+      if (result !== OK) {
+        creep.room.visual.text(result.toString(), creep.pos)
+        return Result.fail
+      }
+
+      creep.movedResource = true
+
+      creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+        request[CreepLogisticsRequestKeys.amount]
+      target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+        request[CreepLogisticsRequestKeys.amount]
+
+      creep.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+      return Result.success
+    }
+
+    // Withdraw or offer type
+
+    // Creeps need to transfer to each other
+
+    if (target instanceof Creep) {
+      if (
+        target.transfer(
+          creep,
+          request[CreepLogisticsRequestKeys.resourceType],
+          request[CreepLogisticsRequestKeys.amount],
+        ) !== OK
+      )
+        return Result.fail
+
+      target.movedResource = true
+
+      creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+        request[CreepLogisticsRequestKeys.amount]
+      target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+        request[CreepLogisticsRequestKeys.amount]
+
+      creep.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+      return Result.action
+    }
+
+    if (
+      creep.withdraw(
+        target,
+        request[CreepLogisticsRequestKeys.resourceType],
+        request[CreepLogisticsRequestKeys.amount],
+      ) !== OK
+    )
+      return Result.fail
+
+    creep.movedResource = true
+
+    creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+      request[CreepLogisticsRequestKeys.amount]
+
+    creep.memory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+    return Result.success
+  }
+
+  runRoomLogisticsRequestsAdvanced(creep: Creep, args?: FindNewRoomLogisticsRequestArgs) {
+    if (creep.spawning) return Result.noAction
+
+    const result = creepProcs.runRoomLogisticsRequestAdvanced(creep, args)
+    if (result === Result.action) return result
+
+    creepProcs.runRoomLogisticsRequestAdvanced(creep, args)
+    return Result.success
+  }
+
+  runRoomLogisticsRequest(creep: Creep) {
+    const creepMemory = Memory.creeps[creep.name]
+    const request = creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
+    if (!request) return Result.fail
+
+    /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
+    const target = findObjectWithID(request[CreepLogisticsRequestKeys.target])
+
+    if (getRange(target.pos, creep.pos) > 1) {
+      creep.createMoveRequest({
+        origin: creep.pos,
+        goals: [{ pos: target.pos, range: 1 }],
+        defaultCostMatrix(roomName) {
+          const roomManager = RoomManager.roomManagers[roomName]
+          if (!roomManager) return false
+
+          return roomManager.defaultCostMatrix
+        },
+      })
+
+      return Result.action
+    }
+
+    // If we already moved a resource creep tick, then wait (presumably) until the next one to take any resoure-moving action
+    if (creep.movedResource) return Result.noAction
+
+    /*     log(
+          'DOING REQUEST',
+          request.T + ', ' + request[CreepRoomLogisticsRequestKeys.amount] + ', ' + creep.store.getCapacity(request[CreepRoomLogisticsRequestKeys.resourceType]) + ', ' + creep.name,
+          { position: 1 },
+      ) */
+    // Pickup type
+
+    if (target instanceof Resource) {
+      creep.pickup(target)
+      creep.movedResource = true
+
+      creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+        request[CreepLogisticsRequestKeys.amount]
+      target.nextAmount -= request[CreepLogisticsRequestKeys.amount]
+
+      creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+      return Result.success
+    }
+
+    if (request[CreepLogisticsRequestKeys.type] === RoomLogisticsRequestTypes.transfer) {
+      if (
+        creep.transfer(
+          target as AnyStoreStructure | Creep,
+          request[CreepLogisticsRequestKeys.resourceType],
+          request[CreepLogisticsRequestKeys.amount],
+        ) !== OK
+      )
+        return Result.fail
+
+      creep.movedResource = true
+
+      creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+        request[CreepLogisticsRequestKeys.amount]
+      target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+        request[CreepLogisticsRequestKeys.amount]
+
+      creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+      return Result.success
+    }
+
+    // Withdraw or offer type
+
+    // Creeps need to transfer to each other
+
+    if (target instanceof Creep) {
+      if (
+        target.transfer(
+          creep,
+          request[CreepLogisticsRequestKeys.resourceType],
+          request[CreepLogisticsRequestKeys.amount],
+        ) !== OK
+      )
+        return Result.fail
+
+      creep.movedResource = true
+
+      creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+        request[CreepLogisticsRequestKeys.amount]
+      target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+        request[CreepLogisticsRequestKeys.amount]
+
+      creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+      return Result.success
+    }
+
+    if (
+      creep.withdraw(
+        target,
+        request[CreepLogisticsRequestKeys.resourceType],
+        request[CreepLogisticsRequestKeys.amount],
+      ) !== OK
+    )
+      return Result.fail
+
+    creep.movedResource = true
+
+    creep.nextStore[request[CreepLogisticsRequestKeys.resourceType]] +=
+      request[CreepLogisticsRequestKeys.amount]
+    target.nextStore[request[CreepLogisticsRequestKeys.resourceType]] -=
+      request[CreepLogisticsRequestKeys.amount]
+
+    creepMemory[CreepMemoryKeys.roomLogisticsRequests].splice(0, 1)
+    return Result.success
+  }
+
+  runRoomLogisticsRequests(creep: Creep) {
+    if (creep.spawning) return false
+
+    if (this.runRoomLogisticsRequest(creep) !== Result.success) return false
+
+    this.runRoomLogisticsRequest(creep)
+    return true
+  }
+
+  findCreepRoomLogisticsRequestAmount(
+    creep: Creep,
+    type: RoomLogisticsRequestTypes,
+    targetID: Id<RoomLogisticsTargets>,
+    amount: number,
+    resourceType: ResourceConstant,
+  ) {
+    const target = findObjectWithID(targetID)
+
+    // Pickup type
+
+    if (target instanceof Resource) {
+      // Update in accordance to potential resource decay
+
+      amount = Math.min(target.nextAmount, amount)
+      if (amount <= 0) return amount
+
+      target.reserveAmount -= amount
+      return amount
+    }
+
+    if (type === RoomLogisticsRequestTypes.transfer) {
+      // Delete the request if the target is fulfilled
+
+      const targetFreeReserveStore = roomObjectUtils.freeNextStoreOf(target, resourceType)
+      if (targetFreeReserveStore < amount) return 0
+
+      amount = Math.min(Math.min(creep.nextStore[resourceType], targetFreeReserveStore), amount)
+      if (amount <= 0) return amount
+
+      target.reserveStore[resourceType] += amount
+      return amount
+    }
+
+    // Withdraw or offer type
+
+    // Delete the request if the target doesn't have what we need
+
+    if (target.nextStore[resourceType] < amount) return amount
+
+    amount = Math.min(target.nextStore[resourceType], amount)
+    if (amount <= 0) return amount
+
+    target.reserveStore[resourceType] -= amount
+    return amount
+  }
+
+  createCreepRoomLogisticsRequest(
+    creep: Creep,
+    type: RoomLogisticsRequestTypes,
+    targetID: Id<RoomLogisticsTargets>,
+    amount: number,
+    resourceType: ResourceConstant = RESOURCE_ENERGY,
+  ) {
+    /* amount = */ this.findCreepRoomLogisticsRequestAmount(creep, type, targetID, amount, resourceType)
+    if (amount <= 0) return Result.fail
+
+    creep.memory[CreepMemoryKeys.roomLogisticsRequests].push({
+      [CreepLogisticsRequestKeys.type]: type,
+      [CreepLogisticsRequestKeys.target]: targetID,
+      [CreepLogisticsRequestKeys.resourceType]: resourceType,
+      [CreepLogisticsRequestKeys.amount]: amount,
+    })
+
+    return Result.success
+  }
+
+  activeRenew(creep: Creep) {
+    const { room } = creep
+
+    // If there is insufficient CPU to renew, inform false
+
+    if (!room.myCreepsByRole.fastFiller.length) return
+    if (creep.isDying()) return
+
+    // If the creep's age is less than the benefit from renewing, inform false
+
+    const creepCost = Memory.creeps[creep.name][CreepMemoryKeys.cost]
+    const energyCost = Math.ceil(creepCost / 2.5 / creep.body.length)
+    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.floor(600 / creep.body.length)) return
+
+    const spawns = room.roomManager.structures.spawn.filter(
+      spawn => !spawn.renewed && !spawn.spawning,
+    )
+    if (!spawns.length) return
+
+    const spawn = findClosestObject(creep.pos, spawns)
+
+    if (getRange(creep.pos, spawn.pos) > 1) {
+      creep.createMoveRequest({
+        origin: creep.pos,
+        goals: [{ pos: spawn.pos, range: 1 }],
+        avoidEnemyRanges: true,
+      })
+      return
+    }
+
+    const result = spawn.renewCreep(creep)
+    if (result === OK) {
+      statsManager.updateStat(creep.room.name, 'eosp', energyCost)
+      spawn.renewed = true
+    }
+  }
+
+  passiveRenew(creep: Creep) {
+    const { room } = creep
+
+    // If there is insufficient CPU to renew, inform false
+
+    if (creep.body.length > 10) return
+    if (!room.myCreepsByRole.fastFiller.length) return
+    if (creep.isDying()) return
+
+    // If the creep's age is less than the benefit from renewing, inform false
+
+    const creepCost = Memory.creeps[creep.name][CreepMemoryKeys.cost]
+    const energyCost = Math.ceil(creepCost / 2.5 / creep.body.length)
+    if (CREEP_LIFE_TIME - creep.ticksToLive < Math.floor(600 / creep.body.length)) return
+
+    // Get the room's spawns, stopping if there are none
+
+    const spawns = room.roomManager.structures.spawn
+
+    // Get a spawn in range of 1, informing false if there are none
+
+    const spawn = spawns.find(
+      spawn =>
+        getRangeXY(creep.pos.x, spawn.pos.x, creep.pos.y, spawn.pos.y) === 1 &&
+        !spawn.renewed &&
+        !spawn.spawning &&
+        structureUtils.isRCLActionable(spawn),
+    )
+    if (!spawn) return
+
+    const result = spawn.renewCreep(creep)
+    if (result === OK) {
+      statsManager.updateStat(creep.room.name, 'eosp', energyCost)
+      spawn.renewed = true
+    }
+  }
+
 }
 
 export const creepProcs = new CreepProcs()

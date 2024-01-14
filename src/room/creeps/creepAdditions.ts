@@ -28,32 +28,11 @@ Object.defineProperties(Creep.prototype, {
             return (this._role = creepRoles[parseInt(this.nameData[0])])
         },
     },
-    cost: {
-        get() {
-            if (this._cost) return this._cost
-
-            return (this._cost = parseInt(this.nameData[1]))
-        },
-    },
     commune: {
         get() {
             if (this._commune) return this._commune
 
             return (this._commune = Game.rooms[this.nameData[2]])
-        },
-    },
-    defaultParts: {
-        get() {
-            if (this._defaultParts) return this._defaultParts
-
-            return (this._defaultParts = parseInt(this.nameData[3]))
-        },
-    },
-    customID: {
-        get() {
-            if (this._customID) return this._customID
-
-            return (this._customID = parseInt(this.nameData[4]))
         },
     },
     strength: {

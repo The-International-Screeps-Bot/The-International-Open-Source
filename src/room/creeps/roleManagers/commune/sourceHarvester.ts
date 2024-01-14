@@ -21,6 +21,7 @@ import { Hauler } from './hauler'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 import { structureUtils } from 'room/structureUtils'
+import { creepProcs } from 'room/creeps/creepProcs'
 
 export class SourceHarvester extends Creep {
     constructor(creepID: Id<Creep>) {
@@ -191,16 +192,16 @@ export class SourceHarvester extends Creep {
             if (this.nextStore.energy < myCreepUtils.parts(this).work) {
                 if (this.movedResource) return false
 
-                const result = this.runRoomLogisticsRequestAdvanced({
-                    resourceTypes: new Set([RESOURCE_ENERGY]),
-                    types: new Set<RoomLogisticsRequestTypes>([
-                        RoomLogisticsRequestTypes.withdraw,
-                        RoomLogisticsRequestTypes.pickup,
-                        RoomLogisticsRequestTypes.offer,
-                    ]),
-                    conditions: request => {
-                        getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
-                    },
+                const result = creepProcs.runRoomLogisticsRequestAdvanced(this, {
+                  resourceTypes: new Set([RESOURCE_ENERGY]),
+                  types: new Set<RoomLogisticsRequestTypes>([
+                    RoomLogisticsRequestTypes.withdraw,
+                    RoomLogisticsRequestTypes.pickup,
+                    RoomLogisticsRequestTypes.offer,
+                  ]),
+                  conditions: request => {
+                    getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+                  },
                 })
                 if (result !== Result.success) return false
             }
@@ -226,16 +227,16 @@ export class SourceHarvester extends Creep {
         if (this.nextStore.energy < workPartCount) {
             if (this.movedResource) return false
 
-            const result = this.runRoomLogisticsRequestAdvanced({
-                resourceTypes: new Set([RESOURCE_ENERGY]),
-                types: new Set<RoomLogisticsRequestTypes>([
-                    RoomLogisticsRequestTypes.withdraw,
-                    RoomLogisticsRequestTypes.pickup,
-                    RoomLogisticsRequestTypes.offer,
-                ]),
-                conditions: request => {
-                    getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
-                },
+            const result = creepProcs.runRoomLogisticsRequestAdvanced(this, {
+              resourceTypes: new Set([RESOURCE_ENERGY]),
+              types: new Set<RoomLogisticsRequestTypes>([
+                RoomLogisticsRequestTypes.withdraw,
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.offer,
+              ]),
+              conditions: request => {
+                getRange(findObjectWithID(request.targetID).pos, this.pos) <= 1
+              },
             })
             if (result !== Result.success) return false
         }

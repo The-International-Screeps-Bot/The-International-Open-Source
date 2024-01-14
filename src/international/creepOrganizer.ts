@@ -55,7 +55,8 @@ export class CreepOrganizer {
         creep.room.myCreeps.push(creep)
         creep.room.myCreepsByRole[role].push(creepName)
 
-        collectiveManager.customCreepIDs[creep.customID] = true
+        const customID = creepUtils.customIDCreep(creep)
+        collectiveManager.customCreepIDs[customID] = true
 
         // Add the creep's name to the position in its room
 

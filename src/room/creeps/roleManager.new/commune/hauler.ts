@@ -1,3 +1,4 @@
+import { creepProcs } from "room/creeps/creepProcs"
 import { DefaultRoleManager } from "room/creeps/defaultRoleManager"
 
 class HaulerManager extends DefaultRoleManager {
@@ -8,8 +9,8 @@ class HaulerManager extends DefaultRoleManager {
 
     run(creep: Creep) {
 
-        creep.passiveRenew()
-        creep.runRoomLogisticsRequestsAdvanced()
+        creepProcs.passiveRenew(creep)
+        creepProcs.runRoomLogisticsRequestsAdvanced(creep)
     }
 }
 

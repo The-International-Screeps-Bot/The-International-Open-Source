@@ -14,6 +14,7 @@ import {
 } from 'international/constants'
 import { statsManager } from 'international/statsManager'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
+import { creepProcs } from 'room/creeps/creepProcs'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 import { structureUtils } from 'room/structureUtils'
 import {
@@ -59,7 +60,7 @@ export class Hauler extends Creep {
         return true
     }
 
-    passiveRenew() {
+    passiveRenew?() {
 
         const { room } = this
 
@@ -68,11 +69,12 @@ export class Hauler extends Creep {
         if (this.body.length > 10) return
         if (!room.myCreepsByRole.fastFiller.length) return
         // only renew if we are the same as the desired hauler cost
-        if (this.cost !== Memory.rooms[room.name][RoomMemoryKeys.minHaulerCost]) return
+        const creepCost = Memory.creeps[this.name][CreepMemoryKeys.cost]
+        if (creepCost !== Memory.rooms[room.name][RoomMemoryKeys.minHaulerCost]) return
 
         // If the creep's age is less than the benefit from renewing, inform false
 
-        const energyCost = Math.ceil(this.findCost() / 2.5 / this.body.length)
+        const energyCost = Math.ceil(creepCost / 2.5 / this.body.length)
         if (CREEP_LIFE_TIME - this.ticksToLive < Math.floor(600 / this.body.length)) return
 
         // Get the room's spawns, stopping if there are none
@@ -351,18 +353,18 @@ export class Hauler extends Creep {
         if (this.room.name !== this.commune.name) {
             // Fulfill requests near the hauler
 
-            this.runRoomLogisticsRequestsAdvanced({
-                types: new Set([
-                    RoomLogisticsRequestTypes.pickup,
-                    RoomLogisticsRequestTypes.withdraw,
-                ]),
-                resourceTypes: new Set([RESOURCE_ENERGY]),
-                conditions: request => {
-                    // If the target is near the creep
+            creepProcs.runRoomLogisticsRequestAdvanced(this, {
+              types: new Set([
+                RoomLogisticsRequestTypes.pickup,
+                RoomLogisticsRequestTypes.withdraw,
+              ]),
+              resourceTypes: new Set([RESOURCE_ENERGY]),
+              conditions: request => {
+                // If the target is near the creep
 
-                    const targetPos = findObjectWithID(request.targetID).pos
-                    return getRange(targetPos, this.pos) <= 0
-                },
+                const targetPos = findObjectWithID(request.targetID).pos
+                return getRange(targetPos, this.pos) <= 0
+              },
             })
 
             if (!this.needsResources()) {
@@ -464,60 +466,55 @@ export class Hauler extends Creep {
 
         const isBySourceHarvestPos = getRange(this.pos, sourceHarvestPos) <= 1
         if (isBySourceHarvestPos || creepMemory[CreepMemoryKeys.roomLogisticsRequests].length > 0) {
-            const freeNextStoreInitial = this.freeNextStore
+          const freeNextStoreInitial = this.freeNextStore
 
-            this.runRoomLogisticsRequestsAdvanced({
-                types: new Set([
-                    RoomLogisticsRequestTypes.pickup,
-                    RoomLogisticsRequestTypes.withdraw,
-                ]),
-                resourceTypes: new Set([RESOURCE_ENERGY]),
-                conditions: request => {
-                    // If the target is near the creep or source
+          creepProcs.runRoomLogisticsRequestAdvanced(this, {
+            types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
+            resourceTypes: new Set([RESOURCE_ENERGY]),
+            conditions: request => {
+              // If the target is near the creep or source
 
-                    const targetPos = findObjectWithID(request.targetID).pos
-                    return (
-                        getRange(targetPos, this.pos) <= 1 ||
-                        getRange(
-                            targetPos,
-                            this.room.roomManager.remoteSources[
-                                creepMemory[CreepMemoryKeys.sourceIndex]
-                            ].pos,
-                        ) <= 1
-                    )
-                },
-            })
+              const targetPos = findObjectWithID(request.targetID).pos
+              return (
+                getRange(targetPos, this.pos) <= 1 ||
+                getRange(
+                  targetPos,
+                  this.room.roomManager.remoteSources[creepMemory[CreepMemoryKeys.sourceIndex]].pos,
+                ) <= 1
+              )
+            },
+          })
 
-            // remove fulfilled reserved source credit from source credit
+          // remove fulfilled reserved source credit from source credit
 
-            // Should be a negative number, as we should have more used store than before
-            const freeNextStoreDifference = this.freeNextStore - freeNextStoreInitial
-            if (freeNextStoreDifference !== 0) {
-                Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceCredit][
-                    creepMemory[CreepMemoryKeys.sourceIndex]
-                ] += freeNextStoreDifference
-                Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceCreditReservation][
-                    creepMemory[CreepMemoryKeys.sourceIndex]
-                ] += freeNextStoreDifference
-            }
+          // Should be a negative number, as we should have more used store than before
+          const freeNextStoreDifference = this.freeNextStore - freeNextStoreInitial
+          if (freeNextStoreDifference !== 0) {
+            Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceCredit][
+              creepMemory[CreepMemoryKeys.sourceIndex]
+            ] += freeNextStoreDifference
+            Memory.rooms[this.room.name][RoomMemoryKeys.remoteSourceCreditReservation][
+              creepMemory[CreepMemoryKeys.sourceIndex]
+            ] += freeNextStoreDifference
+          }
 
-            return !this.needsResources()
+          return !this.needsResources()
         }
 
         // Fulfill requests near the hauler
 
-        this.runRoomLogisticsRequestsAdvanced({
-            types: new Set<RoomLogisticsRequestTypes>([
-                RoomLogisticsRequestTypes.pickup,
-                RoomLogisticsRequestTypes.withdraw,
-            ]),
-            resourceTypes: new Set([RESOURCE_ENERGY]),
-            conditions: request => {
-                // If the target is near the creep
+        creepProcs.runRoomLogisticsRequestAdvanced(this, {
+          types: new Set<RoomLogisticsRequestTypes>([
+            RoomLogisticsRequestTypes.pickup,
+            RoomLogisticsRequestTypes.withdraw,
+          ]),
+          resourceTypes: new Set([RESOURCE_ENERGY]),
+          conditions: request => {
+            // If the target is near the creep
 
-                const targetPos = findObjectWithID(request.targetID).pos
-                return getRange(targetPos, this.pos) <= 1
-            },
+            const targetPos = findObjectWithID(request.targetID).pos
+            return getRange(targetPos, this.pos) <= 1
+          },
         })
 
         if (!this.needsResources()) return true
@@ -561,18 +558,18 @@ export class Hauler extends Creep {
 
         if (commune.communeManager.remoteResourcePathType === RoomMemoryKeys.remoteSourceHubPaths) {
             if (this.room.name === commune.name) {
-                this.passiveRenew()
+                creepProcs.passiveRenew(this)
 
-                this.runRoomLogisticsRequestAdvanced({
-                    types: new Set([RoomLogisticsRequestTypes.transfer]),
-                    resourceTypes: new Set([RESOURCE_ENERGY]),
-                    noDelivery: true,
-                    conditions: request => {
-                        // If the target is near the creep
+                creepProcs.runRoomLogisticsRequestAdvanced(this, {
+                  types: new Set([RoomLogisticsRequestTypes.transfer]),
+                  resourceTypes: new Set([RESOURCE_ENERGY]),
+                  noDelivery: true,
+                  conditions: request => {
+                    // If the target is near the creep
 
-                        const targetPos = findObjectWithID(request.targetID).pos
-                        return getRange(targetPos, this.pos) <= 1
-                    },
+                    const targetPos = findObjectWithID(request.targetID).pos
+                    return getRange(targetPos, this.pos) <= 1
+                  },
                 })
 
                 // If we tried to respond but weren't able to do so in a single tick, then we should wait to try again next tick
@@ -683,11 +680,11 @@ export class Hauler extends Creep {
         }
 
         if (this.room.name === commune.name) {
-            this.passiveRenew()
+            creepProcs.passiveRenew(this)
 
-            this.runRoomLogisticsRequestsAdvanced({
-                types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.transfer]),
-                resourceTypes: new Set([RESOURCE_ENERGY]),
+            creepProcs.runRoomLogisticsRequestAdvanced(this, {
+              types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.transfer]),
+              resourceTypes: new Set([RESOURCE_ENERGY]),
             })
 
             // We haven't emptied ourselves yet
@@ -1041,11 +1038,11 @@ export class Hauler extends Creep {
     }
 
     runCommuneLogistics?() {
-        this.passiveRenew()
+        creepProcs.passiveRenew(this)
 
-        if (this.runRoomLogisticsRequestsAdvanced() === Result.action) {
-            this.relay()
-            return Result.action
+        if (creepProcs.runRoomLogisticsRequestAdvanced(this) === Result.action) {
+          this.relay()
+          return Result.action
         }
 
         return Result.success
