@@ -55,6 +55,19 @@ global.killCreeps = function (roles?) {
     return `Killed an total of ${killedCreepCount} creeps ${roles ? `with the roles ${roles}` : ''}`
 }
 
+global.killPowerCreeps = function() {
+    let killedCreeps = 0
+
+    for (const creepName in Game.powerCreeps) {
+        const creep = Game.powerCreeps[creepName]
+
+        creep.suicide()
+        killedCreeps += 1
+    }
+
+    return `Killed a total of ${killedCreeps} creeps`
+}
+
 global.removeCSites = function (removeInProgress, types?) {
     let removedCSCount = 0
 

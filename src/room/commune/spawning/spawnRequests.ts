@@ -643,10 +643,7 @@ export class SpawnRequestsManager {
 
         /* customLog('e', partsMultiplier) */
         const role = 'maintainer'
-        customLog(
-          'maintainer',
-          partsMultiplier + ', ' + maxCreeps + ', ' + this.spawnEnergyCapacity,
-        )
+
         if (this.communeManager.hasSufficientRoads) {
           return {
             type: SpawnRequestTypes.groupDiverse,

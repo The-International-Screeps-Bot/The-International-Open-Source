@@ -79,8 +79,8 @@ export class MigrationManager {
 
   private hardMigration() {
 
-
       global.killCreeps()
+      global.killPowerCreeps()
       global.clearMemory()
       global.removeCSites()
 

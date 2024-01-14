@@ -1390,6 +1390,8 @@ declare global {
        */
       killCreeps(roles?: CreepRoles[]): string
 
+      killPowerCreeps(): string
+
       /**
        * Removes all specified construction sites owned by the bot
        */
