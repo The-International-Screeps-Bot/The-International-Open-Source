@@ -27,7 +27,6 @@ import {
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
-import './towers'
 import './links'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
@@ -39,10 +38,7 @@ import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerSizeManager } from './haulerSize'
 import { HaulerNeedManager } from './haulerNeed'
-import {
-    packCoord,
-    unpackPosAt,
-} from 'other/codec'
+import { packCoord, unpackPosAt } from 'other/codec'
 import { StoringStructuresManager } from './storingStructures'
 import { LinkManager } from './links'
 import { FactoryManager } from './factory'
@@ -203,6 +199,7 @@ export class CommuneManager {
       roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
     }
 
+    this.room.roomManager.communePlanner.attemptPlan(this.room)
     communeProcs.registerFunneling(room)
     communeProcs.getRCLUpdate(room)
 
@@ -253,8 +250,6 @@ export class CommuneManager {
 
   initRun() {
     this.preTickTest()
-
-    this.room.roomManager.communePlanner.preTickRun(this.room)
 
     const roomMemory = Memory.rooms[this.room.name]
     if (!roomMemory[RoomMemoryKeys.communePlanned]) return
@@ -611,7 +606,7 @@ export class CommuneManager {
     // We can use links
 
     const controllerLink = this.controllerLink
-    if (!controllerLink || ! structureUtils.isRCLActionable(controllerLink)) return false
+    if (!controllerLink || !structureUtils.isRCLActionable(controllerLink)) return false
 
     const hubLink = this.room.roomManager.hubLink
     if (!hubLink || !structureUtils.isRCLActionable(hubLink)) return false
@@ -812,8 +807,8 @@ export class CommuneManager {
 
     let actionableSpawningStructures: SpawningStructures = structures.spawn
     actionableSpawningStructures = actionableSpawningStructures.concat(structures.extension)
-    actionableSpawningStructures = actionableSpawningStructures.filter(
-      structure => structureUtils.isRCLActionable(structure),
+    actionableSpawningStructures = actionableSpawningStructures.filter(structure =>
+      structureUtils.isRCLActionable(structure),
     )
 
     this.actionableSpawningStructuresIDs = actionableSpawningStructures.map(

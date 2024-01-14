@@ -291,7 +291,7 @@ export class RequestsManager extends Sleepable {
       if (Game.map.getRoomStatus(requestName) !== Game.map.getRoomStatus(communeName)) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
-        Memory.workRequests[requestName][WorkRequestKeys.abandon] = 20000
+        request[CombatRequestKeys.abandon] = 20000
         continue
       }
 
@@ -364,7 +364,7 @@ export class RequestsManager extends Sleepable {
       if (Game.map.getRoomStatus(requestName) !== Game.map.getRoomStatus(communeName)) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
-        Memory.workRequests[requestName][WorkRequestKeys.abandon] = 20000
+        request[HaulRequestKeys.abandon] = 20000
         continue
       }
 

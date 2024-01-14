@@ -61,9 +61,9 @@ export function originalLoop() {
     simpleAllies.initRun()
     wasm.collaborator()
 
-    roomsManager.updateRun()
     roomDataManager.initRooms()
     roomDataManager.updateRooms()
+    roomsManager.updateRun()
     transactionsManager.run()
     requestsManager.run()
 
