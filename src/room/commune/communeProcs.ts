@@ -1,6 +1,7 @@
 import { roomUtils } from 'room/roomUtils'
 import { communeDataManager } from './communeData'
 import { communeUtils } from './communeUtils'
+import { RoomLogisticsRequestTypes } from 'international/constants'
 
 /**
  * Minor processes for communes

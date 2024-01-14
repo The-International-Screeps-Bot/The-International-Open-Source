@@ -1,4 +1,4 @@
-import { findClosestRoomName, randomIntRange, randomRange, utils } from 'utils/utils'
+import { randomIntRange, randomRange, utils } from 'utils/utils'
 import { collectiveManager } from './collective'
 import { roomNameUtils } from 'room/roomNameUtils'
 import {
@@ -159,15 +159,21 @@ export class RequestsManager extends Sleepable {
         continue
       }
 
-      const communeName = findClosestRoomName(roomName, communesForResponding)
+      const communeName = roomNameUtils.findClosestRoomName(roomName, communesForResponding)
       if (!communeName) {
         // Wait on the request
         Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
         continue
       }
 
-      // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
+      if (Game.map.getRoomStatus(roomName) !== Game.map.getRoomStatus(communeName)) {
+        // We probably can't reach as it will likely be a respawn, novice, or closed
 
+        Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
+        continue
+      }
+
+      // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
       if (
         Game.map.getRoomLinearDistance(communeName, roomName) > maxWorkRequestDistance ||
         roomNameUtils.advancedFindDistance(communeName, roomName, {
@@ -279,11 +285,17 @@ export class RequestsManager extends Sleepable {
         communes.push(roomName)
       }
 
-      const communeName = findClosestRoomName(requestName, communes)
+      const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
-      // Run a more simple and less expensive check, then a more complex and expensive to confirm
+      if (Game.map.getRoomStatus(requestName) !== Game.map.getRoomStatus(communeName)) {
+        // We probably can't reach as it will likely be a respawn, novice, or closed
 
+        Memory.workRequests[requestName][WorkRequestKeys.abandon] = 20000
+        continue
+      }
+
+      // Run a more simple and less expensive check, then a more complex and expensive to confirm
       if (
         Game.map.getRoomLinearDistance(communeName, requestName) > maxCombatDistance ||
         roomNameUtils.advancedFindDistance(communeName, requestName, {
@@ -346,11 +358,17 @@ export class RequestsManager extends Sleepable {
         communes.push(roomName)
       }
 
-      const communeName = findClosestRoomName(requestName, communes)
+      const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
-      // Run a more simple and less expensive check, then a more complex and expensive to confirm
+      if (Game.map.getRoomStatus(requestName) !== Game.map.getRoomStatus(communeName)) {
+        // We probably can't reach as it will likely be a respawn, novice, or closed
 
+        Memory.workRequests[requestName][WorkRequestKeys.abandon] = 20000
+        continue
+      }
+
+      // Run a more simple and less expensive check, then a more complex and expensive to confirm
       if (
         Game.map.getRoomLinearDistance(communeName, requestName) > maxHaulDistance ||
         roomNameUtils.advancedFindDistance(communeName, requestName, {

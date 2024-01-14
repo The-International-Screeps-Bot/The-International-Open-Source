@@ -34,10 +34,6 @@ import { GarbageCollector } from 'international/garbageCollector'
 import { EndTickManager } from 'international/endTick'
 import { EndTickCreepManager } from 'room/creeps/endTickCreepManager'
 import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
-import { ContainerManager } from 'room/container'
-import { DroppedResourceManager } from 'room/droppedResources'
-import { RuinsManager } from 'room/ruins'
-import { TombstoneManager } from 'room/tombstones'
 import { HaulerNeedManager } from 'room/commune/haulerNeed'
 import { LinkManager } from 'room/commune/links'
 import { StoringStructuresManager } from 'room/commune/storingStructures'
@@ -103,6 +99,12 @@ import { CreepProcs } from 'room/creeps/creepProcs'
 import { Procs } from 'utils/procs'
 import { RoomObjectUtils } from 'room/roomObjectUtils'
 import { StructureUtils } from 'room/structureUtils'
+import { RemoteProcs } from 'room/remoteProcs'
+import { RemoteUtils } from 'room/remoteUtils'
+import { LogisticsProcs } from 'room/logisticsProcs'
+import { LogisticsUtils } from 'room/logisticsUtils'
+import { TowerProcs } from 'room/commune/towerProcs'
+import { TowerUtils } from 'room/commune/towerUtils'
 
 export function profilerRegister() {
   // Classes
@@ -150,10 +152,6 @@ export function profilerRegister() {
   profiler.registerClass(SourceManager, 'SourceManager')
   profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
-  profiler.registerClass(ContainerManager, 'ContainerManager')
-  profiler.registerClass(DroppedResourceManager, 'DroppedResourceManager')
-  profiler.registerClass(RuinsManager, 'RuinManager')
-  profiler.registerClass(TombstoneManager, 'TombstoneManager')
   profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
   profiler.registerClass(LinkManager, 'LinkManager')
   profiler.registerClass(StoringStructuresManager, 'StoringStructuresManager')
@@ -174,6 +172,12 @@ export function profilerRegister() {
   profiler.registerClass(CommuneProcs, 'CommuneProc')
   profiler.registerClass(RoomObjectUtils, 'RoomObjectUtils')
   profiler.registerClass(StructureUtils, 'StructureUtils')
+  profiler.registerClass(RemoteProcs, 'RemoteProcs')
+  profiler.registerClass(RemoteUtils, 'RemoteUtils')
+  profiler.registerClass(LogisticsProcs, 'LogisticsProcs')
+  profiler.registerClass(LogisticsUtils, 'LogisticsUtils')
+  profiler.registerClass(TowerProcs, 'TowerProcs')
+  profiler.registerClass(TowerUtils, 'TowerUtils')
 
   // Creep classes
 

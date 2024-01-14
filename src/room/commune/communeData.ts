@@ -9,6 +9,7 @@ interface CommuneData {
   generalRepairStructureCoords: Set<string>
   maxUpgradeStrength: number
   estimatedCommuneSourceIncome: number[]
+  towerRampartRepairTreshold: number
 }
 
 /**
@@ -28,6 +29,7 @@ export class CommuneDataManager {
     if (utils.isTickInterval(10)) {
 
       delete data.estimatedCommuneSourceIncome
+      delete data.towerRampartRepairTreshold
     }
   }
 }

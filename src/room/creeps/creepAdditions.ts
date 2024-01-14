@@ -9,9 +9,9 @@ import {
 import { customLog } from 'utils/logging'
 import { getRangeXY, getRange, isXYExit, isExit } from 'utils/utils'
 import { profiler } from 'other/profiler'
-import { towerFunctions } from 'room/commune/towers'
 import { creepUtils } from './creepUtils'
 import { structureUtils } from 'room/structureUtils'
+import { towerUtils } from 'room/commune/towerUtils'
 
 Object.defineProperties(Creep.prototype, {
     nameData: {
@@ -364,7 +364,7 @@ const additions = {
                 if (!structureUtils.isRCLActionable(tower)) continue
                 if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
 
-                this._grossTowerDamage = towerFunctions.estimateDamageGross(tower, this.pos)
+                this._grossTowerDamage = towerUtils.estimateDamageGross(tower, this.pos)
             }
 
             return this._grossTowerDamage

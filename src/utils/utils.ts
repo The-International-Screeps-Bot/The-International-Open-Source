@@ -406,22 +406,6 @@ export function findCreepInQueueMatchingRequest(queue: string[], requestPackedPo
   return undefined
 }
 
-export function findClosestRoomName(start: string, targets: Iterable<string>) {
-  let minRange = Infinity
-  let closest = undefined
-
-  for (const target of targets) {
-    const range = Game.map.getRoomLinearDistance(start, target)
-
-    if (range > minRange) continue
-
-    minRange = range
-    closest = target
-  }
-
-  return closest
-}
-
 /**
  * Generatesa a random integer between two thresholds
  */

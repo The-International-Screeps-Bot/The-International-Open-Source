@@ -35,7 +35,6 @@ import { CombatRequestManager } from './combatRequest'
 import { PowerSpawnsManager } from './powerSpawn'
 import './haulerSize'
 import { SourceManager } from './sourceManager'
-import { TowerManager } from './towers'
 import { DefenceManager } from './defence'
 import { SpawningStructuresManager } from './spawning/spawningStructures'
 import { HaulRequestManager } from './haulRequestManager'
@@ -57,6 +56,8 @@ import { LogTypes, customLog } from 'utils/logging'
 import { communeUtils } from './communeUtils'
 import { communeProcs } from './communeProcs'
 import { structureUtils } from 'room/structureUtils'
+import { logisticsProcs } from 'room/logisticsProcs'
+import { towerProcs } from './towerProcs'
 
 export type ResourceTargets = {
   min: Partial<{ [key in ResourceConstant]: number }>
@@ -71,7 +72,6 @@ export class CommuneManager {
   constructionManager: ConstructionManager
   defenceManager: DefenceManager
 
-  towerManager: TowerManager
   storingStructuresManager: StoringStructuresManager
   linkManager: LinkManager
   labManager: LabManager
@@ -122,7 +122,6 @@ export class CommuneManager {
     this.constructionManager = new ConstructionManager(this)
     this.defenceManager = new DefenceManager(this)
 
-    this.towerManager = new TowerManager(this)
     this.storingStructuresManager = new StoringStructuresManager(this)
     this.linkManager = new LinkManager(this)
     this.labManager = new LabManager(this)
@@ -274,7 +273,7 @@ export class CommuneManager {
     if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
     this.defenceManager.run()
-    this.towerManager.run()
+    towerProcs.run(this.room)
     this.defenceManager.manageThreat()
     this.defenceManager.manageDefenceRequests()
 
@@ -291,10 +290,10 @@ export class CommuneManager {
     this.spawningStructuresManager.createRoomLogisticsRequests()
     this.storingStructuresManager.run()
     this.factoryManager.run()
-    this.room.roomManager.containerManager.runCommune()
-    this.room.roomManager.droppedResourceManager.runCommune()
-    this.room.roomManager.tombstoneManager.runCommune()
-    this.room.roomManager.ruinManager.runCommune()
+    logisticsProcs.createCommuneContainerLogisticsRequests(this.room)
+    logisticsProcs.createCommuneDroppedResourceLogisticsRequests(this.room)
+    logisticsProcs.createCommuneTombstoneLogisticsRequests(this.room)
+    logisticsProcs.createCommuneRuinLogisticsRequests(this.room)
     this.linkManager.run()
     this.labManager.run()
     this.powerSpawningStructuresManager.run()

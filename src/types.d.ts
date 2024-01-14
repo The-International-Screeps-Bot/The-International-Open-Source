@@ -24,6 +24,8 @@ import {
   PowerCreepTasks,
   RoomLogisticsRequestTypes,
   MovedTypes,
+  RoomStatsKeys,
+  RoomStatusKeys,
 } from 'international/constants'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
@@ -1217,6 +1219,7 @@ declare global {
     [RoomMemoryKeys.type]: RoomTypes
     [RoomMemoryKeys.lastScout]: number
     [RoomMemoryKeys.danger]?: number
+    [RoomMemoryKeys.status]: RoomStatusKeys
     /***
      * The destination roomNames of each portal
      */
