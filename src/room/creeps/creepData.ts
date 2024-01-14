@@ -22,21 +22,19 @@ export interface CreepData {
  * Handles cached data for creeps we own
  */
 export class CreepDataManager {
-  creepsData: {[creepName: string]: Partial<CreepData> } = {}
+  data: { [creepName: string]: Partial<CreepData> } = {}
 
-  updateData() {
-
+  updateCreeps() {
     if (utils.isTickInterval(15)) {
-      this.updateCreeps()
+      for (const creepName in Game.creeps) {
+        this.updateCreep(creepName)
+      }
     }
   }
 
-  private updateCreeps() {
-
-    for (const creepName in Game.creeps) {
-
-      /* delete . */
-    }
+  private updateCreep(creepName: string) {
+    const data = this.data[creepName]
+    /* delete . */
   }
 }
 

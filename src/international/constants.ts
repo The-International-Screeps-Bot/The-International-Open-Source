@@ -236,7 +236,6 @@ export enum RoomMemoryKeys {
    * Tells (mostly civilians) if the room is safe (non-undefined number) and what tick it will refresh
    */
   danger,
-  portalsTo,
   status,
 
   // Types specific
@@ -269,6 +268,9 @@ export enum RoomMemoryKeys {
   dynamicScore,
   dynamicScoreUpdate,
   communePlanned,
+  portalsTo,
+  sourceCoords,
+  controllerCoord,
 
   // Commune
 

@@ -76,7 +76,7 @@ export class CreepOrganizer {
         }
 
         // initialize inter-tick data for the creep if it isn't already
-        creepDataManager.creepsData[creep.name] ??= {}
+        creepDataManager.data[creep.name] ??= {}
 
         creep.update()
 

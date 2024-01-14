@@ -537,8 +537,6 @@ declare global {
      */
     deleteTask(taskID: any, responder: boolean): void
 
-    scoutByRoomName(): number | false
-
     scoutRemote(scoutingRoom?: Room): number | false
     scoutEnemyReservedRemote(): number | false
     scoutEnemyUnreservedRemote(): number | false
@@ -1224,6 +1222,8 @@ declare global {
      * The destination roomNames of each portal
      */
     [RoomMemoryKeys.portalsTo]: string[]
+    [RoomMemoryKeys.sourceCoords]: string
+    [RoomMemoryKeys.controllerCoord]: string
 
     // Types specific
 

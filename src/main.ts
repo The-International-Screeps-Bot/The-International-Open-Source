@@ -37,60 +37,61 @@ import { creepDataManager } from 'room/creeps/creepData'
 import { roomDataManager } from 'room/roomData'
 import { utils } from 'utils/utils'
 import { procs } from 'utils/procs'
+import { communeDataManager } from 'room/commune/communeData'
 
 export function originalLoop() {
+  memHack.run()
+  if (segmentsManager.run() === Result.stop) return
 
-    memHack.run()
-    if (segmentsManager.run() === Result.stop) return
+  if (Game.flags.deactivate) return
+  if (Game.cpu.bucket < CPUMaxPerTick) {
+    procs.outOfBucket()
+    return
+  }
+  if (global.userScript) global.userScript.initialRun()
 
-    if (Game.flags.deactivate) return
-    if (Game.cpu.bucket < CPUMaxPerTick) {
-        procs.outOfBucket()
-        return
-    }
-    if (global.userScript) global.userScript.initialRun()
+  profiler.wrap((): void => {
+    migrationManager.run()
+    respawnManager.run()
+    initManager.run()
 
-    profiler.wrap((): void => {
-        migrationManager.run()
-        respawnManager.run()
-        initManager.run()
+    tickInit.configGeneral()
+    statsManager.tickInit()
+    collectiveManager.update()
+    simpleAllies.initRun()
+    wasm.collaborator()
 
-        tickInit.configGeneral()
-        statsManager.tickInit()
-        collectiveManager.update()
-        simpleAllies.initRun()
-        wasm.collaborator()
+    roomsManager.updateRun()
+    roomDataManager.initRooms()
+    roomDataManager.updateRooms()
+    transactionsManager.run()
+    requestsManager.run()
 
-        roomDataManager.updateRooms()
-        roomsManager.updateRun()
-        transactionsManager.run()
-        requestsManager.run()
+    if (global.collectivizer) global.collectivizer.run()
+    if (global.userScript) global.userScript.run()
+    playerManager.run()
+    roomsManager.initRun()
+    creepOrganizer.run()
+    creepDataManager.updateCreeps()
+    powerCreepOrganizer.run()
 
-        if (global.collectivizer) global.collectivizer.run()
-        if (global.userScript) global.userScript.run()
-        playerManager.run()
-        roomsManager.initRun()
-        creepOrganizer.run()
-        creepDataManager.updateData()
-        powerCreepOrganizer.run()
+    roomPruningManager.run()
+    flagManager.run()
+    constructionSiteManager.run()
+    marketManager.run()
 
-        roomPruningManager.run()
-        flagManager.run()
-        constructionSiteManager.run()
-        marketManager.run()
+    roomsManager.run()
 
-        roomsManager.run()
+    mapVisualsManager.run()
+    simpleAllies.endRun()
+    marketManager.advancedSellPixels()
+    if (global.userScript) global.userScript.endRun()
+    statsManager.internationalEndRun()
 
-        mapVisualsManager.run()
-        simpleAllies.endRun()
-        marketManager.advancedSellPixels()
-        if (global.userScript) global.userScript.endRun()
-        statsManager.internationalEndRun()
+    collectiveManager.advancedGeneratePixel()
 
-        collectiveManager.advancedGeneratePixel()
-
-        segmentsManager.endRun()
-        endTickManager.run()
-    })
+    segmentsManager.endRun()
+    endTickManager.run()
+  })
 }
 export const loop = ErrorMapper.wrapLoop(originalLoop)

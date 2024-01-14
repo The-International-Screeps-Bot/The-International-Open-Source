@@ -8,7 +8,7 @@ export class MyCreepUtils {
    * provides a cached number of parts for creeps we own
    */
   parts(creep: Creep) {
-    const data = creepDataManager.creepsData[creep.name].parts
+    const data = creepDataManager.data[creep.name].parts
     if (data) return data
 
     const parts: typeof data = {}
@@ -18,40 +18,39 @@ export class MyCreepUtils {
     // +1 for every part to its type category
     for (const part of creep.body) parts[part.type] += 1
 
-    creepDataManager.creepsData[creep.name].parts = parts
+    creepDataManager.data[creep.name].parts = parts
     return parts
   }
 
   boosts(creep: Creep) {
-    const data = creepDataManager.creepsData[creep.name].boosts
+    const data = creepDataManager.data[creep.name].boosts
     if (data) return data
 
     const boosts: typeof data = {}
 
     for (const part of creep.body) {
-        const boost = part.boost as MineralBoostConstant
-        if (!boost) continue
+      const boost = part.boost as MineralBoostConstant
+      if (!boost) continue
 
-        if (!boosts[boost]) {
+      if (!boosts[boost]) {
+        boosts[boost] = 1
+        continue
+      }
 
-          boosts[boost] = 1
-          continue
-        }
-
-        boosts[boost] += 1
+      boosts[boost] += 1
     }
 
-    creepDataManager.creepsData[creep.name].boosts = boosts
+    creepDataManager.data[creep.name].boosts = boosts
     return boosts
   }
 
   upgradeStrength(creep: Creep) {
-    const data = creepDataManager.creepsData[creep.name].upgradeStrength
+    const data = creepDataManager.data[creep.name].upgradeStrength
     if (data) return data
 
     const upgradeStrength = this.findUpgradeStrength(this.parts(creep).work, this.boosts(creep))
 
-    creepDataManager.creepsData[creep.name].upgradeStrength = upgradeStrength
+    creepDataManager.data[creep.name].upgradeStrength = upgradeStrength
     return data
   }
 

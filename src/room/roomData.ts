@@ -1,3 +1,4 @@
+import { utils } from "utils/utils"
 import { communeDataManager } from "./commune/communeData"
 
 interface RoomData {
@@ -10,21 +11,36 @@ interface RoomData {
 export class RoomDataManager {
   data: {[roomName: string]: Partial<RoomData>} = {}
 
-  updateRooms() {
+  initRooms() {
     for (const roomName in Game.rooms) {
+      const room = Game.rooms[roomName]
 
-      this.updateRoom(Game.rooms[roomName])
+      this.initRoom(room)
     }
   }
 
-  private updateRoom(room: Room) {
-
+  private initRoom(room: Room) {
     this.data[room.name] ??= {}
 
     if (room.controller && room.controller.my) {
 
-      communeDataManager.updateCommune(room)
+      communeDataManager.initCommune(room)
     }
+  }
+
+  updateRooms() {
+    for (const roomName in this.data) {
+
+
+      this.updateRoom(roomName)
+    }
+  }
+
+  private updateRoom(roomName: string) {
+
+    const data = this.data[roomName]
+
+
   }
 }
 

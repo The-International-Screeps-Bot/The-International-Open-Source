@@ -1,68 +1,33 @@
 import {
-  allStructureTypes,
-  WorkRequestKeys,
-  CombatRequestKeys,
-  defaultPlainCost,
-  defaultSwampCost,
-  impassibleStructureTypes,
-  impassibleStructureTypesSet,
-  maxRampartGroupSize,
-  maxRemoteRoomDistance,
-  customColors,
-  PlayerMemoryKeys,
-  roomDimensions,
-  roomTypeProperties,
-  roomTypes,
-  constantRoomTypes,
-  stamps,
-  defaultStructureTypesByBuildPriority,
-  Result,
-  adjacentOffsets,
-  CreepMemoryKeys,
-  RoomMemoryKeys,
-  RoomTypes,
-  packedPosLength,
-  maxRemotePathDistance,
-  RoomLogisticsRequestTypes,
-  remoteRoles,
-  RemoteResourcePathTypes,
-  FlagNames,
+    CombatRequestKeys, maxRampartGroupSize,
+    maxRemoteRoomDistance,
+    customColors,
+    PlayerMemoryKeys,
+    roomDimensions, constantRoomTypes, defaultStructureTypesByBuildPriority,
+    Result, RoomMemoryKeys,
+    RoomTypes,
+    packedPosLength,
+    maxRemotePathDistance,
+    RoomLogisticsRequestTypes, RemoteResourcePathTypes,
+    FlagNames
 } from 'international/constants'
 import {
-    areCoordsEqual,
-    createPosMap,
     findAdjacentCoordsToCoord,
     findCoordsInsideRect,
-    findObjectWithID,
-    getRangeXY,
-    isNearRoomEdge,
-    newID,
-    packAsNum,
-    packXYAsNum,
-    randomRange,
-    unpackNumAsCoord,
-    unpackNumAsPos,
-    doesCoordExist,
-    findClosestObjectInRange,
-    findClosestObject,
+    findObjectWithID, packAsNum,
+    packXYAsNum, unpackNumAsCoord, doesCoordExist, findClosestObject,
     randomIntRange,
-    roundTo,
+    roundTo
 } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
 import {
     packCoord,
     packCoordList,
-    packXYAsCoord,
-    unpackCoord,
-    unpackCoordAsPos,
-    unpackPos,
-    unpackPosList,
+    packXYAsCoord, unpackPosList
 } from 'other/codec'
-import { posix } from 'path'
 import { playerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
-import { myCreepUtils } from './creeps/myCreepUtils'
 import { roomObjectUtils } from './roomObjectUtils'
 
 /**
@@ -71,206 +36,173 @@ import { roomObjectUtils } from './roomObjectUtils'
     @param [type] The status of action performed
 */
 Room.prototype.actionVisual = function (pos1, pos2, type?) {
-    const room = this
+  const room = this
 
-    // Stop if roomVisuals are disabled
+  // Stop if roomVisuals are disabled
 
-    if (!global.settings.roomVisuals) return
+  if (!global.settings.roomVisuals) return
 
-    // Construct colors for each type
+  // Construct colors for each type
 
-    const colorsForTypes: { [key: string]: string } = {
-        success: customColors.lightBlue,
-        fail: customColors.red,
-    }
+  const colorsForTypes: { [key: string]: string } = {
+    success: customColors.lightBlue,
+    fail: customColors.red,
+  }
 
-    // If no type, type is success. Construct type from color
+  // If no type, type is success. Construct type from color
 
-    if (!type) type = 'success'
-    const color: string = colorsForTypes[type]
+  if (!type) type = 'success'
+  const color: string = colorsForTypes[type]
 
-    // Create visuals
+  // Create visuals
 
-    room.visual.circle(pos2.x, pos2.y, { stroke: color })
-    room.visual.line(pos1, pos2, { color })
+  room.visual.circle(pos2.x, pos2.y, { stroke: color })
+  room.visual.line(pos1, pos2, { color })
 }
 
 Room.prototype.targetVisual = function (coord1, coord2, visualize = global.settings.roomVisuals) {
-    if (!visualize) return
+  if (!visualize) return
 
-    this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
-        color: customColors.green,
-        opacity: 0.3,
-    })
-}
-
-Room.prototype.scoutByRoomName = function () {
-    // Find the numbers in the room's name
-
-    const [EWstring, NSstring] = this.name.match(/\d+/g)
-
-    // Convert he numbers from strings into actual numbers
-
-    const EW = parseInt(EWstring)
-    const NS = parseInt(NSstring)
-
-    // Use the numbers to deduce some room types - cheaply!
-
-    if (EW % 10 === 0 && NS % 10 === 0)
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.intersection)
-    if (EW % 10 === 0 || NS % 10 === 0)
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.highway)
-    if (EW % 5 === 0 && NS % 5 === 0) return (this.memory[RoomMemoryKeys.type] = RoomTypes.center)
-    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
-        const roomMemory = Memory.rooms[this.name]
-
-        // Record the positions of keeper lairs
-
-        const lairCoords = this.roomManager.structures.keeperLair.map(lair => lair.pos)
-        roomMemory[RoomMemoryKeys.keeperLairCoords] = packCoordList(lairCoords)
-
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.sourceKeeper)
-    }
-
-    return false
+  this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
+    color: customColors.green,
+    opacity: 0.3,
+  })
 }
 
 Room.prototype.scoutRemote = function (scoutingRoom) {
-    if (this.scoutEnemyReservedRemote()) return this.memory[RoomMemoryKeys.type]
-    if (this.scoutEnemyUnreservedRemote()) return this.memory[RoomMemoryKeys.type]
+  if (this.scoutEnemyReservedRemote()) return this.memory[RoomMemoryKeys.type]
+  if (this.scoutEnemyUnreservedRemote()) return this.memory[RoomMemoryKeys.type]
 
-    if (!scoutingRoom) return this.memory[RoomMemoryKeys.type]
-    return this.scoutMyRemote(scoutingRoom)
+  if (!scoutingRoom) return this.memory[RoomMemoryKeys.type]
+  return this.scoutMyRemote(scoutingRoom)
 }
 
 Room.prototype.scoutEnemyReservedRemote = function () {
-    const { controller } = this
+  const { controller } = this
 
-    if (!controller.reservation) return false
-    if (controller.reservation.username === Memory.me) return false
-    if (controller.reservation.username === 'Invader') return false
+  if (!controller.reservation) return false
+  if (controller.reservation.username === Memory.me) return false
+  if (controller.reservation.username === 'Invader') return false
 
-    // If there are roads or containers or sources harvested, inform false
+  // If there are roads or containers or sources harvested, inform false
 
-    if (
-        !this.roomManager.structures.road &&
-        !this.roomManager.structures.container &&
-        !this.find(FIND_SOURCES, {
-            filter: source => source.ticksToRegeneration > 0,
-        })
-    )
-        return false
+  if (
+    !this.roomManager.structures.road &&
+    !this.roomManager.structures.container &&
+    !this.find(FIND_SOURCES, {
+      filter: source => source.ticksToRegeneration > 0,
+    })
+  )
+    return false
 
-    // If the controller is not reserved by an ally
+  // If the controller is not reserved by an ally
 
-    if (!global.settings.allies.includes(controller.reservation.username)) {
-        this.memory[RoomMemoryKeys.owner] = controller.reservation.username
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
-    }
-
-    // Otherwise if the room is reserved by an ally
-
+  if (!global.settings.allies.includes(controller.reservation.username)) {
     this.memory[RoomMemoryKeys.owner] = controller.reservation.username
-    return (this.memory[RoomMemoryKeys.type] = RoomTypes.allyRemote)
+    return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
+  }
+
+  // Otherwise if the room is reserved by an ally
+
+  this.memory[RoomMemoryKeys.owner] = controller.reservation.username
+  return (this.memory[RoomMemoryKeys.type] = RoomTypes.allyRemote)
 }
 
 Room.prototype.scoutEnemyUnreservedRemote = function () {
-    const { controller } = this
+  const { controller } = this
 
-    if (controller.reservation) {
-        if (controller.reservation.username === Memory.me) return false
-        if (controller.reservation.username === 'Invader') return false
+  if (controller.reservation) {
+    if (controller.reservation.username === Memory.me) return false
+    if (controller.reservation.username === 'Invader') return false
+  }
+
+  const harvestedSources = this.find(FIND_SOURCES, {
+    filter: source => source.ticksToRegeneration > 0,
+  })
+  if (!harvestedSources.length) return false
+
+  // Find creeps that I don't own that aren't invaders
+
+  const creepsNotMine = this.roomManager.notMyCreeps.enemy.concat(this.roomManager.notMyCreeps.ally)
+
+  // Iterate through them
+
+  for (const creep of creepsNotMine) {
+    // If the creep is an invdader, iterate
+
+    if (creep.owner.username === 'Invader') continue
+
+    // If the creep has work parts
+
+    if (creep.parts.work > 0) {
+      // If the creep is owned by an ally
+
+      if (global.settings.allies.includes(creep.owner.username)) {
+        // Set type to allyRemote and stop
+
+        this.memory[RoomMemoryKeys.owner] = creep.owner.username
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.allyRemote)
+      }
+
+      // If the creep is not owned by an ally
+
+      // Set type to enemyRemote and stop
+
+      this.memory[RoomMemoryKeys.owner] = creep.owner.username
+
+      /* room.createAttackCombatRequest() */
+      this.createHarassCombatRequest()
+
+      return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
     }
+  }
 
-    const harvestedSources = this.find(FIND_SOURCES, {
-        filter: source => source.ticksToRegeneration > 0,
-    })
-    if (!harvestedSources.length) return false
-
-    // Find creeps that I don't own that aren't invaders
-
-    const creepsNotMine = this.roomManager.notMyCreeps.enemy.concat(
-        this.roomManager.notMyCreeps.ally,
-    )
-
-    // Iterate through them
-
-    for (const creep of creepsNotMine) {
-        // If the creep is an invdader, iterate
-
-        if (creep.owner.username === 'Invader') continue
-
-        // If the creep has work parts
-
-        if (creep.parts.work > 0) {
-            // If the creep is owned by an ally
-
-            if (global.settings.allies.includes(creep.owner.username)) {
-                // Set type to allyRemote and stop
-
-                this.memory[RoomMemoryKeys.owner] = creep.owner.username
-                return (this.memory[RoomMemoryKeys.type] = RoomTypes.allyRemote)
-            }
-
-            // If the creep is not owned by an ally
-
-            // Set type to enemyRemote and stop
-
-            this.memory[RoomMemoryKeys.owner] = creep.owner.username
-
-            /* room.createAttackCombatRequest() */
-            this.createHarassCombatRequest()
-
-            return (this.memory[RoomMemoryKeys.type] = RoomTypes.enemyRemote)
-        }
-    }
-
-    return false
+  return false
 }
 
 Room.prototype.scoutMyRemote = function (scoutingRoom) {
-    const roomMemory = Memory.rooms[this.name]
+  const roomMemory = Memory.rooms[this.name]
 
-    // The room is a remote but its commune no longer exists, change to neutral
+  // The room is a remote but its commune no longer exists, change to neutral
 
-    if (
-        roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-        !collectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
-    )
-        roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
+  if (
+    roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
+    !collectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
+  )
+    roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 
-    // If the room is already a remote of the scoutingRoom
+  // If the room is already a remote of the scoutingRoom
 
-    if (
-        roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-        scoutingRoom.name === roomMemory[RoomMemoryKeys.commune]
-    )
-        return roomMemory[RoomMemoryKeys.type]
+  if (
+    roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
+    scoutingRoom.name === roomMemory[RoomMemoryKeys.commune]
+  )
+    return roomMemory[RoomMemoryKeys.type]
 
-    let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
+  let distance = Game.map.getRoomLinearDistance(scoutingRoom.name, this.name)
 
-    if (distance > maxRemoteRoomDistance) return roomMemory[RoomMemoryKeys.type]
+  if (distance > maxRemoteRoomDistance) return roomMemory[RoomMemoryKeys.type]
 
-    // Find distance from scoutingRoom
+  // Find distance from scoutingRoom
 
-    if (distance <= maxRemoteRoomDistance)
-        distance = roomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
-            typeWeights: {
-                keeper: Infinity,
-                enemy: Infinity,
-                enemyRemote: Infinity,
-                ally: Infinity,
-                allyRemote: Infinity,
-            },
-        })
+  if (distance <= maxRemoteRoomDistance)
+    distance = roomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
+      typeWeights: {
+        keeper: Infinity,
+        enemy: Infinity,
+        enemyRemote: Infinity,
+        ally: Infinity,
+        allyRemote: Infinity,
+      },
+    })
 
-    if (distance > maxRemoteRoomDistance) return roomMemory[RoomMemoryKeys.type]
+  if (distance > maxRemoteRoomDistance) return roomMemory[RoomMemoryKeys.type]
 
-    // Get the anchor from the scoutingRoom, stopping if it's undefined
+  // Get the anchor from the scoutingRoom, stopping if it's undefined
 
-    const anchor = scoutingRoom.roomManager.anchor
-    if (!anchor) return roomMemory[RoomMemoryKeys.type]
-    /*
+  const anchor = scoutingRoom.roomManager.anchor
+  if (!anchor) return roomMemory[RoomMemoryKeys.type]
+  /*
     const newSourceEfficacies = []
     let newSourceEfficaciesTotal = 0
 
@@ -327,212 +259,212 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
     if (!newReservationEfficacy) return roomMemory[RoomMemoryKeys.type]
  */
-    // If already a remote, apply special considerations
+  // If already a remote, apply special considerations
 
-    if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
-        // Generate new important positions
-
-        let disable: boolean
-        let newCost = 0
-        const pathsThrough = new Set<string>()
-
-        const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
-        const packedRemoteSourceHarvestPositions =
-            this.roomManager.findRemoteSourceHarvestPositions(scoutingRoom, packedRemoteSources)
-        const packedRemoteControllerPositions =
-            this.roomManager.findRemoteControllerPositions(scoutingRoom)
-
-        const weightCoords: { [packedCoord: string]: number } = {}
-
-        for (const i in packedRemoteSources) {
-            for (const pos of unpackPosList(packedRemoteSourceHarvestPositions[i])) {
-                weightCoords[packCoord(pos)] = 20
-            }
-        }
-
-        for (const pos of unpackPosList(packedRemoteControllerPositions)) {
-            weightCoords[packCoord(pos)] = 20
-        }
-
-        const packedRemoteSourcePaths = {
-            [RoomMemoryKeys.remoteSourceFastFillerPaths]:
-                this.roomManager.findRemoteSourceFastFillerPaths(
-                    scoutingRoom,
-                    packedRemoteSourceHarvestPositions,
-                    weightCoords,
-                    pathsThrough,
-                ),
-            [RoomMemoryKeys.remoteSourceHubPaths]: this.roomManager.findRemoteSourceHubPaths(
-                scoutingRoom,
-                packedRemoteSourceHarvestPositions,
-                weightCoords,
-                pathsThrough,
-            ),
-        }
-
-        for (const key in packedRemoteSourcePaths) {
-            const pathName = key as unknown as RemoteResourcePathTypes
-            const packedPath = packedRemoteSourcePaths[pathName]
-
-            if (!packedPath.length) {
-                disable = true
-                break
-            }
-            const unpackedLength = packedPath.length / packedPosLength
-
-            newCost += unpackedLength
-            if (unpackedLength > maxRemotePathDistance) disable = true
-        }
-
-        const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
-            scoutingRoom,
-            packedRemoteControllerPositions,
-            weightCoords,
-            pathsThrough,
-        )
-        if (!packedRemoteControllerPath.length) {
-            disable = true
-        }
-        if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance)
-            disable = true
-
-        newCost += packedRemoteControllerPath.length / packedPosLength
-
-        // Compare new, potential efficiency, to old efficiency
-
-        let currentCost = 0
-        for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
-            currentCost += packedPath.length / packedPosLength
-        }
-        currentCost += roomMemory[RoomMemoryKeys.remoteControllerPath].length / packedPosLength
-
-        if (newCost >= currentCost) {
-            return roomMemory[RoomMemoryKeys.type]
-        }
-
-        // Successful remote value generation, now assign them
-
-        // reconcile old data
-
-        const oldCommuneMemory = Memory.rooms[roomMemory[RoomMemoryKeys.commune]]
-        const index = oldCommuneMemory[RoomMemoryKeys.remotes].indexOf(this.name)
-        oldCommuneMemory[RoomMemoryKeys.remotes].splice(index, 1)
-
-        //
-
-        roomMemory[RoomMemoryKeys.disable] = disable
-
-        roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
-        roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
-        roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] =
-            packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceFastFillerPaths]
-        roomMemory[RoomMemoryKeys.remoteSourceHubPaths] =
-            packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceHubPaths]
-        roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
-        roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
-        // No reason to have the room or commune in the list - would result is uneeded searches
-        pathsThrough.delete(this.name)
-        pathsThrough.delete(scoutingRoom.name)
-        roomMemory[RoomMemoryKeys.pathsThrough] = Array.from(pathsThrough)
-
-        roomMemory[RoomMemoryKeys.maxSourceIncome] = []
-        roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
-        roomMemory[RoomMemoryKeys.haulers] = []
-        roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
-        roomMemory[RoomMemoryKeys.hasContainer] = []
-        roomMemory[RoomMemoryKeys.roads] = []
-        roomMemory[RoomMemoryKeys.disableSources] = []
-
-        for (const i in packedRemoteSources) {
-            roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
-            roomMemory[RoomMemoryKeys.hasContainer][i] = false
-            roomMemory[RoomMemoryKeys.roads][i] = 0
-        }
-        roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
-        roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
-        roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
-        roomMemory[RoomMemoryKeys.abandonRemote] = 0
-
-        // Add the room's name to the scoutingRoom's remotes data
-        roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
-
-        Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
-        roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
-        roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
-
-        roomNameUtils.cleanMemory(this.name)
-
-        return roomMemory[RoomMemoryKeys.type]
-    }
-
-    // The room is not a remote
+  if (roomMemory[RoomMemoryKeys.type] === RoomTypes.remote) {
+    // Generate new important positions
 
     let disable: boolean
-
-    // Generate new important positions
+    let newCost = 0
     const pathsThrough = new Set<string>()
 
     const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
     const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
-        scoutingRoom,
-        packedRemoteSources,
+      scoutingRoom,
+      packedRemoteSources,
     )
     const packedRemoteControllerPositions =
-        this.roomManager.findRemoteControllerPositions(scoutingRoom)
+      this.roomManager.findRemoteControllerPositions(scoutingRoom)
 
     const weightCoords: { [packedCoord: string]: number } = {}
 
     for (const i in packedRemoteSources) {
-        for (const pos of unpackPosList(packedRemoteSourceHarvestPositions[i])) {
-            weightCoords[packCoord(pos)] = 20
-        }
+      for (const pos of unpackPosList(packedRemoteSourceHarvestPositions[i])) {
+        weightCoords[packCoord(pos)] = 20
+      }
     }
 
     for (const pos of unpackPosList(packedRemoteControllerPositions)) {
-        weightCoords[packCoord(pos)] = 20
+      weightCoords[packCoord(pos)] = 20
     }
 
     const packedRemoteSourcePaths = {
-        [RoomMemoryKeys.remoteSourceFastFillerPaths]:
-            this.roomManager.findRemoteSourceFastFillerPaths(
-                scoutingRoom,
-                packedRemoteSourceHarvestPositions,
-                weightCoords,
-                pathsThrough,
-            ),
-        [RoomMemoryKeys.remoteSourceHubPaths]: this.roomManager.findRemoteSourceHubPaths(
-            scoutingRoom,
-            packedRemoteSourceHarvestPositions,
-            weightCoords,
-            pathsThrough,
+      [RoomMemoryKeys.remoteSourceFastFillerPaths]:
+        this.roomManager.findRemoteSourceFastFillerPaths(
+          scoutingRoom,
+          packedRemoteSourceHarvestPositions,
+          weightCoords,
+          pathsThrough,
         ),
+      [RoomMemoryKeys.remoteSourceHubPaths]: this.roomManager.findRemoteSourceHubPaths(
+        scoutingRoom,
+        packedRemoteSourceHarvestPositions,
+        weightCoords,
+        pathsThrough,
+      ),
     }
 
     for (const key in packedRemoteSourcePaths) {
-        const pathName = key as unknown as RemoteResourcePathTypes
-        const packedPath = packedRemoteSourcePaths[pathName]
+      const pathName = key as unknown as RemoteResourcePathTypes
+      const packedPath = packedRemoteSourcePaths[pathName]
 
-        if (!packedPath.length) {
-            disable = true
-            break
-        }
+      if (!packedPath.length) {
+        disable = true
+        break
+      }
+      const unpackedLength = packedPath.length / packedPosLength
 
-        const unpackedLength = packedPath.length / packedPosLength
-        if (unpackedLength > maxRemotePathDistance) disable = true
+      newCost += unpackedLength
+      if (unpackedLength > maxRemotePathDistance) disable = true
     }
 
     const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
-        scoutingRoom,
-        packedRemoteControllerPositions,
-        weightCoords,
-        pathsThrough,
+      scoutingRoom,
+      packedRemoteControllerPositions,
+      weightCoords,
+      pathsThrough,
     )
     if (!packedRemoteControllerPath.length) {
-        disable = true
+      disable = true
     }
     if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) disable = true
 
-    /*
+    newCost += packedRemoteControllerPath.length / packedPosLength
+
+    // Compare new, potential efficiency, to old efficiency
+
+    let currentCost = 0
+    for (const packedPath of roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths]) {
+      currentCost += packedPath.length / packedPosLength
+    }
+    currentCost += roomMemory[RoomMemoryKeys.remoteControllerPath].length / packedPosLength
+
+    if (newCost >= currentCost) {
+      return roomMemory[RoomMemoryKeys.type]
+    }
+
+    // Successful remote value generation, now assign them
+
+    // reconcile old data
+
+    const oldCommuneMemory = Memory.rooms[roomMemory[RoomMemoryKeys.commune]]
+    const index = oldCommuneMemory[RoomMemoryKeys.remotes].indexOf(this.name)
+    oldCommuneMemory[RoomMemoryKeys.remotes].splice(index, 1)
+
+    //
+
+    roomMemory[RoomMemoryKeys.disable] = disable
+
+    roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
+    roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
+    roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] =
+      packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceFastFillerPaths]
+    roomMemory[RoomMemoryKeys.remoteSourceHubPaths] =
+      packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceHubPaths]
+    roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
+    roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
+    // No reason to have the room or commune in the list - would result is uneeded searches
+    pathsThrough.delete(this.name)
+    pathsThrough.delete(scoutingRoom.name)
+    roomMemory[RoomMemoryKeys.pathsThrough] = Array.from(pathsThrough)
+
+    roomMemory[RoomMemoryKeys.maxSourceIncome] = []
+    roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
+    roomMemory[RoomMemoryKeys.haulers] = []
+    roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
+    roomMemory[RoomMemoryKeys.hasContainer] = []
+    roomMemory[RoomMemoryKeys.roads] = []
+    roomMemory[RoomMemoryKeys.disableSources] = []
+
+    for (const i in packedRemoteSources) {
+      roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
+      roomMemory[RoomMemoryKeys.hasContainer][i] = false
+      roomMemory[RoomMemoryKeys.roads][i] = 0
+    }
+    roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
+    roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
+    roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
+    roomMemory[RoomMemoryKeys.abandonRemote] = 0
+
+    // Add the room's name to the scoutingRoom's remotes data
+    roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+
+    Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
+    roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
+    roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
+
+    roomNameUtils.cleanMemory(this.name)
+
+    return roomMemory[RoomMemoryKeys.type]
+  }
+
+  // The room is not a remote
+
+  let disable: boolean
+
+  // Generate new important positions
+  const pathsThrough = new Set<string>()
+
+  const packedRemoteSources = this.roomManager.findRemoteSources(scoutingRoom)
+  const packedRemoteSourceHarvestPositions = this.roomManager.findRemoteSourceHarvestPositions(
+    scoutingRoom,
+    packedRemoteSources,
+  )
+  const packedRemoteControllerPositions =
+    this.roomManager.findRemoteControllerPositions(scoutingRoom)
+
+  const weightCoords: { [packedCoord: string]: number } = {}
+
+  for (const i in packedRemoteSources) {
+    for (const pos of unpackPosList(packedRemoteSourceHarvestPositions[i])) {
+      weightCoords[packCoord(pos)] = 20
+    }
+  }
+
+  for (const pos of unpackPosList(packedRemoteControllerPositions)) {
+    weightCoords[packCoord(pos)] = 20
+  }
+
+  const packedRemoteSourcePaths = {
+    [RoomMemoryKeys.remoteSourceFastFillerPaths]: this.roomManager.findRemoteSourceFastFillerPaths(
+      scoutingRoom,
+      packedRemoteSourceHarvestPositions,
+      weightCoords,
+      pathsThrough,
+    ),
+    [RoomMemoryKeys.remoteSourceHubPaths]: this.roomManager.findRemoteSourceHubPaths(
+      scoutingRoom,
+      packedRemoteSourceHarvestPositions,
+      weightCoords,
+      pathsThrough,
+    ),
+  }
+
+  for (const key in packedRemoteSourcePaths) {
+    const pathName = key as unknown as RemoteResourcePathTypes
+    const packedPath = packedRemoteSourcePaths[pathName]
+
+    if (!packedPath.length) {
+      disable = true
+      break
+    }
+
+    const unpackedLength = packedPath.length / packedPosLength
+    if (unpackedLength > maxRemotePathDistance) disable = true
+  }
+
+  const packedRemoteControllerPath = this.roomManager.findRemoteControllerPath(
+    scoutingRoom,
+    packedRemoteControllerPositions,
+    weightCoords,
+    pathsThrough,
+  )
+  if (!packedRemoteControllerPath.length) {
+    disable = true
+  }
+  if (packedRemoteControllerPath.length / packedPosLength > maxRemotePathDistance) disable = true
+
+  /*
     roomMemory[RoomMemoryKeys.roads] = []
     roomMemory[RoomMemoryKeys.roadsQuota] = []
 
@@ -556,276 +488,298 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         if (path.length > maxRemotePathDistance) disable = true
     }
  */
-    // Accept remote as own
+  // Accept remote as own
 
-    roomMemory[RoomMemoryKeys.disable] = disable
+  roomMemory[RoomMemoryKeys.disable] = disable
 
-    roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
-    roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
-    roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] =
-        packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceFastFillerPaths]
-    roomMemory[RoomMemoryKeys.remoteSourceHubPaths] =
-        packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceHubPaths]
-    roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
-    roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
-    // No reason to have the room or commune in the list - would result is uneeded searches
-    pathsThrough.delete(this.name)
-    pathsThrough.delete(scoutingRoom.name)
-    roomMemory[RoomMemoryKeys.pathsThrough] = Array.from(pathsThrough)
+  roomMemory[RoomMemoryKeys.remoteSources] = packedRemoteSources
+  roomMemory[RoomMemoryKeys.remoteSourceHarvestPositions] = packedRemoteSourceHarvestPositions
+  roomMemory[RoomMemoryKeys.remoteSourceFastFillerPaths] =
+    packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceFastFillerPaths]
+  roomMemory[RoomMemoryKeys.remoteSourceHubPaths] =
+    packedRemoteSourcePaths[RoomMemoryKeys.remoteSourceHubPaths]
+  roomMemory[RoomMemoryKeys.remoteControllerPositions] = packedRemoteControllerPositions
+  roomMemory[RoomMemoryKeys.remoteControllerPath] = packedRemoteControllerPath
+  // No reason to have the room or commune in the list - would result is uneeded searches
+  pathsThrough.delete(this.name)
+  pathsThrough.delete(scoutingRoom.name)
+  roomMemory[RoomMemoryKeys.pathsThrough] = Array.from(pathsThrough)
 
-    roomMemory[RoomMemoryKeys.maxSourceIncome] = []
-    roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
-    roomMemory[RoomMemoryKeys.haulers] = []
-    roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
-    roomMemory[RoomMemoryKeys.hasContainer] = []
-    roomMemory[RoomMemoryKeys.roads] = []
-    roomMemory[RoomMemoryKeys.disableSources] = []
+  roomMemory[RoomMemoryKeys.maxSourceIncome] = []
+  roomMemory[RoomMemoryKeys.remoteSourceHarvesters] = []
+  roomMemory[RoomMemoryKeys.haulers] = []
+  roomMemory[RoomMemoryKeys.remoteSourceCredit] = []
+  roomMemory[RoomMemoryKeys.hasContainer] = []
+  roomMemory[RoomMemoryKeys.roads] = []
+  roomMemory[RoomMemoryKeys.disableSources] = []
 
-    for (const i in packedRemoteSources) {
-        roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
-        roomMemory[RoomMemoryKeys.hasContainer][i] = false
-        roomMemory[RoomMemoryKeys.roads][i] = 0
-    }
-    roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
-    roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
-    roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
-    roomMemory[RoomMemoryKeys.abandonRemote] = 0
+  for (const i in packedRemoteSources) {
+    roomMemory[RoomMemoryKeys.remoteSourceCredit][i] = 0
+    roomMemory[RoomMemoryKeys.hasContainer][i] = false
+    roomMemory[RoomMemoryKeys.roads][i] = 0
+  }
+  roomMemory[RoomMemoryKeys.remoteSourceCreditChange] = []
+  roomMemory[RoomMemoryKeys.remoteSourceCreditReservation] = []
+  roomMemory[RoomMemoryKeys.remoteCoreAttacker] = 0
+  roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
-    // Add the room's name to the scoutingRoom's remotes data
-    roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+  // Add the room's name to the scoutingRoom's remotes data
+  roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
-    Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
-    roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
-    roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
+  Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
+  roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
+  roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
 
-    roomNameUtils.cleanMemory(this.name)
+  roomNameUtils.cleanMemory(this.name)
 
-    return roomMemory[RoomMemoryKeys.type]
+  return roomMemory[RoomMemoryKeys.type]
 }
 
 Room.prototype.scoutEnemyRoom = function () {
-    const { controller } = this
-    const playerName = controller.owner.username
-    const roomMemory = this.memory
+  const { controller } = this
+  const playerName = controller.owner.username
+  const roomMemory = this.memory
 
-    let player = Memory.players[playerName]
-    if (!player) {
-        player = playerManager.initPlayer(playerName)
-    }
+  let player = Memory.players[playerName]
+  if (!player) {
+    player = playerManager.initPlayer(playerName)
+  }
 
-    // General
+  // General
 
-    const level = controller.level
-    roomMemory[RoomMemoryKeys.RCL] = level
+  const level = controller.level
+  roomMemory[RoomMemoryKeys.RCL] = level
 
-    roomMemory[RoomMemoryKeys.powerEnabled] = controller.isPowerEnabled
+  roomMemory[RoomMemoryKeys.powerEnabled] = controller.isPowerEnabled
 
-    // Offensive threat
+  // Offensive threat
 
-    let threat = 0
+  let threat = 0
 
-    threat += Math.pow(level, 2)
+  threat += Math.pow(level, 2)
 
-    threat += this.roomManager.structures.spawn.length * 50
-    threat += this.roomManager.structures.nuker.length * 300
-    threat += Math.pow(this.roomManager.structures.lab.length * 10000, 0.4)
+  threat += this.roomManager.structures.spawn.length * 50
+  threat += this.roomManager.structures.nuker.length * 300
+  threat += Math.pow(this.roomManager.structures.lab.length * 10000, 0.4)
 
-    threat = Math.floor(threat)
+  threat = Math.floor(threat)
 
-    roomMemory[RoomMemoryKeys.offensiveThreat] = threat
-    Memory.players[playerName][PlayerMemoryKeys.offensiveThreat] = Math.max(
-        threat,
-        player[PlayerMemoryKeys.offensiveThreat],
-    )
+  roomMemory[RoomMemoryKeys.offensiveThreat] = threat
+  Memory.players[playerName][PlayerMemoryKeys.offensiveThreat] = Math.max(
+    threat,
+    player[PlayerMemoryKeys.offensiveThreat],
+  )
 
-    // Defensive threat
+  // Defensive threat
 
-    threat = 0
+  threat = 0
 
-    const energy = this.roomManager.resourcesInStoringStructures.energy
+  const energy = this.roomManager.resourcesInStoringStructures.energy
 
-    roomMemory[RoomMemoryKeys.energy] = energy
-    threat += Math.pow(energy, 0.5)
+  roomMemory[RoomMemoryKeys.energy] = energy
+  threat += Math.pow(energy, 0.5)
 
-    const ramparts = this.roomManager.structures.rampart
-    const avgRampartHits =
-        ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
+  const ramparts = this.roomManager.structures.rampart
+  const avgRampartHits =
+    ramparts.reduce((total, rampart) => total + rampart.hits, 0) / ramparts.length
 
-    threat += Math.pow(avgRampartHits, 0.5)
-    threat += this.roomManager.structures.spawn.length * 100
-    threat += this.roomManager.structures.tower.length * 300
-    threat += Math.pow(this.roomManager.structures.extension.length * 400, 0.8)
+  threat += Math.pow(avgRampartHits, 0.5)
+  threat += this.roomManager.structures.spawn.length * 100
+  threat += this.roomManager.structures.tower.length * 300
+  threat += Math.pow(this.roomManager.structures.extension.length * 400, 0.8)
 
-    const hasTerminal = this.terminal !== undefined
+  const hasTerminal = this.terminal !== undefined
 
-    if (hasTerminal) {
-        threat += 800
+  if (hasTerminal) {
+    threat += 800
 
-        roomMemory[RoomMemoryKeys.terminal] = true
-    }
+    roomMemory[RoomMemoryKeys.terminal] = true
+  }
 
-    threat = Math.floor(threat)
+  threat = Math.floor(threat)
 
-    roomMemory[RoomMemoryKeys.defensiveStrength] = threat
-    Memory.players[playerName][PlayerMemoryKeys.defensiveStrength] = Math.max(
-        threat,
-        player[PlayerMemoryKeys.defensiveStrength],
-    )
+  roomMemory[RoomMemoryKeys.defensiveStrength] = threat
+  Memory.players[playerName][PlayerMemoryKeys.defensiveStrength] = Math.max(
+    threat,
+    player[PlayerMemoryKeys.defensiveStrength],
+  )
 
-    // Combat request creation
-    this.createAttackCombatRequest()
+  // Combat request creation
+  this.createAttackCombatRequest()
 
-    roomMemory[RoomMemoryKeys.type] = RoomTypes.enemy
-    return roomMemory[RoomMemoryKeys.type]
+  roomMemory[RoomMemoryKeys.type] = RoomTypes.enemy
+  return roomMemory[RoomMemoryKeys.type]
 }
 
 Room.prototype.basicScout = function () {
-    const { controller } = this
+  const { controller } = this
 
-    // Record that the room was scouted this tick
+  // Record that the room was scouted this tick
 
-    this.memory[RoomMemoryKeys.lastScout] = Game.time
+  this.memory[RoomMemoryKeys.lastScout] = Game.time
 
-    if (!controller) return this.memory[RoomMemoryKeys.type]
+  if (!controller) return this.memory[RoomMemoryKeys.type]
 
+  // If the contoller is owned
+
+  if (controller.owner) {
+    // Stop if the controller is owned by me
+
+    if (controller.my) return this.memory[RoomMemoryKeys.type]
+
+    const owner = controller.owner.username
+    this.memory[RoomMemoryKeys.owner] = owner
+
+    // If the controller is owned by an ally
+
+    if (global.settings.allies.includes(owner))
+      return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+
+    return this.scoutEnemyRoom()
+  }
+
+  this.createWorkRequest()
+
+  // No controller owner
+
+  if (this.scoutRemote()) return this.memory[RoomMemoryKeys.type]
+
+  return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
+}
+
+Room.prototype.advancedScout = function (scoutingRoom: Room) {
+  const roomMemory = Memory.rooms[this.name]
+
+  // Record that the room was scouted this tick
+  roomMemory[RoomMemoryKeys.lastScout] = Game.time
+
+  // If the room already has a type and its type is constant, no need to go further
+  if (constantRoomTypes.has(roomMemory[RoomMemoryKeys.type])) {
+    return roomMemory[RoomMemoryKeys.type]
+  }
+
+  const { controller } = this
+  if (controller) {
+    roomMemory[RoomMemoryKeys.controllerCoord] = packCoord(controller.pos)
+  }
+
+  const sources = this.find(FIND_SOURCES)
+  if (sources.length) {
+    const packedSourceCoords = packCoordList(sources.map(source => source.pos))
+    roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
+  }
+
+  const roomNameScoutType = roomNameUtils.scoutByRoomName(this.name)
+  if (roomNameScoutType) {
+    if (roomNameScoutType === RoomTypes.sourceKeeper) {
+      // Record the positions of keeper lairs
+
+      const lairCoords = this.roomManager.structures.keeperLair.map(lair => lair.pos)
+      roomMemory[RoomMemoryKeys.keeperLairCoords] = packCoordList(lairCoords)
+    }
+
+    return roomMemory[RoomMemoryKeys.type]
+  }
+
+  // If there is a controller
+  if (controller) {
     // If the contoller is owned
 
     if (controller.owner) {
-        // Stop if the controller is owned by me
+      // Stop if the controller is owned by me
 
-        if (controller.my) return this.memory[RoomMemoryKeys.type]
+      if (controller.my) return this.memory[RoomMemoryKeys.type]
 
-        const owner = controller.owner.username
-        this.memory[RoomMemoryKeys.owner] = owner
+      const owner = controller.owner.username
 
-        // If the controller is owned by an ally
+      this.memory[RoomMemoryKeys.owner] = owner
 
-        if (global.settings.allies.includes(owner))
-            return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+      // If the controller is owned by an ally
 
-        return this.scoutEnemyRoom()
+      if (global.settings.allies.includes(owner))
+        return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+
+      return this.scoutEnemyRoom()
     }
 
     this.createWorkRequest()
 
-    // No controller owner
+    // No controlller owner
 
-    if (this.scoutRemote()) return this.memory[RoomMemoryKeys.type]
+    if (this.scoutRemote(scoutingRoom)) return this.memory[RoomMemoryKeys.type]
 
     return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
-}
+  }
 
-Room.prototype.advancedScout = function (scoutingRoom: Room) {
-    const { controller } = this
-
-    // Record that the room was scouted this tick
-
-    this.memory[RoomMemoryKeys.lastScout] = Game.time
-
-    if (constantRoomTypes.has(this.memory[RoomMemoryKeys.type]))
-        return this.memory[RoomMemoryKeys.type]
-    if (this.scoutByRoomName()) return this.memory[RoomMemoryKeys.type]
-
-    // If there is a controller
-
-    if (controller) {
-        // If the contoller is owned
-
-        if (controller.owner) {
-            // Stop if the controller is owned by me
-
-            if (controller.my) return this.memory[RoomMemoryKeys.type]
-
-            const owner = controller.owner.username
-
-            this.memory[RoomMemoryKeys.owner] = owner
-
-            // If the controller is owned by an ally
-
-            if (global.settings.allies.includes(owner))
-                return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
-
-            return this.scoutEnemyRoom()
-        }
-
-        this.createWorkRequest()
-
-        // No controlller owner
-
-        if (this.scoutRemote(scoutingRoom)) return this.memory[RoomMemoryKeys.type]
-
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
-    }
-
-    return this.memory[RoomMemoryKeys.type]
+  return this.memory[RoomMemoryKeys.type]
 }
 
 Room.prototype.createAttackCombatRequest = function (opts) {
-    if (!global.settings.autoAttack) return
-    if (this.controller && this.controller.safeMode) return
+  if (!global.settings.autoAttack) return
+  if (this.controller && this.controller.safeMode) return
 
-    let request = Memory.combatRequests[this.name]
-    if (request) {
-        if (request[CombatRequestKeys.type] !== 'attack') return
+  let request = Memory.combatRequests[this.name]
+  if (request) {
+    if (request[CombatRequestKeys.type] !== 'attack') return
 
-        if (!opts) return
+    if (!opts) return
 
-        Object.assign(request, opts)
-        return
-    }
+    Object.assign(request, opts)
+    return
+  }
 
-    if (global.settings.nonAggressionPlayers.includes(Memory.rooms[RoomMemoryKeys.owner])) return
+  if (global.settings.nonAggressionPlayers.includes(Memory.rooms[RoomMemoryKeys.owner])) return
 
-    request = Memory.combatRequests[this.name] = {
-        [CombatRequestKeys.type]: 'attack',
-    }
+  request = Memory.combatRequests[this.name] = {
+    [CombatRequestKeys.type]: 'attack',
+  }
 
-    request[CombatRequestKeys.maxTowerDamage] = Math.ceil(
-        this.roomManager.structures.tower.length * TOWER_POWER_ATTACK * 1.1,
-    )
+  request[CombatRequestKeys.maxTowerDamage] = Math.ceil(
+    this.roomManager.structures.tower.length * TOWER_POWER_ATTACK * 1.1,
+  )
 
-    request[CombatRequestKeys.minDamage] = 10
-    request[CombatRequestKeys.minMeleeHeal] = 10
-    request[CombatRequestKeys.minRangedHeal] = 10
-    request[CombatRequestKeys.quadQuota] = 1
+  request[CombatRequestKeys.minDamage] = 10
+  request[CombatRequestKeys.minMeleeHeal] = 10
+  request[CombatRequestKeys.minRangedHeal] = 10
+  request[CombatRequestKeys.quadQuota] = 1
 
-    if (opts) {
-        Object.assign(request, opts)
-        return
-    }
+  if (opts) {
+    Object.assign(request, opts)
+    return
+  }
 }
 
 Room.prototype.createHarassCombatRequest = function (opts) {
-    if (!global.settings.autoAttack) return
+  if (!global.settings.autoAttack) return
 
-    let request = Memory.combatRequests[this.name]
-    if (request) {
-        if (request[CombatRequestKeys.type] !== 'harass') return
+  let request = Memory.combatRequests[this.name]
+  if (request) {
+    if (request[CombatRequestKeys.type] !== 'harass') return
 
-        if (!opts) return
+    if (!opts) return
 
-        Object.assign(request, opts)
-        return
-    }
+    Object.assign(request, opts)
+    return
+  }
 
-    if (!this.roomManager.notMyCreeps.enemy.length) return
-    if (global.settings.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
-    if (this.roomManager.enemyAttackers.length > 0) return
+  if (!this.roomManager.notMyCreeps.enemy.length) return
+  if (global.settings.nonAggressionPlayers.includes(this.memory[RoomMemoryKeys.owner])) return
+  if (this.roomManager.enemyAttackers.length > 0) return
 
-    request = Memory.combatRequests[this.name] = {
-        [CombatRequestKeys.type]: 'harass',
-    }
+  request = Memory.combatRequests[this.name] = {
+    [CombatRequestKeys.type]: 'harass',
+  }
 
-    request[CombatRequestKeys.minDamage] = 10
-    request[CombatRequestKeys.minMeleeHeal] = 10
-    request[CombatRequestKeys.minRangedHeal] = 10
+  request[CombatRequestKeys.minDamage] = 10
+  request[CombatRequestKeys.minMeleeHeal] = 10
+  request[CombatRequestKeys.minRangedHeal] = 10
 
-    if (opts) {
-        Object.assign(request, opts)
-        return
-    }
+  if (opts) {
+    Object.assign(request, opts)
+    return
+  }
 
-    /*
+  /*
     const structures = this[CreepMemoryKeys.structureTarget]s
 
     let totalHits = 0
@@ -837,487 +791,473 @@ Room.prototype.createHarassCombatRequest = function (opts) {
 }
 
 Room.prototype.createDefendCombatRequest = function (opts) {
-    let request = Memory.combatRequests[this.name]
-    if (request) {
-        if (request[CombatRequestKeys.type] !== 'defend') return
+  let request = Memory.combatRequests[this.name]
+  if (request) {
+    if (request[CombatRequestKeys.type] !== 'defend') return
 
-        if (!opts) return
+    if (!opts) return
 
-        Object.assign(request, opts)
-        return
-    }
+    Object.assign(request, opts)
+    return
+  }
 
-    request = Memory.combatRequests[this.name] = {
-        [CombatRequestKeys.type]: 'defend',
-    }
+  request = Memory.combatRequests[this.name] = {
+    [CombatRequestKeys.type]: 'defend',
+  }
 
-    request[CombatRequestKeys.inactionTimer] = 0
-    request[CombatRequestKeys.inactionTimerMax] = randomIntRange(
-        2000,
-        3000,
-    )
+  request[CombatRequestKeys.inactionTimer] = 0
+  request[CombatRequestKeys.inactionTimerMax] = randomIntRange(2000, 3000)
 
-    const enemySquadData = this.roomManager.enemySquadData
+  const enemySquadData = this.roomManager.enemySquadData
 
-    request[CombatRequestKeys.minRangedHeal] = Math.max(enemySquadData.highestRangedDamage, 1)
-    request[CombatRequestKeys.minMeleeHeal] = Math.max(enemySquadData.highestMeleeDamage, 1)
-    request[CombatRequestKeys.minDamage] = enemySquadData.highestHeal * 1.2
+  request[CombatRequestKeys.minRangedHeal] = Math.max(enemySquadData.highestRangedDamage, 1)
+  request[CombatRequestKeys.minMeleeHeal] = Math.max(enemySquadData.highestMeleeDamage, 1)
+  request[CombatRequestKeys.minDamage] = enemySquadData.highestHeal * 1.2
 
-    if (opts) {
-        Object.assign(request, opts)
-        return
-    }
+  if (opts) {
+    Object.assign(request, opts)
+    return
+  }
 }
 
 Room.prototype.distanceTransform = function (
-    initialCoords,
-    visuals,
-    minAvoid = 1,
-    x1 = 0,
-    y1 = 0,
-    x2 = roomDimensions - 1,
-    y2 = roomDimensions - 1,
+  initialCoords,
+  visuals,
+  minAvoid = 1,
+  x1 = 0,
+  y1 = 0,
+  x2 = roomDimensions - 1,
+  y2 = roomDimensions - 1,
 ) {
-    // Use a costMatrix to record distances
+  // Use a costMatrix to record distances
 
-    const distanceCoords = new Uint8Array(2500)
+  const distanceCoords = new Uint8Array(2500)
 
-    if (!initialCoords)
-        initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
+  if (!initialCoords) initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
 
-    let x
-    let y
-    let minX = Math.max(x1 - 1, 0)
-    let minY = Math.max(y1 - 1, 0)
-    let maxX = Math.min(x2 + 1, roomDimensions - 1)
-    let maxY = Math.min(y2 + 1, roomDimensions - 1)
-    let packedCoord
+  let x
+  let y
+  let minX = Math.max(x1 - 1, 0)
+  let minY = Math.max(y1 - 1, 0)
+  let maxX = Math.min(x2 + 1, roomDimensions - 1)
+  let maxY = Math.min(y2 + 1, roomDimensions - 1)
+  let packedCoord
 
-    for (x = minX; x <= maxX; x += 1) {
-        for (y = minY; y <= maxY; y += 1) {
-            packedCoord = packXYAsNum(x, y)
-            distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
-        }
+  for (x = minX; x <= maxX; x += 1) {
+    for (y = minY; y <= maxY; y += 1) {
+      packedCoord = packXYAsNum(x, y)
+      distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
     }
+  }
 
-    let top
-    let left
-    let topLeft
-    let topRight
-    let bottomLeft
+  let top
+  let left
+  let topLeft
+  let topRight
+  let bottomLeft
 
+  // Loop through the xs and ys inside the bounds
+
+  for (x = x1; x <= x2; x += 1) {
+    for (y = y1; y <= y2; y += 1) {
+      top = distanceCoords[packXYAsNum(x, y - 1)] || 0
+      left = distanceCoords[packXYAsNum(x - 1, y)] || 0
+      topLeft = distanceCoords[packXYAsNum(x - 1, y - 1)] || 0
+      topRight = distanceCoords[packXYAsNum(x + 1, y - 1)] || 0
+      bottomLeft = distanceCoords[packXYAsNum(x - 1, y + 1)] || 0
+
+      packedCoord = packXYAsNum(x, y)
+
+      distanceCoords[packedCoord] = Math.min(
+        Math.min(top, left, topLeft, topRight, bottomLeft) + 1,
+        distanceCoords[packedCoord],
+      )
+    }
+  }
+
+  let bottom
+  let right
+  let bottomRight
+
+  // Loop through the xs and ys inside the bounds
+
+  for (x = x2; x >= x1; x -= 1) {
+    for (y = y2; y >= y1; y -= 1) {
+      bottom = distanceCoords[packXYAsNum(x, y + 1)] || 0
+      right = distanceCoords[packXYAsNum(x + 1, y)] || 0
+      bottomRight = distanceCoords[packXYAsNum(x + 1, y + 1)] || 0
+      topRight = distanceCoords[packXYAsNum(x + 1, y - 1)] || 0
+      bottomLeft = distanceCoords[packXYAsNum(x - 1, y + 1)] || 0
+
+      packedCoord = packXYAsNum(x, y)
+
+      distanceCoords[packedCoord] = Math.min(
+        Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1,
+        distanceCoords[packedCoord],
+      )
+    }
+  }
+
+  if (visuals) {
     // Loop through the xs and ys inside the bounds
 
     for (x = x1; x <= x2; x += 1) {
-        for (y = y1; y <= y2; y += 1) {
-            top = distanceCoords[packXYAsNum(x, y - 1)] || 0
-            left = distanceCoords[packXYAsNum(x - 1, y)] || 0
-            topLeft = distanceCoords[packXYAsNum(x - 1, y - 1)] || 0
-            topRight = distanceCoords[packXYAsNum(x + 1, y - 1)] || 0
-            bottomLeft = distanceCoords[packXYAsNum(x - 1, y + 1)] || 0
-
-            packedCoord = packXYAsNum(x, y)
-
-            distanceCoords[packedCoord] = Math.min(
-                Math.min(top, left, topLeft, topRight, bottomLeft) + 1,
-                distanceCoords[packedCoord],
-            )
-        }
+      for (y = y1; y <= y2; y += 1) {
+        this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+          fill: `hsl(${200}${distanceCoords[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
+          opacity: 0.4,
+        })
+        this.visual.text(distanceCoords[packXYAsNum(x, y)].toString(), x, y)
+      }
     }
+  }
 
-    let bottom
-    let right
-    let bottomRight
-
-    // Loop through the xs and ys inside the bounds
-
-    for (x = x2; x >= x1; x -= 1) {
-        for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCoords[packXYAsNum(x, y + 1)] || 0
-            right = distanceCoords[packXYAsNum(x + 1, y)] || 0
-            bottomRight = distanceCoords[packXYAsNum(x + 1, y + 1)] || 0
-            topRight = distanceCoords[packXYAsNum(x + 1, y - 1)] || 0
-            bottomLeft = distanceCoords[packXYAsNum(x - 1, y + 1)] || 0
-
-            packedCoord = packXYAsNum(x, y)
-
-            distanceCoords[packedCoord] = Math.min(
-                Math.min(bottom, right, bottomRight, topRight, bottomLeft) + 1,
-                distanceCoords[packedCoord],
-            )
-        }
-    }
-
-    if (visuals) {
-        // Loop through the xs and ys inside the bounds
-
-        for (x = x1; x <= x2; x += 1) {
-            for (y = y1; y <= y2; y += 1) {
-                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${distanceCoords[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
-                    opacity: 0.4,
-                })
-                this.visual.text(distanceCoords[packXYAsNum(x, y)].toString(), x, y)
-            }
-        }
-    }
-
-    return distanceCoords
+  return distanceCoords
 }
 
 Room.prototype.diagonalDistanceTransform = function (
-    initialCoords,
-    visuals,
-    minAvoid = 1,
-    x1 = 0,
-    y1 = 0,
-    x2 = roomDimensions - 1,
-    y2 = roomDimensions - 1,
+  initialCoords,
+  visuals,
+  minAvoid = 1,
+  x1 = 0,
+  y1 = 0,
+  x2 = roomDimensions - 1,
+  y2 = roomDimensions - 1,
 ) {
-    // Use a costMatrix to record distances
+  // Use a costMatrix to record distances
 
-    const distanceCoords = new Uint8Array(2500)
+  const distanceCoords = new Uint8Array(2500)
 
-    if (!initialCoords)
-        initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
+  if (!initialCoords) initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
 
-    let x
-    let y
-    let packedCoord
+  let x
+  let y
+  let packedCoord
 
-    for (x = x1; x <= x2; x += 1) {
-        for (y = y1; y <= y2; y += 1) {
-            packedCoord = packXYAsNum(x, y)
-            distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
-        }
+  for (x = x1; x <= x2; x += 1) {
+    for (y = y1; y <= y2; y += 1) {
+      packedCoord = packXYAsNum(x, y)
+      distanceCoords[packedCoord] = initialCoords[packedCoord] >= minAvoid ? 0 : 255
     }
+  }
 
-    let top
-    let left
+  let top
+  let left
 
+  // Loop through the xs and ys inside the bounds
+
+  for (x = x1; x <= x2; x += 1) {
+    for (y = y1; y <= y2; y += 1) {
+      top = distanceCoords[packXYAsNum(x, y - 1)] || 0
+      left = distanceCoords[packXYAsNum(x - 1, y)] || 0
+
+      packedCoord = packXYAsNum(x, y)
+
+      distanceCoords[packedCoord] = Math.min(Math.min(top, left) + 1, distanceCoords[packedCoord])
+    }
+  }
+
+  let bottom
+  let right
+
+  // Loop through the xs and ys inside the bounds
+
+  for (x = x2; x >= x1; x -= 1) {
+    for (y = y2; y >= y1; y -= 1) {
+      bottom = distanceCoords[packXYAsNum(x, y + 1)] || 0
+      right = distanceCoords[packXYAsNum(x + 1, y)] || 0
+
+      packedCoord = packXYAsNum(x, y)
+
+      distanceCoords[packedCoord] = Math.min(
+        Math.min(bottom, right) + 1,
+        distanceCoords[packedCoord],
+      )
+    }
+  }
+
+  if (visuals) {
     // Loop through the xs and ys inside the bounds
 
     for (x = x1; x <= x2; x += 1) {
-        for (y = y1; y <= y2; y += 1) {
-            top = distanceCoords[packXYAsNum(x, y - 1)] || 0
-            left = distanceCoords[packXYAsNum(x - 1, y)] || 0
-
-            packedCoord = packXYAsNum(x, y)
-
-            distanceCoords[packedCoord] = Math.min(
-                Math.min(top, left) + 1,
-                distanceCoords[packedCoord],
-            )
-        }
+      for (y = y1; y <= y2; y += 1) {
+        this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+          fill: `hsl(${200}${distanceCoords[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
+          opacity: 0.4,
+        })
+        this.visual.text(distanceCoords[packXYAsNum(x, y)].toString(), x, y)
+      }
     }
+  }
 
-    let bottom
-    let right
-
-    // Loop through the xs and ys inside the bounds
-
-    for (x = x2; x >= x1; x -= 1) {
-        for (y = y2; y >= y1; y -= 1) {
-            bottom = distanceCoords[packXYAsNum(x, y + 1)] || 0
-            right = distanceCoords[packXYAsNum(x + 1, y)] || 0
-
-            packedCoord = packXYAsNum(x, y)
-
-            distanceCoords[packedCoord] = Math.min(
-                Math.min(bottom, right) + 1,
-                distanceCoords[packedCoord],
-            )
-        }
-    }
-
-    if (visuals) {
-        // Loop through the xs and ys inside the bounds
-
-        for (x = x1; x <= x2; x += 1) {
-            for (y = y1; y <= y2; y += 1) {
-                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${distanceCoords[packXYAsNum(x, y)] * 10}, 100%, 60%)`,
-                    opacity: 0.4,
-                })
-                this.visual.text(distanceCoords[packXYAsNum(x, y)].toString(), x, y)
-            }
-        }
-    }
-
-    return distanceCoords
+  return distanceCoords
 }
 
 Room.prototype.findClosestPos = function (opts) {
-    // Construct a cost matrix for visited tiles and add seeds to it
+  // Construct a cost matrix for visited tiles and add seeds to it
 
-    let visitedCoords = new Uint8Array(2500)
+  let visitedCoords = new Uint8Array(2500)
 
-    // Record startPos as visited
+  // Record startPos as visited
 
-    for (const coord of opts.sources) visitedCoords[packAsNum(coord)] = 1
+  for (const coord of opts.sources) visitedCoords[packAsNum(coord)] = 1
 
-    // Construct values for the check
+  // Construct values for the check
 
-    let thisGeneration = opts.sources
-    let nextGeneration: Coord[] = []
-    let depth = 0
+  let thisGeneration = opts.sources
+  let nextGeneration: Coord[] = []
+  let depth = 0
 
-    // So long as there are positions in this gen
+  // So long as there are positions in this gen
 
-    while (thisGeneration.length) {
-        // Reset nextGeneration
+  while (thisGeneration.length) {
+    // Reset nextGeneration
 
-        nextGeneration = []
+    nextGeneration = []
 
-        let localVisitedCoords = new Uint8Array(visitedCoords)
+    let localVisitedCoords = new Uint8Array(visitedCoords)
 
-        // Flood cardinal directions, excluding impassibles
+    // Flood cardinal directions, excluding impassibles
 
-        if (opts.cardinalFlood) {
-            // Iterate through positions of this gen
+    if (opts.cardinalFlood) {
+      // Iterate through positions of this gen
 
-            for (const coord of thisGeneration) {
-                // If the pos can be an anchor, inform it
+      for (const coord of thisGeneration) {
+        // If the pos can be an anchor, inform it
 
-                if (opts.targetCondition(coord))
-                    return new RoomPosition(coord.x, coord.y, this.name)
+        if (opts.targetCondition(coord)) return new RoomPosition(coord.x, coord.y, this.name)
 
-                // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+        // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
 
-                const adjacentCoords = [
-                    {
-                        x: coord.x - 1,
-                        y: coord.y,
-                    },
-                    {
-                        x: coord.x + 1,
-                        y: coord.y,
-                    },
-                    {
-                        x: coord.x,
-                        y: coord.y - 1,
-                    },
-                    {
-                        x: coord.x,
-                        y: coord.y + 1,
-                    },
-                ]
+        const adjacentCoords = [
+          {
+            x: coord.x - 1,
+            y: coord.y,
+          },
+          {
+            x: coord.x + 1,
+            y: coord.y,
+          },
+          {
+            x: coord.x,
+            y: coord.y - 1,
+          },
+          {
+            x: coord.x,
+            y: coord.y + 1,
+          },
+        ]
 
-                // Loop through adjacent positions
+        // Loop through adjacent positions
 
-                for (const coord2 of adjacentCoords) {
-                    if (!doesCoordExist(coord2)) continue
+        for (const coord2 of adjacentCoords) {
+          if (!doesCoordExist(coord2)) continue
 
-                    // Iterate if the adjacent pos has been visited or isn't a tile
+          // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (localVisitedCoords[packAsNum(coord2)] === 1) continue
+          if (localVisitedCoords[packAsNum(coord2)] === 1) continue
 
-                    // Otherwise record that it has been visited
+          // Otherwise record that it has been visited
 
-                    localVisitedCoords[packAsNum(coord2)] = 1
+          localVisitedCoords[packAsNum(coord2)] = 1
 
-                    if (opts.coordMap[packAsNum(coord2)] === 255) continue
+          if (opts.coordMap[packAsNum(coord2)] === 255) continue
 
-                    // Add it tofastFillerSide the next gen
+          // Add it tofastFillerSide the next gen
 
-                    nextGeneration.push(coord2)
-                }
-            }
+          nextGeneration.push(coord2)
         }
-
-        // Flood all adjacent positions excluding diagonals
-
-        if (!nextGeneration.length) {
-            localVisitedCoords = new Uint8Array(visitedCoords)
-
-            // Iterate through positions of this gen
-
-            for (const coord of thisGeneration) {
-                // If the pos can be an anchor, inform it
-
-                if (opts.targetCondition(coord))
-                    return new RoomPosition(coord.x, coord.y, this.name)
-
-                // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
-
-                const adjacentCoords = findCoordsInsideRect(
-                    coord.x - 1,
-                    coord.y - 1,
-                    coord.x + 1,
-                    coord.y + 1,
-                )
-
-                // Loop through adjacent positions
-
-                for (const coord2 of adjacentCoords) {
-                    if (!doesCoordExist(coord2)) continue
-
-                    // Iterate if the adjacent pos has been visited or isn't a tile
-
-                    if (localVisitedCoords[packAsNum(coord2)] === 1) continue
-
-                    // Otherwise record that it has been visited
-
-                    localVisitedCoords[packAsNum(coord2)] = 1
-
-                    if (opts.coordMap[packAsNum(coord2)] === 255) continue
-
-                    // Add it tofastFillerSide the next gen
-
-                    nextGeneration.push(coord2)
-                }
-            }
-        }
-
-        // Flood all adjacent positions, including diagonals
-
-        if (!nextGeneration.length) {
-            localVisitedCoords = new Uint8Array(visitedCoords)
-
-            // Iterate through positions of this gen
-
-            for (const coord of thisGeneration) {
-                // If the pos can be an anchor, inform it
-
-                if (opts.targetCondition(coord))
-                    return new RoomPosition(coord.x, coord.y, this.name)
-
-                // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
-
-                const adjacentCoords = findCoordsInsideRect(
-                    coord.x - 1,
-                    coord.y - 1,
-                    coord.x + 1,
-                    coord.y + 1,
-                )
-                // Loop through adjacent positions
-
-                for (const coord2 of adjacentCoords) {
-                    if (!doesCoordExist(coord2)) continue
-
-                    // Iterate if the adjacent pos has been visited or isn't a tile
-
-                    if (localVisitedCoords[packAsNum(coord2)] === 1) continue
-
-                    // Otherwise record that it has been visited
-
-                    localVisitedCoords[packAsNum(coord2)] = 1
-
-                    // Add it tofastFillerSide the next gen
-
-                    nextGeneration.push(coord2)
-                }
-            }
-        }
-
-        if (opts.visuals) {
-            for (const coord of nextGeneration) {
-                this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
-                    font: 0.5,
-                    color: customColors.yellow,
-                })
-
-                this.visual.text(depth.toString(), coord.x, coord.y + 0.5, {
-                    font: 0.5,
-                    color: customColors.green,
-                })
-            }
-        }
-
-        // Set this gen to next gen
-
-        visitedCoords = new Uint8Array(localVisitedCoords)
-        thisGeneration = nextGeneration
-        depth += 1
+      }
     }
 
-    // Inform false if no value was found
+    // Flood all adjacent positions excluding diagonals
 
-    return false
+    if (!nextGeneration.length) {
+      localVisitedCoords = new Uint8Array(visitedCoords)
+
+      // Iterate through positions of this gen
+
+      for (const coord of thisGeneration) {
+        // If the pos can be an anchor, inform it
+
+        if (opts.targetCondition(coord)) return new RoomPosition(coord.x, coord.y, this.name)
+
+        // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+        const adjacentCoords = findCoordsInsideRect(
+          coord.x - 1,
+          coord.y - 1,
+          coord.x + 1,
+          coord.y + 1,
+        )
+
+        // Loop through adjacent positions
+
+        for (const coord2 of adjacentCoords) {
+          if (!doesCoordExist(coord2)) continue
+
+          // Iterate if the adjacent pos has been visited or isn't a tile
+
+          if (localVisitedCoords[packAsNum(coord2)] === 1) continue
+
+          // Otherwise record that it has been visited
+
+          localVisitedCoords[packAsNum(coord2)] = 1
+
+          if (opts.coordMap[packAsNum(coord2)] === 255) continue
+
+          // Add it tofastFillerSide the next gen
+
+          nextGeneration.push(coord2)
+        }
+      }
+    }
+
+    // Flood all adjacent positions, including diagonals
+
+    if (!nextGeneration.length) {
+      localVisitedCoords = new Uint8Array(visitedCoords)
+
+      // Iterate through positions of this gen
+
+      for (const coord of thisGeneration) {
+        // If the pos can be an anchor, inform it
+
+        if (opts.targetCondition(coord)) return new RoomPosition(coord.x, coord.y, this.name)
+
+        // Otherwise construct a rect and get the positions in a range of 1 (not diagonals)
+
+        const adjacentCoords = findCoordsInsideRect(
+          coord.x - 1,
+          coord.y - 1,
+          coord.x + 1,
+          coord.y + 1,
+        )
+        // Loop through adjacent positions
+
+        for (const coord2 of adjacentCoords) {
+          if (!doesCoordExist(coord2)) continue
+
+          // Iterate if the adjacent pos has been visited or isn't a tile
+
+          if (localVisitedCoords[packAsNum(coord2)] === 1) continue
+
+          // Otherwise record that it has been visited
+
+          localVisitedCoords[packAsNum(coord2)] = 1
+
+          // Add it tofastFillerSide the next gen
+
+          nextGeneration.push(coord2)
+        }
+      }
+    }
+
+    if (opts.visuals) {
+      for (const coord of nextGeneration) {
+        this.visual.text(opts.coordMap[packAsNum(coord)].toString(), coord.x, coord.y, {
+          font: 0.5,
+          color: customColors.yellow,
+        })
+
+        this.visual.text(depth.toString(), coord.x, coord.y + 0.5, {
+          font: 0.5,
+          color: customColors.green,
+        })
+      }
+    }
+
+    // Set this gen to next gen
+
+    visitedCoords = new Uint8Array(localVisitedCoords)
+    thisGeneration = nextGeneration
+    depth += 1
+  }
+
+  // Inform false if no value was found
+
+  return false
 }
 
 Room.prototype.errorVisual = function (coord, visualize = global.settings.roomVisuals) {
-    if (!visualize) return
+  if (!visualize) return
 
-    this.visual.circle(coord.x, coord.y, {
-        fill: '',
-        stroke: customColors.red,
-        radius: 0.5,
-        strokeWidth: 0.15,
-        opacity: 0.3,
-    })
+  this.visual.circle(coord.x, coord.y, {
+    fill: '',
+    stroke: customColors.red,
+    radius: 0.5,
+    strokeWidth: 0.15,
+    opacity: 0.3,
+  })
 }
 
 Room.prototype.findAllyCSiteTargetID = function (creep) {
-    // If there are no sites inform false
+  // If there are no sites inform false
 
-    if (!this.roomManager.notMyConstructionSites.ally.length) return false
+  if (!this.roomManager.notMyConstructionSites.ally.length) return false
 
-    // Loop through structuretypes of the build priority
+  // Loop through structuretypes of the build priority
 
-    for (const structureType of defaultStructureTypesByBuildPriority) {
-        const cSitesOfType = this.roomManager.allyConstructionSitesByType[structureType]
-        if (!cSitesOfType.length) continue
+  for (const structureType of defaultStructureTypesByBuildPriority) {
+    const cSitesOfType = this.roomManager.allyConstructionSitesByType[structureType]
+    if (!cSitesOfType.length) continue
 
-        // Otherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
+    // Otherwise get the anchor, using the creep's pos if undefined, or using the center of the room if there is no creep
 
-        const anchor = this.roomManager.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
+    const anchor = this.roomManager.anchor || creep?.pos || new RoomPosition(25, 25, this.name)
 
-        // Record the closest site to the anchor in the room's global and inform true
+    // Record the closest site to the anchor in the room's global and inform true
 
-        this.memory[RoomMemoryKeys.constructionSiteTarget] = findClosestObject(
-            anchor,
-            cSitesOfType,
-        ).id
-        return true
-    }
+    this.memory[RoomMemoryKeys.constructionSiteTarget] = findClosestObject(anchor, cSitesOfType).id
+    return true
+  }
 
-    // no target was found
+  // no target was found
 
-    return false
+  return false
 }
 
 Room.prototype.findUnprotectedCoords = function (visuals) {
-    // Construct a cost matrix for the flood
+  // Construct a cost matrix for the flood
 
-    this.unprotectedCoords = new Uint8Array(2500)
-    const visitedCoords = new Uint8Array(2500)
+  this.unprotectedCoords = new Uint8Array(2500)
+  const visitedCoords = new Uint8Array(2500)
 
-    // Construct values for the flood
+  // Construct values for the flood
 
-    let depth = 0
-    let thisGeneration: Coord[] = this.find(FIND_EXIT)
-    let nextGeneration: Coord[] = []
+  let depth = 0
+  let thisGeneration: Coord[] = this.find(FIND_EXIT)
+  let nextGeneration: Coord[] = []
 
-    // Loop through positions of seeds
+  // Loop through positions of seeds
 
-    for (const coord of thisGeneration) visitedCoords[packAsNum(coord)] = 1
+  for (const coord of thisGeneration) visitedCoords[packAsNum(coord)] = 1
 
-    // So long as there are positions in this gen
+  // So long as there are positions in this gen
 
-    while (thisGeneration.length) {
-        // Reset next gen
+  while (thisGeneration.length) {
+    // Reset next gen
 
-        nextGeneration = []
+    nextGeneration = []
 
-        // Iterate through positions of this gen
+    // Iterate through positions of this gen
 
-        for (const coord1 of thisGeneration) {
-            // If the depth isn't 0
+    for (const coord1 of thisGeneration) {
+      // If the depth isn't 0
 
-            if (depth > 0) {
-                const packedCoord1 = packAsNum(coord1)
+      if (depth > 0) {
+        const packedCoord1 = packAsNum(coord1)
 
-                // Iterate if the terrain is a wall
+        // Iterate if the terrain is a wall
 
-                if (this.rampartCoords[packedCoord1] > 0) continue
+        if (this.rampartCoords[packedCoord1] > 0) continue
 
-                // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
+        // Otherwise so long as the pos isn't a wall record its depth in the flood cost matrix
 
-                this.unprotectedCoords[packedCoord1] = depth * 10 + 10
+        this.unprotectedCoords[packedCoord1] = depth * 10 + 10
 
-                // If visuals are enabled, show the depth on the pos
-                /*
+        // If visuals are enabled, show the depth on the pos
+        /*
                 if (visuals)
                     this.visual.rect(coord1.x - 0.5, coord1.y - 0.5, 1, 1, {
                         fill: `hsl(${200}${depth * 2}, 100%, 60%)`,
@@ -1325,312 +1265,312 @@ Room.prototype.findUnprotectedCoords = function (visuals) {
                     })
                     this.visual.text(depth.toString(), coord1.x, coord1.y)
  */
-            }
+      }
 
-            // Loop through adjacent positions
+      // Loop through adjacent positions
 
-            for (const coord2 of findCoordsInsideRect(
-                coord1.x - 1,
-                coord1.y - 1,
-                coord1.x + 1,
-                coord1.y + 1,
-            )) {
-                const packedCoord2 = packAsNum(coord2)
+      for (const coord2 of findCoordsInsideRect(
+        coord1.x - 1,
+        coord1.y - 1,
+        coord1.x + 1,
+        coord1.y + 1,
+      )) {
+        const packedCoord2 = packAsNum(coord2)
 
-                // Iterate if the adjacent pos has been visited or isn't a tile
+        // Iterate if the adjacent pos has been visited or isn't a tile
 
-                if (visitedCoords[packedCoord2] === 1) continue
+        if (visitedCoords[packedCoord2] === 1) continue
 
-                // Otherwise record that it has been visited
+        // Otherwise record that it has been visited
 
-                visitedCoords[packedCoord2] = 1
+        visitedCoords[packedCoord2] = 1
 
-                // Add it to the next gen
+        // Add it to the next gen
 
-                nextGeneration.push(coord2)
-            }
-        }
-
-        // Set this gen to next gen
-
-        thisGeneration = nextGeneration
-
-        // Increment depth
-
-        depth += 1
+        nextGeneration.push(coord2)
+      }
     }
+
+    // Set this gen to next gen
+
+    thisGeneration = nextGeneration
+
+    // Increment depth
+
+    depth += 1
+  }
 }
 
 Room.prototype.groupRampartPositions = function (rampartPositions) {
-    const room = this
+  const room = this
 
-    // Construct a costMatrix to store visited positions
+  // Construct a costMatrix to store visited positions
 
-    const visitedCoords = new Uint8Array(2500)
+  const visitedCoords = new Uint8Array(2500)
 
-    const groupedPositions = []
-    let groupIndex = 0
+  const groupedPositions = []
+  let groupIndex = 0
 
-    // Loop through each pos of positions
+  // Loop through each pos of positions
 
-    for (const packedPos of rampartPositions) {
-        const pos = unpackNumAsCoord(packedPos)
+  for (const packedPos of rampartPositions) {
+    const pos = unpackNumAsCoord(packedPos)
 
-        // If the pos has already been visited, iterate
+    // If the pos has already been visited, iterate
 
-        if (visitedCoords[packAsNum(pos)] === 1) continue
+    if (visitedCoords[packAsNum(pos)] === 1) continue
 
-        // Record that this pos has been visited
+    // Record that this pos has been visited
 
-        visitedCoords[packAsNum(pos)] = 1
+    visitedCoords[packAsNum(pos)] = 1
 
-        // Construct the group for this index with the pos in it the group
+    // Construct the group for this index with the pos in it the group
 
-        groupedPositions[groupIndex] = [new RoomPosition(pos.x, pos.y, room.name)]
+    groupedPositions[groupIndex] = [new RoomPosition(pos.x, pos.y, room.name)]
 
-        // Construct values for floodFilling
+    // Construct values for floodFilling
 
-        let thisGeneration = [pos]
-        let nextGeneration: Coord[] = []
-        let groupSize = 0
+    let thisGeneration = [pos]
+    let nextGeneration: Coord[] = []
+    let groupSize = 0
 
-        // So long as there are positions in this gen
+    // So long as there are positions in this gen
 
-        while (thisGeneration.length) {
-            // Reset next gen
+    while (thisGeneration.length) {
+      // Reset next gen
 
-            nextGeneration = []
+      nextGeneration = []
 
-            // Iterate through positions of this gen
+      // Iterate through positions of this gen
 
-            for (const pos of thisGeneration) {
-                // Loop through adjacent positions
+      for (const pos of thisGeneration) {
+        // Loop through adjacent positions
 
-                for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
-                    const packedAdjacentCoord = packAsNum(adjacentPos)
+        for (const adjacentPos of findAdjacentCoordsToCoord(pos)) {
+          const packedAdjacentCoord = packAsNum(adjacentPos)
 
-                    // Iterate if the adjacent pos has been visited or isn't a tile
+          // Iterate if the adjacent pos has been visited or isn't a tile
 
-                    if (visitedCoords[packedAdjacentCoord] === 1) continue
+          if (visitedCoords[packedAdjacentCoord] === 1) continue
 
-                    // Otherwise record that it has been visited
+          // Otherwise record that it has been visited
 
-                    visitedCoords[packedAdjacentCoord] = 1
+          visitedCoords[packedAdjacentCoord] = 1
 
-                    // If a rampart is not planned for this position, iterate
+          // If a rampart is not planned for this position, iterate
 
-                    if (this.rampartCoords[packAsNum(adjacentPos)] !== 1) continue
+          if (this.rampartCoords[packAsNum(adjacentPos)] !== 1) continue
 
-                    // Add it to the next gen and this group
+          // Add it to the next gen and this group
 
-                    groupedPositions[groupIndex].push(
-                        new RoomPosition(adjacentPos.x, adjacentPos.y, room.name),
-                    )
+          groupedPositions[groupIndex].push(
+            new RoomPosition(adjacentPos.x, adjacentPos.y, room.name),
+          )
 
-                    groupSize += 1
-                    nextGeneration.push(adjacentPos)
-                }
-            }
-
-            if (groupSize >= maxRampartGroupSize) break
-
-            // Set this gen to next gen
-
-            thisGeneration = nextGeneration
+          groupSize += 1
+          nextGeneration.push(adjacentPos)
         }
+      }
 
-        // Increase the groupIndex
+      if (groupSize >= maxRampartGroupSize) break
 
-        groupIndex += 1
+      // Set this gen to next gen
+
+      thisGeneration = nextGeneration
     }
 
-    // Inform groupedPositions
+    // Increase the groupIndex
 
-    return groupedPositions
+    groupIndex += 1
+  }
+
+  // Inform groupedPositions
+
+  return groupedPositions
 }
 
 Room.prototype.findPositionsInsideRect = function (x1, y1, x2, y2) {
-    // Construct positions
+  // Construct positions
 
-    const positions = []
+  const positions = []
 
-    // Loop through coordinates inside the rect
+  // Loop through coordinates inside the rect
 
-    for (let x = x1; x <= x2; x += 1) {
-        for (let y = y1; y <= y2; y += 1) {
-            // Iterate if the pos doesn't map onto a room
+  for (let x = x1; x <= x2; x += 1) {
+    for (let y = y1; y <= y2; y += 1) {
+      // Iterate if the pos doesn't map onto a room
 
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+      if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            // Otherwise ass the x and y to positions
+      // Otherwise ass the x and y to positions
 
-            positions.push(new RoomPosition(x, y, this.name))
-        }
+      positions.push(new RoomPosition(x, y, this.name))
     }
+  }
 
-    // Inform positions
+  // Inform positions
 
-    return positions
+  return positions
 }
 
 Room.prototype.findAdjacentPositions = function (rx, ry) {
-    // Construct positions
+  // Construct positions
 
-    const positions = []
+  const positions = []
 
-    // Loop through coordinates inside the rect
+  // Loop through coordinates inside the rect
 
-    for (let x = rx - 1; x <= rx + 1; x += 1) {
-        for (let y = ry - 1; y <= ry + 1; y += 1) {
-            if (x === rx && y === ry) continue
+  for (let x = rx - 1; x <= rx + 1; x += 1) {
+    for (let y = ry - 1; y <= ry + 1; y += 1) {
+      if (x === rx && y === ry) continue
 
-            // Iterate if the pos doesn't map onto a room
+      // Iterate if the pos doesn't map onto a room
 
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+      if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            // Otherwise ass the x and y to positions
+      // Otherwise ass the x and y to positions
 
-            positions.push(new RoomPosition(x, y, this.name))
-        }
+      positions.push(new RoomPosition(x, y, this.name))
     }
+  }
 
-    // Inform positions
+  // Inform positions
 
-    return positions
+  return positions
 }
 
 Room.prototype.createWorkRequest = function () {
-    if (this.find(FIND_SOURCES).length < 2) return false
-    if (Memory.workRequests[this.name]) return false
+  if (this.find(FIND_SOURCES).length < 2) return false
+  if (Memory.workRequests[this.name]) return false
 
-    roomNameUtils.findDynamicScore(this.name)
+  roomNameUtils.findDynamicScore(this.name)
 
-    const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
-    if (communePlanned === false) return false
+  const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
+  if (communePlanned === false) return false
 
-    if (communePlanned !== true) {
-        const result = this.roomManager.communePlanner.preTickRun(this)
-        if (result === Result.fail) {
-            this.memory[RoomMemoryKeys.communePlanned] = false
-            return false
-        }
-
-        if (result !== Result.success) {
-            return false
-        }
+  if (communePlanned !== true) {
+    const result = this.roomManager.communePlanner.preTickRun(this)
+    if (result === Result.fail) {
+      this.memory[RoomMemoryKeys.communePlanned] = false
+      return false
     }
 
-    const request = (Memory.workRequests[this.name] = {})
+    if (result !== Result.success) {
+      return false
+    }
+  }
 
-    return true
+  const request = (Memory.workRequests[this.name] = {})
+
+  return true
 }
 
 Room.prototype.findSwampPlainsRatio = function () {
-    const terrainAmounts = [0, 0, 0]
+  const terrainAmounts = [0, 0, 0]
 
-    const terrain = this.getTerrain()
+  const terrain = this.getTerrain()
 
-    for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            terrainAmounts[terrain.get(x, y)] += 1
-        }
+  for (let x = 0; x < roomDimensions; x += 1) {
+    for (let y = 0; y < roomDimensions; y += 1) {
+      terrainAmounts[terrain.get(x, y)] += 1
     }
+  }
 
-    return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
+  return terrainAmounts[TERRAIN_MASK_SWAMP] / terrainAmounts[0]
 }
 
 Room.prototype.visualizeCoordMap = function (coordMap, color, magnification = 2) {
-    if (color) {
-        for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * magnification}, 100%, 60%)`,
-                    opacity: 0.4,
-                })
-            }
-        }
-
-        return
-    }
-
+  if (color) {
     for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            this.visual.text(coordMap[packXYAsNum(x, y)].toString(), x, y, {
-                font: 0.5,
-            })
-        }
+      for (let y = 0; y < roomDimensions; y += 1) {
+        this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+          fill: `hsl(${200}${coordMap[packXYAsNum(x, y)] * magnification}, 100%, 60%)`,
+          opacity: 0.4,
+        })
+      }
     }
+
+    return
+  }
+
+  for (let x = 0; x < roomDimensions; x += 1) {
+    for (let y = 0; y < roomDimensions; y += 1) {
+      this.visual.text(coordMap[packXYAsNum(x, y)].toString(), x, y, {
+        font: 0.5,
+      })
+    }
+  }
 }
 
 Room.prototype.visualizeCostMatrix = function (cm, color, magnification = 2) {
-    if (color) {
-        for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-                this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
-                    fill: `hsl(${200}${cm.get(x, y) * magnification}, 100%, 60%)`,
-                    opacity: 0.4,
-                })
-            }
-        }
-
-        return
-    }
-
+  if (color) {
     for (let x = 0; x < roomDimensions; x += 1) {
-        for (let y = 0; y < roomDimensions; y += 1) {
-            this.visual.text(cm.get(x, y).toString(), x, y, {
-                font: 0.5,
-            })
-        }
+      for (let y = 0; y < roomDimensions; y += 1) {
+        this.visual.rect(x - 0.5, y - 0.5, 1, 1, {
+          fill: `hsl(${200}${cm.get(x, y) * magnification}, 100%, 60%)`,
+          opacity: 0.4,
+        })
+      }
     }
+
+    return
+  }
+
+  for (let x = 0; x < roomDimensions; x += 1) {
+    for (let y = 0; y < roomDimensions; y += 1) {
+      this.visual.text(cm.get(x, y).toString(), x, y, {
+        font: 0.5,
+      })
+    }
+  }
 }
 
 Room.prototype.coordHasStructureTypes = function (coord, types) {
-    for (const structure of this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
-        if (!types.has(structure.structureType)) continue
+  for (const structure of this.lookForAt(LOOK_STRUCTURES, coord.x, coord.y)) {
+    if (!types.has(structure.structureType)) continue
 
-        return true
-    }
+    return true
+  }
 
-    return false
+  return false
 }
 
 Room.prototype.createPowerTask = function (target, powerType, priority) {
-    // There is already has a power creep responding to this target with the power
-    customLog('MADE POWER TASK FOR', target)
-    if (target.reservePowers.has(powerType)) return false
+  // There is already has a power creep responding to this target with the power
+  customLog('MADE POWER TASK FOR', target)
+  if (target.reservePowers.has(powerType)) return false
 
-    // Create a power task with info on the cooldown
+  // Create a power task with info on the cooldown
 
-    const effect = target.effectsData.get(powerType)
-    const cooldown = effect ? effect.ticksRemaining : 0
+  const effect = target.effectsData.get(powerType)
+  const cooldown = effect ? effect.ticksRemaining : 0
 
-    const ID = collectiveManager.newTickID()
+  const ID = collectiveManager.newTickID()
 
-    return (this.powerTasks[ID] = {
-        taskID: ID,
-        targetID: target.id,
-        powerType,
-        packedCoord: packCoord(target.pos),
-        cooldown,
-        priority,
-    })
+  return (this.powerTasks[ID] = {
+    taskID: ID,
+    targetID: target.id,
+    powerType,
+    packedCoord: packCoord(target.pos),
+    cooldown,
+    priority,
+  })
 }
 
 Room.prototype.highestWeightedStoringStructures = function (resourceType) {
-    if (!this.storage && !this.terminal) return false
+  if (!this.storage && !this.terminal) return false
 
-    if (!this.storage) return this.terminal
-    if (!this.terminal) return this.storage
+  if (!this.storage) return this.terminal
+  if (!this.terminal) return this.storage
 
-    if (
-      this.storage.store.getUsedCapacity(resourceType) / 3 >
-      this.terminal.store.getUsedCapacity(resourceType)
-    ) {
+  if (
+    this.storage.store.getUsedCapacity(resourceType) / 3 >
+    this.terminal.store.getUsedCapacity(resourceType)
+  ) {
     return this.storage
-    }
+  }
 
-    return this.terminal
+  return this.terminal
 }
 
 Room.prototype.createRoomLogisticsRequest = function (args) {
@@ -1686,14 +1626,20 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 
   if (Game.flags[FlagNames.debugRoomLogistics]) {
     if (args.type === RoomLogisticsRequestTypes.offer) {
-      this.visual.text('O ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {font: '0.3'})
-      this.visual.text(args.priority.toString(), args.target.pos, {font: '0.3'})
+      this.visual.text('O ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {
+        font: '0.3',
+      })
+      this.visual.text(args.priority.toString(), args.target.pos, { font: '0.3' })
     } else if (args.type === RoomLogisticsRequestTypes.transfer) {
-      this.visual.text('T ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {font: '0.3'})
-      this.visual.text(args.priority.toString(), args.target.pos, {font: '0.3'})
+      this.visual.text('T ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {
+        font: '0.3',
+      })
+      this.visual.text(args.priority.toString(), args.target.pos, { font: '0.3' })
     } else if (args.type === RoomLogisticsRequestTypes.withdraw) {
-      this.visual.text('W ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {font: '0.3'})
-      this.visual.text(args.priority.toString(), args.target.pos, {font: '0.3'})
+      this.visual.text('W ' + amount.toString(), args.target.pos.x, args.target.pos.y + 0.5, {
+        font: '0.3',
+      })
+      this.visual.text(args.priority.toString(), args.target.pos, { font: '0.3' })
     }
   }
 
@@ -1716,79 +1662,79 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
 }
 
 Room.prototype.findStructureAtCoord = function <T extends Structure>(
-    coord: Coord,
-    conditions: (structure: T) => boolean,
+  coord: Coord,
+  conditions: (structure: T) => boolean,
 ) {
-    return this.findStructureAtXY(coord.x, coord.y, conditions)
+  return this.findStructureAtXY(coord.x, coord.y, conditions)
 }
 
 Room.prototype.findStructureAtXY = function <T extends Structure>(
-    x: number,
-    y: number,
-    conditions: (structure: T) => boolean,
+  x: number,
+  y: number,
+  conditions: (structure: T) => boolean,
 ) {
-    const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
-    if (!structureIDs) return false
+  const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
+  if (!structureIDs) return false
 
-    for (const ID of structureIDs) {
-        const structure = findObjectWithID(ID) as T
-        if (conditions(structure)) return structure
-    }
+  for (const ID of structureIDs) {
+    const structure = findObjectWithID(ID) as T
+    if (conditions(structure)) return structure
+  }
 
-    return false
+  return false
 }
 
 Room.prototype.findCSiteAtCoord = function <T extends ConstructionSite>(
-    coord: Coord,
-    conditions: (cSite: T) => boolean,
+  coord: Coord,
+  conditions: (cSite: T) => boolean,
 ) {
-    return this.findCSiteAtXY(coord.x, coord.y, conditions)
+  return this.findCSiteAtXY(coord.x, coord.y, conditions)
 }
 
 Room.prototype.findCSiteAtXY = function <T extends ConstructionSite>(
-    x: number,
-    y: number,
-    conditions: (cSite: T) => boolean,
+  x: number,
+  y: number,
+  conditions: (cSite: T) => boolean,
 ) {
-    const cSiteIDs = this.roomManager.cSiteCoords.get(packXYAsCoord(x, y))
-    if (!cSiteIDs) return false
+  const cSiteIDs = this.roomManager.cSiteCoords.get(packXYAsCoord(x, y))
+  if (!cSiteIDs) return false
 
-    for (const ID of cSiteIDs) {
-        const cSite = findObjectWithID(ID) as T
-        /* console.log('findCSite', cSite, ID) */
-        if (conditions(cSite)) return cSite
-    }
+  for (const ID of cSiteIDs) {
+    const cSite = findObjectWithID(ID) as T
+    /* console.log('findCSite', cSite, ID) */
+    if (conditions(cSite)) return cSite
+  }
 
-    return false
+  return false
 }
 
 Room.prototype.findStructureInRange = function <T extends Structure>(
-    startCoord: Coord,
-    range: number,
-    condition: (structure: T) => boolean,
+  startCoord: Coord,
+  range: number,
+  condition: (structure: T) => boolean,
 ): T | false {
-    let structureID: Id<Structure>
+  let structureID: Id<Structure>
 
-    for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
-        for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
-            // Iterate if the pos doesn't map onto a room
+  for (let x = startCoord.x - range; x <= startCoord.x + range; x += 1) {
+    for (let y = startCoord.y - range; y <= startCoord.y + range; y += 1) {
+      // Iterate if the pos doesn't map onto a room
 
-            if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
+      if (x < 0 || x >= roomDimensions || y < 0 || y >= roomDimensions) continue
 
-            const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
-            if (!structureIDs) continue
+      const structureIDs = this.roomManager.structureCoords.get(packXYAsCoord(x, y))
+      if (!structureIDs) continue
 
-            structureID = structureIDs.find(structureID => {
-                return condition(findObjectWithID(structureID) as T)
-            })
+      structureID = structureIDs.find(structureID => {
+        return condition(findObjectWithID(structureID) as T)
+      })
 
-            if (structureID) return findObjectWithID(structureID) as T
-        }
+      if (structureID) return findObjectWithID(structureID) as T
     }
+  }
 
-    return false
+  return false
 }
 
 Room.prototype.coordVisual = function (x, y, fill = customColors.lightBlue) {
-    this.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill })
+  this.visual.rect(x - 0.5, y - 0.5, 1, 1, { fill })
 }

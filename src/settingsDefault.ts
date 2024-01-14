@@ -4,7 +4,7 @@ import { Settings } from 'types/settings'
  * Default global.settings. DO NOT MODIFY for personal use; instead, include your preferences in global.settings.ts
  */
 export const defaultSettings: Settings = {
-  breakingVersion: 124,
+  breakingVersion: 125,
   roomVisuals: false,
   mapVisuals: false,
   allies: ['MarvinTMB'],
