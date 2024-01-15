@@ -353,7 +353,7 @@ export class Hauler extends Creep {
         if (this.room.name !== this.commune.name) {
             // Fulfill requests near the hauler
 
-            creepProcs.runRoomLogisticsRequestAdvanced(this, {
+            creepProcs.runRoomLogisticsRequestsAdvanced(this, {
               types: new Set([
                 RoomLogisticsRequestTypes.pickup,
                 RoomLogisticsRequestTypes.withdraw,
@@ -468,7 +468,7 @@ export class Hauler extends Creep {
         if (isBySourceHarvestPos || creepMemory[CreepMemoryKeys.roomLogisticsRequests].length > 0) {
           const freeNextStoreInitial = this.freeNextStore
 
-          creepProcs.runRoomLogisticsRequestAdvanced(this, {
+          creepProcs.runRoomLogisticsRequestsAdvanced(this, {
             types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
             resourceTypes: new Set([RESOURCE_ENERGY]),
             conditions: request => {
@@ -503,7 +503,7 @@ export class Hauler extends Creep {
 
         // Fulfill requests near the hauler
 
-        creepProcs.runRoomLogisticsRequestAdvanced(this, {
+        creepProcs.runRoomLogisticsRequestsAdvanced(this, {
           types: new Set<RoomLogisticsRequestTypes>([
             RoomLogisticsRequestTypes.pickup,
             RoomLogisticsRequestTypes.withdraw,
@@ -560,7 +560,7 @@ export class Hauler extends Creep {
             if (this.room.name === commune.name) {
                 creepProcs.passiveRenew(this)
 
-                creepProcs.runRoomLogisticsRequestAdvanced(this, {
+                creepProcs.runRoomLogisticsRequestsAdvanced(this, {
                   types: new Set([RoomLogisticsRequestTypes.transfer]),
                   resourceTypes: new Set([RESOURCE_ENERGY]),
                   noDelivery: true,
@@ -1040,7 +1040,7 @@ export class Hauler extends Creep {
     runCommuneLogistics?() {
         creepProcs.passiveRenew(this)
 
-        if (creepProcs.runRoomLogisticsRequestAdvanced(this) === Result.action) {
+        if (creepProcs.runRoomLogisticsRequestsAdvanced(this) === Result.action) {
           this.relay()
           return Result.action
         }
