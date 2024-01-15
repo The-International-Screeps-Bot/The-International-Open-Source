@@ -8,8 +8,6 @@ import {
   forCoordsAroundRange,
   utils,
 } from 'utils/utils'
-import './spawning/spawningStructures'
-
 import './defence'
 import './workRequest'
 import './combatRequest'
@@ -28,7 +26,6 @@ import './links'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
-import './haulerSize'
 import { DefenceManager } from './defence'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerNeedManager } from './haulerNeed'

@@ -1,5 +1,5 @@
 import {
-    CreepLogisticsRequestKeys,
+  CreepLogisticsRequestKeys,
   CreepMemoryKeys,
   ReservedCoordTypes,
   Result,
@@ -22,7 +22,11 @@ import { collectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from './myCreepUtils'
-import { CreepLogisticsRequest, FindNewRoomLogisticsRequestArgs, RoomLogisticsRequest } from 'types/roomRequests'
+import {
+  CreepLogisticsRequest,
+  FindNewRoomLogisticsRequestArgs,
+  RoomLogisticsRequest,
+} from 'types/roomRequests'
 
 export class CreepUtils {
   expandName(creepName: string) {
@@ -44,14 +48,14 @@ export class CreepUtils {
     if (creep._commune !== undefined) return creep._commune
 
     const expandedName = this.expandName(creep.name)
-    return creep._commune = Game.rooms[expandedName[1]]
+    return (creep._commune = Game.rooms[expandedName[1]])
   }
 
   customIDCreep(creep: Creep) {
     if (creep._customID !== undefined) return creep._customID
 
     const expandedName = this.expandName(creep.name)
-    return creep._customID = parseInt(expandedName[2])
+    return (creep._customID = parseInt(expandedName[2]))
   }
 
   findEnergySpentOnConstruction(
@@ -214,7 +218,9 @@ export class CreepUtils {
             creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.withdraw][
               bestRequest.delivery
             ] ||
-            creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.offer][bestRequest.delivery] ||
+            creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.offer][
+              bestRequest.delivery
+            ] ||
             creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.pickup][bestRequest.delivery]
 
           nextCreepRequest = {
@@ -225,7 +231,8 @@ export class CreepUtils {
               creep.nextStore[nextRequest.resourceType] + creep.freeNextStore,
               creepRequest[CreepLogisticsRequestKeys.amount],
             ),
-            [CreepLogisticsRequestKeys.noReserve]: creepRequest[CreepLogisticsRequestKeys.noReserve],
+            [CreepLogisticsRequestKeys.noReserve]:
+              creepRequest[CreepLogisticsRequestKeys.noReserve],
             [CreepLogisticsRequestKeys.delivery]: true,
           }
 
@@ -337,7 +344,11 @@ export class CreepUtils {
     ])
   }
 
-  canAcceptRoomLogisticsRequest(creep: Creep, requestType: RoomLogisticsRequestTypes, requestID: string) {
+  canAcceptRoomLogisticsRequest(
+    creep: Creep,
+    requestType: RoomLogisticsRequestTypes,
+    requestID: string,
+  ) {
     const request = creep.room.roomLogisticsRequests[requestType][requestID]
     const target = findObjectWithID(request.targetID)
 
@@ -463,8 +474,7 @@ export class CreepUtils {
     return true
   }
 
-
-createBackupStoringStructuresRoomLogisticsRequest(
+  createBackupStoringStructuresRoomLogisticsRequest(
     creep: Creep,
     types: Set<RoomLogisticsRequestTypes>,
     resourceTypes: Set<ResourceConstant>,
@@ -551,9 +561,9 @@ createBackupStoringStructuresRoomLogisticsRequest(
       if (request.delivery) {
         // Take extra energy in case its needed
 
-        /*       if (request.resourceType === RESOURCE_ENERGY) {
+        if (request.resourceType === RESOURCE_ENERGY) {
           return creep.nextStore[request.resourceType] + creep.freeNextStore
-        } */
+        }
 
         return Math.min(request.amount, creep.nextStore[request.resourceType] + creep.freeNextStore)
       }
@@ -596,7 +606,8 @@ createBackupStoringStructuresRoomLogisticsRequest(
 
       if (structure.nextHits / structure.hitsMax > repairThreshold) continue
 
-      const score = getRange(creep.pos, structure.pos) + (structure.nextHits / structure.hitsMax) * 20
+      const score =
+        getRange(creep.pos, structure.pos) + (structure.nextHits / structure.hitsMax) * 20
       if (score >= lowestScore) continue
 
       lowestScore = score
@@ -617,7 +628,6 @@ createBackupStoringStructuresRoomLogisticsRequest(
 
     return this.findNewRepairTarget(creep) || this.findNewRampartRepairTarget(creep)
   }
-
 }
 
 export const creepUtils = new CreepUtils()
