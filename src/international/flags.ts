@@ -17,8 +17,8 @@ import { roomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
-import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructures'
 import { roomUtils } from 'room/roomUtils'
+import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
 
 export class FlagManager {
   run() {

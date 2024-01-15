@@ -35,8 +35,15 @@ export class CreepDataManager {
   }
 
   private updateCreep(creepName: string) {
+
+    if (!Game.creeps[creepName]) {
+      delete this.data[creepName]
+      return
+    }
+
     const data = this.data[creepName]
-    /* delete . */
+
+    /* .delete */
 
     if (utils.isTickInterval(15)) {
     }

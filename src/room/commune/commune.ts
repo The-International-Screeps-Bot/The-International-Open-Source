@@ -1,5 +1,4 @@
 import {
-  findLinkThroughput,
   findObjectWithID,
   getRange,
   packAsNum,
@@ -16,7 +15,6 @@ import './workRequest'
 import './combatRequest'
 import {
   creepRoles,
-  packedPosLength,
   RoomMemoryKeys,
   RoomTypes,
   rampartUpkeepCost,
@@ -42,7 +40,6 @@ import { collectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
-import { communeUtils } from './communeUtils'
 import { communeProcs } from './communeProcs'
 import { structureUtils } from 'room/structureUtils'
 import { logisticsProcs } from 'room/logisticsProcs'
