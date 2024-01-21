@@ -103,7 +103,7 @@ export class RemotesManager {
 
       if (
         utils.isTickInterval(checkRoomStatusInterval) &&
-        Game.map.getRoomStatus(remoteName).status !== Game.map.getRoomStatus(room.name).status
+        Memory.rooms[room.name][RoomMemoryKeys.status] !== remoteMemory[RoomMemoryKeys.status]
       ) {
         this.communeManager.removeRemote(remoteName, index)
         continue

@@ -61,8 +61,8 @@ export class Scout extends Creep {
             // Iterate if the room statuses aren't the same
 
             if (
-                Game.map.getRoomStatus(roomName).status !==
-                Game.map.getRoomStatus(this.room.name).status
+                Memory.rooms[this.room.name][RoomMemoryKeys.status] !==
+                roomNameUtils.getStatusForPotentialMemory(roomName)
             )
                 continue
 

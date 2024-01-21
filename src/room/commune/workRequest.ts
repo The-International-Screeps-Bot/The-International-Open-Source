@@ -74,7 +74,7 @@ export class WorkRequestManager {
     // If the room is closed or is now a respawn or novice zone
     if (
       utils.isTickInterval(checkRoomStatusInverval) &&
-      Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
+      Memory.rooms[room.name][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]
     ) {
       this.delete(requestName, request)
       return

@@ -5,6 +5,7 @@ import {
     CombatRequestKeys,
     HaulRequestKeys,
     RoomMemoryKeys,
+    RoomStatusKeys,
     RoomTypes,
     WorkRequestKeys,
     antifaRoles,
@@ -146,13 +147,13 @@ export class RequestsManager extends Sleepable {
       // If there is not enough reserved GCL to make a new request
       /* if (reservedGCL <= 0) return */
 
-      const type = Memory.rooms[roomName][RoomMemoryKeys.type]
+      const roomMemory = Memory.rooms[roomName]
       // if someone else has acquired the room
       if (
-        type === RoomTypes.ally ||
-        type === RoomTypes.enemy ||
-        type === RoomTypes.allyRemote ||
-        type === RoomTypes.enemyRemote
+        roomMemory[RoomMemoryKeys.type] === RoomTypes.ally ||
+        roomMemory[RoomMemoryKeys.type] === RoomTypes.enemy ||
+        roomMemory[RoomMemoryKeys.type] === RoomTypes.allyRemote ||
+        roomMemory[RoomMemoryKeys.type] === RoomTypes.enemyRemote
       ) {
         // Wait on the request
         Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
@@ -166,7 +167,7 @@ export class RequestsManager extends Sleepable {
         continue
       }
 
-      if (Game.map.getRoomStatus(roomName) !== Game.map.getRoomStatus(communeName)) {
+      if (Memory.rooms[communeName][RoomMemoryKeys.status] !== roomMemory[RoomMemoryKeys.status]) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
         Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
@@ -288,7 +289,7 @@ export class RequestsManager extends Sleepable {
       const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
-      if (Game.map.getRoomStatus(requestName) !== Game.map.getRoomStatus(communeName)) {
+      if (Memory.rooms[communeName][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
         request[CombatRequestKeys.abandon] = 20000
@@ -361,7 +362,7 @@ export class RequestsManager extends Sleepable {
       const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
-      if (Game.map.getRoomStatus(requestName) !== Game.map.getRoomStatus(communeName)) {
+      if (Memory.rooms[communeName][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
         request[HaulRequestKeys.abandon] = 20000

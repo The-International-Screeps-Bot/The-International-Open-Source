@@ -1,34 +1,41 @@
 import {
-    CombatRequestKeys, maxRampartGroupSize,
-    maxRemoteRoomDistance,
-    customColors,
-    PlayerMemoryKeys,
-    roomDimensions, constantRoomTypes, defaultStructureTypesByBuildPriority,
-    Result, RoomMemoryKeys,
-    RoomTypes,
-    packedPosLength,
-    maxRemotePathDistance,
-    RoomLogisticsRequestTypes, RemoteResourcePathTypes,
-    FlagNames
+  CombatRequestKeys,
+  maxRampartGroupSize,
+  maxRemoteRoomDistance,
+  customColors,
+  PlayerMemoryKeys,
+  roomDimensions,
+  constantRoomTypes,
+  defaultStructureTypesByBuildPriority,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+  packedPosLength,
+  maxRemotePathDistance,
+  RoomLogisticsRequestTypes,
+  RemoteResourcePathTypes,
+  FlagNames,
+  RoomStatusKeys,
 } from 'international/constants'
 import {
-    findAdjacentCoordsToCoord,
-    findCoordsInsideRect,
-    findObjectWithID, packAsNum,
-    packXYAsNum, unpackNumAsCoord, doesCoordExist, findClosestObject,
-    randomIntRange,
-    roundTo
+  findAdjacentCoordsToCoord,
+  findCoordsInsideRect,
+  findObjectWithID,
+  packAsNum,
+  packXYAsNum,
+  unpackNumAsCoord,
+  doesCoordExist,
+  findClosestObject,
+  randomIntRange,
+  roundTo,
 } from 'utils/utils'
 import { collectiveManager } from 'international/collective'
-import {
-    packCoord,
-    packCoordList,
-    packXYAsCoord, unpackPosList
-} from 'other/codec'
+import { packCoord, packCoordList, packXYAsCoord, unpackPosList } from 'other/codec'
 import { playerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 import { roomObjectUtils } from './roomObjectUtils'
+import { roomNameProcs } from './roomNameProcs'
 
 /**
     @param pos1 pos of the object performing the action
@@ -613,42 +620,49 @@ Room.prototype.scoutEnemyRoom = function () {
 
 Room.prototype.basicScout = function () {
   const { controller } = this
+  const roomMemory = Memory.rooms[this.name]
+
+  if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
+    roomNameProcs.findAndRecordStatus(this.name, roomMemory)
+  }
 
   // Record that the room was scouted this tick
+  roomMemory[RoomMemoryKeys.lastScout] = Game.time
 
-  this.memory[RoomMemoryKeys.lastScout] = Game.time
-
-  if (!controller) return this.memory[RoomMemoryKeys.type]
+  if (!controller) return roomMemory[RoomMemoryKeys.type]
 
   // If the contoller is owned
-
   if (controller.owner) {
     // Stop if the controller is owned by me
 
-    if (controller.my) return this.memory[RoomMemoryKeys.type]
+    if (controller.my) return roomMemory[RoomMemoryKeys.type]
 
     const owner = controller.owner.username
-    this.memory[RoomMemoryKeys.owner] = owner
+    roomMemory[RoomMemoryKeys.owner] = owner
 
     // If the controller is owned by an ally
 
     if (global.settings.allies.includes(owner))
-      return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.ally)
 
     return this.scoutEnemyRoom()
   }
 
   this.createWorkRequest()
 
-  // No controller owner
+  // There is no controller owner
 
-  if (this.scoutRemote()) return this.memory[RoomMemoryKeys.type]
+  if (this.scoutRemote()) return roomMemory[RoomMemoryKeys.type]
 
-  return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
+  return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
 }
 
 Room.prototype.advancedScout = function (scoutingRoom: Room) {
   const roomMemory = Memory.rooms[this.name]
+
+  if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
+    roomNameProcs.findAndRecordStatus(this.name, roomMemory)
+  }
 
   // Record that the room was scouted this tick
   roomMemory[RoomMemoryKeys.lastScout] = Game.time
@@ -669,7 +683,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
     roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
   }
 
-  const roomNameScoutType = roomNameUtils.scoutByRoomName(this.name)
+  const roomNameScoutType = roomNameProcs.findAndRecordConstantType(this.name)
   if (roomNameScoutType) {
     if (roomNameScoutType === RoomTypes.sourceKeeper) {
       // Record the positions of keeper lairs
@@ -688,16 +702,16 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
     if (controller.owner) {
       // Stop if the controller is owned by me
 
-      if (controller.my) return this.memory[RoomMemoryKeys.type]
+      if (controller.my) return roomMemory[RoomMemoryKeys.type]
 
       const owner = controller.owner.username
 
-      this.memory[RoomMemoryKeys.owner] = owner
+      roomMemory[RoomMemoryKeys.owner] = owner
 
       // If the controller is owned by an ally
 
       if (global.settings.allies.includes(owner))
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
+        return (roomMemory[RoomMemoryKeys.type] = RoomTypes.ally)
 
       return this.scoutEnemyRoom()
     }
@@ -706,12 +720,12 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
 
     // No controlller owner
 
-    if (this.scoutRemote(scoutingRoom)) return this.memory[RoomMemoryKeys.type]
+    if (this.scoutRemote(scoutingRoom)) return roomMemory[RoomMemoryKeys.type]
 
-    return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
+    return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
   }
 
-  return this.memory[RoomMemoryKeys.type]
+  return roomMemory[RoomMemoryKeys.type]
 }
 
 Room.prototype.createAttackCombatRequest = function (opts) {

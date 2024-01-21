@@ -1,6 +1,7 @@
 import {
     Result,
     RoomMemoryKeys,
+    RoomStatusKeys,
     RoomTypes,
     defaultSwampCost,
     dynamicScoreRoomRange,
@@ -24,6 +25,8 @@ import {
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
+import { roomProcs } from './roomProcs'
+import { roomNameProcs } from './roomNameProcs'
 
 /**
  * considers a position being flooded
@@ -326,35 +329,19 @@ export class RoomNameUtils {
     return closest
   }
 
-  scoutByRoomName(roomName: string) {
-    // Find the numbers in the room's name
-
-    const [EWstring, NSstring] = roomName.match(/\d+/g)
-
-    // Convert he numbers from strings into actual numbers
-
-    const EW = parseInt(EWstring)
-    const NS = parseInt(NSstring)
-
+  /**
+   * get the room status for a room that potentially has no initialized memory
+   */
+  getStatusForPotentialMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
-
-    // Use the numbers to deduce some room types - cheaply!
-
-    if (EW % 10 === 0 && NS % 10 === 0) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.intersection)
+    if (!roomMemory) {
+      Memory.rooms[roomName] = {} as any
+      return RoomStatusKeys[roomNameProcs.findAndRecordStatus(roomName)]
     }
 
-    if (EW % 10 === 0 || NS % 10 === 0) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.highway)
-    }
-    if (EW % 5 === 0 && NS % 5 === 0) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.center)
-    }
-    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.sourceKeeper)
-    }
+    // Otherwise there is room memory
 
-    return false
+    return roomMemory[RoomMemoryKeys.status]
   }
 }
 

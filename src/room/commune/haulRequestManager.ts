@@ -36,7 +36,7 @@ export class HaulRequestManager {
 
       if (
         utils.isTickInterval(checkRoomStatusInverval) &&
-        Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
+        Memory.rooms[room.name][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]
       ) {
         delete Memory.haulRequests[requestName]
         room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
