@@ -616,12 +616,14 @@ export class CreepUtils {
 
     if (!bestTarget) return false
 
-    creep.memory[CreepMemoryKeys.structureTarget] = bestTarget.id
+    const creepMemory = Memory.creeps[creep.name]
+    creepMemory[CreepMemoryKeys.structureTarget] = bestTarget.id
     return bestTarget
   }
 
   findRepairTarget(creep: Creep) {
-    if (creep.memory[CreepMemoryKeys.structureTarget]) {
+    const creepMemory = Memory.creeps[creep.name]
+    if (creepMemory[CreepMemoryKeys.structureTarget]) {
       const repairTarget = findObjectWithID(creep.memory[CreepMemoryKeys.structureTarget])
       if (repairTarget) return repairTarget
     }

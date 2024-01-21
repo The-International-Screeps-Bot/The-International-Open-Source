@@ -5,8 +5,6 @@ import { findObjectWithID, getRange } from 'utils/utils'
 
 class BuilderManager extends DefaultRoleManager {
     role: CreepRoles = 'hauler'
-    // Allows for the pattern: instance.manager.run(instance)
-    manager = this
 
     runInitial(creep: Creep) {
         if (!creep.room.roomManager.cSiteTarget) return

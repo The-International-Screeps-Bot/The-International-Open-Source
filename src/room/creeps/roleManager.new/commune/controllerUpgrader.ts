@@ -5,8 +5,6 @@ import { DefaultRoleManager } from 'room/creeps/defaultRoleManager'
 
 class ControllerUpgraderManager extends DefaultRoleManager {
     role: CreepRoles = 'controllerUpgrader'
-    // Allows for the pattern: instance.manager.run(instance)
-    manager = this
 
     isDying(creep: Creep) {
         // Stop if creep is spawning

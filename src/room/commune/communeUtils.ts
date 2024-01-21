@@ -257,6 +257,21 @@ export class CommuneUtils {
     }
     return room.organizedSpawns
   }
+
+  /**
+   * Wether the commune wants to be funneled for upgrading, independent of what other rooms want.
+   * Assumes the room already meats the requirements to be a funnel target
+   */
+  wantsToBeFunneledIndependent(room: Room) {
+
+    const desiredStrength = communeUtils.getDesiredUpgraderStrength(room)
+    const maxStrength = communeUtils.getMaxUpgradeStrength(room)
+    // We do not have enough desire
+    if (desiredStrength < maxStrength) return false
+
+    // We have enough desired strength to register our room as fully funneled
+    return true
+  }
 }
 
 export const communeUtils = new CommuneUtils()

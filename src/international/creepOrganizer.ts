@@ -1,5 +1,5 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { customColors, remoteRoles, roomLogisticsRoles } from './constants'
+import { CreepMemoryKeys, customColors, remoteRoles, roomLogisticsRoles } from './constants'
 import { customLog } from 'utils/logging'
 import { collectiveManager, CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
@@ -23,6 +23,7 @@ export class CreepOrganizer {
             Game.creeps[creepName].initRun()
         }
     }
+
     private organizeCreep(creepName: string) {
 
         let creep = Game.creeps[creepName]
@@ -35,6 +36,16 @@ export class CreepOrganizer {
             delete Memory.creeps[creepName]
             return
         }
+
+        // Kill the creep if it has no valid commune (we don't know what to do with it)
+
+        const commune = creep.commune
+        if (!commune || !commune.controller.my) {
+            creep.suicide()
+            return
+        }
+
+        //
 
         collectiveManager.creepCount += 1
 
@@ -67,16 +78,7 @@ export class CreepOrganizer {
         if (roomLogisticsRoles.has(role)) {
             creepProcs.updateLogisticsRequests(creep)
         }
-
-        // Get the commune the creep is from
-
-        const commune = creep.commune
-        if (!commune) return
-
-        if (!commune.controller.my) {
-            creep.suicide()
-            return
-        }
+        creepProcs.registerInterTickRepairTarget(creep)
 
         // initialize inter-tick data for the creep if it isn't already
         creepDataManager.data[creep.name] ??= {}

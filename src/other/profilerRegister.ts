@@ -103,6 +103,7 @@ import { SpawningStructureUtils } from 'room/commune/spawning/spawningStructureU
 import { NukerProcs } from 'room/commune/nukerProcs'
 import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
+import { RoomProcs } from 'room/roomProcs'
 
 export function profilerRegister() {
   // Classes
@@ -154,6 +155,7 @@ export function profilerRegister() {
   profiler.registerClass(Operator, 'Operator')
   profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
   profiler.registerClass(RoomUtils, 'RoomUtils')
+  profiler.registerClass(RoomProcs, 'RoomProcs')
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
   profiler.registerClass(RoomDataManager, 'RoomDataManager')
   profiler.registerClass(CommuneDataManager, 'CommuneDataManager')

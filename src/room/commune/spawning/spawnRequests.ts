@@ -846,7 +846,9 @@ export class SpawnRequestsManager {
               creepsQuota: 1,
               minCostPerCreep: 200,
               priority,
-              memoryAdditions: {},
+              memoryAdditions: {
+                [CreepMemoryKeys.preferRoads]: true,
+              },
             }
           }
 
@@ -866,7 +868,7 @@ export class SpawnRequestsManager {
 
         // If there is a terminal and it is sufficient RCL, and there's a funnel target and we aren't it, then don't allow upgraders to spawn
         if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
-          const funnelingRoomNames = collectiveManager.funnelingRoomNames
+          const funnelingRoomNames = collectiveManager.getFunnelingRoomNames()
           if (
             !funnelingRoomNames.has(this.communeManager.room.name)
           ) {
@@ -970,11 +972,14 @@ export class SpawnRequestsManager {
             }
           }
 
-          const controllerLink = this.communeManager.controllerLink
-          const maxCreeps =
-            controllerLink && structureUtils.isRCLActionable(controllerLink)
-              ? this.communeManager.room.roomManager.upgradePositions.length
-              : this.communeManager.room.roomManager.upgradePositions.length - 1
+          const upgradePositions = this.communeManager.room.roomManager.upgradePositions
+          let maxCreeps = upgradePositions.length
+
+          // If the upgrade structure is a link, then it's the controllerLink
+          if (upgradeStructure instanceof StructureLink) {
+            // Reduce max upgrader count by 1 to account for the tile the link takes up
+            maxCreeps -= 1
+          }
 
           if (this.spawnEnergyCapacity >= 1400) {
             partsMultiplier = Math.round(partsMultiplier / 12)

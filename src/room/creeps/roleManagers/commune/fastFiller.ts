@@ -20,8 +20,7 @@ export class FastFiller extends Creep {
         const fastFillerPos = this.findFastFillerPos()
         if (!fastFillerPos) return true
 
-        // If the this is standing on the fastFillerPos, inform false
-
+        // If the this is standing on the fastFillerPos, we didn't travel
         if (getRange(this.pos, fastFillerPos) === 0) return false
 
         // Otherwise, make a move request to it
@@ -43,25 +42,27 @@ export class FastFiller extends Creep {
 
         this.message = 'FFP'
 
-        // Stop if the creep already has a packedFastFillerPos
+        const creepMemory = Memory.creeps[this.name]
 
-        if (this.memory[CreepMemoryKeys.packedCoord])
-            return unpackCoordAsPos(this.memory[CreepMemoryKeys.packedCoord], room.name)
+        // Stop if the creep already has a packedFastFillerPos
+        if (creepMemory[CreepMemoryKeys.packedCoord]) {
+          return unpackCoordAsPos(creepMemory[CreepMemoryKeys.packedCoord], room.name)
+        }
 
         // Get usedFastFillerPositions
 
         const reservedCoords = room.roomManager.reservedCoords
 
         const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(pos => {
-            return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
+          return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
         })
         if (!openFastFillerPositions.length) return false
 
         const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
         const packedCoord = packCoord(fastFillerPos)
 
-        this.memory[CreepMemoryKeys.packedCoord] = packedCoord
-        room.roomManager.reservedCoords.set(packedCoord, ReservedCoordTypes.important)
+        creepMemory[CreepMemoryKeys.packedCoord] = packedCoord
+        reservedCoords.set(packedCoord, ReservedCoordTypes.important)
 
         return fastFillerPos
     }

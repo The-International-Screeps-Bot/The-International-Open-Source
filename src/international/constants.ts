@@ -1473,3 +1473,10 @@ export enum FlagNames {
 }
 
 export const IDUpdateInterval = randomIntRange(50, 100)
+
+export const creepDamageEvents = new Set([
+  EVENT_ATTACK_TYPE_MELEE,
+  EVENT_ATTACK_TYPE_DISMANTLE,
+  EVENT_ATTACK_TYPE_RANGED,
+  EVENT_ATTACK_TYPE_RANGED_MASS,
+])

@@ -212,6 +212,7 @@ export class CreepProcs {
 
     return false
   }
+
   /**
    * Overhead logic ran for dead creeps
    */
@@ -219,6 +220,24 @@ export class CreepProcs {
     const creepMemory = Memory.creeps[creepName]
     const role = creepUtils.roleName(creepName)
   }
+
+  registerInterTickRepairTarget(creep: Creep) {
+    const creepMemory = Memory.creeps[creep.name]
+    if (!creepMemory[CreepMemoryKeys.structureTarget]) return
+
+    const target = findObjectWithID(creepMemory[CreepMemoryKeys.structureTarget])
+    if (!target) {
+      delete creepMemory[CreepMemoryKeys.structureTarget]
+      return
+    }
+
+    this.registerRepairReservation(creep, target)
+  }
+
+  private registerRepairReservation(creep: Creep, target: Structure<BuildableStructureConstant>) {
+    target.reserveHits += creep.store.getUsedCapacity(RESOURCE_ENERGY) * REPAIR_POWER
+  }
+
   runRepair(creep: Creep, target: Structure) {
     // If we've already schedhuled a work intent, don't try to do another
     if (creep.worked) return Result.noAction
@@ -246,6 +265,7 @@ export class CreepProcs {
     target.nextHits = Math.min(target.nextHits + workParts * REPAIR_POWER, target.hitsMax)
     return Result.success
   }
+
   repairCommune(creep: Creep) {
     if (creep.needsResources()) {
       if (
@@ -278,6 +298,8 @@ export class CreepProcs {
       creep.message = '❌🔧'
       return false
     }
+
+    this.registerRepairReservation(creep, repairTarget)
 
     creep.message = '⏩🔧'
     creep.room.targetVisual(creep.pos, repairTarget.pos)
@@ -321,8 +343,11 @@ export class CreepProcs {
 
     // Find repair targets that don't include the current target, informing true if none were found
 
-    repairTarget = creepUtils.findNewRepairTarget(creep) || creepUtils.findNewRampartRepairTarget(creep)
+    repairTarget =
+      creepUtils.findNewRepairTarget(creep) || creepUtils.findNewRampartRepairTarget(creep)
     if (!repairTarget) return true
+
+    this.registerRepairReservation(creep, repairTarget)
 
     creep.actionCoord = repairTarget.pos
 
@@ -1013,7 +1038,13 @@ export class CreepProcs {
     amount: number,
     resourceType: ResourceConstant = RESOURCE_ENERGY,
   ) {
-    /* amount = */ this.findCreepRoomLogisticsRequestAmount(creep, type, targetID, amount, resourceType)
+    /* amount = */ this.findCreepRoomLogisticsRequestAmount(
+      creep,
+      type,
+      targetID,
+      amount,
+      resourceType,
+    )
     if (amount <= 0) return Result.fail
 
     creep.memory[CreepMemoryKeys.roomLogisticsRequests].push({
@@ -1099,7 +1130,6 @@ export class CreepProcs {
       spawn.renewed = true
     }
   }
-
 }
 
 export const creepProcs = new CreepProcs()

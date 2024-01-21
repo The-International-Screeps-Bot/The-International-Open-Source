@@ -10,6 +10,11 @@ interface CommuneData {
   maxUpgradeStrength: number
   estimatedCommuneSourceIncome: number[]
   towerRampartRepairTreshold: number
+  rampartDamageCoords: number
+  /**
+   * The amount of hits for each rampart the previous tick, if exists
+   */
+  previousRampartHits: number
 }
 
 /**

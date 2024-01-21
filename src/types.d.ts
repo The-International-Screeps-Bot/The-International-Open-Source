@@ -517,9 +517,9 @@ declare global {
     generalRepairStructures: (StructureRoad | StructureContainer)[]
     rampartRepairStructures: StructureRampart[]
 
-    considerFunneled: boolean
-
     organizedSpawns: OrganizedSpawns | false
+
+    fastFillerCoords: Coord[]
 
     // Commune
 
@@ -1078,11 +1078,13 @@ declare global {
     readonly effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
 
     _nextHits: number
-
     /**
      * The estimated hits amount next tick
      */
     nextHits: number
+
+    _reserveHits: number
+    reserveHits: number
 
     // _nextStore: Partial<StoreDefinition>
 

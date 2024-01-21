@@ -8,18 +8,6 @@ import { randomIntRange } from 'utils/utils'
  * Minor processes for communes
  */
 export class CommuneProcs {
-  registerFunneling(room: Room) {
-    // We need a terminal and for it be to active
-    if (!room.terminal || room.controller.level < 6) return
-
-    const desiredStrength = communeUtils.getDesiredUpgraderStrength(room)
-    const maxStrength = communeUtils.getMaxUpgradeStrength(room)
-    // We do not have enough desire
-    if (desiredStrength < maxStrength) return
-
-    // We have enough desired strength to register our room as fully funneled
-    room.considerFunneled = true
-  }
 
   getRCLUpdate(room: Room) {
     const data = communeDataManager.data[room.name]
@@ -63,6 +51,25 @@ export class CommuneProcs {
 
     roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(Memory.minHaulerCost, 100 * room.roomManager.structures.spawn.length)
     roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(0, 10)
+  }
+
+  registerRampartDamage(room: Room) {
+    if (!room.roomManager.enemyAttackers.length) return
+
+    const data = communeDataManager.data[room.name]
+    if (data.rampartDamageCoords === undefined || room.roomManager.structureUpdate) {
+
+      this.initRampartDamageCoords(room)
+    }
+  }
+
+  private initRampartDamageCoords(room: Room) {
+
+    const ramparts = room.communeManager.defensiveRamparts
+    for (const rampart of ramparts) {
+
+
+    }
   }
 }
 

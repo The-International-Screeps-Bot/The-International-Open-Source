@@ -19,6 +19,7 @@ import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { roomUtils } from 'room/roomUtils'
 import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
+import { roomProcs } from 'room/roomProcs'
 
 export class FlagManager {
   run() {
@@ -989,6 +990,63 @@ export class FlagManager {
         },
       ],
     })
+  }
+
+  private fastFillerPositions(flagName: string, flagNameParts: string[]) {
+    const flag = Game.flags[flagName]
+    const roomName = flagNameParts[1] || flag.pos.roomName
+    const room = Game.rooms[roomName]
+    if (!room) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    const fastFillerPositions = room.roomManager.fastFillerPositions
+    for (const pos of fastFillerPositions) {
+      room.coordVisual(pos.x, pos.y)
+    }
+  }
+
+  private funneling(flagName: string, flagNameParts: string[]) {
+    const flag = Game.flags[flagName]
+    const roomName = flagNameParts[1] || flag.pos.roomName
+    const room = Game.rooms[roomName]
+    if (!room) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    if (!room.communeManager) {
+      flag.setColor(COLOR_RED)
+      return
+    }
+
+    const funnelOrder = collectiveManager.getFunnelOrder()
+    const funnelWanters = Array.from(collectiveManager.getFunnelingRoomNames())
+
+    const headers = ['funnel order', 'funnel wanted']
+    const data: string[][] = []
+
+    const maxIterations = Math.min(funnelOrder.length, funnelWanters.length)
+    for (let i = 0; i < maxIterations; i++) {
+      const row: string[] = []
+
+      if (funnelOrder[i]) {
+        row.push(funnelOrder[i])
+      } else {
+        row.push('x')
+      }
+
+      if (funnelWanters[i]) {
+        row.push(funnelWanters[i])
+      } else {
+        row.push('x')
+      }
+
+      data.push(row)
+    }
+
+    roomProcs.tableVisual(room, 'Funneling', headers, data)
   }
 }
 

@@ -180,7 +180,6 @@ export class CommuneManager {
     }
 
     this.room.roomManager.communePlanner.attemptPlan(this.room)
-    communeProcs.registerFunneling(room)
     communeProcs.getRCLUpdate(room)
 
     if (!roomMemory[RoomMemoryKeys.combatRequests]) roomMemory[RoomMemoryKeys.combatRequests] = []
@@ -649,6 +648,9 @@ export class CommuneManager {
   }
 
   private _defensiveRamparts: StructureRampart[]
+  /**
+   * This should be cached inter-tick as IDs
+   */
   get defensiveRamparts() {
     if (this._defensiveRamparts) return this._defensiveRamparts
 
@@ -891,73 +893,6 @@ export class CommuneManager {
     }
 
     return ignoreCoords
-    /* const fastFillerLink = this.room.roomManager.fastFillerLink
-        if (
-            fastFillerLink &&
-            fastFillerLink.RCLActionable &&
-            this.room.roomManager.hubLink &&
-            this.room.roomManager.hubLink.RCLActionable &&
-            this.storingStructures.length &&
-            this.room.myCreeps.hubHauler.length
-        ) {
-            const fastFillerPositions = this.room.roomManager.fastFillerPositions
-            for (const pos of fastFillerPositions) {
-                // Make sure the position is reserved (presumably by a fastFiller)
-
-                const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
-                if (!reserveType) continue
-                if (reserveType < ReservedCoordTypes.dying) continue
-
-                forCoordsAroundRange(pos, 1, coord => {
-                    ignoreCoords.add(packCoord(coord))
-                })
-            }
-
-            return ignoreCoords
-        }
-
-        if (this.room.roomManager.fastFillerContainers.length) {
-            const fastFillerPositions = this.room.roomManager.fastFillerPositions
-            for (const pos of fastFillerPositions) {
-                // Make sure the position is reserved (presumably by a fastFiller)
-
-                const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
-                if (!reserveType) continue
-                if (reserveType < ReservedCoordTypes.dying) continue
-
-                // Only ignore coords if the fastFiller pos is in range of a container
-
-                let hasContainer: boolean
-                const potentialIgnoreCoords = new Set<string>()
-
-                forCoordsAroundRange(pos, 1, coord => {
-                    const structure = this.room.findStructureAtCoord(coord, structure => {
-                        return structure.structureType === STRUCTURE_CONTAINER
-                    })
-                    if (structure) {
-                        hasContainer = true
-                        return
-                    }
-
-                    // There is potentially a spawning structure on this coord
-
-                    potentialIgnoreCoords.add(packCoord(coord))
-                })
-
-                if (!hasContainer) continue
-
-                for (const packedCoord of potentialIgnoreCoords) {
-                    ignoreCoords.add(packedCoord)
-                }
-            }
-
-            return ignoreCoords
-        }
-
-        // There are no valid links or containers in the fastFiller
-
-        return ignoreCoords
-         */
   }
 
   /**
@@ -1132,7 +1067,8 @@ export class CommuneManager {
 
   private energyMinResourceTarget(storingStructuresCapacity: number) {
     if (this.room.controller.level < 8) {
-      if (collectiveManager.funnelOrder[0] === this.room.name) {
+      const funnelOrder = collectiveManager.getFunnelOrder()
+      if (funnelOrder[0] === this.room.name) {
         return Math.min(
           this.storedEnergyUpgradeThreshold * 1.2 + this.upgradeTargetDistance(),
           storingStructuresCapacity / 2,

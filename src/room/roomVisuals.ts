@@ -216,8 +216,10 @@ export class RoomVisualsManager {
 
         const data: any[][] = [[]]
 
+        const funnelOrder = collectiveManager.getFunnelOrder()
+
         data[0].push(
-            collectiveManager.funnelOrder.slice(0, 3),
+            funnelOrder.slice(0, 3),
             playerManager.highestThreat,
             collectiveManager.minCredits,
             Game.time - Memory.lastConfig,

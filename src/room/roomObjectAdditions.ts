@@ -18,13 +18,23 @@ Object.defineProperties(RoomObject.prototype, {
         },
     },
     nextHits: {
-        get(this: Structure<BuildableStructureConstant>) {
+        get(this: RoomObject & { hits: number }) {
             if (this._nextHits) return this._nextHits
 
             return (this._nextHits = this.hits)
         },
         set(newNextHits: number) {
             this._nextHits = newNextHits
+        },
+    },
+    reserveHits: {
+        get(this: RoomObject & { hits: number }) {
+            if (this._reserveHits) return this._reserveHits
+
+            return (this._reserveHits = this.hits)
+        },
+        set(newReserveHits: number) {
+            this._reserveHits = newReserveHits
         },
     },
     nextStore: {

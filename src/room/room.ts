@@ -941,13 +941,13 @@ export class RoomManager {
     return (this._structureUpdate = true)
   }
 
-  _structureCoords: Map<string, Id<Structure<StructureConstant>>[]>
+  _structureCoords: StructureCoords
   get structureCoords() {
     if (this._structureCoords && !this.structureUpdate) return this._structureCoords
 
     // Construct storage of structures based on structureType
 
-    const structureCoords: Map<string, Id<Structure<StructureConstant>>[]> = new Map()
+    const structureCoords: StructureCoords = new Map()
 
     // Group structures by structureType
 
@@ -1359,6 +1359,9 @@ export class RoomManager {
   }
 
   _fastFillerPositions: RoomPosition[]
+  /**
+   * To make this more efficient, reverse the way it is calculated. For each potential source, record potential fast filler positions that are adjacent. Then have each potential position search for adjacent spawning structures
+   */
   get fastFillerPositions() {
     if (this._fastFillerPositions && !this.structureUpdate) return this._fastFillerPositions
 
@@ -2417,3 +2420,5 @@ export class RoomManager {
     }
   }
 }
+
+export type StructureCoords = Map<string, Id<Structure<StructureConstant>>[]>

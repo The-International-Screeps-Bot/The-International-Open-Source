@@ -5,6 +5,7 @@ import {
 import { customLog } from './logging'
 import { PlayerRelationships } from 'international/constants'
 import { roomNameUtils } from 'room/roomNameUtils'
+import { Dashboard, Rectangle, Table } from 'screeps-viz'
 
 /**
  * Uses a provided ID to find an object associated with it

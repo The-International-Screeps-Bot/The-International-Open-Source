@@ -9,6 +9,7 @@ import {
   minerals,
   haulerUpdateDefault,
 } from './constants'
+import { communeUtils } from 'room/commune/communeUtils'
 
 const periodicUpdateInterval = randomIntRange(100, 200)
 
@@ -258,7 +259,7 @@ export class CollectiveManager extends Sleepable {
   /**
    * Commune names sorted by funnel priority
    */
-  get funnelOrder() {
+  getFunnelOrder() {
     if (this._funnelOrder) return this._funnelOrder
 
     let funnelOrder: string[] = []
@@ -296,10 +297,15 @@ export class CollectiveManager extends Sleepable {
 
   _funnelingRoomNames: Set<string>
   /**
-   * The names of rooms currently being funneled
+   * The unordered names of rooms currently being funneled. Does 2 passes.
+   * For a room to be in this list, it must be part of a censecutive line starting from index 0.
+   * Take an example where x means the room is not wanting to be funneled and y means they are:
+   * {y, y, y, x, y}.
+   * The last room wants to be funneled, however, only the first 3 rooms will be, excluding the last 2: {y, y, y, x, x}.
    */
-  get funnelingRoomNames() {
+  getFunnelingRoomNames() {
     if (this._funnelingRoomNames) return this._funnelingRoomNames
+    /* if (this._funnelingRoomNames) return this._funnelingRoomNames
 
     const funnelingRoomNames = new Set<string>()
     const funnelTargets = this.funnelOrder
@@ -317,7 +323,56 @@ export class CollectiveManager extends Sleepable {
     }
 
     this._funnelingRoomNames = funnelingRoomNames
+    return funnelingRoomNames */
+
+    const funnelOrder = this.getFunnelOrder()
+    // Rooms that want to get funneled might not get to be if they aren't in line for funneling
+    const funnelWanters = this.getFunnelWanters(funnelOrder)
+
+    const funnelingRoomNames = new Set<string>()
+
+    for (const roomName of funnelOrder) {
+      if (!funnelWanters.has(roomName)) {
+        break
+      }
+
+      // Consider it funneled
+
+      funnelingRoomNames.add(roomName)
+    }
+
+    this._funnelingRoomNames = funnelingRoomNames
     return funnelingRoomNames
+  }
+
+  /**
+   * Qualifying rooms either want to be funneled, or the room next in line to get funneled wants to be funneled.
+   * Take a line where x means the rooms don't independently want to be funneled, and y means they do {x, x, y, y, x}.
+   * This function will work from back to front so that if a previous room wants to be funneled, so will the proceeding one.
+   * In this example, the set should convert to {y, y, y, y, x}
+   */
+  private getFunnelWanters(funnelOrder: string[]) {
+    const funnelWanters = new Set<string>()
+    let previousWantsToBeIndependentlyFunneled: boolean
+
+    // Find what rooms want to get funneled
+
+    for (let i = funnelOrder.length - 1; i >= 0; i -= 1) {
+      const roomName = funnelOrder[i]
+      const room = Game.rooms[roomName]
+
+      const wantsToBeFunneledIndependent = communeUtils.wantsToBeFunneledIndependent(room)
+
+      if (!(previousWantsToBeIndependentlyFunneled && wantsToBeFunneledIndependent)) {
+        previousWantsToBeIndependentlyFunneled = false
+      }
+
+      previousWantsToBeIndependentlyFunneled = wantsToBeFunneledIndependent
+
+      funnelWanters.add(roomName)
+    }
+
+    return funnelWanters
   }
 
   _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
@@ -337,7 +392,6 @@ export class CollectiveManager extends Sleepable {
           this._resourcesInStoringStructures[resource] = resources[resource]
           continue
         }
-
 
         this._resourcesInStoringStructures[resource] += resources[resource]
       }
