@@ -13,7 +13,7 @@ import {
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
 import { CreepProcs } from 'room/creeps/creepProcs'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { SpawnRequest, BodyPartCounts, SpawnRequestTypes } from 'types/spawnRequest'
 import { customLog, LogTypes } from 'utils/logging'
 import { getRange, findAdjacentCoordsToCoord, utils } from 'utils/utils'

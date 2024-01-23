@@ -1030,7 +1030,7 @@ declare global {
 
     /**
      * Wether the structure is disabled or not by the room's downgraded controller level
-     * @method structureUtils.isRCLActionable(structure)
+     * @method StructureUtils.isRCLActionable(structure)
      */
     isRCLActionable: boolean
   }

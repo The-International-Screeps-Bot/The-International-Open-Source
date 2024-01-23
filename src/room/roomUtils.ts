@@ -2,7 +2,7 @@ import { RoomMemoryKeys, RoomTypes, roomDimensions } from 'international/constan
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { RoomDataProcs, roomData } from './roomData'
 import { findObjectWithID, forAdjacentCoords, utils } from 'utils/utils'
-import { structureUtils } from './structureUtils'
+import { StructureUtils } from './structureUtils'
 import { StructureCoords } from './room'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 
@@ -41,7 +41,7 @@ export class RoomUtils {
       anchor.y,
       structure => structure.structureType === STRUCTURE_CONTAINER,
     )
-    if (!container || !structureUtils.isRCLActionable(container)) {
+    if (!container || !StructureUtils.isRCLActionable(container)) {
       data.fastFillerContainerLeftId = false
       return false
     }
@@ -67,7 +67,7 @@ export class RoomUtils {
       anchor.y,
       structure => structure.structureType === STRUCTURE_CONTAINER,
     )
-    if (!container || !structureUtils.isRCLActionable(container)) {
+    if (!container || !StructureUtils.isRCLActionable(container)) {
       data.fastFillerContainerRightId = false
       return false
     }
@@ -130,7 +130,7 @@ export class RoomUtils {
 
     const fastFillerLink = room.roomManager.fastFillerLink
     // If we have a valid link
-    if (fastFillerLink && structureUtils.isRCLActionable(fastFillerLink)) {
+    if (fastFillerLink && StructureUtils.isRCLActionable(fastFillerLink)) {
       // then all fastFiller positions are valid
       const sourcedFastFillerCoords = [
         // left

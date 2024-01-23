@@ -2,7 +2,7 @@ import { CollectiveManager } from 'international/collective'
 import { Result } from 'international/constants'
 import { MarketManager } from 'international/market/marketOrders'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { customLog } from 'utils/logging'
 import { newID, utils } from 'utils/utils'
 import { ResourceTargets } from '../commune'
@@ -12,7 +12,7 @@ import { ResourceRequest } from 'international/simpleAllies/types'
 export class TerminalProcs {
   preTickRun(room: Room) {
     if (!room.terminal) return
-    if (!structureUtils.isRCLActionable(room.terminal)) return
+    if (!StructureUtils.isRCLActionable(room.terminal)) return
 
     const resourceTargets = room.communeManager.resourceTargets
 
@@ -22,7 +22,7 @@ export class TerminalProcs {
   run(room: Room) {
     // Stop if there is no terminal
     if (!room.terminal) return
-    if (!structureUtils.isRCLActionable(room.terminal)) return
+    if (!StructureUtils.isRCLActionable(room.terminal)) return
     if (room.terminal.cooldown > 0) return
 
     const resourceTargets = room.communeManager.resourceTargets

@@ -19,7 +19,7 @@ import { RoomLogisticsRequest } from 'types/roomRequests'
 import { CustomPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from '../myCreepUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { CreepProcs } from '../creepProcs'
 
 Creep.prototype.update = function () {}
@@ -643,7 +643,7 @@ Creep.prototype.findRecycleTarget = function () {
   const { room } = this
 
   const spawns = room.roomManager.structures.spawn.filter(spawn =>
-    structureUtils.isRCLActionable(spawn),
+    StructureUtils.isRCLActionable(spawn),
   )
 
   if (!spawns.length) return false

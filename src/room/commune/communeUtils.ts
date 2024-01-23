@@ -11,7 +11,7 @@ import {
 } from 'international/constants'
 import { CollectiveManager } from 'international/collective'
 import { RoomUtils } from 'room/roomUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { OrganizedSpawns } from './spawning/spawningStructureProcs'
 
 export class CommuneUtils {
@@ -162,7 +162,7 @@ export class CommuneUtils {
 
     maxUpgradeStrength = 0
 
-    if (hubLink && structureUtils.isRCLActionable(hubLink)) {
+    if (hubLink && StructureUtils.isRCLActionable(hubLink)) {
       // Add a bit of extra range because of inherent limitations of withdrawing and transferring
       const range = getRange(upgradeStructure.pos, hubLink.pos) + 3
 
@@ -174,7 +174,7 @@ export class CommuneUtils {
       const sourceLink = sourceLinks[i]
 
       if (!sourceLink) continue
-      if (!structureUtils.isRCLActionable(sourceLink)) continue
+      if (!StructureUtils.isRCLActionable(sourceLink)) continue
 
       const range = getRange(sourceLink.pos, upgradeStructure.pos)
 
@@ -241,7 +241,7 @@ export class CommuneUtils {
 
     for (const spawn of spawns) {
       if (spawn.renewed) continue
-      if (!structureUtils.isRCLActionable(spawn)) continue
+      if (!StructureUtils.isRCLActionable(spawn)) continue
 
       if (spawn.spawning) {
         activeSpawns.push(spawn)

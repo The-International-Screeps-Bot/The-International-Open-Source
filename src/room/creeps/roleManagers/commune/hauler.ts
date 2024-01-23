@@ -16,7 +16,7 @@ import { StatsManager } from 'international/stats'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import {
   findObjectWithID,
   getRange,
@@ -88,7 +88,7 @@ export class Hauler extends Creep {
         getRangeXY(this.pos.x, spawn.pos.x, this.pos.y, spawn.pos.y) === 1 &&
         !spawn.renewed &&
         !spawn.spawning &&
-        structureUtils.isRCLActionable(spawn),
+        StructureUtils.isRCLActionable(spawn),
     )
     if (!spawn) return
 

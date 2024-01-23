@@ -38,7 +38,7 @@ import { ConstructionManager } from 'room/construction/construction'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { communeProcs } from './communeProcs'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { LogisticsProcs } from 'room/logisticsProcs'
 import { towerProcs } from './towerProcs'
 import { sourceProcs } from 'room/sourceProcs'
@@ -585,10 +585,10 @@ export class CommuneManager {
     // We can use links
 
     const controllerLink = this.controllerLink
-    if (!controllerLink || !structureUtils.isRCLActionable(controllerLink)) return false
+    if (!controllerLink || !StructureUtils.isRCLActionable(controllerLink)) return false
 
     const hubLink = this.room.roomManager.hubLink
-    if (!hubLink || !structureUtils.isRCLActionable(hubLink)) return false
+    if (!hubLink || !StructureUtils.isRCLActionable(hubLink)) return false
 
     return (this._upgradeStructure = controllerLink)
   }
@@ -761,7 +761,7 @@ export class CommuneManager {
     let fastFillerSpawnEnergyCapacity = 0
 
     for (const structure of this.actionableSpawningStructures) {
-      if (!structureUtils.isRCLActionable(structure)) continue
+      if (!StructureUtils.isRCLActionable(structure)) continue
       // Outside of the fastFiller
       if (getRange(structure.pos, anchor) > 2) continue
 
@@ -790,7 +790,7 @@ export class CommuneManager {
     let actionableSpawningStructures: SpawningStructures = structures.spawn
     actionableSpawningStructures = actionableSpawningStructures.concat(structures.extension)
     actionableSpawningStructures = actionableSpawningStructures.filter(structure =>
-      structureUtils.isRCLActionable(structure),
+      StructureUtils.isRCLActionable(structure),
     )
 
     this.actionableSpawningStructuresIDs = actionableSpawningStructures.map(

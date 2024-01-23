@@ -20,7 +20,7 @@ import {
 } from 'types/roomRequests'
 import { customLog, stringifyLog } from 'utils/logging'
 import { roomObjectUtils } from 'room/roomObjectUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { packCoord } from 'other/codec'
 
 export class CreepProcs {
@@ -35,7 +35,7 @@ export class CreepProcs {
       creep.room.roomManager.controllerContainer
     const controllerLink = creep.room.communeManager.controllerLink
 
-    if (!controllerStructure && controllerLink && structureUtils.isRCLActionable(controllerLink))
+    if (!controllerStructure && controllerLink && StructureUtils.isRCLActionable(controllerLink))
       controllerStructure = controllerLink
 
     // If there is a controllerContainer
@@ -1123,7 +1123,7 @@ export class CreepProcs {
         getRangeXY(creep.pos.x, spawn.pos.x, creep.pos.y, spawn.pos.y) === 1 &&
         !spawn.renewed &&
         !spawn.spawning &&
-        structureUtils.isRCLActionable(spawn),
+        StructureUtils.isRCLActionable(spawn),
     )
     if (!spawn) return
 

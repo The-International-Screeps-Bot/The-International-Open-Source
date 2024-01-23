@@ -10,7 +10,7 @@ import { customLog } from 'utils/logging'
 import { getRangeXY, getRange, isXYExit, isExit } from 'utils/utils'
 import { profiler } from 'other/profiler'
 import { CreepUtils } from './creepUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { towerUtils } from 'room/commune/towerUtils'
 
 Object.defineProperties(Creep.prototype, {
@@ -230,151 +230,144 @@ Object.defineProperties(Creep.prototype, {
 } as PropertyDescriptorMap & ThisType<Creep>)
 
 Object.defineProperties(PowerCreep.prototype, {
-    macroHealStrength: {
-        get() {
-            if (this._macroHealStrength !== undefined) return this._macroHealStrength
+  macroHealStrength: {
+    get() {
+      if (this._macroHealStrength !== undefined) return this._macroHealStrength
 
-            this._macroHealStrength = 0
+      this._macroHealStrength = 0
 
-            // Find adjacent creeps
+      // Find adjacent creeps
 
-            let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
-            let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0)
-            let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
-            let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
+      let top = Math.max(Math.min(this.pos.y - 3, roomDimensions - 1), 0)
+      let left = Math.max(Math.min(this.pos.x - 3, roomDimensions - 1), 0)
+      let bottom = Math.max(Math.min(this.pos.y + 3, roomDimensions - 1), 0)
+      let right = Math.max(Math.min(this.pos.x + 3, roomDimensions - 1), 0)
 
-            // Find adjacent creeps
+      // Find adjacent creeps
 
-            const adjacentCreeps = this.room.lookForAtArea(
-                LOOK_CREEPS,
-                top,
-                left,
-                bottom,
-                right,
-                true,
-            )
+      const adjacentCreeps = this.room.lookForAtArea(LOOK_CREEPS, top, left, bottom, right, true)
 
-            // Loop through each adjacentCreep this creep
+      // Loop through each adjacentCreep this creep
 
-            for (const posData of adjacentCreeps) {
-                const { creep } = posData
+      for (const posData of adjacentCreeps) {
+        const { creep } = posData
 
-                if (this.owner.username === Memory.me) {
-                    if (creep.owner.username !== Memory.me) continue
-                } else if (this.owner.username !== creep.owner.username) continue
+        if (this.owner.username === Memory.me) {
+          if (creep.owner.username !== Memory.me) continue
+        } else if (this.owner.username !== creep.owner.username) continue
 
-                const range = getRange(this.pos, creep.pos)
-                if (range > 3) continue
+        const range = getRange(this.pos, creep.pos)
+        if (range > 3) continue
 
-                let healStrength = creep.combatStrength.heal
-                if (range > 1) healStrength /= HEAL_POWER / RANGED_HEAL_POWER
+        let healStrength = creep.combatStrength.heal
+        if (range > 1) healStrength /= HEAL_POWER / RANGED_HEAL_POWER
 
-                this._macroHealStrength += Math.floor(healStrength)
-            }
+        this._macroHealStrength += Math.floor(healStrength)
+      }
 
-            return this._macroHealStrength
-        },
+      return this._macroHealStrength
     },
-    netTowerDamage: {
-        get() {
-            if (this._netTowerDamage !== undefined) return this._netTowerDamage
+  },
+  netTowerDamage: {
+    get() {
+      if (this._netTowerDamage !== undefined) return this._netTowerDamage
 
-            this._netTowerDamage = this.grossTowerDamage
+      this._netTowerDamage = this.grossTowerDamage
 
-            // The enemy can't heal when we're in safemode, so don't calculate it
+      // The enemy can't heal when we're in safemode, so don't calculate it
 
-            if (this.room.controller.safeMode) return this._netTowerDamage
+      if (this.room.controller.safeMode) return this._netTowerDamage
 
-            this._netTowerDamage -= this.macroHealStrength
+      this._netTowerDamage -= this.macroHealStrength
 
-            return this._netTowerDamage
-        },
+      return this._netTowerDamage
     },
-    powerCooldowns: {
-        get() {
-            if (this._powerCooldowns) return this._powerCooldowns
+  },
+  powerCooldowns: {
+    get() {
+      if (this._powerCooldowns) return this._powerCooldowns
 
-            this._powerCooldowns = new Map()
+      this._powerCooldowns = new Map()
 
-            for (const powerType in this.powers) {
-                const cooldown = this.powers[powerType].cooldown
-                if (!cooldown) continue
+      for (const powerType in this.powers) {
+        const cooldown = this.powers[powerType].cooldown
+        if (!cooldown) continue
 
-                this._powerCooldowns.set(parseInt(powerType) as PowerConstant, cooldown)
-            }
+        this._powerCooldowns.set(parseInt(powerType) as PowerConstant, cooldown)
+      }
 
-            return this._powerCooldowns
-        },
+      return this._powerCooldowns
     },
+  },
 } as PropertyDescriptorMap & ThisType<PowerCreep>)
 
 const additions = {
-    reserveHits: {
-        get() {
-            if (this._reserveHits !== undefined) return this._reserveHits
+  reserveHits: {
+    get() {
+      if (this._reserveHits !== undefined) return this._reserveHits
 
-            return (this._reserveHits = this.hits + this.macroHealStrength)
-        },
-        set(newHits) {
-            this._reserveHits = newHits
-        },
+      return (this._reserveHits = this.hits + this.macroHealStrength)
     },
-    grossTowerDamage: {
-        get() {
-            if (this._grossTowerDamage !== undefined) return this._grossTowerDamage
-
-            this._grossTowerDamage = 0
-
-            for (const tower of this.room.roomManager.structures.tower) {
-                if (!structureUtils.isRCLActionable(tower)) continue
-                if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
-
-                this._grossTowerDamage = towerUtils.estimateDamageGross(tower, this.pos)
-            }
-
-            return this._grossTowerDamage
-        },
+    set(newHits) {
+      this._reserveHits = newHits
     },
-    message: {
-        get() {
-            if (this._message) return this._message
+  },
+  grossTowerDamage: {
+    get() {
+      if (this._grossTowerDamage !== undefined) return this._grossTowerDamage
 
-            return (this._message = '')
-        },
-        set(newMessage) {
-            this._message = newMessage
-        },
+      this._grossTowerDamage = 0
+
+      for (const tower of this.room.roomManager.structures.tower) {
+        if (!StructureUtils.isRCLActionable(tower)) continue
+        if (tower.store.getUsedCapacity(RESOURCE_ENERGY) < TOWER_ENERGY_COST) continue
+
+        this._grossTowerDamage = towerUtils.estimateDamageGross(tower, this.pos)
+      }
+
+      return this._grossTowerDamage
     },
-    freeCapacityNextTick: {
-        get() {
-            if (this._freeCapacityNextTick !== undefined) return this._freeCapacityNextTick
+  },
+  message: {
+    get() {
+      if (this._message) return this._message
 
-            return (this._freeCapacityNextTick = this.store.getFreeCapacity())
-        },
-        set(newFreeCapacityNextNext) {
-            this._freeCapacityNextTick = newFreeCapacityNextNext
-        },
+      return (this._message = '')
     },
-    isOnExit: {
-        get() {
-            if (this._isOnExit !== undefined) return this._isOnExit
-
-            return isExit(this.pos)
-        },
+    set(newMessage) {
+      this._message = newMessage
     },
-    exitTo: {
-        get() {
-            if (this._exitTo !== undefined) return this._exitTo
+  },
+  freeCapacityNextTick: {
+    get() {
+      if (this._freeCapacityNextTick !== undefined) return this._freeCapacityNextTick
 
-            if (!this.isOnExit) return (this._exitTo = false)
-
-            const exits = Game.map.describeExits(this.room.name)
-            if (this.pos.y === 0) return (this._exitTo = exits[TOP])
-            if (this.pos.x === 0) return (this._exitTo = exits[LEFT])
-            if (this.pos.y === roomDimensions - 1) return (this._exitTo = exits[BOTTOM])
-            return (this._exitTo = exits[RIGHT])
-        },
+      return (this._freeCapacityNextTick = this.store.getFreeCapacity())
     },
+    set(newFreeCapacityNextNext) {
+      this._freeCapacityNextTick = newFreeCapacityNextNext
+    },
+  },
+  isOnExit: {
+    get() {
+      if (this._isOnExit !== undefined) return this._isOnExit
+
+      return isExit(this.pos)
+    },
+  },
+  exitTo: {
+    get() {
+      if (this._exitTo !== undefined) return this._exitTo
+
+      if (!this.isOnExit) return (this._exitTo = false)
+
+      const exits = Game.map.describeExits(this.room.name)
+      if (this.pos.y === 0) return (this._exitTo = exits[TOP])
+      if (this.pos.x === 0) return (this._exitTo = exits[LEFT])
+      if (this.pos.y === roomDimensions - 1) return (this._exitTo = exits[BOTTOM])
+      return (this._exitTo = exits[RIGHT])
+    },
+  },
 } as PropertyDescriptorMap & (ThisType<Creep> | ThisType<PowerCreep>)
 
 /* profiler.registerObject(additions, 'creepAdditions') */

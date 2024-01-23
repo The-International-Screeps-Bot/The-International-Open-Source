@@ -2,7 +2,7 @@ import { PlayerMemoryKeys, RoomLogisticsRequestTypes } from "international/const
 import { PlayerManager } from 'international/players'
 import { StatsManager } from 'international/stats'
 import { packCoord } from 'other/codec'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import {
   findWithHighestScore,
   findObjectWithID,
@@ -17,7 +17,7 @@ import { towerUtils } from './towerUtils'
 export class TowerProcs {
   run(room: Room) {
     const towers = room.roomManager.structures.tower.filter(tower =>
-      structureUtils.isRCLActionable(tower),
+      StructureUtils.isRCLActionable(tower),
     )
     if (!towers.length) {
       room.towerInferiority = room.roomManager.notMyCreeps.enemy.length > 0

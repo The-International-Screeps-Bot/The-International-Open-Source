@@ -1,7 +1,7 @@
 import { CreepMemoryKeys, ReservedCoordTypes } from 'international/constants'
 import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
 export class FastFiller extends Creep {
@@ -130,7 +130,7 @@ export class FastFiller extends Creep {
       let fastFillerStoringStructures: (StructureContainer | StructureLink)[] = []
 
       const fastFillerLink = room.roomManager.fastFillerLink
-      if (fastFillerLink && structureUtils.isRCLActionable(fastFillerLink))
+      if (fastFillerLink && StructureUtils.isRCLActionable(fastFillerLink))
         fastFillerStoringStructures.push(fastFillerLink)
       fastFillerStoringStructures = fastFillerStoringStructures.concat(fastFillerContainers)
 

@@ -27,7 +27,7 @@ import { customLog } from 'utils/logging'
 import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
 import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
 import { communeUtils } from '../communeUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 
 export class SpawnRequestsManager {
   communeManager: CommuneManager
@@ -363,7 +363,7 @@ export class SpawnRequestsManager {
           (!this.communeManager.room.roomManager.hubLink ||
             this.communeManager.room.roomManager.structures.link.length < 2) &&
           (!this.communeManager.room.terminal ||
-            !structureUtils.isRCLActionable(this.communeManager.room.terminal))
+            !StructureUtils.isRCLActionable(this.communeManager.room.terminal))
         )
           return false
 

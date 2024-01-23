@@ -20,7 +20,7 @@ import {
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
 import { roomNameUtils } from 'room/roomNameUtils'
-import { structureUtils } from 'room/structureUtils'
+import { StructureUtils } from 'room/structureUtils'
 
 type RemoteSourcePathTypes =
   | RoomMemoryKeys.remoteSourceFastFillerPaths
@@ -55,7 +55,7 @@ export class RemotesManager {
 
     if (
       this.communeManager.room.storage &&
-      structureUtils.isRCLActionable(this.communeManager.room.storage)
+      StructureUtils.isRCLActionable(this.communeManager.room.storage)
     ) {
       this.communeManager.remoteResourcePathType = RoomMemoryKeys.remoteSourceHubPaths
       return
