@@ -1494,7 +1494,7 @@ export class SpawnRequestsManager {
             /* minCreeps: 1, */
             maxCreeps: 3,
             minCostPerCreep: cost * extraParts.length,
-            priority: this.minRemotePriority - 2,
+            priority: this.minRemotePriority,
             memoryAdditions: {
               [CreepMemoryKeys.remote]: remoteName,
             },
@@ -1524,7 +1524,7 @@ export class SpawnRequestsManager {
             spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteDismantler,
             creepsQuota: 1,
             minCostPerCreep: cost * 2,
-            priority: this.minRemotePriority - 1,
+            priority: this.minRemotePriority,
             memoryAdditions: {
               [CreepMemoryKeys.remote]: remoteName,
             },
