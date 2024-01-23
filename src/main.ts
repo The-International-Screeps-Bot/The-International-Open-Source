@@ -11,7 +11,7 @@ import './room/creeps/creepAdditions'
 import './other/profilerRegister'
 import { memHack } from 'other/memHack'
 import { CPUMaxPerTick, Result } from 'international/constants'
-import { initManager } from './international/init'
+import { InitManager } from './international/init'
 import { MigrationManager } from 'international/migration'
 import { RespawnManager } from './international/respawn'
 import { tickInit } from './international/tickInit'
@@ -23,11 +23,11 @@ import { statsManager } from 'international/statsManager'
 import { playerManager } from 'international/players'
 import { profiler } from 'other/profiler'
 import { flagManager } from 'international/flags'
-import { roomPruningManager } from 'international/roomPruning'
+import { RoomPruningManager } from 'international/roomPruning'
 import './room/construction/minCut'
 import { constructionSiteManager } from './international/constructionSiteManager'
 import { mapVisualsManager } from './international/mapVisuals'
-import { endTickManager } from './international/endTick'
+import { EndTickManager } from './international/endTick'
 import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 import { marketManager } from 'international/market/marketOrders'
@@ -38,6 +38,7 @@ import { roomDataManager } from 'room/roomData'
 import { utils } from 'utils/utils'
 import { procs } from 'utils/procs'
 import { communeDataManager } from 'room/commune/communeData'
+import { GarbageCollector } from 'international/garbageCollector'
 
 export function originalLoop() {
   memHack.run()
@@ -51,13 +52,14 @@ export function originalLoop() {
   if (global.userScript) global.userScript.initialRun()
 
   profiler.wrap((): void => {
-    MigrationManager.run()
-    RespawnManager.run()
-    initManager.run()
+    MigrationManager.tryMigrate()
+    RespawnManager.tryRegisterRespawn()
+    InitManager.tryInit()
 
     tickInit.configGeneral()
     statsManager.tickInit()
     CollectiveManager.update()
+    GarbageCollector.tryRun()
     simpleAllies.initRun()
     wasm.collaborator()
 
@@ -75,7 +77,7 @@ export function originalLoop() {
     creepOrganizer.run()
     powerCreepOrganizer.run()
 
-    roomPruningManager.run()
+    RoomPruningManager.run()
     flagManager.run()
     constructionSiteManager.run()
     marketManager.run()
@@ -91,7 +93,7 @@ export function originalLoop() {
     CollectiveManager.advancedGeneratePixel()
 
     SegmentsManager.endRun()
-    endTickManager.run()
+    EndTickManager.run()
   })
 }
 export const loop = ErrorMapper.wrapLoop(originalLoop)

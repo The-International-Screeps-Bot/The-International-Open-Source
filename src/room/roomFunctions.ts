@@ -218,7 +218,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // loop through sourceNames
 
     for (const source of this.find(FIND_SOURCES)) {
-        const path = customPathFinder.findPath({
+        const path = CustomPathFinder.findPath({
             origin: source.pos,
             goals: [{ pos: anchor, range: 4 }],
             typeWeights: {
@@ -252,7 +252,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         newSourceEfficaciesTotal += newSourceEfficacy
     }
 
-    const newReservationEfficacy = customPathFinder.findPath({
+    const newReservationEfficacy = CustomPathFinder.findPath({
         origin: this.controller.pos,
         goals: [{ pos: anchor, range: 4 }],
         typeWeights: {

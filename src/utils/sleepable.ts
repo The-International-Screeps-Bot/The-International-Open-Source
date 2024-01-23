@@ -37,3 +37,41 @@ export class Sleepable {
         return false
     }
 }
+
+/**
+ * Persistent instances of this class and its inhereters are able to sleep
+ */
+export class StaticSleepable {
+    /**
+     * The tick we need to be asleep until
+     */
+    static sleepUntil: number
+    /**
+     * How long we sleep for each time
+     */
+    static sleepFor = randomIntRange(10, 20)
+
+    /**
+     * Simply checks if the program is alseep or not
+     */
+    static isSleeping() {
+        return StaticSleepable.sleepUntil > Game.time
+    }
+
+    /**
+     * Begin sleeping when whatever process being run is completed
+     */
+    static sleepWhenDone() {
+        StaticSleepable.sleepUntil = Game.time + StaticSleepable.sleepFor
+    }
+
+    /**
+     * Puts the program to sleep for future tick(s) if it is not
+     */
+    static isSleepingResponsive() {
+        if (StaticSleepable.sleepUntil > Game.time) return true
+
+        StaticSleepable.sleepWhenDone()
+        return false
+    }
+}

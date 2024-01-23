@@ -7,7 +7,7 @@ import { CollectiveManager } from './collective'
  * Handles logging, stat recording, and more at the end of the tick
  */
 export class EndTickManager {
-  run() {
+  static run() {
     if (!global.settings.logging) return
 
     const interval = 100 / Math.floor(global.settings.logging)
@@ -39,5 +39,3 @@ export class EndTickManager {
     console.log(CollectiveManager.logs)
   }
 }
-
-export const endTickManager = new EndTickManager()

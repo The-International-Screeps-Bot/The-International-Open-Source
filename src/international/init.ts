@@ -7,8 +7,8 @@ import { PlayerRelationships } from './constants'
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function
  */
-class InitManager {
-  public run() {
+export class InitManager {
+  public static tryInit() {
     this.initMemory()
     this.initGlobal()
   }
@@ -16,7 +16,7 @@ class InitManager {
   /**
    * Construct Memory if it isn't constructed yet
    */
-  private initMemory() {
+  private static initMemory() {
     if (Memory.breakingVersion) return
 
     this.initSegments()
@@ -45,7 +45,7 @@ class InitManager {
   /**
    * Construct global if it isn't constructed yet
    */
-  private initGlobal() {
+  private static initGlobal() {
     if (global.constructed) return
 
     global.constructed = true
@@ -56,7 +56,7 @@ class InitManager {
     this.initPlayers()
   }
 
-  private initPlayers() {
+  private static initPlayers() {
     for (const playerName of global.settings.allies) {
       const playerMemory = Memory.players[playerName]
       if (!playerMemory) {
@@ -67,7 +67,7 @@ class InitManager {
     }
   }
 
-  private initSegments() {
+  private static initSegments() {
 
     RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({
 
@@ -81,5 +81,3 @@ class InitManager {
 
   }
 }
-
-export const initManager = new InitManager()

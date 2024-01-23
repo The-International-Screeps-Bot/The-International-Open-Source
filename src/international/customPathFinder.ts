@@ -104,9 +104,12 @@ export interface CustomPathFinderArgs {
     minReservedCoordType?: ReservedCoordTypes
 }
 
+/**
+ * stateless
+ */
 export class CustomPathFinder {
 
-    findPath(args: CustomPathFinderArgs) {
+    static findPath(args: CustomPathFinderArgs) {
 
         const allowedRoomNames = this.findAllowedRooms(args)
         if (allowedRoomNames === Result.fail) return []
@@ -117,7 +120,7 @@ export class CustomPathFinder {
         return result
     }
 
-    private findAllowedRooms(args: CustomPathFinderArgs) {
+    private static findAllowedRooms(args: CustomPathFinderArgs) {
 
         const allowedRoomNames = new Set([args.origin.roomName])
 
@@ -131,7 +134,7 @@ export class CustomPathFinder {
         return this.multiGoalRoute(args, allowedRoomNames)
     }
 
-    private singleGoalRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
+    private static singleGoalRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
 
         const goal = args.goals[0]
         // If the goal is in the same room as the origin
@@ -154,7 +157,7 @@ export class CustomPathFinder {
         return allowedRoomNames
     }
 
-    private multiGoalRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
+    private static multiGoalRoute(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
 
         /**
          * Room names for goals that have already been searched and thus don't require another one
@@ -198,7 +201,7 @@ export class CustomPathFinder {
         return allowedRoomNames
     }
 
-    private recordRoutesAllowedRooms(route: RoomRoute, allowedRoomNames: Set<string>, args: CustomPathFinderArgs, goal: PathGoal) {
+    private static recordRoutesAllowedRooms(route: RoomRoute, allowedRoomNames: Set<string>, args: CustomPathFinderArgs, goal: PathGoal) {
 
         for (const roomRoute of route) {
             allowedRoomNames.add(roomRoute.room)
@@ -217,7 +220,7 @@ export class CustomPathFinder {
         }
     }
 
-    private weightRoom(roomName: string, args: CustomPathFinderArgs, goal: PathGoal) {
+    private static weightRoom(roomName: string, args: CustomPathFinderArgs, goal: PathGoal) {
         const roomMemory = Memory.rooms[roomName]
         if (!roomMemory) {
             if (roomName === goal.pos.roomName) return 1
@@ -243,7 +246,7 @@ export class CustomPathFinder {
     }
 
 
-    private weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
+    private static weightStructurePlans(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
         if (!args.weightCommuneStructurePlans) return
 
         if (!args.weightCoords) args.weightCoords = {}
@@ -258,7 +261,7 @@ export class CustomPathFinder {
         }
     }
 
-    private weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: string) {
+    private static weightCommuneStructurePlans(args: CustomPathFinderArgs, roomName: string) {
         if (!args.weightCommuneStructurePlans) return false
 
         const roomMemory = Memory.rooms[roomName]
@@ -334,7 +337,7 @@ export class CustomPathFinder {
         return true
     }
 
-    private weightRemoteStructurePlans(args: CustomPathFinderArgs, roomName: string) {
+    private static weightRemoteStructurePlans(args: CustomPathFinderArgs, roomName: string) {
         if (!args.weightRemoteStructurePlans.remoteResourcePathType) return false
 
         const roomMemory = Memory.rooms[roomName]
@@ -371,7 +374,7 @@ export class CustomPathFinder {
         return true
     }
 
-    private generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
+    private static generatePath(args: CustomPathFinderArgs, allowedRoomNames: Set<string>) {
         args.plainCost = args.plainCost || defaultPlainCost
         args.swampCost = args.swampCost || defaultSwampCost
         if (args.avoidKeeperLairs === undefined) args.avoidKeeperLairs = true
@@ -678,5 +681,3 @@ export class CustomPathFinder {
         return pathFinderResult.path
     }
 }
-
-export const customPathFinder = new CustomPathFinder()

@@ -4,7 +4,7 @@ import { customLog } from 'utils/logging'
  * Credit to SemperRabbit for this nice piece of code!
  */
 export class RespawnManager {
-  static run() {
+  static tryRegisterRespawn() {
     if (!this.hasRespawned()) return
 
     global.clearMemory()

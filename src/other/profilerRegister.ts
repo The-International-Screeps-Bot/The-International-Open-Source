@@ -109,10 +109,12 @@ import { RoomsManager } from 'room/rooms'
 import { SegmentsManager } from 'international/segments'
 import { wasm } from './wasmInit'
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
+import { InitManager } from 'international/init'
 
 export function profilerRegister() {
   // Classes
 
+  profiler.registerClass(InitManager, 'InitManager')
   profiler.registerClass(CollectiveManager, 'CollectiveManager')
   profiler.registerClass(StatsManager, 'StatsManager')
   profiler.registerClass(PlayerManager, 'PlayerManager')

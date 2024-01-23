@@ -1,11 +1,11 @@
 import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
 import { findLowestScore, randomIntRange } from '../utils/utils'
-import { Sleepable } from 'utils/sleepable'
+import { Sleepable, StaticSleepable } from 'utils/sleepable'
 import { CollectiveManager } from './collective'
 
-export class RoomPruningManager extends Sleepable {
-    sleepFor = randomIntRange(50000, 100000)
-    run() {
+export class RoomPruningManager extends StaticSleepable {
+    static sleepFor = randomIntRange(50000, 100000)
+    static run() {
         if (this.isSleepingResponsive()) return
 
         // Make sure all rooms are max RCL
@@ -46,5 +46,3 @@ export class RoomPruningManager extends Sleepable {
         Memory.rooms[highestCommuneScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
     }
 }
-
-export const roomPruningManager = new RoomPruningManager()

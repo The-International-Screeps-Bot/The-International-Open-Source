@@ -6,7 +6,7 @@ import { roomNameProcs } from 'room/roomNameProcs'
  * Migrate version by performing actions, if required
  */
 export class MigrationManager {
-  public static run() {
+  public static tryMigrate() {
     // We are at the right version, no need to migrate
     if (Memory.breakingVersion === global.settings.breakingVersion) return
 

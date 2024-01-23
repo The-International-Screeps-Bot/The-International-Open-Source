@@ -16,7 +16,7 @@ import { statsManager } from 'international/statsManager'
 import { creepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
 import { RoomLogisticsRequest } from 'types/roomRequests'
-import { customPathFinder } from 'international/customPathFinder'
+import { CustomPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from '../myCreepUtils'
 import { structureUtils } from 'room/structureUtils'
@@ -642,7 +642,9 @@ Creep.prototype.hasNonEnergyResource = function () {
 Creep.prototype.findRecycleTarget = function () {
   const { room } = this
 
-  const spawns = room.roomManager.structures.spawn.filter(spawn => structureUtils.isRCLActionable(spawn))
+  const spawns = room.roomManager.structures.spawn.filter(spawn =>
+    structureUtils.isRCLActionable(spawn),
+  )
 
   if (!spawns.length) return false
 
@@ -909,7 +911,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
   )
     return this.memory[CreepMemoryKeys.quadBulldozeTargets]
 
-  const path = customPathFinder.findPath({
+  const path = CustomPathFinder.findPath({
     origin: this.pos,
     goals: [
       {

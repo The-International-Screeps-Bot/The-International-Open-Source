@@ -9,7 +9,7 @@ import {
   defaultPlainCost,
   packedPosLength,
 } from 'international/constants'
-import { CustomPathFinderArgs, PathGoal, customPathFinder } from 'international/customPathFinder'
+import { CustomPathFinderArgs, PathGoal, CustomPathFinder } from 'international/customPathFinder'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosAt } from 'other/codec'
 import { areCoordsEqual, arePositionsEqual, findObjectWithID, getRange } from 'utils/utils'
 
@@ -148,7 +148,7 @@ export class CreepMoveProcs {
     }
 
     // Generate a new path
-    const path = customPathFinder.findPath(args)
+    const path = CustomPathFinder.findPath(args)
     if (!path.length) return Result.fail
 
     // Limit the path's length to the cacheAmount
