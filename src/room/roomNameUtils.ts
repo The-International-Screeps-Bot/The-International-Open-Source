@@ -25,8 +25,8 @@ import {
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
-import { roomProcs } from './roomProcs'
-import { roomNameProcs } from './roomNameProcs'
+import { RoomProcs } from './roomProcs'
+import { RoomNameProcs } from './roomNameProcs'
 
 /**
  * considers a position being flooded
@@ -39,7 +39,7 @@ type FloodForCoordCheck = (
 ) => boolean | Result.stop
 
 export class RoomNameUtils {
-  abandonRemote(roomName: string, time: number) {
+  static abandonRemote(roomName: string, time: number) {
     const roomMemory = Memory.rooms[roomName]
 
     if (roomMemory[RoomMemoryKeys.abandonRemote] >= time) return
@@ -47,7 +47,7 @@ export class RoomNameUtils {
     roomMemory[RoomMemoryKeys.abandonRemote] = time
     delete roomMemory[RoomMemoryKeys.recursedAbandonment]
   }
-  findDynamicScore(roomName: string) {
+  static findDynamicScore(roomName: string) {
     let dynamicScore = 0
 
     let closestEnemy = 0
@@ -117,7 +117,7 @@ export class RoomNameUtils {
 
     return dynamicScore
   }
-  floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
+  static floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
     const visitedCoords = new Uint8Array(2500)
 
     let depth = 0
@@ -156,8 +156,11 @@ export class RoomNameUtils {
 
     return false
   }
-  floodFillCardinalFor() {}
-  isSourceSpawningStructure(roomName: string, structure: StructureExtension | StructureSpawn) {
+  static floodFillCardinalFor() {}
+  static isSourceSpawningStructure(
+    roomName: string,
+    structure: StructureExtension | StructureSpawn,
+  ) {
     const packedSourceHarvestPositions =
       Memory.rooms[roomName][RoomMemoryKeys.communeSourceHarvestPositions]
     for (const i in packedSourceHarvestPositions) {
@@ -172,7 +175,7 @@ export class RoomNameUtils {
   /**
    * Removes roomType-based values in the room's memory that don't match its type
    */
-  cleanMemory(roomName: string) {
+  static cleanMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
     for (const key in roomMemory) {
       // Make sure key is a type-specific key
@@ -189,7 +192,7 @@ export class RoomNameUtils {
   /**
    * Finds the name of the closest commune, exluding the specified roomName
    */
-  findClosestCommuneName(roomName: string) {
+  static findClosestCommuneName(roomName: string) {
     const communesNotThis = []
 
     for (const communeName of CollectiveManager.communes) {
@@ -203,13 +206,13 @@ export class RoomNameUtils {
         Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]
   }
-  findClosestClaimType(roomName: string) {
+  static findClosestClaimType(roomName: string) {
     return Array.from(CollectiveManager.communes).sort(
       (a, b) =>
         Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]
   }
-  updateCreepsOfRemoteName(remoteName: string, communeManager: CommuneManager) {
+  static updateCreepsOfRemoteName(remoteName: string, communeManager: CommuneManager) {
     const remoteMemory = Memory.rooms[remoteName]
 
     communeManager.room.creepsOfRemote[remoteName] = {}
@@ -222,7 +225,7 @@ export class RoomNameUtils {
       communeManager.remoteSourceHarvesters[remoteName].push([])
     }
   }
-  diagonalCoords(roomName: string, commune: Room) {
+  static diagonalCoords(roomName: string, commune: Room) {
     const anchor = commune.roomManager.anchor
     if (!anchor) throw Error('no anchor for room: ' + roomName)
 
@@ -253,7 +256,7 @@ export class RoomNameUtils {
 
     return diagonalCoords
   }
-  pack(roomName: string) {
+  static pack(roomName: string) {
     // Find the numbers in the room's name
 
     let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/)
@@ -264,19 +267,19 @@ export class RoomNameUtils {
     }
   }
 
-  unpackXY(x: number, y: number) {
+  static unpackXY(x: number, y: number) {
     return (
       (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
     )
   }
 
-  unpack(roomCoord: RoomCoord) {
+  static unpack(roomCoord: RoomCoord) {
     return this.unpackXY(roomCoord.x, roomCoord.y)
   }
   /**
    * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
    */
-  advancedFindDistance(
+  static advancedFindDistance(
     originRoomName: string,
     goalRoomName: string,
     opts: {
@@ -315,7 +318,7 @@ export class RoomNameUtils {
     return findRouteResult.length
   }
 
-  findClosestRoomName(roomName: string, targetRoomNames: Iterable<string>) {
+  static findClosestRoomName(roomName: string, targetRoomNames: Iterable<string>) {
     let minRange = Infinity
     let closest = undefined
 
@@ -334,11 +337,11 @@ export class RoomNameUtils {
   /**
    * get the room status for a room that potentially has no initialized memory
    */
-  getStatusForPotentialMemory(roomName: string) {
+  static getStatusForPotentialMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
     if (!roomMemory) {
       Memory.rooms[roomName] = {} as any
-      return RoomStatusKeys[roomNameProcs.findAndRecordStatus(roomName)]
+      return RoomStatusKeys[RoomNameProcs.findAndRecordStatus(roomName)]
     }
 
     // Otherwise there is room memory
@@ -346,5 +349,3 @@ export class RoomNameUtils {
     return roomMemory[RoomMemoryKeys.status]
   }
 }
-
-export const roomNameUtils = new RoomNameUtils()

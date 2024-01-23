@@ -32,10 +32,10 @@ import {
 import { CollectiveManager } from 'international/collective'
 import { packCoord, packCoordList, packXYAsCoord, unpackPosList } from 'other/codec'
 import { PlayerManager } from 'international/players'
-import { roomNameUtils } from './roomNameUtils'
+import { RoomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
-import { roomObjectUtils } from './roomObjectUtils'
-import { roomNameProcs } from './roomNameProcs'
+import { RoomObjectUtils } from './roomObjectUtils'
+import { RoomNameProcs } from './roomNameProcs'
 
 /**
     @param pos1 pos of the object performing the action
@@ -193,7 +193,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
   // Find distance from scoutingRoom
 
   if (distance <= maxRemoteRoomDistance)
-    distance = roomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
+    distance = RoomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
       typeWeights: {
         keeper: Infinity,
         enemy: Infinity,
@@ -394,13 +394,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
     // Add the room's name to the scoutingRoom's remotes data
-    roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+    RoomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
     roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
 
-    roomNameUtils.cleanMemory(this.name)
+    RoomNameUtils.cleanMemory(this.name)
 
     return roomMemory[RoomMemoryKeys.type]
   }
@@ -531,13 +531,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
   roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
   // Add the room's name to the scoutingRoom's remotes data
-  roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+  RoomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
   Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
   roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
   roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
 
-  roomNameUtils.cleanMemory(this.name)
+  RoomNameUtils.cleanMemory(this.name)
 
   return roomMemory[RoomMemoryKeys.type]
 }
@@ -623,7 +623,7 @@ Room.prototype.basicScout = function () {
   const roomMemory = Memory.rooms[this.name]
 
   if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
-    roomNameProcs.findAndRecordStatus(this.name, roomMemory)
+    RoomNameProcs.findAndRecordStatus(this.name, roomMemory)
   }
 
   // Record that the room was scouted this tick
@@ -661,7 +661,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
   const roomMemory = Memory.rooms[this.name]
 
   if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
-    roomNameProcs.findAndRecordStatus(this.name, roomMemory)
+    RoomNameProcs.findAndRecordStatus(this.name, roomMemory)
   }
 
   // Record that the room was scouted this tick
@@ -683,7 +683,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
     roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
   }
 
-  const roomNameScoutType = roomNameProcs.findAndRecordConstantType(this.name)
+  const roomNameScoutType = RoomNameProcs.findAndRecordConstantType(this.name)
   if (roomNameScoutType) {
     if (roomNameScoutType === RoomTypes.sourceKeeper) {
       // Record the positions of keeper lairs
@@ -1457,7 +1457,7 @@ Room.prototype.createWorkRequest = function () {
   if (this.find(FIND_SOURCES).length < 2) return false
   if (Memory.workRequests[this.name]) return false
 
-  roomNameUtils.findDynamicScore(this.name)
+  RoomNameUtils.findDynamicScore(this.name)
 
   const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
   if (communePlanned === false) return false
@@ -1618,7 +1618,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     )
       return Result.fail
 
-    amount = roomObjectUtils.freeReserveStoreOf(args.target, args.resourceType)
+    amount = RoomObjectUtils.freeReserveStoreOf(args.target, args.resourceType)
     /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
   }
 

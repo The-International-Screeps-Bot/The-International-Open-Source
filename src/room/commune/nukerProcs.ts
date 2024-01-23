@@ -1,5 +1,5 @@
 import { RoomMemoryKeys, Result, NukeRequestKeys, RoomLogisticsRequestTypes } from "international/constants"
-import { roomObjectUtils } from "room/roomObjectUtils"
+import { RoomObjectUtils } from 'room/roomObjectUtils'
 
 const nukerResources = [RESOURCE_ENERGY, RESOURCE_GHODIUM]
 
@@ -11,34 +11,34 @@ export class NukerProcs {
 
     const nuker = room.roomManager.nuker
     if (!nuker) {
-        return
+      return
     }
 
     if (this.createRoomLogisticsRequests(room, nuker) === Result.action) return
 
     const request = Memory.nukeRequests[requestName]
     nuker.launchNuke(
-        new RoomPosition(request[NukeRequestKeys.x], request[NukeRequestKeys.y], requestName),
+      new RoomPosition(request[NukeRequestKeys.x], request[NukeRequestKeys.y], requestName),
     )
-}
+  }
 
-private createRoomLogisticsRequests(room: Room, nuker: StructureNuker) {
+  private createRoomLogisticsRequests(room: Room, nuker: StructureNuker) {
     let result = Result.noAction
 
     for (const resource of nukerResources) {
-        if (roomObjectUtils.freeReserveStoreOf(nuker, resource) <= 0) continue
+      if (RoomObjectUtils.freeReserveStoreOf(nuker, resource) <= 0) continue
 
-        room.createRoomLogisticsRequest({
-            target: nuker,
-            type: RoomLogisticsRequestTypes.transfer,
-            priority: 100,
-        })
+      room.createRoomLogisticsRequest({
+        target: nuker,
+        type: RoomLogisticsRequestTypes.transfer,
+        priority: 100,
+      })
 
-        result = Result.action
+      result = Result.action
     }
 
     return result
-}
+  }
 }
 
 export const nukerProcs = new NukerProcs()

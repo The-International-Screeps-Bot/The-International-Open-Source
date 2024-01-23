@@ -4,7 +4,7 @@ import {
 } from '../international/constants'
 import { customLog } from './logging'
 import { PlayerRelationships } from 'international/constants'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 
 /**
@@ -742,14 +742,14 @@ export function getMe() {
 }
 
 export class Utils {
-  isTickInterval(interval: number) {
+  static isTickInterval(interval: number) {
     return Game.time % interval === 0
   }
   /**
    *
    * @returns [score, index]
    */
-  findIndexWithLowestScore<T>(iter: T[], f: (val: T) => number | false): [number, number] {
+  static findIndexWithLowestScore<T>(iter: T[], f: (val: T) => number | false): [number, number] {
     let lowestScore = Infinity
     let bestIndex: number
 
@@ -767,7 +767,7 @@ export class Utils {
     return [lowestScore, bestIndex]
   }
 
-  getInterRangeXY(
+  static getInterRangeXY(
     x1: number,
     y1: number,
     roomName1: string,
@@ -779,8 +779,8 @@ export class Utils {
       return getRangeXY(x1, x2, y1, y2)
     }
 
-    const roomCoord1 = roomNameUtils.pack(roomName1)
-    const roomCoord2 = roomNameUtils.pack(roomName2)
+    const roomCoord1 = RoomNameUtils.pack(roomName1)
+    const roomCoord2 = RoomNameUtils.pack(roomName2)
 
     const worldCoord1 = {
       x:
@@ -802,7 +802,7 @@ export class Utils {
     return range
   }
 
-  getInterRange(coord1: Coord, roomName1: string, coord2: Coord, roomName2: string) {
+  static getInterRange(coord1: Coord, roomName1: string, coord2: Coord, roomName2: string) {
     return this.getInterRangeXY(coord1.x, coord1.y, roomName1, coord2.x, coord2.y, roomName2)
   }
 }

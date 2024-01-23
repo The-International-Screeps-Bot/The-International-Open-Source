@@ -1,4 +1,4 @@
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import { CollectiveManager } from './collective'
 import {
   allStructureTypes,
@@ -202,7 +202,7 @@ global.claim = function (requestName, communeName, priority = 0, override?: bool
 
   if (override) {
     Memory.rooms[requestName][RoomMemoryKeys.type] = RoomTypes.neutral
-    roomNameUtils.cleanMemory(requestName)
+    RoomNameUtils.cleanMemory(requestName)
   }
 
   return `${
@@ -306,7 +306,7 @@ global.deleteBasePlans = function (roomName) {
 }
 
 global.usedHeap = function () {
-    const usedHeap =
-        Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
-    return (usedHeap * 100).toFixed(2) + '%'
+  const usedHeap =
+    Game.cpu.getHeapStatistics().total_heap_size / Game.cpu.getHeapStatistics().heap_size_limit
+  return (usedHeap * 100).toFixed(2) + '%'
 }

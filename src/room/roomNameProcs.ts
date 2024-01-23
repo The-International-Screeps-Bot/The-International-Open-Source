@@ -1,15 +1,15 @@
 import { RoomMemoryKeys, RoomStatusKeys, RoomTypes } from 'international/constants'
 
 export class RoomNameProcs {
-  findAndRecordStatus(roomName: string, roomMemory = Memory.rooms[roomName]) {
+  static findAndRecordStatus(roomName: string, roomMemory = Memory.rooms[roomName]) {
     const status = Game.map.getRoomStatus(roomName).status
     roomMemory[RoomMemoryKeys.status] = RoomStatusKeys[status]
 
     return status
   }
 
-  findAndRecordConstantType(roomName: string) {
-    
+  static findAndRecordConstantType(roomName: string) {
+
     // Find the numbers in the room's name
     const [EWstring, NSstring] = roomName.match(/\d+/g)
 
@@ -39,5 +39,3 @@ export class RoomNameProcs {
     return false
   }
 }
-
-export const roomNameProcs = new RoomNameProcs()

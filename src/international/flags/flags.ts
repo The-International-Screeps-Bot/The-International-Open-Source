@@ -13,13 +13,13 @@ import {
 } from '../constants'
 import { CollectiveManager } from '../collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { RoomUtils } from 'room/roomUtils'
 import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
-import { roomProcs } from 'room/roomProcs'
+import { RoomProcs } from 'room/roomProcs'
 
 export class FlagManager {
   run() {
@@ -304,7 +304,7 @@ export class FlagManager {
 
     const terrain = Game.map.getRoomTerrain(room.name)
     const rampartPlans = room.roomManager.rampartPlans
-    roomNameUtils.floodFillFor(room.name, [anchor], coord => {
+    RoomNameUtils.floodFillFor(room.name, [anchor], coord => {
       // Ignore terrain that protects us
       if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
@@ -348,7 +348,7 @@ export class FlagManager {
     }
 
     const terrain = Game.map.getRoomTerrain(room.name)
-    roomNameUtils.floodFillFor(room.name, [room.controller.pos], (coord, packedCoord, depth) => {
+    RoomNameUtils.floodFillFor(room.name, [room.controller.pos], (coord, packedCoord, depth) => {
       // See if we should even consider the coord
 
       // Ignore terrain that protects us
@@ -458,7 +458,7 @@ export class FlagManager {
     const flag = Game.flags[flagName]
     const roomName = flagNameParts[1] || flag.pos.roomName
 
-    const dynamicScore = roomNameUtils.findDynamicScore(roomName)
+    const dynamicScore = RoomNameUtils.findDynamicScore(roomName)
     customLog('dynamic score for ' + roomName, dynamicScore)
   }
 
@@ -732,7 +732,7 @@ export class FlagManager {
       return
     }
 
-    const diagonalCoords = roomNameUtils.diagonalCoords(room.name, commune)
+    const diagonalCoords = RoomNameUtils.diagonalCoords(room.name, commune)
     room.visualizeCoordMap(diagonalCoords)
   }
 
@@ -1046,7 +1046,7 @@ export class FlagManager {
       data.push(row)
     }
 
-    roomProcs.tableVisual(room, 'Funneling', headers, data)
+    RoomProcs.tableVisual(room, 'Funneling', headers, data)
   }
 }
 

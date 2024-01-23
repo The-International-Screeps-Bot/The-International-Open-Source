@@ -1,6 +1,6 @@
 import { randomIntRange, randomRange, utils } from 'utils/utils'
 import { CollectiveManager } from './collective'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import {
   CombatRequestKeys,
   HaulRequestKeys,
@@ -62,7 +62,7 @@ export class RequestsManager extends StaticSleepable {
         !roomMemory[RoomMemoryKeys.dynamicScore] ||
         Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
       ) {
-        roomNameUtils.findDynamicScore(roomName)
+        RoomNameUtils.findDynamicScore(roomName)
       }
     }
   }
@@ -160,7 +160,7 @@ export class RequestsManager extends StaticSleepable {
         continue
       }
 
-      const communeName = roomNameUtils.findClosestRoomName(roomName, communesForResponding)
+      const communeName = RoomNameUtils.findClosestRoomName(roomName, communesForResponding)
       if (!communeName) {
         // Wait on the request
         Memory.workRequests[roomName][WorkRequestKeys.abandon] = 20000
@@ -177,7 +177,7 @@ export class RequestsManager extends StaticSleepable {
       // Run a more simple and less expensive check, then a more complex and expensive to confirm. If the check fails, abandon the room for some time
       if (
         Game.map.getRoomLinearDistance(communeName, roomName) > maxWorkRequestDistance ||
-        roomNameUtils.advancedFindDistance(communeName, roomName, {
+        RoomNameUtils.advancedFindDistance(communeName, roomName, {
           typeWeights: {
             keeper: Infinity,
             enemy: Infinity,
@@ -288,7 +288,7 @@ export class RequestsManager extends StaticSleepable {
         communes.push(roomName)
       }
 
-      const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
+      const communeName = RoomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
       if (
@@ -304,7 +304,7 @@ export class RequestsManager extends StaticSleepable {
       // Run a more simple and less expensive check, then a more complex and expensive to confirm
       if (
         Game.map.getRoomLinearDistance(communeName, requestName) > maxCombatDistance ||
-        roomNameUtils.advancedFindDistance(communeName, requestName, {
+        RoomNameUtils.advancedFindDistance(communeName, requestName, {
           typeWeights: {
             keeper: Infinity,
             enemy: Infinity,
@@ -364,7 +364,7 @@ export class RequestsManager extends StaticSleepable {
         communes.push(roomName)
       }
 
-      const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
+      const communeName = RoomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
       if (
@@ -380,7 +380,7 @@ export class RequestsManager extends StaticSleepable {
       // Run a more simple and less expensive check, then a more complex and expensive to confirm
       if (
         Game.map.getRoomLinearDistance(communeName, requestName) > maxHaulDistance ||
-        roomNameUtils.advancedFindDistance(communeName, requestName, {
+        RoomNameUtils.advancedFindDistance(communeName, requestName, {
           typeWeights: {
             keeper: Infinity,
             enemy: Infinity,

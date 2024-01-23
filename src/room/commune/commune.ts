@@ -35,13 +35,13 @@ import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
 import { CollectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { communeProcs } from './communeProcs'
 import { StructureUtils } from 'room/structureUtils'
 import { LogisticsProcs } from 'room/logisticsProcs'
 import { towerProcs } from './towerProcs'
-import { sourceProcs } from 'room/sourceProcs'
+import { SourceProcs } from 'room/sourceProcs'
 import { terminalProcs } from './terminal/terminalProcs'
 import { spawningStructureProcs } from './spawning/spawningStructureProcs'
 import { observerProcs } from './observerProcs'
@@ -152,7 +152,7 @@ export class CommuneManager {
     if (roomMemory[RoomMemoryKeys.abandonCommune] === true) {
       room.controller.unclaim()
       roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-      roomNameUtils.cleanMemory(room.name)
+      RoomNameUtils.cleanMemory(room.name)
 
       for (const cSite of room.find(FIND_MY_CONSTRUCTION_SITES)) {
         cSite.remove()
@@ -255,7 +255,7 @@ export class CommuneManager {
     this.combatRequestManager.run()
     this.haulRequestManager.run()
 
-    sourceProcs.createPowerTasks(this.room)
+    SourceProcs.createPowerTasks(this.room)
     this.remotesManager.run()
     this.haulerNeedManager.run()
 
@@ -337,7 +337,7 @@ export class CommuneManager {
     const remoteMemory = Memory.rooms[remoteName]
 
     remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-    roomNameUtils.cleanMemory(remoteName)
+    RoomNameUtils.cleanMemory(remoteName)
   }
 
   findMinRangedAttackCost(minDamage: number = 10) {
@@ -817,7 +817,7 @@ export class CommuneManager {
     const structuresToSort: SpawningStructures = []
 
     for (const structure of this.actionableSpawningStructures) {
-      if (roomNameUtils.isSourceSpawningStructure(this.room.name, structure)) {
+      if (RoomNameUtils.isSourceSpawningStructure(this.room.name, structure)) {
         spawningStructuresByPriority.push(structure)
       }
 

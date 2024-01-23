@@ -8,7 +8,7 @@ import {
 } from 'international/constants'
 import { getRangeXY, getRange, randomOf } from 'utils/utils'
 import { partial } from 'lodash'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 
 export class Scout extends Creep {
   scoutedRooms?: string[]
@@ -62,7 +62,7 @@ export class Scout extends Creep {
 
       if (
         Memory.rooms[this.room.name][RoomMemoryKeys.status] !==
-        roomNameUtils.getStatusForPotentialMemory(roomName)
+        RoomNameUtils.getStatusForPotentialMemory(roomName)
       )
         continue
 
@@ -241,7 +241,7 @@ export class Scout extends Creep {
 
         // Clean the room's memory
 
-        roomNameUtils.cleanMemory(room.name)
+        RoomNameUtils.cleanMemory(room.name)
 
         // And delete the creep's scoutTarget
 

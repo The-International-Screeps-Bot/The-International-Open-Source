@@ -1,7 +1,7 @@
 import { RoomUtils } from 'room/roomUtils'
 
 export class SourceProcs {
-  createPowerTasks(room: Room) {
+  static createPowerTasks(room: Room) {
     if (!room.myPowerCreeps.length) return
 
     const sources = RoomUtils.getSources(room)
@@ -10,5 +10,3 @@ export class SourceProcs {
     }
   }
 }
-
-export const sourceProcs = new SourceProcs()

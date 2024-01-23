@@ -1,8 +1,7 @@
 import { Dashboard, Rectangle, Table } from "screeps-viz"
 
 export class RoomProcs {
-  tableVisual(room: Room, title: string, headers: string[], data: string[][]) {
-
+  static tableVisual(room: Room, title: string, headers: string[], data: string[][]) {
     Dashboard({
       config: {
         room: room.name,
@@ -29,5 +28,3 @@ export class RoomProcs {
     })
   }
 }
-
-export const roomProcs = new RoomProcs()

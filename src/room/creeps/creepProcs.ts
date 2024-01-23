@@ -19,7 +19,7 @@ import {
   RoomLogisticsTargets,
 } from 'types/roomRequests'
 import { customLog, stringifyLog } from 'utils/logging'
-import { roomObjectUtils } from 'room/roomObjectUtils'
+import { RoomObjectUtils } from 'room/roomObjectUtils'
 import { StructureUtils } from 'room/structureUtils'
 import { packCoord } from 'other/codec'
 
@@ -472,7 +472,7 @@ export class CreepProcs {
 
     // Delete the request if the target is fulfilled
 
-    const targetFreeNextStore = roomObjectUtils.freeNextStoreOf(
+    const targetFreeNextStore = RoomObjectUtils.freeNextStoreOf(
       target,
       request[CreepLogisticsRequestKeys.resourceType],
     )
@@ -548,7 +548,7 @@ export class CreepProcs {
     target: Resource,
   ) {
     const creepMemory = Memory.creeps[creep.name]
-    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+    const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(
       creep,
       request[CreepLogisticsRequestKeys.resourceType],
     )
@@ -591,7 +591,7 @@ export class CreepProcs {
       return false
     }
 
-    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+    const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(
       creep,
       request[CreepLogisticsRequestKeys.resourceType],
     )
@@ -643,7 +643,7 @@ export class CreepProcs {
     if (target instanceof Resource) {
       // Update in accordance to potential resource decay
 
-      const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+      const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(
         creep,
         request[CreepLogisticsRequestKeys.resourceType],
       )
@@ -685,7 +685,7 @@ export class CreepProcs {
       return false
     }
 
-    const creepFreeNextStore = roomObjectUtils.freeNextStoreOf(
+    const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(
       creep,
       request[CreepLogisticsRequestKeys.resourceType],
     )
@@ -1011,7 +1011,7 @@ export class CreepProcs {
     if (type === RoomLogisticsRequestTypes.transfer) {
       // Delete the request if the target is fulfilled
 
-      const targetFreeReserveStore = roomObjectUtils.freeNextStoreOf(target, resourceType)
+      const targetFreeReserveStore = RoomObjectUtils.freeNextStoreOf(target, resourceType)
       if (targetFreeReserveStore < amount) return 0
 
       amount = Math.min(Math.min(creep.nextStore[resourceType], targetFreeReserveStore), amount)

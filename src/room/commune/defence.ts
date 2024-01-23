@@ -27,7 +27,7 @@ import {
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
 import { CollectiveManager } from 'international/collective'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { customLog, LogTypes } from 'utils/logging'
 
@@ -100,7 +100,7 @@ export class DefenceManager {
 
     const terrain = Game.map.getRoomTerrain(room.name)
     const rampartPlans = this.communeManager.room.roomManager.rampartPlans
-    const enemyCoord = roomNameUtils.floodFillFor(room.name, [anchor], coord => {
+    const enemyCoord = RoomNameUtils.floodFillFor(room.name, [anchor], coord => {
       // Ignore terrain that protects us
       if (terrain.get(coord.x, coord.y) === TERRAIN_MASK_WALL) return false
 
@@ -140,7 +140,7 @@ export class DefenceManager {
   private isControllerSafe() {
     const { room } = this.communeManager
     const terrain = Game.map.getRoomTerrain(room.name)
-    const enemyCoord = roomNameUtils.floodFillFor(
+    const enemyCoord = RoomNameUtils.floodFillFor(
       room.name,
       [room.controller.pos],
       (coord, packedCoord, depth) => {

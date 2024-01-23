@@ -1,6 +1,6 @@
-import { roomNameUtils } from 'room/roomNameUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
 import { RoomMemoryKeys, RoomTypes, SegmentIDs, majorVersion } from './constants'
-import { roomNameProcs } from 'room/roomNameProcs'
+import { RoomNameProcs } from 'room/roomNameProcs'
 
 /**
  * Migrate version by performing actions, if required
@@ -19,7 +19,9 @@ export class MigrationManager {
     }
     // If the Memory's breaking version is more than the setting's, somebody messed up
     if (Memory.breakingVersion > global.settings.breakingVersion) {
-      throw Error(`breakingVersion exceeds maximum published. Please downgrade to v${majorVersion}.${global.settings.breakingVersion}`)
+      throw Error(
+        `breakingVersion exceeds maximum published. Please downgrade to v${majorVersion}.${global.settings.breakingVersion}`,
+      )
     }
 
     // Otherwise, we are still not at the desired version. Do a breaking migration
@@ -28,7 +30,6 @@ export class MigrationManager {
   }
 
   private static trySoftMigrations() {
-
     if (Memory.breakingVersion === 89) {
       global.killCreeps()
       Memory.breakingVersion += 1
@@ -51,24 +52,19 @@ export class MigrationManager {
       Memory.breakingVersion += 1
     }
     if (Memory.breakingVersion === 121) {
-
       Memory.breakingVersion += 1
     }
     if (Memory.breakingVersion === 122) {
-
       delete (Memory as any).recordedTransactionIDs
       delete (Memory as any).constructionSites
       Memory.breakingVersion += 1
     }
     if (Memory.breakingVersion === 123) {
-
-      RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({
-
-      } as BasePlansSegment)
+      RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({} as BasePlansSegment)
 
       RawMemory.segments[SegmentIDs.IDs] = JSON.stringify({
-          constructionSites: {},
-          recordedTransactionIDs: {},
+        constructionSites: {},
+        recordedTransactionIDs: {},
       } as IDsSegment)
       Memory.breakingVersion += 1
     }
@@ -78,19 +74,16 @@ export class MigrationManager {
     }
     if (Memory.breakingVersion === 126) {
       for (const roomName in Memory.rooms) {
-
-        roomNameProcs.findAndRecordStatus(roomName)
+        RoomNameProcs.findAndRecordStatus(roomName)
       }
       Memory.breakingVersion += 1
     }
   }
 
   private static hardMigration() {
-
-      global.killCreeps()
-      global.killPowerCreeps()
-      global.clearMemory()
-      global.removeCSites()
-
+    global.killCreeps()
+    global.killPowerCreeps()
+    global.clearMemory()
+    global.removeCSites()
   }
 }

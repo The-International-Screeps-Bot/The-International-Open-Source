@@ -223,14 +223,14 @@ export class MapVisualsManager {
         }
     }
     private static test(roomName: string, roomMemory: RoomMemory) {
-        /*
+      /*
         Game.map.visual.text((Game.time - roomMemory[RoomMemoryKeys.lastScout]).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
         })
         */
-        /*
-        const roomCoord = roomNameUtils.pack(roomName)
+      /*
+        const roomCoord = RoomNameUtils.pack(roomName)
         Game.map.visual.text(('x: ' + roomCoord.x + ', y: ' + roomCoord.y).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
