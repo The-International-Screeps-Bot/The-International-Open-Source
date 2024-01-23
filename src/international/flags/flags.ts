@@ -34,7 +34,7 @@ export class FlagManager {
   /**
    * Tricks typescript into accepting the dynamic function call in run()
    */
-  public doNothing(flagName: string, flagNameParts: string[]) {}
+  doNothing(flagName: string, flagNameParts: string[]) {}
 
   private internationalDataVisuals(flagName: string, flagNameParts: string[]) {
     const flag = Game.flags[flagName]

@@ -18,7 +18,7 @@ import { SpawnRequest, BodyPartCounts, SpawnRequestTypes } from 'types/spawnRequ
 import { customLog, LogTypes } from 'utils/logging'
 import { getRange, findAdjacentCoordsToCoord, Utils } from 'utils/utils'
 import { SpawnRequestConstructor, SpawnRequestConstructors } from './spawnRequestConstructors'
-import { communeUtils } from '../communeUtils'
+import { CommuneUtils } from '../communeUtils'
 
 export class SpawningStructureProcs {
   public static tryRunSpawning(room: Room) {
@@ -28,7 +28,7 @@ export class SpawningStructureProcs {
     this.test(room)
 
     // There are no spawns that we can spawn with (they are probably spawning something)
-    const organizedSpawns = communeUtils.getOrganizedSpawns(room, spawns)
+    const organizedSpawns = CommuneUtils.getOrganizedSpawns(room, spawns)
     if (!organizedSpawns) return
 
     this.registerSpawningCreeps(room, organizedSpawns.activeSpawns)
@@ -179,7 +179,10 @@ export class SpawningStructureProcs {
     return Result.success
   }
 
-  private static findSpawnIndexForSpawnRequest(inactiveSpawns: StructureSpawn[], request: SpawnRequest) {
+  private static findSpawnIndexForSpawnRequest(
+    inactiveSpawns: StructureSpawn[],
+    request: SpawnRequest,
+  ) {
     if (request.spawnTarget) {
       const [score, index] = Utils.findIndexWithLowestScore(inactiveSpawns, spawn => {
         return getRange(spawn.pos, request.spawnTarget)
@@ -294,7 +297,7 @@ export class SpawningStructureProcs {
 
     // There is a vivid benefit to powering spawns
 
-    const organizedSpawns = communeUtils.getOrganizedSpawns(room)
+    const organizedSpawns = CommuneUtils.getOrganizedSpawns(room)
     // We need spawns if we want to power them
     if (!organizedSpawns) return
     // Make sure there are no inactive spawns
@@ -351,7 +354,7 @@ export class SpawningStructureProcs {
   private static testRequests() {}
 
   static tryRegisterSpawningMovement(room: Room) {
-    const organizedSpawns = communeUtils.getOrganizedSpawns(room)
+    const organizedSpawns = CommuneUtils.getOrganizedSpawns(room)
     if (!organizedSpawns) return
 
     // For every spawn spawning a creep, register their movement intentions

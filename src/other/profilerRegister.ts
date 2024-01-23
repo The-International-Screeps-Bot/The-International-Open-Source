@@ -31,7 +31,6 @@ import { EndTickCreepManager } from 'room/creeps/endTickCreepManager'
 import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { HaulerNeedManager } from 'room/commune/haulerNeed'
 import { LinkManager } from 'room/commune/links'
-import { DefenceManager } from 'room/commune/defence'
 import { CombatRequestManager } from 'room/commune/combatRequest'
 import { MapVisualsManager } from 'international/mapVisuals'
 import { MigrationManager } from 'international/migration'
@@ -112,6 +111,8 @@ import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 import { InitManager } from 'international/init'
 import { TickInit } from 'international/tickInit'
 import { DebugUtils } from 'debug/debugUtils'
+import { DefenceProcs } from 'room/commune/defenceProcs'
+import { DefenceUtils } from 'room/commune/defenceUtils'
 
 export function profilerRegister() {
   // Classes
@@ -162,7 +163,8 @@ export function profilerRegister() {
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
   profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
   profiler.registerClass(LinkManager, 'LinkManager')
-  profiler.registerClass(DefenceManager, 'DefenceManager')
+  profiler.registerClass(DefenceProcs, 'DefenceProcs')
+  profiler.registerClass(DefenceUtils, 'DefenceUtils')
   profiler.registerClass(CombatRequestManager, 'CombatRequestManager')
   profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
   profiler.registerClass(Operator, 'Operator')

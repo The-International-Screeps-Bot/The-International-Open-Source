@@ -15,7 +15,7 @@ import { StructureUtils } from 'room/structureUtils'
 import { OrganizedSpawns } from './spawning/spawningStructureProcs'
 
 export class CommuneUtils {
-  getGeneralRepairStructures(room: Room) {
+  static getGeneralRepairStructures(room: Room) {
     if (room.generalRepairStructures) return room.generalRepairStructures
 
     const repairTargets = this.getGeneralRepairStructuresFromCoords(room)
@@ -58,7 +58,7 @@ export class CommuneUtils {
     return repairTargets
   }
 
-  private getGeneralRepairStructuresFromCoords(room: Room) {
+  private static getGeneralRepairStructuresFromCoords(room: Room) {
     const repairTargets: (StructureContainer | StructureRoad)[] = []
     const structureCoords = communeData[room.name].generalRepairStructureCoords
     if (!structureCoords) return repairTargets
@@ -78,7 +78,7 @@ export class CommuneUtils {
     return repairTargets
   }
 
-  getRampartRepairTargets(room: Room) {
+  static getRampartRepairTargets(room: Room) {
     if (room.rampartRepairStructures) return room.rampartRepairStructures
 
     const repairTargets: StructureRampart[] = []
@@ -121,7 +121,7 @@ export class CommuneUtils {
   /**
    * The presently desired upgrader strength for the commune based on energy thresholds
    */
-  getDesiredUpgraderStrength(room: Room) {
+  static getDesiredUpgraderStrength(room: Room) {
     const strength = Math.pow(
       (room.roomManager.resourcesInStoringStructures.energy -
         room.communeManager.storedEnergyUpgradeThreshold * 0.5) /
@@ -132,7 +132,7 @@ export class CommuneUtils {
     return strength
   }
 
-  getMaxUpgradeStrength(room: Room) {
+  static getMaxUpgradeStrength(room: Room) {
     const data = communeData[room.name]
     if (data.maxUpgradeStrength !== undefined && !room.roomManager.structureUpdate)
       return data.maxUpgradeStrength
@@ -187,7 +187,7 @@ export class CommuneUtils {
     return maxUpgradeStrength
   }
 
-  getEstimatedSourceIncome(room: Room) {
+  static getEstimatedSourceIncome(room: Room) {
     const data = communeData[room.name]
     if (data.estimatedCommuneSourceIncome !== undefined) return data.estimatedCommuneSourceIncome
 
@@ -215,7 +215,7 @@ export class CommuneUtils {
     return estimatedIncome
   }
 
-  canTakeNewWorkRequest(roomName: string) {
+  static canTakeNewWorkRequest(roomName: string) {
     if (Memory.rooms[roomName][RoomMemoryKeys.workRequest]) return false
     if (Game.rooms[roomName].energyCapacityAvailable < 650) return false
 
@@ -229,7 +229,7 @@ export class CommuneUtils {
    * Find spawns that are inactive and active
    * Assign spawnIDs to creeps
    */
-  public getOrganizedSpawns(
+  static getOrganizedSpawns(
     room: Room,
     spawns: StructureSpawn[] = room.roomManager.structures.spawn,
   ): false | OrganizedSpawns {
@@ -262,9 +262,9 @@ export class CommuneUtils {
    * Wether the commune wants to be funneled for upgrading, independent of what other rooms want.
    * Assumes the room already meats the requirements to be a funnel target
    */
-  wantsToBeFunneledIndependent(room: Room) {
-    const desiredStrength = communeUtils.getDesiredUpgraderStrength(room)
-    const maxStrength = communeUtils.getMaxUpgradeStrength(room)
+  static wantsToBeFunneledIndependent(room: Room) {
+    const desiredStrength = this.getDesiredUpgraderStrength(room)
+    const maxStrength = this.getMaxUpgradeStrength(room)
     // We do not have enough desire
     if (desiredStrength < maxStrength) return false
 
@@ -272,5 +272,3 @@ export class CommuneUtils {
     return true
   }
 }
-
-export const communeUtils = new CommuneUtils()

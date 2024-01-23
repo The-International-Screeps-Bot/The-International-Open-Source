@@ -8,7 +8,7 @@ import {
   minerals,
   haulerUpdateDefault,
 } from './constants'
-import { communeUtils } from 'room/commune/communeUtils'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 const periodicUpdateInterval = randomIntRange(100, 200)
 
@@ -362,7 +362,7 @@ export class CollectiveManager {
       const roomName = funnelOrder[i]
       const room = Game.rooms[roomName]
 
-      const wantsToBeFunneledIndependent = communeUtils.wantsToBeFunneledIndependent(room)
+      const wantsToBeFunneledIndependent = CommuneUtils.wantsToBeFunneledIndependent(room)
 
       if (!(previousWantsToBeIndependentlyFunneled && wantsToBeFunneledIndependent)) {
         previousWantsToBeIndependentlyFunneled = false

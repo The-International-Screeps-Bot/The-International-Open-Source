@@ -2,7 +2,7 @@ import { RoomMemoryKeys, packedPosLength, stamps } from 'international/constants
 import { customLog } from 'utils/logging'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneManager } from './commune'
-import { communeUtils } from './communeUtils'
+import { CommuneUtils } from './communeUtils'
 import { StructureUtils } from 'room/structureUtils'
 
 export class HaulerNeedManager {
@@ -45,7 +45,7 @@ export class HaulerNeedManager {
   private sourceNeed() {
     const room = this.communeManager.room
     const packedSourcePaths = Memory.rooms[room.name][RoomMemoryKeys.communeSourcePaths]
-    const estimatedSourceIncome = communeUtils.getEstimatedSourceIncome(room)
+    const estimatedSourceIncome = CommuneUtils.getEstimatedSourceIncome(room)
 
     const hubLink = room.roomManager.hubLink
     if (hubLink && StructureUtils.isRCLActionable(hubLink)) {

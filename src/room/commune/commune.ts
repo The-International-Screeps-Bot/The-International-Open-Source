@@ -26,7 +26,7 @@ import './links'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
-import { DefenceManager } from './defence'
+import { DefenceProcs } from './defenceProcs'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerNeedManager } from './haulerNeed'
 import { packCoord, unpackPosAt } from 'other/codec'
@@ -58,7 +58,6 @@ export class CommuneManager {
   // Managers
 
   constructionManager: ConstructionManager
-  defenceManager: DefenceManager
 
   linkManager: LinkManager
   labManager: LabManager
@@ -101,7 +100,6 @@ export class CommuneManager {
 
   constructor() {
     this.constructionManager = new ConstructionManager(this)
-    this.defenceManager = new DefenceManager(this)
 
     this.linkManager = new LinkManager(this)
     this.labManager = new LabManager(this)
@@ -244,10 +242,10 @@ export class CommuneManager {
   run() {
     if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
-    this.defenceManager.run()
+    DefenceProcs.run(this.room)
     TowerProcs.run(this.room)
-    this.defenceManager.manageThreat()
-    this.defenceManager.manageDefenceRequests()
+    DefenceProcs.manageThreat(this.room)
+    DefenceProcs.manageDefenceRequests(this.room)
 
     TerminalProcs.run(this.room)
 

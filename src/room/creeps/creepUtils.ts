@@ -20,7 +20,7 @@ import { packCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
 import { RoomManager } from 'room/room'
 import { CollectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
-import { communeUtils } from 'room/commune/communeUtils'
+import { CommuneUtils } from 'room/commune/communeUtils'
 import { MyCreepUtils } from './myCreepUtils'
 import {
   CreepLogisticsRequest,
@@ -582,7 +582,7 @@ export class CreepUtils {
   static findNewRampartRepairTarget(creep: Creep) {
     const ramparts = creep.room.roomManager.enemyAttackers.length
       ? creep.room.communeManager.defensiveRamparts
-      : communeUtils.getRampartRepairTargets(creep.room)
+      : CommuneUtils.getRampartRepairTargets(creep.room)
 
     const [score, bestTarget] = findWithLowestScore(ramparts, structure => {
       if (structure.nextHits / structure.hitsMax > 0.9) return false
@@ -604,7 +604,7 @@ export class CreepUtils {
     let lowestScore = Infinity
     let bestTarget
 
-    const structures = communeUtils.getGeneralRepairStructures(creep.room)
+    const structures = CommuneUtils.getGeneralRepairStructures(creep.room)
     for (const structure of structures) {
       // If above 30% of max hits
 

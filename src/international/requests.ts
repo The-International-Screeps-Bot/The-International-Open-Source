@@ -17,7 +17,7 @@ import { indexOf } from 'lodash'
 import { Sleepable, StaticSleepable } from 'utils/sleepable'
 import { util } from 'chai'
 import { WorkRequest } from 'types/internationalRequests'
-import { communeUtils } from 'room/commune/communeUtils'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 const runRequestInverval = randomIntRange(100, 200)
 
@@ -128,7 +128,7 @@ export class RequestsManager extends StaticSleepable {
     const communesForResponding = new Set<string>()
 
     for (const roomName of CollectiveManager.communes) {
-      if (!communeUtils.canTakeNewWorkRequest(roomName)) continue
+      if (!CommuneUtils.canTakeNewWorkRequest(roomName)) continue
 
       communesForResponding.add(roomName)
     }

@@ -17,7 +17,7 @@ import {
   offsetsByDirection,
 } from 'international/constants'
 import { CreepUtils } from './creepUtils'
-import { communeUtils } from 'room/commune/communeUtils'
+import { CommuneUtils } from 'room/commune/communeUtils'
 import {
   CreepLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
@@ -389,7 +389,7 @@ export class CreepProcs {
 
     const workPartCount = MyCreepUtils.parts(creep).work
     // At some point we should compare this search with flat searching positions around the creep
-    const structure = communeUtils.getGeneralRepairStructures(creep.room).find(structure => {
+    const structure = CommuneUtils.getGeneralRepairStructures(creep.room).find(structure => {
       return (
         getRange(structure.pos, creep.pos) <= 3 &&
         structure.hitsMax - structure.hits >= workPartCount * REPAIR_POWER

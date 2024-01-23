@@ -1,7 +1,7 @@
 import { towerPowers } from "international/constants"
 import { findWithLowestScore, getRange } from 'utils/utils'
 import { CommuneDataProcs, communeData } from './communeData'
-import { communeUtils } from './communeUtils'
+import { CommuneUtils } from './communeUtils'
 import { packCoord } from 'other/codec'
 
 const minTowerRampartRepairTreshold = RAMPART_DECAY_AMOUNT * 1.5
@@ -82,7 +82,7 @@ export class TowerUtils {
   static findRampartRepairTarget(room: Room) {
     const ramparts = room.roomManager.enemyAttackers.length
       ? room.communeManager.defensiveRamparts
-      : communeUtils.getRampartRepairTargets(room)
+      : CommuneUtils.getRampartRepairTargets(room)
 
     const [score, rampart] = findWithLowestScore(ramparts, rampart => {
       let score = rampart.hits

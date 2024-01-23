@@ -22,7 +22,7 @@ import {
 import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from '../commune'
 import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
-import { communeUtils } from '../communeUtils'
+import { CommuneUtils } from '../communeUtils'
 import { StructureUtils } from 'room/structureUtils'
 
 export class SpawnRequestsManager {
@@ -563,7 +563,7 @@ export class SpawnRequestsManager {
   private maintainers() {
     this.rawSpawnRequestsArgs.push(
       ((): SpawnRequestArgs | false => {
-        const generalRepairStructures = communeUtils.getGeneralRepairStructures(
+        const generalRepairStructures = CommuneUtils.getGeneralRepairStructures(
           this.communeManager.room,
         )
         const repairTargets = generalRepairStructures.filter(
@@ -572,9 +572,9 @@ export class SpawnRequestsManager {
 
         // Get ramparts below their max hits
 
-        const repairRamparts = communeUtils
-          .getRampartRepairTargets(this.communeManager.room)
-          .filter(rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits)
+        const repairRamparts = CommuneUtils.getRampartRepairTargets(
+          this.communeManager.room,
+        ).filter(rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits)
 
         // If there are no ramparts or repair targets
 
@@ -902,7 +902,7 @@ export class SpawnRequestsManager {
           ) {
             return false
           }
-          partsMultiplier = communeUtils.getDesiredUpgraderStrength(this.communeManager.room)
+          partsMultiplier = CommuneUtils.getDesiredUpgraderStrength(this.communeManager.room)
         }
 
         // Otherwise if there is no storing structure
@@ -912,7 +912,7 @@ export class SpawnRequestsManager {
 
         partsMultiplier = Math.min(
           partsMultiplier,
-          communeUtils.getMaxUpgradeStrength(this.communeManager.room),
+          CommuneUtils.getMaxUpgradeStrength(this.communeManager.room),
         )
         if (partsMultiplier <= 0) return false
 

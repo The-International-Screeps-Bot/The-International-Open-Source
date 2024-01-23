@@ -11,7 +11,7 @@ import {
   scalePriority,
   Utils,
 } from 'utils/utils'
-import { communeUtils } from './communeUtils'
+import { CommuneUtils } from './communeUtils'
 import { TowerUtils } from './towerUtils'
 
 export class TowerProcs {

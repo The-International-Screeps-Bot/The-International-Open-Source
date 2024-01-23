@@ -1,6 +1,6 @@
 import { RoomUtils } from 'room/roomUtils'
 import { CommuneDataProcs, communeData } from './communeData'
-import { communeUtils } from './communeUtils'
+import { CommuneUtils } from './communeUtils'
 import {
   RoomLogisticsRequestTypes,
   RoomMemoryKeys,
