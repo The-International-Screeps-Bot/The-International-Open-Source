@@ -1,7 +1,7 @@
 import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { CreepUtils } from 'room/creeps/creepUtils'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class ControllerUpgrader extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -39,7 +39,7 @@ export class ControllerUpgrader extends Creep {
   }
 
   initRun() {
-    this.room.communeManager.upgradeStrength += myCreepUtils.upgradeStrength(this)
+    this.room.communeManager.upgradeStrength += MyCreepUtils.upgradeStrength(this)
   }
 
   public static roleManager(room: Room, creepsOfRole: string[]) {

@@ -1,10 +1,10 @@
 import { time } from "console"
 
-class DebugUtils {
+export class DebugUtils {
   /**
    * Deeply stringifies values with some added benefits
    */
-  stringify(v: any) {
+  static stringify(v: any) {
     let alreadyReferencedObjects: any[] = []
     const recStringify = (value: any, depth: number): string => {
       switch (typeof value) {
@@ -60,10 +60,11 @@ class DebugUtils {
 
     return recStringify(v, 0)
   }
+
   /**
    * I don't fully understand what this does or what it is meant to do
    */
-  findGlobalLength() {
+  static findGlobalLength() {
     const dict: { [key: number]: string } = {
       0: '',
       3: 'K',
@@ -113,8 +114,6 @@ class DebugUtils {
     }
   }
 }
-
-global.debugUtils = new DebugUtils()
 
 global.stringify = function stringify(v: any, maxDepth = 3) {
     let alreadyReferencedObjects: any[] = [];

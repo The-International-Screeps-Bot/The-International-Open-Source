@@ -6,7 +6,7 @@ import {
   getRange,
   getRangeXY,
 } from 'utils/utils'
-import { myCreepUtils } from './myCreepUtils'
+import { MyCreepUtils } from './myCreepUtils'
 import { StatsManager } from 'international/stats'
 import {
   CreepMemoryKeys,
@@ -78,7 +78,7 @@ export class CreepProcs {
 
       creep.actionCoord = creep.room.roomManager.centerUpgradePos
 
-      const workPartCount = myCreepUtils.parts(creep).work
+      const workPartCount = MyCreepUtils.parts(creep).work
       const controllerRange = getRange(creep.pos, controller.pos)
 
       if (controllerRange <= 3 && creep.nextStore.energy > 0) {
@@ -203,7 +203,7 @@ export class CreepProcs {
 
       const energySpentOnUpgrades = Math.min(
         creep.nextStore.energy,
-        myCreepUtils.parts(creep).work * UPGRADE_CONTROLLER_POWER,
+        MyCreepUtils.parts(creep).work * UPGRADE_CONTROLLER_POWER,
       )
 
       StatsManager.updateStat(creep.room.name, 'eou', energySpentOnUpgrades)
@@ -252,7 +252,7 @@ export class CreepProcs {
     if (creep.worked) return Result.noAction
     if (creep.repair(target) !== OK) return Result.fail
 
-    const workParts = myCreepUtils.parts(creep).work
+    const workParts = MyCreepUtils.parts(creep).work
     // Estimate the repair cost, assuming it goes through
     const energySpentOnRepair = Math.min(
       workParts,
@@ -300,7 +300,7 @@ export class CreepProcs {
 
     // Otherwise if we don't need resources and can maintain
 
-    const workPartCount = myCreepUtils.parts(creep).work
+    const workPartCount = MyCreepUtils.parts(creep).work
     let repairTarget = CreepUtils.findRepairTarget(creep)
 
     if (!repairTarget) {
@@ -387,7 +387,7 @@ export class CreepProcs {
 
     creep.message += '🗺️'
 
-    const workPartCount = myCreepUtils.parts(creep).work
+    const workPartCount = MyCreepUtils.parts(creep).work
     // At some point we should compare this search with flat searching positions around the creep
     const structure = communeUtils.getGeneralRepairStructures(creep.room).find(structure => {
       return (

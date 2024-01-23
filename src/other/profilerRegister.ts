@@ -111,6 +111,7 @@ import { wasm } from './wasmInit'
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 import { InitManager } from 'international/init'
 import { TickInit } from 'international/tickInit'
+import { DebugUtils } from 'debug/debugUtils'
 
 export function profilerRegister() {
   // Classes
@@ -141,6 +142,7 @@ export function profilerRegister() {
   profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
   profiler.registerClass(TradingUtils, 'MarketUtils')
   profiler.registerClass(Utils, 'Utils')
+  profiler.registerClass(DebugUtils, 'DebugUtils')
   profiler.registerClass(Procs, 'Procs')
   profiler.registerClass(SegmentsManager, 'SegmentsManager')
 
@@ -205,7 +207,7 @@ export function profilerRegister() {
 
   // Objects
 
-  profiler.registerObject(global.debugUtils, 'debugUtils')
+  profiler.registerObject(global.DebugUtils, 'DebugUtils')
 
   // Room objects
 

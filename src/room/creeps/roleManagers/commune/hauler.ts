@@ -15,7 +15,7 @@ import {
 import { StatsManager } from 'international/stats'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
 import { CreepProcs } from 'room/creeps/creepProcs'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { StructureUtils } from 'room/structureUtils'
 import {
   findObjectWithID,
@@ -113,7 +113,7 @@ export class Hauler extends Creep {
       creepMemory[CreepMemoryKeys.previousRelayer] = undefined
     }
 
-    const carryParts = myCreepUtils.parts(this).carry
+    const carryParts = MyCreepUtils.parts(this).carry
     this.commune.communeManager.haulerCarryParts += carryParts
 
     if (this.hasValidRemote()) {
@@ -1035,7 +1035,7 @@ export class Hauler extends Creep {
 
     if (!creepMemory[CreepMemoryKeys.taskRoom]) {
       creepMemory[CreepMemoryKeys.taskRoom] = this.room.name
-      this.commune.communeManager.communeHaulerCarryParts += myCreepUtils.parts(this).carry
+      this.commune.communeManager.communeHaulerCarryParts += MyCreepUtils.parts(this).carry
     }
 
     this.runCommuneLogistics()

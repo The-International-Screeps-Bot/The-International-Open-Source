@@ -154,7 +154,7 @@ export class SpawningStructureProcs {
     if (result !== OK) {
       customLog(
         'Failed to spawn: spawning failed',
-        `error: ${result}, request: ${global.debugUtils.stringify(request)}`,
+        `error: ${result}, request: ${global.DebugUtils.stringify(request)}`,
         {
           type: LogTypes.error,
           position: 3,

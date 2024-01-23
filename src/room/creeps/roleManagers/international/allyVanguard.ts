@@ -9,7 +9,7 @@ import {
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { CreepUtils } from 'room/creeps/creepUtils'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
 export class AllyVanguard extends Creep {
@@ -29,7 +29,7 @@ export class AllyVanguard extends Creep {
 
     if (!request) return
 
-    request[WorkRequestKeys.allyVanguard] -= myCreepUtils.parts(this).work
+    request[WorkRequestKeys.allyVanguard] -= MyCreepUtils.parts(this).work
   }
 
   findRemote?(): boolean {

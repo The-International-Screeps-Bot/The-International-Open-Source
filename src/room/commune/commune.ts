@@ -37,7 +37,7 @@ import { CollectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
-import { communeProcs } from './communeProcs'
+import { CommuneProcs } from './communeProcs'
 import { StructureUtils } from 'room/structureUtils'
 import { LogisticsProcs } from 'room/logisticsProcs'
 import { TowerProcs } from './towerProcs'
@@ -180,7 +180,7 @@ export class CommuneManager {
     }
 
     this.room.roomManager.communePlanner.attemptPlan(this.room)
-    communeProcs.getRCLUpdate(room)
+    CommuneProcs.getRCLUpdate(room)
 
     if (!roomMemory[RoomMemoryKeys.combatRequests]) roomMemory[RoomMemoryKeys.combatRequests] = []
     if (!roomMemory[RoomMemoryKeys.haulRequests]) roomMemory[RoomMemoryKeys.haulRequests] = []
@@ -274,7 +274,7 @@ export class CommuneManager {
     this.room.roomManager.creepRoleManager.run()
     this.room.roomManager.powerCreepRoleManager.run()
 
-    communeProcs.tryUpdateMinHaulerCost(this.room)
+    CommuneProcs.tryUpdateMinHaulerCost(this.room)
     SpawningStructureProcs.tryRunSpawning(this.room)
 
     SpawningStructureProcs.tryRegisterSpawningMovement(this.room)

@@ -82,5 +82,5 @@ export function customLog(title: any, message?: any, opts?: LogOpts) {
 }
 
 export function stringifyLog(title: any, message: any, opts?: LogOpts) {
-  return customLog(title, global.debugUtils.stringify(message), opts)
+  return customLog(title, global.DebugUtils.stringify(message), opts)
 }

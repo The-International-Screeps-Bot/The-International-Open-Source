@@ -21,7 +21,7 @@ import { RoomManager } from 'room/room'
 import { CollectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
 import { communeUtils } from 'room/commune/communeUtils'
-import { myCreepUtils } from './myCreepUtils'
+import { MyCreepUtils } from './myCreepUtils'
 import {
   CreepLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
@@ -61,7 +61,7 @@ export class CreepUtils {
   static findEnergySpentOnConstruction(
     creep: Creep,
     cSite: ConstructionSite,
-    workParts: number = myCreepUtils.parts(creep).work,
+    workParts: number = MyCreepUtils.parts(creep).work,
   ) {
     const energySpent = Math.min(
       workParts * BUILD_POWER,
@@ -105,7 +105,11 @@ export class CreepUtils {
 
     return upgradePos
   }
-  static harvestSource(creep: Creep, source: Source, workParts: number = myCreepUtils.parts(creep).work) {
+  static harvestSource(
+    creep: Creep,
+    source: Source,
+    workParts: number = MyCreepUtils.parts(creep).work,
+  ) {
     if (creep.harvest(source) !== OK) {
       return Result.fail
     }

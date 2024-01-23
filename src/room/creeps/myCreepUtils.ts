@@ -7,7 +7,7 @@ export class MyCreepUtils {
   /**
    * provides a cached number of parts for creeps we own
    */
-  parts(creep: Creep) {
+  static parts(creep: Creep) {
     const data = creepData[creep.name].parts
     if (data) return data
 
@@ -22,7 +22,7 @@ export class MyCreepUtils {
     return parts
   }
 
-  boosts(creep: Creep) {
+  static boosts(creep: Creep) {
     const data = creepData[creep.name].boosts
     if (data) return data
 
@@ -44,7 +44,7 @@ export class MyCreepUtils {
     return boosts
   }
 
-  upgradeStrength(creep: Creep) {
+  static upgradeStrength(creep: Creep) {
     const data = creepData[creep.name].upgradeStrength
     if (data) return data
 
@@ -54,7 +54,7 @@ export class MyCreepUtils {
     return data
   }
 
-  findUpgradeStrength(workParts: number, boosts: Boosts) {
+  static findUpgradeStrength(workParts: number, boosts: Boosts) {
     if (boosts.XGH2O > 0) {
       return workParts * BOOSTS.work.XGH2O.upgradeController
     }
@@ -70,5 +70,3 @@ export class MyCreepUtils {
     return workParts
   }
 }
-
-export const myCreepUtils = new MyCreepUtils()

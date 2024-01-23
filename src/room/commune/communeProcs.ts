@@ -12,7 +12,7 @@ import { randomIntRange } from 'utils/utils'
  * Minor processes for communes
  */
 export class CommuneProcs {
-  getRCLUpdate(room: Room) {
+  static getRCLUpdate(room: Room) {
     const data = communeData[room.name]
     // If the registered RCL is the actual RCL, we're good. No need to update anything
     if (data.registeredRCL === room.controller.level) {
@@ -27,7 +27,7 @@ export class CommuneProcs {
     this.updateRegisteredRCL(room)
   }
 
-  private updateRegisteredRCL(room: Room) {
+  private static updateRegisteredRCL(room: Room) {
     const data = communeData[room.name]
     /* const roomData = roomData[room.name] */
 
@@ -36,7 +36,7 @@ export class CommuneProcs {
     data.registeredRCL = room.controller.level
   }
 
-  tryUpdateMinHaulerCost(room: Room) {
+  static tryUpdateMinHaulerCost(room: Room) {
     const roomMemory = Memory.rooms[room.name]
 
     // If there is no min hauler size
@@ -61,7 +61,7 @@ export class CommuneProcs {
     roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(0, 10)
   }
 
-  registerRampartDamage(room: Room) {
+  static registerRampartDamage(room: Room) {
     if (!room.roomManager.enemyAttackers.length) return
 
     const data = communeData[room.name]
@@ -70,11 +70,9 @@ export class CommuneProcs {
     }
   }
 
-  private initRampartDamageCoords(room: Room) {
+  private static initRampartDamageCoords(room: Room) {
     const ramparts = room.communeManager.defensiveRamparts
     for (const rampart of ramparts) {
     }
   }
 }
-
-export const communeProcs = new CommuneProcs()

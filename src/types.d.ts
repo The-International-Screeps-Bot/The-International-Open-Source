@@ -1374,7 +1374,7 @@ declare global {
 
       lastReset: number
 
-      debugUtils: DebugUtils
+      DebugUtils: DebugUtils
 
       // Command functions
 

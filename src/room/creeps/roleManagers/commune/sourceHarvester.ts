@@ -19,7 +19,7 @@ import {
 import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
 import { CreepUtils } from 'room/creeps/creepUtils'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { StructureUtils } from 'room/structureUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
@@ -185,7 +185,7 @@ export class SourceHarvester extends Creep {
       return false
 
     if (!sourceContainer) {
-      if (this.nextStore.energy < myCreepUtils.parts(this).work) {
+      if (this.nextStore.energy < MyCreepUtils.parts(this).work) {
         if (this.movedResource) return false
 
         const result = CreepProcs.runRoomLogisticsRequestAdvanced(this, {
@@ -212,7 +212,7 @@ export class SourceHarvester extends Creep {
       return true
     }
 
-    const workPartCount = myCreepUtils.parts(this).work
+    const workPartCount = MyCreepUtils.parts(this).work
 
     // If the sourceContainer doesn't need repairing, inform false
     if (sourceContainer.hitsMax - sourceContainer.hits < workPartCount * REPAIR_POWER) return false

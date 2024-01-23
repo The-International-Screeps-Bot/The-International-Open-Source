@@ -1,101 +1,101 @@
 import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'international/constants'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class Claimer extends Creep {
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
+  constructor(creepID: Id<Creep>) {
+    super(creepID)
+  }
+
+  initRun() {
+    if (this.isDying()) return
+
+    const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
+    if (!request) return
+
+    request[WorkRequestKeys.claimer] -= 1
+  }
+
+  /**
+   * Claims a room specified in the creep's commune workRequest
+   */
+  claimRoom?(): void {
+    const creep = this
+    const { room } = creep
+
+    if (room.controller.my) return
+
+    // If the creep is not in range to claim the controller
+
+    if (creep.pos.getRangeTo(room.controller) > 1) {
+      // Move to the controller and stop
+
+      creep.createMoveRequest({
+        origin: creep.pos,
+        goals: [{ pos: room.controller.pos, range: 1 }],
+        avoidEnemyRanges: true,
+        plainCost: 1,
+        swampCost: MyCreepUtils.parts(this).move >= 5 ? 1 : undefined,
+      })
+
+      return
     }
 
-    initRun() {
-        if (this.isDying()) return
+    // If the owner or reserver isn't me
 
-        const request = Memory.workRequests[this.memory[CreepMemoryKeys.workRequest]]
-        if (!request) return
-
-        request[WorkRequestKeys.claimer] -= 1
+    if (
+      room.controller.owner ||
+      (room.controller.reservation && room.controller.reservation.username !== Memory.me)
+    ) {
+      creep.attackController(room.controller)
+      return
     }
 
-    /**
-     * Claims a room specified in the creep's commune workRequest
-     */
-    claimRoom?(): void {
-        const creep = this
-        const { room } = creep
+    // Otherwise, claim the controller. If the successful, remove claimerNeed
 
-        if (room.controller.my) return
+    if (!creep.claimController(room.controller)) return
 
-        // If the creep is not in range to claim the controller
+    // We claimed the controller
+  }
 
-        if (creep.pos.getRangeTo(room.controller) > 1) {
-            // Move to the controller and stop
+  static roleManager(room: Room, creepsOfRole: string[]) {
+    // Loop through the names of the creeps of the role
 
-            creep.createMoveRequest({
-                origin: creep.pos,
-                goals: [{ pos: room.controller.pos, range: 1 }],
-                avoidEnemyRanges: true,
-                plainCost: 1,
-                swampCost: myCreepUtils.parts(this).move >= 5 ? 1 : undefined,
-            })
+    for (const creepName of creepsOfRole) {
+      // Get the creep using its name
 
-            return
-        }
+      const creep: Claimer = Game.creeps[creepName]
 
-        // If the owner or reserver isn't me
+      creep.message = creep.memory[CreepMemoryKeys.workRequest]
 
-        if (
-            room.controller.owner ||
-            (room.controller.reservation && room.controller.reservation.username !== Memory.me)
-        ) {
-            creep.attackController(room.controller)
-            return
-        }
+      if (room.name === creep.memory[CreepMemoryKeys.workRequest]) {
+        creep.claimRoom()
+        continue
+      }
 
-        // Otherwise, claim the controller. If the successful, remove claimerNeed
+      // Otherwise if the creep is not in the claimTarget
 
-        if (!creep.claimController(room.controller)) return
-
-        // We claimed the controller
+      if (
+        creep.createMoveRequest({
+          origin: creep.pos,
+          goals: [
+            {
+              pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.workRequest]),
+              range: 25,
+            },
+          ],
+          avoidEnemyRanges: true,
+          plainCost: 1,
+          swampCost: MyCreepUtils.parts(creep).move >= 5 ? 1 : undefined,
+          typeWeights: {
+            [RoomTypes.enemy]: Infinity,
+            [RoomTypes.ally]: Infinity,
+            [RoomTypes.sourceKeeper]: Infinity,
+          },
+        }) === Result.fail
+      ) {
+        const request = Memory.workRequests[creep.memory[CreepMemoryKeys.workRequest]]
+        if (request) request[WorkRequestKeys.abandon] = 20000
+      }
     }
-
-    static roleManager(room: Room, creepsOfRole: string[]) {
-        // Loop through the names of the creeps of the role
-
-        for (const creepName of creepsOfRole) {
-            // Get the creep using its name
-
-            const creep: Claimer = Game.creeps[creepName]
-
-            creep.message = creep.memory[CreepMemoryKeys.workRequest]
-
-            if (room.name === creep.memory[CreepMemoryKeys.workRequest]) {
-                creep.claimRoom()
-                continue
-            }
-
-            // Otherwise if the creep is not in the claimTarget
-
-            if (
-                creep.createMoveRequest({
-                    origin: creep.pos,
-                    goals: [
-                        {
-                            pos: new RoomPosition(25, 25, creep.memory[CreepMemoryKeys.workRequest]),
-                            range: 25,
-                        },
-                    ],
-                    avoidEnemyRanges: true,
-                    plainCost: 1,
-                    swampCost: myCreepUtils.parts(creep).move >= 5 ? 1 : undefined,
-                    typeWeights: {
-                        [RoomTypes.enemy]: Infinity,
-                        [RoomTypes.ally]: Infinity,
-                        [RoomTypes.sourceKeeper]: Infinity,
-                    },
-                }) === Result.fail
-            ) {
-                const request = Memory.workRequests[creep.memory[CreepMemoryKeys.workRequest]]
-                if (request) request[WorkRequestKeys.abandon] = 20000
-            }
-        }
-    }
+  }
 }
