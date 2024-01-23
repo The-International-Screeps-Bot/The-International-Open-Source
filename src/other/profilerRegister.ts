@@ -4,7 +4,7 @@ import { RoomManager } from 'room/room'
 import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
-import { StatsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { ConstructionManager } from 'room/construction/construction'
 import { RemotesManager } from 'room/commune/remotesManager'
 import { HaulRequestManager } from 'room/commune/haulRequestManager'
@@ -44,7 +44,7 @@ import { RampartPlans } from 'room/construction/rampartPlans'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { minCutToExit } from 'room/construction/minCut'
 import { FeatureFlagManager } from 'international/featureFlags'
-import { ConstructionSiteManager } from 'international/constructionSiteManager'
+import { ConstructionSiteManager } from 'international/constructionSites'
 import { TransactionsManager } from 'international/transactions'
 import { CommunePlanner } from 'room/construction/communePlanner'
 import {
@@ -110,11 +110,13 @@ import { SegmentsManager } from 'international/segments'
 import { wasm } from './wasmInit'
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 import { InitManager } from 'international/init'
+import { TickInit } from 'international/tickInit'
 
 export function profilerRegister() {
   // Classes
 
   profiler.registerClass(InitManager, 'InitManager')
+  profiler.registerClass(TickInit, 'TickInit')
   profiler.registerClass(CollectiveManager, 'CollectiveManager')
   profiler.registerClass(StatsManager, 'StatsManager')
   profiler.registerClass(PlayerManager, 'PlayerManager')

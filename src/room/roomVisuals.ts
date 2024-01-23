@@ -9,14 +9,14 @@ import {
     RoomMemoryKeys,
     RoomTypes,
 } from 'international/constants'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { CollectiveManager } from 'international/collective'
-import { playerManager } from 'international/players'
+import { PlayerManager } from 'international/players'
 import { unpackCoord } from 'other/codec'
 
 export class RoomVisualsManager {
@@ -213,7 +213,7 @@ export class RoomVisualsManager {
 
     data[0].push(
       funnelOrder.slice(0, 3),
-      playerManager.highestThreat,
+      PlayerManager.highestThreat,
       CollectiveManager.minCredits,
       Game.time - Memory.lastConfig,
     )

@@ -4,12 +4,10 @@ import { customLog } from 'utils/logging'
 import { CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { powerCreepClasses } from 'room/creeps/powerCreepClasses'
-import { statsManager } from './statsManager'
+import { StatsManager } from './stats'
 
 export class PowerCreepOrganizer {
-  constructor() {}
-
-  public run() {
+  public static run() {
     // Clear non-existent creeps from memory
 
     for (const creepName in Memory.powerCreeps) {
@@ -25,7 +23,7 @@ export class PowerCreepOrganizer {
     }
   }
 
-  private processCreep(creepName: string) {
+  private static processCreep(creepName: string) {
     let creep = Game.powerCreeps[creepName]
 
     // If the creep isn't spawned
@@ -63,5 +61,3 @@ export class PowerCreepOrganizer {
     creep.initRun()
   }
 }
-
-export const powerCreepOrganizer = new PowerCreepOrganizer()

@@ -3,11 +3,10 @@ import { IDUpdateInterval, RoomStatsKeys } from "./constants"
 import { randomIntRange, utils } from "utils/utils"
 import { CollectiveManager } from './collective'
 import { SegmentsManager } from './segments'
-import { statsManager } from "./statsManager"
+import { StatsManager } from './stats'
 
 export class TransactionsManager {
-
-  run() {
+  static run() {
     if (!utils.isTickInterval(IDUpdateInterval)) return
 
     const recordedTransactionIDs = SegmentsManager.IDs.recordedTransactionIDs
@@ -16,18 +15,15 @@ export class TransactionsManager {
     this.pruneRecordedTransactions(recordedTransactionIDs, currentTransactionIDs)
   }
 
-  private registerCurrentTransactions(recordedTransactionIDs: RecordedTransactionIDs) {
-
+  private static registerCurrentTransactions(recordedTransactionIDs: RecordedTransactionIDs) {
     const currentTransactionIDs = new Set<string>()
 
     for (const transaction of Game.market.outgoingTransactions) {
-
       currentTransactionIDs.add(transaction.transactionId)
       this.registerTransaction(recordedTransactionIDs, transaction)
     }
 
     for (const transaction of Game.market.incomingTransactions) {
-
       currentTransactionIDs.add(transaction.transactionId)
       this.registerTransaction(recordedTransactionIDs, transaction)
     }
@@ -38,8 +34,10 @@ export class TransactionsManager {
   /**
    * Remove recorded transaction IDs that are no longer present in current data
    */
-  private pruneRecordedTransactions(recordedTransactionIDs: RecordedTransactionIDs, currentTransactionIDs: Set<string>) {
-
+  private static pruneRecordedTransactions(
+    recordedTransactionIDs: RecordedTransactionIDs,
+    currentTransactionIDs: Set<string>,
+  ) {
     for (const transactionID in recordedTransactionIDs) {
       // only delete if it isn't in current data
       if (currentTransactionIDs.has(transactionID)) continue
@@ -48,8 +46,10 @@ export class TransactionsManager {
     }
   }
 
-  private registerTransaction(recordedTransactionIDs: RecordedTransactionIDs, transaction: Transaction) {
-
+  private static registerTransaction(
+    recordedTransactionIDs: RecordedTransactionIDs,
+    transaction: Transaction,
+  ) {
     // don't register already registered orders
     if (recordedTransactionIDs[transaction.transactionId]) return
 
@@ -58,46 +58,56 @@ export class TransactionsManager {
     this.processTransaction(transaction)
   }
 
-  private processTransaction(transaction: Transaction) {
-
+  private static processTransaction(transaction: Transaction) {
     if (transaction.resourceType !== RESOURCE_ENERGY) return
 
     if (transaction.sender.username === Memory.me) {
-
       this.processTransactionMySend(transaction)
     }
     if (transaction.recipient.username === Memory.me) {
-
       this.processTransactionMyReceive(transaction)
     }
   }
 
-  private processTransactionMySend(transaction: Transaction) {
+  private static processTransactionMySend(transaction: Transaction) {
     if (!CollectiveManager.communes.has(transaction.from)) return
 
     if (transaction.order) {
-
-      statsManager.updateCommuneStat(transaction.from, RoomStatsKeys.EnergyOutputSold, transaction.amount)
+      StatsManager.updateCommuneStat(
+        transaction.from,
+        RoomStatsKeys.EnergyOutputSold,
+        transaction.amount,
+      )
       return
     }
 
     const isDomestic = this.isDomestic(transaction.from, transaction.to)
     if (isDomestic) {
-
-      statsManager.updateCommuneStat(transaction.from, RoomStatsKeys.EnergyTerminalSentDomestic, transaction.amount)
+      StatsManager.updateCommuneStat(
+        transaction.from,
+        RoomStatsKeys.EnergyTerminalSentDomestic,
+        transaction.amount,
+      )
     }
     // Not a domestic trade
     else {
-      statsManager.updateCommuneStat(transaction.from, RoomStatsKeys.EnergyTerminalSentOther, transaction.amount)
+      StatsManager.updateCommuneStat(
+        transaction.from,
+        RoomStatsKeys.EnergyTerminalSentOther,
+        transaction.amount,
+      )
     }
   }
 
-  private processTransactionMyReceive(transaction: Transaction) {
+  private static processTransactionMyReceive(transaction: Transaction) {
     if (!CollectiveManager.communes.has(transaction.to)) return
 
     if (transaction.order) {
-
-      statsManager.updateCommuneStat(transaction.to, RoomStatsKeys.EnergyInputBought, transaction.amount)
+      StatsManager.updateCommuneStat(
+        transaction.to,
+        RoomStatsKeys.EnergyInputBought,
+        transaction.amount,
+      )
       return
     }
   }
@@ -105,8 +115,7 @@ export class TransactionsManager {
   /**
    * Wether or not the transfer was domestic
    */
-  private isDomestic(from: string, to: string) {
-
+  private static isDomestic(from: string, to: string) {
     return CollectiveManager.communes.has(from) && CollectiveManager.communes.has(to)
   }
 }

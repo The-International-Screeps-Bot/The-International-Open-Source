@@ -21,22 +21,22 @@ interface CommuneData {
  * Handles cached data for communes
  */
 export class CommuneDataManager {
-  data: { [roomName: string]: Partial<CommuneData> } = {}
+  static data: { [roomName: string]: Partial<CommuneData> } = {}
 
   /**
    * Called by the room's RoomManager
    */
-  initCommune(room: Room) {
+  static initCommune(room: Room) {
     this.data[room.name] ??= {}
   }
 
-  updateCommunes() {
+  static updateCommunes() {
     for (const roomName in this.data) {
       this.updateCommune(roomName)
     }
   }
 
-  private updateCommune(roomName: string) {
+  private static updateCommune(roomName: string) {
     const data = this.data[roomName]
 
     if (utils.isTickInterval(10)) {
@@ -45,5 +45,3 @@ export class CommuneDataManager {
     }
   }
 }
-
-export const communeDataManager = new CommuneDataManager()

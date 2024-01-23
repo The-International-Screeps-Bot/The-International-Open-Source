@@ -1,6 +1,6 @@
 import { CollectiveManager } from 'international/collective'
 import { Result } from 'international/constants'
-import { marketManager } from 'international/market/marketOrders'
+import { MarketManager } from 'international/market/marketOrders'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { structureUtils } from 'room/structureUtils'
 import { customLog } from 'utils/logging'
@@ -35,7 +35,7 @@ export class TerminalProcs {
     if (!global.settings.marketUsage) return
     // only run every terminal cooldown interval, to have every terminal share the same required data (reduces CPU costs)
     if (utils.isTickInterval(TERMINAL_COOLDOWN)) return
-    if (!marketManager.isMarketFunctional) return
+    if (!MarketManager.isMarketFunctional) return
 
     if (this.manageResources(room, resourceTargets) === Result.action) return
   }

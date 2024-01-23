@@ -13,7 +13,7 @@ import {
   roomLogisticsRoles,
   storingStructureTypesSet,
 } from 'international/constants'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { arePositionsEqual, findObjectWithID, findWithLowestScore, getRange } from 'utils/utils'
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
@@ -116,7 +116,7 @@ export class CreepUtils {
     const energyHarvested = Math.min(workParts * HARVEST_POWER, source.energy)
     creep.nextStore.energy += energyHarvested
     // Record the harvest in stats
-    statsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyInputHarvest, energyHarvested)
+    StatsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyInputHarvest, energyHarvested)
 
     return Result.success
   }

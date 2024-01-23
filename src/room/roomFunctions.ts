@@ -31,7 +31,7 @@ import {
 } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { packCoord, packCoordList, packXYAsCoord, unpackPosList } from 'other/codec'
-import { playerManager } from 'international/players'
+import { PlayerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 import { roomObjectUtils } from './roomObjectUtils'
@@ -549,7 +549,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
   let player = Memory.players[playerName]
   if (!player) {
-    player = playerManager.initPlayer(playerName)
+    player = PlayerManager.initPlayer(playerName)
   }
 
   // General

@@ -1,6 +1,6 @@
 import { CollectiveManager } from 'international/collective'
 import { RoomLogisticsRequestTypes } from 'international/constants'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { scalePriority } from 'utils/utils'
 
 export class PowerSpawnProcs {
@@ -22,7 +22,7 @@ export class PowerSpawnProcs {
     const result = powerSpawn.processPower()
 
     if (result === OK)
-      statsManager.updateStat(powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
+      StatsManager.updateStat(powerSpawn.room.name, 'eop', POWER_SPAWN_ENERGY_RATIO)
   }
 
   /**

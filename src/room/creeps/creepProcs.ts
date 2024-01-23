@@ -1,7 +1,7 @@
 import { RoomManager } from 'room/room'
 import { findClosestObject, findObjectWithID, forAdjacentCoords, getRange, getRangeXY } from 'utils/utils'
 import { myCreepUtils } from './myCreepUtils'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import {
   CreepMemoryKeys,
   CreepLogisticsRequestKeys,
@@ -81,7 +81,7 @@ export class CreepProcs {
 
           const controlPoints = workPartCount * UPGRADE_CONTROLLER_POWER
 
-          statsManager.updateStat(creep.room.name, 'eou', controlPoints)
+          StatsManager.updateStat(creep.room.name, 'eou', controlPoints)
           creep.message += `🔋${controlPoints}`
         }
       }
@@ -110,7 +110,7 @@ export class CreepProcs {
 
             // Add control points to total controlPoints counter and say the success
 
-            statsManager.updateStat(creep.room.name, 'eoro', energySpentOnRepairs)
+            StatsManager.updateStat(creep.room.name, 'eoro', energySpentOnRepairs)
             creep.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
           }
         }
@@ -200,7 +200,7 @@ export class CreepProcs {
         myCreepUtils.parts(creep).work * UPGRADE_CONTROLLER_POWER,
       )
 
-      statsManager.updateStat(creep.room.name, 'eou', energySpentOnUpgrades)
+      StatsManager.updateStat(creep.room.name, 'eou', energySpentOnUpgrades)
       creep.message = `🔋${energySpentOnUpgrades}`
 
       // Inform true
@@ -254,10 +254,10 @@ export class CreepProcs {
 
     // Record the repair attempt in different places for barricades than other structures
     if (target.structureType === STRUCTURE_RAMPART || target.structureType === STRUCTURE_WALL) {
-      statsManager.updateStat(creep.room.name, 'eorwr', energySpentOnRepair)
+      StatsManager.updateStat(creep.room.name, 'eorwr', energySpentOnRepair)
       creep.message = `🧱${energySpentOnRepair * REPAIR_POWER}`
     } else {
-      statsManager.updateStat(creep.room.name, 'eoro', energySpentOnRepair)
+      StatsManager.updateStat(creep.room.name, 'eoro', energySpentOnRepair)
       creep.message = `🔧${energySpentOnRepair * REPAIR_POWER}`
     }
 
@@ -1089,7 +1089,7 @@ export class CreepProcs {
 
     const result = spawn.renewCreep(creep)
     if (result === OK) {
-      statsManager.updateStat(creep.room.name, 'eosp', energyCost)
+      StatsManager.updateStat(creep.room.name, 'eosp', energyCost)
       spawn.renewed = true
     }
   }
@@ -1126,7 +1126,7 @@ export class CreepProcs {
 
     const result = spawn.renewCreep(creep)
     if (result === OK) {
-      statsManager.updateStat(creep.room.name, 'eosp', energyCost)
+      StatsManager.updateStat(creep.room.name, 'eosp', energyCost)
       spawn.renewed = true
     }
   }

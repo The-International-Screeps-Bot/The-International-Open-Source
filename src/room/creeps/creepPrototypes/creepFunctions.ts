@@ -12,7 +12,7 @@ import {
 import {
   packCoord, unpackCoordAsPos
 } from 'other/codec'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { creepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
 import { RoomLogisticsRequest } from 'types/roomRequests'
@@ -261,7 +261,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
   // Add control points to total controlPoints counter and say the success
 
-  statsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
+  StatsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
   this.message = `🚧 ` + energySpentOnConstruction
 
   return Result.success
@@ -343,7 +343,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Add control points to total controlPoints counter and say the success
 
-    statsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
+    StatsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
     this.message = `🚧${energySpentOnConstruction}`
 
     // Inform true

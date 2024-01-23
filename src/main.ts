@@ -14,30 +14,30 @@ import { CPUMaxPerTick, Result } from 'international/constants'
 import { InitManager } from './international/init'
 import { MigrationManager } from 'international/migration'
 import { RespawnManager } from './international/respawn'
-import { tickInit } from './international/tickInit'
+import { TickInit } from './international/tickInit'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
-import { creepOrganizer } from './international/creepOrganizer'
-import { powerCreepOrganizer } from 'international/powerCreepOrganizer'
+import { CreepOrganizer } from './international/creepOrganizer'
+import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
 import { ErrorMapper } from 'other/ErrorMapper'
-import { statsManager } from 'international/statsManager'
-import { playerManager } from 'international/players'
+import { StatsManager } from 'international/stats'
+import { PlayerManager } from 'international/players'
 import { profiler } from 'other/profiler'
 import { flagManager } from 'international/flags'
 import { RoomPruningManager } from 'international/roomPruning'
 import './room/construction/minCut'
-import { constructionSiteManager } from './international/constructionSiteManager'
-import { mapVisualsManager } from './international/mapVisuals'
+import { ConstructionSiteManager } from './international/constructionSites'
+import { MapVisualsManager } from './international/mapVisuals'
 import { EndTickManager } from './international/endTick'
 import { wasm } from 'other/wasmInit'
-import { requestsManager } from 'international/requests'
-import { marketManager } from 'international/market/marketOrders'
-import { transactionsManager } from 'international/transactions'
+import { RequestsManager } from 'international/requests'
+import { MarketManager } from 'international/market/marketOrders'
+import { TransactionsManager } from 'international/transactions'
 import { SegmentsManager } from 'international/segments'
 import { creepDataManager } from 'room/creeps/creepData'
-import { roomDataManager } from 'room/roomData'
+import { RoomDataManager } from 'room/roomData'
 import { utils } from 'utils/utils'
 import { procs } from 'utils/procs'
-import { communeDataManager } from 'room/commune/communeData'
+import { CommuneDataManager } from 'room/commune/communeData'
 import { GarbageCollector } from 'international/garbageCollector'
 
 export function originalLoop() {
@@ -56,39 +56,39 @@ export function originalLoop() {
     RespawnManager.tryRegisterRespawn()
     InitManager.tryInit()
 
-    tickInit.configGeneral()
-    statsManager.tickInit()
+    TickInit.configGeneral()
+    StatsManager.tickInit()
     CollectiveManager.update()
     GarbageCollector.tryRun()
     simpleAllies.initRun()
     wasm.collaborator()
 
-    roomDataManager.initRooms()
-    roomDataManager.updateRooms()
+    RoomDataManager.initRooms()
+    RoomDataManager.updateRooms()
     RoomsManager.updateRun()
-    transactionsManager.run()
-    requestsManager.run()
+    TransactionsManager.run()
+    RequestsManager.run()
 
     if (global.collectivizer) global.collectivizer.run()
     if (global.userScript) global.userScript.run()
-    playerManager.run()
+    PlayerManager.run()
     RoomsManager.initRun()
     creepDataManager.updateCreeps()
-    creepOrganizer.run()
-    powerCreepOrganizer.run()
+    CreepOrganizer.run()
+    PowerCreepOrganizer.run()
 
     RoomPruningManager.run()
     flagManager.run()
-    constructionSiteManager.run()
-    marketManager.run()
+    ConstructionSiteManager.run()
+    MarketManager.run()
 
     RoomsManager.run()
 
-    mapVisualsManager.run()
+    MapVisualsManager.run()
     simpleAllies.endRun()
-    marketManager.advancedSellPixels()
+    MarketManager.advancedSellPixels()
     if (global.userScript) global.userScript.endRun()
-    statsManager.internationalEndRun()
+    StatsManager.internationalEndRun()
 
     CollectiveManager.advancedGeneratePixel()
 

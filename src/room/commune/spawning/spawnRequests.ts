@@ -21,7 +21,7 @@ import {
 } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { CommuneManager } from '../commune'
 import { customLog } from 'utils/logging'
 import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'

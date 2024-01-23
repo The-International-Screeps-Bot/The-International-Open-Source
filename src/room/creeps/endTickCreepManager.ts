@@ -7,7 +7,7 @@ import {
     friendlyDieChants,
     powerCreepClassNames,
 } from 'international/constants'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'
 import { RoomManager } from '../room'

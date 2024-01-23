@@ -4,7 +4,7 @@ import {
     Result,
     roomDimensions,
 } from 'international/constants'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { creepUtils } from 'room/creeps/creepUtils'

@@ -10,7 +10,7 @@ import {
   customColors,
   MovedTypes,
 } from 'international/constants'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
 import { creepProcs } from 'room/creeps/creepProcs'
 import { structureUtils } from 'room/structureUtils'
@@ -169,7 +169,7 @@ export class SpawningStructureProcs {
     // Record in stats the costs
 
     room.communeManager.nextSpawnEnergyAvailable -= request.cost
-    statsManager.updateStat(room.name, 'eosp', request.cost)
+    StatsManager.updateStat(room.name, 'eosp', request.cost)
 
     // The spawn we intented to spawn should no longer be considered inactive
     inactiveSpawns.splice(spawnIndex, 1)

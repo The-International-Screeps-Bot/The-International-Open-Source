@@ -1,6 +1,6 @@
 import { getMe } from 'utils/utils'
-import { playerManager } from './players'
-import { statsManager } from './statsManager'
+import { PlayerManager } from './players'
+import { StatsManager } from './stats'
 import { PlayerMemoryKeys, SegmentIDs } from './constants'
 import { PlayerRelationships } from './constants'
 
@@ -40,7 +40,7 @@ export class InitManager {
     Memory.combatRequests = {}
     Memory.haulRequests = {}
     Memory.nukeRequests = {}
-    statsManager.internationalConfig()
+    StatsManager.internationalConfig()
   }
   /**
    * Construct global if it isn't constructed yet
@@ -60,7 +60,7 @@ export class InitManager {
     for (const playerName of global.settings.allies) {
       const playerMemory = Memory.players[playerName]
       if (!playerMemory) {
-        playerManager.initPlayer(playerName)
+        PlayerManager.initPlayer(playerName)
       }
 
       playerMemory[PlayerMemoryKeys.relationship] = PlayerRelationships.ally
@@ -68,16 +68,11 @@ export class InitManager {
   }
 
   private static initSegments() {
-
-    RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({
-
-    } as BasePlansSegment)
+    RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({} as BasePlansSegment)
 
     RawMemory.segments[SegmentIDs.IDs] = JSON.stringify({
-        constructionSites: {},
-        recordedTransactionIDs: {},
+      constructionSites: {},
+      recordedTransactionIDs: {},
     } as IDsSegment)
-
-
   }
 }

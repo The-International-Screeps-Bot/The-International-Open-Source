@@ -8,7 +8,7 @@ import { SegmentsManager } from './segments'
  * Tracks and records constructionSites and thier age, deleting old sites
  */
 export class ConstructionSiteManager {
-  run() {
+  static run() {
     if (!utils.isTickInterval(IDUpdateInterval)) return
 
     const recordedIDs = SegmentsManager.IDs.constructionSites
@@ -55,9 +55,7 @@ export class ConstructionSiteManager {
     }
   }
 
-  getMaxCSiteAge(cSite: ConstructionSite) {
+  static getMaxCSiteAge(cSite: ConstructionSite) {
     return 20000 + cSite.progress * 5
   }
 }
-
-export const constructionSiteManager = new ConstructionSiteManager()

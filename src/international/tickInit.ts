@@ -1,6 +1,6 @@
 
-class TickInit {
-    configGeneral() {
+export class TickInit {
+    static configGeneral() {
 
         // Chant logic
 
@@ -10,5 +10,3 @@ class TickInit {
         }
     }
 }
-
-export const tickInit = new TickInit()

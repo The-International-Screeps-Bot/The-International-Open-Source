@@ -6,14 +6,15 @@ import {
     RoomTypes,
     roomDimensions,
     packedPosLength,
+    FlagNames,
 } from './constants'
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled
  */
 export class MapVisualsManager {
-    run() {
-        if (!global.settings.mapVisuals) return
+    static run() {
+        if (!global.settings.mapVisuals && !Game.flags[FlagNames.mapVisuals]) return
 
         for (const roomName in Memory.rooms) {
             const roomMemory = Memory.rooms[roomName]
@@ -194,7 +195,7 @@ export class MapVisualsManager {
 
         this.workRequests()
     }
-    private workRequests() {
+    private static workRequests() {
         for (const roomName in Memory.workRequests) {
             const priority = Memory.workRequests[roomName][WorkRequestKeys.priority]
             const preference =
@@ -221,7 +222,7 @@ export class MapVisualsManager {
             }
         }
     }
-    private test(roomName: string, roomMemory: RoomMemory) {
+    private static test(roomName: string, roomMemory: RoomMemory) {
         /*
         Game.map.visual.text((Game.time - roomMemory[RoomMemoryKeys.lastScout]).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
@@ -237,5 +238,3 @@ export class MapVisualsManager {
         */
     }
 }
-
-export const mapVisualsManager = new MapVisualsManager()

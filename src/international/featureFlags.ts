@@ -10,17 +10,13 @@ interface FeatureFlagConfig {
 
 export class FeatureFlagManager {
     // An object to hold the flag configuration
-    flags: FeatureFlagConfig = {
+    static flags: FeatureFlagConfig = {
         [Feature.testFeatureEnabled]: false,
         [Feature.testFeatureDisabled]: false,
     }
 
-    constructor() {}
-
     // Method to check if a combination of feature flags are turned on
-    areFlagsOn(flags: Feature[]): boolean {
+    static areFlagsOn(flags: Feature[]): boolean {
         return flags.every(flag => !!flag) // Check if every flag in the array is turned on
     }
 }
-
-export const featureFlagManager = new FeatureFlagManager()

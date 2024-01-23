@@ -145,13 +145,13 @@ const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
 ])
 
 export class StatsManager {
-  stats: {
+  static stats: {
     [roomType in RoomTypes.commune | RoomTypes.remote]: {
       [roomName: string]: Partial<CommuneStats>
     }
   }
 
-  private roomConfig(roomName: string, roomType: number) {
+  private static roomConfig(roomName: string, roomType: number) {
     if (roomType === RoomTypes.commune) {
       const roomStats = (this.stats[RoomTypes.commune][roomName] = {
         [RoomStatsKeys.SpawnUsagePercentage]: 0,
@@ -199,11 +199,11 @@ export class StatsManager {
     }
   }
 
-  roomInitialRun(roomName: string, roomType: number) {
+  static roomInitialRun(roomName: string, roomType: number) {
     this.roomConfig(roomName, roomType)
   }
 
-  private roomCommuneEndRun(roomName: string, forceUpdate: boolean = false) {
+  private static roomCommuneEndRun(roomName: string, forceUpdate: boolean = false) {
     const room = Game.rooms[roomName]
     const roomMemory = Memory.rooms[roomName]
     const interTickRoomStats = Memory.stats.rooms[roomName]
@@ -291,7 +291,7 @@ export class StatsManager {
       interTickRoomStats[statName] = roomStats[statName]
     }
   }
-  internationalConfig() {
+  static internationalConfig() {
     Memory.stats = {
       lastReset: global.lastReset,
       tickLength: 0,
@@ -333,11 +333,11 @@ export class StatsManager {
     this.internationalEndRun()
   }
 
-  tickInit() {
+  static tickInit() {
     this.stats = { [RoomTypes.commune]: {}, [RoomTypes.remote]: {} }
   }
 
-  internationalEndRun() {
+  static internationalEndRun() {
     // Run communes one last time to update stats
 
     for (const roomName in Memory.stats.rooms) {
@@ -408,7 +408,7 @@ export class StatsManager {
     this.stats = undefined
   }
 
-  private average(
+  private static average(
     avg: number,
     dataPoint: number,
     averagedOverTickCount: number = 1000,
@@ -429,7 +429,7 @@ export class StatsManager {
   /**
    * average but don't account for time skips
    */
-  private averageMarginalTimeStep(
+  private static averageMarginalTimeStep(
     avg: number,
     dataPoint: number,
     averagedOverTickCount: number = 1000,
@@ -444,7 +444,7 @@ export class StatsManager {
     return roundTo(avg, precision)
   }
 
-  updateStat(roomName: string, statName: keyof RoomStats | keyof CommuneStats, value: number) {
+  static updateStat(roomName: string, statName: keyof RoomStats | keyof CommuneStats, value: number) {
     if (this.stats[RoomTypes.commune][roomName]) {
       this.updateCommuneStat(roomName, statName as keyof CommuneStats, value)
       return
@@ -459,11 +459,11 @@ export class StatsManager {
     }
   }
 
-  updateCommuneStat(roomName: string, statName: keyof CommuneStats, value: number) {
+  static updateCommuneStat(roomName: string, statName: keyof CommuneStats, value: number) {
     this.stats[RoomTypes.commune][roomName][statName] += value
   }
 
-  updateRemoteStat(
+  static updateRemoteStat(
     roomName: string,
     statName: keyof RoomStats | keyof CommuneStats,
     value: number,

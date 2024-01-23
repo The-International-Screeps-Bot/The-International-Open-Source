@@ -45,7 +45,7 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 import { EndTickCreepManager } from './creeps/endTickCreepManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import { RoomVisualsManager } from './roomVisuals'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { CommunePlanner } from './construction/communePlanner'
 import {
   packCoord,
@@ -193,7 +193,7 @@ export class RoomManager {
 
     const roomType = roomMemory[RoomMemoryKeys.type]
     if (roomTypesUsedForStats.includes(roomType)) {
-      statsManager.roomInitialRun(room.name, roomType)
+      StatsManager.roomInitialRun(room.name, roomType)
     }
 
     room.moveRequests = {}

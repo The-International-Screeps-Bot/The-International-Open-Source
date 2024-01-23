@@ -1,5 +1,5 @@
 import { utils } from "utils/utils"
-import { communeDataManager } from "./commune/communeData"
+import { CommuneDataManager } from './commune/communeData'
 
 interface RoomData {
   sourceIDs: Id<Source>[]
@@ -12,9 +12,9 @@ interface RoomData {
  * Handles cached data for rooms, including some overlapping data for communes and remotes
  */
 export class RoomDataManager {
-  data: {[roomName: string]: Partial<RoomData>} = {}
+  static data: { [roomName: string]: Partial<RoomData> } = {}
 
-  initRooms() {
+  static initRooms() {
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName]
 
@@ -22,29 +22,21 @@ export class RoomDataManager {
     }
   }
 
-  private initRoom(room: Room) {
+  private static initRoom(room: Room) {
     this.data[room.name] ??= {}
 
     if (room.controller && room.controller.my) {
-
-      communeDataManager.initCommune(room)
+      CommuneDataManager.initCommune(room)
     }
   }
 
-  updateRooms() {
+  static updateRooms() {
     for (const roomName in this.data) {
-
-
       this.updateRoom(roomName)
     }
   }
 
-  private updateRoom(roomName: string) {
-
+  private static updateRoom(roomName: string) {
     const data = this.data[roomName]
-
-
   }
 }
-
-export const roomDataManager = new RoomDataManager()

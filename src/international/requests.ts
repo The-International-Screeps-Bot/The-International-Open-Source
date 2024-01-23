@@ -14,7 +14,7 @@ import {
   maxWorkRequestDistance,
 } from './constants'
 import { indexOf } from 'lodash'
-import { Sleepable } from 'utils/sleepable'
+import { Sleepable, StaticSleepable } from 'utils/sleepable'
 import { util } from 'chai'
 import { WorkRequest } from 'types/internationalRequests'
 import { communeUtils } from 'room/commune/communeUtils'
@@ -22,10 +22,10 @@ import { communeUtils } from 'room/commune/communeUtils'
 const runRequestInverval = randomIntRange(100, 200)
 
 // Should adsorb the request content of tickInit
-export class RequestsManager extends Sleepable {
-  sleepFor = randomIntRange(100, 200)
+export class RequestsManager extends StaticSleepable {
+  static sleepFor = randomIntRange(100, 200)
 
-  run() {
+  public static run() {
     this.updateWorkRequests()
     this.updateCombatRequests()
     this.updateHaulRequests()
@@ -39,7 +39,7 @@ export class RequestsManager extends Sleepable {
 
   // update requests
 
-  private updateWorkRequests() {
+  private static updateWorkRequests() {
     const runThreshold = randomIntRange(19000, 20000)
 
     for (const roomName in Memory.workRequests) {
@@ -67,7 +67,7 @@ export class RequestsManager extends Sleepable {
     }
   }
 
-  private updateCombatRequests() {
+  private static updateCombatRequests() {
     for (const requestName in Memory.combatRequests) {
       const request = Memory.combatRequests[requestName]
 
@@ -88,7 +88,7 @@ export class RequestsManager extends Sleepable {
     }
   }
 
-  private updateHaulRequests() {
+  private static updateHaulRequests() {
     for (const requestName in Memory.haulRequests) {
       const request = Memory.haulRequests[requestName]
 
@@ -108,7 +108,7 @@ export class RequestsManager extends Sleepable {
 
   // run requests
 
-  private runWorkRequests() {
+  private static runWorkRequests() {
     if (!global.settings.autoClaim) return
     /* if (CollectiveManager.communes.size >= CollectiveManager.maxCommunes) return */
 
@@ -200,7 +200,7 @@ export class RequestsManager extends Sleepable {
     }
   }
 
-  private shouldWorkRequestGetResponse(
+  private static shouldWorkRequestGetResponse(
     request: WorkRequest,
     roomName: string,
     reservedGCL: number,
@@ -224,7 +224,7 @@ export class RequestsManager extends Sleepable {
     return true
   }
 
-  private runCombatRequests() {
+  private static runCombatRequests() {
     for (const requestName in Memory.combatRequests) {
       const request = Memory.combatRequests[requestName]
 
@@ -328,7 +328,7 @@ export class RequestsManager extends Sleepable {
     }
   }
 
-  private runHaulRequests() {
+  private static runHaulRequests() {
     for (const requestName in Memory.haulRequests) {
       const request = Memory.haulRequests[requestName]
 
@@ -401,5 +401,3 @@ export class RequestsManager extends Sleepable {
     }
   }
 }
-
-export const requestsManager = new RequestsManager()

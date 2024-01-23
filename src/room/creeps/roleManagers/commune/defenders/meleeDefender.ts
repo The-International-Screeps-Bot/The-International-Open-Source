@@ -5,7 +5,7 @@ import {
     PlayerMemoryKeys,
     ReservedCoordTypes,
 } from 'international/constants'
-import { playerManager } from 'international/players'
+import { PlayerManager } from 'international/players'
 import {
     areCoordsEqual,
     findClosestObject,

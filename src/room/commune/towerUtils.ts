@@ -1,6 +1,6 @@
 import { towerPowers } from "international/constants"
 import { findWithLowestScore, getRange } from "utils/utils"
-import { communeDataManager } from "./communeData"
+import { CommuneDataManager } from './communeData'
 import { communeUtils } from "./communeUtils"
 import { packCoord } from "other/codec"
 
@@ -48,7 +48,7 @@ export class TowerUtils {
   }
 
   getRampartRepairTreshold(room: Room) {
-    const data = communeDataManager.data[room.name]
+    const data = CommuneDataManager.data[room.name]
       if (data.towerRampartRepairTreshold !== undefined) return data.towerRampartRepairTreshold
 
       let rampartRepairTreshold = minTowerRampartRepairTreshold

@@ -8,7 +8,7 @@ import {
 import { randomIntRange, randomTick, utils } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { WorkRequest } from 'types/internationalRequests'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)

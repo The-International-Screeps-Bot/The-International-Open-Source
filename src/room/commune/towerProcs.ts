@@ -1,15 +1,21 @@
 import { PlayerMemoryKeys, RoomLogisticsRequestTypes } from "international/constants"
-import { playerManager } from "international/players"
-import { statsManager } from "international/statsManager"
-import { packCoord } from "other/codec"
-import { structureUtils } from "room/structureUtils"
-import { findWithHighestScore, findObjectWithID, randomTick, findWithLowestScore, scalePriority, utils } from "utils/utils"
-import { communeUtils } from "./communeUtils"
-import { towerUtils } from "./towerUtils"
+import { PlayerManager } from 'international/players'
+import { StatsManager } from 'international/stats'
+import { packCoord } from 'other/codec'
+import { structureUtils } from 'room/structureUtils'
+import {
+  findWithHighestScore,
+  findObjectWithID,
+  randomTick,
+  findWithLowestScore,
+  scalePriority,
+  utils,
+} from 'utils/utils'
+import { communeUtils } from './communeUtils'
+import { towerUtils } from './towerUtils'
 
 export class TowerProcs {
   run(room: Room) {
-
     const towers = room.roomManager.structures.tower.filter(tower =>
       structureUtils.isRCLActionable(tower),
     )
@@ -56,7 +62,7 @@ export class TowerProcs {
         } else {
           const playerMemory =
             Memory.players[enemyCreep.owner.username] ||
-            playerManager.initPlayer(enemyCreep.owner.username)
+            PlayerManager.initPlayer(enemyCreep.owner.username)
           const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
           if (/* findWeightedRangeFromExit(enemyCreep.pos, weight) *  */ damage < enemyCreep.hits) {
@@ -86,8 +92,7 @@ export class TowerProcs {
 
   private attackEnemyCreeps(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
     if (Game.flags.disableTowerAttacks) {
-      room.towerInferiority =
-        room.roomManager.enemyAttackers.length > 0
+      room.towerInferiority = room.roomManager.enemyAttackers.length > 0
       return false
     }
     if (!actionableTowerIDs.length) return false
@@ -172,7 +177,7 @@ export class TowerProcs {
       const tower = findObjectWithID(actionableTowerIDs[i])
       if (tower.repair(repairTarget) !== OK) continue
 
-      statsManager.updateStat(room.name, 'eorwr', TOWER_ENERGY_COST)
+      StatsManager.updateStat(room.name, 'eorwr', TOWER_ENERGY_COST)
       actionableTowerIDs.splice(i, 1)
     }
 

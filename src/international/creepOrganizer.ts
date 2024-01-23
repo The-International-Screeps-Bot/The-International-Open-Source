@@ -3,15 +3,13 @@ import { CreepMemoryKeys, customColors, remoteRoles, roomLogisticsRoles } from '
 import { customLog } from 'utils/logging'
 import { CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
-import { statsManager } from './statsManager'
+import { StatsManager } from './stats'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { creepDataManager } from 'room/creeps/creepData'
 import { creepProcs } from 'room/creeps/creepProcs'
 
 export class CreepOrganizer {
-  constructor() {}
-
-  public run() {
+  public static run() {
     // Loop through all of my creeps
 
     for (const creepName in Memory.creeps) {
@@ -24,7 +22,7 @@ export class CreepOrganizer {
     }
   }
 
-  private organizeCreep(creepName: string) {
+  private static organizeCreep(creepName: string) {
     let creep = Game.creeps[creepName]
 
     // If creep doesn't exist
@@ -90,5 +88,3 @@ export class CreepOrganizer {
     commune.creepsFromRoomAmount += 1
   }
 }
-
-export const creepOrganizer = new CreepOrganizer()

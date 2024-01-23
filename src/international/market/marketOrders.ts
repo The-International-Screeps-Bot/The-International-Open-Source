@@ -6,7 +6,7 @@ import { customLog } from 'utils/logging'
 const optimizeOrdersInterval = randomIntRange(900, 1000)
 
 export class MarketManager {
-  run() {
+  static run() {
     this._myOrders = undefined
     this.cachedOrders = {}
     this._myOrdersCount = undefined
@@ -22,7 +22,7 @@ export class MarketManager {
     this.pruneMyOrders()
   }
 
-  private pruneMyOrders() {
+  private static pruneMyOrders() {
     // If there is sufficiently few orders
 
     if (this.myOrdersCount < MARKET_MAX_ORDERS * 0.8) return
@@ -34,7 +34,7 @@ export class MarketManager {
     }
   }
 
-  private optimizeMyOrders(): void {
+  private static optimizeMyOrders(): void {
     const myOrders = Game.market.orders
     for (const ID in myOrders) {
       // If the order is inactive (it likely has no remaining resources), delete it
@@ -49,7 +49,7 @@ export class MarketManager {
         const orders = this.getOrders(order.resourceType, ORDER_BUY)
         if (!orders) continue
 
-        const newPrice = Math.min(marketManager.getAvgPrice(order.resourceType) * 1.2)
+        const newPrice = Math.min(this.getAvgPrice(order.resourceType) * 1.2)
         if (order.price === newPrice) continue
 
         const absDiff = Math.abs(order.price - newPrice)
@@ -65,7 +65,7 @@ export class MarketManager {
       const orders = this.getOrders(order.resourceType, ORDER_SELL)
       if (!orders) continue
 
-      const newPrice = Math.min(marketManager.getAvgPrice(order.resourceType) * 0.8)
+      const newPrice = Math.min(this.getAvgPrice(order.resourceType) * 0.8)
       if (order.price === newPrice) continue
 
       const absDiff = Math.abs(order.price - newPrice)
@@ -79,7 +79,7 @@ export class MarketManager {
   /**
    * Finds the cheapest sell order
    */
-  getShardSellOrder(
+  static getShardSellOrder(
     roomName: string,
     resourceType: MarketResourceConstant,
     amount: number,
@@ -108,7 +108,7 @@ export class MarketManager {
   /**
    * Finds the most expensive buy order
    */
-  getShardBuyOrder(
+  static getShardBuyOrder(
     roomName: string,
     resourceType: MarketResourceConstant,
     amount: number,
@@ -138,7 +138,7 @@ export class MarketManager {
   /**
    * Finds the cheapest sell order
    */
-  getGlobalSellOrder(
+  static getGlobalSellOrder(
     resourceType: MarketResourceConstant,
     maxPrice = this.getAvgPrice(resourceType) * 1.2,
   ) {
@@ -166,7 +166,7 @@ export class MarketManager {
   /**
    * Finds the most expensive buy order
    */
-  getGlobalBuyOrder(
+  static getGlobalBuyOrder(
     resourceType: MarketResourceConstant,
     minPrice = this.getAvgPrice(resourceType) * 0.8,
   ) {
@@ -194,7 +194,7 @@ export class MarketManager {
   /**
    * Find the highest order and sell pixels to it
    */
-  advancedSellPixels() {
+  static advancedSellPixels() {
     if (!global.settings.pixelSelling) return
 
     if (Game.resources[PIXEL] === 0) return
@@ -257,14 +257,14 @@ export class MarketManager {
   /**
    * intra-tick cached orders sorted by resourceType and trade type
    */
-  cachedOrders: CachedMarketOrders
+  static cachedOrders: CachedMarketOrders
 
   /**
    * orders created by other players that we are on acceptable terms with, for a specified resource and trade type
    * See engine: https://github.com/screeps/engine/blob/7ee5b8e24b16b6b31727a83db15f676f5061a114/src/game/market.js#L13
    * It seems that there is caching for each resource, but nothing else. So we will use that cache while also organizing by order type (BUY or SELL)
    */
-  getOrders(resourceType: MarketResourceConstant, orderType: MarketOrderTypes) {
+  static getOrders(resourceType: MarketResourceConstant, orderType: MarketOrderTypes) {
     if (this.cachedOrders[resourceType]) {
       return this.cachedOrders[resourceType][orderType]
     }
@@ -299,14 +299,14 @@ export class MarketManager {
   /**
    * My outgoing orders organized by room, order type and resourceType
    */
-  _myOrders: {
+  static _myOrders: {
     [roomName: string]: Partial<Record<string, Partial<Record<MarketResourceConstant, Order[]>>>>
   }
 
   /**
    * Gets my outgoing orders organized by room, order type and resourceType
    */
-  get myOrders() {
+  static get myOrders() {
     // If _myOrders are already defined, inform them
 
     if (this._myOrders) return this._myOrders
@@ -349,32 +349,32 @@ export class MarketManager {
   /**
    * The number of orders owned by me
    */
-  _myOrdersCount: number
+  static _myOrdersCount: number
 
   /**
    * Gets the number of orders owned by me
    */
-  get myOrdersCount() {
+  static get myOrdersCount() {
     if (this._myOrdersCount !== undefined) return this._myOrdersCount
 
     return (this._myOrdersCount = Object.keys(Game.market.orders).length)
   }
 
-  _isMarketFunctional: boolean
+  static _isMarketFunctional: boolean
   /**
    * Determines if it is functional based on the existence of orders
    */
-  get isMarketFunctional() {
+  static get isMarketFunctional() {
     if (this._isMarketFunctional !== undefined) return this._isMarketFunctional
 
     return (this._isMarketFunctional = !!Game.market.getAllOrders().length)
   }
 
-  private resourceHistory: Partial<{ [key in MarketResourceConstant]: { [days: string]: number } }>
+  private static resourceHistory: Partial<{ [key in MarketResourceConstant]: { [days: string]: number } }>
   /**
    * Finds the average trading price of a resourceType over a set amount of days
    */
-  getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
+  static getAvgPrice(resourceType: MarketResourceConstant, days = 2) {
     if (this.resourceHistory[resourceType] && this.resourceHistory[resourceType][days]) {
       return this.resourceHistory[resourceType][days]
     }
@@ -401,10 +401,8 @@ export class MarketManager {
     return avgPrice
   }
 
-  decidePrice(resourceType: ResourceConstant, priority: number, startTick: number = Game.time) {}
+  static decidePrice(resourceType: ResourceConstant, priority: number, startTick: number = Game.time) {}
 }
-
-export const marketManager = new MarketManager()
 
 export type MarketOrderTypes = ORDER_BUY | ORDER_SELL
 

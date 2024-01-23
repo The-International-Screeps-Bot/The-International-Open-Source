@@ -1471,6 +1471,7 @@ export enum FlagNames {
   debugRoomLogistics = 'debugRoomLogistics',
   debugCreepLogistics = 'debugCreepLogistics',
   debugSpawning = 'debugSpawning',
+  mapVisuals = 'mapVisuals',
 }
 
 export const IDUpdateInterval = randomIntRange(50, 100)
