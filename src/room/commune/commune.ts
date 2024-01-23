@@ -43,7 +43,7 @@ import { LogisticsProcs } from 'room/logisticsProcs'
 import { towerProcs } from './towerProcs'
 import { SourceProcs } from 'room/sourceProcs'
 import { terminalProcs } from './terminal/terminalProcs'
-import { spawningStructureProcs } from './spawning/spawningStructureProcs'
+import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
 import { observerProcs } from './observerProcs'
 import { powerSpawnProcs } from './powerSpawnProcs'
 
@@ -259,7 +259,7 @@ export class CommuneManager {
     this.remotesManager.run()
     this.haulerNeedManager.run()
 
-    spawningStructureProcs.createRoomLogisticsRequests(this.room)
+    SpawningStructureProcs.createRoomLogisticsRequests(this.room)
     LogisticsProcs.createCommuneStoringStructureLogisticsRequests(this.room)
     this.factoryManager.run()
     LogisticsProcs.createCommuneContainerLogisticsRequests(this.room)
@@ -269,15 +269,15 @@ export class CommuneManager {
     this.linkManager.run()
     this.labManager.run()
     powerSpawnProcs.run(this.room)
-    spawningStructureProcs.createPowerTasks(this.room)
+    SpawningStructureProcs.createPowerTasks(this.room)
 
     this.room.roomManager.creepRoleManager.run()
     this.room.roomManager.powerCreepRoleManager.run()
 
     communeProcs.tryUpdateMinHaulerCost(this.room)
-    spawningStructureProcs.tryRunSpawning(this.room)
+    SpawningStructureProcs.tryRunSpawning(this.room)
 
-    spawningStructureProcs.tryRegisterSpawningMovement(this.room)
+    SpawningStructureProcs.tryRegisterSpawningMovement(this.room)
     this.room.roomManager.endTickCreepManager.run()
     this.room.roomManager.roomVisualsManager.run()
 

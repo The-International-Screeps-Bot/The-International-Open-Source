@@ -1472,6 +1472,7 @@ export enum FlagNames {
   debugCreepLogistics = 'debugCreepLogistics',
   debugSpawning = 'debugSpawning',
   mapVisuals = 'mapVisuals',
+  deactivate = 'deactiveate',
 }
 
 export const IDUpdateInterval = randomIntRange(50, 100)

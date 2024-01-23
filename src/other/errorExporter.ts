@@ -4,17 +4,17 @@ import { SegmentIDs } from "international/constants"
  * Rather cpu intensive and unavoidably inefficient. Try to avoid this needing to ba called
  */
 export class ErrorExporter {
-  public getSegmentData(): ErrorsSegment {
+  public static getSegmentData(): ErrorsSegment {
     const segment = RawMemory.segments[SegmentIDs.errors]
     if (segment === undefined || segment.length === 0) return { errors: [] }
     else return JSON.parse(RawMemory.segments[SegmentIDs.errors])
   }
 
-  public setSegmentData(data: ErrorsSegment): void {
+  public static setSegmentData(data: ErrorsSegment): void {
     RawMemory.segments[SegmentIDs.errors] = JSON.stringify(data)
   }
 
-  public addErrorToSegment(stack: string, version?: number): void {
+  public static addErrorToSegment(stack: string, version?: number): void {
     const data = this.getSegmentData()
     if (JSON.stringify(data).length > 90000) {
       Game.notify(`Error segment (${SegmentIDs.errors}) is almost full`)
@@ -26,5 +26,3 @@ export class ErrorExporter {
     this.setSegmentData(data)
   }
 }
-
-export const errorExporter = new ErrorExporter()

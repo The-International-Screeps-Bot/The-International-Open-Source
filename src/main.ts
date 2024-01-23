@@ -10,7 +10,7 @@ import './room/roomObjectAdditions'
 import './room/creeps/creepAdditions'
 import './other/profilerRegister'
 import { MemoryHack } from 'other/memoryHack'
-import { CPUMaxPerTick, Result } from 'international/constants'
+import { CPUMaxPerTick, FlagNames, Result } from 'international/constants'
 import { InitManager } from './international/init'
 import { MigrationManager } from 'international/migration'
 import { RespawnManager } from './international/respawn'
@@ -44,7 +44,7 @@ export function originalLoop() {
   MemoryHack.runHack()
   if (SegmentsManager.run() === Result.stop) return
 
-  if (Game.flags.deactivate) return
+  if (Game.flags[FlagNames.deactivate]) return
   if (Game.cpu.bucket < CPUMaxPerTick) {
     Procs.outOfBucket()
     return

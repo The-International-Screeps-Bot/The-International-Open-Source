@@ -18,11 +18,10 @@ import { SpawnRequest, BodyPartCounts, SpawnRequestTypes } from 'types/spawnRequ
 import { customLog, LogTypes } from 'utils/logging'
 import { getRange, findAdjacentCoordsToCoord, Utils } from 'utils/utils'
 import { SpawnRequestConstructor, SpawnRequestConstructors } from './spawnRequestConstructors'
-import { spawningStructureUtils } from './spawningStructureUtils'
 import { communeUtils } from '../communeUtils'
 
 export class SpawningStructureProcs {
-  public tryRunSpawning(room: Room) {
+  public static tryRunSpawning(room: Room) {
     const spawns = room.roomManager.structures.spawn
     if (!spawns.length) return
 
@@ -42,7 +41,7 @@ export class SpawningStructureProcs {
     this.runSpawning(room, organizedSpawns.inactiveSpawns)
   }
 
-  private runSpawning(room: Room, inactiveSpawns: StructureSpawn[]) {
+  private static runSpawning(room: Room, inactiveSpawns: StructureSpawn[]) {
     const spawnRequestsArgs = room.communeManager.spawnRequestsManager.run()
 
     for (const requestArgs of spawnRequestsArgs) {
@@ -56,7 +55,7 @@ export class SpawningStructureProcs {
     }
   }
 
-  private registerSpawningCreeps(room: Room, activeSpawns: StructureSpawn[]) {
+  private static registerSpawningCreeps(room: Room, activeSpawns: StructureSpawn[]) {
     for (const spawn of activeSpawns) {
       const creep = Game.creeps[spawn.spawning.name]
       CreepProcs.registerSpawning(creep, spawn)
@@ -74,7 +73,7 @@ export class SpawningStructureProcs {
     }
   }
 
-  private runSpawnRequest(
+  private static runSpawnRequest(
     room: Room,
     inactiveSpawns: StructureSpawn[],
     request: SpawnRequest,
@@ -180,7 +179,7 @@ export class SpawningStructureProcs {
     return Result.success
   }
 
-  private findSpawnIndexForSpawnRequest(inactiveSpawns: StructureSpawn[], request: SpawnRequest) {
+  private static findSpawnIndexForSpawnRequest(inactiveSpawns: StructureSpawn[], request: SpawnRequest) {
     if (request.spawnTarget) {
       const [score, index] = Utils.findIndexWithLowestScore(inactiveSpawns, spawn => {
         return getRange(spawn.pos, request.spawnTarget)
@@ -192,7 +191,7 @@ export class SpawningStructureProcs {
     return 0
   }
 
-  private constructBodyFromSpawnRequest(role: CreepRoles, bodyPartCounts: BodyPartCounts) {
+  private static constructBodyFromSpawnRequest(role: CreepRoles, bodyPartCounts: BodyPartCounts) {
     let body: BodyPartConstant[] = []
 
     if (role === 'hauler') {
@@ -247,7 +246,7 @@ export class SpawningStructureProcs {
     return body
   }
 
-  private findDirections(room: Room, pos: RoomPosition) {
+  private static findDirections(room: Room, pos: RoomPosition) {
     const anchor = room.roomManager.anchor
     if (!anchor) throw Error('No anchor for spawning structures ' + room.name)
 
@@ -269,11 +268,11 @@ export class SpawningStructureProcs {
     return directions
   }
 
-  private testSpawn(spawn: StructureSpawn, body: BodyPartConstant[], requestID: number) {
+  private static testSpawn(spawn: StructureSpawn, body: BodyPartConstant[], requestID: number) {
     return spawn.spawnCreep(body, requestID.toString(), { dryRun: true })
   }
 
-  private advancedSpawn(
+  private static advancedSpawn(
     spawn: StructureSpawn,
     spawnRequest: SpawnRequest,
     body: BodyPartConstant[],
@@ -290,7 +289,7 @@ export class SpawningStructureProcs {
     return spawnResult
   }
 
-  createPowerTasks(room: Room) {
+  static createPowerTasks(room: Room) {
     if (!room.myPowerCreeps.length) return
 
     // There is a vivid benefit to powering spawns
@@ -306,7 +305,7 @@ export class SpawningStructureProcs {
     }
   }
 
-  createRoomLogisticsRequests(room: Room) {
+  static createRoomLogisticsRequests(room: Room) {
     // If all spawning structures are 100% filled, no need to go further
     if (room.energyAvailable === room.energyCapacityAvailable) return
 
@@ -322,7 +321,7 @@ export class SpawningStructureProcs {
   /**
    * Spawn request debugging
    */
-  private test(room: Room) {
+  private static test(room: Room) {
     /*
   const args = room.communeManager.spawnRequestsManager.run()
   stringifyLog('spawn request args', args)
@@ -334,7 +333,7 @@ export class SpawningStructureProcs {
     this.testRequests()
   }
 
-  private testArgs(room: Room) {
+  private static testArgs(room: Room) {
     const spawnRequestsArgs = room.communeManager.spawnRequestsManager.run()
 
     for (const request of spawnRequestsArgs) {
@@ -349,9 +348,9 @@ export class SpawningStructureProcs {
     }
   }
 
-  private testRequests() {}
+  private static testRequests() {}
 
-  tryRegisterSpawningMovement(room: Room) {
+  static tryRegisterSpawningMovement(room: Room) {
     const organizedSpawns = communeUtils.getOrganizedSpawns(room)
     if (!organizedSpawns) return
 
@@ -412,7 +411,6 @@ export class SpawningStructureProcs {
     }
   }
 }
-export const spawningStructureProcs = new SpawningStructureProcs()
 
 export interface OrganizedSpawns {
   activeSpawns: StructureSpawn[]
