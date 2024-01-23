@@ -1,6 +1,6 @@
 import { packCoord, unpackCoord } from "other/codec"
-import { CommuneDataManager } from './communeData'
-import { RoomDataManager } from 'room/roomData'
+import { CommuneDataProcs, communeData } from './communeData'
+import { RoomDataProcs } from 'room/roomData'
 import { findLinkThroughput, getRange, packAsNum, unpackNumAsCoord } from 'utils/utils'
 import {
   Result,
@@ -52,7 +52,7 @@ export class CommuneUtils {
       }
     }
 
-    CommuneDataManager.data[room.name].generalRepairStructureCoords = structureCoords
+    communeData[room.name].generalRepairStructureCoords = structureCoords
 
     room.generalRepairStructures = repairTargets
     return repairTargets
@@ -60,7 +60,7 @@ export class CommuneUtils {
 
   private getGeneralRepairStructuresFromCoords(room: Room) {
     const repairTargets: (StructureContainer | StructureRoad)[] = []
-    const structureCoords = CommuneDataManager.data[room.name].generalRepairStructureCoords
+    const structureCoords = communeData[room.name].generalRepairStructureCoords
     if (!structureCoords) return repairTargets
 
     for (const packedCoord of structureCoords) {
@@ -133,7 +133,7 @@ export class CommuneUtils {
   }
 
   getMaxUpgradeStrength(room: Room) {
-    const data = CommuneDataManager.data[room.name]
+    const data = communeData[room.name]
     if (data.maxUpgradeStrength !== undefined && !room.roomManager.structureUpdate)
       return data.maxUpgradeStrength
 
@@ -188,7 +188,7 @@ export class CommuneUtils {
   }
 
   getEstimatedSourceIncome(room: Room) {
-    const data = CommuneDataManager.data[room.name]
+    const data = communeData[room.name]
     if (data.estimatedCommuneSourceIncome !== undefined) return data.estimatedCommuneSourceIncome
 
     const sources = RoomUtils.getSources(room)

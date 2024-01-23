@@ -1,8 +1,8 @@
 import { towerPowers } from "international/constants"
 import { findWithLowestScore, getRange } from "utils/utils"
-import { CommuneDataManager } from './communeData'
-import { communeUtils } from "./communeUtils"
-import { packCoord } from "other/codec"
+import { CommuneDataProcs, communeData } from './communeData'
+import { communeUtils } from './communeUtils'
+import { packCoord } from 'other/codec'
 
 const minTowerRampartRepairTreshold = RAMPART_DECAY_AMOUNT * 1.5
 
@@ -48,22 +48,21 @@ export class TowerUtils {
   }
 
   getRampartRepairTreshold(room: Room) {
-    const data = CommuneDataManager.data[room.name]
-      if (data.towerRampartRepairTreshold !== undefined) return data.towerRampartRepairTreshold
+    const data = communeData[room.name]
+    if (data.towerRampartRepairTreshold !== undefined) return data.towerRampartRepairTreshold
 
-      let rampartRepairTreshold = minTowerRampartRepairTreshold
+    let rampartRepairTreshold = minTowerRampartRepairTreshold
 
-      const enemySquadData = room.roomManager.enemySquadData
-      rampartRepairTreshold += enemySquadData.highestDismantle
-      // Melee damage includes ranged
-      rampartRepairTreshold += enemySquadData.highestMeleeDamage
+    const enemySquadData = room.roomManager.enemySquadData
+    rampartRepairTreshold += enemySquadData.highestDismantle
+    // Melee damage includes ranged
+    rampartRepairTreshold += enemySquadData.highestMeleeDamage
 
-      data.towerRampartRepairTreshold = rampartRepairTreshold
-      return rampartRepairTreshold
+    data.towerRampartRepairTreshold = rampartRepairTreshold
+    return rampartRepairTreshold
   }
 
   findHealTarget(room: Room) {
-
     if (room.roomManager.enemyAttackers.length) {
       return room.roomManager.myDamagedCreeps.find(creep => {
         return !creep.isOnExit && !room.roomManager.enemyThreatCoords.has(packCoord(creep.pos))

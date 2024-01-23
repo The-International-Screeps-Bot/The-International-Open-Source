@@ -1,7 +1,7 @@
 import { utils } from "utils/utils"
-import { CommuneDataManager } from './commune/communeData'
+import { CommuneDataProcs } from './commune/communeData'
 
-interface RoomData {
+export interface RoomData {
   sourceIDs: Id<Source>[]
   fastFillerContainerLeftId: Id<StructureContainer> | false
   fastFillerContainerRightId: Id<StructureContainer> | false
@@ -9,11 +9,14 @@ interface RoomData {
 }
 
 /**
+ * Inter-tick room data
+ */
+export const roomData: { [roomName: string]: Partial<RoomData> } = {}
+
+/**
  * Handles cached data for rooms, including some overlapping data for communes and remotes
  */
-export class RoomDataManager {
-  static data: { [roomName: string]: Partial<RoomData> } = {}
-
+export class RoomDataProcs {
   static initRooms() {
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName]
@@ -23,20 +26,20 @@ export class RoomDataManager {
   }
 
   private static initRoom(room: Room) {
-    this.data[room.name] ??= {}
+    roomData[room.name] ??= {}
 
     if (room.controller && room.controller.my) {
-      CommuneDataManager.initCommune(room)
+      CommuneDataProcs.initCommune(room)
     }
   }
 
   static updateRooms() {
-    for (const roomName in this.data) {
+    for (const roomName in roomData) {
       this.updateRoom(roomName)
     }
   }
 
   private static updateRoom(roomName: string) {
-    const data = this.data[roomName]
+    const data = roomData[roomName]
   }
 }

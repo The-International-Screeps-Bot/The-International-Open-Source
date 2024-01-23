@@ -36,10 +36,20 @@ CommuneProc runs logic for the commune to update data, make intents, and run sub
 
 Managers can be a combination of utilities, processors and data.
 
+## Data
+
+A state or set of states generally contained in an object. Should not include functions
+
+should probably be opperated on by Procs.
+
 ### Example
 
 The MarketManager handles caching market related data, updating / deleting it as needed, while pruning and optimizing existing orders that the bot controls.
 
 ## Use of classes
 
-Classes should be static. If a class needs to be instantiated, there is probably a better way to do it
+Classes should be static. If a class needs to be instantiated, there is probably a better way to do it.
+
+Inherence of classes should be avoided.
+
+Mixing state and state modifiers (functions) in classes should be avoided.

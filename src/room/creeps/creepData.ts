@@ -18,29 +18,34 @@ export interface CreepData {
    */
   defenceStrength: number
 }
+
+/**
+ * Inter-tick creep data
+ */
+export const creepData: { [creepName: string]: Partial<CreepData> } = {}
+
 /**
  * Handles cached data for creeps we own
  */
-export class CreepDataManager {
-  static data: { [creepName: string]: Partial<CreepData> } = {}
+export class CreepDataProcs {
 
   static initCreep(creepName: string) {
-    this.data[creepName] ??= {}
+    creepData[creepName] ??= {}
   }
 
   static updateCreeps() {
-    for (const creepName in this.data) {
+    for (const creepName in creepData) {
       this.updateCreep(creepName)
     }
   }
 
   private static updateCreep(creepName: string) {
     if (!Game.creeps[creepName]) {
-      delete this.data[creepName]
+      delete creepData[creepName]
       return
     }
 
-    const data = this.data[creepName]
+    const data = creepData[creepName]
 
     /* .delete */
 

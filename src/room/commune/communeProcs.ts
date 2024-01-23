@@ -1,5 +1,5 @@
 import { RoomUtils } from 'room/roomUtils'
-import { CommuneDataManager } from './communeData'
+import { CommuneDataProcs, communeData } from './communeData'
 import { communeUtils } from './communeUtils'
 import {
   RoomLogisticsRequestTypes,
@@ -13,7 +13,7 @@ import { randomIntRange } from 'utils/utils'
  */
 export class CommuneProcs {
   getRCLUpdate(room: Room) {
-    const data = CommuneDataManager.data[room.name]
+    const data = communeData[room.name]
     // If the registered RCL is the actual RCL, we're good. No need to update anything
     if (data.registeredRCL === room.controller.level) {
       return
@@ -28,12 +28,12 @@ export class CommuneProcs {
   }
 
   private updateRegisteredRCL(room: Room) {
-    const communeData = CommuneDataManager.data[room.name]
-    /* const roomData = RoomDataManager.data[room.name] */
+    const data = communeData[room.name]
+    /* const roomData = roomData[room.name] */
 
-    delete communeData.generalRepairStructureCoords
+    delete data.generalRepairStructureCoords
 
-    communeData.registeredRCL = room.controller.level
+    data.registeredRCL = room.controller.level
   }
 
   tryUpdateMinHaulerCost(room: Room) {
@@ -64,7 +64,7 @@ export class CommuneProcs {
   registerRampartDamage(room: Room) {
     if (!room.roomManager.enemyAttackers.length) return
 
-    const data = CommuneDataManager.data[room.name]
+    const data = communeData[room.name]
     if (data.rampartDamageCoords === undefined || room.roomManager.structureUpdate) {
       this.initRampartDamageCoords(room)
     }

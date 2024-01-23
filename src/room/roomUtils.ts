@@ -1,6 +1,6 @@
 import { RoomMemoryKeys, RoomTypes, roomDimensions } from 'international/constants'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
-import { RoomDataManager } from './roomData'
+import { RoomDataProcs, roomData } from './roomData'
 import { findObjectWithID, forAdjacentCoords, utils } from 'utils/utils'
 import { structureUtils } from './structureUtils'
 import { StructureCoords } from './room'
@@ -12,7 +12,7 @@ export class RoomUtils {
   }
 
   static getSources(room: Room): Source[] {
-    const data = RoomDataManager.data[room.name]
+    const data = roomData[room.name]
     if (data.sourceIDs !== undefined) {
       return data.sourceIDs.map(ID => findObjectWithID(ID))
     }
@@ -28,7 +28,7 @@ export class RoomUtils {
    * returns a container if exists and is RCL actionable
    */
   static getFastFillerContainerLeft(room: Room) {
-    const data = RoomDataManager.data[room.name]
+    const data = roomData[room.name]
     if (data.fastFillerContainerLeftId !== undefined && !room.roomManager.structureUpdate) {
       return data.fastFillerContainerLeftId
     }
@@ -54,7 +54,7 @@ export class RoomUtils {
    * returns a container if exists and is RCL actionable
    */
   static getFastFillerContainerRight(room: Room) {
-    const data = RoomDataManager.data[room.name]
+    const data = roomData[room.name]
     if (data.fastFillerContainerRightId !== undefined && !room.roomManager.structureUpdate) {
       return data.fastFillerContainerRightId
     }
@@ -77,7 +77,7 @@ export class RoomUtils {
   }
 
   static getFastFillerCoords(room: Room) {
-    const data = RoomDataManager.data[room.name]
+    const data = roomData[room.name]
     if (data.fastFillerCoords !== undefined && !room.roomManager.structureUpdate) {
       const fastFillerCoords = data.fastFillerCoords.map(packedCoord => unpackCoord(packedCoord))
       return fastFillerCoords

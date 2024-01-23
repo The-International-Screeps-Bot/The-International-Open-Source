@@ -18,26 +18,30 @@ interface CommuneData {
 }
 
 /**
+ * Inter-tick data for communes
+ */
+export const communeData: { [roomName: string]: Partial<CommuneData>} = {}
+
+/**
  * Handles cached data for communes
  */
-export class CommuneDataManager {
-  static data: { [roomName: string]: Partial<CommuneData> } = {}
+export class CommuneDataProcs {
 
   /**
    * Called by the room's RoomManager
    */
   static initCommune(room: Room) {
-    this.data[room.name] ??= {}
+    communeData[room.name] ??= {}
   }
 
   static updateCommunes() {
-    for (const roomName in this.data) {
+    for (const roomName in communeData) {
       this.updateCommune(roomName)
     }
   }
 
   private static updateCommune(roomName: string) {
-    const data = this.data[roomName]
+    const data = communeData[roomName]
 
     if (utils.isTickInterval(10)) {
       delete data.estimatedCommuneSourceIncome

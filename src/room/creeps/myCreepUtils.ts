@@ -1,4 +1,4 @@
-import { Boosts, CreepDataManager } from './creepData'
+import { Boosts, CreepDataProcs, creepData } from './creepData'
 
 /**
  * Utilities only creeps the bot owns should use
@@ -8,7 +8,7 @@ export class MyCreepUtils {
    * provides a cached number of parts for creeps we own
    */
   parts(creep: Creep) {
-    const data = CreepDataManager.data[creep.name].parts
+    const data = creepData[creep.name].parts
     if (data) return data
 
     const parts: typeof data = {}
@@ -18,12 +18,12 @@ export class MyCreepUtils {
     // +1 for every part to its type category
     for (const part of creep.body) parts[part.type] += 1
 
-    CreepDataManager.data[creep.name].parts = parts
+    creepData[creep.name].parts = parts
     return parts
   }
 
   boosts(creep: Creep) {
-    const data = CreepDataManager.data[creep.name].boosts
+    const data = creepData[creep.name].boosts
     if (data) return data
 
     const boosts: typeof data = {}
@@ -40,17 +40,17 @@ export class MyCreepUtils {
       boosts[boost] += 1
     }
 
-    CreepDataManager.data[creep.name].boosts = boosts
+    creepData[creep.name].boosts = boosts
     return boosts
   }
 
   upgradeStrength(creep: Creep) {
-    const data = CreepDataManager.data[creep.name].upgradeStrength
+    const data = creepData[creep.name].upgradeStrength
     if (data) return data
 
     const upgradeStrength = this.findUpgradeStrength(this.parts(creep).work, this.boosts(creep))
 
-    CreepDataManager.data[creep.name].upgradeStrength = upgradeStrength
+    creepData[creep.name].upgradeStrength = upgradeStrength
     return data
   }
 

@@ -33,11 +33,11 @@ import { RequestsManager } from 'international/requests'
 import { MarketManager } from 'international/market/marketOrders'
 import { TransactionsManager } from 'international/transactions'
 import { SegmentsManager } from 'international/segments'
-import { CreepDataManager } from 'room/creeps/creepData'
-import { RoomDataManager } from 'room/roomData'
+import { CreepDataProcs } from 'room/creeps/creepData'
+import { RoomDataProcs } from 'room/roomData'
 import { utils } from 'utils/utils'
 import { procs } from 'utils/procs'
-import { CommuneDataManager } from 'room/commune/communeData'
+import { CommuneDataProcs } from 'room/commune/communeData'
 import { GarbageCollector } from 'international/garbageCollector'
 
 export function originalLoop() {
@@ -63,8 +63,8 @@ export function originalLoop() {
     simpleAllies.initRun()
     wasm.collaborator()
 
-    RoomDataManager.initRooms()
-    RoomDataManager.updateRooms()
+    RoomDataProcs.initRooms()
+    RoomDataProcs.updateRooms()
     RoomsManager.updateRun()
     TransactionsManager.run()
     RequestsManager.run()
@@ -73,7 +73,7 @@ export function originalLoop() {
     if (global.userScript) global.userScript.run()
     PlayerManager.run()
     RoomsManager.initRun()
-    CreepDataManager.updateCreeps()
+    CreepDataProcs.updateCreeps()
     CreepOrganizer.run()
     PowerCreepOrganizer.run()
 
