@@ -7,7 +7,7 @@ The bot intends to implement a primarily data-oriented style, with some aspects 
 # Data/functional structures
 
 ## Utils
-- does not contain its own data
+- does not contain any state
 - contains functions/methods
 
 Utils stands for utilities. These are functions that will generally take inputs and provide information in return.
@@ -17,7 +17,7 @@ Utils stands for utilities. These are functions that will generally take inputs 
 CommuneUtils contains utility functions that provide often cached information on call that helps with processing
 
 ## Procs
-- does not contain its own data
+- does not contain any state
 - contains functions/methods
 
 Procs stands for processors. These are functions that will generally run logic for specified things.
