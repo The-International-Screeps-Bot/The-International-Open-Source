@@ -31,84 +31,85 @@ export interface RoomStats {
 }
 
 export interface CommuneStats extends RoomStats {
-    /**
-     * Controller Level
-     */
-    cl: number
-    /**
-     * Energy Input Harvest
-     */
-    eih: number
-    /**
-     * Energy Input Bought
-     */
-    eib?: number
-    /**
-     * Energy Output Upgrade
-     */
-    eou: number
-    /**
-     * Energy Output Repair Other (non-barricade structures)
-     */
-    eoro: number
-    /**
-     * Energy Output Repair Wall or Rampart
-     */
-    eorwr: number
-    /**
-     * Energy Output Build
-     */
-    eob: number
-    /**
-     * Energy Output Sold
-     */
-    eos: number
-    /**
-     * Energy Output Spawn
-     */
-    eosp: number
-    /**
-     * Energy Output Power
-     */
-    eop: number
-    /**
-     * Minerals Harvested
-     */
-    mh: number
-    /**
-     * Energy Stored
-     */
-    es: number
-    /**
-     * Creep Count
-     */
-    cc: number
-    /**
-     * Total Creep Count
-     */
-    tcc: number
-    /**
-     * Power Creep Count
-     */
-    pcc: number
-    /**
-     * Spawn Usage as a decimal
-     */
-    su: number
-    /**
-     * hauler size
-     */
-    mhc: number
-    /**
-     * energy out transactions costs
-     */
-    eotc: number
+  /**
+   * Controller Level
+   */
+  cl: number
+  /**
+   * Energy Input Harvest
+   */
+  eih: number
+  /**
+   * Energy Input Bought
+   */
+  eib?: number
+  /**
+   * Energy Output Upgrade
+   */
+  eou: number
+  /**
+   * Energy Output Repair Other (non-barricade structures)
+   */
+  eoro: number
+  /**
+   * Energy Output Repair Wall or Rampart
+   */
+  eorwr: number
+  /**
+   * Energy Output Build
+   */
+  eob: number
+  /**
+   * Energy Output Sold
+   */
+  eos: number
+  /**
+   * Energy Output Spawn
+   */
+  eosp: number
+  /**
+   * Energy Output Power
+   */
+  eop: number
+  /**
+   * Minerals Harvested
+   */
+  mh: number
+  /**
+   * Energy Stored
+   */
+  es: number
+  /**
+   * Creep Count
+   */
+  cc: number
+  /**
+   * Total Creep Count
+   */
+  tcc: number
+  /**
+   * Power Creep Count
+   */
+  pcc: number
+  /**
+   * Spawn Usage as a decimal
+   */
+  su: number
+  /**
+   * hauler size
+   */
+  mhc: number
+  /**
+   * energy out transactions costs
+   */
+  eotc: number
 
-    // Better way to define shortform types
+  // Better way to define shortform types
 
-    [RoomStatsKeys.EnergyTerminalSentDomestic]: number
-    [RoomStatsKeys.EnergyTerminalSentOther]: number
-    [RoomStatsKeys.BatteriesStoredTimes10]: number
+  [RoomStatsKeys.EnergyTerminalSentDomestic]: number
+  [RoomStatsKeys.EnergyTerminalSentOther]: number
+  [RoomStatsKeys.BatteriesStoredTimes10]: number
+  [RoomStatsKeys.CpuUsed]: number
 }
 
 const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
@@ -140,6 +141,7 @@ const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
     RoomStatsKeys.EnergyOutputTransactionCosts,
     RoomStatsKeys.EnergyTerminalSentDomestic,
     RoomStatsKeys.EnergyTerminalSentOther,
+    RoomStatsKeys.CpuUsed,
 ])
 
 export class StatsManager {
@@ -178,6 +180,7 @@ export class StatsManager {
                 [RoomStatsKeys.EnergyOutputTransactionCosts]: 0,
                 [RoomStatsKeys.EnergyTerminalSentDomestic]: 0,
                 [RoomStatsKeys.EnergyTerminalSentOther]: 0,
+                [RoomStatsKeys.CpuUsed]: 0,
             })
 
             if (Memory.stats.rooms[roomName]) return

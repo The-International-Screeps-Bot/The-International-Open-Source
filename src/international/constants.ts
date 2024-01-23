@@ -1322,6 +1322,7 @@ export enum RoomStatsKeys {
   EnergyOutputTransactionCosts = 'eotc',
   EnergyTerminalSentDomestic = 'etsd',
   EnergyTerminalSentOther = 'etso',
+  CpuUsed = 'cpu',
 
   GameTime = 'gt',
   RemoteCount = 'rc',

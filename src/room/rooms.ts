@@ -1,5 +1,6 @@
 import {
     RoomMemoryKeys,
+    RoomStatsKeys,
     RoomTypes,
     customColors,
     roomTypesUsedForStats,
@@ -13,7 +14,7 @@ import { CreepRoleManager } from './creeps/creepRoleManager'
 
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import './roomVisuals'
-import { createPosMap } from 'utils/utils'
+import { createPosMap, findCPUOf } from 'utils/utils'
 import { statsManager } from 'international/statsManager'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
@@ -21,7 +22,7 @@ import { RoomManager } from './room'
 import { LogTypes, customLog } from 'utils/logging'
 
 class RoomsManager {
-    constructor() {}
+
     updateRun() {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
@@ -36,33 +37,45 @@ class RoomsManager {
             room.roomManager.update(room)
         }
     }
+
     initRun() {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
             room.roomManager.initRun()
         }
     }
+
     run() {
 
         for (const roomName in Game.rooms) {
-            console.log(roomName)
-            const room = Game.rooms[roomName]
-            room.roomManager.run()
 
-            // Log room stats
-
-            const roomMemory = Memory.rooms[room.name]
-            const roomType = roomMemory[RoomMemoryKeys.type]
-
-            customLog(
-                `<a style="cursor: pointer;color:inherit; text-decoration:underline;" href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
-                `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreeps.length}`,
-                {
-                    type: LogTypes.info,
-                    position: 2,
-                },
-            )
+            this.runRoom(roomName)
         }
+    }
+
+    private runRoom(roomName: string) {
+
+        const startCPU = Game.cpu.generatePixel()
+
+        const room = Game.rooms[roomName]
+        room.roomManager.run()
+
+        // Log room stats
+
+        const roomMemory = Memory.rooms[room.name]
+        const roomType = roomMemory[RoomMemoryKeys.type]
+
+        customLog(
+            `<a style="cursor: pointer;color:inherit; text-decoration:underline;" href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
+            `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreeps.length}`,
+            {
+                type: LogTypes.info,
+                position: 2,
+            },
+        )
+
+        const usedCPU = Game.cpu.getUsed() - startCPU
+        statsManager.updateCommuneStat(roomName, RoomStatsKeys.CpuUsed, usedCPU)
     }
 }
 
