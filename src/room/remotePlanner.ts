@@ -61,7 +61,7 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { minCutToExit } from './construction/minCut'
 import { CustomPathFinder } from 'international/customPathFinder'
-import { towerUtils } from './commune/towerUtils'
+import { TowerUtils } from './commune/towerUtils'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 8
@@ -2933,7 +2933,7 @@ export class RemotePlanner {
         let minIndividualDamage = Infinity
 
         for (const packedCoord of this.outsideMinCut) {
-          const damage = towerUtils.estimateRangeDamage(coord, unpackNumAsCoord(packedCoord))
+          const damage = TowerUtils.estimateRangeDamage(coord, unpackNumAsCoord(packedCoord))
           damageMap[packedCoord] += damage
 
           if (damage >= minIndividualDamage) continue

@@ -3,7 +3,7 @@ import { RoomNameUtils } from 'room/roomNameUtils'
 import { forRoomNamesAroundRangeXY, Utils } from 'utils/utils'
 
 export class ObserverProcs {
-  preTickRun(room: Room) {
+  static preTickRun(room: Room) {
     // Run only every so often
     if (!Utils.isTickInterval(10)) return
 
@@ -16,7 +16,7 @@ export class ObserverProcs {
     observer.observeRoom(scoutTarget)
   }
 
-  findScoutTarget(room: Room) {
+  static findScoutTarget(room: Room) {
     const roomCoord = RoomNameUtils.pack(room.name)
 
     let scoutTarget: string | undefined
@@ -35,7 +35,7 @@ export class ObserverProcs {
     return scoutTarget
   }
 
-  private findRoomNameScore(room: Room, scoutRoomName: string) {
+  private static findRoomNameScore(room: Room, scoutRoomName: string) {
     const roomsDistance = OBSERVER_RANGE - Game.map.getRoomLinearDistance(room.name, scoutRoomName)
 
     const scoutRoomMemory = Memory.rooms[scoutRoomName]
@@ -53,5 +53,3 @@ export class ObserverProcs {
     return score
   }
 }
-
-export const observerProcs = new ObserverProcs()

@@ -4,7 +4,7 @@ import { StatsManager } from 'international/stats'
 import { scalePriority } from 'utils/utils'
 
 export class PowerSpawnProcs {
-  public run(room: Room) {
+  static run(room: Room) {
     const powerSpawn = room.roomManager.powerSpawn
     if (!powerSpawn) return
 
@@ -15,7 +15,7 @@ export class PowerSpawnProcs {
   /**
    * So long as there are sufficient resources, try to process power
    */
-  private advancedProcessPower(powerSpawn: StructurePowerSpawn) {
+  private static advancedProcessPower(powerSpawn: StructurePowerSpawn) {
     if (powerSpawn.store.getCapacity(RESOURCE_ENERGY) < POWER_SPAWN_ENERGY_RATIO) return
     if (!powerSpawn.store.getCapacity(RESOURCE_POWER)) return
 
@@ -28,7 +28,7 @@ export class PowerSpawnProcs {
   /**
    * Find unspawned power creeps and spawn them
    */
-  private advancedSpawn(powerSpawn: StructurePowerSpawn) {
+  private static advancedSpawn(powerSpawn: StructurePowerSpawn) {
     for (let i = CollectiveManager.unspawnedPowerCreepNames.length - 1; i >= 0; i--) {
       const creep = Game.powerCreeps[CollectiveManager.unspawnedPowerCreepNames[i]]
 
@@ -38,7 +38,7 @@ export class PowerSpawnProcs {
     }
   }
 
-  private createRoomLogisticsRequests(room: Room, powerSpawn: StructurePowerSpawn) {
+  private static createRoomLogisticsRequests(room: Room, powerSpawn: StructurePowerSpawn) {
     // Make sure we have a reasonable amount of energy and power
 
     const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
@@ -82,5 +82,3 @@ export class PowerSpawnProcs {
     }
   }
 }
-
-export const powerSpawnProcs = new PowerSpawnProcs()

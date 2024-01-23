@@ -6,11 +6,11 @@ import { StructureUtils } from 'room/structureUtils'
 import { customLog } from 'utils/logging'
 import { newID, Utils } from 'utils/utils'
 import { ResourceTargets } from '../commune'
-import { tradingUtils } from './tradingUtils'
+import { TradingUtils } from './tradingUtils'
 import { ResourceRequest } from 'international/simpleAllies/types'
 
 export class TerminalProcs {
-  preTickRun(room: Room) {
+  static preTickRun(room: Room) {
     if (!room.terminal) return
     if (!StructureUtils.isRCLActionable(room.terminal)) return
 
@@ -19,7 +19,7 @@ export class TerminalProcs {
     this.createTerminalRequests(room, resourceTargets)
   }
 
-  run(room: Room) {
+  static run(room: Room) {
     // Stop if there is no terminal
     if (!room.terminal) return
     if (!StructureUtils.isRCLActionable(room.terminal)) return
@@ -40,7 +40,7 @@ export class TerminalProcs {
     if (this.manageResources(room, resourceTargets) === Result.action) return
   }
 
-  private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
+  private static createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
     const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
     for (const key in resourceTargets.min) {
       const resourceType = key as ResourceConstant
@@ -53,7 +53,7 @@ export class TerminalProcs {
       if (storedResourceAmount >= targetAmount) continue
 
       targetAmount = Math.floor(targetAmount * 1.1)
-      const priority = tradingUtils.getPriority(storedResourceAmount, targetAmount)
+      const priority = TradingUtils.getPriority(storedResourceAmount, targetAmount)
       const amount = Math.min(
         targetAmount - storedResourceAmount,
         room.terminal.store.getFreeCapacity(),
@@ -70,7 +70,7 @@ export class TerminalProcs {
     }
   }
 
-  private findBestTerminalRequest(
+  private static findBestTerminalRequest(
     room: Room,
     resourceTargets: ResourceTargets,
   ): [TerminalRequest, string, number] {
@@ -98,7 +98,7 @@ export class TerminalProcs {
       if (storedResource <= minStoredResource) continue */
 
       const ourPriority = Math.max(
-        tradingUtils.getPriority(storedResource, resourceTargets.min[request.resource]),
+        TradingUtils.getPriority(storedResource, resourceTargets.min[request.resource]),
         0,
       )
       // Our priority should be lower
@@ -107,12 +107,12 @@ export class TerminalProcs {
       // The request's priority must be 10% greater than our own
       if (priorityDiff < 0.15) continue
 
-      const equivalentAmount = tradingUtils.getAmountFromPriority(
+      const equivalentAmount = TradingUtils.getAmountFromPriority(
         request.priority,
         resourceTargets.min[request.resource],
       )
 
-      const equivalentPriority = tradingUtils.getPriority(
+      const equivalentPriority = TradingUtils.getPriority(
         equivalentAmount,
         resourceTargets.min[request.resource],
       )
@@ -138,7 +138,7 @@ export class TerminalProcs {
       )
 
       const sendAmount =
-        tradingUtils.findLargestTransactionAmount(
+        TradingUtils.findLargestTransactionAmount(
           budget,
           maxSendAmount,
           room.name,
@@ -160,7 +160,7 @@ export class TerminalProcs {
           ', ' +
           (storedResource - request.amount) * priorityDiff +
           ', ' +
-          tradingUtils.getAmountFromPriority(priorityDiff, resourceTargets.min[request.resource]),
+          TradingUtils.getAmountFromPriority(priorityDiff, resourceTargets.min[request.resource]),
       )
       // Make sure we are fulfilling at least 10% of the request
       if (request.amount * 0.1 > sendAmount) continue
@@ -178,7 +178,7 @@ export class TerminalProcs {
     return [bestRequest, bestRequestID, amount]
   }
 
-  private respondToTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
+  private static respondToTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
     // We don't have enough energy to help other rooms
     if (room.roomManager.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy)
       return Result.noAction
@@ -195,7 +195,7 @@ export class TerminalProcs {
     return Result.action
   }
 
-  private findBestAllyRequest(
+  private static findBestAllyRequest(
     room: Room,
     resourceTargets: ResourceTargets,
   ): [ResourceRequest, number] {
@@ -220,7 +220,7 @@ export class TerminalProcs {
       const storedResource = resourcesInStoringStructures[request.resourceType] || 0
       if (storedResource <= minStoredResource) continue
 
-      const sendAmount = tradingUtils.findLargestTransactionAmount(
+      const sendAmount = TradingUtils.findLargestTransactionAmount(
         budget,
         Math.min(request.amount, storedResource - minStoredResource),
         room.name,
@@ -242,7 +242,7 @@ export class TerminalProcs {
     return [bestRequest, amount]
   }
 
-  private respondToAllyRequests(room: Room, resourceTargets: ResourceTargets) {
+  private static respondToAllyRequests(room: Room, resourceTargets: ResourceTargets) {
     if (!global.settings.allyCommunication) return Result.noAction
     if (!simpleAllies.allySegmentData) return Result.noAction
     if (!simpleAllies.allySegmentData.requests) return Result.noAction
@@ -265,7 +265,7 @@ export class TerminalProcs {
     return Result.action
   }
 
-  private manageResources(room: Room, resourceTargets: ResourceTargets) {
+  private static manageResources(room: Room, resourceTargets: ResourceTargets) {
     for (const key in resourceTargets.min) {
       const resourceType = key as ResourceConstant
 
@@ -277,7 +277,7 @@ export class TerminalProcs {
     return Result.noAction
   }
 
-  private manageResource(
+  private static manageResource(
     room: Room,
     resourceType: ResourceConstant,
     resourceTargets: ResourceTargets,
@@ -290,7 +290,7 @@ export class TerminalProcs {
       if (Game.market.credits < CollectiveManager.minCredits) return Result.noAction
 
       if (
-        tradingUtils.advancedBuy(room, resourceType, min - room.terminal.store[resourceType]) ===
+        TradingUtils.advancedBuy(room, resourceType, min - room.terminal.store[resourceType]) ===
         Result.success
       ) {
         return Result.action
@@ -307,7 +307,7 @@ export class TerminalProcs {
 
     // Try to sell the excess amount
     if (
-      tradingUtils.advancedSell(room, resourceType, room.terminal.store[resourceType] - max) ===
+      TradingUtils.advancedSell(room, resourceType, room.terminal.store[resourceType] - max) ===
       Result.success
     ) {
       return Result.action
@@ -316,5 +316,3 @@ export class TerminalProcs {
     return Result.noAction
   }
 }
-
-export const terminalProcs = new TerminalProcs()

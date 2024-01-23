@@ -40,12 +40,12 @@ import { LogTypes, customLog } from 'utils/logging'
 import { communeProcs } from './communeProcs'
 import { StructureUtils } from 'room/structureUtils'
 import { LogisticsProcs } from 'room/logisticsProcs'
-import { towerProcs } from './towerProcs'
+import { TowerProcs } from './towerProcs'
 import { SourceProcs } from 'room/sourceProcs'
-import { terminalProcs } from './terminal/terminalProcs'
+import { TerminalProcs } from './terminal/terminalProcs'
 import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
-import { observerProcs } from './observerProcs'
-import { powerSpawnProcs } from './powerSpawnProcs'
+import { ObserverProcs } from './observerProcs'
+import { PowerSpawnProcs } from './powerSpawnProcs'
 
 export type ResourceTargets = {
   min: Partial<{ [key in ResourceConstant]: number }>
@@ -234,8 +234,8 @@ export class CommuneManager {
     if (!roomMemory[RoomMemoryKeys.communePlanned]) return
 
     this.constructionManager.preTickRun()
-    observerProcs.preTickRun(this.room)
-    terminalProcs.preTickRun(this.room)
+    ObserverProcs.preTickRun(this.room)
+    TerminalProcs.preTickRun(this.room)
     this.remotesManager.initRun()
     this.haulRequestManager.preTickRun()
     this.workRequestManager.preTickRun()
@@ -245,11 +245,11 @@ export class CommuneManager {
     if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
 
     this.defenceManager.run()
-    towerProcs.run(this.room)
+    TowerProcs.run(this.room)
     this.defenceManager.manageThreat()
     this.defenceManager.manageDefenceRequests()
 
-    terminalProcs.run(this.room)
+    TerminalProcs.run(this.room)
 
     this.workRequestManager.run()
     this.combatRequestManager.run()
@@ -268,7 +268,7 @@ export class CommuneManager {
     LogisticsProcs.createCommuneRuinLogisticsRequests(this.room)
     this.linkManager.run()
     this.labManager.run()
-    powerSpawnProcs.run(this.room)
+    PowerSpawnProcs.run(this.room)
     SpawningStructureProcs.createPowerTasks(this.room)
 
     this.room.roomManager.creepRoleManager.run()

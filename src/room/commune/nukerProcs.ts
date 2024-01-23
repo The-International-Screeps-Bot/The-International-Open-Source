@@ -4,7 +4,7 @@ import { RoomObjectUtils } from 'room/roomObjectUtils'
 const nukerResources = [RESOURCE_ENERGY, RESOURCE_GHODIUM]
 
 export class NukerProcs {
-  run(room: Room) {
+  static run(room: Room) {
     const roomMemory = Memory.rooms[room.name]
     const requestName = roomMemory[RoomMemoryKeys.nukeRequest]
     if (!requestName) return
@@ -22,7 +22,7 @@ export class NukerProcs {
     )
   }
 
-  private createRoomLogisticsRequests(room: Room, nuker: StructureNuker) {
+  private static createRoomLogisticsRequests(room: Room, nuker: StructureNuker) {
     let result = Result.noAction
 
     for (const resource of nukerResources) {
@@ -40,5 +40,3 @@ export class NukerProcs {
     return result
   }
 }
-
-export const nukerProcs = new NukerProcs()

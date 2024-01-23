@@ -6,7 +6,7 @@ import { MarketManager } from 'international/market/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
 
 export class TradingUtils {
-  advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
+  static advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {
     const mySpecificOrders = MarketManager.myOrders[room.name]?.[ORDER_SELL][resourceType] || []
 
     for (const order of mySpecificOrders) amount -= order.remainingAmount
@@ -67,7 +67,8 @@ export class TradingUtils {
 
     return Result.success
   }
-  advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
+
+  static advancedBuy(room: Room, resourceType: ResourceConstant, amount: number) {
     const mySpecificOrders = MarketManager.myOrders[room.name]?.[ORDER_BUY][resourceType] || []
 
     for (const order of mySpecificOrders) amount -= order.remainingAmount
@@ -127,6 +128,7 @@ export class TradingUtils {
 
     return Result.success
   }
+
   /**
    * Finds the largest possible transaction amount given a budget and starting amount
    * @param budget The number of energy willing to be invested in the trade
@@ -135,7 +137,7 @@ export class TradingUtils {
    * @param roomName2
    * @returns
    */
-  findLargestTransactionAmount(
+  static findLargestTransactionAmount(
     budget: number,
     amount: number,
     roomName1: string,
@@ -153,7 +155,7 @@ export class TradingUtils {
 
     return Math.floor(amount)
   }
-  advancedDeal(room: Room, order: Order, amount: number) {
+  static advancedDeal(room: Room, order: Order, amount: number) {
     const dealAmount = this.findLargestTransactionAmount(
       room.terminal.store.energy * 0.75,
       amount,
@@ -172,7 +174,7 @@ export class TradingUtils {
     return Result.success
   }
 
-  getPriority(amount: number, targetAmount: number) {
+  static getPriority(amount: number, targetAmount: number) {
     // the / 2 is temporary
     const priority = roundTo(1 - amount / targetAmount, 2)
     return priority
@@ -181,16 +183,14 @@ export class TradingUtils {
   /**
    * Inverse function of priority
    */
-  getTargetAmountFromPriority(priority: number, amount: number) {
+  static getTargetAmountFromPriority(priority: number, amount: number) {
     return amount / -(priority - 1)
   }
 
   /**
    * Inverse function of priority
    */
-  getAmountFromPriority(priority: number, targetAmount: number) {
+  static getAmountFromPriority(priority: number, targetAmount: number) {
     return targetAmount * -(priority - 1)
   }
 }
-
-export const tradingUtils = new TradingUtils()
