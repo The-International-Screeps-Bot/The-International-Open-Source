@@ -6,7 +6,7 @@ import {
   customColors,
 } from 'international/constants'
 import { randomIntRange, randomTick, utils } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { statsManager } from 'international/statsManager'
 import { WorkRequest } from 'types/internationalRequests'

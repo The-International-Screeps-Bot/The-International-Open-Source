@@ -15,18 +15,18 @@ import { playerManager } from 'international/players'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { statsManager } from 'international/statsManager'
 import {
-    findObjectWithID,
-    findWeightedRangeFromExit,
-    getRange,
-    isAlly,
-    isXYInBorder,
-    randomIntRange,
-    randomRange,
-    randomTick,
+  findObjectWithID,
+  findWeightedRangeFromExit,
+  getRange,
+  isAlly,
+  isXYInBorder,
+  randomIntRange,
+  randomRange,
+  randomTick,
 } from 'utils/utils'
 import { packCoord } from 'other/codec'
 import { CommuneManager } from './commune'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { customLog, LogTypes } from 'utils/logging'
@@ -69,11 +69,11 @@ export class DefenceManager {
         if (controller.ticksToDowngrade <= CONTROLLER_DOWNGRADE_SAFEMODE_THRESHOLD) return false
         // If another room is safemoded, make sure that we are a higher level
         if (
-            collectiveManager.safemodedCommuneName &&
-            Game.rooms[collectiveManager.safemodedCommuneName].controller.level >=
-                this.communeManager.room.controller.level
+          CollectiveManager.safemodedCommuneName &&
+          Game.rooms[CollectiveManager.safemodedCommuneName].controller.level >=
+            this.communeManager.room.controller.level
         )
-            return false
+          return false
 
         // Filter attackers that are not invaders. If there are none, stop
 
@@ -178,10 +178,10 @@ export class DefenceManager {
         if (!this.shouldSafeMode()) return
 
         // If another room is safemoded and we determined it to be okay: unclaim it so we can safemode
-        if (collectiveManager.safemodedCommuneName) {
-            const safemodedRoom = Game.rooms[collectiveManager.safemodedCommuneName]
-            safemodedRoom.controller.unclaim()
-            // Add a return if we can't unclaim and safemode on the same tick
+        if (CollectiveManager.safemodedCommuneName) {
+          const safemodedRoom = Game.rooms[CollectiveManager.safemodedCommuneName]
+          safemodedRoom.controller.unclaim()
+          // Add a return if we can't unclaim and safemode on the same tick
         }
 
         if (this.communeManager.room.controller.activateSafeMode() !== OK) return
@@ -189,7 +189,7 @@ export class DefenceManager {
         // Safemode was probably activated
 
         // Record that we safemoded so other communes know
-        collectiveManager.safemodedCommuneName = this.communeManager.room.name
+        CollectiveManager.safemodedCommuneName = this.communeManager.room.name
     }
 
     private considerRampartsPublic() {
@@ -328,7 +328,7 @@ export class DefenceManager {
 
         if (!global.settings.allyCommunication) return
 
-        simpleAllies.myRequests.defense.push({
+        simpleAllies.requestDefense({
             roomName: room.name,
             priority: 1,
         })

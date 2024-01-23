@@ -105,6 +105,10 @@ import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
 import { RoomProcs } from 'room/roomProcs'
 import { RoomNameProcs } from 'room/roomNameProcs'
+import { RoomsManager } from 'room/rooms'
+import { SegmentsManager } from 'international/segments'
+import { wasm } from './wasmInit'
+import { initSync } from '../wasm/pkg/commiebot_wasm.js'
 
 export function profilerRegister() {
   // Classes
@@ -134,9 +138,11 @@ export function profilerRegister() {
   profiler.registerClass(TradingUtils, 'MarketUtils')
   profiler.registerClass(Utils, 'Utils')
   profiler.registerClass(Procs, 'Procs')
+  profiler.registerClass(SegmentsManager, 'SegmentsManager')
 
   // Room classes
 
+  profiler.registerClass(RoomsManager, 'RoomsManager')
   profiler.registerClass(CommuneManager, 'CommuneManager')
   profiler.registerClass(RoomManager, 'RoomManager')
   profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
@@ -202,6 +208,8 @@ export function profilerRegister() {
   // Functions
 
   profiler.registerFN(originalLoop, 'loop')
+  profiler.registerFN(wasm.collaborator, 'wasm.collaborator')
+  profiler.registerFN(initSync, 'wasm.initSync')
 
   // codec functions
 

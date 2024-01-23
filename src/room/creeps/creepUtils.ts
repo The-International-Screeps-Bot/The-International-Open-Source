@@ -18,7 +18,7 @@ import { arePositionsEqual, findObjectWithID, findWithLowestScore, getRange } fr
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
 import { RoomManager } from 'room/room'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from './myCreepUtils'

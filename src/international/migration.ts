@@ -6,7 +6,7 @@ import { roomNameProcs } from 'room/roomNameProcs'
  * Migrate version by performing actions, if required
  */
 export class MigrationManager {
-  public run() {
+  public static run() {
     // We are at the right version, no need to migrate
     if (Memory.breakingVersion === global.settings.breakingVersion) return
 
@@ -27,7 +27,7 @@ export class MigrationManager {
     this.hardMigration()
   }
 
-  private trySoftMigrations() {
+  private static trySoftMigrations() {
 
     if (Memory.breakingVersion === 89) {
       global.killCreeps()
@@ -85,7 +85,7 @@ export class MigrationManager {
     }
   }
 
-  private hardMigration() {
+  private static hardMigration() {
 
       global.killCreeps()
       global.killPowerCreeps()
@@ -94,5 +94,3 @@ export class MigrationManager {
 
   }
 }
-
-export const migrationManager = new MigrationManager()

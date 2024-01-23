@@ -20,127 +20,127 @@ export class CollectiveManager extends Sleepable {
   /**
    * Antifa creeps by combat request name, then by role with an array of creep names
    */
-  creepsByCombatRequest: { [requestName: string]: Partial<{ [key in CreepRoles]: string[] }> }
+  static creepsByCombatRequest: { [requestName: string]: Partial<{ [key in CreepRoles]: string[] }> }
 
-  creepsByHaulRequest: { [requestName: string]: string[] }
+  static creepsByHaulRequest: { [requestName: string]: string[] }
 
-  unspawnedPowerCreepNames: string[]
+  static unspawnedPowerCreepNames: string[]
 
-  terminalRequests: { [ID: string]: TerminalRequest }
+  static terminalRequests: { [ID: string]: TerminalRequest }
 
-  tickID: number
-  customCreepIDs: true[]
-  customCreepIDIndex: number
+  static tickID: number
+  static customCreepIDs: true[]
+  static customCreepIDIndex: number
 
-  internationalDataVisuals: boolean
+  static internationalDataVisuals: boolean
 
-  terminalCommunes: string[]
+  static terminalCommunes: string[]
 
   /**
    * The aggregate number of each mineral nodes we have access to
    */
-  mineralNodes: Partial<{ [key in MineralConstant]: number }>
+  static mineralNodes: Partial<{ [key in MineralConstant]: number }>
 
   /**
    * The name of the room that is safemoded, if there is one
    */
-  safemodedCommuneName: string | undefined
+  static safemodedCommuneName: string | undefined
   /**
    * An intra-tick collection of commands we wish to issue
    */
-  myCommands: any[]
+  static myCommands: any[]
   /**
    * Terrain binaries of wall or not wall for rooms
    */
-  terrainBinaries: { [roomName: string]: Uint8Array } = {}
-  constructionSiteCount = 0
-  creepCount: number
-  powerCreepCount: number
+  static terrainBinaries: { [roomName: string]: Uint8Array } = {}
+  static constructionSiteCount = 0
+  static creepCount: number
+  static powerCreepCount: number
   /**
    * A string to console log as rich text
    */
-  logs = ''
+  static logs = ''
   /**
    * Room names that have controllers we own
    */
-  communes: Set<string>
-  communesForWorkRequests: Set<string>
-  communesForCombatRequests: Set<string>
-  communesForHaulRequests: Set<string>
+  static communes: Set<string>
+  static communesForWorkRequests: Set<string>
+  static communesForCombatRequests: Set<string>
+  static communesForHaulRequests: Set<string>
 
   /**
-   * Updates values to be present for this tick
+   * Updates values to be present for CollectiveManager tick
    */
-  update() {
+  static update() {
     // initalize or re-initialize
 
-    this.creepsByCombatRequest = {}
-    this.creepsByHaulRequest = {}
-    this.unspawnedPowerCreepNames = []
-    this.terminalRequests = {}
-    this.terminalCommunes = []
+    CollectiveManager.creepsByCombatRequest = {}
+    CollectiveManager.creepsByHaulRequest = {}
+    CollectiveManager.unspawnedPowerCreepNames = []
+    CollectiveManager.terminalRequests = {}
+    CollectiveManager.terminalCommunes = []
 
-    this.tickID = 0
-    this.customCreepIDs = []
-    this.customCreepIDIndex = 0
-    this.mineralNodes = {}
+    CollectiveManager.tickID = 0
+    CollectiveManager.customCreepIDs = []
+    CollectiveManager.customCreepIDIndex = 0
+    CollectiveManager.mineralNodes = {}
     for (const mineralType of minerals) {
-      this.mineralNodes[mineralType] = 0
+      CollectiveManager.mineralNodes[mineralType] = 0
     }
-    this.myCommands = []
-    this.logs = ''
-    this.creepCount = 0
-    this.powerCreepCount = 0
-    this.communes = new Set()
-    this.communesForWorkRequests = new Set()
-    this.communesForCombatRequests = new Set()
-    this.communesForHaulRequests = new Set()
+    CollectiveManager.myCommands = []
+    CollectiveManager.logs = ''
+    CollectiveManager.creepCount = 0
+    CollectiveManager.powerCreepCount = 0
+    CollectiveManager.communes = new Set()
+    CollectiveManager.communesForWorkRequests = new Set()
+    CollectiveManager.communesForCombatRequests = new Set()
+    CollectiveManager.communesForHaulRequests = new Set()
 
     // delete
 
-    this.safemodedCommuneName = undefined
-    this._workRequestsByScore = undefined
-    this._defaultMinCacheAmount = undefined
-    this.internationalDataVisuals = undefined
+    CollectiveManager.safemodedCommuneName = undefined
+    CollectiveManager._workRequestsByScore = undefined
+    CollectiveManager._defaultMinCacheAmount = undefined
+    CollectiveManager.internationalDataVisuals = undefined
 
     //
 
-    this.updateMinHaulerCost()
+    CollectiveManager.updateMinHaulerCost()
 
-    // Run this stuff every so often
+    // Run CollectiveManager stuff every so often
 
     if (utils.isTickInterval(periodicUpdateInterval)) {
       // delete
 
-      this._funnelOrder = undefined
-      this._funnelingRoomNames = undefined
-      this._minCredits = undefined
-      this._resourcesInStoringStructures = undefined
-      this._maxCSitesPerRoom = undefined
+      CollectiveManager._funnelOrder = undefined
+      CollectiveManager._funnelingRoomNames = undefined
+      CollectiveManager._minCredits = undefined
+      CollectiveManager._resourcesInStoringStructures = undefined
+      CollectiveManager._maxCSitesPerRoom = undefined
     }
 
     //
   }
 
-  newCustomCreepID() {
+  static newCustomCreepID() {
     // Try to use an existing unused ID index
 
-    for (; this.customCreepIDIndex < this.customCreepIDs.length; this.customCreepIDIndex++) {
-      if (this.customCreepIDs[this.customCreepIDIndex]) continue
+    for (; CollectiveManager.customCreepIDIndex < CollectiveManager.customCreepIDs.length; CollectiveManager.customCreepIDIndex++) {
+      if (CollectiveManager.customCreepIDs[CollectiveManager.customCreepIDIndex]) continue
 
-      this.customCreepIDs[this.customCreepIDIndex] = true
-      this.customCreepIDIndex += 1
-      return this.customCreepIDIndex - 1
+      CollectiveManager.customCreepIDs[CollectiveManager.customCreepIDIndex] = true
+      CollectiveManager.customCreepIDIndex += 1
+      return CollectiveManager.customCreepIDIndex - 1
     }
 
     // All previous indexes are being used, add a new index
 
-    this.customCreepIDs.push(true)
-    this.customCreepIDIndex += 1
-    return this.customCreepIDIndex - 1
+    CollectiveManager.customCreepIDs.push(true)
+    CollectiveManager.customCreepIDIndex += 1
+    return CollectiveManager.customCreepIDIndex - 1
   }
 
-  advancedGeneratePixel() {
+  static advancedGeneratePixel() {
     if (!global.settings.pixelGeneration) return
 
     // Stop if the bot is not running on MMO
@@ -152,7 +152,7 @@ export class CollectiveManager extends Sleepable {
     Game.cpu.generatePixel()
   }
 
-  updateMinHaulerCost() {
+  static updateMinHaulerCost() {
     if (Game.time - Memory.minHaulerCostUpdate < haulerUpdateDefault) return
 
     // cpu limit is potentially variable if GCL changes
@@ -179,39 +179,39 @@ export class CollectiveManager extends Sleepable {
   /**
    * Provides a cached binary of wall or not wall terrain
    */
-  getTerrainBinary(roomName: string) {
-    if (this.terrainBinaries[roomName]) return this.terrainBinaries[roomName]
+  static getTerrainBinary(roomName: string) {
+    if (CollectiveManager.terrainBinaries[roomName]) return CollectiveManager.terrainBinaries[roomName]
 
-    this.terrainBinaries[roomName] = new Uint8Array(2500)
+    CollectiveManager.terrainBinaries[roomName] = new Uint8Array(2500)
 
     const terrain = Game.map.getRoomTerrain(roomName)
 
     for (let x = 0; x < roomDimensions; x += 1) {
       for (let y = 0; y < roomDimensions; y += 1) {
-        this.terrainBinaries[roomName][packXYAsNum(x, y)] =
+        CollectiveManager.terrainBinaries[roomName][packXYAsNum(x, y)] =
           terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
       }
     }
 
-    return this.terrainBinaries[roomName]
+    return CollectiveManager.terrainBinaries[roomName]
   }
 
-  newTickID() {
-    return (this.tickID += 1).toString()
+  static newTickID() {
+    return (CollectiveManager.tickID += 1).toString()
   }
 
-  _minCredits: number
-  get minCredits() {
-    if (this._minCredits !== undefined) return this._minCredits
+  static _minCredits: number
+  static get minCredits() {
+    if (CollectiveManager._minCredits !== undefined) return CollectiveManager._minCredits
 
-    return (this._minCredits = collectiveManager.communes.size * 10000)
+    return (CollectiveManager._minCredits = CollectiveManager.communes.size * 10000)
   }
 
-  _workRequestsByScore: (string | undefined)[]
-  get workRequestsByScore(): (string | undefined)[] {
-    if (this._workRequestsByScore) return this._workRequestsByScore
+  static _workRequestsByScore: (string | undefined)[]
+  static get workRequestsByScore(): (string | undefined)[] {
+    if (CollectiveManager._workRequestsByScore) return CollectiveManager._workRequestsByScore
 
-    return (this._workRequestsByScore = Object.keys(Memory.workRequests).sort(
+    return (CollectiveManager._workRequestsByScore = Object.keys(Memory.workRequests).sort(
       (a, b) =>
         (Memory.workRequests[a][WorkRequestKeys.priority] ??
           Memory.rooms[a][RoomMemoryKeys.score] + Memory.rooms[a][RoomMemoryKeys.dynamicScore]) -
@@ -220,47 +220,47 @@ export class CollectiveManager extends Sleepable {
     ))
   }
 
-  _defaultMinCacheAmount: number
-  get defaultMinPathCacheTime() {
-    if (this._defaultMinCacheAmount !== undefined) return this._defaultMinCacheAmount
+  static _defaultMinCacheAmount: number
+  static get defaultMinPathCacheTime() {
+    if (CollectiveManager._defaultMinCacheAmount !== undefined) return CollectiveManager._defaultMinCacheAmount
 
     const avgCPUUsagePercent = Memory.stats.cpu.usage / Game.cpu.limit
 
-    return (this._defaultMinCacheAmount = Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1)
+    return (CollectiveManager._defaultMinCacheAmount = Math.floor(Math.pow(avgCPUUsagePercent * 10, 2.2)) + 1)
   }
 
-  _maxCommunes: number
-  get maxCommunes() {
-    return (this._maxCommunes = Math.round(Game.cpu.limit / 10))
+  static _maxCommunes: number
+  static get maxCommunes() {
+    return (CollectiveManager._maxCommunes = Math.round(Game.cpu.limit / 10))
   }
 
-  _avgCommunesPerMineral: number
-  get avgCommunesPerMineral() {
+  static _avgCommunesPerMineral: number
+  static get avgCommunesPerMineral() {
     let sum = 0
 
-    for (const mineralType in this.mineralNodes) {
-      sum += this.mineralNodes[mineralType as MineralConstant]
+    for (const mineralType in CollectiveManager.mineralNodes) {
+      sum += CollectiveManager.mineralNodes[mineralType as MineralConstant]
     }
 
     const avg = roundTo(sum / minerals.length, 2)
-    return (this._avgCommunesPerMineral = avg)
+    return (CollectiveManager._avgCommunesPerMineral = avg)
   }
 
-  _compoundPriority: Partial<{ [key in MineralCompoundConstant]: number }>
-  get compoundPriority() {
-    if (this._compoundPriority) return this._compoundPriority
+  static _compoundPriority: Partial<{ [key in MineralCompoundConstant]: number }>
+  static get compoundPriority() {
+    if (CollectiveManager._compoundPriority) return CollectiveManager._compoundPriority
 
-    this._compoundPriority = {}
+    CollectiveManager._compoundPriority = {}
 
-    return this._compoundPriority
+    return CollectiveManager._compoundPriority
   }
 
-  _funnelOrder: string[]
+  static _funnelOrder: string[]
   /**
    * Commune names sorted by funnel priority
    */
-  getFunnelOrder() {
-    if (this._funnelOrder) return this._funnelOrder
+  static getFunnelOrder() {
+    if (CollectiveManager._funnelOrder) return CollectiveManager._funnelOrder
 
     let funnelOrder: string[] = []
 
@@ -269,7 +269,7 @@ export class CollectiveManager extends Sleepable {
     const communesByLevel: { [level: string]: [string, number][] } = {}
     for (let i = 6; i < 8; i++) communesByLevel[i] = []
 
-    for (const roomName of collectiveManager.communes) {
+    for (const roomName of CollectiveManager.communes) {
       const room = Game.rooms[roomName]
       if (!room.terminal) continue
 
@@ -292,23 +292,23 @@ export class CollectiveManager extends Sleepable {
       funnelOrder = funnelOrder.concat(communesByLevel[level].map(tuple => tuple[0]))
     }
 
-    return (this._funnelOrder = funnelOrder)
+    return (CollectiveManager._funnelOrder = funnelOrder)
   }
 
-  _funnelingRoomNames: Set<string>
+  static _funnelingRoomNames: Set<string>
   /**
    * The unordered names of rooms currently being funneled. Does 2 passes.
-   * For a room to be in this list, it must be part of a censecutive line starting from index 0.
+   * For a room to be in CollectiveManager list, it must be part of a censecutive line starting from index 0.
    * Take an example where x means the room is not wanting to be funneled and y means they are:
    * {y, y, y, x, y}.
    * The last room wants to be funneled, however, only the first 3 rooms will be, excluding the last 2: {y, y, y, x, x}.
    */
-  getFunnelingRoomNames() {
-    if (this._funnelingRoomNames) return this._funnelingRoomNames
-    /* if (this._funnelingRoomNames) return this._funnelingRoomNames
+  static getFunnelingRoomNames() {
+    if (CollectiveManager._funnelingRoomNames) return CollectiveManager._funnelingRoomNames
+    /* if (CollectiveManager._funnelingRoomNames) return CollectiveManager._funnelingRoomNames
 
     const funnelingRoomNames = new Set<string>()
-    const funnelTargets = this.funnelOrder
+    const funnelTargets = CollectiveManager.funnelOrder
 
     for (const roomName of funnelTargets) {
       const room = Game.rooms[roomName]
@@ -322,12 +322,12 @@ export class CollectiveManager extends Sleepable {
       funnelingRoomNames.add(roomName)
     }
 
-    this._funnelingRoomNames = funnelingRoomNames
+    CollectiveManager._funnelingRoomNames = funnelingRoomNames
     return funnelingRoomNames */
 
-    const funnelOrder = this.getFunnelOrder()
+    const funnelOrder = CollectiveManager.getFunnelOrder()
     // Rooms that want to get funneled might not get to be if they aren't in line for funneling
-    const funnelWanters = this.getFunnelWanters(funnelOrder)
+    const funnelWanters = CollectiveManager.getFunnelWanters(funnelOrder)
 
     const funnelingRoomNames = new Set<string>()
 
@@ -341,17 +341,17 @@ export class CollectiveManager extends Sleepable {
       funnelingRoomNames.add(roomName)
     }
 
-    this._funnelingRoomNames = funnelingRoomNames
+    CollectiveManager._funnelingRoomNames = funnelingRoomNames
     return funnelingRoomNames
   }
 
   /**
    * Qualifying rooms either want to be funneled, or the room next in line to get funneled wants to be funneled.
    * Take a line where x means the rooms don't independently want to be funneled, and y means they do {x, x, y, y, x}.
-   * This function will work from back to front so that if a previous room wants to be funneled, so will the proceeding one.
-   * In this example, the set should convert to {y, y, y, y, x}
+   * CollectiveManager function will work from back to front so that if a previous room wants to be funneled, so will the proceeding one.
+   * In CollectiveManager example, the set should convert to {y, y, y, y, x}
    */
-  private getFunnelWanters(funnelOrder: string[]) {
+  private static getFunnelWanters(funnelOrder: string[]) {
     const funnelWanters = new Set<string>()
     let previousWantsToBeIndependentlyFunneled: boolean
 
@@ -375,40 +375,38 @@ export class CollectiveManager extends Sleepable {
     return funnelWanters
   }
 
-  _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
-  get resourcesInStoringStructures() {
-    if (this._resourcesInStoringStructures) return this._resourcesInStoringStructures
+  static _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
+  static get resourcesInStoringStructures() {
+    if (CollectiveManager._resourcesInStoringStructures) return CollectiveManager._resourcesInStoringStructures
 
-    this._resourcesInStoringStructures = {}
+    CollectiveManager._resourcesInStoringStructures = {}
 
-    for (const roomName of collectiveManager.communes) {
+    for (const roomName of CollectiveManager.communes) {
       const room = Game.rooms[roomName]
       const resources = room.roomManager.resourcesInStoringStructures
 
       for (const key in resources) {
         const resource = key as unknown as ResourceConstant
 
-        if (!this._resourcesInStoringStructures[resource]) {
-          this._resourcesInStoringStructures[resource] = resources[resource]
+        if (!CollectiveManager._resourcesInStoringStructures[resource]) {
+          CollectiveManager._resourcesInStoringStructures[resource] = resources[resource]
           continue
         }
 
-        this._resourcesInStoringStructures[resource] += resources[resource]
+        CollectiveManager._resourcesInStoringStructures[resource] += resources[resource]
       }
     }
 
-    return this._resourcesInStoringStructures
+    return CollectiveManager._resourcesInStoringStructures
   }
 
-  _maxCSitesPerRoom: number
+  static _maxCSitesPerRoom: number
   /**
    * The largest amount of construction sites we can try to have in a room
    */
-  get maxCSitesPerRoom() {
-    if (this._maxCSitesPerRoom) return this._maxCSitesPerRoom
+  static get maxCSitesPerRoom() {
+    if (CollectiveManager._maxCSitesPerRoom) return CollectiveManager._maxCSitesPerRoom
 
-    return Math.max(Math.min(MAX_CONSTRUCTION_SITES / collectiveManager.communes.size, 20), 3)
+    return Math.max(Math.min(MAX_CONSTRUCTION_SITES / CollectiveManager.communes.size, 20), 3)
   }
 }
-
-export const collectiveManager = new CollectiveManager()

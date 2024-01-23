@@ -1,17 +1,17 @@
 // General processes
 
-import { collectiveManager } from "international/collective"
+import { CollectiveManager } from 'international/collective'
 import { LogTypes, customLog } from "./logging"
 
 export class Procs {
   outOfBucket() {
-    collectiveManager.logs = ''
+    CollectiveManager.logs = ''
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
       type: LogTypes.warning,
     })
     console.log(
       global.settings.logging
-        ? collectiveManager.logs
+        ? CollectiveManager.logs
         : `Skipping tick due to low bucket, bucket remaining ${Game.cpu.bucket}`,
     )
   }

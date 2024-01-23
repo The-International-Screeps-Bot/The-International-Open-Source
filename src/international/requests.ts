@@ -1,17 +1,17 @@
 import { randomIntRange, randomRange, utils } from 'utils/utils'
-import { collectiveManager } from './collective'
+import { CollectiveManager } from './collective'
 import { roomNameUtils } from 'room/roomNameUtils'
 import {
-    CombatRequestKeys,
-    HaulRequestKeys,
-    RoomMemoryKeys,
-    RoomStatusKeys,
-    RoomTypes,
-    WorkRequestKeys,
-    antifaRoles,
-    maxCombatDistance,
-    maxHaulDistance,
-    maxWorkRequestDistance,
+  CombatRequestKeys,
+  HaulRequestKeys,
+  RoomMemoryKeys,
+  RoomStatusKeys,
+  RoomTypes,
+  WorkRequestKeys,
+  antifaRoles,
+  maxCombatDistance,
+  maxHaulDistance,
+  maxWorkRequestDistance,
 } from './constants'
 import { indexOf } from 'lodash'
 import { Sleepable } from 'utils/sleepable'
@@ -72,9 +72,9 @@ export class RequestsManager extends Sleepable {
       const request = Memory.combatRequests[requestName]
 
       if (request[CombatRequestKeys.responder]) {
-        collectiveManager.creepsByCombatRequest[requestName] = {}
+        CollectiveManager.creepsByCombatRequest[requestName] = {}
         for (const role of antifaRoles)
-          collectiveManager.creepsByCombatRequest[requestName][role] = []
+          CollectiveManager.creepsByCombatRequest[requestName][role] = []
         request[CombatRequestKeys.quads] = 0
         continue
       }
@@ -93,7 +93,7 @@ export class RequestsManager extends Sleepable {
       const request = Memory.haulRequests[requestName]
 
       if (request[HaulRequestKeys.responder]) {
-        collectiveManager.creepsByHaulRequest[requestName] = []
+        CollectiveManager.creepsByHaulRequest[requestName] = []
         continue
       }
 
@@ -110,9 +110,9 @@ export class RequestsManager extends Sleepable {
 
   private runWorkRequests() {
     if (!global.settings.autoClaim) return
-    /* if (collectiveManager.communes.size >= collectiveManager.maxCommunes) return */
+    /* if (CollectiveManager.communes.size >= CollectiveManager.maxCommunes) return */
 
-    let reservedGCL = Game.gcl.level - collectiveManager.communes.size
+    let reservedGCL = Game.gcl.level - CollectiveManager.communes.size
 
     // Subtract the number of workRequests with responders
 
@@ -127,7 +127,7 @@ export class RequestsManager extends Sleepable {
 
     const communesForResponding = new Set<string>()
 
-    for (const roomName of collectiveManager.communes) {
+    for (const roomName of CollectiveManager.communes) {
       if (!communeUtils.canTakeNewWorkRequest(roomName)) continue
 
       communesForResponding.add(roomName)
@@ -135,7 +135,7 @@ export class RequestsManager extends Sleepable {
 
     // Assign and abandon workRequests, in order of score
 
-    const workRequests = collectiveManager.workRequestsByScore
+    const workRequests = CollectiveManager.workRequestsByScore
     for (const roomName of workRequests) {
       const request = Memory.workRequests[roomName]
 
@@ -200,11 +200,13 @@ export class RequestsManager extends Sleepable {
     }
   }
 
-  private shouldWorkRequestGetResponse(request: WorkRequest, roomName: string, reservedGCL: number) {
-
+  private shouldWorkRequestGetResponse(
+    request: WorkRequest,
+    roomName: string,
+    reservedGCL: number,
+  ) {
     // If there is no GCL left to claim with
     if (Game.gcl.level <= reservedGCL) {
-
       const room = Game.rooms[roomName]
       // If we don't own the request room's contorller already, then we should stop
       if (room && !room.controller.my) {
@@ -215,7 +217,7 @@ export class RequestsManager extends Sleepable {
     if (request[WorkRequestKeys.abandon]) return false
     if (
       request[WorkRequestKeys.responder] &&
-      collectiveManager.communes.has(request[WorkRequestKeys.responder])
+      CollectiveManager.communes.has(request[WorkRequestKeys.responder])
     ) {
       return false
     }
@@ -229,7 +231,7 @@ export class RequestsManager extends Sleepable {
       if (request[CombatRequestKeys.abandon]) continue
       if (
         request[CombatRequestKeys.responder] &&
-        collectiveManager.communes.has(request[CombatRequestKeys.responder])
+        CollectiveManager.communes.has(request[CombatRequestKeys.responder])
       )
         continue
 
@@ -237,7 +239,7 @@ export class RequestsManager extends Sleepable {
 
       const communes = []
 
-      for (const roomName of collectiveManager.communes) {
+      for (const roomName of CollectiveManager.communes) {
         /* if (Memory.rooms[roomName].combatRequests.includes(requestName)) continue */
 
         // Ensure the combatRequest isn't responded to by the room the request is for
@@ -289,7 +291,10 @@ export class RequestsManager extends Sleepable {
       const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
-      if (Memory.rooms[communeName][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]) {
+      if (
+        Memory.rooms[communeName][RoomMemoryKeys.status] !==
+        Memory.rooms[requestName][RoomMemoryKeys.status]
+      ) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
         request[CombatRequestKeys.abandon] = 20000
@@ -316,9 +321,9 @@ export class RequestsManager extends Sleepable {
       Memory.rooms[communeName][RoomMemoryKeys.combatRequests].push(requestName)
       request[CombatRequestKeys.responder] = communeName
 
-      collectiveManager.creepsByCombatRequest[requestName] = {}
+      CollectiveManager.creepsByCombatRequest[requestName] = {}
       for (const role of antifaRoles) {
-        collectiveManager.creepsByCombatRequest[requestName][role] = []
+        CollectiveManager.creepsByCombatRequest[requestName][role] = []
       }
     }
   }
@@ -330,7 +335,7 @@ export class RequestsManager extends Sleepable {
       if (request[HaulRequestKeys.abandon]) continue
       if (
         request[HaulRequestKeys.responder] &&
-        collectiveManager.communes.has(request[HaulRequestKeys.responder])
+        CollectiveManager.communes.has(request[HaulRequestKeys.responder])
       )
         continue
 
@@ -338,7 +343,7 @@ export class RequestsManager extends Sleepable {
 
       const communes = []
 
-      for (const roomName of collectiveManager.communes) {
+      for (const roomName of CollectiveManager.communes) {
         if (Memory.rooms[roomName][RoomMemoryKeys.haulRequests].includes(requestName)) {
           continue
         }
@@ -362,7 +367,10 @@ export class RequestsManager extends Sleepable {
       const communeName = roomNameUtils.findClosestRoomName(requestName, communes)
       if (!communeName) continue
 
-      if (Memory.rooms[communeName][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]) {
+      if (
+        Memory.rooms[communeName][RoomMemoryKeys.status] !==
+        Memory.rooms[requestName][RoomMemoryKeys.status]
+      ) {
         // We probably can't reach as it will likely be a respawn, novice, or closed
 
         request[HaulRequestKeys.abandon] = 20000
@@ -389,7 +397,7 @@ export class RequestsManager extends Sleepable {
       Memory.rooms[communeName][RoomMemoryKeys.haulRequests].push(requestName)
       request[HaulRequestKeys.responder] = communeName
 
-      collectiveManager.creepsByHaulRequest[requestName] = []
+      CollectiveManager.creepsByHaulRequest[requestName] = []
     }
   }
 }

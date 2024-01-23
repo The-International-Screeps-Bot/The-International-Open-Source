@@ -12,15 +12,15 @@ import {
     roomTypeProperties,
     roomTypes,
 } from 'international/constants'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import {
-    findAdjacentCoordsToCoord,
-    forAdjacentCoords,
-    forRoomNamesAroundRangeXY,
-    getRange,
-    packAsNum,
-    packXYAsNum,
-    roundTo,
+  findAdjacentCoordsToCoord,
+  forAdjacentCoords,
+  forRoomNamesAroundRangeXY,
+  getRange,
+  packAsNum,
+  packXYAsNum,
+  roundTo,
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
@@ -33,9 +33,9 @@ import { roomNameProcs } from './roomNameProcs'
  * @returns Wether or not the position should be flooded next generation
  */
 type FloodForCoordCheck = (
-    coord: Coord,
-    packedCoord: number,
-    generation?: number,
+  coord: Coord,
+  packedCoord: number,
+  generation?: number,
 ) => boolean | Result.stop
 
 export class RoomNameUtils {
@@ -107,7 +107,7 @@ export class RoomNameUtils {
     const roomMemory = Memory.rooms[roomName]
     const mineralType = roomMemory[RoomMemoryKeys.mineralType]
     const mineralScore =
-      collectiveManager.mineralNodes[mineralType] - collectiveManager.avgCommunesPerMineral
+      CollectiveManager.mineralNodes[mineralType] - CollectiveManager.avgCommunesPerMineral
     dynamicScore += mineralScore * 40
 
     dynamicScore = roundTo(dynamicScore, 2)
@@ -168,6 +168,7 @@ export class RoomNameUtils {
 
     return false
   }
+
   /**
    * Removes roomType-based values in the room's memory that don't match its type
    */
@@ -184,13 +185,14 @@ export class RoomNameUtils {
       delete roomMemory[key as unknown as keyof RoomMemory]
     }
   }
+
   /**
    * Finds the name of the closest commune, exluding the specified roomName
    */
   findClosestCommuneName(roomName: string) {
     const communesNotThis = []
 
-    for (const communeName of collectiveManager.communes) {
+    for (const communeName of CollectiveManager.communes) {
       if (roomName == communeName) continue
 
       communesNotThis.push(communeName)
@@ -202,7 +204,7 @@ export class RoomNameUtils {
     )[0]
   }
   findClosestClaimType(roomName: string) {
-    return Array.from(collectiveManager.communes).sort(
+    return Array.from(CollectiveManager.communes).sort(
       (a, b) =>
         Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]

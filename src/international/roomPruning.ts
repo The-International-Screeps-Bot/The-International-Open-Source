@@ -1,7 +1,7 @@
 import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
 import { findLowestScore, randomIntRange } from '../utils/utils'
 import { Sleepable } from 'utils/sleepable'
-import { collectiveManager } from './collective'
+import { CollectiveManager } from './collective'
 
 export class RoomPruningManager extends Sleepable {
     sleepFor = randomIntRange(50000, 100000)
@@ -15,19 +15,19 @@ export class RoomPruningManager extends Sleepable {
         let highestCommuneScore = 0
         let highestCommuneScoreCommuneName: string
 
-        for (const roomName of collectiveManager.communes) {
-            const room = Game.rooms[roomName]
-            if (room.controller.level < maxControllerLevel) return
+        for (const roomName of CollectiveManager.communes) {
+          const room = Game.rooms[roomName]
+          if (room.controller.level < maxControllerLevel) return
 
-            rooms += 1
+          rooms += 1
 
-            const roomMemory = Memory.rooms[roomName]
-            const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
+          const roomMemory = Memory.rooms[roomName]
+          const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
 
-            if (score <= highestCommuneScore) continue
+          if (score <= highestCommuneScore) continue
 
-            highestCommuneScore = score
-            highestCommuneScoreCommuneName = roomName
+          highestCommuneScore = score
+          highestCommuneScoreCommuneName = roomName
         }
 
         // Have multiple rooms before we unclaim

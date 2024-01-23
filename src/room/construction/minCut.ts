@@ -65,7 +65,7 @@
  */
 
 import { customColors, roomDimensions } from 'international/constants'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'utils/utils'
 
 // the eight surrounding points of a tile

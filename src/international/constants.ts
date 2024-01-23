@@ -1,5 +1,5 @@
 import { packCoord } from 'other/codec'
-import { collectiveManager } from './collective'
+import { CollectiveManager } from './collective'
 import { CommuneManager } from 'room/commune/commune'
 import { randomIntRange } from 'utils/utils'
 

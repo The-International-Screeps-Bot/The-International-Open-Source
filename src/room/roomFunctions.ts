@@ -29,7 +29,7 @@ import {
   randomIntRange,
   roundTo,
 } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { packCoord, packCoordList, packXYAsCoord, unpackPosList } from 'other/codec'
 import { playerManager } from 'international/players'
 import { roomNameUtils } from './roomNameUtils'
@@ -174,7 +174,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
   if (
     roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-    !collectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
+    !CollectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
   )
     roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 
@@ -242,7 +242,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         for (const pos of path) {
             newSourceEfficacy +=
-                collectiveManager.getTerrainBinary(pos.roomName)[packAsNum(pos)] ===
+                CollectiveManager.getTerrainBinary(pos.roomName)[packAsNum(pos)] ===
                 TERRAIN_MASK_SWAMP
                     ? defaultSwampCost
                     : 1
@@ -847,7 +847,7 @@ Room.prototype.distanceTransform = function (
 
   const distanceCoords = new Uint8Array(2500)
 
-  if (!initialCoords) initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
+  if (!initialCoords) initialCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.name))
 
   let x
   let y
@@ -942,7 +942,7 @@ Room.prototype.diagonalDistanceTransform = function (
 
   const distanceCoords = new Uint8Array(2500)
 
-  if (!initialCoords) initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
+  if (!initialCoords) initialCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.name))
 
   let x
   let y
@@ -1559,7 +1559,7 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
   const effect = target.effectsData.get(powerType)
   const cooldown = effect ? effect.ticksRemaining : 0
 
-  const ID = collectiveManager.newTickID()
+  const ID = CollectiveManager.newTickID()
 
   return (this.powerTasks[ID] = {
     taskID: ID,
@@ -1636,7 +1636,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
   if (args.priority === undefined) args.priority = 1
   else args.priority = roundTo(args.priority / 20, 2)
 
-  const ID = collectiveManager.newTickID()
+  const ID = CollectiveManager.newTickID()
 
   if (Game.flags[FlagNames.debugRoomLogistics]) {
     if (args.type === RoomLogisticsRequestTypes.offer) {

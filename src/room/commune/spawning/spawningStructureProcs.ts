@@ -1,4 +1,4 @@
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import {
   CreepMemoryKeys,
   ReservedCoordTypes,
@@ -117,7 +117,7 @@ export class SpawningStructureProcs {
 
     const spawnIndex = this.findSpawnIndexForSpawnRequest(inactiveSpawns, request)
     const spawn = inactiveSpawns[spawnIndex]
-    const ID = collectiveManager.newCustomCreepID()
+    const ID = CollectiveManager.newCustomCreepID()
 
     // See if creep can be spawned
 

@@ -19,7 +19,7 @@ import {
   randomRange,
   roundTo,
 } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { packPos, unpackPosList } from 'other/codec'
 import { statsManager } from 'international/statsManager'
 import { CommuneManager } from '../commune'
@@ -362,7 +362,8 @@ export class SpawnRequestsManager {
         if (
           (!this.communeManager.room.roomManager.hubLink ||
             this.communeManager.room.roomManager.structures.link.length < 2) &&
-          (!this.communeManager.room.terminal || !structureUtils.isRCLActionable(this.communeManager.room.terminal))
+          (!this.communeManager.room.terminal ||
+            !structureUtils.isRCLActionable(this.communeManager.room.terminal))
         )
           return false
 
@@ -868,10 +869,8 @@ export class SpawnRequestsManager {
 
         // If there is a terminal and it is sufficient RCL, and there's a funnel target and we aren't it, then don't allow upgraders to spawn
         if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
-          const funnelingRoomNames = collectiveManager.getFunnelingRoomNames()
-          if (
-            !funnelingRoomNames.has(this.communeManager.room.name)
-          ) {
+          const funnelingRoomNames = CollectiveManager.getFunnelingRoomNames()
+          if (!funnelingRoomNames.has(this.communeManager.room.name)) {
             return false
           }
         }
@@ -1752,8 +1751,8 @@ export class SpawnRequestsManager {
 
             let spawnGroup: string[]
 
-            if (collectiveManager.creepsByCombatRequest[requestName]) {
-              spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+            if (CollectiveManager.creepsByCombatRequest[requestName]) {
+              spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
             }
             spawnGroup = []
 
@@ -1872,7 +1871,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaRangedAttacker'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
 
@@ -1907,7 +1906,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaDismantler'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minDismantleCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1940,7 +1939,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaAttacker'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minAttackCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1970,7 +1969,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaHealer'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minMeleeHealCost
                     let extraParts: BodyPartConstant[] = []
 

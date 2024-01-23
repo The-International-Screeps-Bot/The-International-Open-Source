@@ -8,7 +8,7 @@ import {
 } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { Duo } from './duo'
 import { Quad } from './quad'
 
@@ -18,10 +18,10 @@ export class Antifa extends Creep {
     }
 
     initRun() {
-        if (collectiveManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]])
-            collectiveManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]][
-                this.role
-            ].push(this.name)
+        if (CollectiveManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]])
+          CollectiveManager.creepsByCombatRequest[this.memory[CreepMemoryKeys.combatRequest]][
+            this.role
+          ].push(this.name)
 
         // We don't want a squad or we already have done
 

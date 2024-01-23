@@ -21,9 +21,9 @@ import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
 import { LogTypes, customLog } from 'utils/logging'
 
-class RoomsManager {
+export class RoomsManager {
 
-    updateRun() {
+    static updateRun() {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
 
@@ -38,14 +38,14 @@ class RoomsManager {
         }
     }
 
-    initRun() {
+    static initRun() {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
             room.roomManager.initRun()
         }
     }
 
-    run() {
+    static run() {
 
         for (const roomName in Game.rooms) {
 
@@ -53,7 +53,7 @@ class RoomsManager {
         }
     }
 
-    private runRoom(roomName: string) {
+    private static runRoom(roomName: string) {
 
         const startCPU = Game.cpu.generatePixel()
 
@@ -78,5 +78,3 @@ class RoomsManager {
         statsManager.updateCommuneStat(roomName, RoomStatsKeys.CpuUsed, usedCPU)
     }
 }
-
-export const roomsManager = new RoomsManager()

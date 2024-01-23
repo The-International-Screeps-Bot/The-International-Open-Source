@@ -11,7 +11,7 @@ import {
   ourImpassibleStructuresSet,
   packedPosLength,
 } from './constants'
-import { collectiveManager } from './collective'
+import { CollectiveManager } from './collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
@@ -909,8 +909,8 @@ export class FlagManager {
     const headers = ['roomName', 'resource', 'amount', 'priority']
     const data: any[][] = []
 
-    for (const ID in collectiveManager.terminalRequests) {
-      const request = collectiveManager.terminalRequests[ID]
+    for (const ID in CollectiveManager.terminalRequests) {
+      const request = CollectiveManager.terminalRequests[ID]
 
       const row: any[] = [request.roomName, request.resource, request.amount, request.priority]
       data.push(row)
@@ -956,7 +956,7 @@ export class FlagManager {
     const headers = ['resource', 'amount']
     const data: any[][] = []
 
-    const resourcesInStoringStructures = collectiveManager.resourcesInStoringStructures
+    const resourcesInStoringStructures = CollectiveManager.resourcesInStoringStructures
     for (const key in resourcesInStoringStructures) {
       const resourceType = key as ResourceConstant
 
@@ -1021,8 +1021,8 @@ export class FlagManager {
       return
     }
 
-    const funnelOrder = collectiveManager.getFunnelOrder()
-    const funnelWanters = Array.from(collectiveManager.getFunnelingRoomNames())
+    const funnelOrder = CollectiveManager.getFunnelOrder()
+    const funnelWanters = Array.from(CollectiveManager.getFunnelingRoomNames())
 
     const headers = ['funnel order', 'funnel wanted']
     const data: string[][] = []

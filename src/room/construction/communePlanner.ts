@@ -43,7 +43,7 @@ import {
   randomIntRange,
   sortBy,
 } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import {
   packCoord,
   packPos,
@@ -225,7 +225,7 @@ export class CommunePlanner {
 
     // Stop if there isn't sufficient CPU
     if (Game.cpu.bucket < CPUMaxPerTick) return Result.noAction
-    if (collectiveManager.communes.size <= 1 && Game.cpu.bucket < basePlanCPUBucketThreshold) {
+    if (CollectiveManager.communes.size <= 1 && Game.cpu.bucket < basePlanCPUBucketThreshold) {
       return Result.noAction
     }
 
@@ -252,7 +252,7 @@ export class CommunePlanner {
 
     if (!this.terrainCoords) {
       this.planAttempts = []
-      this.terrainCoords = collectiveManager.getTerrainBinary(this.room.name)
+      this.terrainCoords = CollectiveManager.getTerrainBinary(this.room.name)
     }
 
     // Plan attempt / configuration

@@ -33,7 +33,7 @@ import { packCoord, unpackPosAt } from 'other/codec'
 import { LinkManager } from './links'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
@@ -160,12 +160,12 @@ export class CommuneManager {
       return
     }
 
-    collectiveManager.communes.add(room.name)
+    CollectiveManager.communes.add(room.name)
 
-    if (this.room.controller.safeMode) collectiveManager.safemodedCommuneName = this.room.name
+    if (this.room.controller.safeMode) CollectiveManager.safemodedCommuneName = this.room.name
 
     if (!roomMemory[RoomMemoryKeys.greatestRCL]) {
-      if (collectiveManager.communes.size <= 1)
+      if (CollectiveManager.communes.size <= 1)
         roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
       else if (
         room.controller.progress > room.controller.progressTotal ||
@@ -221,10 +221,10 @@ export class CommuneManager {
     room.defenderEnemyTargetsWithDefender = new Map()
 
     if (room.terminal && room.controller.level >= 6) {
-      collectiveManager.terminalCommunes.push(room.name)
+      CollectiveManager.terminalCommunes.push(room.name)
     }
 
-    collectiveManager.mineralNodes[this.room.roomManager.mineral.mineralType] += 1
+    CollectiveManager.mineralNodes[this.room.roomManager.mineral.mineralType] += 1
   }
 
   initRun() {
@@ -1067,7 +1067,7 @@ export class CommuneManager {
 
   private energyMinResourceTarget(storingStructuresCapacity: number) {
     if (this.room.controller.level < 8) {
-      const funnelOrder = collectiveManager.getFunnelOrder()
+      const funnelOrder = CollectiveManager.getFunnelOrder()
       if (funnelOrder[0] === this.room.name) {
         return Math.min(
           this.storedEnergyUpgradeThreshold * 1.2 + this.upgradeTargetDistance(),

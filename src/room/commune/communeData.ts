@@ -1,5 +1,5 @@
-import { collectiveManager } from "international/collective";
-import { utils } from "utils/utils";
+import { CollectiveManager } from 'international/collective'
+import { utils } from 'utils/utils'
 
 interface CommuneData {
   /**
@@ -40,7 +40,6 @@ export class CommuneDataManager {
     const data = this.data[roomName]
 
     if (utils.isTickInterval(10)) {
-
       delete data.estimatedCommuneSourceIncome
       delete data.towerRampartRepairTreshold
     }

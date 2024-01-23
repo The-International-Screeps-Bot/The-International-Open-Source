@@ -2,8 +2,8 @@ import './settings'
 import './other/userScript/userScript'
 import './international/commands'
 import './debug/debugUtils'
-import { collectiveManager } from './international/collective'
-import { roomsManager } from 'room/rooms'
+import { CollectiveManager } from './international/collective'
+import { RoomsManager } from 'room/rooms'
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 import './room/roomObjectAdditions'
@@ -12,8 +12,8 @@ import './other/profilerRegister'
 import { memHack } from 'other/memHack'
 import { CPUMaxPerTick, Result } from 'international/constants'
 import { initManager } from './international/init'
-import { migrationManager } from 'international/migration'
-import { respawnManager } from './international/respawn'
+import { MigrationManager } from 'international/migration'
+import { RespawnManager } from './international/respawn'
 import { tickInit } from './international/tickInit'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { creepOrganizer } from './international/creepOrganizer'
@@ -32,7 +32,7 @@ import { wasm } from 'other/wasmInit'
 import { requestsManager } from 'international/requests'
 import { marketManager } from 'international/market/marketOrders'
 import { transactionsManager } from 'international/transactions'
-import { segmentsManager } from 'international/segments'
+import { SegmentsManager } from 'international/segments'
 import { creepDataManager } from 'room/creeps/creepData'
 import { roomDataManager } from 'room/roomData'
 import { utils } from 'utils/utils'
@@ -41,7 +41,7 @@ import { communeDataManager } from 'room/commune/communeData'
 
 export function originalLoop() {
   memHack.run()
-  if (segmentsManager.run() === Result.stop) return
+  if (SegmentsManager.run() === Result.stop) return
 
   if (Game.flags.deactivate) return
   if (Game.cpu.bucket < CPUMaxPerTick) {
@@ -51,26 +51,26 @@ export function originalLoop() {
   if (global.userScript) global.userScript.initialRun()
 
   profiler.wrap((): void => {
-    migrationManager.run()
-    respawnManager.run()
+    MigrationManager.run()
+    RespawnManager.run()
     initManager.run()
 
     tickInit.configGeneral()
     statsManager.tickInit()
-    collectiveManager.update()
+    CollectiveManager.update()
     simpleAllies.initRun()
     wasm.collaborator()
 
     roomDataManager.initRooms()
     roomDataManager.updateRooms()
-    roomsManager.updateRun()
+    RoomsManager.updateRun()
     transactionsManager.run()
     requestsManager.run()
 
     if (global.collectivizer) global.collectivizer.run()
     if (global.userScript) global.userScript.run()
     playerManager.run()
-    roomsManager.initRun()
+    RoomsManager.initRun()
     creepDataManager.updateCreeps()
     creepOrganizer.run()
     powerCreepOrganizer.run()
@@ -80,7 +80,7 @@ export function originalLoop() {
     constructionSiteManager.run()
     marketManager.run()
 
-    roomsManager.run()
+    RoomsManager.run()
 
     mapVisualsManager.run()
     simpleAllies.endRun()
@@ -88,9 +88,9 @@ export function originalLoop() {
     if (global.userScript) global.userScript.endRun()
     statsManager.internationalEndRun()
 
-    collectiveManager.advancedGeneratePixel()
+    CollectiveManager.advancedGeneratePixel()
 
-    segmentsManager.endRun()
+    SegmentsManager.endRun()
     endTickManager.run()
   })
 }

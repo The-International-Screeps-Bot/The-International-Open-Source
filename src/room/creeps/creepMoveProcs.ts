@@ -1,4 +1,4 @@
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import {
   CreepMemoryKeys,
   FlagNames,
@@ -41,7 +41,7 @@ export class CreepMoveProcs {
 
     // Assign default args
 
-    opts.cacheAmount ??= collectiveManager.defaultMinPathCacheTime
+    opts.cacheAmount ??= CollectiveManager.defaultMinPathCacheTime
 
     if (creepMoveProcs.useExistingPath(creep, args, opts) === Result.success) {
       return Result.success

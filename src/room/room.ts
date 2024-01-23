@@ -61,33 +61,33 @@ import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
 import { PathGoal, customPathFinder } from 'international/customPathFinder'
 import { roomNameUtils } from './roomNameUtils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
 import { structureUtils } from './structureUtils'
 import { remoteProcs } from './remoteProcs'
 import { logisticsProcs } from './logisticsProcs'
 
 export interface InterpretedRoomEvent {
-    eventType: EventConstant
-    actionType?: EventAttackType | EventHealType
-    amount?: number
-    target?: Id<Creep | PowerCreep | Structure | Resource | Ruin | Tombstone>
+  eventType: EventConstant
+  actionType?: EventAttackType | EventHealType
+  amount?: number
+  target?: Id<Creep | PowerCreep | Structure | Resource | Ruin | Tombstone>
 }
 
 export interface DeadCreepNames {
-    my: Set<string>
-    enemy: Set<string>
-    ally: Set<string>
+  my: Set<string>
+  enemy: Set<string>
+  ally: Set<string>
 }
 
 export interface NotMyCreeps {
-    ally: Creep[]
-    enemy: Creep[]
+  ally: Creep[]
+  enemy: Creep[]
 }
 
 export interface NotMyConstructionSites {
-    ally: ConstructionSite[]
-    enemy: ConstructionSite[]
+  ally: ConstructionSite[]
+  enemy: ConstructionSite[]
 }
 
 export class RoomManager {
@@ -542,10 +542,10 @@ export class RoomManager {
 
   isStartRoom() {
     return (
-      collectiveManager.communes.size === 1 &&
+      CollectiveManager.communes.size === 1 &&
       this.room.controller.my &&
       this.room.controller.safeMode &&
-      collectiveManager.communes.has(this.room.name)
+      CollectiveManager.communes.has(this.room.name)
     )
   }
 
@@ -1727,7 +1727,7 @@ export class RoomManager {
     if (this._quadCostMatrix) return this._quadCostMatrix
 
     const quadCostMatrix = new PathFinder.CostMatrix()
-    const terrainCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.room.name))
+    const terrainCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.room.name))
 
     const roadCoords = new Set()
     for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
@@ -1880,7 +1880,7 @@ export class RoomManager {
     if (this._quadBulldozeCostMatrix) return this._quadBulldozeCostMatrix
 
     const quadBulldozeCostMatrix = new PathFinder.CostMatrix()
-    const terrainCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.room.name))
+    const terrainCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.room.name))
 
     const roadCoords = new Set()
     for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))

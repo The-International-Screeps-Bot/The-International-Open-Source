@@ -1,8 +1,8 @@
 import { Sleepable } from "utils/sleepable"
 import { IDUpdateInterval, RoomStatsKeys } from "./constants"
 import { randomIntRange, utils } from "utils/utils"
-import { collectiveManager } from "./collective"
-import { segmentsManager } from "./segments"
+import { CollectiveManager } from './collective'
+import { SegmentsManager } from './segments'
 import { statsManager } from "./statsManager"
 
 export class TransactionsManager {
@@ -10,7 +10,7 @@ export class TransactionsManager {
   run() {
     if (!utils.isTickInterval(IDUpdateInterval)) return
 
-    const recordedTransactionIDs = segmentsManager.IDs.recordedTransactionIDs
+    const recordedTransactionIDs = SegmentsManager.IDs.recordedTransactionIDs
 
     const currentTransactionIDs = this.registerCurrentTransactions(recordedTransactionIDs)
     this.pruneRecordedTransactions(recordedTransactionIDs, currentTransactionIDs)
@@ -73,7 +73,7 @@ export class TransactionsManager {
   }
 
   private processTransactionMySend(transaction: Transaction) {
-    if (!collectiveManager.communes.has(transaction.from)) return
+    if (!CollectiveManager.communes.has(transaction.from)) return
 
     if (transaction.order) {
 
@@ -93,7 +93,7 @@ export class TransactionsManager {
   }
 
   private processTransactionMyReceive(transaction: Transaction) {
-    if (!collectiveManager.communes.has(transaction.to)) return
+    if (!CollectiveManager.communes.has(transaction.to)) return
 
     if (transaction.order) {
 
@@ -107,7 +107,7 @@ export class TransactionsManager {
    */
   private isDomestic(from: string, to: string) {
 
-    return (collectiveManager.communes.has(from) && collectiveManager.communes.has(to))
+    return CollectiveManager.communes.has(from) && CollectiveManager.communes.has(to)
   }
 }
 

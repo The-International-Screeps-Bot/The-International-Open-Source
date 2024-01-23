@@ -1,6 +1,6 @@
 import { customLog } from 'utils/logging'
 import { findLowestScore, roundTo } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { statsManager } from 'international/statsManager'
 import { marketManager } from 'international/market/marketOrders'
 import { Result, RoomStatsKeys } from 'international/constants'
@@ -43,7 +43,7 @@ export class TradingUtils {
     }
 
     if (mySpecificOrders.length) return false
-    if (Game.market.credits < collectiveManager.minCredits) return false
+    if (Game.market.credits < CollectiveManager.minCredits) return false
     if (marketManager.myOrdersCount === MARKET_MAX_ORDERS) return false
 
     const orders = marketManager.getOrders(resourceType, ORDER_SELL)

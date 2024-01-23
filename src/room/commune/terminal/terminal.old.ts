@@ -2,7 +2,7 @@ import { minerals, Result, RoomMemoryKeys } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { newID, roundTo } from 'utils/utils'
 import './tradingUtils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from 'room/commune/commune'
 
 const MAX_TRANSFER = 20000

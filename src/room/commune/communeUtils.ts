@@ -9,7 +9,7 @@ import {
   packedPosLength,
   structureTypesToProtectSet,
 } from 'international/constants'
-import { collectiveManager } from "international/collective"
+import { CollectiveManager } from 'international/collective'
 import { roomUtils } from "room/roomUtils"
 import { structureUtils } from "room/structureUtils"
 import { OrganizedSpawns } from './spawning/spawningStructureProcs'

@@ -7,18 +7,23 @@ import {
     ReservedCoordTypes,
     MovedTypes
 } from 'international/constants'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import {
-    areCoordsEqual,
-    arePositionsEqual, findObjectWithID, getRangeEuc, getRange,
-    isExit, forAdjacentCoords
+  areCoordsEqual,
+  arePositionsEqual,
+  findObjectWithID,
+  getRangeEuc,
+  getRange,
+  isExit,
+  forAdjacentCoords,
 } from 'utils/utils'
 import {
-    packCoord,
-    packPos, unpackCoordAsPos,
-    unpackPos,
-    unpackPosAt,
-    unpackPosList
+  packCoord,
+  packPos,
+  unpackCoordAsPos,
+  unpackPos,
+  unpackPosAt,
+  unpackPosList,
 } from 'other/codec'
 import { creepMoveProcs } from '../creepMoveProcs'
 
@@ -139,7 +144,7 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
   // Assign default args
 
   args.origin ??= this.pos
-  opts.cacheAmount ??= collectiveManager.defaultMinPathCacheTime
+  opts.cacheAmount ??= CollectiveManager.defaultMinPathCacheTime
 
   if (creepMoveProcs.useExistingPath(this, args, opts) === Result.success) {
     return Result.success

@@ -1,12 +1,13 @@
-import { collectiveManager } from "international/collective"
-import { Result } from "international/constants"
-import { marketManager } from "international/market/marketOrders"
-import { ResourceRequest, simpleAllies } from "international/simpleAllies/simpleAllies"
-import { structureUtils } from "room/structureUtils"
-import { customLog } from "utils/logging"
-import { newID, utils } from "utils/utils"
-import { ResourceTargets } from "../commune"
-import { tradingUtils } from "./tradingUtils"
+import { CollectiveManager } from 'international/collective'
+import { Result } from 'international/constants'
+import { marketManager } from 'international/market/marketOrders'
+import { simpleAllies } from 'international/simpleAllies/simpleAllies'
+import { structureUtils } from 'room/structureUtils'
+import { customLog } from 'utils/logging'
+import { newID, utils } from 'utils/utils'
+import { ResourceTargets } from '../commune'
+import { tradingUtils } from './tradingUtils'
+import { ResourceRequest } from 'international/simpleAllies/types'
 
 export class TerminalProcs {
   preTickRun(room: Room) {
@@ -19,7 +20,6 @@ export class TerminalProcs {
   }
 
   run(room: Room) {
-
     // Stop if there is no terminal
     if (!room.terminal) return
     if (!structureUtils.isRCLActionable(room.terminal)) return
@@ -41,8 +41,7 @@ export class TerminalProcs {
   }
 
   private createTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
-    const resourcesInStoringStructures =
-      room.roomManager.resourcesInStoringStructures
+    const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
     for (const key in resourceTargets.min) {
       const resourceType = key as ResourceConstant
       let targetAmount = resourceTargets.min[resourceType]
@@ -62,7 +61,7 @@ export class TerminalProcs {
 
       const ID = newID()
 
-      collectiveManager.terminalRequests[ID] = {
+      CollectiveManager.terminalRequests[ID] = {
         priority,
         resource: resourceType,
         amount,
@@ -75,8 +74,7 @@ export class TerminalProcs {
     room: Room,
     resourceTargets: ResourceTargets,
   ): [TerminalRequest, string, number] {
-    const resourcesInStoringStructures =
-      room.roomManager.resourcesInStoringStructures
+    const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
     const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
     const budget = Math.min(
       storedEnergy - room.communeManager.minStoredEnergy,
@@ -88,8 +86,8 @@ export class TerminalProcs {
     let bestRequest: TerminalRequest
     let amount: number
 
-    for (const ID in collectiveManager.terminalRequests) {
-      const request = collectiveManager.terminalRequests[ID]
+    for (const ID in CollectiveManager.terminalRequests) {
+      const request = CollectiveManager.terminalRequests[ID]
 
       // Don't respond to requests for this room
       if (request.roomName === room.name) continue
@@ -139,12 +137,13 @@ export class TerminalProcs {
         ),
       )
 
-      const sendAmount = tradingUtils.findLargestTransactionAmount(
-        budget,
-        maxSendAmount,
-        room.name,
-        request.roomName,
-      ) / 2
+      const sendAmount =
+        tradingUtils.findLargestTransactionAmount(
+          budget,
+          maxSendAmount,
+          room.name,
+          request.roomName,
+        ) / 2
       customLog(
         'TERMINAL REQUEST ' + request.resource,
         maxSendAmount +
@@ -167,8 +166,7 @@ export class TerminalProcs {
       if (request.amount * 0.1 > sendAmount) continue
 
       const score =
-        Game.map.getRoomLinearDistance(room.name, request.roomName) +
-        request.priority * 100
+        Game.map.getRoomLinearDistance(room.name, request.roomName) + request.priority * 100
       if (score >= lowestScore) continue
 
       amount = sendAmount
@@ -182,25 +180,17 @@ export class TerminalProcs {
 
   private respondToTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
     // We don't have enough energy to help other rooms
-    if (
-      room.roomManager.resourcesInStoringStructures.energy <
-      room.communeManager.minStoredEnergy
-    )
+    if (room.roomManager.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy)
       return Result.noAction
 
     const [request, ID, amount] = this.findBestTerminalRequest(room, resourceTargets)
     if (!request) return Result.noAction
 
-    room.terminal.send(
-      request.resource,
-      amount,
-      request.roomName,
-      'Terminal request',
-    )
+    room.terminal.send(request.resource, amount, request.roomName, 'Terminal request')
 
     // Consequences
 
-    delete collectiveManager.terminalRequests[ID]
+    delete CollectiveManager.terminalRequests[ID]
     room.terminal.intended = true
     return Result.action
   }
@@ -209,14 +199,10 @@ export class TerminalProcs {
     room: Room,
     resourceTargets: ResourceTargets,
   ): [ResourceRequest, number] {
-    const resourcesInStoringStructures =
-      room.roomManager.resourcesInStoringStructures
+    const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
     const minStoredEnergy = resourceTargets.min[RESOURCE_ENERGY] * 1.1
     const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
-    const budget = Math.min(
-      storedEnergy - minStoredEnergy,
-      room.terminal.store[RESOURCE_ENERGY],
-    )
+    const budget = Math.min(storedEnergy - minStoredEnergy, room.terminal.store[RESOURCE_ENERGY])
 
     let lowestScore = Infinity
     let bestRequestID: string
@@ -245,8 +231,7 @@ export class TerminalProcs {
       if (request.amount * 0.1 > sendAmount) continue
 
       const score =
-        Game.map.getRoomLinearDistance(room.name, request.roomName) +
-        request.priority * 100
+        Game.map.getRoomLinearDistance(room.name, request.roomName) + request.priority * 100
       if (score >= lowestScore) continue
 
       amount = sendAmount
@@ -264,21 +249,13 @@ export class TerminalProcs {
 
     // We don't have enough energy to help other rooms
 
-    if (
-      room.roomManager.resourcesInStoringStructures.energy <
-      room.communeManager.minStoredEnergy
-    )
+    if (room.roomManager.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy)
       return false
 
     const [request, amount] = this.findBestAllyRequest(room, resourceTargets)
     if (!request) return Result.noAction
 
-    room.terminal.send(
-      request.resourceType,
-      amount,
-      request.roomName,
-      'Ally request',
-    )
+    room.terminal.send(request.resourceType, amount, request.roomName, 'Ally request')
 
     // Consequences
 
@@ -310,7 +287,7 @@ export class TerminalProcs {
     // We don't have enough
 
     if (room.terminal.store[resourceType] < min * 1.1) {
-      if (Game.market.credits < collectiveManager.minCredits) return Result.noAction
+      if (Game.market.credits < CollectiveManager.minCredits) return Result.noAction
 
       if (
         tradingUtils.advancedBuy(room, resourceType, min - room.terminal.store[resourceType]) ===

@@ -1,8 +1,8 @@
 import { Sleepable } from 'utils/sleepable'
-import { CollectiveManager, collectiveManager } from './collective'
+import { CollectiveManager } from './collective'
 import { utils } from 'utils/utils'
 import { IDUpdateInterval } from './constants'
-import { segmentsManager } from './segments'
+import { SegmentsManager } from './segments'
 
 /**
  * Tracks and records constructionSites and thier age, deleting old sites
@@ -11,9 +11,9 @@ export class ConstructionSiteManager {
   run() {
     if (!utils.isTickInterval(IDUpdateInterval)) return
 
-    const recordedIDs = segmentsManager.IDs.constructionSites
+    const recordedIDs = SegmentsManager.IDs.constructionSites
 
-    collectiveManager.constructionSiteCount = 0
+    CollectiveManager.constructionSiteCount = 0
 
     // Initialize uninitialized construction sites
 
@@ -51,12 +51,12 @@ export class ConstructionSiteManager {
 
       // Otherwise increase the constructionSite's age
       recordedIDs[cSiteID] += 1 * IDUpdateInterval
-      collectiveManager.constructionSiteCount += 1
+      CollectiveManager.constructionSiteCount += 1
     }
   }
 
   getMaxCSiteAge(cSite: ConstructionSite) {
-    return 20000 + (cSite.progress * 5)
+    return 20000 + cSite.progress * 5
   }
 }
 
