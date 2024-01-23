@@ -25,7 +25,7 @@ import {
   unpackPosAt,
   unpackPosList,
 } from 'other/codec'
-import { creepMoveProcs } from '../creepMoveProcs'
+import { CreepMoveProcs } from '../creepMoveProcs'
 
 PowerCreep.prototype.createMoveRequestByPath = Creep.prototype.createMoveRequestByPath = function (
   args,
@@ -146,14 +146,14 @@ PowerCreep.prototype.createMoveRequest = Creep.prototype.createMoveRequest = fun
   args.origin ??= this.pos
   opts.cacheAmount ??= CollectiveManager.defaultMinPathCacheTime
 
-  if (creepMoveProcs.useExistingPath(this, args, opts) === Result.success) {
+  if (CreepMoveProcs.useExistingPath(this, args, opts) === Result.success) {
     return Result.success
   }
 
-  const path = creepMoveProcs.findNewPath(this, args, opts)
+  const path = CreepMoveProcs.findNewPath(this, args, opts)
   if (path === Result.fail) return Result.fail
 
-  creepMoveProcs.useNewPath(this, args, opts, path)
+  CreepMoveProcs.useNewPath(this, args, opts, path)
   return Result.success
 }
 

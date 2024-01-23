@@ -20,7 +20,7 @@ export class CreepMoveProcs {
   /**
    * work in progress
    */
-  createMoveRequest(creep: Creep, goals: PathGoal[], args: any, opts: any) {
+  static createMoveRequest(creep: Creep, goals: PathGoal[], args: any, opts: any) {
     // Stop if the we know the creep won't move
 
     if (creep.moveRequest) return Result.noAction
@@ -43,18 +43,18 @@ export class CreepMoveProcs {
 
     opts.cacheAmount ??= CollectiveManager.defaultMinPathCacheTime
 
-    if (creepMoveProcs.useExistingPath(creep, args, opts) === Result.success) {
+    if (this.useExistingPath(creep, args, opts) === Result.success) {
       return Result.success
     }
 
-    const path = creepMoveProcs.findNewPath(creep, args, opts)
+    const path = this.findNewPath(creep, args, opts)
     if (path === Result.fail) return Result.fail
 
-    creepMoveProcs.useNewPath(creep, args, opts, path)
+    this.useNewPath(creep, args, opts, path)
     return Result.success
   }
 
-  useExistingPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
+  static useExistingPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
     if (creep.spawning) return Result.noAction
 
     const creepMemory = Memory.creeps[creep.name] || Memory.powerCreeps[creep.name]
@@ -94,7 +94,7 @@ export class CreepMoveProcs {
    * Similar to the game's moveByPath
    * We need to also check if the next position is an opposite exit coord
    */
-  private findMoveTarget(
+  private static findMoveTarget(
     creep: Creep,
     creepMemory: CreepMemory | PowerCreepMemory,
   ): Result.fail | RoomPosition {
@@ -128,7 +128,7 @@ export class CreepMoveProcs {
     return Result.fail
   }
 
-  findNewPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
+  static findNewPath(creep: Creep, args: CustomPathFinderArgs, opts: MoveRequestOpts) {
     // Assign the creep to the args
 
     args.creep = creep
@@ -166,7 +166,7 @@ export class CreepMoveProcs {
     return path
   }
 
-  useNewPath(
+  static useNewPath(
     creep: Creep,
     args: CustomPathFinderArgs,
     opts: MoveRequestOpts,
@@ -201,7 +201,7 @@ export class CreepMoveProcs {
     return Result.success
   }
 
-  private registerSpawnDirections(creep: Creep, path: RoomPosition[]) {
+  private static registerSpawnDirections(creep: Creep, path: RoomPosition[]) {
     if (!creep.spawnID) return
 
     const spawn = findObjectWithID(creep.spawnID)
@@ -243,5 +243,3 @@ export class CreepMoveProcs {
     return
   }
 }
-
-export const creepMoveProcs = new CreepMoveProcs()
