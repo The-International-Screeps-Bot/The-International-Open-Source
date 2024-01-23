@@ -10,8 +10,8 @@ import {
   structureTypesToProtectSet,
 } from 'international/constants'
 import { CollectiveManager } from 'international/collective'
-import { roomUtils } from "room/roomUtils"
-import { structureUtils } from "room/structureUtils"
+import { RoomUtils } from 'room/roomUtils'
+import { structureUtils } from 'room/structureUtils'
 import { OrganizedSpawns } from './spawning/spawningStructureProcs'
 
 export class CommuneUtils {
@@ -191,7 +191,7 @@ export class CommuneUtils {
     const data = CommuneDataManager.data[room.name]
     if (data.estimatedCommuneSourceIncome !== undefined) return data.estimatedCommuneSourceIncome
 
-    const sources = roomUtils.getSources(room)
+    const sources = RoomUtils.getSources(room)
     const estimatedIncome: number[] = []
 
     for (let i = 0; i < sources.length; i += 1) {
@@ -263,7 +263,6 @@ export class CommuneUtils {
    * Assumes the room already meats the requirements to be a funnel target
    */
   wantsToBeFunneledIndependent(room: Room) {
-
     const desiredStrength = communeUtils.getDesiredUpgraderStrength(room)
     const maxStrength = communeUtils.getMaxUpgradeStrength(room)
     // We do not have enough desire

@@ -7,11 +7,11 @@ import { StructureCoords } from './room'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 
 export class RoomUtils {
-  getRemoteRepairStructures(room: Room) {
+  static getRemoteRepairStructures(room: Room) {
     const repairStructures: (StructureContainer | StructureRoad)[] = []
   }
 
-  getSources(room: Room): Source[] {
+  static getSources(room: Room): Source[] {
     const data = RoomDataManager.data[room.name]
     if (data.sourceIDs !== undefined) {
       return data.sourceIDs.map(ID => findObjectWithID(ID))
@@ -27,7 +27,7 @@ export class RoomUtils {
   /**
    * returns a container if exists and is RCL actionable
    */
-  getFastFillerContainerLeft(room: Room) {
+  static getFastFillerContainerLeft(room: Room) {
     const data = RoomDataManager.data[room.name]
     if (data.fastFillerContainerLeftId !== undefined && !room.roomManager.structureUpdate) {
       return data.fastFillerContainerLeftId
@@ -53,7 +53,7 @@ export class RoomUtils {
   /**
    * returns a container if exists and is RCL actionable
    */
-  getFastFillerContainerRight(room: Room) {
+  static getFastFillerContainerRight(room: Room) {
     const data = RoomDataManager.data[room.name]
     if (data.fastFillerContainerRightId !== undefined && !room.roomManager.structureUpdate) {
       return data.fastFillerContainerRightId
@@ -76,7 +76,7 @@ export class RoomUtils {
     return container
   }
 
-  getFastFillerCoords(room: Room) {
+  static getFastFillerCoords(room: Room) {
     const data = RoomDataManager.data[room.name]
     if (data.fastFillerCoords !== undefined && !room.roomManager.structureUpdate) {
       const fastFillerCoords = data.fastFillerCoords.map(packedCoord => unpackCoord(packedCoord))
@@ -124,7 +124,7 @@ export class RoomUtils {
   /**
    * fastFiller coords that have a source, but not necessarily a sink
    */
-  private getSourcedFastFillerCoords(room: Room) {
+  private static getSourcedFastFillerCoords(room: Room) {
     const anchor = room.roomManager.anchor
     if (!anchor) throw Error('no anchor')
 
@@ -163,7 +163,7 @@ export class RoomUtils {
     return sourcedFastFillerCoords
   }
 
-  findStructureStructureAroundCoord<T extends Structure>(
+  static findStructureStructureAroundCoord<T extends Structure>(
     room: Room,
     startCoord: Coord,
     range: number,
@@ -196,5 +196,3 @@ export class RoomUtils {
     return false
   }
 }
-
-export const roomUtils = new RoomUtils()

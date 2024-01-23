@@ -5,7 +5,7 @@ import { CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { StatsManager } from './stats'
 import { creepUtils } from 'room/creeps/creepUtils'
-import { creepDataManager } from 'room/creeps/creepData'
+import { CreepDataManager } from 'room/creeps/creepData'
 import { creepProcs } from 'room/creeps/creepProcs'
 
 export class CreepOrganizer {
@@ -46,7 +46,7 @@ export class CreepOrganizer {
 
     CollectiveManager.creepCount += 1
 
-    creepDataManager.initCreep(creepName)
+    CreepDataManager.initCreep(creepName)
 
     // Get the creep's role
 
@@ -78,7 +78,7 @@ export class CreepOrganizer {
     creepProcs.registerInterTickRepairTarget(creep)
 
     // initialize inter-tick data for the creep if it isn't already
-    creepDataManager.data[creep.name] ??= {}
+    CreepDataManager.data[creep.name] ??= {}
 
     creep.update()
 

@@ -1,4 +1,4 @@
-import { Boosts, creepDataManager } from "./creepData"
+import { Boosts, CreepDataManager } from './creepData'
 
 /**
  * Utilities only creeps the bot owns should use
@@ -8,7 +8,7 @@ export class MyCreepUtils {
    * provides a cached number of parts for creeps we own
    */
   parts(creep: Creep) {
-    const data = creepDataManager.data[creep.name].parts
+    const data = CreepDataManager.data[creep.name].parts
     if (data) return data
 
     const parts: typeof data = {}
@@ -18,12 +18,12 @@ export class MyCreepUtils {
     // +1 for every part to its type category
     for (const part of creep.body) parts[part.type] += 1
 
-    creepDataManager.data[creep.name].parts = parts
+    CreepDataManager.data[creep.name].parts = parts
     return parts
   }
 
   boosts(creep: Creep) {
-    const data = creepDataManager.data[creep.name].boosts
+    const data = CreepDataManager.data[creep.name].boosts
     if (data) return data
 
     const boosts: typeof data = {}
@@ -40,32 +40,31 @@ export class MyCreepUtils {
       boosts[boost] += 1
     }
 
-    creepDataManager.data[creep.name].boosts = boosts
+    CreepDataManager.data[creep.name].boosts = boosts
     return boosts
   }
 
   upgradeStrength(creep: Creep) {
-    const data = creepDataManager.data[creep.name].upgradeStrength
+    const data = CreepDataManager.data[creep.name].upgradeStrength
     if (data) return data
 
     const upgradeStrength = this.findUpgradeStrength(this.parts(creep).work, this.boosts(creep))
 
-    creepDataManager.data[creep.name].upgradeStrength = upgradeStrength
+    CreepDataManager.data[creep.name].upgradeStrength = upgradeStrength
     return data
   }
 
   findUpgradeStrength(workParts: number, boosts: Boosts) {
-
     if (boosts.XGH2O > 0) {
-      return (workParts * BOOSTS.work.XGH2O.upgradeController)
+      return workParts * BOOSTS.work.XGH2O.upgradeController
     }
 
     if (boosts.GH2O > 0) {
-      return (workParts * BOOSTS.upgrade.GH2O.upgradeController)
+      return workParts * BOOSTS.upgrade.GH2O.upgradeController
     }
 
     if (boosts.GH > 0) {
-      return (workParts * BOOSTS.upgrade.GH.upgradeController)
+      return workParts * BOOSTS.upgrade.GH.upgradeController
     }
 
     return workParts

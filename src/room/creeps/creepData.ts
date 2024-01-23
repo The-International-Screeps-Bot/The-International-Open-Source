@@ -22,20 +22,19 @@ export interface CreepData {
  * Handles cached data for creeps we own
  */
 export class CreepDataManager {
-  data: { [creepName: string]: Partial<CreepData> } = {}
+  static data: { [creepName: string]: Partial<CreepData> } = {}
 
-  initCreep(creepName: string) {
+  static initCreep(creepName: string) {
     this.data[creepName] ??= {}
   }
 
-  updateCreeps() {
+  static updateCreeps() {
     for (const creepName in this.data) {
       this.updateCreep(creepName)
     }
   }
 
-  private updateCreep(creepName: string) {
-
+  private static updateCreep(creepName: string) {
     if (!Game.creeps[creepName]) {
       delete this.data[creepName]
       return
@@ -49,5 +48,3 @@ export class CreepDataManager {
     }
   }
 }
-
-export const creepDataManager = new CreepDataManager()

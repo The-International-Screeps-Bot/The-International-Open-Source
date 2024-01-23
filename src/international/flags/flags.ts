@@ -10,14 +10,14 @@ import {
   customColors,
   ourImpassibleStructuresSet,
   packedPosLength,
-} from './constants'
-import { CollectiveManager } from './collective'
+} from '../constants'
+import { CollectiveManager } from '../collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
 import { roomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
-import { roomUtils } from 'room/roomUtils'
+import { RoomUtils } from 'room/roomUtils'
 import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
 import { roomProcs } from 'room/roomProcs'
 

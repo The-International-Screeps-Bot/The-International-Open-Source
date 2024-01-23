@@ -22,7 +22,7 @@ import { ErrorMapper } from 'other/ErrorMapper'
 import { StatsManager } from 'international/stats'
 import { PlayerManager } from 'international/players'
 import { profiler } from 'other/profiler'
-import { flagManager } from 'international/flags'
+import { flagManager } from 'international/flags/flags'
 import { RoomPruningManager } from 'international/roomPruning'
 import './room/construction/minCut'
 import { ConstructionSiteManager } from './international/constructionSites'
@@ -33,7 +33,7 @@ import { RequestsManager } from 'international/requests'
 import { MarketManager } from 'international/market/marketOrders'
 import { TransactionsManager } from 'international/transactions'
 import { SegmentsManager } from 'international/segments'
-import { creepDataManager } from 'room/creeps/creepData'
+import { CreepDataManager } from 'room/creeps/creepData'
 import { RoomDataManager } from 'room/roomData'
 import { utils } from 'utils/utils'
 import { procs } from 'utils/procs'
@@ -73,7 +73,7 @@ export function originalLoop() {
     if (global.userScript) global.userScript.run()
     PlayerManager.run()
     RoomsManager.initRun()
-    creepDataManager.updateCreeps()
+    CreepDataManager.updateCreeps()
     CreepOrganizer.run()
     PowerCreepOrganizer.run()
 

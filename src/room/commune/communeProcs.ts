@@ -1,4 +1,4 @@
-import { roomUtils } from 'room/roomUtils'
+import { RoomUtils } from 'room/roomUtils'
 import { CommuneDataManager } from './communeData'
 import { communeUtils } from './communeUtils'
 import {

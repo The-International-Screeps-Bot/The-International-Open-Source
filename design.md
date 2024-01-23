@@ -7,6 +7,7 @@ The bot intends to implement a primarily data-oriented style, with some aspects 
 # Data/functional structures
 
 ## Utils
+- a static class
 - does not contain any state
 - contains functions/methods
 
@@ -17,6 +18,7 @@ Utils stands for utilities. These are functions that will generally take inputs 
 CommuneUtils contains utility functions that provide often cached information on call that helps with processing
 
 ## Procs
+- a static class
 - does not contain any state
 - contains functions/methods
 
@@ -27,11 +29,17 @@ Procs stands for processors. These are functions that will generally run logic f
 CommuneProc runs logic for the commune to update data, make intents, and run sub processes like towers, spawning, creeps, etc.
 
 ## Manager
-- contains its own data
+- a static class
+- can contain state
 - contains functions/methods
+- should generally be avoided given its combination of data and functions, which breaks data-oriented design ideals
 
 Managers can be a combination of utilities, processors and data.
 
 ### Example
 
 The MarketManager handles caching market related data, updating / deleting it as needed, while pruning and optimizing existing orders that the bot controls.
+
+## Use of classes
+
+Classes should be static. If a class needs to be instantiated, there is probably a better way to do it
