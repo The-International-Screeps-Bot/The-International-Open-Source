@@ -39,7 +39,7 @@ import { roomNameUtils } from 'room/roomNameUtils'
 import { LogTypes, customLog } from 'utils/logging'
 import { communeProcs } from './communeProcs'
 import { structureUtils } from 'room/structureUtils'
-import { logisticsProcs } from 'room/logisticsProcs'
+import { LogisticsProcs } from 'room/logisticsProcs'
 import { towerProcs } from './towerProcs'
 import { sourceProcs } from 'room/sourceProcs'
 import { terminalProcs } from './terminal/terminalProcs'
@@ -260,12 +260,12 @@ export class CommuneManager {
     this.haulerNeedManager.run()
 
     spawningStructureProcs.createRoomLogisticsRequests(this.room)
-    logisticsProcs.createCommuneStoringStructureLogisticsRequests(this.room)
+    LogisticsProcs.createCommuneStoringStructureLogisticsRequests(this.room)
     this.factoryManager.run()
-    logisticsProcs.createCommuneContainerLogisticsRequests(this.room)
-    logisticsProcs.createCommuneDroppedResourceLogisticsRequests(this.room)
-    logisticsProcs.createCommuneTombstoneLogisticsRequests(this.room)
-    logisticsProcs.createCommuneRuinLogisticsRequests(this.room)
+    LogisticsProcs.createCommuneContainerLogisticsRequests(this.room)
+    LogisticsProcs.createCommuneDroppedResourceLogisticsRequests(this.room)
+    LogisticsProcs.createCommuneTombstoneLogisticsRequests(this.room)
+    LogisticsProcs.createCommuneRuinLogisticsRequests(this.room)
     this.linkManager.run()
     this.labManager.run()
     powerSpawnProcs.run(this.room)

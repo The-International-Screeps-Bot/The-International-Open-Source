@@ -10,7 +10,7 @@ import {
   RoomLogisticsRequestTypes,
   offsetsByDirection,
 } from 'international/constants'
-import { creepUtils } from './creepUtils'
+import { CreepUtils } from './creepUtils'
 import { communeUtils } from 'room/commune/communeUtils'
 import {
   CreepLogisticsRequest,
@@ -43,9 +43,9 @@ export class CreepProcs {
     if (controllerStructure) {
       // If we're not on a viable upgrade pos
 
-      const upgradePos = creepUtils.findUpgradePosWeak(creep)
+      const upgradePos = CreepUtils.findUpgradePosWeak(creep)
       if (!upgradePos) {
-        const upgradePos = creepUtils.findUpgradePosStrong(creep)
+        const upgradePos = CreepUtils.findUpgradePosStrong(creep)
         if (!upgradePos) return false
 
         if (getRange(creep.pos, upgradePos) > 0) {
@@ -218,7 +218,7 @@ export class CreepProcs {
    */
   static runDead(creepName: string) {
     const creepMemory = Memory.creeps[creepName]
-    const role = creepUtils.roleName(creepName)
+    const role = CreepUtils.roleName(creepName)
   }
 
   static registerInterTickRepairTarget(creep: Creep) {
@@ -234,7 +234,10 @@ export class CreepProcs {
     this.registerRepairReservation(creep, target)
   }
 
-  private static registerRepairReservation(creep: Creep, target: Structure<BuildableStructureConstant>) {
+  private static registerRepairReservation(
+    creep: Creep,
+    target: Structure<BuildableStructureConstant>,
+  ) {
     target.reserveHits += creep.store.getUsedCapacity(RESOURCE_ENERGY) * REPAIR_POWER
   }
 
@@ -292,7 +295,7 @@ export class CreepProcs {
     // Otherwise if we don't need resources and can maintain
 
     const workPartCount = myCreepUtils.parts(creep).work
-    let repairTarget = creepUtils.findRepairTarget(creep)
+    let repairTarget = CreepUtils.findRepairTarget(creep)
 
     if (!repairTarget) {
       creep.message = '❌🔧'
@@ -344,7 +347,7 @@ export class CreepProcs {
     // Find repair targets that don't include the current target, informing true if none were found
 
     repairTarget =
-      creepUtils.findNewRepairTarget(creep) || creepUtils.findNewRampartRepairTarget(creep)
+      CreepUtils.findNewRepairTarget(creep) || CreepUtils.findNewRampartRepairTarget(creep)
     if (!repairTarget) return true
 
     this.registerRepairReservation(creep, repairTarget)
@@ -726,7 +729,7 @@ export class CreepProcs {
   }
 
   static runRoomLogisticsRequestAdvanced(creep: Creep, args?: FindNewRoomLogisticsRequestArgs) {
-    const request = creepUtils.findRoomLogisticsRequest(creep, args)
+    const request = CreepUtils.findRoomLogisticsRequest(creep, args)
     if (!request) return Result.noAction
 
     /* log('REQUEST RESPONSE', request.T, { position: 1 }) */

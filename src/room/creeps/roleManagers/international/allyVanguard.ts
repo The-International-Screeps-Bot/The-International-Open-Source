@@ -8,7 +8,7 @@ import {
 } from 'international/constants'
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
@@ -98,7 +98,7 @@ export class AllyVanguard extends Creep {
     // Try to normally harvest. Iterate if creep harvested
 
     const source = room.find(FIND_SOURCES)[sourceIndex]
-    if (creepUtils.harvestSource(this, source) === Result.fail) return
+    if (CreepUtils.harvestSource(this, source) === Result.fail) return
   }
 
   getEnergyFromRoom?(): boolean {
@@ -126,7 +126,7 @@ export class AllyVanguard extends Creep {
     // Try to normally harvest. Iterate if creep harvested
 
     const source = this.room.roomManager.communeSources[sourceIndex]
-    if (creepUtils.harvestSource(this, source) === Result.success) {
+    if (CreepUtils.harvestSource(this, source) === Result.success) {
       return true
     }
     return true

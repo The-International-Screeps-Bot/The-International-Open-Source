@@ -18,7 +18,7 @@ import {
 } from 'utils/utils'
 import { packCoord, packPos, reversePosList, unpackPos } from 'other/codec'
 import { Hauler } from './hauler'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 import { structureUtils } from 'room/structureUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
@@ -68,7 +68,7 @@ export class SourceHarvester extends Creep {
     const source = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
 
     if (getRange(this.pos, source.pos) <= 1) {
-      creepUtils.harvestSource(this, source)
+      CreepUtils.harvestSource(this, source)
     }
   }
 

@@ -65,7 +65,7 @@ import { CollectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
 import { structureUtils } from './structureUtils'
 import { remoteProcs } from './remoteProcs'
-import { logisticsProcs } from './logisticsProcs'
+import { LogisticsProcs } from './logisticsProcs'
 
 export interface InterpretedRoomEvent {
   eventType: EventConstant
@@ -284,10 +284,10 @@ export class RoomManager {
     }
 
     if (this.room.memory[RoomMemoryKeys.type] === RoomTypes.remote) {
-      logisticsProcs.createRemoteContainerLogisticsRequests(this.room)
-      logisticsProcs.createRemoteDroppedResourceLogisticsRequests(this.room)
-      logisticsProcs.createRemoteTombstoneLogisticsRequests(this.room)
-      logisticsProcs.createRemoteRuinLogisticsRequests(this.room)
+      LogisticsProcs.createRemoteContainerLogisticsRequests(this.room)
+      LogisticsProcs.createRemoteDroppedResourceLogisticsRequests(this.room)
+      LogisticsProcs.createRemoteTombstoneLogisticsRequests(this.room)
+      LogisticsProcs.createRemoteRuinLogisticsRequests(this.room)
     }
 
     this.creepRoleManager.run()

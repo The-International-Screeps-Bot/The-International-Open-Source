@@ -4,7 +4,7 @@ import { customLog } from 'utils/logging'
 import { CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'
 import { StatsManager } from './stats'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { CreepDataProcs, creepData } from 'room/creeps/creepData'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
@@ -65,7 +65,7 @@ export class CreepOrganizer {
     creep.room.myCreeps.push(creep)
     creep.room.myCreepsByRole[role].push(creepName)
 
-    const customID = creepUtils.customIDCreep(creep)
+    const customID = CreepUtils.customIDCreep(creep)
     CollectiveManager.customCreepIDs[customID] = true
 
     // Add the creep's name to the position in its room

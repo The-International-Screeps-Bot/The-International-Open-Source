@@ -20,7 +20,7 @@ import {
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
@@ -290,7 +290,7 @@ export class RemoteHarvester extends Creep {
       if (this.maintainContainer(container) === Result.action) return Result.success
 
       const source = this.room.roomManager.remoteSources[sourceIndex]
-      creepUtils.harvestSource(this, source)
+      CreepUtils.harvestSource(this, source)
 
       // Give our energy to the container so it doesn't drop on the ground
 
@@ -309,7 +309,7 @@ export class RemoteHarvester extends Creep {
     if (this.buildContainer() === Result.action) return Result.success
 
     const source = this.room.roomManager.remoteSources[sourceIndex]
-    creepUtils.harvestSource(this, source)
+    CreepUtils.harvestSource(this, source)
 
     // Stop, we don't have enough energy to justify a request
 

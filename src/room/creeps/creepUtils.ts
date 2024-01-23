@@ -29,36 +29,36 @@ import {
 } from 'types/roomRequests'
 
 export class CreepUtils {
-  expandName(creepName: string) {
+  static expandName(creepName: string) {
     return creepName.split('_')
   }
 
-  roleName(creepName: string) {
+  static roleName(creepName: string) {
     const expandedName = this.expandName(creepName)
     return creepRoles[parseInt(expandedName[0])]
   }
 
-  roleCreep(creep: Creep) {
+  static roleCreep(creep: Creep) {
     if (creep._role !== undefined) return creep._role
 
     return (creep._role = this.roleName(creep.name))
   }
 
-  communeCreep(creep: Creep) {
+  static communeCreep(creep: Creep) {
     if (creep._commune !== undefined) return creep._commune
 
     const expandedName = this.expandName(creep.name)
     return (creep._commune = Game.rooms[expandedName[1]])
   }
 
-  customIDCreep(creep: Creep) {
+  static customIDCreep(creep: Creep) {
     if (creep._customID !== undefined) return creep._customID
 
     const expandedName = this.expandName(creep.name)
     return (creep._customID = parseInt(expandedName[2]))
   }
 
-  findEnergySpentOnConstruction(
+  static findEnergySpentOnConstruction(
     creep: Creep,
     cSite: ConstructionSite,
     workParts: number = myCreepUtils.parts(creep).work,
@@ -72,7 +72,7 @@ export class CreepUtils {
 
     return energySpent
   }
-  findUpgradePosWeak(creep: Creep): RoomPosition | undefined {
+  static findUpgradePosWeak(creep: Creep): RoomPosition | undefined {
     const upgradePos = creep.room.roomManager.upgradePositions.find(
       pos =>
         arePositionsEqual(creep.pos, pos) &&
@@ -80,7 +80,7 @@ export class CreepUtils {
     )
     return upgradePos
   }
-  findUpgradePosStrong(creep: Creep): RoomPosition | undefined {
+  static findUpgradePosStrong(creep: Creep): RoomPosition | undefined {
     const creepMemory = Memory.creeps[creep.name]
     // use our packed coord if we have one
     if (creepMemory[CreepMemoryKeys.packedCoord]) {
@@ -105,7 +105,7 @@ export class CreepUtils {
 
     return upgradePos
   }
-  harvestSource(creep: Creep, source: Source, workParts: number = myCreepUtils.parts(creep).work) {
+  static harvestSource(creep: Creep, source: Source, workParts: number = myCreepUtils.parts(creep).work) {
     if (creep.harvest(source) !== OK) {
       return Result.fail
     }
@@ -121,7 +121,7 @@ export class CreepUtils {
     return Result.success
   }
 
-  findRoomLogisticsRequest(creep: Creep, args?: FindNewRoomLogisticsRequestArgs) {
+  static findRoomLogisticsRequest(creep: Creep, args?: FindNewRoomLogisticsRequestArgs) {
     const creepMemory = Memory.creeps[creep.name]
     if (creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]) {
       return creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
@@ -307,7 +307,7 @@ export class CreepUtils {
     return creepMemory[CreepMemoryKeys.roomLogisticsRequests][0]
   }
 
-  findRoomLogisticsRequestTypes(creep: Creep, args: FindNewRoomLogisticsRequestArgs) {
+  static findRoomLogisticsRequestTypes(creep: Creep, args: FindNewRoomLogisticsRequestArgs) {
     if (args && args.types) {
       if (args.types.has(RoomLogisticsRequestTypes.transfer) && creep.hasNonEnergyResource()) {
         /* if (args && args.noDelivery) return Result.fail */
@@ -344,7 +344,7 @@ export class CreepUtils {
     ])
   }
 
-  canAcceptRoomLogisticsRequest(
+  static canAcceptRoomLogisticsRequest(
     creep: Creep,
     requestType: RoomLogisticsRequestTypes,
     requestID: string,
@@ -474,7 +474,7 @@ export class CreepUtils {
     return true
   }
 
-  createBackupStoringStructuresRoomLogisticsRequest(
+  static createBackupStoringStructuresRoomLogisticsRequest(
     creep: Creep,
     types: Set<RoomLogisticsRequestTypes>,
     resourceTypes: Set<ResourceConstant>,
@@ -490,7 +490,7 @@ export class CreepUtils {
     return this.createBackupStoringStructuresRoomLogisticsRequestWithdraw(creep, resourceTypes)
   }
 
-  createBackupStoringStructuresRoomLogisticsRequestTransfer(creep: Creep) {
+  static createBackupStoringStructuresRoomLogisticsRequestTransfer(creep: Creep) {
     const storingStructures = creep.commune.communeManager.storingStructures
     if (!storingStructures.length) return Result.fail
 
@@ -520,7 +520,7 @@ export class CreepUtils {
     }
   }
 
-  createBackupStoringStructuresRoomLogisticsRequestWithdraw(
+  static createBackupStoringStructuresRoomLogisticsRequestWithdraw(
     creep: Creep,
     resourceTypes: Set<ResourceConstant> = new Set([RESOURCE_ENERGY]),
   ) {
@@ -548,7 +548,7 @@ export class CreepUtils {
     }
   }
 
-  findRoomLogisticRequestAmount(creep: Creep, request: RoomLogisticsRequest) {
+  static findRoomLogisticRequestAmount(creep: Creep, request: RoomLogisticsRequest) {
     const target = findObjectWithID(request.targetID)
 
     // Pickup type
@@ -575,7 +575,7 @@ export class CreepUtils {
     return Math.min(creep.freeNextStore, request.amount)
   }
 
-  findNewRampartRepairTarget(creep: Creep) {
+  static findNewRampartRepairTarget(creep: Creep) {
     const ramparts = creep.room.roomManager.enemyAttackers.length
       ? creep.room.communeManager.defensiveRamparts
       : communeUtils.getRampartRepairTargets(creep.room)
@@ -593,7 +593,7 @@ export class CreepUtils {
     return bestTarget
   }
 
-  findNewRepairTarget(creep: Creep) {
+  static findNewRepairTarget(creep: Creep) {
     const enemyAttackers = !!creep.room.roomManager.enemyAttackers.length
     let repairThreshold = enemyAttackers ? 0.1 : 0.3
 
@@ -621,7 +621,7 @@ export class CreepUtils {
     return bestTarget
   }
 
-  findRepairTarget(creep: Creep) {
+  static findRepairTarget(creep: Creep) {
     const creepMemory = Memory.creeps[creep.name]
     if (creepMemory[CreepMemoryKeys.structureTarget]) {
       const repairTarget = findObjectWithID(creep.memory[CreepMemoryKeys.structureTarget])
@@ -631,5 +631,3 @@ export class CreepUtils {
     return this.findNewRepairTarget(creep) || this.findNewRampartRepairTarget(creep)
   }
 }
-
-export const creepUtils = new CreepUtils()

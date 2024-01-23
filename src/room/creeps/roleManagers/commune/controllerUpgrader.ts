@@ -1,6 +1,6 @@
 import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
 import { CreepProcs } from 'room/creeps/creepProcs'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class ControllerUpgrader extends Creep {

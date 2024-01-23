@@ -1,6 +1,6 @@
 import { RoomMemoryKeys, creepRoles, packedPosLength } from 'international/constants'
 import { CreepProcs } from 'room/creeps/creepProcs'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { DefaultRoleManager } from 'room/creeps/defaultRoleManager'
 
 class ControllerUpgraderManager extends DefaultRoleManager {

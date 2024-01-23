@@ -13,7 +13,7 @@ import {
   packCoord, unpackCoordAsPos
 } from 'other/codec'
 import { StatsManager } from 'international/stats'
-import { creepUtils } from '../creepUtils'
+import { CreepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
 import { RoomLogisticsRequest } from 'types/roomRequests'
 import { CustomPathFinder } from 'international/customPathFinder'
@@ -251,7 +251,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
   // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-  const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(
+  const energySpentOnConstruction = CreepUtils.findEnergySpentOnConstruction(
     this,
     cSite,
     myCreepUtils.parts(this).work,
@@ -333,7 +333,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
   if (buildResult === OK) {
     // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-    const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(
+    const energySpentOnConstruction = CreepUtils.findEnergySpentOnConstruction(
       this,
       cSiteTarget,
       myCreepUtils.parts(this).work,

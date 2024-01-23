@@ -7,7 +7,7 @@ import {
 import { StatsManager } from 'international/stats'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
-import { creepUtils } from 'room/creeps/creepUtils'
+import { CreepUtils } from 'room/creeps/creepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 
 export class Maintainer extends Creep {
