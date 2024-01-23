@@ -20,7 +20,7 @@ import { CustomPathFinder } from 'international/customPathFinder'
 import { communeUtils } from 'room/commune/communeUtils'
 import { myCreepUtils } from '../myCreepUtils'
 import { structureUtils } from 'room/structureUtils'
-import { creepProcs } from '../creepProcs'
+import { CreepProcs } from '../creepProcs'
 
 Creep.prototype.update = function () {}
 
@@ -177,7 +177,7 @@ Creep.prototype.builderGetEnergy = function () {
       return Result.noAction
     }
 
-    creepProcs.runRoomLogisticsRequestAdvanced(this, {
+    CreepProcs.runRoomLogisticsRequestAdvanced(this, {
       types: new Set<RoomLogisticsRequestTypes>([
         RoomLogisticsRequestTypes.withdraw,
         RoomLogisticsRequestTypes.pickup,
@@ -194,7 +194,7 @@ Creep.prototype.builderGetEnergy = function () {
 
   // We don't have a storage or terminal, don't allow use of sourceContainers
 
-  creepProcs.runRoomLogisticsRequestAdvanced(this, {
+  CreepProcs.runRoomLogisticsRequestAdvanced(this, {
     types: new Set<RoomLogisticsRequestTypes>([
       RoomLogisticsRequestTypes.withdraw,
       RoomLogisticsRequestTypes.pickup,

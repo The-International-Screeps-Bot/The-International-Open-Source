@@ -22,7 +22,7 @@ import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
 import { creepUtils } from 'room/creeps/creepUtils'
 import { myCreepUtils } from 'room/creeps/myCreepUtils'
-import { creepProcs } from 'room/creeps/creepProcs'
+import { CreepProcs } from 'room/creeps/creepProcs'
 
 export class RemoteHarvester extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -330,7 +330,7 @@ export class RemoteHarvester extends Creep {
     if (this.nextStore.energy >= myCreepUtils.parts(this).work) return Result.success
     if (this.movedResource) return Result.fail
 
-    return creepProcs.runRoomLogisticsRequestAdvanced(this, {
+    return CreepProcs.runRoomLogisticsRequestAdvanced(this, {
       resourceTypes: new Set([RESOURCE_ENERGY]),
       types: new Set<RoomLogisticsRequestTypes>([
         RoomLogisticsRequestTypes.withdraw,
