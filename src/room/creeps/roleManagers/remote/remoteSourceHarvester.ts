@@ -16,7 +16,7 @@ import {
   randomTick,
   scalePriority,
   areCoordsEqual,
-  utils,
+  Utils,
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
@@ -63,7 +63,7 @@ export class RemoteHarvester extends Creep {
   }
 
   initRun(): void {
-    if (utils.isTickInterval(10) && this.getActiveBodyparts(MOVE) === 0) {
+    if (Utils.isTickInterval(10) && this.getActiveBodyparts(MOVE) === 0) {
       this.suicide()
       return
     }

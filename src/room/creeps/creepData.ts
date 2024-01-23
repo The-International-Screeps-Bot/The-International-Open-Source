@@ -1,10 +1,10 @@
 import { util } from "chai"
-import { utils } from "utils/utils"
+import { Utils } from 'utils/utils'
 
-export type Boosts = Partial<{[ key in MineralBoostConstant]: number }>
+export type Boosts = Partial<{ [key in MineralBoostConstant]: number }>
 
 export interface CreepData {
-  parts: Partial<{[key in BodyPartConstant]: number }>
+  parts: Partial<{ [key in BodyPartConstant]: number }>
   /**
    * update when applying boosts
    */
@@ -28,7 +28,6 @@ export const creepData: { [creepName: string]: Partial<CreepData> } = {}
  * Handles cached data for creeps we own
  */
 export class CreepDataProcs {
-
   static initCreep(creepName: string) {
     creepData[creepName] ??= {}
   }
@@ -49,7 +48,7 @@ export class CreepDataProcs {
 
     /* .delete */
 
-    if (utils.isTickInterval(15)) {
+    if (Utils.isTickInterval(15)) {
     }
   }
 }

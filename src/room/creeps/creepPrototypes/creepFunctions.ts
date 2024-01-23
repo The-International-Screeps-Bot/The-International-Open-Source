@@ -6,8 +6,12 @@ import {
   RoomLogisticsRequestTypes
 } from 'international/constants'
 import {
-  findClosestObject, findObjectWithID, getRangeXY,
-  findClosestObjectInRange, getRange, findWithLowestScore
+  findClosestObject,
+  findObjectWithID,
+  getRangeXY,
+  findClosestObjectInRange,
+  getRange,
+  findWithLowestScore,
 } from 'utils/utils'
 import {
   packCoord, unpackCoordAsPos

@@ -23,7 +23,7 @@ import {
   getRangeXY,
   randomIntRange,
   randomTick,
-  utils,
+  Utils,
 } from 'utils/utils'
 
 export class Hauler extends Creep {
@@ -100,7 +100,7 @@ export class Hauler extends Creep {
   }
 
   initRun() {
-    if (utils.isTickInterval(10) && this.getActiveBodyparts(CARRY) === 0) {
+    if (Utils.isTickInterval(10) && this.getActiveBodyparts(CARRY) === 0) {
       this.suicide()
       return
     }

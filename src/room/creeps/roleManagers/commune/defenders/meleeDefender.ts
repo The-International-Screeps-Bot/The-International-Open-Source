@@ -7,17 +7,17 @@ import {
 } from 'international/constants'
 import { PlayerManager } from 'international/players'
 import {
-    areCoordsEqual,
-    findClosestObject,
-    findClosestObjectEuc,
-    findFurthestObjectEuc,
-    findObjectWithID,
-    getRangeXY,
-    getRangeEucXY,
-    getRange,
-    randomTick,
-    randomVal,
-    getRangeEuc,
+  areCoordsEqual,
+  findClosestObject,
+  findClosestObjectEuc,
+  findFurthestObjectEuc,
+  findObjectWithID,
+  getRangeXY,
+  getRangeEucXY,
+  getRange,
+  randomTick,
+  randomVal,
+  getRangeEuc,
 } from 'utils/utils'
 import { packCoord } from 'other/codec'
 

@@ -1,5 +1,11 @@
 import { RoomManager } from 'room/room'
-import { findClosestObject, findObjectWithID, forAdjacentCoords, getRange, getRangeXY } from 'utils/utils'
+import {
+  findClosestObject,
+  findObjectWithID,
+  forAdjacentCoords,
+  getRange,
+  getRangeXY,
+} from 'utils/utils'
 import { myCreepUtils } from './myCreepUtils'
 import { StatsManager } from 'international/stats'
 import {

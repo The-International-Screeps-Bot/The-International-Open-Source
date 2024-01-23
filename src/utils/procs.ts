@@ -4,7 +4,7 @@ import { CollectiveManager } from 'international/collective'
 import { LogTypes, customLog } from "./logging"
 
 export class Procs {
-  outOfBucket() {
+  static outOfBucket() {
     CollectiveManager.logs = ''
     customLog('Skipping tick due to low bucket, bucket remaining', Game.cpu.bucket, {
       type: LogTypes.warning,
@@ -16,5 +16,3 @@ export class Procs {
     )
   }
 }
-
-export const procs = new Procs()

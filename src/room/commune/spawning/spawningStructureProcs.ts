@@ -16,8 +16,8 @@ import { CreepProcs } from 'room/creeps/creepProcs'
 import { StructureUtils } from 'room/structureUtils'
 import { SpawnRequest, BodyPartCounts, SpawnRequestTypes } from 'types/spawnRequest'
 import { customLog, LogTypes } from 'utils/logging'
-import { getRange, findAdjacentCoordsToCoord, utils } from 'utils/utils'
-import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
+import { getRange, findAdjacentCoordsToCoord, Utils } from 'utils/utils'
+import { SpawnRequestConstructor, SpawnRequestConstructors } from './spawnRequestConstructors'
 import { spawningStructureUtils } from './spawningStructureUtils'
 import { communeUtils } from '../communeUtils'
 
@@ -46,7 +46,7 @@ export class SpawningStructureProcs {
     const spawnRequestsArgs = room.communeManager.spawnRequestsManager.run()
 
     for (const requestArgs of spawnRequestsArgs) {
-      const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](room, requestArgs)
+      const spawnRequests = SpawnRequestConstructorsByType[requestArgs.type](room, requestArgs)
 
       // Loop through priorities inside requestsByPriority
 
@@ -182,7 +182,7 @@ export class SpawningStructureProcs {
 
   private findSpawnIndexForSpawnRequest(inactiveSpawns: StructureSpawn[], request: SpawnRequest) {
     if (request.spawnTarget) {
-      const [score, index] = utils.findIndexWithLowestScore(inactiveSpawns, spawn => {
+      const [score, index] = Utils.findIndexWithLowestScore(inactiveSpawns, spawn => {
         return getRange(spawn.pos, request.spawnTarget)
       })
 
@@ -326,7 +326,7 @@ export class SpawningStructureProcs {
     /*
   const args = room.communeManager.spawnRequestsManager.run()
   stringifyLog('spawn request args', args)
-  stringifyLog('request', spawnRequestConstructorsByType[requestArgs.type](room, args[0]))
+  stringifyLog('request', SpawnRequestConstructorsByType[requestArgs.type](room, args[0]))
 */
     return
 
@@ -419,10 +419,10 @@ export interface OrganizedSpawns {
   inactiveSpawns: StructureSpawn[]
 }
 
-export const spawnRequestConstructorsByType: {
+export const SpawnRequestConstructorsByType: {
   [key in SpawnRequestTypes]: SpawnRequestConstructor
 } = {
-  [SpawnRequestTypes.individualUniform]: spawnRequestConstructors.spawnRequestIndividualUniform,
-  [SpawnRequestTypes.groupDiverse]: spawnRequestConstructors.spawnRequestGroupDiverse,
-  [SpawnRequestTypes.groupUniform]: spawnRequestConstructors.spawnRequestGroupUniform,
+  [SpawnRequestTypes.individualUniform]: SpawnRequestConstructors.spawnRequestIndividualUniform,
+  [SpawnRequestTypes.groupDiverse]: SpawnRequestConstructors.spawnRequestGroupDiverse,
+  [SpawnRequestTypes.groupUniform]: SpawnRequestConstructors.spawnRequestGroupUniform,
 }

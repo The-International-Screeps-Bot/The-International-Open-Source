@@ -26,19 +26,19 @@ import {
     roomTypesUsedForStats,
 } from 'international/constants'
 import {
-    findClosestObject,
-    findHighestScore,
-    findObjectWithID,
-    forAdjacentCoords,
-    forCoordsInRange,
-    forRoomNamesAroundRangeXY,
-    getRange,
-    getRangeXY,
-    isAlly,
-    packAsNum,
-    packXYAsNum,
-    randomTick,
-    sortBy,
+  findClosestObject,
+  findHighestScore,
+  findObjectWithID,
+  forAdjacentCoords,
+  forCoordsInRange,
+  forRoomNamesAroundRangeXY,
+  getRange,
+  getRangeXY,
+  isAlly,
+  packAsNum,
+  packXYAsNum,
+  randomTick,
+  sortBy,
 } from 'utils/utils'
 import { CommuneManager } from './commune/commune'
 import { CreepRoleManager } from './creeps/creepRoleManager'

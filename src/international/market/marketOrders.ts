@@ -1,4 +1,4 @@
-import { findHighestScore, randomIntRange, randomTick, utils } from 'utils/utils'
+import { findHighestScore, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { PlayerMemoryKeys, Result, RoomMemoryKeys } from '../constants'
 import { CollectiveManager } from '../collective'
 import { customLog } from 'utils/logging'
@@ -15,7 +15,7 @@ export class MarketManager {
     if (randomTick(100)) {
       this.resourceHistory = {}
     }
-    if (utils.isTickInterval(optimizeOrdersInterval)) {
+    if (Utils.isTickInterval(optimizeOrdersInterval)) {
       this.optimizeMyOrders()
     }
 
@@ -370,7 +370,9 @@ export class MarketManager {
     return (this._isMarketFunctional = !!Game.market.getAllOrders().length)
   }
 
-  private static resourceHistory: Partial<{ [key in MarketResourceConstant]: { [days: string]: number } }>
+  private static resourceHistory: Partial<{
+    [key in MarketResourceConstant]: { [days: string]: number }
+  }>
   /**
    * Finds the average trading price of a resourceType over a set amount of days
    */
@@ -401,13 +403,17 @@ export class MarketManager {
     return avgPrice
   }
 
-  static decidePrice(resourceType: ResourceConstant, priority: number, startTick: number = Game.time) {}
+  static decidePrice(
+    resourceType: ResourceConstant,
+    priority: number,
+    startTick: number = Game.time,
+  ) {}
 }
 
 export type MarketOrderTypes = ORDER_BUY | ORDER_SELL
 
 export type CachedMarketOrders = Partial<{
-        [key in MarketResourceConstant]: {
-            [key in MarketOrderTypes]: Order[]
-        }
-    }>
+  [key in MarketResourceConstant]: {
+    [key in MarketOrderTypes]: Order[]
+  }
+}>

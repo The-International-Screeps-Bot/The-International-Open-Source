@@ -1,4 +1,4 @@
-import { utils } from "utils/utils"
+import { Utils } from 'utils/utils'
 import { CommuneDataProcs } from './commune/communeData'
 
 export interface RoomData {

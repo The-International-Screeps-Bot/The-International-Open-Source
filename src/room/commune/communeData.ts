@@ -1,5 +1,5 @@
 import { CollectiveManager } from 'international/collective'
-import { utils } from 'utils/utils'
+import { Utils } from 'utils/utils'
 
 interface CommuneData {
   /**
@@ -20,13 +20,12 @@ interface CommuneData {
 /**
  * Inter-tick data for communes
  */
-export const communeData: { [roomName: string]: Partial<CommuneData>} = {}
+export const communeData: { [roomName: string]: Partial<CommuneData> } = {}
 
 /**
  * Handles cached data for communes
  */
 export class CommuneDataProcs {
-
   /**
    * Called by the room's RoomManager
    */
@@ -43,7 +42,7 @@ export class CommuneDataProcs {
   private static updateCommune(roomName: string) {
     const data = communeData[roomName]
 
-    if (utils.isTickInterval(10)) {
+    if (Utils.isTickInterval(10)) {
       delete data.estimatedCommuneSourceIncome
       delete data.towerRampartRepairTreshold
     }

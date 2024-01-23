@@ -2,7 +2,7 @@ import {
     CombatRequestKeys,
     CreepMemoryKeys
 } from 'international/constants'
-import { findClosestObject, getRange, utils } from 'utils/utils'
+import { findClosestObject, getRange, Utils } from 'utils/utils'
 import { Antifa } from './antifa'
 
 interface MembersByType {
@@ -49,12 +49,9 @@ export class DynamicSquad {
     if (this.runCombatRoom()) return
 
     if (!this.getInFormation()) return
-
-
   }
 
   private runCombatRoom() {
-
     this.runMelee()
     this.runHealer()
     this.runRanger()
@@ -63,40 +60,34 @@ export class DynamicSquad {
   }
 
   private runMelee() {
-
     const melee = this.membersByType.melee
     if (!melee) return
-
-
   }
 
   private runHealer() {
-
     const healer = this.membersByType.healer
     if (!healer) return
 
     const melee = this.membersByType.melee
     if (melee) {
-
-        if (getRange(healer.pos, melee.pos) <= 1) {
-
-            if (melee.hits < melee.hitsMax) {
-                healer.heal(melee)
-                healer.assignMoveRequest(melee.pos)
-            }
-            return
-
-            healer.createMoveRequest({
-                origin: healer.pos,
-                goals: [
-                  {
-                    pos: melee.pos,
-                    range: 1,
-                  },
-                ],
-              })
+      if (getRange(healer.pos, melee.pos) <= 1) {
+        if (melee.hits < melee.hitsMax) {
+          healer.heal(melee)
+          healer.assignMoveRequest(melee.pos)
         }
         return
+
+        healer.createMoveRequest({
+          origin: healer.pos,
+          goals: [
+            {
+              pos: melee.pos,
+              range: 1,
+            },
+          ],
+        })
+      }
+      return
     }
 
     // There is no melee
@@ -105,15 +96,11 @@ export class DynamicSquad {
   }
 
   private runRanger() {
-
     const ranger = this.membersByType.ranger
     if (!ranger) return
-
-
   }
 
   private runDismantler() {
-
     const dismantler = this.membersByType.dismantler
     if (!dismantler) return
     /*
@@ -137,7 +124,7 @@ export class DynamicSquad {
       const previousMember = members[previousIndex]
       // If we are the member in question or nearby to it
       if (
-        utils.getInterRange(
+        Utils.getInterRange(
           member.pos,
           member.room.name,
           previousMember.pos,

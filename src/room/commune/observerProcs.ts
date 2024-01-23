@@ -1,11 +1,11 @@
 import { RoomMemoryKeys } from "international/constants"
 import { RoomNameUtils } from 'room/roomNameUtils'
-import { forRoomNamesAroundRangeXY, utils } from 'utils/utils'
+import { forRoomNamesAroundRangeXY, Utils } from 'utils/utils'
 
 export class ObserverProcs {
   preTickRun(room: Room) {
     // Run only every so often
-    if (!utils.isTickInterval(10)) return
+    if (!Utils.isTickInterval(10)) return
 
     const observer = room.roomManager.structures.observer[0]
     if (!observer) return

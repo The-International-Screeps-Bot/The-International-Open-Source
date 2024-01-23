@@ -1,4 +1,4 @@
-import { packXYAsNum, randomIntRange, roundTo, utils } from '../utils/utils'
+import { packXYAsNum, randomIntRange, roundTo, Utils } from '../utils/utils'
 
 import {
   WorkRequestKeys,
@@ -19,7 +19,9 @@ export class CollectiveManager {
   /**
    * Antifa creeps by combat request name, then by role with an array of creep names
    */
-  static creepsByCombatRequest: { [requestName: string]: Partial<{ [key in CreepRoles]: string[] }> }
+  static creepsByCombatRequest: {
+    [requestName: string]: Partial<{ [key in CreepRoles]: string[] }>
+  }
 
   static creepsByHaulRequest: { [requestName: string]: string[] }
 
@@ -108,7 +110,7 @@ export class CollectiveManager {
 
     // Run CollectiveManager stuff every so often
 
-    if (utils.isTickInterval(periodicUpdateInterval)) {
+    if (Utils.isTickInterval(periodicUpdateInterval)) {
       // delete
 
       this._funnelOrder = undefined

@@ -9,7 +9,7 @@ export class SpawnRequestConstructors {
     /**
      * Generally, all creeps will have the same bodies
      */
-    spawnRequestIndividualUniform(room: Room, args: SpawnRequestArgs) {
+    static spawnRequestIndividualUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
@@ -157,7 +157,8 @@ export class SpawnRequestConstructors {
 
         return spawnRequests
     }
-    spawnRequestGroupDiverse(room: Room, args: SpawnRequestArgs) {
+
+    static spawnRequestGroupDiverse(room: Room, args: SpawnRequestArgs) {
 
         const spawnRequests: SpawnRequest[] = []
 
@@ -295,7 +296,8 @@ export class SpawnRequestConstructors {
 
         return spawnRequests
     }
-    spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
+
+    static spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         if (Game.flags[FlagNames.debugSpawning]) {
@@ -405,5 +407,3 @@ export class SpawnRequestConstructors {
         return spawnRequests
     }
 }
-
-export const spawnRequestConstructors = new SpawnRequestConstructors()

@@ -5,22 +5,22 @@ import { RoomMemoryKeys } from './constants'
  * Intended to clean Memory, global, segments from stale data
  */
 export class GarbageCollector extends StaticSleepable {
-    // Clean rooms that haven't been scouted for a certain amount of ticks
-    static cleanRoomThreshold = 300000
-    static sleepFor = 100000
-    static tryRun() {
-        if (this.isSleepingResponsive()) return
+  // Clean rooms that haven't been scouted for a certain amount of ticks
+  static cleanRoomThreshold = 300000
+  static sleepFor = 100000
+  static tryRun() {
+    if (this.isSleepingResponsive()) return
 
-        this.cleanRooms()
-        this.cleanPlayers()
-    }
-    static cleanRooms() {
-        for (const roomName in Memory.rooms) {
-            const roomMemory = Memory.rooms[roomName]
-            if (Game.time - roomMemory[RoomMemoryKeys.lastScout] < this.cleanRoomThreshold) continue
+    this.cleanRooms()
+    this.cleanPlayers()
+  }
+  static cleanRooms() {
+    for (const roomName in Memory.rooms) {
+      const roomMemory = Memory.rooms[roomName]
+      if (Game.time - roomMemory[RoomMemoryKeys.lastScout] < this.cleanRoomThreshold) continue
 
-            delete Memory.rooms[roomName]
-        }
+      delete Memory.rooms[roomName]
     }
-    static cleanPlayers() {}
+  }
+  static cleanPlayers() {}
 }

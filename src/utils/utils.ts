@@ -806,5 +806,3 @@ export class Utils {
     return this.getInterRangeXY(coord1.x, coord1.y, roomName1, coord2.x, coord2.y, roomName2)
   }
 }
-
-export const utils = new Utils()

@@ -6,13 +6,13 @@ import {
     RoomTypes,
 } from 'international/constants'
 import {
-    findCarryPartsRequired,
-    findObjectWithID,
-    getRangeXY,
-    getRange,
-    randomTick,
-    scalePriority,
-    areCoordsEqual,
+  findCarryPartsRequired,
+  findObjectWithID,
+  getRangeXY,
+  getRange,
+  randomTick,
+  scalePriority,
+  areCoordsEqual,
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'

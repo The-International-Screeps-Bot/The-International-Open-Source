@@ -1,6 +1,6 @@
 import { Sleepable } from 'utils/sleepable'
 import { CollectiveManager } from './collective'
-import { utils } from 'utils/utils'
+import { Utils } from 'utils/utils'
 import { IDUpdateInterval } from './constants'
 import { SegmentsManager } from './segments'
 
@@ -9,7 +9,7 @@ import { SegmentsManager } from './segments'
  */
 export class ConstructionSiteManager {
   static run() {
-    if (!utils.isTickInterval(IDUpdateInterval)) return
+    if (!Utils.isTickInterval(IDUpdateInterval)) return
 
     const recordedIDs = SegmentsManager.IDs.constructionSites
 

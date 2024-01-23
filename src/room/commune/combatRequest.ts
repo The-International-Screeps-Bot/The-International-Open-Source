@@ -1,7 +1,7 @@
 import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
 import { CommuneManager } from './commune'
 import { StatsManager } from 'international/stats'
-import { randomIntRange, utils } from 'utils/utils'
+import { randomIntRange, Utils } from 'utils/utils'
 import { CombatRequest } from 'types/internationalRequests'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
@@ -64,8 +64,9 @@ export class CombatRequestManager {
 
     // If the room is closed or is now a respawn or novice zone
     if (
-      utils.isTickInterval(checkRoomStatusInverval) &&
-      Memory.rooms[room.name][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]
+      Utils.isTickInterval(checkRoomStatusInverval) &&
+      Memory.rooms[room.name][RoomMemoryKeys.status] !==
+        Memory.rooms[requestName][RoomMemoryKeys.status]
     ) {
       return false
     }

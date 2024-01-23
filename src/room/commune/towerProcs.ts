@@ -9,7 +9,7 @@ import {
   randomTick,
   findWithLowestScore,
   scalePriority,
-  utils,
+  Utils,
 } from 'utils/utils'
 import { communeUtils } from './communeUtils'
 import { towerUtils } from './towerUtils'

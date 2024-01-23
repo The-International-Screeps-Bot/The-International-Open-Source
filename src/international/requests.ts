@@ -1,4 +1,4 @@
-import { randomIntRange, randomRange, utils } from 'utils/utils'
+import { randomIntRange, randomRange, Utils } from 'utils/utils'
 import { CollectiveManager } from './collective'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import {
@@ -30,7 +30,7 @@ export class RequestsManager extends StaticSleepable {
     this.updateCombatRequests()
     this.updateHaulRequests()
 
-    if (utils.isTickInterval(runRequestInverval)) return
+    if (Utils.isTickInterval(runRequestInverval)) return
 
     this.runWorkRequests()
     this.runCombatRequests()

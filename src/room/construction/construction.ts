@@ -8,7 +8,7 @@ import {
     structureTypesToProtectSet,
 } from 'international/constants'
 import { customLog } from 'utils/logging'
-import { findObjectWithID, packAsNum, randomIntRange, randomTick, utils } from 'utils/utils'
+import { findObjectWithID, packAsNum, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
@@ -89,7 +89,7 @@ export class ConstructionManager {
     // If there are no builders
 
     // Only run every so often
-    else if (this.room.controller.level !== 1 && !utils.isTickInterval(constructionInterval))
+    else if (this.room.controller.level !== 1 && !Utils.isTickInterval(constructionInterval))
       return false
 
     // If there are too many construction sites

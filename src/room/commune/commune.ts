@@ -6,7 +6,7 @@ import {
   findLowestScore,
   roundTo,
   forCoordsAroundRange,
-  utils,
+  Utils,
 } from 'utils/utils'
 import './defence'
 import './workRequest'
@@ -138,7 +138,7 @@ export class CommuneManager {
       delete this._storedEnergyBuildThreshold
     }
 
-    if (utils.isTickInterval(100)) {
+    if (Utils.isTickInterval(100)) {
       delete this._upgradeStructure
       delete this._hasSufficientRoads
       delete this._resourceTargets

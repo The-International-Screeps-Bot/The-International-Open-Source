@@ -15,7 +15,7 @@ import {
   randomIntRange,
   randomRange,
   randomTick,
-  utils,
+  Utils,
 } from 'utils/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
@@ -102,7 +102,7 @@ export class RemotesManager {
       // The room is closed or is now a respawn or novice zone
 
       if (
-        utils.isTickInterval(checkRoomStatusInterval) &&
+        Utils.isTickInterval(checkRoomStatusInterval) &&
         Memory.rooms[room.name][RoomMemoryKeys.status] !== remoteMemory[RoomMemoryKeys.status]
       ) {
         this.communeManager.removeRemote(remoteName, index)
@@ -360,7 +360,7 @@ export class RemotesManager {
   private manageUse(remoteName: string): boolean {
     const roomMemory = Memory.rooms[remoteName]
     // If we aren't on the inverval to check for use
-    if (!utils.isTickInterval(manageUseInterval)) {
+    if (!Utils.isTickInterval(manageUseInterval)) {
       // Inform the current state of things
       return !roomMemory[RoomMemoryKeys.disable]
     }

@@ -18,7 +18,7 @@ import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { RoomUtils } from 'room/roomUtils'
-import { spawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
+import { SpawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
 import { RoomProcs } from 'room/roomProcs'
 
 export class FlagManager {
@@ -477,7 +477,7 @@ export class FlagManager {
     const spawnRequestsArgs = room.communeManager.spawnRequestsManager.run()
 
     for (const requestArgs of spawnRequestsArgs) {
-      const spawnRequests = spawnRequestConstructorsByType[requestArgs.type](room, requestArgs)
+      const spawnRequests = SpawnRequestConstructorsByType[requestArgs.type](room, requestArgs)
 
       for (const request of spawnRequests) {
         const row: any[] = []

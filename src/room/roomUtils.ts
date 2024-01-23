@@ -1,7 +1,7 @@
 import { RoomMemoryKeys, RoomTypes, roomDimensions } from 'international/constants'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { RoomDataProcs, roomData } from './roomData'
-import { findObjectWithID, forAdjacentCoords, utils } from 'utils/utils'
+import { findObjectWithID, forAdjacentCoords, Utils } from 'utils/utils'
 import { StructureUtils } from './structureUtils'
 import { StructureCoords } from './room'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'

@@ -444,7 +444,11 @@ export class StatsManager {
     return roundTo(avg, precision)
   }
 
-  static updateStat(roomName: string, statName: keyof RoomStats | keyof CommuneStats, value: number) {
+  static updateStat(
+    roomName: string,
+    statName: keyof RoomStats | keyof CommuneStats,
+    value: number,
+  ) {
     if (this.stats[RoomTypes.commune][roomName]) {
       this.updateCommuneStat(roomName, statName as keyof CommuneStats, value)
       return

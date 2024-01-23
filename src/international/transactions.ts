@@ -1,13 +1,13 @@
-import { Sleepable } from "utils/sleepable"
-import { IDUpdateInterval, RoomStatsKeys } from "./constants"
-import { randomIntRange, utils } from "utils/utils"
+import { Sleepable } from 'utils/sleepable'
+import { IDUpdateInterval, RoomStatsKeys } from './constants'
+import { randomIntRange, Utils } from 'utils/utils'
 import { CollectiveManager } from './collective'
 import { SegmentsManager } from './segments'
 import { StatsManager } from './stats'
 
 export class TransactionsManager {
   static run() {
-    if (!utils.isTickInterval(IDUpdateInterval)) return
+    if (!Utils.isTickInterval(IDUpdateInterval)) return
 
     const recordedTransactionIDs = SegmentsManager.IDs.recordedTransactionIDs
 

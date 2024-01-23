@@ -5,7 +5,7 @@ import {
   RoomTypes,
   customColors,
 } from 'international/constants'
-import { randomIntRange, randomTick, utils } from 'utils/utils'
+import { randomIntRange, randomTick, Utils } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { StatsManager } from 'international/stats'
@@ -73,8 +73,9 @@ export class WorkRequestManager {
 
     // If the room is closed or is now a respawn or novice zone
     if (
-      utils.isTickInterval(checkRoomStatusInverval) &&
-      Memory.rooms[room.name][RoomMemoryKeys.status] !== Memory.rooms[requestName][RoomMemoryKeys.status]
+      Utils.isTickInterval(checkRoomStatusInverval) &&
+      Memory.rooms[room.name][RoomMemoryKeys.status] !==
+        Memory.rooms[requestName][RoomMemoryKeys.status]
     ) {
       this.delete(requestName, request)
       return

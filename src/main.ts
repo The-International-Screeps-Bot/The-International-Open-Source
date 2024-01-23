@@ -9,7 +9,7 @@ import './room/roomObjectFunctions'
 import './room/roomObjectAdditions'
 import './room/creeps/creepAdditions'
 import './other/profilerRegister'
-import { memHack } from 'other/memHack'
+import { MemoryHack } from 'other/memoryHack'
 import { CPUMaxPerTick, Result } from 'international/constants'
 import { InitManager } from './international/init'
 import { MigrationManager } from 'international/migration'
@@ -35,18 +35,18 @@ import { TransactionsManager } from 'international/transactions'
 import { SegmentsManager } from 'international/segments'
 import { CreepDataProcs } from 'room/creeps/creepData'
 import { RoomDataProcs } from 'room/roomData'
-import { utils } from 'utils/utils'
-import { procs } from 'utils/procs'
+import { Utils } from 'utils/utils'
+import { Procs } from 'utils/procs'
 import { CommuneDataProcs } from 'room/commune/communeData'
 import { GarbageCollector } from 'international/garbageCollector'
 
 export function originalLoop() {
-  memHack.run()
+  MemoryHack.runHack()
   if (SegmentsManager.run() === Result.stop) return
 
   if (Game.flags.deactivate) return
   if (Game.cpu.bucket < CPUMaxPerTick) {
-    procs.outOfBucket()
+    Procs.outOfBucket()
     return
   }
   if (global.userScript) global.userScript.initialRun()
