@@ -422,13 +422,13 @@ export class CreepUtils {
         if (request.resourceType === RESOURCE_ENERGY) {
           const minAmount = creep.freeNextStore
 
-          storingStructure = creep.commune.communeManager.storingStructures.find(
+          storingStructure = CommuneUtils.storingStructures(creep.commune).find(
             structure => structure.reserveStore[request.resourceType] >= minAmount,
           )
         } else {
           const minAmount = Math.min(creep.freeNextStore, request.amount)
 
-          storingStructure = creep.commune.communeManager.storingStructures.find(
+          storingStructure = CommuneUtils.storingStructures(creep.commune).find(
             structure => structure.reserveStore[request.resourceType] >= minAmount,
           )
         }
@@ -495,7 +495,7 @@ export class CreepUtils {
   }
 
   static createBackupStoringStructuresRoomLogisticsRequestTransfer(creep: Creep) {
-    const storingStructures = creep.commune.communeManager.storingStructures
+    const storingStructures = CommuneUtils.storingStructures(creep.commune)
     if (!storingStructures.length) return Result.fail
 
     const nextStore = creep.nextStore
@@ -528,7 +528,7 @@ export class CreepUtils {
     creep: Creep,
     resourceTypes: Set<ResourceConstant> = new Set([RESOURCE_ENERGY]),
   ) {
-    const storingStructures = creep.commune.communeManager.storingStructures
+    const storingStructures = CommuneUtils.storingStructures(creep.commune)
     if (!storingStructures.length) return Result.fail
 
     let resourceType: ResourceConstant

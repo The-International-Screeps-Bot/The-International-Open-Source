@@ -30,17 +30,18 @@ export class RequestsManager extends StaticSleepable {
     this.updateCombatRequests()
     this.updateHaulRequests()
 
-    if (Utils.isTickInterval(runRequestInverval)) return
+    if (Utils.isTickInterval(runRequestInverval)) {
 
-    this.runWorkRequests()
-    this.runCombatRequests()
-    this.runHaulRequests()
+      this.runWorkRequests()
+      this.runCombatRequests()
+      this.runHaulRequests()
+    }
   }
 
   // update requests
 
   private static updateWorkRequests() {
-    const runThreshold = randomIntRange(19000, 20000)
+    const newDynamicScoreTreshold = randomIntRange(19000, 20000)
 
     for (const roomName in Memory.workRequests) {
       const request = Memory.workRequests[roomName]
@@ -60,7 +61,7 @@ export class RequestsManager extends StaticSleepable {
       const roomMemory = Memory.rooms[roomName]
       if (
         !roomMemory[RoomMemoryKeys.dynamicScore] ||
-        Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= runThreshold
+        Game.time - roomMemory[RoomMemoryKeys.dynamicScoreUpdate] >= newDynamicScoreTreshold
       ) {
         RoomNameUtils.findDynamicScore(roomName)
       }
@@ -267,20 +268,20 @@ export class RequestsManager extends StaticSleepable {
 
         // Ensure we can afford the creeps required
 
-        const minRangedAttackCost = room.communeManager.findMinRangedAttackCost(
+        const minRangedAttackCost = Utils.findMinRangedAttackCost(
           request[CombatRequestKeys.minDamage],
         )
-        const minMeleeHealCost = room.communeManager.findMinHealCost(
+        const minMeleeHealCost = Utils.findMinHealCost(
           request[CombatRequestKeys.minMeleeHeal] +
             (request[CombatRequestKeys.maxTowerDamage] || 0),
         )
-        const minRangedHealCost = room.communeManager.findMinHealCost(
+        const minRangedHealCost = Utils.findMinHealCost(
           request[CombatRequestKeys.minRangedHeal],
         )
 
         if (minRangedAttackCost + minRangedHealCost > room.energyCapacityAvailable) continue
 
-        const minAttackCost = room.communeManager.findMinMeleeAttackCost(
+        const minAttackCost = Utils.findMinMeleeAttackCost(
           request[CombatRequestKeys.minDamage],
         )
         if (minAttackCost > room.energyCapacityAvailable) continue
@@ -352,7 +353,7 @@ export class RequestsManager extends StaticSleepable {
         if (room.controller.level < 4) continue
         if (!room.roomManager.structures.spawn.length) continue
 
-        if (!room.communeManager.storingStructures.length) continue
+        if (!CommuneUtils.storingStructures(room).length) continue
         // Ensure we aren't responding to too many requests for our energy level
         if (
           room.roomManager.resourcesInStoringStructures.energy /

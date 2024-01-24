@@ -1,6 +1,6 @@
-import { packCoord, unpackCoord } from "other/codec"
+import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneDataProcs, communeData } from './communeData'
-import { RoomDataProcs } from 'room/roomData'
+import { RoomDataProcs, roomData } from 'room/roomData'
 import { findLinkThroughput, getRange, packAsNum, unpackNumAsCoord } from 'utils/utils'
 import {
   Result,
@@ -13,6 +13,7 @@ import { CollectiveManager } from 'international/collective'
 import { RoomUtils } from 'room/roomUtils'
 import { StructureUtils } from 'room/structureUtils'
 import { OrganizedSpawns } from './spawning/spawningStructureProcs'
+import { ResourceTargets } from './commune'
 
 export class CommuneUtils {
   static getGeneralRepairStructures(room: Room) {
@@ -124,7 +125,7 @@ export class CommuneUtils {
   static getDesiredUpgraderStrength(room: Room) {
     const strength = Math.pow(
       (room.roomManager.resourcesInStoringStructures.energy -
-        room.communeManager.storedEnergyUpgradeThreshold * 0.5) /
+        this.storedEnergyUpgradeThreshold(room) * 0.5) /
         (6000 + room.controller.level * 2000),
       2,
     )
@@ -270,5 +271,233 @@ export class CommuneUtils {
 
     // We have enough desired strength to register our room as fully funneled
     return true
+  }
+
+  static getResourceTargets(room: Room) {
+    const data = communeData[room.name]
+    if (data.resourceTargets !== undefined) return data.resourceTargets
+
+    const resourceTargets: ResourceTargets = {
+      min: {},
+      max: {},
+    }
+    const storingStructuresCapacity = this.storingStructuresCapacity(room)
+    let min: number
+
+    resourceTargets.min[RESOURCE_BATTERY] = room.roomManager.factory
+      ? storingStructuresCapacity * 0.005
+      : 0
+    resourceTargets.max[RESOURCE_BATTERY] = storingStructuresCapacity * 0.015
+
+    min = resourceTargets.min[RESOURCE_ENERGY] =
+      storingStructuresCapacity * 0.9 /* this.energyMinResourceTarget(storingStructuresCapacity) */
+    resourceTargets.max[RESOURCE_ENERGY] = Math.max(
+      storingStructuresCapacity * 0.5,
+      this.minStoredEnergy(room),
+      min,
+    )
+
+    // minerals
+
+    resourceTargets.min[RESOURCE_HYDROGEN] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_HYDROGEN] = storingStructuresCapacity * 0.027
+
+    resourceTargets.min[RESOURCE_OXYGEN] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_OXYGEN] = storingStructuresCapacity * 0.027
+
+    resourceTargets.min[RESOURCE_UTRIUM] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_UTRIUM] = storingStructuresCapacity * 0.027
+
+    resourceTargets.min[RESOURCE_KEANIUM] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_KEANIUM] = storingStructuresCapacity * 0.027
+
+    resourceTargets.min[RESOURCE_LEMERGIUM] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_LEMERGIUM] = storingStructuresCapacity * 0.027
+
+    resourceTargets.min[RESOURCE_ZYNTHIUM] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_ZYNTHIUM] = storingStructuresCapacity * 0.027
+
+    if (Game.shard.name === 'swc') {
+      resourceTargets.min[RESOURCE_CATALYST] = storingStructuresCapacity * 0
+      resourceTargets.max[RESOURCE_CATALYST] = storingStructuresCapacity * 0.01
+    } else {
+      resourceTargets.min[RESOURCE_CATALYST] = storingStructuresCapacity * 0.01
+      resourceTargets.max[RESOURCE_CATALYST] = storingStructuresCapacity * 0.027
+    }
+
+    // Boosts
+
+    resourceTargets.min[RESOURCE_UTRIUM_HYDRIDE] = 0
+    resourceTargets.max[RESOURCE_UTRIUM_HYDRIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_UTRIUM_OXIDE] = 0
+    resourceTargets.max[RESOURCE_UTRIUM_OXIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_KEANIUM_HYDRIDE] = 0
+    resourceTargets.max[RESOURCE_KEANIUM_HYDRIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_KEANIUM_OXIDE] = 0
+    resourceTargets.max[RESOURCE_KEANIUM_OXIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_LEMERGIUM_HYDRIDE] = 0
+    resourceTargets.max[RESOURCE_LEMERGIUM_HYDRIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_LEMERGIUM_OXIDE] = 0
+    resourceTargets.max[RESOURCE_LEMERGIUM_OXIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_ZYNTHIUM_HYDRIDE] = 0
+    resourceTargets.max[RESOURCE_ZYNTHIUM_HYDRIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_ZYNTHIUM_OXIDE] = 0
+    resourceTargets.max[RESOURCE_ZYNTHIUM_OXIDE] = storingStructuresCapacity * 0.01
+
+    resourceTargets.min[RESOURCE_GHODIUM_HYDRIDE] = 0
+    resourceTargets.max[RESOURCE_GHODIUM_HYDRIDE] = storingStructuresCapacity * 0.01
+
+    // other raw
+
+    resourceTargets.min[RESOURCE_POWER] = room.roomManager.powerSpawn
+      ? storingStructuresCapacity * 0.002
+      : 0
+    resourceTargets.max[RESOURCE_POWER] = storingStructuresCapacity * 0.015
+
+    resourceTargets.min[RESOURCE_OPS] = storingStructuresCapacity * 0.01
+    resourceTargets.max[RESOURCE_OPS] = storingStructuresCapacity * 0.02
+
+    resourceTargets.min[RESOURCE_METAL] = 0
+    resourceTargets.max[RESOURCE_METAL] = 0
+
+    resourceTargets.min[RESOURCE_BIOMASS] = 0
+    resourceTargets.max[RESOURCE_BIOMASS] = 0
+
+    resourceTargets.min[RESOURCE_SILICON] = 0
+    resourceTargets.max[RESOURCE_SILICON] = 0
+
+    resourceTargets.min[RESOURCE_MIST] = 0
+    resourceTargets.max[RESOURCE_MIST] = 0
+
+    // commodities
+    // low level
+
+    resourceTargets.min[RESOURCE_GHODIUM_MELT] = 0
+    resourceTargets.max[RESOURCE_GHODIUM_MELT] = 0
+
+    resourceTargets.min[RESOURCE_COMPOSITE] = 0
+    resourceTargets.max[RESOURCE_COMPOSITE] = 0
+
+    resourceTargets.min[RESOURCE_CRYSTAL] = 0
+    resourceTargets.max[RESOURCE_CRYSTAL] = 0
+
+    resourceTargets.min[RESOURCE_LIQUID] = 0
+    resourceTargets.max[RESOURCE_LIQUID] = 0
+
+    // tier 1 commodities
+
+    resourceTargets.min[RESOURCE_ALLOY] = 0
+    resourceTargets.max[RESOURCE_ALLOY] = 0
+
+    resourceTargets.min[RESOURCE_CELL] = 0
+    resourceTargets.max[RESOURCE_CELL] = 0
+
+    resourceTargets.min[RESOURCE_WIRE] = 0
+    resourceTargets.max[RESOURCE_WIRE] = 0
+
+    resourceTargets.min[RESOURCE_CONDENSATE] = 0
+    resourceTargets.max[RESOURCE_CONDENSATE] = 0
+
+    // tier 2
+
+    // tier 3
+
+    // tier 4
+
+    // tier 5
+
+    data.resourceTargets = resourceTargets
+    return resourceTargets
+  }
+
+  /**
+   * The minimum amount of stored energy the room should only use in emergencies
+   */
+  static minStoredEnergy(room: Room) {
+    const data = communeData[room.name]
+    if (data.minStoredEnergy !== undefined) return data.minStoredEnergy
+
+    // Consider the controller level to an exponent and this room's attack threat
+
+    let minStoredEnergy =
+      Math.pow(room.controller.level * 6000, 1.06) + room.memory[RoomMemoryKeys.threatened] * 20
+
+    // If there is a next RCL, Take away some minimum based on how close we are to the next RCL
+
+    const RClCost = room.controller.progressTotal
+    if (RClCost) {
+      minStoredEnergy -= Math.pow(
+        (Math.min(room.controller.progress, RClCost) / RClCost) * 20,
+        3.35,
+      )
+    }
+
+    minStoredEnergy = Math.floor(minStoredEnergy)
+
+    data.minStoredEnergy = minStoredEnergy
+    return minStoredEnergy
+  }
+
+  static storedEnergyUpgradeThreshold(room: Room) {
+    return Math.floor(this.minStoredEnergy(room) * 1.3)
+  }
+
+  static energyMinResourceTarget(room: Room, storingStructuresCapacity: number) {
+    if (room.controller.level < 8) {
+      const funnelOrder = CollectiveManager.getFunnelOrder()
+      if (funnelOrder[0] === room.name) {
+        return Math.min(
+          this.storedEnergyUpgradeThreshold(room) * 1.2 + this.upgradeTargetDistance(room),
+          storingStructuresCapacity / 2,
+        )
+      }
+      return Math.min(this.storedEnergyUpgradeThreshold(room) * 1.2, storingStructuresCapacity / 2)
+    }
+
+    return this.minStoredEnergy(room)
+  }
+
+  static upgradeTargetDistance(room: Room) {
+    return Math.min(
+      room.controller.progressTotal - room.controller.progress,
+      Game.gcl.progressTotal - Game.gcl.progress,
+    )
+  }
+
+  /**
+   * Presciption on if we should be trying to build remote contianers
+   */
+  static shouldRemoteContainers(room: Room) {
+    return room.energyCapacityAvailable >= 650
+  }
+
+  static storingStructuresCapacity(room: Room) {
+    if (room.storingStructuresCapacity !== undefined) return room.storingStructuresCapacity
+
+    let capacity = 0
+    if (room.storage && room.controller.level >= 4) capacity += room.storage.store.getCapacity()
+    if (room.terminal && room.controller.level >= 6) capacity += room.terminal.store.getCapacity()
+
+    room.storingStructuresCapacity = capacity
+    return capacity
+  }
+
+  static storingStructures(room: Room) {
+    if (room.storingStructures !== undefined) return room.storingStructures
+
+    const storingStructures: (StructureStorage | StructureTerminal)[] = []
+
+    if (room.storage && room.controller.level >= 4) storingStructures.push(room.storage)
+    if (room.terminal && room.controller.level >= 6) storingStructures.push(room.terminal)
+
+    room.storingStructures = storingStructures
+    return storingStructures
   }
 }

@@ -1,5 +1,6 @@
 import { RoomMemoryKeys } from 'international/constants'
 import { CommuneManager, ResourceTargets } from './commune'
+import { CommuneUtils } from './communeUtils'
 
 const BASE_RESOURCES = [
     'energy',
@@ -239,7 +240,7 @@ export class FactoryManager {
 
         if (
             this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_ENERGY] >
-                this.communeManager.room.communeManager.minStoredEnergy * 1.2 &&
+            CommuneUtils.minStoredEnergy(this.communeManager.room) * 1.2 &&
             this.communeManager.room.roomManager.resourcesInStoringStructures.battery <
                 this.communeManager.room.roomManager.resourcesInStoringStructures.energy / 100
         ) {
@@ -250,7 +251,7 @@ export class FactoryManager {
 
         if (
             this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_ENERGY] <
-                this.communeManager.room.communeManager.minStoredEnergy &&
+            CommuneUtils.minStoredEnergy(this.communeManager.room) &&
             this.communeManager.room.roomManager.resourcesInStoringStructures[RESOURCE_BATTERY] >=
                 600
         ) {
@@ -290,7 +291,7 @@ export class FactoryManager {
 
         const resourcesInStoringStructures =
             this.communeManager.room.roomManager.resourcesInStoringStructures
-        const resourceTargets = this.communeManager.resourceTargets
+        const resourceTargets = CommuneUtils.getResourceTargets(this.communeManager.room)
 
         for (const resourceType of stuffToMake) {
             const max = resourceTargets.max[resourceType]

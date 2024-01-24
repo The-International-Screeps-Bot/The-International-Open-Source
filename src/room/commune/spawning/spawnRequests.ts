@@ -1,29 +1,19 @@
 import {
   WorkRequestKeys,
   CombatRequestKeys,
-  containerUpkeepCost,
-  customColors,
-  rampartUpkeepCost,
-  roadUpkeepCost,
   packedPosLength,
   decayCosts,
   CreepMemoryKeys,
   RoomMemoryKeys,
   RoomTypes,
 } from 'international/constants'
-import {
-  findCarryPartsRequired,
-  findLinkThroughput,
-  getRangeXY,
-  getRange,
-  randomRange,
-  roundTo,
-} from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from '../commune'
-import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
+import { SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
 import { CommuneUtils } from '../communeUtils'
 import { StructureUtils } from 'room/structureUtils'
+import { CommuneProcs } from '../communeProcs'
+import { Utils } from 'utils/utils'
 
 export class SpawnRequestsManager {
   communeManager: CommuneManager
@@ -585,7 +575,7 @@ export class SpawnRequestsManager {
         if (
           repairTargets.length ||
           this.communeManager.room.towerInferiority ||
-          !this.communeManager.storingStructures.length
+          !CommuneUtils.storingStructures(this.communeManager.room).length
         ) {
           priority = Math.min(
             6 + this.communeManager.room.creepsFromRoom.maintainer.length * 0.5,
@@ -681,7 +671,7 @@ export class SpawnRequestsManager {
         if (!this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
         let priority: number
-        if (this.communeManager.storingStructures.length) {
+        if (CommuneUtils.storingStructures(this.communeManager.room).length) {
           priority = this.activeRemotePriority + 0.1
         } else {
           priority = this.minRemotePriority - 0.5
@@ -880,7 +870,7 @@ export class SpawnRequestsManager {
         }
 
         let priority: number
-        if (this.communeManager.storingStructures.length) {
+        if (CommuneUtils.storingStructures(this.communeManager.room).length) {
           priority = this.activeRemotePriority + 0.2
         } else {
           priority = this.minRemotePriority - 1
@@ -898,7 +888,7 @@ export class SpawnRequestsManager {
 
           if (
             this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
-            this.communeManager.room.communeManager.storedEnergyUpgradeThreshold
+            CommuneUtils.storedEnergyUpgradeThreshold(this.communeManager.room)
           ) {
             return false
           }
@@ -1689,26 +1679,26 @@ export class SpawnRequestsManager {
 
       //
 
-      const minRangedAttackCost = this.communeManager.room.communeManager.findMinRangedAttackCost(
+      const minRangedAttackCost = Utils.findMinRangedAttackCost(
         request[CombatRequestKeys.minDamage],
       )
       const rangedAttackAmount = Math.floor(
         minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
       )
 
-      const minAttackCost = this.communeManager.room.communeManager.findMinMeleeAttackCost(
+      const minAttackCost = Utils.findMinMeleeAttackCost(
         request[CombatRequestKeys.minDamage],
       )
       const attackAmount = Math.floor(minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]))
 
-      const minMeleeHealCost = this.communeManager.room.communeManager.findMinHealCost(
+      const minMeleeHealCost = Utils.findMinHealCost(
         request[CombatRequestKeys.minMeleeHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
       )
       const meleeHealAmount = Math.floor(
         minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
       )
 
-      const minRangedHealCost = this.communeManager.room.communeManager.findMinHealCost(
+      const minRangedHealCost = Utils.findMinHealCost(
         request[CombatRequestKeys.minRangedHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
       )
       const rangedHealAmount = Math.floor(
@@ -1730,7 +1720,7 @@ export class SpawnRequestsManager {
           (rangedAttackAmount + rangedHealAmount) * 2 > 50 ||
           attackAmount * 2 > 50
         ) {
-          this.communeManager.room.communeManager.deleteCombatRequest(requestName, i)
+          CommuneProcs.deleteCombatRequest(this.communeManager.room, requestName, i)
           continue
         }
 
@@ -1857,7 +1847,7 @@ export class SpawnRequestsManager {
         minAttackCost + minMeleeHealCost > this.communeManager.room.energyCapacityAvailable ||
         minAttackCost > this.communeManager.room.energyCapacityAvailable
       ) {
-        this.communeManager.room.communeManager.deleteCombatRequest(requestName, i)
+        CommuneProcs.deleteCombatRequest(this.communeManager.room, requestName, i)
         continue
       }
 

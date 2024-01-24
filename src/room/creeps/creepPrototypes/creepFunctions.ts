@@ -176,7 +176,7 @@ Creep.prototype.builderGetEnergy = function () {
   if (this.room.communeManager.buildersMakeRequests) return Result.noAction
   if (!this.needsResources()) return Result.noAction
 
-  if (this.room.communeManager && this.room.communeManager.storingStructures.length) {
+  if (this.room.communeManager && CommuneUtils.storingStructures(this.room).length) {
     if (this.room.roomManager.resourcesInStoringStructures.energy < 1000) {
       return Result.noAction
     }

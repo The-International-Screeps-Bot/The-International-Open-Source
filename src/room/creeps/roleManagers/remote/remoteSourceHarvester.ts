@@ -23,6 +23,7 @@ import { indexOf } from 'lodash'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 export class RemoteHarvester extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -370,7 +371,7 @@ export class RemoteHarvester extends Creep {
 
   buildContainer(): number {
     // Don't build new remote containers until we can reserve the room
-    if (!this.commune.communeManager.shouldRemoteContainers) return Result.noAction
+    if (!CommuneUtils.shouldRemoteContainers(this.room)) return Result.noAction
 
     // Make sure we're a bit ahead source regen time
 

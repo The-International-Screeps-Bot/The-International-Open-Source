@@ -1,11 +1,12 @@
 import {
-    RoomLogisticsRequestTypes,
-    linkReceiveTreshold,
-    linkSendThreshold,
+  RoomLogisticsRequestTypes,
+  linkReceiveTreshold,
+  linkSendThreshold,
 } from 'international/constants'
 import { customLog } from 'utils/logging'
 import { CommuneManager } from './commune'
 import { StructureUtils } from 'room/structureUtils'
+import { CommuneUtils } from './communeUtils'
 
 export class LinkManager {
   communeManager: CommuneManager
@@ -143,7 +144,7 @@ export class LinkManager {
     if (
       this.communeManager.room.controller.ticksToDowngrade > 10000 &&
       this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
-        this.communeManager.storedEnergyUpgradeThreshold * 0.5
+        CommuneUtils.storedEnergyUpgradeThreshold(this.communeManager.room) * 0.5
     )
       return
 

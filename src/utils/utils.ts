@@ -805,4 +805,40 @@ export class Utils {
   static getInterRange(coord1: Coord, roomName1: string, coord2: Coord, roomName2: string) {
     return this.getInterRangeXY(coord1.x, coord1.y, roomName1, coord2.x, coord2.y, roomName2)
   }
+
+  static findMinRangedAttackCost(minDamage: number = 10) {
+    const rawCost =
+      (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+      (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+
+  static findMinMeleeAttackCost(minDamage: number = 30) {
+    const rawCost =
+      (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+      (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+
+  /**
+   * Finds how expensive it will be to provide enough heal parts to withstand attacks
+   */
+  static findMinHealCost(minHeal: number = 12) {
+    const rawCost =
+      (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] + (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[HEAL] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+
+  static findMinDismantleCost(minDismantle: number = 0) {
+    const rawCost = minDismantle * BODYPART_COST[WORK] + minDismantle * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[WORK] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
 }

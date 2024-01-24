@@ -278,7 +278,7 @@ export class CreepProcs {
   static repairCommune(creep: Creep) {
     if (creep.needsResources()) {
       if (
-        creep.room.communeManager.storingStructures.length &&
+        CommuneUtils.storingStructures(creep.room).length &&
         creep.room.roomManager.resourcesInStoringStructures.energy < 3000
       )
         return Result.fail

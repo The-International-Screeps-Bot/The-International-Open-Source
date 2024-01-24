@@ -520,6 +520,8 @@ declare global {
     organizedSpawns: OrganizedSpawns | false
 
     fastFillerCoords: Coord[]
+    storingStructuresCapacity: number
+    storingStructures: (StructureStorage | StructureTerminal)[]
 
     // Commune
 
@@ -1379,6 +1381,7 @@ declare global {
       // Command functions
 
       stringify(v: any, maxDepth: number): void
+      roughSizeOfObject(object: any): void
 
       /**
        * Deletes all properties of global

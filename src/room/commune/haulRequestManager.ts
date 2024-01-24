@@ -6,6 +6,7 @@ import {
 } from 'international/constants'
 import { randomIntRange, randomTick, Utils } from 'utils/utils'
 import { CommuneManager } from './commune'
+import { CommuneUtils } from './communeUtils'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
 
@@ -26,7 +27,7 @@ export class HaulRequestManager {
       if (
         !request ||
         !room.roomManager.structures.spawn.length ||
-        room.roomManager.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy
+        room.roomManager.resourcesInStoringStructures.energy < CommuneUtils.minStoredEnergy(this.communeManager.room)
       ) {
         this.communeManager.room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
         continue

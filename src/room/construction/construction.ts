@@ -15,6 +15,7 @@ import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 import { CollectiveManager } from 'international/collective'
 import { Sleepable } from 'utils/sleepable'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
   STRUCTURE_EXTENSION,
@@ -114,7 +115,7 @@ export class ConstructionManager {
   }
   private placeRamparts(RCL: number, maxCSites: number) {
     const rampartPlans = this.communeManager.room.roomManager.rampartPlans
-    const hasStoringStructure = !!this.room.communeManager.storingStructures.length
+    const hasStoringStructure = !!CommuneUtils.storingStructures(this.communeManager.room).length
 
     for (const packedCoord in rampartPlans.map) {
       const coord = unpackCoord(packedCoord)

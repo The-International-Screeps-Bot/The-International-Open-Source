@@ -8,13 +8,14 @@ import { newID, Utils } from 'utils/utils'
 import { ResourceTargets } from '../commune'
 import { TradingUtils } from './tradingUtils'
 import { ResourceRequest } from 'international/simpleAllies/types'
+import { CommuneUtils } from '../communeUtils'
 
 export class TerminalProcs {
   static preTickRun(room: Room) {
     if (!room.terminal) return
     if (!StructureUtils.isRCLActionable(room.terminal)) return
 
-    const resourceTargets = room.communeManager.resourceTargets
+    const resourceTargets = CommuneUtils.getResourceTargets(room)
 
     this.createTerminalRequests(room, resourceTargets)
   }
@@ -25,7 +26,7 @@ export class TerminalProcs {
     if (!StructureUtils.isRCLActionable(room.terminal)) return
     if (room.terminal.cooldown > 0) return
 
-    const resourceTargets = room.communeManager.resourceTargets
+    const resourceTargets = CommuneUtils.getResourceTargets(room)
 
     if (this.respondToTerminalRequests(room, resourceTargets) === Result.action) return
     if (this.respondToAllyRequests(room, resourceTargets) === Result.action) return
@@ -77,7 +78,7 @@ export class TerminalProcs {
     const resourcesInStoringStructures = room.roomManager.resourcesInStoringStructures
     const storedEnergy = resourcesInStoringStructures[RESOURCE_ENERGY]
     const budget = Math.min(
-      storedEnergy - room.communeManager.minStoredEnergy,
+      storedEnergy - CommuneUtils.minStoredEnergy(room),
       room.terminal.store.getUsedCapacity(RESOURCE_ENERGY),
     )
 
@@ -180,7 +181,7 @@ export class TerminalProcs {
 
   private static respondToTerminalRequests(room: Room, resourceTargets: ResourceTargets) {
     // We don't have enough energy to help other rooms
-    if (room.roomManager.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy)
+    if (room.roomManager.resourcesInStoringStructures.energy < CommuneUtils.minStoredEnergy(room))
       return Result.noAction
 
     const [request, ID, amount] = this.findBestTerminalRequest(room, resourceTargets)
@@ -249,7 +250,7 @@ export class TerminalProcs {
 
     // We don't have enough energy to help other rooms
 
-    if (room.roomManager.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy)
+    if (room.roomManager.resourcesInStoringStructures.energy < CommuneUtils.minStoredEnergy(room))
       return false
 
     const [request, amount] = this.findBestAllyRequest(room, resourceTargets)

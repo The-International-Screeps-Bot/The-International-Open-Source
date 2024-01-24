@@ -1,4 +1,5 @@
 import { Result, customColors, PowerCreepMemoryKeys, PowerCreepTasks } from 'international/constants'
+import { CommuneUtils } from 'room/commune/communeUtils'
 import { PowerTask } from 'types/roomRequests'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
@@ -146,7 +147,7 @@ export class Operator extends PowerCreep {
 
         // We are sufficiently full of ops
 
-        const storingStructure = this.room.communeManager.storingStructures[0]
+        const storingStructure = CommuneUtils.storingStructures(this.room)[0]
         if (!storingStructure) return false
 
         this.memory[PowerCreepMemoryKeys.task] = PowerCreepTasks.transferOps
@@ -157,7 +158,7 @@ export class Operator extends PowerCreep {
 
         // We are sufficiently full of ops
 
-        const storingStructure = this.room.communeManager.storingStructures[0]
+        const storingStructure = CommuneUtils.storingStructures(this.room)[0]
         if (!storingStructure) return false
 
         const transferAmount = this.store.getUsedCapacity(RESOURCE_OPS) * 0.5

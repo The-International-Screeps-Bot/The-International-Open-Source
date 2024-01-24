@@ -18,6 +18,7 @@ import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { CollectiveManager } from 'international/collective'
 import { PlayerManager } from 'international/players'
 import { unpackCoord } from 'other/codec'
+import { CommuneUtils } from './commune/communeUtils'
 
 export class RoomVisualsManager {
   roomManager: RoomManager
@@ -623,11 +624,11 @@ export class RoomVisualsManager {
     const data: any[][] = [
       [
         this.roomManager.resourcesInStoringStructures.energy || 0,
-        this.roomManager.room.communeManager.minStoredEnergy,
+        CommuneUtils.minStoredEnergy(this.roomManager.room),
         this.roomManager.room.communeManager.minRampartHits,
         roomMemory[RoomMemoryKeys.threatened].toFixed(2),
         roomMemory[RoomMemoryKeys.lastAttackedBy],
-        this.roomManager.room.communeManager.storedEnergyUpgradeThreshold,
+        CommuneUtils.storedEnergyUpgradeThreshold(this.roomManager.room),
         this.roomManager.room.communeManager.storedEnergyBuildThreshold,
         this.roomManager.room.towerInferiority || 'false',
       ],

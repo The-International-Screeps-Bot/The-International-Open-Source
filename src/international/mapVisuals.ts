@@ -8,6 +8,7 @@ import {
     packedPosLength,
     FlagNames,
 } from './constants'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled
@@ -43,7 +44,7 @@ export class MapVisualsManager {
                 if (!anchor) throw Error('No anchor for mapVisuals commune ' + roomName)
 
                 Game.map.visual.text(
-                    `⚡${room.roomManager.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`,
+                    `⚡${room.roomManager.resourcesInStoringStructures.energy} / ${CommuneUtils.minStoredEnergy(room)}`,
                     new RoomPosition(2, 8, roomName),
                     {
                         align: 'left',

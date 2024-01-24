@@ -9,6 +9,7 @@ import {
     powerSpawnRefillThreshold,
 } from 'international/constants'
 import { packCoord, unpackCoord } from 'other/codec'
+import { CommuneUtils } from 'room/commune/communeUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { findObjectWithID, getRange, unpackNumAsPos } from 'utils/utils'
 
@@ -500,7 +501,7 @@ export class HubHauler extends Creep {
 
         if (
           resource === RESOURCE_ENERGY &&
-          room.roomManager.resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy
+          room.roomManager.resourcesInStoringStructures.energy < CommuneUtils.minStoredEnergy(room)
         )
           continue
 

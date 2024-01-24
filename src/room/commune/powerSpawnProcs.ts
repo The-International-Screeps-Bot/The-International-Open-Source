@@ -2,6 +2,7 @@ import { CollectiveManager } from 'international/collective'
 import { RoomLogisticsRequestTypes } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { scalePriority } from 'utils/utils'
+import { CommuneUtils } from './communeUtils'
 
 export class PowerSpawnProcs {
   static run(room: Room) {
@@ -46,14 +47,14 @@ export class PowerSpawnProcs {
     // Make sure we have a reasonable amount of power to process
     if (resourcesInStoringStructures.power < powerSpawn.store.getCapacity(RESOURCE_POWER)) return
     // Make sure we have enough energy -- don't process power if our economy is struggling or reovering
-    if (resourcesInStoringStructures.energy < room.communeManager.minStoredEnergy) return
+    if (resourcesInStoringStructures.energy < CommuneUtils.minStoredEnergy(room)) return
 
     // energy
 
     room.createRoomLogisticsRequest({
       target: powerSpawn,
       /* onlyFull: true, */
-      type: RoomLogisticsRequestTypes.offer,
+      type: RoomLogisticsRequestTypes.transfer,
       priority: scalePriority(
         powerSpawn.store.getCapacity(RESOURCE_ENERGY),
         powerSpawn.usedReserveStore,
@@ -71,7 +72,7 @@ export class PowerSpawnProcs {
       room.createRoomLogisticsRequest({
         target: powerSpawn,
         /* onlyFull: true, */
-        type: RoomLogisticsRequestTypes.offer,
+        type: RoomLogisticsRequestTypes.transfer,
         priority: scalePriority(
           powerSpawn.store.getCapacity(RESOURCE_ENERGY),
           powerSpawn.usedReserveStore,

@@ -1,5 +1,6 @@
 import { CollectiveManager } from 'international/collective'
 import { Utils } from 'utils/utils'
+import { ResourceTargets } from './commune'
 
 interface CommuneData {
   /**
@@ -15,6 +16,8 @@ interface CommuneData {
    * The amount of hits for each rampart the previous tick, if exists
    */
   previousRampartHits: number
+  resourceTargets: ResourceTargets
+  minStoredEnergy: number
 }
 
 /**
@@ -45,6 +48,12 @@ export class CommuneDataProcs {
     if (Utils.isTickInterval(10)) {
       delete data.estimatedCommuneSourceIncome
       delete data.towerRampartRepairTreshold
+      delete data.minStoredEnergy
+    }
+
+    if (Utils.isTickInterval(100)) {
+
+      delete data.resourceTargets
     }
   }
 }
