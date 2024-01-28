@@ -357,7 +357,7 @@ export class Quad {
 
     // Attack mode
 
-    opts.defaultCostMatrixes = function (roomName) {
+    opts.overrideCostMatrixes = function (roomName) {
       return [RoomManager.roomManagers[roomName].quadCostMatrix]
     }
     moveLeader.createMoveRequest(opts)

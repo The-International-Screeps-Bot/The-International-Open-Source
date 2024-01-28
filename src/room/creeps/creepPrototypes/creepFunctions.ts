@@ -923,7 +923,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
         range: 0,
       },
     ],
-    defaultCostMatrixes(roomName) {
+    overrideCostMatrixes(roomName) {
       return [RoomManager.roomManagers[roomName].quadBulldozeCostMatrix]
     },
   })
