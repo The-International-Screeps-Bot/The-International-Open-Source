@@ -78,6 +78,11 @@ export class MigrationManager {
       }
       Memory.breakingVersion += 1
     }
+    if (Memory.breakingVersion === 127) {
+      global.killCreeps()
+      global.killPowerCreeps()
+      Memory.breakingVersion += 1
+    }
   }
 
   private static hardMigration() {

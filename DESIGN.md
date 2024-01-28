@@ -53,3 +53,11 @@ Classes should be static, and static classes should not be instantiated. If a cl
 Inherence of classes should be avoided.
 
 Mixing state and state modifiers (functions) in classes should be avoided.
+
+# Creep Tasks
+
+Allows creeps to track general inter-tick actions that are desired for fulfillment
+
+## Task Runners
+
+Task runners decide what actions to take based on the task data provided. Besides running tasks, runners may delete tasks, stop additional tasks to be ran, and more

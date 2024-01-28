@@ -14,25 +14,18 @@ import { StructureUtils } from 'room/structureUtils'
 import { TowerUtils } from 'room/commune/towerUtils'
 
 Object.defineProperties(Creep.prototype, {
-  nameData: {
-    get() {
-      if (this._nameData) return this._nameData
-
-      return (this._nameData = CreepUtils.expandName(this.name))
-    },
-  },
   role: {
     get() {
       if (this._role) return this._role
 
-      return (this._role = creepRoles[parseInt(this.nameData[0])])
+      return (this._role = creepRoles[parseInt(CreepUtils.expandName(this.name)[0])])
     },
   },
   commune: {
     get() {
       if (this._commune) return this._commune
 
-      return (this._commune = Game.rooms[this.nameData[1]])
+      return (this._commune = Game.rooms[Memory.creeps[this.name][CreepMemoryKeys.commune]])
     },
   },
   strength: {

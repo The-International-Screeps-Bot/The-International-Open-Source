@@ -23,7 +23,7 @@ import {
   FindNewRoomLogisticsRequestArgs,
   RoomLogisticsRequest,
   RoomLogisticsTargets,
-} from 'types/roomRequests'
+} from '../../types/roomLogistics'
 import { customLog, stringifyLog } from 'utils/logging'
 import { RoomObjectUtils } from 'room/roomObjectUtils'
 import { StructureUtils } from 'room/structureUtils'

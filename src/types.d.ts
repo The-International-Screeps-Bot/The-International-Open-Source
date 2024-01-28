@@ -12,7 +12,7 @@ import {
   NukeRequestKeys,
   PlayerMemoryKeys,
   PowerCreepMemoryKeys,
-  PowerRequestKeys,
+  PowerTaskKeys,
   RoomMemoryKeys,
   RoomTypes,
   SleepFor,
@@ -21,7 +21,7 @@ import {
   ReservedCoordTypes,
   WorkTypes,
   creepRoles,
-  PowerCreepTasks,
+  CreepPowerTaskNames,
   RoomLogisticsRequestTypes,
   MovedTypes,
   RoomStatsKeys,
@@ -37,15 +37,16 @@ import { CombatRequest, HaulRequest, NukeRequest, WorkRequest } from 'types/inte
 import { PlayerMemory } from 'types/players'
 import {
   CreepLogisticsRequest,
-  PowerTask,
+  CreepPowerRequest,
   RoomLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
   CreateRoomLogisticsRequestArgs,
-} from 'types/roomRequests'
+} from 'types/roomLogistics'
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
 import { StatsMemory } from 'types/stats'
 import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
 import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureProcs'
+import { CreepTask, CreepPowerTask } from 'types/creepTasks'
 
 declare global {
   interface ProfilerData {
@@ -506,7 +507,7 @@ declare global {
     roomLogisticsRequests: {
       [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
     }
-    powerTasks: { [ID: string]: PowerTask }
+    powerTasks: { [ID: string]: CreepPowerRequest }
 
     attackingDefenderIDs: Set<Id<Creep>>
     defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
@@ -666,7 +667,7 @@ declare global {
       target: Structure | Source,
       powerType: PowerConstant,
       priority: number,
-    ): PowerTask | false
+    ): CreepPowerRequest | false
 
     highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
 
@@ -958,9 +959,6 @@ declare global {
     findQuadBulldozeTargets(goalCoord: RoomPosition): Id<Structure>[]
 
     // Creep Getters
-
-    _nameData: string[]
-    nameData: string[]
 
     _role: CreepRoles
     /**
@@ -1272,6 +1270,7 @@ declare global {
   }
 
   interface CreepMemory {
+    [CreepMemoryKeys.commune]: string
     [CreepMemoryKeys.preferRoads]: boolean
     [CreepMemoryKeys.sourceIndex]: number
     [CreepMemoryKeys.dying]: boolean
@@ -1320,15 +1319,14 @@ declare global {
     [CreepMemoryKeys.stationary]: boolean
     [CreepMemoryKeys.defaultParts]: number
     [CreepMemoryKeys.cost]: number
+    [CreepMemoryKeys.task]: CreepTask
+
+    // Power Creep
+
+    [CreepMemoryKeys.powerTask]: CreepPowerTask
   }
 
-  interface PowerCreepMemory extends CreepMemory {
-    [PowerCreepMemoryKeys.commune]: string
-    [PowerCreepMemoryKeys.task]: PowerCreepTasks
-    [PowerCreepMemoryKeys.taskTarget]: Id<Structure | Source>
-    [PowerCreepMemoryKeys.taskPower]: PowerConstant
-    [PowerCreepMemoryKeys.taskRoom]: string
-  }
+  interface PowerCreepMemory extends CreepMemory {}
 
   interface UserScriptTemplate {
     /**

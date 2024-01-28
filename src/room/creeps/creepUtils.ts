@@ -16,7 +16,7 @@ import {
 import { StatsManager } from 'international/stats'
 import { arePositionsEqual, findObjectWithID, findWithLowestScore, getRange } from 'utils/utils'
 import { CreepRoleManager } from './creepRoleManager'
-import { packCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
+import { packCoord, unpackCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
 import { RoomManager } from 'room/room'
 import { CollectiveManager } from 'international/collective'
 import { creepClasses } from './creepClasses'
@@ -26,7 +26,10 @@ import {
   CreepLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
   RoomLogisticsRequest,
-} from 'types/roomRequests'
+} from 'types/roomLogistics'
+import { RoomObjectUtils } from 'room/roomObjectUtils'
+import { RoomUtils } from 'room/roomUtils'
+import { roomData } from 'room/roomData'
 
 export class CreepUtils {
   static expandName(creepName: string) {
@@ -44,18 +47,9 @@ export class CreepUtils {
     return (creep._role = this.roleName(creep.name))
   }
 
-  static communeCreep(creep: Creep) {
-    if (creep._commune !== undefined) return creep._commune
-
-    const expandedName = this.expandName(creep.name)
-    return (creep._commune = Game.rooms[expandedName[1]])
-  }
-
-  static customIDCreep(creep: Creep) {
-    if (creep._customID !== undefined) return creep._customID
-
-    const expandedName = this.expandName(creep.name)
-    return (creep._customID = parseInt(expandedName[2]))
+  static customIDName(creepName: string) {
+    const expandedName = this.expandName(creepName)
+    return parseInt(expandedName[1])
   }
 
   static findEnergySpentOnConstruction(
@@ -558,25 +552,29 @@ export class CreepUtils {
     // Pickup type
 
     if (target instanceof Resource) {
-      return Math.min(creep.freeNextStore, request.amount)
+      const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(creep, request.resourceType)
+      return Math.min(creepFreeNextStore, request.amount)
     }
 
     if (request.type === RoomLogisticsRequestTypes.transfer) {
+      const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(creep, request.resourceType)
+
       if (request.delivery) {
         // Take extra energy in case its needed
 
         if (request.resourceType === RESOURCE_ENERGY) {
-          return creep.nextStore[request.resourceType] + creep.freeNextStore
+          return creep.nextStore[request.resourceType] + creepFreeNextStore
         }
 
-        return Math.min(request.amount, creep.nextStore[request.resourceType] + creep.freeNextStore)
+        return Math.min(request.amount, creep.nextStore[request.resourceType] + creepFreeNextStore)
       }
       return Math.min(creep.nextStore[request.resourceType], request.amount)
     }
 
     // Withdraw or offer type
 
-    return Math.min(creep.freeNextStore, request.amount)
+    const creepFreeNextStore = RoomObjectUtils.freeNextStoreOf(creep, request.resourceType)
+    return Math.min(creepFreeNextStore, request.amount)
   }
 
   static findNewRampartRepairTarget(creep: Creep) {
@@ -633,5 +631,68 @@ export class CreepUtils {
     }
 
     return this.findNewRepairTarget(creep) || this.findNewRampartRepairTarget(creep)
+  }
+
+  static findFastFillerCoord(creep: Creep) {
+    const creepMemory = Memory.creeps[creep.name]
+    if (creepMemory[CreepMemoryKeys.packedCoord]) {
+      return unpackCoord(creepMemory[CreepMemoryKeys.packedCoord])
+    }
+
+    return this.findNewFastFillerCoord(creep, creepMemory)
+  }
+
+  /**
+   * Find the closest open fast filler coord, if exists. Then assign it to the creep
+   */
+  static findNewFastFillerCoord(creep: Creep, creepMemory = Memory.creeps[creep.name]) {
+
+    const fastFillerCoords = RoomUtils.getFastFillerCoords(creep.room)
+    if (!fastFillerCoords.length) return false
+
+    const reservedCoords = creep.room.roomManager.reservedCoords
+
+    const result = this.findOpenFastFillerCoord(creep, reservedCoords)
+    if (result === Result.fail) return false
+
+    creepMemory[CreepMemoryKeys.packedCoord] = result.packedCoord
+    reservedCoords.set(result.packedCoord, ReservedCoordTypes.important)
+
+    return result.coord
+  }
+
+  private static findOpenFastFillerCoord(creep: Creep, reservedCoords: Map<string, ReservedCoordTypes>) {
+
+    const packedFastFillerCoords = roomData[creep.room.name].fastFillerCoords
+
+    let lowestScore = Infinity
+    let bestCoord: Coord
+    let bestPackedCoord: string
+    let bestIndex: number
+
+    for (let i = 0; i < packedFastFillerCoords.length; i++) {
+      const packedCoord = packedFastFillerCoords[i]
+
+      if (reservedCoords.get(packedCoord) === ReservedCoordTypes.important) {
+        continue
+      }
+
+      const coord = unpackCoord(packedCoord)
+
+      const score = getRange(coord, creep.pos)
+      if (score >= lowestScore) continue
+
+      lowestScore = score
+      bestCoord = coord
+      bestPackedCoord = packedCoord
+      bestIndex = i
+    }
+    if (!bestCoord) return Result.fail
+
+    return {
+      coord: bestCoord,
+      packedCoord: bestPackedCoord,
+      index: bestIndex,
+    }
   }
 }

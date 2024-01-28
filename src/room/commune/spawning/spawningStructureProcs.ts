@@ -281,10 +281,11 @@ export class SpawningStructureProcs {
     body: BodyPartConstant[],
     requestID: number,
   ) {
-    const creepName = `${creepRoles.indexOf(spawnRequest.role)}_${spawn.room.name}_${requestID}`
+    const creepName = `${creepRoles.indexOf(spawnRequest.role)}_${requestID}`
 
     spawnRequest.extraOpts.energyStructures = spawn.room.communeManager.spawningStructuresByPriority
 
+    spawnRequest.extraOpts.memory[CreepMemoryKeys.commune] = spawn.room.name
     spawnRequest.extraOpts.memory[CreepMemoryKeys.defaultParts] = spawnRequest.defaultParts
     spawnRequest.extraOpts.memory[CreepMemoryKeys.cost] = spawnRequest.cost
 

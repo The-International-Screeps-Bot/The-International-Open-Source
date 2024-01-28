@@ -66,6 +66,7 @@ import { customLog } from 'utils/logging'
 import { StructureUtils } from './structureUtils'
 import { LogisticsProcs } from './logisticsProcs'
 import { CommuneProcs } from './commune/communeProcs'
+import { roomData } from './roomData'
 
 export interface InterpretedRoomEvent {
   eventType: EventConstant
@@ -740,6 +741,9 @@ export class RoomManager {
     this._structureCoords = undefined
     this.sourceContainerIDs = undefined
 
+    const data = roomData[this.room.name]
+    data.fastFillerCoords = undefined
+
     const communeManager = this.room.communeManager
     if (communeManager) {
       communeManager.actionableSpawningStructuresIDs = undefined
@@ -749,7 +753,6 @@ export class RoomManager {
 
       this.fastFillerContainerIDs = undefined
       this._upgradePositions = undefined
-      this._fastFillerPositions = undefined
     }
 
     if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
@@ -1173,67 +1176,6 @@ export class RoomManager {
       filter: structure => combatTargetStructureTypes.has(structure.structureType),
     })
     return (this._combatStructureTargets = combatStructureTargets)
-  }
-
-  _fastFillerPositions: RoomPosition[]
-  /**
-   * To make this more efficient, reverse the way it is calculated. For each potential source, record potential fast filler positions that are adjacent. Then have each potential position search for adjacent spawning structures
-   */
-  get fastFillerPositions() {
-    if (this._fastFillerPositions && !this.structureUpdate) return this._fastFillerPositions
-
-    const anchor = this.anchor
-    if (!anchor) throw Error('no anchor')
-
-    const fastFillerPositions: RoomPosition[] = []
-    let rawFastFillerPositions = [
-      new RoomPosition(anchor.x - 1, anchor.y - 1, this.room.name),
-      new RoomPosition(anchor.x - 1, anchor.y + 1, this.room.name),
-      new RoomPosition(anchor.x + 1, anchor.y - 1, this.room.name),
-      new RoomPosition(anchor.x + 1, anchor.y + 1, this.room.name),
-    ]
-    const structureCoords = this.structureCoords
-
-    const fastFillerLink = this.fastFillerLink
-    const sufficientLink = fastFillerLink && StructureUtils.isRCLActionable(fastFillerLink)
-
-    for (const pos of rawFastFillerPositions) {
-      const adjacentStructuresOfTypes: Partial<Record<StructureConstant, number>> = {
-        [STRUCTURE_SPAWN]: 0,
-        [STRUCTURE_EXTENSION]: 0,
-        [STRUCTURE_CONTAINER]: 0,
-      }
-
-      forAdjacentCoords(pos, adjacentCoord => {
-        const structuresAtCoord = structureCoords.get(packCoord(adjacentCoord))
-        if (!structuresAtCoord) return
-
-        for (const ID of structuresAtCoord) {
-          const structure = findObjectWithID(ID)
-
-          if (adjacentStructuresOfTypes[structure.structureType] === undefined) continue
-
-          // Increase structure amount for this structureType on the adjacentPos
-
-          adjacentStructuresOfTypes[structure.structureType] += 1
-        }
-      })
-
-      // If there is containers and spawning structures, make it an offial fastFillerPosition
-
-      if (!sufficientLink && adjacentStructuresOfTypes[STRUCTURE_CONTAINER] === 0) continue
-
-      if (
-        adjacentStructuresOfTypes[STRUCTURE_SPAWN] +
-          adjacentStructuresOfTypes[STRUCTURE_EXTENSION] ===
-        0
-      )
-        continue
-
-      fastFillerPositions.push(pos)
-    }
-
-    return (this._fastFillerPositions = fastFillerPositions)
   }
 
   _remoteNamesByEfficacy: string[]

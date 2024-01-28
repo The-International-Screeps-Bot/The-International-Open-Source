@@ -8,10 +8,9 @@ export class RoomPruningManager extends StaticSleepable {
     static run() {
         if (this.isSleepingResponsive()) return
 
-        // Make sure all rooms are max RCL
-        // Temple rooms?
+        // Find the highest scoring commune. Remember that higher score is less preferable.
 
-        let rooms = 0
+        let maxRCLRooms = 0
         let highestCommuneScore = 0
         let highestCommuneScoreCommuneName: string
 
@@ -19,7 +18,7 @@ export class RoomPruningManager extends StaticSleepable {
           const room = Game.rooms[roomName]
           if (room.controller.level < maxControllerLevel) return
 
-          rooms += 1
+          maxRCLRooms += 1
 
           const roomMemory = Memory.rooms[roomName]
           const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
@@ -30,8 +29,9 @@ export class RoomPruningManager extends StaticSleepable {
           highestCommuneScoreCommuneName = roomName
         }
 
-        // Have multiple rooms before we unclaim
-        if (rooms <= 1) return
+        // Ensure that every room is max RCL
+        // What about temple rooms?
+        if (maxRCLRooms !== CollectiveManager.communes.size) return
 
         // Find the lowest scoring workRequest
         const lowestWorkRequestScore = findLowestScore(

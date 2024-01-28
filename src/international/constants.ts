@@ -150,6 +150,7 @@ export enum SleepFor {
 }
 
 export enum CreepMemoryKeys {
+  commune,
   preferRoads,
   sourceIndex,
   dying,
@@ -188,26 +189,38 @@ export enum CreepMemoryKeys {
   stationary,
   defaultParts,
   cost,
-}
-
-export enum PowerCreepMemoryKeys {
-  commune,
-  /**
-   * The name of the method queued for operation
-   */
   task,
-  taskTarget,
-  /**
-   * The type of power the creep should use
-   */
-  taskPower,
-  taskRoom,
+
+  // Power Creep
+
+  powerTask,
 }
 
-export enum PowerRequestKeys {
+export enum CreepTaskKeys {
+  taskName,
   target,
-  type,
-  cooldown,
+  roomName,
+}
+
+export enum CreepTaskNames {
+
+  // Creep
+
+  harvestMineral,
+
+  // Power Creep
+
+  advancedGenerateOps,
+  advancedEnablePower,
+  advancedRenew,
+  transferOps,
+}
+
+export enum CreepPowerTaskKeys {
+  taskName,
+  target,
+  power,
+  roomName,
 }
 
 export enum RoomTypes {
@@ -538,13 +551,6 @@ export const communeCreepRoles: Set<CreepRoles> = new Set([
   'meleeDefender',
   'rangedDefender',
 ])
-
-export enum PowerCreepTasks {
-  advancedEnablePower,
-  advancedGenerateOps,
-  advancedRenew,
-  transferOps,
-}
 
 export const powerCreepClassNames: PowerClassConstant[] = ['operator']
 

@@ -47,6 +47,7 @@ import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
 import { ObserverProcs } from './observerProcs'
 import { PowerSpawnProcs } from './powerSpawnProcs'
 import { CommuneUtils } from './communeUtils'
+import { RoomUtils } from 'room/roomUtils'
 
 export type ResourceTargets = {
   min: Partial<{ [key in ResourceConstant]: number }>
@@ -557,16 +558,16 @@ export class CommuneManager {
   }
 
   findFastFillerIgnoreCoords(ignoreCoords: Set<number>) {
-    const fastFillerPositions = this.room.roomManager.fastFillerPositions
-    for (const pos of fastFillerPositions) {
+    const fastFillerCoords = RoomUtils.getFastFillerCoords(this.room)
+    for (const coord of fastFillerCoords) {
       // Make sure the position is reserved (presumably by a fastFiller)
 
-      const reserveType = this.room.roomManager.reservedCoords.get(packCoord(pos))
+      const reserveType = this.room.roomManager.reservedCoords.get(packCoord(coord))
       if (!reserveType) continue
       if (reserveType < ReservedCoordTypes.dying) continue
 
       // register structures the fastFiller should be able to fill
-      forCoordsAroundRange(pos, 1, coord => {
+      forCoordsAroundRange(coord, 1, coord => {
         ignoreCoords.add(packAsNum(coord))
       })
     }

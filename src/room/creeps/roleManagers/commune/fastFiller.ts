@@ -3,6 +3,9 @@ import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 import { StructureUtils } from 'room/structureUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
+import { RoomUtils } from 'room/roomUtils'
+import { roomData } from 'room/roomData'
+import { CreepUtils } from 'room/creeps/creepUtils'
 
 export class FastFiller extends Creep {
   update() {
@@ -17,11 +20,11 @@ export class FastFiller extends Creep {
   }
 
   travelToFastFiller?(): boolean {
-    const fastFillerPos = this.findFastFillerPos()
-    if (!fastFillerPos) return true
+    const fastFillerCoord = CreepUtils.findFastFillerCoord(this)
+    if (!fastFillerCoord) return true
 
     // If the this is standing on the fastFillerPos, we didn't travel
-    if (getRange(this.pos, fastFillerPos) === 0) return false
+    if (getRange(this.pos, fastFillerCoord) === 0) return false
 
     // Otherwise, make a move request to it
 
@@ -29,42 +32,12 @@ export class FastFiller extends Creep {
 
     this.createMoveRequest({
       origin: this.pos,
-      goals: [{ pos: fastFillerPos, range: 0 }],
+      goals: [{ pos: new RoomPosition(fastFillerCoord.x, fastFillerCoord.y, this.room.name), range: 0 }],
     })
 
     // And inform true
 
     return true
-  }
-
-  findFastFillerPos?() {
-    const { room } = this
-
-    this.message = 'FFP'
-
-    const creepMemory = Memory.creeps[this.name]
-
-    // Stop if the creep already has a packedFastFillerPos
-    if (creepMemory[CreepMemoryKeys.packedCoord]) {
-      return unpackCoordAsPos(creepMemory[CreepMemoryKeys.packedCoord], room.name)
-    }
-
-    // Get usedFastFillerPositions
-
-    const reservedCoords = room.roomManager.reservedCoords
-
-    const openFastFillerPositions = room.roomManager.fastFillerPositions.filter(pos => {
-      return reservedCoords.get(packCoord(pos)) !== ReservedCoordTypes.important
-    })
-    if (!openFastFillerPositions.length) return false
-
-    const fastFillerPos = findClosestPos(this.pos, openFastFillerPositions)
-    const packedCoord = packCoord(fastFillerPos)
-
-    creepMemory[CreepMemoryKeys.packedCoord] = packedCoord
-    reservedCoords.set(packedCoord, ReservedCoordTypes.important)
-
-    return fastFillerPos
   }
 
   fillFastFiller?(): boolean {

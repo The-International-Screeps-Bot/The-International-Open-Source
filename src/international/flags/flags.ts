@@ -992,7 +992,7 @@ export class FlagManager {
     })
   }
 
-  private fastFillerPositions(flagName: string, flagNameParts: string[]) {
+  private fastFillerCoords(flagName: string, flagNameParts: string[]) {
     const flag = Game.flags[flagName]
     const roomName = flagNameParts[1] || flag.pos.roomName
     const room = Game.rooms[roomName]
@@ -1001,8 +1001,8 @@ export class FlagManager {
       return
     }
 
-    const fastFillerPositions = room.roomManager.fastFillerPositions
-    for (const pos of fastFillerPositions) {
+    const fastFillerCoords = RoomUtils.getFastFillerCoords(room)
+    for (const pos of fastFillerCoords) {
       room.coordVisual(pos.x, pos.y)
     }
   }

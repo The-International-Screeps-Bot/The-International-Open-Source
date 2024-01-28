@@ -14,6 +14,7 @@ import { CommuneUtils } from '../communeUtils'
 import { StructureUtils } from 'room/structureUtils'
 import { CommuneProcs } from '../communeProcs'
 import { Utils } from 'utils/utils'
+import { RoomUtils } from 'room/roomUtils'
 
 export class SpawnRequestsManager {
   communeManager: CommuneManager
@@ -373,9 +374,8 @@ export class SpawnRequestsManager {
       ((): SpawnRequestArgs | false => {
         // Get the fastFiller positions, if there are none, inform false
 
-        const fastFillerPositionsCount =
-          this.communeManager.room.roomManager.fastFillerPositions.length
-        if (!fastFillerPositionsCount) return false
+        const fastFillerCoordsCount = RoomUtils.getFastFillerCoords(this.communeManager.room).length
+        if (!fastFillerCoordsCount) return false
 
         const anchor = this.communeManager.room.roomManager.anchor
         if (!anchor) throw Error('no anchor for room ' + this.communeManager.room.name)
@@ -402,7 +402,7 @@ export class SpawnRequestsManager {
           defaultParts,
           extraParts: [],
           partsMultiplier: 1,
-          creepsQuota: fastFillerPositionsCount,
+          creepsQuota: fastFillerCoordsCount,
           minCostPerCreep: 150,
           priority,
           spawnTarget: anchor,

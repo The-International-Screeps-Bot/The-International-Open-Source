@@ -11,6 +11,7 @@ export class PowerSpawnProcs {
 
     this.advancedProcessPower(powerSpawn)
     this.advancedSpawn(powerSpawn)
+    this.createRoomLogisticsRequests(room, powerSpawn)
   }
 
   /**
@@ -74,7 +75,7 @@ export class PowerSpawnProcs {
         /* onlyFull: true, */
         type: RoomLogisticsRequestTypes.transfer,
         priority: scalePriority(
-          powerSpawn.store.getCapacity(RESOURCE_ENERGY),
+          powerSpawn.store.getCapacity(RESOURCE_POWER),
           powerSpawn.usedReserveStore,
           10,
           true,

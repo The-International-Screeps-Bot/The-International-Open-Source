@@ -16,6 +16,7 @@ import {
 import { packCoord, unpackCoord, unpackCoordList, unpackPosAt, unpackPosList } from 'other/codec'
 import { LogTypes, customLog } from 'utils/logging'
 import { forCoordsAroundRange, unpackNumAsCoord, visualizePath } from '../utils/utils'
+import { RoomUtils } from 'room/roomUtils'
 
 export interface PathGoal {
     pos: RoomPosition
@@ -326,7 +327,8 @@ export class CustomPathFinder {
 
             // Loop through each position of fastFillerPositions, have creeps prefer to avoid
 
-            for (const pos of room.roomManager.fastFillerPositions) {
+            const fastFillerCoords = RoomUtils.getFastFillerCoords(room)
+            for (const pos of fastFillerCoords) {
                 const packedCoord = packCoord(pos)
 
                 const currentWeight = args.weightCoords[roomName][packedCoord] || 0

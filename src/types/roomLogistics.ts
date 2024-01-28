@@ -1,8 +1,4 @@
-import {
-  CreepLogisticsRequestKeys,
-  PowerRequestKeys,
-  RoomLogisticsRequestTypes,
-} from 'international/constants'
+import { CreepLogisticsRequestKeys, RoomLogisticsRequestTypes } from 'international/constants'
 
 export type RoomLogisticsTargets = AnyStoreStructure | Creep | Tombstone | Ruin | Resource
 
@@ -75,19 +71,4 @@ export interface FindNewRoomLogisticsRequestArgs {
      * DO NOT USE THIS TO COMMAND CERTAIN RESOURCETYPES, instead use resourceTypes
      */
     conditions?(request: RoomLogisticsRequest): any
-}
-
-export interface PowerRequest {
-    [PowerRequestKeys.target]: Id<Structure | Source>
-    [PowerRequestKeys.type]: PowerConstant
-    [PowerRequestKeys.cooldown]: number
-}
-
-export interface PowerTask {
-    taskID: string
-    targetID: Id<Structure | Source>
-    powerType: PowerConstant
-    packedCoord: string
-    cooldown: number
-    priority: number
 }
