@@ -406,75 +406,13 @@ export class CustomPathFinder {
           if (defaultCosts) costs = defaultCosts
         } else costs = new PathFinder.CostMatrix()
 
-        // If there is no route
-
-        if (allowedRoomNames.size <= 1) {
-          // Configure y and loop through top exits
-
-          let x
-          let y = 0
-          for (x = 0; x < roomDimensions; x += 1) costs.set(x, y, 255)
-
-          // Configure x and loop through left exits
-
-          x = 0
-          for (y = 0; y < roomDimensions; y += 1) costs.set(x, y, 255)
-
-          // Configure y and loop through bottom exits
-
-          y = roomDimensions - 1
-          for (x = 0; x < roomDimensions; x += 1) costs.set(x, y, 255)
-
-          // Configure x and loop through right exits
-
-          x = roomDimensions - 1
-          for (y = 0; y < roomDimensions; y += 1) costs.set(x, y, 255)
-        }
+        CustomPathFinder.weightExits(costs, allowedRoomNames)
 
         if (args.defaultCostMatrix) return costs
 
-        if (args.weightCoordMapsForRoomName) {
-          const coordMap = args.weightCoordMapsForRoomName(roomName)
-          if (coordMap) {
-            for (const index in coordMap) {
-              const packedCoord = parseInt(index)
-
-              if (coordMap[packedCoord] === 0) continue
-
-              const coord = unpackNumAsCoord(packedCoord)
-              if (costs.get(coord.x, coord.y) === 255) continue
-
-              costs.set(coord.x, coord.y, coordMap[packedCoord])
-            }
-          }
-        }
-
-        // Weight positions
-
-        if (args.weightCoords && args.weightCoords[roomName]) {
-          for (const packedCoord in args.weightCoords[roomName]) {
-            const coord = unpackCoord(packedCoord)
-
-            costs.set(coord.x, coord.y, args.weightCoords[roomName][packedCoord])
-          }
-        }
-
-        // Weight coord maps
-
-        if (args.weightCoordMaps) {
-          for (const coordMap of args.weightCoordMaps) {
-            for (const index in coordMap) {
-              const packedCoord = parseInt(index)
-
-              if (coordMap[packedCoord] === 0) continue
-
-              const coord = unpackNumAsCoord(packedCoord)
-              if (costs.get(coord.x, coord.y) === 255) continue
-
-              costs.set(coord.x, coord.y, coordMap[packedCoord])
-            }
-          }
-        }
+        CustomPathFinder.weightCoordMapsForRoomName(costs, args, roomName)
+        CustomPathFinder.weightCoords(costs, args, roomName)
+        CustomPathFinder.weightCoordMaps(costs, args, roomName)
 
         // If we have no vision in the room
 
@@ -482,17 +420,7 @@ export class CustomPathFinder {
 
         CustomPathFinder.weightCreep(costs, args, room)
         CustomPathFinder.avoidStationaryPositions(costs, args, room)
-
-        // Weight structures
-
-        for (const key in args.weightStructures) {
-          // Get the numeric value of the weight
-
-          const structureType = key as StructureConstant
-
-          for (const structure of room.roomManager.structures[structureType])
-            costs.set(structure.pos.x, structure.pos.y, args.weightStructures[structureType])
-        }
+        CustomPathFinder.weightStructures(costs, args, room)
 
         for (const portal of room.roomManager.structures.portal)
           costs.set(portal.pos.x, portal.pos.y, 255)
@@ -506,22 +434,7 @@ export class CustomPathFinder {
         CustomPathFinder.avoidKeeperLairs(costs, args, roomMemory)
         CustomPathFinder.avoidNotMyCreeps(costs, args, room)
         CustomPathFinder.avoidImpassibleStructures(costs, args, room)
-
-        // Stop if there are no cost matrixes to weight
-
-        if (args.overrideCostMatrixes) {
-          // Otherwise iterate through each x and y in the room
-
-          for (let x = 0; x < roomDimensions; x += 1) {
-            for (let y = 0; y < roomDimensions; y += 1) {
-              // Loop through each costMatrix
-
-              for (const costMatrix of args.overrideCostMatrixes(roomName)) {
-                costs.set(x, y, costMatrix.get(x, y))
-              }
-            }
-          }
-        }
+        CustomPathFinder.overrideCostMatrixes(costs, args, roomName)
 
         // Inform the CostMatrix
 
@@ -570,6 +483,84 @@ export class CustomPathFinder {
     return pathFinderResult.path
   }
 
+  static weightExits(costs: CostMatrix, allowedRoomNames: Set<string>) {
+    // If there i
+    if (allowedRoomNames.size > 1) return
+
+    // There is no route
+
+    // Configure y and loop through top exits
+
+    let x
+    let y = 0
+    for (x = 0; x < roomDimensions; x += 1) costs.set(x, y, 255)
+
+    // Configure x and loop through left exits
+
+    x = 0
+    for (y = 0; y < roomDimensions; y += 1) costs.set(x, y, 255)
+
+    // Configure y and loop through bottom exits
+
+    y = roomDimensions - 1
+    for (x = 0; x < roomDimensions; x += 1) costs.set(x, y, 255)
+
+    // Configure x and loop through right exits
+
+    x = roomDimensions - 1
+    for (y = 0; y < roomDimensions; y += 1) costs.set(x, y, 255)
+  }
+
+  static weightCoordMapsForRoomName(
+    costs: CostMatrix,
+    args: CustomPathFinderArgs,
+    roomName: string,
+  ) {
+    if (!args.weightCoordMapsForRoomName) return
+
+    const coordMap = args.weightCoordMapsForRoomName(roomName)
+    if (!coordMap) return
+
+    for (const index in coordMap) {
+      const packedCoord = parseInt(index)
+
+      if (coordMap[packedCoord] === 0) continue
+
+      const coord = unpackNumAsCoord(packedCoord)
+      if (costs.get(coord.x, coord.y) === 255) continue
+
+      costs.set(coord.x, coord.y, coordMap[packedCoord])
+    }
+  }
+
+  static weightCoords(costs: CostMatrix, args: CustomPathFinderArgs, roomName: string) {
+    if (!args.weightCoords) return
+    if (!args.weightCoords[roomName]) return
+
+    for (const packedCoord in args.weightCoords[roomName]) {
+      const coord = unpackCoord(packedCoord)
+
+      costs.set(coord.x, coord.y, args.weightCoords[roomName][packedCoord])
+    }
+  }
+
+  static weightCoordMaps(costs: CostMatrix, args: CustomPathFinderArgs, roomName: string) {
+    if (!args.weightCoordMaps) return
+
+    for (const coordMap of args.weightCoordMaps) {
+      for (const index in coordMap) {
+        const packedCoord = parseInt(index)
+
+        if (coordMap[packedCoord] === 0) continue
+
+        const coord = unpackNumAsCoord(packedCoord)
+        if (costs.get(coord.x, coord.y) === 255) continue
+
+        costs.set(coord.x, coord.y, coordMap[packedCoord])
+      }
+    }
+  }
+
   static weightCreep(costs: CostMatrix, args: CustomPathFinderArgs, room: Room) {
     if (!args.creep) return
 
@@ -598,6 +589,17 @@ export class CustomPathFinder {
 
       const coord = unpackCoord(packedCoord)
       costs.set(coord.x, coord.y, reserveType * 5 + 5)
+    }
+  }
+
+  static weightStructures(costs: CostMatrix, args: CustomPathFinderArgs, room: Room) {
+    for (const key in args.weightStructures) {
+      // Get the numeric value of the weight
+
+      const structureType = key as StructureConstant
+
+      for (const structure of room.roomManager.structures[structureType])
+        costs.set(structure.pos.x, structure.pos.y, args.weightStructures[structureType])
     }
   }
 
@@ -672,6 +674,21 @@ export class CustomPathFinder {
       for (const cSite of room.roomManager.cSites[structureType]) {
         // Set pos as impassible
         costs.set(cSite.pos.x, cSite.pos.y, 255)
+      }
+    }
+  }
+
+  static overrideCostMatrixes(costs: CostMatrix, args: CustomPathFinderArgs, roomName: string) {
+    if (!args.overrideCostMatrixes) return
+    // Otherwise iterate through each x and y in the room
+
+    for (let x = 0; x < roomDimensions; x += 1) {
+      for (let y = 0; y < roomDimensions; y += 1) {
+        // Loop through each costMatrix
+
+        for (const costMatrix of args.overrideCostMatrixes(roomName)) {
+          costs.set(x, y, costMatrix.get(x, y))
+        }
       }
     }
   }
