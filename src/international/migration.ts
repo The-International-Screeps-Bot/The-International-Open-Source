@@ -8,7 +8,9 @@ import { RoomNameProcs } from 'room/roomNameProcs'
 export class MigrationManager {
   public static tryMigrate() {
     // We are at the right version, no need to migrate
-    if (Memory.breakingVersion === global.settings.breakingVersion) return
+    if (Memory.breakingVersion === global.settings.breakingVersion) {
+      return
+    }
 
     // Try to do a soft migration
     this.trySoftMigrations()

@@ -209,7 +209,7 @@ export class TowerProcs {
     if (!room.myPowerCreeps.length) return
 
     for (const tower of room.roomManager.structures.tower) {
-      room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
+      room.createPowerRequest(tower, PWR_OPERATE_TOWER, 1)
     }
   }
 

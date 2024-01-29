@@ -684,7 +684,7 @@ Room.prototype.advancedScout = function (scoutingRoom: Room) {
   }
 
   const roomNameScoutType = RoomNameProcs.findAndRecordConstantType(this.name)
-  if (roomNameScoutType) {
+  if (roomNameScoutType !== Result.fail) {
     if (roomNameScoutType === RoomTypes.sourceKeeper) {
       // Record the positions of keeper lairs
 
@@ -1459,13 +1459,14 @@ Room.prototype.createWorkRequest = function () {
 
   RoomNameUtils.findDynamicScore(this.name)
 
-  const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
-  if (communePlanned === false) return false
+  const roomMemory = Memory.rooms[this.name]
+  const communePlanned = roomMemory[RoomMemoryKeys.communePlanned]
+  if (communePlanned !== undefined) return false
 
-  if (communePlanned !== true) {
+  if (communePlanned !== Result.success) {
     const result = this.roomManager.communePlanner.attemptPlan(this)
     if (result === Result.fail) {
-      this.memory[RoomMemoryKeys.communePlanned] = false
+      roomMemory[RoomMemoryKeys.communePlanned] = Result.fail
       return false
     }
 
@@ -1549,7 +1550,7 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
   return false
 }
 
-Room.prototype.createPowerTask = function (target, powerType, priority) {
+Room.prototype.createPowerRequest = function (target, powerType, priority) {
   // There is already has a power creep responding to this target with the power
   customLog('MADE POWER TASK FOR', target)
   if (target.reservePowers.has(powerType)) return false
@@ -1561,10 +1562,10 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
 
   const ID = CollectiveManager.newTickID()
 
-  return (this.powerTasks[ID] = {
+  return (this.powerRequests[ID] = {
     taskID: ID,
     targetID: target.id,
-    powerType,
+    power: powerType,
     packedCoord: packCoord(target.pos),
     cooldown,
     priority,

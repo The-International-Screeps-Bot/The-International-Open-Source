@@ -1,16 +1,16 @@
 import {
-    Result,
-    RoomMemoryKeys,
-    RoomStatusKeys,
-    RoomTypes,
-    defaultSwampCost,
-    dynamicScoreRoomRange,
-    maxControllerLevel,
-    preferredCommuneRange,
-    remoteRoles,
-    roomDimensions,
-    roomTypeProperties,
-    roomTypes,
+  Result,
+  RoomMemoryKeys,
+  RoomStatusKeys,
+  RoomTypes,
+  defaultSwampCost,
+  dynamicScoreRoomRange,
+  maxControllerLevel,
+  preferredCommuneRange,
+  remoteRoles,
+  roomDimensions,
+  roomTypeProperties,
+  roomTypes,
 } from 'international/constants'
 import { CollectiveManager } from 'international/collective'
 import {
@@ -27,6 +27,7 @@ import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
 import { RoomProcs } from './roomProcs'
 import { RoomNameProcs } from './roomNameProcs'
+import { RoomUtils } from './roomUtils'
 
 /**
  * considers a position being flooded
@@ -339,13 +340,54 @@ export class RoomNameUtils {
    */
   static getStatusForPotentialMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
-    if (!roomMemory) {
-      Memory.rooms[roomName] = {} as any
-      return RoomStatusKeys[RoomNameProcs.findAndRecordStatus(roomName)]
+    if (roomMemory === undefined) {
+      const roomMemory = Memory.rooms[roomName] = {} as RoomMemory
+      RoomNameUtils.basicScout(roomName)
+      
+      return roomMemory[RoomMemoryKeys.status]
     }
 
     // Otherwise there is room memory
 
     return roomMemory[RoomMemoryKeys.status]
+  }
+
+  static basicScout(roomName: string, room = Game.rooms[roomName]) {
+    const roomMemory = Memory.rooms[roomName]
+
+    if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
+      RoomNameProcs.findAndRecordStatus(roomName, roomMemory)
+    }
+
+    // Record that the room was scouted this tick
+    roomMemory[RoomMemoryKeys.lastScout] = Game.time
+
+    if (!room) return roomMemory[RoomMemoryKeys.type]
+    if (!room.controller) return roomMemory[RoomMemoryKeys.type]
+
+    // If the contoller is owned
+    if (room.controller.owner) {
+      // Stop if the controller is owned by me
+
+      if (room.controller.my) return roomMemory[RoomMemoryKeys.type]
+
+      const owner = room.controller.owner.username
+      roomMemory[RoomMemoryKeys.owner] = owner
+
+      // If the controller is owned by an ally
+
+      if (global.settings.allies.includes(owner))
+        return (roomMemory[RoomMemoryKeys.type] = RoomTypes.ally)
+
+      return room.scoutEnemyRoom()
+    }
+
+    room.createWorkRequest()
+
+    // There is no controller owner
+
+    if (room.scoutRemote()) return roomMemory[RoomMemoryKeys.type]
+
+    return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
   }
 }

@@ -17,7 +17,9 @@ export class GarbageCollector extends StaticSleepable {
   static cleanRooms() {
     for (const roomName in Memory.rooms) {
       const roomMemory = Memory.rooms[roomName]
-      if (Game.time - roomMemory[RoomMemoryKeys.lastScout] < this.cleanRoomThreshold) continue
+      if (roomMemory[RoomMemoryKeys.lastScout] && Game.time - roomMemory[RoomMemoryKeys.lastScout] < this.cleanRoomThreshold) {
+        continue
+      }
 
       delete Memory.rooms[roomName]
     }

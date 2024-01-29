@@ -52,7 +52,7 @@ export class ConstructionManager {
 
     this.manageConstructionSites()
 
-    if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
+    if (Memory.rooms[this.room.name][RoomMemoryKeys.communePlanned] !== Result.success) return
     // If it's not our first room, wait until RCL 2 before begining construction efforts
     if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
 

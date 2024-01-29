@@ -7,6 +7,7 @@ import {
     roomDimensions,
     packedPosLength,
     FlagNames,
+    Result,
 } from './constants'
 import { CommuneUtils } from 'room/commune/communeUtils'
 
@@ -184,7 +185,7 @@ export class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory[RoomMemoryKeys.communePlanned] === false) {
+            if (roomMemory[RoomMemoryKeys.communePlanned] === Result.fail) {
                 Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
                     stroke: customColors.red,
                     strokeWidth: 2,

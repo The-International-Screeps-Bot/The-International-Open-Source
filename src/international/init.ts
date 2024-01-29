@@ -3,6 +3,7 @@ import { PlayerManager } from './players'
 import { StatsManager } from './stats'
 import { PlayerMemoryKeys, SegmentIDs } from './constants'
 import { PlayerRelationships } from './constants'
+import { RoomNameUtils } from 'room/roomNameUtils'
 
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function
@@ -17,7 +18,7 @@ export class InitManager {
    * Construct Memory if it isn't constructed yet
    */
   private static initMemory() {
-    if (Memory.breakingVersion) return
+    if (Memory.breakingVersion !== undefined) return
 
     this.initSegments()
 
@@ -42,6 +43,7 @@ export class InitManager {
     Memory.nukeRequests = {}
     StatsManager.internationalConfig()
   }
+
   /**
    * Construct global if it isn't constructed yet
    */
@@ -50,10 +52,12 @@ export class InitManager {
 
     global.constructed = true
 
-    global.packedRoomNames = {}
-    global.unpackedRoomNames = {}
-
     this.initPlayers()
+
+    for (const roomName in Memory.rooms) {
+
+      RoomNameUtils.basicScout(roomName)
+    }
   }
 
   private static initPlayers() {

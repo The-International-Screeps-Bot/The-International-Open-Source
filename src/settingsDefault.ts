@@ -45,8 +45,8 @@ export const defaultSettings: Settings = {
   allySegmentID: 90,
   errorExporting: true,
   structureMigration: true,
-  roomLogisticsVisuals: false,
   debugLogging: false,
+  season: false,
   /*   relationships: {
     MarvinTMB: PlayerRelationships.ally,
   }, */

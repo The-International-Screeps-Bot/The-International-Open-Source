@@ -2,6 +2,7 @@ import { RoomUtils } from 'room/roomUtils'
 import { CommuneDataProcs, communeData } from './communeData'
 import { CommuneUtils } from './communeUtils'
 import {
+  Result,
   RoomLogisticsRequestTypes,
   RoomMemoryKeys,
   RoomTypes,
@@ -88,7 +89,6 @@ export class CommuneProcs {
       roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
     }
 
-    room.roomManager.communePlanner.attemptPlan(room)
     CommuneProcs.getRCLUpdate(room)
 
     if (!roomMemory[RoomMemoryKeys.combatRequests]) roomMemory[RoomMemoryKeys.combatRequests] = []
@@ -99,7 +99,7 @@ export class CommuneProcs {
     communeManager.communeHaulerNeed = 0
     communeManager.nextSpawnEnergyAvailable = room.energyAvailable
 
-    if (!roomMemory[RoomMemoryKeys.remotes]) roomMemory[RoomMemoryKeys.remotes] = []
+    if (roomMemory[RoomMemoryKeys.remotes] == undefined) roomMemory[RoomMemoryKeys.remotes] = []
     if (roomMemory[RoomMemoryKeys.threatened] == undefined) {
       roomMemory[RoomMemoryKeys.threatened] = 0
     }
@@ -139,8 +139,10 @@ export class CommuneProcs {
   static initRun(room: Room) {
     this.preTickTest(room)
 
+    room.roomManager.communePlanner.attemptPlan(room)
+
     const roomMemory = Memory.rooms[room.name]
-    if (!roomMemory[RoomMemoryKeys.communePlanned]) return
+    if (roomMemory[RoomMemoryKeys.communePlanned] !== Result.success) return
 
     const communeManager = room.communeManager
 
@@ -164,7 +166,7 @@ export class CommuneProcs {
 
   static run(room: Room) {
     const roomMemory = Memory.rooms[room.name]
-    if (!roomMemory[RoomMemoryKeys.communePlanned]) return
+    if (roomMemory[RoomMemoryKeys.communePlanned] !== Result.success) return
 
     const communeManager = room.communeManager
 

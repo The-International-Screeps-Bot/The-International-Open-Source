@@ -1,4 +1,4 @@
-import { RoomMemoryKeys, RoomStatusKeys, RoomTypes } from 'international/constants'
+import { Result, RoomMemoryKeys, RoomStatusKeys, RoomTypes } from 'international/constants'
 
 export class RoomNameProcs {
   static findAndRecordStatus(roomName: string, roomMemory = Memory.rooms[roomName]) {
@@ -36,6 +36,6 @@ export class RoomNameProcs {
       return (roomMemory[RoomMemoryKeys.type] = RoomTypes.sourceKeeper)
     }
 
-    return false
+    return Result.fail
   }
 }

@@ -3188,7 +3188,6 @@ export class RemotePlanner {
     roomMemory[RoomMemoryKeys.mineralPath] = plan.mineralPath
     roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
     roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
-    roomMemory[RoomMemoryKeys.communePlanned] = true
   }
   private visualizeGrid() {
     for (let x = 0; x < roomDimensions; x++) {

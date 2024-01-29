@@ -6,7 +6,7 @@ export class SourceProcs {
 
     const sources = RoomUtils.getSources(room)
     for (const source of sources) {
-      room.createPowerTask(source, PWR_REGEN_SOURCE, 10)
+      room.createPowerRequest(source, PWR_REGEN_SOURCE, 10)
     }
   }
 }

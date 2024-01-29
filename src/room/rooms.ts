@@ -53,7 +53,7 @@ export class RoomsManager {
   }
 
   private static runRoom(roomName: string) {
-    const startCPU = Game.cpu.generatePixel()
+    const startCPU = Game.cpu.getUsed()
 
     const room = Game.rooms[roomName]
     RoomProcs.run(room)
@@ -73,6 +73,6 @@ export class RoomsManager {
     )
 
     const usedCPU = Game.cpu.getUsed() - startCPU
-    StatsManager.updateCommuneStat(roomName, RoomStatsKeys.CpuUsed, usedCPU)
+    StatsManager.updateStat(roomName, RoomStatsKeys.CpuUsed, usedCPU)
   }
 }

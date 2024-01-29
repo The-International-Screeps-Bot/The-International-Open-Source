@@ -37,7 +37,6 @@ import { CombatRequest, HaulRequest, NukeRequest, WorkRequest } from 'types/inte
 import { PlayerMemory } from 'types/players'
 import {
   CreepLogisticsRequest,
-  CreepPowerRequest,
   RoomLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
   CreateRoomLogisticsRequestArgs,
@@ -46,7 +45,7 @@ import { UserScriptTemplate } from 'other/userScript/userScript.example'
 import { StatsMemory } from 'types/stats'
 import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
 import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureProcs'
-import { CreepTask, CreepPowerTask } from 'types/creepTasks'
+import { CreepTask, CreepPowerTask, PowerRequest } from 'types/creepTasks'
 
 declare global {
   interface ProfilerData {
@@ -507,7 +506,7 @@ declare global {
     roomLogisticsRequests: {
       [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
     }
-    powerTasks: { [ID: string]: CreepPowerRequest }
+    powerRequests: { [ID: string]: PowerRequest }
 
     attackingDefenderIDs: Set<Id<Creep>>
     defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
@@ -663,11 +662,11 @@ declare global {
 
     coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
-    createPowerTask(
+    createPowerRequest(
       target: Structure | Source,
       powerType: PowerConstant,
       priority: number,
-    ): CreepPowerRequest | false
+    ): PowerRequest | false
 
     highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
 
@@ -1185,7 +1184,7 @@ declare global {
     [RoomMemoryKeys.score]: number
     [RoomMemoryKeys.dynamicScore]: number
     [RoomMemoryKeys.dynamicScoreUpdate]: number
-    [RoomMemoryKeys.communePlanned]: boolean
+    [RoomMemoryKeys.communePlanned]: Result.success | Result.fail
 
     // Commune
 
@@ -1367,10 +1366,6 @@ declare global {
        * Whether global is constructed or not
        */
       constructed: true | undefined
-
-      packedRoomNames: { [roomName: string]: string }
-
-      unpackedRoomNames: { [roomName: string]: string }
 
       lastReset: number
 

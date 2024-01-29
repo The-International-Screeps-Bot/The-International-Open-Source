@@ -92,14 +92,13 @@ export interface Settings {
    */
   structureMigration: boolean
   /**
-   * Wether or not to generate visuals for room logistics requests
-   */
-  roomLogisticsVisuals: boolean
-  /**
    * Wether or not to generate and display logs for debugging purposes
    */
   debugLogging: boolean
-
+  /**
+   * Wether or not the bot should run season logic
+   */
+  season: boolean
   /* relationships: RelationshipSettings */
 }
 

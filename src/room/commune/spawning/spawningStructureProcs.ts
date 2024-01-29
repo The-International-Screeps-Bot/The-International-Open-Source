@@ -305,7 +305,7 @@ export class SpawningStructureProcs {
     if (organizedSpawns.inactiveSpawns.length) return
 
     for (const spawn of organizedSpawns.activeSpawns) {
-      room.createPowerTask(spawn, PWR_OPERATE_SPAWN, 2)
+      room.createPowerRequest(spawn, PWR_OPERATE_SPAWN, 2)
     }
   }
 

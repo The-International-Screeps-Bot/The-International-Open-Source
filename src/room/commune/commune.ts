@@ -1,24 +1,17 @@
 import {
   findObjectWithID,
   getRange,
-  packAsNum,
-  randomTick,
-  findLowestScore,
+  packAsNum, findLowestScore,
   roundTo,
-  forCoordsAroundRange,
-  Utils,
+  forCoordsAroundRange
 } from 'utils/utils'
-import './defence'
 import './workRequest'
 import './combatRequest'
 import {
-  creepRoles,
-  RoomMemoryKeys,
-  RoomTypes,
-  rampartUpkeepCost,
+  RoomMemoryKeys, rampartUpkeepCost,
   RemoteResourcePathTypes,
   ReservedCoordTypes,
-  RoomStatsKeys,
+  RoomStatsKeys
 } from 'international/constants'
 import './factory'
 import { LabManager } from './labs'
@@ -26,26 +19,15 @@ import './links'
 import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
-import { DefenceProcs } from './defenceProcs'
 import { HaulRequestManager } from './haulRequestManager'
 import { HaulerNeedManager } from './haulerNeed'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { LinkManager } from './links'
 import { FactoryManager } from './factory'
 import { SpawnRequestsManager } from './spawning/spawnRequests'
-import { CollectiveManager } from 'international/collective'
 import { ConstructionManager } from 'room/construction/construction'
 import { RoomNameUtils } from 'room/roomNameUtils'
-import { LogTypes, customLog } from 'utils/logging'
-import { CommuneProcs } from './communeProcs'
 import { StructureUtils } from 'room/structureUtils'
-import { LogisticsProcs } from 'room/logisticsProcs'
-import { TowerProcs } from './towerProcs'
-import { SourceProcs } from 'room/sourceProcs'
-import { TerminalProcs } from './terminal/terminalProcs'
-import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
-import { ObserverProcs } from './observerProcs'
-import { PowerSpawnProcs } from './powerSpawnProcs'
 import { CommuneUtils } from './communeUtils'
 import { RoomUtils } from 'room/roomUtils'
 

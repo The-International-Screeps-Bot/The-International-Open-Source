@@ -104,7 +104,7 @@ export class RoomProcs {
     room.myPowerCreepsByRole = {}
     for (const className of powerCreepClassNames) room.myPowerCreepsByRole[className] = []
 
-    room.powerTasks = {}
+    room.powerRequests = {}
 
     room.creepsOfSource = []
     for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])

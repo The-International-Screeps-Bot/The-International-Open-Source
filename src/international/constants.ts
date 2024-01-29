@@ -427,6 +427,11 @@ export const roomTypes: Record<RoomTypes, Set<keyof RoomMemory>> = {
     RoomMemoryKeys.dynamicScore,
     RoomMemoryKeys.dynamicScoreUpdate,
     RoomMemoryKeys.clearedEnemyStructures,
+    RoomMemoryKeys.workRequest,
+    RoomMemoryKeys.combatRequests,
+    RoomMemoryKeys.haulRequests,
+    RoomMemoryKeys.mineral,
+    RoomMemoryKeys.greatestRCL,
   ]),
   [RoomTypes.remote]: new Set([
     RoomMemoryKeys.commune,

@@ -9,7 +9,7 @@ global.settingsExample = {
   // Assigns the default settings
   ...defaultSettings,
   // Your preferences here
-  roomVisuals: true,
+  publicRamparts: false,
   // etc...
 }
 
@@ -38,7 +38,7 @@ if (Game.shard.name === 'shard2') {
         // etc...
     }
 }
-else if (Game.shard.name === 'swc') {
+else if (Game.shard.name === 'season') {
 
     global.settings = {
         // Assigns the default settings

@@ -211,7 +211,7 @@ export class Operator extends PowerCreep {
       [CreepPowerTaskKeys.target]: request.targetID,
       [CreepPowerTaskKeys.power]: request.power,
     }
-    delete this.room.powerTasks[request.taskID]
+    delete this.room.powerRequests[request.taskID]
 
     return task
   }
@@ -220,35 +220,35 @@ export class Operator extends PowerCreep {
     let lowestScore = Infinity
     let bestTask: PowerRequest
 
-    for (const ID in this.room.powerTasks) {
-      const task = this.room.powerTasks[ID]
+    for (const ID in this.room.powerRequests) {
+      const request = this.room.powerRequests[ID]
 
       // We don't have the requested power
 
-      const power = this.powers[task.powerType]
+      const power = this.powers[request.power]
       if (!power) continue
 
       // We don't have enough ops for the task
 
-      if ((POWER_INFO[task.powerType] as any).ops > this.nextStore.ops) continue
+      if ((POWER_INFO[request.power] as any).ops > this.nextStore.ops) continue
 
-      const taskTargetPos = findObjectWithID(task.targetID).pos
+      const taskTargetPos = findObjectWithID(request.targetID).pos
       const range = getRange(this.pos, taskTargetPos)
 
       // The target doesn't need us yet or we can't yet provide
 
       if (
-        Math.max(task.cooldown, this.powerCooldowns.get(task.powerType) || 0) >
-        range + (POWER_INFO[task.powerType] as any).range + 3
+        Math.max(request.cooldown, this.powerCooldowns.get(request.power) || 0) >
+        range + (POWER_INFO[request.power] as any).range + 3
       )
         continue
 
-      const score = task.priority + range / 100
+      const score = request.priority + range / 100
 
       if (score >= lowestScore) continue
 
       lowestScore = score
-      bestTask = task
+      bestTask = request
     }
 
     if (!bestTask) return Result.fail

@@ -6,6 +6,7 @@ import {
   CombatRequestKeys,
   RoomMemoryKeys,
   RoomTypes,
+  Result,
 } from './constants'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
@@ -175,8 +176,9 @@ global.destroyCommuneStructures = function (types?) {
 
 global.claim = function (requestName, communeName, priority = 0, override?: boolean) {
   if (!Memory.rooms[requestName]) return 'No roomMemory for ' + requestName
-  if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== true)
+  if (Memory.rooms[requestName][RoomMemoryKeys.communePlanned] !== Result.success) {
     return 'Planning not completed for ' + requestName
+  }
 
   if (!Memory.workRequests[requestName]) {
     Memory.workRequests[requestName] = {

@@ -212,7 +212,7 @@ export class FlagManager {
       flag.setColor(COLOR_RED)
       return
     }
-    if (roomMemory[RoomMemoryKeys.communePlanned] !== true) {
+    if (roomMemory[RoomMemoryKeys.communePlanned] !== Result.success) {
       flag.setColor(COLOR_RED)
       return
     }
@@ -889,7 +889,7 @@ export class FlagManager {
       flag.setColor(COLOR_RED)
       return
     }
-    if (!roomMemory[RoomMemoryKeys.communePlanned]) {
+    if (roomMemory[RoomMemoryKeys.communePlanned] !== Result.success) {
       flag.setColor(COLOR_RED)
       return
     }
