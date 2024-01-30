@@ -570,7 +570,7 @@ export class HubHauler extends Creep {
     )
       return false
 
-    const amount = Math.min(this.freeNextStore, powerSpawn.freeSpecificStore(resource))
+    const amount = Math.min(this.freeNextStore, powerSpawn.store.getFreeCapacity(resource))
 
     // Find a provider
 
@@ -590,7 +590,7 @@ export class HubHauler extends Creep {
       this,
       RoomLogisticsRequestTypes.transfer,
       powerSpawn.id,
-      Math.min(this.freeNextStore + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+      Math.min(this.freeNextStore + this.store[resource], powerSpawn.store.getFreeCapacity(resource)),
       resource,
     )
     return true
@@ -620,7 +620,7 @@ export class HubHauler extends Creep {
     )
       return false
 
-    const amount = Math.min(this.freeNextStore, powerSpawn.freeSpecificStore(resource))
+    const amount = Math.min(this.freeNextStore, powerSpawn.store.getFreeCapacity(resource))
 
     // Find a provider
 
@@ -640,7 +640,7 @@ export class HubHauler extends Creep {
       this,
       RoomLogisticsRequestTypes.transfer,
       powerSpawn.id,
-      Math.min(this.freeNextStore + this.store[resource], powerSpawn.freeSpecificStore(resource)),
+      Math.min(this.freeNextStore + this.store[resource], powerSpawn.store.getFreeCapacity(resource)),
       resource,
     )
     return true

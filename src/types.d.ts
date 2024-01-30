@@ -1066,12 +1066,6 @@ declare global {
   interface RoomObject {
     // Functions
 
-    /**
-     * Finds the total free store capacity of a specific resource for this RoomObject
-     * @deprecated either create a util without a prototype or use your brain to do the math yourself
-     */
-    freeSpecificStore(resourceType?: ResourceConstant): number
-
     // RoomObject getters
 
     _effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
