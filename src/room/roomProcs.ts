@@ -171,7 +171,6 @@ export class RoomProcs {
   }
 
   static run(room: Room) {
-
     const roomMemory = Memory.rooms[room.name]
     if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
       CommuneProcs.run(room)
@@ -201,7 +200,6 @@ export class RoomProcs {
    * Debug
    */
   visualizeReservedCoords(room: Room) {
-
     const roomManager = room.roomManager
 
     customLog('reservedCoords', JSON.stringify([...roomManager.reservedCoords]))
@@ -236,22 +234,5 @@ export class RoomProcs {
         },
       ],
     })
-  }
-
-  static runCreeps(room: Room) {
-
-    for (const role in room.myCreepsByRole) {
-
-      const creepNames = room.myCreepsByRole[role as CreepRoles]
-      if (!creepNames) continue
-
-      switch (role) {
-        case 'hauler':
-          HaulerServices.runCreeps(creepNames)
-          break
-        default:
-          throw Error(`No service for role ${role}`)
-      }
-    }
   }
 }

@@ -11,6 +11,7 @@ import {
   customColors,
   packedPosLength,
   relayOffsets,
+  RoomStatsKeys,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
@@ -94,7 +95,7 @@ export class Hauler extends Creep {
 
     const result = spawn.renewCreep(this)
     if (result === OK) {
-      StatsManager.updateStat(this.room.name, 'eosp', energyCost)
+      StatsManager.updateStat(this.room.name, RoomStatsKeys.EnergyOutputSpawn, energyCost)
       spawn.renewed = true
     }
   }

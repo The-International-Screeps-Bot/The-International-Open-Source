@@ -116,6 +116,8 @@ import { HaulerServices } from 'room/creeps/roleManager.new/commune/haulerServic
 import { MyCreepProcs } from 'room/creeps/myCreepProcs'
 import { RoomServices } from 'room/roomServices'
 import { HaulerNeedOps } from 'room/commune/haulerNeedOps'
+import { MyCreepServices } from 'room/creeps/myCreepServices'
+import { MyPowerCreepServices } from 'room/creeps/myPowerCreepServices'
 
 export function profilerRegister() {
   // Classes
@@ -198,9 +200,7 @@ export function profilerRegister() {
 
   // Creep classes
 
-  profiler.registerClass(PowerCreepProcs, 'PowerCreepProcs')
-  profiler.registerClass(PowerCreepUtils, 'PowerCreepUtils')
-
+  profiler.registerClass(MyCreepServices, 'MyCreepServices')
   profiler.registerClass(CreepProcs, 'CreepProcs')
   profiler.registerClass(CreepMoveProcs, 'CreepMoveProcs')
   profiler.registerClass(CreepUtils, 'CreepUtils')
@@ -210,6 +210,10 @@ export function profilerRegister() {
   profiler.registerClass(Quad, 'Quad')
   profiler.registerClass(DynamicSquad, 'DynamicSquad')
   profiler.registerClass(Duo, 'Duo')
+
+  profiler.registerClass(MyPowerCreepServices, 'MyPowerCreepServices')
+  profiler.registerClass(PowerCreepProcs, 'PowerCreepProcs')
+  profiler.registerClass(PowerCreepUtils, 'PowerCreepUtils')
 
   // Creep Roles
 
