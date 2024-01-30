@@ -22,19 +22,13 @@ import { PowerSpawnProcs } from './powerSpawnProcs'
 import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
 import { TowerProcs } from './towerProcs'
 import { HaulerNeedOps } from './haulerNeedOps'
+import { CommuneManager } from './commune'
 
 /**
  * Minor processes for communes
  */
 export class CommuneProcs {
-  static update(room: Room) {
-    const communeManager = room.communeManager
-    communeManager.room = room
-
-    // non manager
-
-    //
-
+  static clean(communeManager: CommuneManager) {
     delete communeManager._maxCombatRequests
     delete communeManager._defensiveRamparts
     delete communeManager._sourceLinks
@@ -53,6 +47,13 @@ export class CommuneProcs {
       delete communeManager._upgradeStructure
       delete communeManager._hasSufficientRoads
     }
+  }
+
+  static update(room: Room) {
+    const communeManager = room.communeManager
+    communeManager.room = room
+
+    // non manager
 
     const roomMemory = Memory.rooms[room.name]
 
