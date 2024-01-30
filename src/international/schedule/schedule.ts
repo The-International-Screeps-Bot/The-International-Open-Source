@@ -12,7 +12,7 @@ export class ScheduleProcs {
         continue
       }
 
-      task.opperation()
+      task.operation()
     }
   }
 
@@ -21,7 +21,7 @@ export class ScheduleProcs {
     // If the task hasn't been ran yet, run it
     if (task.sleepUntil === undefined) {
 
-      task.opperation()
+      task.operation()
       task.sleepUntil = Game.time + task.interval
       return
     }
@@ -30,7 +30,7 @@ export class ScheduleProcs {
 
     // Otherwise we are ready to be ran
 
-    task.opperation()
+    task.operation()
     task.sleepUntil = Game.time + task.interval
   }
 

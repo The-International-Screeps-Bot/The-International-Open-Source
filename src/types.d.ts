@@ -332,7 +332,7 @@ declare global {
     chantIndex: number
 
     /**
-     * the tick of the last holistic configuration opperation
+     * the tick of the last holistic configuration operation
      */
     lastConfig: number
 

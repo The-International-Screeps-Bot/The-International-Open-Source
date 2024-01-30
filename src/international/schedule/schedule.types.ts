@@ -5,9 +5,9 @@ export type Schedule = (ScheduleTask | ScheduleIntervalTask)[]
  */
 export interface ScheduleTask {
   /**
-   * The task's opperation to execute when it is allowed to do so
+   * The task's operation to execute when it is allowed to do so
    */
-  opperation(): void
+  operation(): void
 }
 
 export interface ScheduleIntervalTask extends ScheduleTask {
