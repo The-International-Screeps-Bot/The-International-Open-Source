@@ -67,7 +67,7 @@ import { StructureUtils } from './structureUtils'
 import { LogisticsProcs } from './logisticsProcs'
 import { CommuneProcs } from './commune/communeProcs'
 import { roomData } from './roomData'
-import { RoomOps } from './RoomOps'
+import { RoomOps } from './roomOps'
 
 export interface InterpretedRoomEvent {
   eventType: EventConstant

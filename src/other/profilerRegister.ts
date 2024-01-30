@@ -101,7 +101,7 @@ import { SpawningStructureUtils } from 'room/commune/spawning/spawningStructureU
 import { NukerProcs } from 'room/commune/nukerProcs'
 import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
-import { RoomOps } from 'room/roomProcs'
+import { RoomOps } from 'room/roomOps'
 import { RoomNameProcs } from 'room/roomNameProcs'
 import { SegmentsManager } from 'international/segments'
 import { wasm } from './wasmInit'

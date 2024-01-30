@@ -19,7 +19,7 @@ import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { RoomUtils } from 'room/roomUtils'
 import { SpawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
-import { RoomOps } from 'room/roomProcs'
+import { RoomOps } from 'room/roomOps'
 
 export class FlagManager {
   run() {

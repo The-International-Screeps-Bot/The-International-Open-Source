@@ -270,4 +270,9 @@ export class RoomOps {
     data.terrainBinary = terrainBinary
     return terrainBinary
   }
+
+  static getStructures(room: Room) {
+
+    
+  }
 }
