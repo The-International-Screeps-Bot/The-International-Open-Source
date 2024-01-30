@@ -20,7 +20,6 @@ import { RemotesManager } from './remotesManager'
 import { WorkRequestManager } from './workRequest'
 import { CombatRequestManager } from './combatRequest'
 import { HaulRequestManager } from './haulRequestManager'
-import { HaulerNeedManager } from './haulerNeed'
 import { packCoord, unpackPosAt } from 'other/codec'
 import { LinkManager } from './links'
 import { FactoryManager } from './factory'
@@ -52,7 +51,6 @@ export class CommuneManager {
   workRequestManager: WorkRequestManager
   combatRequestManager: CombatRequestManager
   haulRequestManager: HaulRequestManager
-  haulerNeedManager: HaulerNeedManager
 
   factoryManager: FactoryManager
 
@@ -94,7 +92,6 @@ export class CommuneManager {
     this.workRequestManager = new WorkRequestManager(this)
     this.combatRequestManager = new CombatRequestManager(this)
     this.haulRequestManager = new HaulRequestManager(this)
-    this.haulerNeedManager = new HaulerNeedManager(this)
 
     this.factoryManager = new FactoryManager(this)
   }

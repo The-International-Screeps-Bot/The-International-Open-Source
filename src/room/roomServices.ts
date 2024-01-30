@@ -22,7 +22,7 @@ import { RoomManager } from './room'
 import { LogTypes, customLog } from 'utils/logging'
 import { RoomProcs } from './roomProcs'
 
-export class RoomsManager {
+export class RoomServices {
   static updateRun() {
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName]

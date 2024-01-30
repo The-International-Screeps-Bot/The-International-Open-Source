@@ -29,7 +29,6 @@ import { GarbageCollector } from 'international/garbageCollector'
 import { EndTickManager } from 'international/endTick'
 import { EndTickCreepManager } from 'room/creeps/endTickCreepManager'
 import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
-import { HaulerNeedManager } from 'room/commune/haulerNeed'
 import { LinkManager } from 'room/commune/links'
 import { CombatRequestManager } from 'room/commune/combatRequest'
 import { MapVisualsManager } from 'international/mapVisuals'
@@ -104,7 +103,6 @@ import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
 import { RoomProcs } from 'room/roomProcs'
 import { RoomNameProcs } from 'room/roomNameProcs'
-import { RoomsManager } from 'room/rooms'
 import { SegmentsManager } from 'international/segments'
 import { wasm } from './wasmInit'
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
@@ -113,6 +111,11 @@ import { TickInit } from 'international/tickInit'
 import { DebugUtils } from 'debug/debugUtils'
 import { DefenceProcs } from 'room/commune/defenceProcs'
 import { DefenceUtils } from 'room/commune/defenceUtils'
+import { HaulerProcs } from 'room/creeps/roleManager.new/commune/haulerProcs'
+import { HaulerServices } from 'room/creeps/roleManager.new/commune/haulerServices'
+import { MyCreepProcs } from 'room/creeps/myCreepProcs'
+import { RoomServices } from 'room/roomServices'
+import { HaulerNeedOps } from 'room/commune/haulerNeedOps'
 
 export function profilerRegister() {
   // Classes
@@ -149,7 +152,7 @@ export function profilerRegister() {
 
   // Room classes
 
-  profiler.registerClass(RoomsManager, 'RoomsManager')
+  profiler.registerClass(RoomServices, 'RoomServices')
   profiler.registerClass(CommuneManager, 'CommuneManager')
   profiler.registerClass(RoomManager, 'RoomManager')
   profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
@@ -161,7 +164,6 @@ export function profilerRegister() {
   profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
   profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
-  profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
   profiler.registerClass(LinkManager, 'LinkManager')
   profiler.registerClass(DefenceProcs, 'DefenceProcs')
   profiler.registerClass(DefenceUtils, 'DefenceUtils')
@@ -192,6 +194,7 @@ export function profilerRegister() {
   profiler.registerClass(NukerProcs, 'NukerProcs')
   profiler.registerClass(ObserverProcs, 'ObserverProcs')
   profiler.registerClass(PowerSpawnProcs, 'PowerSpawnProcs')
+  profiler.registerClass(HaulerNeedOps, 'HaulerNeedOps')
 
   // Creep classes
 
@@ -201,11 +204,17 @@ export function profilerRegister() {
   profiler.registerClass(CreepProcs, 'CreepProcs')
   profiler.registerClass(CreepMoveProcs, 'CreepMoveProcs')
   profiler.registerClass(CreepUtils, 'CreepUtils')
+  profiler.registerClass(MyCreepProcs, 'MyCreepProcs')
   profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
 
   profiler.registerClass(Quad, 'Quad')
   profiler.registerClass(DynamicSquad, 'DynamicSquad')
   profiler.registerClass(Duo, 'Duo')
+
+  // Creep Roles
+
+  profiler.registerClass(HaulerServices, 'HaulerServices')
+  profiler.registerClass(HaulerProcs, 'HaulerProcs')
 
   // Objects
 

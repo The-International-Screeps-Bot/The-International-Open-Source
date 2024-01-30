@@ -21,6 +21,7 @@ import { DefenceProcs } from './defenceProcs'
 import { PowerSpawnProcs } from './powerSpawnProcs'
 import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
 import { TowerProcs } from './towerProcs'
+import { HaulerNeedOps } from './haulerNeedOps'
 
 /**
  * Minor processes for communes
@@ -183,7 +184,7 @@ export class CommuneProcs {
 
     SourceProcs.createPowerTasks(room)
     communeManager.remotesManager.run()
-    communeManager.haulerNeedManager.run()
+    HaulerNeedOps.run(room)
 
     SpawningStructureProcs.createRoomLogisticsRequests(room)
     LogisticsProcs.createCommuneStoringStructureLogisticsRequests(room)

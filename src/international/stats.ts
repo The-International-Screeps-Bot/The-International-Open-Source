@@ -4,108 +4,33 @@ import { customLog, LogTypes } from 'utils/logging'
 import { CollectiveManager } from './collective'
 
 export interface RoomStats {
-  /**
-   * Game Time
-   */
-  gt: number
-  /**
-   * Remote Count
-   */
-  rc: number
-  /**
-   * Remote Energy Stored
-   */
-  res: number
-  /**
-   * Remote Energy Input Harvest
-   */
-  reih: number
-  /**
-   * Remote Energy Output Repair Other (non-barricade structures)
-   */
-  reoro: number
-  /**
-   * Remote Energy Output Build
-   */
-  reob: number
+  [RoomStatsKeys.GameTime]: number
+  [RoomStatsKeys.RemoteCount]: number
+  [RoomStatsKeys.RemoteEnergyStored]: number
+  [RoomStatsKeys.RemoteEnergyInputHarvest]: number
+  [RoomStatsKeys.RemoteEnergyOutputRepairOther]: number
+  [RoomStatsKeys.RemoteEnergyOutputBuild]: number
 }
 
 export interface CommuneStats extends RoomStats {
-  /**
-   * Controller Level
-   */
-  cl: number
-  /**
-   * Energy Input Harvest
-   */
-  eih: number
-  /**
-   * Energy Input Bought
-   */
-  eib?: number
-  /**
-   * Energy Output Upgrade
-   */
-  eou: number
-  /**
-   * Energy Output Repair Other (non-barricade structures)
-   */
-  eoro: number
-  /**
-   * Energy Output Repair Wall or Rampart
-   */
-  eorwr: number
-  /**
-   * Energy Output Build
-   */
-  eob: number
-  /**
-   * Energy Output Sold
-   */
-  eos: number
-  /**
-   * Energy Output Spawn
-   */
-  eosp: number
-  /**
-   * Energy Output Power
-   */
-  eop: number
-  /**
-   * Minerals Harvested
-   */
-  mh: number
-  /**
-   * Energy Stored
-   */
-  es: number
-  /**
-   * Creep Count
-   */
-  cc: number
-  /**
-   * Total Creep Count
-   */
-  tcc: number
-  /**
-   * Power Creep Count
-   */
-  pcc: number
-  /**
-   * Spawn Usage as a decimal
-   */
-  su: number
-  /**
-   * hauler size
-   */
-  mhc: number
-  /**
-   * energy out transactions costs
-   */
-  eotc: number
-
-  // Better way to define shortform types
-
+  [RoomStatsKeys.ControllerLevel]: number
+  [RoomStatsKeys.EnergyInputHarvest]: number
+  [RoomStatsKeys.EnergyInputBought]: number
+  [RoomStatsKeys.EnergyOutputUpgrade]: number
+  [RoomStatsKeys.EnergyOutputRepairOther]: number
+  [RoomStatsKeys.EnergyOutputRepairWallOrRampart]: number
+  [RoomStatsKeys.EnergyOutputSold]: number
+  [RoomStatsKeys.EnergyOutputBuild]: number
+  [RoomStatsKeys.EnergyOutputSpawn]: number
+  [RoomStatsKeys.EnergyOutputPower]: number
+  [RoomStatsKeys.MineralsHarvested]: number
+  [RoomStatsKeys.EnergyStored]: number
+  [RoomStatsKeys.CreepCount]: number
+  [RoomStatsKeys.TotalCreepCount]: number
+  [RoomStatsKeys.PowerCreepCount]: number
+  [RoomStatsKeys.SpawnUsagePercentage]: number
+  [RoomStatsKeys.MinHaulerCost]: number
+  [RoomStatsKeys.EnergyOutputTransactionCosts]: number
   [RoomStatsKeys.EnergyTerminalSentDomestic]: number
   [RoomStatsKeys.EnergyTerminalSentOther]: number
   [RoomStatsKeys.BatteriesStoredTimes10]: number

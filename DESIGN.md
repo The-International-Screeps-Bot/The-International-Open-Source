@@ -10,6 +10,7 @@ The bot intends to implement a primarily data-oriented style, with some aspects 
 - a static class
 - does not contain any state
 - contains functions/methods
+- acts on singular inputs
 
 Utils stands for utilities. These are functions that will generally take inputs and provide information in return.
 
@@ -21,12 +22,35 @@ CommuneUtils contains utility functions that provide often cached information on
 - a static class
 - does not contain any state
 - contains functions/methods
+- acts on singular inputs
 
 Procs stands for processors. These are functions that will generally run logic for specified things.
 
 ### Example
 
 CommuneProc runs logic for the commune to update data, make intents, and run sub processes like towers, spawning, creeps, etc.
+
+## Ops
+- a static class
+- does not contain any state
+- contains functions/methods
+- acts on singular inputs
+
+### Example
+
+HaulerNeedOps contians functions that provide cached information, carry out processes, or whatever else.
+
+## Services
+- a static class
+- does not contain any state
+- contains function/methods
+- acts on plural inputs
+
+Services run plural inputs, which in turn are generally ran through procs and utils.
+
+### Example
+
+RoomServices contains functions that runs logic for a list of rooms.
 
 ## Manager
 - a static class

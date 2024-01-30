@@ -15,6 +15,8 @@ import { CommuneProcs } from './commune/communeProcs'
 import { LogisticsProcs } from './logisticsProcs'
 import { customLog } from 'utils/logging'
 import { unpackCoord } from 'other/codec'
+import { HaulerServices } from './creeps/roleManager.new/commune/haulerServices'
+import { HaulerProcs } from './creeps/roleManager.new/commune/haulerProcs'
 
 export class RoomProcs {
   static update(room: Room) {
@@ -234,5 +236,22 @@ export class RoomProcs {
         },
       ],
     })
+  }
+
+  static runCreeps(room: Room) {
+
+    for (const role in room.myCreepsByRole) {
+
+      const creepNames = room.myCreepsByRole[role as CreepRoles]
+      if (!creepNames) continue
+
+      switch (role) {
+        case 'hauler':
+          HaulerServices.runCreeps(creepNames)
+          break
+        default:
+          throw Error(`No service for role ${role}`)
+      }
+    }
   }
 }
