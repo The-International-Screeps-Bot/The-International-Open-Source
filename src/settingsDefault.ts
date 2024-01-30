@@ -5,8 +5,6 @@ import { Settings } from 'types/settings'
  */
 export const defaultSettings: Settings = {
   breakingVersion: 128,
-  roomVisuals: false,
-  mapVisuals: false,
   allies: ['MarvinTMB'],
   nonAggressionPlayers: [],
   tradeBlacklist: [],

@@ -16,13 +16,17 @@ import { CommuneUtils } from 'room/commune/communeUtils'
  */
 export class MapVisualsManager {
     static run() {
-        if (!global.settings.mapVisuals && !Game.flags[FlagNames.mapVisuals]) return
+        if (!Game.flags[FlagNames.mapVisuals]) return
 
         for (const roomName in Memory.rooms) {
             const roomMemory = Memory.rooms[roomName]
 
             const type = roomMemory[RoomMemoryKeys.type]
             if (!type) continue
+
+            if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
+                this.visualizeCommune(roomName, roomMemory)
+            }
 
             // Room type
 
@@ -197,6 +201,12 @@ export class MapVisualsManager {
 
         this.workRequests()
     }
+
+    private static visualizeCommune(roomName: string, roomMemory: RoomMemory) {
+
+
+    }
+
     private static workRequests() {
         for (const roomName in Memory.workRequests) {
             const priority = Memory.workRequests[roomName][WorkRequestKeys.priority]

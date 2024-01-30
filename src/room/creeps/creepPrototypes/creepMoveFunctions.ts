@@ -5,7 +5,8 @@ import {
     CreepMemoryKeys, Result,
     communeCreepRoles,
     ReservedCoordTypes,
-    MovedTypes
+    MovedTypes,
+    FlagNames
 } from 'international/constants'
 import { CollectiveManager } from 'international/collective'
 import {
@@ -218,7 +219,8 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
         // Score based on value of reservation
         if (reservationType !== undefined) score += reservationType * 2
 
-        if (global.settings.roomVisuals) this.room.visual.text(score.toString(), coord.x, coord.y)
+        if (Game.flags[FlagNames.roomVisuals])
+          this.room.visual.text(score.toString(), coord.x, coord.y)
 
         // Preference for lower-scoring coords
         if (score >= lowestScore) return
@@ -286,28 +288,28 @@ PowerCreep.prototype.shove = Creep.prototype.shove = function (avoidPackedCoords
 
     this.assignMoveRequest(shoveCoord)
 
-    if (global.settings.roomVisuals)
-        room.visual.circle(this.pos, {
-            fill: '',
-            stroke: customColors.red,
-            radius: 0.5,
-            strokeWidth: 0.15,
-        })
+    if (Game.flags[FlagNames.roomVisuals])
+      room.visual.circle(this.pos, {
+        fill: '',
+        stroke: customColors.red,
+        radius: 0.5,
+        strokeWidth: 0.15,
+      })
 
     if (!this.moveRequest) return false
 
-    if (global.settings.roomVisuals) {
-        room.visual.circle(this.pos, {
-            fill: '',
-            stroke: customColors.yellow,
-            radius: 0.5,
-            strokeWidth: 0.15,
-            opacity: 0.3,
-        })
+    if (Game.flags[FlagNames.roomVisuals]) {
+      room.visual.circle(this.pos, {
+        fill: '',
+        stroke: customColors.yellow,
+        radius: 0.5,
+        strokeWidth: 0.15,
+        opacity: 0.3,
+      })
 
-        room.visual.line(this.pos, unpackCoordAsPos(this.moveRequest, this.room.name), {
-            color: customColors.yellow,
-        })
+      room.visual.line(this.pos, unpackCoordAsPos(this.moveRequest, this.room.name), {
+        color: customColors.yellow,
+      })
     }
 
     this.runMoveRequest()
@@ -331,11 +333,11 @@ PowerCreep.prototype.runMoveRequest = Creep.prototype.runMoveRequest = function 
 
     this.room.roomManager.runMoveRequestOrder += 1
 
-    if (global.settings.roomVisuals)
-        room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
-            fill: customColors.lightBlue,
-            opacity: 0.2,
-        })
+    if (Game.flags[FlagNames.roomVisuals])
+      room.visual.rect(this.pos.x - 0.5, this.pos.y - 0.5, 1, 1, {
+        fill: customColors.lightBlue,
+        opacity: 0.2,
+      })
 
     // Record where the creep is tying to move
 
@@ -381,11 +383,11 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // If there is no creep at the pos
 
     if (!creepNameAtPos) {
-        /*         if (this.spawning) {
+      /*         if (this.spawning) {
             this.moved = this.moveRequest
             delete room.moveRequests[this.moveRequest]
 
-            if (global.settings.roomVisuals) {
+            if (Game.flags[FlagNames.roomVisuals]) {
                 const moved = unpackCoord(this.moved)
 
                 room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
@@ -396,33 +398,33 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
  */
-        // loop through each index of the queue, drawing visuals
+      // loop through each index of the queue, drawing visuals
 
-        if (global.settings.roomVisuals) {
-            const moveRequestPos = unpackCoordAsPos(this.moveRequest, room.name)
+      if (Game.flags[FlagNames.roomVisuals]) {
+        const moveRequestPos = unpackCoordAsPos(this.moveRequest, room.name)
 
-            room.visual.rect(moveRequestPos.x - 0.5, moveRequestPos.y - 0.5, 1, 1, {
-                fill: customColors.green,
-                opacity: 0.2,
-            })
-
-            for (let index = queue.length - 1; index >= 0; index--) {
-                const creep = Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]
-
-                room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, {
-                    fill: customColors.yellow,
-                    opacity: 0.2,
-                })
-            }
-        }
-
-        // Have each member of the queue run its moveRequest
+        room.visual.rect(moveRequestPos.x - 0.5, moveRequestPos.y - 0.5, 1, 1, {
+          fill: customColors.green,
+          opacity: 0.2,
+        })
 
         for (let index = queue.length - 1; index >= 0; index--) {
-            ;(Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
-        }
+          const creep = Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]
 
-        return
+          room.visual.rect(creep.pos.x - 0.5, creep.pos.y - 0.5, 1, 1, {
+            fill: customColors.yellow,
+            opacity: 0.2,
+          })
+        }
+      }
+
+      // Have each member of the queue run its moveRequest
+
+      for (let index = queue.length - 1; index >= 0; index--) {
+        ;(Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+      }
+
+      return
     }
 
     const packedCoord = packCoord(this.pos)
@@ -432,17 +434,17 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     // if creepAtPos is fatigued it is useless to us
 
     if ((creepAtPos as Creep).fatigue > 0) {
-        this.moved = MovedTypes.wait
+      this.moved = MovedTypes.wait
 
-        /* delete room.moveRequests[this.moved] */
-        delete this.moveRequest
-        return
+      /* delete room.moveRequests[this.moved] */
+      delete this.moveRequest
+      return
     }
     /*
     // We're spawning, just get us space to move into
 
     if (this.spawning) {
-        if (global.settings.roomVisuals) {
+        if (Game.flags[FlagNames.roomVisuals]) {
             const moved = unpackCoord(this.moveRequest)
 
             room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
@@ -463,61 +465,60 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
     }
  */
     if (creepAtPos.moved) {
-        // might not be what we want. uncomment if (more) stuck bugs appear
-        /*         if (creepAtPos.moved === 'moved') {
+      // might not be what we want. uncomment if (more) stuck bugs appear
+      /*         if (creepAtPos.moved === 'moved') {
             delete this.moveRequest
             this.moved = 'moved'
             return
         } */
-        if (creepAtPos.moved === MovedTypes.moved) {
-            this.runMoveRequest()
-            return
+      if (creepAtPos.moved === MovedTypes.moved) {
+        this.runMoveRequest()
+        return
+      }
+
+      if (creepAtPos.moved === MovedTypes.wait) {
+        if (creepAtPos instanceof PowerCreep) {
+          delete this.moveRequest
+          this.moved = MovedTypes.wait
+          return
         }
 
-        if (creepAtPos.moved === MovedTypes.wait) {
-            if (creepAtPos instanceof PowerCreep) {
-                delete this.moveRequest
-                this.moved = MovedTypes.wait
-                return
-            }
+        // Don't allow swapping in the queue if we might move a creep out of the commune
+        // Will trade if:
+        // remotes are different
+        // sourceIndexes are different
+        // Traffic priorities are by default different
+        // One is around empty while the other is around full
 
-            // Don't allow swapping in the queue if we might move a creep out of the commune
-            // Will trade if:
-            // remotes are different
-            // sourceIndexes are different
-            // Traffic priorities are by default different
-            // One is around empty while the other is around full
+        if (
+          (!this.isOnExit || !communeCreepRoles.has(creepAtPos.role)) &&
+          (this.memory[CreepMemoryKeys.remote] !== creepAtPos.memory[CreepMemoryKeys.remote] ||
+            this.memory[CreepMemoryKeys.sourceIndex] !==
+              creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
+            TrafficPriorities[this.role] + (this.needsResources() ? 0.1 : 0) >
+              TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0.1 : 0))
+        ) {
+          // Have the creep move to its moveRequest
 
-            if (
-                (!this.isOnExit || !communeCreepRoles.has(creepAtPos.role)) &&
-                (this.memory[CreepMemoryKeys.remote] !==
-                    creepAtPos.memory[CreepMemoryKeys.remote] ||
-                    this.memory[CreepMemoryKeys.sourceIndex] !==
-                        creepAtPos.memory[CreepMemoryKeys.sourceIndex] ||
-                    TrafficPriorities[this.role] + (this.needsResources() ? 0.1 : 0) >
-                        TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0.1 : 0))
-            ) {
-                // Have the creep move to its moveRequest
+          this.runMoveRequest()
 
-                this.runMoveRequest()
+          // Have the creepAtPos move to the creep and inform true
 
-                // Have the creepAtPos move to the creep and inform true
-
-                creepAtPos.moveRequest = packedCoord
-                room.moveRequests[packedCoord] = [creepAtPos.name]
-                creepAtPos.runMoveRequest()
-                return
-            }
-
-            delete this.moveRequest
-            this.moved = MovedTypes.wait
-            return
+          creepAtPos.moveRequest = packedCoord
+          room.moveRequests[packedCoord] = [creepAtPos.name]
+          creepAtPos.runMoveRequest()
+          return
         }
 
-        // If the creep is where the creepAtPos is trying to move to
-        /*
+        delete this.moveRequest
+        this.moved = MovedTypes.wait
+        return
+      }
+
+      // If the creep is where the creepAtPos is trying to move to
+      /*
         if (packedCoord === creepAtPos.moved) {
-            if (global.settings.roomVisuals)
+            if (Game.flags[FlagNames.roomVisuals])
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: customColors.purple,
                     opacity: 0.2,
@@ -527,39 +528,39 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
  */
-        if (global.settings.roomVisuals)
-            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                fill: customColors.white,
-                opacity: 0.2,
-            })
+      if (Game.flags[FlagNames.roomVisuals])
+        room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+          fill: customColors.white,
+          opacity: 0.2,
+        })
 
-        // Otherwise, loop through each index of the queue
+      // Otherwise, loop through each index of the queue
 
-        for (let index = queue.length - 1; index >= 0; index--) {
-            // Have the creep run its moveRequest
+      for (let index = queue.length - 1; index >= 0; index--) {
+        // Have the creep run its moveRequest
 
-            ;(Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
-        }
+        ;(Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+      }
 
-        // loop through each index of the queue, drawing visuals
+      // loop through each index of the queue, drawing visuals
 
-        if (global.settings.roomVisuals)
-            for (let index = queue.length - 1; index >= 0; index--)
-                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: customColors.yellow,
-                    opacity: 0.2,
-                })
-        return
+      if (Game.flags[FlagNames.roomVisuals])
+        for (let index = queue.length - 1; index >= 0; index--)
+          room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+            fill: customColors.yellow,
+            opacity: 0.2,
+          })
+      return
     }
 
     // If the creepAtPos has a moveRequest
 
     if (creepAtPos.moveRequest) {
-        // If it's not valid
+      // If it's not valid
 
-        if (!room.moveRequests[creepAtPos.moveRequest]) {
-            /*
-            if (global.settings.roomVisuals)
+      if (!room.moveRequests[creepAtPos.moveRequest]) {
+        /*
+            if (Game.flags[FlagNames.roomVisuals])
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: customColors.teal,
                     opacity: 0.2,
@@ -575,64 +576,64 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             room.moveRequests.set(packedCoord, [creepAtPos.name])
             creepAtPos.runMoveRequest()
             */
-            return
-        }
+        return
+      }
 
-        // If the creepAtPos wants to move to creep
+      // If the creepAtPos wants to move to creep
 
-        if (packedCoord === creepAtPos.moveRequest) {
-            if (global.settings.roomVisuals)
-                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: customColors.teal,
-                    opacity: 0.2,
-                })
-            /*
+      if (packedCoord === creepAtPos.moveRequest) {
+        if (Game.flags[FlagNames.roomVisuals])
+          room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+            fill: customColors.teal,
+            opacity: 0.2,
+          })
+        /*
             // Culprit for relay issues?
 
             this.room.visual.text('R', this.pos)
 
             this.room.targetVisual(creepAtPos.pos, unpackCoord(creepAtPos.moveRequest), true)
  */
-            // Have the creep move to its moveRequest
+        // Have the creep move to its moveRequest
 
-            this.runMoveRequest()
-            creepAtPos.runMoveRequest()
-            return
+        this.runMoveRequest()
+        creepAtPos.runMoveRequest()
+        return
+      }
+
+      // If both creeps moveRequests are aligned
+
+      if (this.moveRequest === creepAtPos.moveRequest) {
+        if (Game.flags[FlagNames.roomVisuals])
+          room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+            fill: customColors.pink,
+            opacity: 0.2,
+          })
+
+        // Prefer the creep with the higher priority
+
+        if (
+          !(creepAtPos instanceof PowerCreep) &&
+          TrafficPriorities[this.role] + (this.needsResources() ? 0.1 : 0) >
+            TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0.1 : 0)
+        ) {
+          this.runMoveRequest()
+
+          delete creepAtPos.moveRequest
+          creepAtPos.moved = MovedTypes.moved
+
+          return
         }
 
-        // If both creeps moveRequests are aligned
+        delete this.moveRequest
+        this.moved = MovedTypes.moved
 
-        if (this.moveRequest === creepAtPos.moveRequest) {
-            if (global.settings.roomVisuals)
-                room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                    fill: customColors.pink,
-                    opacity: 0.2,
-                })
+        creepAtPos.runMoveRequest()
+        return
+      }
 
-            // Prefer the creep with the higher priority
-
-            if (
-                !(creepAtPos instanceof PowerCreep) &&
-                TrafficPriorities[this.role] + (this.needsResources() ? 0.1 : 0) >
-                    TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0.1 : 0)
-            ) {
-                this.runMoveRequest()
-
-                delete creepAtPos.moveRequest
-                creepAtPos.moved = MovedTypes.moved
-
-                return
-            }
-
-            delete this.moveRequest
-            this.moved = MovedTypes.moved
-
-            creepAtPos.runMoveRequest()
-            return
-        }
-
-        // Swap if creep has higher priority than creepAtPos
-        /*
+      // Swap if creep has higher priority than creepAtPos
+      /*
         if (
             !(creepAtPos instanceof PowerCreep) &&
             (!this.isOnExit ||
@@ -640,7 +641,7 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             (TrafficPriorities[this.role] + (this.needsResources() ? 0.1 : 0) >
                 TrafficPriorities[creepAtPos.role] + (this.needsResources() ? 0.1 : 0))
         ) {
-            if (global.settings.roomVisuals)
+            if (Game.flags[FlagNames.roomVisuals])
                 room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
                     fill: customColors.pink,
                     opacity: 0.2,
@@ -656,69 +657,69 @@ PowerCreep.prototype.recurseMoveRequest = Creep.prototype.recurseMoveRequest = f
             return
         }
  */
-        // If the creepAtPos is in the queue
+      // If the creepAtPos is in the queue
 
-        if (queue.includes(creepAtPos.name)) {
-            // loop through each index of the queue
+      if (queue.includes(creepAtPos.name)) {
+        // loop through each index of the queue
 
-            for (let index = queue.length - 1; index >= 0; index--)
-                // Have the creep run its moveRequest
+        for (let index = queue.length - 1; index >= 0; index--)
+          // Have the creep run its moveRequest
 
-                (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
+          (Game.creeps[queue[index]] || Game.powerCreeps[queue[index]]).runMoveRequest()
 
-            // loop through each index of the queue, drawing visuals
+        // loop through each index of the queue, drawing visuals
 
-            if (global.settings.roomVisuals)
-                for (let index = queue.length - 1; index >= 0; index--)
-                    room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-                        fill: customColors.yellow,
-                        opacity: 0.2,
-                    })
+        if (Game.flags[FlagNames.roomVisuals])
+          for (let index = queue.length - 1; index >= 0; index--)
+            room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+              fill: customColors.yellow,
+              opacity: 0.2,
+            })
 
-            return
-        }
-
-        if (creepAtPos.actionCoord) {
-            // No point in swapping to get to the same target
-            if (this.actionCoord && areCoordsEqual(this.actionCoord, creepAtPos.actionCoord)) {
-                delete this.moveRequest
-                return
-            }
-
-            // If swapping will get it closer or equal range to its actionCoord
-            if (
-                getRange(this.pos, creepAtPos.actionCoord) <
-                getRange(creepAtPos.pos, creepAtPos.actionCoord)
-            ) {
-                // Run creep's moveRequest, trading places with creepAtPos
-
-                this.runMoveRequest()
-
-                creepAtPos.moveRequest = packedCoord
-                room.moveRequests[packedCoord] = [creepAtPos.name]
-                creepAtPos.runMoveRequest()
-                return
-            }
-        }
-
-        creepAtPos.recurseMoveRequest(queue)
         return
+      }
+
+      if (creepAtPos.actionCoord) {
+        // No point in swapping to get to the same target
+        if (this.actionCoord && areCoordsEqual(this.actionCoord, creepAtPos.actionCoord)) {
+          delete this.moveRequest
+          return
+        }
+
+        // If swapping will get it closer or equal range to its actionCoord
+        if (
+          getRange(this.pos, creepAtPos.actionCoord) <
+          getRange(creepAtPos.pos, creepAtPos.actionCoord)
+        ) {
+          // Run creep's moveRequest, trading places with creepAtPos
+
+          this.runMoveRequest()
+
+          creepAtPos.moveRequest = packedCoord
+          room.moveRequests[packedCoord] = [creepAtPos.name]
+          creepAtPos.runMoveRequest()
+          return
+        }
+      }
+
+      creepAtPos.recurseMoveRequest(queue)
+      return
     }
 
     // Otherwise the creepAtPos has no moveRequest, try to shove
     if (creepAtPos.shove(new Set([packedCoord]))) {
-        this.room.visual.text('S', creepAtPos.pos)
-        this.runMoveRequest()
-        return
+      this.room.visual.text('S', creepAtPos.pos)
+      this.runMoveRequest()
+      return
     }
 
     if (this.isOnExit) return
 
-    if (global.settings.roomVisuals)
-        room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
-            fill: customColors.teal,
-            opacity: 0.2,
-        })
+    if (Game.flags[FlagNames.roomVisuals])
+      room.visual.rect(creepAtPos.pos.x - 0.5, creepAtPos.pos.y - 0.5, 1, 1, {
+        fill: customColors.teal,
+        opacity: 0.2,
+      })
 
     // Run creep's moveRequest, trading places with creepAtPos
 

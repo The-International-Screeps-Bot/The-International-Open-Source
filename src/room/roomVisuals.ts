@@ -8,6 +8,7 @@ import {
     packedPosLength,
     RoomMemoryKeys,
     RoomTypes,
+    FlagNames,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
@@ -34,7 +35,7 @@ export class RoomVisualsManager {
   private roomVisuals() {
     // Stop if roomVisuals are disabled
 
-    if (!global.settings.roomVisuals) return
+    if (!Game.flags[FlagNames.roomVisuals]) return
 
     this.controllerVisuals()
     this.spawnVisuals()

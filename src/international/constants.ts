@@ -1483,6 +1483,7 @@ export enum FlagNames {
   debugCreepLogistics = 'debugCreepLogistics',
   debugSpawning = 'debugSpawning',
   mapVisuals = 'mapVisuals',
+  roomVisuals = 'roomVisuals',
   deactivate = 'deactiveate',
 }
 

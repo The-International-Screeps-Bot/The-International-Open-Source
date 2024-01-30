@@ -10,6 +10,7 @@ import {
   customColors,
   MovedTypes,
   RoomStatsKeys,
+  FlagNames,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
@@ -378,7 +379,7 @@ export class SpawningStructureProcs {
         creep.moved = creep.moveRequest
         delete room.moveRequests[creep.moveRequest]
 
-        if (global.settings.roomVisuals) {
+        if (Game.flags[FlagNames.roomVisuals]) {
           const moved = unpackCoord(creep.moved)
 
           room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {
@@ -395,7 +396,7 @@ export class SpawningStructureProcs {
       const creepAtPos = Game.creeps[creepNameAtPos] || Game.powerCreeps[creepNameAtPos]
       const packedCoord = packCoord(creep.pos)
 
-      if (global.settings.roomVisuals) {
+      if (Game.flags[FlagNames.roomVisuals]) {
         const moved = unpackCoord(creep.moveRequest)
 
         room.visual.rect(moved.x - 0.5, moved.y - 0.5, 1, 1, {

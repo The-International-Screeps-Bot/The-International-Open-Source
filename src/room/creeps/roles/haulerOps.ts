@@ -765,7 +765,7 @@ export class HaulerOps {
   }
 
   private static relayCoord(creep: Creep, coord: Coord) {
-    if (global.settings.roomVisuals) {
+    if (Game.flags[FlagNames.roomVisuals]) {
       creep.room.visual.circle(coord.x, coord.y, { fill: customColors.lightBlue })
     }
 

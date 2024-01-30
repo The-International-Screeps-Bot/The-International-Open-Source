@@ -1,6 +1,6 @@
 import { ErrorMapper } from 'other/ErrorMapper'
 import {
-  customColors, roomDimensions, PlayerMemoryKeys, Result
+  customColors, roomDimensions, PlayerMemoryKeys, Result, FlagNames
 } from '../international/constants'
 import { customLog } from './logging'
 import { PlayerRelationships } from 'international/constants'
@@ -693,7 +693,7 @@ export function randomOf<T>(array: T[]): T {
 export function visualizePath(
   path: RoomPosition[],
   color: string = customColors.yellow,
-  visualize: boolean = global.settings.roomVisuals,
+  visualize: boolean = !!Game.flags[FlagNames.roomVisuals],
 ) {
   if (!visualize) return
 

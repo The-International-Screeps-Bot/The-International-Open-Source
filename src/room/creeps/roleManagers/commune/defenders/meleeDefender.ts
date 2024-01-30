@@ -4,6 +4,7 @@ import {
     CreepMemoryKeys,
     PlayerMemoryKeys,
     ReservedCoordTypes,
+    FlagNames,
 } from 'international/constants'
 import { PlayerManager } from 'international/players'
 import {
@@ -111,11 +112,11 @@ export class MeleeDefender extends Creep {
             findClosestObject(this.pos, enemyCreeps) ||
             findClosestObject(this.pos, this.room.roomManager.notMyCreeps.enemy)
 
-        if (global.settings.roomVisuals)
-            this.room.visual.line(this.pos, enemyCreep.pos, {
-                color: customColors.green,
-                opacity: 0.3,
-            })
+        if (Game.flags[FlagNames.roomVisuals])
+          this.room.visual.line(this.pos, enemyCreep.pos, {
+            color: customColors.green,
+            opacity: 0.3,
+          })
 
         // If out of range move to it
 
@@ -206,8 +207,8 @@ export class MeleeDefender extends Creep {
 
         // Visualize the targeting, if roomVisuals are enabled
 
-        if (global.settings.roomVisuals) {
-            /*
+        if (Game.flags[FlagNames.roomVisuals]) {
+          /*
             for (const rampart of ramparts)
                 room.visual.text(
                     getRangeEucXY(enemyCreep.pos.x, rampart.pos.x, enemyCreep.pos.y, rampart.pos.y).toString(),
@@ -216,9 +217,9 @@ export class MeleeDefender extends Creep {
                 )
  */
 
-            this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, {
-                color: customColors.yellow,
-            })
+          this.room.visual.line(this.pos.x, this.pos.y, rampart.pos.x, rampart.pos.y, {
+            color: customColors.yellow,
+          })
         }
 
         // If the creep is range 0 to the closestRampart, inform false

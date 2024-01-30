@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, MovedTypes, RoomTypes, customColors, roomDimensions } from 'international/constants'
+import { CreepMemoryKeys, FlagNames, MovedTypes, RoomTypes, customColors, roomDimensions } from 'international/constants'
 import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils/utils'
 import { Antifa } from './antifa'
 import { CustomPathFinderArgs } from 'international/customPathFinder'
@@ -182,11 +182,11 @@ export class Duo {
             this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-            if (global.settings.roomVisuals)
-                this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
-                    color: customColors.green,
-                    opacity: 0.3,
-                })
+            if (Game.flags[FlagNames.roomVisuals])
+              this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+              })
 
             // Get the range between the creeps
 
@@ -224,11 +224,11 @@ export class Duo {
         // Otherwise, get the closest enemyAttacker
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
-        if (global.settings.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
-                color: customColors.green,
-                opacity: 0.3,
-            })
+        if (Game.flags[FlagNames.roomVisuals])
+          this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
+            color: customColors.green,
+            opacity: 0.3,
+          })
 
         // Get the range between the creeps
 
@@ -310,11 +310,11 @@ export class Duo {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (global.settings.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, {
-                color: customColors.green,
-                opacity: 0.3,
-            })
+        if (Game.flags[FlagNames.roomVisuals])
+          this.leader.room.visual.line(this.leader.pos, structure.pos, {
+            color: customColors.green,
+            opacity: 0.3,
+          })
 
         if (
             getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 3
@@ -376,11 +376,11 @@ export class Duo {
             this.leader.message = 'EC'
 
             const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-            if (global.settings.roomVisuals)
-                this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
-                    color: customColors.green,
-                    opacity: 0.3,
-                })
+            if (Game.flags[FlagNames.roomVisuals])
+              this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
+                color: customColors.green,
+                opacity: 0.3,
+              })
 
             // If the range is more than 1
 
@@ -412,11 +412,11 @@ export class Duo {
         }
 
         const enemyAttacker = findClosestObject(this.leader.pos, enemyAttackers)
-        if (global.settings.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
-                color: customColors.green,
-                opacity: 0.3,
-            })
+        if (Game.flags[FlagNames.roomVisuals])
+          this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
+            color: customColors.green,
+            opacity: 0.3,
+          })
 
         // If the range is more than 1
 
@@ -455,11 +455,11 @@ export class Duo {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (global.settings.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, {
-                color: customColors.green,
-                opacity: 0.3,
-            })
+        if (Game.flags[FlagNames.roomVisuals])
+          this.leader.room.visual.line(this.leader.pos, structure.pos, {
+            color: customColors.green,
+            opacity: 0.3,
+          })
 
         if (
             getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1
@@ -506,11 +506,11 @@ export class Duo {
         if (!structures.length) return false
 
         let structure = findClosestObject(this.leader.pos, structures)
-        if (global.settings.roomVisuals)
-            this.leader.room.visual.line(this.leader.pos, structure.pos, {
-                color: customColors.green,
-                opacity: 0.3,
-            })
+        if (Game.flags[FlagNames.roomVisuals])
+          this.leader.room.visual.line(this.leader.pos, structure.pos, {
+            color: customColors.green,
+            opacity: 0.3,
+          })
 
         if (
             getRangeXY(this.leader.pos.x, structure.pos.x, this.leader.pos.y, structure.pos.y) > 1

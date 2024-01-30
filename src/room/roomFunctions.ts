@@ -48,7 +48,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
 
   // Stop if roomVisuals are disabled
 
-  if (!global.settings.roomVisuals) return
+  if (!Game.flags[FlagNames.roomVisuals]) return
 
   // Construct colors for each type
 
@@ -68,7 +68,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
   room.visual.line(pos1, pos2, { color })
 }
 
-Room.prototype.targetVisual = function (coord1, coord2, visualize = global.settings.roomVisuals) {
+Room.prototype.targetVisual = function (coord1, coord2, visualize = !!Game.flags[FlagNames.roomVisuals]) {
   if (!visualize) return
 
   this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
@@ -1190,7 +1190,7 @@ Room.prototype.findClosestPos = function (opts) {
   return false
 }
 
-Room.prototype.errorVisual = function (coord, visualize = global.settings.roomVisuals) {
+Room.prototype.errorVisual = function (coord, visualize = !!Game.flags[FlagNames.roomVisuals]) {
   if (!visualize) return
 
   this.visual.circle(coord.x, coord.y, {

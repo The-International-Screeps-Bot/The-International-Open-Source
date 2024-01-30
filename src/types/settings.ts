@@ -4,15 +4,6 @@ export interface Settings {
    * Increment to induce migrations which can be controlled with the migration manager
    */
   breakingVersion: number | undefined
-  /**
-   * Wether the bot should generate any room visuals
-   */
-  roomVisuals: boolean
-
-  /**
-   * Wether the bot should generate map visuals
-   */
-  mapVisuals: boolean
 
   /**
    * A list of usernames to treat as allies
