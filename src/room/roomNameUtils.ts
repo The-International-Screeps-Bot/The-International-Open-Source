@@ -25,7 +25,7 @@ import {
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
-import { RoomOps } from './roomProcs'
+import { RoomOps } from './RoomOps'
 import { RoomNameProcs } from './roomNameProcs'
 import { RoomUtils } from './roomUtils'
 

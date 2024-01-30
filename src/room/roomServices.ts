@@ -20,7 +20,7 @@ import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
 import { LogTypes, customLog } from 'utils/logging'
-import { RoomOps } from './roomProcs'
+import { RoomOps } from './RoomOps'
 
 export class RoomServices {
   static updateRun() {

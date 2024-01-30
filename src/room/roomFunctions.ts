@@ -36,7 +36,7 @@ import { RoomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 import { RoomObjectUtils } from './roomObjectUtils'
 import { RoomNameProcs } from './roomNameProcs'
-import { RoomOps } from './roomProcs'
+import { RoomOps } from './RoomOps'
 
 /**
     @param pos1 pos of the object performing the action
