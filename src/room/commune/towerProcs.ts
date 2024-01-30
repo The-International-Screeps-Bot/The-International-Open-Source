@@ -1,4 +1,4 @@
-import { PlayerMemoryKeys, RoomLogisticsRequestTypes } from "international/constants"
+import { PlayerMemoryKeys, RoomLogisticsRequestTypes, RoomStatsKeys } from "international/constants"
 import { PlayerManager } from 'international/players'
 import { StatsManager } from 'international/stats'
 import { packCoord } from 'other/codec'
@@ -177,7 +177,7 @@ export class TowerProcs {
       const tower = findObjectWithID(actionableTowerIDs[i])
       if (tower.repair(repairTarget) !== OK) continue
 
-      StatsManager.updateStat(room.name, 'eorwr', TOWER_ENERGY_COST)
+      StatsManager.updateStat(room.name, RoomStatsKeys.EnergyOutputRepairWallOrRampart, TOWER_ENERGY_COST)
       actionableTowerIDs.splice(i, 1)
     }
 

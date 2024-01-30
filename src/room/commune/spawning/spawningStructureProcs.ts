@@ -9,6 +9,7 @@ import {
   creepRoles,
   customColors,
   MovedTypes,
+  RoomStatsKeys,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
@@ -168,7 +169,7 @@ export class SpawningStructureProcs {
     // Record in stats the costs
 
     room.communeManager.nextSpawnEnergyAvailable -= request.cost
-    StatsManager.updateStat(room.name, 'eosp', request.cost)
+    StatsManager.updateStat(room.name, RoomStatsKeys.EnergyOutputSpawn, request.cost)
 
     // The spawn we intented to spawn should no longer be considered inactive
     inactiveSpawns.splice(spawnIndex, 1)

@@ -3,6 +3,7 @@ import {
     ReservedCoordTypes,
     Result,
     RoomMemoryKeys,
+    RoomStatsKeys,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
@@ -65,7 +66,7 @@ export class MineralHarvester extends Creep {
       mineral.mineralAmount,
     )
     this.reserveStore[mineral.mineralType] += mineralsHarvested
-    StatsManager.updateStat(this.room.name, 'mh', mineralsHarvested)
+    StatsManager.updateStat(this.room.name, RoomStatsKeys.MineralsHarvested, mineralsHarvested)
 
     this.message = `⛏️${mineralsHarvested}`
     return Result.success

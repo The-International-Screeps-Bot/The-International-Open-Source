@@ -3,7 +3,8 @@ import {
   roomDimensions, Result, CreepMemoryKeys, RoomMemoryKeys,
   ReservedCoordTypes,
   WorkTypes,
-  RoomLogisticsRequestTypes
+  RoomLogisticsRequestTypes,
+  RoomStatsKeys
 } from 'international/constants'
 import {
   findClosestObject,
@@ -265,7 +266,7 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
   // Add control points to total controlPoints counter and say the success
 
-  StatsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
+  StatsManager.updateStat(this.room.name, RoomStatsKeys.EnergyOutputBuild, energySpentOnConstruction)
   this.message = `🚧 ` + energySpentOnConstruction
 
   return Result.success
@@ -347,7 +348,7 @@ Creep.prototype.advancedBuildAllyCSite = function () {
 
     // Add control points to total controlPoints counter and say the success
 
-    StatsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
+    StatsManager.updateStat(this.room.name, RoomStatsKeys.EnergyOutputBuild, energySpentOnConstruction)
     this.message = `🚧${energySpentOnConstruction}`
 
     // Inform true
