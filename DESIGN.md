@@ -36,6 +36,8 @@ CommuneProc runs logic for the commune to update data, make intents, and run sub
 - contains functions/methods
 - acts on singular inputs
 
+Ops stands for Operations. These are functions that will run logic for specified things, sometimes retrieving values.
+
 ### Example
 
 HaulerNeedOps contians functions that provide cached information, carry out processes, or whatever else.
