@@ -1,12 +1,10 @@
-import { HaulerProcs } from "./haulerProcs";
+import { HaulerOps } from './haulerOps'
 
 export class HaulerServices {
   static runCreeps(creepNames: string[]) {
-
     for (const creepName of creepNames) {
-
       const creep = Game.creeps[creepName]
-      HaulerProcs.runCreep(creep)
+      HaulerOps.runCreep(creep)
     }
   }
 }

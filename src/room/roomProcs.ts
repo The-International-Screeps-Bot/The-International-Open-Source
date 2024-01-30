@@ -16,7 +16,7 @@ import { LogisticsProcs } from './logisticsProcs'
 import { customLog } from 'utils/logging'
 import { unpackCoord } from 'other/codec'
 import { HaulerServices } from './creeps/roles/commune/haulerServices'
-import { HaulerProcs } from './creeps/roles/commune/haulerProcs'
+import { HaulerOps } from './creeps/roles/commune/haulerOps'
 
 export class RoomProcs {
   static update(room: Room) {

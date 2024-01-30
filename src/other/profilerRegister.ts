@@ -111,7 +111,7 @@ import { TickInit } from 'international/tickInit'
 import { DebugUtils } from 'debug/debugUtils'
 import { DefenceProcs } from 'room/commune/defenceProcs'
 import { DefenceUtils } from 'room/commune/defenceUtils'
-import { HaulerProcs } from 'room/creeps/roles/commune/haulerProcs'
+import { HaulerOps } from 'room/creeps/roles/commune/haulerOps'
 import { HaulerServices } from 'room/creeps/roles/commune/haulerServices'
 import { MyCreepProcs } from 'room/creeps/myCreepProcs'
 import { RoomServices } from 'room/roomServices'
@@ -218,7 +218,7 @@ export function profilerRegister() {
   // Creep Roles
 
   profiler.registerClass(HaulerServices, 'HaulerServices')
-  profiler.registerClass(HaulerProcs, 'HaulerProcs')
+  profiler.registerClass(HaulerOps, 'HaulerOps')
 
   // Objects
 

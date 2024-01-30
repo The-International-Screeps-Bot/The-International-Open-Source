@@ -20,7 +20,7 @@ import { Hauler } from 'room/creeps/roleManagers/commune/hauler'
 import { StructureUtils } from 'room/structureUtils'
 import { getRangeXY, Utils, randomIntRange, findObjectWithID, getRange } from 'utils/utils'
 
-export class HaulerProcs {
+export class HaulerOps {
   static isDying(creep: Creep) {
     // Stop if creep is spawning
 
