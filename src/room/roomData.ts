@@ -1,5 +1,5 @@
 import { Utils } from 'utils/utils'
-import { CommuneDataProcs } from './commune/communeData'
+import { CommuneDataOps } from './commune/communeData'
 
 export interface RoomData {
   sourceIDs: Id<Source>[]
@@ -16,7 +16,7 @@ export const roomData: { [roomName: string]: Partial<RoomData> } = {}
 /**
  * Handles cached data for rooms, including some overlapping data for communes and remotes
  */
-export class RoomDataProcs {
+export class RoomDataOps {
   static initRooms() {
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName]
@@ -29,7 +29,7 @@ export class RoomDataProcs {
     roomData[room.name] ??= {}
 
     if (room.controller && room.controller.my) {
-      CommuneDataProcs.initCommune(room)
+      CommuneDataOps.initCommune(room)
     }
   }
 

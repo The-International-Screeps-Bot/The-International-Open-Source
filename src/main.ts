@@ -34,10 +34,10 @@ import { MarketManager } from 'international/market/marketOrders'
 import { TransactionsManager } from 'international/transactions'
 import { SegmentsManager } from 'international/segments'
 import { CreepDataProcs } from 'room/creeps/creepData'
-import { RoomDataProcs } from 'room/roomData'
+import { RoomDataOps } from 'room/roomData'
 import { Utils } from 'utils/utils'
 import { Procs } from 'utils/procs'
-import { CommuneDataProcs } from 'room/commune/communeData'
+import { CommuneDataOps } from 'room/commune/communeData'
 import { GarbageCollector } from 'international/garbageCollector'
 
 export function originalLoop() {
@@ -63,8 +63,8 @@ export function originalLoop() {
     simpleAllies.initRun()
     wasm.collaborator()
 
-    RoomDataProcs.initRooms()
-    RoomDataProcs.updateRooms()
+    RoomDataOps.initRooms()
+    RoomDataOps.updateRooms()
     RoomServices.updateRun()
     TransactionsManager.run()
     RequestsManager.run()

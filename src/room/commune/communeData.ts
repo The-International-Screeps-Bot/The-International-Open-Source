@@ -28,7 +28,7 @@ export const communeData: { [roomName: string]: Partial<CommuneData> } = {}
 /**
  * Handles cached data for communes
  */
-export class CommuneDataProcs {
+export class CommuneDataOps {
   /**
    * Called by the room's RoomManager
    */
@@ -52,7 +52,6 @@ export class CommuneDataProcs {
     }
 
     if (Utils.isTickInterval(100)) {
-
       delete data.resourceTargets
     }
   }

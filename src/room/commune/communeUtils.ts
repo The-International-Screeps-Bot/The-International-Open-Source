@@ -1,6 +1,6 @@
 import { packCoord, unpackCoord } from 'other/codec'
-import { CommuneDataProcs, communeData } from './communeData'
-import { RoomDataProcs, roomData } from 'room/roomData'
+import { CommuneDataOps, communeData } from './communeData'
+import { RoomDataOps, roomData } from 'room/roomData'
 import { findLinkThroughput, getRange, packAsNum, unpackNumAsCoord } from 'utils/utils'
 import {
   Result,

@@ -1,6 +1,6 @@
 import { towerPowers } from "international/constants"
 import { findWithLowestScore, getRange } from 'utils/utils'
-import { CommuneDataProcs, communeData } from './communeData'
+import { CommuneDataOps, communeData } from './communeData'
 import { CommuneUtils } from './communeUtils'
 import { packCoord } from 'other/codec'
 

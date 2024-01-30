@@ -1,6 +1,6 @@
 import { RoomMemoryKeys, RoomTypes, roomDimensions } from 'international/constants'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
-import { RoomDataProcs, roomData } from './roomData'
+import { RoomDataOps, roomData } from './roomData'
 import { findObjectWithID, forAdjacentCoords, Utils } from 'utils/utils'
 import { StructureUtils } from './structureUtils'
 import { StructureCoords } from './room'

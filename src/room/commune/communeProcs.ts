@@ -1,5 +1,5 @@
 import { RoomUtils } from 'room/roomUtils'
-import { CommuneDataProcs, communeData } from './communeData'
+import { CommuneDataOps, communeData } from './communeData'
 import { CommuneUtils } from './communeUtils'
 import {
   Result,

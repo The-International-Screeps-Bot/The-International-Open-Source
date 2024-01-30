@@ -76,8 +76,8 @@ import {
 import { CustomPathFinder } from 'international/customPathFinder'
 import { RoomUtils } from 'room/roomUtils'
 import { CommuneUtils } from 'room/commune/communeUtils'
-import { RoomDataProcs } from 'room/roomData'
-import { CommuneDataProcs } from 'room/commune/communeData'
+import { RoomDataOps } from 'room/roomData'
+import { CommuneDataOps } from 'room/commune/communeData'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepMoveProcs } from 'room/creeps/creepMoveProcs'
 import { CommuneProcs } from 'room/commune/communeProcs'
@@ -177,8 +177,8 @@ export function profilerRegister() {
   profiler.registerClass(RoomUtils, 'RoomUtils')
   profiler.registerClass(RoomProcs, 'RoomProcs')
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
-  profiler.registerClass(RoomDataProcs, 'RoomDataProcs')
-  profiler.registerClass(CommuneDataProcs, 'CommuneDataProcs')
+  profiler.registerClass(RoomDataOps, 'RoomDataProcs')
+  profiler.registerClass(CommuneDataOps, 'CommuneDataProcs')
   profiler.registerClass(CommuneProcs, 'CommuneProc')
   profiler.registerClass(RoomObjectUtils, 'RoomObjectUtils')
   profiler.registerClass(StructureUtils, 'StructureUtils')
