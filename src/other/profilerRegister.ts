@@ -101,7 +101,7 @@ import { SpawningStructureUtils } from 'room/commune/spawning/spawningStructureU
 import { NukerProcs } from 'room/commune/nukerProcs'
 import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
-import { RoomProcs } from 'room/roomProcs'
+import { RoomOps } from 'room/roomProcs'
 import { RoomNameProcs } from 'room/roomNameProcs'
 import { SegmentsManager } from 'international/segments'
 import { wasm } from './wasmInit'
@@ -175,7 +175,7 @@ export function profilerRegister() {
   profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
   profiler.registerClass(RoomNameProcs, 'RoomNameProcs')
   profiler.registerClass(RoomUtils, 'RoomUtils')
-  profiler.registerClass(RoomProcs, 'RoomProcs')
+  profiler.registerClass(RoomOps, 'RoomProcs')
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
   profiler.registerClass(RoomDataOps, 'RoomDataProcs')
   profiler.registerClass(CommuneDataOps, 'CommuneDataProcs')

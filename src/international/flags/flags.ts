@@ -19,7 +19,7 @@ import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { RoomUtils } from 'room/roomUtils'
 import { SpawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
-import { RoomProcs } from 'room/roomProcs'
+import { RoomOps } from 'room/roomProcs'
 
 export class FlagManager {
   run() {
@@ -1046,7 +1046,7 @@ export class FlagManager {
       data.push(row)
     }
 
-    RoomProcs.tableVisual(room, 'Funneling', headers, data)
+    RoomOps.tableVisual(room, 'Funneling', headers, data)
   }
 }
 

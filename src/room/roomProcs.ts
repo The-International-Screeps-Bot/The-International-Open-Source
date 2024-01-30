@@ -5,10 +5,11 @@ import {
   powerCreepClassNames,
   RoomLogisticsRequestTypes,
   RoomTypes,
+  roomDimensions,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { randomTick } from 'utils/utils'
+import { packXYAsNum, randomTick } from 'utils/utils'
 import { RoomNameUtils } from './roomNameUtils'
 import { CommuneManager } from './commune/commune'
 import { CommuneProcs } from './commune/communeProcs'
@@ -17,8 +18,9 @@ import { customLog } from 'utils/logging'
 import { unpackCoord } from 'other/codec'
 import { HaulerServices } from './creeps/roles/haulerServices'
 import { HaulerOps } from './creeps/roles/haulerOps'
+import { roomData } from './roomData'
 
-export class RoomProcs {
+export class RoomOps {
   static update(room: Room) {
     const roomManager = room.roomManager
 
@@ -234,5 +236,38 @@ export class RoomProcs {
         },
       ],
     })
+  }
+
+  /**
+   * Creates a new terrain binary: 0 = not wall, 255 = wall.
+   * Callers of this function are responsible for caching the data themselves (or not, if preferred).
+   */
+  static createTerrainBinary(roomName: string) {
+    const terrainBinary = new Uint8Array(2500)
+
+    const terrain = Game.map.getRoomTerrain(roomName)
+
+    for (let x = 0; x < roomDimensions; x += 1) {
+      for (let y = 0; y < roomDimensions; y += 1) {
+        terrainBinary[packXYAsNum(x, y)] = terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
+      }
+    }
+
+    return terrainBinary
+  }
+
+  /**
+   * A temporaly-discrete cached terrain binary. 0 = not wall, 255 = wall
+   */
+  static getTerrainBinary(roomName: string) {
+    const data = roomData[roomName]
+    if (data.terrainBinary !== undefined) {
+      return data.terrainBinary
+    }
+
+    const terrainBinary = this.createTerrainBinary(roomName)
+
+    data.terrainBinary = terrainBinary
+    return terrainBinary
   }
 }

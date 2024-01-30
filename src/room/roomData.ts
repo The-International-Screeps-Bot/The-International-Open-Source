@@ -6,6 +6,7 @@ export interface RoomData {
   fastFillerContainerLeftId: Id<StructureContainer> | false
   fastFillerContainerRightId: Id<StructureContainer> | false
   fastFillerCoords: string[]
+  terrainBinary: Uint8Array
 }
 
 /**
@@ -41,5 +42,10 @@ export class RoomDataOps {
 
   private static updateRoom(roomName: string) {
     const data = roomData[roomName]
+
+    if (Utils.isTickInterval(100)) {
+
+      delete data.terrainBinary
+    }
   }
 }

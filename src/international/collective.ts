@@ -50,10 +50,6 @@ export class CollectiveManager {
    * An intra-tick collection of commands we wish to issue
    */
   static myCommands: any[]
-  /**
-   * Terrain binaries of wall or not wall for rooms
-   */
-  static terrainBinaries: { [roomName: string]: Uint8Array } = {}
   static constructionSiteCount = 0
   static creepCount: number
   static powerCreepCount: number
@@ -175,26 +171,6 @@ export class CollectiveManager {
     )
 
     Memory.minHaulerCostUpdate = Game.time
-  }
-
-  /**
-   * Provides a cached binary of wall or not wall terrain
-   */
-  static getTerrainBinary(roomName: string) {
-    if (this.terrainBinaries[roomName]) return this.terrainBinaries[roomName]
-
-    this.terrainBinaries[roomName] = new Uint8Array(2500)
-
-    const terrain = Game.map.getRoomTerrain(roomName)
-
-    for (let x = 0; x < roomDimensions; x += 1) {
-      for (let y = 0; y < roomDimensions; y += 1) {
-        this.terrainBinaries[roomName][packXYAsNum(x, y)] =
-          terrain.get(x, y) === TERRAIN_MASK_WALL ? 255 : 0
-      }
-    }
-
-    return this.terrainBinaries[roomName]
   }
 
   static newTickID() {

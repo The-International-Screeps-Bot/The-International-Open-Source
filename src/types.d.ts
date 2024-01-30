@@ -574,7 +574,7 @@ declare global {
      * Finds open spaces in a room and records them in a cost matrix
      */
     distanceTransform(
-      initialCoords?: CoordMap,
+      initialCoords: CoordMap,
       visuals?: boolean,
       /**
        * The smallest number to convert into an avoid value
@@ -590,7 +590,7 @@ declare global {
      * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
      */
     diagonalDistanceTransform(
-      initialCoords?: CoordMap,
+      initialCoords: CoordMap,
       visuals?: boolean,
       /**
        * The smallest number to convert into an avoid value

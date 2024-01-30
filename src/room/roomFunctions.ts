@@ -36,6 +36,7 @@ import { RoomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 import { RoomObjectUtils } from './roomObjectUtils'
 import { RoomNameProcs } from './roomNameProcs'
+import { RoomOps } from './roomProcs'
 
 /**
     @param pos1 pos of the object performing the action
@@ -847,8 +848,6 @@ Room.prototype.distanceTransform = function (
 
   const distanceCoords = new Uint8Array(2500)
 
-  if (!initialCoords) initialCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.name))
-
   let x
   let y
   let minX = Math.max(x1 - 1, 0)
@@ -941,8 +940,6 @@ Room.prototype.diagonalDistanceTransform = function (
   // Use a costMatrix to record distances
 
   const distanceCoords = new Uint8Array(2500)
-
-  if (!initialCoords) initialCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.name))
 
   let x
   let y

@@ -67,6 +67,7 @@ import { StructureUtils } from './structureUtils'
 import { LogisticsProcs } from './logisticsProcs'
 import { CommuneProcs } from './commune/communeProcs'
 import { roomData } from './roomData'
+import { RoomOps } from './roomProcs'
 
 export interface InterpretedRoomEvent {
   eventType: EventConstant
@@ -1486,7 +1487,7 @@ export class RoomManager {
     if (this._quadCostMatrix) return this._quadCostMatrix
 
     const quadCostMatrix = new PathFinder.CostMatrix()
-    const terrainCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.room.name))
+    const terrainCoords = new Uint8Array(RoomOps.getTerrainBinary(this.room.name))
 
     const roadCoords = new Set()
     for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
@@ -1639,7 +1640,7 @@ export class RoomManager {
     if (this._quadBulldozeCostMatrix) return this._quadBulldozeCostMatrix
 
     const quadBulldozeCostMatrix = new PathFinder.CostMatrix()
-    const terrainCoords = new Uint8Array(CollectiveManager.getTerrainBinary(this.room.name))
+    const terrainCoords = new Uint8Array(RoomOps.getTerrainBinary(this.room.name))
 
     const roadCoords = new Set()
     for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))

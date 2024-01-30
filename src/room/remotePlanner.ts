@@ -292,7 +292,6 @@ export class RemotePlanner {
     // Initial configuration
 
     if (!this.terrainCoords) {
-      this.terrainCoords = CollectiveManager.getTerrainBinary(this.room.name)
       this.planAttempts = []
     }
 

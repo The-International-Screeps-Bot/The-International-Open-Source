@@ -63,6 +63,7 @@ import { RampartPlans } from './rampartPlans'
 import { minCutToExit } from './minCut'
 import { CustomPathFinder } from 'international/customPathFinder'
 import { TowerUtils } from 'room/commune/towerUtils'
+import { RoomOps } from 'room/roomProcs'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 8
@@ -425,7 +426,7 @@ export class CommunePlanner {
     this.planAttempts = []
     this.findFastFillerStartCoords()
 
-    this.terrainCoords = CollectiveManager.getTerrainBinary(this.room.name)
+    this.terrainCoords = RoomOps.createTerrainBinary(this.room.name)
   }
   private findFastFillerStartCoords() {
     if (this.fastFillerStartCoords) return

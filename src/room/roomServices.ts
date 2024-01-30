@@ -20,7 +20,7 @@ import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
 import { LogTypes, customLog } from 'utils/logging'
-import { RoomProcs } from './roomProcs'
+import { RoomOps } from './roomProcs'
 
 export class RoomServices {
   static updateRun() {
@@ -34,7 +34,7 @@ export class RoomServices {
         RoomManager.roomManagers[room.name] = room.roomManager
       }
 
-      RoomProcs.update(room)
+      RoomOps.update(room)
     }
   }
 
@@ -42,7 +42,7 @@ export class RoomServices {
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName]
 
-      RoomProcs.initRun(room)
+      RoomOps.initRun(room)
     }
   }
 
@@ -56,7 +56,7 @@ export class RoomServices {
     const startCPU = Game.cpu.getUsed()
 
     const room = Game.rooms[roomName]
-    RoomProcs.run(room)
+    RoomOps.run(room)
 
     // Log room stats
 

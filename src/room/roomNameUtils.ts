@@ -25,7 +25,7 @@ import {
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
-import { RoomProcs } from './roomProcs'
+import { RoomOps } from './roomProcs'
 import { RoomNameProcs } from './roomNameProcs'
 import { RoomUtils } from './roomUtils'
 
@@ -341,9 +341,9 @@ export class RoomNameUtils {
   static getStatusForPotentialMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
     if (roomMemory === undefined) {
-      const roomMemory = Memory.rooms[roomName] = {} as RoomMemory
+      const roomMemory = (Memory.rooms[roomName] = {} as RoomMemory)
       RoomNameUtils.basicScout(roomName)
-      
+
       return roomMemory[RoomMemoryKeys.status]
     }
 
