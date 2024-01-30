@@ -3,7 +3,7 @@ import './other/userScript/userScript'
 import './international/commands'
 import './debug/debugUtils'
 import { CollectiveManager } from './international/collective'
-import { RoomsManager } from 'room/roomServoces'
+import { RoomServices } from 'room/roomServices'
 import './room/resourceAdditions'
 import './room/roomObjectFunctions'
 import './room/roomObjectAdditions'
@@ -65,14 +65,14 @@ export function originalLoop() {
 
     RoomDataProcs.initRooms()
     RoomDataProcs.updateRooms()
-    RoomsManager.updateRun()
+    RoomServices.updateRun()
     TransactionsManager.run()
     RequestsManager.run()
 
     if (global.collectivizer) global.collectivizer.run()
     if (global.userScript) global.userScript.run()
     PlayerManager.run()
-    RoomsManager.initRun()
+    RoomServices.initRun()
     CreepDataProcs.updateCreeps()
     CreepOrganizer.run()
     PowerCreepOrganizer.run()
@@ -82,7 +82,7 @@ export function originalLoop() {
     ConstructionSiteManager.run()
     MarketManager.run()
 
-    RoomsManager.run()
+    RoomServices.run()
 
     MapVisualsManager.run()
     simpleAllies.endRun()

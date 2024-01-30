@@ -1,5 +1,5 @@
 import { customLog } from 'utils/logging'
-import { HaulerServices } from './roles/commune/haulerServices'
+import { HaulerServices } from './roles/haulerServices'
 
 export class MyCreepServices {
   static runCreeps(room: Room) {
