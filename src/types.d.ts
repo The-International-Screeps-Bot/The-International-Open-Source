@@ -523,6 +523,8 @@ declare global {
     storingStructuresCapacity: number
     storingStructures: (StructureStorage | StructureTerminal)[]
 
+    structures: OrganizedStructures
+
     // Commune
 
     // Functions

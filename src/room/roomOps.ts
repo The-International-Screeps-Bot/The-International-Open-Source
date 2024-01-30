@@ -6,6 +6,7 @@ import {
   RoomLogisticsRequestTypes,
   RoomTypes,
   roomDimensions,
+  allStructureTypes,
 } from 'international/constants'
 import { StatsManager } from 'international/stats'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
@@ -272,7 +273,19 @@ export class RoomOps {
   }
 
   static getStructures(room: Room) {
+    if (room.structures !== undefined) {
+      return room.structures
+    }
 
-    
+    const structures: OrganizedStructures = {} as OrganizedStructures
+    for (const structureType of allStructureTypes) structures[structureType] = []
+
+    const unorganizedStructures = room.find(FIND_STRUCTURES)
+    for (const structure of unorganizedStructures) {
+      structures[structure.structureType].push(structure as any)
+    }
+
+    room.structures = structures
+    return structures
   }
 }
