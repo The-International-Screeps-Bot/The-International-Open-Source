@@ -53,6 +53,7 @@ export class CommuneDataOps {
 
     if (Utils.isTickInterval(100)) {
       delete data.resourceTargets
+      delete communeData[roomName]
     }
   }
 }

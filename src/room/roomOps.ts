@@ -80,54 +80,6 @@ export class RoomOps {
   static update(room: Room) {
     const roomManager = room.roomManager
 
-    delete roomManager._structureUpdate
-    delete roomManager.checkedCSiteUpdate
-    delete roomManager._communeSources
-    delete roomManager._remoteSources
-    delete roomManager._mineral
-    delete roomManager.checkedCSiteUpdate
-    delete roomManager._structures
-    delete roomManager._cSites
-    delete roomManager._notMyCreeps
-    delete roomManager._enemyAttackers
-    delete roomManager._myDamagedCreeps
-    delete roomManager._myDamagedPowerCreeps
-    delete roomManager._allyDamagedCreeps
-    roomManager._enemyCreepPositions = undefined
-    delete roomManager._notMyConstructionSites
-    delete roomManager._allyConstructionSitesByType
-    delete roomManager._dismantleTargets
-    delete roomManager._destructibleStructures
-    delete roomManager._combatStructureTargets
-    delete roomManager._remoteNamesByEfficacy
-    delete roomManager._remoteSourceIndexesByEfficacy
-
-    roomManager._sourceContainers = undefined
-    roomManager._fastFillerContainers = undefined
-    roomManager._controllerContainer = undefined
-    roomManager._mineralContainer = undefined
-    roomManager._fastFillerLink = undefined
-    roomManager._hubLink = undefined
-    roomManager._droppedEnergy = undefined
-    roomManager._droppedResources = undefined
-    roomManager._actionableWalls = undefined
-    roomManager._quadCostMatrix = undefined
-    roomManager._quadBulldozeCostMatrix = undefined
-    roomManager._enemyDamageThreat = undefined
-    roomManager._enemyThreatCoords = undefined
-    roomManager._enemyThreatGoals = undefined
-    /* this._flags = undefined */
-    roomManager._resourcesInStoringStructures = undefined
-    roomManager._unprotectedEnemyCreeps = undefined
-    roomManager._exitCoords = undefined
-    roomManager._advancedLogistics = undefined
-    roomManager._defaultCostMatrix = undefined
-    roomManager._totalEnemyCombatStrength = undefined
-    roomManager._factory = undefined
-    roomManager._powerSpawn = undefined
-    roomManager._nuker = undefined
-    roomManager._observer = undefined
-
     if (randomTick()) {
       delete roomManager._nukeTargetCoords
       roomManager.roomLogisticsBlacklistCoords = new Set()

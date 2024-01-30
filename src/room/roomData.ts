@@ -46,6 +46,7 @@ export class RoomDataOps {
     if (Utils.isTickInterval(100)) {
 
       delete data.terrainBinary
+      delete roomData[roomName]
     }
   }
 }
