@@ -74,11 +74,10 @@ The MarketManager handles caching market related data, updating / deleting it as
 
 ## Use of classes
 
-Classes should be static, and static classes should not be instantiated. If a class needs to be instantiated, there is probably a better way to do it.
+Classes should be static, and static classes should not be instantiated. If a class "needs" to be instantiated, there is probably a better way to do it.
 
 Inherence of classes should be avoided.
-
-Mixing state and state modifiers (functions) in classes should be avoided.
+classes should no contain state and alter state. They should do only one or the other.
 
 # Creep Tasks
 
