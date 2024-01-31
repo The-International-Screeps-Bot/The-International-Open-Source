@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, ReservedCoordTypes } from 'international/constants'
+import { CreepMemoryKeys, ReservedCoordTypes } from 'constants/general'
 import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 import { StructureUtils } from 'room/structureUtils'
@@ -32,7 +32,9 @@ export class FastFiller extends Creep {
 
     this.createMoveRequest({
       origin: this.pos,
-      goals: [{ pos: new RoomPosition(fastFillerCoord.x, fastFillerCoord.y, this.room.name), range: 0 }],
+      goals: [
+        { pos: new RoomPosition(fastFillerCoord.x, fastFillerCoord.y, this.room.name), range: 0 },
+      ],
     })
 
     // And inform true

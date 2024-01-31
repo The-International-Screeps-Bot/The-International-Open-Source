@@ -5,7 +5,7 @@ import {
   CreepPowerTaskKeys,
   CreepTaskKeys,
   CreepTaskNames,
-} from 'international/constants'
+} from 'constants/general'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import { CreepPowerTask, PowerRequest } from 'types/creepTasks'
 import { customLog } from 'utils/logging'

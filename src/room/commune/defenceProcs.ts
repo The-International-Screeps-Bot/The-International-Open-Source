@@ -1,5 +1,12 @@
 import { CollectiveManager } from "international/collective"
-import { Result, ourImpassibleStructuresSet, RoomMemoryKeys, PlayerMemoryKeys, CombatRequestKeys, defaultDataDecay } from "international/constants"
+import {
+  Result,
+  ourImpassibleStructuresSet,
+  RoomMemoryKeys,
+  PlayerMemoryKeys,
+  CombatRequestKeys,
+  defaultDataDecay,
+} from 'constants/general'
 import { PlayerManager } from "international/players"
 import { simpleAllies } from "international/simpleAllies/simpleAllies"
 import { packCoord } from "other/codec"

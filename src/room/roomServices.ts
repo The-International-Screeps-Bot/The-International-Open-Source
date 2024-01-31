@@ -1,10 +1,10 @@
 import {
-    RoomMemoryKeys,
-    RoomStatsKeys,
-    RoomTypes,
-    customColors,
-    roomTypesUsedForStats,
-} from '../international/constants'
+  RoomMemoryKeys,
+  RoomStatsKeys,
+  RoomTypes,
+  customColors,
+  roomTypesUsedForStats,
+} from '../constants/general'
 
 import './roomFunctions'
 

@@ -1,4 +1,4 @@
-import { CreepPowerTaskKeys, CreepTaskKeys, CreepTaskNames } from '../international/constants'
+import { CreepPowerTaskKeys, CreepTaskKeys, CreepTaskNames } from '../constants/general'
 
 export type CreepTaskTargets = Structure | Creep | Tombstone | Ruin | Resource
 

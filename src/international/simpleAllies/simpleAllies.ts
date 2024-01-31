@@ -1,5 +1,5 @@
 import { CollectiveManager } from '../collective'
-import { maxSegmentsOpen } from '../constants'
+import { maxSegmentsOpen } from '../../constants/general'
 import {
   AllyRequests,
   AttackRequest,

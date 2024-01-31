@@ -1,5 +1,5 @@
 import { creepClasses } from 'room/creeps/creepClasses'
-import { customColors, remoteRoles } from './constants'
+import { customColors, remoteRoles } from '../constants/general'
 import { customLog } from 'utils/logging'
 import { CollectiveManager } from './collective'
 import { packCoord } from 'other/codec'

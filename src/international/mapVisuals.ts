@@ -1,14 +1,14 @@
 import { unpackPosAt, unpackPosList } from 'other/codec'
 import {
-    customColors,
-    WorkRequestKeys,
-    RoomMemoryKeys,
-    RoomTypes,
-    roomDimensions,
-    packedPosLength,
-    FlagNames,
-    Result,
-} from './constants'
+  customColors,
+  WorkRequestKeys,
+  RoomMemoryKeys,
+  RoomTypes,
+  roomDimensions,
+  packedPosLength,
+  FlagNames,
+  Result,
+} from '../constants/general'
 import { CommuneUtils } from 'room/commune/communeUtils'
 
 /**

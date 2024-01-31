@@ -1,134 +1,134 @@
-import { allResources, customColors } from 'international/constants'
+import { allResources, customColors } from 'constants/general'
 import { customLog } from 'utils/logging'
 import { findObjectWithID } from 'utils/utils'
 
 Object.defineProperties(RoomObject.prototype, {
-    effectsData: {
-        get() {
-            if (this._effectsData) return this._effectsData
+  effectsData: {
+    get() {
+      if (this._effectsData) return this._effectsData
 
-            this._effectsData = new Map()
-            if (!this.effects) return this._effectsData
+      this._effectsData = new Map()
+      if (!this.effects) return this._effectsData
 
-            for (const effectData of this.effects) {
-                this._effectsData.set(effectData.effect, effectData)
-            }
+      for (const effectData of this.effects) {
+        this._effectsData.set(effectData.effect, effectData)
+      }
 
-            return this._effectsData
-        },
+      return this._effectsData
     },
-    nextHits: {
-        get(this: RoomObject & { hits: number }) {
-            if (this._nextHits) return this._nextHits
+  },
+  nextHits: {
+    get(this: RoomObject & { hits: number }) {
+      if (this._nextHits) return this._nextHits
 
-            return (this._nextHits = this.hits)
-        },
-        set(newNextHits: number) {
-            this._nextHits = newNextHits
-        },
+      return (this._nextHits = this.hits)
     },
-    reserveHits: {
-        get(this: RoomObject & { hits: number }) {
-            if (this._reserveHits) return this._reserveHits
-
-            return (this._reserveHits = this.hits)
-        },
-        set(newReserveHits: number) {
-            this._reserveHits = newReserveHits
-        },
+    set(newNextHits: number) {
+      this._nextHits = newNextHits
     },
-    nextStore: {
-        get(this: AnyStoreStructure) {
-            if (this._nextStore) return this._nextStore
+  },
+  reserveHits: {
+    get(this: RoomObject & { hits: number }) {
+      if (this._reserveHits) return this._reserveHits
 
-            const parent = this
-            const referenceStore = Object.assign({}, this.store)
-
-            this._nextStore = new Proxy(referenceStore, {
-                get(target: CustomStore, resourceType: ResourceConstant) {
-                    return target[resourceType] ?? 0
-                },
-                set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
-                    if (parent._usedNextStore !== undefined) {
-                        parent._usedNextStore += newAmount - (target[resourceType] ?? 0)
-                    }
-                    // Update the change
-
-                    target[resourceType] = newAmount
-                    return true
-                },
-            })
-
-            return this._nextStore
-        },
+      return (this._reserveHits = this.hits)
     },
-    usedNextStore: {
-        get(this: RoomObject & { store?: StoreDefinition }) {
-            if (this._usedNextStore !== undefined) return this._usedNextStore
-
-            this._usedNextStore = 0
-
-            for (const key in this.nextStore) {
-                this._usedNextStore += this.nextStore[key as ResourceConstant]
-            }
-
-            return this._usedNextStore
-        },
+    set(newReserveHits: number) {
+      this._reserveHits = newReserveHits
     },
-    freeNextStore: {
-        get(this: RoomObject & { store?: StoreDefinition }) {
-            return this.store.getCapacity() - this.usedNextStore
+  },
+  nextStore: {
+    get(this: AnyStoreStructure) {
+      if (this._nextStore) return this._nextStore
+
+      const parent = this
+      const referenceStore = Object.assign({}, this.store)
+
+      this._nextStore = new Proxy(referenceStore, {
+        get(target: CustomStore, resourceType: ResourceConstant) {
+          return target[resourceType] ?? 0
         },
-    },
-    reserveStore: {
-        get(this: AnyStoreStructure) {
-            if (this._reserveStore) return this._reserveStore
+        set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
+          if (parent._usedNextStore !== undefined) {
+            parent._usedNextStore += newAmount - (target[resourceType] ?? 0)
+          }
+          // Update the change
 
-            const parent = this
-            const referenceStore = Object.assign({}, this.store)
-
-            this._reserveStore = new Proxy(referenceStore, {
-                get(target: CustomStore, resourceType: ResourceConstant) {
-                    return target[resourceType] ?? 0
-                },
-                set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
-                    if (parent._usedReserveStore !== undefined) {
-                        parent._usedReserveStore += newAmount - (target[resourceType] ?? 0)
-                    }
-
-                    // Update the change
-
-                    target[resourceType] = newAmount
-                    return true
-                },
-            })
-
-            return this._reserveStore
+          target[resourceType] = newAmount
+          return true
         },
+      })
+
+      return this._nextStore
     },
-    usedReserveStore: {
-        get(this: RoomObject & { store?: StoreDefinition }) {
-            if (this._usedReserveStore !== undefined) return this._usedReserveStore
+  },
+  usedNextStore: {
+    get(this: RoomObject & { store?: StoreDefinition }) {
+      if (this._usedNextStore !== undefined) return this._usedNextStore
 
-            this._usedReserveStore = 0
+      this._usedNextStore = 0
 
-            for (const key in this.reserveStore) {
-                this._usedReserveStore += this.reserveStore[key as ResourceConstant]
-            }
+      for (const key in this.nextStore) {
+        this._usedNextStore += this.nextStore[key as ResourceConstant]
+      }
 
-            return this._usedReserveStore
+      return this._usedNextStore
+    },
+  },
+  freeNextStore: {
+    get(this: RoomObject & { store?: StoreDefinition }) {
+      return this.store.getCapacity() - this.usedNextStore
+    },
+  },
+  reserveStore: {
+    get(this: AnyStoreStructure) {
+      if (this._reserveStore) return this._reserveStore
+
+      const parent = this
+      const referenceStore = Object.assign({}, this.store)
+
+      this._reserveStore = new Proxy(referenceStore, {
+        get(target: CustomStore, resourceType: ResourceConstant) {
+          return target[resourceType] ?? 0
         },
-    },
-    freeReserveStore: {
-        get(this: RoomObject & { store?: StoreDefinition }) {
-            return this.store.getCapacity() - this.usedReserveStore
-        },
-    },
-    reservePowers: {
-        get() {
-            if (this._reservePowers) return this._reservePowers
+        set(target: CustomStore, resourceType: ResourceConstant, newAmount) {
+          if (parent._usedReserveStore !== undefined) {
+            parent._usedReserveStore += newAmount - (target[resourceType] ?? 0)
+          }
 
-            return (this._reservePowers = new Set())
+          // Update the change
+
+          target[resourceType] = newAmount
+          return true
         },
+      })
+
+      return this._reserveStore
     },
+  },
+  usedReserveStore: {
+    get(this: RoomObject & { store?: StoreDefinition }) {
+      if (this._usedReserveStore !== undefined) return this._usedReserveStore
+
+      this._usedReserveStore = 0
+
+      for (const key in this.reserveStore) {
+        this._usedReserveStore += this.reserveStore[key as ResourceConstant]
+      }
+
+      return this._usedReserveStore
+    },
+  },
+  freeReserveStore: {
+    get(this: RoomObject & { store?: StoreDefinition }) {
+      return this.store.getCapacity() - this.usedReserveStore
+    },
+  },
+  reservePowers: {
+    get() {
+      if (this._reservePowers) return this._reservePowers
+
+      return (this._reservePowers = new Set())
+    },
+  },
 } as PropertyDescriptorMap & ThisType<RoomObject>)

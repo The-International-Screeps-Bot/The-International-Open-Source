@@ -1,10 +1,10 @@
 import {
-    WorkRequestKeys,
-    CreepMemoryKeys,
-    Result,
-    RoomTypes,
-    ReservedCoordTypes,
-} from 'international/constants'
+  WorkRequestKeys,
+  CreepMemoryKeys,
+  Result,
+  RoomTypes,
+  ReservedCoordTypes,
+} from 'constants/general'
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { CreepUtils } from 'room/creeps/creepUtils'

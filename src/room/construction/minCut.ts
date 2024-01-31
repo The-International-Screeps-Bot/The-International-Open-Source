@@ -64,7 +64,7 @@
  * each round of bfs. See the comments in the code for details.
  */
 
-import { customColors, roomDimensions } from 'international/constants'
+import { customColors, roomDimensions } from 'constants/general'
 import { CollectiveManager } from 'international/collective'
 import { findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'utils/utils'
 

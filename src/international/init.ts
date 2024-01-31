@@ -1,8 +1,8 @@
 import { getMe } from 'utils/utils'
 import { PlayerManager } from './players'
 import { StatsManager } from './stats'
-import { PlayerMemoryKeys, SegmentIDs } from './constants'
-import { PlayerRelationships } from './constants'
+import { PlayerMemoryKeys, SegmentIDs } from '../constants/general'
+import { PlayerRelationships } from '../constants/general'
 import { RoomNameUtils } from 'room/roomNameUtils'
 
 /**

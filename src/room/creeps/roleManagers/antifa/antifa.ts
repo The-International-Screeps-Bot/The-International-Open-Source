@@ -1,12 +1,12 @@
 import {
-    CombatRequestKeys,
-    CreepMemoryKeys,
-    FlagNames,
-    RoomTypes,
-    antifaRoles,
-    customColors,
-    squadQuotas,
-} from 'international/constants'
+  CombatRequestKeys,
+  CreepMemoryKeys,
+  FlagNames,
+  RoomTypes,
+  antifaRoles,
+  customColors,
+  squadQuotas,
+} from 'constants/general'
 import { customLog } from 'utils/logging'
 import { findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'

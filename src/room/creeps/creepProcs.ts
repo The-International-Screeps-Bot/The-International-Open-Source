@@ -16,7 +16,7 @@ import {
   RoomLogisticsRequestTypes,
   offsetsByDirection,
   RoomStatsKeys,
-} from 'international/constants'
+} from 'constants/general'
 import { CreepUtils } from './creepUtils'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import {

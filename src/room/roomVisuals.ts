@@ -1,15 +1,15 @@
 import {
-    WorkRequestKeys,
-    CombatRequestKeys,
-    HaulRequestKeys,
-    customColors,
-    roomDimensions,
-    stamps,
-    packedPosLength,
-    RoomMemoryKeys,
-    RoomTypes,
-    FlagNames,
-} from 'international/constants'
+  WorkRequestKeys,
+  CombatRequestKeys,
+  HaulRequestKeys,
+  customColors,
+  roomDimensions,
+  stamps,
+  packedPosLength,
+  RoomMemoryKeys,
+  RoomTypes,
+  FlagNames,
+} from 'constants/general'
 import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'

@@ -7,7 +7,7 @@ import {
   RoomMemoryKeys,
   minerals,
   haulerUpdateDefault,
-} from './constants'
+} from '../constants/general'
 import { CommuneUtils } from 'room/commune/communeUtils'
 
 const periodicUpdateInterval = randomIntRange(100, 200)

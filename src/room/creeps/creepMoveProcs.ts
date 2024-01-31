@@ -8,7 +8,7 @@ import {
   defaultCreepSwampCost,
   defaultPlainCost,
   packedPosLength,
-} from 'international/constants'
+} from 'constants/general'
 import { CustomPathFinderArgs, PathGoal, CustomPathFinder } from 'international/customPathFinder'
 import { packCoord, packPos, packPosList, unpackPos, unpackPosAt } from 'other/codec'
 import { areCoordsEqual, arePositionsEqual, findObjectWithID, getRange } from 'utils/utils'

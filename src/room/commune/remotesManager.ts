@@ -7,7 +7,7 @@ import {
   RoomTypes,
   defaultDataDecay,
   maxRemotePathDistance,
-} from 'international/constants'
+} from 'constants/general'
 import {
   findCarryPartsRequired,
   findLowestScore,

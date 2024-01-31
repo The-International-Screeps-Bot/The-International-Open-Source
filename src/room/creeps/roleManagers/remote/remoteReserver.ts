@@ -5,7 +5,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   packedPosLength,
-} from 'international/constants'
+} from 'constants/general'
 import { getRange, randomTick } from 'utils/utils'
 import {
   packCoord,

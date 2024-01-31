@@ -1,13 +1,13 @@
 import {
-    CreepMemoryKeys,
-    packedPosLength,
-    ReservedCoordTypes,
-    Result,
-    RoomLogisticsRequestTypes,
-    RoomMemoryKeys,
-    RoomStatsKeys,
-    WorkTypes,
-} from 'international/constants'
+  CreepMemoryKeys,
+  packedPosLength,
+  ReservedCoordTypes,
+  Result,
+  RoomLogisticsRequestTypes,
+  RoomMemoryKeys,
+  RoomStatsKeys,
+  WorkTypes,
+} from 'constants/general'
 import { StatsManager } from 'international/stats'
 import {
   findCoordsInsideRect,

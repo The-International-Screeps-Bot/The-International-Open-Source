@@ -1,5 +1,5 @@
 import { CollectiveManager } from 'international/collective'
-import { RoomLogisticsRequestTypes, RoomStatsKeys } from 'international/constants'
+import { RoomLogisticsRequestTypes, RoomStatsKeys } from 'constants/general'
 import { StatsManager } from 'international/stats'
 import { scalePriority } from 'utils/utils'
 import { CommuneUtils } from './communeUtils'

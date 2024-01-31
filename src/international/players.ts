@@ -1,8 +1,8 @@
 import { isNumber } from 'lodash'
-import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from './constants'
+import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from '../constants/general'
 import { randomTick } from '../utils/utils'
 import { Sleepable, StaticSleepable } from '../utils/sleepable'
-import { PlayerRelationships } from './constants'
+import { PlayerRelationships } from '../constants/general'
 
 export class PlayerManager extends StaticSleepable {
     /**

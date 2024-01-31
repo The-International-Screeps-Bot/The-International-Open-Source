@@ -8,11 +8,12 @@ import {
 import './workRequest'
 import './combatRequest'
 import {
-  RoomMemoryKeys, rampartUpkeepCost,
+  RoomMemoryKeys,
+  rampartUpkeepCost,
   RemoteResourcePathTypes,
   ReservedCoordTypes,
-  RoomStatsKeys
-} from 'international/constants'
+  RoomStatsKeys,
+} from 'constants/general'
 import './factory'
 import { LabManager } from './labs'
 import './links'

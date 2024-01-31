@@ -7,7 +7,7 @@ import {
   RoomTypes,
   roomDimensions,
   allStructureTypes,
-} from 'international/constants'
+} from 'constants/general'
 import { StatsManager } from 'international/stats'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { packXYAsNum, randomTick } from 'utils/utils'

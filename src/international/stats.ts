@@ -1,5 +1,11 @@
 import { roundTo } from 'utils/utils'
-import { CPUMaxPerTick, customColors, RoomMemoryKeys, RoomStatsKeys, RoomTypes } from './constants'
+import {
+  CPUMaxPerTick,
+  customColors,
+  RoomMemoryKeys,
+  RoomStatsKeys,
+  RoomTypes,
+} from '../constants/general'
 import { customLog, LogTypes } from 'utils/logging'
 import { CollectiveManager } from './collective'
 

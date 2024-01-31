@@ -1,7 +1,7 @@
 import { Sleepable } from 'utils/sleepable'
 import { CollectiveManager } from './collective'
 import { Utils } from 'utils/utils'
-import { IDUpdateInterval } from './constants'
+import { IDUpdateInterval } from '../constants/general'
 import { SegmentsManager } from './segments'
 
 /**

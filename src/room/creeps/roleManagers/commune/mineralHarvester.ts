@@ -1,10 +1,10 @@
 import {
-    CreepMemoryKeys,
-    ReservedCoordTypes,
-    Result,
-    RoomMemoryKeys,
-    RoomStatsKeys,
-} from 'international/constants'
+  CreepMemoryKeys,
+  ReservedCoordTypes,
+  Result,
+  RoomMemoryKeys,
+  RoomStatsKeys,
+} from 'constants/general'
 import { StatsManager } from 'international/stats'
 import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'

@@ -11,7 +11,7 @@ import {
   customColors,
   FlagNames,
   relayOffsets,
-} from 'international/constants'
+} from 'constants/general'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, reversePosList, packCoord, unpackCoord } from 'other/codec'
 import { CreepProcs } from 'room/creeps/creepProcs'

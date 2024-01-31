@@ -1,7 +1,5 @@
-import { packCoord } from 'other/codec'
-import { CollectiveManager } from './collective'
-import { CommuneManager } from 'room/commune/commune'
-import { randomIntRange } from 'utils/utils'
+import { packCoord } from '../other/codec'
+import { randomIntRange } from '../utils/utils'
 
 export enum PlayerRelationships {
   ally,
@@ -203,7 +201,6 @@ export enum CreepTaskKeys {
 }
 
 export enum CreepTaskNames {
-
   // Creep
 
   harvestMineral,

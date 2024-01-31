@@ -11,7 +11,7 @@ import {
   MovedTypes,
   RoomStatsKeys,
   FlagNames,
-} from 'international/constants'
+} from 'constants/general'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
 import { CreepProcs } from 'room/creeps/creepProcs'

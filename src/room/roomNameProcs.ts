@@ -1,4 +1,4 @@
-import { Result, RoomMemoryKeys, RoomStatusKeys, RoomTypes } from 'international/constants'
+import { Result, RoomMemoryKeys, RoomStatusKeys, RoomTypes } from 'constants/general'
 
 export class RoomNameProcs {
   static findAndRecordStatus(roomName: string, roomMemory = Memory.rooms[roomName]) {
@@ -9,7 +9,6 @@ export class RoomNameProcs {
   }
 
   static findAndRecordConstantType(roomName: string) {
-
     // Find the numbers in the room's name
     const [EWstring, NSstring] = roomName.match(/\d+/g)
 

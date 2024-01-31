@@ -16,7 +16,7 @@ import {
   structureTypesToProtectSet,
   RoomMemoryKeys,
   basePlanCPUBucketThreshold,
-} from 'international/constants'
+} from 'constants/general'
 import {
   areCoordsEqual,
   createPosMap,

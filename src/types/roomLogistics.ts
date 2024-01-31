@@ -1,4 +1,4 @@
-import { CreepLogisticsRequestKeys, RoomLogisticsRequestTypes } from 'international/constants'
+import { CreepLogisticsRequestKeys, RoomLogisticsRequestTypes } from 'constants/general'
 
 export type RoomLogisticsTargets = AnyStoreStructure | Creep | Tombstone | Ruin | Resource
 
@@ -61,14 +61,14 @@ export interface CreateRoomLogisticsRequestArgs {
 }
 
 export interface FindNewRoomLogisticsRequestArgs {
-    types?: Set<RoomLogisticsRequestTypes>
-    /**
-     * Use this to command certain resourceTypes
-     */
-    resourceTypes?: Set<ResourceConstant>
-    noDelivery?: boolean
-    /**
-     * DO NOT USE THIS TO COMMAND CERTAIN RESOURCETYPES, instead use resourceTypes
-     */
-    conditions?(request: RoomLogisticsRequest): any
+  types?: Set<RoomLogisticsRequestTypes>
+  /**
+   * Use this to command certain resourceTypes
+   */
+  resourceTypes?: Set<ResourceConstant>
+  noDelivery?: boolean
+  /**
+   * DO NOT USE THIS TO COMMAND CERTAIN RESOURCETYPES, instead use resourceTypes
+   */
+  conditions?(request: RoomLogisticsRequest): any
 }

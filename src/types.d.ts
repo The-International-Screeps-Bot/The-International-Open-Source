@@ -26,7 +26,7 @@ import {
   MovedTypes,
   RoomStatsKeys,
   RoomStatusKeys,
-} from 'international/constants'
+} from 'constants/general'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settingsDefault'

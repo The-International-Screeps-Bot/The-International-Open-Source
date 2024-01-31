@@ -1,7 +1,4 @@
-import {
-    CombatRequestKeys,
-    CreepMemoryKeys
-} from 'international/constants'
+import { CombatRequestKeys, CreepMemoryKeys } from 'constants/general'
 import { findClosestObject, getRange, Utils } from 'utils/utils'
 import { Antifa } from './antifa'
 
@@ -156,4 +153,3 @@ export class DynamicSquad {
    */
   private createMoveRequest() {}
 }
-

@@ -3,7 +3,7 @@ import { findLowestScore, roundTo } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { StatsManager } from 'international/stats'
 import { MarketManager } from 'international/market/marketOrders'
-import { Result, RoomStatsKeys } from 'international/constants'
+import { Result, RoomStatsKeys } from 'constants/general'
 
 export class TradingUtils {
   static advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {

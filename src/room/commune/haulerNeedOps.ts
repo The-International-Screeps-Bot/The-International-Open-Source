@@ -1,11 +1,10 @@
-import { RoomMemoryKeys, RoomStatsKeys, packedPosLength, stamps } from "international/constants"
-import { StructureUtils } from "room/structureUtils"
-import { findCarryPartsRequired } from "utils/utils"
-import { CommuneUtils } from "./communeUtils"
+import { RoomMemoryKeys, RoomStatsKeys, packedPosLength, stamps } from 'constants/general'
+import { StructureUtils } from 'room/structureUtils'
+import { findCarryPartsRequired } from 'utils/utils'
+import { CommuneUtils } from './communeUtils'
 
 export class HaulerNeedOps {
   static run(room: Room) {
-
     this.sourceNeed(room)
     this.controllerNeed(room)
 
@@ -27,8 +26,10 @@ export class HaulerNeedOps {
       (room.controller.level >= 4 && room.storage) ||
       (room.terminal && room.controller.level >= 6)
     ) {
-      room.communeManager.communeHaulerNeed += Memory.stats.rooms[room.name][RoomStatsKeys.EnergyOutputSpawn] / 10
-      room.communeManager.communeHaulerNeed += Memory.stats.rooms[room.name][RoomStatsKeys.SpawnUsagePercentage] * 8
+      room.communeManager.communeHaulerNeed +=
+        Memory.stats.rooms[room.name][RoomStatsKeys.EnergyOutputSpawn] / 10
+      room.communeManager.communeHaulerNeed +=
+        Memory.stats.rooms[room.name][RoomStatsKeys.SpawnUsagePercentage] * 8
     }
 
     room.communeManager.communeHaulerNeed = Math.round(room.communeManager.communeHaulerNeed)
@@ -66,16 +67,13 @@ export class HaulerNeedOps {
   }
 
   private static controllerNeed(room: Room) {
-
     if (room.controller.level < 2) return
 
     // There is a viable controllerContainer
 
     if (room.roomManager.controllerContainer) {
       room.communeManager.communeHaulerNeed += findCarryPartsRequired(
-        Memory.rooms[room.name][RoomMemoryKeys.upgradePath].length /
-          packedPosLength +
-          3,
+        Memory.rooms[room.name][RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
         room.communeManager.upgradeStrength * 1.1,
       )
       return
@@ -95,9 +93,7 @@ export class HaulerNeedOps {
     // There is a viable controllerLink but we need to haul to it
 
     room.communeManager.communeHaulerNeed += findCarryPartsRequired(
-      Memory.rooms[room.name][RoomMemoryKeys.upgradePath].length /
-        packedPosLength +
-        3,
+      Memory.rooms[room.name][RoomMemoryKeys.upgradePath].length / packedPosLength + 3,
       room.communeManager.upgradeStrength * 1.1,
     )
     return

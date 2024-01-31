@@ -1,9 +1,15 @@
-import { separateStoreStructureTypes } from "international/constants"
+import { separateStoreStructureTypes } from 'constants/general'
 
 export class RoomObjectUtils {
-  static freeNextStoreOf(roomObject: RoomObject & { store: StoreDefinition }, resourceType: ResourceConstant) {
+  static freeNextStoreOf(
+    roomObject: RoomObject & { store: StoreDefinition },
+    resourceType: ResourceConstant,
+  ) {
     // If our storing system is like a lab, nuker, power spawn
-    if (roomObject instanceof Structure && separateStoreStructureTypes.has(roomObject.structureType)) {
+    if (
+      roomObject instanceof Structure &&
+      separateStoreStructureTypes.has(roomObject.structureType)
+    ) {
       return roomObject.store.getCapacity(resourceType) - roomObject.nextStore[resourceType]
     }
 
@@ -15,7 +21,10 @@ export class RoomObjectUtils {
     resourceType: ResourceConstant,
   ) {
     // If our storing system is like a lab, nuker, power spawn
-    if (roomObject instanceof Structure && separateStoreStructureTypes.has(roomObject.structureType)) {
+    if (
+      roomObject instanceof Structure &&
+      separateStoreStructureTypes.has(roomObject.structureType)
+    ) {
       return roomObject.store.getCapacity(resourceType) - roomObject.reserveStore[resourceType]
     }
 

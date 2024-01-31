@@ -1,12 +1,12 @@
 import {
-    buildableStructuresSet,
-    buildableStructureTypes,
-    customColors,
-    impassibleStructureTypesSet,
-    Result,
-    RoomMemoryKeys,
-    structureTypesToProtectSet,
-} from 'international/constants'
+  buildableStructuresSet,
+  buildableStructureTypes,
+  customColors,
+  impassibleStructureTypesSet,
+  Result,
+  RoomMemoryKeys,
+  structureTypesToProtectSet,
+} from 'constants/general'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, packAsNum, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'

@@ -1,13 +1,15 @@
 import {
-    impassibleStructureTypesSet,
-    customColors, TrafficPriorities,
-    packedPosLength,
-    CreepMemoryKeys, Result,
-    communeCreepRoles,
-    ReservedCoordTypes,
-    MovedTypes,
-    FlagNames
-} from 'international/constants'
+  impassibleStructureTypesSet,
+  customColors,
+  TrafficPriorities,
+  packedPosLength,
+  CreepMemoryKeys,
+  Result,
+  communeCreepRoles,
+  ReservedCoordTypes,
+  MovedTypes,
+  FlagNames,
+} from 'constants/general'
 import { CollectiveManager } from 'international/collective'
 import {
   areCoordsEqual,

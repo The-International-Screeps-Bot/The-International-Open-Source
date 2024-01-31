@@ -1,11 +1,11 @@
 import {
-    CreepMemoryKeys,
-    Result,
-    RoomMemoryKeys,
-    RoomTypes,
-    communeSign,
-    nonCommuneSigns,
-} from 'international/constants'
+  CreepMemoryKeys,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+  communeSign,
+  nonCommuneSigns,
+} from 'constants/general'
 import { getRangeXY, getRange, randomOf } from 'utils/utils'
 import { partial } from 'lodash'
 import { RoomNameUtils } from 'room/roomNameUtils'

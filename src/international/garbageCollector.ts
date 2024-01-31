@@ -1,5 +1,5 @@
 import { Sleepable, StaticSleepable } from 'utils/sleepable'
-import { RoomMemoryKeys } from './constants'
+import { RoomMemoryKeys } from '../constants/general'
 
 /**
  * Intended to clean Memory, global, segments from stale data

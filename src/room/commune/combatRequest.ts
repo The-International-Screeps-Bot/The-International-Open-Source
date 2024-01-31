@@ -1,4 +1,4 @@
-import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
+import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'constants/general'
 import { CommuneManager } from './commune'
 import { StatsManager } from 'international/stats'
 import { randomIntRange, Utils } from 'utils/utils'

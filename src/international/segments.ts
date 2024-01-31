@@ -1,4 +1,4 @@
-import { Result, SegmentIDs } from './constants'
+import { Result, SegmentIDs } from '../constants/general'
 
 export class SegmentsManager {
   static run() {

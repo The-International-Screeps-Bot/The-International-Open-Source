@@ -1,5 +1,5 @@
 import { findHighestScore, randomIntRange, randomTick, Utils } from 'utils/utils'
-import { PlayerMemoryKeys, Result, RoomMemoryKeys } from '../constants'
+import { PlayerMemoryKeys, Result, RoomMemoryKeys } from '../../constants/general'
 import { CollectiveManager } from '../collective'
 import { customLog } from 'utils/logging'
 

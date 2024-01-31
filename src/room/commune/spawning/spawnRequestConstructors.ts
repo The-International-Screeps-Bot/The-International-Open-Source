@@ -1,7 +1,7 @@
 import { SpawnRequest } from 'types/spawnRequest'
 import { LogTypes, customLog } from 'utils/logging'
 import { SpawnRequestArgs } from 'types/spawnRequest'
-import { CreepMemoryKeys, FlagNames } from 'international/constants'
+import { CreepMemoryKeys, FlagNames } from 'constants/general'
 
 export type SpawnRequestConstructor = (room: Room, args: SpawnRequestArgs) => SpawnRequest[]
 

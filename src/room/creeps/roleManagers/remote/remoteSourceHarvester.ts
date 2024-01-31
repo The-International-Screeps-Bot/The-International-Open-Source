@@ -7,7 +7,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   WorkTypes,
-} from 'international/constants'
+} from 'constants/general'
 import {
   findCarryPartsRequired,
   findObjectWithID,

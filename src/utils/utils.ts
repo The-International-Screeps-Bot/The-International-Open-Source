@@ -1,9 +1,13 @@
 import { ErrorMapper } from 'other/ErrorMapper'
 import {
-  customColors, roomDimensions, PlayerMemoryKeys, Result, FlagNames
-} from '../international/constants'
+  customColors,
+  roomDimensions,
+  PlayerMemoryKeys,
+  Result,
+  FlagNames,
+} from '../constants/general'
 import { customLog } from './logging'
-import { PlayerRelationships } from 'international/constants'
+import { PlayerRelationships } from 'constants/general'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 

@@ -1,4 +1,4 @@
-import { customColors } from 'international/constants'
+import { customColors } from 'constants/general'
 import { LogTypes, customLog } from 'utils/logging'
 import { findCPUColor, findCPUOf } from 'utils/utils'
 import { CollectiveManager } from './collective'

@@ -12,7 +12,7 @@ import {
   maxCombatDistance,
   maxHaulDistance,
   maxWorkRequestDistance,
-} from './constants'
+} from '../constants/general'
 import { indexOf } from 'lodash'
 import { Sleepable, StaticSleepable } from 'utils/sleepable'
 import { util } from 'chai'

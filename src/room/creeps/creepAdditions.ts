@@ -1,11 +1,11 @@
 import {
-    CreepMemoryKeys,
-    creepRoles,
-    dismantleBoosts,
-    dismantleBoostsSet,
-    roomDimensions,
-    towerPowers,
-} from 'international/constants'
+  CreepMemoryKeys,
+  creepRoles,
+  dismantleBoosts,
+  dismantleBoostsSet,
+  roomDimensions,
+  towerPowers,
+} from 'constants/general'
 import { customLog } from 'utils/logging'
 import { getRangeXY, getRange, isXYExit, isExit } from 'utils/utils'
 import { profiler } from 'other/profiler'

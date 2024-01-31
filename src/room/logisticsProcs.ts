@@ -1,4 +1,4 @@
-import { RoomLogisticsRequestTypes } from 'international/constants'
+import { RoomLogisticsRequestTypes } from 'constants/general'
 import { scalePriority } from 'utils/utils'
 
 export class LogisticsProcs {
@@ -197,7 +197,6 @@ export class LogisticsProcs {
   }
 
   static createCommuneStoringStructureLogisticsRequests(room: Room) {
-
     const storingStructures: AnyStoreStructure[] = []
 
     const storage = room.storage
@@ -205,25 +204,25 @@ export class LogisticsProcs {
 
     const terminal = room.terminal
     if (terminal && !terminal.effectsData.get(PWR_DISRUPT_TERMINAL))
-        storingStructures.push(terminal)
+      storingStructures.push(terminal)
 
     for (const structure of storingStructures) {
-        room.createRoomLogisticsRequest({
-            target: structure,
-            onlyFull: true,
-            type: RoomLogisticsRequestTypes.offer,
-            priority: 0,
-        })
+      room.createRoomLogisticsRequest({
+        target: structure,
+        onlyFull: true,
+        type: RoomLogisticsRequestTypes.offer,
+        priority: 0,
+      })
 
-        // We are close to full
+      // We are close to full
 
-        if (structure.usedReserveStore > structure.store.getCapacity() * 0.9) continue
+      if (structure.usedReserveStore > structure.store.getCapacity() * 0.9) continue
 
-        room.createRoomLogisticsRequest({
-            target: structure,
-            type: RoomLogisticsRequestTypes.transfer,
-            priority: 100,
-        })
+      room.createRoomLogisticsRequest({
+        target: structure,
+        type: RoomLogisticsRequestTypes.transfer,
+        priority: 100,
+      })
     }
   }
 }

@@ -7,7 +7,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   Result,
-} from './constants'
+} from '../constants/general'
 
 const importantStructures: StructureConstant[] = [STRUCTURE_SPAWN]
 

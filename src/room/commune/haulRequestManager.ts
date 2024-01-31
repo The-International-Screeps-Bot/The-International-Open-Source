@@ -1,9 +1,4 @@
-import {
-  customColors,
-  HaulRequestKeys,
-  CombatRequestKeys,
-  RoomMemoryKeys,
-} from 'international/constants'
+import { customColors, HaulRequestKeys, CombatRequestKeys, RoomMemoryKeys } from 'constants/general'
 import { randomIntRange, randomTick, Utils } from 'utils/utils'
 import { CommuneManager } from './commune'
 import { CommuneUtils } from './communeUtils'

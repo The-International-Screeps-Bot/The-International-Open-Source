@@ -6,7 +6,7 @@ import {
   CreepMemoryKeys,
   RoomMemoryKeys,
   RoomTypes,
-} from 'international/constants'
+} from 'constants/general'
 import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from '../commune'
 import { SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'

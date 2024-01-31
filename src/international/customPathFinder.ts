@@ -12,7 +12,7 @@ import {
   impassibleStructureTypes,
   impassibleStructureTypesSet,
   roomDimensions,
-} from './constants'
+} from '../constants/general'
 import { packCoord, unpackCoord, unpackCoordList, unpackPosAt, unpackPosList } from 'other/codec'
 import { LogTypes, customLog } from 'utils/logging'
 import { forCoordsAroundRange, unpackNumAsCoord, visualizePath } from '../utils/utils'

@@ -10,7 +10,7 @@ import {
   customColors,
   ourImpassibleStructuresSet,
   packedPosLength,
-} from '../constants'
+} from '../../constants/general'
 import { CollectiveManager } from '../collective'
 import { CombatRequestTypes } from 'types/internationalRequests'
 import { RoomNameUtils } from 'room/roomNameUtils'

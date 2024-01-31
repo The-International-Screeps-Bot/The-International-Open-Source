@@ -1,11 +1,15 @@
 import {
-  impassibleStructureTypes, quadAttackMemberOffsets,
-  roomDimensions, Result, CreepMemoryKeys, RoomMemoryKeys,
+  impassibleStructureTypes,
+  quadAttackMemberOffsets,
+  roomDimensions,
+  Result,
+  CreepMemoryKeys,
+  RoomMemoryKeys,
   ReservedCoordTypes,
   WorkTypes,
   RoomLogisticsRequestTypes,
-  RoomStatsKeys
-} from 'international/constants'
+  RoomStatsKeys,
+} from 'constants/general'
 import {
   findClosestObject,
   findObjectWithID,

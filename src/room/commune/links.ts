@@ -2,7 +2,7 @@ import {
   RoomLogisticsRequestTypes,
   linkReceiveTreshold,
   linkSendThreshold,
-} from 'international/constants'
+} from 'constants/general'
 import { customLog } from 'utils/logging'
 import { CommuneManager } from './commune'
 import { StructureUtils } from 'room/structureUtils'

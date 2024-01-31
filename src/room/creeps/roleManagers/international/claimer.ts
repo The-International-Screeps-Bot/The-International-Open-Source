@@ -1,4 +1,4 @@
-import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'international/constants'
+import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from 'constants/general'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class Claimer extends Creep {

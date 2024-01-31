@@ -1,10 +1,10 @@
 import {
-    CreepMemoryKeys,
-    packedPosLength,
-    Result,
-    RoomMemoryKeys,
-    RoomTypes,
-} from 'international/constants'
+  CreepMemoryKeys,
+  packedPosLength,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+} from 'constants/general'
 import {
   findCarryPartsRequired,
   findObjectWithID,

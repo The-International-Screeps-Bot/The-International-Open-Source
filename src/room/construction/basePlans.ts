@@ -2,7 +2,7 @@ import { customLog } from 'utils/logging'
 import { packXYAsNum, splitStringAt } from 'utils/utils'
 import { packCoord, packBasePlanCoord, packXYAsCoord, unpackBasePlanCoords } from 'other/codec'
 import { encode, decode } from 'base32768'
-import { allStructureTypes } from 'international/constants'
+import { allStructureTypes } from 'constants/general'
 
 export class BasePlans {
   /**

@@ -1,5 +1,5 @@
 import { RoomNameUtils } from 'room/roomNameUtils'
-import { RoomMemoryKeys, RoomTypes, SegmentIDs, majorVersion } from './constants'
+import { RoomMemoryKeys, RoomTypes, SegmentIDs, majorVersion } from '../constants/general'
 import { RoomNameProcs } from 'room/roomNameProcs'
 
 /**

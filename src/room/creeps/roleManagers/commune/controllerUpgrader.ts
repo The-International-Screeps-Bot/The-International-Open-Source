@@ -1,4 +1,9 @@
-import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
+import {
+  CreepMemoryKeys,
+  ReservedCoordTypes,
+  RoomMemoryKeys,
+  packedPosLength,
+} from 'constants/general'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'

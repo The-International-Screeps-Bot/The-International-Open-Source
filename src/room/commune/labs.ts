@@ -1,4 +1,4 @@
-import { RoomLogisticsRequestTypes, minerals } from 'international/constants'
+import { RoomLogisticsRequestTypes, minerals } from 'constants/general'
 import { CommuneManager } from './commune'
 import { Hauler } from '../creeps/roleManagers/commune/hauler'
 import { findObjectWithID, getRange, randomTick, scalePriority } from 'utils/utils'

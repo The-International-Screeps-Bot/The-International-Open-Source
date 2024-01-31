@@ -1,11 +1,11 @@
 import {
-    impassibleStructureTypes,
-    customColors,
-    CreepMemoryKeys,
-    PlayerMemoryKeys,
-    ReservedCoordTypes,
-    FlagNames,
-} from 'international/constants'
+  impassibleStructureTypes,
+  customColors,
+  CreepMemoryKeys,
+  PlayerMemoryKeys,
+  ReservedCoordTypes,
+  FlagNames,
+} from 'constants/general'
 import { PlayerManager } from 'international/players'
 import {
   areCoordsEqual,

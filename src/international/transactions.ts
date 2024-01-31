@@ -1,5 +1,5 @@
 import { Sleepable } from 'utils/sleepable'
-import { IDUpdateInterval, RoomStatsKeys } from './constants'
+import { IDUpdateInterval, RoomStatsKeys } from '../constants/general'
 import { randomIntRange, Utils } from 'utils/utils'
 import { CollectiveManager } from './collective'
 import { SegmentsManager } from './segments'

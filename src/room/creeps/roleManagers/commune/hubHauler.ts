@@ -1,13 +1,13 @@
 import {
-    CreepMemoryKeys,
-    ReservedCoordTypes,
-    Result,
-    RoomLogisticsRequestTypes,
-    RoomMemoryKeys,
-    linkReceiveTreshold,
-    linkSendThreshold,
-    powerSpawnRefillThreshold,
-} from 'international/constants'
+  CreepMemoryKeys,
+  ReservedCoordTypes,
+  Result,
+  RoomLogisticsRequestTypes,
+  RoomMemoryKeys,
+  linkReceiveTreshold,
+  linkSendThreshold,
+  powerSpawnRefillThreshold,
+} from 'constants/general'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
