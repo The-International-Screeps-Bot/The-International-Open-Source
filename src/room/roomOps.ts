@@ -13,7 +13,7 @@ import { Dashboard, Rectangle, Table } from 'screeps-viz'
 import { packXYAsNum, randomTick } from 'utils/utils'
 import { RoomNameUtils } from './roomNameUtils'
 import { CommuneManager } from './commune/commune'
-import { CommuneProcs } from './commune/communeProcs'
+import { CommuneOps } from './commune/communeOps'
 import { LogisticsProcs } from './logisticsProcs'
 import { customLog } from 'utils/logging'
 import { unpackCoord } from 'other/codec'
@@ -23,7 +23,6 @@ import { roomData } from './roomData'
 import { RoomManager } from './room'
 
 export class RoomOps {
-
   /**
    * Not perfect, but should help reduce heap usage until RoomManagers are deprecated.
    */
@@ -169,13 +168,13 @@ export class RoomOps {
       CommuneManager.communeManagers[room.name] = room.communeManager
     }
 
-    CommuneProcs.update(room)
+    CommuneOps.update(room)
     return true
   }
 
   static initRun(room: Room) {
     if (room.communeManager) {
-      CommuneProcs.initRun(room)
+      CommuneOps.initRun(room)
       return
     }
   }
@@ -183,7 +182,7 @@ export class RoomOps {
   static run(room: Room) {
     const roomMemory = Memory.rooms[room.name]
     if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
-      CommuneProcs.run(room)
+      CommuneOps.run(room)
       return
     }
 

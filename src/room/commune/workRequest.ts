@@ -10,7 +10,7 @@ import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
 import { StatsManager } from 'international/stats'
 import { WorkRequest } from 'types/internationalRequests'
-import { CommuneProcs } from './communeProcs'
+import { CommuneOps } from './communeOps'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
 
@@ -192,7 +192,7 @@ export class WorkRequestManager {
 
     if (combatRequest[CombatRequestKeys.responder]) {
       const combatRequestResponder = Game.rooms[combatRequest[CombatRequestKeys.responder]]
-      CommuneProcs.deleteCombatRequest(
+      CommuneOps.deleteCombatRequest(
         combatRequestResponder,
         combatRequest[CombatRequestKeys.responder],
         combatRequestResponder.memory[RoomMemoryKeys.combatRequests].indexOf(workRequestName),

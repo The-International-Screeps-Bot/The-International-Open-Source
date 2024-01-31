@@ -21,21 +21,18 @@ import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
 import { LogTypes, customLog } from 'utils/logging'
 import { RoomOps } from './roomOps'
-import { CommuneProcs } from './commune/communeProcs'
+import { CommuneOps } from './commune/communeOps'
 
 export class RoomServices {
   static cleanManagers() {
-
     for (const roomName in RoomManager.roomManagers) {
-
       const roomManager = RoomManager.roomManagers[roomName]
       RoomOps.clean(roomManager)
     }
 
     for (const roomName in CommuneManager.communeManagers) {
-
       const communeManager = CommuneManager.communeManagers[roomName]
-      CommuneProcs.clean(communeManager)
+      CommuneOps.clean(communeManager)
     }
   }
 

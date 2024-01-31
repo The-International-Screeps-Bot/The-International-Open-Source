@@ -27,7 +27,7 @@ import { CommuneManager } from './commune'
 /**
  * Minor processes for communes
  */
-export class CommuneProcs {
+export class CommuneOps {
   static clean(communeManager: CommuneManager) {
     delete communeManager._maxCombatRequests
     delete communeManager._defensiveRamparts
@@ -91,7 +91,7 @@ export class CommuneProcs {
       roomMemory[RoomMemoryKeys.greatestRCL] = room.controller.level
     }
 
-    CommuneProcs.getRCLUpdate(room)
+    CommuneOps.getRCLUpdate(room)
 
     if (!roomMemory[RoomMemoryKeys.combatRequests]) roomMemory[RoomMemoryKeys.combatRequests] = []
     if (!roomMemory[RoomMemoryKeys.haulRequests]) roomMemory[RoomMemoryKeys.haulRequests] = []
@@ -202,7 +202,7 @@ export class CommuneProcs {
     room.roomManager.creepRoleManager.run()
     room.roomManager.powerCreepRoleManager.run()
 
-    CommuneProcs.tryUpdateMinHaulerCost(room)
+    CommuneOps.tryUpdateMinHaulerCost(room)
     SpawningStructureProcs.tryRunSpawning(room)
 
     SpawningStructureProcs.tryRegisterSpawningMovement(room)

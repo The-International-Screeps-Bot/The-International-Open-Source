@@ -21,7 +21,7 @@ import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { StructureUtils } from 'room/structureUtils'
-import { CommuneProcs } from './communeProcs'
+import { CommuneOps } from './communeOps'
 
 type RemoteSourcePathTypes =
   | RoomMemoryKeys.remoteSourceFastFillerPaths
@@ -93,7 +93,7 @@ export class RemotesManager {
         remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote ||
         remoteMemory[RoomMemoryKeys.commune] !== room.name
       ) {
-        CommuneProcs.removeRemote(room, remoteName, index)
+        CommuneOps.removeRemote(room, remoteName, index)
         continue
       }
 
@@ -106,7 +106,7 @@ export class RemotesManager {
         Utils.isTickInterval(checkRoomStatusInterval) &&
         Memory.rooms[room.name][RoomMemoryKeys.status] !== remoteMemory[RoomMemoryKeys.status]
       ) {
-        CommuneProcs.removeRemote(room, remoteName, index)
+        CommuneOps.removeRemote(room, remoteName, index)
         continue
       }
 

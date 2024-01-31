@@ -80,7 +80,7 @@ import { RoomDataOps } from 'room/roomData'
 import { CommuneDataOps } from 'room/commune/communeData'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepMoveProcs } from 'room/creeps/creepMoveProcs'
-import { CommuneProcs } from 'room/commune/communeProcs'
+import { CommuneOps } from 'room/commune/communeOps'
 import { PowerCreepProcs } from 'room/creeps/powerCreeps/powerCreepProcs'
 import { PowerCreepUtils } from 'room/creeps/powerCreeps/powerCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
@@ -179,7 +179,7 @@ export function profilerRegister() {
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
   profiler.registerClass(RoomDataOps, 'RoomDataProcs')
   profiler.registerClass(CommuneDataOps, 'CommuneDataProcs')
-  profiler.registerClass(CommuneProcs, 'CommuneProc')
+  profiler.registerClass(CommuneOps, 'CommuneProc')
   profiler.registerClass(RoomObjectUtils, 'RoomObjectUtils')
   profiler.registerClass(StructureUtils, 'StructureUtils')
   profiler.registerClass(RemoteProcs, 'RemoteProcs')

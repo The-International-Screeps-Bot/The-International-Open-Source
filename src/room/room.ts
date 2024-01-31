@@ -65,7 +65,7 @@ import { CollectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
 import { StructureUtils } from './structureUtils'
 import { LogisticsProcs } from './logisticsProcs'
-import { CommuneProcs } from './commune/communeProcs'
+import { CommuneOps } from './commune/communeOps'
 import { roomData } from './roomData'
 import { RoomOps } from './roomOps'
 

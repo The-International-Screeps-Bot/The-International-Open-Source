@@ -12,7 +12,7 @@ import { CommuneManager } from '../commune'
 import { SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
 import { CommuneUtils } from '../communeUtils'
 import { StructureUtils } from 'room/structureUtils'
-import { CommuneProcs } from '../communeProcs'
+import { CommuneOps } from '../communeOps'
 import { Utils } from 'utils/utils'
 import { RoomUtils } from 'room/roomUtils'
 
@@ -1686,9 +1686,7 @@ export class SpawnRequestsManager {
         minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
       )
 
-      const minAttackCost = Utils.findMinMeleeAttackCost(
-        request[CombatRequestKeys.minDamage],
-      )
+      const minAttackCost = Utils.findMinMeleeAttackCost(request[CombatRequestKeys.minDamage])
       const attackAmount = Math.floor(minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]))
 
       const minMeleeHealCost = Utils.findMinHealCost(
@@ -1720,7 +1718,7 @@ export class SpawnRequestsManager {
           (rangedAttackAmount + rangedHealAmount) * 2 > 50 ||
           attackAmount * 2 > 50
         ) {
-          CommuneProcs.deleteCombatRequest(this.communeManager.room, requestName, i)
+          CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, i)
           continue
         }
 
@@ -1847,7 +1845,7 @@ export class SpawnRequestsManager {
         minAttackCost + minMeleeHealCost > this.communeManager.room.energyCapacityAvailable ||
         minAttackCost > this.communeManager.room.energyCapacityAvailable
       ) {
-        CommuneProcs.deleteCombatRequest(this.communeManager.room, requestName, i)
+        CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, i)
         continue
       }
 

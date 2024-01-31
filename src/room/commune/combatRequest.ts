@@ -3,7 +3,7 @@ import { CommuneManager } from './commune'
 import { StatsManager } from 'international/stats'
 import { randomIntRange, Utils } from 'utils/utils'
 import { CombatRequest } from 'types/internationalRequests'
-import { CommuneProcs } from './communeProcs'
+import { CommuneOps } from './communeOps'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
 
@@ -176,7 +176,7 @@ export class CombatRequestManager {
     if (threateningAttacker) {
       request[CombatRequestKeys.abandon] = 1500
 
-      CommuneProcs.deleteCombatRequest(room, requestName, index)
+      CommuneOps.deleteCombatRequest(room, requestName, index)
       return
     }
 
@@ -186,7 +186,7 @@ export class CombatRequestManager {
       this.manageInaction(requestName, index)
     } else {
       if (!request[CombatRequestKeys.inactionTimerMax]) {
-        CommuneProcs.deleteCombatRequest(room, requestName, index)
+        CommuneOps.deleteCombatRequest(room, requestName, index)
         return
       }
 
@@ -243,7 +243,7 @@ export class CombatRequestManager {
       this.manageInaction(requestName, index)
     } else {
       if (!request[CombatRequestKeys.inactionTimerMax]) {
-        CommuneProcs.deleteCombatRequest(room, requestName, index)
+        CommuneOps.deleteCombatRequest(room, requestName, index)
         return
       }
 
@@ -255,7 +255,7 @@ export class CombatRequestManager {
     const request = Memory.combatRequests[requestName]
 
     if (request[CombatRequestKeys.inactionTimer] <= 0) {
-      CommuneProcs.deleteCombatRequest(this.communeManager.room, requestName, index)
+      CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, index)
       return
     }
   }
@@ -266,7 +266,7 @@ export class CombatRequestManager {
     if (request[CombatRequestKeys.abandonments] >= 3) {
       // Delete the request
 
-      CommuneProcs.deleteCombatRequest(this.communeManager.room, requestName, index)
+      CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, index)
       return
     }
 
