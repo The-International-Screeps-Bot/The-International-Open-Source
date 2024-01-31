@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, ReservedCoordTypes } from 'constants/general'
+import { CreepMemoryKeys, ReservedCoordTypes } from '../../../../constants/general'
 import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 import { StructureUtils } from 'room/structureUtils'

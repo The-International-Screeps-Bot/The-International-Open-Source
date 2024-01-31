@@ -1,4 +1,4 @@
-import { allResources, customColors } from 'constants/general'
+import { allResources, customColors } from '../constants/general'
 import { customLog } from 'utils/logging'
 import { findObjectWithID } from 'utils/utils'
 

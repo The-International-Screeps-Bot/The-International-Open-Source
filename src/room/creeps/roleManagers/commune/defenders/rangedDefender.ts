@@ -4,7 +4,7 @@ import {
     rangedMassAttackMultiplierByRange,
     CreepMemoryKeys,
     ReservedCoordTypes,
-} from 'constants/general'
+} from '../../../../../constants/general'
 import {
     areCoordsEqual,
     findClosestObject,

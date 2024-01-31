@@ -1,4 +1,4 @@
-import { CombatRequestKeys, CreepMemoryKeys } from 'constants/general'
+import { CombatRequestKeys, CreepMemoryKeys } from '../../../../constants/general'
 import { findClosestObject, getRange, Utils } from 'utils/utils'
 import { Antifa } from './antifa'
 

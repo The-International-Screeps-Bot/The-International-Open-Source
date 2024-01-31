@@ -11,7 +11,7 @@ import {
   roomDimensions,
   roomTypeProperties,
   roomTypes,
-} from 'constants/general'
+} from '../constants/general'
 import { CollectiveManager } from 'international/collective'
 import {
   findAdjacentCoordsToCoord,

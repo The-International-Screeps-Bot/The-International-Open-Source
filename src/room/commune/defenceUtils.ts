@@ -1,5 +1,5 @@
 import { CollectiveManager } from "international/collective"
-import { Result, ourImpassibleStructuresSet } from 'constants/general'
+import { Result, ourImpassibleStructuresSet } from '../../constants/general'
 import { packCoord } from "other/codec"
 import { RoomNameUtils } from "room/roomNameUtils"
 import { findObjectWithID, isAlly } from "utils/utils"

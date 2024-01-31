@@ -8,7 +8,7 @@ import {
   generalRepairStructureTypes,
   packedPosLength,
   structureTypesToProtectSet,
-} from 'constants/general'
+} from '../../constants/general'
 import { CollectiveManager } from 'international/collective'
 import { RoomUtils } from 'room/roomUtils'
 import { StructureUtils } from 'room/structureUtils'

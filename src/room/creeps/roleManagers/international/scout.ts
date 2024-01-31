@@ -5,7 +5,7 @@ import {
   RoomTypes,
   communeSign,
   nonCommuneSigns,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { getRangeXY, getRange, randomOf } from 'utils/utils'
 import { partial } from 'lodash'
 import { RoomNameUtils } from 'room/roomNameUtils'

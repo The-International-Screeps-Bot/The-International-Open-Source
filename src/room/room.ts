@@ -24,7 +24,7 @@ import {
   remoteTypeWeights,
   roomDimensions,
   roomTypesUsedForStats,
-} from 'constants/general'
+} from '../constants/general'
 import {
   findClosestObject,
   findHighestScore,

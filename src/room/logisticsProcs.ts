@@ -1,4 +1,4 @@
-import { RoomLogisticsRequestTypes } from 'constants/general'
+import { RoomLogisticsRequestTypes } from '../constants/general'
 import { scalePriority } from 'utils/utils'
 
 export class LogisticsProcs {

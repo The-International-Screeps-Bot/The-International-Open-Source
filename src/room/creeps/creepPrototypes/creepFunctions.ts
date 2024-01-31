@@ -9,7 +9,7 @@ import {
   WorkTypes,
   RoomLogisticsRequestTypes,
   RoomStatsKeys,
-} from 'constants/general'
+} from '../../../constants/general'
 import {
   findClosestObject,
   findObjectWithID,

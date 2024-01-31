@@ -1,4 +1,4 @@
-import { separateStoreStructureTypes } from 'constants/general'
+import { separateStoreStructureTypes } from '../constants/general'
 
 export class RoomObjectUtils {
   static freeNextStoreOf(

@@ -7,7 +7,7 @@ import {
   RoomMemoryKeys,
   RoomStatsKeys,
   WorkTypes,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { StatsManager } from 'international/stats'
 import {
   findCoordsInsideRect,

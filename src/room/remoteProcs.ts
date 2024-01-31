@@ -1,3 +1,3 @@
-import { RoomLogisticsRequestTypes } from 'constants/general'
+import { RoomLogisticsRequestTypes } from '../constants/general'
 
 export class RemoteProcs {}

@@ -4,7 +4,7 @@ import {
   HaulRequestKeys,
   NukeRequestKeys,
   WorkRequestKeys,
-} from 'constants/general'
+} from '../constants/general'
 
 export interface WorkRequest {
   [WorkRequestKeys.claimer]?: number

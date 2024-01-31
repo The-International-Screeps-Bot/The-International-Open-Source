@@ -1,4 +1,4 @@
-import { minerals, Result, RoomMemoryKeys } from 'constants/general'
+import { minerals, Result, RoomMemoryKeys } from '../../../constants/general'
 import { customLog } from 'utils/logging'
 import { newID, roundTo } from 'utils/utils'
 import './tradingUtils'

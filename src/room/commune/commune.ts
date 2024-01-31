@@ -13,7 +13,7 @@ import {
   RemoteResourcePathTypes,
   ReservedCoordTypes,
   RoomStatsKeys,
-} from 'constants/general'
+} from '../../constants/general'
 import './factory'
 import { LabManager } from './labs'
 import './links'

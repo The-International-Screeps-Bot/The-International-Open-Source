@@ -1,5 +1,5 @@
-import { PlayerRelationships } from 'constants/general'
-import { PlayerMemoryKeys } from 'constants/general'
+import { PlayerRelationships } from '../constants/general'
+import { PlayerMemoryKeys } from '../constants/general'
 
 export interface PlayerMemory {
   [PlayerMemoryKeys.offensiveThreat]: number
