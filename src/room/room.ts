@@ -85,6 +85,7 @@ export interface DeadCreepNames {
 export interface NotMyCreeps {
   ally: Creep[]
   enemy: Creep[]
+  invader: Creep[]
 }
 
 export interface NotMyConstructionSites {
@@ -892,12 +893,21 @@ export class RoomManager {
     const notMyCreeps: NotMyCreeps = {
       ally: [],
       enemy: [],
+      invader: [],
     }
 
     for (const creep of this.room.find(FIND_HOSTILE_CREEPS)) {
       if (isAlly(creep.owner.username)) {
         notMyCreeps.ally.push(creep)
         continue
+      }
+
+      if (creep.owner.username == 'Invader') {
+        notMyCreeps.invader.push(creep)
+
+        // TODO: Clean up invader checks on notMyCreeps.enemy(attackers) references
+
+        // continue // Remove once TODO is completed
       }
 
       // The creep isn't of an ally, so it's of an enemy!
