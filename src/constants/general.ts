@@ -751,15 +751,6 @@ export const combatTargetStructureTypes: Set<StructureConstant> = new Set([
 
 export const generalRepairStructureTypes = new Set([STRUCTURE_ROAD, STRUCTURE_CONTAINER])
 
-/**
- * These structures have seperate store capacities for different resources. For example, labs can hold minerals and energy, but at different amounts and without conflict
- */
-export const separateStoreStructureTypes = new Set<StructureConstant>([
-  STRUCTURE_LAB,
-  STRUCTURE_NUKER,
-  STRUCTURE_POWER_SPAWN,
-])
-
 export const customColors = {
   white: '#ffffff',
   lightGrey: '#eaeaea',
@@ -1051,17 +1042,6 @@ export const relayRoles: Set<CreepRoles> = new Set(['hauler'])
  * Used to modify the remaining bucket amount, resulting in the default cacheAmount for moveRequests
  */
 export const cacheAmountModifier = 25
-
-/**
- * Which structures should be safemoded when attacked
- */
-export const safemodeTargets: StructureConstant[] = [
-  STRUCTURE_SPAWN,
-  STRUCTURE_TOWER,
-  STRUCTURE_STORAGE,
-  STRUCTURE_TERMINAL,
-]
-export const safemodeTargetsSet = new Set(safemodeTargets)
 
 /**
  * The number of ticks to wait between hauler size updates

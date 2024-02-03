@@ -208,6 +208,11 @@ export class SpawnRequestConstructors {
                 : room.creepsFromRoom[args.role].length
         }
 
+        let extraPartsCost = 0
+        for (const part of args.extraParts) {
+            extraPartsCost += BODYPART_COST[part]
+        }
+
         // So long as there are totalExtraParts left to assign
 
         while (totalExtraParts >= args.extraParts.length && args.maxCreeps > 0) {
@@ -250,10 +255,25 @@ export class SpawnRequestConstructors {
                 }
             }
 
+            // Apply extraParts once without restrictions
+
+            tier += 1
+
+            for (const part of args.extraParts) {
+
+                cost += BODYPART_COST[part]
+                bodyPartCounts[part] += 1
+
+                remainingAllowedParts -= 1
+                totalExtraParts -= 1
+            }
+
+            // Apply additional extraParts with restrictions
+
             let stop = false
 
             // So long as the cost is less than the maxCostPerCreep and the size is below max size
-            while (cost < maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
+            while (cost - extraPartsCost <= maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
 
                 tier += 1
 
@@ -266,7 +286,7 @@ export class SpawnRequestConstructors {
                         break
                     }
 
-                    cost += BODYPART_COST[part]
+                    cost += partCost
                     bodyPartCounts[part] += 1
 
                     remainingAllowedParts -= 1
@@ -376,7 +396,7 @@ export class SpawnRequestConstructors {
                         break
                     }
 
-                    cost += BODYPART_COST[part]
+                    cost += partCost
                     bodyPartCounts[part] += 1
                     partsCount += 1
                 }

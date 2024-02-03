@@ -280,27 +280,9 @@ export class CollectiveManager {
    * {y, y, y, x, y}.
    * The last room wants to be funneled, however, only the first 3 rooms will be, excluding the last 2: {y, y, y, x, x}.
    */
-  static getFunnelingRoomNames() {
+  /* static getFunnelingRoomNames() {
     if (this._funnelingRoomNames) return this._funnelingRoomNames
-    /* if (this._funnelingRoomNames) return this._funnelingRoomNames
 
-    const funnelingRoomNames = new Set<string>()
-    const funnelTargets = this.funnelOrder
-
-    for (const roomName of funnelTargets) {
-      const room = Game.rooms[roomName]
-      if (!room.considerFunneled) {
-        funnelingRoomNames.add(roomName)
-        break
-      }
-
-      // Consider it funneled
-
-      funnelingRoomNames.add(roomName)
-    }
-
-    this._funnelingRoomNames = funnelingRoomNames
-    return funnelingRoomNames */
 
     const funnelOrder = this.getFunnelOrder()
     // Rooms that want to get funneled might not get to be if they aren't in line for funneling
@@ -320,7 +302,7 @@ export class CollectiveManager {
 
     this._funnelingRoomNames = funnelingRoomNames
     return funnelingRoomNames
-  }
+  } */
 
   /**
    * Qualifying rooms either want to be funneled, or the room next in line to get funneled wants to be funneled.
@@ -328,7 +310,7 @@ export class CollectiveManager {
    * CollectiveManager function will work from back to front so that if a previous room wants to be funneled, so will the proceeding one.
    * In CollectiveManager example, the set should convert to {y, y, y, y, x}
    */
-  private static getFunnelWanters(funnelOrder: string[]) {
+  /* private static getFunnelWanters(funnelOrder: string[]) {
     const funnelWanters = new Set<string>()
     let previousWantsToBeIndependentlyFunneled: boolean
 
@@ -338,7 +320,7 @@ export class CollectiveManager {
       const roomName = funnelOrder[i]
       const room = Game.rooms[roomName]
 
-      const wantsToBeFunneledIndependent = CommuneUtils.wantsToBeFunneledIndependent(room)
+      const wantsToBeFunneledIndependent = CommuneUtils.getUpgradeCapacity(room)
 
       if (!(previousWantsToBeIndependentlyFunneled && wantsToBeFunneledIndependent)) {
         previousWantsToBeIndependentlyFunneled = false
@@ -350,6 +332,42 @@ export class CollectiveManager {
     }
 
     return funnelWanters
+  } */
+
+  static getFunnelingRoomNames() {
+
+    const funnelTargets = new Set<string>()
+    // How much energy we are allowed to distribute each tick of funneling
+    let funnelDistribution = 0
+    const funnelTargetQuotas: {[roomName: string]: number} = {}
+
+    for (const roomName of CollectiveManager.communes) {
+      const room = Game.rooms[roomName]
+
+      const desiredStrength = CommuneUtils.getDesiredUpgraderStrength(room)
+      const maxUpgradeStrength = CommuneUtils.getMaxUpgradeStrength(room)
+      // We do not have enough desire
+      if (desiredStrength > maxUpgradeStrength) {
+
+        funnelDistribution += desiredStrength - maxUpgradeStrength
+        continue
+      }
+
+      funnelTargetQuotas[roomName] = maxUpgradeStrength
+    }
+
+    if (funnelDistribution === 0) return funnelTargets
+
+    for (const roomName in funnelTargetQuotas) {
+      const funnelQuota = funnelTargetQuotas[roomName]
+
+      funnelTargets.add(roomName)
+
+      funnelDistribution -= funnelQuota
+      if (funnelDistribution <= 0) break
+    }
+
+    return funnelTargets
   }
 
   static _resourcesInStoringStructures: Partial<{ [key in ResourceConstant]: number }>
