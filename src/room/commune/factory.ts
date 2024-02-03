@@ -1,4 +1,4 @@
-import { RoomMemoryKeys } from 'constants/general'
+import { RoomMemoryKeys } from '../../constants/general'
 import { CommuneManager, ResourceTargets } from './commune'
 import { CommuneUtils } from './communeUtils'
 

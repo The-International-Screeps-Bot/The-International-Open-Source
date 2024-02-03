@@ -6,7 +6,7 @@ import {
   PlayerMemoryKeys,
   CombatRequestKeys,
   defaultDataDecay,
-} from 'constants/general'
+} from '../../constants/general'
 import { PlayerManager } from "international/players"
 import { simpleAllies } from "international/simpleAllies/simpleAllies"
 import { packCoord } from "other/codec"

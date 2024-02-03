@@ -5,7 +5,7 @@ import {
   RoomTypes,
   customColors,
   roomDimensions,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { findClosestObject, getRangeXY, getRange, isExit, isXYExit } from 'utils/utils'
 import { Antifa } from './antifa'
 import { CustomPathFinderArgs } from 'international/customPathFinder'

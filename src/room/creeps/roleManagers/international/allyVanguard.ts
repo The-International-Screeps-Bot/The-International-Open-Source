@@ -5,7 +5,7 @@ import {
   RoomTypes,
   Result,
   ReservedCoordTypes,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { CreepUtils } from 'room/creeps/creepUtils'

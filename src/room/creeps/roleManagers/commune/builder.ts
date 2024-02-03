@@ -1,4 +1,4 @@
-import { Result, RoomLogisticsRequestTypes } from 'constants/general'
+import { Result, RoomLogisticsRequestTypes } from '../../../../constants/general'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, getRange } from 'utils/utils'
 

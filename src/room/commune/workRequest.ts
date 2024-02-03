@@ -4,7 +4,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   customColors,
-} from 'constants/general'
+} from '../../constants/general'
 import { randomIntRange, randomTick, Utils } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'

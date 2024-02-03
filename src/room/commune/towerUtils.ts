@@ -1,4 +1,4 @@
-import { towerPowers } from 'constants/general'
+import { towerPowers } from '../../constants/general'
 import { findWithLowestScore, getRange } from 'utils/utils'
 import { CommuneDataOps, communeData } from './communeData'
 import { CommuneUtils } from './communeUtils'

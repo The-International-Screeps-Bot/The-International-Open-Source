@@ -15,7 +15,7 @@ import {
   buildableStructureTypes,
   structureTypesToProtectSet,
   RoomMemoryKeys,
-} from 'constants/general'
+} from '../constants/general'
 import {
   areCoordsEqual,
   createPosMap,

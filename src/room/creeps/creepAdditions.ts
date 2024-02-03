@@ -5,7 +5,7 @@ import {
   dismantleBoostsSet,
   roomDimensions,
   towerPowers,
-} from 'constants/general'
+} from '../../constants/general'
 import { customLog } from 'utils/logging'
 import { getRangeXY, getRange, isXYExit, isExit } from 'utils/utils'
 import { profiler } from 'other/profiler'

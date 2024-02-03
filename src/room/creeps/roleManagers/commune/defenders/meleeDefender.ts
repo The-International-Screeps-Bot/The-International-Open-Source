@@ -5,7 +5,7 @@ import {
   PlayerMemoryKeys,
   ReservedCoordTypes,
   FlagNames,
-} from 'constants/general'
+} from '../../../../../constants/general'
 import { PlayerManager } from 'international/players'
 import {
   areCoordsEqual,

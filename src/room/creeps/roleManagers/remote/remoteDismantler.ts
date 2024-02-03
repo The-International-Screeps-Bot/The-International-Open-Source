@@ -4,7 +4,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   remoteTypeWeights,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { findObjectWithID, getRangeXY, randomTick } from 'utils/utils'
 
 export class RemoteDismantler extends Creep {

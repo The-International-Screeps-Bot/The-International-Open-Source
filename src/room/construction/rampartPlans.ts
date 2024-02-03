@@ -1,7 +1,7 @@
 import { packXYAsNum } from 'utils/utils'
 import { packCoord, packRampartPlanCoord, packXYAsCoord } from 'other/codec'
 import { encode, decode } from 'base32768'
-import { allStructureTypes } from 'constants/general'
+import { allStructureTypes } from '../../constants/general'
 
 export class RampartPlans {
   /**

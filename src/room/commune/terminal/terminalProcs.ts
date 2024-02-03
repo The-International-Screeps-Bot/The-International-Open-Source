@@ -1,5 +1,5 @@
 import { CollectiveManager } from 'international/collective'
-import { Result } from 'constants/general'
+import { Result } from '../../../constants/general'
 import { MarketManager } from 'international/market/marketOrders'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { StructureUtils } from 'room/structureUtils'

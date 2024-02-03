@@ -7,7 +7,7 @@ import {
   linkReceiveTreshold,
   linkSendThreshold,
   powerSpawnRefillThreshold,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'

@@ -1,4 +1,4 @@
-import { RoomMemoryKeys } from 'constants/general'
+import { RoomMemoryKeys } from '../../constants/general'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { forRoomNamesAroundRangeXY, Utils } from 'utils/utils'
 

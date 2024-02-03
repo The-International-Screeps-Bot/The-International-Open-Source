@@ -8,7 +8,7 @@ import {
   RoomTypes,
   creepRoles,
   haulerUpdateDefault,
-} from 'constants/general'
+} from '../../constants/general'
 import { Utils, randomIntRange, randomTick } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { RoomNameUtils } from 'room/roomNameUtils'

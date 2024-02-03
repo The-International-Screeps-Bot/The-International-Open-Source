@@ -4,7 +4,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   remoteTypeWeights,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { findClosestObject, getRangeXY, randomIntRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
 

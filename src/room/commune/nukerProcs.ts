@@ -3,7 +3,7 @@ import {
   Result,
   NukeRequestKeys,
   RoomLogisticsRequestTypes,
-} from 'constants/general'
+} from '../../constants/general'
 import { RoomObjectUtils } from 'room/roomObjectUtils'
 
 const nukerResources = [RESOURCE_ENERGY, RESOURCE_GHODIUM]

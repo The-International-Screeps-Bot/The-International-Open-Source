@@ -1,4 +1,4 @@
-import { SegmentIDs } from 'constants/general'
+import { SegmentIDs } from '../constants/general'
 
 /**
  * Rather cpu intensive and unavoidably inefficient. Try to avoid this needing to ba called

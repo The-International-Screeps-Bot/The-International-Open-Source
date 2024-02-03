@@ -1,4 +1,4 @@
-import { CreepMemoryKeys, ReservedCoordTypes, Result, roomDimensions } from 'constants/general'
+import { CreepMemoryKeys, ReservedCoordTypes, Result, roomDimensions } from '../../../../constants/general'
 import { StatsManager } from 'international/stats'
 import { findCoordsInsideRect, findObjectWithID, getRange } from 'utils/utils'
 import { packCoord } from 'other/codec'

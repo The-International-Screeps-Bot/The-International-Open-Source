@@ -1,4 +1,4 @@
-import { decayCosts } from "constants/general"
+import { decayCosts } from "../constants/general"
 
 Object.defineProperties(Resource.prototype, {
      nextAmount: {

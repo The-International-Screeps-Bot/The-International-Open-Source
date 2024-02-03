@@ -9,7 +9,7 @@ import {
   ReservedCoordTypes,
   MovedTypes,
   FlagNames,
-} from 'constants/general'
+} from '../../../constants/general'
 import { CollectiveManager } from 'international/collective'
 import {
   areCoordsEqual,

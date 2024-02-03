@@ -1,4 +1,4 @@
-import { CreepMemoryKeys } from 'constants/general'
+import { CreepMemoryKeys } from '../../../../constants/general'
 import { CollectiveManager } from 'international/collective'
 
 export class RequestHauler extends Creep {

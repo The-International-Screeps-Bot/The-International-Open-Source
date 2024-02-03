@@ -1,4 +1,4 @@
-import { customColors, powerCreepClassNames } from 'constants/general'
+import { customColors, powerCreepClassNames } from '../../constants/general'
 import { statsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { RoomManager } from 'room/room'
