@@ -1,4 +1,4 @@
-import { RoomMemoryKeys, RoomTypes, roomDimensions } from 'constants/general'
+import { RoomMemoryKeys, RoomTypes, roomDimensions } from '../constants/general'
 import { packCoord, packXYAsCoord, unpackCoord } from 'other/codec'
 import { RoomDataOps, roomData } from './roomData'
 import { findObjectWithID, forAdjacentCoords, Utils } from 'utils/utils'

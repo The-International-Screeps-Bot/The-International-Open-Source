@@ -7,7 +7,7 @@ import {
   FlagNames,
 } from '../constants/general'
 import { customLog } from './logging'
-import { PlayerRelationships } from 'constants/general'
+import { PlayerRelationships } from '../constants/general'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
 

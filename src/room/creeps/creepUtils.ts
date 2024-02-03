@@ -12,7 +12,7 @@ import {
   packedPosLength,
   roomLogisticsRoles,
   storingStructureTypesSet,
-} from 'constants/general'
+} from '../../constants/general'
 import { StatsManager } from 'international/stats'
 import { arePositionsEqual, findObjectWithID, findWithLowestScore, getRange } from 'utils/utils'
 import { CreepRoleManager } from './creepRoleManager'

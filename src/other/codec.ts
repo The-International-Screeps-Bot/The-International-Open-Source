@@ -1,5 +1,5 @@
 // eslint-disable
-import { buildableStructureTypes, packedPosLength, stampKeys } from 'constants/general'
+import { buildableStructureTypes, packedPosLength, stampKeys } from '../constants/general'
 import { encode, decode } from 'base32768'
 
 /**

@@ -4,7 +4,7 @@ import {
   Result,
   RoomMemoryKeys,
   RoomTypes,
-} from 'constants/general'
+} from '../../../../constants/general'
 import {
   findCarryPartsRequired,
   findObjectWithID,

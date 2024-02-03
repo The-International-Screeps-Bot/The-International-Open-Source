@@ -1,4 +1,4 @@
-import { CreepLogisticsRequestKeys, RoomLogisticsRequestTypes } from 'constants/general'
+import { CreepLogisticsRequestKeys, RoomLogisticsRequestTypes } from '../constants/general'
 
 export type RoomLogisticsTargets = AnyStoreStructure | Creep | Tombstone | Ruin | Resource
 

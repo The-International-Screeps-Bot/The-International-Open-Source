@@ -6,7 +6,7 @@ import {
   Result,
   RoomMemoryKeys,
   structureTypesToProtectSet,
-} from 'constants/general'
+} from '../../constants/general'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, packAsNum, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'

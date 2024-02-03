@@ -203,7 +203,7 @@ export enum CreepTaskKeys {
 export enum CreepTaskNames {
   // Creep
 
-  harvestMineral,
+  // harvestMineral,
 
   // Power Creep
 
@@ -1021,12 +1021,12 @@ export const antifaRoles: (
   | 'antifaDismantler'
   | 'antifaDowngrader'
 )[] = [
-  'antifaRangedAttacker',
-  'antifaAttacker',
-  'antifaHealer',
-  'antifaDismantler',
-  'antifaDowngrader',
-]
+    'antifaRangedAttacker',
+    'antifaAttacker',
+    'antifaHealer',
+    'antifaDismantler',
+    'antifaDowngrader',
+  ]
 
 /**
  * Roles for which to provide spawnGroups for based on their shared remoteName

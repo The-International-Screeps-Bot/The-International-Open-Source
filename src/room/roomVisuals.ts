@@ -9,7 +9,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   FlagNames,
-} from 'constants/general'
+} from '../constants/general'
 import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'

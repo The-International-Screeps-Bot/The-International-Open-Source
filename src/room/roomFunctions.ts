@@ -16,7 +16,7 @@ import {
   RemoteResourcePathTypes,
   FlagNames,
   RoomStatusKeys,
-} from 'constants/general'
+} from '../constants/general'
 import {
   findAdjacentCoordsToCoord,
   findCoordsInsideRect,

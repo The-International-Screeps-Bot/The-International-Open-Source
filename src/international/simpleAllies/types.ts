@@ -1,4 +1,4 @@
-import { Command } from '../collectivizer'
+// import { Command } from '../collectivizer'
 
 /**
  * Represents the segment data for simpleAllies.
@@ -7,7 +7,7 @@ export interface SimpleAlliesSegment {
   econ?: EconInfo
   requests: AllyRequests
   updated: number
-  commands: Command[]
+  // commands: Command[]
 }
 
 /**

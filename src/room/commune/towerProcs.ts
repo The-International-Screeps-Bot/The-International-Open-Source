@@ -1,4 +1,4 @@
-import { PlayerMemoryKeys, RoomLogisticsRequestTypes, RoomStatsKeys } from 'constants/general'
+import { PlayerMemoryKeys, RoomLogisticsRequestTypes, RoomStatsKeys } from '../../constants/general'
 import { PlayerManager } from 'international/players'
 import { StatsManager } from 'international/stats'
 import { packCoord } from 'other/codec'

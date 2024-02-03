@@ -6,7 +6,7 @@ import {
   antifaRoles,
   customColors,
   squadQuotas,
-} from 'constants/general'
+} from '../../../../constants/general'
 import { customLog } from 'utils/logging'
 import { findClosestObject, getRangeXY, isExit, isXYExit } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'

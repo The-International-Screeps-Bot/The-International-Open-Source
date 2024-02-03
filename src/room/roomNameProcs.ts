@@ -1,4 +1,4 @@
-import { Result, RoomMemoryKeys, RoomStatusKeys, RoomTypes } from 'constants/general'
+import { Result, RoomMemoryKeys, RoomStatusKeys, RoomTypes } from '../constants/general'
 
 export class RoomNameProcs {
   static findAndRecordStatus(roomName: string, roomMemory = Memory.rooms[roomName]) {

@@ -10,7 +10,7 @@ import {
   customColors,
   packedQuadAttackMemberOffsets,
   quadAttackMemberOffsets,
-} from 'constants/general'
+} from '../../../../constants/general'
 import {
   arePositionsEqual,
   doesCoordExist,

@@ -1,4 +1,4 @@
-import { RoomMemoryKeys } from 'constants/general'
+import { RoomMemoryKeys } from '../constants/general'
 
 export class StructureUtils {
   static isRCLActionable(structure: Structure) {

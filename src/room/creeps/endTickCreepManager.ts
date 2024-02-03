@@ -6,7 +6,7 @@ import {
   enemyDieChants,
   friendlyDieChants,
   powerCreepClassNames,
-} from 'constants/general'
+} from '../../constants/general'
 import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'

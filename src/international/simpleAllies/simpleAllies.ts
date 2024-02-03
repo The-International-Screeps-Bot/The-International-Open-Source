@@ -108,7 +108,7 @@ export class SimpleAllies {
 
     const newSegmentData: SimpleAlliesSegment = {
       requests: this.myRequests as AllyRequests,
-      commands: CollectiveManager.myCommands,
+      // commands: CollectiveManager.myCommands,
       updated: Game.time,
     }
 
