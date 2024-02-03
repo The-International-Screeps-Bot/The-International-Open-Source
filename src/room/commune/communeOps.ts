@@ -57,6 +57,8 @@ export class CommuneOps {
 
     const roomMemory = Memory.rooms[room.name]
 
+    roomMemory[RoomMemoryKeys.lastScout] = Game.time
+
     // If we should abandon the room
 
     if (roomMemory[RoomMemoryKeys.abandonCommune] === true) {
