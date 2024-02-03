@@ -21,6 +21,7 @@ import { customLog, LogTypes } from 'utils/logging'
 import { getRange, findAdjacentCoordsToCoord, Utils } from 'utils/utils'
 import { SpawnRequestConstructor, SpawnRequestConstructors } from './spawnRequestConstructors'
 import { CommuneUtils } from '../communeUtils'
+import { DebugUtils } from 'debug/debugUtils'
 
 export class SpawningStructureProcs {
   public static tryRunSpawning(room: Room) {
@@ -156,7 +157,7 @@ export class SpawningStructureProcs {
     if (result !== OK) {
       customLog(
         'Failed to spawn: spawning failed',
-        `error: ${result}, request: ${global.DebugUtils.stringify(request)}`,
+        `error: ${result}, request: ${DebugUtils.stringify(request)}`,
         {
           type: LogTypes.error,
           position: 3,

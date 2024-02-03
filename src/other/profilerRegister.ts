@@ -222,7 +222,7 @@ export function profilerRegister() {
 
   // Objects
 
-  profiler.registerObject(global.DebugUtils, 'DebugUtils')
+  profiler.registerObject(DebugUtils, 'DebugUtils')
 
   // Room objects
 
