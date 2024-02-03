@@ -9,6 +9,8 @@ import {
 import { getRangeXY, getRange, randomOf } from 'utils/utils'
 import { partial } from 'lodash'
 import { RoomNameUtils } from 'room/roomNameUtils'
+import { RoomNameOps } from 'room/roomNameOps'
+import { RoomOps } from 'room/roomOps'
 
 export class Scout extends Creep {
   scoutedRooms?: string[]
@@ -235,15 +237,8 @@ export class Scout extends Creep {
       if (creepMemory[CreepMemoryKeys.scoutTarget] === room.name) {
         creep.message = '👁️'
 
-        // Get information about the room
-
-        room.advancedScout(creep.commune)
-
-        // Clean the room's memory
-
+        RoomOps.advancedScout(room, creep.commune)
         RoomNameUtils.cleanMemory(room.name)
-
-        // And delete the creep's scoutTarget
 
         delete creepMemory[CreepMemoryKeys.scoutTarget]
       }

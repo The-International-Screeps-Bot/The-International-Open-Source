@@ -23,6 +23,7 @@ import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
 import { TowerProcs } from './towerProcs'
 import { HaulerNeedOps } from './haulerNeedOps'
 import { CommuneManager } from './commune'
+import { RoomOps } from 'room/roomOps'
 
 /**
  * Minor processes for communes
@@ -57,7 +58,9 @@ export class CommuneOps {
 
     const roomMemory = Memory.rooms[room.name]
 
-    roomMemory[RoomMemoryKeys.lastScout] = Game.time
+    if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
+      RoomOps.advancedScout(room, room)
+    }
 
     // If we should abandon the room
 
@@ -319,4 +322,6 @@ export class CommuneOps {
     remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
     RoomNameUtils.cleanMemory(remoteName)
   }
+
+
 }

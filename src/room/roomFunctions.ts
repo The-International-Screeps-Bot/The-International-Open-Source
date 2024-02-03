@@ -35,7 +35,7 @@ import { PlayerManager } from 'international/players'
 import { RoomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
 import { RoomObjectUtils } from './roomObjectUtils'
-import { RoomNameProcs } from './roomNameProcs'
+import { RoomNameOps } from './roomNameOps'
 import { RoomOps } from './roomOps'
 
 /**
@@ -68,7 +68,11 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
   room.visual.line(pos1, pos2, { color })
 }
 
-Room.prototype.targetVisual = function (coord1, coord2, visualize = !!Game.flags[FlagNames.roomVisuals]) {
+Room.prototype.targetVisual = function (
+  coord1,
+  coord2,
+  visualize = !!Game.flags[FlagNames.roomVisuals],
+) {
   if (!visualize) return
 
   this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
@@ -616,116 +620,6 @@ Room.prototype.scoutEnemyRoom = function () {
   this.createAttackCombatRequest()
 
   roomMemory[RoomMemoryKeys.type] = RoomTypes.enemy
-  return roomMemory[RoomMemoryKeys.type]
-}
-
-Room.prototype.basicScout = function () {
-  const { controller } = this
-  const roomMemory = Memory.rooms[this.name]
-
-  if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
-    RoomNameProcs.findAndRecordStatus(this.name, roomMemory)
-  }
-
-  // Record that the room was scouted this tick
-  roomMemory[RoomMemoryKeys.lastScout] = Game.time
-
-  if (!controller) return roomMemory[RoomMemoryKeys.type]
-
-  // If the contoller is owned
-  if (controller.owner) {
-    // Stop if the controller is owned by me
-
-    if (controller.my) return roomMemory[RoomMemoryKeys.type]
-
-    const owner = controller.owner.username
-    roomMemory[RoomMemoryKeys.owner] = owner
-
-    // If the controller is owned by an ally
-
-    if (global.settings.allies.includes(owner))
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.ally)
-
-    return this.scoutEnemyRoom()
-  }
-
-  this.createWorkRequest()
-
-  // There is no controller owner
-
-  if (this.scoutRemote()) return roomMemory[RoomMemoryKeys.type]
-
-  return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
-}
-
-Room.prototype.advancedScout = function (scoutingRoom: Room) {
-  const roomMemory = Memory.rooms[this.name]
-
-  if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
-    RoomNameProcs.findAndRecordStatus(this.name, roomMemory)
-  }
-
-  // Record that the room was scouted this tick
-  roomMemory[RoomMemoryKeys.lastScout] = Game.time
-
-  // If the room already has a type and its type is constant, no need to go further
-  if (constantRoomTypes.has(roomMemory[RoomMemoryKeys.type])) {
-    return roomMemory[RoomMemoryKeys.type]
-  }
-
-  const { controller } = this
-  if (controller) {
-    roomMemory[RoomMemoryKeys.controllerCoord] = packCoord(controller.pos)
-  }
-
-  const sources = this.find(FIND_SOURCES)
-  if (sources.length) {
-    const packedSourceCoords = packCoordList(sources.map(source => source.pos))
-    roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
-  }
-
-  const roomNameScoutType = RoomNameProcs.findAndRecordConstantType(this.name)
-  if (roomNameScoutType !== Result.fail) {
-    if (roomNameScoutType === RoomTypes.sourceKeeper) {
-      // Record the positions of keeper lairs
-
-      const lairCoords = this.roomManager.structures.keeperLair.map(lair => lair.pos)
-      roomMemory[RoomMemoryKeys.keeperLairCoords] = packCoordList(lairCoords)
-    }
-
-    return roomMemory[RoomMemoryKeys.type]
-  }
-
-  // If there is a controller
-  if (controller) {
-    // If the contoller is owned
-
-    if (controller.owner) {
-      // Stop if the controller is owned by me
-
-      if (controller.my) return roomMemory[RoomMemoryKeys.type]
-
-      const owner = controller.owner.username
-
-      roomMemory[RoomMemoryKeys.owner] = owner
-
-      // If the controller is owned by an ally
-
-      if (global.settings.allies.includes(owner))
-        return (roomMemory[RoomMemoryKeys.type] = RoomTypes.ally)
-
-      return this.scoutEnemyRoom()
-    }
-
-    this.createWorkRequest()
-
-    // No controlller owner
-
-    if (this.scoutRemote(scoutingRoom)) return roomMemory[RoomMemoryKeys.type]
-
-    return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
-  }
-
   return roomMemory[RoomMemoryKeys.type]
 }
 

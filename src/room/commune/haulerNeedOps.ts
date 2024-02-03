@@ -12,25 +12,17 @@ export class HaulerNeedOps {
       room.memory[RoomMemoryKeys.mineralPath].length / packedPosLength + 3,
       (room.communeManager.mineralHarvestStrength / EXTRACTOR_COOLDOWN) * 1.1,
     )
-    room.communeManager.communeHaulerNeed += room.roomManager.structures.lab.length
+    const structures = room.roomManager.structures
+    room.communeManager.communeHaulerNeed += structures.lab.length
 
-    const extensions =
-      room.roomManager.structures.extension.length - stamps.fastFiller.structures.extension.length
+    const extensions = structures.extension.length - stamps.fastFiller.structures.extension.length
     if (extensions > 0) {
-      room.roomManager.structures.extension.length / (room.towerInferiority ? 1.5 : 4)
+      structures.extension.length / (room.towerInferiority ? 1.5 : 4)
     }
 
     /* haulerNeed += room.roomManager.structures.extension.length / 10 */
 
-    if (
-      (room.controller.level >= 4 && room.storage) ||
-      (room.terminal && room.controller.level >= 6)
-    ) {
-      room.communeManager.communeHaulerNeed +=
-        Memory.stats.rooms[room.name][RoomStatsKeys.EnergyOutputSpawn] / 10
-      room.communeManager.communeHaulerNeed +=
-        Memory.stats.rooms[room.name][RoomStatsKeys.SpawnUsagePercentage] * 8
-    }
+    this.storingStructureNeed(room)
 
     room.communeManager.communeHaulerNeed = Math.round(room.communeManager.communeHaulerNeed)
   }
@@ -97,5 +89,15 @@ export class HaulerNeedOps {
       room.communeManager.upgradeStrength * 1.1,
     )
     return
+  }
+
+  private static storingStructureNeed(room: Room) {
+    const storingStructures = CommuneUtils.storingStructures(room)
+    if (!storingStructures.length) return
+
+    room.communeManager.communeHaulerNeed +=
+      Memory.stats.rooms[room.name][RoomStatsKeys.EnergyOutputSpawn] / 10
+    room.communeManager.communeHaulerNeed +=
+      Memory.stats.rooms[room.name][RoomStatsKeys.SpawnUsagePercentage] * 8
   }
 }

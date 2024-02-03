@@ -1,6 +1,6 @@
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { RoomMemoryKeys, RoomTypes, SegmentIDs, majorVersion } from '../constants/general'
-import { RoomNameProcs } from 'room/roomNameProcs'
+import { RoomNameOps } from 'room/roomNameOps'
 
 /**
  * Migrate version by performing actions, if required
@@ -76,7 +76,7 @@ export class MigrationManager {
     }
     if (Memory.breakingVersion === 126) {
       for (const roomName in Memory.rooms) {
-        RoomNameProcs.findAndRecordStatus(roomName)
+        RoomNameOps.findAndRecordStatus(roomName)
       }
       Memory.breakingVersion += 1
     }

@@ -22,7 +22,6 @@ export class InitManager {
 
     this.initSegments()
 
-    Memory.breakingVersion = global.settings.breakingVersion
     Memory.me = getMe()
     /* (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
@@ -42,6 +41,8 @@ export class InitManager {
     Memory.haulRequests = {}
     Memory.nukeRequests = {}
     StatsManager.internationalConfig()
+
+    Memory.breakingVersion = global.settings.breakingVersion
   }
 
   /**
@@ -50,14 +51,9 @@ export class InitManager {
   private static initGlobal() {
     if (global.constructed) return
 
-    global.constructed = true
-
     this.initPlayers()
 
-    for (const roomName in Memory.rooms) {
-
-      RoomNameUtils.basicScout(roomName)
-    }
+    global.constructed = true
   }
 
   private static initPlayers() {

@@ -18,6 +18,7 @@ import {
   forAdjacentCoords,
   forRoomNamesAroundRangeXY,
   getRange,
+  isAlly,
   packAsNum,
   packXYAsNum,
   roundTo,
@@ -26,7 +27,7 @@ import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
 import { RoomOps } from './roomOps'
-import { RoomNameProcs } from './roomNameProcs'
+import { RoomNameOps } from './roomNameOps'
 import { RoomUtils } from './roomUtils'
 
 /**
@@ -342,7 +343,7 @@ export class RoomNameUtils {
     const roomMemory = Memory.rooms[roomName]
     if (roomMemory === undefined) {
       const roomMemory = (Memory.rooms[roomName] = {} as RoomMemory)
-      RoomNameUtils.basicScout(roomName)
+      RoomNameOps.basicScout(roomName)
 
       return roomMemory[RoomMemoryKeys.status]
     }
@@ -350,44 +351,5 @@ export class RoomNameUtils {
     // Otherwise there is room memory
 
     return roomMemory[RoomMemoryKeys.status]
-  }
-
-  static basicScout(roomName: string, room = Game.rooms[roomName]) {
-    const roomMemory = Memory.rooms[roomName]
-
-    if (roomMemory[RoomMemoryKeys.lastScout] === undefined) {
-      RoomNameProcs.findAndRecordStatus(roomName, roomMemory)
-    }
-
-    // Record that the room was scouted this tick
-    roomMemory[RoomMemoryKeys.lastScout] = Game.time
-
-    if (!room) return roomMemory[RoomMemoryKeys.type]
-    if (!room.controller) return roomMemory[RoomMemoryKeys.type]
-
-    // If the contoller is owned
-    if (room.controller.owner) {
-      // Stop if the controller is owned by me
-
-      if (room.controller.my) return roomMemory[RoomMemoryKeys.type]
-
-      const owner = room.controller.owner.username
-      roomMemory[RoomMemoryKeys.owner] = owner
-
-      // If the controller is owned by an ally
-
-      if (global.settings.allies.includes(owner))
-        return (roomMemory[RoomMemoryKeys.type] = RoomTypes.ally)
-
-      return room.scoutEnemyRoom()
-    }
-
-    room.createWorkRequest()
-
-    // There is no controller owner
-
-    if (room.scoutRemote()) return roomMemory[RoomMemoryKeys.type]
-
-    return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
   }
 }

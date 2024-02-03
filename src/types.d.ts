@@ -551,14 +551,6 @@ declare global {
 
     scoutEnemyRoom(): number
 
-    basicScout(): number
-
-    /**
-     * Finds the type of a room and initializes its custom properties
-     * @param scoutingRoom The room that is performing the scout operation
-     */
-    advancedScout(scoutingRoom: Room): number
-
     makeRemote(scoutingRoom: Room): boolean
 
     createAttackCombatRequest(opts?: Partial<CombatRequest>): void
